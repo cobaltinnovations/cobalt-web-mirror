@@ -1,0 +1,254 @@
+{
+	"id": "790a36aa-7f5e-4c41-9b68-65539ae04020",
+	"epicProfile": {
+		"resourceType": "Patient",
+		"id": "eyoElyx5GA24lzyLY9DJh5g3",
+		"extension": [
+			{
+				"url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+				"extension": [
+					{
+						"url": "ombCategory",
+						"valueCoding": {
+							"system": "http://hl7.org/fhir/us/core/ValueSet/omb-race-category",
+							"code": "UNK",
+							"display": "Unknown"
+						}
+					},
+					{
+						"url": "text",
+						"valueString": "Unknown"
+					}
+				]
+			},
+			{
+				"url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+				"extension": [
+					{
+						"url": "ombCategory",
+						"valueCoding": {
+							"system": "http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category",
+							"code": "UNK",
+							"display": "Unknown"
+						}
+					},
+					{
+						"url": "text",
+						"valueString": "Unknown"
+					}
+				]
+			},
+			{
+				"url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+				"valueCode": "F"
+			}
+		],
+		"identifier": [
+			{
+				"use": "usual",
+				"type": {
+					"text": "CCH"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.110",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "DCR"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.104",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "EPI"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.0",
+				"value": "11401802"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "EXTERNAL"
+				},
+				"value": "Z001"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "FHIR"
+				},
+				"value": "T1u8Cz7J2I3n1mGTaYuBOOX4tuHbtYzlgY5qe3qxL8AQB"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "FHIR STU3"
+				},
+				"value": "eyoElyx5GA24lzyLY9DJh5g3"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "HUP"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.100",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "HUP SMS"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.101",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "INTERNAL"
+				},
+				"value": "      Z001"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "MCP"
+				},
+				"system": "urn:oid:2.16.840.1.113883.3.2023.1.2.4.2.0",
+				"value": "642006837"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "MYC"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.2",
+				"value": "EPICDAD"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "MYCHARTLOGIN"
+				},
+				"value": "EPICDAD"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "PAH"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.103",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "PMC"
+				},
+				"system": "urn:oid:1.2.840.114350.1.13.87.3.7.5.737384.102",
+				"value": "330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "UID"
+				},
+				"system": "urn:oid:1.3.6.1.4.1.22812.19.44324.0",
+				"value": "8330009978"
+			},
+			{
+				"use": "usual",
+				"type": {
+					"text": "WPRINTERNAL"
+				},
+				"value": "8"
+			}
+		],
+		"active": true,
+		"name": [
+			{
+				"use": "official",
+				"text": "DAD Zzzepic",
+				"family": "Zzzepic",
+				"given": ["DAD"]
+			},
+			{
+				"use": "usual",
+				"text": "DAD Zzzepic",
+				"family": "Zzzepic",
+				"given": ["dsfsafd"]
+			}
+		],
+		"telecom": [
+			{
+				"system": "phone",
+				"value": "215-555-2020",
+				"use": "home"
+			},
+			{
+				"system": "phone",
+				"value": "215-555-1212",
+				"use": "work"
+			},
+			{
+				"system": "phone",
+				"value": "215-555-1111",
+				"use": "mobile"
+			},
+			{
+				"system": "email",
+				"value": "fake.person@example.edu"
+			}
+		],
+		"gender": "male",
+		"deceasedBoolean": false,
+		"address": [
+			{
+				"use": "home",
+				"line": ["111 Fake St."],
+				"city": "PHILADELPHIA",
+				"district": "PHILADELPHIA",
+				"state": "PA",
+				"postalCode": "19104",
+				"country": "USA"
+			}
+		],
+		"maritalStatus": {
+			"text": "Single"
+		},
+		"communication": [
+			{
+				"language": {
+					"coding": [
+						{
+							"system": "http://hl7.org/fhir/ValueSet/languages",
+							"code": "fj",
+							"display": "Fijian"
+						}
+					],
+					"text": "Fijian"
+				},
+				"preferred": true
+			}
+		],
+		"generalPractitioner": [
+			{
+				"reference": "https://ssproxytest.example.com/POC-FHIR/api/FHIR/STU3/Practitioner/xxx",
+				"display": "Dr. G Ruggiero"
+			}
+		],
+		"managingOrganization": {
+			"reference": "https://ssproxytest.example.com/POC-FHIR/api/FHIR/STU3/Organization/xxx",
+			"display": "Example Institution"
+		}
+	},
+	"specialist": null,
+	"referredToPic": null,
+	"cobaltAccountId": "2ae397bc-44c9-469b-b5db-dffa469276dd",
+	"loggedIn": null,
+	"patientGoals": null,
+	"patientOrderDetails": null
+}

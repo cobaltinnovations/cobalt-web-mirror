@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+    exported-variables:
+        - COMMIT_HASH
+        - IMAGE_TAG
+        - IMAGE_URI
+phases:
+    pre_build:
+        commands:
+            - echo Logging in to Amazon ECR...
+            - aws --version
+            - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 428761942715.dkr.ecr.us-east-2.amazonaws.com
+            - REPOSITORY_URI=428761942715.dkr.ecr.us-east-2.amazonaws.com/pic-cobalt/webapp
+            - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            - IMAGE_TAG=${COMMIT_HASH:=latest}
+            - IMAGE_URI=$REPOSITORY_URI:$IMAGE_TAG
+    build:
+        commands:
+            - echo Build started on `date`
+            - docker build -t $IMAGE_URI -t $REPOSITORY_URI:latest . -f ./docker/Dockerfile
+    post_build:
+        commands:
+            - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
+            - echo Build successfully completed on `date`
+            - echo Pushing the Docker images...
+            - docker push $REPOSITORY_URI:latest
+            - docker push $IMAGE_URI
+            - printf '{"ImageURI":"%s"}' $IMAGE_URI > imageDetail.json
+artifacts:
+    files:
+        - imageDetail.json

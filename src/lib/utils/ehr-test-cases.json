@@ -1,0 +1,220 @@
+{
+	"Exact- all data elements": [
+		{
+			"firstName": "Richard",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Kendall Park",
+				"state": "NJ",
+				"postalCode": "08824",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "MALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		},
+		{
+			"firstName": "Larry",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Phila",
+				"state": "PA",
+				"postalCode": "19145",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "MALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Exact Name, DOB and Gender": [
+		{
+			"firstName": "Robert",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Egg Harbor",
+				"state": "NJ",
+				"postalCode": "08215",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "MALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		},
+		{
+			"firstName": "Gladys",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Phila",
+				"state": "PA",
+				"postalCode": "19145",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Similar DOB (year/month)": [
+		{
+			"firstName": "Patricia",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Gwynedd",
+				"state": "PA",
+				"postalCode": "19454",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		},
+		{
+			"firstName": "Jacqueline",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Phoenixville",
+				"state": "PA",
+				"postalCode": "19640",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Dif Gender, Dif Phone": [
+		{
+			"firstName": "Adam",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Philadelphia",
+				"state": "PA",
+				"postalCode": "19146",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		},
+		{
+			"firstName": "David",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Boothwyn",
+				"state": "PA",
+				"postalCode": "19061",
+				"country": "USA"
+			},
+			"nationalIdentifier": "1111",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Exact Last Name, DOB, Gender, Address and Phone Number": [
+		{
+			"firstName": "Annie",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Aldan",
+				"state": "PA",
+				"postalCode": "19018",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		},
+		{
+			"firstName": "Chloe",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Washington Crossing",
+				"state": "PA",
+				"postalCode": "18977",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "MALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Exact Full Name, DOB, Sex and Phone Number": [
+		{
+			"firstName": "Chen",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Phila",
+				"state": "PA",
+				"postalCode": "19146",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "FEMALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	],
+	"Dif Address": [
+		{
+			"firstName": "Antonio",
+			"lastName": "Fake",
+			"middleInitial": "",
+			"dateOfBirth": "1921-01-01",
+			"address": {
+				"line1": "123 Fake St",
+				"city": "Phila",
+				"state": "PA",
+				"postalCode": "19146",
+				"country": "USA"
+			},
+			"nationalIdentifier": "",
+			"gender": "MALE",
+			"emailAddress": "",
+			"phoneNumber": "111-555-1234"
+		}
+	]
+}

@@ -1,0 +1,11 @@
+node_modules
+target
+.git
+.gitignore
+bin
+
+# Elastic Beanstalk Files
+.elasticbeanstalk
+.ebextensions
+
+**/Dockerfile

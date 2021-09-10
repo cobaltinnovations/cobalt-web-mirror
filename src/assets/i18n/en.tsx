@@ -1,0 +1,437 @@
+export const en = {
+	translation: {
+		patientSignIn: {
+			cobalt: 'Cobalt',
+			greeting: 'Welcome to Cobalt Integrated Care',
+			signIn: 'Sign in with myCobaltMedicine',
+			createAccount: 'Create a myCobaltMedicine account',
+			callProviderPrompt: 'If you prefer to speak with your primary care provider’s mental health team, please call ',
+			crisisModalPrompt:
+				', available Monday-Friday between 8:30 AM and 5:00 PM. \n\n This tool is not for emergencies and does not offer live communication with a clinician. If you need immediate help, click',
+			crisisModalButtonText: 'here.',
+			scheduledConfirmation: 'Your appointment was scheduled',
+		},
+		phoneModal: {
+			header: 'Talk to our mental health team on the phone',
+			subHeader: 'Choose an option below',
+			nonEmergencyLabel: '1. Call Cobalt Integrated Care, available Monday-Friday 8:30a-5p, to talk to our mental health team',
+			nonEmergencyButtonTopRow: 'Call 215-555-1111',
+			nonEmergencyButtonBottomRow: 'Cobalt Integrated Care',
+			emergencyLabel: '2. Talk with the on-call clinician about an urgent issue:',
+			emergencyButtonTopRow: 'Call 215-555-1111',
+			emergencyButtonBottomRow: '24/7 Cobalt Crisis Response Center',
+			emergencyOutsideWorkingHoursTopRow: 'Call 911',
+			emergencyOutsideWorkingHoursBottomRow: 'For urgent emergencies when there is nobody on-call',
+			emergencyOutsideWorkingHoursText:
+				'Unfortunately, no LCSW is currently available to take your call. If this is an emergency, please instead call 911.',
+			crisisResources: 'crisis resources',
+			clinicianToCall:
+				'We want to check in with you to make sure you are safe. A clinician will call you within one business day to talk about how they can help. Please don’t hesitate to use the crisis resources listed below, which are available 24/7.',
+			dismiss: 'dismiss',
+		},
+		inCrisisResources: {
+			title: 'If you are in crisis',
+			subtitleText: 'If you have thoughts of harming yourself or others, please immediately contact one of the following',
+			orOption: 'or go to your nearest emergency department or crisis center',
+			call911Prompt: 'Call 911',
+			call911Subtext: '24/7 emergency',
+			callSuicideHotline: 'Call 800-273-8255',
+			callSuicideHotlineSubtext: '24/7 National suicide prevention line',
+			textLine: 'Text 741 741',
+			textLineSubtext: '24/7 Crisis Text Line',
+			callCobaltCrisisResponseCenter: 'Call 215-555-1111',
+			callCobaltCrisisResponseCenterSubtext: '24/7 Cobalt Crisis Response Center',
+		},
+		phoneModalScheduling: {
+			header: 'Talk to our mental health team on the phone',
+			subHeader: 'A mental health coordinator is available for a 30-minute appointment at the following times.',
+			cancelButton: 'Cancel',
+			scheduleButton: 'Schedule',
+		},
+		home: {
+			greeting: {
+				newPatient: 'Welcome to Cobalt Integrated Care, {{name}}.',
+				finishAssessmentPatient: 'Great job finishing the screening, {{name}}',
+				returningPatient: 'Welcome back, {{name}}',
+			},
+			label: {
+				firstStep: 'First step',
+				dispositionReview: 'Gathering our recommendation',
+				recommendedNextStep: 'Recommended next step',
+				appointmentScheduled: 'Next appointment',
+				connectingToCare: 'Connecting you to care',
+				connectedToCare: 'Connected to care',
+				confirmYourConnection: 'Confirm your care connection',
+			},
+			body: {
+				firstStep:
+					'Your primary care provider suggested that you are interested in receiving support for your mental health through the Cobalt Integrated Care program. Please take our assessment so we can determine what type of care is best for you. \n \n This tool is not for emergencies - if you need immediate help at any time during the assessment, please click the "In Crisis" button in the top right corner. \n \n Everything you share is confidential - COBALT is a simple, secure way to manage your Cobalt Medicine mental health care from your computer or mobile device. ',
+				initialAssessmentViaPhone: 'You have an appointment to take our assessment so we can determine what type of care is best for you. ',
+				dispositionReview:
+					'We’re reviewing your clinical information to make sure we connect with the right care. Expect a notification from us in the next 48 hours.',
+				scheduleFirstAppointment: 'It’s time to schedule an appointment with a mental health provider on your primary care team.',
+				scheduleFollowUpAppointment: 'It’s time to schedule another appointment with {{specialist}}',
+				takePreAppointmentAssessmentNoGoals: 'Let’s check how you’ve been doing recently',
+				takePreAppointmentAssessment: 'You set a goal to {{goal}}. Assess your progress by re-taking the screening before your next appointment',
+				dispositionResources:
+					'We understand your goal is to {{goal}}. To help with this, we recommend that you explore the mental health resources on this website.',
+				didNotActNoGoals: 'Based on your assessment, we recommend that you meet with a mental health provider on your primary care team.',
+				didNotActNoBhpNoGoals:
+					'Based on your assessment, we recommend that you meet with a mental health provider. We can help you find and schedule services that are right for you.',
+				didNotActReferredOutNoGoals:
+					'Based on your assessment, we recommend that you meet with a specialty mental health provider. We can help you find and schedule services that are right for you.',
+				didNotActResourcesNoGoals: 'Based on your assessment, we recommend that you explore the mental health resources on this website.',
+				didNotAct:
+					'We understand your goal is {{goal}}. To help with this, we recommend that you meet with a mental health provider on your primary care team.',
+				didNotActExtraInfo:
+					'A provider in our office can help you feel better. This is a short term program - after 8-10 sessions, most patients reach their goals',
+				didNotActNoBhp:
+					'We understand your goal is {{goal}}. To help with this, we recommend that you meet with a mental health provider. We can help you find and schedule services that are right for you.',
+				didNotActReferredOut:
+					'We understand your goal is {{goal}}. To help with this, we recommend that you meet with a specialty mental health provider. We can help you find and schedule services that are right for you.',
+				didNotActResources:
+					'We understand your goal is {{goal}}. To help with this, we recommend that you explore the mental health resources on this site.',
+				optionalReferral:
+					'Your assessment responses did not indicate any symptoms - however if you would like to speak with someone about support we can help you find and schedule services that are right for you. Choose an option below.',
+				specialtyCareLooking:
+					'We are working on finding care resources and scheduling options for you. We will contact you within 48 hours. You can also reach us at X during Y hours',
+				specialtyCareMhicAppointment: 'You have an upcoming appointment to help you get connected to care.',
+				specialtyCareExternalAppointment: 'You have the following upcoming appointment with a specialty mental health provider.',
+				specialtyCareExternalAppointmentPleaseConfirm: 'Please let us know that you connected with a specialty mental health provider.',
+				specialtyCareExternalAppointmentConfirmed: 'We are happy we were able to connect you with a specialty mental health provider.',
+				episodeEnded: 'Please feel free to explore the mental health resources on this website.',
+				assessmentClosedOffHours:
+					'We’re sorry for the inconvenience, but the online assessment is currently not available. Please call the Cobalt integrated care resource center at 215-555-1212 if you would like to take a brief assessment. The resource center is available between 8am and 5pm Monday through Friday. If you need immediate help, please click',
+				crisisScreenLink: 'here',
+				afterCrisisScreenLink: 'for crisis resources.',
+			},
+			actionButton: {
+				startInitialAssessment: 'Take the assessment',
+				finishInitialAssessment: 'Finish the assessment',
+				takePreAppointmentAssessment: 'Take pre-appointment assessment',
+				takePreAppointmentAssessmentNoGoals: 'Take pre-appointment assessment',
+				finishPreAppointmentAssessment: 'Finish pre-appointment assessment',
+				scheduleAppointmentGeneric: 'Schedule an appointment',
+				specialtyCareExternalAppointmentPleaseConfirm: 'Confirm appointment attendance',
+				episodeEnded: 'Resources for you',
+				didNotActResourcesNoGoals: 'Resources for you',
+			},
+			extraPrompt: {
+				assessmentDeadline: 'Goal: complete by {{dueDate}}',
+				assessmentOverdue: '{{days}} days ago',
+				appointmentOverdueAlert: 'Time to schedule, {{name}}!',
+				appointmentMissedAlert: 'You missed your appointment on {{date}}',
+				completePreApptAssessment: 'Goal: complete before appointment on {{date}}',
+				reassessmentComingDueAlert: ' ({{hours}})',
+				lastAppointmentPrompt: 'Your last appointment was on {{date}} with {{specialist}}',
+			},
+			scheduledComponent: {
+				nextAppointmentHeader: 'Next appointment',
+				appointmentHeader: 'Appointment',
+				backButtonText: 'Return to home',
+				thankYou: 'Thank you for finishing the screening, {{name}}!',
+				description: 'We’ll discuss the results in your next appointment.',
+				viewCalendarButtonText: 'View my calendar',
+			},
+		},
+		assessment: {
+			schedulePhoneAssessmentModal: {
+				title: 'Complete screening over the phone',
+				subTitle: 'Choose an option below:',
+				optionOneLabel: '1. Call Cobalt Integrated Care:',
+				optionOneLabelSubtext: 'Available Monday – Friday, 8:30a-5p, or leave a voicemail after hours.',
+				optionOneButtonText: 'Call 215-555-1212',
+				optionOneButtonSecondaryText: 'Cobalt Integrated Care',
+				optionTwoLabel: '2. Have Cobalt Integrated Care call you:',
+				optionTwoButtonText: 'Schedule A Screening',
+			},
+			additionalPrompts: {
+				drugQPrivacyStatement: 'Just a reminder, this information is confidential',
+			},
+		},
+		contactLcsw: {
+			header: 'If you think you might harm yourself or others, please immediately contact one of the following',
+			call: 'Call',
+			text: 'Text',
+			picOnCall: 'On-call Cobalt Integrated Care clinician 8:00-5:00 PM EST',
+			emergency: '24/7 Emergency',
+			suicidePreventionLine: '24/7 National suicide prevention line',
+			crisisTextLine: '24/7 Crisis Text Line',
+			picCrisis: '24/7 Cobalt Crisis Response Center',
+			inCrisisAlert: 'A clinician will follow up with you within the next 24 hours to see how we can help',
+			inCrisisResources: 'The resources above can be accessed at any time by clicking the In Crisis button on the top right.',
+		},
+		letsGetStarted: {
+			header: {
+				firstTime: 'Take the assessment',
+				preApptStart: 'Let’s check how you’ve been doing recently',
+				partialStart: 'Let’s keep going',
+			},
+			body: {
+				firstTime:
+					'To match you with the right support, we’d like to learn about you and how you’re feeling. Before we start, please make sure you are in a comfortable place. This assessment takes about 10-15 minutes to complete. \n \n Only you and your care team will have access to your answers. You can take a break at any time — we’ll save your progress.',
+				preApptStart:
+					'Before we start, please make sure you are in a comfortable place. You can take a break at any time — we’ll save your progress. \n \n Is now a good time?',
+				partialStart:
+					'You previously made progress on the assessment. We’ll pick up where you left off. Before we start, please make sure you are in a comfortable place. \n \n Is now a good time?',
+			},
+			continueButtonText: 'Let’s continue',
+			remindMeLaterText: 'Remind me later',
+			takePhoneScreeningText: 'Take the screening over the phone',
+		},
+		personalInformation: {
+			personalInformationDescription:
+				'Let’s begin with who you are and what you’re looking for. Your primary care team gave us a head start. Please make sure your preferred cell phone number and email are correct, or enter these if they are not populated. If other information is incorrect, please log into myCobaltMedicine to make or request changes.',
+			lastName: 'Last Name',
+			preferredName: 'Preferred Name',
+			age: 'Age',
+			phoneNumber: 'Preferred Phone Number',
+			phoneNumberPlaceholderText: 'Format: 123-456-7890',
+			genderIdentity: 'Gender Identity',
+			city: 'City',
+			state: 'State',
+			dob: 'Date of Birth',
+			address: 'Address',
+			zip: 'Zip Code',
+			insurance: 'Insurance',
+			race: 'Race',
+			ethnicity: 'Ethnicity',
+			preferredLanguage: 'Preferred language',
+			eductionLevel: 'Education level',
+			continueButtonText: 'Continue',
+			email: 'Email',
+			emailPlaceholderText: 'Preferred Email',
+		},
+		listOfDiagnoses: {
+			descriptionText: 'In order to give you the right care, please select the condition(s) you’d like help with today.',
+			subheaderText: 'Select all that apply',
+			skipButtonText: 'Skip for now',
+			backButtonText: 'Back',
+			nextButtonText: 'Next',
+			specifyOtherText: 'Specify other:',
+		},
+		listOfSymptoms: {
+			descriptionText: 'Do you want help with any of these symptoms?',
+			subheaderText: 'Select all that apply',
+			skipButtonText: 'Skip for now',
+			specifyOtherText: 'Specify other:',
+			backButtonText: 'Back',
+			nextButtonText: 'Next',
+		},
+		lookingForDiagnosis: {
+			descriptionText: 'Are you looking for help with...',
+			subheaderText: 'a specific diagnosis?',
+			yesButtonText: 'Yes',
+			noButtonText: 'No',
+			backButtonText: 'Back',
+		},
+		militaryNationalGuard: {
+			initialQuestion:
+				'There are clinical programs specifically designed to assist Veterans and their families. \n \n Have you or anybody in your immediate family served in the US Military or National Guard?',
+			pre911Text: 'Yes, I or an immediate family member served in the military before 9/11/01',
+			post911Text: 'Yes, I or an immediate family member served in the military after 9/11/01',
+			noButtonText: 'No',
+		},
+		interstitialScreen: {
+			headerText: {
+				preCssrs: 'Thank you, {{name}}. That background really helps.',
+				preGad7: '',
+				letsKeepGoing: 'Great job, {{name}}. We’re learning a lot about you.',
+				goals: 'Thank you, {{name}}. We have a strong understanding of how we can support you. Just a couple questions left.',
+			},
+			subheaderText: {
+				preCssrs:
+					'Sometimes when people are depressed, anxious, or just stressed, they think about death or dying. The following 3 questions will ask about your safety. They may be challenging, but it’s important we ask them up front.',
+				preGad7: 'Next, we’d like to learn about how you’ve been feeling recently.',
+				letsKeepGoing: 'You’re almost there. Just a few more questions.',
+				goals: '',
+			},
+			buttonText: {
+				preCssrs: 'Continue',
+				preGad7: 'Continue',
+				letsKeepGoing: 'Continue',
+				goals: 'Continue',
+			},
+		},
+		finalizeScreen: {
+			headerText: 'Thank you, {{name}} for completing these assessments.',
+			subheaderText: 'When you submit your assessment, we will determine what type of care is best for you.',
+		},
+		loadingPage: {
+			headerText: 'Working on your recommendation...',
+			bodyText: 'We are determining what type of care is best for you.',
+		},
+		goalSetting: {
+			hopeToSeeOrFeel: {
+				header: 'Now, let’s look forward to 6 months from now. What do you hope to see or feel?',
+				instructions: 'Select all that apply.',
+			},
+			rankOrderOfImportance: {
+				header: 'Please rank your goals in order of importance to you.',
+				instructions: 'Use the arrows or drag-and-drop to reorder.',
+			},
+			openToOptions: {
+				header: 'To get there, which of the following options are you open to?',
+				instructions: 'Select all that apply.',
+			},
+			backButtonText: 'Back',
+			nextButtonText: 'Next',
+			skipButtonText: 'No specific goals right now',
+			optionLabels: {
+				happier: 'Feel happier',
+				stressed: 'Get stress relief',
+				sleep: 'Sleep better',
+				time: 'Spend more time with people I care about',
+				life: 'Discuss problems in my life',
+				pain: 'Reduce my discomfort or pain',
+				other: 'Other',
+				therapy: 'Therapy',
+				meds: 'Medication',
+				selfDirected: 'Self-directed exercises',
+				group: 'Group support',
+			},
+		},
+		preAppointmentResults: {
+			header: 'Next appointment',
+			backButtonText: 'Return to home',
+			thankYou: 'Thank you for finishing the screening, {{name}}!',
+			description: 'We’ll discuss the results in your next appointment.',
+			viewCalendarButtonText: 'View my calendar',
+		},
+		noAvailableAppointments: {
+			callButtonTopRow: 'Call 1-800-123-4567',
+			callButtonBottomRow: 'Cobalt Integrated Care',
+			pleaseCallMeText: 'Please call me',
+			descriptionText:
+				'At this time, there are no available mental health providers in the office of your primary care provider, {}. We can help you connect with other specialists outside our clinic.',
+			willCallText: 'I will call Cobalt Integrated Care.',
+			wantToBeCalledText: 'I want Cobalt Integrated Care to call me.',
+			disclaimerText: 'If you do not contact us, a staff member will call you in the next business day.',
+		},
+		connectWithSupportHeader: {
+			paymentOptionsDisclaimer:
+				'Payment options vary by provider. Services may be free of charge, covered by insurance, or self-pay, and you may choose to filter by your specific payment preferences. CobaltCare PPO and insurance plans through Cobalt cover most services with Cobalt providers. Copays and deductibles may apply.',
+		},
+		immediateHelpHeader: {
+			subheader: 'Your mental health provider is available for a 30-minute session at the following times.',
+		},
+		mhic: {
+			header: {
+				patientCount: '{{count}} patients',
+				flaggedCount: 'flagged - {{count}}',
+				riskCount: 'safety risk - {{count}}',
+			},
+			modal: {
+				cancel: 'cancel',
+				save: 'save',
+			},
+			filters: {
+				searchPlaceholder: 'Search',
+				filteredPatientCount: 'Showing {{count}} patients',
+				filtersLabel: 'Filters',
+				clearButtonText: 'Clear All',
+			},
+			patientDetailModal: {
+				accordion: {
+					demographicsLabel: 'Demographics',
+					triageLabel: 'Triage',
+					contactInfoLabel: 'Contact Info',
+					notesLabel: 'Notes',
+				},
+				demographicsTab: {
+					demographicsTile: {
+						title: 'Demographics',
+						modalButton: 'edit demographics',
+						mrn: 'MRN',
+						dob: 'DOB',
+						age: 'Age',
+						insurance: 'Insurance',
+						language: 'Preferred language',
+						zip: 'Zip code',
+						engagement: 'Engagement',
+					},
+					careTeamTile: {
+						title: 'Care team',
+						modalButton: 'assign panel',
+						orderingProvider: 'Ordering provider',
+						billingProvider: 'Billing Provider',
+						pcProvider: 'PC Provider',
+						mhicProvider: 'MHIC',
+						bhpProvider: 'BHP',
+						psychiatristProvider: 'Psychiatrist',
+					},
+					scheduleTile: {
+						title: 'Schedule',
+						modalButton: 'schedule',
+						actions: {
+							scheduleOwnCalendar: 'Schedule on my calendar',
+							scheduleWithLCSW: 'Schedule appointment with LCSW',
+							recordSpecialtyCareScheduling: 'Record specialty care scheduling',
+						},
+					},
+				},
+				triageTab: {
+					triageTile: {
+						title: 'Triage',
+						modalButton: 'change triage',
+						focusedReview: 'Focused Review',
+						bhp: 'BHP',
+						reviewed: 'Reviewed',
+						notReviewed: 'Not reviewed',
+						psychiatrist: 'Psychiatrist',
+						commentPlaceholder: 'Comment',
+						submitComment: 'save',
+						patient: 'Patient',
+						modalHeader: 'Current triage',
+					},
+					clinicalInfoTile: {
+						title: 'Clinical information',
+						modalButton: 'view episodes',
+						diagnosesLabel: 'Diagnoses',
+						medicationsLabel: 'Medications',
+						reasonForReferral: 'Reason for referral',
+						evaluationLabel: 'Most recent order',
+					},
+					assessmentScoresTile: {
+						title: 'Assessment score',
+						modalButton: 'start assessment',
+						lastAssessmentLabel: 'Last assessment',
+						acuityLabel: 'Acuity',
+						recommendationLabel: 'Recommendation',
+					},
+				},
+				contactInfoTab: {
+					contactTile: {
+						title: 'Contact information',
+						modalButton: 'edit contact info',
+						mainPhoneLabel: 'PHONE NUMBER',
+						homePhoneLabel: 'Home phone',
+						workPhoneLabel: 'Work phone',
+						mobilePhoneLabel: 'Mobile Phone',
+						emailLabel: 'Email',
+						phoneLabel: 'Phone',
+						modalHeader: 'Contact Information',
+					},
+					contactHistoryTile: {
+						title: 'Contact History',
+						modalButton: 'add contact attempt',
+						modalHeader: 'Add Contact Attempt',
+						referringLocation: 'Referring Location',
+						callResult: 'Call Result',
+						notes: 'Notes',
+					},
+				},
+				notesTab: {
+					enterUpdateTile: {
+						title: ' Enter an update',
+						textboxPlaceholder: 'Enter new update',
+						submitButton: 'submit',
+					},
+					updateHistoryTile: {
+						title: 'Update History',
+					},
+				},
+			},
+		},
+	},
+};
