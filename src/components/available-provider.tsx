@@ -89,6 +89,16 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 		const classes = useAvailableProviderStyles();
 		const placeholderImage = useRandomPlaceholderImage();
 
+		const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;
+
+		let entityName = (provider.entity || provider.clinic) ? joinComma(provider.entity, provider.clinic) : null;
+
+		// It's possible this is the same as the title.  If so, null it out
+		// so we don't show the same text twice
+		if(entityName && entityName === finalTitle) {
+			entityName = null;
+		}
+
 		return (
 			<div
 				ref={ref}
@@ -112,11 +122,11 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 							</p>
 						)} */}
 
-						{provider.supportRolesDescription && (
+						{finalTitle && (
 							<p className="mb-0">
-								<i>{provider.supportRolesDescription}</i>
+								<i>{finalTitle}</i>
 							</p>
-						)}
+						)}				
 
 						{provider.treatmentDescription ? (
 							<p className="mb-0">
@@ -126,7 +136,11 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 							provider.specialty && <p className="mb-0">{provider.specialty}</p>
 						)}
 
-						{(provider.entity || provider.clinic) && <p className="mb-0">{joinComma(provider.entity, provider.clinic)}</p>}
+						{entityName && (
+							<p className="mb-0">
+								{entityName}
+							</p>
+						)}
 
 						<div>
 							{provider.paymentFundingDescriptions &&
