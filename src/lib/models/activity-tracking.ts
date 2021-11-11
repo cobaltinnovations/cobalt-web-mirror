@@ -1,6 +1,7 @@
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/ActivityType.java#L18
 export enum AcivityTypeId {
 	Content = 'CONTENT',
+	Url = 'URL',
 }
 
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/ActivityAction.java#L18
@@ -15,4 +16,5 @@ export interface ActivityTracking {
 	activityTypeId: AcivityTypeId;
 	activityActionId: ActivityActionId;
 	activityKey: string;
+	context: string;
 }

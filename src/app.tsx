@@ -30,6 +30,7 @@ import { ErrorModalProvider } from '@/contexts/error-modal-context';
 
 import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
+import useUrlViewTracking from './hooks/use-url-view-tracking';
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,8 @@ const AppWithProviders: FC = () => {
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [pathname]);
+
+	useUrlViewTracking();
 
 	return (
 		<>
