@@ -39,7 +39,7 @@ export default function useUrlViewTracking(): void {
 				activityActionId: ActivityActionId.View,
 				activityTypeId: AcivityTypeId.Url,
 				context,
-			});
+			}).fetch();
 		}
 	}, [pathname, initialized, query, account, isTrackedSession]);
 }
