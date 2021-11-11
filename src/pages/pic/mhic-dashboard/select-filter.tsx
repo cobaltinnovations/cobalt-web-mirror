@@ -35,6 +35,7 @@ export const SelectFilter: FC<Props> = (props) => {
 					value: undefined,
 					label: 'No Filter',
 				},
+				// @ts-ignore
 				...selectOptions?.map((option) => {
 					return {
 						value: option,
