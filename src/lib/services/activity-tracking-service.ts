@@ -6,14 +6,14 @@ interface ActivityTrackingResponse {
 }
 
 export interface ActivityTrackingContext {
-	pathname: string;
+	contentId?: string;
+	pathname?: string;
 	queryParams?: Record<string, string[]>;
 }
 
 interface TrackData {
 	activityTypeId: AcivityTypeId;
 	activityActionId: ActivityActionId;
-	activityKey?: string;
 	context?: ActivityTrackingContext;
 }
 

@@ -72,7 +72,9 @@ const OnYourTimeDetail: FC = () => {
 			.track({
 				activityActionId: ActivityActionId.View,
 				activityTypeId: AcivityTypeId.Content,
-				activityKey: item.contentId,
+				context: {
+					contentId: item.contentId,
+				}
 			})
 			.fetch()
 			.catch((e) => {

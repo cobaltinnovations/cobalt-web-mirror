@@ -15,6 +15,5 @@ export interface ActivityTracking {
 	accountId: string;
 	activityTypeId: AcivityTypeId;
 	activityActionId: ActivityActionId;
-	activityKey: string;
 	context: string;
 }
