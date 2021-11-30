@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, useCallback, useContext } from 'react';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import Loader from '@/components/loader';
 import ErrorDisplay from '@/components/error-display';
@@ -19,6 +19,7 @@ interface AsyncPageProps {
 }
 
 const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
+	const history = useHistory();
 	const [fetchPageDataError, setFetchPageDataError] = useState<ErrorConfig | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
@@ -48,7 +49,8 @@ const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
 						return;
 					}
 
-					return <Redirect to="/sign-in" />;
+					history.replace('/sign-in');
+					return;
 				}
 
 				setFetchPageDataError(error);
@@ -56,7 +58,7 @@ const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
 
 			setDisplayState(DISPLAY_STATES.ERROR);
 		}
-	}, [fetchData, setShowReauthModal, setSignOnUrl]);
+	}, [fetchData, history, setShowReauthModal, setSignOnUrl]);
 
 	useEffect(() => {
 		fetchPageData();
