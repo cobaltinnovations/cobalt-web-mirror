@@ -13,7 +13,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-export const InTheStudioThanks: FC = () => {
+const InTheStudioThanks: FC = () => {
 	const classes = useStyles();
 
 	return (
@@ -23,7 +23,10 @@ export const InTheStudioThanks: FC = () => {
 					<Card className={classes.thankYouCard}>
 						<h2 className="mb-5">thank you</h2>
 						<p>
-							<small>Your content has been submitted and will become available after an admin has approved it.</small>
+							<small>
+								Your content has been submitted and will become available after an admin has approved
+								it.
+							</small>
 						</p>
 					</Card>
 				</Col>
@@ -31,3 +34,5 @@ export const InTheStudioThanks: FC = () => {
 		</Container>
 	);
 };
+
+export default InTheStudioThanks;

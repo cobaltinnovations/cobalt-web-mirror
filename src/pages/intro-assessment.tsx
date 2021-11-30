@@ -69,7 +69,7 @@ const IntroAssessment: FC = () => {
 				sessionId: assessment.sessionId,
 			});
 
-			history.replace({
+			history.push({
 				pathname: '/intro-assessment',
 				search: '?' + searchParams.toString(),
 				state: history.location.state,
@@ -85,7 +85,7 @@ const IntroAssessment: FC = () => {
 
 			let redirectUrl = authRedirectUrl || history.location.state?.from || '/';
 
-			history.replace(redirectUrl);
+			history.push(redirectUrl);
 			Cookies.remove('authRedirectUrl');
 		}
 	}, [account, assessment, history, setAccount]);
@@ -94,7 +94,7 @@ const IntroAssessment: FC = () => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.replace(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
+			history.push(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
 		}
 	}, [assessment, history]);
 

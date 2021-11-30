@@ -12,6 +12,7 @@ import colors from '@/jss/colors';
 
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
@@ -40,18 +41,28 @@ const useStyles = createUseStyles({
 interface SessionRowProps {
 	session: GroupSessionModel;
 	onEditClick(groupSessionId: string): void;
+	onViewClick(groupSessionId: string): void;
 	onAddClick(groupSessionId: string): void;
 	onCopyClick(groupSessionId: string): void;
 	onCancelClick(groupSessionId: string): void;
 	onDeleteClick(groupSessionId: string): void;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onCopyClick, onCancelClick, onDeleteClick }) => {
+const SessionRow: FC<SessionRowProps> = ({
+	session,
+	onEditClick,
+	onViewClick,
+	onAddClick,
+	onCopyClick,
+	onCancelClick,
+	onDeleteClick,
+}) => {
 	const classes = useStyles();
 	const { account } = useAccount();
 
 	const canAddSession =
-		(account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR || account?.roleId === ROLE_ID.ADMINISTRATOR) && session.groupSessionStatusId === SESSION_STATUS.NEW;
+		(account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR || account?.roleId === ROLE_ID.ADMINISTRATOR) &&
+		session.groupSessionStatusId === SESSION_STATUS.NEW;
 
 	const hasDropdown =
 		session.groupSessionStatusId === SESSION_STATUS.NEW ||
@@ -66,7 +77,10 @@ const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onC
 				<span className="d-block font-size-xs">{session.createdDateDescription}</span>
 			</TableCell>
 			<TableCell>
-				<Link to={`/in-the-studio/group-session-scheduled/${session.groupSessionId}`} className="d-block font-size-xs font-karla-bold">
+				<Link
+					to={`/in-the-studio/group-session-scheduled/${session.groupSessionId}`}
+					className="d-block font-size-xs font-karla-bold"
+				>
 					{session.title}
 				</Link>
 				<span className="d-block font-size-xs">{session.startDateTimeDescription}</span>
@@ -76,7 +90,10 @@ const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onC
 			</TableCell>
 			<TableCell>
 				{session.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT && (
-					<SessionAttendees currentAmount={session.seatsReserved} maxAmount={session.seatsReserved + session.seatsAvailable} />
+					<SessionAttendees
+						currentAmount={session.seatsReserved || 0}
+						maxAmount={(session.seatsReserved || 0) + (session.seatsAvailable || 0)}
+					/>
 				)}
 				{session.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL && '(external)'}
 			</TableCell>
@@ -88,7 +105,8 @@ const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onC
 					<SessionDropdown
 						id={session.groupSessionId}
 						items={[
-							...(session.groupSessionStatusId === SESSION_STATUS.NEW || session.groupSessionStatusId === SESSION_STATUS.ADDED
+							...(session.groupSessionStatusId === SESSION_STATUS.NEW ||
+							session.groupSessionStatusId === SESSION_STATUS.ADDED
 								? [
 										{
 											icon: <EditIcon className={classes.iconPath} />,
@@ -110,6 +128,17 @@ const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onC
 										},
 								  ]
 								: []),
+							...(session.groupSessionStatusId === SESSION_STATUS.ARCHIVED
+								? [
+										{
+											icon: <InfoIcon className={classes.iconPath} />,
+											title: 'View',
+											onClick: () => {
+												onViewClick(session.groupSessionId);
+											},
+										},
+								  ]
+								: []),
 							...(session.groupSessionStatusId === SESSION_STATUS.ADDED ||
 							session.groupSessionStatusId === SESSION_STATUS.ARCHIVED ||
 							session.groupSessionStatusId === SESSION_STATUS.CANCELED
@@ -123,7 +152,8 @@ const SessionRow: FC<SessionRowProps> = ({ session, onEditClick, onAddClick, onC
 										},
 								  ]
 								: []),
-							...(session.groupSessionStatusId === SESSION_STATUS.NEW || session.groupSessionStatusId === SESSION_STATUS.ADDED
+							...(session.groupSessionStatusId === SESSION_STATUS.NEW ||
+							session.groupSessionStatusId === SESSION_STATUS.ADDED
 								? [
 										{
 											icon: <CloseIcon className={classes.iconPolygon} />,
