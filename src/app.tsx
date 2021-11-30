@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider as BootstrapThemeProvider } from 'react-bootstrap';
@@ -13,6 +13,7 @@ import PrivateRoute from '@/components/private-route';
 import InCrisisModal from '@/components/in-crisis-modal';
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
+import Loader from '@/components/loader';
 
 import { Routes } from '@/routes';
 
@@ -30,6 +31,7 @@ import { ErrorModalProvider } from '@/contexts/error-modal-context';
 
 import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const queryClient = new QueryClient();
 
@@ -55,28 +57,45 @@ const AppWithProviders: FC = () => {
 
 			<Switch>
 				{Routes.map((route, index) => {
-					return <Route key={index} path={route.path} exact={route.exact} children={route.header ? <route.header /> : null} />;
+					return (
+						<Route
+							key={index}
+							path={route.path}
+							exact={route.exact}
+							children={route.header ? <route.header /> : null}
+						/>
+					);
 				})}
 			</Switch>
-			<Switch>
-				{Routes.map((route, index) => {
-					const isEnabled = route.checkEnabled ? route.checkEnabled({ subdomain, account, institution }) : true;
+			<Suspense fallback={<Loader />}>
+				<Switch>
+					{Routes.map((route, index) => {
+						const isEnabled = route.checkEnabled
+							? route.checkEnabled({ subdomain, account, institution })
+							: true;
 
-					if (route.private) {
-						return (
-							<PrivateRoute key={index} path={route.path} exact={route.exact} enabled={isEnabled} unauthRedirect={route.unauthRedirect}>
-								<route.main />
-							</PrivateRoute>
-						);
-					} else {
-						return (
-							<Route key={index} path={route.path} exact={route.exact}>
-								{isEnabled ? <route.main /> : <NoMatch />}
-							</Route>
-						);
-					}
-				})}
-			</Switch>
+						if (route.private) {
+							return (
+								<PrivateRoute
+									key={index}
+									path={route.path}
+									exact={route.exact}
+									enabled={isEnabled}
+									// unauthRedirect={route.unauthRedirect}
+								>
+									<route.main />
+								</PrivateRoute>
+							);
+						} else {
+							return (
+								<Route key={index} path={route.path} exact={route.exact}>
+									{isEnabled ? <route.main /> : <NoMatch />}
+								</Route>
+							);
+						}
+					})}
+				</Switch>
+			</Suspense>
 			<Footer />
 		</>
 	);

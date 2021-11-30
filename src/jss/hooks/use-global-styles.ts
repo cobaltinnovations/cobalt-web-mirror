@@ -132,6 +132,7 @@ export const useGlobalStyles = createUseStyles({
 			...fonts.xs,
 			borderRadius: 0,
 			...fonts.karlaRegular,
+			boxShadow: '1px 2px 8px 0px rgba(0,0,0,0.32)',
 			'&__triangle': {
 				borderBottomColor: `${colors.primary} !important`,
 				'&:before': {

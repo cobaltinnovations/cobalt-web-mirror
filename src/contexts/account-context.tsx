@@ -76,9 +76,11 @@ const AccountProvider: FC = (props) => {
 		Cookies.remove('piccobalt_patientcontext');
 
 		let signInPath = '/sign-in';
-		if (subdomain === 'pic') {
-			if (!__DEV__ && isMhic) {
-				const redirectUrl = window.location.hostname.toLowerCase().includes('dev') ? 'https://www.cobaltplatform.com' : 'https://dev.cobaltplatform.com';
+		const hostname = window.location.hostname.toLowerCase();
+		
+		if (hostname.indexOf('pic.') === 0) {
+			if (isMhic) {
+				const redirectUrl = hostname.indexOf('pic.dev.') === 0 ? 'https://pic.dev.cobaltinnovations.org/sign-in-email' : 'https://pic.cobaltinnovations.org/sign-in-email';
 				window.location.href = redirectUrl;
 				return;
 			}

@@ -8,7 +8,8 @@ interface Props {
 	hideHeader?: boolean;
 	inCrisis?: boolean;
 }
-export const ContactLCSW: FC<Props> = ({ hideHeader, inCrisis }) => {
+
+const ContactLCSW: FC<Props> = ({ hideHeader, inCrisis }) => {
 	const { t } = useTranslation();
 	const contactButtons = [
 		{
@@ -32,16 +33,23 @@ export const ContactLCSW: FC<Props> = ({ hideHeader, inCrisis }) => {
 			type: 'call',
 		},
 	];
+
 	return (
 		<Container style={{ maxWidth: '600px' }}>
 			<Col className={'col-auto mt-3'}>
 				{hideHeader !== true && <h5>{t('contactLcsw.header')}</h5>}
 				{contactButtons.map((button) => (
-					<Button variant="grey" className={'my-2 d-flex align-items-center'} href={`tel:${button.number}`} key={button.key}>
+					<Button
+						variant="grey"
+						className={'my-2 d-flex align-items-center'}
+						href={`tel:${button.number}`}
+						key={button.key}
+					>
 						{button.type === 'call' ? <PhoneIcon className={'mr-2'} /> : <TextIcon className={'mr-2'} />}
 						<div className={'d-flex flex-column font-size-s'}>
 							<span className={'text-primary mb-2'}>
-								{t(`${button.type === 'call' ? 'contactLcsw.call' : 'contactLcsw.text'}`)} {button.number}
+								{t(`${button.type === 'call' ? 'contactLcsw.call' : 'contactLcsw.text'}`)}{' '}
+								{button.number}
 							</span>
 							<span className={'font-weight-regular'}>{t(`contactLcsw.${button.key}`)}</span>
 						</div>
@@ -57,3 +65,5 @@ export const ContactLCSW: FC<Props> = ({ hideHeader, inCrisis }) => {
 		</Container>
 	);
 };
+
+export default ContactLCSW;

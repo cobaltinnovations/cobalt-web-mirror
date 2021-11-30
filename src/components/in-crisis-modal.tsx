@@ -5,7 +5,7 @@ import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import useAccount from '@/hooks/use-account';
 import { useTranslation } from 'react-i18next';
 import useSubdomain from '@/hooks/use-subdomain';
-import { ContactLCSW } from '@/pages/pic/contact-lcsw/contact-lcsw';
+import ContactLCSW from '@/pages/pic/contact-lcsw/contact-lcsw';
 
 const useInCrisisModalStyles = createUseStyles({
 	inCrisisModal: {
@@ -49,7 +49,9 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 					<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
 					<div className={'d-flex flex-column font-size-s ml-2'}>
 						<span className={'text-primary mb-2'}>{t('inCrisisResources.callSuicideHotline')}</span>
-						<span className={'font-weight-regular'}>{t('inCrisisResources.callSuicideHotlineSubtext')}</span>
+						<span className={'font-weight-regular'}>
+							{t('inCrisisResources.callSuicideHotlineSubtext')}
+						</span>
 					</div>
 				</Button>
 				<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:741741">
@@ -63,12 +65,19 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:2158295433">
 						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
 						<div className={'d-flex flex-column font-size-s ml-2'}>
-							<span className={'text-primary mb-2'}>{t('inCrisisResources.callCobaltCrisisResponseCenter')}</span>
-							<span className={'font-weight-regular'}>{t('inCrisisResources.callCobaltCrisisResponseCenterSubtext')}</span>
+							<span className={'text-primary mb-2'}>
+								{t('inCrisisResources.callCobaltCrisisResponseCenter')}
+							</span>
+							<span className={'font-weight-regular'}>
+								{t('inCrisisResources.callCobaltCrisisResponseCenterSubtext')}
+							</span>
 						</div>
 					</Button>
 				)}
-				<div className={'text-center font-weight-bold'} style={{ margin: '0 auto', marginTop: '1.5em', width: '80%' }}>
+				<div
+					className={'text-center font-weight-bold'}
+					style={{ margin: '0 auto', marginTop: '1.5em', width: '80%' }}
+				>
 					{t('inCrisisResources.orOption')}
 				</div>
 			</div>

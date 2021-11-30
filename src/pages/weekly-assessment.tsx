@@ -77,11 +77,11 @@ const WeeklyAssessment: FC = () => {
 	const navigateForwards = useCallback(
 		(submissionResponse) => {
 			if (submissionResponse.assessment) {
-				history.replace(
+				history.push(
 					`/weekly-assessment?questionId=${submissionResponse.assessment.question.questionId}&sessionId=${submissionResponse.assessment.sessionId}`
 				);
 			} else {
-				history.replace(SUPPORT_ROUTE);
+				history.push(SUPPORT_ROUTE);
 			}
 		},
 		[SUPPORT_ROUTE, history]
@@ -91,7 +91,7 @@ const WeeklyAssessment: FC = () => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.replace(`/weekly-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.previousSessionId}`);
+			history.push(`/weekly-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.previousSessionId}`);
 		}
 	}, [assessment, history]);
 
