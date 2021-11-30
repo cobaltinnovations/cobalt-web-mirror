@@ -13,6 +13,7 @@ import PrivateRoute from '@/components/private-route';
 import InCrisisModal from '@/components/in-crisis-modal';
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
+import ReauthModal from '@/components/reauth-modal';
 
 import { Routes } from '@/routes';
 
@@ -27,6 +28,7 @@ import { InCrisisModalProvider } from '@/contexts/in-crisis-modal-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import { AlertProvider } from '@/contexts/alert-context';
 import { ErrorModalProvider } from '@/contexts/error-modal-context';
+import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
 import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
@@ -50,21 +52,37 @@ const AppWithProviders: FC = () => {
 		<>
 			<InCrisisModal show={show} isCall={isCall} onHide={closeInCrisisModal} />
 			<ErrorModal />
+			<ReauthModal />
 
 			<Alert />
 
 			<Switch>
 				{Routes.map((route, index) => {
-					return <Route key={index} path={route.path} exact={route.exact} children={route.header ? <route.header /> : null} />;
+					return (
+						<Route
+							key={index}
+							path={route.path}
+							exact={route.exact}
+							children={route.header ? <route.header /> : null}
+						/>
+					);
 				})}
 			</Switch>
 			<Switch>
 				{Routes.map((route, index) => {
-					const isEnabled = route.checkEnabled ? route.checkEnabled({ subdomain, account, institution }) : true;
+					const isEnabled = route.checkEnabled
+						? route.checkEnabled({ subdomain, account, institution })
+						: true;
 
 					if (route.private) {
 						return (
-							<PrivateRoute key={index} path={route.path} exact={route.exact} enabled={isEnabled} unauthRedirect={route.unauthRedirect}>
+							<PrivateRoute
+								key={index}
+								path={route.path}
+								exact={route.exact}
+								enabled={isEnabled}
+								unauthRedirect={route.unauthRedirect}
+							>
 								<route.main />
 							</PrivateRoute>
 						);
@@ -93,17 +111,19 @@ const ThemedApp: FC = () => {
 
 	return (
 		<ErrorModalProvider>
-			<HeaderProvider>
-				<AccountProvider>
-					<AlertProvider>
-						<BookingProvider>
-							<InCrisisModalProvider>
-								<AppWithProviders />
-							</InCrisisModalProvider>
-						</BookingProvider>
-					</AlertProvider>
-				</AccountProvider>
-			</HeaderProvider>
+			<ReauthModalProvider>
+				<HeaderProvider>
+					<AccountProvider>
+						<AlertProvider>
+							<BookingProvider>
+								<InCrisisModalProvider>
+									<AppWithProviders />
+								</InCrisisModalProvider>
+							</BookingProvider>
+						</AlertProvider>
+					</AccountProvider>
+				</HeaderProvider>
+			</ReauthModalProvider>
 		</ErrorModalProvider>
 	);
 };

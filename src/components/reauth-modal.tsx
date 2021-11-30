@@ -1,6 +1,10 @@
-import React, { FC } from 'react';
+import Cookies from 'js-cookie';
+import React, { FC, useCallback, useContext } from 'react';
+import { useHistory, useLocation } from 'react-router';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+
+import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 
 const usStyles = createUseStyles({
 	modal: {
@@ -12,9 +16,27 @@ const usStyles = createUseStyles({
 
 const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 	const classes = usStyles();
+	const history = useHistory();
+	const location = useLocation();
+	const { showReauthModal, setShowReauthModal, signOnUrl } = useContext(ReauthModalContext);
+
+	const handleOnEnter = useCallback(() => {
+		const authRedirectUrl = location.pathname + (location.search || '');
+		Cookies.set('authRedirectUrl', authRedirectUrl);
+	}, [location.pathname, location.search]);
 
 	return (
-		<Modal dialogClassName={classes.modal} centered {...props}>
+		<Modal
+			show={showReauthModal}
+			dialogClassName={classes.modal}
+			centered
+			{...props}
+			onHide={() => {
+				history.goBack();
+				setShowReauthModal(false);
+			}}
+			onEnter={handleOnEnter}
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>Reauthentication Required</Modal.Title>
 			</Modal.Header>
@@ -22,7 +44,15 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 				<p className="mb-3">This page contains information that requires reauthentication.</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button type="button" variant="outline-primary" size="sm" onClick={props.onHide}>
+				<Button
+					type="button"
+					variant="outline-primary"
+					size="sm"
+					onClick={() => {
+						history.goBack();
+						setShowReauthModal(false);
+					}}
+				>
 					cancel
 				</Button>
 				<Button
@@ -30,8 +60,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 					variant="primary"
 					size="sm"
 					onClick={() => {
-						window.alert('[TODO]: Link to sso page');
-						props.onHide();
+						window.location.href = signOnUrl;
 					}}
 				>
 					proceed
