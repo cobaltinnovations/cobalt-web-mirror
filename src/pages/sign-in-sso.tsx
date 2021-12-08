@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 import useSubdomain from '@/hooks/use-subdomain';
+import useQuery from '@/hooks/use-query';
 
 import AsyncPage from '@/components/async-page';
 import Select from '@/components/select';
@@ -20,10 +21,14 @@ const SignInSSO: FC = () => {
 	const [ssoOptions, setSsoOptions] = useState<AccountSource[]>([]);
 	const [ssoSelectValue, setSsoSelectValue] = useState<string>('');
 
+	const query = useQuery();
+	const accountSourceId = query.get('accountSourceId');
+
 	const fetchData = useCallback(async () => {
 		const { accountSources } = await institutionService
 			.getAccountSources({
 				...(subdomain ? { subdomain } : {}),
+				...(accountSourceId ? { accountSourceId } : {}),
 			})
 			.fetch();
 
@@ -35,7 +40,7 @@ const SignInSSO: FC = () => {
 
 		setSsoOptions(accountSources);
 		setSsoSelectValue(firstAccountSource.accountSourceId);
-	}, [subdomain]);
+	}, [accountSourceId, subdomain]);
 
 	function handleSsoSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		setSsoSelectValue(event.currentTarget.value);

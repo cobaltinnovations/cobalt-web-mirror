@@ -68,6 +68,7 @@ const AccountProvider: FC = (props) => {
 	const [isTrackedSession, setIsTrackedSession] = useState(!!query.get('track'));
 
 	const immediateAccess = query.get('immediateAccess');
+	const accountSourceId = query.get('accountSourceId');
 
 	const signOutAndClearContext = useCallback(() => {
 		Cookies.remove('accessToken');
@@ -175,13 +176,16 @@ const AccountProvider: FC = (props) => {
 	// Fetch subdomain instituion on mount
 	useEffect(() => {
 		institutionService
-			.getInstitution({ subdomain })
+			.getInstitution({
+				subdomain,
+				...(accountSourceId ? { accountSourceId } : {}),
+			 })
 			.fetch()
 			.then((response) => {
 				setAccountSources(response.accountSources);
 				setSubdomainInstitution(response.institution);
 			});
-	}, [subdomain]);
+	}, [accountSourceId, subdomain]);
 
 	const institutionCapabilities = useMemo(() => {
 		if (!account || !subdomainInstitution || !account.capabilities) {

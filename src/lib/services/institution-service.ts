@@ -8,6 +8,7 @@ interface GetAccountSourcesResponse {
 
 interface GetAccountSourcesRequestBody {
 	subdomain?: string;
+	accountSourceId?: string;
 }
 
 interface GetInstitutionResponse {
