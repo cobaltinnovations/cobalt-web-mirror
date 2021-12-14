@@ -19,6 +19,8 @@ export type ApiError = {
 	globalErrors?: string;
 	fieldErrors?: FieldError[];
 	metaData?: Record<string, string | boolean>;
+	accessTokenStatus?: 'PARTIALLY_EXPIRED' | 'FULLY_EXPIRED';
+	signOnUrl?: string;
 };
 
 type FieldError = {
