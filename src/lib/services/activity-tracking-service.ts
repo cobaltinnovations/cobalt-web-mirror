@@ -5,10 +5,16 @@ interface ActivityTrackingResponse {
 	activityTracking: ActivityTracking;
 }
 
+export interface ActivityTrackingContext {
+	contentId?: string;
+	pathname?: string;
+	queryParams?: Record<string, string[]>;
+}
+
 interface TrackData {
 	activityTypeId: AcivityTypeId;
 	activityActionId: ActivityActionId;
-	activityKey?: string;
+	context?: ActivityTrackingContext;
 }
 
 export const activityTrackingService = {
@@ -16,7 +22,10 @@ export const activityTrackingService = {
 		return httpSingleton.orchestrateRequest<ActivityTrackingResponse>({
 			method: 'post',
 			url: '/activity-tracking',
-			data,
+			data: {
+				...data,
+				context: JSON.stringify(data.context),
+			},
 		});
 	},
 };

@@ -33,6 +33,7 @@ import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
 import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
+import useUrlViewTracking from './hooks/use-url-view-tracking';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const queryClient = new QueryClient();
@@ -49,6 +50,8 @@ const AppWithProviders: FC = () => {
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [pathname]);
+
+	useUrlViewTracking();
 
 	return (
 		<>

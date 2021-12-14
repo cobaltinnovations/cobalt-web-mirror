@@ -42,6 +42,7 @@ type AccountContextConfig = {
 	isMhic: boolean;
 	picPatient: PatientObject | undefined;
 	signOutAndClearContext: () => void;
+	isTrackedSession: boolean;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
@@ -64,8 +65,10 @@ const AccountProvider: FC = (props) => {
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
+	const [isTrackedSession, setIsTrackedSession] = useState(!!query.get('track'));
 
 	const immediateAccess = query.get('immediateAccess');
+	const accountSourceId = query.get('accountSourceId');
 
 	const signOutAndClearContext = useCallback(() => {
 		Cookies.remove('accessToken');
@@ -74,6 +77,7 @@ const AccountProvider: FC = (props) => {
 		Cookies.remove('seenWaivedCopay');
 		Cookies.remove('x-mhic-cobalt-token');
 		Cookies.remove('piccobalt_patientcontext');
+		setIsTrackedSession(false);
 
 		let signInPath = '/sign-in';
 		const hostname = window.location.hostname.toLowerCase();
@@ -125,6 +129,13 @@ const AccountProvider: FC = (props) => {
 			Cookies.set('authRedirectUrl', authRedirectUrl);
 			Cookies.set('immediateAccess', '1');
 
+			if (isTrackedSession) {
+				// force sign-in flow for tracked sessions
+				setInitialized(true);
+
+				return;
+			}
+
 			accountService
 				.createAnonymousAccount()
 				.fetch()
@@ -139,7 +150,6 @@ const AccountProvider: FC = (props) => {
 				.catch((e) => {
 					handleError(e);
 				});
-			return;
 		} else if (accessTokenFromCookie) {
 			if (immediateAccess || immediateSupportRouteMatch) {
 				Cookies.set('immediateAccess', '1');
@@ -163,18 +173,21 @@ const AccountProvider: FC = (props) => {
 					signOutAndClearContext();
 				});
 		}
-	}, [handleError, history, immediateAccess, immediateSupportRouteMatch, initialized, location.pathname, location.search, signOutAndClearContext]);
+	}, [handleError, history, immediateAccess, immediateSupportRouteMatch, initialized, location.pathname, location.search, signOutAndClearContext, isTrackedSession]);
 
 	// Fetch subdomain instituion on mount
 	useEffect(() => {
 		institutionService
-			.getInstitution({ subdomain })
+			.getInstitution({
+				subdomain,
+				...(accountSourceId ? { accountSourceId } : {}),
+			 })
 			.fetch()
 			.then((response) => {
 				setAccountSources(response.accountSources);
 				setSubdomainInstitution(response.institution);
 			});
-	}, [subdomain]);
+	}, [accountSourceId, subdomain]);
 
 	const institutionCapabilities = useMemo(() => {
 		if (!account || !subdomainInstitution || !account.capabilities) {
@@ -197,6 +210,7 @@ const AccountProvider: FC = (props) => {
 		isMhic,
 		picPatient,
 		signOutAndClearContext,
+		isTrackedSession,
 	};
 
 	return (

@@ -26,10 +26,14 @@ export class HttpClient {
 	_headers: any;
 	_requests: Record<string, OrchestratedRequest<any>>;
 	_axiosInstance: AxiosInstance;
+	_sessionTrackingId = uuidv4();
 
 	constructor(httpConfig: HttpConfig) {
 		this._baseUrl = httpConfig.baseUrl || '';
-		this._headers = httpConfig.defaultHeaders || {};
+		this._headers = {
+			'X-Session-Tracking-Id': this._sessionTrackingId,
+			...httpConfig.defaultHeaders
+		};
 		this._requests = {};
 
 		this._axiosInstance = axios.create({
