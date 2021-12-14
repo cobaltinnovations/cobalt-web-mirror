@@ -14,8 +14,9 @@ export default function useUrlViewTracking(): void {
 	const query = useQuery();
 	const { pathname } = useLocation();
 
+	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!isTrackedSession || !initialized || !account) {
+		if (!isTrackedSession || !initialized || !accountId) {
 			return;
 		}
 
@@ -41,5 +42,5 @@ export default function useUrlViewTracking(): void {
 				context,
 			}).fetch();
 		}
-	}, [pathname, initialized, query, account, isTrackedSession]);
+	}, [pathname, initialized, query, accountId, isTrackedSession]);
 }
