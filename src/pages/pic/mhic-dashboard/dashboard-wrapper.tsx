@@ -16,7 +16,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-export const DashboardWrapper: FC = () => {
+const DashboardWrapper: FC = () => {
 	useHeaderTitle(null);
 	const { path } = useRouteMatch();
 	const classes = useStyles();
@@ -68,3 +68,5 @@ export const DashboardWrapper: FC = () => {
 		</Container>
 	);
 };
+
+export default DashboardWrapper;

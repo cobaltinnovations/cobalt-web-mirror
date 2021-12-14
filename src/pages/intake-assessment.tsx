@@ -107,26 +107,26 @@ const IntakeAssessment: FC = () => {
 
 			if (isGroupSessionAssessment) {
 				if (typeof response.assessment.bookingAllowed === 'boolean') {
-					history.replace({
+					history.push({
 						pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
 						state: {
-							...(history.location.state as Object),
+							...(history.location.state as Record<string, unknown>),
 							passedAssessment: response.assessment.bookingAllowed ? true : false,
 						},
 					});
 					if (response.assessment.bookingAllowed) {
-						history.replace({
+						history.push({
 							pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
 							state: {
-								...(history.location.state as Object),
+								...(history.location.state as Record<string, unknown>),
 								passedAssessment: true,
 							},
 						});
 					} else {
-						history.replace({
+						history.push({
 							pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
 							state: {
-								...(history.location.state as Object),
+								...(history.location.state as Record<string, unknown>),
 								passedAssessment: false,
 							},
 						});
@@ -135,7 +135,7 @@ const IntakeAssessment: FC = () => {
 					return;
 				}
 
-				history.replace(
+				history.push(
 					`/intake-assessment?groupSessionId=${groupSessionId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
 					history.location.state
 				);
@@ -143,7 +143,7 @@ const IntakeAssessment: FC = () => {
 				if (typeof response.assessment.bookingAllowed === 'boolean') {
 					if (response.assessment.bookingAllowed) {
 						if (selectedProvider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-							history.replace({
+							history.push({
 								pathname: '/ehr-lookup',
 								state: history.location.state,
 							});
@@ -154,13 +154,13 @@ const IntakeAssessment: FC = () => {
 						}
 					} else {
 						setIsEligible(false);
-						history.replace(supportPageRoute);
+						history.push(supportPageRoute);
 					}
 
 					return;
 				}
 
-				history.replace(
+				history.push(
 					`/intake-assessment?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
 					history.location.state
 				);
@@ -264,7 +264,7 @@ const IntakeAssessment: FC = () => {
 							setSelectedProvider(undefined);
 							setSelectedTimeSlot(undefined);
 
-							history.replace(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
+							history.push(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
 								successBooking: true,
 								emailAddress: response.account.emailAddress,
 							});
@@ -360,7 +360,7 @@ const IntakeAssessment: FC = () => {
 										type="button"
 										variant="outline-primary"
 										onClick={() => {
-											history.replace(
+											history.push(
 												`/intake-assessment?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
 												history.location.state
 											);

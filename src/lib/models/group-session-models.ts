@@ -50,12 +50,12 @@ export interface GroupSessionModel {
 	durationInMinutes: number;
 	durationInMinutesDescription: string;
 	scheduleUrl: string;
-	seats: number;
-	seatsDescription: string;
-	seatsAvailable: number;
-	seatsAvailableDescription: string;
-	seatsReserved: number;
-	seatsReservedDescription: string;
+	seats?: number;
+	seatsDescription?: string;
+	seatsAvailable?: number;
+	seatsAvailableDescription?: string;
+	seatsReserved?: number;
+	seatsReservedDescription?: string;
 	timeZone: string;
 	imageUrl: string;
 	videoconferenceUrl: string;

@@ -8,10 +8,15 @@ import { AssessmentForm } from '@/pages/pic/assessment/assessment-form';
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom';
 import { getFormattedPatientObject, FormattedPatientObject, Disposition } from '@/pages/pic/utils';
 import useAccount from '@/hooks/use-account';
-import { useGetAssessmentByPatientId, useAssessmentResponses, useGetDisposition, useAcknowledgeCrisis } from '@/hooks/pic-hooks';
+import {
+	useGetAssessmentByPatientId,
+	useAssessmentResponses,
+	useGetDisposition,
+	useAcknowledgeCrisis,
+} from '@/hooks/pic-hooks';
 import { PicAssessment } from '@/pages/pic/utils';
 import { IQuestionnaireResponse } from '@ahryman40k/ts-fhir-types/lib/R4';
-import { ContactLCSW } from '@/pages/pic/contact-lcsw/contact-lcsw';
+import ContactLCSW from '@/pages/pic/contact-lcsw/contact-lcsw';
 import { AxiosError } from 'axios';
 
 const AssessmentWrapper = () => {
@@ -107,13 +112,28 @@ export const Assessment: FC<AssessmentProps> = ({ patient, assessment, dispositi
 				<PersonalInformation nextUrl={`${path}/lookingFor/0`} patient={patient} assessmentId={assessment.id} />
 			</Route>
 			<Route path={`${path}/lookingFor/0`}>
-				<LookingForHome previousUrl={`${path}/personalInfo`} nextUrl={`${path}/lookingFor/1`} assessmentId={assessment.id} responses={responses} />
+				<LookingForHome
+					previousUrl={`${path}/personalInfo`}
+					nextUrl={`${path}/lookingFor/1`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/lookingFor/1`}>
-				<LookingForDetail previousUrl={`${path}/lookingFor/0`} nextUrl={`${path}/military`} assessmentId={assessment.id} responses={responses} />
+				<LookingForDetail
+					previousUrl={`${path}/lookingFor/0`}
+					nextUrl={`${path}/military`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/military`}>
-				<MilitaryNationalGuard previousUrl={`${path}/lookingFor/1`} nextUrl={`${path}/clinical/0`} assessmentId={assessment.id} responses={responses} />
+				<MilitaryNationalGuard
+					previousUrl={`${path}/lookingFor/1`}
+					nextUrl={`${path}/clinical/0`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/clinical/:page`}>
 				<AssessmentForm
@@ -167,13 +187,28 @@ export const MHICAssessment: FC<MHICAssessmentProps> = ({ patientName, assessmen
 				<Redirect to={`${url}/lookingFor/0`} />
 			</Route>
 			<Route path={`${path}/lookingFor/0`}>
-				<LookingForHome previousUrl={finishedUrl} nextUrl={`${url}/lookingFor/1`} assessmentId={assessment.id} responses={responses} />
+				<LookingForHome
+					previousUrl={finishedUrl}
+					nextUrl={`${url}/lookingFor/1`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/lookingFor/1`}>
-				<LookingForDetail previousUrl={`${url}/lookingFor/0`} nextUrl={`${url}/military`} assessmentId={assessment.id} responses={responses} />
+				<LookingForDetail
+					previousUrl={`${url}/lookingFor/0`}
+					nextUrl={`${url}/military`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/military`}>
-				<MilitaryNationalGuard previousUrl={`${url}/lookingFor/1`} nextUrl={`${url}/clinical/0`} assessmentId={assessment.id} responses={responses} />
+				<MilitaryNationalGuard
+					previousUrl={`${url}/lookingFor/1`}
+					nextUrl={`${url}/clinical/0`}
+					assessmentId={assessment.id}
+					responses={responses}
+				/>
 			</Route>
 			<Route path={`${path}/clinical/:page`}>
 				<AssessmentForm

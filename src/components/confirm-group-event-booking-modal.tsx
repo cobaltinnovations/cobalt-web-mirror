@@ -21,6 +21,10 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 	const classes = useConfirmGroupEventBookingModalStyles();
 
 	const navigateToExternalUrl = useCallback(() => {
+		if (!externalUrl) {
+			return;
+		}
+
 		const url = externalUrl?.startsWith('http') ? externalUrl : `https://${externalUrl}`;
 
 		window.open(url, '_self');
