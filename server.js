@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
 const serialize = require('serialize-javascript');
 const cookieSession = require('cookie-session');
 const yn = require('yn');
+const cookieParser = require('cookie-parser');
 
 const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
@@ -128,9 +129,33 @@ if (basicAuthEnabled) {
 /* ----------------------------------------- */
 
 app.use(express.static(path.join(__dirname, 'build')));
+app.use(cookieParser());
 
 app.get('/news/:pdfName', (_req, res) => {
 	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
+});
+
+app.get('/pic/finish-sso', (_req, res) => {
+    const accessToken = _req.query.accessToken;
+	const patientContext = _req.query.patientContext;
+
+    const options = {
+		sameSite: 'lax'
+	};
+
+	if(accessToken) {
+		res.cookie('accessToken', accessToken, options);
+	} else {
+		res.clearCookie('accessToken');
+	}
+
+	if(patientContext) {
+    	res.cookie('piccobalt_patientcontext', patientContext, options);
+	} else {
+		res.clearCookie('piccobalt_patientcontext');
+	}
+
+    res.redirect(patientContext ? '/pic/home' : '/pic/mhic');
 });
 
 app.get('*', (_req, res) => {

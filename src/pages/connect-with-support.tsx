@@ -40,7 +40,6 @@ import { accountService, appointmentService, providerService, CreateAppointmentD
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
 import colors from '@/jss/colors';
-import 'react-datepicker/dist/react-datepicker.css';
 import { BookingContext, SearchResult, BookingFilters } from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';

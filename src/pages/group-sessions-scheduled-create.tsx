@@ -1,7 +1,8 @@
+import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -20,7 +21,12 @@ import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
-import { CreateGroupSessionRequestBody, GroupSessionSchedulingSystemId, groupSessionsService, imageUploader } from '@/lib/services';
+import {
+	CreateGroupSessionRequestBody,
+	GroupSessionSchedulingSystemId,
+	groupSessionsService,
+	imageUploader,
+} from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel, ROLE_ID, ScreeningQuestionV2 } from '@/lib/models';
 
 import fonts from '@/jss/fonts';
@@ -100,7 +106,12 @@ const groupSessionSchema = yup
 			)
 			.when('isRestricted', {
 				is: true,
-				then: (a) => a.test('non-falsy-values', 'Screening question is a required field.', (arr) => !!arr?.length && arr.every((sq) => sq.question)),
+				then: (a) =>
+					a.test(
+						'non-falsy-values',
+						'Screening question is a required field.',
+						(arr) => !!arr?.length && arr.every((sq) => sq.question)
+					),
 			}),
 		confirmationEmailTemplate: yup.string().default(''),
 		followUpEmail: yup.boolean().required().default(false),
@@ -122,6 +133,10 @@ const GroupSessionsCreate: FC = () => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const classes = useStyles();
+	const isViewMode = !!useRouteMatch({
+		path: '/group-sessions/scheduled/:groupSessionId/view',
+		exact: true,
+	});
 
 	const { showAlert } = useAlert();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
@@ -137,7 +152,7 @@ const GroupSessionsCreate: FC = () => {
 	const [initialValues, setInitialValues] = useState<GroupSessionFormData>();
 
 	const [isEdit, setIsEdit] = useState(false);
-	const [shouldDisabledInputs, setShouldDisabledInputs] = useState(false);
+	const [hasReservations, setHasReservations] = useState(false);
 	const [isCopy, setIsCopy] = useState(false);
 
 	const [sessionCropModalImageSource, setSessionCropModalImageSource] = useState('');
@@ -147,8 +162,9 @@ const GroupSessionsCreate: FC = () => {
 
 	useHeaderTitle(`${initialValues?.title ? initialValues.title : 'Create Studio Session'}${isCopy ? ' (copy)' : ''}`);
 
+	const accountId = account?.accountId;
 	const fetchData = useCallback(async () => {
-		if (!groupSessionId && !groupSessionIdToCopy) {
+		if (!accountId || (!groupSessionId && !groupSessionIdToCopy)) {
 			// If there is no groupSessionId and no groupSessionIdToCopy,
 			// that means this is a new session. Do not fetch any data.
 			return;
@@ -165,7 +181,7 @@ const GroupSessionsCreate: FC = () => {
 			]);
 
 			groupSessionToSet = groupSession;
-			setShouldDisabledInputs(groupSessionReservations.length > 0 ? true : false);
+			setHasReservations(groupSessionReservations.length > 0);
 			setIsEdit(true);
 			setReservations(groupSessionReservations);
 		}
@@ -193,32 +209,44 @@ const GroupSessionsCreate: FC = () => {
 		}
 
 		if (groupSessionToSet) {
+			let capacity = undefined;
+			if (isNumber(groupSessionToSet.seatsAvailable) || isNumber(groupSessionToSet.seatsReserved)) {
+				capacity = (groupSessionToSet.seatsAvailable || 0) + (groupSessionToSet.seatsReserved || 0);
+			}
+
 			setSession(groupSessionToSet);
 			setImagePreview(groupSessionToSet.imageUrl);
 			setInitialValues({
-				isCobaltScheduling: groupSessionToSet.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT ? true : false,
+				isCobaltScheduling:
+					groupSessionToSet.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT
+						? true
+						: false,
 				date: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('YYYY-MM-DD'),
 				startTime: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('hh:mm A'),
 				endTime: isCopy ? '' : moment(groupSessionToSet.endDateTime).format('hh:mm A'),
 				schedulingUrl: groupSessionToSet.scheduleUrl,
-				isModerator: groupSessionToSet.facilitatorAccountId === account?.accountId,
+				isModerator: groupSessionToSet.facilitatorAccountId === accountId,
 				facilitatorsName: groupSessionToSet.facilitatorName,
 				facilitatorsEmail: groupSessionToSet.facilitatorEmailAddress,
 				title: groupSessionToSet.title,
 				description: groupSessionToSet.description,
 				imageUrl: groupSessionToSet.imageUrl,
 				meetingUrl: groupSessionToSet.videoconferenceUrl,
-				capacity: groupSessionToSet.seatsAvailable + groupSessionToSet.seatsReserved,
+				capacity,
 				slug: groupSessionToSet.urlName,
 				isRestricted: !!groupSessionToSet.screeningQuestions.length ? true : false,
 				screeningQuestions: screeningQuestionsToSet,
 				confirmationEmailTemplate: groupSessionToSet.confirmationEmailContent,
 				followUpEmail: groupSessionToSet.sendFollowupEmail,
-				...(groupSessionToSet.followupEmailContent ? { followUpEmailTemplate: groupSessionToSet.followupEmailContent } : {}),
-				...(groupSessionToSet.followupEmailSurveyUrl ? { followUpEmailSurveyUrl: groupSessionToSet.followupEmailSurveyUrl } : {}),
+				...(groupSessionToSet.followupEmailContent
+					? { followUpEmailTemplate: groupSessionToSet.followupEmailContent }
+					: {}),
+				...(groupSessionToSet.followupEmailSurveyUrl
+					? { followUpEmailSurveyUrl: groupSessionToSet.followupEmailSurveyUrl }
+					: {}),
 			} as GroupSessionFormData);
 		}
-	}, [groupSessionId, groupSessionIdToCopy]);
+	}, [accountId, groupSessionId, groupSessionIdToCopy]);
 
 	function handleCancelSessionButtonClick() {
 		setShowSessionCancelModal(true);
@@ -242,8 +270,12 @@ const GroupSessionsCreate: FC = () => {
 
 	async function handleSubmit(values: GroupSessionFormData) {
 		try {
-			const startDateTime = moment(`${values.date} ${values.startTime}`).format('YYYY-MM-DD[T]HH:mm');
-			const endDateTime = moment(`${values.date} ${values.endTime}`).format('YYYY-MM-DD[T]HH:mm');
+			const startDateTime = moment(`${values.date} ${values.startTime}`, 'YYYY-MM-DD HH:mm A').format(
+				'YYYY-MM-DD[T]HH:mm'
+			);
+			const endDateTime = moment(`${values.date} ${values.endTime}`, 'YYYY-MM-DD HH:mm A').format(
+				'YYYY-MM-DD[T]HH:mm'
+			);
 
 			const submissionValues: CreateGroupSessionRequestBody = {
 				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
@@ -302,7 +334,11 @@ const GroupSessionsCreate: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<SessionCancelModal show={showSessionCancelModal} onCancel={handleCancelSessionModalCancel} onHide={handleCancelSessionModalHide} />
+			<SessionCancelModal
+				show={showSessionCancelModal}
+				onCancel={handleCancelSessionModalCancel}
+				onHide={handleCancelSessionModalHide}
+			/>
 
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 				<Breadcrumb
@@ -330,9 +366,14 @@ const GroupSessionsCreate: FC = () => {
 								</h1>
 								<p className="mb-0 text-danger">Required*</p>
 							</div>
-							{groupSessionId && (
+							{!isViewMode && groupSessionId && (
 								<>
-									<Button className="ml-auto mr-2" size="sm" variant="danger" onClick={handleCancelSessionButtonClick}>
+									<Button
+										className="ml-auto mr-2"
+										size="sm"
+										variant="danger"
+										onClick={handleCancelSessionButtonClick}
+									>
 										cancel session
 									</Button>
 
@@ -364,8 +405,19 @@ const GroupSessionsCreate: FC = () => {
 							onSubmit={handleSubmit}
 						>
 							{(formikBag) => {
-								const { values, setFieldValue, setFieldTouched, handleChange, handleBlur, touched, errors, handleSubmit } = formikBag;
-								const selectedStartTimeSlotIdx = timeSlots.findIndex((time) => time === values.startTime);
+								const {
+									values,
+									setFieldValue,
+									setFieldTouched,
+									handleChange,
+									handleBlur,
+									touched,
+									errors,
+									handleSubmit,
+								} = formikBag;
+								const selectedStartTimeSlotIdx = timeSlots.findIndex(
+									(time) => time === values.startTime
+								);
 
 								return (
 									<>
@@ -436,6 +488,7 @@ const GroupSessionsCreate: FC = () => {
 														Would you like to use Cobalt's scheduling system?
 													</Form.Label>
 													<Form.Check
+														disabled={isViewMode}
 														type="radio"
 														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-Yes"
@@ -448,6 +501,7 @@ const GroupSessionsCreate: FC = () => {
 														}}
 													/>
 													<Form.Check
+														disabled={isViewMode}
 														type="radio"
 														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-No"
@@ -469,12 +523,17 @@ const GroupSessionsCreate: FC = () => {
 														showYearDropdown
 														showMonthDropdown
 														dropdownMode="select"
-														selected={values.date ? moment(values.date).toDate() : undefined}
+														selected={
+															values.date ? moment(values.date).toDate() : undefined
+														}
 														onChange={(date) => {
 															setFieldTouched('date', true);
-															setFieldValue('date', date ? moment(date).format('YYYY-MM-DD') : '');
+															setFieldValue(
+																'date',
+																date ? moment(date).format('YYYY-MM-DD') : ''
+															);
 														}}
-														disabled={shouldDisabledInputs}
+														disabled={hasReservations || isViewMode}
 													/>
 												</Form.Group>
 
@@ -489,8 +548,12 @@ const GroupSessionsCreate: FC = () => {
 																setFieldValue('startTime', event.target.value);
 															}}
 															required={requiredFields.startTime}
-															error={touched.startTime && errors.startTime ? errors.startTime : ''}
-															disabled={shouldDisabledInputs}
+															error={
+																touched.startTime && errors.startTime
+																	? errors.startTime
+																	: ''
+															}
+															disabled={hasReservations || isViewMode}
 														>
 															<option value="" disabled>
 																Select...
@@ -513,8 +576,10 @@ const GroupSessionsCreate: FC = () => {
 																setFieldValue('endTime', event.target.value);
 															}}
 															required={requiredFields.endTime}
-															error={touched.endTime && errors.endTime ? errors.endTime : ''}
-															disabled={shouldDisabledInputs}
+															error={
+																touched.endTime && errors.endTime ? errors.endTime : ''
+															}
+															disabled={hasReservations || isViewMode}
 														>
 															<option value="" disabled>
 																Select...
@@ -545,7 +610,12 @@ const GroupSessionsCreate: FC = () => {
 														onBlur={handleBlur}
 														onChange={handleChange}
 														required={!values.isCobaltScheduling}
-														error={touched.schedulingUrl && errors.schedulingUrl ? errors.schedulingUrl : ''}
+														error={
+															touched.schedulingUrl && errors.schedulingUrl
+																? errors.schedulingUrl
+																: ''
+														}
+														disabled={isViewMode}
 													/>
 												)}
 											</Card>
@@ -558,6 +628,7 @@ const GroupSessionsCreate: FC = () => {
 														Are you the facilitator of this session?
 													</Form.Label>
 													<Form.Check
+														disabled={isViewMode}
 														type="radio"
 														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-Yes"
@@ -570,6 +641,7 @@ const GroupSessionsCreate: FC = () => {
 														}}
 													/>
 													<Form.Check
+														disabled={isViewMode}
 														type="radio"
 														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-No"
@@ -593,7 +665,12 @@ const GroupSessionsCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.facilitatorsName}
-													error={touched.facilitatorsName && errors.facilitatorsName ? errors.facilitatorsName : ''}
+													error={
+														touched.facilitatorsName && errors.facilitatorsName
+															? errors.facilitatorsName
+															: ''
+													}
+													disabled={isViewMode}
 												/>
 
 												<InputHelper
@@ -605,7 +682,12 @@ const GroupSessionsCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.facilitatorsEmail}
-													error={touched.facilitatorsEmail && errors.facilitatorsEmail ? errors.facilitatorsEmail : ''}
+													error={
+														touched.facilitatorsEmail && errors.facilitatorsEmail
+															? errors.facilitatorsEmail
+															: ''
+													}
+													disabled={isViewMode}
 												/>
 											</Card>
 
@@ -623,7 +705,7 @@ const GroupSessionsCreate: FC = () => {
 													onChange={handleChange}
 													required={requiredFields.title}
 													error={touched.title && errors.title ? errors.title : ''}
-													disabled={shouldDisabledInputs}
+													disabled={hasReservations || isViewMode}
 												/>
 
 												<InputHelper
@@ -636,13 +718,19 @@ const GroupSessionsCreate: FC = () => {
 													onChange={handleChange}
 													helperText="How would you like to describe your session? (This will be featured on the Colbalt Platform, should be 2-3 sentences long, and should highlight the benefit for participants)."
 													required={requiredFields.description}
-													error={touched.description && errors.description ? errors.description : ''}
+													error={
+														touched.description && errors.description
+															? errors.description
+															: ''
+													}
+													disabled={isViewMode}
 												/>
 
 												<ImageUpload
 													imagePreview={imagePreview}
 													isUploading={isUploading}
 													progress={progress}
+													disabled={isViewMode}
 													onChange={(file) => {
 														const sourceUrl = URL.createObjectURL(file);
 
@@ -666,7 +754,12 @@ const GroupSessionsCreate: FC = () => {
 															onBlur={handleBlur}
 															onChange={handleChange}
 															required
-															error={touched.meetingUrl && errors.meetingUrl ? errors.meetingUrl : ''}
+															disabled={isViewMode}
+															error={
+																touched.meetingUrl && errors.meetingUrl
+																	? errors.meetingUrl
+																	: ''
+															}
 														/>
 
 														<InputHelper
@@ -679,7 +772,12 @@ const GroupSessionsCreate: FC = () => {
 															onBlur={handleBlur}
 															onChange={handleChange}
 															required={requiredFields.capacity}
-															error={touched.capacity && errors.capacity ? errors.capacity : ''}
+															error={
+																touched.capacity && errors.capacity
+																	? errors.capacity
+																	: ''
+															}
+															disabled={isViewMode}
 														/>
 													</>
 												)}
@@ -695,7 +793,7 @@ const GroupSessionsCreate: FC = () => {
 													helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
 													required={requiredFields.slug}
 													error={touched.slug && errors.slug ? errors.slug : ''}
-													disabled={shouldDisabledInputs}
+													disabled={hasReservations || isViewMode}
 												/>
 											</Card>
 
@@ -717,7 +815,7 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('isRestricted', false);
 														}}
-														disabled={shouldDisabledInputs}
+														disabled={hasReservations || isViewMode}
 													/>
 													<Form.Check
 														type="radio"
@@ -730,28 +828,39 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('isRestricted', true);
 														}}
-														disabled={shouldDisabledInputs}
+														disabled={hasReservations || isViewMode}
 													/>
 												</Form.Group>
 
 												{values.screeningQuestions &&
 													values.screeningQuestions.map((screeningQuestion, index) => {
-														const touchedScreenQuestions = ((touched.screeningQuestions as unknown) as []) || [];
-														const sqTouched = !!touchedScreenQuestions.length ? touchedScreenQuestions[index] : false;
+														const touchedScreenQuestions =
+															((touched.screeningQuestions as unknown) as []) || [];
+														const sqTouched = !!touchedScreenQuestions.length
+															? touchedScreenQuestions[index]
+															: false;
 
 														return (
-															<div key={screeningQuestion.questionId} className="position-relative">
+															<div
+																key={screeningQuestion.questionId}
+																className="position-relative"
+															>
 																{index !== 0 && (
 																	<Button
 																		size="sm"
 																		className={classes.removeButton}
 																		variant="danger"
 																		onClick={() => {
-																			const screeningQuestionsClone = cloneDeep(values.screeningQuestions || []);
+																			const screeningQuestionsClone = cloneDeep(
+																				values.screeningQuestions || []
+																			);
 																			screeningQuestionsClone.splice(index, 1);
 
 																			setFieldTouched('screeningQuestions', true);
-																			setFieldValue('screeningQuestions', screeningQuestionsClone);
+																			setFieldValue(
+																				'screeningQuestions',
+																				screeningQuestionsClone
+																			);
 																		}}
 																	>
 																		<CloseIcon height={24} width={24} />
@@ -765,38 +874,58 @@ const GroupSessionsCreate: FC = () => {
 																	as="textarea"
 																	onBlur={handleBlur}
 																	onChange={(event) => {
-																		const screeningQuestionsClone = cloneDeep(values.screeningQuestions || []);
-																		screeningQuestionsClone[index].question = event.currentTarget.value;
+																		const screeningQuestionsClone = cloneDeep(
+																			values.screeningQuestions || []
+																		);
+																		screeningQuestionsClone[index].question =
+																			event.currentTarget.value;
 
 																		setFieldTouched('screeningQuestions', true);
-																		setFieldValue('screeningQuestions', screeningQuestionsClone);
+																		setFieldValue(
+																			'screeningQuestions',
+																			screeningQuestionsClone
+																		);
 																	}}
 																	helperText="An attendee must first answer “Yes” to this question before being allowed to reserve a seat."
 																	required={requiredFields.screeningQuestions}
 																	error={
-																		sqTouched && !screeningQuestion && errors.screeningQuestions
+																		sqTouched &&
+																		!screeningQuestion &&
+																		errors.screeningQuestions
 																			? errors.screeningQuestions
 																			: ''
 																	}
-																	disabled={shouldDisabledInputs}
+																	disabled={hasReservations || isViewMode}
 																/>
 																<div className="mb-5">
 																	<Form.Check
+																		disabled={isViewMode}
 																		type="switch"
 																		id={`screening-question-toggle--${screeningQuestion.questionId}`}
 																		label="Reduce text size"
 																		value="SMALL"
-																		checked={screeningQuestion.fontSizeId === 'SMALL'}
+																		checked={
+																			screeningQuestion.fontSizeId === 'SMALL'
+																		}
 																		onChange={(event) => {
-																			const screeningQuestionsClone = cloneDeep(values.screeningQuestions || []);
+																			const screeningQuestionsClone = cloneDeep(
+																				values.screeningQuestions || []
+																			);
 
 																			if (event.currentTarget.checked) {
-																				screeningQuestionsClone[index].fontSizeId = 'SMALL';
+																				screeningQuestionsClone[
+																					index
+																				].fontSizeId = 'SMALL';
 																			} else {
-																				screeningQuestionsClone[index].fontSizeId = 'DEFAULT';
+																				screeningQuestionsClone[
+																					index
+																				].fontSizeId = 'DEFAULT';
 																			}
 
-																			setFieldValue('screeningQuestions', screeningQuestionsClone);
+																			setFieldValue(
+																				'screeningQuestions',
+																				screeningQuestionsClone
+																			);
 																		}}
 																	/>
 																</div>
@@ -806,15 +935,25 @@ const GroupSessionsCreate: FC = () => {
 
 												<div className="text-right">
 													<Button
+														disabled={isViewMode}
 														size="sm"
 														onClick={() => {
-															const screeningQuestionsClone = cloneDeep(values.screeningQuestions || []);
+															const screeningQuestionsClone = cloneDeep(
+																values.screeningQuestions || []
+															);
 															// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 															// @ts-ignore
-															screeningQuestionsClone.push({ questionId: uuidv4(), fontSizeId: 'DEFAULT', question: '' });
+															screeningQuestionsClone.push({
+																questionId: uuidv4(),
+																fontSizeId: 'DEFAULT',
+																question: '',
+															});
 
 															setFieldTouched('screeningQuestions', true);
-															setFieldValue('screeningQuestions', screeningQuestionsClone);
+															setFieldValue(
+																'screeningQuestions',
+																screeningQuestionsClone
+															);
 														}}
 													>
 														add question
@@ -827,6 +966,7 @@ const GroupSessionsCreate: FC = () => {
 													<h5 className="mb-5">Confirmation Email</h5>
 
 													<InputHelper
+														disabled={isViewMode}
 														label="Email Copy"
 														name="confirmationEmailTemplate"
 														value={values.confirmationEmailTemplate}
@@ -836,7 +976,8 @@ const GroupSessionsCreate: FC = () => {
 														helperText="This email will be sent to attendees after they reserve a seat for the session."
 														required={requiredFields.confirmationEmailTemplate}
 														error={
-															touched.confirmationEmailTemplate && errors.confirmationEmailTemplate
+															touched.confirmationEmailTemplate &&
+															errors.confirmationEmailTemplate
 																? errors.confirmationEmailTemplate
 																: ''
 														}
@@ -849,10 +990,12 @@ const GroupSessionsCreate: FC = () => {
 
 												<Form.Group>
 													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
-														Do you want to include a follow-up email? <span className="text-danger">*</span>
+														Do you want to include a follow-up email?{' '}
+														<span className="text-danger">*</span>
 													</Form.Label>
 													<p className="mb-2 ml-0 mr-auto text-muted font-size-xxs">
-														This email will be sent to attendees immediately after the session.
+														This email will be sent to attendees immediately after the
+														session.
 													</p>
 													<Form.Check
 														type="radio"
@@ -865,7 +1008,7 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('followUpEmail', false);
 														}}
-														disabled={shouldDisabledInputs}
+														disabled={hasReservations || isViewMode}
 													/>
 													<Form.Check
 														type="radio"
@@ -878,10 +1021,11 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('followUpEmail', true);
 														}}
-														disabled={shouldDisabledInputs}
+														disabled={hasReservations || isViewMode}
 													/>
 												</Form.Group>
 												<InputHelper
+													disabled={isViewMode}
 													className="mb-5"
 													label="Email Text"
 													name="followUpEmailTemplate"
@@ -890,7 +1034,11 @@ const GroupSessionsCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.followUpEmailTemplate}
-													error={touched.followUpEmailTemplate && errors.followUpEmailTemplate ? errors.followUpEmailTemplate : ''}
+													error={
+														touched.followUpEmailTemplate && errors.followUpEmailTemplate
+															? errors.followUpEmailTemplate
+															: ''
+													}
 												/>
 												<InputHelper
 													label="Survey URL"
@@ -901,13 +1049,24 @@ const GroupSessionsCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.followUpEmailSurveyUrl}
-													error={touched.followUpEmailSurveyUrl && errors.followUpEmailSurveyUrl ? errors.followUpEmailSurveyUrl : ''}
-													disabled={shouldDisabledInputs}
+													error={
+														touched.followUpEmailSurveyUrl && errors.followUpEmailSurveyUrl
+															? errors.followUpEmailSurveyUrl
+															: ''
+													}
+													disabled={hasReservations || isViewMode}
 												/>
 											</Card>
 
-											<SessionFormSubmitBanner title={isEdit ? 'update studio session' : 'add studio session'}>
-												{isEdit && <p className="mb-0 mt-2">An email with updates will be sent to all attendees</p>}
+											<SessionFormSubmitBanner
+												disabled={isViewMode}
+												title={isEdit ? 'update studio session' : 'add studio session'}
+											>
+												{!isViewMode && isEdit && (
+													<p className="mb-0 mt-2">
+														An email with updates will be sent to all attendees
+													</p>
+												)}
 											</SessionFormSubmitBanner>
 										</Form>
 									</>
@@ -917,7 +1076,12 @@ const GroupSessionsCreate: FC = () => {
 					</Col>
 					{isEdit && (
 						<Col lg={4}>
-							{session && <SessionAttendeeList attendees={reservations} capacity={session?.seatsReserved + session?.seatsAvailable || 0} />}
+							{session && (
+								<SessionAttendeeList
+									attendees={reservations}
+									capacity={(session?.seatsReserved || 0) + (session?.seatsAvailable || 0)}
+								/>
+							)}
 						</Col>
 					)}
 				</Row>

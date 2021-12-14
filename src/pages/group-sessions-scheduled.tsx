@@ -85,6 +85,10 @@ const GroupSessions: FC = () => {
 		history.push(`/group-sessions/scheduled/${groupSessionId}/edit`);
 	}
 
+	function handleSessionViewClicked(groupSessionId: string) {
+		history.push(`/group-sessions/scheduled/${groupSessionId}/view`);
+	}
+
 	function handleSessionCreateCopyClicked(groupSessionId: string) {
 		history.push(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
 	}
@@ -204,6 +208,7 @@ const GroupSessions: FC = () => {
 											key={session.groupSessionId}
 											session={session}
 											onEditClick={handleSessionEditClicked}
+											onViewClick={handleSessionViewClicked}
 											onCopyClick={handleSessionCreateCopyClicked}
 											onAddClick={(sessionId) => {
 												handleSessionActionClicked(sessionId, GROUP_SESSION_STATUS_ID.ADDED);
