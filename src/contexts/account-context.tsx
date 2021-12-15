@@ -9,14 +9,13 @@ import { accountService, institutionService } from '@/lib/services';
 import useQuery from '@/hooks/use-query';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import useHandleError from '@/hooks/use-handle-error';
-import { useGetPicPatient, useGetValidMhic } from '@/hooks/pic-hooks';
+import { useGetPicPatient } from '@/hooks/pic-hooks';
 import { PatientObject } from '@/pages/pic/utils';
 import useSubdomain from '@/hooks/use-subdomain';
 import { isPicPatientAccount, isPicMhicAccount } from '@/pages/pic/utils';
 
 const PicPatientAuthCtx = ({ onPatientChange, onUnauthorized }: { onPatientChange: (data: PatientObject) => void; onUnauthorized: () => void }) => {
 	const location = useLocation();
-	const history = useHistory();
 
 	useGetPicPatient(onPatientChange, (error) => {
 		if (error.response?.status === 401) {
@@ -65,10 +64,10 @@ const AccountProvider: FC = (props) => {
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
-	const [isTrackedSession, setIsTrackedSession] = useState(!!query.get('track'));
+	const [isTrackedSession, setIsTrackedSession] = useState(!!query.get('track') || !!Cookies.get('trackActivity'));
+	const [sessionAccountSourceId] = useState(query.get('accountSourceId'));
 
 	const immediateAccess = query.get('immediateAccess');
-	const accountSourceId = query.get('accountSourceId');
 
 	const signOutAndClearContext = useCallback(() => {
 		Cookies.remove('accessToken');
@@ -77,11 +76,12 @@ const AccountProvider: FC = (props) => {
 		Cookies.remove('seenWaivedCopay');
 		Cookies.remove('x-mhic-cobalt-token');
 		Cookies.remove('piccobalt_patientcontext');
+		Cookies.remove('trackActivity');
 		setIsTrackedSession(false);
 
 		let signInPath = '/sign-in';
 		const hostname = window.location.hostname.toLowerCase();
-		
+
 		if (hostname.indexOf('pic.') === 0) {
 			if (isMhic) {
 				const redirectUrl = hostname.indexOf('pic.dev.') === 0 ? 'https://pic.dev.cobaltinnovations.org/sign-in-email' : 'https://pic.cobaltinnovations.org/sign-in-email';
@@ -95,7 +95,7 @@ const AccountProvider: FC = (props) => {
 		history.push(signInPath);
 		setAccount(undefined);
 		setInstitution(undefined);
-	}, [subdomain, history, isMhic]);
+	}, [history, isMhic]);
 
 	// Fetch account if we have accessToken cookie
 	useEffect(() => {
@@ -131,6 +131,7 @@ const AccountProvider: FC = (props) => {
 
 			if (isTrackedSession) {
 				// force sign-in flow for tracked sessions
+				Cookies.set('trackActivity', '1');
 				setInitialized(true);
 
 				return;
@@ -180,14 +181,14 @@ const AccountProvider: FC = (props) => {
 		institutionService
 			.getInstitution({
 				subdomain,
-				...(accountSourceId ? { accountSourceId } : {}),
+				...(sessionAccountSourceId ? { accountSourceId: sessionAccountSourceId } : {}),
 			 })
 			.fetch()
 			.then((response) => {
 				setAccountSources(response.accountSources);
 				setSubdomainInstitution(response.institution);
 			});
-	}, [accountSourceId, subdomain]);
+	}, [sessionAccountSourceId, subdomain]);
 
 	const institutionCapabilities = useMemo(() => {
 		if (!account || !subdomainInstitution || !account.capabilities) {
