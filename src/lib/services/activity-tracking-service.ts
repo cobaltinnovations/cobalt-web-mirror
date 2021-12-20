@@ -1,5 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { ActivityTracking, AcivityTypeId, ActivityActionId } from '@/lib/models';
+import { OrchestratedRequest } from '@/lib/http-client';
 
 interface ActivityTrackingResponse {
 	activityTracking: ActivityTracking;
@@ -18,7 +19,7 @@ interface TrackData {
 }
 
 export const activityTrackingService = {
-	track(data: TrackData) {
+	track(data: TrackData): OrchestratedRequest<ActivityTrackingResponse> {
 		return httpSingleton.orchestrateRequest<ActivityTrackingResponse>({
 			method: 'post',
 			url: '/activity-tracking',
@@ -28,4 +29,14 @@ export const activityTrackingService = {
 			},
 		});
 	},
+	trackUnauthenticated(data: TrackData): OrchestratedRequest<ActivityTrackingResponse> {
+		return httpSingleton.orchestrateRequest<ActivityTrackingResponse>({
+			method: 'post',
+			url: '/unauthenticated-activity-tracking',
+			data: {
+				...data,
+				context: JSON.stringify(data.context),
+			},
+		});
+	}
 };

@@ -7,7 +7,7 @@ import { ActivityTrackingContext, activityTrackingService } from '@/lib/services
 import useAccount from './use-account';
 import useQuery from './use-query';
 
-const TRACKED_PATHS = ['/connect-with-support']
+const TRACKED_PATHS = ['/sign-in', '/connect-with-support']
 
 export default function useUrlViewTracking(): void {
 	const { account, initialized, isTrackedSession } = useAccount();
@@ -16,7 +16,7 @@ export default function useUrlViewTracking(): void {
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!isTrackedSession || !initialized || !accountId) {
+		if (!isTrackedSession || !initialized) {
 			return;
 		}
 
@@ -36,11 +36,19 @@ export default function useUrlViewTracking(): void {
 				context.queryParams = queryParamsAsObject;
 			}
 
-			activityTrackingService.track({
-				activityActionId: ActivityActionId.View,
-				activityTypeId: AcivityTypeId.Url,
-				context,
-			}).fetch();
+			if (!accountId) {
+				activityTrackingService.trackUnauthenticated({
+					activityActionId: ActivityActionId.View,
+					activityTypeId: AcivityTypeId.Url,
+					context,
+				}).fetch();
+			} else {
+				activityTrackingService.track({
+					activityActionId: ActivityActionId.View,
+					activityTypeId: AcivityTypeId.Url,
+					context,
+				}).fetch();
+			}
 		}
 	}, [pathname, initialized, query, accountId, isTrackedSession]);
 }
