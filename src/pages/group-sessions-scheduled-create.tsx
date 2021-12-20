@@ -1054,7 +1054,7 @@ const GroupSessionsCreate: FC = () => {
 															? errors.followUpEmailSurveyUrl
 															: ''
 													}
-													disabled={hasReservations || isViewMode}
+													disabled={isViewMode}
 												/>
 											</Card>
 
