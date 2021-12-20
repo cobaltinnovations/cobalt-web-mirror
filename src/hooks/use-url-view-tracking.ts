@@ -16,7 +16,7 @@ export default function useUrlViewTracking(): void {
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!isTrackedSession || !initialized) {
+		if (!initialized) {
 			return;
 		}
 
@@ -42,13 +42,18 @@ export default function useUrlViewTracking(): void {
 					activityTypeId: AcivityTypeId.Url,
 					context,
 				}).fetch();
-			} else {
-				activityTrackingService.track({
-					activityActionId: ActivityActionId.View,
-					activityTypeId: AcivityTypeId.Url,
-					context,
-				}).fetch();
+				return
 			}
+
+			if (!isTrackedSession) {
+				return;
+			}
+
+			activityTrackingService.track({
+				activityActionId: ActivityActionId.View,
+				activityTypeId: AcivityTypeId.Url,
+				context,
+			}).fetch();
 		}
 	}, [pathname, initialized, query, accountId, isTrackedSession]);
 }
