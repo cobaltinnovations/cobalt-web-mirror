@@ -69,11 +69,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 		}
 
 		if (history.location.state.passedAssessment) {
-			if (!account?.emailAddress || isAnonymous) {
-				setShowCollectEmailModal(true);
-			} else {
-				setShowConfirmReservationModal(true);
-			}
+			setShowCollectEmailModal(true);
 		} else {
 			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
 		}

@@ -213,11 +213,7 @@ const InTheStudioDetail: FC = () => {
 								disabled={groupEvent?.seatsAvailable === 0}
 								variant="primary"
 								onClick={() => {
-									if (!account?.emailAddress || isAnonymous) {
-										setShowCollectEmailModal(true);
-									} else {
-										setShowConfirmReservationModal(true);
-									}
+									setShowCollectEmailModal(true);
 								}}
 							>
 								{groupEvent?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a Place'}
