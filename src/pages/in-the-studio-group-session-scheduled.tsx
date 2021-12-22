@@ -80,11 +80,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			history.push(`/intake-assessment?groupSessionId=${session.groupSessionId}`);
 		}
 
-		if (!account?.emailAddress || isAnonymous) {
-			setShowCollectEmailModal(true);
-		} else {
-			setShowConfirmReservationModal(true);
-		}
+		setShowCollectEmailModal(true);
 	}
 
 	return (
