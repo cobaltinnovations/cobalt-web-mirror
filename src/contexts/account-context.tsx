@@ -30,7 +30,7 @@ const PicPatientAuthCtx = ({ onPatientChange, onUnauthorized }: { onPatientChang
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
-	setAccount: React.Dispatch<any>;
+	setAccount: React.Dispatch<React.SetStateAction<AccountModel | undefined>>;
 	initialized: boolean;
 	isAnonymous: boolean;
 	institution: Institution | undefined;
