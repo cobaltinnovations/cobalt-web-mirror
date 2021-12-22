@@ -22,7 +22,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 	const handleError = useHandleError();
 	const history = useHistory<{ passedAssessment?: boolean }>();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const { account, isAnonymous } = useAccount();
+	const { account, setAccount } = useAccount();
 	const { showAlert } = useAlert();
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
@@ -73,7 +73,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 		} else {
 			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
 		}
-	}, [account, history.location.state, isAnonymous]);
+	}, [account, history.location.state]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
@@ -115,7 +115,9 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 						try {
 							setIsBooking(true);
 
-							await groupSessionsService.reserveGroupSession(session.groupSessionId, collectedEmail).fetch();
+							const response = await groupSessionsService.reserveGroupSession(session.groupSessionId, collectedEmail).fetch();
+
+							setAccount(response.account);
 							await fetchData();
 
 							setShowConfirmReservationModal(false);
