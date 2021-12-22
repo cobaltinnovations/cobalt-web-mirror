@@ -73,7 +73,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 		} else {
 			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
 		}
-	}, [account, history.location.state]);
+	}, [history.location.state]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
