@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect } from 'react';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, Link, useHistory, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -20,6 +20,7 @@ import useHandleError from '@/hooks/use-handle-error';
 
 const InTheStudioGroupSessionScheduled: FC = () => {
 	const handleError = useHandleError();
+	const location = useLocation();
 	const history = useHistory<{ passedAssessment?: boolean }>();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { account, setAccount } = useAccount();
@@ -49,7 +50,21 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 
 		setSession(groupSession);
 		setReservation(groupSessionReservation);
-	}, [groupSessionId]);
+
+		/* --------------------------------------------------------- */
+		/* This fires after you complete the sessions assessment */
+		/* --------------------------------------------------------- */
+		if (typeof history.location.state?.passedAssessment !== 'boolean') {
+			return;
+		}
+
+		if (history.location.state.passedAssessment) {
+			setShowCollectEmailModal(true);
+			history.replace(location.pathname, { passedAssessment: undefined });
+		} else {
+			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
+		}
+	}, [groupSessionId, history, location.pathname]);
 
 	/* --------------------------------------------------------- */
 	/* Prepopulate the email modal with the accounts email */
@@ -59,21 +74,6 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			setCollectedEmail(account.emailAddress);
 		}
 	}, [account]);
-
-	/* --------------------------------------------------------- */
-	/* This fires after you complete the sessions assessment */
-	/* --------------------------------------------------------- */
-	useEffect(() => {
-		if (typeof history.location.state?.passedAssessment !== 'boolean') {
-			return;
-		}
-
-		if (history.location.state.passedAssessment) {
-			setShowCollectEmailModal(true);
-		} else {
-			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
-		}
-	}, [history.location.state]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
@@ -145,6 +145,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 
 						await groupSessionsService.cancelGroupSessionReservation(reservation.groupSessionReservationId).fetch();
 						await fetchData();
+						history.replace(location.pathname, { passedAssessment: undefined });
 
 						setShowConfirmCancelModal(false);
 					} catch (error) {
