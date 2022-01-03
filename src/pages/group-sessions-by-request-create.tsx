@@ -282,7 +282,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 												</Form.Label>
 												<p className="text-muted" style={{ ...fonts.xxs }}>
 													How would you like to describe your session? (This will be featured
-													on the Colbalt Platform, should be 2-3 sentences long, and should
+													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
 												</p>
 												<Wysiwyg
