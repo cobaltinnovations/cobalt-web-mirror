@@ -76,7 +76,9 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 			throw new Error();
 		}
 
-		const { groupSessionRequest } = await groupSessionsService.getGroupSessionRequestById(groupSessionRequestId).fetch();
+		const { groupSessionRequest } = await groupSessionsService
+			.getGroupSessionRequestById(groupSessionRequestId)
+			.fetch();
 
 		setSession(groupSessionRequest);
 	}, [groupSessionRequestId]);
@@ -125,7 +127,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 							<img src={session?.imageUrl} alt="" />
 						</div>
 						<Card className="mb-5 border-0 p-6">
-							<p className="mb-5">{session?.description}</p>
+							<div dangerouslySetInnerHTML={{ __html: session?.description || '' }}></div>
 							<p className="mb-0 text-danger">required*</p>
 						</Card>
 						<Formik<RequestSessionFormData>
@@ -135,7 +137,16 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 							onSubmit={handleFormSubmit}
 						>
 							{(formikBag) => {
-								const { values, setFieldValue, setFieldTouched, handleChange, handleBlur, handleSubmit, touched, errors } = formikBag;
+								const {
+									values,
+									setFieldValue,
+									setFieldTouched,
+									handleChange,
+									handleBlur,
+									handleSubmit,
+									touched,
+									errors,
+								} = formikBag;
 
 								return (
 									<Form onSubmit={handleSubmit}>
@@ -163,7 +174,11 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												onBlur={handleBlur}
 												onChange={handleChange}
 												required={requiredFields.emailAddress}
-												error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+												error={
+													touched.emailAddress && errors.emailAddress
+														? errors.emailAddress
+														: ''
+												}
 											/>
 
 											<InputHelper
@@ -176,7 +191,9 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												onBlur={handleBlur}
 												onChange={handleChange}
 												required={requiredFields.phoneNumber}
-												error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''}
+												error={
+													touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''
+												}
 											/>
 
 											<Form.Group className="mb-5">
@@ -221,10 +238,15 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 															showYearDropdown
 															showMonthDropdown
 															dropdownMode="select"
-															selected={values.date ? moment(values.date).toDate() : undefined}
+															selected={
+																values.date ? moment(values.date).toDate() : undefined
+															}
 															onChange={(date) => {
 																setFieldTouched('date', true);
-																setFieldValue('date', date ? moment(date).format('YYYY-MM-DD') : '');
+																setFieldValue(
+																	'date',
+																	date ? moment(date).format('YYYY-MM-DD') : ''
+																);
 															}}
 														/>
 													</Form.Group>
@@ -289,7 +311,9 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE}
 													value={NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE}
-													checked={values.numberOfPeople === NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE}
+													checked={
+														values.numberOfPeople === NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE
+													}
 													onChange={handleChange}
 												/>
 												<Form.Check
@@ -300,13 +324,17 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE}
 													value={NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE}
-													checked={values.numberOfPeople === NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE}
+													checked={
+														values.numberOfPeople === NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE
+													}
 													onChange={handleChange}
 												/>
 											</Form.Group>
 
 											<InputHelper
-												className={session?.customQuestion1 || session?.customQuestion2 ? 'mb-5' : ''}
+												className={
+													session?.customQuestion1 || session?.customQuestion2 ? 'mb-5' : ''
+												}
 												label="Is there anything you’d like the facilitator to know about your group in particular?"
 												name="additionalDetails"
 												value={values.additionalDetails}
@@ -314,7 +342,11 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												onBlur={handleBlur}
 												onChange={handleChange}
 												required={requiredFields.additionalDetails}
-												error={touched.additionalDetails && errors.additionalDetails ? errors.additionalDetails : ''}
+												error={
+													touched.additionalDetails && errors.additionalDetails
+														? errors.additionalDetails
+														: ''
+												}
 											/>
 
 											{session?.customQuestion1 && (
@@ -327,7 +359,11 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.customQuestionOne}
-													error={touched.customQuestionOne && errors.customQuestionOne ? errors.customQuestionOne : ''}
+													error={
+														touched.customQuestionOne && errors.customQuestionOne
+															? errors.customQuestionOne
+															: ''
+													}
 												/>
 											)}
 
@@ -340,7 +376,11 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.customQuestionTwo}
-													error={touched.customQuestionTwo && errors.customQuestionTwo ? errors.customQuestionTwo : ''}
+													error={
+														touched.customQuestionTwo && errors.customQuestionTwo
+															? errors.customQuestionTwo
+															: ''
+													}
 												/>
 											)}
 										</Card>
