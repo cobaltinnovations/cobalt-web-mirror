@@ -12,7 +12,14 @@ import InputHelper from '@/components/input-helper';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
 import { adminService, ContentTypeLabel, imageUploader, InstitutionFilters } from '@/lib/services';
-import { Content, ContentTypeId, ContentVisibilityTypeId, PersonalizationChoice, PersonalizationQuestion, ROLE_ID } from '@/lib/models';
+import {
+	Content,
+	ContentTypeId,
+	ContentVisibilityTypeId,
+	PersonalizationChoice,
+	PersonalizationQuestion,
+	ROLE_ID,
+} from '@/lib/models';
 
 import fonts from '@/jss/fonts';
 
@@ -271,7 +278,16 @@ const CreateOnYourTimeContent: FC = () => {
 							onSubmit={handleSubmit}
 						>
 							{(formikBag) => {
-								const { values, setFieldValue, setFieldTouched, handleChange, handleBlur, touched, errors, handleSubmit } = formikBag;
+								const {
+									values,
+									setFieldValue,
+									setFieldTouched,
+									handleChange,
+									handleBlur,
+									touched,
+									errors,
+									handleSubmit,
+								} = formikBag;
 								return (
 									<>
 										<SessionCropModal
@@ -335,7 +351,9 @@ const CreateOnYourTimeContent: FC = () => {
 										<Form onSubmit={handleSubmit}>
 											<Row>
 												<Col className="mb-5">
-													<h3 className="mb-2">{isAdding ? 'add public post' : 'add on your time content'}</h3>
+													<h3 className="mb-2">
+														{isAdding ? 'add public post' : 'add on your time content'}
+													</h3>
 													<span>Required *</span>
 												</Col>
 											</Row>
@@ -352,36 +370,71 @@ const CreateOnYourTimeContent: FC = () => {
 																		label="Content Type"
 																		value={values.contentTypeId || ''}
 																		as="select"
-																		onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-																			setFieldValue('contentTypeId', event.target.value);
-																			setFieldValue('urlRequired', event.target.value !== ContentTypeId.InternalBlog);
+																		onChange={(
+																			event: React.ChangeEvent<HTMLSelectElement>
+																		) => {
+																			setFieldValue(
+																				'contentTypeId',
+																				event.target.value
+																			);
+																			setFieldValue(
+																				'urlRequired',
+																				event.target.value !==
+																					ContentTypeId.InternalBlog
+																			);
 																		}}
 																		required={requiredFields.contentTypeId}
-																		error={touched.contentTypeId && errors.contentTypeId ? errors.contentTypeId : ''}
+																		error={
+																			touched.contentTypeId &&
+																			errors.contentTypeId
+																				? errors.contentTypeId
+																				: ''
+																		}
 																		disabled={shouldDisabledInputs}
 																	>
 																		<option value="" disabled>
 																			Select...
 																		</option>
-																		<option key={'External Blog'} value={ContentTypeId.ExternalBlog}>
+																		<option
+																			key={'External Blog'}
+																			value={ContentTypeId.ExternalBlog}
+																		>
 																			External Blog
 																		</option>
-																		<option key={'Internal Blog'} value={ContentTypeId.InternalBlog}>
+																		<option
+																			key={'Internal Blog'}
+																			value={ContentTypeId.InternalBlog}
+																		>
 																			Internal Blog
 																		</option>
-																		<option key={'Article'} value={ContentTypeId.Article}>
+																		<option
+																			key={'Article'}
+																			value={ContentTypeId.Article}
+																		>
 																			Article
 																		</option>
-																		<option key={'Audio'} value={ContentTypeId.Audio}>
+																		<option
+																			key={'Audio'}
+																			value={ContentTypeId.Audio}
+																		>
 																			Audio
 																		</option>
-																		<option key={'Video'} value={ContentTypeId.Video}>
+																		<option
+																			key={'Video'}
+																			value={ContentTypeId.Video}
+																		>
 																			Video
 																		</option>
-																		<option key={'Podcast'} value={ContentTypeId.Podcast}>
+																		<option
+																			key={'Podcast'}
+																			value={ContentTypeId.Podcast}
+																		>
 																			Podcast
 																		</option>
-																		<option key={'Worksheet'} value={ContentTypeId.Worksheet}>
+																		<option
+																			key={'Worksheet'}
+																			value={ContentTypeId.Worksheet}
+																		>
 																			Worksheet
 																		</option>
 																	</InputHelper>
@@ -396,25 +449,40 @@ const CreateOnYourTimeContent: FC = () => {
 																		label="Content Type Label"
 																		value={values.contentTypeLabel || ''}
 																		as="select"
-																		onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-																			setFieldValue('contentTypeLabel', event.target.value);
+																		onChange={(
+																			event: React.ChangeEvent<HTMLSelectElement>
+																		) => {
+																			setFieldValue(
+																				'contentTypeLabel',
+																				event.target.value
+																			);
 																		}}
 																		required={requiredFields.contentTypeLabel}
 																		error={
-																			touched.contentTypeLabel && errors.contentTypeLabel ? errors.contentTypeLabel : ''
+																			touched.contentTypeLabel &&
+																			errors.contentTypeLabel
+																				? errors.contentTypeLabel
+																				: ''
 																		}
 																		disabled={shouldDisabledInputs}
 																	>
 																		<option value="" disabled>
 																			Select...
 																		</option>
-																		{contentTypeLabelOptions.map((option, index) => {
-																			return (
-																				<option key={index} value={option.contentTypeLabelId}>
-																					{option.description}
-																				</option>
-																			);
-																		})}
+																		{contentTypeLabelOptions.map(
+																			(option, index) => {
+																				return (
+																					<option
+																						key={index}
+																						value={
+																							option.contentTypeLabelId
+																						}
+																					>
+																						{option.description}
+																					</option>
+																				);
+																			}
+																		)}
 																	</InputHelper>
 																</div>
 															</Col>
@@ -433,7 +501,11 @@ const CreateOnYourTimeContent: FC = () => {
 																		onBlur={handleBlur}
 																		onChange={handleChange}
 																		required={requiredFields.title}
-																		error={touched.title && errors.title ? errors.title : ''}
+																		error={
+																			touched.title && errors.title
+																				? errors.title
+																				: ''
+																		}
 																		disabled={shouldDisabledInputs}
 																	/>
 																</div>
@@ -453,7 +525,11 @@ const CreateOnYourTimeContent: FC = () => {
 																		onBlur={handleBlur}
 																		onChange={handleChange}
 																		required={requiredFields.author}
-																		error={touched.author && errors.author ? errors.author : ''}
+																		error={
+																			touched.author && errors.author
+																				? errors.author
+																				: ''
+																		}
 																		disabled={shouldDisabledInputs}
 																	/>
 																</div>
@@ -471,9 +547,17 @@ const CreateOnYourTimeContent: FC = () => {
 																			as="input"
 																			onBlur={handleBlur}
 																			onChange={handleChange}
-																			required={requiredFields.url && values.contentTypeId !== ContentTypeId.InternalBlog}
+																			required={
+																				requiredFields.url &&
+																				values.contentTypeId !==
+																					ContentTypeId.InternalBlog
+																			}
 																			disabled={shouldDisabledInputs}
-																			error={touched.url && errors.url ? errors.url : ''}
+																			error={
+																				touched.url && errors.url
+																					? errors.url
+																					: ''
+																			}
 																		/>
 																	</Col>
 																</Form.Row>
@@ -484,10 +568,21 @@ const CreateOnYourTimeContent: FC = () => {
 																			showMonthDropdown
 																			dropdownMode="select"
 																			labelText="Submitted Date"
-																			selected={values.created ? moment(values.created).toDate() : undefined}
+																			selected={
+																				values.created
+																					? moment(values.created).toDate()
+																					: undefined
+																			}
 																			onChange={(date) => {
 																				setFieldTouched('date', true);
-																				setFieldValue('created', date ? moment(date).format('YYYY-MM-DD') : '');
+																				setFieldValue(
+																					'created',
+																					date
+																						? moment(date).format(
+																								'YYYY-MM-DD'
+																						  )
+																						: ''
+																				);
 																			}}
 																			disabled={shouldDisabledInputs}
 																		/>
@@ -510,7 +605,11 @@ const CreateOnYourTimeContent: FC = () => {
 																			onChange={handleChange}
 																			required={requiredFields.duration}
 																			disabled={shouldDisabledInputs}
-																			error={touched.duration && errors.duration ? errors.duration : ''}
+																			error={
+																				touched.duration && errors.duration
+																					? errors.duration
+																					: ''
+																			}
 																		/>
 																	</Col>
 																</Form.Row>
@@ -543,18 +642,33 @@ const CreateOnYourTimeContent: FC = () => {
 															<Col>
 																<div className="d-flex">
 																	<CircleIndicator>6</CircleIndicator>
-																	{values.contentTypeId === ContentTypeId.InternalBlog ? (
+																	{values.contentTypeId ===
+																	ContentTypeId.InternalBlog ? (
 																		<div className="ml-6 flex-fill">
-																			<Form.Label className="mb-2" style={{ ...fonts.xs }}>
-																				Post Content *
+																			<Form.Label
+																				className="mb-2"
+																				style={{ ...fonts.xs }}
+																			>
+																				Post Content{' '}
+																				{requiredFields.description && (
+																					<span>*</span>
+																				)}
 																			</Form.Label>
 																			<Wysiwyg
 																				readOnly={shouldDisabledInputs}
-																				initialValue={values.description}
-																				onBlur={(value: string) => {
+																				value={values.description}
+																				onChange={(value: string) => {
 																					setFieldValue('description', value);
 																				}}
 																			/>
+																			{touched.description && errors.description && (
+																				<p
+																					className="text-danger"
+																					style={{ ...fonts.xxs }}
+																				>
+																					description is a required field
+																				</p>
+																			)}
 																		</div>
 																	) : (
 																		<InputHelper
@@ -566,7 +680,12 @@ const CreateOnYourTimeContent: FC = () => {
 																			onBlur={handleBlur}
 																			onChange={handleChange}
 																			required={requiredFields.description}
-																			error={touched.description && errors.description ? errors.description : ''}
+																			error={
+																				touched.description &&
+																				errors.description
+																					? errors.description
+																					: ''
+																			}
 																			disabled={shouldDisabledInputs}
 																		/>
 																	)}
@@ -576,15 +695,21 @@ const CreateOnYourTimeContent: FC = () => {
 													</Card>
 													{!isAdding && (
 														<>
-															{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+															{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
+																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 																<Card className="mb-5 border-0 p-6">
 																	<h5 className="mb-2">Visibility *</h5>
 																	<div className="mb-5" style={{ ...fonts.xs }}>
-																		Choose which institutions are allowed to share this content with their patients.
+																		Choose which institutions are allowed to share
+																		this content with their patients.
 																	</div>
 																	<Form.Group className="mb-5">
-																		<Form.Label className="mb-1" style={{ ...fonts.xs }}>
-																			Allow other institutions to share this content?
+																		<Form.Label
+																			className="mb-1"
+																			style={{ ...fonts.xs }}
+																		>
+																			Allow other institutions to share this
+																			content?
 																		</Form.Label>
 																		<Form.Check
 																			type="radio"
@@ -594,9 +719,18 @@ const CreateOnYourTimeContent: FC = () => {
 																			label="No"
 																			checked={values.visibilityPrivate}
 																			onChange={() => {
-																				setFieldValue('visibilityPrivate', true);
-																				setFieldValue('visibilityNetwork', false);
-																				setFieldValue('visibilityPublic', false);
+																				setFieldValue(
+																					'visibilityPrivate',
+																					true
+																				);
+																				setFieldValue(
+																					'visibilityNetwork',
+																					false
+																				);
+																				setFieldValue(
+																					'visibilityPublic',
+																					false
+																				);
 																				setSelectedInstitutions([]);
 																			}}
 																			disabled={shouldDisabledInputs}
@@ -609,12 +743,18 @@ const CreateOnYourTimeContent: FC = () => {
 																			label="Yes"
 																			checked={!values.visibilityPrivate}
 																			onChange={() => {
-																				setFieldValue('visibilityPrivate', false);
+																				setFieldValue(
+																					'visibilityPrivate',
+																					false
+																				);
 																			}}
 																			disabled={shouldDisabledInputs}
 																		/>
 																	</Form.Group>
-																	<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+																	<Form.Label
+																		className="mb-1"
+																		style={{ ...fonts.xs }}
+																	>
 																		Select the level of visibility:
 																	</Form.Label>
 																	<Form.Group>
@@ -625,61 +765,113 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityNetwork"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>Only other Institutions in my network</div>
-																					<div className={classes.grayText}>
-																						Visible to patients and providers from selected institutions in my
+																					<div style={{ ...fonts.xs }}>
+																						Only other Institutions in my
 																						network
+																					</div>
+																					<div className={classes.grayText}>
+																						Visible to patients and
+																						providers from selected
+																						institutions in my network
 																					</div>
 																				</>
 																			}
 																			checked={values.visibilityNetwork}
 																			onChange={() => {
-																				setFieldValue('visibilityNetwork', true);
-																				setFieldValue('visibilityPublic', false);
+																				setFieldValue(
+																					'visibilityNetwork',
+																					true
+																				);
+																				setFieldValue(
+																					'visibilityPublic',
+																					false
+																				);
 																			}}
-																			disabled={shouldDisabledInputs || values.visibilityPrivate}
+																			disabled={
+																				shouldDisabledInputs ||
+																				values.visibilityPrivate
+																			}
 																		/>
-																		{!!contentInstitutions && contentInstitutions.length > 0 && (
-																			<div className="ml-7 mt-2 mb-3">
-																				<Form.Label className="mb-2" style={{ ...fonts.xs }}>
-																					Select the other institutions you will allow to have access to your post:
-																				</Form.Label>
-																				{contentInstitutions.map(({ institutionId, name }, index) => {
-																					return (
-																						<Form.Check
-																							key={index}
-																							type="checkbox"
-																							bsPrefix="cobalt-modal-form__check"
-																							id={institutionId}
-																							name={institutionId}
-																							label={
-																								<div
-																									style={{
-																										...fonts.xs,
-																									}}
-																								>
-																									{name}
-																								</div>
-																							}
-																							checked={selectedInstitutions?.includes(institutionId)}
-																							onBlur={handleBlur}
-																							onChange={() => {
-																								setFieldValue('visibilityNetwork', true);
-																								setFieldValue('visibilityPublic', false);
-																								setSelectedInstitutions((prevState) => {
-																									if (prevState?.includes(institutionId)) {
-																										return prevState?.filter((id) => id !== institutionId);
-																									} else {
-																										return [...prevState, institutionId];
+																		{!!contentInstitutions &&
+																			contentInstitutions.length > 0 && (
+																				<div className="ml-7 mt-2 mb-3">
+																					<Form.Label
+																						className="mb-2"
+																						style={{ ...fonts.xs }}
+																					>
+																						Select the other institutions
+																						you will allow to have access to
+																						your post:
+																					</Form.Label>
+																					{contentInstitutions.map(
+																						(
+																							{ institutionId, name },
+																							index
+																						) => {
+																							return (
+																								<Form.Check
+																									key={index}
+																									type="checkbox"
+																									bsPrefix="cobalt-modal-form__check"
+																									id={institutionId}
+																									name={institutionId}
+																									label={
+																										<div
+																											style={{
+																												...fonts.xs,
+																											}}
+																										>
+																											{name}
+																										</div>
 																									}
-																								});
-																							}}
-																							disabled={shouldDisabledInputs || values.visibilityPrivate}
-																						/>
-																					);
-																				})}
-																			</div>
-																		)}
+																									checked={selectedInstitutions?.includes(
+																										institutionId
+																									)}
+																									onBlur={handleBlur}
+																									onChange={() => {
+																										setFieldValue(
+																											'visibilityNetwork',
+																											true
+																										);
+																										setFieldValue(
+																											'visibilityPublic',
+																											false
+																										);
+																										setSelectedInstitutions(
+																											(
+																												prevState
+																											) => {
+																												if (
+																													prevState?.includes(
+																														institutionId
+																													)
+																												) {
+																													return prevState?.filter(
+																														(
+																															id
+																														) =>
+																															id !==
+																															institutionId
+																													);
+																												} else {
+																													return [
+																														...prevState,
+																														institutionId,
+																													];
+																												}
+																											}
+																										);
+																									}}
+																									disabled={
+																										shouldDisabledInputs ||
+																										values.visibilityPrivate
+																									}
+																								/>
+																							);
+																						}
+																					)}
+																				</div>
+																			)}
 																		<Form.Check
 																			type="radio"
 																			bsPrefix="cobalt-modal-form__check"
@@ -687,19 +879,28 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityPublic"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>Public</div>
+																					<div style={{ ...fonts.xs }}>
+																						Public
+																					</div>
 																					<div className={classes.grayText}>
-																						Available for use by other institutions
+																						Available for use by other
+																						institutions
 																					</div>
 																				</>
 																			}
 																			checked={values.visibilityPublic}
 																			onChange={() => {
-																				setFieldValue('visibilityNetwork', false);
+																				setFieldValue(
+																					'visibilityNetwork',
+																					false
+																				);
 																				setFieldValue('visibilityPublic', true);
 																				setSelectedInstitutions([]);
 																			}}
-																			disabled={shouldDisabledInputs || values.visibilityPrivate}
+																			disabled={
+																				shouldDisabledInputs ||
+																				values.visibilityPrivate
+																			}
 																		/>
 																	</Form.Group>
 																</Card>
@@ -708,14 +909,23 @@ const CreateOnYourTimeContent: FC = () => {
 													)}
 													{account?.roleId === ROLE_ID.ADMINISTRATOR && (
 														<>
-															{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+															{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
+																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 																<Card className="mb-5 border-0">
-																	<div className="p-6" style={{ borderBottom: `1px solid ${colors.border}` }}>
+																	<div
+																		className="p-6"
+																		style={{
+																			borderBottom: `1px solid ${colors.border}`,
+																		}}
+																	>
 																		<h5 className="mb-2">Tags</h5>
 																		<p>
-																			Tags are used to determine which resources are shown first to a patient depending on
-																			how they answered the initial assessment questions. If no categories are selected,
-																			then the resource will be de-prioritized an appear lower in a patient’s list of
+																			Tags are used to determine which resources
+																			are shown first to a patient depending on
+																			how they answered the initial assessment
+																			questions. If no categories are selected,
+																			then the resource will be de-prioritized an
+																			appear lower in a patient’s list of
 																			resources.
 																		</p>
 																	</div>
@@ -757,8 +967,11 @@ const CreateOnYourTimeContent: FC = () => {
 													<OnYourTimePreview
 														description={values.description}
 														contentTypeLabel={
-															contentTypeLabelOptions.find((option) => option.contentTypeLabelId === values.contentTypeLabel)
-																?.description
+															contentTypeLabelOptions.find(
+																(option) =>
+																	option.contentTypeLabelId ===
+																	values.contentTypeLabel
+															)?.description
 														}
 														imageUrl={imagePreview}
 														title={values.title}
