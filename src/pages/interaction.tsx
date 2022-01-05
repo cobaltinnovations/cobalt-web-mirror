@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import { interactionService } from '@/lib/services';
@@ -10,9 +10,11 @@ const Interaction: FC = () => {
 		interactionInstanceId: string;
 		interactionOptionId: string;
 	}>();
+	const [optionResponse, setOptionResponse] = useState('');
 
 	const fetchData = useCallback(async () => {
-		await interactionService.postInteraction(interactionInstanceId, interactionOptionId).fetch();
+		const response = await interactionService.postInteraction(interactionInstanceId, interactionOptionId).fetch();
+		setOptionResponse(response.optionResponse);
 	}, [interactionInstanceId, interactionOptionId]);
 
 	return (
@@ -21,6 +23,7 @@ const Interaction: FC = () => {
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h1>Interaction</h1>
+						<p>{optionResponse}</p>
 					</Col>
 				</Row>
 			</Container>
