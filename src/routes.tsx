@@ -653,7 +653,7 @@ export const Routes = [
 		  ]
 		: []),
 	{
-		path: '/interaction/option',
+		path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
 		exact: true,
 		private: true,
 		header: (): ReactElement => <Header />,
