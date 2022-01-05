@@ -13,8 +13,11 @@ const Interaction: FC = () => {
 	const [optionResponse, setOptionResponse] = useState('');
 
 	const fetchData = useCallback(async () => {
-		const response = await interactionService.postInteraction(interactionInstanceId, interactionOptionId).fetch();
-		setOptionResponse(response.optionResponse);
+		const { interactionOption } = await interactionService
+			.postInteraction(interactionInstanceId, interactionOptionId)
+			.fetch();
+
+		setOptionResponse(interactionOption.optionResponse);
 	}, [interactionInstanceId, interactionOptionId]);
 
 	return (

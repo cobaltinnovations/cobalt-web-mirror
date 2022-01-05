@@ -1,13 +1,15 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 
 interface PostInteractionResponseBody {
-	interactionOptionId: string;
-	interactionId: string;
-	optionDescription: string;
-	optionResponse: string;
-	finalFlag: boolean;
-	optionOrder: number;
-	optionUrl: string;
+	interactionOption: {
+		interactionOptionId: string;
+		interactionId: string;
+		optionDescription: string;
+		optionResponse: string;
+		finalFlag: boolean;
+		optionOrder: number;
+		optionUrl: string;
+	};
 }
 
 export const interactionService = {
