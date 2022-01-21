@@ -68,6 +68,7 @@ const DashboardWrapper = React.lazy(() => import('@/pages/pic/mhic-dashboard/das
 const PicProviderSearch = React.lazy(() => import('@/pages/pic/provider-search'));
 const PicProviderCalendar = React.lazy(() => import('@/pages/pic/provider-calendar'));
 const ContactLCSW = React.lazy(() => import('@/pages/pic/contact-lcsw/contact-lcsw'));
+const MyCalendarScheduling = React.lazy(() => import('@/pages/scheduling/my-calendar'));
 
 interface RouteGuardProps {
 	subdomain?: string;
@@ -92,6 +93,7 @@ const isVanillaSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomai
 const isPicSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomain === 'pic';
 const isPicPatientRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicPatientAccount(account);
 const isPicMhicRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicMhicAccount(account);
+const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 
 const RedirectToSupport = () => {
 	const match = useRouteMatch<{ supportRoleId: string }>();
@@ -373,6 +375,14 @@ export const Routes = [
 		private: true,
 		header: (): ReactElement => <Header />,
 		main: MyCalendar,
+	},
+	{
+		path: '/scheduling',
+		exact: true,
+		private: true,
+		checkEnabled: isProviderRouteGuard,
+		header: (): ReactElement => <Header />,
+		main: MyCalendarScheduling,
 	},
 	{
 		path: '/appointments/:appointmentId',
