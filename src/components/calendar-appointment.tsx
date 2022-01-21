@@ -122,7 +122,7 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					<BackgroundImageContainer size={82} imageUrl={appointment.provider?.imageUrl ?? placeholderImage} />
 
 					<div className={classes.informationCopyContainer}>
-						<small className="text-uppercase text-muted">{appointment.appointmentDescription}</small>
+						<div dangerouslySetInnerHTML={{ __html: appointment.appointmentDescription }} />
 
 						<h6 className="mb-0">{appointment.name}</h6>
 
@@ -144,7 +144,10 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					<Link to="#" onClick={onCancel}>
 						cancel reservation
 					</Link>
-					<JoinButton contactEmail={appointment.provider?.emailAddress} joinUrl={appointment.videoconferenceUrl} />
+					<JoinButton
+						contactEmail={appointment.provider?.emailAddress}
+						joinUrl={appointment.videoconferenceUrl}
+					/>
 				</div>
 			</div>
 		);
