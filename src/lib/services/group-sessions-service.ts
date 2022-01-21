@@ -10,6 +10,7 @@ import {
 	GROUP_SESSION_SORT_ORDER,
 	GroupSessionCountModel,
 	GroupSessionResponseModel,
+	AccountModel,
 } from '@/lib/models';
 
 // Scheduled
@@ -86,6 +87,7 @@ interface UpdateGroupSessionStatusByIdResponseBody {
 
 interface ReserveGroupSessionResponseBody {
 	groupSessionReservation: GroupSessionReservationModel;
+	account: AccountModel;
 }
 
 interface GetGroupSessionCountsResponseBody {

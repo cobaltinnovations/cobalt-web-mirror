@@ -24,7 +24,7 @@ interface RouteParams {
 const InTheStudioDetail: FC = () => {
 	const handleError = useHandleError();
 	const { groupEventId } = useParams<RouteParams>();
-	const { account, isAnonymous } = useAccount();
+	const { account, setAccount } = useAccount();
 
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
@@ -113,7 +113,7 @@ const InTheStudioDetail: FC = () => {
 
 						try {
 							setIsBooking(true);
-							await appointmentService
+							const response = await appointmentService
 								.createAppointment({
 									providerId: groupEvent.provider ? groupEvent.provider.providerId : undefined,
 									date: groupEvent.localStartDate,
@@ -124,6 +124,7 @@ const InTheStudioDetail: FC = () => {
 								})
 								.fetch();
 
+							setAccount(response.account);
 							await fetchData();
 
 							setShowConfirmReservationModal(false);
@@ -213,11 +214,7 @@ const InTheStudioDetail: FC = () => {
 								disabled={groupEvent?.seatsAvailable === 0}
 								variant="primary"
 								onClick={() => {
-									if (!account?.emailAddress || isAnonymous) {
-										setShowCollectEmailModal(true);
-									} else {
-										setShowConfirmReservationModal(true);
-									}
+									setShowCollectEmailModal(true);
 								}}
 							>
 								{groupEvent?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a Place'}

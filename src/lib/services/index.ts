@@ -11,6 +11,7 @@ export * from './group-event-service';
 export * from './group-sessions-service';
 export * from './image-upload-service';
 export * from './institution-service';
+export * from './interaction-service';
 export * from './provider-service';
 export * from './recommendations-service';
 export * from './reporting-service';

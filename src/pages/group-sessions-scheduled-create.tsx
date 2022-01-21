@@ -39,6 +39,7 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
 import { createUseStyles } from 'react-jss';
+import Wysiwyg from '@/components/admin-cms/wysiwyg';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -708,23 +709,29 @@ const GroupSessionsCreate: FC = () => {
 													disabled={hasReservations || isViewMode}
 												/>
 
-												<InputHelper
-													className="mb-5"
-													label="Description"
-													name="description"
-													value={values.description}
-													as="textarea"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													helperText="How would you like to describe your session? (This will be featured on the Colbalt Platform, should be 2-3 sentences long, and should highlight the benefit for participants)."
-													required={requiredFields.description}
-													error={
-														touched.description && errors.description
-															? errors.description
-															: ''
+												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													Description {requiredFields.description && <span>*</span>}
+												</Form.Label>
+												<p className="text-muted" style={{ ...fonts.xxs }}>
+													How would you like to describe your session? (This will be featured
+													on the Cobalt Platform, should be 2-3 sentences long, and should
+													highlight the benefit for participants).
+												</p>
+												<Wysiwyg
+													className={
+														touched.description && errors.description ? 'mb-2' : 'mb-5'
 													}
-													disabled={isViewMode}
+													readOnly={isViewMode}
+													value={values.description}
+													onChange={(value) => {
+														setFieldValue('description', value);
+													}}
 												/>
+												{touched.description && errors.description && (
+													<p className="text-danger" style={{ ...fonts.xxs }}>
+														description is a required field
+													</p>
+												)}
 
 												<ImageUpload
 													imagePreview={imagePreview}

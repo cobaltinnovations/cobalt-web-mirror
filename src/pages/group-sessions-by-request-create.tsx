@@ -20,6 +20,7 @@ import useAccount from '@/hooks/use-account';
 import { ROLE_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
+import Wysiwyg from '@/components/admin-cms/wysiwyg';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -120,7 +121,16 @@ const GroupSessionsByRequestCreate: FC = () => {
 							onSubmit={handleFormSubmit}
 						>
 							{(formikBag) => {
-								const { values, setFieldValue, setFieldTouched, handleChange, handleBlur, handleSubmit, touched, errors } = formikBag;
+								const {
+									values,
+									setFieldValue,
+									setFieldTouched,
+									handleChange,
+									handleBlur,
+									handleSubmit,
+									touched,
+									errors,
+								} = formikBag;
 
 								return (
 									<>
@@ -211,7 +221,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.responsible}
-													error={touched.managersName && errors.managersName ? errors.managersName : ''}
+													error={
+														touched.managersName && errors.managersName
+															? errors.managersName
+															: ''
+													}
 												/>
 
 												<InputHelper
@@ -223,7 +237,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 													onBlur={handleBlur}
 													onChange={handleChange}
 													required={requiredFields.managersEmail}
-													error={touched.managersEmail && errors.managersEmail ? errors.managersEmail : ''}
+													error={
+														touched.managersEmail && errors.managersEmail
+															? errors.managersEmail
+															: ''
+													}
 												/>
 											</Card>
 											<Card className="mb-5 border-0 p-6">
@@ -252,8 +270,36 @@ const GroupSessionsByRequestCreate: FC = () => {
 													onChange={handleChange}
 													helperText="How would you like to describe your session? (This will be featured on the Cobalt Platform, should be 2-3 sentences long, and should highlight the benefit for participants)."
 													required={requiredFields.description}
-													error={touched.description && errors.description ? errors.description : ''}
+													error={
+														touched.description && errors.description
+															? errors.description
+															: ''
+													}
 												/>
+
+												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													Description {requiredFields.description && <span>*</span>}
+												</Form.Label>
+												<p className="text-muted" style={{ ...fonts.xxs }}>
+													How would you like to describe your session? (This will be featured
+													on the Cobalt Platform, should be 2-3 sentences long, and should
+													highlight the benefit for participants).
+												</p>
+												<Wysiwyg
+													className={
+														touched.description && errors.description ? 'mb-2' : 'mb-5'
+													}
+													readOnly={false}
+													value={values.description}
+													onChange={(value) => {
+														setFieldValue('description', value);
+													}}
+												/>
+												{touched.description && errors.description && (
+													<p className="text-danger" style={{ ...fonts.xxs }}>
+														description is a required field
+													</p>
+												)}
 
 												<ImageUpload
 													imagePreview={imagePreview}
@@ -280,7 +326,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 													onChange={handleChange}
 													helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
 													required={requiredFields.sessionHandle}
-													error={touched.sessionHandle && errors.sessionHandle ? errors.sessionHandle : ''}
+													error={
+														touched.sessionHandle && errors.sessionHandle
+															? errors.sessionHandle
+															: ''
+													}
 												/>
 											</Card>
 											<Card className="mb-5 border-0 p-6">
@@ -293,10 +343,15 @@ const GroupSessionsByRequestCreate: FC = () => {
 													<li>Preferred session date(s)</li>
 													<li>Preferred session time(s)</li>
 													<li>Estimated Number of Attendees*</li>
-													<li>Is there anything you’d like the facilitator to know about your group in particular?</li>
+													<li>
+														Is there anything you’d like the facilitator to know about your
+														group in particular?
+													</li>
 												</ul>
 												<p className="mb-3">(*Required)</p>
-												<p className="mb-5">If you’d like to add custom questions, please add them below.</p>
+												<p className="mb-5">
+													If you’d like to add custom questions, please add them below.
+												</p>
 
 												<Form.Check
 													type="checkbox"

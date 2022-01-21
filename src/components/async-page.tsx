@@ -20,7 +20,7 @@ interface AsyncPageProps {
 
 const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
 	const history = useHistory();
-	const [fetchPageDataError, setFetchPageDataError] = useState<ErrorConfig | undefined>(undefined);
+	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
 
@@ -52,10 +52,9 @@ const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
 					history.replace('/sign-in');
 					return;
 				}
-
-				setFetchPageDataError(error);
 			}
 
+			setFetchPageDataError(error);
 			setDisplayState(DISPLAY_STATES.ERROR);
 		}
 	}, [fetchData, history, setShowReauthModal, setSignOnUrl]);

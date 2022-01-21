@@ -1033,7 +1033,8 @@ const ConnectWithSupport: FC = () => {
 															setSelectedProvider(provider);
 															setSelectedTimeSlot(timeSlot);
 
-															const needsEmail = isAnonymous || !account?.emailAddress;
+															// const needsEmail = isAnonymous || !account?.emailAddress;
+															const needsEmail = true;
 															const needsPhoneNumber =
 																!!provider.phoneNumberRequiredForAppointment && (isAnonymous || !account?.phoneNumber);
 

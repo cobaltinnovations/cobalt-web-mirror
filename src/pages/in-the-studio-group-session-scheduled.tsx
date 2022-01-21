@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect } from 'react';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, Link, useHistory, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -20,9 +20,10 @@ import useHandleError from '@/hooks/use-handle-error';
 
 const InTheStudioGroupSessionScheduled: FC = () => {
 	const handleError = useHandleError();
+	const location = useLocation();
 	const history = useHistory<{ passedAssessment?: boolean }>();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const { account, isAnonymous } = useAccount();
+	const { account, setAccount } = useAccount();
 	const { showAlert } = useAlert();
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
@@ -45,11 +46,29 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			throw new Error('groupSessionId is required.');
 		}
 
-		const { groupSession, groupSessionReservation } = await groupSessionsService.getGroupSessionById(groupSessionId).fetch();
+		const { groupSession, groupSessionReservation } = await groupSessionsService
+			.getGroupSessionById(groupSessionId)
+			.fetch();
 
 		setSession(groupSession);
 		setReservation(groupSessionReservation);
-	}, [groupSessionId]);
+
+		/* --------------------------------------------------------- */
+		/* This fires after you complete the sessions assessment */
+		/* --------------------------------------------------------- */
+		if (typeof history.location.state?.passedAssessment !== 'boolean') {
+			return;
+		}
+
+		if (history.location.state.passedAssessment) {
+			setShowCollectEmailModal(true);
+			history.replace(location.pathname, { passedAssessment: undefined });
+		} else {
+			window.alert(
+				'Based on your answer(s), this session does not seem like a good match. Please join us in another.'
+			);
+		}
+	}, [groupSessionId, history, location.pathname]);
 
 	/* --------------------------------------------------------- */
 	/* Prepopulate the email modal with the accounts email */
@@ -60,35 +79,12 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 		}
 	}, [account]);
 
-	/* --------------------------------------------------------- */
-	/* This fires after you complete the sessions assessment */
-	/* --------------------------------------------------------- */
-	useEffect(() => {
-		if (typeof history.location.state?.passedAssessment !== 'boolean') {
-			return;
-		}
-
-		if (history.location.state.passedAssessment) {
-			if (!account?.emailAddress || isAnonymous) {
-				setShowCollectEmailModal(true);
-			} else {
-				setShowConfirmReservationModal(true);
-			}
-		} else {
-			window.alert('Based on your answer(s), this session does not seem like a good match. Please join us in another.');
-		}
-	}, [account, history.location.state, isAnonymous]);
-
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
 			history.push(`/intake-assessment?groupSessionId=${session.groupSessionId}`);
 		}
 
-		if (!account?.emailAddress || isAnonymous) {
-			setShowCollectEmailModal(true);
-		} else {
-			setShowConfirmReservationModal(true);
-		}
+		setShowCollectEmailModal(true);
 	}
 
 	return (
@@ -123,7 +119,11 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 						try {
 							setIsBooking(true);
 
-							await groupSessionsService.reserveGroupSession(session.groupSessionId, collectedEmail).fetch();
+							const response = await groupSessionsService
+								.reserveGroupSession(session.groupSessionId, collectedEmail)
+								.fetch();
+
+							setAccount(response.account);
 							await fetchData();
 
 							setShowConfirmReservationModal(false);
@@ -149,8 +149,11 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 					try {
 						setIsCancelling(true);
 
-						await groupSessionsService.cancelGroupSessionReservation(reservation.groupSessionReservationId).fetch();
+						await groupSessionsService
+							.cancelGroupSessionReservation(reservation.groupSessionReservationId)
+							.fetch();
 						await fetchData();
+						history.replace(location.pathname, { passedAssessment: undefined });
 
 						setShowConfirmCancelModal(false);
 					} catch (error) {
@@ -184,14 +187,22 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 						<Row>
 							<Col>
 								<h6 className="text-white text-center mb-1">you've reserved a place for this event</h6>
-								<p className="text-white text-center mb-3">Join us at {session?.startDateTimeDescription}</p>
+								<p className="text-white text-center mb-3">
+									Join us at {session?.startDateTimeDescription}
+								</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
 										<Button as="div" variant="light" size="sm" className="mr-2">
 											view calendar
 										</Button>
 									</Link>
-									<Button as="a" variant="light" size="sm" href={session?.videoconferenceUrl || ''} target="_blank">
+									<Button
+										as="a"
+										variant="light"
+										size="sm"
+										href={session?.videoconferenceUrl || ''}
+										target="_blank"
+									>
 										join now
 									</Button>
 								</div>
@@ -214,7 +225,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			<Container className="pt-5 pb-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<p className="mb-0">{session?.description}</p>
+						<div dangerouslySetInnerHTML={{ __html: session?.description || '' }}></div>
 					</Col>
 				</Row>
 				<Row className="mt-5 text-center">
@@ -229,7 +240,11 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 								Cancel Reservation
 							</Button>
 						) : (
-							<Button disabled={session?.seatsAvailable === 0} variant="primary" onClick={handleReserveButtonClick}>
+							<Button
+								disabled={session?.seatsAvailable === 0}
+								variant="primary"
+								onClick={handleReserveButtonClick}
+							>
 								{session?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a Place'}
 							</Button>
 						)}
