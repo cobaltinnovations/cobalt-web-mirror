@@ -95,7 +95,7 @@ interface GetGroupSessionCountsResponseBody {
 }
 
 // By-request
-interface CreateGroupSessionRequestRequestBody {
+export interface CreateGroupSessionRequestRequestBody {
 	facilitatorAccountId: string | null;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;
@@ -202,7 +202,9 @@ export const groupSessionsService = {
 			data: { groupSessionStatusId },
 		});
 	},
-	isGroupSession(event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel): event is GroupSessionModel {
+	isGroupSession(
+		event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel
+	): event is GroupSessionModel {
 		return typeof (event as GroupSessionModel).groupSessionId !== 'undefined';
 	},
 	reserveGroupSession(groupSessionId: string, emailAddress: string) {
@@ -227,7 +229,10 @@ export const groupSessionsService = {
 			url: '/group-sessions/counts',
 		});
 	},
-	getGroupSessionCountByStatusId(groupSessionCounts: GroupSessionCountModel[], groupSessionStatusId: GROUP_SESSION_STATUS_ID) {
+	getGroupSessionCountByStatusId(
+		groupSessionCounts: GroupSessionCountModel[],
+		groupSessionStatusId: GROUP_SESSION_STATUS_ID
+	) {
 		if (!groupSessionCounts) {
 			return 0;
 		}
@@ -284,14 +289,19 @@ export const groupSessionsService = {
 			url: `/group-session-requests/${groupSessionRequestId}`,
 		});
 	},
-	updateGroupSessionRequestStatusById(groupSessionRequestId: string, groupSessionRequestStatusId: 'ADDED' | 'ARCHIVED' | 'DELETED') {
+	updateGroupSessionRequestStatusById(
+		groupSessionRequestId: string,
+		groupSessionRequestStatusId: 'ADDED' | 'ARCHIVED' | 'DELETED'
+	) {
 		return httpSingleton.orchestrateRequest<UpdateGroupSessionRequestStatusByIdResponseBody>({
 			method: 'put',
 			url: `/group-session-requests/${groupSessionRequestId}/status`,
 			data: { groupSessionRequestStatusId },
 		});
 	},
-	isGroupSessionByRequest(event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel): event is GroupSessionRequestModel {
+	isGroupSessionByRequest(
+		event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel
+	): event is GroupSessionRequestModel {
 		return typeof (event as GroupSessionRequestModel).groupSessionRequestId !== 'undefined';
 	},
 	signUpForGroupSessionRequest(data: SignUpForGroupSessionRequestRequestBody) {

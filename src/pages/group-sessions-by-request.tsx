@@ -75,6 +75,10 @@ const GroupSessionsByRequest: FC = () => {
 		setStatusFilterValue(value);
 	}
 
+	function handleSessionEditClicked(groupSessionRequestId: string) {
+		history.push(`/group-sessions/by-request/${groupSessionRequestId}/edit`);
+	}
+
 	async function handleSessionActionClicked(
 		groupSessionRequestId: string,
 		actionId: GROUP_SESSION_STATUS_ID.ADDED | GROUP_SESSION_STATUS_ID.ARCHIVED | GROUP_SESSION_STATUS_ID.DELETED
@@ -169,6 +173,7 @@ const GroupSessionsByRequest: FC = () => {
 										<SessionRequestRow
 											key={session.groupSessionRequestId}
 											session={session}
+											onEditClick={handleSessionEditClicked}
 											onAddClick={(sessionId) => {
 												handleSessionActionClicked(sessionId, GROUP_SESSION_STATUS_ID.ADDED);
 											}}
