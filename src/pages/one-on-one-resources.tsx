@@ -34,9 +34,9 @@ const OneOnOneResources: FC = () => {
 			<Container className="pt-5 pb-8">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h6>CobaltPeers</h6>
+						<h6>Peers</h6>
 						<p className="mb-5">
-							CobaltPeers is support offered by health system colleagues with similar experiences for individuals seeking reduced isolation and
+							Peers support is offered by health system colleagues with similar experiences for individuals seeking reduced isolation and
 							acknowledgement of challenges and difficulties unique to their work through brief one-on-one sessions and offer for follow up.
 						</p>
 						<h6>Resilience Coaches</h6>
