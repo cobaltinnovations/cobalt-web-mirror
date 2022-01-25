@@ -9,6 +9,7 @@ import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
 import colors from '@/jss/colors';
 
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
@@ -36,15 +37,19 @@ const useStyles = createUseStyles({
 
 interface SessionRequestRowProps {
 	session: GroupSessionRequestModel;
+	onEditClick(groupSessionRequestId: string): void;
 	onAddClick(groupSessionRequestId: string): void;
 	onArchiveClick(groupSessionRequestId: string): void;
 	onUnarchiveClick(groupSessionRequestId: string): void;
 	onDeleteClick(groupSessionRequestId: string): void;
 }
 
-const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onAddClick, onArchiveClick, onUnarchiveClick, onDeleteClick }) => {
+const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, onAddClick, onArchiveClick, onUnarchiveClick, onDeleteClick }) => {
 	const classes = useStyles();
 	const { account } = useAccount();
+
+	const canEditSession = (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
+		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW || session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
 
 	const canAddSession =
 		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
@@ -71,6 +76,17 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onAddClick, on
 					<SessionDropdown
 						id={session.groupSessionRequestId}
 						items={[
+							...(canEditSession
+									? [
+											{
+												icon: <EditIcon className={classes.iconPath} />,
+												title: 'Edit',
+												onClick: () => {
+													onEditClick(session.groupSessionRequestId);
+												},
+											},
+									  ]
+									: []),
 							...(canAddSession
 								? [
 										{
