@@ -24,6 +24,8 @@ const InteractionInstances: FC = () => {
 	}, [interactionId]);
 
 	const handleInteractionOptionButtonClick = async (interactionOption: InteractionOption) => {
+		if(!window.confirm('Are you sure you want to record a followup of "' + interactionOption.optionDescription + '"?')) return;
+
 		try {
 			if (!interactionInstance) {
 				throw new Error('interactionInstance is undefined.');
@@ -62,7 +64,7 @@ const InteractionInstances: FC = () => {
 				{interactionOptionActions.length > 0 && (
 					<Row className="pb-3">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<h3 className="mb-4 text-center">Actions Already Taken</h3>
+							<h3 className="mb-4 text-center">Followups Already Recorded</h3>
 							<ul>
 								{interactionOptionActions.map((interactionOptionAction) => {
 									return (
@@ -82,7 +84,7 @@ const InteractionInstances: FC = () => {
 				{interactionOptions.length > 0 && (
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<h3 className="mb-4 text-center">Actions You Can Take</h3>
+							<h3 className="mb-4 text-center">Record Your Followup</h3>
 							{interactionOptions.map((interactionOption) => {
 								return (
 									<Button
