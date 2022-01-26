@@ -79,25 +79,27 @@ const InteractionInstances: FC = () => {
 						</Col>
 					</Row>
 				)}
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h3 className="mb-4 text-center">Actions You Can Take</h3>
-						{interactionOptions.map((interactionOption) => {
-							return (
-								<Button
-									key={interactionOption.interactionOptionId}
-									className="d-block w-100 mb-1"
-									variant="light"
-									onClick={() => {
-										handleInteractionOptionButtonClick(interactionOption);
-									}}
-								>
-									{interactionOption.optionDescription}
-								</Button>
-							);
-						})}
-					</Col>
-				</Row>
+				{interactionOptions.length > 0 && (
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<h3 className="mb-4 text-center">Actions You Can Take</h3>
+							{interactionOptions.map((interactionOption) => {
+								return (
+									<Button
+										key={interactionOption.interactionOptionId}
+										className="d-block w-100 mb-1"
+										variant="light"
+										onClick={() => {
+											handleInteractionOptionButtonClick(interactionOption);
+										}}
+									>
+										{interactionOption.optionDescription}
+									</Button>
+								);
+							})}
+						</Col>
+					</Row>
+				)}
 			</Container>
 		</AsyncPage>
 	);
