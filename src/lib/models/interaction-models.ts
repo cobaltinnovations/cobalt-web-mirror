@@ -31,3 +31,14 @@ export interface InteractionOption {
 	optionOrder: number;
 	optionUrl: string;
 }
+
+export interface InteractionOptionAction {
+	interactionOptionActionId: string;
+	interactionOptionId: string;
+	interactionInstanceId: string;
+	accountId: string;
+	description: string;
+	descriptionAsHtml: string;
+	created: string;
+	createdDescription: string;
+}

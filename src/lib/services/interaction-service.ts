@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { InteractionInstance, InteractionOption } from '@/lib/models';
+import { InteractionInstance, InteractionOption, InteractionOptionAction } from '@/lib/models';
 
 interface PostInteractionResponseBody {
 	interactionOption: InteractionOption;
@@ -8,6 +8,7 @@ interface PostInteractionResponseBody {
 interface GetInteractionInstancesResponseBody {
 	interactionOptions: InteractionOption[];
 	interactionInstance: InteractionInstance;
+	interactionOptionActions: InteractionOptionAction[];
 }
 
 export const interactionService = {

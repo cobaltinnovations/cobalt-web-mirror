@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
-import { InteractionInstance, InteractionOption } from '@/lib/models';
+import { InteractionInstance, InteractionOption, InteractionOptionAction } from '@/lib/models';
 import { interactionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
@@ -13,12 +13,14 @@ const InteractionInstances: FC = () => {
 	const { interactionId } = useParams<{ interactionId: string }>();
 	const [interactionInstance, setInteractionInstance] = useState<InteractionInstance>();
 	const [interactionOptions, setInteractionOptions] = useState<InteractionOption[]>([]);
+	const [interactionOptionActions, setInteractionOptionActions] = useState<InteractionOptionAction[]>([]);
 
 	const fetchData = useCallback(async () => {
 		const response = await interactionService.getInteractionInstances(interactionId).fetch();
 
 		setInteractionInstance(response.interactionInstance);
 		setInteractionOptions(response.interactionOptions);
+		setInteractionOptionActions(response.interactionOptionActions);
 	}, [interactionId]);
 
 	const handleInteractionOptionButtonClick = async (interactionOption: InteractionOption) => {
@@ -49,6 +51,7 @@ const InteractionInstances: FC = () => {
 			<Container className="py-5">
 				<Row className="pb-3">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<h3 className="mb-4 text-center">Interaction Data</h3>
 						<div
 							dangerouslySetInnerHTML={{
 								__html: interactionInstance?.metadata.endUserHtmlRepresentation || '',
@@ -56,8 +59,29 @@ const InteractionInstances: FC = () => {
 						/>
 					</Col>
 				</Row>
+				{interactionOptionActions.length > 0 && (
+					<Row className="pb-3">
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<h3 className="mb-4 text-center">Actions Already Taken</h3>
+							<ul>
+								{interactionOptionActions.map((interactionOptionAction) => {
+									return (
+										<li>
+											<div
+												dangerouslySetInnerHTML={{
+													__html: interactionOptionAction.descriptionAsHtml,
+												}}
+											/>
+										</li>
+									);
+								})}
+							</ul>
+						</Col>
+					</Row>
+				)}
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<h3 className="mb-4 text-center">Actions You Can Take</h3>
 						{interactionOptions.map((interactionOption) => {
 							return (
 								<Button
