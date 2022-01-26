@@ -66,7 +66,7 @@ const InteractionInstances: FC = () => {
 							<ul>
 								{interactionOptionActions.map((interactionOptionAction) => {
 									return (
-										<li>
+										<li key={interactionOptionAction.interactionOptionActionId}>
 											<div
 												dangerouslySetInnerHTML={{
 													__html: interactionOptionAction.descriptionAsHtml,
@@ -85,6 +85,7 @@ const InteractionInstances: FC = () => {
 						{interactionOptions.map((interactionOption) => {
 							return (
 								<Button
+									key={interactionOption.interactionOptionId}
 									className="d-block w-100 mb-1"
 									variant="light"
 									onClick={() => {
