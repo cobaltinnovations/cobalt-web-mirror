@@ -69,6 +69,7 @@ const PicProviderSearch = React.lazy(() => import('@/pages/pic/provider-search')
 const PicProviderCalendar = React.lazy(() => import('@/pages/pic/provider-calendar'));
 const ContactLCSW = React.lazy(() => import('@/pages/pic/contact-lcsw/contact-lcsw'));
 const Interaction = React.lazy(() => import('@/pages/interaction'));
+const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 
 interface RouteGuardProps {
 	subdomain?: string;
@@ -658,6 +659,13 @@ export const Routes = [
 		private: true,
 		header: (): ReactElement => <Header />,
 		main: Interaction,
+	},
+	{
+		path: '/interaction-instances/:interactionId',
+		exact: true,
+		private: true,
+		header: (): ReactElement => <Header />,
+		main: InteractionInstances,
 	},
 	{
 		path: '*',

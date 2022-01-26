@@ -9,5 +9,6 @@ export * from './external-group-event-type';
 export * from './group-event';
 export * from './group-session-models';
 export * from './institution';
+export * from './interaction-models';
 export * from './provider';
 export * from './roles';
