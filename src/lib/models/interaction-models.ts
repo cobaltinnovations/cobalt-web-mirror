@@ -5,20 +5,13 @@ export interface InteractionInstance {
 	startDateTimeDescription: string;
 	timeZone: string;
 	completedFlag: boolean;
-	metadata: {
-		gad7Answers: string;
-		phoneNumber: string;
-		phq4Answers: string;
-		phq9Answers: string;
-		pcptsdAnswers: string;
-		phoneNumberForDisplay: string;
-		endUserHtmlRepresentation: string;
-	};
-	hipaaCompliantMetadata: {
-		phoneNumber: string;
-		phoneNumberForDisplay: string;
-		endUserHtmlRepresentation: string;
-	};
+
+	// Intentionally typed like this.
+	// We don’t know all possible object properties.
+	// They can and will change drastically over time.
+	metadata: Record<string, any>;
+	hipaaCompliantMetadata: Record<string, any>;
+
 	caseNumber: string;
 }
 
