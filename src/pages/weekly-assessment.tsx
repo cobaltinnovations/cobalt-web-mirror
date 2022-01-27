@@ -56,7 +56,7 @@ const WeeklyAssessment: FC = () => {
 			}
 		}
 
-		return `/connect-with-support?${params.toString()}`;
+		return `/connect-with-support${params.toString() ? `?${params.toString()}` : ''}`;
 	}, [history.location.state]);
 
 	const fetchData = useCallback(async () => {
@@ -91,7 +91,9 @@ const WeeklyAssessment: FC = () => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.push(`/weekly-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.previousSessionId}`);
+			history.push(
+				`/weekly-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.previousSessionId}`
+			);
 		}
 	}, [assessment, history]);
 
@@ -204,7 +206,10 @@ const WeeklyAssessment: FC = () => {
 				}}
 			/>
 			<AsyncPage fetchData={fetchData}>
-				<ProgressBar current={assessment?.assessmentProgress || 0} max={assessment?.assessmentProgressTotal || 0} />
+				<ProgressBar
+					current={assessment?.assessmentProgress || 0}
+					max={assessment?.assessmentProgressTotal || 0}
+				/>
 
 				<Container className="pt-5 pb-5">
 					<Row>
@@ -212,13 +217,18 @@ const WeeklyAssessment: FC = () => {
 							{assessment?.assessmentPrompt && <p className="mb-3">{assessment?.assessmentPrompt}</p>}
 							<Form>
 								{assessment?.question && (
-									<SurveyQuestion key={assessment.question.questionId} question={assessment.question} onChange={handleSurveyQuestionChange} />
+									<SurveyQuestion
+										key={assessment.question.questionId}
+										question={assessment.question}
+										onChange={handleSurveyQuestionChange}
+									/>
 								)}
 								<div
 									className={classNames({
 										'd-flex': true,
 										'justify-content-end': !assessment?.previousQuestionId,
-										'justify-content-between': assessment?.previousQuestionId && assessment?.nextQuestionId,
+										'justify-content-between':
+											assessment?.previousQuestionId && assessment?.nextQuestionId,
 									})}
 								>
 									{assessment?.previousQuestionId && (
