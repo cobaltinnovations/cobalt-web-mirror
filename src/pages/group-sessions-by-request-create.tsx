@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { FC, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { FC, useCallback, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -13,7 +13,7 @@ import SessionCropModal from '@/components/session-crop-modal';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
 import fonts from '@/jss/fonts';
-import { imageUploader, groupSessionsService } from '@/lib/services';
+import { imageUploader, groupSessionsService, CreateGroupSessionRequestRequestBody } from '@/lib/services';
 import ImageUpload from '@/components/image-upload';
 import useAlert from '@/hooks/use-alert';
 import useAccount from '@/hooks/use-account';
@@ -21,6 +21,7 @@ import { ROLE_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
+import AsyncPage from '@/components/async-page';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -44,11 +45,10 @@ type GroupSessionByRequestFormData = yup.InferType<typeof groupSessionByRequestS
 const requiredFields = getRequiredYupFields<GroupSessionByRequestFormData>(groupSessionByRequestSchema);
 
 const GroupSessionsByRequestCreate: FC = () => {
-	useHeaderTitle('Create Studio Session');
-
 	const handleError = useHandleError();
 	const { showAlert } = useAlert();
 	const { account } = useAccount();
+	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 
 	const history = useHistory();
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);
@@ -57,28 +57,70 @@ const GroupSessionsByRequestCreate: FC = () => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
 
-	async function handleFormSubmit(values: GroupSessionByRequestFormData) {
-		try {
-			await groupSessionsService
-				.createGroupSessionRequest({
-					facilitatorAccountId: values.responsible ? account?.accountId ?? null : null,
-					facilitatorName: values.managersName,
-					facilitatorEmailAddress: values.managersEmail,
-					title: values.title,
-					description: values.description,
-					urlName: values.sessionHandle,
-					imageUrl: values.imageUrl,
-					customQuestion1: values.customQuestionOneDescription,
-					customQuestion2: values.customQuestionTwoDescription,
-				})
-				.fetch();
+	const [isEdit, setIsEdit] = useState(false);
+	const [initialValues, setInitialValues] = useState<GroupSessionByRequestFormData>();
 
-			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
+	useHeaderTitle(initialValues?.title ? initialValues?.title : 'Create Studio Session');
+
+	const fetchData = useCallback(async () => {
+		if (!groupSessionId) {
+			// If there is no groupSessionId, that means this is a new session. Do not fetch any data.
+			return;
+		}
+
+		const { groupSessionRequest } = await groupSessionsService.getGroupSessionRequestById(groupSessionId).fetch();
+
+		setIsEdit(true);
+		setInitialValues({
+			responsible: groupSessionRequest.facilitatorEmailAddress === account?.emailAddress,
+			managersName: groupSessionRequest.facilitatorName,
+			managersEmail: groupSessionRequest.facilitatorEmailAddress,
+			title: groupSessionRequest.title,
+			description: groupSessionRequest.description,
+			imageUrl: groupSessionRequest.imageUrl || '',
+			sessionHandle: groupSessionRequest.urlName,
+			customQuestionOne: !!groupSessionRequest.customQuestion1,
+			customQuestionOneDescription: groupSessionRequest.customQuestion1 || '',
+			customQuestionTwo: !!groupSessionRequest.customQuestion2,
+			customQuestionTwoDescription: groupSessionRequest.customQuestion2 || '',
+		} as GroupSessionByRequestFormData);
+	}, [account, groupSessionId]);
+
+	async function handleFormSubmit(values: GroupSessionByRequestFormData) {
+		const submissionValues: CreateGroupSessionRequestRequestBody = {
+			facilitatorAccountId: values.responsible ? account?.accountId ?? null : null,
+			facilitatorName: values.managersName,
+			facilitatorEmailAddress: values.managersEmail,
+			title: values.title,
+			description: values.description,
+			urlName: values.sessionHandle,
+			imageUrl: values.imageUrl,
+			customQuestion1: values.customQuestionOneDescription,
+			customQuestion2: values.customQuestionTwoDescription,
+		};
+
+		try {
+			if (isEdit) {
+				if (!groupSessionId) {
+					throw new Error('groupSessionId not found.');
+				}
+
+				await groupSessionsService.updateGroupSessionRequest(groupSessionId, submissionValues).fetch();
+
+				showAlert({
+					variant: 'success',
+					text: 'Your studio session was updated!',
+				});
+			} else {
+				await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
+
 				showAlert({
 					variant: 'success',
 					text: 'Your studio session was added!',
 				});
+			}
 
+			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
 				history.push('/group-sessions/by-request');
 			} else {
 				history.push('/in-the-studio-thanks');
@@ -89,7 +131,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 	}
 
 	return (
-		<>
+		<AsyncPage fetchData={fetchData}>
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 				<Breadcrumb
 					breadcrumbs={[
@@ -99,7 +141,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 						},
 						{
 							to: '/group-sessions/by-request/create',
-							title: 'create studio session',
+							title: initialValues?.title ? initialValues.title : 'create studio session',
 						},
 					]}
 				/>
@@ -108,7 +150,9 @@ const GroupSessionsByRequestCreate: FC = () => {
 			<Container className="pt-5 pb-32">
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-2 font-size-xl">create studio session by request</h1>
+						<h1 className="mb-2 font-size-xl">
+							{initialValues?.title ? initialValues.title : 'create studio session by request'}
+						</h1>
 						<p className="mb-0 text-danger">Required*</p>
 					</Col>
 				</Row>
@@ -117,7 +161,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 						<Formik<GroupSessionByRequestFormData>
 							enableReinitialize
 							validationSchema={groupSessionByRequestSchema}
-							initialValues={groupSessionByRequestSchema.cast(undefined)}
+							initialValues={initialValues || groupSessionByRequestSchema.cast(undefined)}
 							onSubmit={handleFormSubmit}
 						>
 							{(formikBag) => {
@@ -260,23 +304,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 													error={touched.title && errors.title ? errors.title : ''}
 												/>
 
-												<InputHelper
-													className="mb-5"
-													label="Description"
-													name="description"
-													value={values.description}
-													as="textarea"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													helperText="How would you like to describe your session? (This will be featured on the Cobalt Platform, should be 2-3 sentences long, and should highlight the benefit for participants)."
-													required={requiredFields.description}
-													error={
-														touched.description && errors.description
-															? errors.description
-															: ''
-													}
-												/>
-
 												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
 													Description {requiredFields.description && <span>*</span>}
 												</Form.Label>
@@ -404,7 +431,13 @@ const GroupSessionsByRequestCreate: FC = () => {
 												)}
 											</Card>
 
-											<SessionFormSubmitBanner title="add studio session by request" />
+											<SessionFormSubmitBanner
+												title={
+													isEdit
+														? 'update studio session by request'
+														: 'add studio session by request'
+												}
+											/>
 										</Form>
 									</>
 								);
@@ -413,7 +446,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 					</Col>
 				</Row>
 			</Container>
-		</>
+		</AsyncPage>
 	);
 };
 
