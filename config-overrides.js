@@ -20,6 +20,12 @@ module.exports = {
 		// Expose a dev flag for configuration of environment variables
 		config.plugins.push(new webpack.DefinePlugin({ __DEV__: env !== 'production' }));
 
+		config.ignoreWarnings = config.ignoreWarnings || [];
+		config.ignoreWarnings = [
+			...config.ignoreWarnings,
+			/Failed to parse source map from.*@ahryman40k\/ts-fhir-types.*/,
+		];
+
 		return config;
 	},
 };
