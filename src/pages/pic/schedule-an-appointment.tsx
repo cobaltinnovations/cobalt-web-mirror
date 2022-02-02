@@ -276,6 +276,7 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 
 		const findOptionsRequest = providerService.fetchFindOptions({
 			supportRoleIds: routedSupportRoleIds,
+			institutionId: account!.institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
 

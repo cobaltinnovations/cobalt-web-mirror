@@ -12,6 +12,7 @@ import { ReactComponent as PaperIcon } from '@/assets/icons/icon-description.svg
 import { ReactComponent as CheckCircleIcon } from '@/assets/icons/icon-check-circle.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import useHeaderTitle from '@/hooks/use-header-title';
+import useAccount from '@/hooks/use-account';
 import { ERROR_CODES } from '@/lib/http-client';
 import { appointmentService, CreateAppointmentData, FindFilters, FindOptionsResponse, providerService } from '@/lib/services';
 import { queryParamDateRegex } from '@/lib/utils';
@@ -52,6 +53,7 @@ const PicProviderSearch: FC = () => {
 	const handleError = useHandleError();
 	const history = useHistory();
 	const location = useLocation();
+	const { account } = useAccount();
 	const [openFilterModal, setOpenFilterModal] = useState<BookingFilters | null>(null);
 	const [didInit, setDidInit] = useState(false);
 	const [isBooking, setIsBooking] = useState(false);
@@ -146,6 +148,7 @@ const PicProviderSearch: FC = () => {
 
 		const findOptionsRequest = providerService.fetchFindOptions({
 			supportRoleIds: routedSupportRoleIds,
+			institutionId: account!.institutionId,
 		});
 
 		async function init() {

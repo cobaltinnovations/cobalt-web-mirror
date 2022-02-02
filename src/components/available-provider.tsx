@@ -114,7 +114,13 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 				<div className="d-flex align-items-center">
 					<BackgroundImageContainer size={116} imageUrl={provider.imageUrl || placeholderImage} />
 					<div className="pl-3">
-						<h5 className="mb-0">{joinComma(provider.name, provider.license)}</h5>
+						<h5 className="mb-0">
+							{provider.bioUrl ? (
+								<a href={provider.bioUrl} target="_blank" rel="noreferrer">{joinComma(provider.name, provider.license)}</a>
+							) : (
+								joinComma(provider.name, provider.license)
+							)}
+						</h5>
 
 						{/* {provider.schedulingSystemId !== 'EPIC' && (
 							<p className={classNames('d-inline-block text-white px-2', classes.acceptsAnons)}>
@@ -126,7 +132,7 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 							<p className="mb-0">
 								<i>{finalTitle}</i>
 							</p>
-						)}				
+						)}
 
 						{provider.treatmentDescription ? (
 							<p className="mb-0">

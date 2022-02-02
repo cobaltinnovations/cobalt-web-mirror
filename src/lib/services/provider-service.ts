@@ -15,6 +15,7 @@ import {
 	AppointmentReasonType,
 	AppointmentModel,
 	FollowupModel,
+	Specialty,
 } from '@/lib/models';
 import { getSubdomain } from '@/hooks/use-subdomain';
 import { OrchestratedRequest } from '@/lib/http-client';
@@ -35,6 +36,7 @@ export interface FindOptionsResponse {
 	recommendationLevel: RecommendationLevel;
 	scores: AssessmentScore;
 	supportRoles: SupportRole[];
+	specialties: Specialty[];
 }
 
 export interface FindFilters {
@@ -51,6 +53,7 @@ export interface FindFilters {
 	paymentTypeIds?: PaymentType['paymentTypeId'][];
 	licenseTypes?: string[];
 	systemAffinityId?: string;
+	specialtyIds?: string[];
 }
 
 export interface FindProvidersResponse {
@@ -124,12 +127,14 @@ export const providerService = {
 		endDate,
 		clinicIds,
 		providerId,
+		institutionId,
 	}: {
 		supportRoleIds?: string[];
 		startDate?: string;
 		endDate?: string;
 		clinicIds?: string[];
 		providerId?: string;
+		institutionId: string;
 	}): OrchestratedRequest<FindOptionsResponse> {
 		let url = '/providers/find-options';
 		const params = new URLSearchParams();
@@ -158,9 +163,9 @@ export const providerService = {
 			params.append('providerId', providerId);
 		}
 
-		if (supportRoleIds?.length || startDate || endDate || clinicIds?.length) {
-			url += `?${params.toString()}`;
-		}
+		params.set('institutionId', institutionId);
+
+		url += `?${params.toString()}`;
 
 		return httpSingleton.orchestrateRequest<FindOptionsResponse>({
 			method: 'get',

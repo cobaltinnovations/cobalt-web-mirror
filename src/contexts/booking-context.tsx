@@ -20,6 +20,7 @@ export enum BookingFilters {
 	Provider,
 	Availability,
 	Payment,
+	Specialty,
 }
 
 export interface SearchResult {
@@ -56,6 +57,8 @@ interface BookingState {
 	setClinicsFilter: Dispatch<SetStateAction<string[]>>;
 	providerFilter: string | undefined;
 	setProviderFilter: Dispatch<SetStateAction<string | undefined>>;
+	specialtyFilter: string[];
+	setSpecialtyFilter: Dispatch<SetStateAction<string[]>>;
 
 	selectedAppointmentTypeId?: string;
 	setSelectedAppointmentTypeId: Dispatch<SetStateAction<string | undefined>>;
@@ -103,6 +106,7 @@ const BookingProvider: FC = (props) => {
 	const [paymentTypeFilter, setPaymentTypeFilter] = useState<PaymentType['paymentTypeId'][]>([]);
 	const [clinicsFilter, setClinicsFilter] = useState<string[]>([]);
 	const [providerFilter, setProviderFilter] = useState<string>();
+	const [specialtyFilter, setSpecialtyFilter] = useState<string[]>([]);
 
 	const [selectedAppointmentTypeId, setSelectedAppointmentTypeId] = useState<string>();
 	const [selectedDate, setSelectedDate] = useState<string>();
@@ -180,6 +184,7 @@ const BookingProvider: FC = (props) => {
 				[BookingFilters.Availability]: availabilityFilter !== findOptions?.defaultAvailability,
 				[BookingFilters.Payment]: !!paymentTypeFilter.length,
 				[BookingFilters.Days]: Object.values(dateFilter.days).filter((day) => !day).length > 0,
+				[BookingFilters.Specialty]: !!specialtyFilter.length,
 			};
 		},
 		[
@@ -191,6 +196,7 @@ const BookingProvider: FC = (props) => {
 			formattedTimeFilter.startTime,
 			paymentTypeFilter.length,
 			providerTypeFilter,
+			specialtyFilter.length,
 		]
 	);
 
@@ -222,6 +228,8 @@ const BookingProvider: FC = (props) => {
 				setClinicsFilter,
 				providerFilter,
 				setProviderFilter,
+				specialtyFilter,
+				setSpecialtyFilter,
 
 				timeSlotEndTime,
 				formattedAvailabilityDate,
