@@ -124,12 +124,14 @@ export const providerService = {
 		endDate,
 		clinicIds,
 		providerId,
+		institutionId,
 	}: {
 		supportRoleIds?: string[];
 		startDate?: string;
 		endDate?: string;
 		clinicIds?: string[];
 		providerId?: string;
+		institutionId: string;
 	}): OrchestratedRequest<FindOptionsResponse> {
 		let url = '/providers/find-options';
 		const params = new URLSearchParams();
@@ -158,9 +160,9 @@ export const providerService = {
 			params.append('providerId', providerId);
 		}
 
-		if (supportRoleIds?.length || startDate || endDate || clinicIds?.length) {
-			url += `?${params.toString()}`;
-		}
+		params.set('institutionId', institutionId);
+
+		url += `?${params.toString()}`;
 
 		return httpSingleton.orchestrateRequest<FindOptionsResponse>({
 			method: 'get',
