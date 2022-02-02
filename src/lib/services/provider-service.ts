@@ -15,6 +15,7 @@ import {
 	AppointmentReasonType,
 	AppointmentModel,
 	FollowupModel,
+	Specialty,
 } from '@/lib/models';
 import { getSubdomain } from '@/hooks/use-subdomain';
 import { OrchestratedRequest } from '@/lib/http-client';
@@ -35,6 +36,7 @@ export interface FindOptionsResponse {
 	recommendationLevel: RecommendationLevel;
 	scores: AssessmentScore;
 	supportRoles: SupportRole[];
+	specialties: Specialty[];
 }
 
 export interface FindFilters {
@@ -120,7 +122,7 @@ interface GetProviderByIdResponse {
 
 export const providerService = {
 	fetchFindOptions({
-		supportRoleIds,		
+		supportRoleIds,
 		startDate,
 		endDate,
 		clinicIds,

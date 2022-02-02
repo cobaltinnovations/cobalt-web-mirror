@@ -82,3 +82,8 @@ export interface Provider {
 	emailAddress?: string;
 	bioUrl?: string;
 }
+
+export interface Specialty {
+	description: string;
+	specialtyId: string;
+}
