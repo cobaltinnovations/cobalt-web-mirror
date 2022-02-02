@@ -327,7 +327,7 @@ const ConnectWithSupport: FC = () => {
 		}
 
 		const findOptionsRequest = providerService.fetchFindOptions({
-			supportRoleIds: routedSupportRoleIds,
+			supportRoleIds: routedSupportRoleIds,			
 			institutionId: account!.institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
@@ -392,6 +392,8 @@ const ConnectWithSupport: FC = () => {
 						supportRoleIds: providerTypeFilter,
 						paymentTypeIds: paymentTypeFilter,
 						clinicIds: clinicsFilter,
+						// TODO: replace this with real filter value
+						// specialtyIds: ['58ccf1bb-8257-4a01-8847-c4d99e360ef6']
 				  };
 		}
 

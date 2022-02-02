@@ -51,6 +51,7 @@ export interface FindFilters {
 	paymentTypeIds?: PaymentType['paymentTypeId'][];
 	licenseTypes?: string[];
 	systemAffinityId?: string;
+	specialtyIds?: string[];
 }
 
 export interface FindProvidersResponse {
@@ -119,7 +120,7 @@ interface GetProviderByIdResponse {
 
 export const providerService = {
 	fetchFindOptions({
-		supportRoleIds,
+		supportRoleIds,		
 		startDate,
 		endDate,
 		clinicIds,
