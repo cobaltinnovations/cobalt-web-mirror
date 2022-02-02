@@ -80,4 +80,5 @@ export interface Provider {
 	skipIntakePrompt: boolean;
 	treatmentDescription?: string;
 	emailAddress?: string;
+	bioUrl?: string;
 }
