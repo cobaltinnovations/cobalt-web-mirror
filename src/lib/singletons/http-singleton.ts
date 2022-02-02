@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 
 import { HttpClient } from '@/lib/http-client';
 import config from '@/lib/config';
@@ -11,5 +12,13 @@ export const httpSingleton = new HttpClient({
 	tokenHeaderKey: 'X-Cobalt-Access-Token',
 	getToken: () => {
 		return Cookies.get('accessToken');
+	},
+	fingerprintHeaderKey: 'X-Cobalt-Fingerprint-Id',
+	getFingerprintId: () => {
+		return config.COBALT_WEB_FINGERPRINTING_ENABLED?.toLocaleLowerCase() === 'true'
+			? FingerprintJS.load({ token: config.COBALT_WEB_FINGERPRINTING_TOKEN })
+					.then((fp) => fp.get())
+					.then((r) => r.visitorId)
+			: Promise.resolve(undefined);
 	},
 });

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
 // https://github.com/axios/axios/blob/master/index.d.ts
@@ -10,6 +11,8 @@ export type HttpConfig = {
 	defaultHeaders?: Record<string, string | number | boolean>;
 	tokenHeaderKey?: string;
 	getToken?(): string | undefined;
+	fingerprintHeaderKey?: string;
+	getFingerprintId(): Promise<string | undefined>;
 };
 
 export type OrchestratedRequest<T = undefined> = {
@@ -32,7 +35,7 @@ export class HttpClient {
 		this._baseUrl = httpConfig.baseUrl || '';
 		this._headers = {
 			'X-Session-Tracking-Id': this._sessionTrackingId,
-			...httpConfig.defaultHeaders
+			...httpConfig.defaultHeaders,
 		};
 		this._requests = {};
 
@@ -49,6 +52,17 @@ export class HttpClient {
 				},
 			],
 		});
+
+		(async () => {
+			try {
+				const fpId = await httpConfig.getFingerprintId();
+				if (fpId && httpConfig.fingerprintHeaderKey) {
+					this._headers[httpConfig.fingerprintHeaderKey] = fpId;
+				}
+			} catch (e) {
+				console.log(e);
+			}
+		})();
 	}
 
 	abortRequest(requestId: string) {
