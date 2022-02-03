@@ -44,6 +44,7 @@ import { BookingContext, SearchResult, BookingFilters } from '@/contexts/booking
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
+import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -149,6 +150,8 @@ const ConnectWithSupport: FC = () => {
 		setClinicsFilter,
 		providerFilter,
 		setProviderFilter,
+		specialtyFilter,
+		setSpecialtyFilter,
 
 		selectedAppointmentTypeId,
 		setSelectedAppointmentTypeId,
@@ -252,6 +255,7 @@ const ConnectWithSupport: FC = () => {
 			setAvailabilityFilter(findOptions.defaultAvailability);
 			setVisitTypeIdsFilter(findOptions.defaultVisitTypeIds);
 			setPaymentTypeFilter([]);
+			setSpecialtyFilter([]);
 			setClinicsFilter(routedClinicIds.length ? routedClinicIds : findOptions.defaultClinicIds);
 			if (routedProviderId) {
 				setProviderFilter(routedProviderId);
@@ -267,6 +271,7 @@ const ConnectWithSupport: FC = () => {
 			setProviderFilter,
 			setProviderTypeFilter,
 			setTimeFilter,
+			setSpecialtyFilter,
 		]
 	);
 
@@ -328,6 +333,7 @@ const ConnectWithSupport: FC = () => {
 
 		const findOptionsRequest = providerService.fetchFindOptions({
 			supportRoleIds: routedSupportRoleIds,
+			institutionId: account!.institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
 
@@ -391,6 +397,7 @@ const ConnectWithSupport: FC = () => {
 						supportRoleIds: providerTypeFilter,
 						paymentTypeIds: paymentTypeFilter,
 						clinicIds: clinicsFilter,
+						specialtyIds: specialtyFilter,
 				  };
 		}
 
@@ -435,6 +442,7 @@ const ConnectWithSupport: FC = () => {
 		handleError,
 		paymentTypeFilter,
 		providerFilter,
+		specialtyFilter,
 		providerTypeFilter,
 		selectedSearchResult,
 		setAppointmentTypes,
@@ -596,6 +604,19 @@ const ConnectWithSupport: FC = () => {
 				}}
 			/>
 
+			<FilterSpecialtyModal
+				specialties={findOptions?.specialties ?? []}
+				selectedSpecialties={specialtyFilter}
+				show={openFilterModal === BookingFilters.Specialty}
+				onHide={() => {
+					setOpenFilterModal(null);
+				}}
+				onSave={(selectedSpecialties) => {
+					setOpenFilterModal(null);
+					setSpecialtyFilter(selectedSpecialties)
+				}}
+			/>
+
 			<CollectContactInfoModal
 				promptForEmail={promptForEmail}
 				promptForPhoneNumber={promptForPhoneNumber}
@@ -653,18 +674,28 @@ const ConnectWithSupport: FC = () => {
 						...aT,
 						disabled: !selectedTimeSlot?.appointmentTypeIds.includes(aT.appointmentTypeId),
 					}))}
-				epicDepartment={epicDepartments.find((eD) => eD.epicDepartmentId === selectedTimeSlot?.epicDepartmentId)}
+				epicDepartment={epicDepartments.find(
+					(eD) => eD.epicDepartmentId === selectedTimeSlot?.epicDepartmentId
+				)}
 				timeSlot={selectedTimeSlot}
-				providerName={`${selectedProvider?.name}${selectedProvider?.license ? `, ${selectedProvider?.license}` : ''}`}
+				providerName={`${selectedProvider?.name}${
+					selectedProvider?.license ? `, ${selectedProvider?.license}` : ''
+				}`}
 				onHide={() => {
 					setSelectedAppointmentTypeId(undefined);
 					setShowConfirmAppointmentTypeModal(false);
 				}}
 				onConfirm={(appointmentTypeId) => {
-					const selectedAppointmentType = appointmentTypes.find((aT) => appointmentTypeId === aT.appointmentTypeId);
+					const selectedAppointmentType = appointmentTypes.find(
+						(aT) => appointmentTypeId === aT.appointmentTypeId
+					);
 
 					if (selectedAppointmentType && selectedAppointmentType.visitTypeId === 'FOLLOWUP') {
-						if (!window.confirm('Do you understand that this appointment is reserved for individuals that have met with this provider before?')) {
+						if (
+							!window.confirm(
+								'Do you understand that this appointment is reserved for individuals that have met with this provider before?'
+							)
+						) {
 							return;
 						}
 					}
@@ -786,7 +817,10 @@ const ConnectWithSupport: FC = () => {
 
 			<HeroContainer>
 				<div className="d-flex justify-content-center align-items-center">
-					<small className="text-white text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
+					<small
+						className="text-white text-center"
+						dangerouslySetInnerHTML={{ __html: recommendationHtml }}
+					/>
 					<Link to="/one-on-one-resources">
 						<InfoIcon className={classes.infoIcon} />
 					</Link>
@@ -808,9 +842,10 @@ const ConnectWithSupport: FC = () => {
 								title="payment options vary by provider"
 							>
 								<p className="pb-4 m-0">
-									Payment options vary by provider. Services may be free of charge, covered by insurance, or self-pay, and you may choose to
-									filter by your specific payment preferences. CobaltCare PPO and insurance plans through Cobalt cover most services with Cobalt
-									providers. Copays and deductibles may apply.
+									Payment options vary by provider. Services may be free of charge, covered by
+									insurance, or self-pay, and you may choose to filter by your specific payment
+									preferences. CobaltCare PPO and insurance plans through Cobalt cover most services
+									with Cobalt providers. Copays and deductibles may apply.
 								</p>
 							</Accordion>
 						</Col>
@@ -869,10 +904,15 @@ const ConnectWithSupport: FC = () => {
 													return (
 														<MenuItem key={result.id} option={result} position={idx}>
 															<div className="d-flex align-items-center">
-																<BackgroundImageContainer imageUrl={result.imageUrl} size={43} />
+																<BackgroundImageContainer
+																	imageUrl={result.imageUrl}
+																	size={43}
+																/>
 																<div className="ml-3">
 																	<p className="mb-0">{result.displayName}</p>
-																	{result.description && <small>{result.description}</small>}
+																	{result.description && (
+																		<small>{result.description}</small>
+																	)}
 																</div>
 															</div>
 														</MenuItem>
@@ -882,7 +922,9 @@ const ConnectWithSupport: FC = () => {
 										);
 									}}
 								/>
-								{selectedSearchResult.length !== 0 && <ClearIcon className={classes.clearIcon} onClick={handleClearSearchButtonClick} />}
+								{selectedSearchResult.length !== 0 && (
+									<ClearIcon className={classes.clearIcon} onClick={handleClearSearchButtonClick} />
+								)}
 							</div>
 						</Col>
 					</Row>
@@ -903,16 +945,34 @@ const ConnectWithSupport: FC = () => {
 								>
 									Days
 								</FilterPill>
-								<FilterPill active={activeFilters[BookingFilters.Time]} onClick={() => setOpenFilterModal(BookingFilters.Time)}>
+								<FilterPill
+									active={activeFilters[BookingFilters.Time]}
+									onClick={() => setOpenFilterModal(BookingFilters.Time)}
+								>
 									Times
 								</FilterPill>
-								<FilterPill active={activeFilters[BookingFilters.Provider]} onClick={() => setOpenFilterModal(BookingFilters.Provider)}>
+								<FilterPill
+									active={activeFilters[BookingFilters.Provider]}
+									onClick={() => setOpenFilterModal(BookingFilters.Provider)}
+								>
 									Provider Type
 								</FilterPill>
-								<FilterPill active={activeFilters[BookingFilters.Availability]} onClick={() => setOpenFilterModal(BookingFilters.Availability)}>
+								<FilterPill
+									active={activeFilters[BookingFilters.Availability]}
+									onClick={() => setOpenFilterModal(BookingFilters.Availability)}
+								>
 									Availability
 								</FilterPill>
-								<FilterPill active={activeFilters[BookingFilters.Payment]} onClick={() => setOpenFilterModal(BookingFilters.Payment)}>
+								<FilterPill
+									active={activeFilters[BookingFilters.Specialty]}
+									onClick={() => setOpenFilterModal(BookingFilters.Specialty)}
+								>
+									Specialty
+								</FilterPill>
+								<FilterPill
+									active={activeFilters[BookingFilters.Payment]}
+									onClick={() => setOpenFilterModal(BookingFilters.Payment)}
+								>
 									Payment Type
 								</FilterPill>
 							</div>
@@ -974,7 +1034,8 @@ const ConnectWithSupport: FC = () => {
 									clinic: '',
 									license: '',
 									specialty: '',
-									imageUrl: 'https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/providers/cobalt-medicine-teams-clinic.jpg',
+									imageUrl:
+										'https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/providers/cobalt-medicine-teams-clinic.jpg',
 									isDefaultImageUrl: true,
 									timeZone: '',
 									locale: '',
@@ -983,7 +1044,8 @@ const ConnectWithSupport: FC = () => {
 									supportRoles: [],
 									appointmentTypeIds: [],
 									treatmentDescription: '* Available Mon-Fri, 8:30-2 & 2:30-5',
-									supportRolesDescription: 'Time Efficient, Accessible, and Multidisciplinary approach to therapy and/or medication',
+									supportRolesDescription:
+										'Time Efficient, Accessible, and Multidisciplinary approach to therapy and/or medication',
 									paymentFundingDescriptions: ['Accepts Insurance'],
 									intakeAssessmentRequired: false,
 									skipIntakePrompt: true,
@@ -1015,7 +1077,11 @@ const ConnectWithSupport: FC = () => {
 
 							<Container>
 								<Row>
-									<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
 										{section.fullyBooked ? (
 											<p className="mb-4">
 												<strong>all appointments are booked for this date</strong>
@@ -1036,17 +1102,23 @@ const ConnectWithSupport: FC = () => {
 															// const needsEmail = isAnonymous || !account?.emailAddress;
 															const needsEmail = true;
 															const needsPhoneNumber =
-																!!provider.phoneNumberRequiredForAppointment && (isAnonymous || !account?.phoneNumber);
+																!!provider.phoneNumberRequiredForAppointment &&
+																(isAnonymous || !account?.phoneNumber);
 
 															setPromptForEmail(needsEmail);
 															setPromptForPhoneNumber(needsPhoneNumber);
 
 															if (provider.appointmentTypeIds.length === 1) {
 																const selectedAppointmentType = appointmentTypes.find(
-																	(aT) => aT.appointmentTypeId === provider.appointmentTypeIds[0]
+																	(aT) =>
+																		aT.appointmentTypeId ===
+																		provider.appointmentTypeIds[0]
 																);
 
-																if (selectedAppointmentType && selectedAppointmentType.visitTypeId === 'FOLLOWUP') {
+																if (
+																	selectedAppointmentType &&
+																	selectedAppointmentType.visitTypeId === 'FOLLOWUP'
+																) {
 																	if (
 																		!window.confirm(
 																			'Do you understand that this appointment is reserved for individuals that have met with this provider before?'
@@ -1056,8 +1128,13 @@ const ConnectWithSupport: FC = () => {
 																	}
 																}
 
-																setSelectedAppointmentTypeId(selectedAppointmentType?.appointmentTypeId);
-																continueBookingProcess(provider, needsEmail || needsPhoneNumber);
+																setSelectedAppointmentTypeId(
+																	selectedAppointmentType?.appointmentTypeId
+																);
+																continueBookingProcess(
+																	provider,
+																	needsEmail || needsPhoneNumber
+																);
 															} else {
 																setShowConfirmAppointmentTypeModal(true);
 															}
