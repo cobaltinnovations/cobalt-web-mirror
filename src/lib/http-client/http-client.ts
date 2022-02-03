@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
 // https://github.com/axios/axios/blob/master/index.d.ts
