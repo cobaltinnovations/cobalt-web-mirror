@@ -60,7 +60,7 @@ export class HttpClient {
 					this._headers[httpConfig.fingerprintHeaderKey] = fpId;
 				}
 			} catch (e) {
-				console.log(e);
+				console.warn('failed to fingerprint', e);
 			}
 		})();
 	}
