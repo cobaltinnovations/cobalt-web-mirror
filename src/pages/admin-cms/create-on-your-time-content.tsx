@@ -71,9 +71,9 @@ const onYourTimeContentSchema = yup
 		duration: yup.string().default(''),
 		description: yup.string().required().default(''),
 		imageUrl: yup.string().default(''),
-		visibilityPrivate: yup.boolean().default(true),
+		visibilityPrivate: yup.boolean().default(false),
 		visibilityNetwork: yup.boolean().default(false),
-		visibilityPublic: yup.boolean().default(false),
+		visibilityPublic: yup.boolean().default(true),
 	});
 
 export type onYourTimeFormData = yup.InferType<typeof onYourTimeContentSchema>;
