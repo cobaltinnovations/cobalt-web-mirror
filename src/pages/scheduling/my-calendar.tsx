@@ -89,7 +89,7 @@ const useContainerStyles = createUseStyles({
 	},
 	leftCalendar: {
 		'& .fc .fc-toolbar.fc-header-toolbar': {
-			margin: 0,
+			marginBottom: 12,
 			'& .fc-toolbar-chunk': {
 				display: 'flex',
 				alignItems: 'center',
@@ -113,6 +113,14 @@ const useContainerStyles = createUseStyles({
 				'& button.fc-prev-button': {
 					marginLeft: 8,
 				},
+				'& button.fc-today-button': {
+					...fonts.xs,
+					borderRadius: 500,
+					padding: '4px 12px',
+					color: colors.primary,
+					backgroundColor: 'transparent',
+					border: `1px solid ${colors.gray200}`,
+				},
 			},
 		},
 		'& .fc-theme-standard .fc-scrollgrid': {
@@ -120,6 +128,10 @@ const useContainerStyles = createUseStyles({
 		},
 		'& .fc-theme-standard td, .fc-theme-standard th': {
 			border: 0,
+			'& a:not([href])': {
+				...fonts.xs,
+				color: colors.gray600,
+			},
 		},
 		'& .fc .fc-daygrid-day': {
 			'& .fc-daygrid-day-frame': {
@@ -472,50 +484,52 @@ export const MyCalendarScheduling: FC = () => {
 		<Container fluid>
 			<Row className={classNames('no-gutters', classes.wrapper)}>
 				<Col xs={3} className={classNames('h-100 px-5', classes.sideBar)}>
-					<Accordion
-						open={accordionExpanded}
-						onToggle={() => {
-							setAccordionExpanded(!accordionExpanded);
-						}}
-						title="My Calendar"
-					>
-						<div className="mb-4">
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal1"
-								label="Owner"
-								checked={true}
-								onChange={() => {
-									//
-								}}
-							/>
+					<div className="mb-6">
+						<Accordion
+							open={accordionExpanded}
+							onToggle={() => {
+								setAccordionExpanded(!accordionExpanded);
+							}}
+							title="My Calendar"
+						>
+							<div className="mb-4">
+								<Form.Check
+									type="radio"
+									bsPrefix="cobalt-modal-form__check"
+									id="cal1"
+									label="Owner"
+									checked={true}
+									onChange={() => {
+										//
+									}}
+								/>
 
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal2"
-								label="Editor"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
+								<Form.Check
+									type="radio"
+									bsPrefix="cobalt-modal-form__check"
+									id="cal2"
+									label="Editor"
+									checked={false}
+									onChange={() => {
+										//
+									}}
+								/>
 
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal3"
-								label="Viewer"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
-						</div>
-					</Accordion>
+								<Form.Check
+									type="radio"
+									bsPrefix="cobalt-modal-form__check"
+									id="cal3"
+									label="Viewer"
+									checked={false}
+									onChange={() => {
+										//
+									}}
+								/>
+							</div>
+						</Accordion>
+					</div>
 
-					<div className={classes.leftCalendar}>
+					<div className={classNames('mb-9', classes.leftCalendar)}>
 						<FullCalendar
 							ref={leftCalendarRef}
 							height="auto"
@@ -534,9 +548,8 @@ export const MyCalendarScheduling: FC = () => {
 						/>
 					</div>
 
-					<h4 className="mt-6 mb-2">view by</h4>
-
-					<div className="d-flex">
+					<h5 className="mb-2">view by</h5>
+					<div className="mb-9 d-flex">
 						<Form.Check
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -547,7 +560,6 @@ export const MyCalendarScheduling: FC = () => {
 								setCurrentMainCalendarView(MainCalendarView.Day);
 							}}
 						/>
-
 						<Form.Check
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -559,7 +571,6 @@ export const MyCalendarScheduling: FC = () => {
 								setCurrentMainCalendarView(MainCalendarView.Week);
 							}}
 						/>
-
 						<Form.Check
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -573,13 +584,12 @@ export const MyCalendarScheduling: FC = () => {
 						/>
 					</div>
 
-					<h4 className="mt-9 mb-2">actions</h4>
-
+					<h5 className=" mb-5">actions</h5>
 					<div className="d-flex flex-column align-items-start">
 						<Button
 							variant="link"
 							size="sm"
-							className="p-0 mb-2"
+							className="p-0 mb-5 font-size-xs"
 							onClick={() => {
 								setAddingAppointment(true);
 							}}
@@ -590,7 +600,7 @@ export const MyCalendarScheduling: FC = () => {
 						<Button
 							variant="link"
 							size="sm"
-							className="p-0 mb-2"
+							className="p-0 mb-5 font-size-xs"
 							onClick={() => {
 								setManagingAvailability(true);
 							}}
@@ -601,7 +611,7 @@ export const MyCalendarScheduling: FC = () => {
 						<Button
 							variant="link"
 							size="sm"
-							className="p-0 text-left"
+							className="p-0 text-left font-size-xs"
 							onClick={() => {
 								setManagingAvailability(true);
 							}}
