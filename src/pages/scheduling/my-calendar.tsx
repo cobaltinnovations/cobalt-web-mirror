@@ -87,6 +87,95 @@ const useContainerStyles = createUseStyles({
 			#6C7978 10px
 		) !important;`,
 	},
+	leftCalendar: {
+		'& .fc .fc-toolbar.fc-header-toolbar': {
+			margin: 0,
+			'& .fc-toolbar-chunk': {
+				display: 'flex',
+				alignItems: 'center',
+				'& .fc-toolbar-title': {
+					...fonts.m,
+				},
+				'& button.fc-prev-button, & button.fc-next-button': {
+					margin: 0,
+					border: 0,
+					width: 32,
+					height: 32,
+					padding: 0,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					backgroundColor: 'transparent',
+					'& .fc-icon': {
+						color: colors.dark,
+					},
+				},
+				'& button.fc-prev-button': {
+					marginLeft: 8,
+				},
+			},
+		},
+		'& .fc-theme-standard .fc-scrollgrid': {
+			border: 0,
+		},
+		'& .fc-theme-standard td, .fc-theme-standard th': {
+			border: 0,
+		},
+		'& .fc .fc-daygrid-day': {
+			'& .fc-daygrid-day-frame': {
+				width: 45,
+				height: 45,
+				display: 'flex',
+				borderRadius: '50%',
+				alignItems: 'center',
+				flexDirection: 'column',
+				justifyContent: 'center',
+				margin: '0 auto',
+			},
+			'& .fc-daygrid-day-number': {
+				padding: 0,
+				marginTop: -4,
+				color: colors.dark,
+			},
+			'& .fc-daygrid-day-events': {
+				width: 6,
+				height: 6,
+				margin: 0,
+				minHeight: 0,
+				flexShrink: 0,
+				borderRadius: '50%',
+				position: 'relative',
+				border: `1px solid ${colors.gray600}`,
+				'& .fc-daygrid-event-harness': {
+					width: 6,
+					height: 6,
+					top: -1,
+					left: -1,
+					borderRadius: '50%',
+					position: 'relative',
+					backgroundColor: colors.primary,
+					'& .fc-daygrid-event': {
+						display: 'none',
+					},
+				},
+				'& .fc-daygrid-event-harness:not(:first-of-type)': {
+					display: 'none',
+				},
+			},
+			'&.fc-day-today': {
+				backgroundColor: 'transparent',
+				'& .fc-daygrid-day-frame': {
+					backgroundColor: colors.secondary,
+				},
+				'& .fc-daygrid-day-number': {
+					color: colors.white,
+				},
+				'& .fc-daygrid-day-events .fc-daygrid-event-harness': {
+					backgroundColor: colors.white,
+				},
+			},
+		},
+	},
 });
 
 const MOCK_MONDAY = moment().startOf('week').weekday(1);
@@ -426,21 +515,24 @@ export const MyCalendarScheduling: FC = () => {
 						</div>
 					</Accordion>
 
-					<FullCalendar
-						ref={leftCalendarRef}
-						height="auto"
-						plugins={[dayGridPlugin, interactionPlugin]}
-						initialView={MainCalendarView.Month}
-						headerToolbar={{
-							left: 'title prev next',
-							right: 'today',
-						}}
-						dateClick={(clickInfo) => {
-							if (mainCalendarRef.current) {
-								mainCalendarRef.current.getApi().gotoDate(clickInfo.date);
-							}
-						}}
-					/>
+					<div className={classes.leftCalendar}>
+						<FullCalendar
+							ref={leftCalendarRef}
+							height="auto"
+							plugins={[dayGridPlugin, interactionPlugin]}
+							initialView={MainCalendarView.Month}
+							events={calendarEvents}
+							headerToolbar={{
+								left: 'title prev next',
+								right: 'today',
+							}}
+							dateClick={(clickInfo) => {
+								if (mainCalendarRef.current) {
+									mainCalendarRef.current.getApi().gotoDate(clickInfo.date);
+								}
+							}}
+						/>
+					</div>
 
 					<h4 className="mt-6 mb-2">view by</h4>
 
