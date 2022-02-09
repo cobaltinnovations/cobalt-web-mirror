@@ -72,19 +72,19 @@ const useContainerStyles = createUseStyles({
 	blockedTimeslot: {
 		background: `repeating-linear-gradient(
 			-45deg,
-			${colors.border},
-			${colors.border} 5px,
-			transparent 5px,
-			transparent 10px
+			transparent,
+			transparent 9px,
+			${colors.border} 10px,
+			${colors.border} 11px
 		) !important;`,
 	},
 	blockedAvailabilityTimeslot: {
 		background: `repeating-linear-gradient(
 			-45deg,
-			${colors.border},
-			${colors.border} 5px,
-			#6C7978 5px,
-			#6C7978 10px
+			#6C7978,
+			#6C7978 9px,
+			${colors.border} 10px,
+			${colors.border} 11px
 		) !important;`,
 	},
 	leftCalendar: {
@@ -182,9 +182,67 @@ const useContainerStyles = createUseStyles({
 				'& .fc-daygrid-day-number': {
 					color: colors.white,
 				},
-				'& .fc-daygrid-day-events .fc-daygrid-event-harness': {
-					backgroundColor: colors.white,
+				'& .fc-daygrid-day-events': {
+					border: `1px solid ${colors.white}`,
+					'& .fc-daygrid-event-harness': {
+						backgroundColor: colors.white,
+					},
 				},
+			},
+		},
+	},
+	mainCalendar: {
+		height: '100%',
+		'& .fc': {
+			'& .fc-daygrid-day-events': {
+				margin: 0,
+			},
+			'& .fc-daygrid-body-natural .fc-daygrid-day-events': {
+				margin: 0,
+			},
+			'& .fc-daygrid-event-harness > a': {
+				margin: 0,
+				borderRadius: 0,
+				padding: '6px 7px',
+			},
+			'& .fc-daygrid-day.fc-day-today, & .fc-timegrid-col.fc-day-today': {
+				backgroundColor: '#F1E7DF',
+			},
+			'& .fc-timegrid-slot': {
+				height: 48,
+			},
+			'& .fc-timegrid-slot-label': {
+				verticalAlign: 'top',
+			},
+			'& .fc-timegrid-slot-label-cushion': {
+				...fonts.xxxs,
+				color: colors.gray600,
+				padding: '4px 4px 0 0',
+			},
+			'& .fc-bg-event': {
+				backgroundColor: colors.white,
+			},
+			'& .fc-timegrid-now-indicator-arrow': {
+				display: 'none',
+			},
+			'& .fc-timegrid-now-indicator-line': {
+				borderColor: colors.primary,
+				'&:before': {
+					top: -3,
+					left: 0,
+					width: 6,
+					height: 6,
+					content: '""',
+					borderRadius: '50%',
+					position: 'absolute',
+					backgroundColor: colors.primary,
+				},
+			},
+			'& .fc-timegrid-event, .fc-timegrid-more-link': {
+				borderRadius: 0,
+			},
+			'& .fc-timegrid-event .fc-event-main': {
+				padding: '7px 11px',
 			},
 		},
 	},
@@ -622,79 +680,83 @@ export const MyCalendarScheduling: FC = () => {
 				</Col>
 
 				<Col>
-					<FullCalendar
-						ref={mainCalendarRef}
-						height="100%"
-						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-						headerToolbar={false}
-						initialView={currentMainCalendarView}
-						// editable={true}
-						// selectable={true}
-						// selectMirror={true}
-						// dayMaxEvents={true}
-						// weekends={weekendsVisible}
-						// allDayContent={(...args) => {
-						// 	console.log({args})
-						// }}
-						nowIndicator
-						events={calendarEvents}
-						eventContent={(evtInfo) => {
-							if (evtInfo.event.display === 'background') {
-								return;
-							}
+					<div className={classes.mainCalendar}>
+						<FullCalendar
+							ref={mainCalendarRef}
+							height="100%"
+							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+							headerToolbar={false}
+							initialView={currentMainCalendarView}
+							// editable={true}
+							// selectable={true}
+							// selectMirror={true}
+							// dayMaxEvents={true}
+							// weekends={weekendsVisible}
+							// allDayContent={(...args) => {
+							// 	console.log({args})
+							// }}
+							nowIndicator
+							events={calendarEvents}
+							eventContent={(evtInfo) => {
+								if (evtInfo.event.display === 'background') {
+									return;
+								}
 
-							const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
+								const startTime = evtInfo.event.allDay
+									? null
+									: moment(evtInfo.event.start).format('h:mma');
 
-							return (
-								<>
-									<b>{evtInfo.event.title}</b> {startTime}
-								</>
-							);
-						}}
-						// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
-						// select={(selectInfo) => {
-						// 	const title = prompt('Please enter a new title for your event');
-						// 	const calendarApi = selectInfo.view.calendar;
+								return (
+									<>
+										<b>{evtInfo.event.title}</b> {startTime}
+									</>
+								);
+							}}
+							// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
+							// select={(selectInfo) => {
+							// 	const title = prompt('Please enter a new title for your event');
+							// 	const calendarApi = selectInfo.view.calendar;
 
-						// 	calendarApi.unselect(); // clear date selection
+							// 	calendarApi.unselect(); // clear date selection
 
-						// 	if (title) {
-						// 		calendarApi.addEvent({
-						// 			id: Math.random() + 'a',
-						// 			title,
-						// 			start: selectInfo.startStr,
-						// 			end: selectInfo.endStr,
-						// 			allDay: selectInfo.allDay,
-						// 		});
-						// 	}
-						// }}
-						eventClick={(clickInfo, ...args) => {
-							console.log({ clickInfo, args });
-							if (clickInfo.event.allDay) {
-								setFollowupPatientList(clickInfo.event.extendedProps.patients);
-								return;
-							} else if (clickInfo.event.extendedProps.isAvailability) {
-								setSelectedAvailability(true as any);
-								return;
-							} else if (clickInfo.event.extendedProps.isBlockedTime) {
-								return;
-							}
+							// 	if (title) {
+							// 		calendarApi.addEvent({
+							// 			id: Math.random() + 'a',
+							// 			title,
+							// 			start: selectInfo.startStr,
+							// 			end: selectInfo.endStr,
+							// 			allDay: selectInfo.allDay,
+							// 		});
+							// 	}
+							// }}
+							eventClick={(clickInfo, ...args) => {
+								console.log({ clickInfo, args });
+								if (clickInfo.event.allDay) {
+									setFollowupPatientList(clickInfo.event.extendedProps.patients);
+									return;
+								} else if (clickInfo.event.extendedProps.isAvailability) {
+									setSelectedAvailability(true as any);
+									return;
+								} else if (clickInfo.event.extendedProps.isBlockedTime) {
+									return;
+								}
 
-							setSelectedAppointment(true);
+								setSelectedAppointment(true);
 
-							// if (
-							// 	window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)
-							// ) {
-							// 	clickInfo.event.remove();
-							// }
-						}}
-						eventsSet={(events, ...args) => {
-							console.log('eventsSet', { events, args });
-						}}
-						// eventAdd={function(){}}
-						// eventChange={function(){}}
-						// eventRemove={function(){}}
-					/>
+								// if (
+								// 	window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)
+								// ) {
+								// 	clickInfo.event.remove();
+								// }
+							}}
+							eventsSet={(events, ...args) => {
+								console.log('eventsSet', { events, args });
+							}}
+							// eventAdd={function(){}}
+							// eventChange={function(){}}
+							// eventRemove={function(){}}
+						/>
+					</div>
 				</Col>
 
 				{sidebarToggled && (
