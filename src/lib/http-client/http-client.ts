@@ -10,6 +10,8 @@ export type HttpConfig = {
 	defaultHeaders?: Record<string, string | number | boolean>;
 	tokenHeaderKey?: string;
 	getToken?(): string | undefined;
+	fingerprintHeaderKey?: string;
+	getFingerprintId(): Promise<string | undefined>;
 };
 
 export type OrchestratedRequest<T = undefined> = {
@@ -32,7 +34,7 @@ export class HttpClient {
 		this._baseUrl = httpConfig.baseUrl || '';
 		this._headers = {
 			'X-Session-Tracking-Id': this._sessionTrackingId,
-			...httpConfig.defaultHeaders
+			...httpConfig.defaultHeaders,
 		};
 		this._requests = {};
 
@@ -49,6 +51,17 @@ export class HttpClient {
 				},
 			],
 		});
+
+		(async () => {
+			try {
+				const fpId = await httpConfig.getFingerprintId();
+				if (fpId && httpConfig.fingerprintHeaderKey) {
+					this._headers[httpConfig.fingerprintHeaderKey] = fpId;
+				}
+			} catch (e) {
+				console.warn('failed to fingerprint', e);
+			}
+		})();
 	}
 
 	abortRequest(requestId: string) {
