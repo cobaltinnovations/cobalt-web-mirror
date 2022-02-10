@@ -24,8 +24,8 @@ import moment from 'moment';
 import React, { FC, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Dropdown, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import InputMask from 'react-input-mask';
 import { createUseStyles } from 'react-jss';
+import TimeInput from '@/components/time-input';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -194,6 +194,11 @@ const useContainerStyles = createUseStyles({
 	mainCalendar: {
 		height: '100%',
 		'& .fc': {
+			'& .fc-col-header-cell-cushion': {
+				...fonts.s,
+				color: colors.dark,
+				padding: '9px 7px',
+			},
 			'& .fc-daygrid-day-events': {
 				margin: 0,
 			},
@@ -207,6 +212,10 @@ const useContainerStyles = createUseStyles({
 			},
 			'& .fc-daygrid-day.fc-day-today, & .fc-timegrid-col.fc-day-today': {
 				backgroundColor: '#F1E7DF',
+			},
+			'& .fc-timegrid-divider': {
+				padding: 0,
+				borderColor: colors.dark,
 			},
 			'& .fc-timegrid-slot': {
 				height: 48,
@@ -228,10 +237,10 @@ const useContainerStyles = createUseStyles({
 			'& .fc-timegrid-now-indicator-line': {
 				borderColor: colors.primary,
 				'&:before': {
-					top: -3,
+					top: -4,
 					left: 0,
-					width: 6,
-					height: 6,
+					width: 7,
+					height: 7,
 					content: '""',
 					borderRadius: '50%',
 					position: 'absolute',
@@ -1531,22 +1540,14 @@ const AvailabilityForm: FC<{
 
 						<Form.Group controlId="startTime">
 							<Form.Row>
-								<Col xs={12} md={7}>
-									<InputHelper
-										as={InputMask}
-										//@ts-expect-error InputHelper `as` type forwarding
-										mask="99:99"
-										maskChar="_"
+								<Col>
+									<TimeInput
 										name="startTime"
 										label="Start Time"
-										value={values.startTime}
-										onChange={handleChange}
-									/>
-								</Col>
-								<Col>
-									<MeridianSwitch
-										selected={values.startTimeMeridian}
-										onChange={(newStartMeridian) => {
+										time={values.startTime}
+										onTimeChange={handleChange}
+										meridian={values.startTimeMeridian}
+										onMeridianChange={(newStartMeridian) => {
 											setFieldValue('startTimeMeridian', newStartMeridian);
 										}}
 									/>
@@ -1556,22 +1557,14 @@ const AvailabilityForm: FC<{
 
 						<Form.Group controlId="endTime">
 							<Form.Row>
-								<Col xs={12} md={7}>
-									<InputHelper
-										as={InputMask}
-										//@ts-expect-error InputHelper `as` type forwarding
-										mask="99:99"
-										maskChar="_"
+								<Col>
+									<TimeInput
 										name="endTime"
 										label="End Time"
-										value={values.endTime}
-										onChange={handleChange}
-									/>
-								</Col>
-								<Col>
-									<MeridianSwitch
-										selected={values.endTimeMeridian}
-										onChange={(newEndMeridian) => {
+										time={values.endTime}
+										onTimeChange={handleChange}
+										meridian={values.endTimeMeridian}
+										onMeridianChange={(newEndMeridian) => {
 											setFieldValue('endTimeMeridian', newEndMeridian);
 										}}
 									/>
@@ -1792,22 +1785,14 @@ const BlockTimeForm: FC<{
 
 						<Form.Group controlId="startTime">
 							<Form.Row>
-								<Col xs={12} md={7}>
-									<InputHelper
-										as={InputMask}
-										//@ts-expect-error InputHelper `as` type forwarding
-										mask="99:99"
-										maskChar="_"
+								<Col>
+									<TimeInput
 										name="startTime"
 										label="Start Time"
-										value={values.startTime}
-										onChange={handleChange}
-									/>
-								</Col>
-								<Col>
-									<MeridianSwitch
-										selected={values.startTimeMeridian}
-										onChange={(newStartMeridian) => {
+										time={values.startTime}
+										onTimeChange={handleChange}
+										meridian={values.startTimeMeridian}
+										onMeridianChange={(newStartMeridian) => {
 											setFieldValue('startTimeMeridian', newStartMeridian);
 										}}
 									/>
@@ -1817,22 +1802,14 @@ const BlockTimeForm: FC<{
 
 						<Form.Group controlId="endTime">
 							<Form.Row>
-								<Col xs={12} md={7}>
-									<InputHelper
-										as={InputMask}
-										//@ts-expect-error InputHelper `as` type forwarding
-										mask="99:99"
-										maskChar="_"
+								<Col>
+									<TimeInput
 										name="endTime"
 										label="End Time"
-										value={values.endTime}
-										onChange={handleChange}
-									/>
-								</Col>
-								<Col>
-									<MeridianSwitch
-										selected={values.endTimeMeridian}
-										onChange={(newEndMeridian) => {
+										time={values.endTime}
+										onTimeChange={handleChange}
+										meridian={values.endTimeMeridian}
+										onMeridianChange={(newEndMeridian) => {
 											setFieldValue('endTimeMeridian', newEndMeridian);
 										}}
 									/>
@@ -1969,22 +1946,14 @@ const AddAppointmentForm: FC<{
 
 						<Form.Group controlId="startTime">
 							<Form.Row>
-								<Col xs={12} md={7}>
-									<InputHelper
-										as={InputMask}
-										//@ts-expect-error InputHelper `as` type forwarding
-										mask="99:99"
-										maskChar="_"
+								<Col>
+									<TimeInput
 										name="startTime"
 										label="Start Time"
-										value={values.startTime}
-										onChange={handleChange}
-									/>
-								</Col>
-								<Col>
-									<MeridianSwitch
-										selected={values.startTimeMeridian}
-										onChange={(newStartMeridian) => {
+										time={values.startTime}
+										onTimeChange={handleChange}
+										meridian={values.startTimeMeridian}
+										onMeridianChange={(newStartMeridian) => {
 											setFieldValue('startTimeMeridian', newStartMeridian);
 										}}
 									/>
@@ -2265,65 +2234,6 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 					</button>
 				</div>
 			</div>
-		</div>
-	);
-};
-
-const useMeridianSwitchStyles = createUseStyles({
-	meridianToggleWrapper: {
-		display: 'flex',
-		height: '100%',
-		borderRadius: 50,
-		overflow: 'hidden',
-		border: `1px solid ${colors.gray300}`,
-	},
-	meridianButton: {
-		flex: 1,
-		backgroundColor: 'transparent',
-		border: 'none',
-		outline: 'none !important',
-		...fonts.xxs,
-	},
-	meridianSelectedButton: {
-		backgroundColor: colors.secondary,
-		color: colors.white,
-	},
-});
-
-const MeridianSwitch: FC<{
-	selected: string;
-	onChange: (newSelected: 'am' | 'pm') => void;
-}> = ({ selected, onChange }) => {
-	const classes = useMeridianSwitchStyles();
-
-	return (
-		<div className={classes.meridianToggleWrapper}>
-			<button
-				type="button"
-				className={classNames(classes.meridianButton, {
-					[classes.meridianSelectedButton]: selected === 'am',
-				})}
-				onClick={() => {
-					if (selected !== 'am') {
-						onChange('am');
-					}
-				}}
-			>
-				AM
-			</button>
-			<button
-				type="button"
-				className={classNames(classes.meridianButton, {
-					[classes.meridianSelectedButton]: selected === 'pm',
-				})}
-				onClick={() => {
-					if (selected !== 'pm') {
-						onChange('pm');
-					}
-				}}
-			>
-				PM
-			</button>
 		</div>
 	);
 };

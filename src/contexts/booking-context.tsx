@@ -1,11 +1,11 @@
 import moment, { Moment } from 'moment';
 import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback } from 'react';
-import { Range } from 'react-input-range';
-
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
+
+type Range = { min: number; max: number };
 
 interface DateFilter {
 	from: Moment;
@@ -176,10 +176,13 @@ const BookingProvider: FC = (props) => {
 		(findOptions?: FindOptionsResponse) => {
 			return {
 				[BookingFilters.Date]:
-					moment(dateFilter.from).format('YYYY-MM-DD') !== moment(findOptions?.defaultStartDate).format('YYYY-MM-DD') ||
-					moment(dateFilter.to).format('YYYY-MM-DD') !== moment(findOptions?.defaultEndDate).format('YYYY-MM-DD'),
+					moment(dateFilter.from).format('YYYY-MM-DD') !==
+						moment(findOptions?.defaultStartDate).format('YYYY-MM-DD') ||
+					moment(dateFilter.to).format('YYYY-MM-DD') !==
+						moment(findOptions?.defaultEndDate).format('YYYY-MM-DD'),
 				[BookingFilters.Time]:
-					formattedTimeFilter.startTime !== findOptions?.defaultStartTime || formattedTimeFilter.endTime !== findOptions?.defaultEndTime,
+					formattedTimeFilter.startTime !== findOptions?.defaultStartTime ||
+					formattedTimeFilter.endTime !== findOptions?.defaultEndTime,
 				[BookingFilters.Provider]: !isEqual(providerTypeFilter, findOptions?.defaultSupportRoleIds),
 				[BookingFilters.Availability]: availabilityFilter !== findOptions?.defaultAvailability,
 				[BookingFilters.Payment]: !!paymentTypeFilter.length,
