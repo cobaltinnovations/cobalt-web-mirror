@@ -133,6 +133,9 @@ const useContainerStyles = createUseStyles({
 				color: colors.gray600,
 			},
 		},
+		'& .fc .fc-daygrid-day-bg .fc-bg-event': {
+			borderRadius: 50,
+		},
 		'& .fc .fc-daygrid-day': {
 			'& .fc-daygrid-day-frame': {
 				width: 45,
@@ -602,7 +605,17 @@ export const MyCalendarScheduling: FC = () => {
 							height="auto"
 							plugins={[dayGridPlugin, interactionPlugin]}
 							initialView={MainCalendarView.Month}
-							events={calendarEvents}
+							events={[
+								...calendarEvents,
+								{
+									id: 'current-week',
+									start: moment().startOf('week').weekday(0).toDate(),
+									end: moment().startOf('week').weekday(7).toDate(),
+									display: 'background',
+									allDay: true,
+									backgroundColor: colors.secondary,
+								},
+							]}
 							headerToolbar={{
 								left: 'title prev next',
 								right: 'today',
