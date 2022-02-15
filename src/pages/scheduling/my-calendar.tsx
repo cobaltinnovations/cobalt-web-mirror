@@ -1311,9 +1311,9 @@ const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) => {
 			</div>
 
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>Edit availability</h4>
+				<h5 className="m-0">Edit availability</h5>
 
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+				<Button variant="link" size="sm" className="text-danger p-0" onClick={() => onClose()}>
 					delete
 				</Button>
 			</div>
