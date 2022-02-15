@@ -1201,7 +1201,7 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				</div>
 
 				<div className="d-flex align-items-center justify-content-between mb-2">
-					<h4>appointment types</h4>
+					<h5>appointment types</h5>
 
 					<button className={schedulingClasses.roundBtn} onClick={() => setAppointmentTypeModalOpen(true)}>
 						<PlusIcon />
@@ -1222,7 +1222,7 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				})}
 
 				<div className="d-flex align-items-center justify-content-between mt-4">
-					<h4>regular hours</h4>
+					<h5>regular hours</h5>
 
 					<button className={schedulingClasses.roundBtn} onClick={() => onEditAvailability()}>
 						<PlusIcon />
@@ -1232,9 +1232,9 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				<div className="d-flex flex-column mt-2">
 					{MOCK_AVAILABILITIES.map((availability) => {
 						return (
-							<div key={availability.availabilityId} className="mb-2 border p-2">
+							<div key={availability.availabilityId} className="mb-2 border py-2 px-3">
 								<div className="d-flex align-items-center justify-content-between">
-									<p className="m-0">{availability.title}</p>
+									<p className="m-0 font-karla-bold">{availability.title}</p>
 									<Button
 										variant="link"
 										size="sm"
@@ -1262,7 +1262,7 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				</div>
 
 				<div className="d-flex align-items-center justify-content-between mt-4">
-					<h4>unavailable time block</h4>
+					<h5>unavailable time block</h5>
 
 					<button className={schedulingClasses.roundBtn} onClick={() => onEditTimeBlock()}>
 						<PlusIcon />
@@ -1270,9 +1270,9 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				</div>
 
 				<div className="d-flex flex-column mt-2">
-					<div className="mb-2 border p-2">
+					<div className="mb-2 border py-2 px-3">
 						<div className="d-flex align-items-center justify-content-between">
-							<p className="m-0">Friday 8/14, 1pm - 4pm</p>
+							<p className="m-0 font-karla-bold">Friday 8/14, 1pm - 4pm</p>
 
 							<Button
 								variant="link"
