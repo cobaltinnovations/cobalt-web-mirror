@@ -1,9 +1,3 @@
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
-import { ReactComponent as WarningTriangleIcon } from '@/assets/icons/icon-warning-triangle.svg';
 import Accordion from '@/components/accordion';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
@@ -26,6 +20,14 @@ import { Button, Col, Container, Dropdown, Form, Modal, ModalProps, Row } from '
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { createUseStyles } from 'react-jss';
 import TimeInput from '@/components/time-input';
+
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
+import { ReactComponent as WarningTriangleIcon } from '@/assets/icons/icon-warning-triangle.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -2139,7 +2141,7 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 				<Button
 					variant="primary"
 					size="sm"
-					className="p-1 mr-1"
+					className="mr-1"
 					onClick={() => {
 						//
 					}}
@@ -2150,23 +2152,23 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 				<Button
 					variant="primary"
 					size="sm"
-					className="p-1 mr-1"
+					className="px-2 mr-1"
 					onClick={() => {
-						//
+						return;
 					}}
 				>
-					copy
+					<CopyIcon />
 				</Button>
 
 				<Button
 					variant="primary"
 					size="sm"
-					className="p-1"
+					className="px-2"
 					onClick={() => {
-						//
+						return;
 					}}
 				>
-					edit
+					<EditIcon />
 				</Button>
 			</div>
 
@@ -2181,10 +2183,10 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 						size="sm"
 						className="p-0"
 						onClick={() => {
-							//
+							return;
 						}}
 					>
-						edit
+						<EditIcon />
 					</Button>
 				</div>
 			</div>
@@ -2209,7 +2211,7 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 							alert('TODO: Show assessment results');
 						}}
 					>
-						edit
+						view
 					</Button>
 				</div>
 
@@ -2226,7 +2228,7 @@ const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppoint
 							alert('TODO: Show assessment results');
 						}}
 					>
-						edit
+						view
 					</Button>
 				</div>
 			</div>
