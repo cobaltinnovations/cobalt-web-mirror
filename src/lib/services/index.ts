@@ -15,3 +15,4 @@ export * from './interaction-service';
 export * from './provider-service';
 export * from './recommendations-service';
 export * from './reporting-service';
+export * from './scheduling-service';

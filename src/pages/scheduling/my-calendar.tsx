@@ -6,8 +6,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 import { ERROR_CODES } from '@/lib/http-client';
-import { AppointmentType } from '@/lib/models';
-import { providerService } from '@/lib/services';
+import { AppointmentType, PatientIntakeQuestion, SchedulingAppointmentType, ScreeningQuestion } from '@/lib/models';
+import { providerService, schedulingService } from '@/lib/services';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -15,7 +15,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import { Formik } from 'formik';
 import moment from 'moment';
-import React, { FC, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Dropdown, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { createUseStyles } from 'react-jss';
@@ -28,6 +28,8 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
 import { ReactComponent as WarningTriangleIcon } from '@/assets/icons/icon-warning-triangle.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
+import { cloneDeep } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -853,6 +855,7 @@ export default MyCalendarScheduling;
 
 interface AppointmentTypeFormModalProps extends ModalProps {
 	appointmentTypeId?: string;
+	onSave(appointmentType: SchedulingAppointmentType): void;
 }
 
 const useModalStyles = createUseStyles({
@@ -869,71 +872,71 @@ const useModalStyles = createUseStyles({
 		border: 'none',
 		backgroundColor: colors.danger,
 	},
+	removeButton: {
+		top: 0,
+		right: 0,
+		zIndex: 1,
+		position: 'absolute',
+		padding: '8px !important',
+		transform: 'translate(40%, -40%)',
+	},
 });
 
-const AppointmentTypeFormModal = (props: AppointmentTypeFormModalProps) => {
-	const { appointmentTypeId, ...modalProps } = props;
+const AppointmentTypeFormModal = ({ appointmentTypeId, onSave, ...modalProps }: AppointmentTypeFormModalProps) => {
 	const classes = useModalStyles();
+	const handleError = useHandleError();
 
-	const [formDataModel, setFormDataModel] = useState({
-		title: '',
-		color: '',
-		nickname: '',
-		duration: '',
-		collectedClientInfo: {
-			firstName: false,
-			lastName: false,
-			email: true,
-			phoneNumber: false,
-		},
-		screeningQuestions: {
-			q1: true,
-			q2: true,
-			q3: false,
-		},
-	});
-
-	const [otherDuration, setOtherDuration] = useState('');
-	const [newQuestionText, setNewQuestionText] = useState('');
-
-	const MOCK_DURATIONS = [
+	const [title, setTitle] = useState('');
+	const [color, setColor] = useState(colors.primary);
+	const [nickname, setNickname] = useState('');
+	const [duration, setDuration] = useState('');
+	const [durationInMinutes, setDurationInMinutes] = useState<number>();
+	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([
 		{
-			label: '30m',
-			value: '30',
-		},
-		{
-			label: '45m',
-			value: '45',
-		},
-		{
-			label: '60m',
-			value: '60',
-		},
-	];
-
-	const [screeningQuestions, setScreeningQuestions] = useState([
-		{
-			questionId: 'q1',
-			questionText: 'Will this be your first time meeting with this provider?',
-			questionHint: '(Screens for new patients)',
-		},
-		{
-			questionId: 'q2',
-			questionText: 'Have you met with this provider within the last year?',
-			questionHint: '(Screens for returning patients)',
-			questionWarning:
-				'Usually, this question is not used if “Will this be your first time meeting with this provider?” is enabled',
-		},
-		{
-			questionId: 'q3',
-			questionText: 'Are you a legal resident of Pennsylvania?',
-			questionHint: '(Screens for PA residents)',
+			question: 'What is your email address?',
+			fontSizeId: 'DEFAULT',
+			questionContentHintId: 'EMAIL_ADDRESS',
 		},
 	]);
+	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
 	useEffect(() => {
 		// TODO: Fetch by ID, or is it passed down from parent?
 	}, []);
+
+	const handleSaveButtonClick = useCallback(async () => {
+		modalProps.onHide();
+
+		try {
+			const response = await schedulingService
+				.postApointmentType({
+					name: title,
+					description: nickname,
+					schedulingSystemId: 'COBALT',
+					visitTypeId: 'INITIAL',
+					durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
+					hexColor: color,
+					patientIntakeQuestions,
+					screeningQuestions,
+				})
+				.fetch();
+
+			onSave(response.appointmentType);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [
+		color,
+		duration,
+		durationInMinutes,
+		handleError,
+		modalProps,
+		nickname,
+		onSave,
+		patientIntakeQuestions,
+		screeningQuestions,
+		title,
+	]);
 
 	return (
 		<Modal centered size="lg" {...modalProps}>
@@ -947,80 +950,97 @@ const AppointmentTypeFormModal = (props: AppointmentTypeFormModalProps) => {
 					className="mb-4"
 					type="text"
 					label="Title (how this appears to clients)"
-					value={''}
-					onChange={(event) => {
-						// setName(event.currentTarget.value);
+					value={title}
+					onChange={({ currentTarget }) => {
+						setTitle(currentTarget.value);
 					}}
 					required
 				/>
 
 				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Color</Form.Label>
-					<div className="d-flex">
-						<div>c1</div>
-						<div>c2</div>
-						<div>c3</div>
-						<div>c4</div>
-						<div>c5</div>
-					</div>
+					<Form.Label className="d-block" style={{ ...fonts.xs }}>
+						Color:
+					</Form.Label>
+					<input
+						type="color"
+						value={color}
+						onChange={({ currentTarget }) => {
+							setColor(currentTarget.value);
+						}}
+					/>
 				</Form.Group>
 
 				<InputHelper
 					className="mb-4"
 					type="text"
 					label="Nickname (how this appears on your calendar)"
-					value={''}
-					onChange={(event) => {
-						// setName(event.currentTarget.value);
+					value={nickname}
+					onChange={({ currentTarget }) => {
+						setNickname(currentTarget.value);
 					}}
 					required
 				/>
 
 				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Duration</Form.Label>
+					<Form.Label className="m-0" style={{ ...fonts.xs }}>
+						Duration:
+					</Form.Label>
 					<div className="d-flex align-items-center">
-						{MOCK_DURATIONS.map((duration, idx) => {
-							return (
-								<Form.Check
-									className="mr-6"
-									id={`duration-${idx}`}
-									key={idx}
-									type="radio"
-									bsPrefix="cobalt-modal-form__check"
-									name="duration"
-									label={duration.label}
-									checked={formDataModel.duration === duration.value}
-									onChange={() => {
-										setFormDataModel({
-											...formDataModel,
-											duration: duration.value,
-										});
-									}}
-								/>
-							);
-						})}
 						<Form.Check
+							className="mr-6"
+							id="duration-30"
+							type="radio"
+							bsPrefix="cobalt-modal-form__check"
+							name="duration"
+							label="30m"
+							checked={duration === '30'}
+							onChange={() => {
+								setDuration('30');
+							}}
+						/>
+						<Form.Check
+							className="mr-6"
+							id="duration-45"
+							type="radio"
+							bsPrefix="cobalt-modal-form__check"
+							name="duration"
+							label="45m"
+							checked={duration === '45'}
+							onChange={() => {
+								setDuration('45');
+							}}
+						/>
+						<Form.Check
+							className="mr-6"
+							id="duration-60"
+							type="radio"
+							bsPrefix="cobalt-modal-form__check"
+							name="duration"
+							label="60m"
+							checked={duration === '60'}
+							onChange={() => {
+								setDuration('60');
+							}}
+						/>
+						<Form.Check
+							className="mr-6"
 							id="duration-other"
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label={
 								<InputHelper
-									// className="mb-4"
 									type="number"
-									label="other"
-									value={otherDuration}
-									onChange={(event) => {
-										setOtherDuration(event.target.value);
+									label="other (minutes)"
+									value={durationInMinutes}
+									onChange={({ currentTarget }) => {
+										setDurationInMinutes(parseInt(currentTarget.value, 10));
 									}}
 								/>
 							}
-							checked={formDataModel.duration === 'other'}
+							checked={duration === 'other'}
 							onChange={() => {
-								setFormDataModel({
-									...formDataModel,
-									duration: 'other',
-								});
+								setDuration('other');
 							}}
 						/>
 					</div>
@@ -1032,33 +1052,63 @@ const AppointmentTypeFormModal = (props: AppointmentTypeFormModalProps) => {
 					<Form.Label style={{ ...fonts.xs }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
 						{[
-							{ label: 'First name', key: 'firstName' },
-							{ label: 'Last name', key: 'lastName' },
-							{ label: 'Email (required by Cobalt)', key: 'email', disabled: true },
-							{ label: 'Phone number', key: 'phoneNumber' },
-						].map(({ key, label, disabled }) => {
-							//@ts-expect-error key type
-							const isChecked = formDataModel.collectedClientInfo[key];
+							{
+								label: 'First name',
+								question: 'What is your first name?',
+								questionContentHintId: 'FIRST_NAME',
+							},
+							{
+								label: 'Last name',
+								question: 'What is your last name?',
+								questionContentHintId: 'LAST_NAME',
+							},
+							{
+								label: 'Email (required by Cobalt)',
+								question: 'What is your email address?',
+								questionContentHintId: 'EMAIL_ADDRESS',
+								disabled: true,
+							},
+							{
+								label: 'Phone number',
+								question: 'What is your phone number?',
+								questionContentHintId: 'PHONE_NUMBER',
+							},
+						].map(({ label, question, questionContentHintId, disabled }) => {
+							const isChecked = !!patientIntakeQuestions.find(
+								(patientIntakeQuestion) =>
+									patientIntakeQuestion.questionContentHintId === questionContentHintId
+							);
 
 							return (
 								<Form.Check
-									id={`collect-${key}`}
-									key={key}
+									id={`collect-${questionContentHintId}`}
+									key={questionContentHintId}
 									bsPrefix="cobalt-modal-form__check"
 									type="checkbox"
-									name={`collect-${key}`}
+									name={`collect-${questionContentHintId}`}
 									className="mr-6"
 									label={label}
 									checked={isChecked}
 									disabled={disabled}
-									onChange={() => {
-										setFormDataModel({
-											...formDataModel,
-											collectedClientInfo: {
-												...formDataModel.collectedClientInfo,
-												[key]: !isChecked,
-											},
-										});
+									onChange={({ currentTarget }) => {
+										const patientIntakeQuestionsClone = cloneDeep(patientIntakeQuestions || []);
+
+										if (currentTarget.checked) {
+											patientIntakeQuestionsClone.push({
+												question,
+												fontSizeId: 'DEFAULT',
+												questionContentHintId,
+											});
+										} else {
+											const indexToRemove = patientIntakeQuestionsClone.findIndex(
+												(patientIntakeQuestion) =>
+													patientIntakeQuestion.questionContentHintId ===
+													questionContentHintId
+											);
+											patientIntakeQuestionsClone.splice(indexToRemove, 1);
+										}
+
+										setPatientIntakeQuestions(patientIntakeQuestionsClone);
 									}}
 								/>
 							);
@@ -1068,80 +1118,73 @@ const AppointmentTypeFormModal = (props: AppointmentTypeFormModalProps) => {
 
 				<h3 className="mb-4">Screening Questions</h3>
 
-				{screeningQuestions.map((question, idx) => {
-					const hint = question.questionHint ? (
-						<small className="d-inline">{question.questionHint}</small>
-					) : null;
-
-					const warning = question.questionWarning ? (
-						<p className="mb-0 text-secondary font-size-xxs">
-							<WarningTriangleIcon /> {question.questionWarning}
-						</p>
-					) : null;
-
+				{screeningQuestions.map((screeningQuestion, index) => {
 					return (
-						<div key={question.questionId} className="py-3 border-bottom">
-							<div className="d-flex align-items-center">
-								<p className="mb-0">
-									{question.questionText} {hint}
-								</p>
+						<div key={index} className="position-relative">
+							<Button
+								size="sm"
+								className={classes.removeButton}
+								variant="danger"
+								onClick={() => {
+									const screeningQuestionsClone = cloneDeep(screeningQuestions || []);
+									screeningQuestionsClone.splice(index, 1);
 
+									setScreeningQuestions(screeningQuestionsClone);
+								}}
+							>
+								<CloseIcon height={24} width={24} />
+							</Button>
+							<InputHelper
+								className="mb-3"
+								label={`Screening Question #${index + 1}`}
+								name="screeningQuestion"
+								value={screeningQuestion.question}
+								as="textarea"
+								onChange={(event) => {
+									const screeningQuestionsClone = cloneDeep(screeningQuestions || []);
+									screeningQuestionsClone[index].question = event.currentTarget.value;
+
+									setScreeningQuestions(screeningQuestionsClone);
+								}}
+								helperText="An attendee must first answer “Yes” to this question before being allowed to reserve a seat."
+							/>
+							<div className="mb-5">
 								<Form.Check
-									className="ml-auto"
 									type="switch"
-									id={question.questionId}
-									// label="Check this switch"
+									id={`screening-question-toggle--${index}`}
+									label="Reduce text size"
+									value="SMALL"
+									checked={screeningQuestion.fontSizeId === 'SMALL'}
+									onChange={(event) => {
+										const screeningQuestionsClone = cloneDeep(screeningQuestions || []);
+
+										if (event.currentTarget.checked) {
+											screeningQuestionsClone[index].fontSizeId = 'SMALL';
+										} else {
+											screeningQuestionsClone[index].fontSizeId = 'DEFAULT';
+										}
+
+										setScreeningQuestions(screeningQuestionsClone);
+									}}
 								/>
 							</div>
-
-							{warning}
 						</div>
 					);
 				})}
-
-				<div className="mt-5" style={{ position: 'relative' }}>
-					<button className={classes.clearQuestionBtn} onClick={() => setNewQuestionText('')}>
-						<CloseIcon height={15} width={15} />
-					</button>
-
-					<textarea
-						name="new-question"
-						value={newQuestionText}
-						className="w-100 p-1 border text-dark h-100"
-						onChange={(e) => {
-							setNewQuestionText(e.target.value);
-						}}
-						rows={5}
-					/>
-
+				<div className="text-right">
 					<Button
-						className="mt-2"
 						size="sm"
 						onClick={() => {
-							const newId = `q${screeningQuestions.length + 1}`;
-
-							setFormDataModel({
-								...formDataModel,
-								screeningQuestions: {
-									...formDataModel.screeningQuestions,
-									[newId]: false,
-								},
+							const screeningQuestionsClone = cloneDeep(screeningQuestions || []);
+							screeningQuestionsClone.push({
+								fontSizeId: 'DEFAULT',
+								question: '',
 							});
 
-							setScreeningQuestions([
-								...screeningQuestions,
-								{
-									questionId: newId,
-									questionText: newQuestionText,
-									questionHint: '',
-									questionWarning: '',
-								},
-							]);
-
-							setNewQuestionText('');
+							setScreeningQuestions(screeningQuestionsClone);
 						}}
 					>
-						<PlusIcon /> add question
+						add question
 					</Button>
 				</div>
 			</Modal.Body>
@@ -1152,16 +1195,17 @@ const AppointmentTypeFormModal = (props: AppointmentTypeFormModalProps) => {
 				</Button>
 
 				<div>
-					<Button className="mr-2" size="sm" variant="outline-primary">
-						cancel
-					</Button>
 					<Button
+						className="mr-2"
 						size="sm"
-						variant="outline"
+						variant="outline-primary"
 						onClick={() => {
 							modalProps.onHide();
 						}}
 					>
+						cancel
+					</Button>
+					<Button size="sm" variant="outline" onClick={handleSaveButtonClick}>
 						save
 					</Button>
 				</div>
@@ -1188,6 +1232,9 @@ const ManageAvailabilityPanel = ({ onEditAvailability, onEditTimeBlock, onClose 
 				show={appointmentTypeModalOpen}
 				onHide={() => {
 					setAppointmentTypeModalOpen(false);
+				}}
+				onSave={(newAppointmentType) => {
+					console.log(newAppointmentType);
 				}}
 			/>
 
