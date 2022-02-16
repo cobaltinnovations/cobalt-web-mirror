@@ -58,6 +58,8 @@ export const ManageAvailabilityPanel = ({
 			throw new Error('account.providerId is undefined');
 		}
 
+		// [TODO]: If editing, fetch the appointmentType details by ID
+
 		const [appointmentTypesResponse, regularHoursResponse, unavailableTimeResponse] = await Promise.all([
 			schedulingService.getAppointmentTypes(account.providerId).fetch(),
 			schedulingService.getRegularHours(account.providerId).fetch(),
@@ -76,13 +78,11 @@ export const ManageAvailabilityPanel = ({
 				onHide={() => {
 					setAppointmentTypeModalOpen(false);
 				}}
-				onSave={(newAppointmentType) => {
-					console.log(newAppointmentType);
-				}}
+				onSave={fetchData}
 			/>
 
-			<div>
-				<div className="d-flex align-items-center justify-content-between py-4">
+			<div className="py-4">
+				<div className="mb-7 d-flex align-items-center justify-content-between">
 					<h3>Manage availability</h3>
 					<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 						<CloseIcon />
@@ -90,32 +90,34 @@ export const ManageAvailabilityPanel = ({
 				</div>
 
 				<AsyncPage fetchData={fetchData}>
-					<div className="d-flex align-items-center justify-content-between mb-2">
+					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>appointment types</h5>
 						<button className={classes.roundBtn} onClick={() => setAppointmentTypeModalOpen(true)}>
 							<PlusIcon />
 						</button>
 					</div>
-					{appointmentTypes.map((appointmentType) => {
-						return (
-							<AppointmentTypeItem
-								key={appointmentType.appointmentTypeId}
-								color={appointmentType.hexColor}
-								nickname={appointmentType.name}
-								onEdit={() => {
-									setAppointmentTypeModalOpen(true);
-								}}
-							/>
-						);
-					})}
+					<div className="mb-5">
+						{appointmentTypes.map((appointmentType) => {
+							return (
+								<AppointmentTypeItem
+									key={appointmentType.appointmentTypeId}
+									color={appointmentType.hexColor}
+									nickname={appointmentType.name}
+									onEdit={() => {
+										setAppointmentTypeModalOpen(true);
+									}}
+								/>
+							);
+						})}
+					</div>
 
-					<div className="d-flex align-items-center justify-content-between mt-4">
+					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>regular hours</h5>
 						<button className={classes.roundBtn} onClick={() => onEditAvailability()}>
 							<PlusIcon />
 						</button>
 					</div>
-					<div className="d-flex flex-column mt-2">
+					<div className="mb-5">
 						{regularHours.map((logicalAvailability) => {
 							return (
 								<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
@@ -149,13 +151,13 @@ export const ManageAvailabilityPanel = ({
 						})}
 					</div>
 
-					<div className="d-flex align-items-center justify-content-between mt-4">
+					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>unavailable time block</h5>
 						<button className={classes.roundBtn} onClick={() => onEditTimeBlock()}>
 							<PlusIcon />
 						</button>
 					</div>
-					<div className="d-flex flex-column mt-2">
+					<div>
 						{unavailableTimeBlocks.map((logicalAvailability) => {
 							return (
 								<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
