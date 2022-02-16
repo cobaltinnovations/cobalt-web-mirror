@@ -58,8 +58,6 @@ export const ManageAvailabilityPanel = ({
 			throw new Error('account.providerId is undefined');
 		}
 
-		// [TODO]: If editing, fetch the appointmentType details by ID
-
 		const [appointmentTypesResponse, regularHoursResponse, unavailableTimeResponse] = await Promise.all([
 			schedulingService.getAppointmentTypes(account.providerId).fetch(),
 			schedulingService.getRegularHours(account.providerId).fetch(),
