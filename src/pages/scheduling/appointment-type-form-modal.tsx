@@ -60,7 +60,7 @@ export const AppointmentTypeFormModal = ({
 
 		try {
 			const response = await schedulingService
-				.postApointmentType({
+				.postAppointmentType({
 					name: title,
 					description: nickname,
 					schedulingSystemId: 'COBALT',

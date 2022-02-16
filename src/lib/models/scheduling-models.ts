@@ -6,7 +6,6 @@ export interface SchedulingAppointmentType {
 	durationInMinutes: number;
 	durationInMinutesDescription: string;
 	hexColor: string;
-	hexColorDescription: string;
 	assessmentId: string;
 	patientIntakeQuestions: PatientIntakeQuestion[];
 	screeningQuestions: ScreeningQuestion[];
