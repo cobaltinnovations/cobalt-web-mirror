@@ -44,11 +44,6 @@ const useSchedulingStyles = createUseStyles({
 			fill: colors.primary,
 		},
 	},
-	appointmentTypeColorCircle: {
-		width: 12,
-		height: 12,
-		borderRadius: 100,
-	},
 	typeahead: {
 		'& .rbt input': {
 			height: 56,
@@ -66,9 +61,12 @@ const useSchedulingStyles = createUseStyles({
 
 const useContainerStyles = createUseStyles({
 	wrapper: {
-		height: 'calc(100vh - 6px)', // subtracting footer height
+		display: 'flex',
+		height: 'calc(100vh - 60px)', // subtracting header + footer height
 	},
 	sideBar: {
+		width: 440,
+		flexShrink: 0,
 		backgroundColor: colors.white,
 		overflowX: 'scroll',
 	},
@@ -198,6 +196,7 @@ const useContainerStyles = createUseStyles({
 		},
 	},
 	mainCalendar: {
+		flex: 1,
 		height: '100%',
 		'& .fc': {
 			'& .fc-col-header-cell-cushion': {
@@ -554,297 +553,291 @@ export const MyCalendarScheduling: FC = () => {
 	}, [currentMainCalendarView]);
 
 	return (
-		<Container fluid>
-			<Row className={classNames('no-gutters', classes.wrapper)}>
-				<Col xs={3} className={classNames('h-100 px-5', classes.sideBar)}>
-					<div className="mb-6">
-						<Accordion
-							open={accordionExpanded}
-							onToggle={() => {
-								setAccordionExpanded(!accordionExpanded);
-							}}
-							title="My Calendar"
-						>
-							<div className="mb-4">
-								<Form.Check
-									type="radio"
-									bsPrefix="cobalt-modal-form__check"
-									id="cal1"
-									label="Owner"
-									checked={true}
-									onChange={() => {
-										//
-									}}
-								/>
+		<div className={classes.wrapper}>
+			<div className={classNames('h-100 px-5', classes.sideBar)}>
+				<div className="mb-6">
+					<Accordion
+						open={accordionExpanded}
+						onToggle={() => {
+							setAccordionExpanded(!accordionExpanded);
+						}}
+						title="My Calendar"
+					>
+						<div className="mb-4">
+							<Form.Check
+								type="radio"
+								bsPrefix="cobalt-modal-form__check"
+								id="cal1"
+								label="Owner"
+								checked={true}
+								onChange={() => {
+									//
+								}}
+							/>
 
-								<Form.Check
-									type="radio"
-									bsPrefix="cobalt-modal-form__check"
-									id="cal2"
-									label="Editor"
-									checked={false}
-									onChange={() => {
-										//
-									}}
-								/>
+							<Form.Check
+								type="radio"
+								bsPrefix="cobalt-modal-form__check"
+								id="cal2"
+								label="Editor"
+								checked={false}
+								onChange={() => {
+									//
+								}}
+							/>
 
-								<Form.Check
-									type="radio"
-									bsPrefix="cobalt-modal-form__check"
-									id="cal3"
-									label="Viewer"
-									checked={false}
-									onChange={() => {
-										//
-									}}
-								/>
-							</div>
-						</Accordion>
-					</div>
+							<Form.Check
+								type="radio"
+								bsPrefix="cobalt-modal-form__check"
+								id="cal3"
+								label="Viewer"
+								checked={false}
+								onChange={() => {
+									//
+								}}
+							/>
+						</div>
+					</Accordion>
+				</div>
 
-					<div className={classNames('mb-9', classes.leftCalendar)}>
-						<FullCalendar
-							ref={leftCalendarRef}
-							height="auto"
-							plugins={[dayGridPlugin, interactionPlugin]}
-							initialView={MainCalendarView.Month}
-							events={[
-								...calendarEvents,
-								{
-									id: 'current-week',
-									start: moment().startOf('week').weekday(0).toDate(),
-									end: moment().startOf('week').weekday(7).toDate(),
-									display: 'background',
-									allDay: true,
-									backgroundColor: colors.secondary,
-								},
-							]}
-							headerToolbar={{
-								left: 'title prev next',
-								right: 'today',
-							}}
-							dateClick={(clickInfo) => {
-								if (mainCalendarRef.current) {
-									mainCalendarRef.current.getApi().gotoDate(clickInfo.date);
-								}
+				<div className={classNames('mb-9', classes.leftCalendar)}>
+					<FullCalendar
+						ref={leftCalendarRef}
+						height="auto"
+						plugins={[dayGridPlugin, interactionPlugin]}
+						initialView={MainCalendarView.Month}
+						events={[
+							...calendarEvents,
+							{
+								id: 'current-week',
+								start: moment().startOf('week').weekday(0).toDate(),
+								end: moment().startOf('week').weekday(7).toDate(),
+								display: 'background',
+								allDay: true,
+								backgroundColor: colors.secondary,
+							},
+						]}
+						headerToolbar={{
+							left: 'title prev next',
+							right: 'today',
+						}}
+						dateClick={(clickInfo) => {
+							if (mainCalendarRef.current) {
+								mainCalendarRef.current.getApi().gotoDate(clickInfo.date);
+							}
+						}}
+					/>
+				</div>
+
+				<h5 className="mb-2">view by</h5>
+				<div className="mb-9 d-flex">
+					<Form.Check
+						type="radio"
+						bsPrefix="cobalt-modal-form__check"
+						id="calendarView-day"
+						label="day"
+						checked={currentMainCalendarView === MainCalendarView.Day}
+						onChange={() => {
+							setCurrentMainCalendarView(MainCalendarView.Day);
+						}}
+					/>
+					<Form.Check
+						type="radio"
+						bsPrefix="cobalt-modal-form__check"
+						id="calendarView-week"
+						label="week"
+						className="ml-2"
+						checked={currentMainCalendarView === MainCalendarView.Week}
+						onChange={() => {
+							setCurrentMainCalendarView(MainCalendarView.Week);
+						}}
+					/>
+					<Form.Check
+						type="radio"
+						bsPrefix="cobalt-modal-form__check"
+						id="calendarView-month"
+						label="month"
+						className="ml-2"
+						checked={currentMainCalendarView === MainCalendarView.Month}
+						onChange={() => {
+							setCurrentMainCalendarView(MainCalendarView.Month);
+						}}
+					/>
+				</div>
+
+				<h5 className=" mb-5">actions</h5>
+				<div className="d-flex flex-column align-items-start">
+					<Button
+						variant="link"
+						size="sm"
+						className="p-0 mb-5 font-size-xs"
+						onClick={() => {
+							setAddingAppointment(true);
+						}}
+					>
+						new appointment
+					</Button>
+
+					<Button
+						variant="link"
+						size="sm"
+						className="p-0 mb-5 font-size-xs"
+						onClick={() => {
+							setManagingAvailability(true);
+						}}
+					>
+						manage availability
+					</Button>
+
+					<Button
+						variant="link"
+						size="sm"
+						className="p-0 text-left font-size-xs"
+						onClick={() => {
+							setManagingAvailability(true);
+						}}
+					>
+						add unavailable time block
+					</Button>
+				</div>
+			</div>
+
+			<div className={classes.mainCalendar}>
+				<FullCalendar
+					ref={mainCalendarRef}
+					height="100%"
+					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+					headerToolbar={false}
+					initialView={currentMainCalendarView}
+					// editable={true}
+					// selectable={true}
+					// selectMirror={true}
+					// dayMaxEvents={true}
+					// weekends={weekendsVisible}
+					// allDayContent={(...args) => {
+					// 	console.log({args})
+					// }}
+					nowIndicator
+					events={calendarEvents}
+					eventContent={(evtInfo) => {
+						if (evtInfo.event.display === 'background') {
+							return;
+						}
+
+						const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
+
+						return (
+							<>
+								<b>{evtInfo.event.title}</b> {startTime}
+							</>
+						);
+					}}
+					// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
+					// select={(selectInfo) => {
+					// 	const title = prompt('Please enter a new title for your event');
+					// 	const calendarApi = selectInfo.view.calendar;
+
+					// 	calendarApi.unselect(); // clear date selection
+
+					// 	if (title) {
+					// 		calendarApi.addEvent({
+					// 			id: Math.random() + 'a',
+					// 			title,
+					// 			start: selectInfo.startStr,
+					// 			end: selectInfo.endStr,
+					// 			allDay: selectInfo.allDay,
+					// 		});
+					// 	}
+					// }}
+					eventClick={(clickInfo, ...args) => {
+						console.log({ clickInfo, args });
+						if (clickInfo.event.allDay) {
+							setFollowupPatientList(clickInfo.event.extendedProps.patients);
+							return;
+						} else if (clickInfo.event.extendedProps.isAvailability) {
+							setSelectedAvailability(true as any);
+							return;
+						} else if (clickInfo.event.extendedProps.isBlockedTime) {
+							return;
+						}
+
+						setSelectedAppointment(true);
+
+						// if (
+						// 	window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)
+						// ) {
+						// 	clickInfo.event.remove();
+						// }
+					}}
+					eventsSet={(events, ...args) => {
+						console.log('eventsSet', { events, args });
+					}}
+					// eventAdd={function(){}}
+					// eventChange={function(){}}
+					// eventRemove={function(){}}
+				/>
+			</div>
+
+			{sidebarToggled && (
+				<div className={classNames('px-5 h-100', classes.sideBar)}>
+					{editingAvailability ? (
+						<EditAvailabilityPanel
+							onClose={() => {
+								setEditingAvailability(false);
 							}}
 						/>
-					</div>
-
-					<h5 className="mb-2">view by</h5>
-					<div className="mb-9 d-flex">
-						<Form.Check
-							type="radio"
-							bsPrefix="cobalt-modal-form__check"
-							id="calendarView-day"
-							label="day"
-							checked={currentMainCalendarView === MainCalendarView.Day}
-							onChange={() => {
-								setCurrentMainCalendarView(MainCalendarView.Day);
+					) : selectedAvailability ? (
+						<SelectedAvailabilityPanel
+							onEditAvailability={() => {
+								setEditingAvailability(true);
+							}}
+							onClose={() => {
+								setSelectedAvailability(false as any);
 							}}
 						/>
-						<Form.Check
-							type="radio"
-							bsPrefix="cobalt-modal-form__check"
-							id="calendarView-week"
-							label="week"
-							className="ml-2"
-							checked={currentMainCalendarView === MainCalendarView.Week}
-							onChange={() => {
-								setCurrentMainCalendarView(MainCalendarView.Week);
+					) : editingTimeBlock ? (
+						<EditTimeBlockPanel
+							onClose={() => {
+								setEditingTimeBlock(false);
 							}}
 						/>
-						<Form.Check
-							type="radio"
-							bsPrefix="cobalt-modal-form__check"
-							id="calendarView-month"
-							label="month"
-							className="ml-2"
-							checked={currentMainCalendarView === MainCalendarView.Month}
-							onChange={() => {
-								setCurrentMainCalendarView(MainCalendarView.Month);
+					) : addingAppointment ? (
+						<AddAppointmentPanel
+							onClose={() => {
+								setAddingAppointment(false);
 							}}
 						/>
-					</div>
-
-					<h5 className=" mb-5">actions</h5>
-					<div className="d-flex flex-column align-items-start">
-						<Button
-							variant="link"
-							size="sm"
-							className="p-0 mb-5 font-size-xs"
-							onClick={() => {
+					) : managingAvailability ? (
+						<ManageAvailabilityPanel
+							onEditAvailability={() => {
+								setEditingAvailability(true);
+							}}
+							onEditTimeBlock={() => {
+								setEditingTimeBlock(true);
+							}}
+							onClose={() => {
+								setManagingAvailability(false);
+							}}
+						/>
+					) : followupPatientList.length > 0 ? (
+						<FollowUpsListPanel
+							onClose={() => {
+								setFollowupPatientList([]);
+							}}
+						/>
+					) : selectedAppointment ? (
+						<SelectedAppointmentPanel
+							onAddAppointment={() => {
 								setAddingAppointment(true);
 							}}
-						>
-							new appointment
-						</Button>
-
-						<Button
-							variant="link"
-							size="sm"
-							className="p-0 mb-5 font-size-xs"
-							onClick={() => {
-								setManagingAvailability(true);
+							onClose={() => {
+								setSelectedAppointment(null);
 							}}
-						>
-							manage availability
-						</Button>
-
-						<Button
-							variant="link"
-							size="sm"
-							className="p-0 text-left font-size-xs"
-							onClick={() => {
-								setManagingAvailability(true);
-							}}
-						>
-							add unavailable time block
-						</Button>
-					</div>
-				</Col>
-
-				<Col>
-					<div className={classes.mainCalendar}>
-						<FullCalendar
-							ref={mainCalendarRef}
-							height="100%"
-							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-							headerToolbar={false}
-							initialView={currentMainCalendarView}
-							// editable={true}
-							// selectable={true}
-							// selectMirror={true}
-							// dayMaxEvents={true}
-							// weekends={weekendsVisible}
-							// allDayContent={(...args) => {
-							// 	console.log({args})
-							// }}
-							nowIndicator
-							events={calendarEvents}
-							eventContent={(evtInfo) => {
-								if (evtInfo.event.display === 'background') {
-									return;
-								}
-
-								const startTime = evtInfo.event.allDay
-									? null
-									: moment(evtInfo.event.start).format('h:mma');
-
-								return (
-									<>
-										<b>{evtInfo.event.title}</b> {startTime}
-									</>
-								);
-							}}
-							// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
-							// select={(selectInfo) => {
-							// 	const title = prompt('Please enter a new title for your event');
-							// 	const calendarApi = selectInfo.view.calendar;
-
-							// 	calendarApi.unselect(); // clear date selection
-
-							// 	if (title) {
-							// 		calendarApi.addEvent({
-							// 			id: Math.random() + 'a',
-							// 			title,
-							// 			start: selectInfo.startStr,
-							// 			end: selectInfo.endStr,
-							// 			allDay: selectInfo.allDay,
-							// 		});
-							// 	}
-							// }}
-							eventClick={(clickInfo, ...args) => {
-								console.log({ clickInfo, args });
-								if (clickInfo.event.allDay) {
-									setFollowupPatientList(clickInfo.event.extendedProps.patients);
-									return;
-								} else if (clickInfo.event.extendedProps.isAvailability) {
-									setSelectedAvailability(true as any);
-									return;
-								} else if (clickInfo.event.extendedProps.isBlockedTime) {
-									return;
-								}
-
-								setSelectedAppointment(true);
-
-								// if (
-								// 	window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)
-								// ) {
-								// 	clickInfo.event.remove();
-								// }
-							}}
-							eventsSet={(events, ...args) => {
-								console.log('eventsSet', { events, args });
-							}}
-							// eventAdd={function(){}}
-							// eventChange={function(){}}
-							// eventRemove={function(){}}
 						/>
-					</div>
-				</Col>
-
-				{sidebarToggled && (
-					<Col xs={3} className={classNames('px-5 h-100', classes.sideBar)}>
-						{editingAvailability ? (
-							<EditAvailabilityPanel
-								onClose={() => {
-									setEditingAvailability(false);
-								}}
-							/>
-						) : selectedAvailability ? (
-							<SelectedAvailabilityPanel
-								onEditAvailability={() => {
-									setEditingAvailability(true);
-								}}
-								onClose={() => {
-									setSelectedAvailability(false as any);
-								}}
-							/>
-						) : editingTimeBlock ? (
-							<EditTimeBlockPanel
-								onClose={() => {
-									setEditingTimeBlock(false);
-								}}
-							/>
-						) : addingAppointment ? (
-							<AddAppointmentPanel
-								onClose={() => {
-									setAddingAppointment(false);
-								}}
-							/>
-						) : managingAvailability ? (
-							<ManageAvailabilityPanel
-								onEditAvailability={() => {
-									setEditingAvailability(true);
-								}}
-								onEditTimeBlock={() => {
-									setEditingTimeBlock(true);
-								}}
-								onClose={() => {
-									setManagingAvailability(false);
-								}}
-							/>
-						) : followupPatientList.length > 0 ? (
-							<FollowUpsListPanel
-								onClose={() => {
-									setFollowupPatientList([]);
-								}}
-							/>
-						) : selectedAppointment ? (
-							<SelectedAppointmentPanel
-								onAddAppointment={() => {
-									setAddingAppointment(true);
-								}}
-								onClose={() => {
-									setSelectedAppointment(null);
-								}}
-							/>
-						) : null}
-					</Col>
-				)}
-			</Row>
-		</Container>
+					) : null}
+				</div>
+			)}
+		</div>
 	);
 };
 

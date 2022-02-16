@@ -14,7 +14,7 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
-const useSchedulingStyles = createUseStyles({
+const useStyles = createUseStyles({
 	roundBtn: {
 		width: 36,
 		height: 36,
@@ -41,13 +41,13 @@ export const ManageAvailabilityPanel = ({
 	onEditTimeBlock,
 	onClose,
 }: ManageAvailabilityPanelProps) => {
+	const classes = useStyles();
 	const { account } = useAccount();
-	const schedulingClasses = useSchedulingStyles();
-	const [appointmentTypeModalOpen, setAppointmentTypeModalOpen] = useState(false);
 
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
 	const [regularHours, setRegularHours] = useState<LogicalAvailability[]>([]);
 	const [unavailableTimeBlocks, setUnavailableTimeBlocks] = useState<LogicalAvailability[]>([]);
+	const [appointmentTypeModalOpen, setAppointmentTypeModalOpen] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!account) {
@@ -55,7 +55,7 @@ export const ManageAvailabilityPanel = ({
 		}
 
 		if (!account.providerId) {
-			throw new Error('.providerId is undefined');
+			throw new Error('account.providerId is undefined');
 		}
 
 		const [appointmentTypesResponse, regularHoursResponse, unavailableTimeResponse] = await Promise.all([
@@ -92,10 +92,7 @@ export const ManageAvailabilityPanel = ({
 				<AsyncPage fetchData={fetchData}>
 					<div className="d-flex align-items-center justify-content-between mb-2">
 						<h5>appointment types</h5>
-						<button
-							className={schedulingClasses.roundBtn}
-							onClick={() => setAppointmentTypeModalOpen(true)}
-						>
+						<button className={classes.roundBtn} onClick={() => setAppointmentTypeModalOpen(true)}>
 							<PlusIcon />
 						</button>
 					</div>
@@ -114,7 +111,7 @@ export const ManageAvailabilityPanel = ({
 
 					<div className="d-flex align-items-center justify-content-between mt-4">
 						<h5>regular hours</h5>
-						<button className={schedulingClasses.roundBtn} onClick={() => onEditAvailability()}>
+						<button className={classes.roundBtn} onClick={() => onEditAvailability()}>
 							<PlusIcon />
 						</button>
 					</div>
@@ -154,7 +151,7 @@ export const ManageAvailabilityPanel = ({
 
 					<div className="d-flex align-items-center justify-content-between mt-4">
 						<h5>unavailable time block</h5>
-						<button className={schedulingClasses.roundBtn} onClick={() => onEditTimeBlock()}>
+						<button className={classes.roundBtn} onClick={() => onEditTimeBlock()}>
 							<PlusIcon />
 						</button>
 					</div>
