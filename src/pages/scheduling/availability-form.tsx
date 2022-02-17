@@ -36,11 +36,12 @@ interface FormSchema {
 }
 
 interface AvailabilityFormProps {
+	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
 	onBack: () => void;
 	onSuccess: (logicalAvailability: LogicalAvailability) => void;
 }
 
-export const AvailabilityForm: FC<AvailabilityFormProps> = ({ onBack, onSuccess }) => {
+export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilityTypeId, onBack, onSuccess }) => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
@@ -90,7 +91,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ onBack, onSuccess 
 						startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
 						endDateTime: endDateTime.format('YYYY-MM-DDTHH:mm:ss'),
 						appointmentTypeIds,
-						logicalAvailabilityTypeId: 'OPEN',
+						logicalAvailabilityTypeId,
 						recurrenceTypeId: values.recurring ? 'DAILY' : 'NONE',
 						recurSunday: values.occurance.S,
 						recurMonday: values.occurance.M,
@@ -107,7 +108,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ onBack, onSuccess 
 				handleError(error);
 			}
 		},
-		[account, appointmentTypes, handleError, onSuccess]
+		[account, appointmentTypes, handleError, logicalAvailabilityTypeId, onSuccess]
 	);
 
 	return (

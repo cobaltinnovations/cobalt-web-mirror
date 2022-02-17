@@ -19,7 +19,6 @@ import { createUseStyles } from 'react-jss';
 import TimeInput from '@/components/time-input';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
@@ -28,6 +27,7 @@ import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { AppointmentTypeItem } from './appointment-type-item';
 import { EditAvailabilityPanel } from './edit-availability-panel';
+import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -795,7 +795,7 @@ export const MyCalendarScheduling: FC = () => {
 							}}
 						/>
 					) : editingTimeBlock ? (
-						<EditTimeBlockPanel
+						<EditUnavailableTimeBlockPanel
 							onClose={() => {
 								setEditingTimeBlock(false);
 							}}
@@ -870,44 +870,6 @@ const useModalStyles = createUseStyles({
 
 //
 
-interface EditTimeBlockPanelProps {
-	onClose: () => void;
-}
-
-const EditTimeBlockPanel = ({ onClose }: EditTimeBlockPanelProps) => {
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<ChevronLeftIcon fill={colors.primary} className="mr-1" />
-					back
-				</Button>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>Edit time block</h4>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					delete
-				</Button>
-			</div>
-
-			<BlockTimeForm
-				onBack={() => {
-					onClose();
-				}}
-				onSuccess={() => {
-					onClose();
-				}}
-			/>
-		</div>
-	);
-};
-
 interface AddAppointmentPanelProps {
 	onClose: () => void;
 }
@@ -932,202 +894,6 @@ const AddAppointmentPanel = ({ onClose }: AddAppointmentPanelProps) => {
 				}}
 			/>
 		</div>
-	);
-};
-
-const BlockTimeForm: FC<{
-	onBack: () => void;
-	onSuccess: () => void;
-}> = ({ onBack, onSuccess }) => {
-	const { account } = useAccount();
-	const handleError = useHandleError();
-
-	return (
-		<Formik
-			initialValues={{
-				date: '',
-				startTime: '',
-				startTimeMeridian: '',
-				endTime: '',
-				endTimeMeridian: '',
-				recurring: false,
-				occurance: {
-					S: false,
-					M: false,
-					T: false,
-					W: false,
-					Th: false,
-					F: false,
-					Sa: false,
-				},
-				endDate: '',
-			}}
-			enableReinitialize
-			onSubmit={(values) => {
-				if (!account || !account.providerId) {
-					return;
-				}
-
-				const dateTime = moment(values.date).startOf('day');
-
-				const startTimeMoment = moment(`${values.startTime} ${values.startTimeMeridian}`, 'hh:mm a');
-
-				const startDateTime = dateTime.clone().set({
-					hours: startTimeMoment.hours(),
-					minutes: startTimeMoment.minutes(),
-					seconds: startTimeMoment.seconds(),
-				});
-
-				const endTimeMoment = moment(`${values.endTime} ${values.endTimeMeridian}`, 'hh:mm a');
-
-				const endDateTime = dateTime.clone().set({
-					hours: endTimeMoment.hours(),
-					minutes: endTimeMoment.minutes(),
-					seconds: endTimeMoment.seconds(),
-				});
-
-				// const request = providerService.createLogicalAvailability({
-				// 	providerId: account.providerId,
-				// 	startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
-				// 	endDateTime: endDateTime.format('YYYY-MM-DDTHH:mm:ss'),
-				// });
-
-				// request
-				// 	.fetch()
-				// 	.then(() => {
-				// 		onSuccess();
-				// 	})
-				// 	.catch((e) => {
-				// 		if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-				// 			handleError(e);
-				// 		}
-				// 	});
-			}}
-		>
-			{(formikBag) => {
-				const { values, setFieldValue, handleChange, handleSubmit } = formikBag;
-				const isValid =
-					!!values.startTime && !!values.startTimeMeridian && !!values.endTime && !!values.endTimeMeridian;
-
-				return (
-					<Form onSubmit={handleSubmit}>
-						<Form.Group controlId="date">
-							<DatePicker
-								showYearDropdown
-								showMonthDropdown
-								dropdownMode="select"
-								labelText={values.recurring ? 'Start Date' : 'Date'}
-								selected={values.date ? moment(values.date).toDate() : undefined}
-								onChange={(date) => {
-									setFieldValue('date', date ? moment(date).format('YYYY-MM-DD') : '');
-								}}
-							/>
-						</Form.Group>
-
-						<Form.Group controlId="startTime">
-							<Form.Row>
-								<Col>
-									<TimeInput
-										name="startTime"
-										label="Start Time"
-										time={values.startTime}
-										onTimeChange={handleChange}
-										meridian={values.startTimeMeridian}
-										onMeridianChange={(newStartMeridian) => {
-											setFieldValue('startTimeMeridian', newStartMeridian);
-										}}
-									/>
-								</Col>
-							</Form.Row>
-						</Form.Group>
-
-						<Form.Group controlId="endTime">
-							<Form.Row>
-								<Col>
-									<TimeInput
-										name="endTime"
-										label="End Time"
-										time={values.endTime}
-										onTimeChange={handleChange}
-										meridian={values.endTimeMeridian}
-										onMeridianChange={(newEndMeridian) => {
-											setFieldValue('endTimeMeridian', newEndMeridian);
-										}}
-									/>
-								</Col>
-							</Form.Row>
-						</Form.Group>
-
-						<Form.Group controlId="recurring">
-							<Form.Check
-								id="recurring"
-								className="ml-auto"
-								type="switch"
-								label="Recurring"
-								onChange={handleChange}
-							/>
-						</Form.Group>
-
-						{values.recurring && (
-							<>
-								<Form.Group>
-									<Form.Label style={{ ...fonts.xs }}>Occurs on...</Form.Label>
-									<div className="d-flex align-items-center flex-wrap">
-										{(['S', 'M', 'T', 'W', 'Th', 'F', 'Sa'] as const).map((dayOfWeek, idx) => {
-											return (
-												<Form.Check
-													className="mr-4"
-													key={idx}
-													id={`occurance.${dayOfWeek}`}
-													bsPrefix="cobalt-modal-form__check"
-													type="checkbox"
-													label={dayOfWeek}
-													checked={values.occurance[dayOfWeek]}
-													onChange={() => {
-														setFieldValue(
-															`occurance.${dayOfWeek}`,
-															!values.occurance[dayOfWeek]
-														);
-													}}
-												/>
-											);
-										})}
-									</div>
-								</Form.Group>
-
-								<Form.Group controlId="endDate">
-									<DatePicker
-										showYearDropdown
-										showMonthDropdown
-										dropdownMode="select"
-										labelText="End Date"
-										selected={values.endDate ? moment(values.endDate).toDate() : undefined}
-										onChange={(date) => {
-											setFieldValue('endDate', date ? moment(date).format('YYYY-MM-DD') : '');
-										}}
-									/>
-								</Form.Group>
-							</>
-						)}
-
-						<div className="mb-6 d-flex flex-row justify-content-between">
-							<Button
-								variant="outline-primary"
-								size="sm"
-								onClick={() => {
-									onBack();
-								}}
-							>
-								cancel
-							</Button>
-							<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
-								save
-							</Button>
-						</div>
-					</Form>
-				);
-			}}
-		</Formik>
 	);
 };
 
