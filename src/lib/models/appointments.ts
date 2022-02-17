@@ -11,6 +11,7 @@ export interface AppointmentType {
 	durationInMinutesDescription: string;
 	name: string;
 	visitTypeId: string;
+	hexColor: string;
 }
 
 export interface EpicDepartment {

@@ -135,7 +135,7 @@ export const ManageAvailabilityPanel = ({
 										return (
 											<AppointmentTypeItem
 												key={appointmentType.appointmentTypeId}
-												color={'#000000'}
+												color={appointmentType.hexColor}
 												nickname={appointmentType.name}
 											/>
 										);
@@ -175,7 +175,7 @@ export const ManageAvailabilityPanel = ({
 										return (
 											<AppointmentTypeItem
 												key={appointmentType.appointmentTypeId}
-												color={'#000000'}
+												color={appointmentType.hexColor}
 												nickname={appointmentType.name}
 											/>
 										);
