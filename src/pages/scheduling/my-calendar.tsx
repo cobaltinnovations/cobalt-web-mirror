@@ -842,34 +842,6 @@ export const MyCalendarScheduling: FC = () => {
 
 export default MyCalendarScheduling;
 
-//
-
-const useModalStyles = createUseStyles({
-	clearQuestionBtn: {
-		position: 'absolute',
-		top: -22,
-		right: -22,
-		width: 44,
-		height: 44,
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderRadius: 100,
-		border: 'none',
-		backgroundColor: colors.danger,
-	},
-	removeButton: {
-		top: 0,
-		right: 0,
-		zIndex: 1,
-		position: 'absolute',
-		padding: '8px !important',
-		transform: 'translate(40%, -40%)',
-	},
-});
-
-//
-
 interface AddAppointmentPanelProps {
 	onClose: () => void;
 }
