@@ -50,11 +50,7 @@ export const ManageAvailabilityPanel = ({
 	const [appointmentTypeModalOpen, setAppointmentTypeModalOpen] = useState(false);
 
 	const fetchData = useCallback(async () => {
-		if (!account) {
-			throw new Error('account is undefined');
-		}
-
-		if (!account.providerId) {
+		if (!account || !account.providerId) {
 			throw new Error('account.providerId is undefined');
 		}
 

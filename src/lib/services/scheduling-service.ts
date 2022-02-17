@@ -3,18 +3,6 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { SchedulingAppointmentType, PatientIntakeQuestion, ScreeningQuestion, LogicalAvailability } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
-interface GetAppointmentTypesResponse {
-	appointmentTypes: SchedulingAppointmentType[];
-}
-
-interface GetRegularHoursResponse {
-	logicalAvailabilities: LogicalAvailability[];
-}
-
-interface GetUnavailableTimeResponse {
-	logicalAvailabilities: LogicalAvailability[];
-}
-
 interface PostApointmentTypeRequest {
 	name: string;
 	description: string;
@@ -26,30 +14,43 @@ interface PostApointmentTypeRequest {
 	screeningQuestions: ScreeningQuestion[];
 }
 
-interface PostApointmentTypeResponse {
-	appointmentType: SchedulingAppointmentType;
+interface PostLogicalAvailabilitiesRequest {
+	providerId: string;
+	startDateTime: string;
+	endDateTime: string;
+	appointmentTypeIds: string[];
+	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
+	recurrenceTypeId: 'NONE' | 'DAILY';
+	recurSunday: boolean;
+	recurMonday: boolean;
+	recurTuesday: boolean;
+	recurWednesday: boolean;
+	recurThursday: boolean;
+	recurFriday: boolean;
+	recurSaturday: boolean;
 }
 
 export const schedulingService = {
 	getAppointmentTypes(providerId: string) {
-		return httpSingleton.orchestrateRequest<GetAppointmentTypesResponse>({
+		return httpSingleton.orchestrateRequest<{ appointmentTypes: SchedulingAppointmentType[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/appointment-types', { providerId }),
 		});
 	},
 	getRegularHours(providerId: string) {
-		return httpSingleton.orchestrateRequest<GetRegularHoursResponse>({
+		return httpSingleton.orchestrateRequest<{ logicalAvailabilities: LogicalAvailability[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/logical-availabilities', {
 				providerId,
 				recurrenceTypeId: 'DAILY',
+				logicalAvailabilityTypeId: 'OPEN',
 				startDateTime: moment().subtract(1, 'year').toDate(),
 				endDateTime: moment().add(1, 'year').toDate(),
 			}),
 		});
 	},
 	getUnavailableTime(providerId: string) {
-		return httpSingleton.orchestrateRequest<GetUnavailableTimeResponse>({
+		return httpSingleton.orchestrateRequest<{ logicalAvailabilities: LogicalAvailability[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/logical-availabilities', {
 				providerId,
@@ -60,9 +61,16 @@ export const schedulingService = {
 		});
 	},
 	postAppointmentType(data: PostApointmentTypeRequest) {
-		return httpSingleton.orchestrateRequest<PostApointmentTypeResponse>({
+		return httpSingleton.orchestrateRequest<{ appointmentType: SchedulingAppointmentType }>({
 			method: 'POST',
 			url: '/appointment-types',
+			data,
+		});
+	},
+	postLogicalAvailability(data: PostLogicalAvailabilitiesRequest) {
+		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
+			method: 'POST',
+			url: '/logical-availabilities',
 			data,
 		});
 	},
