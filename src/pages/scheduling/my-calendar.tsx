@@ -501,6 +501,8 @@ export const MyCalendarScheduling: FC = () => {
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
 	const [selectedAppointment, setSelectedAppointment] = useState<any>();
 
+	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
+
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
 
 	const leftCalendarRef = useRef<FullCalendar>(null);
@@ -781,7 +783,9 @@ export const MyCalendarScheduling: FC = () => {
 				<div className={classNames('px-5 h-100', classes.sideBar)}>
 					{editingAvailability ? (
 						<EditAvailabilityPanel
+							logicalAvailabilityId={logicalAvailabilityIdToEdit}
 							onClose={() => {
+								setLogicalAvailabilityIdToEdit(undefined);
 								setEditingAvailability(false);
 							}}
 						/>
@@ -796,7 +800,9 @@ export const MyCalendarScheduling: FC = () => {
 						/>
 					) : editingTimeBlock ? (
 						<EditUnavailableTimeBlockPanel
+							logicalAvailabilityId={logicalAvailabilityIdToEdit}
 							onClose={() => {
+								setLogicalAvailabilityIdToEdit(undefined);
 								setEditingTimeBlock(false);
 							}}
 						/>
@@ -808,10 +814,16 @@ export const MyCalendarScheduling: FC = () => {
 						/>
 					) : managingAvailability ? (
 						<ManageAvailabilityPanel
-							onEditAvailability={() => {
+							onEditAvailability={(logicalAvailabilityId) => {
+								if (logicalAvailabilityId) {
+									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
+								}
 								setEditingAvailability(true);
 							}}
-							onEditTimeBlock={() => {
+							onEditTimeBlock={(logicalAvailabilityId) => {
+								if (logicalAvailabilityId) {
+									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
+								}
 								setEditingTimeBlock(true);
 							}}
 							onClose={() => {

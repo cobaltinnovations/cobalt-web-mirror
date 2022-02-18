@@ -32,8 +32,8 @@ const useStyles = createUseStyles({
 
 interface ManageAvailabilityPanelProps {
 	onClose: () => void;
-	onEditAvailability: () => void;
-	onEditTimeBlock: () => void;
+	onEditAvailability: (logicalAvailabilityId?: string) => void;
+	onEditTimeBlock: (logicalAvailabilityId?: string) => void;
 }
 
 export const ManageAvailabilityPanel = ({
@@ -137,7 +137,7 @@ export const ManageAvailabilityPanel = ({
 											size="sm"
 											className="p-0"
 											onClick={() => {
-												onEditAvailability();
+												onEditAvailability(logicalAvailability.logicalAvailabilityId);
 											}}
 										>
 											<EditIcon height={24} width={24} />
@@ -177,7 +177,7 @@ export const ManageAvailabilityPanel = ({
 											size="sm"
 											className="p-0"
 											onClick={() => {
-												onEditTimeBlock();
+												onEditTimeBlock(logicalAvailability.logicalAvailabilityId);
 											}}
 										>
 											<EditIcon height={24} width={24} />

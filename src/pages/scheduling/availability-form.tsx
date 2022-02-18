@@ -145,7 +145,6 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 						!!values.endTime &&
 						!!values.endTimeMeridian;
 
-					console.log({ values });
 					return (
 						<Form onSubmit={handleSubmit}>
 							<Form.Group controlId="date">

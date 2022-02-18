@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import Loader from '@/components/loader';
 import ErrorDisplay from '@/components/error-display';
-import { ErrorConfig, ERROR_CODES } from '@/lib/http-client';
+import { ERROR_CODES } from '@/lib/http-client';
 import { isErrorConfig } from '@/lib/utils/error-utils';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 
@@ -16,9 +16,17 @@ enum DISPLAY_STATES {
 interface AsyncPageProps {
 	fetchData(): void;
 	abortFetch?(): void;
+	showBackButton?: boolean;
+	showRetryButton?: boolean;
 }
 
-const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
+const AsyncPage: FC<AsyncPageProps> = ({
+	children,
+	fetchData,
+	abortFetch,
+	showBackButton = true,
+	showRetryButton = true,
+}) => {
 	const history = useHistory();
 	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
@@ -77,8 +85,8 @@ const AsyncPage: FC<AsyncPageProps> = ({ children, fetchData, abortFetch }) => {
 				return (
 					<ErrorDisplay
 						error={fetchPageDataError}
-						showBackButton={true}
-						showRetryButton={true}
+						showBackButton={showBackButton}
+						showRetryButton={showRetryButton}
 						onRetryButtonClick={fetchPageData}
 					/>
 				);
