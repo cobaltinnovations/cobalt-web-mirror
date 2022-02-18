@@ -47,6 +47,8 @@ export const ManageAvailabilityPanel = ({
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
 	const [regularHours, setRegularHours] = useState<LogicalAvailability[]>([]);
 	const [unavailableTimeBlocks, setUnavailableTimeBlocks] = useState<LogicalAvailability[]>([]);
+
+	const [appointmentTypeIdToEdit, setAppointmentTypeIdToEdit] = useState<string>();
 	const [appointmentTypeModalOpen, setAppointmentTypeModalOpen] = useState(false);
 
 	const fetchData = useCallback(async () => {
@@ -68,11 +70,16 @@ export const ManageAvailabilityPanel = ({
 	return (
 		<>
 			<AppointmentTypeFormModal
+				appointmentTypeId={appointmentTypeIdToEdit}
 				show={appointmentTypeModalOpen}
 				onHide={() => {
+					setAppointmentTypeIdToEdit(undefined);
 					setAppointmentTypeModalOpen(false);
 				}}
-				onSave={fetchData}
+				onSave={() => {
+					fetchData();
+					setAppointmentTypeModalOpen(false);
+				}}
 			/>
 
 			<div className="py-4">
@@ -98,6 +105,7 @@ export const ManageAvailabilityPanel = ({
 									color={appointmentType.hexColor}
 									nickname={appointmentType.name}
 									onEdit={() => {
+										setAppointmentTypeIdToEdit(appointmentType.appointmentTypeId);
 										setAppointmentTypeModalOpen(true);
 									}}
 								/>

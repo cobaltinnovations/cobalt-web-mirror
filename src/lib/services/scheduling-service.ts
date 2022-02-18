@@ -1,9 +1,9 @@
-import moment from 'moment';
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { SchedulingAppointmentType, PatientIntakeQuestion, ScreeningQuestion, LogicalAvailability } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
 interface PostApointmentTypeRequest {
+	providerId: string;
 	name: string;
 	description: string;
 	schedulingSystemId: string;
@@ -44,8 +44,6 @@ export const schedulingService = {
 				providerId,
 				recurrenceTypeId: 'DAILY',
 				logicalAvailabilityTypeId: 'OPEN',
-				startDateTime: moment().subtract(1, 'year').toDate(),
-				endDateTime: moment().add(1, 'year').toDate(),
 			}),
 		});
 	},
@@ -55,8 +53,6 @@ export const schedulingService = {
 			url: buildQueryParamUrl('/logical-availabilities', {
 				providerId,
 				logicalAvailabilityTypeId: 'BLOCK',
-				startDateTime: moment().subtract(1, 'year').toDate(),
-				endDateTime: moment().add(1, 'year').toDate(),
 			}),
 		});
 	},
@@ -67,10 +63,30 @@ export const schedulingService = {
 			data,
 		});
 	},
+	getAppointmentType(appointmentTypeId: string) {
+		return httpSingleton.orchestrateRequest<{ appointmentType: SchedulingAppointmentType }>({
+			method: 'GET',
+			url: `/appointment-types/${appointmentTypeId}`,
+		});
+	},
+	updateAppointmentType(appointmentTypeId: string, data: PostApointmentTypeRequest) {
+		return httpSingleton.orchestrateRequest<{ appointmentType: SchedulingAppointmentType }>({
+			method: 'PUT',
+			url: `/appointment-types/${appointmentTypeId}`,
+			data,
+		});
+	},
 	postLogicalAvailability(data: PostLogicalAvailabilitiesRequest) {
 		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
 			method: 'POST',
 			url: '/logical-availabilities',
+			data,
+		});
+	},
+	updateLogicalAvailability(logicalAvailabilityId: string, data: PostLogicalAvailabilitiesRequest) {
+		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
+			method: 'PUT',
+			url: `/logical-availabilities/${logicalAvailabilityId}`,
 			data,
 		});
 	},

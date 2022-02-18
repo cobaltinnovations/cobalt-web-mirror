@@ -1,10 +1,11 @@
 import { cloneDeep } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { PatientIntakeQuestion, SchedulingAppointmentType, ScreeningQuestion } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
@@ -34,6 +35,7 @@ export const AppointmentTypeFormModal = ({
 	onSave,
 	...modalProps
 }: AppointmentTypeFormModalProps) => {
+	const { account } = useAccount();
 	const classes = useModalStyles();
 	const handleError = useHandleError();
 
@@ -51,37 +53,86 @@ export const AppointmentTypeFormModal = ({
 	]);
 	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
-	useEffect(() => {
-		// TODO: Fetch by ID, or is it passed down from parent?
-	}, []);
+	const handleOnEnter = useCallback(async () => {
+		if (appointmentTypeId) {
+			try {
+				const { appointmentType } = await schedulingService.getAppointmentType(appointmentTypeId).fetch();
+
+				setTitle(appointmentType.name);
+				setColor(appointmentType.hexColor);
+				setNickname('');
+
+				if (
+					appointmentType.durationInMinutes === 30 ||
+					appointmentType.durationInMinutes === 45 ||
+					appointmentType.durationInMinutes === 60
+				) {
+					setDuration(String(appointmentType.durationInMinutes));
+					setDurationInMinutes(undefined);
+				} else {
+					setDuration('other');
+					setDurationInMinutes(appointmentType.durationInMinutes);
+				}
+
+				setPatientIntakeQuestions(appointmentType.patientIntakeQuestions);
+				setScreeningQuestions(appointmentType.screeningQuestions);
+			} catch (error) {
+				handleError(error);
+			}
+		} else {
+			setTitle('');
+			setColor(colors.primary);
+			setNickname('');
+			setDuration('');
+			setDurationInMinutes(undefined);
+			setPatientIntakeQuestions([
+				{
+					question: 'What is your email address?',
+					fontSizeId: 'DEFAULT',
+					questionContentHintId: 'EMAIL_ADDRESS',
+				},
+			]);
+			setScreeningQuestions([]);
+		}
+	}, [appointmentTypeId, handleError]);
 
 	const handleSaveButtonClick = useCallback(async () => {
-		modalProps.onHide();
-
 		try {
-			const response = await schedulingService
-				.postAppointmentType({
-					name: title,
-					description: nickname,
-					schedulingSystemId: 'COBALT',
-					visitTypeId: 'INITIAL',
-					durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
-					hexColor: color,
-					patientIntakeQuestions,
-					screeningQuestions,
-				})
-				.fetch();
+			if (!account || !account.providerId) {
+				throw new Error('account.providerId is undeinfed');
+			}
+
+			const requestBody = {
+				providerId: account.providerId,
+				name: title,
+				description: nickname,
+				schedulingSystemId: 'COBALT',
+				visitTypeId: 'INITIAL',
+				durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
+				hexColor: color,
+				patientIntakeQuestions,
+				screeningQuestions,
+			};
+
+			let response;
+
+			if (appointmentTypeId) {
+				response = await schedulingService.updateAppointmentType(appointmentTypeId, requestBody).fetch();
+			} else {
+				response = await schedulingService.postAppointmentType(requestBody).fetch();
+			}
 
 			onSave(response.appointmentType);
 		} catch (error) {
 			handleError(error);
 		}
 	}, [
+		account,
+		appointmentTypeId,
 		color,
 		duration,
 		durationInMinutes,
 		handleError,
-		modalProps,
 		nickname,
 		onSave,
 		patientIntakeQuestions,
@@ -90,9 +141,9 @@ export const AppointmentTypeFormModal = ({
 	]);
 
 	return (
-		<Modal centered size="lg" {...modalProps}>
+		<Modal centered size="lg" onEnter={handleOnEnter} {...modalProps}>
 			<Modal.Header closeButton>
-				<Modal.Title>{appointmentTypeId ? `Edit ${'title'}` : 'New appointment type'}</Modal.Title>
+				<Modal.Title>{appointmentTypeId ? 'Edit appointment type' : 'New appointment type'}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<h3 className="mb-4">Setup</h3>
@@ -225,7 +276,7 @@ export const AppointmentTypeFormModal = ({
 								questionContentHintId: 'PHONE_NUMBER',
 							},
 						].map(({ label, question, questionContentHintId, disabled }) => {
-							const isChecked = !!patientIntakeQuestions.find(
+							const isChecked = !!(patientIntakeQuestions || []).find(
 								(patientIntakeQuestion) =>
 									patientIntakeQuestion.questionContentHintId === questionContentHintId
 							);
@@ -269,7 +320,7 @@ export const AppointmentTypeFormModal = ({
 
 				<h3 className="mb-4">Screening Questions</h3>
 
-				{screeningQuestions.map((screeningQuestion, index) => {
+				{(screeningQuestions || []).map((screeningQuestion, index) => {
 					return (
 						<div key={index} className="position-relative">
 							<Button
