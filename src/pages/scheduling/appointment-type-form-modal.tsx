@@ -14,6 +14,52 @@ import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
+enum QUESTION_CONTENT_HINT_IDS {
+	FIRST_NAME = 'FIRST_NAME',
+	LAST_NAME = 'LAST_NAME',
+	EMAIL_ADDRESS = 'EMAIL_ADDRESS',
+	PHONE_NUMBER = 'PHONE_NUMBER',
+}
+
+interface PatientIntakeCheckbox {
+	label: string;
+	question: string;
+	fontSizeId: 'DEFAULT';
+	questionContentHintId: QUESTION_CONTENT_HINT_IDS;
+	disabled: boolean;
+}
+
+const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCheckbox> = {
+	[QUESTION_CONTENT_HINT_IDS.FIRST_NAME]: {
+		label: 'First name',
+		question: 'What is your first name?',
+		fontSizeId: 'DEFAULT',
+		questionContentHintId: QUESTION_CONTENT_HINT_IDS.FIRST_NAME,
+		disabled: false,
+	},
+	[QUESTION_CONTENT_HINT_IDS.LAST_NAME]: {
+		label: 'Last name',
+		question: 'What is your last name?',
+		fontSizeId: 'DEFAULT',
+		questionContentHintId: QUESTION_CONTENT_HINT_IDS.LAST_NAME,
+		disabled: false,
+	},
+	[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]: {
+		label: 'Email (Required by Cobalt)',
+		question: 'What is your email address?',
+		fontSizeId: 'DEFAULT',
+		questionContentHintId: QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS,
+		disabled: true,
+	},
+	[QUESTION_CONTENT_HINT_IDS.PHONE_NUMBER]: {
+		label: 'Phone number',
+		question: 'What is your phone number?',
+		fontSizeId: 'DEFAULT',
+		questionContentHintId: QUESTION_CONTENT_HINT_IDS.PHONE_NUMBER,
+		disabled: false,
+	},
+};
+
 const useModalStyles = createUseStyles({
 	removeButton: {
 		top: 0,
@@ -47,11 +93,7 @@ export const AppointmentTypeFormModal = ({
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([
-		{
-			question: 'What is your email address?',
-			fontSizeId: 'DEFAULT',
-			questionContentHintId: 'EMAIL_ADDRESS',
-		},
+		PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS],
 	]);
 	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
@@ -87,13 +129,7 @@ export const AppointmentTypeFormModal = ({
 			setNickname('');
 			setDuration('');
 			setDurationInMinutes(undefined);
-			setPatientIntakeQuestions([
-				{
-					question: 'What is your email address?',
-					fontSizeId: 'DEFAULT',
-					questionContentHintId: 'EMAIL_ADDRESS',
-				},
-			]);
+			setPatientIntakeQuestions([PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]]);
 			setScreeningQuestions([]);
 		}
 	}, [appointmentTypeId, handleError]);
@@ -273,68 +309,48 @@ export const AppointmentTypeFormModal = ({
 				<Form.Group>
 					<Form.Label style={{ ...fonts.xs }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
-						{[
-							{
-								label: 'First name',
-								question: 'What is your first name?',
-								questionContentHintId: 'FIRST_NAME',
-							},
-							{
-								label: 'Last name',
-								question: 'What is your last name?',
-								questionContentHintId: 'LAST_NAME',
-							},
-							{
-								label: 'Email (required by Cobalt)',
-								question: 'What is your email address?',
-								questionContentHintId: 'EMAIL_ADDRESS',
-								disabled: true,
-							},
-							{
-								label: 'Phone number',
-								question: 'What is your phone number?',
-								questionContentHintId: 'PHONE_NUMBER',
-							},
-						].map(({ label, question, questionContentHintId, disabled }) => {
-							const isChecked = !!(patientIntakeQuestions || []).find(
-								(patientIntakeQuestion) =>
-									patientIntakeQuestion.questionContentHintId === questionContentHintId
-							);
+						{Object.values(PatientIntakeCheckboxes).map(
+							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
+								const isChecked = !!(patientIntakeQuestions || []).find(
+									(patientIntakeQuestion) =>
+										patientIntakeQuestion.questionContentHintId === questionContentHintId
+								);
 
-							return (
-								<Form.Check
-									id={`collect-${questionContentHintId}`}
-									key={questionContentHintId}
-									bsPrefix="cobalt-modal-form__check"
-									type="checkbox"
-									name={`collect-${questionContentHintId}`}
-									className="mr-6"
-									label={label}
-									checked={isChecked}
-									disabled={disabled}
-									onChange={({ currentTarget }) => {
-										const patientIntakeQuestionsClone = cloneDeep(patientIntakeQuestions || []);
+								return (
+									<Form.Check
+										id={`collect-${questionContentHintId}`}
+										key={questionContentHintId}
+										bsPrefix="cobalt-modal-form__check"
+										type="checkbox"
+										name={`collect-${questionContentHintId}`}
+										className="mr-6"
+										label={label}
+										checked={isChecked}
+										disabled={disabled}
+										onChange={({ currentTarget }) => {
+											const patientIntakeQuestionsClone = cloneDeep(patientIntakeQuestions || []);
 
-										if (currentTarget.checked) {
-											patientIntakeQuestionsClone.push({
-												question,
-												fontSizeId: 'DEFAULT',
-												questionContentHintId,
-											});
-										} else {
-											const indexToRemove = patientIntakeQuestionsClone.findIndex(
-												(patientIntakeQuestion) =>
-													patientIntakeQuestion.questionContentHintId ===
-													questionContentHintId
-											);
-											patientIntakeQuestionsClone.splice(indexToRemove, 1);
-										}
+											if (currentTarget.checked) {
+												patientIntakeQuestionsClone.push({
+													question,
+													fontSizeId,
+													questionContentHintId,
+												});
+											} else {
+												const indexToRemove = patientIntakeQuestionsClone.findIndex(
+													(patientIntakeQuestion) =>
+														patientIntakeQuestion.questionContentHintId ===
+														questionContentHintId
+												);
+												patientIntakeQuestionsClone.splice(indexToRemove, 1);
+											}
 
-										setPatientIntakeQuestions(patientIntakeQuestionsClone);
-									}}
-								/>
-							);
-						})}
+											setPatientIntakeQuestions(patientIntakeQuestionsClone);
+										}}
+									/>
+								);
+							}
+						)}
 					</div>
 				</Form.Group>
 
