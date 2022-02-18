@@ -98,41 +98,45 @@ export const AppointmentTypeFormModal = ({
 	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
 	const handleOnEnter = useCallback(async () => {
-		if (appointmentTypeId) {
-			try {
-				const { appointmentType } = await schedulingService.getAppointmentType(appointmentTypeId).fetch();
+		if (!appointmentTypeId) {
+			return;
+		}
 
-				setTitle(appointmentType.name);
-				setColor(appointmentType.hexColor);
-				setNickname('');
+		try {
+			const { appointmentType } = await schedulingService.getAppointmentType(appointmentTypeId).fetch();
 
-				if (
-					appointmentType.durationInMinutes === 30 ||
-					appointmentType.durationInMinutes === 45 ||
-					appointmentType.durationInMinutes === 60
-				) {
-					setDuration(String(appointmentType.durationInMinutes));
-					setDurationInMinutes(undefined);
-				} else {
-					setDuration('other');
-					setDurationInMinutes(appointmentType.durationInMinutes);
-				}
-
-				setPatientIntakeQuestions(appointmentType.patientIntakeQuestions);
-				setScreeningQuestions(appointmentType.screeningQuestions);
-			} catch (error) {
-				handleError(error);
-			}
-		} else {
-			setTitle('');
-			setColor(colors.primary);
+			setTitle(appointmentType.name);
+			setColor(appointmentType.hexColor);
 			setNickname('');
-			setDuration('');
-			setDurationInMinutes(undefined);
-			setPatientIntakeQuestions([PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]]);
-			setScreeningQuestions([]);
+
+			if (
+				appointmentType.durationInMinutes === 30 ||
+				appointmentType.durationInMinutes === 45 ||
+				appointmentType.durationInMinutes === 60
+			) {
+				setDuration(String(appointmentType.durationInMinutes));
+				setDurationInMinutes(undefined);
+			} else {
+				setDuration('other');
+				setDurationInMinutes(appointmentType.durationInMinutes);
+			}
+
+			setPatientIntakeQuestions(appointmentType.patientIntakeQuestions);
+			setScreeningQuestions(appointmentType.screeningQuestions);
+		} catch (error) {
+			handleError(error);
 		}
 	}, [appointmentTypeId, handleError]);
+
+	const handleOnExited = useCallback(() => {
+		setTitle('');
+		setColor(colors.primary);
+		setNickname('');
+		setDuration('');
+		setDurationInMinutes(undefined);
+		setPatientIntakeQuestions([PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]]);
+		setScreeningQuestions([]);
+	}, []);
 
 	const handleSaveButtonClick = useCallback(async () => {
 		try {
@@ -151,7 +155,6 @@ export const AppointmentTypeFormModal = ({
 				patientIntakeQuestions,
 				screeningQuestions,
 			};
-
 			let response;
 
 			if (appointmentTypeId) {
@@ -197,7 +200,7 @@ export const AppointmentTypeFormModal = ({
 	}, [appointmentTypeId, handleError, onDelete]);
 
 	return (
-		<Modal centered size="lg" onEnter={handleOnEnter} {...modalProps}>
+		<Modal centered size="lg" onEnter={handleOnEnter} onExited={handleOnExited} {...modalProps}>
 			<Modal.Header closeButton>
 				<Modal.Title>{appointmentTypeId ? 'Edit appointment type' : 'New appointment type'}</Modal.Title>
 			</Modal.Header>
