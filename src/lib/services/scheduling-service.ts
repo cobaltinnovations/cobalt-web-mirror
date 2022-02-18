@@ -76,6 +76,12 @@ export const schedulingService = {
 			data,
 		});
 	},
+	deleteAppointmentType(appointmentTypeId: string) {
+		return httpSingleton.orchestrateRequest<{ appointmentType: SchedulingAppointmentType }>({
+			method: 'DELETE',
+			url: `/appointment-types/${appointmentTypeId}`,
+		});
+	},
 	postLogicalAvailability(data: PostLogicalAvailabilitiesRequest) {
 		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
 			method: 'POST',
@@ -83,11 +89,23 @@ export const schedulingService = {
 			data,
 		});
 	},
+	getLogicalAvailability(logicalAvailabilityId: string) {
+		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
+			method: 'GET',
+			url: `/logical-availabilities/${logicalAvailabilityId}`,
+		});
+	},
 	updateLogicalAvailability(logicalAvailabilityId: string, data: PostLogicalAvailabilitiesRequest) {
 		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
 			method: 'PUT',
 			url: `/logical-availabilities/${logicalAvailabilityId}`,
 			data,
+		});
+	},
+	deleteLogicalAvailabilitiy(logicalAvailabilityId: string) {
+		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
+			method: 'DELETE',
+			url: `/logical-availabilities/${logicalAvailabilityId}`,
 		});
 	},
 };

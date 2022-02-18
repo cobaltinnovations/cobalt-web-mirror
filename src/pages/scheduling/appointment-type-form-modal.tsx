@@ -28,11 +28,13 @@ const useModalStyles = createUseStyles({
 interface AppointmentTypeFormModalProps extends ModalProps {
 	appointmentTypeId?: string;
 	onSave(appointmentType: SchedulingAppointmentType): void;
+	onDelete(appointmentType: SchedulingAppointmentType): void;
 }
 
 export const AppointmentTypeFormModal = ({
 	appointmentTypeId,
 	onSave,
+	onDelete,
 	...modalProps
 }: AppointmentTypeFormModalProps) => {
 	const { account } = useAccount();
@@ -139,6 +141,24 @@ export const AppointmentTypeFormModal = ({
 		screeningQuestions,
 		title,
 	]);
+
+	const handleDeleteButtonClick = useCallback(async () => {
+		if (!window.confirm('Are you sure you want to delete this appointment type?')) {
+			return;
+		}
+
+		try {
+			if (!appointmentTypeId) {
+				throw new Error('appointmentTypeId is undefined');
+			}
+
+			const response = await schedulingService.deleteAppointmentType(appointmentTypeId).fetch();
+
+			onDelete(response.appointmentType);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [appointmentTypeId, handleError, onDelete]);
 
 	return (
 		<Modal centered size="lg" onEnter={handleOnEnter} {...modalProps}>
@@ -392,10 +412,13 @@ export const AppointmentTypeFormModal = ({
 			</Modal.Body>
 
 			<Modal.Footer className="border-top pt-5">
-				<Button size="sm" variant="link">
-					delete
-				</Button>
-
+				<div>
+					{appointmentTypeId && (
+						<Button size="sm" variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
+							delete
+						</Button>
+					)}
+				</div>
 				<div>
 					<Button
 						className="mr-2"

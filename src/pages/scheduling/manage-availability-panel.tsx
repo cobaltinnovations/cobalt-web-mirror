@@ -80,6 +80,10 @@ export const ManageAvailabilityPanel = ({
 					fetchData();
 					setAppointmentTypeModalOpen(false);
 				}}
+				onDelete={() => {
+					fetchData();
+					setAppointmentTypeModalOpen(false);
+				}}
 			/>
 
 			<div className="py-4">
