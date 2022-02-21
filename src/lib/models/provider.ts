@@ -24,6 +24,16 @@ export interface LogicalAvailability {
 	endDateTime: string;
 	endDateTimeDescription: string;
 	appointmentTypes: AppointmentType[];
+
+	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
+	recurrenceTypeId: 'DAILY';
+	recurSunday: boolean;
+	recurMonday: boolean;
+	recurTuesday: boolean;
+	recurWednesday: boolean;
+	recurThursday: boolean;
+	recurFriday: boolean;
+	recurSaturday: boolean;
 }
 
 export interface PaymentType {

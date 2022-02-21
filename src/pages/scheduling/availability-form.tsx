@@ -14,7 +14,7 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import fonts from '@/jss/fonts';
 import { cloneDeep } from 'lodash';
 
-interface FormSchema {
+export interface AvailabilityFormSchema {
 	appointmentTypes: string[];
 	startDate: string;
 	startTime: string;
@@ -23,25 +23,31 @@ interface FormSchema {
 	endTime: string;
 	endTimeMeridian: string;
 	typesAccepted: 'all' | 'limited';
-	recurring: false;
+	recurring: boolean;
 	occurance: {
-		S: false;
-		M: false;
-		T: false;
-		W: false;
-		Th: false;
-		F: false;
-		Sa: false;
+		S: boolean;
+		M: boolean;
+		T: boolean;
+		W: boolean;
+		Th: boolean;
+		F: boolean;
+		Sa: boolean;
 	};
 }
 
 interface AvailabilityFormProps {
 	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
+	initialValues?: AvailabilityFormSchema;
 	onBack: () => void;
 	onSuccess: (logicalAvailability: LogicalAvailability) => void;
 }
 
-export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilityTypeId, onBack, onSuccess }) => {
+export const AvailabilityForm: FC<AvailabilityFormProps> = ({
+	logicalAvailabilityTypeId,
+	initialValues,
+	onBack,
+	onSuccess,
+}) => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
@@ -56,7 +62,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 	}, [account]);
 
 	const handleFormSubmit = useCallback(
-		async (values: FormSchema) => {
+		async (values: AvailabilityFormSchema) => {
 			if (!account || !account.providerId) {
 				throw new Error('account.providerId is undefined');
 			}
@@ -79,10 +85,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 				seconds: endTimeMoment.seconds(),
 			});
 
-			const appointmentTypeIds =
-				values.appointmentTypes.length > 0
-					? values.appointmentTypes
-					: appointmentTypes.map((at) => at.appointmentTypeId);
+			const appointmentTypeIds = values.typesAccepted === 'all' ? [] : values.appointmentTypes;
 
 			try {
 				const response = await schedulingService
@@ -108,32 +111,34 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 				handleError(error);
 			}
 		},
-		[account, appointmentTypes, handleError, logicalAvailabilityTypeId, onSuccess]
+		[account, handleError, logicalAvailabilityTypeId, onSuccess]
 	);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<Formik<FormSchema>
-				initialValues={{
-					appointmentTypes: [],
-					startDate: '',
-					startTime: '',
-					startTimeMeridian: '',
-					endDate: '',
-					endTime: '',
-					endTimeMeridian: '',
-					typesAccepted: 'all',
-					recurring: false,
-					occurance: {
-						S: false,
-						M: false,
-						T: false,
-						W: false,
-						Th: false,
-						F: false,
-						Sa: false,
-					},
-				}}
+			<Formik<AvailabilityFormSchema>
+				initialValues={
+					initialValues || {
+						appointmentTypes: [],
+						startDate: '',
+						startTime: '',
+						startTimeMeridian: '',
+						endDate: '',
+						endTime: '',
+						endTimeMeridian: '',
+						typesAccepted: 'all',
+						recurring: false,
+						occurance: {
+							S: false,
+							M: false,
+							T: false,
+							W: false,
+							Th: false,
+							F: false,
+							Sa: false,
+						},
+					}
+				}
 				enableReinitialize
 				onSubmit={handleFormSubmit}
 			>
@@ -257,6 +262,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 										type="radio"
 										label="all"
 										value="all"
+										checked={values.typesAccepted === 'all'}
 										onChange={handleChange}
 									/>
 									<Form.Check
@@ -267,6 +273,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({ logicalAvailabilit
 										type="radio"
 										label="limit to..."
 										value="limited"
+										checked={values.typesAccepted === 'limited'}
 										onChange={handleChange}
 									/>
 								</div>
