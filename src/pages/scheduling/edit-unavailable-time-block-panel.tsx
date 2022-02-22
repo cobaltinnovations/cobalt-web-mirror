@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { schedulingService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
-import { AvailabilityForm } from './availability-form';
+import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
+import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
 import colors from '@/jss/colors';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -18,6 +19,8 @@ export const EditUnavailableTimeBlockPanel = ({
 	logicalAvailabilityId,
 	onClose,
 }: EditUnavailableTimeBlockPanelProps) => {
+	const [initialValues, setInitialValues] = useState<AvailabilityFormSchema>();
+
 	const fetchData = useCallback(async () => {
 		// Return instead of throwing error
 		// if no logicalAvailabilityId, we are creating a new one
@@ -25,8 +28,8 @@ export const EditUnavailableTimeBlockPanel = ({
 			return;
 		}
 
-		const response = await schedulingService.getLogicalAvailability(logicalAvailabilityId).fetch();
-		console.log(response);
+		const { logicalAvailability } = await schedulingService.getLogicalAvailability(logicalAvailabilityId).fetch();
+		setInitialValues(AvailabilityFormDataFromLogicalAvailability(logicalAvailability));
 	}, [logicalAvailabilityId]);
 
 	return (
@@ -49,7 +52,13 @@ export const EditUnavailableTimeBlockPanel = ({
 					</Button>
 				</div>
 
-				<AvailabilityForm logicalAvailabilityTypeId="BLOCK" onBack={onClose} onSuccess={onClose} />
+				<AvailabilityForm
+					logicalAvailabilityId={logicalAvailabilityId}
+					logicalAvailabilityTypeId="BLOCK"
+					initialValues={initialValues}
+					onBack={onClose}
+					onSuccess={onClose}
+				/>
 			</AsyncPage>
 		</div>
 	);

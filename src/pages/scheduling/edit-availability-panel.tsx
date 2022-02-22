@@ -1,10 +1,10 @@
-import moment from 'moment';
 import React, { useCallback, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { schedulingService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
+import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
 import colors from '@/jss/colors';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -26,29 +26,7 @@ export const EditAvailabilityPanel = ({ logicalAvailabilityId, onClose }: EditAv
 		}
 
 		const { logicalAvailability } = await schedulingService.getLogicalAvailability(logicalAvailabilityId).fetch();
-		const startMoment = moment(logicalAvailability.startDateTime, 'YYYY-MM-DDTHH:mm');
-		const endMoment = moment(logicalAvailability.endDateTime, 'YYYY-MM-DDTHH:mm');
-
-		setInitialValues({
-			appointmentTypes: logicalAvailability.appointmentTypes.map((at) => at.appointmentTypeId),
-			startDate: startMoment.format('MMM DD, yyyy'),
-			startTime: startMoment.format('hh:mm'),
-			startTimeMeridian: startMoment.format('a'),
-			endDate: endMoment.format('MMM DD, yyyy'),
-			endTime: endMoment.format('hh:mm'),
-			endTimeMeridian: endMoment.format('a'),
-			typesAccepted: logicalAvailability.appointmentTypes.length > 0 ? 'limited' : 'all',
-			recurring: logicalAvailability.recurrenceTypeId === 'DAILY' ? true : false,
-			occurance: {
-				S: logicalAvailability.recurSunday,
-				M: logicalAvailability.recurMonday,
-				T: logicalAvailability.recurTuesday,
-				W: logicalAvailability.recurWednesday,
-				Th: logicalAvailability.recurThursday,
-				F: logicalAvailability.recurFriday,
-				Sa: logicalAvailability.recurSaturday,
-			},
-		});
+		setInitialValues(AvailabilityFormDataFromLogicalAvailability(logicalAvailability));
 	}, [logicalAvailabilityId]);
 
 	return (
@@ -72,6 +50,7 @@ export const EditAvailabilityPanel = ({ logicalAvailabilityId, onClose }: EditAv
 				</div>
 
 				<AvailabilityForm
+					logicalAvailabilityId={logicalAvailabilityId}
 					logicalAvailabilityTypeId="OPEN"
 					initialValues={initialValues}
 					onBack={onClose}

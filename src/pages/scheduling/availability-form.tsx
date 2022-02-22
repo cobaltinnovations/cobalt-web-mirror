@@ -36,6 +36,7 @@ export interface AvailabilityFormSchema {
 }
 
 interface AvailabilityFormProps {
+	logicalAvailabilityId?: string;
 	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
 	initialValues?: AvailabilityFormSchema;
 	onBack: () => void;
@@ -43,6 +44,7 @@ interface AvailabilityFormProps {
 }
 
 export const AvailabilityForm: FC<AvailabilityFormProps> = ({
+	logicalAvailabilityId,
 	logicalAvailabilityTypeId,
 	initialValues,
 	onBack,
@@ -87,31 +89,38 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 			const appointmentTypeIds = values.typesAccepted === 'all' ? [] : values.appointmentTypes;
 
+			const requestBody = {
+				providerId: account.providerId,
+				startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
+				endDateTime: endDateTime.format('YYYY-MM-DDTHH:mm:ss'),
+				appointmentTypeIds,
+				logicalAvailabilityTypeId,
+				recurrenceTypeId: values.recurring ? ('DAILY' as const) : ('NONE' as const),
+				recurSunday: values.occurance.S,
+				recurMonday: values.occurance.M,
+				recurTuesday: values.occurance.T,
+				recurWednesday: values.occurance.W,
+				recurThursday: values.occurance.Th,
+				recurFriday: values.occurance.F,
+				recurSaturday: values.occurance.Sa,
+			};
+
 			try {
-				const response = await schedulingService
-					.postLogicalAvailability({
-						providerId: account.providerId,
-						startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
-						endDateTime: endDateTime.format('YYYY-MM-DDTHH:mm:ss'),
-						appointmentTypeIds,
-						logicalAvailabilityTypeId,
-						recurrenceTypeId: values.recurring ? 'DAILY' : 'NONE',
-						recurSunday: values.occurance.S,
-						recurMonday: values.occurance.M,
-						recurTuesday: values.occurance.T,
-						recurWednesday: values.occurance.W,
-						recurThursday: values.occurance.Th,
-						recurFriday: values.occurance.F,
-						recurSaturday: values.occurance.Sa,
-					})
-					.fetch();
+				let response;
+				if (logicalAvailabilityId) {
+					response = await schedulingService
+						.updateLogicalAvailability(logicalAvailabilityId, requestBody)
+						.fetch();
+				} else {
+					response = await schedulingService.postLogicalAvailability(requestBody).fetch();
+				}
 
 				onSuccess(response.logicalAvailability);
 			} catch (error) {
 				handleError(error);
 			}
 		},
-		[account, handleError, logicalAvailabilityTypeId, onSuccess]
+		[account, handleError, logicalAvailabilityId, logicalAvailabilityTypeId, onSuccess]
 	);
 
 	return (
