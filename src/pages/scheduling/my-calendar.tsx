@@ -384,6 +384,7 @@ export const MyCalendarScheduling: FC = () => {
 				};
 			});
 
+			// [TODO]: MAKE THIS REAL
 			const formattedFollowUps = providerCalendar.followups.map((availability, index) => {
 				return {
 					id: `followups${index}`,
@@ -412,6 +413,7 @@ export const MyCalendarScheduling: FC = () => {
 				};
 			});
 
+			// [TODO]: MAKE THIS REAL
 			const MOCK_APPTS = [
 				{
 					id: 'appt1',
@@ -455,6 +457,10 @@ export const MyCalendarScheduling: FC = () => {
 			handleError(error);
 		}
 	}, [account, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent, handleError]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
 
 	const sidebarToggled =
 		managingAvailability ||
