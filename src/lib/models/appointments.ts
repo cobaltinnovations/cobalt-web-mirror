@@ -55,6 +55,7 @@ export interface AppointmentModel {
 	account?: AccountModel;
 	appointmentReason?: AppointmentReason;
 	appointmentDescription: string;
+	appointmentType: AppointmentType;
 }
 
 export enum AppointmentReasonType {

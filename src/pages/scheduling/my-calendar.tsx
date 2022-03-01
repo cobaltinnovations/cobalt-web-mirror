@@ -29,6 +29,7 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import { EditAvailabilityPanel } from './edit-availability-panel';
 import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 import { schedulingService } from '@/lib/services';
+import Color from 'color';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -258,6 +259,9 @@ const useContainerStyles = createUseStyles({
 			'& .fc-timegrid-event .fc-event-main': {
 				padding: '7px 11px',
 			},
+			'& .fc-timegrid-event-harness-inset .fc-timegrid-event': {
+				boxShadow: 'none',
+			},
 		},
 	},
 });
@@ -390,6 +394,9 @@ export const MyCalendarScheduling: FC = () => {
 					title: appointment.account?.displayName || 'Anonymous',
 					start: moment(appointment.startTime).toDate(),
 					end: moment(appointment.endTime).toDate(),
+					backgroundColor: Color(appointment.appointmentType.hexColor).lighten(0.7).hex(),
+					borderColor: appointment.appointmentType.hexColor,
+					textColor: '#21312A',
 				};
 			});
 
@@ -643,9 +650,12 @@ export const MyCalendarScheduling: FC = () => {
 						const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
 
 						return (
-							<>
-								<b>{evtInfo.event.title}</b> {startTime}
-							</>
+							<div>
+								<p className="mb-0">
+									<strong>{evtInfo.event.title}</strong>
+								</p>
+								<p className="mb-0">{startTime}</p>
+							</div>
 						);
 					}}
 					// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
