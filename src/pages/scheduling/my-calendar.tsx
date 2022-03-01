@@ -75,8 +75,8 @@ const useContainerStyles = createUseStyles({
 			-45deg,
 			transparent,
 			transparent 9px,
-			${colors.border} 10px,
-			${colors.border} 11px
+			${colors.black} 10px,
+			${colors.black} 11px
 		) !important;`,
 	},
 	blockedAvailabilityTimeslot: {
@@ -84,8 +84,8 @@ const useContainerStyles = createUseStyles({
 			-45deg,
 			#6C7978,
 			#6C7978 9px,
-			${colors.border} 10px,
-			${colors.border} 11px
+			${colors.black} 10px,
+			${colors.black} 11px
 		) !important;`,
 	},
 	leftCalendar: {
@@ -234,7 +234,7 @@ const useContainerStyles = createUseStyles({
 				padding: '4px 4px 0 0',
 			},
 			'& .fc-bg-event': {
-				backgroundColor: colors.white,
+				// backgroundColor: colors.white,
 			},
 			'& .fc-timegrid-now-indicator-arrow': {
 				display: 'none',
@@ -384,6 +384,15 @@ export const MyCalendarScheduling: FC = () => {
 				};
 			});
 
+			const formattedAppointments = providerCalendar.appointments.map((appointment, index) => {
+				return {
+					id: `appointment${index}`,
+					title: appointment.account?.displayName || 'Anonymous',
+					start: moment(appointment.startTime).toDate(),
+					end: moment(appointment.endTime).toDate(),
+				};
+			});
+
 			// [TODO]: MAKE THIS REAL
 			const formattedFollowUps = providerCalendar.followups.map((followup, index) => {
 				return {
@@ -413,23 +422,9 @@ export const MyCalendarScheduling: FC = () => {
 				};
 			});
 
-			// [TODO]: MAKE THIS REAL
-			const MOCK_APPTS = [
-				{
-					id: 'appt1',
-					title: 'Patient Name',
-					start: MOCK_MONDAY.clone().hours(9).toDate(),
-				},
-				{
-					id: 'appt2',
-					title: 'Patient Name',
-					start: MOCK_MONDAY.clone().hours(15).toDate(),
-				},
-			];
-
 			const allCalendarEvents = [
 				...formattedFollowUps,
-				...MOCK_APPTS,
+				...formattedAppointments,
 				...formattedAvailabilities,
 				...formattedBlockedTimes,
 			];

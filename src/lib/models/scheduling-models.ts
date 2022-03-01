@@ -1,4 +1,4 @@
-import { FollowupModel, LogicalAvailability } from '@/lib/models';
+import { AppointmentModel, FollowupModel, LogicalAvailability } from '@/lib/models';
 
 export interface SchedulingAppointmentType {
 	appointmentTypeId: string;
@@ -29,4 +29,5 @@ export interface ProviderCalendar {
 	availabilities: LogicalAvailability[];
 	blocks: Omit<LogicalAvailability, 'appointmentTypes'>[];
 	followups: FollowupModel[];
+	appointments: AppointmentModel[];
 }
