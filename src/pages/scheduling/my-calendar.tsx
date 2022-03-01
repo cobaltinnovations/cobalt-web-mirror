@@ -385,7 +385,7 @@ export const MyCalendarScheduling: FC = () => {
 			});
 
 			// [TODO]: MAKE THIS REAL
-			const formattedFollowUps = providerCalendar.followups.map((availability, index) => {
+			const formattedFollowUps = providerCalendar.followups.map((followup, index) => {
 				return {
 					id: `followups${index}`,
 					allDay: true,
@@ -619,17 +619,6 @@ export const MyCalendarScheduling: FC = () => {
 						}}
 					>
 						manage availability
-					</Button>
-
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0 text-left font-size-xs"
-						onClick={() => {
-							setManagingAvailability(true);
-						}}
-					>
-						add unavailable time block
 					</Button>
 				</div>
 			</div>
