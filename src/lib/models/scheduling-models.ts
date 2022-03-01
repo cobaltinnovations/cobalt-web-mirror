@@ -1,3 +1,5 @@
+import { LogicalAvailability } from '@/lib/models';
+
 export interface SchedulingAppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
@@ -20,4 +22,11 @@ export interface PatientIntakeQuestion {
 export interface ScreeningQuestion {
 	question: string;
 	fontSizeId: 'DEFAULT' | 'SMALL';
+}
+
+export interface ProviderCalendar {
+	providerId: string;
+	availabilities: LogicalAvailability[];
+	blocks: Omit<LogicalAvailability, 'appointmentTypes'>[];
+	followups: any[];
 }

@@ -1,5 +1,11 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { SchedulingAppointmentType, PatientIntakeQuestion, ScreeningQuestion, LogicalAvailability } from '@/lib/models';
+import {
+	SchedulingAppointmentType,
+	PatientIntakeQuestion,
+	ScreeningQuestion,
+	LogicalAvailability,
+	ProviderCalendar,
+} from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
 interface PostApointmentTypeRequest {
@@ -106,6 +112,12 @@ export const schedulingService = {
 		return httpSingleton.orchestrateRequest<{ logicalAvailability: LogicalAvailability }>({
 			method: 'DELETE',
 			url: `/logical-availabilities/${logicalAvailabilityId}`,
+		});
+	},
+	getCalendar(providerId: string, queryParameters: { startDate: string; endDate: string }) {
+		return httpSingleton.orchestrateRequest<{ providerCalendar: ProviderCalendar }>({
+			method: 'GET',
+			url: buildQueryParamUrl(`/providers/${providerId}/calendar`, queryParameters),
 		});
 	},
 };

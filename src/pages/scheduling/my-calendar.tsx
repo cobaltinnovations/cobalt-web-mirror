@@ -12,7 +12,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import { Formik } from 'formik';
 import moment from 'moment';
-import React, { FC, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Col, Dropdown, Form } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { createUseStyles } from 'react-jss';
@@ -28,6 +28,7 @@ import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { AppointmentTypeItem } from './appointment-type-item';
 import { EditAvailabilityPanel } from './edit-availability-panel';
 import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
+import { schedulingService } from '@/lib/services';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -263,180 +264,6 @@ const useContainerStyles = createUseStyles({
 
 const MOCK_MONDAY = moment().startOf('week').weekday(1);
 
-const MOCK_FOLLOWUPS = [
-	{
-		id: 'followups1',
-		allDay: true,
-		title: 'X followups',
-		start: MOCK_MONDAY.clone().toDate(),
-		extendedProps: {
-			patients: [
-				{
-					id: 'f1p1',
-					name: 'Patient 1',
-					phone: '(333) 333-3333',
-				},
-				{
-					id: 'f1p2',
-					name: 'Patient 2',
-					phone: '(333) 333-3333',
-				},
-				{
-					id: 'f1p3',
-					name: 'Patient 3',
-					phone: '(333) 333-3333',
-				},
-			],
-		},
-	},
-	{
-		id: 'followups2',
-		allDay: true,
-		title: 'X followups',
-		start: MOCK_MONDAY.clone().weekday(2).toDate(),
-		extendedProps: {
-			patients: [
-				{
-					id: 'f2p1',
-					name: 'Patient 1',
-					phone: '(333) 333-3333',
-				},
-				{
-					id: 'f2p2',
-					name: 'Patient 2',
-					phone: '(333) 333-3333',
-				},
-				{
-					id: 'f2p3',
-					name: 'Patient 3',
-					phone: '(333) 333-3333',
-				},
-			],
-		},
-	},
-];
-
-const MOCK_APPTS = [
-	{
-		id: 'appt1',
-		title: 'Patient Name',
-		start: MOCK_MONDAY.clone().hours(9).toDate(),
-	},
-	{
-		id: 'appt2',
-		title: 'Patient Name',
-		start: MOCK_MONDAY.clone().hours(15).toDate(),
-	},
-];
-
-const MOCK_AVAILABILITY_EVENTS = [
-	{
-		id: 'avail1',
-		start: MOCK_MONDAY.clone().hours(9).toDate(),
-		end: MOCK_MONDAY.clone().hours(12).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail2',
-		start: MOCK_MONDAY.clone().hours(13).toDate(),
-		end: MOCK_MONDAY.clone().hours(17).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail3',
-		start: MOCK_MONDAY.clone().weekday(2).hours(9).toDate(),
-		end: MOCK_MONDAY.clone().weekday(2).hours(12).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail4',
-		start: MOCK_MONDAY.clone().weekday(2).hours(13).toDate(),
-		end: MOCK_MONDAY.clone().weekday(2).hours(17).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail5',
-		start: MOCK_MONDAY.clone().weekday(3).hours(9).toDate(),
-		end: MOCK_MONDAY.clone().weekday(3).hours(12).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail6',
-		start: MOCK_MONDAY.clone().weekday(3).hours(13).toDate(),
-		end: MOCK_MONDAY.clone().weekday(3).hours(17).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail7',
-		start: MOCK_MONDAY.clone().weekday(4).hours(9).toDate(),
-		end: MOCK_MONDAY.clone().weekday(4).hours(12).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail8',
-		start: MOCK_MONDAY.clone().weekday(4).hours(13).toDate(),
-		end: MOCK_MONDAY.clone().weekday(4).hours(17).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail9',
-		start: MOCK_MONDAY.clone().weekday(5).hours(9).toDate(),
-		end: MOCK_MONDAY.clone().weekday(5).hours(12).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-		},
-	},
-	{
-		id: 'avail10',
-		start: MOCK_MONDAY.clone().weekday(5).hours(13).toDate(),
-		end: MOCK_MONDAY.clone().weekday(5).hours(14).minutes(30).toDate(),
-		display: 'background',
-		extendedProps: {
-			isAvailability: true,
-			isBlockedTime: true,
-		},
-	},
-];
-
-const MOCK_BLOCKED_TIMES = [
-	{
-		id: 'blockedTime1',
-		start: MOCK_MONDAY.clone().weekday(5).hours(13).toDate(),
-		end: MOCK_MONDAY.clone().weekday(5).hours(17).toDate(),
-		display: 'background',
-		extendedProps: {
-			isBlockedTime: true,
-		},
-	},
-];
-
-const MOCK_INIT_EVENTS = [...MOCK_FOLLOWUPS, ...MOCK_APPTS, ...MOCK_AVAILABILITY_EVENTS, ...MOCK_BLOCKED_TIMES];
-
 const MOCK_APPT_TYPES = [
 	{
 		appointmentTypeId: 'apptType1',
@@ -491,7 +318,10 @@ enum MainCalendarView {
 }
 
 export const MyCalendarScheduling: FC = () => {
+	const handleError = useHandleError();
 	const classes = useContainerStyles();
+	const { account } = useAccount();
+
 	const [accordionExpanded, setAccordionExpanded] = useState(false);
 	const [managingAvailability, setManagingAvailability] = useState(false);
 	const [editingAvailability, setEditingAvailability] = useState(false);
@@ -510,27 +340,121 @@ export const MyCalendarScheduling: FC = () => {
 
 	const [draftEvent, setDraftEvent] = useState<any>();
 
-	const calendarEvents = useMemo(() => {
-		const mapped = MOCK_INIT_EVENTS.map((e: any) => {
-			const classNames = [];
-			if (e.extendedProps?.isBlockedTime && e.extendedProps?.isAvailability) {
-				classNames.push(classes.blockedAvailabilityTimeslot);
-			} else if (e.extendedProps?.isBlockedTime) {
-				classNames.push(classes.blockedTimeslot);
+	const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+
+	const fetchData = useCallback(async () => {
+		try {
+			if (!mainCalendarRef.current) {
+				throw new Error('mainCalendarRef.current is undefined');
 			}
 
-			return {
-				...e,
-				classNames,
-			};
-		});
+			if (!account || !account.providerId) {
+				throw new Error('account.providerId is undefined');
+			}
 
-		if (draftEvent) {
-			mapped.push(draftEvent);
+			const { activeStart, activeEnd } = mainCalendarRef.current.getApi().view;
+			const startDate = moment(activeStart).format('YYYY-MM-DD');
+			const endDate = moment(activeEnd).format('YYYY-MM-DD');
+
+			const { providerCalendar } = await schedulingService
+				.getCalendar(account.providerId, { startDate, endDate })
+				.fetch();
+
+			const formattedAvailabilities = providerCalendar.availabilities.map((availability, index) => {
+				return {
+					id: `availability${index}`,
+					start: availability.startDateTime,
+					end: availability.endDateTime,
+					display: 'background',
+					extendedProps: {
+						isAvailability: true,
+					},
+				};
+			});
+
+			const formattedBlockedTimes = providerCalendar.blocks.map((availability, index) => {
+				return {
+					id: `blockedTime${index}`,
+					start: availability.startDateTime,
+					end: availability.endDateTime,
+					display: 'background',
+					extendedProps: {
+						isBlockedTime: true,
+					},
+				};
+			});
+
+			const formattedFollowUps = providerCalendar.followups.map((availability, index) => {
+				return {
+					id: `followups${index}`,
+					allDay: true,
+					title: 'X followups',
+					start: MOCK_MONDAY.clone().toDate(),
+					extendedProps: {
+						patients: [
+							{
+								id: 'f1p1',
+								name: 'Patient 1',
+								phone: '(333) 333-3333',
+							},
+							{
+								id: 'f1p2',
+								name: 'Patient 2',
+								phone: '(333) 333-3333',
+							},
+							{
+								id: 'f1p3',
+								name: 'Patient 3',
+								phone: '(333) 333-3333',
+							},
+						],
+					},
+				};
+			});
+
+			const MOCK_APPTS = [
+				{
+					id: 'appt1',
+					title: 'Patient Name',
+					start: MOCK_MONDAY.clone().hours(9).toDate(),
+				},
+				{
+					id: 'appt2',
+					title: 'Patient Name',
+					start: MOCK_MONDAY.clone().hours(15).toDate(),
+				},
+			];
+
+			const allCalendarEvents = [
+				...formattedFollowUps,
+				...MOCK_APPTS,
+				...formattedAvailabilities,
+				...formattedBlockedTimes,
+			];
+
+			const formattedCalendarEvents = allCalendarEvents.map((e: any) => {
+				const classNames = [];
+				if (e.extendedProps?.isBlockedTime && e.extendedProps?.isAvailability) {
+					classNames.push(classes.blockedAvailabilityTimeslot);
+				} else if (e.extendedProps?.isBlockedTime) {
+					classNames.push(classes.blockedTimeslot);
+				}
+
+				return {
+					...e,
+					classNames,
+				};
+			});
+
+			if (draftEvent) {
+				formattedCalendarEvents.push(draftEvent);
+			}
+
+			setCalendarEvents(formattedCalendarEvents);
+		} catch (error) {
+			handleError(error);
 		}
-
-		return mapped;
-	}, [classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent]);
+	}, [account, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent, handleError]);
 
 	const sidebarToggled =
 		managingAvailability ||
@@ -550,8 +474,9 @@ export const MyCalendarScheduling: FC = () => {
 
 		if (mainCalendarApi.view.type !== currentMainCalendarView) {
 			mainCalendarApi.changeView(currentMainCalendarView);
+			fetchData();
 		}
-	}, [currentMainCalendarView]);
+	}, [currentMainCalendarView, fetchData]);
 
 	return (
 		<div className={classes.wrapper}>
