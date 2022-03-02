@@ -12,7 +12,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import { Formik } from 'formik';
 import moment from 'moment';
-import React, { FC, forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Dropdown, Form } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { createUseStyles } from 'react-jss';
@@ -30,6 +30,8 @@ import { EditAvailabilityPanel } from './edit-availability-panel';
 import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 import { schedulingService } from '@/lib/services';
 import Color from 'color';
+import { ERROR_CODES } from '@/lib/http-client';
+import { AxiosError } from 'axios';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -338,9 +340,12 @@ export const MyCalendarScheduling: FC = () => {
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
+	const [activeStart, setActiveStart] = useState<Date>();
+	const [activeEnd, setActiveEnd] = useState<Date>();
 
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
+	const inFlightRequest = useRef<ReturnType<typeof schedulingService['getCalendar']>>();
 
 	const [draftEvent, setDraftEvent] = useState<any>();
 
@@ -352,17 +357,16 @@ export const MyCalendarScheduling: FC = () => {
 				throw new Error('mainCalendarRef.current is undefined');
 			}
 
-			if (!account || !account.providerId) {
-				throw new Error('account.providerId is undefined');
+			if (!account || !account.providerId || !activeStart || !activeEnd) {
+				throw new Error('missing Calendar parameters');
 			}
 
-			const { activeStart, activeEnd } = mainCalendarRef.current.getApi().view;
 			const startDate = moment(activeStart).format('YYYY-MM-DD');
 			const endDate = moment(activeEnd).format('YYYY-MM-DD');
 
-			const { providerCalendar } = await schedulingService
-				.getCalendar(account.providerId, { startDate, endDate })
-				.fetch();
+			inFlightRequest.current = schedulingService.getCalendar(account.providerId, { startDate, endDate });
+
+			const { providerCalendar } = await inFlightRequest.current.fetch();
 
 			const formattedAvailabilities = providerCalendar.availabilities.map((availability, index) => {
 				return {
@@ -436,32 +440,41 @@ export const MyCalendarScheduling: FC = () => {
 				...formattedBlockedTimes,
 			];
 
-			const formattedCalendarEvents = allCalendarEvents.map((e: any) => {
-				const classNames = [];
-				if (e.extendedProps?.isBlockedTime && e.extendedProps?.isAvailability) {
-					classNames.push(classes.blockedAvailabilityTimeslot);
-				} else if (e.extendedProps?.isBlockedTime) {
-					classNames.push(classes.blockedTimeslot);
-				}
+			setCalendarEvents(allCalendarEvents);
+		} catch (error) {
+			if ((error as AxiosError).code !== ERROR_CODES.REQUEST_ABORTED) {
+				handleError(error);
+			}
+		}
+	}, [account, activeEnd, activeStart, handleError]);
 
-				return {
-					...e,
-					classNames,
-				};
-			});
-
-			if (draftEvent) {
-				formattedCalendarEvents.push(draftEvent);
+	const formattedCalendarEvents = useMemo(() => {
+		const formatted = calendarEvents.map((e) => {
+			const classNames = [];
+			if (e.extendedProps?.isBlockedTime && e.extendedProps?.isAvailability) {
+				classNames.push(classes.blockedAvailabilityTimeslot);
+			} else if (e.extendedProps?.isBlockedTime) {
+				classNames.push(classes.blockedTimeslot);
 			}
 
-			setCalendarEvents(formattedCalendarEvents);
-		} catch (error) {
-			handleError(error);
+			return {
+				...e,
+				classNames,
+			};
+		});
+		if (draftEvent) {
+			formatted.push(draftEvent);
 		}
-	}, [account, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent, handleError]);
+
+		return formatted;
+	}, [calendarEvents, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent]);
 
 	useEffect(() => {
 		fetchData();
+
+		return () => {
+			inFlightRequest.current?.abort();
+		};
 	}, [fetchData]);
 
 	const sidebarToggled =
@@ -482,9 +495,8 @@ export const MyCalendarScheduling: FC = () => {
 
 		if (mainCalendarApi.view.type !== currentMainCalendarView) {
 			mainCalendarApi.changeView(currentMainCalendarView);
-			fetchData();
 		}
-	}, [currentMainCalendarView, fetchData]);
+	}, [currentMainCalendarView]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -541,7 +553,7 @@ export const MyCalendarScheduling: FC = () => {
 						plugins={[dayGridPlugin, interactionPlugin]}
 						initialView={MainCalendarView.Month}
 						events={[
-							...calendarEvents,
+							...formattedCalendarEvents,
 							{
 								id: 'current-week',
 								start: moment().startOf('week').weekday(0).toDate(),
@@ -641,7 +653,7 @@ export const MyCalendarScheduling: FC = () => {
 					// 	console.log({args})
 					// }}
 					nowIndicator
-					events={calendarEvents}
+					events={formattedCalendarEvents}
 					eventContent={(evtInfo) => {
 						if (evtInfo.event.display === 'background') {
 							return;
@@ -701,6 +713,10 @@ export const MyCalendarScheduling: FC = () => {
 					// eventAdd={function(){}}
 					// eventChange={function(){}}
 					// eventRemove={function(){}}
+					datesSet={({ start, end }) => {
+						setActiveStart(start);
+						setActiveEnd(end);
+					}}
 				/>
 			</div>
 
