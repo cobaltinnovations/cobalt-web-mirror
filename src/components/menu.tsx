@@ -249,13 +249,17 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 						</li>
 					)}
 					<li>
-						<Link
-							to={account?.roleId === 'PROVIDER' ? '/scheduling' : '/my-calendar'}
-							onClick={handleLinkClick}
-						>
+						<Link to="/my-calendar" onClick={handleLinkClick}>
 							my calendar
 						</Link>
 					</li>
+					{account?.roleId === 'PROVIDER' ? (
+						<li>
+							<Link to="/scheduling" onClick={handleLinkClick}>
+								my schedule
+							</Link>
+						</li>
+					) : null}
 					<li>
 						<Link to="/in-the-studio" onClick={handleLinkClick}>
 							in the studio
