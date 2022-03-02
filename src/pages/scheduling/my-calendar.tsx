@@ -32,6 +32,7 @@ import { schedulingService } from '@/lib/services';
 import Color from 'color';
 import { ERROR_CODES } from '@/lib/http-client';
 import { AxiosError } from 'axios';
+import { Link } from 'react-router-dom';
 
 const useSchedulingStyles = createUseStyles({
 	roundBtn: {
@@ -807,24 +808,50 @@ interface AddAppointmentPanelProps {
 }
 
 const AddAppointmentPanel = ({ onClose }: AddAppointmentPanelProps) => {
+	const { account } = useAccount();
+	const relativeUrl = `/connect-with-support?&immediateAccess=true&providerId=${account?.providerId}`;
+	const fullUrl = `${window.location.protocol}//${window.location.host}${relativeUrl}`;
+
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>Add appointment</h4>
+				<h4>New appointment</h4>
 
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
 			</div>
 
-			<AddAppointmentForm
+			<p>Patients can use this URL to book with you:</p>
+
+			<div className="border d-flex align-items-center p-2">
+				<Link to={relativeUrl} target="_blank">
+					{fullUrl}
+				</Link>
+
+				{navigator?.clipboard ? (
+					<Button
+						variant="primary"
+						size="sm"
+						className="px-2 ml-2"
+						onClick={() => {
+							navigator.clipboard.writeText(fullUrl);
+							return;
+						}}
+					>
+						<CopyIcon />
+					</Button>
+				) : null}
+			</div>
+
+			{/* <AddAppointmentForm
 				onBack={() => {
 					onClose();
 				}}
 				onSuccess={() => {
 					onClose();
 				}}
-			/>
+			/> */}
 		</div>
 	);
 };
