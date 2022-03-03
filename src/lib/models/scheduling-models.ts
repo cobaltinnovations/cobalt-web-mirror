@@ -21,6 +21,7 @@ export interface SchedulingAvailability {
 	appointmentTypes: AppointmentType[];
 	endDateTime: string;
 	endDateTimeDescription: string;
+	logicalAvailabilityId: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
 }
