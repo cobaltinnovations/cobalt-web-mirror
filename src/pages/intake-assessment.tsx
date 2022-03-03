@@ -28,7 +28,6 @@ const IntakeAssessment: FC = () => {
 	const groupSessionId = query.get('groupSessionId') || '';
 	const questionId = query.get('questionId') || '';
 	const sessionId = query.get('sessionId') || '';
-	const appointmentTypeId = query.get('appointmentTypeId') || '';
 	const { account, setAccount } = useAccount();
 
 	const [isSavingInfo, setIsSavingInfo] = useState(false);
@@ -62,6 +61,8 @@ const IntakeAssessment: FC = () => {
 		setIsEligible,
 		getFiltersQueryString,
 	} = useContext(BookingContext);
+
+	const appointmentTypeId = query.get('appointmentTypeId') || selectedAppointmentTypeId;
 
 	const supportPageRoute = {
 		pathname: '/connect-with-support',
@@ -355,7 +356,11 @@ const IntakeAssessment: FC = () => {
 										}
 									}}
 								>
-									{isGroupSessionAssessment && <p className="mb-5">Only people who answer "Yes" are eligible to reserve a seat.</p>}
+									{isGroupSessionAssessment && (
+										<p className="mb-5">
+											Only people who answer "Yes" are eligible to reserve a seat.
+										</p>
+									)}
 								</SurveyQuestion>
 							)}
 
@@ -376,7 +381,12 @@ const IntakeAssessment: FC = () => {
 								)}
 
 								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
-									<Button type="submit" className="ml-auto" variant="primary" onClick={() => submitAnswers(selectedQuestionAnswers)}>
+									<Button
+										type="submit"
+										className="ml-auto"
+										variant="primary"
+										onClick={() => submitAnswers(selectedQuestionAnswers)}
+									>
 										{assessment?.nextQuestionId ? 'next' : 'done'}
 									</Button>
 								)}
@@ -398,7 +408,9 @@ const IntakeAssessment: FC = () => {
 						/>
 					)}
 
-					{isGroupSessionAssessment && <Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>}
+					{isGroupSessionAssessment && (
+						<Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>
+					)}
 					{!isGroupSessionAssessment && <Link to={supportPageRoute}>exit booking</Link>}
 				</p>
 			</Container>
