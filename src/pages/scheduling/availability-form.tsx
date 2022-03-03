@@ -253,6 +253,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 									<Form.Group controlId="endDate">
 										<DatePicker
+											isClearable
 											showYearDropdown
 											showMonthDropdown
 											dropdownMode="select"

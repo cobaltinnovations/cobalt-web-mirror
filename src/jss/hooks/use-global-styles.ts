@@ -184,6 +184,9 @@ export const useGlobalStyles = createUseStyles({
 				color: colors.gray500,
 				backgroundColor: colors.gray200,
 			},
+			'&__close-icon': {
+				marginRight: 30,
+			},
 		},
 
 		/* ----------------------------------------------------------- */
