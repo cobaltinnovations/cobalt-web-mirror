@@ -347,8 +347,8 @@ export const MyCalendarScheduling: FC = () => {
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
-	const [activeStart, setActiveStart] = useState<Date>();
-	const [activeEnd, setActiveEnd] = useState<Date>();
+	const [activeStartDate, setActiveStartDate] = useState<string>();
+	const [activeEndDate, setActiveEndDate] = useState<string>();
 
 	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
@@ -365,14 +365,14 @@ export const MyCalendarScheduling: FC = () => {
 				throw new Error('mainCalendarRef.current is undefined');
 			}
 
-			if (!account || !account.providerId || !activeStart || !activeEnd) {
+			if (!account || !account.providerId || !activeStartDate || !activeEndDate) {
 				throw new Error('missing Calendar parameters');
 			}
 
-			const startDate = moment(activeStart).format('YYYY-MM-DD');
-			const endDate = moment(activeEnd).format('YYYY-MM-DD');
-
-			inFlightRequest.current = schedulingService.getCalendar(account.providerId, { startDate, endDate });
+			inFlightRequest.current = schedulingService.getCalendar(account.providerId, {
+				startDate: activeStartDate,
+				endDate: activeEndDate,
+			});
 
 			const { providerCalendar } = await inFlightRequest.current.fetch();
 
@@ -455,7 +455,7 @@ export const MyCalendarScheduling: FC = () => {
 				handleError(error);
 			}
 		}
-	}, [account, activeEnd, activeStart, handleError]);
+	}, [account, activeEndDate, activeStartDate, handleError]);
 
 	const formattedCalendarEvents = useMemo(() => {
 		const formatted = calendarEvents.map((e) => {
@@ -583,6 +583,10 @@ export const MyCalendarScheduling: FC = () => {
 
 							mainCalendarRef.current?.getApi().gotoDate(clickedDate);
 							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
+						}}
+						datesSet={({ start, end }) => {
+							setActiveStartDate(moment(start).format('YYYY-MM-DD'));
+							setActiveEndDate(moment(end).format('YYYY-MM-DD'));
 						}}
 					/>
 				</div>
@@ -726,10 +730,6 @@ export const MyCalendarScheduling: FC = () => {
 					// eventAdd={function(){}}
 					// eventChange={function(){}}
 					// eventRemove={function(){}}
-					datesSet={({ start, end }) => {
-						setActiveStart(start);
-						setActiveEnd(end);
-					}}
 				/>
 			</div>
 
