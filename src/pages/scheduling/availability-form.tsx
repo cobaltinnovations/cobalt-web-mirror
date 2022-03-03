@@ -4,7 +4,7 @@ import { Button, Col, Form } from 'react-bootstrap';
 import { Formik } from 'formik';
 
 import { LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
-import { schedulingService } from '@/lib/services';
+import { PostLogicalAvailabilitiesRequest, schedulingService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
@@ -54,14 +54,21 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 	const handleError = useHandleError();
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
 
+	const hideAppointmentTypes = logicalAvailabilityTypeId === 'BLOCK';
+
 	const fetchData = useCallback(async () => {
 		if (!account || !account.providerId) {
 			throw new Error('account.providerId is undefined');
 		}
 
+		if (hideAppointmentTypes) {
+			setAppointmentTypes([]);
+			return;
+		}
+
 		const appointmentTypesResponse = await schedulingService.getAppointmentTypes(account.providerId).fetch();
 		setAppointmentTypes(appointmentTypesResponse.appointmentTypes);
-	}, [account]);
+	}, [account, hideAppointmentTypes]);
 
 	const handleFormSubmit = useCallback(
 		async (values: AvailabilityFormSchema) => {
@@ -82,14 +89,11 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				: moment(values.startDate).startOf('day');
 			const endTimeMoment = moment(`${values.endTime} ${values.endTimeMeridian}`, 'hh:mm a');
 
-			const appointmentTypeIds = values.typesAccepted === 'all' ? [] : values.appointmentTypes;
-
 			const requestBody = {
 				providerId: account.providerId,
 				startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
 				...(endDay.isValid() && { endDate: endDay.format('YYYY-MM-DD') }),
 				endTime: endTimeMoment.format('HH:mm:ss'),
-				appointmentTypeIds,
 				logicalAvailabilityTypeId,
 				recurrenceTypeId: values.recurring ? ('DAILY' as const) : ('NONE' as const),
 				recurSunday: values.occurance.S,
@@ -100,6 +104,11 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				recurFriday: values.occurance.F,
 				recurSaturday: values.occurance.Sa,
 			};
+
+			if (!hideAppointmentTypes) {
+				(requestBody as PostLogicalAvailabilitiesRequest).appointmentTypeIds =
+					values.typesAccepted === 'all' ? [] : values.appointmentTypes;
+			}
 
 			try {
 				let response;
@@ -116,7 +125,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				handleError(error);
 			}
 		},
-		[account, handleError, logicalAvailabilityId, logicalAvailabilityTypeId, onSuccess]
+		[account, handleError, hideAppointmentTypes, logicalAvailabilityId, logicalAvailabilityTypeId, onSuccess]
 	);
 
 	return (
@@ -207,6 +216,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 							<Form.Group controlId="recurring">
 								<Form.Check
 									id="recurring"
+									checked={values.recurring}
 									className="ml-auto"
 									type="switch"
 									label="Recurring"
@@ -256,74 +266,78 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 								</>
 							)}
 
-							<Form.Group controlId="typesAccepted">
-								<Form.Label style={{ ...fonts.xs }}>Appointment types accepted:</Form.Label>
-								<div>
-									<Form.Check
-										name="typesAccepted"
-										id="all"
-										className="d-inline-block mr-4"
-										bsPrefix="cobalt-modal-form__check"
-										type="radio"
-										label="all"
-										value="all"
-										checked={values.typesAccepted === 'all'}
-										onChange={handleChange}
-									/>
-									<Form.Check
-										name="typesAccepted"
-										id="limited"
-										className="d-inline-block"
-										bsPrefix="cobalt-modal-form__check"
-										type="radio"
-										label="limit to..."
-										value="limited"
-										checked={values.typesAccepted === 'limited'}
-										onChange={handleChange}
-									/>
-								</div>
-							</Form.Group>
-
-							{values.typesAccepted === 'limited' && (
-								<Form.Group controlId="appointmentTypes">
-									{appointmentTypes.map((appointmentType, idx) => {
-										return (
+							{hideAppointmentTypes ? null : (
+								<>
+									<Form.Group controlId="typesAccepted">
+										<Form.Label style={{ ...fonts.xs }}>Appointment types accepted:</Form.Label>
+										<div>
 											<Form.Check
-												key={idx}
-												id={`appointment-type--${appointmentType.appointmentTypeId}`}
+												name="typesAccepted"
+												id="all"
+												className="d-inline-block mr-4"
 												bsPrefix="cobalt-modal-form__check"
-												type="checkbox"
-												name="appointmentTypes"
-												value={appointmentType.appointmentTypeId}
-												label={
-													<AppointmentTypeItem
-														color={appointmentType.hexColor}
-														nickname={appointmentType.name}
-													/>
-												}
-												checked={values.appointmentTypes.includes(
-													appointmentType.appointmentTypeId
-												)}
-												onChange={({ currentTarget }) => {
-													const appointmentTypesClone = cloneDeep(
-														values.appointmentTypes || []
-													);
-
-													if (currentTarget.checked) {
-														appointmentTypesClone.push(currentTarget.value);
-													} else {
-														const indexToRemove = appointmentTypesClone.findIndex(
-															(at) => at === currentTarget.value
-														);
-														appointmentTypesClone.splice(indexToRemove, 1);
-													}
-
-													setFieldValue('appointmentTypes', appointmentTypesClone);
-												}}
+												type="radio"
+												label="all"
+												value="all"
+												checked={values.typesAccepted === 'all'}
+												onChange={handleChange}
 											/>
-										);
-									})}
-								</Form.Group>
+											<Form.Check
+												name="typesAccepted"
+												id="limited"
+												className="d-inline-block"
+												bsPrefix="cobalt-modal-form__check"
+												type="radio"
+												label="limit to..."
+												value="limited"
+												checked={values.typesAccepted === 'limited'}
+												onChange={handleChange}
+											/>
+										</div>
+									</Form.Group>
+
+									{values.typesAccepted === 'limited' && (
+										<Form.Group controlId="appointmentTypes">
+											{appointmentTypes.map((appointmentType, idx) => {
+												return (
+													<Form.Check
+														key={idx}
+														id={`appointment-type--${appointmentType.appointmentTypeId}`}
+														bsPrefix="cobalt-modal-form__check"
+														type="checkbox"
+														name="appointmentTypes"
+														value={appointmentType.appointmentTypeId}
+														label={
+															<AppointmentTypeItem
+																color={appointmentType.hexColor}
+																nickname={appointmentType.name}
+															/>
+														}
+														checked={values.appointmentTypes.includes(
+															appointmentType.appointmentTypeId
+														)}
+														onChange={({ currentTarget }) => {
+															const appointmentTypesClone = cloneDeep(
+																values.appointmentTypes || []
+															);
+
+															if (currentTarget.checked) {
+																appointmentTypesClone.push(currentTarget.value);
+															} else {
+																const indexToRemove = appointmentTypesClone.findIndex(
+																	(at) => at === currentTarget.value
+																);
+																appointmentTypesClone.splice(indexToRemove, 1);
+															}
+
+															setFieldValue('appointmentTypes', appointmentTypesClone);
+														}}
+													/>
+												);
+											})}
+										</Form.Group>
+									)}
+								</>
 							)}
 
 							<div className="mt-4 d-flex flex-row justify-content-between">

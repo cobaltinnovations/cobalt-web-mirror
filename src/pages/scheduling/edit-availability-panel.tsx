@@ -9,13 +9,15 @@ import colors from '@/jss/colors';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface EditAvailabilityPanelProps {
 	logicalAvailabilityId?: string;
-	onClose: () => void;
+	onClose: (didUpdate?: boolean) => void;
 }
 
 export const EditAvailabilityPanel = ({ logicalAvailabilityId, onClose }: EditAvailabilityPanelProps) => {
+	const handleError = useHandleError();
 	const [initialValues, setInitialValues] = useState<AvailabilityFormSchema>();
 
 	const fetchData = useCallback(async () => {
@@ -29,24 +31,50 @@ export const EditAvailabilityPanel = ({ logicalAvailabilityId, onClose }: EditAv
 		setInitialValues(AvailabilityFormDataFromLogicalAvailability(logicalAvailability));
 	}, [logicalAvailabilityId]);
 
+	const onCancel = useCallback(() => {
+		onClose(false);
+	}, [onClose]);
+
+	const onSuccess = useCallback(() => {
+		onClose(true);
+	}, [onClose]);
+
+	const onDelete = useCallback(() => {
+		if (!logicalAvailabilityId || !window.confirm('Confirm Deleting this availability?')) {
+			return;
+		}
+
+		schedulingService
+			.deleteLogicalAvailabilitiy(logicalAvailabilityId)
+			.fetch()
+			.then(() => {
+				onSuccess();
+			})
+			.catch((e) => {
+				handleError(e);
+			});
+	}, [handleError, logicalAvailabilityId, onSuccess]);
+
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<Button variant="link" size="sm" className="p-0" onClick={onClose}>
+				<Button variant="link" size="sm" className="p-0" onClick={onCancel}>
 					<ChevronLeftIcon fill={colors.primary} className="mr-1" />
 					back
 				</Button>
-				<Button variant="link" size="sm" className="p-0" onClick={onClose}>
+				<Button variant="link" size="sm" className="p-0" onClick={onCancel}>
 					<CloseIcon />
 				</Button>
 			</div>
 
 			<AsyncPage fetchData={fetchData} showBackButton={false} showRetryButton={false}>
 				<div className="d-flex align-items-center justify-content-between py-4">
-					<h5 className="m-0">Edit availability</h5>
-					<Button variant="link" size="sm" className="text-danger p-0" onClick={onClose}>
-						delete
-					</Button>
+					<h5 className="m-0">{logicalAvailabilityId ? 'Edit' : 'New'} availability</h5>
+					{logicalAvailabilityId && (
+						<Button variant="link" size="sm" className="text-danger p-0" onClick={onDelete}>
+							delete
+						</Button>
+					)}
 				</div>
 
 				<AvailabilityForm
@@ -54,7 +82,7 @@ export const EditAvailabilityPanel = ({ logicalAvailabilityId, onClose }: EditAv
 					logicalAvailabilityTypeId="OPEN"
 					initialValues={initialValues}
 					onBack={onClose}
-					onSuccess={onClose}
+					onSuccess={onSuccess}
 				/>
 			</AsyncPage>
 		</div>

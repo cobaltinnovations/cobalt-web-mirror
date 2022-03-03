@@ -20,12 +20,12 @@ interface PostApointmentTypeRequest {
 	screeningQuestions: ScreeningQuestion[];
 }
 
-interface PostLogicalAvailabilitiesRequest {
+export interface PostLogicalAvailabilitiesRequest {
 	providerId: string;
 	startDateTime: string;
 	endDate?: string;
 	endTime: string;
-	appointmentTypeIds: string[];
+	appointmentTypeIds?: string[];
 	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
 	recurrenceTypeId: 'NONE' | 'DAILY';
 	recurSunday: boolean;
