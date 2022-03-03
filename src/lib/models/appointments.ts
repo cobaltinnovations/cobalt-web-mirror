@@ -12,6 +12,7 @@ export interface AppointmentType {
 	name: string;
 	visitTypeId: string;
 	hexColor: string;
+	assessmentId?: string;
 }
 
 export interface EpicDepartment {

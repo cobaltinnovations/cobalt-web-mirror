@@ -176,6 +176,7 @@ const ConnectWithSupport: FC = () => {
 		setIsEligible,
 		preserveFilters,
 		setPreserveFilters,
+		selectedAppointmentType,
 	} = useContext(BookingContext);
 	const [searchQuery, setSearchQuery] = useState('');
 
@@ -507,7 +508,7 @@ const ConnectWithSupport: FC = () => {
 			navigateToEhrLookup();
 		} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
 			navigateToIntakeAssessment(provider);
-		} else if (provider?.intakeAssessmentRequired) {
+		} else if (provider?.intakeAssessmentRequired || !!selectedAppointmentType?.assessmentId) {
 			setShowConfirmIntakeAssessmentModal(true);
 		} else if (promptForInfo || promptForEmail || promptForPhoneNumber) {
 			setShowCollectInfoModal(true);
@@ -686,11 +687,9 @@ const ConnectWithSupport: FC = () => {
 					setShowConfirmAppointmentTypeModal(false);
 				}}
 				onConfirm={(appointmentTypeId) => {
-					const selectedAppointmentType = appointmentTypes.find(
-						(aT) => appointmentTypeId === aT.appointmentTypeId
-					);
+					const confirmedApptType = appointmentTypes.find((aT) => appointmentTypeId === aT.appointmentTypeId);
 
-					if (selectedAppointmentType && selectedAppointmentType.visitTypeId === 'FOLLOWUP') {
+					if (confirmedApptType && confirmedApptType.visitTypeId === 'FOLLOWUP') {
 						if (
 							!window.confirm(
 								'Do you understand that this appointment is reserved for individuals that have met with this provider before?'
@@ -1109,15 +1108,15 @@ const ConnectWithSupport: FC = () => {
 															setPromptForPhoneNumber(needsPhoneNumber);
 
 															if (provider.appointmentTypeIds.length === 1) {
-																const selectedAppointmentType = appointmentTypes.find(
+																const confirmedApptType = appointmentTypes.find(
 																	(aT) =>
 																		aT.appointmentTypeId ===
 																		provider.appointmentTypeIds[0]
 																);
 
 																if (
-																	selectedAppointmentType &&
-																	selectedAppointmentType.visitTypeId === 'FOLLOWUP'
+																	confirmedApptType &&
+																	confirmedApptType.visitTypeId === 'FOLLOWUP'
 																) {
 																	if (
 																		!window.confirm(
@@ -1129,7 +1128,7 @@ const ConnectWithSupport: FC = () => {
 																}
 
 																setSelectedAppointmentTypeId(
-																	selectedAppointmentType?.appointmentTypeId
+																	confirmedApptType?.appointmentTypeId
 																);
 																continueBookingProcess(
 																	provider,

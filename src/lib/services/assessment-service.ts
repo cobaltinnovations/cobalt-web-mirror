@@ -99,7 +99,19 @@ export const assessmentService = {
 	/* ----------------------------------------------------------- */
 	/* Intake assessment */
 	/* ----------------------------------------------------------- */
-	getIntakeAssessmentQuestion(providerId?: string, questionId?: string, sessionId?: string, groupSessionId?: string) {
+	getIntakeAssessmentQuestion({
+		providerId,
+		questionId,
+		sessionId,
+		groupSessionId,
+		appointmentTypeId,
+	}: {
+		providerId?: string;
+		questionId?: string;
+		sessionId?: string;
+		groupSessionId?: string;
+		appointmentTypeId?: string;
+	}) {
 		if (providerId && groupSessionId) {
 			throw new Error('Only provide a providerId or a groupSessionId, not both.');
 		}
@@ -120,6 +132,10 @@ export const assessmentService = {
 
 		if (sessionId) {
 			searchParams.set('sessionId', sessionId);
+		}
+
+		if (appointmentTypeId) {
+			searchParams.set('appointmentTypeId', appointmentTypeId);
 		}
 
 		return httpSingleton.orchestrateRequest<AssessmentResponse>({

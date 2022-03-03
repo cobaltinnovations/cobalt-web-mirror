@@ -28,6 +28,7 @@ const IntakeAssessment: FC = () => {
 	const groupSessionId = query.get('groupSessionId') || '';
 	const questionId = query.get('questionId') || '';
 	const sessionId = query.get('sessionId') || '';
+	const appointmentTypeId = query.get('appointmentTypeId') || '';
 	const { account, setAccount } = useAccount();
 
 	const [isSavingInfo, setIsSavingInfo] = useState(false);
@@ -72,11 +73,15 @@ const IntakeAssessment: FC = () => {
 		let response;
 
 		if (providerId) {
-			response = await assessmentService.getIntakeAssessmentQuestion(providerId, questionId, sessionId).fetch();
+			response = await assessmentService
+				.getIntakeAssessmentQuestion({ appointmentTypeId, providerId, questionId, sessionId })
+				.fetch();
 
 			setIsGroupSessionAssessment(false);
 		} else if (groupSessionId) {
-			response = await assessmentService.getIntakeAssessmentQuestion(undefined, questionId, sessionId, groupSessionId).fetch();
+			response = await assessmentService
+				.getIntakeAssessmentQuestion({ questionId, sessionId, groupSessionId })
+				.fetch();
 
 			setIsGroupSessionAssessment(true);
 		} else {
@@ -89,7 +94,7 @@ const IntakeAssessment: FC = () => {
 
 		setAssessment(response.assessment);
 		setSelectedQuestionAnswers(response.assessment.question.selectedAssessmentAnswers);
-	}, [groupSessionId, providerId, questionId, sessionId]);
+	}, [appointmentTypeId, groupSessionId, providerId, questionId, sessionId]);
 
 	const submitAnswers = async (assessmentAnswers: SelectedQuestionAnswer[]) => {
 		if (!assessment) {

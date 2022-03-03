@@ -1,7 +1,7 @@
 import moment, { Moment } from 'moment';
 import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback } from 'react';
 import { FilterDays } from '@/components/filter-days-modal';
-import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot } from '@/lib/models';
+import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
 
@@ -84,6 +84,7 @@ interface BookingState {
 	preserveFilters: boolean;
 	setPreserveFilters: Dispatch<SetStateAction<boolean>>;
 	getFiltersQueryString: () => string;
+	selectedAppointmentType?: AppointmentType;
 }
 
 const BookingContext = createContext({} as BookingState);
@@ -203,6 +204,14 @@ const BookingProvider: FC = (props) => {
 		]
 	);
 
+	const selectedAppointmentType = useMemo(() => {
+		if (!selectedAppointmentTypeId) {
+			return;
+		}
+
+		return appointmentTypes.find((aT) => aT.appointmentTypeId === selectedAppointmentTypeId);
+	}, [appointmentTypes, selectedAppointmentTypeId]);
+
 	return (
 		<BookingContext.Provider
 			value={{
@@ -259,6 +268,7 @@ const BookingProvider: FC = (props) => {
 				preserveFilters,
 				setPreserveFilters,
 				getFiltersQueryString,
+				selectedAppointmentType,
 			}}
 		>
 			{props.children}
