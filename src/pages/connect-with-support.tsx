@@ -503,12 +503,12 @@ const ConnectWithSupport: FC = () => {
 		});
 	}
 
-	function continueBookingProcess(provider?: Provider, promptForInfo = false) {
+	function continueBookingProcess(provider?: Provider, requireAssessment = false, promptForInfo = false) {
 		if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
 			navigateToEhrLookup();
 		} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
 			navigateToIntakeAssessment(provider);
-		} else if (provider?.intakeAssessmentRequired || !!selectedAppointmentType?.assessmentId) {
+		} else if (provider?.intakeAssessmentRequired || requireAssessment) {
 			setShowConfirmIntakeAssessmentModal(true);
 		} else if (promptForInfo || promptForEmail || promptForPhoneNumber) {
 			setShowCollectInfoModal(true);
@@ -701,7 +701,7 @@ const ConnectWithSupport: FC = () => {
 
 					setSelectedAppointmentTypeId(appointmentTypeId);
 					setShowConfirmAppointmentTypeModal(false);
-					continueBookingProcess(selectedProvider);
+					continueBookingProcess(selectedProvider, !!confirmedApptType?.assessmentId);
 				}}
 			/>
 
@@ -1132,6 +1132,7 @@ const ConnectWithSupport: FC = () => {
 																);
 																continueBookingProcess(
 																	provider,
+																	!!confirmedApptType?.assessmentId,
 																	needsEmail || needsPhoneNumber
 																);
 															} else {
