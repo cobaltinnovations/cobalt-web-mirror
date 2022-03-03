@@ -324,20 +324,26 @@ enum MainCalendarView {
 	Month = 'dayGridMonth',
 }
 
+enum CalendarSidebar {
+	ManageAvailability,
+	EditAvailability,
+	EditTimeBlock,
+	ViewAvailability,
+	NewAppointment,
+	ViewAppointment,
+}
+
 export const MyCalendarScheduling: FC = () => {
 	const handleError = useHandleError();
 	const classes = useContainerStyles();
 	const { account } = useAccount();
 
 	const [accordionExpanded, setAccordionExpanded] = useState(false);
-	const [managingAvailability, setManagingAvailability] = useState(false);
-	const [editingAvailability, setEditingAvailability] = useState(false);
-	const [editingTimeBlock, setEditingTimeBlock] = useState(false);
-	const [addingAppointment, setAddingAppointment] = useState(false);
-	const [selectedAvailability, setSelectedAvailability] = useState<typeof MOCK_AVAILABILITIES>();
+	const [activeSidebar, setActiveSidebar] = useState<CalendarSidebar | null>(null);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
 	const [selectedAppointment, setSelectedAppointment] = useState<any>();
 
+	const [logicalAvailabilityIdToView, setLogicalAvailabilityIdToView] = useState<string>();
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
@@ -376,6 +382,7 @@ export const MyCalendarScheduling: FC = () => {
 					end: availability.endDateTime,
 					display: 'background',
 					extendedProps: {
+						logicalAvailabilityId: availability.logicalAvailabilityId,
 						isAvailability: true,
 					},
 				};
@@ -478,14 +485,7 @@ export const MyCalendarScheduling: FC = () => {
 		};
 	}, [fetchData]);
 
-	const sidebarToggled =
-		managingAvailability ||
-		editingAvailability ||
-		editingTimeBlock ||
-		addingAppointment ||
-		selectedAvailability ||
-		selectedAppointment ||
-		followupPatientList.length > 0;
+	const sidebarToggled = followupPatientList.length > 0;
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -557,8 +557,14 @@ export const MyCalendarScheduling: FC = () => {
 							...formattedCalendarEvents,
 							{
 								id: 'current-week',
-								start: moment().startOf('week').weekday(0).toDate(),
-								end: moment().startOf('week').weekday(7).toDate(),
+								start: moment(leftCalendarRef.current?.getApi().getDate())
+									.startOf('week')
+									.weekday(0)
+									.toDate(),
+								end: moment(leftCalendarRef.current?.getApi().getDate())
+									.startOf('week')
+									.weekday(7)
+									.toDate(),
 								display: 'background',
 								allDay: true,
 								backgroundColor: colors.secondary,
@@ -619,7 +625,7 @@ export const MyCalendarScheduling: FC = () => {
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setAddingAppointment(true);
+							setActiveSidebar(CalendarSidebar.NewAppointment);
 						}}
 					>
 						new appointment
@@ -630,7 +636,7 @@ export const MyCalendarScheduling: FC = () => {
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setManagingAvailability(true);
+							setActiveSidebar(CalendarSidebar.ManageAvailability);
 						}}
 					>
 						manage availability
@@ -694,7 +700,8 @@ export const MyCalendarScheduling: FC = () => {
 							setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
 						} else if (clickInfo.event.extendedProps.isAvailability) {
-							setSelectedAvailability(true as any);
+							setLogicalAvailabilityIdToView(clickInfo.event.extendedProps.logicalAvailabilityId);
+							setActiveSidebar(CalendarSidebar.ViewAvailability);
 							return;
 						} else if (clickInfo.event.extendedProps.isBlockedTime) {
 							return;
@@ -721,77 +728,98 @@ export const MyCalendarScheduling: FC = () => {
 				/>
 			</div>
 
-			{sidebarToggled && (
+			{(sidebarToggled || activeSidebar !== null) && (
 				<div className={classNames('px-5 h-100', classes.sideBar)}>
-					{editingAvailability ? (
-						<EditAvailabilityPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={() => {
-								setLogicalAvailabilityIdToEdit(undefined);
-								setEditingAvailability(false);
-								fetchData();
-							}}
-						/>
-					) : selectedAvailability ? (
-						<SelectedAvailabilityPanel
-							onEditAvailability={() => {
-								setEditingAvailability(true);
-							}}
-							onClose={() => {
-								setSelectedAvailability(false as any);
-								fetchData();
-							}}
-						/>
-					) : editingTimeBlock ? (
-						<EditUnavailableTimeBlockPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={() => {
-								setLogicalAvailabilityIdToEdit(undefined);
-								setEditingTimeBlock(false);
-								fetchData();
-							}}
-						/>
-					) : addingAppointment ? (
-						<AddAppointmentPanel
-							onClose={() => {
-								setAddingAppointment(false);
-								fetchData();
-							}}
-						/>
-					) : managingAvailability ? (
+					{activeSidebar === CalendarSidebar.ManageAvailability && (
 						<ManageAvailabilityPanel
 							onEditAvailability={(logicalAvailabilityId) => {
 								if (logicalAvailabilityId) {
 									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
 								}
-								setEditingAvailability(true);
+								setActiveSidebar(CalendarSidebar.EditAvailability);
 							}}
 							onEditTimeBlock={(logicalAvailabilityId) => {
 								if (logicalAvailabilityId) {
 									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
 								}
-								setEditingTimeBlock(true);
+								setActiveSidebar(CalendarSidebar.EditTimeBlock);
 							}}
 							onClose={() => {
-								setManagingAvailability(false);
-								fetchData();
+								setActiveSidebar(null);
 							}}
 						/>
-					) : followupPatientList.length > 0 ? (
-						<FollowUpsListPanel
+					)}
+
+					{activeSidebar === CalendarSidebar.EditAvailability && (
+						<EditAvailabilityPanel
+							logicalAvailabilityId={logicalAvailabilityIdToEdit}
+							onClose={(didUpdate) => {
+								setLogicalAvailabilityIdToEdit(undefined);
+
+								if (logicalAvailabilityIdToView) {
+									setActiveSidebar(CalendarSidebar.ViewAvailability);
+								} else {
+									setActiveSidebar(CalendarSidebar.ManageAvailability);
+								}
+
+								if (didUpdate) {
+									fetchData();
+								}
+							}}
+						/>
+					)}
+
+					{activeSidebar === CalendarSidebar.EditTimeBlock && (
+						<EditUnavailableTimeBlockPanel
+							logicalAvailabilityId={logicalAvailabilityIdToEdit}
+							onClose={(didUpdate) => {
+								setLogicalAvailabilityIdToEdit(undefined);
+								setActiveSidebar(CalendarSidebar.ManageAvailability);
+
+								if (didUpdate) {
+									fetchData();
+								}
+							}}
+						/>
+					)}
+
+					{activeSidebar === CalendarSidebar.ViewAvailability && (
+						<SelectedAvailabilityPanel
+							onEditAvailability={() => {
+								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
+								setActiveSidebar(CalendarSidebar.EditAvailability);
+							}}
 							onClose={() => {
-								setFollowupPatientList([]);
-								fetchData();
+								setLogicalAvailabilityIdToView(undefined);
+								setActiveSidebar(null);
 							}}
 						/>
-					) : selectedAppointment ? (
+					)}
+
+					{activeSidebar === CalendarSidebar.NewAppointment && (
+						<AddAppointmentPanel
+							onClose={() => {
+								setActiveSidebar(null);
+							}}
+						/>
+					)}
+
+					{activeSidebar === CalendarSidebar.ViewAppointment && (
 						<SelectedAppointmentPanel
 							onAddAppointment={() => {
-								setAddingAppointment(true);
+								setActiveSidebar(CalendarSidebar.NewAppointment);
 							}}
 							onClose={() => {
 								setSelectedAppointment(null);
 								fetchData();
+							}}
+						/>
+					)}
+
+					{followupPatientList.length > 0 ? (
+						<FollowUpsListPanel
+							onClose={() => {
+								setFollowupPatientList([]);
 							}}
 						/>
 					) : null}
