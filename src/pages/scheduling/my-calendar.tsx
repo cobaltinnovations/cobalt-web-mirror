@@ -712,6 +712,7 @@ export const MyCalendarScheduling: FC = () => {
 							onClose={() => {
 								setLogicalAvailabilityIdToEdit(undefined);
 								setEditingAvailability(false);
+								fetchData();
 							}}
 						/>
 					) : selectedAvailability ? (
@@ -721,6 +722,7 @@ export const MyCalendarScheduling: FC = () => {
 							}}
 							onClose={() => {
 								setSelectedAvailability(false as any);
+								fetchData();
 							}}
 						/>
 					) : editingTimeBlock ? (
@@ -729,12 +731,14 @@ export const MyCalendarScheduling: FC = () => {
 							onClose={() => {
 								setLogicalAvailabilityIdToEdit(undefined);
 								setEditingTimeBlock(false);
+								fetchData();
 							}}
 						/>
 					) : addingAppointment ? (
 						<AddAppointmentPanel
 							onClose={() => {
 								setAddingAppointment(false);
+								fetchData();
 							}}
 						/>
 					) : managingAvailability ? (
@@ -753,12 +757,14 @@ export const MyCalendarScheduling: FC = () => {
 							}}
 							onClose={() => {
 								setManagingAvailability(false);
+								fetchData();
 							}}
 						/>
 					) : followupPatientList.length > 0 ? (
 						<FollowUpsListPanel
 							onClose={() => {
 								setFollowupPatientList([]);
+								fetchData();
 							}}
 						/>
 					) : selectedAppointment ? (
@@ -768,6 +774,7 @@ export const MyCalendarScheduling: FC = () => {
 							}}
 							onClose={() => {
 								setSelectedAppointment(null);
+								fetchData();
 							}}
 						/>
 					) : null}
