@@ -11,7 +11,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import { Formik } from 'formik';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import React, { FC, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Dropdown, Form } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
@@ -350,6 +350,7 @@ export const MyCalendarScheduling: FC = () => {
 	const [activeStart, setActiveStart] = useState<Date>();
 	const [activeEnd, setActiveEnd] = useState<Date>();
 
+	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
 	const inFlightRequest = useRef<ReturnType<typeof schedulingService['getCalendar']>>();
@@ -477,6 +478,23 @@ export const MyCalendarScheduling: FC = () => {
 		return formatted;
 	}, [calendarEvents, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent]);
 
+	const leftCalendarEvents = useMemo(() => {
+		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
+		const end = start.clone().weekday(7);
+
+		return [
+			...formattedCalendarEvents,
+			{
+				id: 'current-week',
+				start: start.toDate(),
+				end: end.toDate(),
+				display: 'background',
+				allDay: true,
+				backgroundColor: colors.secondary,
+			},
+		];
+	}, [formattedCalendarEvents, leftCalendarMoment]);
+
 	useEffect(() => {
 		fetchData();
 
@@ -553,31 +571,18 @@ export const MyCalendarScheduling: FC = () => {
 						height="auto"
 						plugins={[dayGridPlugin, interactionPlugin]}
 						initialView={MainCalendarView.Month}
-						events={[
-							...formattedCalendarEvents,
-							{
-								id: 'current-week',
-								start: moment(leftCalendarRef.current?.getApi().getDate())
-									.startOf('week')
-									.weekday(0)
-									.toDate(),
-								end: moment(leftCalendarRef.current?.getApi().getDate())
-									.startOf('week')
-									.weekday(7)
-									.toDate(),
-								display: 'background',
-								allDay: true,
-								backgroundColor: colors.secondary,
-							},
-						]}
+						events={leftCalendarEvents}
 						headerToolbar={{
 							left: 'title prev next',
 							right: 'today',
 						}}
 						dateClick={(clickInfo) => {
-							if (mainCalendarRef.current) {
-								mainCalendarRef.current.getApi().gotoDate(clickInfo.date);
-							}
+							const clickedDate = clickInfo.date;
+
+							setLeftCalendarMoment(moment(clickedDate));
+
+							mainCalendarRef.current?.getApi().gotoDate(clickedDate);
+							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
 						}}
 					/>
 				</div>
