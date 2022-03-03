@@ -23,7 +23,8 @@ interface PostApointmentTypeRequest {
 interface PostLogicalAvailabilitiesRequest {
 	providerId: string;
 	startDateTime: string;
-	endDateTime?: string;
+	endDate?: string;
+	endTime: string;
 	appointmentTypeIds: string[];
 	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
 	recurrenceTypeId: 'NONE' | 'DAILY';

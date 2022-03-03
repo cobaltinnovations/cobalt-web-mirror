@@ -130,7 +130,7 @@ export const ManageAvailabilityPanel = ({
 									<div className="d-flex align-items-center justify-content-between">
 										<p className="m-0 font-karla-bold">
 											{logicalAvailability.startDateTimeDescription}{' '}
-											{logicalAvailability.endDateTimeDescription}
+											{logicalAvailability.endDateDescription}
 										</p>
 										<Button
 											variant="link"
@@ -170,7 +170,7 @@ export const ManageAvailabilityPanel = ({
 									<div className="d-flex align-items-center justify-content-between">
 										<p className="m-0 font-karla-bold">
 											{logicalAvailability.startDateTimeDescription}{' '}
-											{logicalAvailability.endDateTimeDescription}
+											{logicalAvailability.endDateDescription}
 										</p>
 										<Button
 											variant="link"

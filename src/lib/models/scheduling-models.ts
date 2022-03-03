@@ -1,16 +1,28 @@
-import { AppointmentModel, FollowupModel, LogicalAvailability } from '@/lib/models';
+import { AppointmentModel, AppointmentType, FollowupModel } from '@/lib/models';
 
 export interface SchedulingAppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
 	visitTypeId: string;
+	acuityAppointmentTypeId: string;
+	epicVisitTypeId: string;
+	epicVisitTypeIdType: string;
 	name: string;
+	description: string;
 	durationInMinutes: number;
 	durationInMinutesDescription: string;
 	hexColor: string;
 	assessmentId: string;
 	patientIntakeQuestions: PatientIntakeQuestion[];
 	screeningQuestions: ScreeningQuestion[];
+}
+
+export interface SchedulingAvailability {
+	appointmentTypes: AppointmentType[];
+	endDateTime: string;
+	endDateTimeDescription: string;
+	startDateTime: string;
+	startDateTimeDescription: string;
 }
 
 export interface PatientIntakeQuestion {
@@ -26,8 +38,8 @@ export interface ScreeningQuestion {
 
 export interface ProviderCalendar {
 	providerId: string;
-	availabilities: LogicalAvailability[];
-	blocks: Omit<LogicalAvailability, 'appointmentTypes'>[];
+	availabilities: SchedulingAvailability[];
+	blocks: Omit<SchedulingAvailability, 'appointmentTypes'>[];
 	followups: FollowupModel[];
 	appointments: AppointmentModel[];
 }

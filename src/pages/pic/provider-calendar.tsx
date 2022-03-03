@@ -22,7 +22,15 @@ import { appointmentService, providerService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
 import Select from '@/components/select';
-import { AppointmentType, LogicalAvailability, AvailabilityTimeSlot, AppointmentModel, AppointmentReason, FollowupModel, AccountModel } from '@/lib/models';
+import {
+	AppointmentType,
+	LogicalAvailability,
+	AvailabilityTimeSlot,
+	AppointmentModel,
+	AppointmentReason,
+	FollowupModel,
+	AccountModel,
+} from '@/lib/models';
 import DatePicker from '@/components/date-picker';
 import { ERROR_CODES } from '@/lib/http-client';
 import ScheduleOnCalendar, { ColoredAppointmentReason } from './schedule-on-calendar';
@@ -274,13 +282,20 @@ const AppointmentList = forwardRef<
 
 					return (
 						<div key={timeslot.time} className="py-2">
-							<div className={classNames('d-inline-block bg-secondary text-white px-3 py-1', classes.slotTime)}>
+							<div
+								className={classNames(
+									'd-inline-block bg-secondary text-white px-3 py-1',
+									classes.slotTime
+								)}
+							>
 								{timeSlotMoment.format('h:mma')}
 							</div>
 
 							<div className="mx-2">
 								<CalendarSlotCard
-									selected={timeslot.appointment && timeslot.appointment.appointmentId === selectedSlotId}
+									selected={
+										timeslot.appointment && timeslot.appointment.appointmentId === selectedSlotId
+									}
 									onClick={() => {
 										if (!!timeslot.appointment?.account) {
 											onSelectSlot(timeslot.appointment.appointmentId);
@@ -302,7 +317,13 @@ const AppointmentList = forwardRef<
 									}}
 									available={!timeslot.appointment}
 									patientName={timeslot.appointment?.account?.displayName}
-									time={timeslot.appointment ? `${appointmentStartMoment.format('H:mma')} - ${appointmentEndMoment.format('H:mma')}` : ''}
+									time={
+										timeslot.appointment
+											? `${appointmentStartMoment.format(
+													'H:mma'
+											  )} - ${appointmentEndMoment.format('H:mma')}`
+											: ''
+									}
 									reason={timeslot.appointment?.appointmentReason}
 								/>
 							</div>
@@ -424,7 +445,13 @@ const CalendarMonthView: FC<{
 								const showDate = day.month() === month.month();
 								const isSelected = selectedDay?.isSame(day);
 
-								return <CalendarDayCell key={dayIndex} onSelect={onDaySelect} {...{ showDate, day, isSelected }} />;
+								return (
+									<CalendarDayCell
+										key={dayIndex}
+										onSelect={onDaySelect}
+										{...{ showDate, day, isSelected }}
+									/>
+								);
 							})}
 						</tr>
 					);
@@ -434,7 +461,10 @@ const CalendarMonthView: FC<{
 	);
 };
 
-const CalendarDaySelect: FC<{ selectedDay?: moment.Moment; onDaySelect: (dayMoment: moment.Moment) => void }> = ({ selectedDay, onDaySelect }) => {
+const CalendarDaySelect: FC<{ selectedDay?: moment.Moment; onDaySelect: (dayMoment: moment.Moment) => void }> = ({
+	selectedDay,
+	onDaySelect,
+}) => {
 	const [thisMonth, nextMonth] = useMemo(() => {
 		const currentMonth = moment().startOf('month');
 		const nextMonth = currentMonth.clone().add(1, 'month');
@@ -454,7 +484,10 @@ const CalendarDaySelect: FC<{ selectedDay?: moment.Moment; onDaySelect: (dayMome
 	);
 };
 
-const SelectedWeek: FC<{ day?: moment.Moment; onDaySelect: (dayMoment: moment.Moment) => void }> = ({ day, onDaySelect }) => {
+const SelectedWeek: FC<{ day?: moment.Moment; onDaySelect: (dayMoment: moment.Moment) => void }> = ({
+	day,
+	onDaySelect,
+}) => {
 	const classes = useStyles();
 	const week = useMemo(() => {
 		if (!day) {
@@ -477,7 +510,14 @@ const SelectedWeek: FC<{ day?: moment.Moment; onDaySelect: (dayMoment: moment.Mo
 					{week.map((weekDay, dayIndex) => {
 						const isSelected = weekDay.isSame(day);
 
-						return <CalendarDayCell key={dayIndex} showDate onSelect={onDaySelect} {...{ day: weekDay, isSelected }} />;
+						return (
+							<CalendarDayCell
+								key={dayIndex}
+								showDate
+								onSelect={onDaySelect}
+								{...{ day: weekDay, isSelected }}
+							/>
+						);
 					})}
 				</tr>
 			</tbody>
@@ -521,7 +561,10 @@ const SelectedWeekHeader: FC<{
 	);
 };
 
-const AvailabilityCard: FC<{ availability: LogicalAvailability; onDelete: (id: string) => void }> = ({ availability, onDelete }) => {
+const AvailabilityCard: FC<{ availability: LogicalAvailability; onDelete: (id: string) => void }> = ({
+	availability,
+	onDelete,
+}) => {
 	const classes = useStyles();
 	const startTime = useMemo(() => {
 		const startMoment = moment(availability.startDateTime);
@@ -529,9 +572,9 @@ const AvailabilityCard: FC<{ availability: LogicalAvailability; onDelete: (id: s
 	}, [availability.startDateTime]);
 
 	const endTime = useMemo(() => {
-		const endMoment = moment(availability.endDateTime);
+		const endMoment = moment(`${availability.endDate}T${availability.endTime}`);
 		return endMoment.minutes() ? endMoment.format('h:ma') : endMoment.format('ha').slice(0, -1);
-	}, [availability.endDateTime]);
+	}, [availability.endDate, availability.endTime]);
 
 	const appointmentTypes = useMemo(() => {
 		return availability.appointmentTypes.map((aT) => aT.name).join(',');
@@ -644,7 +687,9 @@ const CalendarAvailabilities: FC<{
 							.deleteLogicalAvailability(availabilityId)
 							.fetch()
 							.then(() => {
-								setAvailabilities(availabilities.filter((a) => a.logicalAvailabilityId !== availabilityId));
+								setAvailabilities(
+									availabilities.filter((a) => a.logicalAvailabilityId !== availabilityId)
+								);
 							})
 							.catch((e) => {
 								if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -805,7 +850,11 @@ const AddCalendarAvailability: FC<{
 				{(formikBag) => {
 					const { values, setFieldValue, handleChange, handleSubmit } = formikBag;
 					const isValid =
-						!!values.appointmentType && !!values.startTime && !!values.startTimeMeridian && !!values.endTime && !!values.endTimeMeridian;
+						!!values.appointmentType &&
+						!!values.startTime &&
+						!!values.startTimeMeridian &&
+						!!values.endTime &&
+						!!values.endTimeMeridian;
 					return (
 						<Form onSubmit={handleSubmit}>
 							<Form.Group controlId="appointmentType" className="mb-3">
@@ -1003,7 +1052,11 @@ const PicProviderCalendar: FC = () => {
 						</Col>
 						{activeView !== CalendarViews.CreateAppointment && (
 							<Col xs={4} md={8} className="text-right">
-								<Button size="sm" className="my-2 mx-3" onClick={() => setActiveView(CalendarViews.CreateAppointment)}>
+								<Button
+									size="sm"
+									className="my-2 mx-3"
+									onClick={() => setActiveView(CalendarViews.CreateAppointment)}
+								>
 									Schedule
 								</Button>
 							</Col>
@@ -1046,24 +1099,27 @@ const PicProviderCalendar: FC = () => {
 							/>
 						</Col>
 						<Col xs={12} md={8}>
-							{activeView === CalendarViews.Day && selectedPatient && patientDisposition && !!patientDisposition.id && (
-								<div className="my-6 mx-6 py-6">
-									<PatientDetailView
-										selectedDispositionId={selectedPatient?.accountId}
-										disposition={patientDisposition}
-										onCloseClick={() => {
-											setSelectedPatient(undefined);
-											setPatientDisposition(undefined);
-											setSelectedSlotId('');
-										}}
-										onScheduleChange={() => {
-											if (apptListCtrlRef.current) {
-												apptListCtrlRef.current.fetchSchedule();
-											}
-										}}
-									/>
-								</div>
-							)}
+							{activeView === CalendarViews.Day &&
+								selectedPatient &&
+								patientDisposition &&
+								!!patientDisposition.id && (
+									<div className="my-6 mx-6 py-6">
+										<PatientDetailView
+											selectedDispositionId={selectedPatient?.accountId}
+											disposition={patientDisposition}
+											onCloseClick={() => {
+												setSelectedPatient(undefined);
+												setPatientDisposition(undefined);
+												setSelectedSlotId('');
+											}}
+											onScheduleChange={() => {
+												if (apptListCtrlRef.current) {
+													apptListCtrlRef.current.fetchSchedule();
+												}
+											}}
+										/>
+									</div>
+								)}
 
 							{activeView === CalendarViews.CreateAppointment && (
 								<ScheduleOnCalendar

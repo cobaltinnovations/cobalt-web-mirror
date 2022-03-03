@@ -107,7 +107,7 @@ export const AppointmentTypeFormModal = ({
 
 			setTitle(appointmentType.name);
 			setColor(appointmentType.hexColor);
-			setNickname('');
+			setNickname(appointmentType.description);
 
 			if (
 				appointmentType.durationInMinutes === 30 ||
