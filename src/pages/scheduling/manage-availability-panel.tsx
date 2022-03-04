@@ -128,10 +128,15 @@ export const ManageAvailabilityPanel = ({
 							return (
 								<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
 									<div className="d-flex align-items-center justify-content-between">
-										<p className="m-0 font-karla-bold">
-											{logicalAvailability.startDateTimeDescription}{' '}
-											{logicalAvailability.endDateDescription}
-										</p>
+										<div>
+											{logicalAvailability.descriptionComponents?.map((description, index) => {
+												return (
+													<p key={index} className="m-0 font-karla-bold">
+														{description}
+													</p>
+												);
+											})}
+										</div>
 										<Button
 											variant="link"
 											size="sm"

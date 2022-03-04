@@ -35,6 +35,7 @@ export interface LogicalAvailability {
 	recurFriday: boolean;
 	recurSaturday: boolean;
 	appointmentTypes: AppointmentType[];
+	descriptionComponents: string[];
 }
 
 export interface PaymentType {
