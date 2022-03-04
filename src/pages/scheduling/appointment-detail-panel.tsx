@@ -1,14 +1,59 @@
-import useHandleError from '@/hooks/use-handle-error';
-import { AccountModel, AppointmentModel } from '@/lib/models';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
+
+import { AccountModel, AppointmentModel, PersonalizationDetails } from '@/lib/models';
+
+import useHandleError from '@/hooks/use-handle-error';
+
+import { ERROR_CODES } from '@/lib/http-client';
+import { accountService, appointmentService } from '@/lib/services';
+
+import { CopyToClipboardButton } from './copy-to-clipboard-button';
+
+import { createUseStyles } from 'react-jss';
+import classNames from 'classnames';
+import { useSchedulingStyles } from './use-scheduling-styles';
+import colors from '@/jss/colors';
+
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { accountService, appointmentService } from '@/lib/services';
-import { ERROR_CODES } from '@/lib/http-client';
-import { CopyToClipboardButton } from './copy-to-clipboard-button';
-import { useSchedulingStyles } from './use-scheduling-styles';
+import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
+import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
+import { AppointmentTypeItem } from './appointment-type-item';
+
+const useStyles = createUseStyles({
+	appointmentsList: {
+		padding: 0,
+		margin: 0,
+		'& li': {
+			padding: '10px 15px',
+		},
+		'& li:nth-child(odd)': {
+			backgroundColor: colors.gray200,
+		},
+	},
+	attendedButton: {
+		color: colors.success,
+		borderColor: colors.success,
+		'& path, & polygon#Shape': {
+			fill: 'currentColor',
+		},
+		'&:focus': {
+			outline: 'none',
+		},
+	},
+	noShowButton: {
+		color: colors.danger,
+		borderColor: colors.danger,
+		'& path, & polygon#Shape': {
+			fill: 'currentColor',
+		},
+		'&:focus': {
+			outline: 'none',
+		},
+	},
+});
 
 interface AppointmentDetailPanelProps {
 	appointmentId?: string;
@@ -23,10 +68,13 @@ export const AppointmentDetailPanel = ({
 	onClose,
 	onAddAppointment,
 }: AppointmentDetailPanelProps) => {
+	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
 	const handleError = useHandleError();
 	const [patient, setPatient] = useState<AccountModel>();
 	const [appointment, setAppointment] = useState<AppointmentModel>();
+	const [assessments, setAssessments] = useState<PersonalizationDetails[]>([]);
+	const [allAppointments, setAllAppointments] = useState<AppointmentModel[]>([]);
 
 	useEffect(() => {
 		const request = appointmentService.getAppointment(appointmentId);
@@ -41,8 +89,9 @@ export const AppointmentDetailPanel = ({
 					.fetch();
 			})
 			.then((accountDetailsResponse) => {
-				console.log('accountDetailsResponse', accountDetailsResponse);
 				setPatient(accountDetailsResponse.account);
+				setAssessments([accountDetailsResponse.assessment]);
+				setAllAppointments(accountDetailsResponse.appointments);
 			})
 			.catch((e) => {
 				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -63,7 +112,6 @@ export const AppointmentDetailPanel = ({
 						? `${patient?.firstName} ${patient?.lastName}`
 						: 'Anonymous'}
 				</h4>
-
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
@@ -73,15 +121,13 @@ export const AppointmentDetailPanel = ({
 				<Button as="a" variant="primary" size="sm" className="mr-1" href={appointment?.videoconferenceUrl}>
 					join now
 				</Button>
-
 				<CopyToClipboardButton className="mr-1" text={appointment?.videoconferenceUrl} />
-
 				<Button variant="primary" size="sm" className="px-2" onClick={onEdit}>
 					<EditIcon />
 				</Button>
 			</div>
 
-			<div className="border p-2 my-2">
+			<div className="border py-2 px-3 mb-2">
 				<div className="mb-2 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
 						<strong>contact information</strong>
@@ -109,50 +155,37 @@ export const AppointmentDetailPanel = ({
 				<p>{patient?.emailAddress || 'Not availabile'}</p>
 			</div>
 
-			<div className="border p-2 my-2">
+			<div className="border py-2 px-3 mb-2">
 				<div className="d-flex mb-1 justify-content-between align-items-center">
 					<p className="mb-0">
 						<strong>assessments completed</strong>
 					</p>
 				</div>
 
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>PH-9</strong> Mon 7/28/20
-					</p>
+				{assessments.map(() => {
+					return (
+						<div className="d-flex mb-1 justify-content-between align-items-center">
+							<p className="mb-0">
+								<strong>[TODO]: Assessment Name</strong> [TODO]: Assessment Date
+							</p>
 
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={() => {
-							alert('TODO: Show assessment results');
-						}}
-					>
-						view
-					</Button>
-				</div>
-
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>PH-9</strong> Wed 8/5/20
-					</p>
-
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={() => {
-							alert('TODO: Show assessment results');
-						}}
-					>
-						view
-					</Button>
-				</div>
+							<Button
+								variant="link"
+								size="sm"
+								className="p-0"
+								onClick={() => {
+									alert('TODO: Show assessment results');
+								}}
+							>
+								view
+							</Button>
+						</div>
+					);
+				})}
 			</div>
 
-			<div className="border p-2 my-2">
-				<div className="d-flex justify-content-between align-items-center">
+			<div className="border">
+				<div className="py-2 px-3 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
 						<strong>all appointments</strong>
 					</p>
@@ -166,6 +199,50 @@ export const AppointmentDetailPanel = ({
 						<PlusIcon />
 					</button>
 				</div>
+				{allAppointments.length > 0 && (
+					<ul className={classes.appointmentsList}>
+						{allAppointments.map((appointment) => {
+							return (
+								<li
+									key={appointment.appointmentId}
+									className="d-flex align-items-center justify-content-between"
+								>
+									<div>
+										<p className="mb-0">
+											<strong>{appointment.startTimeDescription}</strong>
+										</p>
+										<AppointmentTypeItem
+											color={appointment.appointmentType.hexColor}
+											nickname={appointment.appointmentType.name}
+										/>
+									</div>
+									<div className="d-flex align-items-center">
+										<button
+											className={classNames(schedulingClasses.roundBtn, classes.attendedButton)}
+											onClick={() => {
+												return;
+											}}
+										>
+											<CheckIcon />
+										</button>
+										<button
+											className={classNames(
+												schedulingClasses.roundBtn,
+												classes.noShowButton,
+												'ml-2'
+											)}
+											onClick={() => {
+												return;
+											}}
+										>
+											<XIcon />
+										</button>
+									</div>
+								</li>
+							);
+						})}
+					</ul>
+				)}
 			</div>
 		</div>
 	);

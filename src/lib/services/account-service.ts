@@ -1,5 +1,12 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AccountModel, BetaFeature, BetaFeatureId, BetaStatusId } from '@/lib/models';
+import {
+	AccountModel,
+	AppointmentModel,
+	BetaFeature,
+	BetaFeatureId,
+	BetaStatusId,
+	PersonalizationDetails,
+} from '@/lib/models';
 import { Institution } from '../models/institution';
 
 export interface AccountResponse {
@@ -201,7 +208,12 @@ export const accountService = {
 		});
 	},
 	getAppointmentDetailsForAccount(accountId: string, appointmentId: string) {
-		return httpSingleton.orchestrateRequest<any>({
+		return httpSingleton.orchestrateRequest<{
+			account: AccountModel;
+			appointment: AppointmentModel;
+			appointments: AppointmentModel[];
+			assessment: PersonalizationDetails;
+		}>({
 			method: 'GET',
 			url: `/accounts/${accountId}/appointment-details/${appointmentId}`,
 		});
