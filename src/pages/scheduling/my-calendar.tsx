@@ -1,28 +1,17 @@
 import Accordion from '@/components/accordion';
-import DatePicker from '@/components/date-picker';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
-import { AppointmentType } from '@/lib/models';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
-import { Formik } from 'formik';
 import moment, { Moment } from 'moment';
-import React, { FC, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Col, Dropdown, Form } from 'react-bootstrap';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import { createUseStyles } from 'react-jss';
-import TimeInput from '@/components/time-input';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Form } from 'react-bootstrap';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { AppointmentTypeItem } from './appointment-type-item';
@@ -32,291 +21,10 @@ import { schedulingService } from '@/lib/services';
 import Color from 'color';
 import { ERROR_CODES } from '@/lib/http-client';
 import { AxiosError } from 'axios';
-import { Link } from 'react-router-dom';
-
-const useSchedulingStyles = createUseStyles({
-	roundBtn: {
-		width: 36,
-		height: 36,
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderRadius: 100,
-		border: `2px solid ${colors.primary}`,
-		backgroundColor: 'transparent',
-		'& path': {
-			fill: colors.primary,
-		},
-	},
-	typeahead: {
-		'& .rbt input': {
-			height: 56,
-		},
-		'& .rbt .rbt-menu': {
-			border: `1px solid ${colors.border}`,
-			padding: 8,
-			...fonts.xs,
-		},
-		'& .dropdown-item': {
-			textDecoration: 'none',
-		},
-	},
-});
-
-const useContainerStyles = createUseStyles({
-	wrapper: {
-		display: 'flex',
-		height: 'calc(100vh - 60px)', // subtracting header + footer height
-	},
-	sideBar: {
-		width: 440,
-		flexShrink: 0,
-		backgroundColor: colors.white,
-		overflowX: 'scroll',
-	},
-	blockedTimeslot: {
-		background: `repeating-linear-gradient(
-			-45deg,
-			transparent,
-			transparent 9px,
-			${colors.black} 10px,
-			${colors.black} 11px
-		) !important;`,
-	},
-	blockedAvailabilityTimeslot: {
-		background: `repeating-linear-gradient(
-			-45deg,
-			#6C7978,
-			#6C7978 9px,
-			${colors.black} 10px,
-			${colors.black} 11px
-		) !important;`,
-	},
-	leftCalendar: {
-		'& .fc .fc-toolbar.fc-header-toolbar': {
-			marginBottom: 12,
-			'& .fc-toolbar-chunk': {
-				display: 'flex',
-				alignItems: 'center',
-				'& .fc-toolbar-title': {
-					...fonts.m,
-				},
-				'& button.fc-prev-button, & button.fc-next-button': {
-					margin: 0,
-					border: 0,
-					width: 32,
-					height: 32,
-					padding: 0,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					backgroundColor: 'transparent',
-					'& .fc-icon': {
-						color: colors.dark,
-					},
-				},
-				'& button.fc-prev-button': {
-					marginLeft: 8,
-				},
-				'& button.fc-today-button': {
-					...fonts.xs,
-					borderRadius: 500,
-					padding: '4px 12px',
-					color: colors.primary,
-					backgroundColor: 'transparent',
-					border: `1px solid ${colors.gray200}`,
-				},
-			},
-		},
-		'& .fc-theme-standard .fc-scrollgrid': {
-			border: 0,
-		},
-		'& .fc-theme-standard td, .fc-theme-standard th': {
-			border: 0,
-			'& a:not([href])': {
-				...fonts.xs,
-				color: colors.gray600,
-			},
-		},
-		'& .fc .fc-daygrid-day-bg .fc-bg-event': {
-			borderRadius: 50,
-		},
-		'& .fc .fc-daygrid-day': {
-			'& .fc-daygrid-day-frame': {
-				width: 45,
-				height: 45,
-				display: 'flex',
-				borderRadius: '50%',
-				alignItems: 'center',
-				flexDirection: 'column',
-				justifyContent: 'center',
-				margin: '0 auto',
-			},
-			'& .fc-daygrid-day-number': {
-				padding: 0,
-				marginTop: -4,
-				color: colors.dark,
-			},
-			'& .fc-daygrid-day-events': {
-				width: 6,
-				height: 6,
-				margin: 0,
-				minHeight: 0,
-				flexShrink: 0,
-				borderRadius: '50%',
-				position: 'relative',
-				border: `1px solid ${colors.gray600}`,
-				'& .fc-daygrid-event-harness': {
-					width: 6,
-					height: 6,
-					top: -1,
-					left: -1,
-					borderRadius: '50%',
-					position: 'relative',
-					backgroundColor: colors.primary,
-					'& .fc-daygrid-event': {
-						display: 'none',
-					},
-				},
-				'& .fc-daygrid-event-harness:not(:first-of-type)': {
-					display: 'none',
-				},
-			},
-			'&.fc-day-today': {
-				backgroundColor: 'transparent',
-				'& .fc-daygrid-day-frame': {
-					backgroundColor: colors.secondary,
-				},
-				'& .fc-daygrid-day-number': {
-					color: colors.white,
-				},
-				'& .fc-daygrid-day-events': {
-					border: `1px solid ${colors.white}`,
-					'& .fc-daygrid-event-harness': {
-						backgroundColor: colors.white,
-					},
-				},
-			},
-		},
-	},
-	mainCalendar: {
-		flex: 1,
-		height: '100%',
-		'& .fc': {
-			'& .fc-col-header-cell-cushion': {
-				...fonts.s,
-				color: colors.dark,
-				padding: '9px 7px',
-			},
-			'& .fc-daygrid-day-events': {
-				margin: 0,
-			},
-			'& .fc-daygrid-body-natural .fc-daygrid-day-events': {
-				margin: 0,
-			},
-			'& .fc-daygrid-event-harness > a': {
-				margin: 0,
-				borderRadius: 0,
-				padding: '6px 7px',
-			},
-			'& .fc-daygrid-day.fc-day-today, & .fc-timegrid-col.fc-day-today': {
-				backgroundColor: '#F1E7DF',
-			},
-			'& .fc-timegrid-divider': {
-				padding: 0,
-				borderColor: colors.dark,
-			},
-			'& .fc-timegrid-slot': {
-				height: 48,
-			},
-			'& .fc-timegrid-slot-label': {
-				verticalAlign: 'top',
-			},
-			'& .fc-timegrid-slot-label-cushion': {
-				...fonts.xxxs,
-				color: colors.gray600,
-				padding: '4px 4px 0 0',
-			},
-			'& .fc-bg-event': {
-				// backgroundColor: colors.white,
-			},
-			'& .fc-timegrid-now-indicator-arrow': {
-				display: 'none',
-			},
-			'& .fc-timegrid-now-indicator-line': {
-				borderColor: colors.primary,
-				'&:before': {
-					top: -4,
-					left: 0,
-					width: 7,
-					height: 7,
-					content: '""',
-					borderRadius: '50%',
-					position: 'absolute',
-					backgroundColor: colors.primary,
-				},
-			},
-			'& .fc-timegrid-event, .fc-timegrid-more-link': {
-				borderRadius: 0,
-			},
-			'& .fc-timegrid-event .fc-event-main': {
-				padding: '7px 11px',
-			},
-			'& .fc-timegrid-event-harness-inset .fc-timegrid-event': {
-				boxShadow: 'none',
-			},
-		},
-	},
-});
-
-const MOCK_MONDAY = moment().startOf('week').weekday(1);
-
-const MOCK_APPT_TYPES = [
-	{
-		appointmentTypeId: 'apptType1',
-		nickname: '1 hour virtual session',
-		color: '#19C59F',
-	},
-	{
-		appointmentTypeId: 'apptType2',
-		nickname: '30 minute follow-up',
-		color: '#EE8C4E',
-	},
-	{
-		appointmentTypeId: 'apptType3',
-		nickname: 'Collaborative care consultation',
-		color: '#F2B500',
-	},
-	{
-		appointmentTypeId: 'apptType4',
-		nickname: 'All appointment types',
-		color: '#979797',
-		invertedColor: true,
-	},
-];
-
-const MOCK_AVAILABILITIES = [
-	{
-		availabilityId: 'availability1',
-		title: 'Weekdays, 9am - 12pm',
-		appointmentTypes: [MOCK_APPT_TYPES[3]],
-	},
-	{
-		availabilityId: 'availability2',
-		title: 'Monday, Wednesday, Friday, 1pm - 4pm',
-		appointmentTypes: [MOCK_APPT_TYPES[3]],
-	},
-	{
-		availabilityId: 'availability3',
-		title: 'Tuesday, 1pm - 3pm',
-		appointmentTypes: [MOCK_APPT_TYPES[0], MOCK_APPT_TYPES[1]],
-	},
-	{
-		availabilityId: 'availability4',
-		title: 'Friday, 1pm - 2:30pm',
-		appointmentTypes: [MOCK_APPT_TYPES[1]],
-	},
-];
+import { useContainerStyles } from './use-scheduling-styles';
+import { EditAppointmentPanel } from './edit-appointment-panel';
+import { AppointmentDetailPanel } from './appointment-detail-panel';
+import { FollowUpsListPanel } from './follow-ups-list-panel';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -329,7 +37,7 @@ enum CalendarSidebar {
 	EditAvailability,
 	EditTimeBlock,
 	ViewAvailability,
-	NewAppointment,
+	EditAppointment,
 	ViewAppointment,
 }
 
@@ -341,7 +49,8 @@ export const MyCalendarScheduling: FC = () => {
 	const [accordionExpanded, setAccordionExpanded] = useState(false);
 	const [activeSidebar, setActiveSidebar] = useState<CalendarSidebar | null>(null);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
-	const [selectedAppointment, setSelectedAppointment] = useState<any>();
+	const [appointmentIdToView, setAppointmentIdToView] = useState<string>();
+	const [appointmentIdToEdit, setAppointmentIdToEdit] = useState<string>();
 
 	const [logicalAvailabilityIdToView, setLogicalAvailabilityIdToView] = useState<string>();
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
@@ -367,6 +76,10 @@ export const MyCalendarScheduling: FC = () => {
 
 			if (!account || !account.providerId || !activeStartDate || !activeEndDate) {
 				throw new Error('missing Calendar parameters');
+			}
+
+			if (inFlightRequest.current) {
+				inFlightRequest.current.abort();
 			}
 
 			inFlightRequest.current = schedulingService.getCalendar(account.providerId, {
@@ -410,6 +123,9 @@ export const MyCalendarScheduling: FC = () => {
 					backgroundColor: Color(appointment.appointmentType.hexColor).lighten(0.7).hex(),
 					borderColor: appointment.appointmentType.hexColor,
 					textColor: '#21312A',
+					extendedProps: {
+						appointmentId: appointment.appointmentId,
+					},
 				};
 			});
 
@@ -419,7 +135,7 @@ export const MyCalendarScheduling: FC = () => {
 					id: `followups${index}`,
 					allDay: true,
 					title: 'X followups',
-					start: MOCK_MONDAY.clone().toDate(),
+					start: moment().toDate(),
 					extendedProps: {
 						patients: [
 							{
@@ -585,8 +301,22 @@ export const MyCalendarScheduling: FC = () => {
 							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
 						}}
 						datesSet={({ start, end }) => {
-							setActiveStartDate(moment(start).format('YYYY-MM-DD'));
-							setActiveEndDate(moment(end).format('YYYY-MM-DD'));
+							const startMoment = moment(start);
+							const endMoment = moment(end);
+
+							setActiveStartDate(startMoment.format('YYYY-MM-DD'));
+							setActiveEndDate(endMoment.format('YYYY-MM-DD'));
+
+							const mainCal = mainCalendarRef.current?.getApi();
+							const mainMoment = mainCal && moment(mainCal.getDate());
+
+							console.log({ start, end, mainMoment });
+							if (mainMoment?.isBetween(startMoment, endMoment)) {
+								return;
+							}
+
+							mainCal?.gotoDate(start);
+							setLeftCalendarMoment(startMoment);
 						}}
 					/>
 				</div>
@@ -634,7 +364,9 @@ export const MyCalendarScheduling: FC = () => {
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setActiveSidebar(CalendarSidebar.NewAppointment);
+							setActiveSidebar(CalendarSidebar.EditAppointment);
+							setAppointmentIdToView(undefined);
+							setAppointmentIdToEdit(undefined);
 						}}
 					>
 						new appointment
@@ -646,6 +378,8 @@ export const MyCalendarScheduling: FC = () => {
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
 							setActiveSidebar(CalendarSidebar.ManageAvailability);
+							setAppointmentIdToView(undefined);
+							setAppointmentIdToEdit(undefined);
 						}}
 					>
 						manage availability
@@ -704,7 +438,6 @@ export const MyCalendarScheduling: FC = () => {
 					// 	}
 					// }}
 					eventClick={(clickInfo, ...args) => {
-						console.log({ clickInfo, args });
 						if (clickInfo.event.allDay) {
 							setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
@@ -714,15 +447,10 @@ export const MyCalendarScheduling: FC = () => {
 							return;
 						} else if (clickInfo.event.extendedProps.isBlockedTime) {
 							return;
+						} else if (clickInfo.event.extendedProps.appointmentId) {
+							setAppointmentIdToView(clickInfo.event.extendedProps.appointmentId);
+							setActiveSidebar(CalendarSidebar.ViewAppointment);
 						}
-
-						setSelectedAppointment(true);
-
-						// if (
-						// 	window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)
-						// ) {
-						// 	clickInfo.event.remove();
-						// }
 					}}
 					eventsSet={(events, ...args) => {
 						console.log('eventsSet', { events, args });
@@ -801,22 +529,37 @@ export const MyCalendarScheduling: FC = () => {
 						/>
 					)}
 
-					{activeSidebar === CalendarSidebar.NewAppointment && (
-						<AddAppointmentPanel
-							onClose={() => {
-								setActiveSidebar(null);
+					{activeSidebar === CalendarSidebar.EditAppointment && (
+						<EditAppointmentPanel
+							appointmentId={appointmentIdToEdit}
+							onClose={(didUpdate) => {
+								setAppointmentIdToEdit(undefined);
+								if (appointmentIdToView) {
+									setActiveSidebar(CalendarSidebar.ViewAppointment);
+								} else {
+									setActiveSidebar(null);
+								}
+
+								if (didUpdate) {
+									fetchData();
+								}
 							}}
 						/>
 					)}
 
 					{activeSidebar === CalendarSidebar.ViewAppointment && (
-						<SelectedAppointmentPanel
+						<AppointmentDetailPanel
+							appointmentId={appointmentIdToView}
+							onEdit={() => {
+								setAppointmentIdToEdit(appointmentIdToView);
+								setActiveSidebar(CalendarSidebar.EditAppointment);
+							}}
 							onAddAppointment={() => {
-								setActiveSidebar(CalendarSidebar.NewAppointment);
+								setActiveSidebar(CalendarSidebar.EditAppointment);
 							}}
 							onClose={() => {
-								setSelectedAppointment(null);
-								fetchData();
+								setAppointmentIdToView(undefined);
+								setActiveSidebar(null);
 							}}
 						/>
 					)}
@@ -835,179 +578,6 @@ export const MyCalendarScheduling: FC = () => {
 };
 
 export default MyCalendarScheduling;
-
-interface AddAppointmentPanelProps {
-	onClose: () => void;
-}
-
-const AddAppointmentPanel = ({ onClose }: AddAppointmentPanelProps) => {
-	const { account } = useAccount();
-	const relativeUrl = `/connect-with-support?&immediateAccess=true&providerId=${account?.providerId}`;
-	const fullUrl = `${window.location.protocol}//${window.location.host}${relativeUrl}`;
-
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>New appointment</h4>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			<p>Patients can use this URL to book with you:</p>
-
-			<div className="border d-flex align-items-center p-2">
-				<Link to={relativeUrl} target="_blank">
-					{fullUrl}
-				</Link>
-
-				{navigator?.clipboard ? (
-					<Button
-						variant="primary"
-						size="sm"
-						className="px-2 ml-2"
-						onClick={() => {
-							navigator.clipboard.writeText(fullUrl);
-							return;
-						}}
-					>
-						<CopyIcon />
-					</Button>
-				) : null}
-			</div>
-
-			{/* <AddAppointmentForm
-				onBack={() => {
-					onClose();
-				}}
-				onSuccess={() => {
-					onClose();
-				}}
-			/> */}
-		</div>
-	);
-};
-
-const AddAppointmentForm: FC<{
-	onBack: () => void;
-	onSuccess: () => void;
-}> = ({ onBack, onSuccess }) => {
-	const { account } = useAccount();
-	const schedulingClasses = useSchedulingStyles();
-
-	const handleError = useHandleError();
-
-	return (
-		<Formik
-			initialValues={{
-				date: '',
-				startTime: '',
-				startTimeMeridian: '',
-				appointmentTypeId: '',
-				patientId: '',
-			}}
-			enableReinitialize
-			onSubmit={(values) => {
-				if (!account || !account.providerId) {
-					return;
-				}
-
-				const dateTime = moment(values.date).startOf('day');
-
-				const startTimeMoment = moment(`${values.startTime} ${values.startTimeMeridian}`, 'hh:mm a');
-
-				const startDateTime = dateTime.clone().set({
-					hours: startTimeMoment.hours(),
-					minutes: startTimeMoment.minutes(),
-					seconds: startTimeMoment.seconds(),
-				});
-			}}
-		>
-			{(formikBag) => {
-				const { values, setFieldValue, handleChange, handleSubmit } = formikBag;
-				const isValid = !!values.startTime && !!values.startTimeMeridian;
-
-				return (
-					<Form onSubmit={handleSubmit}>
-						<Form.Group controlId="date">
-							<DatePicker
-								showYearDropdown
-								showMonthDropdown
-								dropdownMode="select"
-								labelText={'Date'}
-								selected={values.date ? moment(values.date).toDate() : undefined}
-								onChange={(date) => {
-									setFieldValue('date', date ? moment(date).format('YYYY-MM-DD') : '');
-								}}
-							/>
-						</Form.Group>
-
-						<Form.Group controlId="startTime">
-							<Form.Row>
-								<Col>
-									<TimeInput
-										name="startTime"
-										label="Start Time"
-										time={values.startTime}
-										onTimeChange={handleChange}
-										meridian={values.startTimeMeridian}
-										onMeridianChange={(newStartMeridian) => {
-											setFieldValue('startTimeMeridian', newStartMeridian);
-										}}
-									/>
-								</Col>
-							</Form.Row>
-						</Form.Group>
-
-						<Form.Group controlId="patientId">
-							<div className={classNames('border', schedulingClasses.typeahead)}>
-								<AsyncTypeahead
-									placeholder="Patient name"
-									isLoading={false}
-									onSearch={(q) => {
-										// setIsSearching(true);
-									}}
-									// labelKey={(patient) => {
-									// 	return `${patient.preferredFirstName} ${patient.preferredLastName}`;
-									// }}
-									id="patient-accountId-search"
-									options={[]}
-									selected={[]}
-									onChange={(selected) => {
-										//
-									}}
-								/>
-							</div>
-						</Form.Group>
-
-						<AppointmentTypeDropdown
-							initial={MOCK_APPT_TYPES[0] as any}
-							onChange={(apptType) => {
-								setFieldValue('appointmentTypeId', apptType?.appointmentTypeId);
-							}}
-						/>
-
-						<div className="mt-4 d-flex flex-row justify-content-between">
-							<Button
-								variant="outline-primary"
-								size="sm"
-								onClick={() => {
-									onBack();
-								}}
-							>
-								cancel
-							</Button>
-							<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
-								save
-							</Button>
-						</div>
-					</Form>
-				);
-			}}
-		</Formik>
-	);
-};
 
 interface SelectedAvailabilityPanelProps {
 	onClose: () => void;
@@ -1035,270 +605,10 @@ const SelectedAvailabilityPanel = ({ onClose, onEditAvailability }: SelectedAvai
 						edit
 					</Button>
 				</div>
-				<AppointmentTypeItem color={MOCK_APPT_TYPES[0].color} nickname={MOCK_APPT_TYPES[0].nickname} />
-				<AppointmentTypeItem color={MOCK_APPT_TYPES[1].color} nickname={MOCK_APPT_TYPES[1].nickname} />
+
+				<AppointmentTypeItem color={'#19C59F'} nickname={'1 hour virtual session'} />
+				<AppointmentTypeItem color={'#EE8C4E'} nickname={'30 minute follow-up'} />
 			</div>
 		</div>
-	);
-};
-
-interface FollowUpsListPanelProps {
-	onClose: () => void;
-}
-
-const FollowUpsListPanel = ({ onClose }: FollowUpsListPanelProps) => {
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>2 / 3 follow ups</h4>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			{[
-				{
-					name: 'Patient 1',
-					phoneNumber: '321-765-4321',
-					isDone: true,
-				},
-				{
-					name: 'Patient 2',
-					phoneNumber: '321-765-4321',
-					isDone: false,
-				},
-				{
-					name: 'Patient 3',
-					phoneNumber: '321-765-4321',
-					isDone: false,
-				},
-			].map((followup, idx) => {
-				return (
-					<div key={idx} className="border-bottom mb-4">
-						<div className="d-flex justify-content-between align-items-center">
-							<p className="mb-0">
-								<strong>{followup.name}</strong>, {followup.phoneNumber}
-							</p>
-
-							{followup.isDone ? (
-								<p className="text-success">done</p>
-							) : (
-								<Button
-									variant="outline-primary"
-									size="sm"
-									className="p-1"
-									onClick={() => {
-										//
-									}}
-								>
-									mark done
-								</Button>
-							)}
-						</div>
-					</div>
-				);
-			})}
-		</div>
-	);
-};
-
-interface SelectedAppointmentPanelProps {
-	onClose: () => void;
-	onAddAppointment: () => void;
-}
-
-const SelectedAppointmentPanel = ({ onClose, onAddAppointment }: SelectedAppointmentPanelProps) => {
-	const schedulingClasses = useSchedulingStyles();
-
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>Jane Thompson</h4>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			<div className="mb-4">
-				<Button
-					variant="primary"
-					size="sm"
-					className="mr-1"
-					onClick={() => {
-						//
-					}}
-				>
-					join now
-				</Button>
-
-				<Button
-					variant="primary"
-					size="sm"
-					className="px-2 mr-1"
-					onClick={() => {
-						return;
-					}}
-				>
-					<CopyIcon />
-				</Button>
-
-				<Button
-					variant="primary"
-					size="sm"
-					className="px-2"
-					onClick={() => {
-						return;
-					}}
-				>
-					<EditIcon />
-				</Button>
-			</div>
-
-			<div className="border p-2 my-2">
-				<div className="d-flex justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>contact information</strong>
-					</p>
-
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={() => {
-							return;
-						}}
-					>
-						<EditIcon />
-					</Button>
-				</div>
-			</div>
-
-			<div className="border p-2 my-2">
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>assessments completed</strong>
-					</p>
-				</div>
-
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>PH-9</strong> Mon 7/28/20
-					</p>
-
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={() => {
-							alert('TODO: Show assessment results');
-						}}
-					>
-						view
-					</Button>
-				</div>
-
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>PH-9</strong> Wed 8/5/20
-					</p>
-
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={() => {
-							alert('TODO: Show assessment results');
-						}}
-					>
-						view
-					</Button>
-				</div>
-			</div>
-
-			<div className="border p-2 my-2">
-				<div className="d-flex justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>all appointments</strong>
-					</p>
-
-					<button
-						className={schedulingClasses.roundBtn}
-						onClick={() => {
-							onAddAppointment();
-						}}
-					>
-						<PlusIcon />
-					</button>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-interface AppointmentTypeDropdownToggleProps {
-	selectedAppointmentType?: AppointmentType;
-}
-
-const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, AppointmentTypeDropdownToggleProps>(
-	({ selectedAppointmentType, ...props }, ref) => {
-		return (
-			<button
-				type="button"
-				ref={ref}
-				{...props}
-				className="border d-flex align-items-center px-3"
-				style={{ backgroundColor: 'transparent', width: '100%', height: 56 }}
-			>
-				<div className="d-flex flex-column w-100">
-					<p className="mb-0 text-left" style={{ marginTop: -4 }}>
-						Appointment type
-					</p>
-
-					{selectedAppointmentType && (
-						<AppointmentTypeItem
-							//@ts-expect-error type
-							color={selectedAppointmentType.color}
-							//@ts-expect-error type
-							nickname={selectedAppointmentType.nickname}
-						/>
-					)}
-				</div>
-
-				<UnfoldIcon className="ml-auto" />
-			</button>
-		);
-	}
-);
-
-interface AppointmentTypeDropdownProps {
-	initial?: AppointmentType;
-	onChange?: (apptType?: AppointmentType) => void;
-}
-
-const AppointmentTypeDropdown = ({ initial, onChange }: AppointmentTypeDropdownProps) => {
-	const [selectedType, setSelectedType] = useState(initial);
-
-	return (
-		<Dropdown drop="down">
-			<Dropdown.Toggle as={AppointmentTypeDropdownToggle} id="reasons" selectedAppointmentType={selectedType} />
-			<Dropdown.Menu className="w-100">
-				{MOCK_APPT_TYPES.map((apptType, index) => {
-					return (
-						<Dropdown.Item
-							key={index}
-							onClick={() => {
-								setSelectedType((apptType as unknown) as any);
-								onChange && onChange((apptType as unknown) as any);
-							}}
-							className="text-decoration-none"
-						>
-							<AppointmentTypeItem color={apptType.color} nickname={apptType.nickname} />
-						</Dropdown.Item>
-					);
-				})}
-			</Dropdown.Menu>
-		</Dropdown>
 	);
 };
