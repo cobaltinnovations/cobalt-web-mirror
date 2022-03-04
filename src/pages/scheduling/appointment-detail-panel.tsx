@@ -54,6 +54,28 @@ const useStyles = createUseStyles({
 			outline: 'none',
 		},
 	},
+	attendedButtonSolid: {
+		border: 0,
+		color: colors.white,
+		backgroundColor: colors.success,
+		'& path, & polygon#Shape': {
+			fill: 'currentColor',
+		},
+		'&:focus': {
+			outline: 'none',
+		},
+	},
+	noShowButtonSolid: {
+		border: 0,
+		color: colors.white,
+		backgroundColor: colors.danger,
+		'& path, & polygon#Shape': {
+			fill: 'currentColor',
+		},
+		'&:focus': {
+			outline: 'none',
+		},
+	},
 });
 
 interface AppointmentDetailPanelProps {
@@ -193,9 +215,9 @@ export const AppointmentDetailPanel = ({
 					</p>
 				</div>
 
-				{assessments.map(() => {
+				{assessments.map((assessment, index) => {
 					return (
-						<div className="d-flex mb-1 justify-content-between align-items-center">
+						<div key={index} className="d-flex mb-1 justify-content-between align-items-center">
 							<p className="mb-0">
 								<strong>[TODO]: Assessment Name</strong> [TODO]: Assessment Date
 							</p>
@@ -286,7 +308,7 @@ export const AppointmentDetailPanel = ({
 											<button
 												className={classNames(
 													schedulingClasses.roundBtnSolid,
-													classes.attendedButton
+													classes.attendedButtonSolid
 												)}
 												onClick={() => {
 													updateAttendanceStatus(
@@ -304,7 +326,7 @@ export const AppointmentDetailPanel = ({
 												<button
 													className={classNames(
 														schedulingClasses.roundBtnSolid,
-														classes.attendedButton
+														classes.noShowButtonSolid
 													)}
 													onClick={() => {
 														updateAttendanceStatus(
@@ -313,7 +335,7 @@ export const AppointmentDetailPanel = ({
 														);
 													}}
 												>
-													<CheckIcon />
+													<XIcon />
 												</button>
 											))}
 									</div>

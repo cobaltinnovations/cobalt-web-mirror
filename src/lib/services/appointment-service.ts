@@ -129,7 +129,7 @@ export const appointmentService = {
 	},
 	updateAppointmentAttendanceStatus(appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) {
 		return httpSingleton.orchestrateRequest<{ appointment: AppointmentModel }>({
-			method: 'POST',
+			method: 'PUT',
 			url: `/appointments/${appointmentId}/attendance-status`,
 			data: { attendanceStatusId },
 		});
