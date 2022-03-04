@@ -178,12 +178,12 @@ export const AppointmentDetailPanel = ({
 				<p className="mb-0">
 					<strong>phone</strong>
 				</p>
-				<p>{patient?.phoneNumber || 'Not availabile'}</p>
+				<p>{patient?.phoneNumber || 'Not available'}</p>
 
 				<p className="mb-0">
 					<strong>email</strong>
 				</p>
-				<p>{patient?.emailAddress || 'Not availabile'}</p>
+				<p>{patient?.emailAddress || 'Not available'}</p>
 			</div>
 
 			<div className="border py-2 px-3 mb-2">

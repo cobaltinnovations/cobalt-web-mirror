@@ -1164,7 +1164,7 @@ const ConnectWithSupport: FC = () => {
 			<Container>
 				<Row>
 					<Col>
-						<RenderJson json={{ scores: assessmentScore, availabileSections: availableSections }} />
+						<RenderJson json={{ scores: assessmentScore, availableSections: availableSections }} />
 					</Col>
 				</Row>
 			</Container>
