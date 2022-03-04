@@ -12,6 +12,7 @@ export interface CreateAppointmentData {
 	groupEventTypeId?: string;
 	appointmentTypeId?: string;
 	appointmentReasonId?: string;
+	intakeAssessmentId?: string;
 	comment?: string;
 }
 

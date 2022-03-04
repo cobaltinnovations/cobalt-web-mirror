@@ -253,6 +253,7 @@ const IntakeAssessment: FC = () => {
 								appointmentTypeId: selectedAppointmentTypeId,
 								date: formattedAvailabilityDate,
 								time: selectedTimeSlot.time,
+								intakeAssessmentId: assessment?.assessmentId,
 							};
 
 							if (promptForEmail) {
