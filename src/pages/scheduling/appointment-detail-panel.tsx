@@ -190,7 +190,7 @@ export const AppointmentDetailPanel = ({
 						size="sm"
 						className="p-0"
 						onClick={() => {
-							return;
+							alert('TODO: Show edit patient form');
 						}}
 					>
 						<EditIcon />

@@ -218,4 +218,11 @@ export const accountService = {
 			url: `/accounts/${accountId}/appointment-details/${appointmentId}`,
 		});
 	},
+	postRoleRequest(accountId: string, roleId: string) {
+		return httpSingleton.orchestrateRequest<unknown>({
+			method: 'POST',
+			url: `/accounts/${accountId}/role-request`,
+			data: { roleId },
+		});
+	},
 };

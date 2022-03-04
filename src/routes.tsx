@@ -19,6 +19,7 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 
+const Onboarding = React.lazy(() => import('@/pages/onboarding'));
 const SignUp = React.lazy(() => import('@/pages/sign-up'));
 const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 const SignIn = React.lazy(() => import('@/pages/sign-in'));
@@ -137,6 +138,14 @@ const RedirectToSupport = () => {
 };
 
 export const Routes = [
+	{
+		path: '/onboarding',
+		exact: true,
+		private: false,
+		checkEnabled: isVanillaSubdomain,
+		header: (): ReactElement => <Header showHeaderButtons={false} />,
+		main: Onboarding,
+	},
 	{
 		path: '/sign-up',
 		exact: true,
