@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { appointmentService } from '@/lib/services';
+import { accountService, appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { useSchedulingStyles } from './use-scheduling-styles';
@@ -34,8 +34,15 @@ export const AppointmentDetailPanel = ({
 		request
 			.fetch()
 			.then((response) => {
-				setPatient(response.account);
 				setAppointment(response.appointment);
+
+				return accountService
+					.getAppointmentDetailsForAccount(response.appointment.accountId, response.appointment.appointmentId)
+					.fetch();
+			})
+			.then((accountDetailsResponse) => {
+				console.log('accountDetailsResponse', accountDetailsResponse);
+				setPatient(accountDetailsResponse.account);
 			})
 			.catch((e) => {
 				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -52,7 +59,9 @@ export const AppointmentDetailPanel = ({
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<h4>
-					{patient?.firstName} {patient?.lastName}
+					{patient?.firstName || patient?.lastName
+						? `${patient?.firstName} ${patient?.lastName}`
+						: 'Anonymous'}
 				</h4>
 
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
@@ -73,11 +82,10 @@ export const AppointmentDetailPanel = ({
 			</div>
 
 			<div className="border p-2 my-2">
-				<div className="d-flex justify-content-between align-items-center">
+				<div className="mb-2 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
 						<strong>contact information</strong>
 					</p>
-
 					<Button
 						variant="link"
 						size="sm"
@@ -89,6 +97,16 @@ export const AppointmentDetailPanel = ({
 						<EditIcon />
 					</Button>
 				</div>
+
+				<p className="mb-0">
+					<strong>phone</strong>
+				</p>
+				<p>{patient?.phoneNumber || 'Not availabile'}</p>
+
+				<p className="mb-0">
+					<strong>email</strong>
+				</p>
+				<p>{patient?.emailAddress || 'Not availabile'}</p>
 			</div>
 
 			<div className="border p-2 my-2">
