@@ -142,7 +142,14 @@ export const AppointmentDetailPanel = ({
 			</div>
 
 			<div className="mb-4">
-				<Button as="a" variant="primary" size="sm" className="mr-1" href={appointment?.videoconferenceUrl}>
+				<Button
+					as="a"
+					variant="primary"
+					size="sm"
+					className="mr-1"
+					href={appointment?.videoconferenceUrl}
+					target="_blank"
+				>
 					join now
 				</Button>
 				<CopyToClipboardButton className="mr-1" text={appointment?.videoconferenceUrl} />

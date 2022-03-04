@@ -11,10 +11,7 @@ import moment, { Moment } from 'moment';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-
 import { ManageAvailabilityPanel } from './manage-availability-panel';
-import { AppointmentTypeItem } from './appointment-type-item';
 import { EditAvailabilityPanel } from './edit-availability-panel';
 import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 import { schedulingService } from '@/lib/services';
@@ -25,6 +22,7 @@ import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
 import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
+import { SelectedAvailabilityPanel } from './selected-availability-panel';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -109,6 +107,7 @@ export const MyCalendarScheduling: FC = () => {
 					end: availability.endDateTime,
 					display: 'background',
 					extendedProps: {
+						logicalAvailabilityId: availability.logicalAvailabilityId,
 						isBlockedTime: true,
 					},
 				};
@@ -441,11 +440,12 @@ export const MyCalendarScheduling: FC = () => {
 						if (clickInfo.event.allDay) {
 							setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
-						} else if (clickInfo.event.extendedProps.isAvailability) {
+						} else if (
+							clickInfo.event.extendedProps.isAvailability ||
+							clickInfo.event.extendedProps.isBlockedTime
+						) {
 							setLogicalAvailabilityIdToView(clickInfo.event.extendedProps.logicalAvailabilityId);
 							setActiveSidebar(CalendarSidebar.ViewAvailability);
-							return;
-						} else if (clickInfo.event.extendedProps.isBlockedTime) {
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
 							setAppointmentIdToView(clickInfo.event.extendedProps.appointmentId);
@@ -507,7 +507,12 @@ export const MyCalendarScheduling: FC = () => {
 							logicalAvailabilityId={logicalAvailabilityIdToEdit}
 							onClose={(didUpdate) => {
 								setLogicalAvailabilityIdToEdit(undefined);
-								setActiveSidebar(CalendarSidebar.ManageAvailability);
+
+								if (logicalAvailabilityIdToView) {
+									setActiveSidebar(CalendarSidebar.ViewAvailability);
+								} else {
+									setActiveSidebar(CalendarSidebar.ManageAvailability);
+								}
 
 								if (didUpdate) {
 									fetchData();
@@ -518,9 +523,14 @@ export const MyCalendarScheduling: FC = () => {
 
 					{activeSidebar === CalendarSidebar.ViewAvailability && (
 						<SelectedAvailabilityPanel
+							logicalAvailabilityId={logicalAvailabilityIdToView}
 							onEditAvailability={() => {
 								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
 								setActiveSidebar(CalendarSidebar.EditAvailability);
+							}}
+							onEditTimeBlock={() => {
+								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
+								setActiveSidebar(CalendarSidebar.EditTimeBlock);
 							}}
 							onClose={() => {
 								setLogicalAvailabilityIdToView(undefined);
@@ -578,37 +588,3 @@ export const MyCalendarScheduling: FC = () => {
 };
 
 export default MyCalendarScheduling;
-
-interface SelectedAvailabilityPanelProps {
-	onClose: () => void;
-	onEditAvailability: () => void;
-}
-
-const SelectedAvailabilityPanel = ({ onClose, onEditAvailability }: SelectedAvailabilityPanelProps) => {
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>Open availability</h4>
-
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			<div className="border p-2">
-				<div className="d-flex justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>Weekdays, 9am - 12pm</strong>
-					</p>
-
-					<Button variant="link" size="sm" className="p-0" onClick={() => onEditAvailability()}>
-						edit
-					</Button>
-				</div>
-
-				<AppointmentTypeItem color={'#19C59F'} nickname={'1 hour virtual session'} />
-				<AppointmentTypeItem color={'#EE8C4E'} nickname={'30 minute follow-up'} />
-			</div>
-		</div>
-	);
-};
