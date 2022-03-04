@@ -31,6 +31,7 @@ export enum VideoconferencePlatformId {
 export interface AppointmentModel {
 	appointmentId: string;
 	accountId: string;
+	appointmentTypeId: string;
 	acuityAppointmentId: number;
 	bluejeansMeetingId: number;
 	name: string;

@@ -88,6 +88,14 @@ export const appointmentService = {
 		});
 	},
 
+	rescheduleAppointment(appointmentId: string, data: Partial<CreateAppointmentData>) {
+		return httpSingleton.orchestrateRequest<AppointmentResponse>({
+			method: 'put',
+			url: `/appointments/${appointmentId}/reschedule`,
+			data,
+		});
+	},
+
 	createFollowup(data: CreateFollowupDate) {
 		return httpSingleton.orchestrateRequest<FollowupResponse>({
 			method: 'post',
