@@ -16,6 +16,18 @@ export const useSchedulingStyles = createUseStyles({
 			fill: colors.primary,
 		},
 	},
+	roundBtnSolid: {
+		width: 36,
+		height: 36,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 100,
+		backgroundColor: colors.primary,
+		'& path': {
+			fill: colors.white,
+		},
+	},
 	typeahead: {
 		'& .rbt input': {
 			height: 56,

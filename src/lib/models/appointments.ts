@@ -1,6 +1,13 @@
 import { Provider } from '@/lib/models/provider';
 import { AccountModel } from '@/lib/models/account';
 
+export enum ATTENDANCE_STATUS_ID {
+	UNKNOWN = 'UNKNOWN',
+	MISSED = 'MISSED',
+	CANCELED = 'CANCELED',
+	ATTENDED = 'ATTENDED',
+}
+
 export interface AppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
@@ -58,6 +65,7 @@ export interface AppointmentModel {
 	appointmentReason?: AppointmentReason;
 	appointmentDescription: string;
 	appointmentType: AppointmentType;
+	attendanceStatusId: ATTENDANCE_STATUS_ID;
 }
 
 export enum AppointmentReasonType {

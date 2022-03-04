@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AppointmentModel, FollowupModel, AccountModel } from '@/lib/models';
+import { AppointmentModel, FollowupModel, AccountModel, ATTENDANCE_STATUS_ID } from '@/lib/models';
 
 export interface CreateAppointmentData {
 	accountId?: string;
@@ -124,6 +124,13 @@ export const appointmentService = {
 			method: 'post',
 			url: `/followups/${followUpId}/cancel`,
 			data: {},
+		});
+	},
+	updateAppointmentAttendanceStatus(appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) {
+		return httpSingleton.orchestrateRequest<{ appointment: AppointmentModel }>({
+			method: 'POST',
+			url: `/appointments/${appointmentId}/attendance-status`,
+			data: { attendanceStatusId },
 		});
 	},
 };
