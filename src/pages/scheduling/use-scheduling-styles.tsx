@@ -28,20 +28,8 @@ export const useSchedulingStyles = createUseStyles({
 			fill: colors.white,
 		},
 	},
-	typeahead: {
-		'& .rbt input': {
-			height: 56,
-		},
-		'& .rbt .rbt-menu': {
-			border: `1px solid ${colors.border}`,
-			padding: 8,
-			...fonts.xs,
-		},
-		'& .dropdown-item': {
-			textDecoration: 'none',
-		},
-	},
 });
+
 export const useContainerStyles = createUseStyles({
 	wrapper: {
 		display: 'flex',
@@ -58,15 +46,6 @@ export const useContainerStyles = createUseStyles({
 			-45deg,
 			transparent,
 			transparent 9px,
-			${colors.black} 10px,
-			${colors.black} 11px
-		) !important;`,
-	},
-	blockedAvailabilityTimeslot: {
-		background: `repeating-linear-gradient(
-			-45deg,
-			#6C7978,
-			#6C7978 9px,
 			${colors.black} 10px,
 			${colors.black} 11px
 		) !important;`,

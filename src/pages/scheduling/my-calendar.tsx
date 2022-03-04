@@ -1,6 +1,5 @@
 import Accordion from '@/components/accordion';
 import useAccount from '@/hooks/use-account';
-import useHandleError from '@/hooks/use-handle-error';
 import colors from '@/jss/colors';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -8,21 +7,19 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { EditAvailabilityPanel } from './edit-availability-panel';
 import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
-import { schedulingService } from '@/lib/services';
-import Color from 'color';
-import { ERROR_CODES } from '@/lib/http-client';
-import { AxiosError } from 'axios';
+
 import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
 import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
+import { useProviderCalendar } from './use-provider-calendar';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -40,7 +37,6 @@ enum CalendarSidebar {
 }
 
 export const MyCalendarScheduling: FC = () => {
-	const handleError = useHandleError();
 	const classes = useContainerStyles();
 	const { account } = useAccount();
 
@@ -54,130 +50,34 @@ export const MyCalendarScheduling: FC = () => {
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
-	const [activeStartDate, setActiveStartDate] = useState<string>();
-	const [activeEndDate, setActiveEndDate] = useState<string>();
+	const [mainStartDate, setMainStartDate] = useState<string>();
+	const [mainEndDate, setMainEndDate] = useState<string>();
+	const [leftStartDate, setLeftStartDate] = useState<string>();
+	const [leftEndDate, setLeftEndDate] = useState<string>();
 
 	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
-	const inFlightRequest = useRef<ReturnType<typeof schedulingService['getCalendar']>>();
 
 	const [draftEvent, setDraftEvent] = useState<any>();
 
-	const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+	const providerId = account?.providerId ?? '';
+	const { fetchData: fetchMainData, calendarEvents: mainCalendarEvents } = useProviderCalendar({
+		providerId,
+		startDate: mainStartDate,
+		endDate: mainEndDate,
+	});
+	const { fetchData: fetchLeftData, calendarEvents: leftCalendarEvents } = useProviderCalendar({
+		providerId,
+		startDate: leftStartDate,
+		endDate: leftEndDate,
+	});
 
-	const fetchData = useCallback(async () => {
-		try {
-			if (!mainCalendarRef.current) {
-				throw new Error('mainCalendarRef.current is undefined');
-			}
-
-			if (!account || !account.providerId || !activeStartDate || !activeEndDate) {
-				throw new Error('missing Calendar parameters');
-			}
-
-			if (inFlightRequest.current) {
-				inFlightRequest.current.abort();
-			}
-
-			inFlightRequest.current = schedulingService.getCalendar(account.providerId, {
-				startDate: activeStartDate,
-				endDate: activeEndDate,
-			});
-
-			const { providerCalendar } = await inFlightRequest.current.fetch();
-
-			const formattedAvailabilities = providerCalendar.availabilities.map((availability, index) => {
-				return {
-					id: `availability${index}`,
-					start: availability.startDateTime,
-					end: availability.endDateTime,
-					display: 'background',
-					extendedProps: {
-						logicalAvailabilityId: availability.logicalAvailabilityId,
-						isAvailability: true,
-					},
-				};
-			});
-
-			const formattedBlockedTimes = providerCalendar.blocks.map((availability, index) => {
-				return {
-					id: `blockedTime${index}`,
-					start: availability.startDateTime,
-					end: availability.endDateTime,
-					display: 'background',
-					extendedProps: {
-						logicalAvailabilityId: availability.logicalAvailabilityId,
-						isBlockedTime: true,
-					},
-				};
-			});
-
-			const formattedAppointments = providerCalendar.appointments.map((appointment, index) => {
-				return {
-					id: `appointment${index}`,
-					title: appointment.account?.displayName || 'Anonymous',
-					start: moment(appointment.startTime).toDate(),
-					end: moment(appointment.endTime).toDate(),
-					backgroundColor: Color(appointment.appointmentType.hexColor).lighten(0.7).hex(),
-					borderColor: appointment.appointmentType.hexColor,
-					textColor: '#21312A',
-					extendedProps: {
-						appointmentId: appointment.appointmentId,
-					},
-				};
-			});
-
-			// [TODO]: MAKE THIS REAL
-			const formattedFollowUps = providerCalendar.followups.map((followup, index) => {
-				return {
-					id: `followups${index}`,
-					allDay: true,
-					title: 'X followups',
-					start: moment().toDate(),
-					extendedProps: {
-						patients: [
-							{
-								id: 'f1p1',
-								name: 'Patient 1',
-								phone: '(333) 333-3333',
-							},
-							{
-								id: 'f1p2',
-								name: 'Patient 2',
-								phone: '(333) 333-3333',
-							},
-							{
-								id: 'f1p3',
-								name: 'Patient 3',
-								phone: '(333) 333-3333',
-							},
-						],
-					},
-				};
-			});
-
-			const allCalendarEvents = [
-				...formattedFollowUps,
-				...formattedAppointments,
-				...formattedAvailabilities,
-				...formattedBlockedTimes,
-			];
-
-			setCalendarEvents(allCalendarEvents);
-		} catch (error) {
-			if ((error as AxiosError).code !== ERROR_CODES.REQUEST_ABORTED) {
-				handleError(error);
-			}
-		}
-	}, [account, activeEndDate, activeStartDate, handleError]);
-
-	const formattedCalendarEvents = useMemo(() => {
-		const formatted = calendarEvents.map((e) => {
+	const renderedMainCalendarEvents = useMemo(() => {
+		const formatted = mainCalendarEvents.map((e) => {
 			const classNames = [];
-			if (e.extendedProps?.isBlockedTime && e.extendedProps?.isAvailability) {
-				classNames.push(classes.blockedAvailabilityTimeslot);
-			} else if (e.extendedProps?.isBlockedTime) {
+
+			if (e.extendedProps?.isBlockedTime) {
 				classNames.push(classes.blockedTimeslot);
 			}
 
@@ -186,19 +86,20 @@ export const MyCalendarScheduling: FC = () => {
 				classNames,
 			};
 		});
+
 		if (draftEvent) {
 			formatted.push(draftEvent);
 		}
 
 		return formatted;
-	}, [calendarEvents, classes.blockedAvailabilityTimeslot, classes.blockedTimeslot, draftEvent]);
+	}, [mainCalendarEvents, classes.blockedTimeslot, draftEvent]);
 
-	const leftCalendarEvents = useMemo(() => {
+	const renderedLeftCalendarEvents = useMemo(() => {
 		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
 		const end = start.clone().weekday(7);
 
 		return [
-			...formattedCalendarEvents,
+			...leftCalendarEvents,
 			{
 				id: 'current-week',
 				start: start.toDate(),
@@ -208,15 +109,7 @@ export const MyCalendarScheduling: FC = () => {
 				backgroundColor: colors.secondary,
 			},
 		];
-	}, [formattedCalendarEvents, leftCalendarMoment]);
-
-	useEffect(() => {
-		fetchData();
-
-		return () => {
-			inFlightRequest.current?.abort();
-		};
-	}, [fetchData]);
+	}, [leftCalendarEvents, leftCalendarMoment]);
 
 	const sidebarToggled = followupPatientList.length > 0;
 
@@ -286,7 +179,7 @@ export const MyCalendarScheduling: FC = () => {
 						height="auto"
 						plugins={[dayGridPlugin, interactionPlugin]}
 						initialView={MainCalendarView.Month}
-						events={leftCalendarEvents}
+						events={renderedLeftCalendarEvents}
 						headerToolbar={{
 							left: 'title prev next',
 							right: 'today',
@@ -300,22 +193,8 @@ export const MyCalendarScheduling: FC = () => {
 							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
 						}}
 						datesSet={({ start, end }) => {
-							const startMoment = moment(start);
-							const endMoment = moment(end);
-
-							setActiveStartDate(startMoment.format('YYYY-MM-DD'));
-							setActiveEndDate(endMoment.format('YYYY-MM-DD'));
-
-							const mainCal = mainCalendarRef.current?.getApi();
-							const mainMoment = mainCal && moment(mainCal.getDate());
-
-							console.log({ start, end, mainMoment });
-							if (mainMoment?.isBetween(startMoment, endMoment)) {
-								return;
-							}
-
-							mainCal?.gotoDate(start);
-							setLeftCalendarMoment(startMoment);
+							setLeftStartDate(moment(start).format('YYYY-MM-DD'));
+							setLeftEndDate(moment(end).format('YYYY-MM-DD'));
 						}}
 					/>
 				</div>
@@ -402,7 +281,7 @@ export const MyCalendarScheduling: FC = () => {
 					// 	console.log({args})
 					// }}
 					nowIndicator
-					events={formattedCalendarEvents}
+					events={renderedMainCalendarEvents}
 					eventContent={(evtInfo) => {
 						if (evtInfo.event.display === 'background') {
 							return;
@@ -458,6 +337,10 @@ export const MyCalendarScheduling: FC = () => {
 					// eventAdd={function(){}}
 					// eventChange={function(){}}
 					// eventRemove={function(){}}
+					datesSet={({ start, end }) => {
+						setMainStartDate(moment(start).format('YYYY-MM-DD'));
+						setMainEndDate(moment(end).format('YYYY-MM-DD'));
+					}}
 				/>
 			</div>
 
@@ -496,7 +379,8 @@ export const MyCalendarScheduling: FC = () => {
 								}
 
 								if (didUpdate) {
-									fetchData();
+									fetchMainData();
+									fetchLeftData();
 								}
 							}}
 						/>
@@ -515,7 +399,8 @@ export const MyCalendarScheduling: FC = () => {
 								}
 
 								if (didUpdate) {
-									fetchData();
+									fetchMainData();
+									fetchLeftData();
 								}
 							}}
 						/>
@@ -551,7 +436,8 @@ export const MyCalendarScheduling: FC = () => {
 								}
 
 								if (didUpdate) {
-									fetchData();
+									fetchMainData();
+									fetchLeftData();
 								}
 							}}
 						/>
