@@ -3,14 +3,9 @@ import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import { Button } from 'react-bootstrap';
 
-import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-
-import BackgroundImageContainer from '@/components/background-image-container';
-
 import { Provider, AvailabilityTimeSlot } from '@/lib/models';
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
 import mediaQueries from '@/jss/media-queries';
+import { ProviderInfoCard } from './provider-info-card';
 
 const useAvailableProviderStyles = createUseStyles({
 	availableProvider: {
@@ -45,36 +40,7 @@ const useAvailableProviderStyles = createUseStyles({
 			flexShrink: 0,
 		},
 	},
-	paymentPill: {
-		...fonts.xxs,
-		color: colors.dark,
-		display: 'inline-block',
-		border: `2px solid ${colors.border}`,
-		borderRadius: 20,
-		marginTop: 4,
-		padding: '2px 6px',
-	},
-	acceptsAnons: {
-		backgroundColor: colors.primary,
-		borderRadius: 20,
-	},
-	childrenOuter: {
-		display: 'inline-block',
-		transform: 'translateY(4px)',
-	},
 });
-
-function joinComma(valueOne: string, valueTwo: string) {
-	if (valueOne && valueTwo) {
-		return `${valueOne}, ${valueTwo}`;
-	} else if (valueOne) {
-		return valueOne;
-	} else if (valueTwo) {
-		return valueTwo;
-	}
-
-	return '';
-}
 
 interface AvailableProviderProps {
 	ref?: React.ForwardedRef<HTMLDivElement>;
@@ -87,17 +53,6 @@ interface AvailableProviderProps {
 const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement, AvailableProviderProps>(
 	({ className, provider, onTimeSlotClick, selectedTimeSlot, children }, ref) => {
 		const classes = useAvailableProviderStyles();
-		const placeholderImage = useRandomPlaceholderImage();
-
-		const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;
-
-		let entityName = (provider.entity || provider.clinic) ? joinComma(provider.entity, provider.clinic) : null;
-
-		// It's possible this is the same as the title.  If so, null it out
-		// so we don't show the same text twice
-		if(entityName && entityName === finalTitle) {
-			entityName = null;
-		}
 
 		return (
 			<div
@@ -111,57 +66,7 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 					className
 				)}
 			>
-				<div className="d-flex align-items-center">
-					<BackgroundImageContainer size={116} imageUrl={provider.imageUrl || placeholderImage} />
-					<div className="pl-3">
-						<h5 className="mb-0">
-							{provider.bioUrl ? (
-								<a href={provider.bioUrl} target="_blank" rel="noreferrer">{joinComma(provider.name, provider.license)}</a>
-							) : (
-								joinComma(provider.name, provider.license)
-							)}
-						</h5>
-
-						{/* {provider.schedulingSystemId !== 'EPIC' && (
-							<p className={classNames('d-inline-block text-white px-2', classes.acceptsAnons)}>
-								<small>Accepts Anonymous Patients</small>
-							</p>
-						)} */}
-
-						{finalTitle && (
-							<p className="mb-0">
-								<i>{finalTitle}</i>
-							</p>
-						)}
-
-						{provider.treatmentDescription ? (
-							<p className="mb-0">
-								<strong>{provider.treatmentDescription}</strong>
-							</p>
-						) : (
-							provider.specialty && <p className="mb-0">{provider.specialty}</p>
-						)}
-
-						{entityName && (
-							<p className="mb-0">
-								{entityName}
-							</p>
-						)}
-
-						<div>
-							{provider.paymentFundingDescriptions &&
-								provider.paymentFundingDescriptions.map((paymentOption, index) => {
-									return (
-										<div className={classes.paymentPill} key={index}>
-											{paymentOption}
-										</div>
-									);
-								})}
-						</div>
-
-						<div className={classes.childrenOuter}>{children}</div>
-					</div>
-				</div>
+				<ProviderInfoCard provider={provider}>{children}</ProviderInfoCard>
 
 				{Array.isArray(provider.times) && (
 					<div className={classes.horizontalScroller}>
