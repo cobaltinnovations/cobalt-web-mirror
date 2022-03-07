@@ -33,7 +33,7 @@ const useHeaderStyles = createUseStyles({
 		top: 0,
 		left: 0,
 		right: 0,
-		zIndex: 2,
+		zIndex: 4,
 		height: 54,
 		display: 'flex',
 		position: 'fixed',

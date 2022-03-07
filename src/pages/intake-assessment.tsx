@@ -62,6 +62,8 @@ const IntakeAssessment: FC = () => {
 		getFiltersQueryString,
 	} = useContext(BookingContext);
 
+	const appointmentTypeId = query.get('appointmentTypeId') || selectedAppointmentTypeId;
+
 	const supportPageRoute = {
 		pathname: '/connect-with-support',
 		search: getFiltersQueryString(),
@@ -72,11 +74,15 @@ const IntakeAssessment: FC = () => {
 		let response;
 
 		if (providerId) {
-			response = await assessmentService.getIntakeAssessmentQuestion(providerId, questionId, sessionId).fetch();
+			response = await assessmentService
+				.getIntakeAssessmentQuestion({ appointmentTypeId, providerId, questionId, sessionId })
+				.fetch();
 
 			setIsGroupSessionAssessment(false);
 		} else if (groupSessionId) {
-			response = await assessmentService.getIntakeAssessmentQuestion(undefined, questionId, sessionId, groupSessionId).fetch();
+			response = await assessmentService
+				.getIntakeAssessmentQuestion({ questionId, sessionId, groupSessionId })
+				.fetch();
 
 			setIsGroupSessionAssessment(true);
 		} else {
@@ -89,7 +95,7 @@ const IntakeAssessment: FC = () => {
 
 		setAssessment(response.assessment);
 		setSelectedQuestionAnswers(response.assessment.question.selectedAssessmentAnswers);
-	}, [groupSessionId, providerId, questionId, sessionId]);
+	}, [appointmentTypeId, groupSessionId, providerId, questionId, sessionId]);
 
 	const submitAnswers = async (assessmentAnswers: SelectedQuestionAnswer[]) => {
 		if (!assessment) {
@@ -247,6 +253,7 @@ const IntakeAssessment: FC = () => {
 								appointmentTypeId: selectedAppointmentTypeId,
 								date: formattedAvailabilityDate,
 								time: selectedTimeSlot.time,
+								intakeAssessmentId: assessment?.assessmentId,
 							};
 
 							if (promptForEmail) {
@@ -350,7 +357,11 @@ const IntakeAssessment: FC = () => {
 										}
 									}}
 								>
-									{isGroupSessionAssessment && <p className="mb-5">Only people who answer "Yes" are eligible to reserve a seat.</p>}
+									{isGroupSessionAssessment && (
+										<p className="mb-5">
+											Only people who answer "Yes" are eligible to reserve a seat.
+										</p>
+									)}
 								</SurveyQuestion>
 							)}
 
@@ -371,7 +382,12 @@ const IntakeAssessment: FC = () => {
 								)}
 
 								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
-									<Button type="submit" className="ml-auto" variant="primary" onClick={() => submitAnswers(selectedQuestionAnswers)}>
+									<Button
+										type="submit"
+										className="ml-auto"
+										variant="primary"
+										onClick={() => submitAnswers(selectedQuestionAnswers)}
+									>
 										{assessment?.nextQuestionId ? 'next' : 'done'}
 									</Button>
 								)}
@@ -393,7 +409,9 @@ const IntakeAssessment: FC = () => {
 						/>
 					)}
 
-					{isGroupSessionAssessment && <Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>}
+					{isGroupSessionAssessment && (
+						<Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>
+					)}
 					{!isGroupSessionAssessment && <Link to={supportPageRoute}>exit booking</Link>}
 				</p>
 			</Container>

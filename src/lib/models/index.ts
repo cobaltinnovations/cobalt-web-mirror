@@ -12,3 +12,4 @@ export * from './institution';
 export * from './interaction-models';
 export * from './provider';
 export * from './roles';
+export * from './scheduling-models';

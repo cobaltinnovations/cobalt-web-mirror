@@ -1,5 +1,12 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AccountModel, BetaFeature, BetaFeatureId, BetaStatusId } from '@/lib/models';
+import {
+	AccountModel,
+	AppointmentModel,
+	BetaFeature,
+	BetaFeatureId,
+	BetaStatusId,
+	PersonalizationDetails,
+} from '@/lib/models';
 import { Institution } from '../models/institution';
 
 export interface AccountResponse {
@@ -126,7 +133,11 @@ export const accountService = {
 	epicMatch(
 		matchStep: EpicMatchStep,
 		data: Partial<EpicPatientData>,
-		{ providerId, epicDepartmentId, applyToCurrentAccount = false }: { providerId: string; epicDepartmentId: string; applyToCurrentAccount: boolean }
+		{
+			providerId,
+			epicDepartmentId,
+			applyToCurrentAccount = false,
+		}: { providerId: string; epicDepartmentId: string; applyToCurrentAccount: boolean }
 	) {
 		return httpSingleton.orchestrateRequest<EpicMatchRespone>({
 			method: 'post',
@@ -194,6 +205,24 @@ export const accountService = {
 			method: 'put',
 			url: `/accounts/${accountId}/beta-status`,
 			data: { betaStatusId },
+		});
+	},
+	getAppointmentDetailsForAccount(accountId: string, appointmentId: string) {
+		return httpSingleton.orchestrateRequest<{
+			account: AccountModel;
+			appointment: AppointmentModel;
+			appointments: AppointmentModel[];
+			assessment: PersonalizationDetails;
+		}>({
+			method: 'GET',
+			url: `/accounts/${accountId}/appointment-details/${appointmentId}`,
+		});
+	},
+	postRoleRequest(accountId: string, roleId: string) {
+		return httpSingleton.orchestrateRequest<unknown>({
+			method: 'POST',
+			url: `/accounts/${accountId}/role-request`,
+			data: { roleId },
 		});
 	},
 };

@@ -19,11 +19,23 @@ export interface ProviderAvailability {
 export interface LogicalAvailability {
 	logicalAvailabilityId: string;
 	providerId: string;
+	logicalAvailabilityTypeId: 'OPEN' | 'BLOCK';
+	recurrenceTypeId: 'DAILY';
 	startDateTime: string;
 	startDateTimeDescription: string;
-	endDateTime: string;
-	endDateTimeDescription: string;
+	endDate: string;
+	endDateDescription: string;
+	endTime: string;
+	endTimeDescription: string;
+	recurSunday: boolean;
+	recurMonday: boolean;
+	recurTuesday: boolean;
+	recurWednesday: boolean;
+	recurThursday: boolean;
+	recurFriday: boolean;
+	recurSaturday: boolean;
 	appointmentTypes: AppointmentType[];
+	descriptionComponents: string[];
 }
 
 export interface PaymentType {
@@ -80,6 +92,7 @@ export interface Provider {
 	skipIntakePrompt: boolean;
 	treatmentDescription?: string;
 	emailAddress?: string;
+	bio?: string;
 	bioUrl?: string;
 }
 

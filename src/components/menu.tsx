@@ -253,6 +253,13 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 							my calendar
 						</Link>
 					</li>
+					{account?.roleId === 'PROVIDER' ? (
+						<li>
+							<Link to="/scheduling" onClick={handleLinkClick}>
+								my schedule
+							</Link>
+						</li>
+					) : null}
 					<li>
 						<Link to="/in-the-studio" onClick={handleLinkClick}>
 							in the studio
@@ -472,7 +479,13 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 					</div>
 				</div>
 			</CSSTransition>
-			<CSSTransition in={open} timeout={200} classNames="overlay-animation" onClick={handleOverlayClick} unmountOnExit={true}>
+			<CSSTransition
+				in={open}
+				timeout={200}
+				classNames="overlay-animation"
+				onClick={handleOverlayClick}
+				unmountOnExit={true}
+			>
 				<div className={classes.overlay} />
 			</CSSTransition>
 		</>

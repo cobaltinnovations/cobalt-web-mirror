@@ -1,11 +1,11 @@
 import moment, { Moment } from 'moment';
 import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback } from 'react';
-import { Range } from 'react-input-range';
-
 import { FilterDays } from '@/components/filter-days-modal';
-import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot } from '@/lib/models';
+import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
+
+type Range = { min: number; max: number };
 
 interface DateFilter {
 	from: Moment;
@@ -34,6 +34,8 @@ export interface SearchResult {
 interface BookingState {
 	appointmentTypes: FindProvidersResponse['appointmentTypes'];
 	setAppointmentTypes: Dispatch<SetStateAction<FindProvidersResponse['appointmentTypes']>>;
+	specialties: FindProvidersResponse['specialties'];
+	setSpecialties: Dispatch<SetStateAction<FindProvidersResponse['specialties']>>;
 	epicDepartments: FindProvidersResponse['epicDepartments'];
 	setEpicDepartments: Dispatch<SetStateAction<FindProvidersResponse['epicDepartments']>>;
 	availableSections: FindProvidersResponse['sections'];
@@ -84,12 +86,14 @@ interface BookingState {
 	preserveFilters: boolean;
 	setPreserveFilters: Dispatch<SetStateAction<boolean>>;
 	getFiltersQueryString: () => string;
+	selectedAppointmentType?: AppointmentType;
 }
 
 const BookingContext = createContext({} as BookingState);
 
 const BookingProvider: FC = (props) => {
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
+	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);
 	const [availableSections, setAvailableSections] = useState<FindProvidersResponse['sections']>([]);
 
@@ -176,10 +180,13 @@ const BookingProvider: FC = (props) => {
 		(findOptions?: FindOptionsResponse) => {
 			return {
 				[BookingFilters.Date]:
-					moment(dateFilter.from).format('YYYY-MM-DD') !== moment(findOptions?.defaultStartDate).format('YYYY-MM-DD') ||
-					moment(dateFilter.to).format('YYYY-MM-DD') !== moment(findOptions?.defaultEndDate).format('YYYY-MM-DD'),
+					moment(dateFilter.from).format('YYYY-MM-DD') !==
+						moment(findOptions?.defaultStartDate).format('YYYY-MM-DD') ||
+					moment(dateFilter.to).format('YYYY-MM-DD') !==
+						moment(findOptions?.defaultEndDate).format('YYYY-MM-DD'),
 				[BookingFilters.Time]:
-					formattedTimeFilter.startTime !== findOptions?.defaultStartTime || formattedTimeFilter.endTime !== findOptions?.defaultEndTime,
+					formattedTimeFilter.startTime !== findOptions?.defaultStartTime ||
+					formattedTimeFilter.endTime !== findOptions?.defaultEndTime,
 				[BookingFilters.Provider]: !isEqual(providerTypeFilter, findOptions?.defaultSupportRoleIds),
 				[BookingFilters.Availability]: availabilityFilter !== findOptions?.defaultAvailability,
 				[BookingFilters.Payment]: !!paymentTypeFilter.length,
@@ -200,9 +207,19 @@ const BookingProvider: FC = (props) => {
 		]
 	);
 
+	const selectedAppointmentType = useMemo(() => {
+		if (!selectedAppointmentTypeId) {
+			return;
+		}
+
+		return appointmentTypes.find((aT) => aT.appointmentTypeId === selectedAppointmentTypeId);
+	}, [appointmentTypes, selectedAppointmentTypeId]);
+
 	return (
 		<BookingContext.Provider
 			value={{
+				specialties,
+				setSpecialties,
 				appointmentTypes,
 				setAppointmentTypes,
 				epicDepartments,
@@ -256,6 +273,7 @@ const BookingProvider: FC = (props) => {
 				preserveFilters,
 				setPreserveFilters,
 				getFiltersQueryString,
+				selectedAppointmentType,
 			}}
 		>
 			{props.children}

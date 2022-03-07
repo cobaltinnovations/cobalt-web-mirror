@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AppointmentModel, FollowupModel, AccountModel } from '@/lib/models';
+import { AppointmentModel, FollowupModel, AccountModel, ATTENDANCE_STATUS_ID } from '@/lib/models';
 
 export interface CreateAppointmentData {
 	accountId?: string;
@@ -12,6 +12,7 @@ export interface CreateAppointmentData {
 	groupEventTypeId?: string;
 	appointmentTypeId?: string;
 	appointmentReasonId?: string;
+	intakeAssessmentId?: string;
 	comment?: string;
 }
 
@@ -88,6 +89,14 @@ export const appointmentService = {
 		});
 	},
 
+	rescheduleAppointment(appointmentId: string, data: Partial<CreateAppointmentData>) {
+		return httpSingleton.orchestrateRequest<AppointmentResponse>({
+			method: 'put',
+			url: `/appointments/${appointmentId}/reschedule`,
+			data,
+		});
+	},
+
 	createFollowup(data: CreateFollowupDate) {
 		return httpSingleton.orchestrateRequest<FollowupResponse>({
 			method: 'post',
@@ -116,6 +125,13 @@ export const appointmentService = {
 			method: 'post',
 			url: `/followups/${followUpId}/cancel`,
 			data: {},
+		});
+	},
+	updateAppointmentAttendanceStatus(appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) {
+		return httpSingleton.orchestrateRequest<{ appointment: AppointmentModel }>({
+			method: 'PUT',
+			url: `/appointments/${appointmentId}/attendance-status`,
+			data: { attendanceStatusId },
 		});
 	},
 };

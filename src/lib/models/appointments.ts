@@ -1,6 +1,13 @@
 import { Provider } from '@/lib/models/provider';
 import { AccountModel } from '@/lib/models/account';
 
+export enum ATTENDANCE_STATUS_ID {
+	UNKNOWN = 'UNKNOWN',
+	MISSED = 'MISSED',
+	CANCELED = 'CANCELED',
+	ATTENDED = 'ATTENDED',
+}
+
 export interface AppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
@@ -11,6 +18,8 @@ export interface AppointmentType {
 	durationInMinutesDescription: string;
 	name: string;
 	visitTypeId: string;
+	hexColor: string;
+	assessmentId?: string;
 }
 
 export interface EpicDepartment {
@@ -29,6 +38,7 @@ export enum VideoconferencePlatformId {
 export interface AppointmentModel {
 	appointmentId: string;
 	accountId: string;
+	appointmentTypeId: string;
 	acuityAppointmentId: number;
 	bluejeansMeetingId: number;
 	name: string;
@@ -54,6 +64,8 @@ export interface AppointmentModel {
 	account?: AccountModel;
 	appointmentReason?: AppointmentReason;
 	appointmentDescription: string;
+	appointmentType: AppointmentType;
+	attendanceStatusId: ATTENDANCE_STATUS_ID;
 }
 
 export enum AppointmentReasonType {

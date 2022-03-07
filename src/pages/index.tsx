@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, Redirect, useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
@@ -12,7 +13,7 @@ import HeroContainer from '@/components/hero-container';
 import StudioEvent from '@/components/studio-event';
 import OnYourTimeItem from '@/components/on-your-time-item';
 
-import { recommendationsService, groupSessionsService } from '@/lib/services';
+import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
 import { GroupEvent, Content, GroupSessionModel } from '@/lib/models';
 
 import colors from '@/jss/colors';
@@ -68,6 +69,16 @@ const Index: FC = () => {
 
 		setInTheStudioEvents([...response.groupSessions, ...response.groupEvents]);
 		setOnYourTimeContent(response.contents);
+
+		const roleId = Cookies.get('roleId');
+		if (roleId) {
+			try {
+				await accountService.postRoleRequest(accountId, roleId).fetch();
+				Cookies.remove('roleId');
+			} catch (error) {
+				// dont throw
+			}
+		}
 	}, [accountId]);
 
 	function handleConnectWithSupportButtonClick() {
@@ -92,7 +103,9 @@ const Index: FC = () => {
 						<CalendarIcon className={classes.calendarIcon} />
 						connect with support
 					</Button>
-					<small className="text-white text-uppercase">peers, resilience coaches, therapists, psychiatrists, and more are here to help</small>
+					<small className="text-white text-uppercase">
+						peers, resilience coaches, therapists, psychiatrists, and more are here to help
+					</small>
 				</HeroContainer>
 			)}
 
@@ -101,7 +114,11 @@ const Index: FC = () => {
 					<Container fluid className={classNames(classes.inTheStudioContainer, 'pt-5')}>
 						<Container>
 							<Row>
-								<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
 									<div className="d-flex justify-content-between align-items-center mb-2">
 										<h3 className="mb-0">in the studio</h3>
 										<p className="mb-0 text-primary">
@@ -115,7 +132,11 @@ const Index: FC = () => {
 					<Container fluid className={classes.inTheStudioContainer}>
 						<Container fluid="md">
 							<Row>
-								<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
 									<Carousel prevIcon={<ChevronLeft />} nextIcon={<ChevronRight />}>
 										{inTheStudioEvents.map((inTheStudioEvent) => {
 											if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
@@ -133,7 +154,10 @@ const Index: FC = () => {
 
 											return (
 												<Carousel.Item key={inTheStudioEvent.groupEventId}>
-													<Link className="text-decoration-none" to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}>
+													<Link
+														className="text-decoration-none"
+														to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
+													>
 														<StudioEvent groupEvent={inTheStudioEvent} />
 													</Link>
 												</Carousel.Item>
