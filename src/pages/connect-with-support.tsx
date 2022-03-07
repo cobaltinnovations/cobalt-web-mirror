@@ -1,5 +1,15 @@
 import Cookies from 'js-cookie';
-import React, { FC, useEffect, useState, useMemo, useCallback, useRef, useContext, RefObject, useLayoutEffect } from 'react';
+import React, {
+	FC,
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+	useContext,
+	RefObject,
+	useLayoutEffect,
+} from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
@@ -7,17 +17,12 @@ import { useHistory, Link, useLocation } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import moment from 'moment';
 import classNames from 'classnames';
-import { padStart, isEqual } from 'lodash';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
-import useRandomPlaceholderImage, { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
+import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 import { queryParamDateRegex } from '@/lib/utils';
 
-import CollectContactInfoModal from '@/components/collect-contact-info-modal';
-import ConfirmAppointmentTypeModal from '@/components/confirm-appointment-type-modal';
-import ConfirmIntakeAssessmentModal from '@/components/confirm-intake-assessment-modal';
-import ConfirmProviderBookingModal from '@/components/confirm-provider-booking-modal';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import FilterAvailabilityModal from '@/components/filter-availability-modal';
 import FilterDaysModal from '@/components/filter-days-modal';
@@ -36,7 +41,7 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
-import { accountService, appointmentService, providerService, CreateAppointmentData, FindOptionsResponse, FindFilters } from '@/lib/services';
+import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
 import colors from '@/jss/colors';
@@ -45,6 +50,7 @@ import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
+import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -104,16 +110,14 @@ const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('connect with support');
 	const classes = useConnectWithSupportStyles();
-	const { account, isAnonymous, setAccount } = useAccount();
+	const { account } = useAccount();
 
 	const location = useLocation();
 	const history = useHistory<HistoryLocationState>();
-	const placeholderImage = useRandomPlaceholderImage();
+	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
 	const [didInit, setDidInit] = useState(false);
-	const [isBooking, setIsBooking] = useState(false);
-	const [isSavingInfo, setIsSavingInfo] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
@@ -125,9 +129,7 @@ const ConnectWithSupport: FC = () => {
 	const [assessmentScore, setAssessmentScore] = useState<AssessmentScore>();
 	const [openFilterModal, setOpenFilterModal] = useState<BookingFilters | null>(null);
 	const {
-		appointmentTypes,
 		setAppointmentTypes,
-		epicDepartments,
 		setEpicDepartments,
 		availableSections,
 		setAvailableSections,
@@ -153,41 +155,20 @@ const ConnectWithSupport: FC = () => {
 		specialtyFilter,
 		setSpecialtyFilter,
 
-		selectedAppointmentTypeId,
-		setSelectedAppointmentTypeId,
 		selectedDate,
-		setSelectedDate,
 		selectedProvider,
-		setSelectedProvider,
-		selectedTimeSlot,
-		setSelectedTimeSlot,
-		timeSlotEndTime,
-		formattedAvailabilityDate,
-		formattedModalDate,
 		formattedTimeFilter,
-
-		promptForEmail,
-		setPromptForEmail,
-		promptForPhoneNumber,
-		setPromptForPhoneNumber,
 
 		getActiveFiltersState,
 		isEligible,
 		setIsEligible,
 		preserveFilters,
 		setPreserveFilters,
-		selectedAppointmentType,
 	} = useContext(BookingContext);
 	const [searchQuery, setSearchQuery] = useState('');
 
 	const [paymentDisclaimerOpen, setPaymentDisclaimerOpen] = useState(!Cookies.get('paymentDisclaimerSeen'));
-	const [collectedPhoneNumebr, setCollectedPhoneNumber] = useState(account?.phoneNumber ?? '');
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
 	// const [showCopayModal, setShowCopayModal] = useState(!Cookies.get('seenWaivedCopay'));
-	const [showCollectInfoModal, setShowCollectInfoModal] = useState(false);
-	const [showConfirmAppointmentTypeModal, setShowConfirmAppointmentTypeModal] = useState(false);
-	const [showConfirmIntakeAssessmentModal, setShowConfirmIntakeAssessmentModal] = useState(false);
-	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const providerRefs = useMemo(
 		() =>
@@ -252,7 +233,9 @@ const ConnectWithSupport: FC = () => {
 				min: parseInt(findOptions.defaultStartTime, 10),
 				max: parseInt(findOptions.defaultEndTime, 10),
 			});
-			setProviderTypeFilter(routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds);
+			setProviderTypeFilter(
+				routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds
+			);
 			setAvailabilityFilter(findOptions.defaultAvailability);
 			setVisitTypeIdsFilter(findOptions.defaultVisitTypeIds);
 			setPaymentTypeFilter([]);
@@ -297,16 +280,6 @@ const ConnectWithSupport: FC = () => {
 	);
 
 	useEffect(() => {
-		if (account?.emailAddress) {
-			setCollectedEmail(account.emailAddress);
-		}
-
-		if (account?.phoneNumber) {
-			setCollectedPhoneNumber(account.phoneNumber);
-		}
-	}, [account]);
-
-	useEffect(() => {
 		const isImmediate = Cookies.get('immediateAccess');
 
 		if (!isImmediate && !skipAssessment && didInit && !assessmentScore) {
@@ -319,12 +292,13 @@ const ConnectWithSupport: FC = () => {
 		}
 	}, [assessmentScore, didInit, history, location.search, skipAssessment]);
 
+	const institutionId = account?.institutionId ?? '';
 	useEffect(() => {
 		const urlQuery = new URLSearchParams(location.search);
 		const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 		const routedClinicIds = urlQuery.getAll('clinicId');
 
-		if (didInit) {
+		if (didInit || !institutionId) {
 			return () => {
 				if (routedClinicIds) {
 					setSelectedSearchResult([]);
@@ -334,13 +308,16 @@ const ConnectWithSupport: FC = () => {
 
 		const findOptionsRequest = providerService.fetchFindOptions({
 			supportRoleIds: routedSupportRoleIds,
-			institutionId: account!.institutionId,
+			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
 
 		async function init() {
 			try {
-				const [findOptions, recent] = await Promise.all([findOptionsRequest.fetch(), fetchRecentRequest.fetch()]);
+				const [findOptions, recent] = await Promise.all([
+					findOptionsRequest.fetch(),
+					fetchRecentRequest.fetch(),
+				]);
 
 				unstable_batchedUpdates(() => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
@@ -361,7 +338,15 @@ const ConnectWithSupport: FC = () => {
 			findOptionsRequest.abort();
 			fetchRecentRequest.abort();
 		};
-	}, [didInit, preserveFilters, location.search, setFilterDefaults, handleError]);
+	}, [
+		didInit,
+		preserveFilters,
+		location.search,
+		setFilterDefaults,
+		handleError,
+		institutionId,
+		setSelectedSearchResult,
+	]);
 
 	useEffect(() => {
 		if (!didInit) {
@@ -370,7 +355,10 @@ const ConnectWithSupport: FC = () => {
 
 		const selectedSearchEntityId = selectedSearchResult[0] ? selectedSearchResult[0].id : undefined;
 
-		if ((providerFilter && providerFilter === selectedSearchEntityId) || (clinicsFilter.length && clinicsFilter[0] === selectedSearchEntityId)) {
+		if (
+			(providerFilter && providerFilter === selectedSearchEntityId) ||
+			(clinicsFilter.length && clinicsFilter[0] === selectedSearchEntityId)
+		) {
 			setIsLoading(false);
 			return;
 		}
@@ -381,7 +369,9 @@ const ConnectWithSupport: FC = () => {
 
 		if (selectedSearchResult[0]) {
 			findFilters =
-				selectedSearchResult[0].type === 'provider' ? { providerId: selectedSearchResult[0].id } : { clinicIds: [selectedSearchResult[0].id] };
+				selectedSearchResult[0].type === 'provider'
+					? { providerId: selectedSearchResult[0].id }
+					: { clinicIds: [selectedSearchResult[0].id] };
 		} else {
 			findFilters = providerFilter
 				? { providerId: providerFilter }
@@ -485,38 +475,6 @@ const ConnectWithSupport: FC = () => {
 		}
 	}
 
-	function navigateToEhrLookup() {
-		setPreserveFilters(true);
-		history.push(`/ehr-lookup`, {
-			skipAssessment,
-		});
-	}
-
-	function navigateToIntakeAssessment(provider: Provider) {
-		if (!provider) {
-			return;
-		}
-
-		setPreserveFilters(true);
-		history.push(`/intake-assessment?providerId=${provider.providerId}`, {
-			skipAssessment,
-		});
-	}
-
-	function continueBookingProcess(provider?: Provider, requireAssessment = false, promptForInfo = false) {
-		if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-			navigateToEhrLookup();
-		} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
-			navigateToIntakeAssessment(provider);
-		} else if (provider?.intakeAssessmentRequired || requireAssessment) {
-			setShowConfirmIntakeAssessmentModal(true);
-		} else if (promptForInfo || promptForEmail || promptForPhoneNumber) {
-			setShowCollectInfoModal(true);
-		} else {
-			setShowConfirmationModal(true);
-		}
-	}
-
 	const handlePaymentDisclaimerDidClose = useCallback(() => {
 		Cookies.set('paymentDisclaimerSeen', 'true');
 	}, []);
@@ -614,205 +572,11 @@ const ConnectWithSupport: FC = () => {
 				}}
 				onSave={(selectedSpecialties) => {
 					setOpenFilterModal(null);
-					setSpecialtyFilter(selectedSpecialties)
+					setSpecialtyFilter(selectedSpecialties);
 				}}
 			/>
 
-			<CollectContactInfoModal
-				promptForEmail={promptForEmail}
-				promptForPhoneNumber={promptForPhoneNumber}
-				show={showCollectInfoModal}
-				collectedEmail={collectedEmail}
-				collectedPhoneNumber={collectedPhoneNumebr}
-				onHide={() => {
-					setShowCollectInfoModal(false);
-				}}
-				onSubmit={async ({ email, phoneNumber }) => {
-					if (!account || isSavingInfo) {
-						return;
-					}
-
-					setIsSavingInfo(true);
-
-					try {
-						if (promptForEmail) {
-							const accountResponse = await accountService
-								.updateEmailAddressForAccountId(account.accountId, {
-									emailAddress: email,
-								})
-								.fetch();
-
-							setCollectedEmail(email);
-							setAccount(accountResponse.account);
-						}
-
-						if (promptForPhoneNumber) {
-							const accountResponse = await accountService
-								.updatePhoneNumberForAccountId(account.accountId, {
-									phoneNumber,
-								})
-								.fetch();
-
-							setCollectedPhoneNumber(phoneNumber);
-							setAccount(accountResponse.account);
-						}
-
-						setShowCollectInfoModal(false);
-						setShowConfirmationModal(true);
-					} catch (error) {
-						handleError(error);
-					}
-
-					setIsSavingInfo(false);
-				}}
-			/>
-
-			<ConfirmAppointmentTypeModal
-				show={showConfirmAppointmentTypeModal}
-				appointmentTypes={appointmentTypes
-					.filter((aT) => selectedProvider?.appointmentTypeIds.includes(aT.appointmentTypeId))
-					.map((aT) => ({
-						...aT,
-						disabled: !selectedTimeSlot?.appointmentTypeIds.includes(aT.appointmentTypeId),
-					}))}
-				epicDepartment={epicDepartments.find(
-					(eD) => eD.epicDepartmentId === selectedTimeSlot?.epicDepartmentId
-				)}
-				timeSlot={selectedTimeSlot}
-				providerName={`${selectedProvider?.name}${
-					selectedProvider?.license ? `, ${selectedProvider?.license}` : ''
-				}`}
-				onHide={() => {
-					setSelectedAppointmentTypeId(undefined);
-					setShowConfirmAppointmentTypeModal(false);
-				}}
-				onConfirm={(appointmentTypeId) => {
-					const confirmedApptType = appointmentTypes.find((aT) => appointmentTypeId === aT.appointmentTypeId);
-
-					if (confirmedApptType && confirmedApptType.visitTypeId === 'FOLLOWUP') {
-						if (
-							!window.confirm(
-								'Do you understand that this appointment is reserved for individuals that have met with this provider before?'
-							)
-						) {
-							return;
-						}
-					}
-
-					setSelectedAppointmentTypeId(appointmentTypeId);
-					setShowConfirmAppointmentTypeModal(false);
-					continueBookingProcess(selectedProvider, !!confirmedApptType?.assessmentId);
-				}}
-			/>
-
-			<ConfirmIntakeAssessmentModal
-				show={showConfirmIntakeAssessmentModal}
-				onHide={() => {
-					setShowConfirmIntakeAssessmentModal(false);
-				}}
-				onConfirm={() => {
-					if (!selectedProvider) {
-						return;
-					}
-
-					navigateToIntakeAssessment(selectedProvider);
-				}}
-			/>
-
-			<ConfirmProviderBookingModal
-				show={showConfirmationModal}
-				formattedDate={formattedModalDate}
-				provider={selectedProvider}
-				selectedTimeSlot={selectedTimeSlot}
-				timeSlotEndTime={timeSlotEndTime}
-				onHide={() => {
-					setShowConfirmationModal(false);
-				}}
-				onConfirm={async () => {
-					if (isBooking || !selectedProvider || !selectedTimeSlot) {
-						return;
-					}
-
-					try {
-						setIsBooking(true);
-						const appointmentData: CreateAppointmentData = {
-							providerId: selectedProvider.providerId,
-							appointmentTypeId: selectedAppointmentTypeId,
-							date: formattedAvailabilityDate,
-							time: selectedTimeSlot.time,
-						};
-
-						if (promptForEmail) {
-							appointmentData.emailAddress = collectedEmail;
-						}
-
-						if (promptForPhoneNumber) {
-							appointmentData.phoneNumber = collectedPhoneNumebr;
-						}
-
-						const response = await appointmentService.createAppointment(appointmentData).fetch();
-
-						// Update slot status in UI 🤮
-						setAvailableSections(
-							availableSections.map((aS) => {
-								if (aS.date === selectedDate) {
-									const updatedProviders = aS.providers.map((p) => {
-										if (p.providerId === selectedProvider.providerId) {
-											const updatedTimes = p.times.map((time) => {
-												if (time.time === selectedTimeSlot.time) {
-													return {
-														...time,
-														status: 'BOOKED',
-													};
-												}
-
-												return time;
-											});
-
-											return {
-												...p,
-												times: updatedTimes,
-												fullyBooked: updatedTimes.every((t) => t.status === 'BOOKED'),
-											};
-										}
-
-										return p;
-									});
-
-									return {
-										...aS,
-										providers: updatedProviders,
-										fullyBooked: updatedProviders.every((uP) => uP.fullyBooked),
-									};
-								}
-
-								return aS;
-							})
-						);
-
-						setShowConfirmationModal(false);
-
-						setSelectedDate(undefined);
-						setSelectedProvider(undefined);
-						setSelectedTimeSlot(undefined);
-
-						history.replace(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-							successBooking: true,
-							emailAddress: response.account.emailAddress,
-						});
-					} catch (e) {
-						if (e.metadata?.accountPhoneNumberRequired) {
-							setPromptForPhoneNumber(true);
-							setShowConfirmationModal(false);
-							setShowCollectInfoModal(true);
-						} else {
-							handleError(e);
-						}
-					}
-
-					setIsBooking(false);
-				}}
-			/>
+			<BookingModals ref={bookingRef} />
 
 			<HeroContainer>
 				<div className="d-flex justify-content-center align-items-center">
@@ -1094,50 +858,11 @@ const ConnectWithSupport: FC = () => {
 														className="mb-5"
 														provider={provider}
 														onTimeSlotClick={(timeSlot) => {
-															setSelectedDate(section.date);
-															setSelectedProvider(provider);
-															setSelectedTimeSlot(timeSlot);
-
-															// const needsEmail = isAnonymous || !account?.emailAddress;
-															const needsEmail = true;
-															const needsPhoneNumber =
-																!!provider.phoneNumberRequiredForAppointment &&
-																(isAnonymous || !account?.phoneNumber);
-
-															setPromptForEmail(needsEmail);
-															setPromptForPhoneNumber(needsPhoneNumber);
-
-															if (provider.appointmentTypeIds.length === 1) {
-																const confirmedApptType = appointmentTypes.find(
-																	(aT) =>
-																		aT.appointmentTypeId ===
-																		provider.appointmentTypeIds[0]
-																);
-
-																if (
-																	confirmedApptType &&
-																	confirmedApptType.visitTypeId === 'FOLLOWUP'
-																) {
-																	if (
-																		!window.confirm(
-																			'Do you understand that this appointment is reserved for individuals that have met with this provider before?'
-																		)
-																	) {
-																		return;
-																	}
-																}
-
-																setSelectedAppointmentTypeId(
-																	confirmedApptType?.appointmentTypeId
-																);
-																continueBookingProcess(
-																	provider,
-																	!!confirmedApptType?.assessmentId,
-																	needsEmail || needsPhoneNumber
-																);
-															} else {
-																setShowConfirmAppointmentTypeModal(true);
-															}
+															bookingRef.current?.kickoffBookingProcess({
+																provider,
+																date: section.date,
+																timeSlot,
+															});
 														}}
 													/>
 												);
