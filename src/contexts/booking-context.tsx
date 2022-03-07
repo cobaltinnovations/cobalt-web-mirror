@@ -34,6 +34,8 @@ export interface SearchResult {
 interface BookingState {
 	appointmentTypes: FindProvidersResponse['appointmentTypes'];
 	setAppointmentTypes: Dispatch<SetStateAction<FindProvidersResponse['appointmentTypes']>>;
+	specialties: FindProvidersResponse['specialties'];
+	setSpecialties: Dispatch<SetStateAction<FindProvidersResponse['specialties']>>;
 	epicDepartments: FindProvidersResponse['epicDepartments'];
 	setEpicDepartments: Dispatch<SetStateAction<FindProvidersResponse['epicDepartments']>>;
 	availableSections: FindProvidersResponse['sections'];
@@ -91,6 +93,7 @@ const BookingContext = createContext({} as BookingState);
 
 const BookingProvider: FC = (props) => {
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
+	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);
 	const [availableSections, setAvailableSections] = useState<FindProvidersResponse['sections']>([]);
 
@@ -215,6 +218,8 @@ const BookingProvider: FC = (props) => {
 	return (
 		<BookingContext.Provider
 			value={{
+				specialties,
+				setSpecialties,
 				appointmentTypes,
 				setAppointmentTypes,
 				epicDepartments,

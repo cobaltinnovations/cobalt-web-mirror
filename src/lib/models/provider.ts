@@ -92,6 +92,7 @@ export interface Provider {
 	skipIntakePrompt: boolean;
 	treatmentDescription?: string;
 	emailAddress?: string;
+	bio?: string;
 	bioUrl?: string;
 }
 

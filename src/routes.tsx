@@ -55,6 +55,7 @@ const RedirectToBackend = React.lazy(() => import('@/pages/redirect-to-backend')
 const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-time'));
 const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
 const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
+const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
 const NoMatch = React.lazy(() => import('@/pages/no-match'));
 const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
 const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
@@ -611,6 +612,13 @@ export const Routes = [
 			isPicSubdomain(guardProps) && isPicMhicRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: PicProviderCalendar,
+	},
+	{
+		path: '/providers/:providerId',
+		exact: true,
+		private: true,
+		header: (): ReactElement => <Header />,
+		main: ProviderDetail,
 	},
 	...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
 		? [

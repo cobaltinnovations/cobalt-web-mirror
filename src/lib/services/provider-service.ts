@@ -69,6 +69,7 @@ export interface FindProvidersResponse {
 	clinics?: Clinic[];
 	appointments?: AppointmentModel[];
 	followups?: FollowupModel[];
+	specialties?: Specialty[];
 }
 
 interface ProvidersRepsonse {
@@ -214,7 +215,9 @@ export const providerService = {
 		});
 	},
 
-	listLogicalAvailabilities(filters: LogicalAvailabilitiesFilters): OrchestratedRequest<LogicalAvailabilitiesResponse> {
+	listLogicalAvailabilities(
+		filters: LogicalAvailabilitiesFilters
+	): OrchestratedRequest<LogicalAvailabilitiesResponse> {
 		const params = new URLSearchParams({ ...filters });
 
 		return httpSingleton.orchestrateRequest<LogicalAvailabilitiesResponse>({
