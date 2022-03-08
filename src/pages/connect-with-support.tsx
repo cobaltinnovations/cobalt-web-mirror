@@ -45,7 +45,7 @@ import { providerService, FindOptionsResponse, FindFilters } from '@/lib/service
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
 import colors from '@/jss/colors';
-import { BookingContext, SearchResult, BookingFilters } from '@/contexts/booking-context';
+import { BookingContext, SearchResult, BookingFilters, BookingSource } from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
@@ -210,6 +210,13 @@ const ConnectWithSupport: FC = () => {
 			const routedClinicIds = urlQuery.getAll('clinicId');
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 
+			console.log({
+				routedSupportRoleIds,
+				routedStartDate,
+				routedEndDate,
+				routedClinicIds,
+				routedProviderId,
+			});
 			const dateRange =
 				queryParamDateRegex.test(routedStartDate) && queryParamDateRegex.test(routedEndDate)
 					? { from: moment(routedStartDate), to: moment(routedEndDate) }
@@ -859,6 +866,7 @@ const ConnectWithSupport: FC = () => {
 														provider={provider}
 														onTimeSlotClick={(timeSlot) => {
 															bookingRef.current?.kickoffBookingProcess({
+																source: BookingSource.ProviderSearch,
 																provider,
 																date: section.date,
 																timeSlot,

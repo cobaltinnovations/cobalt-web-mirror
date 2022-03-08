@@ -3,7 +3,7 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import Breadcrumb from '@/components/breadcrumb';
 import DayContainer from '@/components/day-container';
 import { ProviderInfoCard } from '@/components/provider-info-card';
-import { BookingContext } from '@/contexts/booking-context';
+import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import colors from '@/jss/colors';
 import mediaQueries from '@/jss/media-queries';
 import { providerService } from '@/lib/services';
@@ -319,6 +319,8 @@ const ProviderDetail = () => {
 																			onClick={() => {
 																				bookingRef.current?.kickoffBookingProcess(
 																					{
+																						source:
+																							BookingSource.ProviderDetail,
 																						timeSlot: availability,
 																						date: section.date,
 																						provider: sectionProvider,

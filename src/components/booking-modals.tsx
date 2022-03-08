@@ -1,4 +1,4 @@
-import { BookingContext } from '@/contexts/booking-context';
+import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { AvailabilityTimeSlot, Provider } from '@/lib/models';
@@ -11,6 +11,7 @@ import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
 import ConfirmProviderBookingModal from './confirm-provider-booking-modal';
 
 export type KickoffBookingOptions = {
+	source: BookingSource;
 	provider: Provider;
 	date: string;
 	timeSlot: AvailabilityTimeSlot;
@@ -74,16 +75,17 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		promptForPhoneNumber,
 		setPromptForPhoneNumber,
 
+		bookingSource,
+		setBookingSource,
 		setPreserveFilters,
 	} = useContext(BookingContext);
 
 	const skipAssessment = !!history.location.state?.skipAssessment;
 	const navigateToEhrLookup = useCallback(() => {
-		setPreserveFilters(true);
 		history.push(`/ehr-lookup`, {
 			skipAssessment,
 		});
-	}, [history, setPreserveFilters, skipAssessment]);
+	}, [history, skipAssessment]);
 
 	const navigateToIntakeAssessment = useCallback(
 		(provider: Provider) => {
@@ -91,19 +93,20 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				return;
 			}
 
-			setPreserveFilters(true);
 			history.push(`/intake-assessment?providerId=${provider.providerId}`, {
 				skipAssessment,
 			});
 		},
-		[history, setPreserveFilters, skipAssessment]
+		[history, skipAssessment]
 	);
 
 	const continueBookingProcess = useCallback(
 		({ provider, requireAssessment = false, promptForInfo = false }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
+				setPreserveFilters(bookingSource === BookingSource.ProviderSearch);
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
+				setPreserveFilters(bookingSource === BookingSource.ProviderSearch);
 				navigateToIntakeAssessment(provider);
 			} else if (provider?.intakeAssessmentRequired || requireAssessment) {
 				setShowConfirmIntakeAssessmentModal(true);
@@ -113,11 +116,20 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				setShowConfirmationModal(true);
 			}
 		},
-		[account?.epicPatientId, navigateToEhrLookup, navigateToIntakeAssessment, promptForEmail, promptForPhoneNumber]
+		[
+			account?.epicPatientId,
+			bookingSource,
+			navigateToEhrLookup,
+			navigateToIntakeAssessment,
+			promptForEmail,
+			promptForPhoneNumber,
+			setPreserveFilters,
+		]
 	);
 
 	const kickoffBookingProcess = useCallback(
-		({ provider, date, timeSlot }: KickoffBookingOptions) => {
+		({ source, provider, date, timeSlot }: KickoffBookingOptions) => {
+			setBookingSource(source);
 			setSelectedProvider(provider);
 			setSelectedDate(date);
 			setSelectedTimeSlot(timeSlot);

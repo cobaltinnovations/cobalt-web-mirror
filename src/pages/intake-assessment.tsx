@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback, useContext } from 'react';
+import React, { FC, useState, useCallback, useContext, useMemo } from 'react';
 import { useHistory, Link, Redirect, Prompt } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 
@@ -59,16 +59,14 @@ const IntakeAssessment: FC = () => {
 
 		isEligible,
 		setIsEligible,
-		getFiltersQueryString,
+		getExitBookingLocation,
 	} = useContext(BookingContext);
 
 	const appointmentTypeId = query.get('appointmentTypeId') || selectedAppointmentTypeId;
 
-	const supportPageRoute = {
-		pathname: '/connect-with-support',
-		search: getFiltersQueryString(),
-		state: history.location.state,
-	};
+	const exitUrl = useMemo(() => {
+		return getExitBookingLocation(history.location.state);
+	}, [getExitBookingLocation, history.location.state]);
 
 	const fetchData = useCallback(async () => {
 		let response;
@@ -160,7 +158,7 @@ const IntakeAssessment: FC = () => {
 						}
 					} else {
 						setIsEligible(false);
-						history.push(supportPageRoute);
+						history.push(exitUrl);
 					}
 
 					return;
@@ -177,7 +175,7 @@ const IntakeAssessment: FC = () => {
 	};
 
 	if (!groupSessionId && (!providerId || !selectedProvider || !selectedTimeSlot)) {
-		return <Redirect to={supportPageRoute} />;
+		return <Redirect to={exitUrl} />;
 	}
 
 	return (
@@ -320,7 +318,7 @@ const IntakeAssessment: FC = () => {
 							title: 'home',
 						},
 						{
-							to: supportPageRoute,
+							to: exitUrl,
 							title: 'connect with support',
 						},
 						{
@@ -400,7 +398,10 @@ const IntakeAssessment: FC = () => {
 					{!isGroupSessionAssessment && isEligible && (
 						<Prompt
 							message={(location) => {
-								if (location.pathname.startsWith('/connect-with-support')) {
+								if (
+									location.pathname.startsWith('/connect-with-support') ||
+									location.pathname.startsWith('/providers')
+								) {
 									return 'Are you sure you want to exit booking?';
 								}
 
@@ -412,7 +413,7 @@ const IntakeAssessment: FC = () => {
 					{isGroupSessionAssessment && (
 						<Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>
 					)}
-					{!isGroupSessionAssessment && <Link to={supportPageRoute}>exit booking</Link>}
+					{!isGroupSessionAssessment && <Link to={exitUrl}>exit booking</Link>}
 				</p>
 			</Container>
 		</AsyncPage>

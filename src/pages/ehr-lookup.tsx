@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback, useEffect, useRef, useContext } from 'react';
+import React, { FC, useState, useCallback, useEffect, useRef, useContext, useMemo } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik, FormikProps } from 'formik';
 import InputMask from 'react-input-mask';
@@ -89,7 +89,7 @@ const EhrLookup: FC = () => {
 
 		isEligible,
 		setIsEligible,
-		getFiltersQueryString,
+		getExitBookingLocation,
 	} = useContext(BookingContext);
 
 	const previousStep = useCallback(() => {
@@ -100,11 +100,9 @@ const EhrLookup: FC = () => {
 		setStep(Math.min(step + 1, NUM_STEPS));
 	}, [step]);
 
-	const supportPageRoute = {
-		pathname: '/connect-with-support',
-		search: getFiltersQueryString(),
-		state: history.location.state,
-	};
+	const exitUrl = useMemo(() => {
+		return getExitBookingLocation(history.location.state);
+	}, [getExitBookingLocation, history.location.state]);
 
 	const searchRecords = useCallback(
 		async (data: Partial<EpicPatientData>, matchStep: EpicMatchStep) => {
@@ -183,7 +181,7 @@ const EhrLookup: FC = () => {
 	};
 
 	if (!selectedProvider || !selectedTimeSlot) {
-		return <Redirect to={supportPageRoute} />;
+		return <Redirect to={exitUrl} />;
 	}
 
 	return (
@@ -195,7 +193,7 @@ const EhrLookup: FC = () => {
 				}}
 				onExitBooking={() => {
 					if (window.confirm('Are you sure you want to exit booking?')) {
-						history.replace(supportPageRoute);
+						history.replace(exitUrl);
 					}
 				}}
 			/>
@@ -207,7 +205,7 @@ const EhrLookup: FC = () => {
 						title: 'home',
 					},
 					{
-						to: supportPageRoute,
+						to: exitUrl,
 						title: 'connect with support',
 					},
 					{
@@ -321,7 +319,7 @@ const EhrLookup: FC = () => {
 										}}
 									/>
 								)}
-								<Link to={supportPageRoute}>exit booking</Link>
+								<Link to={exitUrl}>exit booking</Link>
 							</p>
 						</Container>
 					);
