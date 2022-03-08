@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseStyles } from 'react-jss';
 import fonts from '@/jss/fonts';
 import colors from '@/jss/colors';
 import { Provider } from '@/lib/models';
+import { Link } from 'react-router-dom';
 
 const useProviderInfoStyles = createUseStyles({
 	paymentPill: {
@@ -24,8 +25,9 @@ const useProviderInfoStyles = createUseStyles({
 
 export const ProviderInfoCard: FC<{
 	provider: Provider;
+	linkToExternalBio?: boolean;
 	hideSpecifics?: boolean;
-}> = ({ provider, hideSpecifics = false, children }) => {
+}> = ({ provider, linkToExternalBio = false, hideSpecifics = false, children }) => {
 	const classes = useProviderInfoStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;
@@ -38,19 +40,29 @@ export const ProviderInfoCard: FC<{
 		entityName = null;
 	}
 
+	const renderedLink = useMemo(() => {
+		const linkText = joinComma(provider.name, provider.license);
+
+		if (!linkToExternalBio) {
+			return <Link to={`/providers/${provider.providerId}`}>{linkText}</Link>;
+		}
+
+		if (provider.bioUrl) {
+			return (
+				<a href={provider.bioUrl} target="_blank" rel="noreferrer">
+					{linkText}
+				</a>
+			);
+		}
+
+		return linkText;
+	}, [linkToExternalBio, provider.bioUrl, provider.license, provider.name, provider.providerId]);
+
 	return (
 		<div className="d-flex align-items-center">
 			<BackgroundImageContainer size={116} imageUrl={provider.imageUrl || placeholderImage} />
 			<div className="pl-3">
-				<h5 className="mb-0">
-					{provider.bioUrl ? (
-						<a href={provider.bioUrl} target="_blank" rel="noreferrer">
-							{joinComma(provider.name, provider.license)}
-						</a>
-					) : (
-						joinComma(provider.name, provider.license)
-					)}
-				</h5>
+				<h5 className="mb-0">{renderedLink}</h5>
 
 				{/* {provider.schedulingSystemId !== 'EPIC' && (
 				<p className={classNames('d-inline-block text-white px-2', classes.acceptsAnons)}>

@@ -176,7 +176,11 @@ const ProviderDetail = () => {
 										xl={{ span: 6, offset: 3 }}
 									>
 										{selectedProvider && (
-											<ProviderInfoCard hideSpecifics provider={selectedProvider} />
+											<ProviderInfoCard
+												linkToExternalBio
+												hideSpecifics
+												provider={selectedProvider}
+											/>
 										)}
 									</Col>
 								</Row>
