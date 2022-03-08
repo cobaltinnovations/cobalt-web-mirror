@@ -185,7 +185,7 @@ export const AppointmentDetailPanel = ({
 					<p className="mb-0">
 						<strong>contact information</strong>
 					</p>
-					<Button
+					{/* <Button
 						variant="link"
 						size="sm"
 						className="p-0"
@@ -194,7 +194,7 @@ export const AppointmentDetailPanel = ({
 						}}
 					>
 						<EditIcon />
-					</Button>
+					</Button> */}
 				</div>
 
 				<p className="mb-0">
@@ -225,7 +225,7 @@ export const AppointmentDetailPanel = ({
 							<Button
 								variant="link"
 								size="sm"
-								className="p-0"
+								className="p-0 font-size-xs"
 								onClick={() => {
 									alert('TODO: Show assessment results');
 								}}

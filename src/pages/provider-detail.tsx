@@ -39,7 +39,12 @@ const useProviderDetailStyles = createUseStyles({
 			flexShrink: 0,
 		},
 	},
+	navOuter: {
+		height: 40,
+		marginBottom: 48,
+	},
 	navbar: {
+		height: 40,
 		listStyle: 'none',
 		display: 'flex',
 		margin: 0,
@@ -47,7 +52,16 @@ const useProviderDetailStyles = createUseStyles({
 		alignItems: 'center',
 	},
 	navItem: {
-		borderBottom: `4px solid ${colors.white}`,
+		position: 'relative',
+		'&:after': {
+			bottom: 0,
+			height: 4,
+			width: '100%',
+			content: '""',
+			display: 'block',
+			position: 'absolute',
+			backgroundColor: 'transparent',
+		},
 		'& a': {
 			color: colors.gray600,
 			textDecoration: 'none',
@@ -62,11 +76,13 @@ const useProviderDetailStyles = createUseStyles({
 	},
 	sectionAnchor: {
 		position: 'relative',
-		top: -250,
+		top: -450,
 		visibility: 'hidden',
 	},
 	activeNav: {
-		borderBottomColor: colors.primary,
+		'&:after': {
+			backgroundColor: colors.primary,
+		},
 		'& a': {
 			color: colors.black,
 			textDecoration: 'none',
@@ -90,8 +106,8 @@ const ProviderDetail = () => {
 	} = useContext(BookingContext);
 
 	const inFlightRef = useRef<any>();
-	const bookingRef = useRef<BookingRefHandle>(null);
 	const navRef = useRef<HTMLDivElement>(null);
+	const bookingRef = useRef<BookingRefHandle>(null);
 	const sectionRefs = [
 		useRef<HTMLDivElement>(null),
 		useRef<HTMLDivElement>(null),
@@ -102,7 +118,12 @@ const ProviderDetail = () => {
 
 	useEffect(() => {
 		const handleScroll = () => {
-			setScrolled(window.scrollY > 200);
+			if (!navRef.current) {
+				return;
+			}
+
+			// 54 is the height of the header
+			setScrolled(navRef.current.getBoundingClientRect().top - 54 <= 0);
 		};
 
 		window.addEventListener('scroll', handleScroll);
@@ -146,152 +167,178 @@ const ProviderDetail = () => {
 			<Scrollspy sectionRefs={sectionRefs}>
 				{({ currentElementIndexInViewport }) => {
 					return (
-						<Container className="py-8">
-							<Row>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									{selectedProvider && <ProviderInfoCard hideSpecifics provider={selectedProvider} />}
-								</Col>
-
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-									ref={navRef}
+						<>
+							<Container className="py-4">
+								<Row>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										{selectedProvider && (
+											<ProviderInfoCard hideSpecifics provider={selectedProvider} />
+										)}
+									</Col>
+								</Row>
+							</Container>
+							<div className={classes.navOuter} ref={navRef}>
+								<Container
+									fluid
 									className={classNames('bg-white', {
 										[classes.stickyNavbar]: scrolled,
 									})}
 								>
-									<ul className={classes.navbar}>
-										<li
-											className={classNames('ml-2 py-2', classes.navItem, {
-												[classes.activeNav]: currentElementIndexInViewport === 0,
-											})}
-										>
-											<a href="#about">About</a>
-										</li>
+									<Container>
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
+												<ul className={classes.navbar}>
+													<li
+														className={classNames('ml-2 py-2', classes.navItem, {
+															[classes.activeNav]: currentElementIndexInViewport === 0,
+														})}
+													>
+														<a href="#about">About</a>
+													</li>
+													<li
+														className={classNames('ml-2 py-2', classes.navItem, {
+															[classes.activeNav]: currentElementIndexInViewport === 1,
+														})}
+													>
+														<a href="#specialties">Specialties</a>
+													</li>
+													<li
+														className={classNames('ml-2 py-2', classes.navItem, {
+															[classes.activeNav]: currentElementIndexInViewport === 2,
+														})}
+													>
+														<a href="#payment">Payment</a>
+													</li>
+												</ul>
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+							</div>
+							<Container>
+								<Row className="mb-8">
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<div className="mb-8" ref={sectionRefs[0]}>
+											<div id="about" className={classes.sectionAnchor} />
+											<h4>About</h4>
+											<div
+												dangerouslySetInnerHTML={{
+													__html: selectedProvider?.bio ?? '<p>Not available.</p>',
+												}}
+											></div>
+										</div>
 
-										<li
-											className={classNames('ml-2 py-2', classes.navItem, {
-												[classes.activeNav]: currentElementIndexInViewport === 1,
-											})}
-										>
-											<a href="#specialties">Specialties</a>
-										</li>
-
-										<li
-											className={classNames('ml-2 py-2', classes.navItem, {
-												[classes.activeNav]: currentElementIndexInViewport === 2,
-											})}
-										>
-											<a href="#payment">Payment</a>
-										</li>
-									</ul>
-								</Col>
-
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<div className="py-4" ref={sectionRefs[0]}>
-										<div id="about" className={classes.sectionAnchor} />
-										<h4>About</h4>
-
-										<div
-											dangerouslySetInnerHTML={{
-												__html: selectedProvider?.bio ?? '',
-											}}
-										></div>
-									</div>
-
-									<div className="py-4" ref={sectionRefs[1]}>
-										<div id="specialties" className={classes.sectionAnchor} />
-										<h4>Specialties</h4>
-
-										<ul>
-											{specialties?.map((specialty) => {
-												return <li key={specialty.specialtyId}>{specialty.description}</li>;
-											})}
-										</ul>
-									</div>
-
-									<div className="py-4" ref={sectionRefs[2]}>
-										<div id="payment" className={classes.sectionAnchor} />
-										<h4>Payment</h4>
-
-										<ul>
-											{selectedProvider?.paymentFundingDescriptions?.map(
-												(paymentOption, index) => {
-													return <li key={index}>{paymentOption}</li>;
-												}
+										<div className="mb-8" ref={sectionRefs[1]}>
+											<div id="specialties" className={classes.sectionAnchor} />
+											<h4>Specialties</h4>
+											{!!specialties?.length ? (
+												<ul>
+													{specialties?.map((specialty) => {
+														return (
+															<li key={specialty.specialtyId}>{specialty.description}</li>
+														);
+													})}
+												</ul>
+											) : (
+												<p>Not available.</p>
 											)}
-										</ul>
-									</div>
-								</Col>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<div id="availability" className={classes.sectionAnchor} />
-									<h3>Book an appointment</h3>
+										</div>
 
-									{selectedProvider
-										? availableSections.map((section, idx) => {
-												const sectionProvider = section.providers[0];
-												const timeSlots = sectionProvider.times ?? {};
+										<div ref={sectionRefs[2]}>
+											<div id="payment" className={classes.sectionAnchor} />
+											<h4>Payment</h4>
+											{!!selectedProvider?.paymentFundingDescriptions?.length ? (
+												<ul>
+													{selectedProvider?.paymentFundingDescriptions?.map(
+														(paymentOption, index) => {
+															return <li key={index}>{paymentOption}</li>;
+														}
+													)}
+												</ul>
+											) : (
+												<p>Not available.</p>
+											)}
+										</div>
+									</Col>
+								</Row>
+								<Row>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<div id="availability" className={classes.sectionAnchor} />
+										<h3>Book an appointment</h3>
 
-												return (
-													<div key={section.date}>
-														<DayContainer className="mb-4">
-															<p className="mb-0 font-karla-bold">
-																{section.dateDescription}
-															</p>
-														</DayContainer>
+										{selectedProvider
+											? availableSections.map((section, idx) => {
+													const sectionProvider = section.providers[0];
+													const timeSlots = sectionProvider.times ?? {};
 
-														<div className={classes.horizontalScroller}>
-															{sectionProvider.fullyBooked ? (
-																<p>all appointments are booked for this date</p>
-															) : (
-																timeSlots.map((availability) => (
-																	<Button
-																		size="sm"
-																		variant={
-																			selectedTimeSlot === availability
-																				? 'primary'
-																				: 'light'
-																		}
-																		className={classNames(
-																			`${classes.availabilityButton}`,
-																			'mr-1',
-																			'mb-1'
-																		)}
-																		disabled={availability.status !== 'AVAILABLE'}
-																		key={availability.time}
-																		onClick={() => {
-																			bookingRef.current?.kickoffBookingProcess({
-																				timeSlot: availability,
-																				date: section.date,
-																				provider: sectionProvider,
-																			});
-																		}}
-																	>
-																		{availability.timeDescription}
-																	</Button>
-																))
-															)}
+													return (
+														<div key={section.date}>
+															<DayContainer className="mb-4">
+																<p className="mb-0 font-karla-bold">
+																	{section.dateDescription}
+																</p>
+															</DayContainer>
+
+															<div className={classes.horizontalScroller}>
+																{sectionProvider.fullyBooked ? (
+																	<p>all appointments are booked for this date</p>
+																) : (
+																	timeSlots.map((availability) => (
+																		<Button
+																			size="sm"
+																			variant={
+																				selectedTimeSlot === availability
+																					? 'primary'
+																					: 'light'
+																			}
+																			className={classNames(
+																				`${classes.availabilityButton}`,
+																				'mr-1',
+																				'mb-1'
+																			)}
+																			disabled={
+																				availability.status !== 'AVAILABLE'
+																			}
+																			key={availability.time}
+																			onClick={() => {
+																				bookingRef.current?.kickoffBookingProcess(
+																					{
+																						timeSlot: availability,
+																						date: section.date,
+																						provider: sectionProvider,
+																					}
+																				);
+																			}}
+																		>
+																			{availability.timeDescription}
+																		</Button>
+																	))
+																)}
+															</div>
 														</div>
-													</div>
-												);
-										  })
-										: null}
-								</Col>
-							</Row>
-						</Container>
+													);
+											  })
+											: null}
+									</Col>
+								</Row>
+							</Container>
+						</>
 					);
 				}}
 			</Scrollspy>

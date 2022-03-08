@@ -214,6 +214,10 @@ export const useContainerStyles = createUseStyles({
 					backgroundColor: colors.primary,
 				},
 			},
+			'& .fc-timegrid-event': {
+				marginBottom: 0,
+				overflow: 'hidden',
+			},
 			'& .fc-timegrid-event, .fc-timegrid-more-link': {
 				borderRadius: 0,
 			},
@@ -224,5 +228,11 @@ export const useContainerStyles = createUseStyles({
 				boxShadow: 'none',
 			},
 		},
+	},
+	eventText: {
+		margin: 0,
+		overflow: 'hidden',
+		whiteSpace: 'nowrap',
+		textOverflow: 'ellipsis',
 	},
 });

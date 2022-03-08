@@ -291,10 +291,10 @@ export const MyCalendarScheduling: FC = () => {
 
 						return (
 							<div>
-								<p className="mb-0">
+								<p className={classes.eventText}>
 									<strong>{evtInfo.event.title}</strong>
 								</p>
-								<p className="mb-0">{startTime}</p>
+								<p className={classes.eventText}>{startTime}</p>
 							</div>
 						);
 					}}
