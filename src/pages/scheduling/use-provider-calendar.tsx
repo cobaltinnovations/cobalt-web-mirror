@@ -42,8 +42,13 @@ export const useProviderCalendar = ({
 	useEffect(() => {
 		fetchData();
 
+		const intervalId = setInterval(() => {
+			fetchData();
+		}, 30000);
+
 		return () => {
 			inFlightRequest.current?.abort();
+			clearInterval(intervalId);
 		};
 	}, [fetchData]);
 

@@ -185,12 +185,20 @@ export const MyCalendarScheduling: FC = () => {
 							right: 'today',
 						}}
 						dateClick={(clickInfo) => {
+							const mainCalendarApi = mainCalendarRef.current?.getApi();
+							const mainMoment = moment(mainCalendarApi?.getDate());
 							const clickedDate = clickInfo.date;
+							const clickedMoment = moment(clickedDate);
 
-							setLeftCalendarMoment(moment(clickedDate));
-
-							mainCalendarRef.current?.getApi().gotoDate(clickedDate);
+							setLeftCalendarMoment(clickedMoment);
+							mainCalendarApi?.gotoDate(clickedDate);
 							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
+
+							if (currentMainCalendarView === MainCalendarView.Week) {
+								clickedMoment.week() === mainMoment.week() && fetchMainData();
+							} else if (currentMainCalendarView === MainCalendarView.Day) {
+								clickedMoment.day() === mainMoment.day() && fetchMainData();
+							}
 						}}
 						datesSet={({ start, end }) => {
 							setLeftStartDate(moment(start).format('YYYY-MM-DD'));
