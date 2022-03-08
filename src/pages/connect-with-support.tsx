@@ -210,13 +210,6 @@ const ConnectWithSupport: FC = () => {
 			const routedClinicIds = urlQuery.getAll('clinicId');
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 
-			console.log({
-				routedSupportRoleIds,
-				routedStartDate,
-				routedEndDate,
-				routedClinicIds,
-				routedProviderId,
-			});
 			const dateRange =
 				queryParamDateRegex.test(routedStartDate) && queryParamDateRegex.test(routedEndDate)
 					? { from: moment(routedStartDate), to: moment(routedEndDate) }

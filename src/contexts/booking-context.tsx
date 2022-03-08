@@ -158,7 +158,6 @@ const BookingProvider: FC = (props) => {
 		return tempMoment.format('h:mma');
 	}, [selectedTimeSlot, appointmentTypes, selectedAppointmentTypeId]);
 
-	console.log({ clinicsFilter, dateFilter, timeFilter, providerTypeFilter });
 	const getFiltersQueryString = useCallback(() => {
 		const params = new URLSearchParams({
 			startDate: dateFilter.from.format('YYYY-MM-DD'),

@@ -339,12 +339,6 @@ export const MyCalendarScheduling: FC = () => {
 							setActiveSidebar(CalendarSidebar.ViewAppointment);
 						}
 					}}
-					eventsSet={(events, ...args) => {
-						console.log('eventsSet', { events, args });
-					}}
-					// eventAdd={function(){}}
-					// eventChange={function(){}}
-					// eventRemove={function(){}}
 					datesSet={({ start, end }) => {
 						setMainStartDate(moment(start).format('YYYY-MM-DD'));
 						setMainEndDate(moment(end).format('YYYY-MM-DD'));
