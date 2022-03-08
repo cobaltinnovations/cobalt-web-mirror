@@ -76,7 +76,7 @@ const useProviderDetailStyles = createUseStyles({
 	},
 	sectionAnchor: {
 		position: 'relative',
-		top: -450,
+		top: -100,
 		visibility: 'hidden',
 	},
 	activeNav: {
@@ -164,7 +164,7 @@ const ProviderDetail = () => {
 				]}
 			/>
 
-			<Scrollspy sectionRefs={sectionRefs}>
+			<Scrollspy sectionRefs={sectionRefs} offset={-100}>
 				{({ currentElementIndexInViewport }) => {
 					return (
 						<>
@@ -176,7 +176,11 @@ const ProviderDetail = () => {
 										xl={{ span: 6, offset: 3 }}
 									>
 										{selectedProvider && (
-											<ProviderInfoCard hideSpecifics provider={selectedProvider} />
+											<ProviderInfoCard
+												linkToExternalBio
+												hideSpecifics
+												provider={selectedProvider}
+											/>
 										)}
 									</Col>
 								</Row>
@@ -216,6 +220,13 @@ const ProviderDetail = () => {
 														})}
 													>
 														<a href="#payment">Payment</a>
+													</li>
+													<li
+														className={classNames('ml-2 py-2', classes.navItem, {
+															[classes.activeNav]: currentElementIndexInViewport === 3,
+														})}
+													>
+														<a href="#availability">Availability</a>
 													</li>
 												</ul>
 											</Col>
@@ -278,6 +289,7 @@ const ProviderDetail = () => {
 										md={{ span: 10, offset: 1 }}
 										lg={{ span: 8, offset: 2 }}
 										xl={{ span: 6, offset: 3 }}
+										ref={sectionRefs[3]}
 									>
 										<div id="availability" className={classes.sectionAnchor} />
 										<h3>Book an appointment</h3>

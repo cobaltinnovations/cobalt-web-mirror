@@ -1,5 +1,5 @@
 import moment, { Moment } from 'moment';
-import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback } from 'react';
+import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback, useEffect } from 'react';
 import { LocationDescriptor } from 'history';
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
@@ -132,6 +132,7 @@ const BookingProvider: FC = (props) => {
 	const [isEligible, setIsEligible] = useState(true);
 	const [preserveFilters, setPreserveFilters] = useState(false);
 	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
+	const [previousProviderId, setPreviousProviderId] = useState<string>();
 
 	const timeSlotEndTime = useMemo(() => {
 		if (!selectedTimeSlot || !appointmentTypes.length || !selectedAppointmentTypeId) {
@@ -225,20 +226,30 @@ const BookingProvider: FC = (props) => {
 		return appointmentTypes.find((aT) => aT.appointmentTypeId === selectedAppointmentTypeId);
 	}, [appointmentTypes, selectedAppointmentTypeId]);
 
+	useEffect(() => {
+		if (selectedProvider?.providerId) {
+			setPreviousProviderId(selectedProvider.providerId);
+		}
+	}, [selectedProvider?.providerId]);
+
+	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
 	const getExitBookingLocation = useCallback(
 		(state?: unknown) => {
-			return bookingSource === BookingSource.ProviderSearch
-				? {
-						pathname: '/connect-with-support',
-						search: getFiltersQueryString(),
-						state,
-				  }
-				: {
-						pathname: `/providers/${selectedProvider?.providerId}`,
-						state,
-				  };
+			console.log('reading previous', redirectProviderId);
+			if (bookingSource === BookingSource.ProviderDetail && redirectProviderId) {
+				return {
+					pathname: `/providers/${redirectProviderId}`,
+					state,
+				};
+			}
+
+			return {
+				pathname: '/connect-with-support',
+				search: getFiltersQueryString(),
+				state,
+			};
 		},
-		[bookingSource, getFiltersQueryString, selectedProvider?.providerId]
+		[bookingSource, getFiltersQueryString, redirectProviderId]
 	);
 
 	return (
