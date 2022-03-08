@@ -27,9 +27,10 @@ export interface PersonalizationQuestion {
 	answers: PersonalizationAnswer[];
 	label: string;
 	questionId: string;
-	questionType: 'CHECKBOX' | 'HORIZONTAL_CHECKBOX';
+	questionType: 'CHECKBOX' | 'HORIZONTAL_CHECKBOX' | 'TEXT';
 	selectedAnswers: {
 		answerId: string;
+		answerText?: string;
 	}[];
 }
 

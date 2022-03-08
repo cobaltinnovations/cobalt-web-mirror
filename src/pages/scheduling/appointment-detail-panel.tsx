@@ -3,7 +3,13 @@ import { Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import { AccountModel, AppointmentModel, ATTENDANCE_STATUS_ID, PersonalizationDetails } from '@/lib/models';
+import {
+	AccountModel,
+	AppointmentModel,
+	ATTENDANCE_STATUS_ID,
+	PersonalizationAnswer,
+	PersonalizationDetails,
+} from '@/lib/models';
 
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -217,21 +223,29 @@ export const AppointmentDetailPanel = ({
 
 				{assessments.map((assessment, index) => {
 					return (
-						<div key={index} className="d-flex mb-1 justify-content-between align-items-center">
-							<p className="mb-0">
-								<strong>[TODO]: Assessment Name</strong> [TODO]: Assessment Date
-							</p>
+						<div key={index} className="mb-1 justify-content-between align-items-center">
+							{assessment.assessmentQuestions.map((question) => {
+								const answersMap = question.answers.reduce((acc, answer) => {
+									acc[answer.answerId] = answer;
 
-							<Button
-								variant="link"
-								size="sm"
-								className="p-0 font-size-xs"
-								onClick={() => {
-									alert('TODO: Show assessment results');
-								}}
-							>
-								view
-							</Button>
+									return acc;
+								}, {} as Record<string, PersonalizationAnswer>);
+
+								return (
+									<React.Fragment key={question.questionId}>
+										<p className="mb-0">
+											<strong>{question.label}</strong>
+										</p>
+										{question.selectedAnswers.map((answer) => {
+											const answerText =
+												question.questionType === 'TEXT'
+													? answer.answerText
+													: answersMap[answer.answerId].label;
+											return <p>{answerText}</p>;
+										})}
+									</React.Fragment>
+								);
+							})}
 						</div>
 					);
 				})}
