@@ -19,7 +19,7 @@ interface EditAppointmentPanelProps {
 export const EditAppointmentPanel = ({ appointmentId, onClose }: EditAppointmentPanelProps) => {
 	const handleError = useHandleError();
 	const { account } = useAccount();
-	const relativeUrl = `/connect-with-support?&immediateAccess=true&providerId=${account?.providerId}`;
+	const relativeUrl = `/providers/${account?.providerId}?&immediateAccess=true`;
 	const fullUrl = `${window.location.protocol}//${window.location.host}${relativeUrl}`;
 
 	const [appointment, setAppointment] = useState<AppointmentModel>();
