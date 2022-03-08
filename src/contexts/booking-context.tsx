@@ -1,11 +1,17 @@
 import moment, { Moment } from 'moment';
 import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback } from 'react';
+import { LocationDescriptor } from 'history';
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
 
 type Range = { min: number; max: number };
+
+export enum BookingSource {
+	ProviderSearch,
+	ProviderDetail,
+}
 
 interface DateFilter {
 	from: Moment;
@@ -80,6 +86,8 @@ interface BookingState {
 	promptForPhoneNumber: boolean;
 	setPromptForPhoneNumber: Dispatch<SetStateAction<boolean>>;
 
+	setBookingSource: Dispatch<SetStateAction<BookingSource>>;
+	bookingSource: BookingSource;
 	getActiveFiltersState: (findOptions?: FindOptionsResponse) => Record<BookingFilters, boolean>;
 	isEligible: boolean;
 	setIsEligible: Dispatch<SetStateAction<boolean>>;
@@ -87,6 +95,7 @@ interface BookingState {
 	setPreserveFilters: Dispatch<SetStateAction<boolean>>;
 	getFiltersQueryString: () => string;
 	selectedAppointmentType?: AppointmentType;
+	getExitBookingLocation: (state: unknown) => LocationDescriptor;
 }
 
 const BookingContext = createContext({} as BookingState);
@@ -122,6 +131,7 @@ const BookingProvider: FC = (props) => {
 
 	const [isEligible, setIsEligible] = useState(true);
 	const [preserveFilters, setPreserveFilters] = useState(false);
+	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
 
 	const timeSlotEndTime = useMemo(() => {
 		if (!selectedTimeSlot || !appointmentTypes.length || !selectedAppointmentTypeId) {
@@ -215,6 +225,22 @@ const BookingProvider: FC = (props) => {
 		return appointmentTypes.find((aT) => aT.appointmentTypeId === selectedAppointmentTypeId);
 	}, [appointmentTypes, selectedAppointmentTypeId]);
 
+	const getExitBookingLocation = useCallback(
+		(state?: unknown) => {
+			return bookingSource === BookingSource.ProviderSearch
+				? {
+						pathname: '/connect-with-support',
+						search: getFiltersQueryString(),
+						state,
+				  }
+				: {
+						pathname: `/providers/${selectedProvider?.providerId}`,
+						state,
+				  };
+		},
+		[bookingSource, getFiltersQueryString, selectedProvider?.providerId]
+	);
+
 	return (
 		<BookingContext.Provider
 			value={{
@@ -267,6 +293,8 @@ const BookingProvider: FC = (props) => {
 				promptForPhoneNumber,
 				setPromptForPhoneNumber,
 
+				bookingSource,
+				setBookingSource,
 				getActiveFiltersState,
 				isEligible,
 				setIsEligible,
@@ -274,6 +302,7 @@ const BookingProvider: FC = (props) => {
 				setPreserveFilters,
 				getFiltersQueryString,
 				selectedAppointmentType,
+				getExitBookingLocation,
 			}}
 		>
 			{props.children}
