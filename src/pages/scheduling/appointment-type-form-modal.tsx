@@ -314,6 +314,10 @@ export const AppointmentTypeFormModal = ({
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
 							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
+								if (questionContentHintId === QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS) {
+									return null;
+								}
+
 								const isChecked = !!(patientIntakeQuestions || []).find(
 									(patientIntakeQuestion) =>
 										patientIntakeQuestion.questionContentHintId === questionContentHintId
