@@ -102,7 +102,7 @@ export const AppointmentDetailPanel = ({
 	const handleError = useHandleError();
 	const [patient, setPatient] = useState<AccountModel>();
 	const [appointment, setAppointment] = useState<AppointmentModel>();
-	const [assessments, setAssessments] = useState<PersonalizationDetails[]>([]);
+	const [assessment, setAssessment] = useState<PersonalizationDetails>();
 	const [allAppointments, setAllAppointments] = useState<AppointmentModel[]>([]);
 
 	useEffect(() => {
@@ -119,7 +119,7 @@ export const AppointmentDetailPanel = ({
 			})
 			.then((accountDetailsResponse) => {
 				setPatient(accountDetailsResponse.account);
-				setAssessments([accountDetailsResponse.assessment]);
+				setAssessment(accountDetailsResponse.assessment);
 				setAllAppointments(accountDetailsResponse.appointments);
 			})
 			.catch((e) => {
@@ -221,34 +221,33 @@ export const AppointmentDetailPanel = ({
 					</p>
 				</div>
 
-				{assessments.map((assessment, index) => {
-					return (
-						<div key={index} className="mb-1 justify-content-between align-items-center">
-							{assessment.assessmentQuestions.map((question) => {
-								const answersMap = question.answers.reduce((acc, answer) => {
-									acc[answer.answerId] = answer;
+				{!!assessment && Array.isArray(assessment.assessmentQuestions) && (
+					<div className="mb-1 justify-content-between align-items-center">
+						{assessment.assessmentQuestions.map((question) => {
+							const answersMap = question.answers.reduce((acc, answer) => {
+								acc[answer.answerId] = answer;
 
-									return acc;
-								}, {} as Record<string, PersonalizationAnswer>);
+								return acc;
+							}, {} as Record<string, PersonalizationAnswer>);
 
-								return (
-									<React.Fragment key={question.questionId}>
-										<p className="mb-0">
-											<strong>{question.label}</strong>
-										</p>
-										{question.selectedAnswers.map((answer) => {
-											const answerText =
-												question.questionType === 'TEXT'
-													? answer.answerText
-													: answersMap[answer.answerId].label;
-											return <p>{answerText}</p>;
-										})}
-									</React.Fragment>
-								);
-							})}
-						</div>
-					);
-				})}
+							return (
+								<React.Fragment key={question.questionId}>
+									<p className="mb-0">
+										<strong>{question.label}</strong>
+									</p>
+									{question.selectedAnswers.map((answer) => {
+										const answerText =
+											question.questionType === 'TEXT'
+												? answer.answerText
+												: answersMap[answer.answerId].label;
+
+										return <p>{answerText}</p>;
+									})}
+								</React.Fragment>
+							);
+						})}
+					</div>
+				)}
 			</div>
 
 			<div className="border">
