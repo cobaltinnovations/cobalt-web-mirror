@@ -21,7 +21,7 @@ interface AppointmentFormProps {
 	appointmentId?: string;
 	initialValues?: AppointmentFormSchema;
 	onBack: () => void;
-	onSuccess: () => void;
+	onSuccess: (appointmentId?: string) => void;
 }
 
 export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSuccess }: AppointmentFormProps) => {
@@ -63,8 +63,8 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 
 				request
 					.fetch()
-					.then(() => {
-						onSuccess();
+					.then((response) => {
+						onSuccess(response?.appointment?.appointmentId);
 					})
 					.catch((e) => {
 						if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
