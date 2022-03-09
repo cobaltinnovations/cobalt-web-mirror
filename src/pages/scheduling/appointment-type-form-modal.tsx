@@ -17,7 +17,7 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
 	LAST_NAME = 'LAST_NAME',
-	EMAIL_ADDRESS = 'EMAIL_ADDRESS',
+	// EMAIL_ADDRESS = 'EMAIL_ADDRESS',
 	PHONE_NUMBER = 'PHONE_NUMBER',
 }
 
@@ -44,13 +44,13 @@ const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCh
 		questionContentHintId: QUESTION_CONTENT_HINT_IDS.LAST_NAME,
 		disabled: false,
 	},
-	[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]: {
-		label: 'Email (Required by Cobalt)',
-		question: 'What is your email address?',
-		fontSizeId: 'DEFAULT',
-		questionContentHintId: QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS,
-		disabled: true,
-	},
+	// [QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]: {
+	// 	label: 'Email (Required by Cobalt)',
+	// 	question: 'What is your email address?',
+	// 	fontSizeId: 'DEFAULT',
+	// 	questionContentHintId: QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS,
+	// 	disabled: true,
+	// },
 	[QUESTION_CONTENT_HINT_IDS.PHONE_NUMBER]: {
 		label: 'Phone number',
 		question: 'What is your phone number?',
@@ -92,9 +92,7 @@ export const AppointmentTypeFormModal = ({
 	const [nickname, setNickname] = useState('');
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
-	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([
-		PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS],
-	]);
+	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([]);
 	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
 	const handleOnEnter = useCallback(async () => {
@@ -134,7 +132,7 @@ export const AppointmentTypeFormModal = ({
 		setNickname('');
 		setDuration('');
 		setDurationInMinutes(undefined);
-		setPatientIntakeQuestions([PatientIntakeCheckboxes[QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]]);
+		setPatientIntakeQuestions([]);
 		setScreeningQuestions([]);
 	}, []);
 
@@ -314,10 +312,6 @@ export const AppointmentTypeFormModal = ({
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
 							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
-								if (questionContentHintId === QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS) {
-									return null;
-								}
-
 								const isChecked = !!(patientIntakeQuestions || []).find(
 									(patientIntakeQuestion) =>
 										patientIntakeQuestion.questionContentHintId === questionContentHintId
