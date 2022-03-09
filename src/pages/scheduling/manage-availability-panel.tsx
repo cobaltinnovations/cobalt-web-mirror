@@ -126,38 +126,11 @@ export const ManageAvailabilityPanel = ({
 					<div className="mb-5">
 						{regularHours.map((logicalAvailability) => {
 							return (
-								<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
-									<div className="d-flex align-items-center justify-content-between">
-										<div>
-											{logicalAvailability.descriptionComponents?.map((description, index) => {
-												return (
-													<p key={index} className="m-0 font-karla-bold">
-														{description}
-													</p>
-												);
-											})}
-										</div>
-										<Button
-											variant="link"
-											size="sm"
-											className="p-0"
-											onClick={() => {
-												onEditAvailability(logicalAvailability.logicalAvailabilityId);
-											}}
-										>
-											<EditIcon height={24} width={24} />
-										</Button>
-									</div>
-									{logicalAvailability.appointmentTypes.map((appointmentType) => {
-										return (
-											<AppointmentTypeItem
-												key={appointmentType.appointmentTypeId}
-												color={appointmentType.hexColor}
-												nickname={appointmentType.name}
-											/>
-										);
-									})}
-								</div>
+								<LogicalAvailabilityItem
+									key={logicalAvailability.logicalAvailabilityId}
+									logicalAvailability={logicalAvailability}
+									onEdit={onEditAvailability}
+								/>
 							);
 						})}
 					</div>
@@ -171,38 +144,58 @@ export const ManageAvailabilityPanel = ({
 					<div>
 						{unavailableTimeBlocks.map((logicalAvailability) => {
 							return (
-								<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
-									<div className="d-flex align-items-center justify-content-between">
-										<p className="m-0 font-karla-bold">
-											{logicalAvailability.startDateTimeDescription}{' '}
-											{logicalAvailability.endDateDescription}
-										</p>
-										<Button
-											variant="link"
-											size="sm"
-											className="p-0"
-											onClick={() => {
-												onEditTimeBlock(logicalAvailability.logicalAvailabilityId);
-											}}
-										>
-											<EditIcon height={24} width={24} />
-										</Button>
-									</div>
-									{logicalAvailability.appointmentTypes.map((appointmentType) => {
-										return (
-											<AppointmentTypeItem
-												key={appointmentType.appointmentTypeId}
-												color={appointmentType.hexColor}
-												nickname={appointmentType.name}
-											/>
-										);
-									})}
-								</div>
+								<LogicalAvailabilityItem
+									key={logicalAvailability.logicalAvailabilityId}
+									logicalAvailability={logicalAvailability}
+									onEdit={onEditTimeBlock}
+								/>
 							);
 						})}
 					</div>
 				</AsyncPage>
 			</div>
 		</>
+	);
+};
+
+interface LogicalAvailabilityItemProps {
+	logicalAvailability: LogicalAvailability;
+	onEdit: (availabilityId: string) => void;
+}
+
+const LogicalAvailabilityItem = ({ logicalAvailability, onEdit }: LogicalAvailabilityItemProps) => {
+	return (
+		<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
+			<div className="d-flex align-items-center justify-content-between">
+				<div>
+					{logicalAvailability.descriptionComponents?.map((description, index) => {
+						return (
+							<p key={index} className="m-0 font-karla-bold">
+								{description}
+							</p>
+						);
+					})}
+				</div>
+				<Button
+					variant="link"
+					size="sm"
+					className="p-0"
+					onClick={() => {
+						onEdit(logicalAvailability.logicalAvailabilityId);
+					}}
+				>
+					<EditIcon height={24} width={24} />
+				</Button>
+			</div>
+			{logicalAvailability.appointmentTypes.map((appointmentType) => {
+				return (
+					<AppointmentTypeItem
+						key={appointmentType.appointmentTypeId}
+						color={appointmentType.hexColor}
+						nickname={appointmentType.name}
+					/>
+				);
+			})}
+		</div>
 	);
 };
