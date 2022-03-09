@@ -429,15 +429,16 @@ export const MyCalendarScheduling: FC = () => {
 					{activeSidebar === CalendarSidebar.EditAppointment && (
 						<EditAppointmentPanel
 							appointmentId={appointmentIdToEdit}
-							onClose={(didUpdate) => {
+							onClose={(updatedAppointmentId) => {
 								setAppointmentIdToEdit(undefined);
 								if (appointmentIdToView) {
+									updatedAppointmentId && setAppointmentIdToView(updatedAppointmentId);
 									setActiveSidebar(CalendarSidebar.ViewAppointment);
 								} else {
 									setActiveSidebar(null);
 								}
 
-								if (didUpdate) {
+								if (updatedAppointmentId) {
 									fetchMainData();
 									fetchLeftData();
 								}

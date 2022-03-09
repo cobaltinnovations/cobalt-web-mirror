@@ -13,7 +13,7 @@ import { AppointmentForm } from './appointment-form';
 
 interface EditAppointmentPanelProps {
 	appointmentId?: string;
-	onClose: (didUpdate?: boolean) => void;
+	onClose: (updatedAppointmentId?: string) => void;
 }
 
 export const EditAppointmentPanel = ({ appointmentId, onClose }: EditAppointmentPanelProps) => {
@@ -63,7 +63,7 @@ export const EditAppointmentPanel = ({ appointmentId, onClose }: EditAppointment
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<h4>{appointmentId ? 'Edit' : 'New'} appointment</h4>
 
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(false)}>
+				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -85,10 +85,10 @@ export const EditAppointmentPanel = ({ appointmentId, onClose }: EditAppointment
 					appointmentId={appointmentId}
 					initialValues={initialValues}
 					onBack={() => {
-						onClose(false);
+						onClose();
 					}}
-					onSuccess={() => {
-						onClose(true);
+					onSuccess={(newAppointmentId) => {
+						onClose(newAppointmentId);
 					}}
 				/>
 			)}
