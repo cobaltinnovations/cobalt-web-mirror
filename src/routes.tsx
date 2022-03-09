@@ -390,7 +390,6 @@ export const Routes = [
 	},
 	{
 		path: '/scheduling',
-		exact: true,
 		private: true,
 		checkEnabled: isProviderRouteGuard,
 		header: (): ReactElement => <Header />,

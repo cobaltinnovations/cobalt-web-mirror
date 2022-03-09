@@ -28,6 +28,8 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { cloneDeep } from 'lodash';
+import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
+import { useScrollCalendar } from './use-scroll-calendar';
 
 const useStyles = createUseStyles({
 	appointmentsList: {
@@ -85,18 +87,20 @@ const useStyles = createUseStyles({
 });
 
 interface AppointmentDetailPanelProps {
-	appointmentId?: string;
-	onEdit: () => void;
+	setCalendarDate: (date: Date, time?: string) => void;
 	onClose: () => void;
 	onAddAppointment: () => void;
+	focusDateOnLoad: boolean;
 }
 
 export const AppointmentDetailPanel = ({
-	appointmentId,
-	onEdit,
+	setCalendarDate,
 	onClose,
 	onAddAppointment,
+	focusDateOnLoad,
 }: AppointmentDetailPanelProps) => {
+	const routeMatch = useRouteMatch();
+	const { appointmentId } = useParams<{ appointmentId: string }>();
 	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
 	const handleError = useHandleError();
@@ -104,6 +108,8 @@ export const AppointmentDetailPanel = ({
 	const [appointment, setAppointment] = useState<AppointmentModel>();
 	const [assessment, setAssessment] = useState<PersonalizationDetails>();
 	const [allAppointments, setAllAppointments] = useState<AppointmentModel[]>([]);
+
+	useScrollCalendar(setCalendarDate, focusDateOnLoad, appointment);
 
 	useEffect(() => {
 		const request = appointmentService.getAppointment(appointmentId);
@@ -156,6 +162,10 @@ export const AppointmentDetailPanel = ({
 		[allAppointments, handleError]
 	);
 
+	if (appointment?.rescheduledAppointmentId) {
+		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
+	}
+
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
@@ -180,8 +190,10 @@ export const AppointmentDetailPanel = ({
 				>
 					join now
 				</Button>
+
 				<CopyToClipboardButton className="mr-1" text={appointment?.videoconferenceUrl} />
-				<Button variant="primary" size="sm" className="px-2" onClick={onEdit}>
+
+				<Button as={Link} to={`${routeMatch.url}/edit`} variant="primary" size="sm" className="px-2">
 					<EditIcon />
 				</Button>
 			</div>

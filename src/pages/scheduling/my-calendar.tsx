@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
 import { ManageAvailabilityPanel } from './manage-availability-panel';
@@ -20,6 +20,7 @@ import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
+import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -32,24 +33,23 @@ enum CalendarSidebar {
 	EditAvailability,
 	EditTimeBlock,
 	ViewAvailability,
-	EditAppointment,
-	ViewAppointment,
 }
 
 export const MyCalendarScheduling: FC = () => {
 	const classes = useContainerStyles();
 	const { account } = useAccount();
+	const routeMatch = useRouteMatch();
+	const history = useHistory();
 
 	const [accordionExpanded, setAccordionExpanded] = useState(false);
 	const [activeSidebar, setActiveSidebar] = useState<CalendarSidebar | null>(null);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
-	const [appointmentIdToView, setAppointmentIdToView] = useState<string>();
-	const [appointmentIdToEdit, setAppointmentIdToEdit] = useState<string>();
 
 	const [logicalAvailabilityIdToView, setLogicalAvailabilityIdToView] = useState<string>();
 	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
+	const [focusDateOnLoad, setFocusDateOnLoad] = useState(true);
 	const [mainStartDate, setMainStartDate] = useState<string>();
 	const [mainEndDate, setMainEndDate] = useState<string>();
 	const [leftStartDate, setLeftStartDate] = useState<string>();
@@ -111,7 +111,7 @@ export const MyCalendarScheduling: FC = () => {
 		];
 	}, [leftCalendarEvents, leftCalendarMoment]);
 
-	const sidebarToggled = followupPatientList.length > 0;
+	const sidebarToggled = followupPatientList.length > 0 || activeSidebar !== null || !routeMatch.isExact;
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -124,6 +124,20 @@ export const MyCalendarScheduling: FC = () => {
 			mainCalendarApi.changeView(currentMainCalendarView);
 		}
 	}, [currentMainCalendarView]);
+
+	const setCalendarDate = useCallback((date: Date, scrollTime?: string) => {
+		const nextMoment = moment(date);
+
+		mainCalendarRef.current?.getApi().gotoDate(date);
+		leftCalendarRef.current?.getApi().gotoDate(date);
+		setLeftCalendarMoment(nextMoment);
+
+		if (scrollTime) {
+			setTimeout(() => {
+				mainCalendarRef.current?.getApi().scrollToTime(scrollTime);
+			});
+		}
+	}, []);
 
 	return (
 		<div className={classes.wrapper}>
@@ -190,9 +204,7 @@ export const MyCalendarScheduling: FC = () => {
 							const clickedDate = clickInfo.date;
 							const clickedMoment = moment(clickedDate);
 
-							setLeftCalendarMoment(clickedMoment);
-							mainCalendarApi?.gotoDate(clickedDate);
-							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
+							setCalendarDate(clickedDate);
 
 							if (currentMainCalendarView === MainCalendarView.Week) {
 								clickedMoment.week() === mainMoment.week() && fetchMainData();
@@ -250,9 +262,7 @@ export const MyCalendarScheduling: FC = () => {
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setActiveSidebar(CalendarSidebar.EditAppointment);
-							setAppointmentIdToView(undefined);
-							setAppointmentIdToEdit(undefined);
+							history.push(`${routeMatch.path}/appointments/new-appointment`);
 						}}
 					>
 						new appointment
@@ -264,8 +274,6 @@ export const MyCalendarScheduling: FC = () => {
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
 							setActiveSidebar(CalendarSidebar.ManageAvailability);
-							setAppointmentIdToView(undefined);
-							setAppointmentIdToEdit(undefined);
 						}}
 					>
 						manage availability
@@ -306,24 +314,7 @@ export const MyCalendarScheduling: FC = () => {
 							</div>
 						);
 					}}
-					// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
-					// select={(selectInfo) => {
-					// 	const title = prompt('Please enter a new title for your event');
-					// 	const calendarApi = selectInfo.view.calendar;
-
-					// 	calendarApi.unselect(); // clear date selection
-
-					// 	if (title) {
-					// 		calendarApi.addEvent({
-					// 			id: Math.random() + 'a',
-					// 			title,
-					// 			start: selectInfo.startStr,
-					// 			end: selectInfo.endStr,
-					// 			allDay: selectInfo.allDay,
-					// 		});
-					// 	}
-					// }}
-					eventClick={(clickInfo, ...args) => {
+					eventClick={(clickInfo) => {
 						if (clickInfo.event.allDay) {
 							setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
@@ -335,8 +326,10 @@ export const MyCalendarScheduling: FC = () => {
 							setActiveSidebar(CalendarSidebar.ViewAvailability);
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
-							setAppointmentIdToView(clickInfo.event.extendedProps.appointmentId);
-							setActiveSidebar(CalendarSidebar.ViewAppointment);
+							setFocusDateOnLoad(false);
+							history.push(
+								`${routeMatch.path}/appointments/${clickInfo.event.extendedProps.appointmentId}`
+							);
 						}
 					}}
 					datesSet={({ start, end }) => {
@@ -346,8 +339,43 @@ export const MyCalendarScheduling: FC = () => {
 				/>
 			</div>
 
-			{(sidebarToggled || activeSidebar !== null) && (
+			{sidebarToggled && (
 				<div className={classNames('px-5 h-100', classes.sideBar)}>
+					<Switch>
+						<Route
+							path={[
+								`${routeMatch.path}/appointments/new-appointment`,
+								`${routeMatch.path}/appointments/:appointmentId/edit`,
+							]}
+						>
+							<EditAppointmentPanel
+								focusDateOnLoad={focusDateOnLoad}
+								setCalendarDate={setCalendarDate}
+								onClose={(updatedAppointmentId) => {
+									setFocusDateOnLoad(false);
+									history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
+
+									fetchMainData();
+									fetchLeftData();
+								}}
+							/>
+						</Route>
+
+						<Route path={`${routeMatch.path}/appointments/:appointmentId`}>
+							<AppointmentDetailPanel
+								focusDateOnLoad={focusDateOnLoad}
+								setCalendarDate={setCalendarDate}
+								onAddAppointment={() => {
+									history.push(`${routeMatch.path}/appointments/new-appointment`);
+								}}
+								onClose={() => {
+									setFocusDateOnLoad(true);
+									history.push(`${routeMatch.path}`);
+								}}
+							/>
+						</Route>
+					</Switch>
+
 					{activeSidebar === CalendarSidebar.ManageAvailability && (
 						<ManageAvailabilityPanel
 							onEditAvailability={(logicalAvailabilityId) => {
@@ -421,43 +449,6 @@ export const MyCalendarScheduling: FC = () => {
 							}}
 							onClose={() => {
 								setLogicalAvailabilityIdToView(undefined);
-								setActiveSidebar(null);
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.EditAppointment && (
-						<EditAppointmentPanel
-							appointmentId={appointmentIdToEdit}
-							onClose={(updatedAppointmentId) => {
-								setAppointmentIdToEdit(undefined);
-								if (appointmentIdToView) {
-									updatedAppointmentId && setAppointmentIdToView(updatedAppointmentId);
-									setActiveSidebar(CalendarSidebar.ViewAppointment);
-								} else {
-									setActiveSidebar(null);
-								}
-
-								if (updatedAppointmentId) {
-									fetchMainData();
-									fetchLeftData();
-								}
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.ViewAppointment && (
-						<AppointmentDetailPanel
-							appointmentId={appointmentIdToView}
-							onEdit={() => {
-								setAppointmentIdToEdit(appointmentIdToView);
-								setActiveSidebar(CalendarSidebar.EditAppointment);
-							}}
-							onAddAppointment={() => {
-								setActiveSidebar(CalendarSidebar.EditAppointment);
-							}}
-							onClose={() => {
-								setAppointmentIdToView(undefined);
 								setActiveSidebar(null);
 							}}
 						/>

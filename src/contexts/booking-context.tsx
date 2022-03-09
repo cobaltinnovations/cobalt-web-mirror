@@ -235,7 +235,6 @@ const BookingProvider: FC = (props) => {
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
 	const getExitBookingLocation = useCallback(
 		(state?: unknown) => {
-			console.log('reading previous', redirectProviderId);
 			if (bookingSource === BookingSource.ProviderDetail && redirectProviderId) {
 				return {
 					pathname: `/providers/${redirectProviderId}`,
