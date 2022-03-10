@@ -33,7 +33,6 @@ export const MyCalendarScheduling: FC = () => {
 	const routeMatch = useRouteMatch();
 	const history = useHistory();
 
-	const [accordionExpanded, setAccordionExpanded] = useState(false);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
@@ -47,8 +46,6 @@ export const MyCalendarScheduling: FC = () => {
 	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
-
-	const [draftEvent, setDraftEvent] = useState<any>();
 
 	const providerId = account?.providerId ?? '';
 	const { fetchData: fetchMainData, calendarEvents: mainCalendarEvents } = useProviderCalendar({
@@ -76,12 +73,8 @@ export const MyCalendarScheduling: FC = () => {
 			};
 		});
 
-		if (draftEvent) {
-			formatted.push(draftEvent);
-		}
-
 		return formatted;
-	}, [mainCalendarEvents, classes.blockedTimeslot, draftEvent]);
+	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
 		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
@@ -129,50 +122,7 @@ export const MyCalendarScheduling: FC = () => {
 	return (
 		<div className={classes.wrapper}>
 			<div className={classNames('h-100 px-5', classes.sideBar)}>
-				<div className="mb-6">
-					<Accordion
-						open={accordionExpanded}
-						onToggle={() => {
-							setAccordionExpanded(!accordionExpanded);
-						}}
-						title="My Calendar"
-					>
-						<div className="mb-4">
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal1"
-								label="Owner"
-								checked={true}
-								onChange={() => {
-									//
-								}}
-							/>
-
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal2"
-								label="Editor"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
-
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal3"
-								label="Viewer"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
-						</div>
-					</Accordion>
-				</div>
+				<h4 className="my-6">My Calendar</h4>
 
 				<div className={classNames('mb-9', classes.leftCalendar)}>
 					<FullCalendar
