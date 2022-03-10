@@ -66,7 +66,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 		};
 	}, [appointmentId, handleError, isCreate]);
 
-	if (appointment?.rescheduledAppointmentId) {
+	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
 		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}/edit`} />;
 	}
 

@@ -162,7 +162,7 @@ export const AppointmentDetailPanel = ({
 		[allAppointments, handleError]
 	);
 
-	if (appointment?.rescheduledAppointmentId) {
+	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
 		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
 	}
 
