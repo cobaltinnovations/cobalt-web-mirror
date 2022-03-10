@@ -106,7 +106,6 @@ export const AppointmentTypeFormModal = ({
 
 	const [title, setTitle] = useState('');
 	const [color, setColor] = useState(colors.primary);
-	const [nickname, setNickname] = useState('');
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
@@ -123,7 +122,6 @@ export const AppointmentTypeFormModal = ({
 
 			setTitle(appointmentType.name);
 			setColor(appointmentType.hexColor);
-			setNickname(appointmentType.description);
 
 			if (
 				appointmentType.durationInMinutes === 30 ||
@@ -147,7 +145,6 @@ export const AppointmentTypeFormModal = ({
 	const handleOnExited = useCallback(() => {
 		setTitle('');
 		setColor(colors.primary);
-		setNickname('');
 		setDuration('');
 		setDurationInMinutes(undefined);
 		setPatientIntakeQuestions([]);
@@ -163,7 +160,7 @@ export const AppointmentTypeFormModal = ({
 			const requestBody = {
 				providerId: account.providerId,
 				name: title,
-				description: nickname,
+				description: title,
 				schedulingSystemId: 'COBALT',
 				visitTypeId,
 				durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
@@ -190,7 +187,6 @@ export const AppointmentTypeFormModal = ({
 		duration,
 		durationInMinutes,
 		handleError,
-		nickname,
 		onSave,
 		patientIntakeQuestions,
 		screeningQuestions,
@@ -247,17 +243,6 @@ export const AppointmentTypeFormModal = ({
 						}}
 					/>
 				</Form.Group>
-
-				<InputHelper
-					className="mb-4"
-					type="text"
-					label="Nickname (how this appears on your calendar)"
-					value={nickname}
-					onChange={({ currentTarget }) => {
-						setNickname(currentTarget.value);
-					}}
-					required
-				/>
 
 				<Form.Group>
 					<Form.Label style={{ ...fonts.xs }}>Visit Type:</Form.Label>

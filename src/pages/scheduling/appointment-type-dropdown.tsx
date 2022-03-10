@@ -60,7 +60,7 @@ export const AppointmentTypeDropdown = ({ initialId, onChange }: AppointmentType
 							}}
 							className="text-decoration-none"
 						>
-							<AppointmentTypeItem color={apptType.hexColor} nickname={apptType.name} />
+							<AppointmentTypeItem appointmentType={apptType} />
 						</Dropdown.Item>
 					);
 				})}
@@ -97,12 +97,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 						Appointment type
 					</p>
 
-					{selectedAppointmentType && (
-						<AppointmentTypeItem
-							color={selectedAppointmentType.hexColor}
-							nickname={selectedAppointmentType.name}
-						/>
-					)}
+					{selectedAppointmentType && <AppointmentTypeItem appointmentType={selectedAppointmentType} />}
 				</div>
 
 				<UnfoldIcon className="ml-auto" />

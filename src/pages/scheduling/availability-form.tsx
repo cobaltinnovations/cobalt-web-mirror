@@ -310,10 +310,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 														name="appointmentTypes"
 														value={appointmentType.appointmentTypeId}
 														label={
-															<AppointmentTypeItem
-																color={appointmentType.hexColor}
-																nickname={appointmentType.name}
-															/>
+															<AppointmentTypeItem appointmentType={appointmentType} />
 														}
 														checked={values.appointmentTypes.includes(
 															appointmentType.appointmentTypeId
