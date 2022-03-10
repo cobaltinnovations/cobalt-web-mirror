@@ -730,7 +730,7 @@ const ConnectWithSupport: FC = () => {
 									active={activeFilters[BookingFilters.Specialty]}
 									onClick={() => setOpenFilterModal(BookingFilters.Specialty)}
 								>
-									Specialty
+									Focus
 								</FilterPill>
 								<FilterPill
 									active={activeFilters[BookingFilters.Payment]}

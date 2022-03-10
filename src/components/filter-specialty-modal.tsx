@@ -31,7 +31,7 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, sele
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header>
-				<h3 className="mb-0">specialty</h3>
+				<h3 className="mb-0">focus</h3>
 			</Modal.Header>
 			<Modal.Body>
 				{specialties.map((specialty) => {
