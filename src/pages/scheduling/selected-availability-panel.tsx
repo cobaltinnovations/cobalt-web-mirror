@@ -2,31 +2,28 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { Link, useParams, useRouteMatch } from 'react-router-dom';
 import { AppointmentTypeItem } from './appointment-type-item';
 
 interface SelectedAvailabilityPanelProps {
-	logicalAvailabilityId?: string;
 	onClose: () => void;
-	onEditAvailability: () => void;
-	onEditTimeBlock: () => void;
 }
 
-export const SelectedAvailabilityPanel = ({
-	logicalAvailabilityId,
-	onClose,
-	onEditAvailability,
-	onEditTimeBlock,
-}: SelectedAvailabilityPanelProps) => {
+export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanelProps) => {
+	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId: string }>();
+	const routeMatch = useRouteMatch();
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [logicalAvailability, setLogicalAvailability] = useState<LogicalAvailability>();
 
 	const [appointmentTypes, setAppointmentTypes] = useState<(AppointmentType | SchedulingAppointmentType)[]>([]);
-	const [isBlockedSlot, setIsBlockedSlot] = useState<boolean>(false);
+	const [isBlockedTime, setIsBlockedTime] = useState<boolean | null>(null);
+	const [closePanel, setClosePanel] = useState<boolean>(false);
 
 	const providerId = account?.providerId;
 
@@ -41,7 +38,7 @@ export const SelectedAvailabilityPanel = ({
 		Promise.all([availabilityRequest.fetch(), appointmentTypesRequest.fetch()])
 			.then(([availabilityResponse, appointmentTypesResponse]) => {
 				setLogicalAvailability(availabilityResponse.logicalAvailability);
-				setIsBlockedSlot(availabilityResponse.logicalAvailability.logicalAvailabilityTypeId === 'BLOCK');
+				setIsBlockedTime(availabilityResponse.logicalAvailability.logicalAvailabilityTypeId === 'BLOCK');
 
 				if (availabilityResponse.logicalAvailability.appointmentTypes.length === 0) {
 					setAppointmentTypes(appointmentTypesResponse.appointmentTypes);
@@ -50,7 +47,9 @@ export const SelectedAvailabilityPanel = ({
 				}
 			})
 			.catch((e) => {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+				if (e.code === 'NOT_FOUND') {
+					setClosePanel(true);
+				} else if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(e);
 				}
 			});
@@ -59,14 +58,20 @@ export const SelectedAvailabilityPanel = ({
 			availabilityRequest.abort();
 			appointmentTypesRequest.abort();
 		};
-	}, [handleError, logicalAvailabilityId, providerId]);
+	}, [handleError, logicalAvailabilityId, onClose, providerId]);
+
+	useEffect(() => {
+		closePanel && onClose();
+	}, [closePanel, onClose]);
 
 	return (
 		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>{isBlockedSlot ? 'Blocked Time' : 'Open Availability'}</h4>
+			<div className="d-flex align-items-center py-4">
+				{isBlockedTime !== null && (
+					<h4 className="mb-0">{isBlockedTime ? 'Blocked Time' : 'Open Availability'}</h4>
+				)}
 
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+				<Button variant="link" size="sm" className="ml-auto p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -83,17 +88,12 @@ export const SelectedAvailabilityPanel = ({
 						})}
 					</div>
 
-					<Button
-						variant="link"
-						size="sm"
-						className="p-0"
-						onClick={isBlockedSlot ? onEditTimeBlock : onEditAvailability}
-					>
-						edit
+					<Button as={Link} to={`${routeMatch.url}/edit`} variant="link" size="sm" className="p-0">
+						<EditIcon />
 					</Button>
 				</div>
 
-				{!isBlockedSlot &&
+				{!isBlockedTime &&
 					appointmentTypes.map((aT) => {
 						return (
 							<AppointmentTypeItem key={aT.appointmentTypeId} color={aT.hexColor} nickname={aT.name} />

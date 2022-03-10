@@ -12,7 +12,6 @@ import { Button, Form } from 'react-bootstrap';
 
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { EditAvailabilityPanel } from './edit-availability-panel';
-import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 
 import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
@@ -20,19 +19,12 @@ import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
 	Week = 'timeGridWeek',
 	Month = 'dayGridMonth',
-}
-
-enum CalendarSidebar {
-	ManageAvailability,
-	EditAvailability,
-	EditTimeBlock,
-	ViewAvailability,
 }
 
 export const MyCalendarScheduling: FC = () => {
@@ -42,14 +34,11 @@ export const MyCalendarScheduling: FC = () => {
 	const history = useHistory();
 
 	const [accordionExpanded, setAccordionExpanded] = useState(false);
-	const [activeSidebar, setActiveSidebar] = useState<CalendarSidebar | null>(null);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
-
-	const [logicalAvailabilityIdToView, setLogicalAvailabilityIdToView] = useState<string>();
-	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
 	const [focusDateOnLoad, setFocusDateOnLoad] = useState(true);
+	const [managingAvailabilties, setManagingAvailabilties] = useState(false);
 	const [mainStartDate, setMainStartDate] = useState<string>();
 	const [mainEndDate, setMainEndDate] = useState<string>();
 	const [leftStartDate, setLeftStartDate] = useState<string>();
@@ -110,8 +99,6 @@ export const MyCalendarScheduling: FC = () => {
 			},
 		];
 	}, [leftCalendarEvents, leftCalendarMoment]);
-
-	const sidebarToggled = followupPatientList.length > 0 || activeSidebar !== null || !routeMatch.isExact;
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -258,22 +245,23 @@ export const MyCalendarScheduling: FC = () => {
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
 					<Button
+						as={Link}
+						to={`${routeMatch.path}/appointments/new-appointment`}
 						variant="link"
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
-						onClick={() => {
-							history.push(`${routeMatch.path}/appointments/new-appointment`);
-						}}
 					>
 						new appointment
 					</Button>
 
 					<Button
+						as={Link}
+						to={`${routeMatch.path}/availabilities`}
 						variant="link"
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setActiveSidebar(CalendarSidebar.ManageAvailability);
+							setManagingAvailabilties(true);
 						}}
 					>
 						manage availability
@@ -322,8 +310,10 @@ export const MyCalendarScheduling: FC = () => {
 							clickInfo.event.extendedProps.isAvailability ||
 							clickInfo.event.extendedProps.isBlockedTime
 						) {
-							setLogicalAvailabilityIdToView(clickInfo.event.extendedProps.logicalAvailabilityId);
-							setActiveSidebar(CalendarSidebar.ViewAvailability);
+							setManagingAvailabilties(false);
+							history.push(
+								`${routeMatch.path}/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
+							);
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
 							setFocusDateOnLoad(false);
@@ -339,130 +329,100 @@ export const MyCalendarScheduling: FC = () => {
 				/>
 			</div>
 
-			{sidebarToggled && (
-				<div className={classNames('px-5 h-100', classes.sideBar)}>
-					<Switch>
-						<Route
-							path={[
-								`${routeMatch.path}/appointments/new-appointment`,
-								`${routeMatch.path}/appointments/:appointmentId/edit`,
-							]}
-						>
-							<EditAppointmentPanel
-								focusDateOnLoad={focusDateOnLoad}
-								setCalendarDate={setCalendarDate}
-								onClose={(updatedAppointmentId) => {
-									setFocusDateOnLoad(false);
-									history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
+			<Switch>
+				<Route
+					exact
+					path={[
+						`${routeMatch.path}/appointments/new-appointment`,
+						`${routeMatch.path}/appointments/:appointmentId/edit`,
+					]}
+				>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
+						<EditAppointmentPanel
+							focusDateOnLoad={focusDateOnLoad}
+							setCalendarDate={setCalendarDate}
+							onClose={(updatedAppointmentId) => {
+								setFocusDateOnLoad(false);
+								history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
 
-									fetchMainData();
-									fetchLeftData();
-								}}
-							/>
-						</Route>
+								fetchMainData();
+								fetchLeftData();
+							}}
+						/>
+					</div>
+				</Route>
 
-						<Route path={`${routeMatch.path}/appointments/:appointmentId`}>
-							<AppointmentDetailPanel
-								focusDateOnLoad={focusDateOnLoad}
-								setCalendarDate={setCalendarDate}
-								onAddAppointment={() => {
-									history.push(`${routeMatch.path}/appointments/new-appointment`);
-								}}
-								onClose={() => {
-									setFocusDateOnLoad(true);
-									history.push(`${routeMatch.path}`);
-								}}
-							/>
-						</Route>
-					</Switch>
+				<Route exact path={`${routeMatch.path}/appointments/:appointmentId`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
+						<AppointmentDetailPanel
+							focusDateOnLoad={focusDateOnLoad}
+							setCalendarDate={setCalendarDate}
+							onAddAppointment={() => {
+								history.push(`${routeMatch.path}/appointments/new-appointment`);
+							}}
+							onClose={() => {
+								setFocusDateOnLoad(true);
+								history.push(`${routeMatch.path}`);
+							}}
+						/>
+					</div>
+				</Route>
 
-					{activeSidebar === CalendarSidebar.ManageAvailability && (
+				<Route exact path={`${routeMatch.path}/availabilities`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
 						<ManageAvailabilityPanel
-							onEditAvailability={(logicalAvailabilityId) => {
-								if (logicalAvailabilityId) {
-									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
-								}
-								setActiveSidebar(CalendarSidebar.EditAvailability);
-							}}
-							onEditTimeBlock={(logicalAvailabilityId) => {
-								if (logicalAvailabilityId) {
-									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
-								}
-								setActiveSidebar(CalendarSidebar.EditTimeBlock);
-							}}
 							onClose={() => {
-								setActiveSidebar(null);
+								setManagingAvailabilties(false);
+								history.push(`${routeMatch.path}`);
 							}}
 						/>
-					)}
+					</div>
+				</Route>
 
-					{activeSidebar === CalendarSidebar.EditAvailability && (
+				<Route
+					exact
+					path={[
+						`${routeMatch.path}/availabilities/new-availability`,
+						`${routeMatch.path}/availabilities/new-blocked-time`,
+						`${routeMatch.path}/availabilities/:logicalAvailabilityId/edit`,
+					]}
+				>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
 						<EditAvailabilityPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={(didUpdate) => {
-								setLogicalAvailabilityIdToEdit(undefined);
-
-								if (logicalAvailabilityIdToView) {
-									setActiveSidebar(CalendarSidebar.ViewAvailability);
+							onClose={(logicalAvailabilityId) => {
+								if (managingAvailabilties) {
+									history.push(`${routeMatch.path}/availabilities`);
+								} else if (logicalAvailabilityId) {
+									history.push(`${routeMatch.path}/availabilities/${logicalAvailabilityId}`);
 								} else {
-									setActiveSidebar(CalendarSidebar.ManageAvailability);
+									history.push(`${routeMatch.path}`);
 								}
 
-								if (didUpdate) {
-									fetchMainData();
-									fetchLeftData();
-								}
+								fetchMainData();
+								fetchLeftData();
 							}}
 						/>
-					)}
+					</div>
+				</Route>
 
-					{activeSidebar === CalendarSidebar.EditTimeBlock && (
-						<EditUnavailableTimeBlockPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={(didUpdate) => {
-								setLogicalAvailabilityIdToEdit(undefined);
-
-								if (logicalAvailabilityIdToView) {
-									setActiveSidebar(CalendarSidebar.ViewAvailability);
-								} else {
-									setActiveSidebar(CalendarSidebar.ManageAvailability);
-								}
-
-								if (didUpdate) {
-									fetchMainData();
-									fetchLeftData();
-								}
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.ViewAvailability && (
+				<Route exact path={`${routeMatch.path}/availabilities/:logicalAvailabilityId`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
 						<SelectedAvailabilityPanel
-							logicalAvailabilityId={logicalAvailabilityIdToView}
-							onEditAvailability={() => {
-								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
-								setActiveSidebar(CalendarSidebar.EditAvailability);
-							}}
-							onEditTimeBlock={() => {
-								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
-								setActiveSidebar(CalendarSidebar.EditTimeBlock);
-							}}
 							onClose={() => {
-								setLogicalAvailabilityIdToView(undefined);
-								setActiveSidebar(null);
+								history.push(`${routeMatch.path}`);
 							}}
 						/>
-					)}
+					</div>
+				</Route>
+			</Switch>
 
-					{followupPatientList.length > 0 ? (
+			{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel
 							onClose={() => {
 								setFollowupPatientList([]);
 							}}
 						/>
-					) : null}
-				</div>
-			)}
+					) : null} */}
 		</div>
 	);
 };

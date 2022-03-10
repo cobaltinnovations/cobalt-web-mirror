@@ -7,7 +7,7 @@ import { Button } from 'react-bootstrap';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
-import { Link, Redirect, useParams } from 'react-router-dom';
+import { Link, Redirect, useParams, useRouteMatch } from 'react-router-dom';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { AppointmentForm } from './appointment-form';
 import { useScrollCalendar } from './use-scroll-calendar';
@@ -20,6 +20,7 @@ interface EditAppointmentPanelProps {
 
 export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad }: EditAppointmentPanelProps) => {
 	const { appointmentId } = useParams<{ appointmentId: string }>();
+	const routeMatch = useRouteMatch();
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const relativeUrl = `/providers/${account?.providerId}?&immediateAccess=true`;
@@ -27,7 +28,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 
 	const [appointment, setAppointment] = useState<AppointmentModel>();
 
-	const isCreate = appointmentId === 'new-appointment';
+	const isCreate = routeMatch.path.endsWith('new-appointment');
 
 	const initialValues = useMemo(() => {
 		const appointmentMoment = appointment?.startTime ? moment(appointment?.startTime) : null;

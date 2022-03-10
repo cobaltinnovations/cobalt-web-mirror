@@ -6,6 +6,7 @@ export const useSchedulingStyles = createUseStyles({
 	roundBtn: {
 		width: 36,
 		height: 36,
+		padding: 0,
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
