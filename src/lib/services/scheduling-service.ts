@@ -22,7 +22,7 @@ interface PostApointmentTypeRequest {
 
 export interface PostLogicalAvailabilitiesRequest {
 	providerId: string;
-	startDateTime: string;
+	startDateTime?: string;
 	endDate?: string;
 	endTime: string;
 	appointmentTypeIds?: string[];
