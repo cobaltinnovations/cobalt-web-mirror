@@ -21,7 +21,7 @@ interface AppointmentFormProps {
 	appointmentId?: string;
 	initialValues?: AppointmentFormSchema;
 	onBack: () => void;
-	onSuccess: (appointmentId?: string) => void;
+	onSuccess: (appointmentId: string) => void;
 }
 
 export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSuccess }: AppointmentFormProps) => {

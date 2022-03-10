@@ -25,11 +25,10 @@ const useProviderDetailStyles = createUseStyles({
 			zIndex: 0,
 			margin: 0,
 			marginLeft: -20,
-			paddingTop: 40,
 			paddingLeft: 20,
+			paddingBottom: 20,
 			overflowX: 'auto',
 			flexWrap: 'nowrap',
-			position: 'absolute',
 			width: `calc(100% + 40px)`,
 		},
 	},
@@ -105,7 +104,8 @@ const ProviderDetail = () => {
 		selectedTimeSlot,
 	} = useContext(BookingContext);
 
-	const inFlightRef = useRef<any>();
+	const inFlightFindRef = useRef<any>();
+	const inFlightProviderRef = useRef<any>();
 	const navRef = useRef<HTMLDivElement>(null);
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const sectionRefs = [
@@ -134,18 +134,30 @@ const ProviderDetail = () => {
 	}, []);
 
 	const fetchData = useCallback(() => {
-		const request = providerService.findProviders({ providerId });
-		const promise = request.fetch().then((response) => {
-			setAppointmentTypes(response.appointmentTypes);
-			setSelectedProvider(Object.assign({}, response.sections?.[0]?.providers?.[0], response.provider));
-			setAvailableSections(response.sections);
-			setSpecialties(response.specialties ?? []);
-		});
+		const findRequest = providerService.findProviders({ providerId });
+		const providerRequest = providerService.getProviderById(providerId);
 
-		inFlightRef.current = request;
+		const promise = Promise.all([findRequest.fetch(), providerRequest.fetch()]).then(
+			([findResponse, providerResponse]) => {
+				setAppointmentTypes(findResponse.appointmentTypes);
+				setAvailableSections(findResponse.sections);
+				setSpecialties(findResponse.specialties ?? []);
+				setSelectedProvider(providerResponse.provider);
+			}
+		);
+
+		inFlightFindRef.current = findRequest;
+		inFlightProviderRef.current = providerRequest;
 
 		return promise;
 	}, [providerId, setAppointmentTypes, setAvailableSections, setSelectedProvider, setSpecialties]);
+
+	useEffect(() => {
+		return () => {
+			inFlightFindRef.current?.abort();
+			inFlightProviderRef.current?.abort();
+		};
+	}, []);
 
 	return (
 		<AsyncPage fetchData={fetchData}>

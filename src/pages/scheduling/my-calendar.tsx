@@ -7,12 +7,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { EditAvailabilityPanel } from './edit-availability-panel';
-import { EditUnavailableTimeBlockPanel } from './edit-unavailable-time-block-panel';
 
 import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
@@ -20,6 +19,7 @@ import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
+import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -27,29 +27,17 @@ enum MainCalendarView {
 	Month = 'dayGridMonth',
 }
 
-enum CalendarSidebar {
-	ManageAvailability,
-	EditAvailability,
-	EditTimeBlock,
-	ViewAvailability,
-	EditAppointment,
-	ViewAppointment,
-}
-
 export const MyCalendarScheduling: FC = () => {
 	const classes = useContainerStyles();
 	const { account } = useAccount();
+	const routeMatch = useRouteMatch();
+	const history = useHistory();
 
-	const [accordionExpanded, setAccordionExpanded] = useState(false);
-	const [activeSidebar, setActiveSidebar] = useState<CalendarSidebar | null>(null);
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
-	const [appointmentIdToView, setAppointmentIdToView] = useState<string>();
-	const [appointmentIdToEdit, setAppointmentIdToEdit] = useState<string>();
-
-	const [logicalAvailabilityIdToView, setLogicalAvailabilityIdToView] = useState<string>();
-	const [logicalAvailabilityIdToEdit, setLogicalAvailabilityIdToEdit] = useState<string>();
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
+	const [focusDateOnLoad, setFocusDateOnLoad] = useState(true);
+	const [managingAvailabilties, setManagingAvailabilties] = useState(false);
 	const [mainStartDate, setMainStartDate] = useState<string>();
 	const [mainEndDate, setMainEndDate] = useState<string>();
 	const [leftStartDate, setLeftStartDate] = useState<string>();
@@ -58,8 +46,6 @@ export const MyCalendarScheduling: FC = () => {
 	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
-
-	const [draftEvent, setDraftEvent] = useState<any>();
 
 	const providerId = account?.providerId ?? '';
 	const { fetchData: fetchMainData, calendarEvents: mainCalendarEvents } = useProviderCalendar({
@@ -87,12 +73,8 @@ export const MyCalendarScheduling: FC = () => {
 			};
 		});
 
-		if (draftEvent) {
-			formatted.push(draftEvent);
-		}
-
 		return formatted;
-	}, [mainCalendarEvents, classes.blockedTimeslot, draftEvent]);
+	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
 		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
@@ -111,8 +93,6 @@ export const MyCalendarScheduling: FC = () => {
 		];
 	}, [leftCalendarEvents, leftCalendarMoment]);
 
-	const sidebarToggled = followupPatientList.length > 0;
-
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
 			return;
@@ -125,53 +105,24 @@ export const MyCalendarScheduling: FC = () => {
 		}
 	}, [currentMainCalendarView]);
 
+	const setCalendarDate = useCallback((date: Date, scrollTime?: string) => {
+		const nextMoment = moment(date);
+
+		mainCalendarRef.current?.getApi().gotoDate(date);
+		leftCalendarRef.current?.getApi().gotoDate(date);
+		setLeftCalendarMoment(nextMoment);
+
+		if (scrollTime) {
+			setTimeout(() => {
+				mainCalendarRef.current?.getApi().scrollToTime(scrollTime);
+			});
+		}
+	}, []);
+
 	return (
 		<div className={classes.wrapper}>
 			<div className={classNames('h-100 px-5', classes.sideBar)}>
-				<div className="mb-6">
-					<Accordion
-						open={accordionExpanded}
-						onToggle={() => {
-							setAccordionExpanded(!accordionExpanded);
-						}}
-						title="My Calendar"
-					>
-						<div className="mb-4">
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal1"
-								label="Owner"
-								checked={true}
-								onChange={() => {
-									//
-								}}
-							/>
-
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal2"
-								label="Editor"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
-
-							<Form.Check
-								type="radio"
-								bsPrefix="cobalt-modal-form__check"
-								id="cal3"
-								label="Viewer"
-								checked={false}
-								onChange={() => {
-									//
-								}}
-							/>
-						</div>
-					</Accordion>
-				</div>
+				<h4 className="my-6">My Calendar</h4>
 
 				<div className={classNames('mb-9', classes.leftCalendar)}>
 					<FullCalendar
@@ -190,9 +141,7 @@ export const MyCalendarScheduling: FC = () => {
 							const clickedDate = clickInfo.date;
 							const clickedMoment = moment(clickedDate);
 
-							setLeftCalendarMoment(clickedMoment);
-							mainCalendarApi?.gotoDate(clickedDate);
-							leftCalendarRef.current?.getApi().gotoDate(clickedDate);
+							setCalendarDate(clickedDate);
 
 							if (currentMainCalendarView === MainCalendarView.Week) {
 								clickedMoment.week() === mainMoment.week() && fetchMainData();
@@ -246,26 +195,23 @@ export const MyCalendarScheduling: FC = () => {
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
 					<Button
+						as={Link}
+						to={`${routeMatch.path}/appointments/new-appointment`}
 						variant="link"
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
-						onClick={() => {
-							setActiveSidebar(CalendarSidebar.EditAppointment);
-							setAppointmentIdToView(undefined);
-							setAppointmentIdToEdit(undefined);
-						}}
 					>
 						new appointment
 					</Button>
 
 					<Button
+						as={Link}
+						to={`${routeMatch.path}/availabilities`}
 						variant="link"
 						size="sm"
 						className="p-0 mb-5 font-size-xs"
 						onClick={() => {
-							setActiveSidebar(CalendarSidebar.ManageAvailability);
-							setAppointmentIdToView(undefined);
-							setAppointmentIdToEdit(undefined);
+							setManagingAvailabilties(true);
 						}}
 					>
 						manage availability
@@ -306,24 +252,7 @@ export const MyCalendarScheduling: FC = () => {
 							</div>
 						);
 					}}
-					// initialEvents={[]} // alternatively, use the `events` setting to fetch from a feed
-					// select={(selectInfo) => {
-					// 	const title = prompt('Please enter a new title for your event');
-					// 	const calendarApi = selectInfo.view.calendar;
-
-					// 	calendarApi.unselect(); // clear date selection
-
-					// 	if (title) {
-					// 		calendarApi.addEvent({
-					// 			id: Math.random() + 'a',
-					// 			title,
-					// 			start: selectInfo.startStr,
-					// 			end: selectInfo.endStr,
-					// 			allDay: selectInfo.allDay,
-					// 		});
-					// 	}
-					// }}
-					eventClick={(clickInfo, ...args) => {
+					eventClick={(clickInfo) => {
 						if (clickInfo.event.allDay) {
 							setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
@@ -331,12 +260,16 @@ export const MyCalendarScheduling: FC = () => {
 							clickInfo.event.extendedProps.isAvailability ||
 							clickInfo.event.extendedProps.isBlockedTime
 						) {
-							setLogicalAvailabilityIdToView(clickInfo.event.extendedProps.logicalAvailabilityId);
-							setActiveSidebar(CalendarSidebar.ViewAvailability);
+							setManagingAvailabilties(false);
+							history.push(
+								`${routeMatch.path}/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
+							);
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
-							setAppointmentIdToView(clickInfo.event.extendedProps.appointmentId);
-							setActiveSidebar(CalendarSidebar.ViewAppointment);
+							setFocusDateOnLoad(false);
+							history.push(
+								`${routeMatch.path}/appointments/${clickInfo.event.extendedProps.appointmentId}`
+							);
 						}
 					}}
 					datesSet={({ start, end }) => {
@@ -346,132 +279,100 @@ export const MyCalendarScheduling: FC = () => {
 				/>
 			</div>
 
-			{(sidebarToggled || activeSidebar !== null) && (
-				<div className={classNames('px-5 h-100', classes.sideBar)}>
-					{activeSidebar === CalendarSidebar.ManageAvailability && (
-						<ManageAvailabilityPanel
-							onEditAvailability={(logicalAvailabilityId) => {
-								if (logicalAvailabilityId) {
-									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
-								}
-								setActiveSidebar(CalendarSidebar.EditAvailability);
-							}}
-							onEditTimeBlock={(logicalAvailabilityId) => {
-								if (logicalAvailabilityId) {
-									setLogicalAvailabilityIdToEdit(logicalAvailabilityId);
-								}
-								setActiveSidebar(CalendarSidebar.EditTimeBlock);
-							}}
-							onClose={() => {
-								setActiveSidebar(null);
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.EditAvailability && (
-						<EditAvailabilityPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={(didUpdate) => {
-								setLogicalAvailabilityIdToEdit(undefined);
-
-								if (logicalAvailabilityIdToView) {
-									setActiveSidebar(CalendarSidebar.ViewAvailability);
-								} else {
-									setActiveSidebar(CalendarSidebar.ManageAvailability);
-								}
-
-								if (didUpdate) {
-									fetchMainData();
-									fetchLeftData();
-								}
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.EditTimeBlock && (
-						<EditUnavailableTimeBlockPanel
-							logicalAvailabilityId={logicalAvailabilityIdToEdit}
-							onClose={(didUpdate) => {
-								setLogicalAvailabilityIdToEdit(undefined);
-
-								if (logicalAvailabilityIdToView) {
-									setActiveSidebar(CalendarSidebar.ViewAvailability);
-								} else {
-									setActiveSidebar(CalendarSidebar.ManageAvailability);
-								}
-
-								if (didUpdate) {
-									fetchMainData();
-									fetchLeftData();
-								}
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.ViewAvailability && (
-						<SelectedAvailabilityPanel
-							logicalAvailabilityId={logicalAvailabilityIdToView}
-							onEditAvailability={() => {
-								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
-								setActiveSidebar(CalendarSidebar.EditAvailability);
-							}}
-							onEditTimeBlock={() => {
-								setLogicalAvailabilityIdToEdit(logicalAvailabilityIdToView);
-								setActiveSidebar(CalendarSidebar.EditTimeBlock);
-							}}
-							onClose={() => {
-								setLogicalAvailabilityIdToView(undefined);
-								setActiveSidebar(null);
-							}}
-						/>
-					)}
-
-					{activeSidebar === CalendarSidebar.EditAppointment && (
+			<Switch>
+				<Route
+					exact
+					path={[
+						`${routeMatch.path}/appointments/new-appointment`,
+						`${routeMatch.path}/appointments/:appointmentId/edit`,
+					]}
+				>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
 						<EditAppointmentPanel
-							appointmentId={appointmentIdToEdit}
+							focusDateOnLoad={focusDateOnLoad}
+							setCalendarDate={setCalendarDate}
 							onClose={(updatedAppointmentId) => {
-								setAppointmentIdToEdit(undefined);
-								if (appointmentIdToView) {
-									updatedAppointmentId && setAppointmentIdToView(updatedAppointmentId);
-									setActiveSidebar(CalendarSidebar.ViewAppointment);
-								} else {
-									setActiveSidebar(null);
-								}
+								setFocusDateOnLoad(false);
+								history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
 
-								if (updatedAppointmentId) {
-									fetchMainData();
-									fetchLeftData();
-								}
+								fetchMainData();
+								fetchLeftData();
 							}}
 						/>
-					)}
+					</div>
+				</Route>
 
-					{activeSidebar === CalendarSidebar.ViewAppointment && (
+				<Route exact path={`${routeMatch.path}/appointments/:appointmentId`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
 						<AppointmentDetailPanel
-							appointmentId={appointmentIdToView}
-							onEdit={() => {
-								setAppointmentIdToEdit(appointmentIdToView);
-								setActiveSidebar(CalendarSidebar.EditAppointment);
-							}}
+							focusDateOnLoad={focusDateOnLoad}
+							setCalendarDate={setCalendarDate}
 							onAddAppointment={() => {
-								setActiveSidebar(CalendarSidebar.EditAppointment);
+								history.push(`${routeMatch.path}/appointments/new-appointment`);
 							}}
 							onClose={() => {
-								setAppointmentIdToView(undefined);
-								setActiveSidebar(null);
+								setFocusDateOnLoad(true);
+								history.push(`${routeMatch.path}`);
 							}}
 						/>
-					)}
+					</div>
+				</Route>
 
-					{followupPatientList.length > 0 ? (
+				<Route exact path={`${routeMatch.path}/availabilities`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
+						<ManageAvailabilityPanel
+							onClose={() => {
+								setManagingAvailabilties(false);
+								history.push(`${routeMatch.path}`);
+							}}
+						/>
+					</div>
+				</Route>
+
+				<Route
+					exact
+					path={[
+						`${routeMatch.path}/availabilities/new-availability`,
+						`${routeMatch.path}/availabilities/new-blocked-time`,
+						`${routeMatch.path}/availabilities/:logicalAvailabilityId/edit`,
+					]}
+				>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
+						<EditAvailabilityPanel
+							onClose={(logicalAvailabilityId) => {
+								if (managingAvailabilties) {
+									history.push(`${routeMatch.path}/availabilities`);
+								} else if (logicalAvailabilityId) {
+									history.push(`${routeMatch.path}/availabilities/${logicalAvailabilityId}`);
+								} else {
+									history.push(`${routeMatch.path}`);
+								}
+
+								fetchMainData();
+								fetchLeftData();
+							}}
+						/>
+					</div>
+				</Route>
+
+				<Route exact path={`${routeMatch.path}/availabilities/:logicalAvailabilityId`}>
+					<div className={classNames('px-5 h-100', classes.sideBar)}>
+						<SelectedAvailabilityPanel
+							onClose={() => {
+								history.push(`${routeMatch.path}`);
+							}}
+						/>
+					</div>
+				</Route>
+			</Switch>
+
+			{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel
 							onClose={() => {
 								setFollowupPatientList([]);
 							}}
 						/>
-					) : null}
-				</div>
-			)}
+					) : null} */}
 		</div>
 	);
 };
