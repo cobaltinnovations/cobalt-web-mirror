@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import { Button } from 'react-bootstrap';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { AppointmentType } from '@/lib/models';
 
 const useSchedulingStyles = createUseStyles({
 	appointmentTypeColorCircle: {
@@ -13,22 +14,21 @@ const useSchedulingStyles = createUseStyles({
 });
 
 interface AppointmentTypeItemProps {
-	color: string;
-	nickname: string;
+	appointmentType: AppointmentType;
 	onEdit?: () => void;
 	invertedColor?: boolean;
 }
 
-export const AppointmentTypeItem = ({ color, nickname, onEdit, invertedColor }: AppointmentTypeItemProps) => {
+export const AppointmentTypeItem = ({ appointmentType, onEdit, invertedColor }: AppointmentTypeItemProps) => {
 	const schedulingClasses = useSchedulingStyles();
 
 	const colorStyle = invertedColor
 		? {
 				backgroundColor: 'transparent',
-				border: `1px solid ${color}`,
+				border: `1px solid ${appointmentType.hexColor}`,
 		  }
 		: {
-				backgroundColor: color,
+				backgroundColor: appointmentType.hexColor,
 		  };
 
 	return (
@@ -36,7 +36,7 @@ export const AppointmentTypeItem = ({ color, nickname, onEdit, invertedColor }: 
 			<div className="d-flex align-items-center">
 				<div className={schedulingClasses.appointmentTypeColorCircle} style={colorStyle} />
 
-				<p className="ml-1 mb-0">{nickname}</p>
+				<p className="ml-1 mb-0">{appointmentType.name}</p>
 			</div>
 
 			{onEdit && (

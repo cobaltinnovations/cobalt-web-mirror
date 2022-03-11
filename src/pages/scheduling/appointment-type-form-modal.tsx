@@ -13,6 +13,7 @@ import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import Select from '@/components/select';
 
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
@@ -71,6 +72,22 @@ const useModalStyles = createUseStyles({
 	},
 });
 
+type VisitType = 'INITIAL' | 'FOLLOWUP' | 'OTHER';
+const VISIT_TYPE_IDS = [
+	{
+		visitTypeId: 'INITIAL' as VisitType,
+		label: 'Initial Visit',
+	},
+	{
+		visitTypeId: 'FOLLOWUP' as VisitType,
+		label: 'Followup Visit',
+	},
+	{
+		visitTypeId: 'OTHER' as VisitType,
+		label: 'Other',
+	},
+];
+
 interface AppointmentTypeFormModalProps extends ModalProps {
 	appointmentTypeId?: string;
 	onSave(appointmentType: SchedulingAppointmentType): void;
@@ -89,9 +106,9 @@ export const AppointmentTypeFormModal = ({
 
 	const [title, setTitle] = useState('');
 	const [color, setColor] = useState(colors.primary);
-	const [nickname, setNickname] = useState('');
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
+	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
 	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([]);
 	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
 
@@ -105,7 +122,6 @@ export const AppointmentTypeFormModal = ({
 
 			setTitle(appointmentType.name);
 			setColor(appointmentType.hexColor);
-			setNickname(appointmentType.description);
 
 			if (
 				appointmentType.durationInMinutes === 30 ||
@@ -129,7 +145,6 @@ export const AppointmentTypeFormModal = ({
 	const handleOnExited = useCallback(() => {
 		setTitle('');
 		setColor(colors.primary);
-		setNickname('');
 		setDuration('');
 		setDurationInMinutes(undefined);
 		setPatientIntakeQuestions([]);
@@ -145,9 +160,9 @@ export const AppointmentTypeFormModal = ({
 			const requestBody = {
 				providerId: account.providerId,
 				name: title,
-				description: nickname,
+				description: title,
 				schedulingSystemId: 'COBALT',
-				visitTypeId: 'INITIAL',
+				visitTypeId,
 				durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
 				hexColor: color,
 				patientIntakeQuestions,
@@ -172,11 +187,11 @@ export const AppointmentTypeFormModal = ({
 		duration,
 		durationInMinutes,
 		handleError,
-		nickname,
 		onSave,
 		patientIntakeQuestions,
 		screeningQuestions,
 		title,
+		visitTypeId,
 	]);
 
 	const handleDeleteButtonClick = useCallback(async () => {
@@ -229,16 +244,23 @@ export const AppointmentTypeFormModal = ({
 					/>
 				</Form.Group>
 
-				<InputHelper
-					className="mb-4"
-					type="text"
-					label="Nickname (how this appears on your calendar)"
-					value={nickname}
-					onChange={({ currentTarget }) => {
-						setNickname(currentTarget.value);
-					}}
-					required
-				/>
+				<Form.Group>
+					<Form.Label style={{ ...fonts.xs }}>Visit Type:</Form.Label>
+					<Select
+						value={visitTypeId}
+						onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+							setVisitTypeId(event.target.value as VisitType)
+						}
+					>
+						{VISIT_TYPE_IDS.map((visitTypeOption) => {
+							return (
+								<option key={visitTypeOption.visitTypeId} value={visitTypeOption.visitTypeId}>
+									{visitTypeOption.label}
+								</option>
+							);
+						})}
+					</Select>
+				</Form.Group>
 
 				<Form.Group>
 					<Form.Label className="m-0" style={{ ...fonts.xs }}>

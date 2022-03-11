@@ -90,8 +90,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 							return (
 								<AppointmentTypeItem
 									key={appointmentType.appointmentTypeId}
-									color={appointmentType.hexColor}
-									nickname={appointmentType.name}
+									appointmentType={appointmentType}
 									onEdit={() => {
 										setAppointmentTypeIdToEdit(appointmentType.appointmentTypeId);
 										setAppointmentTypeModalOpen(true);
@@ -183,11 +182,7 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 			</div>
 			{logicalAvailability.appointmentTypes.map((appointmentType) => {
 				return (
-					<AppointmentTypeItem
-						key={appointmentType.appointmentTypeId}
-						color={appointmentType.hexColor}
-						nickname={appointmentType.name}
-					/>
+					<AppointmentTypeItem key={appointmentType.appointmentTypeId} appointmentType={appointmentType} />
 				);
 			})}
 		</div>

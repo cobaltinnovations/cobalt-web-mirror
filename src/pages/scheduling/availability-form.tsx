@@ -91,7 +91,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 			const requestBody = {
 				providerId: account.providerId,
-				startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss'),
+				...(startDateTime.isValid() && { startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss') }),
 				...(endDay.isValid() && { endDate: endDay.format('YYYY-MM-DD') }),
 				endTime: endTimeMoment.format('HH:mm:ss'),
 				logicalAvailabilityTypeId,
@@ -159,6 +159,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				{(formikBag) => {
 					const { values, setFieldValue, handleChange, handleSubmit } = formikBag;
 					const isValid =
+						!!values.startDate &&
 						!!values.startTime &&
 						!!values.startTimeMeridian &&
 						!!values.endTime &&
@@ -309,10 +310,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 														name="appointmentTypes"
 														value={appointmentType.appointmentTypeId}
 														label={
-															<AppointmentTypeItem
-																color={appointmentType.hexColor}
-																nickname={appointmentType.name}
-															/>
+															<AppointmentTypeItem appointmentType={appointmentType} />
 														}
 														checked={values.appointmentTypes.includes(
 															appointmentType.appointmentTypeId

@@ -95,9 +95,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 
 				{!isBlockedTime &&
 					appointmentTypes.map((aT) => {
-						return (
-							<AppointmentTypeItem key={aT.appointmentTypeId} color={aT.hexColor} nickname={aT.name} />
-						);
+						return <AppointmentTypeItem key={aT.appointmentTypeId} appointmentType={aT} />;
 					})}
 			</div>
 		</div>

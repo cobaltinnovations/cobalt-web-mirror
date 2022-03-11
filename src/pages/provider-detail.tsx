@@ -224,7 +224,7 @@ const ProviderDetail = () => {
 															[classes.activeNav]: currentElementIndexInViewport === 1,
 														})}
 													>
-														<a href="#specialties">Specialties</a>
+														<a href="#specialties">Focus</a>
 													</li>
 													<li
 														className={classNames('ml-2 py-2', classes.navItem, {
@@ -265,7 +265,7 @@ const ProviderDetail = () => {
 
 										<div className="mb-8" ref={sectionRefs[1]}>
 											<div id="specialties" className={classes.sectionAnchor} />
-											<h4>Specialties</h4>
+											<h4>Focus</h4>
 											{!!specialties?.length ? (
 												<ul>
 													{specialties?.map((specialty) => {

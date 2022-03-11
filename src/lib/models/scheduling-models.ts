@@ -4,7 +4,6 @@ export interface SchedulingAppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
 	visitTypeId: string;
-	acuityAppointmentTypeId: string;
 	epicVisitTypeId: string;
 	epicVisitTypeIdType: string;
 	name: string;

@@ -162,7 +162,7 @@ export const AppointmentDetailPanel = ({
 		[allAppointments, handleError]
 	);
 
-	if (appointment?.rescheduledAppointmentId) {
+	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
 		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
 	}
 
@@ -289,10 +289,7 @@ export const AppointmentDetailPanel = ({
 										<p className="mb-0">
 											<strong>{appointment.startTimeDescription}</strong>
 										</p>
-										<AppointmentTypeItem
-											color={appointment.appointmentType.hexColor}
-											nickname={appointment.appointmentType.name}
-										/>
+										<AppointmentTypeItem appointmentType={appointment.appointmentType} />
 									</div>
 									<div className="d-flex align-items-center">
 										{appointment.attendanceStatusId === 'UNKNOWN' && (

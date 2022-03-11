@@ -66,6 +66,7 @@ export interface AppointmentModel {
 	appointmentDescription: string;
 	appointmentType: AppointmentType;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
+	canceledForReschedule: boolean;
 	rescheduledAppointmentId?: string;
 }
 
