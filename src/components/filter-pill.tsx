@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, FC } from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import Color from 'color';
@@ -17,9 +17,7 @@ const useFilterPillStyles = createUseStyles({
 		...fonts.karlaRegular,
 		textTransform: 'uppercase',
 		padding: '4px 10px 4px 12px',
-		backgroundColor: Color(colors.dark)
-			.alpha(0.12)
-			.string(),
+		backgroundColor: Color(colors.dark).alpha(0.12).string(),
 		border: `1px solid ${colors.dark}`,
 		'&:focus': {
 			outline: 'none',
@@ -29,6 +27,10 @@ const useFilterPillStyles = createUseStyles({
 		backgroundColor: colors.dark,
 		color: colors.white,
 	},
+	disabledPill: {
+		backgroundColor: colors.shadedPill,
+		color: colors.gray600,
+	},
 	arrowDown: {
 		marginLeft: 2,
 		marginTop: -1,
@@ -37,21 +39,38 @@ const useFilterPillStyles = createUseStyles({
 	activeArrowDown: {
 		fill: colors.white,
 	},
+	disabledArrowDown: {
+		fill: colors.gray600,
+	},
 });
 
 interface FilterPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	active: boolean;
 }
 
-const FilterPill: FC<FilterPillProps> = React.forwardRef(({ children, className, active, ...props }, ref) => {
-	const classes = useFilterPillStyles();
+const FilterPill = React.forwardRef<HTMLButtonElement, FilterPillProps>(
+	({ children, className, active, ...props }, ref) => {
+		const classes = useFilterPillStyles();
 
-	return (
-		// @ts-ignore
-		<button ref={ref} className={classNames(classes.pill, className, { [classes.activePill]: active })} {...props}>
-			{children} <ArrowDown className={classNames(classes.arrowDown, { [classes.activeArrowDown]: active })} />
-		</button>
-	);
-});
+		return (
+			<button
+				ref={ref}
+				className={classNames(classes.pill, className, {
+					[classes.activePill]: active,
+					[classes.disabledPill]: props.disabled,
+				})}
+				{...props}
+			>
+				{children}
+				<ArrowDown
+					className={classNames(classes.arrowDown, {
+						[classes.activeArrowDown]: active,
+						[classes.disabledArrowDown]: props.disabled,
+					})}
+				/>
+			</button>
+		);
+	}
+);
 
 export default FilterPill;

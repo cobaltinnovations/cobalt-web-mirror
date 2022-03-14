@@ -1,4 +1,3 @@
-import Accordion from '@/components/accordion';
 import useAccount from '@/hooks/use-account';
 import colors from '@/jss/colors';
 import FullCalendar from '@fullcalendar/react';
@@ -20,6 +19,7 @@ import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
 import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import useHeaderTitle from '@/hooks/use-header-title';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -27,7 +27,8 @@ enum MainCalendarView {
 	Month = 'dayGridMonth',
 }
 
-export const MyCalendarScheduling: FC = () => {
+export const MySchedule: FC = () => {
+	useHeaderTitle('my schedule');
 	const classes = useContainerStyles();
 	const { account } = useAccount();
 	const routeMatch = useRouteMatch();
@@ -377,4 +378,4 @@ export const MyCalendarScheduling: FC = () => {
 	);
 };
 
-export default MyCalendarScheduling;
+export default MySchedule;
