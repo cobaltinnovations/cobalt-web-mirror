@@ -7,6 +7,10 @@ import Color from 'color';
 import moment from 'moment';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+interface FetchProviderCalendarConfig {
+	throwErrors?: boolean;
+}
+
 export const useProviderCalendar = ({
 	providerId,
 	startDate,
@@ -16,34 +20,41 @@ export const useProviderCalendar = ({
 	const inFlightRequest = useRef<ReturnType<typeof schedulingService['getCalendar']>>();
 	const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
 
-	const fetchData = useCallback(async () => {
-		try {
-			if (!providerId || !startDate || !endDate) {
-				throw new Error('missing Calendar parameters');
+	const fetchData = useCallback(
+		async (config?: FetchProviderCalendarConfig) => {
+			try {
+				if (!providerId || !startDate || !endDate) {
+					throw new Error('missing Calendar parameters');
+				}
+
+				inFlightRequest.current?.abort();
+
+				inFlightRequest.current = schedulingService.getCalendar(providerId, {
+					startDate,
+					endDate,
+				});
+
+				const { providerCalendar } = await inFlightRequest.current.fetch();
+
+				setCalendarEvents(mapCalendarEvents(providerCalendar));
+			} catch (error) {
+				if (config?.throwErrors) {
+					throw error;
+				} else if ((error as AxiosError).code !== ERROR_CODES.REQUEST_ABORTED) {
+					handleError(error);
+				}
 			}
-
-			inFlightRequest.current?.abort();
-
-			inFlightRequest.current = schedulingService.getCalendar(providerId, {
-				startDate,
-				endDate,
-			});
-
-			const { providerCalendar } = await inFlightRequest.current.fetch();
-
-			setCalendarEvents(mapCalendarEvents(providerCalendar));
-		} catch (error) {
-			if ((error as AxiosError).code !== ERROR_CODES.REQUEST_ABORTED) {
-				handleError(error);
-			}
-		}
-	}, [providerId, startDate, endDate, handleError]);
+		},
+		[providerId, startDate, endDate, handleError]
+	);
 
 	useEffect(() => {
 		fetchData();
 
 		const intervalId = setInterval(() => {
-			fetchData();
+			fetchData({ throwErrors: true }).catch(() => {
+				// swallow polling errors
+			});
 		}, 30000);
 
 		return () => {
