@@ -70,7 +70,7 @@ const DashboardWrapper = React.lazy(() => import('@/pages/pic/mhic-dashboard/das
 const PicProviderSearch = React.lazy(() => import('@/pages/pic/provider-search'));
 const PicProviderCalendar = React.lazy(() => import('@/pages/pic/provider-calendar'));
 const ContactLCSW = React.lazy(() => import('@/pages/pic/contact-lcsw/contact-lcsw'));
-const MyCalendarScheduling = React.lazy(() => import('@/pages/scheduling/my-calendar'));
+const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
 const Interaction = React.lazy(() => import('@/pages/interaction'));
 const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 
@@ -393,7 +393,7 @@ export const Routes = [
 		private: true,
 		checkEnabled: isProviderRouteGuard,
 		header: (): ReactElement => <Header />,
-		main: MyCalendarScheduling,
+		main: MySchedule,
 	},
 	{
 		path: '/appointments/:appointmentId',
