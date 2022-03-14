@@ -46,22 +46,23 @@ interface QuickFilterToggleProps {
 	onClick?(event: React.MouseEvent): void;
 }
 
-const QuickFilterToggle: FC<QuickFilterToggleProps> = React.forwardRef(({ children, active, className, id, onClick }, ref) => {
-	function handleQuickFilterToggleClick(event: React.MouseEvent) {
-		event.preventDefault();
+const QuickFilterToggle = React.forwardRef<HTMLButtonElement, QuickFilterToggleProps>(
+	({ children, active, className, id, onClick }, ref) => {
+		function handleQuickFilterToggleClick(event: React.MouseEvent) {
+			event.preventDefault();
 
-		if (onClick) {
-			onClick(event);
+			if (onClick) {
+				onClick(event);
+			}
 		}
-	}
 
-	return (
-		// @ts-ignore :(
-		<FilterPill active={active} ref={ref} id={id} className={className} onClick={handleQuickFilterToggleClick}>
-			{children}
-		</FilterPill>
-	);
-});
+		return (
+			<FilterPill active={active} ref={ref} id={id} className={className} onClick={handleQuickFilterToggleClick}>
+				{children}
+			</FilterPill>
+		);
+	}
+);
 
 interface QuickFilterMenuProps {
 	style?: any;
@@ -69,14 +70,15 @@ interface QuickFilterMenuProps {
 	'aria-labelledby'?: string;
 }
 
-const QuickFilterMenu: FC<QuickFilterMenuProps> = React.forwardRef(({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
-	return (
-		// @ts-ignore :(
-		<div ref={ref} style={style} className={className} aria-labelledby={labeledBy}>
-			<ul className="m-0 list-unstyled">{children}</ul>
-		</div>
-	);
-});
+const QuickFilterMenu = React.forwardRef<HTMLDivElement, QuickFilterMenuProps>(
+	({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+		return (
+			<div ref={ref} style={style} className={className} aria-labelledby={labeledBy}>
+				<ul className="m-0 list-unstyled">{children}</ul>
+			</div>
+		);
+	}
+);
 
 interface QuickFilterItem {
 	value: string | undefined;
@@ -105,8 +107,15 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 				<Dropdown.Header className={classes.quickFilterHeader}>{title}</Dropdown.Header>
 				{items.map((item, index) => {
 					return (
-						<Dropdown.Item key={`${item.value}-${index}`} eventKey={item.value} onSelect={onChange} className={classes.quickFilterItem}>
-							<div className={`w-100 d-flex justify-content-between align-items-center ${classes.formCheckWrapper}`}>
+						<Dropdown.Item
+							key={`${item.value}-${index}`}
+							eventKey={item.value}
+							onSelect={onChange}
+							className={classes.quickFilterItem}
+						>
+							<div
+								className={`w-100 d-flex justify-content-between align-items-center ${classes.formCheckWrapper}`}
+							>
 								<FormCheck
 									type="radio"
 									label={item.label}

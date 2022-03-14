@@ -70,6 +70,7 @@ export interface FindProvidersResponse {
 	appointments?: AppointmentModel[];
 	followups?: FollowupModel[];
 	specialties?: Specialty[];
+	showSpecialties: boolean;
 }
 
 interface ProvidersRepsonse {
