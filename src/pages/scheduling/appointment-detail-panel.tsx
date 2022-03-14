@@ -30,6 +30,7 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { cloneDeep } from 'lodash';
 import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	appointmentsList: {
@@ -100,6 +101,7 @@ export const AppointmentDetailPanel = ({
 	focusDateOnLoad,
 }: AppointmentDetailPanelProps) => {
 	const routeMatch = useRouteMatch();
+	const { account } = useAccount();
 	const { appointmentId } = useParams<{ appointmentId: string }>();
 	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
@@ -111,22 +113,21 @@ export const AppointmentDetailPanel = ({
 
 	useScrollCalendar(setCalendarDate, focusDateOnLoad, appointment);
 
+	const accountId = account?.accountId;
 	useEffect(() => {
-		const request = appointmentService.getAppointment(appointmentId);
+		if (!accountId) {
+			return;
+		}
+
+		const request = accountService.getAppointmentDetailsForAccount(accountId, appointmentId);
 
 		request
 			.fetch()
 			.then((response) => {
+				setPatient(response.account);
 				setAppointment(response.appointment);
-
-				return accountService
-					.getAppointmentDetailsForAccount(response.appointment.accountId, response.appointment.appointmentId)
-					.fetch();
-			})
-			.then((accountDetailsResponse) => {
-				setPatient(accountDetailsResponse.account);
-				setAssessment(accountDetailsResponse.assessment);
-				setAllAppointments(accountDetailsResponse.appointments);
+				setAssessment(response.assessment);
+				setAllAppointments(response.appointments);
 			})
 			.catch((e) => {
 				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -137,30 +138,7 @@ export const AppointmentDetailPanel = ({
 		return () => {
 			request.abort();
 		};
-	}, [appointmentId, handleError]);
-
-	const updateAttendanceStatus = useCallback(
-		async (appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) => {
-			try {
-				const response = await appointmentService
-					.updateAppointmentAttendanceStatus(appointmentId, attendanceStatusId)
-					.fetch();
-
-				const allAppointmentsClone = cloneDeep(allAppointments);
-				const indexToReplace = allAppointmentsClone.findIndex(
-					(appointment) => appointment.appointmentId === appointmentId
-				);
-
-				if (indexToReplace > -1) {
-					allAppointmentsClone[indexToReplace] = response.appointment;
-					setAllAppointments(allAppointmentsClone);
-				}
-			} catch (error) {
-				handleError(error);
-			}
-		},
-		[allAppointments, handleError]
-	);
+	}, [accountId, appointmentId, handleError]);
 
 	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
 		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
@@ -169,11 +147,19 @@ export const AppointmentDetailPanel = ({
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>
-					{patient?.firstName || patient?.lastName
-						? `${patient?.firstName} ${patient?.lastName}`
-						: 'Anonymous'}
-				</h4>
+				<div>
+					<h4>
+						{patient?.firstName || patient?.lastName
+							? `${patient?.firstName} ${patient?.lastName}`
+							: 'Anonymous'}
+					</h4>
+
+					<p className="mb-0">{appointment?.startTimeDescription}</p>
+					{appointment?.appointmentType && (
+						<AppointmentTypeItem appointmentType={appointment.appointmentType} />
+					)}
+				</div>
+
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
@@ -198,10 +184,10 @@ export const AppointmentDetailPanel = ({
 				</Button>
 			</div>
 
-			<div className="border py-2 px-3 mb-2">
+			<div className="border py-2 px-3">
 				<div className="mb-2 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
-						<strong>contact information</strong>
+						<strong>Contact Information</strong>
 					</p>
 					{/* <Button
 						variant="link"
@@ -216,24 +202,24 @@ export const AppointmentDetailPanel = ({
 				</div>
 
 				<p className="mb-0">
-					<strong>phone</strong>
+					<strong>Phone</strong>
 				</p>
 				<p>{patient?.phoneNumber || 'Not available'}</p>
 
 				<p className="mb-0">
-					<strong>email</strong>
+					<strong>Email</strong>
 				</p>
 				<p>{patient?.emailAddress || 'Not available'}</p>
 			</div>
 
-			<div className="border py-2 px-3 mb-2">
-				<div className="d-flex mb-1 justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>assessments completed</strong>
-					</p>
-				</div>
+			{!!assessment && Array.isArray(assessment.assessmentQuestions) && (
+				<div className="border py-2 px-3 mt-2">
+					<div className="d-flex mb-1 justify-content-between align-items-center">
+						<p className="mb-0">
+							<strong>Intake Responses</strong>
+						</p>
+					</div>
 
-				{!!assessment && Array.isArray(assessment.assessmentQuestions) && (
 					<div className="mb-1 justify-content-between align-items-center">
 						{assessment.assessmentQuestions.map((question) => {
 							const answersMap = question.answers.reduce((acc, answer) => {
@@ -259,13 +245,13 @@ export const AppointmentDetailPanel = ({
 							);
 						})}
 					</div>
-				)}
-			</div>
+				</div>
+			)}
 
-			<div className="border">
+			<div className="border mt-2">
 				<div className="py-2 px-3 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
-						<strong>all appointments</strong>
+						<strong>All Appointments</strong>
 					</p>
 
 					<button
@@ -291,82 +277,100 @@ export const AppointmentDetailPanel = ({
 										</p>
 										<AppointmentTypeItem appointmentType={appointment.appointmentType} />
 									</div>
-									<div className="d-flex align-items-center">
-										{appointment.attendanceStatusId === 'UNKNOWN' && (
-											<>
-												<button
-													className={classNames(
-														schedulingClasses.roundBtn,
-														classes.attendedButton
-													)}
-													onClick={() => {
-														updateAttendanceStatus(
-															appointment.appointmentId,
-															ATTENDANCE_STATUS_ID.ATTENDED
-														);
-													}}
-												>
-													<CheckIcon />
-												</button>
-												<button
-													className={classNames(
-														schedulingClasses.roundBtn,
-														classes.noShowButton,
-														'ml-2'
-													)}
-													onClick={() => {
-														updateAttendanceStatus(
-															appointment.appointmentId,
-															ATTENDANCE_STATUS_ID.MISSED
-														);
-													}}
-												>
-													<XIcon />
-												</button>
-											</>
-										)}
 
-										{appointment.attendanceStatusId === 'ATTENDED' && (
-											<button
-												className={classNames(
-													schedulingClasses.roundBtnSolid,
-													classes.attendedButtonSolid
-												)}
-												onClick={() => {
-													updateAttendanceStatus(
-														appointment.appointmentId,
-														ATTENDANCE_STATUS_ID.UNKNOWN
-													);
-												}}
-											>
-												<CheckIcon />
-											</button>
-										)}
+									{/* <AppointmentAttendance
+										appointment={appointment}
+										onUpdate={(updatedAppointment) => {
+											const allAppointmentsClone = cloneDeep(allAppointments);
+											const indexToReplace = allAppointmentsClone.findIndex(
+												(appointment) => appointment.appointmentId === appointmentId
+											);
 
-										{appointment.attendanceStatusId === 'CANCELED' ||
-											(appointment.attendanceStatusId === 'MISSED' && (
-												<button
-													className={classNames(
-														schedulingClasses.roundBtnSolid,
-														classes.noShowButtonSolid
-													)}
-													onClick={() => {
-														updateAttendanceStatus(
-															appointment.appointmentId,
-															ATTENDANCE_STATUS_ID.UNKNOWN
-														);
-													}}
-												>
-													<XIcon />
-												</button>
-											))}
-									</div>
+											if (indexToReplace > -1) {
+												allAppointmentsClone[indexToReplace] = updatedAppointment;
+												setAllAppointments(allAppointmentsClone);
+											}
+										}}
+									/> */}
 								</li>
 							);
 						})}
 					</ul>
 				)}
 			</div>
+		</div>
+	);
+};
+
+const AppointmentAttendance = ({
+	appointment,
+	onUpdate,
+}: {
+	appointment: AppointmentModel;
+	onUpdate: (updatedAppointment: AppointmentModel) => void;
+}) => {
+	const handleError = useHandleError();
+	const classes = useStyles();
+	const schedulingClasses = useSchedulingStyles();
+	const updateAttendanceStatus = useCallback(
+		async (appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) => {
+			try {
+				const response = await appointmentService
+					.updateAppointmentAttendanceStatus(appointmentId, attendanceStatusId)
+					.fetch();
+
+				onUpdate(response.appointment);
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError, onUpdate]
+	);
+
+	return (
+		<div className="d-flex align-items-center">
+			{appointment.attendanceStatusId === 'UNKNOWN' && (
+				<>
+					<button
+						className={classNames(schedulingClasses.roundBtn, classes.attendedButton)}
+						onClick={() => {
+							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.ATTENDED);
+						}}
+					>
+						<CheckIcon />
+					</button>
+					<button
+						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ml-2')}
+						onClick={() => {
+							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
+						}}
+					>
+						<XIcon />
+					</button>
+				</>
+			)}
+
+			{appointment.attendanceStatusId === 'ATTENDED' && (
+				<button
+					className={classNames(schedulingClasses.roundBtnSolid, classes.attendedButtonSolid)}
+					onClick={() => {
+						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
+					}}
+				>
+					<CheckIcon />
+				</button>
+			)}
+
+			{(appointment.attendanceStatusId === 'CANCELED' || appointment.attendanceStatusId === 'MISSED') && (
+				<button
+					className={classNames(schedulingClasses.roundBtnSolid, classes.noShowButtonSolid)}
+					onClick={() => {
+						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
+					}}
+				>
+					<XIcon />
+				</button>
+			)}
 		</div>
 	);
 };
