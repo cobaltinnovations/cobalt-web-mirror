@@ -144,6 +144,9 @@ export const AppointmentDetailPanel = ({
 		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
 	}
 
+	const showIntakeResponses =
+		!!assessment && Array.isArray(assessment.assessmentQuestions) && assessment.assessmentQuestions.length > 0;
+
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
@@ -212,7 +215,7 @@ export const AppointmentDetailPanel = ({
 				<p>{patient?.emailAddress || 'Not available'}</p>
 			</div>
 
-			{!!assessment && Array.isArray(assessment.assessmentQuestions) && (
+			{showIntakeResponses && (
 				<div className="border py-2 px-3 mt-2">
 					<div className="d-flex mb-1 justify-content-between align-items-center">
 						<p className="mb-0">
@@ -221,7 +224,7 @@ export const AppointmentDetailPanel = ({
 					</div>
 
 					<div className="mb-1 justify-content-between align-items-center">
-						{assessment.assessmentQuestions.map((question) => {
+						{assessment?.assessmentQuestions.map((question) => {
 							const answersMap = question.answers.reduce((acc, answer) => {
 								acc[answer.answerId] = answer;
 

@@ -294,7 +294,11 @@ export const MySchedule: FC = () => {
 							setCalendarDate={setCalendarDate}
 							onClose={(updatedAppointmentId) => {
 								setFocusDateOnLoad(false);
-								history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
+								if (updatedAppointmentId) {
+									history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
+								} else {
+									history.push(`${routeMatch.path}`);
+								}
 
 								fetchMainData();
 								fetchLeftData();
