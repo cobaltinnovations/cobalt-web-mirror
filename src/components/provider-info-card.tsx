@@ -43,6 +43,11 @@ export const ProviderInfoCard: FC<{
 	const renderedLink = useMemo(() => {
 		const linkText = joinComma(provider.name, provider.license);
 
+		// Temporary hack
+		if (provider.providerId === 'xxxx-xxxx-xxxx-xxxx') {
+			return linkText;
+		}
+
 		if (!linkToExternalBio) {
 			return <Link to={`/providers/${provider.providerId}`}>{linkText}</Link>;
 		}
