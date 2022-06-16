@@ -14,6 +14,21 @@ In the project directory, you can run:
 Installs dependencies from NPM.<br />
 You must do this before running any other scripts.
 
+#### Apple Silicon (arm64) Notes
+
+You might need to install Chromium in order to have `npm install` complete successfully.
+
+```shell
+brew install chromium --no-quarantine
+```
+
+Then, tell Puppeteer where Chromium lives:
+
+```shell
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+```
+
 ### `npm run dev`
 
 Runs the app in development mode.<br />
