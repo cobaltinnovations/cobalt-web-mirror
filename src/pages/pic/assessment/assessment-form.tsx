@@ -1,7 +1,11 @@
 import React, { FC } from 'react';
 import { ToggleButtonGroup, ToggleButton, Button, Col, Container, Spinner } from 'react-bootstrap';
 import { R4 } from '@ahryman40k/ts-fhir-types';
-import { IQuestionnaire_Item, IQuestionnaireResponse, QuestionnaireResponseStatusKind } from '@ahryman40k/ts-fhir-types/lib/R4';
+import {
+	IQuestionnaire_Item,
+	IQuestionnaireResponse,
+	QuestionnaireResponseStatusKind,
+} from '@ahryman40k/ts-fhir-types/lib/R4';
 import { IntermediateScreen } from '@/pages/pic/assessment/interstitial-screen';
 import { FinalizeScreen } from '@/pages/pic/assessment/finalize-screen';
 import { useSubmitResponse, useAssessmentQuestionnaire } from '@/hooks/pic-hooks';
@@ -49,6 +53,7 @@ export const AssessmentForm: FC<Props> = ({ assessmentId, responses, previousUrl
 		? previousUrl
 		: previousPage.type === 'group' && previousPage.item
 		? generatePath(`${path}/:item`, {
+				// @ts-ignore
 				page: pageNumber - 1,
 				item: previousPage.item.length - 1,
 				...otherParams,
@@ -64,11 +69,33 @@ export const AssessmentForm: FC<Props> = ({ assessmentId, responses, previousUrl
 	});
 
 	if (!currentPage) {
-		return <FinalizeScreen assessmentId={assessmentId} previousUrl={previous} patientName={patientName} nextUrl={finishedUrl} />;
+		return (
+			<FinalizeScreen
+				assessmentId={assessmentId}
+				previousUrl={previous}
+				patientName={patientName}
+				nextUrl={finishedUrl}
+			/>
+		);
 	} else if (currentPage.type === 'group') {
-		return <AssessmentFormItem responses={responses} previousUrl={previous} nextUrl={next} assessmentId={assessmentId} item={currentPage} />;
+		return (
+			<AssessmentFormItem
+				responses={responses}
+				previousUrl={previous}
+				nextUrl={next}
+				assessmentId={assessmentId}
+				item={currentPage}
+			/>
+		);
 	} else if (currentPage.type === 'display' && currentPage.linkId) {
-		return <IntermediateScreen screenId={currentPage.linkId} previousUrl={previous} nextUrl={next} patientName={patientName} />;
+		return (
+			<IntermediateScreen
+				screenId={currentPage.linkId}
+				previousUrl={previous}
+				nextUrl={next}
+				patientName={patientName}
+			/>
+		);
 	}
 	return <p>Page {page}</p>;
 };
@@ -115,54 +142,59 @@ const AssessmentFormItem: FC<AssessmentItemProps> = ({ responses, assessmentId, 
 	const next = questionIndex < item.item.length - 1 ? `${url}/${questionIndex + 1}` : nextUrl;
 	const previous = questionIndex === 0 ? previousUrl : `${url}/${questionIndex - 1}`;
 
-	const submitAnswer = (question: IQuestionnaire_Item, answer: string, previousAnswer: string) => (event: React.MouseEvent) => {
-		event.preventDefault();
-		if (answer === previousAnswer) {
-			history.push(next);
-		}
-		const selectedItem = question.answerOption?.find((a) => a.valueCoding?.code === answer);
-		if (!selectedItem) {
-			return;
-		}
-		const answers = [
-			{
-				linkId: question.linkId,
-				answer: [
-					{
-						valueCoding: {
-							system: selectedItem.valueCoding?.system,
-							code: selectedItem.valueCoding?.code,
-							display: selectedItem.valueCoding?.display,
-							userSelected: true,
-						},
-					},
-				],
-			},
-		];
-
-		const response: IQuestionnaireResponse = {
-			resourceType: 'QuestionnaireResponse',
-			questionnaire: question.linkId,
-			status: QuestionnaireResponseStatusKind._inProgress,
-			item: answers,
-		};
-
-		submitResponse(response, {
-			onSuccess: async () => {
-				const newQuestionnaire = queryClient.getQueryData<R4.IQuestionnaire>(['assessment', assessmentId, 'questionnaire']);
-				const myPageNumber = +questionMatch.params.page;
-				if (newQuestionnaire && newQuestionnaire.item) {
-					const myPage = newQuestionnaire.item[myPageNumber];
-					const moreItemsOnCurrentPage = questionIndex < (myPage.item?.length || 0) - 1;
-					if (moreItemsOnCurrentPage) {
-						history.push(`${url}/${questionIndex + 1}`);
-						return;
-					}
-				}
+	const submitAnswer =
+		(question: IQuestionnaire_Item, answer: string, previousAnswer: string) => (event: React.MouseEvent) => {
+			event.preventDefault();
+			if (answer === previousAnswer) {
 				history.push(next);
-			},
-		});
-	};
+			}
+			const selectedItem = question.answerOption?.find((a) => a.valueCoding?.code === answer);
+			if (!selectedItem) {
+				return;
+			}
+			const answers = [
+				{
+					linkId: question.linkId,
+					answer: [
+						{
+							valueCoding: {
+								system: selectedItem.valueCoding?.system,
+								code: selectedItem.valueCoding?.code,
+								display: selectedItem.valueCoding?.display,
+								userSelected: true,
+							},
+						},
+					],
+				},
+			];
+
+			const response: IQuestionnaireResponse = {
+				resourceType: 'QuestionnaireResponse',
+				questionnaire: question.linkId,
+				status: QuestionnaireResponseStatusKind._inProgress,
+				item: answers,
+			};
+
+			submitResponse(response, {
+				onSuccess: async () => {
+					const newQuestionnaire = queryClient.getQueryData<R4.IQuestionnaire>([
+						'assessment',
+						assessmentId,
+						'questionnaire',
+					]);
+					const myPageNumber = +questionMatch.params.page;
+					if (newQuestionnaire && newQuestionnaire.item) {
+						const myPage = newQuestionnaire.item[myPageNumber];
+						const moreItemsOnCurrentPage = questionIndex < (myPage.item?.length || 0) - 1;
+						if (moreItemsOnCurrentPage) {
+							history.push(`${url}/${questionIndex + 1}`);
+							return;
+						}
+					}
+					history.push(next);
+				},
+			});
+		};
 
 	// display helper list for pre-ptsd
 	const isPrePtsd = item.linkId === '/pic-pre-ptsd';
@@ -189,10 +221,16 @@ const AssessmentFormItem: FC<AssessmentItemProps> = ({ responses, assessmentId, 
 				{!lastPhq9Q && (
 					<h4
 						className={'font-weight-regular mx-auto mt-5'}
-						dangerouslySetInnerHTML={{ __html: isBpi && questionIndex < 4 ? alternativeBpiHeader : item.text || '' }}
+						dangerouslySetInnerHTML={{
+							__html: isBpi && questionIndex < 4 ? alternativeBpiHeader : item.text || '',
+						}}
 					/>
 				)}
-				{isSingleQAlcohol && <h5 className={'font-weight-regular mx-auto mt-3'}>{t('assessment.additionalPrompts.drugQPrivacyStatement')}</h5>}
+				{isSingleQAlcohol && (
+					<h5 className={'font-weight-regular mx-auto mt-3'}>
+						{t('assessment.additionalPrompts.drugQPrivacyStatement')}
+					</h5>
+				)}
 				{isPrePtsd && (
 					<ul className={'mx-auto mt-5'}>
 						<li>a serious accident or fire</li>
@@ -213,7 +251,12 @@ const AssessmentFormItem: FC<AssessmentItemProps> = ({ responses, assessmentId, 
 						<li>“frequently” means most of the time</li>
 					</ul>
 				)}
-				<ToggleButtonGroup type="radio" name={question.linkId} className={'mx-auto mb-1 d-flex flex-column justify-content-center'} value={value}>
+				<ToggleButtonGroup
+					type="radio"
+					name={question.linkId}
+					className={'mx-auto mb-1 d-flex flex-column justify-content-center'}
+					value={value}
+				>
 					{question.answerOption?.map((answer: R4.IQuestionnaire_AnswerOption, answerIndex) => {
 						if (!answer.valueCoding || !answer.valueCoding.display || !answer.valueCoding.code) {
 							console.error('Bad Items');

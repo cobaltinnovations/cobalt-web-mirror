@@ -44,7 +44,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 			setInitialValues(AvailabilityFormDataFromLogicalAvailability(logicalAvailability));
 			setIsBlockedSlot(logicalAvailability.logicalAvailabilityTypeId === 'BLOCK');
 		} catch (e) {
-			if (e.code === 'NOT_FOUND') {
+			if ((e as any).code === 'NOT_FOUND') {
 				setClosePanel(true);
 				return;
 			}

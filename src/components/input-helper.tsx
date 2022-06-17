@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { ElementType, FC, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -9,8 +9,8 @@ import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.
 interface useInputHelperStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
-	as?: 'input' | 'select' | 'textarea';
-	value: string;
+	as?: ElementType<any> | undefined;
+	value: string | number | string[] | undefined;
 	hasError: boolean;
 }
 
@@ -69,7 +69,6 @@ const useInputHelperStyles = createUseStyles({
 
 interface InputHelperProps extends FormControlProps {
 	label: string;
-	as?: 'input' | 'select' | 'textarea' | React.ElementType;
 	name?: string;
 	onFocus?: (...args: any[]) => void;
 	onBlur?: (...args: any[]) => void;
@@ -80,7 +79,16 @@ interface InputHelperProps extends FormControlProps {
 	required?: boolean;
 }
 
-const InputHelper: FC<InputHelperProps> = ({ label, children, className, helperText, characterCounter, required, error, ...props }) => {
+const InputHelper: FC<InputHelperProps> = ({
+	label,
+	children,
+	className,
+	helperText,
+	characterCounter,
+	required,
+	error,
+	...props
+}) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 	const classes = useInputHelperStyles({
@@ -121,11 +129,21 @@ const InputHelper: FC<InputHelperProps> = ({ label, children, className, helperT
 
 	return (
 		<div className={className}>
-			<Form.Group className={classNames('mb-0', classes.inputHelper)} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+			<Form.Group
+				className={classNames('mb-0', classes.inputHelper)}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
+			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>
-				<Form.Control className={classes.input} bsPrefix="input-helper__input" {...props} onFocus={handleFocus} onBlur={handleBlur}>
+				<Form.Control
+					className={classes.input}
+					bsPrefix="input-helper__input"
+					{...props}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
+				>
 					{children}
 				</Form.Control>
 				{props.as === 'select' && <DownChevron className={classes.downChevron} />}

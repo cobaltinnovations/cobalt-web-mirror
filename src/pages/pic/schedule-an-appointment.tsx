@@ -31,7 +31,14 @@ import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 
-import { accountService, appointmentService, providerService, CreateAppointmentData, FindOptionsResponse, FindFilters } from '@/lib/services';
+import {
+	accountService,
+	appointmentService,
+	providerService,
+	CreateAppointmentData,
+	FindOptionsResponse,
+	FindFilters,
+} from '@/lib/services';
 import { Provider, AssessmentScore, Clinic } from '@/lib/models';
 
 import colors from '@/jss/colors';
@@ -198,7 +205,10 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 		return (
 			<HeroContainer>
 				<div className="d-flex justify-content-center align-items-center">
-					<small className="text-white text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
+					<small
+						className="text-white text-center"
+						dangerouslySetInnerHTML={{ __html: recommendationHtml }}
+					/>
 					<Link to="/one-on-one-resources">
 						<InfoIcon className={classes.infoIcon} />
 					</Link>
@@ -245,7 +255,9 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 				min: parseInt(findOptions.defaultStartTime, 10),
 				max: parseInt(findOptions.defaultEndTime, 10),
 			});
-			setProviderTypeFilter(routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds);
+			setProviderTypeFilter(
+				routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds
+			);
 			setAvailabilityFilter(findOptions.defaultAvailability);
 			setPaymentTypeFilter([]);
 			setClinicsFilter(routedClinicIds.length ? routedClinicIds : findOptions.defaultClinicIds);
@@ -253,7 +265,16 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 				setProviderFilter(routedProviderId);
 			}
 		},
-		[location.search, setAvailabilityFilter, setClinicsFilter, setDateFilter, setPaymentTypeFilter, setProviderFilter, setProviderTypeFilter, setTimeFilter]
+		[
+			location.search,
+			setAvailabilityFilter,
+			setClinicsFilter,
+			setDateFilter,
+			setPaymentTypeFilter,
+			setProviderFilter,
+			setProviderTypeFilter,
+			setTimeFilter,
+		]
 	);
 
 	useEffect(() => {
@@ -282,7 +303,10 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 
 		async function init() {
 			try {
-				const [findOptions, recent] = await Promise.all([findOptionsRequest.fetch(), fetchRecentRequest.fetch()]);
+				const [findOptions, recent] = await Promise.all([
+					findOptionsRequest.fetch(),
+					fetchRecentRequest.fetch(),
+				]);
 
 				unstable_batchedUpdates(() => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
@@ -291,8 +315,8 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 					setDidInit(true);
 				});
 			} catch (e) {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-					alert(e.message);
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					alert((e as any).message);
 				}
 			}
 		}
@@ -312,7 +336,10 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 
 		const selectedSearchEntityId = selectedSearchResult[0] ? selectedSearchResult[0].id : undefined;
 
-		if ((providerFilter && providerFilter === selectedSearchEntityId) || (clinicsFilter.length && clinicsFilter[0] === selectedSearchEntityId)) {
+		if (
+			(providerFilter && providerFilter === selectedSearchEntityId) ||
+			(clinicsFilter.length && clinicsFilter[0] === selectedSearchEntityId)
+		) {
 			setIsLoading(false);
 			return;
 		}
@@ -323,7 +350,9 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 
 		if (selectedSearchResult[0]) {
 			findFilters =
-				selectedSearchResult[0].type === 'provider' ? { providerId: selectedSearchResult[0].id } : { clinicIds: [selectedSearchResult[0].id] };
+				selectedSearchResult[0].type === 'provider'
+					? { providerId: selectedSearchResult[0].id }
+					: { clinicIds: [selectedSearchResult[0].id] };
 		} else {
 			findFilters = providerFilter
 				? { providerId: providerFilter }
@@ -561,7 +590,7 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 						setShowCollectInfoModal(false);
 						setShowConfirmationModal(true);
 					} catch (error) {
-						alert(error.message);
+						alert((error as any).message);
 					}
 
 					setIsSavingInfo(false);
@@ -575,9 +604,13 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 						...aT,
 						disabled: !selectedTimeSlot?.appointmentTypeIds.includes(aT.appointmentTypeId),
 					}))}
-				epicDepartment={epicDepartments.find((eD) => eD.epicDepartmentId === selectedTimeSlot?.epicDepartmentId)}
+				epicDepartment={epicDepartments.find(
+					(eD) => eD.epicDepartmentId === selectedTimeSlot?.epicDepartmentId
+				)}
 				timeSlot={selectedTimeSlot}
-				providerName={`${selectedProvider?.name}${selectedProvider?.license ? `, ${selectedProvider?.license}` : ''}`}
+				providerName={`${selectedProvider?.name}${
+					selectedProvider?.license ? `, ${selectedProvider?.license}` : ''
+				}`}
 				onHide={() => {
 					setSelectedAppointmentTypeId(undefined);
 					setShowConfirmAppointmentTypeModal(false);
@@ -682,12 +715,12 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 							successBooking: true,
 						});
 					} catch (e) {
-						if (e.metadata?.accountPhoneNumberRequired) {
+						if ((e as any).metadata?.accountPhoneNumberRequired) {
 							setPromptForPhoneNumber(true);
 							setShowConfirmationModal(false);
 							setShowCollectInfoModal(true);
 						} else {
-							alert(e.message);
+							alert((e as any).message);
 						}
 					}
 
@@ -726,7 +759,10 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 								>
 									Days
 								</FilterPill>
-								<FilterPill active={activeFilters[BookingFilters.Time]} onClick={() => setOpenFilterModal(BookingFilters.Time)}>
+								<FilterPill
+									active={activeFilters[BookingFilters.Time]}
+									onClick={() => setOpenFilterModal(BookingFilters.Time)}
+								>
 									Times
 								</FilterPill>
 							</div>
@@ -803,7 +839,11 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 
 									<Container>
 										<Row>
-											<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
 												{section.fullyBooked ? (
 													<p className="mb-4">
 														<strong>all appointments are booked for this date</strong>
@@ -813,7 +853,11 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 														return (
 															<>
 																<AvailableProvider
-																	ref={providerRefs[`${section.date}-${provider.providerId}`]}
+																	ref={
+																		providerRefs[
+																			`${section.date}-${provider.providerId}`
+																		]
+																	}
 																	key={provider.providerId}
 																	className="mb-5"
 																	provider={provider}
@@ -822,7 +866,8 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 																		setSelectedProvider(provider);
 																		setSelectedTimeSlot(timeSlot);
 
-																		const needsEmail = isAnonymous || !account?.emailAddress;
+																		const needsEmail =
+																			isAnonymous || !account?.emailAddress;
 																		const needsPhoneNumber =
 																			!!provider.phoneNumberRequiredForAppointment &&
 																			(isAnonymous || !account?.phoneNumber);
@@ -833,11 +878,16 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 																		if (provider.appointmentTypeIds.length === 1) {
 																			setSelectedAppointmentTypeId(
 																				appointmentTypes.find(
-																					(aT) => aT.appointmentTypeId === provider.appointmentTypeIds[0]
+																					(aT) =>
+																						aT.appointmentTypeId ===
+																						provider.appointmentTypeIds[0]
 																				)?.appointmentTypeId
 																			);
 
-																			continueBookingProcess(provider, needsEmail || needsPhoneNumber);
+																			continueBookingProcess(
+																				provider,
+																				needsEmail || needsPhoneNumber
+																			);
 																		} else {
 																			setShowConfirmAppointmentTypeModal(true);
 																		}
@@ -875,18 +925,32 @@ const ImmediatePatientHelp: FC<ImmediatePatientHelpProps> = (props) => {
 							<hr className={'mt-2'} />
 							<p>
 								<p className={'mt-1'}> {t('noAvailableAppointments.willCallText')} </p>
-								<Button variant="light" className={'w-100 d-flex justify-content-center align-items-center'} href="tel:1-800-123-4567">
+								<Button
+									variant="light"
+									className={'w-100 d-flex justify-content-center align-items-center'}
+									href="tel:1-800-123-4567"
+								>
 									<PhoneIcon className={'mr-2'} />
 									<div className={'d-flex flex-column font-size-s'}>
-										<span className={'text-primary mb-2'}>{t('noAvailableAppointments.callButtonTopRow')}</span>
-										<span className={'font-weight-regular'}>{t('noAvailableAppointments.callButtonBottomRow')}</span>
+										<span className={'text-primary mb-2'}>
+											{t('noAvailableAppointments.callButtonTopRow')}
+										</span>
+										<span className={'font-weight-regular'}>
+											{t('noAvailableAppointments.callButtonBottomRow')}
+										</span>
 									</div>
 								</Button>
 								<hr className={'mt-2'} />
 								<p className={'mt-1'}>{t('noAvailableAppointments.wantToBeCalledText')}</p>
-								<Button variant="light" className={'w-100 d-flex justify-content-center align-items-center mt-2'} href="tel:1-800-123-4567">
+								<Button
+									variant="light"
+									className={'w-100 d-flex justify-content-center align-items-center mt-2'}
+									href="tel:1-800-123-4567"
+								>
 									<PhoneIcon className={'mr-2'} />
-									<div className={'d-flex flex-column font-size-s'}>{t('noAvailableAppointments.pleaseCallMeText')}</div>
+									<div className={'d-flex flex-column font-size-s'}>
+										{t('noAvailableAppointments.pleaseCallMeText')}
+									</div>
 								</Button>
 								<hr className={'mt-2'} />
 								{t('noAvailableAppointments.descriptionText')}

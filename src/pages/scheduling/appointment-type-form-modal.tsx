@@ -464,7 +464,9 @@ export const AppointmentTypeFormModal = ({
 						size="sm"
 						variant="outline-primary"
 						onClick={() => {
-							modalProps.onHide();
+							if (modalProps?.onHide) {
+								modalProps.onHide();
+							}
 						}}
 					>
 						cancel

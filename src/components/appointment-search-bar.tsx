@@ -84,7 +84,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 				})
 			);
 		} catch (e) {
-			alert(e.message);
+			alert((e as any).message);
 		}
 
 		setIsSearching(false);

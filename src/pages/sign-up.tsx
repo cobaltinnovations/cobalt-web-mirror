@@ -54,7 +54,7 @@ const SignUp: FC = () => {
 				},
 			});
 		} catch (error) {
-			handleError(error.message);
+			handleError((error as any).message);
 		}
 	}
 
@@ -84,7 +84,9 @@ const SignUp: FC = () => {
 											value={values.emailAddress}
 											onChange={handleChange}
 											required={requiredFields.emailAddress}
-											error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+											error={
+												touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''
+											}
 										/>
 										<InputHelper
 											className="mb-7"

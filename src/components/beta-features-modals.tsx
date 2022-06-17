@@ -54,18 +54,26 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
 		try {
 			selection === 'yesAlert'
 				? await Promise.all([
-						accountService.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, BetaStatusId.ENABLED).fetch(),
+						accountService
+							.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, BetaStatusId.ENABLED)
+							.fetch(),
 
 						accountService.updateBetaStatus(account.accountId, BetaStatusId.ENABLED).fetch(),
 				  ])
 				: await accountService
-						.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, selection === 'no' ? BetaStatusId.DISABLED : BetaStatusId.ENABLED)
+						.updateBetaFeatureAlert(
+							account.accountId,
+							props.betaFeatureId,
+							selection === 'no' ? BetaStatusId.DISABLED : BetaStatusId.ENABLED
+						)
 						.fetch();
 		} catch (e) {
 			// do nothing
 		}
 
-		props.onHide();
+		if (props.onHide) {
+			props.onHide();
+		}
 	};
 
 	return (

@@ -46,7 +46,7 @@ const useAlertStyles = createUseStyles({
 
 const Alert: FC = () => {
 	const { alertIsShowing, alertText, alertVariant } = useAlert();
-	const classes = useAlertStyles({ alertVariant });
+	const classes = useAlertStyles();
 
 	return (
 		<CSSTransition
