@@ -274,7 +274,7 @@ const IntakeAssessment: FC = () => {
 								emailAddress: response.account.emailAddress,
 							});
 						} catch (e) {
-							if (e.metadata?.accountPhoneNumberRequired) {
+							if ((e as any).metadata?.accountPhoneNumberRequired) {
 								setPromptForPhoneNumber(true);
 								setShowConfirmationModal(false);
 								setShowCollectInfoModal(true);

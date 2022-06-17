@@ -9,7 +9,7 @@ import classNames from 'classnames';
 interface useInputHelperStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
-	value: string;
+	value: boolean;
 	hasError: boolean;
 }
 
@@ -93,7 +93,11 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 
 	return (
 		<div className={classNames('typeahead-helper', className)}>
-			<Form.Group className={classNames('mb-0', classes.typeaheadHelper)} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+			<Form.Group
+				className={classNames('mb-0', classes.typeaheadHelper)}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
+			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>

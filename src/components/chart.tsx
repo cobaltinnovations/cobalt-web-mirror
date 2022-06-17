@@ -217,9 +217,11 @@ export const Chart: FC<Props> = ({ configuration }) => {
 			</Card.Header>
 			<Card.Body>
 				{configuration.displayPreferenceId === CHART_TYPE_ID.LINE && (
+					// @ts-ignore
 					<Line height={340} data={chartData} options={chartOptions} />
 				)}
 				{configuration.displayPreferenceId === CHART_TYPE_ID.BAR && (
+					// @ts-ignore
 					<Bar height={340} data={chartData} options={chartOptions} />
 				)}
 			</Card.Body>

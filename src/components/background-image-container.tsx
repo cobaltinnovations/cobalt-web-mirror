@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import colors from '@/jss/colors';
 
 const useBackgroundImageContainerStyles = createUseStyles({
-	backgroundImageContainer: ({ imageUrl, size }: { imageUrl: string; size: number }) => ({
+	backgroundImageContainer: ({ imageUrl, size }: { imageUrl: string; size?: number }) => ({
 		flexShrink: 0,
 		position: 'relative',
 		backgroundSize: 'cover',

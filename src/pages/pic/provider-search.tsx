@@ -14,7 +14,13 @@ import useHandleError from '@/hooks/use-handle-error';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 import { ERROR_CODES } from '@/lib/http-client';
-import { appointmentService, CreateAppointmentData, FindFilters, FindOptionsResponse, providerService } from '@/lib/services';
+import {
+	appointmentService,
+	CreateAppointmentData,
+	FindFilters,
+	FindOptionsResponse,
+	providerService,
+} from '@/lib/services';
 import { queryParamDateRegex } from '@/lib/utils';
 
 import AvailableProvider from '@/components/available-provider';
@@ -129,7 +135,9 @@ const PicProviderSearch: FC = () => {
 				min: parseInt(findOptions.defaultStartTime, 10),
 				max: parseInt(findOptions.defaultEndTime, 10),
 			});
-			setProviderTypeFilter(routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds);
+			setProviderTypeFilter(
+				routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds
+			);
 			setClinicsFilter(routedClinicIds.length ? routedClinicIds : findOptions.defaultClinicIds);
 			if (routedProviderId) {
 				setProviderFilter(routedProviderId);
@@ -161,7 +169,7 @@ const PicProviderSearch: FC = () => {
 					setDidInit(true);
 				});
 			} catch (e) {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(e);
 				}
 			}
@@ -359,7 +367,7 @@ const PicProviderSearch: FC = () => {
 							successBooking: true,
 						});
 					} catch (e) {
-						if (e.metadata?.accountPhoneNumberRequired) {
+						if ((e as any).metadata?.accountPhoneNumberRequired) {
 							setShowConfirmationModal(false);
 						} else {
 							handleError(e);
@@ -374,12 +382,16 @@ const PicProviderSearch: FC = () => {
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<p>
-							{t('picProviderSearch.availabilityHeader', 'A {{providerType}} is available for a 30-minute appointment at the times below.', {
-								providerType:
-									providerTypeFilter.findIndex((type) => type === SupportRoleId.MHIC) > -1
-										? t('picProviderSearch.mhic', 'mental health coordinator')
-										: t('picProviderSearch.bhs', 'mental health provider'),
-							})}
+							{t(
+								'picProviderSearch.availabilityHeader',
+								'A {{providerType}} is available for a 30-minute appointment at the times below.',
+								{
+									providerType:
+										providerTypeFilter.findIndex((type) => type === SupportRoleId.MHIC) > -1
+											? t('picProviderSearch.mhic', 'mental health coordinator')
+											: t('picProviderSearch.bhs', 'mental health provider'),
+								}
+							)}
 						</p>
 
 						<hr className="my-4" />
@@ -390,7 +402,12 @@ const PicProviderSearch: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<div className="d-flex">
 							<p className="mr-2">1.</p>
-							<p>{t('picProviderSearch.insuranceInstructions', 'Read important insurance information before scheduling')}</p>
+							<p>
+								{t(
+									'picProviderSearch.insuranceInstructions',
+									'Read important insurance information before scheduling'
+								)}
+							</p>
 						</div>
 
 						<div className="d-flex justify-content-center">
@@ -407,7 +424,9 @@ const PicProviderSearch: FC = () => {
 							>
 								<PaperIcon className="mr-2" />
 								{t('picProviderSearch.readInsuranceInfo', 'Read insurance information')}
-								{insuranceInfoRead && <CheckCircleIcon className={classNames('ml-4', classes.circledCheckIcon)} />}
+								{insuranceInfoRead && (
+									<CheckCircleIcon className={classNames('ml-4', classes.circledCheckIcon)} />
+								)}
 							</Button>
 						</div>
 
@@ -467,7 +486,11 @@ const PicProviderSearch: FC = () => {
 
 							<Container>
 								<Row>
-									<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
 										{section.fullyBooked ? (
 											<p className="mb-4">
 												<strong>all appointments are booked for this date</strong>
@@ -484,7 +507,9 @@ const PicProviderSearch: FC = () => {
 																return;
 															}
 
-															setSelectedAppointmentTypeId(provider.appointmentTypeIds[0]);
+															setSelectedAppointmentTypeId(
+																provider.appointmentTypeIds[0]
+															);
 															setSelectedDate(section.date);
 															setSelectedProvider(provider);
 															setSelectedTimeSlot(timeSlot);

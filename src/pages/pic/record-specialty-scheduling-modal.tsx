@@ -51,7 +51,11 @@ export const PicRecordSpecialtySchedulingModal: FC<PicRecordSpecialtyScheduling>
 		<Modal size="lg" centered show={props.show} onHide={props.onHide}>
 			<Modal.Header closeButton className="border-bottom bg-light">
 				<h4>{t('pic.recordSpecialtySchedulingModal.title', 'record specialty care scheduling')}</h4>
-				<p>{t('pic.recordSpecialtySchedulingModal.subtitle', 'Patient: {{patientName}}', { patientName: props.patientName })}</p>
+				<p>
+					{t('pic.recordSpecialtySchedulingModal.subtitle', 'Patient: {{patientName}}', {
+						patientName: props.patientName,
+					})}
+				</p>
 			</Modal.Header>
 
 			<Modal.Body>
@@ -132,7 +136,9 @@ export const PicRecordSpecialtySchedulingModal: FC<PicRecordSpecialtyScheduling>
 					variant="outline-primary"
 					className="mr-2"
 					onClick={() => {
-						props.onHide();
+						if (props.onHide) {
+							props.onHide();
+						}
 					}}
 				>
 					{t('pic.recordSpecialtySchedulingModal.actions.cancel', 'cancel')}

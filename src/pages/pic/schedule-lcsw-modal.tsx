@@ -132,7 +132,9 @@ export const PicScheduleLCSWModal: FC<PicScheduleLCSWModalProps> = (props) => {
 						disabled: !selectedTimeSlot?.appointmentTypeIds.includes(aT.appointmentTypeId),
 					}))}
 				timeSlot={selectedTimeSlot}
-				providerName={`${selectedProvider?.name}${selectedProvider?.license ? `, ${selectedProvider?.license}` : ''}`}
+				providerName={`${selectedProvider?.name}${
+					selectedProvider?.license ? `, ${selectedProvider?.license}` : ''
+				}`}
 				onHide={() => {
 					setShowConfirmAppointmentTypeModal(false);
 				}}
@@ -145,7 +147,11 @@ export const PicScheduleLCSWModal: FC<PicScheduleLCSWModalProps> = (props) => {
 			<Modal size="lg" centered show={props.show} onHide={props.onHide}>
 				<Modal.Header closeButton className="border-bottom bg-light">
 					<h4>{t('pic.scheduleLCSWModal.title', 'schedule appointment with LCSW')}</h4>
-					<p>{t('pic.scheduleLCSWModal.subtitle', 'Patient: {{patientName}}', { patientName: props.patientName })}</p>
+					<p>
+						{t('pic.scheduleLCSWModal.subtitle', 'Patient: {{patientName}}', {
+							patientName: props.patientName,
+						})}
+					</p>
 				</Modal.Header>
 
 				<Modal.Body>
@@ -165,7 +171,12 @@ export const PicScheduleLCSWModal: FC<PicScheduleLCSWModalProps> = (props) => {
 						) : !!section ? (
 							section?.fullyBooked ? (
 								<p className="text-center m-4">
-									<strong>{t('pic.scheduleLCSWModal.allBooked', 'all appointments are booked for this date')}</strong>
+									<strong>
+										{t(
+											'pic.scheduleLCSWModal.allBooked',
+											'all appointments are booked for this date'
+										)}
+									</strong>
 								</p>
 							) : (
 								section.providers.map((provider) => {
@@ -187,7 +198,9 @@ export const PicScheduleLCSWModal: FC<PicScheduleLCSWModalProps> = (props) => {
 							)
 						) : (
 							<p className="text-center m-4">
-								<strong>{t('pic.scheduleLCSWModal.noAvailabilities', 'No appointments are available.')}</strong>
+								<strong>
+									{t('pic.scheduleLCSWModal.noAvailabilities', 'No appointments are available.')}
+								</strong>
 							</p>
 						)}
 					</div>
@@ -199,7 +212,9 @@ export const PicScheduleLCSWModal: FC<PicScheduleLCSWModalProps> = (props) => {
 						variant="outline-primary"
 						className="mr-2"
 						onClick={() => {
-							props.onHide();
+							if (props.onHide) {
+								props.onHide();
+							}
 						}}
 					>
 						{t('pic.scheduleLCSWModal.actions.cancel', 'cancel')}

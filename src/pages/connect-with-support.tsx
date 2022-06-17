@@ -327,7 +327,7 @@ const ConnectWithSupport: FC = () => {
 					setDidInit(true);
 				});
 			} catch (e) {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(e);
 				}
 			}

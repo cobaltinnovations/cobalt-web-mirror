@@ -10,7 +10,7 @@ export enum SESSION_STATUS {
 }
 
 const useStyles = createUseStyles({
-	sessionStatusDot: ({ status }: { status: SESSION_STATUS }) => {
+	sessionStatusDot: ({ status }: { status: SESSION_STATUS | string }) => {
 		let statusColor;
 
 		switch (status) {

@@ -34,7 +34,7 @@ interface LoaderProps {
 	className?: string;
 }
 
-const Loader: FC<LoaderProps> = React.memo(({ size, className }) => {
+const Loader: FC<LoaderProps> = React.memo(({ size = 64, className }) => {
 	const classes = useLoaderStyles({ size });
 
 	return <div className={classNames(classes.loader, className)} />;

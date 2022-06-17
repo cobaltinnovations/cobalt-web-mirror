@@ -78,9 +78,9 @@ export class HttpClient {
 			return response.data;
 		} catch (error) {
 			if (axios.isCancel(error)) {
-				throw errors[ERROR_CODES.REQUEST_ABORTED](error);
+				throw errors[ERROR_CODES.REQUEST_ABORTED](error as any);
 			} else {
-				throw this._getFormattedError(error);
+				throw this._getFormattedError(error as AxiosError<any>);
 			}
 		}
 	}
