@@ -343,8 +343,7 @@ const ProviderDetail = () => {
 																			onClick={() => {
 																				bookingRef.current?.kickoffBookingProcess(
 																					{
-																						source:
-																							BookingSource.ProviderDetail,
+																						source: BookingSource.ProviderDetail,
 																						timeSlot: availability,
 																						date: section.date,
 																						provider: sectionProvider,

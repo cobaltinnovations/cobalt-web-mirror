@@ -49,7 +49,9 @@ const CmsAvailableContent: FC = () => {
 
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [searchInputValueDebounced, setSearchInputValueDebounced] = useState('');
-	const setDebouncedSearchInputValue = useRef(debounce((value: string) => setSearchInputValueDebounced(value), 500)).current;
+	const setDebouncedSearchInputValue = useRef(
+		debounce((value: string) => setSearchInputValueDebounced(value), 500)
+	).current;
 
 	const [typeFilterValue, setTypeFilterValue] = useState<ContentTypeId | undefined>(undefined);
 	const [statusFilterValue, setStatusFilterValue] = useState<ContentAvailableStatusId | undefined>(undefined);
@@ -100,7 +102,15 @@ const CmsAvailableContent: FC = () => {
 		}
 
 		getTablePage();
-	}, [currentPageIndex, statusFilterValue, typeFilterValue, showAlert, history, searchInputValueDebounced, handleError]);
+	}, [
+		currentPageIndex,
+		statusFilterValue,
+		typeFilterValue,
+		showAlert,
+		history,
+		searchInputValueDebounced,
+		handleError,
+	]);
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
 		setTypeFilterValue(value);
@@ -192,7 +202,9 @@ const CmsAvailableContent: FC = () => {
 											};
 										}),
 									]}
-									onChange={(value) => handleStatusFilterChange(value as ContentAvailableStatusId | undefined)}
+									onChange={(value) =>
+										handleStatusFilterChange(value as ContentAvailableStatusId | undefined)
+									}
 								/>
 							)}
 						</div>
@@ -233,7 +245,12 @@ const CmsAvailableContent: FC = () => {
 				<Col>
 					{content && content.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={15} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={15}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 				</Col>

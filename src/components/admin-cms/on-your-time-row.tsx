@@ -226,7 +226,9 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 				<TableCell>
 					<span className="d-block font-size-xs font-karla-regular">{content.dateCreatedDescription}</span>
 				</TableCell>
-				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>{getIcon(content.contentTypeId)}</TableCell>
+				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
+					{getIcon(content.contentTypeId)}
+				</TableCell>
 				<TableCell width={300}>
 					<span className="d-block font-size-xs font-karla-bold">
 						<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
@@ -246,11 +248,15 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-karla-regular">{content.ownerInstitutionApprovalStatus.description}</span>
+					<span className="ml-2 font-size-xxs font-karla-regular">
+						{content.ownerInstitutionApprovalStatus.description}
+					</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-karla-regular">{content.otherInstitutionApprovalStatus.description}</span>
+					<span className="ml-2 font-size-xxs font-karla-regular">
+						{content.otherInstitutionApprovalStatus.description}
+					</span>
 				</TableCell>
 				<TableCell>
 					<SessionDropdown

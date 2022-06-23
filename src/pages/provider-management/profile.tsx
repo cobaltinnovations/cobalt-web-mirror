@@ -212,7 +212,13 @@ export const ProviderManagementProfile = (): ReactElement => {
 							<div className="mb-4">
 								<h6>Profile photo</h6>
 								<div className="d-flex align-items-center">
-									{provider?.imageUrl && <BackgroundImageContainer className="mr-4" size={90} imageUrl={provider.imageUrl} />}
+									{provider?.imageUrl && (
+										<BackgroundImageContainer
+											className="mr-4"
+											size={90}
+											imageUrl={provider.imageUrl}
+										/>
+									)}
 									<div>
 										<Button className="d-block p-0 mb-3" variant="link" size="sm">
 											upload a new photo

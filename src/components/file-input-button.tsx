@@ -20,14 +20,10 @@ const useFileInputButtonStyles = createUseStyles({
 		...fonts.nunitoSansBold,
 		backgroundColor: colors.primary,
 		'&:hover': {
-			backgroundColor: Color(colors.primary)
-				.lighten(0.16)
-				.hex(),
+			backgroundColor: Color(colors.primary).lighten(0.16).hex(),
 		},
 		'&:active': {
-			backgroundColor: Color(colors.primary)
-				.darken(0.16)
-				.hex(),
+			backgroundColor: Color(colors.primary).darken(0.16).hex(),
 		},
 	},
 	disabled: {

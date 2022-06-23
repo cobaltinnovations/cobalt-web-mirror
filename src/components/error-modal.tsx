@@ -30,7 +30,9 @@ const ErrorModal: FC = () => {
 			}}
 		>
 			<Modal.Header>
-				<h3 className="mb-0">{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}</h3>
+				<h3 className="mb-0">
+					{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}
+				</h3>
 			</Modal.Header>
 			<Modal.Body>
 				{error?.code === 'VALIDATION_FAILED' ? (
@@ -53,7 +55,10 @@ const ErrorModal: FC = () => {
 						</Button>
 
 						<p className="mb-1 font-karla-bold">Need clinical support?</p>
-						<a className="mb-4 d-block font-size-m font-weight-bold text-decoration-none" href="tel:866-301-4724">
+						<a
+							className="mb-4 d-block font-size-m font-weight-bold text-decoration-none"
+							href="tel:866-301-4724"
+						>
 							call 866-301-4724
 						</a>
 

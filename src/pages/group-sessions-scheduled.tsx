@@ -115,7 +115,9 @@ const GroupSessions: FC = () => {
 		setTableIsUpdating(true);
 
 		try {
-			const { groupSession } = await groupSessionsService.updateGroupSessionStatusById(groupSessionId, actionId).fetch();
+			const { groupSession } = await groupSessionsService
+				.updateGroupSessionStatusById(groupSessionId, actionId)
+				.fetch();
 			const { groupSessionCounts } = await groupSessionsService.getGroupSessionCounts().fetch();
 
 			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
@@ -147,7 +149,9 @@ const GroupSessions: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">Quick Filters:</small>
+							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">
+								Quick Filters:
+							</small>
 							<QuickFilterDropdown
 								active={!!statusFilterValue}
 								value={statusFilterValue}
@@ -161,25 +165,39 @@ const GroupSessions: FC = () => {
 									{
 										value: GROUP_SESSION_STATUS_ID.NEW,
 										label: 'New',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.NEW),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.NEW
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.ADDED,
 										label: 'Live',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.ADDED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.ADDED
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.ARCHIVED,
 										label: 'Archived',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.ARCHIVED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.ARCHIVED
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.CANCELED,
 										label: 'Canceled',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.CANCELED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.CANCELED
+										),
 									},
 								]}
-								onChange={(value) => handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)}
+								onChange={(value) =>
+									handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)
+								}
 							/>
 						</div>
 					</div>
@@ -227,7 +245,12 @@ const GroupSessions: FC = () => {
 					</Table>
 					{sessions && sessions.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={sizeOfPage} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={sizeOfPage}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 					{(!sessions || sessions.length <= 0) && (
@@ -246,7 +269,9 @@ const GroupSessions: FC = () => {
 									</Button>
 								</div>
 							)}
-							{!statusFilterValue && <p className="text-center">There are no scheduled studio sessions yet.</p>}
+							{!statusFilterValue && (
+								<p className="text-center">There are no scheduled studio sessions yet.</p>
+							)}
 						</>
 					)}
 				</Col>

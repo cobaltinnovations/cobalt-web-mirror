@@ -141,7 +141,17 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					signOutAndClearContext();
 				});
 		}
-	}, [handleError, history, immediateAccess, immediateSupportRouteMatch, initialized, location.pathname, location.search, signOutAndClearContext, isTrackedSession]);
+	}, [
+		handleError,
+		history,
+		immediateAccess,
+		immediateSupportRouteMatch,
+		initialized,
+		location.pathname,
+		location.search,
+		signOutAndClearContext,
+		isTrackedSession,
+	]);
 
 	// Fetch subdomain instituion on mount
 	useEffect(() => {
@@ -149,7 +159,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			.getInstitution({
 				subdomain,
 				...(sessionAccountSourceId ? { accountSourceId: sessionAccountSourceId } : {}),
-			 })
+			})
 			.fetch()
 			.then((response) => {
 				setAccountSources(response.accountSources);
@@ -179,11 +189,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		isTrackedSession,
 	};
 
-	return (
-		<AccountContext.Provider value={value}>
-			{props.children}
-		</AccountContext.Provider>
-	);
+	return <AccountContext.Provider value={value}>{props.children}</AccountContext.Provider>;
 };
 
 const AccountConsumer = AccountContext.Consumer;

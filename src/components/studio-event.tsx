@@ -29,7 +29,12 @@ const useStudioEventStyles = createUseStyles({
 	},
 });
 
-export type StudioEventViewModel = (GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel) & {
+export type StudioEventViewModel = (
+	| GroupEvent
+	| ExternalGroupEventType
+	| GroupSessionModel
+	| GroupSessionRequestModel
+) & {
 	urlName?: string;
 	isGrouped?: boolean;
 };
@@ -46,7 +51,10 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 	if (groupEventService.isEventExternal(groupEvent)) {
 		return (
 			<div className={className}>
-				<BackgroundImageContainer className={classes.imageContainer} imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage} />
+				<BackgroundImageContainer
+					className={classes.imageContainer}
+					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+				/>
 				<div className={classes.informationContainer}>
 					<h5 className="mb-0">{groupEvent.name}</h5>
 				</div>
@@ -57,10 +65,15 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 	if (groupSessionsService.isGroupSession(groupEvent)) {
 		return (
 			<div className={className}>
-				<BackgroundImageContainer className={classes.imageContainer} imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}>
+				<BackgroundImageContainer
+					className={classes.imageContainer}
+					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+				>
 					{!groupEvent.isGrouped && (
 						<div className={classes.imageContent}>
-							<small className="text-white text-uppercase font-karla-bold">{groupEvent.seatsAvailableDescription}</small>
+							<small className="text-white text-uppercase font-karla-bold">
+								{groupEvent.seatsAvailableDescription}
+							</small>
 						</div>
 					)}
 				</BackgroundImageContainer>
@@ -75,7 +88,10 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 	if (groupSessionsService.isGroupSessionByRequest(groupEvent)) {
 		return (
 			<div className={className}>
-				<BackgroundImageContainer className={classes.imageContainer} imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage} />
+				<BackgroundImageContainer
+					className={classes.imageContainer}
+					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+				/>
 				<div className={classes.informationContainer}>
 					<h5 className="mb-0">{groupEvent.title}</h5>
 				</div>
@@ -85,10 +101,15 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 
 	return (
 		<div className={className}>
-			<BackgroundImageContainer className={classes.imageContainer} imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}>
+			<BackgroundImageContainer
+				className={classes.imageContainer}
+				imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+			>
 				{!groupEvent.isGrouped && (
 					<div className={classes.imageContent}>
-						<small className="text-white text-uppercase font-karla-bold">{groupEvent.seatsAvailableDescription}</small>
+						<small className="text-white text-uppercase font-karla-bold">
+							{groupEvent.seatsAvailableDescription}
+						</small>
 					</div>
 				)}
 			</BackgroundImageContainer>

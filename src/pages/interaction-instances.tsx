@@ -24,7 +24,12 @@ const InteractionInstances: FC = () => {
 	}, [interactionId]);
 
 	const handleInteractionOptionButtonClick = async (interactionOption: InteractionOption) => {
-		if(!window.confirm('Are you sure you want to record a followup of "' + interactionOption.optionDescription + '"?')) return;
+		if (
+			!window.confirm(
+				'Are you sure you want to record a followup of "' + interactionOption.optionDescription + '"?'
+			)
+		)
+			return;
 
 		try {
 			if (!interactionInstance) {

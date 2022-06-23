@@ -55,7 +55,13 @@ const DatePicker: FC<DatePickerProps> = ({ selected, onChange, wrapperClass, lab
 			dateFormat="MMM d, yyyy"
 			selected={selected}
 			onChange={onChange}
-			customInput={<CustomDateInput className={classes.datePicker}  label={labelText} disabled={reactDatePickerProps.disabled} />}
+			customInput={
+				<CustomDateInput
+					className={classes.datePicker}
+					label={labelText}
+					disabled={reactDatePickerProps.disabled}
+				/>
+			}
 			{...reactDatePickerProps}
 		/>
 	);

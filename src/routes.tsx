@@ -311,8 +311,7 @@ export const Routes = [
 		path: '/weekly-assessment',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps) =>
-			isInstitutionSupportEnabledRouteGuard(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) => isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: WeeklyAssessment,
 	},
@@ -328,8 +327,7 @@ export const Routes = [
 		path: '/one-on-one-resources',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps) =>
-			isInstitutionSupportEnabledRouteGuard(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) => isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: OneOnOneResources,
 	},
@@ -337,8 +335,7 @@ export const Routes = [
 		path: '/connect-with-support',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps) =>
-			isInstitutionSupportEnabledRouteGuard(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) => isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: ConnectWithSupport,
 	},
@@ -346,8 +343,7 @@ export const Routes = [
 		path: '/ehr-lookup',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps) =>
-			isInstitutionSupportEnabledRouteGuard(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) => isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: EhrLookup,
 	},

@@ -90,12 +90,16 @@ const GroupSessionsByRequest: FC = () => {
 		}
 
 		const sessionsClone = cloneDeep(sessions);
-		const replacementIndex = sessions.findIndex((session) => session.groupSessionRequestId === groupSessionRequestId);
+		const replacementIndex = sessions.findIndex(
+			(session) => session.groupSessionRequestId === groupSessionRequestId
+		);
 
 		setTableIsUpdating(true);
 
 		try {
-			const { groupSessionRequest } = await groupSessionsService.updateGroupSessionRequestStatusById(groupSessionRequestId, actionId).fetch();
+			const { groupSessionRequest } = await groupSessionsService
+				.updateGroupSessionRequestStatusById(groupSessionRequestId, actionId)
+				.fetch();
 
 			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
 				sessionsClone.splice(replacementIndex, 1);
@@ -125,7 +129,9 @@ const GroupSessionsByRequest: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">Quick Filters:</small>
+							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">
+								Quick Filters:
+							</small>
 							<QuickFilterDropdown
 								active={!!statusFilterValue}
 								value={statusFilterValue}
@@ -149,7 +155,9 @@ const GroupSessionsByRequest: FC = () => {
 										label: 'Archived',
 									},
 								]}
-								onChange={(value) => handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)}
+								onChange={(value) =>
+									handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)
+								}
 							/>
 						</div>
 					</div>
@@ -194,7 +202,12 @@ const GroupSessionsByRequest: FC = () => {
 					</Table>
 					{sessions && sessions.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={sizeOfPage} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={sizeOfPage}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 					{(!sessions || sessions.length <= 0) && (
@@ -212,7 +225,9 @@ const GroupSessionsByRequest: FC = () => {
 									</Button>
 								</div>
 							)}
-							{!statusFilterValue && <p className="text-center">There are no studio session requests yet.</p>}
+							{!statusFilterValue && (
+								<p className="text-center">There are no studio session requests yet.</p>
+							)}
 						</>
 					)}
 				</Col>

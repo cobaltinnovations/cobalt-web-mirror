@@ -66,12 +66,16 @@ const CmsOnYourTime: FC = () => {
 
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [searchInputValueDebounced, setSearchInputValueDebounced] = useState('');
-	const setDebouncedSearchInputValue = useRef(debounce((value: string) => setSearchInputValueDebounced(value), 500)).current;
+	const setDebouncedSearchInputValue = useRef(
+		debounce((value: string) => setSearchInputValueDebounced(value), 500)
+	).current;
 
 	const [typeFilterValue, setTypeFilterValue] = useState<ContentTypeId | undefined>(undefined);
 	const [ownerFilterValue, setOwnerFilterValue] = useState<string | undefined>(undefined);
 	const [statusFilterValue, setStatusFilterValue] = useState<ContentApprovalStatusId | undefined>(undefined);
-	const [otherStatusFilterValue, setOtherStatusFilterValue] = useState<ContentApprovalStatusId | undefined>(undefined);
+	const [otherStatusFilterValue, setOtherStatusFilterValue] = useState<ContentApprovalStatusId | undefined>(
+		undefined
+	);
 
 	const handleSearchInputChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +168,9 @@ const CmsOnYourTime: FC = () => {
 
 	async function handleApproveClick(contentId: string) {
 		try {
-			let { content } = await adminService.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Approved).fetch();
+			let { content } = await adminService
+				.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Approved)
+				.fetch();
 			updateContentItem(content as AdminContentRow);
 			showAlert({ variant: 'success', text: `Your content was approved!` });
 		} catch (e) {
@@ -199,7 +205,9 @@ const CmsOnYourTime: FC = () => {
 
 	async function handleRejectClick(contentId: string) {
 		try {
-			let { content } = await adminService.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Rejected).fetch();
+			let { content } = await adminService
+				.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Rejected)
+				.fetch();
 			updateContentItem(content as AdminContentRow);
 			showAlert({ variant: 'danger', text: `Your content was rejected!` });
 		} catch (e) {
@@ -288,7 +296,9 @@ const CmsOnYourTime: FC = () => {
 											};
 										}),
 									]}
-									onChange={(value) => handleStatusFilterChange(value as ContentApprovalStatusId | undefined)}
+									onChange={(value) =>
+										handleStatusFilterChange(value as ContentApprovalStatusId | undefined)
+									}
 								/>
 							)}
 							{!!filters?.otherApprovalStatuses && (
@@ -309,7 +319,9 @@ const CmsOnYourTime: FC = () => {
 											};
 										}),
 									]}
-									onChange={(value) => handleVisibilityFilterChange(value as ContentApprovalStatusId | undefined)}
+									onChange={(value) =>
+										handleVisibilityFilterChange(value as ContentApprovalStatusId | undefined)
+									}
 								/>
 							)}
 						</div>
@@ -364,7 +376,12 @@ const CmsOnYourTime: FC = () => {
 				<Col>
 					{content && content.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={15} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={15}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 				</Col>

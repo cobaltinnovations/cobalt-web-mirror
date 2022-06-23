@@ -35,7 +35,8 @@ const SignUpVerify: FC = () => {
 			<Row>
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 					<p className="mb-6 text-center">
-						We sent a link to {history.location.state?.emailAddress}. Please follow this link to verify your account.
+						We sent a link to {history.location.state?.emailAddress}. Please follow this link to verify your
+						account.
 					</p>
 					<p className="mb-0 text-center font-karla-bold">didn’t get an email?</p>
 					<div className="text-center">

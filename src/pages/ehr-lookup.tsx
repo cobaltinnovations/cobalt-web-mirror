@@ -11,7 +11,14 @@ import fonts from '@/jss/fonts';
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
 import moment from 'moment';
-import { EpicPatientData, googlePlacesService, accountService, CreateAppointmentData, appointmentService, EpicMatchStep } from '@/lib/services';
+import {
+	EpicPatientData,
+	googlePlacesService,
+	accountService,
+	CreateAppointmentData,
+	appointmentService,
+	EpicMatchStep,
+} from '@/lib/services';
 import { AccountModel } from '@/lib/models';
 import HealthRecordsModal from '@/components/health-records-modal';
 import MatchConfidence from '@/components/match-confidence';
@@ -273,7 +280,9 @@ const EhrLookup: FC = () => {
 
 								{step === 2 && (
 									<>
-										<Form.Label>we've found a few possible matches, help us narrow it down</Form.Label>
+										<Form.Label>
+											we've found a few possible matches, help us narrow it down
+										</Form.Label>
 
 										<MatchConfidence {...confidenceState} className="mb-8" />
 
@@ -329,19 +338,27 @@ const EhrLookup: FC = () => {
 			{__DEV__ && (
 				<Container className="pt-5">
 					<Row>
-						{Object.entries<EpicPatientData[]>(require('../lib/utils/ehr-test-cases.json')).map(([scenario, data]) => {
-							return (
-								<Col key={scenario} className="my-4 d-flex flex-column" md={3}>
-									<Form.Label style={{ ...fonts.xs }}>{scenario}</Form.Label>
+						{Object.entries<EpicPatientData[]>(require('../lib/utils/ehr-test-cases.json')).map(
+							([scenario, data]) => {
+								return (
+									<Col key={scenario} className="my-4 d-flex flex-column" md={3}>
+										<Form.Label style={{ ...fonts.xs }}>{scenario}</Form.Label>
 
-									{data.map((testCase, idx) => (
-										<Button key={idx} className="my-1" size="sm" onClick={() => setInitialValues(testCase)} style={{ ...fonts.xxs }}>
-											{`${testCase.firstName} ${testCase.lastName}`}
-										</Button>
-									))}
-								</Col>
-							);
-						})}
+										{data.map((testCase, idx) => (
+											<Button
+												key={idx}
+												className="my-1"
+												size="sm"
+												onClick={() => setInitialValues(testCase)}
+												style={{ ...fonts.xxs }}
+											>
+												{`${testCase.firstName} ${testCase.lastName}`}
+											</Button>
+										))}
+									</Col>
+								);
+							}
+						)}
 					</Row>
 				</Container>
 			)}
@@ -481,7 +498,13 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 		<>
 			<Form.Group controlId="phoneNumber">
 				<Form.Label style={{ ...fonts.xs }}>Phone Number</Form.Label>
-				<Form.Control required type="text" name="phoneNumber" value={values.phoneNumber} onChange={handleChange} />
+				<Form.Control
+					required
+					type="text"
+					name="phoneNumber"
+					value={values.phoneNumber}
+					onChange={handleChange}
+				/>
 			</Form.Group>
 
 			<Form.Group controlId="emailAddress">
@@ -510,22 +533,42 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 
 			<Form.Group controlId="line2">
 				<Form.Label style={{ ...fonts.xs }}>Address Line 2</Form.Label>
-				<Form.Control type="text" name="line2" value={values.address.line2 || ''} onChange={handleAddressInputChange('line2')} />
+				<Form.Control
+					type="text"
+					name="line2"
+					value={values.address.line2 || ''}
+					onChange={handleAddressInputChange('line2')}
+				/>
 			</Form.Group>
 
 			<Form.Group controlId="city">
 				<Form.Label style={{ ...fonts.xs }}>City</Form.Label>
-				<Form.Control type="text" name="city" value={values.address.city} onChange={handleAddressInputChange('city')} />
+				<Form.Control
+					type="text"
+					name="city"
+					value={values.address.city}
+					onChange={handleAddressInputChange('city')}
+				/>
 			</Form.Group>
 
 			<Form.Group controlId="state">
 				<Form.Label style={{ ...fonts.xs }}>State</Form.Label>
-				<Form.Control type="text" name="state" value={values.address.state} onChange={handleAddressInputChange('state')} />
+				<Form.Control
+					type="text"
+					name="state"
+					value={values.address.state}
+					onChange={handleAddressInputChange('state')}
+				/>
 			</Form.Group>
 
 			<Form.Group controlId="postalCode">
 				<Form.Label style={{ ...fonts.xs }}>Postal Code</Form.Label>
-				<Form.Control type="text" value={values.address.postalCode} placeholder="ex. 19123" onChange={handleAddressInputChange('postalCode')} />
+				<Form.Control
+					type="text"
+					value={values.address.postalCode}
+					placeholder="ex. 19123"
+					onChange={handleAddressInputChange('postalCode')}
+				/>
 			</Form.Group>
 
 			<Form.Row>
@@ -565,7 +608,9 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSearching }: StepProps) {
 	const canSubmit = true;
 
-	const [lastFourSSN, setLastFourSSN] = useState(values.nationalIdentifier.substr(values.nationalIdentifier.length - 5));
+	const [lastFourSSN, setLastFourSSN] = useState(
+		values.nationalIdentifier.substr(values.nationalIdentifier.length - 5)
+	);
 
 	if (isSearching) {
 		return <EhrLoading />;
@@ -677,7 +722,9 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 
 					<RecordCard confidenceState={confidenceState} data={values} fullInfo={false} showConfidence />
 
-					<p className="pt-3">If this record doesn't look right, please email cobaltplatform@xmog.com for help.</p>
+					<p className="pt-3">
+						If this record doesn't look right, please email cobaltplatform@xmog.com for help.
+					</p>
 				</>
 			)}
 
@@ -685,8 +732,8 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 				<>
 					<Form.Label>we'll call to confirm your booking</Form.Label>
 					<p className="pt-3">
-						We found multiple records that match your information. We'll forward your booking request to someone who will sort this out and call you
-						once your booking is confirmed.
+						We found multiple records that match your information. We'll forward your booking request to
+						someone who will sort this out and call you once your booking is confirmed.
 					</p>
 				</>
 			) : (

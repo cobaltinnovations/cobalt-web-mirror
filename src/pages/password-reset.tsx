@@ -88,7 +88,11 @@ const PasswordReset: FC = () => {
 											value={values.confirmPassword}
 											onChange={handleChange}
 											required={requiredFields.confirmPassword}
-											error={touched.confirmPassword && errors.confirmPassword ? errors.confirmPassword : ''}
+											error={
+												touched.confirmPassword && errors.confirmPassword
+													? errors.confirmPassword
+													: ''
+											}
 										/>
 										<div className="mb-3 d-flex flex-row justify-content-between">
 											<Button

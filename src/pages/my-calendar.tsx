@@ -117,8 +117,12 @@ const MyCalendar: FC = () => {
 					try {
 						setIsCancelling(true);
 
-						if (pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.GROUP_SESSION_RESERVATION) {
-							await groupSessionsService.cancelGroupSessionReservation(pendingCancellation.eventId).fetch();
+						if (
+							pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.GROUP_SESSION_RESERVATION
+						) {
+							await groupSessionsService
+								.cancelGroupSessionReservation(pendingCancellation.eventId)
+								.fetch();
 						}
 
 						if (pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.APPOINTMENT) {
@@ -139,14 +143,17 @@ const MyCalendar: FC = () => {
 
 			<div className="pb-8">
 				<HeroContainer>
-					<p className="text-center mb-0 text-white">Your booked sessions, reserved studio seats, and more will be available here.</p>
+					<p className="text-center mb-0 text-white">
+						Your booked sessions, reserved studio seats, and more will be available here.
+					</p>
 				</HeroContainer>
 
 				{history.location.state?.successBooking ? (
 					<HeroContainer className="bg-success">
 						{history.location.state?.emailAddress ? (
 							<h5 className="text-center mb-0 text-white">
-								your session is reserved and we have sent a confirmation to {history.location.state?.emailAddress}
+								your session is reserved and we have sent a confirmation to{' '}
+								{history.location.state?.emailAddress}
 							</h5>
 						) : (
 							<h5 className="text-center mb-0 text-white">your appointment was reserved</h5>
@@ -172,9 +179,18 @@ const MyCalendar: FC = () => {
 							</DayContainer>
 							<Container>
 								<Row>
-									<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
 										{calendarEventGroup.calendarEvents.map((calendarEvent) => {
-											const { calendarEventTypeId, appointment, groupSession, groupSessionReservation } = calendarEvent;
+											const {
+												calendarEventTypeId,
+												appointment,
+												groupSession,
+												groupSessionReservation,
+											} = calendarEvent;
 
 											if (appointment) {
 												return (
@@ -203,7 +219,8 @@ const MyCalendar: FC = () => {
 														onCancel={() => {
 															setPendingCancellation({
 																calendarEventTypeId,
-																eventId: groupSessionReservation.groupSessionReservationId,
+																eventId:
+																	groupSessionReservation.groupSessionReservationId,
 															});
 														}}
 													/>

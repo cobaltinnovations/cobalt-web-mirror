@@ -48,14 +48,10 @@ const useHeroStyles = createUseStyles({
 				color: variantColor,
 				backgroundColor: colors.white,
 				'&:hover': {
-					backgroundColor: Color(variantColor)
-						.lighten(0.64)
-						.hex(),
+					backgroundColor: Color(variantColor).lighten(0.64).hex(),
 				},
 				'&:active': {
-					backgroundColor: Color(variantColor)
-						.lighten(0.48)
-						.hex(),
+					backgroundColor: Color(variantColor).lighten(0.48).hex(),
 				},
 			},
 		};

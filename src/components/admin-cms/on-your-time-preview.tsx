@@ -1,6 +1,6 @@
-import React, {FC, useEffect, useState} from 'react';
-import {Container, Row, Col, Button, Card} from 'react-bootstrap';
-import {createUseStyles} from 'react-jss';
+import React, { FC, useEffect, useState } from 'react';
+import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
 
 import colors from '@/jss/colors';
 
@@ -105,12 +105,11 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 			<div className={classes.bordered}>
 				<Container fluid className="overflow-visible">
 					<Row>
-						<Col xs={{span: 12}}>
+						<Col xs={{ span: 12 }}>
 							<div>
 								<div className="position-relative">
 									{canEmbed ? (
-										<ReactPlayer width="100%" height="160px" url={props?.url} onPlay={() => {
-										}}/>
+										<ReactPlayer width="100%" height="160px" url={props?.url} onPlay={() => {}} />
 									) : (
 										<BackgroundImageContainer
 											className={classes.mediaContainer}
@@ -125,7 +124,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									{props?.title && (
 										<div
 											className="position-relative mb-0"
-											style={{...fonts.xxs, ...fonts.nunitoSansBold}}
+											style={{ ...fonts.xxs, ...fonts.nunitoSansBold }}
 										>
 											<CircleIndicator size={16} className={classes.circleTwo}>
 												2
@@ -134,7 +133,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										</div>
 									)}
 									{props?.author ? (
-										<p className=" position-relative mb-1" style={{...fonts.xxxs}}>
+										<p className=" position-relative mb-1" style={{ ...fonts.xxxs }}>
 											<CircleIndicator size={16} className={classes.circleThree}>
 												3
 											</CircleIndicator>
@@ -149,7 +148,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 											{props?.contentTypeLabel && (
 												<span
 													className="text-muted text-uppercase font-karla-bold"
-													style={{...fonts.xxxs}}
+													style={{ ...fonts.xxxs }}
 												>
 													<CircleIndicator size={16} className={classes.circleOne}>
 														1
@@ -162,7 +161,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										{props?.duration && (
 											<span
 												className="position-relative text-muted text-uppercase font-karla-bold ml-auto "
-												style={{...fonts.xxxs, whiteSpace: "nowrap"}}
+												style={{ ...fonts.xxxs, whiteSpace: 'nowrap' }}
 											>
 												<CircleIndicator size={16} className={classes.circleFour}>
 													4
@@ -179,7 +178,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 				<Container fluid className={classes.descriptionOuter}>
 					<Row>
-						<Col xs={{span: 12}}>
+						<Col xs={{ span: 12 }}>
 							{props?.description && (
 								<div className="position-relative p-2">
 									<CircleIndicator size={16} className={classes.circleSix}>
@@ -187,8 +186,8 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									</CircleIndicator>
 									<p
 										className="mb-0"
-										style={{...fonts.xxs}}
-										dangerouslySetInnerHTML={{__html: props.description || ''}}
+										style={{ ...fonts.xxs }}
+										dangerouslySetInnerHTML={{ __html: props.description || '' }}
 									/>
 								</div>
 							)}
@@ -197,16 +196,15 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 					{!canEmbed && props?.url && (
 						<Row className="mt-2 text-center">
-							<Col xs={{span: 12}}>
-								<div style={{transform: 'scale(0.6)'}}>
+							<Col xs={{ span: 12 }}>
+								<div style={{ transform: 'scale(0.6)' }}>
 									<Button
 										as="a"
 										className="d-inline-block"
 										variant="primary"
 										href={props.url}
 										target="_blank"
-										onClick={() => {
-										}}
+										onClick={() => {}}
 									>
 										{'call to action'}
 									</Button>

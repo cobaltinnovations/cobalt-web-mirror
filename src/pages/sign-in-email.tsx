@@ -86,7 +86,11 @@ const SignInEmail: FC = () => {
 												value={values.emailAddress}
 												onChange={handleChange}
 												required={requiredFields.emailAddress}
-												error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+												error={
+													touched.emailAddress && errors.emailAddress
+														? errors.emailAddress
+														: ''
+												}
 											/>
 											<InputHelper
 												className="mb-1"

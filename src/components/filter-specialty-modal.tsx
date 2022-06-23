@@ -14,11 +14,16 @@ const useStyles = createUseStyles({
 
 interface FilterSpecialtyModalProps extends ModalProps {
 	specialties: Specialty[];
-	selectedSpecialties: string[]
+	selectedSpecialties: string[];
 	onSave(selectedSpecialties: string[]): void;
 }
 
-const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, selectedSpecialties, onSave, ...props }) => {
+const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
+	specialties,
+	selectedSpecialties,
+	onSave,
+	...props
+}) => {
 	const classes = useStyles();
 	const [internalSelectedSpecialties, setInternalSelectedSpecialties] = useState<string[]>([]);
 
@@ -46,9 +51,14 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, sele
 							checked={internalSelectedSpecialties.includes(specialty.specialtyId)}
 							onChange={(event) => {
 								if (event.currentTarget.checked) {
-									setInternalSelectedSpecialties([...internalSelectedSpecialties, specialty.specialtyId]);
+									setInternalSelectedSpecialties([
+										...internalSelectedSpecialties,
+										specialty.specialtyId,
+									]);
 								} else {
-									setInternalSelectedSpecialties(internalSelectedSpecialties.filter((s) => s !== specialty.specialtyId))
+									setInternalSelectedSpecialties(
+										internalSelectedSpecialties.filter((s) => s !== specialty.specialtyId)
+									);
 								}
 							}}
 						/>

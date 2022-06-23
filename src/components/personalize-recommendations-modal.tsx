@@ -102,7 +102,12 @@ interface PersonalizeRecommendationsModalProps extends ModalProps {
 	onClose: (updatedChoices: Record<string, PersonalizationChoice['selectedAnswers']>) => void;
 }
 
-const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> = ({ questions, initialChoices, onClose, ...props }) => {
+const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> = ({
+	questions,
+	initialChoices,
+	onClose,
+	...props
+}) => {
 	const handleError = useHandleError();
 	const classes = usePersonalizeRecommendationsModalStyles();
 
@@ -179,7 +184,9 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 								let Komponent: ComponentType<PersonalizationQuestionProps> | null = null;
 
 								if (question.questionType === 'HORIZONTAL_CHECKBOX') {
-									Komponent = mq.isDesktop ? PersonalizationCheckbox : PersonalizationHorizontalCheckbox;
+									Komponent = mq.isDesktop
+										? PersonalizationCheckbox
+										: PersonalizationHorizontalCheckbox;
 								} else if (question.questionType === 'CHECKBOX') {
 									Komponent = PersonalizationCheckbox;
 								}
@@ -276,7 +283,9 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 
 	return (
 		<div
-			className={`${nested ? classes.nestedItem : ''} ${bottomBordered ? classes.borderBottom : ''} ${fullWidth ? classes.fullWidthItem : classes.item}`}
+			className={`${nested ? classes.nestedItem : ''} ${bottomBordered ? classes.borderBottom : ''} ${
+				fullWidth ? classes.fullWidthItem : classes.item
+			}`}
 		>
 			<p className={fullWidth ? 'px-9' : ''}>
 				<strong>{question.label}</strong>
@@ -304,7 +313,13 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 						/>
 
 						{answer.question && answerIsSelected && (
-							<PersonalizationCheckbox nested question={answer.question} choices={choices} onChange={onChange} bottomBordered={false} />
+							<PersonalizationCheckbox
+								nested
+								question={answer.question}
+								choices={choices}
+								onChange={onChange}
+								bottomBordered={false}
+							/>
 						)}
 					</div>
 				);

@@ -135,11 +135,9 @@ const ThemedApp: FC = () => {
 const App: FC = () => {
 	return (
 		<Router>
-
-				<BootstrapThemeProvider prefixes={prefixes}>
-					<ThemedApp />
-				</BootstrapThemeProvider>
-
+			<BootstrapThemeProvider prefixes={prefixes}>
+				<ThemedApp />
+			</BootstrapThemeProvider>
 		</Router>
 	);
 };

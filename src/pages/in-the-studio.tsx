@@ -54,27 +54,33 @@ const InTheStudio: FC = () => {
 			}, [] as typeof data);
 		}
 
-		const [{ externalGroupEventTypes }, { groupEvents }, { groupSessions }, { groupSessionRequests }] = await Promise.all([
-			groupEventService.fetchExternalGroupEventTypes({ urlName: groupEventUrlName }).fetch(),
-			groupEventService.fetchGroupEvents({ urlName: groupEventUrlName }).fetch(),
-			groupSessionsService
-				.getGroupSessions({
-					viewType: 'PATIENT',
-					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-					urlName: groupEventUrlName,
-				})
-				.fetch(),
-			groupSessionsService
-				.getGroupSessionRequests({
-					viewType: 'PATIENT',
-					groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					urlName: groupEventUrlName,
-				})
-				.fetch(),
-		]);
+		const [{ externalGroupEventTypes }, { groupEvents }, { groupSessions }, { groupSessionRequests }] =
+			await Promise.all([
+				groupEventService.fetchExternalGroupEventTypes({ urlName: groupEventUrlName }).fetch(),
+				groupEventService.fetchGroupEvents({ urlName: groupEventUrlName }).fetch(),
+				groupSessionsService
+					.getGroupSessions({
+						viewType: 'PATIENT',
+						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+						urlName: groupEventUrlName,
+					})
+					.fetch(),
+				groupSessionsService
+					.getGroupSessionRequests({
+						viewType: 'PATIENT',
+						groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						urlName: groupEventUrlName,
+					})
+					.fetch(),
+			]);
 
-		setEventList([...groupByUrlName(externalGroupEventTypes), ...groupEvents, ...groupByUrlName(groupSessionRequests), ...groupByUrlName(groupSessions)]);
+		setEventList([
+			...groupByUrlName(externalGroupEventTypes),
+			...groupEvents,
+			...groupByUrlName(groupSessionRequests),
+			...groupByUrlName(groupSessions),
+		]);
 	}, [groupEventUrlName]);
 
 	return (
@@ -171,14 +177,19 @@ const InTheStudio: FC = () => {
 
 							return (
 								<Col md={6} lg={4} key={groupEvent.groupEventId}>
-									<Link className="mb-2 d-block text-decoration-none" to={`/in-the-studio/${groupEvent.groupEventId}`}>
+									<Link
+										className="mb-2 d-block text-decoration-none"
+										to={`/in-the-studio/${groupEvent.groupEventId}`}
+									>
 										<StudioEvent groupEvent={groupEvent} />
 									</Link>
 								</Col>
 							);
 						})
 					) : (
-						<p className="text-center mb-0">{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}</p>
+						<p className="text-center mb-0">
+							{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}
+						</p>
 					)}
 				</Row>
 			</Container>

@@ -92,7 +92,11 @@ const SignIn: FC = () => {
 
 						{subdomainInstitution?.anonymousEnabled && (
 							<div className="d-flex text-center mb-3 px-5">
-								<Button className="flex-fill" variant="outline-primary" onClick={handleEnterAnonymouslyButtonClick}>
+								<Button
+									className="flex-fill"
+									variant="outline-primary"
+									onClick={handleEnterAnonymouslyButtonClick}
+								>
 									anonymously
 								</Button>
 							</div>

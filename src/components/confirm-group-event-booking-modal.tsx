@@ -17,7 +17,13 @@ interface ConfirmGroupEventBookingModalProps extends ModalProps {
 	externalUrl?: string;
 }
 
-const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({ onConfirm, groupEventName, dateTime, externalUrl, ...modalProps }) => {
+const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
+	onConfirm,
+	groupEventName,
+	dateTime,
+	externalUrl,
+	...modalProps
+}) => {
 	const classes = useConfirmGroupEventBookingModalStyles();
 
 	const navigateToExternalUrl = useCallback(() => {
@@ -49,7 +55,10 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 			</Modal.Header>
 			<Modal.Body>
 				{!!externalUrl ? (
-					<p>This session is managed outside of Cobalt. Please wait a moment while we take you to the site where you can complete your booking.</p>
+					<p>
+						This session is managed outside of Cobalt. Please wait a moment while we take you to the site
+						where you can complete your booking.
+					</p>
 				) : (
 					<>
 						<p className="mb-0 font-karla-bold">in the studio event</p>

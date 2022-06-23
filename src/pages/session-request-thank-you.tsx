@@ -28,7 +28,8 @@ const SessionRequestThankYou: FC = () => {
 					<Card className={classNames('mb-5 pt-10 pb-20 pl-6 pr-6', { [classes.card]: true })}>
 						<h1 className="mb-5 font-size-xxl text-center">thank you for your interest</h1>
 						<p className="mb-0 font-size-xxs text-center">
-							Your request for {history.location.state?.groupSessionName} has been submitted, and a session manager will be contacting you soon.
+							Your request for {history.location.state?.groupSessionName} has been submitted, and a
+							session manager will be contacting you soon.
 						</p>
 					</Card>
 				</Col>

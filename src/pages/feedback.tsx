@@ -53,7 +53,11 @@ const Feedback: FC = () => {
 						)}
 						<p className="mb-4">
 							If you are in immediate crisis,{' '}
-							<span className="text-primary text-decoration-underline cursor-pointer" tabIndex={0} onClick={() => openInCrisisModal()}>
+							<span
+								className="text-primary text-decoration-underline cursor-pointer"
+								tabIndex={0}
+								onClick={() => openInCrisisModal()}
+							>
 								please contact these resources.
 							</span>
 						</p>
@@ -67,7 +71,8 @@ const Feedback: FC = () => {
 							placeholder="Your email address"
 						/>
 						<small className="d-block pl-2 pr-2 mb-5">
-							Enter your email address if you would like our team to follow up in the next two business days
+							Enter your email address if you would like our team to follow up in the next two business
+							days
 						</small>
 						<Form.Control
 							as="textarea"

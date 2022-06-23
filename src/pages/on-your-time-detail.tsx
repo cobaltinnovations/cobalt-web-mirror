@@ -74,7 +74,7 @@ const OnYourTimeDetail: FC = () => {
 				activityTypeId: AcivityTypeId.Content,
 				context: {
 					contentId: item.contentId,
-				}
+				},
 			})
 			.fetch()
 			.catch((e) => {
@@ -139,9 +139,14 @@ const OnYourTimeDetail: FC = () => {
 								/>
 							</div>
 						) : (
-							<BackgroundImageContainer className={classes.mediaContainer} imageUrl={item?.imageUrl || placeholderImage}>
+							<BackgroundImageContainer
+								className={classes.mediaContainer}
+								imageUrl={item?.imageUrl || placeholderImage}
+							>
 								<div className={classes.mediaContent}>
-									<small className="text-white text-uppercase font-karla-bold">{item?.newFlag ? 'NEW' : ''}</small>
+									<small className="text-white text-uppercase font-karla-bold">
+										{item?.newFlag ? 'NEW' : ''}
+									</small>
 								</div>
 							</BackgroundImageContainer>
 						)}
@@ -150,9 +155,15 @@ const OnYourTimeDetail: FC = () => {
 							{item?.author ? <p className="mb-1">by {item?.author}</p> : <p className="mb-1">&nbsp;</p>}
 
 							<div className="d-flex">
-								<small className="text-muted text-uppercase font-karla-bold">{item?.contentTypeLabel}</small>
+								<small className="text-muted text-uppercase font-karla-bold">
+									{item?.contentTypeLabel}
+								</small>
 
-								{item?.duration && <small className="text-muted text-uppercase font-karla-bold ml-auto">{item?.duration}</small>}
+								{item?.duration && (
+									<small className="text-muted text-uppercase font-karla-bold ml-auto">
+										{item?.duration}
+									</small>
+								)}
 							</div>
 						</div>
 					</Col>

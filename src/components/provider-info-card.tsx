@@ -29,7 +29,12 @@ interface ProviderInfoCardProps extends PropsWithChildren {
 	hideSpecifics?: boolean;
 }
 
-export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({ provider, linkToExternalBio = false, hideSpecifics = false, children }) => {
+export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({
+	provider,
+	linkToExternalBio = false,
+	hideSpecifics = false,
+	children,
+}) => {
 	const classes = useProviderInfoStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;

@@ -46,7 +46,11 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 		onChange(questionId, checkedAnswer ? [{ answerId: checkedAnswer }] : []);
 	}
 
-	function handleQuadButtonClick(event: React.MouseEvent<HTMLButtonElement>, question: AssessmentQuestion, answerId: string) {
+	function handleQuadButtonClick(
+		event: React.MouseEvent<HTMLButtonElement>,
+		question: AssessmentQuestion,
+		answerId: string
+	) {
 		event.preventDefault();
 
 		const { questionId } = question;
@@ -95,7 +99,9 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 							value={answer.answerId}
 							name={question.questionId}
 							label={answer.answerDescription}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCheckboxChange(event, question)}
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								handleCheckboxChange(event, question)
+							}
 						/>
 					);
 				});
@@ -114,7 +120,9 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 							value={answer.answerId}
 							name={question.questionId}
 							label={answer.answerDescription}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleRadioChange(event, question)}
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								handleRadioChange(event, question)
+							}
 						/>
 					);
 				});
@@ -122,10 +130,16 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 				return question.answers.map((answer) => {
 					return (
 						<Button
-							variant={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId) ? 'secondary' : 'light'}
+							variant={
+								!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)
+									? 'secondary'
+									: 'light'
+							}
 							className="btn-block"
 							key={answer.answerId}
-							onClick={(event: React.MouseEvent<HTMLButtonElement>) => handleQuadButtonClick(event, question, answer.answerId)}
+							onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+								handleQuadButtonClick(event, question, answer.answerId)
+							}
 						>
 							{answer.answerDescription}
 						</Button>
@@ -157,9 +171,17 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 							showMonthDropdown
 							dropdownMode="select"
 							key={answer.answerId}
-							selected={answersTextValues[answer.answerId] ? moment(answersTextValues[answer.answerId]).toDate() : undefined}
+							selected={
+								answersTextValues[answer.answerId]
+									? moment(answersTextValues[answer.answerId]).toDate()
+									: undefined
+							}
 							onChange={(date) => {
-								handleAnswerTextChange(question.questionId, answer.answerId, date ? moment(date).format('YYYY-MM-DD') : '');
+								handleAnswerTextChange(
+									question.questionId,
+									answer.answerId,
+									date ? moment(date).format('YYYY-MM-DD') : ''
+								);
 							}}
 						/>
 					);

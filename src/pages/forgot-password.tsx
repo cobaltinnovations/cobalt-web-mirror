@@ -63,7 +63,9 @@ const ForgotPassword: FC = () => {
 											value={values.emailAddress}
 											onChange={handleChange}
 											required={requiredFields.emailAddress}
-											error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+											error={
+												touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''
+											}
 										/>
 										<div className="d-flex flex-row justify-content-between">
 											<Button

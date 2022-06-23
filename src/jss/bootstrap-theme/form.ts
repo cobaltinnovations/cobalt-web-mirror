@@ -38,10 +38,11 @@ export const form = {
 			'&:focus': {
 				outline: 'none',
 			},
-			'&[type=date], &[type=datetime-local], &[type=email], &[type=month], &[type=number], &[type=password], &[type=search], &[type=tel], &[type=text], &[type=time], &[type=url], &[type=week]': {
-				height: 54,
-				lineHeight: '5.4rem',
-			},
+			'&[type=date], &[type=datetime-local], &[type=email], &[type=month], &[type=number], &[type=password], &[type=search], &[type=tel], &[type=text], &[type=time], &[type=url], &[type=week]':
+				{
+					height: 54,
+					lineHeight: '5.4rem',
+				},
 			'&[type=date]': {
 				textIndent: 0,
 				paddingLeft: 15,

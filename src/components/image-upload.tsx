@@ -34,7 +34,15 @@ interface ImageUploadProps {
 	disabled?: boolean;
 }
 
-const ImageUpload: FC<ImageUploadProps> = ({ imagePreview, isUploading, progress, onChange, onRemove, className, disabled= false}) => {
+const ImageUpload: FC<ImageUploadProps> = ({
+	imagePreview,
+	isUploading,
+	progress,
+	onChange,
+	onRemove,
+	className,
+	disabled = false,
+}) => {
 	const classes = useStyles({
 		percentage: progress || 0,
 	});

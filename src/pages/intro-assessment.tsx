@@ -94,7 +94,9 @@ const IntroAssessment: FC = () => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.push(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
+			history.push(
+				`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`
+			);
 		}
 	}, [assessment, history]);
 
@@ -166,7 +168,11 @@ const IntroAssessment: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Form>
 							{assessment?.question && (
-								<SurveyQuestion key={assessment.question.questionId} question={assessment.question} onChange={handleSurveyQuestionChange} />
+								<SurveyQuestion
+									key={assessment.question.questionId}
+									question={assessment.question}
+									onChange={handleSurveyQuestionChange}
+								/>
 							)}
 							<div
 								className={classNames({

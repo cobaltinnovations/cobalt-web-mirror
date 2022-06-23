@@ -8,7 +8,12 @@ import NoMatch from '@/pages/no-match';
 
 const blockingPaths: string[] = ['/intro-assessment'];
 
-const PrivateRoute: FC<RouteProps & { enabled?: boolean; unauthRedirect?: string }> = ({ children, enabled = true, unauthRedirect, ...routeProps }) => {
+const PrivateRoute: FC<RouteProps & { enabled?: boolean; unauthRedirect?: string }> = ({
+	children,
+	enabled = true,
+	unauthRedirect,
+	...routeProps
+}) => {
 	const location = useLocation();
 	const { initialized, account } = useAccount();
 	const notAuthRedirectPath = unauthRedirect || '/sign-in';
@@ -48,7 +53,16 @@ const PrivateRoute: FC<RouteProps & { enabled?: boolean; unauthRedirect?: string
 		}
 
 		return children;
-	}, [account, children, enabled, initialized, location.pathname, location.search, routeProps.path, notAuthRedirectPath]);
+	}, [
+		account,
+		children,
+		enabled,
+		initialized,
+		location.pathname,
+		location.search,
+		routeProps.path,
+		notAuthRedirectPath,
+	]);
 
 	return <Route {...routeProps}>{privateChildren}</Route>;
 };

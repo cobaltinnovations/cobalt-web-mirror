@@ -44,19 +44,30 @@ interface SessionRequestRowProps {
 	onDeleteClick(groupSessionRequestId: string): void;
 }
 
-const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, onAddClick, onArchiveClick, onUnarchiveClick, onDeleteClick }) => {
+const SessionRequestRow: FC<SessionRequestRowProps> = ({
+	session,
+	onEditClick,
+	onAddClick,
+	onArchiveClick,
+	onUnarchiveClick,
+	onDeleteClick,
+}) => {
 	const classes = useStyles();
 	const { account } = useAccount();
 
-	const canEditSession = (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
-		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW || session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
+	const canEditSession =
+		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
+		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW ||
+			session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
 
 	const canAddSession =
 		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
 		session.groupSessionRequestStatusId === SESSION_STATUS.NEW;
 
 	const hasDropdown =
-		canAddSession || session.groupSessionRequestStatusId === SESSION_STATUS.ADDED || session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED;
+		canAddSession ||
+		session.groupSessionRequestStatusId === SESSION_STATUS.ADDED ||
+		session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED;
 
 	return (
 		<TableRow>
@@ -64,7 +75,10 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, o
 				<span className="d-block font-size-xs">{session.createdDateDescription}</span>
 			</TableCell>
 			<TableCell>
-				<Link to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`} className="d-block font-size-xs font-karla-bold">
+				<Link
+					to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`}
+					className="d-block font-size-xs font-karla-bold"
+				>
 					{session.title}
 				</Link>
 			</TableCell>
@@ -77,16 +91,16 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, o
 						id={session.groupSessionRequestId}
 						items={[
 							...(canEditSession
-									? [
-											{
-												icon: <EditIcon className={classes.iconPath} />,
-												title: 'Edit',
-												onClick: () => {
-													onEditClick(session.groupSessionRequestId);
-												},
+								? [
+										{
+											icon: <EditIcon className={classes.iconPath} />,
+											title: 'Edit',
+											onClick: () => {
+												onEditClick(session.groupSessionRequestId);
 											},
-									  ]
-									: []),
+										},
+								  ]
+								: []),
 							...(canAddSession
 								? [
 										{

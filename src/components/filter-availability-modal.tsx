@@ -20,7 +20,13 @@ interface FilterAvailabilityModalProps extends ModalProps {
 	onSave(availability: ProviderAvailability['availability'], visitTypeIds: string[]): void;
 }
 
-const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilities, selectedAvailability, selectedVisitTypeIds, onSave, ...props }) => {
+const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
+	availabilities,
+	selectedAvailability,
+	selectedVisitTypeIds,
+	onSave,
+	...props
+}) => {
 	const classes = useFilterAvailabilityModalStyles();
 
 	const [allAvailabilites, setAllAvailabilities] = useState<ProviderAvailability[]>([]);

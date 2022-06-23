@@ -26,7 +26,8 @@ export const useGlobalStyles = createUseStyles({
 			position: 'relative',
 			...fonts.nunitoSansRegular,
 			backgroundColor: colors.background,
-			backgroundImage: 'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
+			backgroundImage:
+				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
 			backgroundPosition: 'top left, right 0px',
 			backgroundRepeat: 'repeat, no-repeat',
 			backgroundSize: '100px 100px, 881px 106px',

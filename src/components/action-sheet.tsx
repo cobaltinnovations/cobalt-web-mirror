@@ -112,14 +112,29 @@ const ActionSheet: FC<ActionSheetProps> = ({ show, onShow, onHide, children }) =
 
 	return (
 		<>
-			<CSSTransition in={show} timeout={transitionDuration} mountOnEnter={true} unmountOnExit={true} classNames={'slide-fade'}>
+			<CSSTransition
+				in={show}
+				timeout={transitionDuration}
+				mountOnEnter={true}
+				unmountOnExit={true}
+				classNames={'slide-fade'}
+			>
 				<div className={classes.actionSheet}>{children}</div>
 			</CSSTransition>
-			<CSSTransition in={show} timeout={transitionDuration} mountOnEnter={true} unmountOnExit={true} classNames={'fade'}>
+			<CSSTransition
+				in={show}
+				timeout={transitionDuration}
+				mountOnEnter={true}
+				unmountOnExit={true}
+				classNames={'fade'}
+			>
 				<div className={classes.shadow} onClick={handleShadowClick} />
 			</CSSTransition>
 			<button
-				className={classNames({ [classes.floatingActionButton]: true, [classes.floatingActionButtonOpen]: show })}
+				className={classNames({
+					[classes.floatingActionButton]: true,
+					[classes.floatingActionButtonOpen]: show,
+				})}
 				onClick={handleAddSessionButtonClick}
 			>
 				<AddIcon width={25} height={25} className={classes.addIcon} />

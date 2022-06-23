@@ -26,9 +26,12 @@ const DownForMaintenance = (): ReactElement => {
 					</div>
 
 					<p className="mb-2 text-center font-size-m">
-						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be back online shortly.
+						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be
+						back online shortly.
 					</p>
-					<p className="mb-8 text-center font-size-m">If you need immediate help, please contact one of the following numbers:</p>
+					<p className="mb-8 text-center font-size-m">
+						If you need immediate help, please contact one of the following numbers:
+					</p>
 
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:911">
 						<PhoneIcon className="mr-4" />
@@ -52,7 +55,9 @@ const DownForMaintenance = (): ReactElement => {
 						</div>
 					</Button>
 
-					<p className="text-center font-size-m font-weight-bold">or go to your nearest emergency department or crisis center</p>
+					<p className="text-center font-size-m font-weight-bold">
+						or go to your nearest emergency department or crisis center
+					</p>
 				</Col>
 			</Row>
 		</Container>

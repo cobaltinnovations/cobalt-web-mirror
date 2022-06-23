@@ -167,7 +167,13 @@ const InTheStudioDetail: FC = () => {
 											view calendar
 										</Button>
 									</Link>
-									<Button as="a" variant="light" size="sm" href={groupEvent.appointment.videoconferenceUrl} target="_blank">
+									<Button
+										as="a"
+										variant="light"
+										size="sm"
+										href={groupEvent.appointment.videoconferenceUrl}
+										target="_blank"
+									>
 										join now
 									</Button>
 								</div>

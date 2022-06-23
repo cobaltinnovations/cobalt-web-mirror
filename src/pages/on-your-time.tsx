@@ -200,10 +200,16 @@ const OnYourTime: FC = () => {
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								{filteredList.length === 0 ? (
-									<p className="text-center">There are no recommendations that match your selections.</p>
+									<p className="text-center">
+										There are no recommendations that match your selections.
+									</p>
 								) : (
 									filteredList.map((item) => (
-										<Link key={item.contentId} to={`/on-your-time/${item.contentId}`} className="d-block mb-3 text-decoration-none">
+										<Link
+											key={item.contentId}
+											to={`/on-your-time/${item.contentId}`}
+											className="d-block mb-3 text-decoration-none"
+										>
 											<OnYourTimeItem
 												imageUrl={item.imageUrl}
 												tag={item.newFlag ? 'NEW' : ''}
@@ -233,7 +239,11 @@ const OnYourTime: FC = () => {
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								{additionalFilteredList.map((item) => (
-									<Link key={item.contentId} to={`/on-your-time/${item.contentId}`} className="d-block mb-3 text-decoration-none">
+									<Link
+										key={item.contentId}
+										to={`/on-your-time/${item.contentId}`}
+										className="d-block mb-3 text-decoration-none"
+									>
 										<OnYourTimeItem
 											imageUrl={item.imageUrl}
 											tag={item.newFlag ? 'NEW' : ''}
