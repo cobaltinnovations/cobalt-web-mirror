@@ -1,4 +1,4 @@
-import React, { FC, ReactElement } from 'react';
+import React, { FC, ReactElement , PropsWithChildren } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import colors from '@/jss/colors';
@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface SessionToggleProps {
+interface SessionToggleProps extends PropsWithChildren {
 	id: string;
 	className?: string;
 	onClick?(event: React.MouseEvent): void;
@@ -68,7 +68,7 @@ const SessionToggle: FC<SessionToggleProps> = React.forwardRef(({ children, clas
 	);
 });
 
-interface SessionMenuProps {
+interface SessionMenuProps extends PropsWithChildren {
 	style?: any;
 	className?: string;
 	'aria-labelledby'?: string;

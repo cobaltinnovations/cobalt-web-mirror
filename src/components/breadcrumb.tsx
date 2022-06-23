@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -28,11 +28,8 @@ type BreadCrumbModel = {
 };
 
 type ColSpec = { span?: number; offset?: number; };
-type ColOverrides = {
 
-}
-
-interface BreadcrumbProps {
+interface BreadcrumbProps extends PropsWithChildren {
 	breadcrumbs: BreadCrumbModel[];
 	xs?: ColSpec;
 	sm?: ColSpec;

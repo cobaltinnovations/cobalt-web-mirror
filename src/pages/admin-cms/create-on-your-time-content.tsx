@@ -4,7 +4,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 
 import AsyncPage from '@/components/async-page';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -38,12 +38,6 @@ import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
-
-interface OnYourTimeParams {
-	contentId: string;
-	editing: string;
-	adding: string;
-}
 
 const useStyles = createUseStyles({
 	grayText: {
@@ -654,13 +648,24 @@ const CreateOnYourTimeContent: FC = () => {
 																					<span>*</span>
 																				)}
 																			</Form.Label>
-																			<Wysiwyg
-																				readOnly={shouldDisabledInputs}
-																				value={values.description}
-																				onChange={(value: string) => {
-																					setFieldValue('description', value);
+																			<Field name="description">
+																				{({ field, meta }: FieldProps) => {
+																					return (
+																						<Wysiwyg
+																							readOnly={
+																								shouldDisabledInputs
+																							}
+																							initialValue={
+																								meta.initialValue
+																							}
+																							onChange={field.onChange(
+																								field.name
+																							)}
+																						/>
+																					);
 																				}}
-																			/>
+																			</Field>
+
 																			{touched.description && errors.description && (
 																				<p
 																					className="text-danger"

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -57,7 +57,7 @@ const useSelectStyles = createUseStyles({
 	}),
 });
 
-interface SelectProps {
+interface SelectProps extends PropsWithChildren {
 	value: string;
 	onChange(event: React.ChangeEvent<HTMLSelectElement>): void;
 	required?: boolean;

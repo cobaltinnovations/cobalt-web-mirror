@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -57,7 +57,7 @@ const useTableCellStyles = createUseStyles({
 	},
 });
 
-interface TableCellProps {
+interface TableCellProps extends PropsWithChildren {
 	header?: boolean;
 	width?: number | string;
 	fixed?: boolean;

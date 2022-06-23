@@ -1,5 +1,4 @@
 import React, { FC, Suspense, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider as BootstrapThemeProvider } from 'react-bootstrap';
 
@@ -35,8 +34,6 @@ import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
 import useUrlViewTracking from './hooks/use-url-view-tracking';
 import 'react-datepicker/dist/react-datepicker.css';
-
-const queryClient = new QueryClient();
 
 const AppWithProviders: FC = () => {
 	useGoogleAnalytics();
@@ -138,11 +135,11 @@ const ThemedApp: FC = () => {
 const App: FC = () => {
 	return (
 		<Router>
-			<QueryClientProvider client={queryClient}>
+
 				<BootstrapThemeProvider prefixes={prefixes}>
 					<ThemedApp />
 				</BootstrapThemeProvider>
-			</QueryClientProvider>
+
 		</Router>
 	);
 };

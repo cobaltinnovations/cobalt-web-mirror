@@ -3,7 +3,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -312,16 +312,17 @@ const GroupSessionsByRequestCreate: FC = () => {
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
 												</p>
-												<Wysiwyg
-													className={
-														touched.description && errors.description ? 'mb-2' : 'mb-5'
-													}
-													readOnly={false}
-													value={values.description}
-													onChange={(value) => {
-														setFieldValue('description', value);
+												<Field name="description">
+													{({ field, meta }: FieldProps) => {
+														return (
+															<Wysiwyg
+																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
+																initialValue={meta.initialValue}
+																onChange={field.onChange(field.name)}
+															/>
+														);
 													}}
-												/>
+												</Field>
 												{touched.description && errors.description && (
 													<p className="text-danger" style={{ ...fonts.xxs }}>
 														description is a required field

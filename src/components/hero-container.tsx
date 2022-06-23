@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -12,7 +12,7 @@ const useHeroContainerStyles = createUseStyles({
 	},
 });
 
-interface HeroContainerProps {
+interface HeroContainerProps extends PropsWithChildren {
 	className?: string;
 }
 

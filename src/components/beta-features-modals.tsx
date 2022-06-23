@@ -13,11 +13,11 @@ const useBetaFeaturesModalStyles = createUseStyles({
 	},
 });
 
-interface BetaFeatureModal extends ModalProps {
+interface BetaFeatureModalProps extends ModalProps {
 	contactEmail?: string;
 }
 
-export const BetaFeatureModal: FC<BetaFeatureModal> = (props) => {
+export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
 	const classes = useBetaFeaturesModalStyles();
 
 	return (
@@ -37,11 +37,11 @@ export const BetaFeatureModal: FC<BetaFeatureModal> = (props) => {
 	);
 };
 
-interface BetaFeatureAlertModal extends ModalProps {
+interface BetaFeatureAlertModalProps extends ModalProps {
 	betaFeatureId: BetaFeatureId;
 }
 
-export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
+export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => {
 	const classes = useBetaFeaturesModalStyles();
 	const { account } = useAccount();
 	const [selection, setSelection] = useState<'yes' | 'no' | 'yesAlert'>('yes');

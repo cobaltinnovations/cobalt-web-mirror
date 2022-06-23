@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
@@ -22,7 +22,7 @@ const useBackgroundImageContainerStyles = createUseStyles({
 	}),
 });
 
-interface BackgroundImageContainerProps {
+interface BackgroundImageContainerProps extends PropsWithChildren {
 	size?: number;
 	className?: string;
 	imageUrl: string;

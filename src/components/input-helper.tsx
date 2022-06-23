@@ -1,4 +1,4 @@
-import React, { ElementType, FC, useState } from 'react';
+import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -67,7 +67,7 @@ const useInputHelperStyles = createUseStyles({
 	}),
 });
 
-interface InputHelperProps extends FormControlProps {
+interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	label: string;
 	name?: string;
 	onFocus?: (...args: any[]) => void;

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
-import { Link, Redirect, useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -21,8 +21,6 @@ import colors from '@/jss/colors';
 import { ReactComponent as ChevronLeft } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as ChevronRight } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
-import { isPicMhicAccount } from './pic/utils';
-import useSubdomain from '@/hooks/use-subdomain';
 
 const useIndexStyles = createUseStyles({
 	inTheStudioContainer: {
@@ -52,7 +50,6 @@ const useIndexStyles = createUseStyles({
 
 const Index: FC = () => {
 	useHeaderTitle(null);
-	const subdomain = useSubdomain();
 	const { account, institution } = useAccount();
 
 	const history = useHistory();
@@ -87,11 +84,6 @@ const Index: FC = () => {
 
 	function handleMoreOnYourTimeButtonClick() {
 		history.push('/on-your-time');
-	}
-
-	if (subdomain === 'pic' && account) {
-		const redirectTo = isPicMhicAccount(account) ? '/pic/mhic' : '/pic/home';
-		return <Redirect to={redirectTo} />;
 	}
 
 	return (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
@@ -11,7 +11,7 @@ const useTableRowStyles = createUseStyles({
 	},
 });
 
-interface TableRowProps {
+interface TableRowProps extends PropsWithChildren {
 	className?: string;
 }
 

@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, PropsWithChildren} from 'react';
 import {Button, Container} from 'react-bootstrap';
 import {createUseStyles} from 'react-jss';
 import {useHistory} from 'react-router-dom';
@@ -18,7 +18,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface SessionFormSubmitBannerProps {
+interface SessionFormSubmitBannerProps extends PropsWithChildren {
 	title: string;
 	disabled?: boolean
 }

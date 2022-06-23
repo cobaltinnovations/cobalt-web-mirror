@@ -1,5 +1,4 @@
 import React, { ReactElement } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -17,7 +16,6 @@ const useStyles = createUseStyles({
 
 const DownForMaintenance = (): ReactElement => {
 	const classes = useStyles();
-	const { t } = useTranslation();
 
 	return (
 		<Container className="pt-20">
@@ -35,26 +33,26 @@ const DownForMaintenance = (): ReactElement => {
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:911">
 						<PhoneIcon className="mr-4" />
 						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.call911Prompt')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.call911Subtext')}</span>
+							<span className="d-block mb-2">Call 911</span>
+							<span className="d-block font-weight-regular">24/7 emergency</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:8007238255">
 						<PhoneIcon className="mr-4" />
 						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.callSuicideHotline')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.callSuicideHotlineSubtext')}</span>
+							<span className="d-block mb-2">Call 800-273-8255</span>
+							<span className="d-block font-weight-regular">24/7 National suicide prevention line</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-4 w-100 d-flex align-items-center" href="tel:741741">
 						<PhoneIcon className="mr-4" />
 						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.textLine')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.textLineSubtext')}</span>
+							<span className="d-block mb-2">Text 741 741</span>
+							<span className="d-block font-weight-regular">24/7 Crisis Text Line</span>
 						</div>
 					</Button>
 
-					<p className="text-center font-size-m font-weight-bold">{t('inCrisisResources.orOption')}</p>
+					<p className="text-center font-size-m font-weight-bold">or go to your nearest emergency department or crisis center</p>
 				</Col>
 			</Row>
 		</Container>

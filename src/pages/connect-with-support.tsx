@@ -197,7 +197,7 @@ const ConnectWithSupport: FC = () => {
 	}, [getActiveFiltersState, findOptions]);
 
 	const setFilterDefaults = useCallback(
-		async (findOptions, preserveFilters = false) => {
+		async (findOptions: FindOptionsResponse, preserveFilters = false) => {
 			if (preserveFilters) {
 				setRecommendationHtml(findOptions.recommendationHtml);
 				setAssessmentScore(findOptions.scores);
@@ -205,7 +205,7 @@ const ConnectWithSupport: FC = () => {
 			}
 
 			const urlQuery = new URLSearchParams(location.search);
-			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
+			const routedSupportRoleIds = urlQuery.getAll('supportRoleId') as SupportRoleId[];
 			const routedStartDate = urlQuery.get('startDate') || '';
 			const routedEndDate = urlQuery.get('endDate') || '';
 			const routedClinicIds = urlQuery.getAll('clinicId');
@@ -261,7 +261,7 @@ const ConnectWithSupport: FC = () => {
 	);
 
 	const searchProviders = useCallback(
-		async (query) => {
+		async (query: string) => {
 			setIsSearching(true);
 
 			try {
@@ -770,7 +770,7 @@ const ConnectWithSupport: FC = () => {
 												pathname: location.pathname,
 												search: '?' + urlQuery.toString(),
 											});
-										} else {
+										} else if (findOptions) {
 											setFilterDefaults(findOptions);
 										}
 									}}

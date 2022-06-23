@@ -1,4 +1,4 @@
-import React, { FC, createContext, useState, ReactElement, useCallback } from 'react';
+import React, { FC, createContext, useState, ReactElement, useCallback, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 
 import { ReactComponent as LogoText } from '@/assets/logos/logo-text.svg';
@@ -26,7 +26,7 @@ type HeaderContextConfig = {
 
 const HeaderContext = createContext({} as HeaderContextConfig);
 
-const HeaderProvider: FC = (props) => {
+const HeaderProvider: FC<PropsWithChildren> = (props) => {
 	const [title, setTitle] = useState<ReactElement | string>(<LogoTextStyled />);
 
 	const resetTitle = useCallback(() => {

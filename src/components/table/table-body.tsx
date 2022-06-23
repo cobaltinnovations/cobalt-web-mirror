@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 
-export const TableBody: FC = React.memo(({ children }) => {
+export const TableBody: FC<PropsWithChildren> = React.memo(({ children }) => {
 	return <tbody>{children}</tbody>;
 });

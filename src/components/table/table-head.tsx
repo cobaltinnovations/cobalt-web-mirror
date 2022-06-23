@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 
 import colors from '@/jss/colors';
@@ -12,7 +12,7 @@ const useTableHeadStyles = createUseStyles({
 	},
 });
 
-export const TableHead: FC = React.memo((props) => {
+export const TableHead: FC<PropsWithChildren> = React.memo((props) => {
 	const classes = useTableHeadStyles();
 
 	return <thead className={classes.tableHead}>{props.children}</thead>;

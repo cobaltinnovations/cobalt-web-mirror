@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, PropsWithChildren, useMemo } from 'react';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseStyles } from 'react-jss';
@@ -23,11 +23,13 @@ const useProviderInfoStyles = createUseStyles({
 	},
 });
 
-export const ProviderInfoCard: FC<{
+interface ProviderInfoCardProps extends PropsWithChildren {
 	provider: Provider;
 	linkToExternalBio?: boolean;
 	hideSpecifics?: boolean;
-}> = ({ provider, linkToExternalBio = false, hideSpecifics = false, children }) => {
+}
+
+export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({ provider, linkToExternalBio = false, hideSpecifics = false, children }) => {
 	const classes = useProviderInfoStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;

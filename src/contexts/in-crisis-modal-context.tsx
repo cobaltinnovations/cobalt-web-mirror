@@ -1,4 +1,4 @@
-import React, { FC, createContext, useState } from 'react';
+import React, { FC, createContext, useState, PropsWithChildren } from 'react';
 
 type InCrisisModalContextConfig = {
 	show: boolean;
@@ -9,7 +9,7 @@ type InCrisisModalContextConfig = {
 
 const InCrisisModalContext = createContext({} as InCrisisModalContextConfig);
 
-const InCrisisModalProvider: FC = (props) => {
+const InCrisisModalProvider: FC<PropsWithChildren> = (props) => {
 	const [show, setShow] = useState(false);
 	const [isCall, setIsCall] = useState(false);
 

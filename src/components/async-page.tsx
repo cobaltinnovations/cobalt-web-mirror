@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback, useContext } from 'react';
+import React, { FC, useState, useEffect, useCallback, useContext, PropsWithChildren } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Loader from '@/components/loader';
@@ -13,7 +13,7 @@ enum DISPLAY_STATES {
 	ERROR = 'ERROR',
 }
 
-interface AsyncPageProps {
+interface AsyncPageProps extends PropsWithChildren {
 	fetchData(): void;
 	abortFetch?(): void;
 	showBackButton?: boolean;

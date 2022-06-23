@@ -5,7 +5,7 @@ import React, { FC, useState, useCallback } from 'react';
 import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useQuery from '@/hooks/use-query';
@@ -717,16 +717,18 @@ const GroupSessionsCreate: FC = () => {
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
 												</p>
-												<Wysiwyg
-													className={
-														touched.description && errors.description ? 'mb-2' : 'mb-5'
-													}
-													readOnly={isViewMode}
-													value={values.description}
-													onChange={(value) => {
-														setFieldValue('description', value);
+												<Field name="description">
+													{({ field, meta }: FieldProps) => {
+														return (
+															<Wysiwyg
+																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
+																readOnly={isViewMode}
+																initialValue={meta.initialValue}
+																onChange={field.onChange(field.name)}
+															/>
+														);
 													}}
-												/>
+												</Field>
 												{touched.description && errors.description && (
 													<p className="text-danger" style={{ ...fonts.xxs }}>
 														description is a required field
@@ -842,7 +844,7 @@ const GroupSessionsCreate: FC = () => {
 												{values.screeningQuestions &&
 													values.screeningQuestions.map((screeningQuestion, index) => {
 														const touchedScreenQuestions =
-															((touched.screeningQuestions as unknown) as []) || [];
+															(touched.screeningQuestions as unknown as []) || [];
 														const sqTouched = !!touchedScreenQuestions.length
 															? touchedScreenQuestions[index]
 															: false;

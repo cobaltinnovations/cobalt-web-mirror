@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -47,7 +47,7 @@ const useLabelledInlineSelectStyles = createUseStyles({
 	},
 });
 
-interface LabelledInlineSelectProps {
+interface LabelledInlineSelectProps extends PropsWithChildren {
 	id: string;
 	value: string;
 	onChange(event: React.ChangeEvent<HTMLSelectElement>): void;

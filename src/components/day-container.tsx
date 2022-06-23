@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -21,7 +21,7 @@ const useDayContainerStyles = createUseStyles({
 	},
 });
 
-interface DayContainerProps {
+interface DayContainerProps extends PropsWithChildren {
 	className?: string;
 }
 

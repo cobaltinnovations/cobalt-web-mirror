@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Dropdown, FormCheck } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -39,7 +39,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface QuickFilterToggleProps {
+interface QuickFilterToggleProps extends PropsWithChildren {
 	id: string;
 	active: boolean;
 	className?: string;
@@ -64,7 +64,7 @@ const QuickFilterToggle = React.forwardRef<HTMLButtonElement, QuickFilterToggleP
 	}
 );
 
-interface QuickFilterMenuProps {
+interface QuickFilterMenuProps extends PropsWithChildren {
 	style?: any;
 	className?: string;
 	'aria-labelledby'?: string;

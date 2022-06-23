@@ -27,12 +27,12 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface SessionAttendeeList {
+interface SessionAttendeeListProps {
 	attendees: GroupSessionReservationModel[];
 	capacity: number;
 }
 
-const SessionAttendeeList: FC<SessionAttendeeList> = ({ attendees, capacity }) => {
+const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity }) => {
 	const classes = useStyles();
 
 	function handleEmailAllButtonClick() {

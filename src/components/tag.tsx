@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
@@ -58,7 +58,7 @@ const useTagStyles = createUseStyles({
 	},
 });
 
-interface TagProps {
+interface TagProps extends PropsWithChildren {
 	variant?: string;
 	className?: string;
 }

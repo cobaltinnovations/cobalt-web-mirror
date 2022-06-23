@@ -1,5 +1,5 @@
 import React, { FC, Dispatch, SetStateAction, useState, useCallback, useRef } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container } from 'react-bootstrap';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import BackgroundImageContainer from '@/components/background-image-container';
@@ -73,7 +73,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const typeAheadRef = useRef<any>(null);
 
-	const searchProviders = useCallback(async (query) => {
+	const searchProviders = useCallback(async (query: string) => {
 		setIsSearching(true);
 
 		try {

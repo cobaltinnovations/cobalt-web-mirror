@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import Color from 'color';
@@ -62,7 +62,7 @@ const useHeroStyles = createUseStyles({
 	},
 });
 
-interface HeroProps {
+interface HeroProps extends PropsWithChildren {
 	variant?: string;
 	className?: string;
 }

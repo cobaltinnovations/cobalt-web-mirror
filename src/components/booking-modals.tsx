@@ -172,6 +172,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 			appointmentTypes,
 			continueBookingProcess,
 			isAnonymous,
+			setBookingSource,
 			setPromptForEmail,
 			setPromptForPhoneNumber,
 			setSelectedAppointmentTypeId,

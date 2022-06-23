@@ -1,5 +1,5 @@
 import { ErrorConfig } from '@/lib/http-client';
-import React, { FC, createContext, useState } from 'react';
+import React, { FC, createContext, useState, PropsWithChildren } from 'react';
 
 type ErrorModalContextConfig = {
 	show: boolean;
@@ -10,7 +10,7 @@ type ErrorModalContextConfig = {
 
 const ErrorModalContext = createContext({} as ErrorModalContextConfig);
 
-const ErrorModalProvider: FC = (props) => {
+const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
 	const [show, setShow] = useState(false);
 	const [error, setError] = useState<ErrorConfig>();
 

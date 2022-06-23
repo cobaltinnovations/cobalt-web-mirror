@@ -27,7 +27,6 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
-import { cloneDeep } from 'lodash';
 import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import useAccount from '@/hooks/use-account';

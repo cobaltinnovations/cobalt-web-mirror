@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
@@ -20,7 +20,7 @@ const useStyles = createUseStyles({
 	}),
 });
 
-interface CircleIndicatorProps {
+interface CircleIndicatorProps extends PropsWithChildren {
 	size?: number;
 	className?: string;
 }

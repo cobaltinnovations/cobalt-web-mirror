@@ -1,5 +1,5 @@
 import moment, { Moment } from 'moment';
-import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'react';
 import { LocationDescriptor } from 'history';
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
@@ -100,7 +100,7 @@ interface BookingState {
 
 const BookingContext = createContext({} as BookingState);
 
-const BookingProvider: FC = (props) => {
+const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
 	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);

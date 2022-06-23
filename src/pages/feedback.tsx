@@ -53,7 +53,7 @@ const Feedback: FC = () => {
 						)}
 						<p className="mb-4">
 							If you are in immediate crisis,{' '}
-							<span className="text-primary text-decoration-underline cursor-pointer" tabIndex={0} onClick={openInCrisisModal}>
+							<span className="text-primary text-decoration-underline cursor-pointer" tabIndex={0} onClick={() => openInCrisisModal()}>
 								please contact these resources.
 							</span>
 						</p>

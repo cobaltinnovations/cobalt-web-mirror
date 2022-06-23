@@ -1,4 +1,4 @@
-import React, { FC, useRef } from 'react';
+import React, { FC, PropsWithChildren, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import Color from 'color';
 import classNames from 'classnames';
@@ -43,7 +43,7 @@ const useFileInputButtonStyles = createUseStyles({
 	},
 });
 
-interface FileInputButtonProps {
+interface FileInputButtonProps extends PropsWithChildren {
 	accept: string;
 	onChange(file: File): void;
 	className?: string;

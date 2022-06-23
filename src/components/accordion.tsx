@@ -1,4 +1,4 @@
-import React, {FC, useEffect} from 'react';
+import React, {FC, PropsWithChildren, useEffect} from 'react';
 import {Collapse} from 'react-bootstrap';
 import {createUseStyles} from 'react-jss';
 
@@ -26,7 +26,7 @@ const useAccordionStyles = createUseStyles({
 	}),
 });
 
-interface AccordionProps {
+interface AccordionProps extends PropsWithChildren {
 	title: string;
 	open: boolean;
 

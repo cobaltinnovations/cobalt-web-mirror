@@ -75,8 +75,8 @@ const WeeklyAssessment: FC = () => {
 	}, [account]);
 
 	const navigateForwards = useCallback(
-		(submissionResponse) => {
-			if (submissionResponse.assessment) {
+		(submissionResponse: Awaited<ReturnType<typeof submitAnswer>>) => {
+			if (submissionResponse?.assessment) {
 				history.push(
 					`/weekly-assessment?questionId=${submissionResponse.assessment.question.questionId}&sessionId=${submissionResponse.assessment.sessionId}`
 				);

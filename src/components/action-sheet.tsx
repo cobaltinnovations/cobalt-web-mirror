@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
@@ -89,7 +89,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface ActionSheetProps {
+interface ActionSheetProps extends PropsWithChildren {
 	show: boolean;
 	onShow(): void;
 	onHide(): void;

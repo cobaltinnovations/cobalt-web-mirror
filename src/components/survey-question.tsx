@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, PropsWithChildren, useRef, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import moment from 'moment';
 
@@ -7,12 +7,12 @@ import DatePicker from '@/components/date-picker';
 
 import { AssessmentQuestion, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 
-interface SurveyQuestion {
+interface SurveyQuestionProps extends PropsWithChildren {
 	question: AssessmentQuestion;
 	onChange(questionId: string, answerIds: SelectedQuestionAnswer[]): void;
 }
 
-const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) => {
+const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children }) => {
 	const checkboxRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
 	const radioRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
 	const [answersTextValues, setAnswersTextValues] = useState(

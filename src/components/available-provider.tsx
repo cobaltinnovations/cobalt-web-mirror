@@ -1,4 +1,4 @@
-import React, { FC, forwardRef } from 'react';
+import React, { FC, forwardRef, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import { Button } from 'react-bootstrap';
@@ -42,7 +42,7 @@ const useAvailableProviderStyles = createUseStyles({
 	},
 });
 
-interface AvailableProviderProps {
+interface AvailableProviderProps extends PropsWithChildren {
 	ref?: React.ForwardedRef<HTMLDivElement>;
 	provider: Provider;
 	onTimeSlotClick: (timeSlot: AvailabilityTimeSlot) => void;

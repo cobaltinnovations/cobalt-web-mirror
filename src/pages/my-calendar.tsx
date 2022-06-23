@@ -1,7 +1,6 @@
 import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObject, useLayoutEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { useQueryClient } from 'react-query';
 
 import useQuery from '@/hooks/use-query';
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -33,7 +32,6 @@ const MyCalendar: FC = () => {
 	const [pendingCancellation, setPendingCancellation] = useState<PendingCancellationModel | undefined>(undefined);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
 	const [calendarEventGroups, setCalendarEventGroups] = useState<CalendarEventGroupsModel[]>([]);
-	const queryClient = useQueryClient();
 
 	const eventRefs = useMemo(
 		() =>
@@ -134,7 +132,7 @@ const MyCalendar: FC = () => {
 					} catch (error) {
 						handleError(error);
 					}
-					await queryClient.invalidateQueries();
+
 					setIsCancelling(false);
 				}}
 			/>
