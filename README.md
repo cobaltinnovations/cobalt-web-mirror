@@ -102,23 +102,3 @@ All local development environment variables must start with `REACT_APP_`. This p
 
 In production, the variables are controlled by the node.js server run-time and this file is irrelevant.
 
-## Internationalization (i18n)
-
-We are using the internationalization library `i18next`, and it's react extension, `react-i18next`
-
-Usage: 1. add text strings to the files in `./src/assets/i18n/` 2. in the component: import the useTranslation Hook, then use the `t` method to translate the strings from the translation library.
-
-    ```
-    import { useTranslation } from 'react-i18next';
-
-    const exampleComponent = () => {
-        const { t, i18n } = useTranslation();
-        return (
-            <span>
-                {t('examplePage.spanText')}
-            </span>
-        )
-    };
-    ```
-
-
