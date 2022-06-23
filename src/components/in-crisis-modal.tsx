@@ -3,9 +3,6 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import useAccount from '@/hooks/use-account';
-import { useTranslation } from 'react-i18next';
-import useSubdomain from '@/hooks/use-subdomain';
-import ContactLCSW from '@/pages/pic/contact-lcsw/contact-lcsw';
 
 const useInCrisisModalStyles = createUseStyles({
 	inCrisisModal: {
@@ -21,77 +18,60 @@ interface InCrisisModalProps extends ModalProps {
 
 const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 	const classes = useInCrisisModalStyles();
-	const { institution, subdomainInstitution } = useAccount();
-	const { t } = useTranslation();
-	const subdomain = useSubdomain();
-
-	// Get the current date + time:
-	const today = new Date();
-	const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-	const START_TIME = '08:00:00';
-	const END_TIME = '17:30:00';
-	const isTooEarly: boolean = time < START_TIME;
-	const isTooLate: boolean = time > END_TIME;
-
-	const modalContent =
-		subdomain === 'pic' ? (
-			<ContactLCSW hideHeader={true} />
-		) : (
-			<div className="mb-5">
-				<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:911">
-					<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-					<div className={'d-flex flex-column font-size-s ml-2'}>
-						<span className={'text-primary mb-2'}>{t('inCrisisResources.call911Prompt')}</span>
-						<span className={'font-weight-regular'}>{t('inCrisisResources.call911Subtext')}</span>
-					</div>
-				</Button>
-				<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:8007238255">
-					<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-					<div className={'d-flex flex-column font-size-s ml-2'}>
-						<span className={'text-primary mb-2'}>{t('inCrisisResources.callSuicideHotline')}</span>
-						<span className={'font-weight-regular'}>
-							{t('inCrisisResources.callSuicideHotlineSubtext')}
-						</span>
-					</div>
-				</Button>
-				<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:741741">
-					<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-					<div className={'d-flex flex-column font-size-s ml-2'}>
-						<span className={'text-primary mb-2'}>{t('inCrisisResources.textLine')}</span>
-						<span className={'font-weight-regular'}>{t('inCrisisResources.textLineSubtext')}</span>
-					</div>
-				</Button>
-				{subdomainInstitution?.institutionId === 'COBALT' && (
-					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:2158295433">
-						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-						<div className={'d-flex flex-column font-size-s ml-2'}>
-							<span className={'text-primary mb-2'}>
-								{t('inCrisisResources.callCobaltCrisisResponseCenter')}
-							</span>
-							<span className={'font-weight-regular'}>
-								{t('inCrisisResources.callCobaltCrisisResponseCenterSubtext')}
-							</span>
-						</div>
-					</Button>
-				)}
-				<div
-					className={'text-center font-weight-bold'}
-					style={{ margin: '0 auto', marginTop: '1.5em', width: '80%' }}
-				>
-					{t('inCrisisResources.orOption')}
-				</div>
-			</div>
-		);
+	const { subdomainInstitution } = useAccount();
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.inCrisisModal} centered>
 			<Modal.Header closeButton className={'bg-primary text-white text-center'}>
-				<h3 className="mb-0">{t('inCrisisResources.title')}</h3>
+				<h3 className="mb-0">If you are in crisis</h3>
 				<p className={'mb-2 text-white p-2'}></p>
 			</Modal.Header>
 			<Modal.Body>
-				{isCall && <p className="mb-5">{t('phoneModal.clinicianToCall')}</p>}
-				{modalContent}
+				{isCall && (
+					<p className="mb-5">
+						We want to check in with you to make sure you are safe. A clinician will call you within one
+						business day to talk about how they can help. Please don’t hesitate to use the crisis resources
+						listed below, which are available 24/7.
+					</p>
+				)}
+				<div className="mb-5">
+					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:911">
+						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
+						<div className={'d-flex flex-column font-size-s ml-2'}>
+							<span className={'text-primary mb-2'}>Call 911</span>
+							<span className={'font-weight-regular'}>24/7 emergency</span>
+						</div>
+					</Button>
+					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:8007238255">
+						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
+						<div className={'d-flex flex-column font-size-s ml-2'}>
+							<span className={'text-primary mb-2'}>Call 800-273-8255</span>
+							<span className={'font-weight-regular'}>24/7 National suicide prevention line</span>
+						</div>
+					</Button>
+					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:741741">
+						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
+						<div className={'d-flex flex-column font-size-s ml-2'}>
+							<span className={'text-primary mb-2'}>Text 741 741</span>
+							<span className={'font-weight-regular'}>24/7 Crisis Text Line</span>
+						</div>
+					</Button>
+					{subdomainInstitution?.institutionId === 'COBALT' && (
+						<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:2158295433">
+							<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
+							<div className={'d-flex flex-column font-size-s ml-2'}>
+								<span className={'text-primary mb-2'}>Call 215-555-1111</span>
+								<span className={'font-weight-regular'}>24/7 Cobalt Crisis Response Center</span>
+							</div>
+						</Button>
+					)}
+					<div
+						className={'text-center font-weight-bold'}
+						style={{ margin: '0 auto', marginTop: '1.5em', width: '80%' }}
+					>
+						or go to your nearest emergency department or crisis center
+					</div>
+				</div>
 			</Modal.Body>
 			<Modal.Footer>
 				<Button
@@ -101,7 +81,7 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 					onClick={modalProps.onHide}
 					style={{ margin: '0 auto' }}
 				>
-					{t('phoneModal.dismiss')}
+					dismiss
 				</Button>
 			</Modal.Footer>
 		</Modal>

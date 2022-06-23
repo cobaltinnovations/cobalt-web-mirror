@@ -17,7 +17,6 @@ import {
 	FollowupModel,
 	Specialty,
 } from '@/lib/models';
-import { getSubdomain } from '@/hooks/use-subdomain';
 import { OrchestratedRequest } from '@/lib/http-client';
 
 export interface FindOptionsResponse {
@@ -176,14 +175,6 @@ export const providerService = {
 	},
 
 	findProviders(filters: FindFilters): OrchestratedRequest<FindProvidersResponse> {
-		const subdomain = getSubdomain();
-
-		if (!filters.systemAffinityId) {
-			if (subdomain === 'pic') {
-				filters.systemAffinityId = 'PIC';
-			}
-		}
-
 		return httpSingleton.orchestrateRequest<FindProvidersResponse>({
 			method: 'post',
 			url: '/providers/find',

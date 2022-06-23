@@ -8,7 +8,6 @@ import Color from 'color';
 
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import useSubdomain from '@/hooks/use-subdomain';
 
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
@@ -173,7 +172,7 @@ interface MenuProps {
 }
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
-	const { account, institution, institutionCapabilities, setAccount, isMhic, signOutAndClearContext } = useAccount();
+	const { account, institution, institutionCapabilities, setAccount, signOutAndClearContext } = useAccount();
 	const classes = useMenuStyles();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [personalMenuIsOpen, setPersonalMenuIsOpen] = useState(true);
@@ -285,7 +284,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 							well-being resources
 						</Link>
 					</li>
-					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
+					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId && (
 						<li>
 							<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
 								Provider Profile
@@ -366,91 +365,6 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 		</>
 	);
 
-	const picOptions = () => (
-		<ul className={classes.menuList}>
-			<li>
-				<Link to="/pic/home" onClick={handleLinkClick}>
-					Home
-				</Link>
-			</li>
-			{/*  TODO: remove scheduling link from menu for now */}
-			{/* <li>
-				<Link to="/pic/schedule" onClick={handleLinkClick}>
-					Schedule an appointment
-				</Link>
-			</li> */}
-			<li>
-				{/* TODO update with link to pic resources when that's done */}
-				<Link to="/well-being-resources" onClick={handleLinkClick}>
-					Resources for you
-				</Link>
-			</li>
-			<li>
-				<Link to="/pic/contact-lcsw" onClick={handleLinkClick}>
-					If you are in crisis
-				</Link>
-			</li>
-			<li>
-				<Link to="/my-calendar" onClick={handleLinkClick}>
-					My calendar
-				</Link>
-			</li>
-
-			{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
-				<li>
-					<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
-						Provider Profile
-					</Link>
-				</li>
-			)}
-
-			<li>
-				<Link to="/privacy" onClick={handleLinkClick}>
-					Privacy
-				</Link>
-			</li>
-			<li>
-				<Link to="/patient-sign-in" onClick={handleSignOutLinkClick}>
-					Sign out
-				</Link>
-			</li>
-		</ul>
-	);
-
-	const mhicOptions = () => (
-		<ul className={classes.menuList}>
-			<li>
-				<Link to="/pic/mhic" onClick={handleLinkClick}>
-					Panel Manager
-				</Link>
-			</li>
-			<li>
-				<Link to="/pic/calendar" onClick={handleLinkClick}>
-					My Calendar
-				</Link>
-			</li>
-
-			{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
-				<li>
-					<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
-						Provider Profile
-					</Link>
-				</li>
-			)}
-
-			<li>
-				<Link to="/patient-sign-in" onClick={handleSignOutLinkClick}>
-					Sign out
-				</Link>
-			</li>
-		</ul>
-	);
-
-	const subdomain = useSubdomain();
-	const hamburgerOptions = () => {
-		return subdomain === 'pic' ? (isMhic ? mhicOptions() : picOptions()) : cobaltOptions();
-	};
-
 	return (
 		<>
 			<CSSTransition in={open} timeout={200} classNames="menu-animation" unmountOnExit={true}>
@@ -462,19 +376,18 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 								<h5 className="mb-0">{account?.displayName}</h5>
 							</div>
 						</div>
-						{hamburgerOptions()}
+						{cobaltOptions()}
 					</div>
 					<div className={classes.menuFooter}>
-						{subdomain !== 'pic' && (
-							<div>
-								<small>
-									<Link to="/feedback" onClick={handleLinkClick}>
-										Submit Feedback
-									</Link>
-								</small>
-								<small>&copy; {new Date().getFullYear()} Cobalt Platform</small>
-							</div>
-						)}
+						<div>
+							<small>
+								<Link to="/feedback" onClick={handleLinkClick}>
+									Submit Feedback
+								</Link>
+							</small>
+							<small>&copy; {new Date().getFullYear()} Cobalt Platform</small>
+						</div>
+
 						<HipaaLogo className={classes.hipaaLogo} />
 					</div>
 				</div>

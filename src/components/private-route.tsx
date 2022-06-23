@@ -5,16 +5,13 @@ import Cookies from 'js-cookie';
 import useAccount from '@/hooks/use-account';
 import Loader from '@/components/loader';
 import NoMatch from '@/pages/no-match';
-import useSubdomain from '@/hooks/use-subdomain';
 
 const blockingPaths: string[] = ['/intro-assessment'];
 
 const PrivateRoute: FC<RouteProps & { enabled?: boolean; unauthRedirect?: string }> = ({ children, enabled = true, unauthRedirect, ...routeProps }) => {
 	const location = useLocation();
 	const { initialized, account } = useAccount();
-	const subdomain = useSubdomain();
-
-	const notAuthRedirectPath = unauthRedirect || (subdomain === 'pic' ? '/patient-sign-in' : '/sign-in');
+	const notAuthRedirectPath = unauthRedirect || '/sign-in';
 
 	const privateChildren = useMemo(() => {
 		if (!initialized) {

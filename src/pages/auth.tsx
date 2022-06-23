@@ -9,7 +9,6 @@ import useQuery from '@/hooks/use-query';
 import Loader from '@/components/loader';
 
 import { accountService } from '@/lib/services';
-import { isPicMhicAccount } from './pic/utils';
 
 type DecodedAccessToken = {
 	sub: string;
@@ -30,13 +29,11 @@ const Auth: FC = () => {
 			return history.replace(authRedirectUrl);
 		}
 
-		const defaultRedirectUrl = account && isPicMhicAccount(account) ? '/pic/mhic' : '/';
-
-		return history.replace(defaultRedirectUrl);
-	}, [history, account]);
+		return history.replace('/');
+	}, [history]);
 
 	const fetchAccount = useCallback(
-		async (accountId) => {
+		async (accountId: string) => {
 			try {
 				const response = await accountService.account(accountId).fetch();
 				setAccount(response.account);

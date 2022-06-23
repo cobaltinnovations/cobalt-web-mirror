@@ -7,7 +7,6 @@ import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import useQuery from '@/hooks/use-query';
 import Header from '@/components/header';
-import { isPicPatientAccount, isPicMhicAccount } from '@/pages/pic/utils';
 import {
 	ProviderManagementBasics,
 	ProviderManagementBluejeansConnection,
@@ -63,13 +62,6 @@ const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
 const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
 const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
 const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
-const PatientSignIn = React.lazy(() => import('@/pages/pic/patient-sign-in/patient-sign-in'));
-const PICHome = React.lazy(() => import('@/pages/pic/home/home'));
-const AssessmentWrapper = React.lazy(() => import('@/pages/pic/assessment/assessment-wrapper'));
-const DashboardWrapper = React.lazy(() => import('@/pages/pic/mhic-dashboard/dashboard-wrapper'));
-const PicProviderSearch = React.lazy(() => import('@/pages/pic/provider-search'));
-const PicProviderCalendar = React.lazy(() => import('@/pages/pic/provider-calendar'));
-const ContactLCSW = React.lazy(() => import('@/pages/pic/contact-lcsw/contact-lcsw'));
 const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
 const Interaction = React.lazy(() => import('@/pages/interaction'));
 const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
@@ -93,10 +85,6 @@ export interface RouteConfig {
 
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
-const isVanillaSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomain !== 'pic';
-const isPicSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomain === 'pic';
-const isPicPatientRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicPatientAccount(account);
-const isPicMhicRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicMhicAccount(account);
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 
 const RedirectToSupport = () => {
@@ -143,7 +131,6 @@ export const Routes = [
 		path: '/onboarding',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header showHeaderButtons={false} />,
 		main: Onboarding,
 	},
@@ -151,7 +138,6 @@ export const Routes = [
 		path: '/sign-up',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header showHeaderButtons={false} />,
 		main: SignUp,
 	},
@@ -159,7 +145,6 @@ export const Routes = [
 		path: '/sign-up-verify',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header showHeaderButtons={false} />,
 		main: SignUpVerify,
 	},
@@ -167,7 +152,6 @@ export const Routes = [
 		path: '/accounts/claim-invite/:accountInviteId',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header showHeaderButtons={false} />,
 		main: SignUpClaim,
 	},
@@ -175,14 +159,12 @@ export const Routes = [
 		path: '/sign-in',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		main: SignIn,
 	},
 	{
 		path: '/sign-in-sso',
 		exact: true,
 		private: false,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header showHeaderButtons={false} />,
 		main: SignInSSO,
 	},
@@ -231,7 +213,6 @@ export const Routes = [
 		path: '/in-the-studio',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudio,
 	},
@@ -239,7 +220,6 @@ export const Routes = [
 		path: '/in-the-studio-thanks',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudioThanks,
 	},
@@ -247,7 +227,6 @@ export const Routes = [
 		path: '/in-the-studio/:groupEventId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudioDetail,
 	},
@@ -255,7 +234,6 @@ export const Routes = [
 		path: '/in-the-studio/external/:externalGroupEventTypeId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudioExternalDetail,
 	},
@@ -263,7 +241,6 @@ export const Routes = [
 		path: '/in-the-studio/group-session-scheduled/:groupSessionId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudioGroupSessionScheduled,
 	},
@@ -271,7 +248,6 @@ export const Routes = [
 		path: '/in-the-studio/group-session-by-request/:groupSessionRequestId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: InTheStudioGroupSessionByRequest,
 	},
@@ -279,7 +255,6 @@ export const Routes = [
 		path: '/on-your-time',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: OnYourTime,
 	},
@@ -287,7 +262,6 @@ export const Routes = [
 		path: '/on-your-time-thanks',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: OnYourTimeThanks,
 	},
@@ -295,7 +269,6 @@ export const Routes = [
 		path: '/thank-you',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: SessionRequestThankYou,
 	},
@@ -303,7 +276,6 @@ export const Routes = [
 		path: '/on-your-time/:contentId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: OnYourTimeDetail,
 	},
@@ -311,7 +283,6 @@ export const Routes = [
 		path: '/covid-19-resources',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: Covid19Resources,
 	},
@@ -333,7 +304,6 @@ export const Routes = [
 		path: '/immediate-support/:supportRoleId',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: RedirectToSupport,
 	},
@@ -341,8 +311,8 @@ export const Routes = [
 		path: '/weekly-assessment',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) =>
+			isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: WeeklyAssessment,
 	},
@@ -358,8 +328,8 @@ export const Routes = [
 		path: '/one-on-one-resources',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) =>
+			isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: OneOnOneResources,
 	},
@@ -367,8 +337,8 @@ export const Routes = [
 		path: '/connect-with-support',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) =>
+			isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: ConnectWithSupport,
 	},
@@ -376,8 +346,8 @@ export const Routes = [
 		path: '/ehr-lookup',
 		exact: true,
 		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
+		checkEnabled: (guardProps: RouteGuardProps) =>
+			isInstitutionSupportEnabledRouteGuard(guardProps),
 		header: (): ReactElement => <Header />,
 		main: EhrLookup,
 	},
@@ -413,7 +383,6 @@ export const Routes = [
 		path: '/account-sessions/:accountSessionId/text',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: AccountSessionDetails,
 	},
@@ -421,7 +390,6 @@ export const Routes = [
 		path: '/account-sessions/:accountSessionId/text',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: AccountSessionDetails,
 	},
@@ -429,7 +397,6 @@ export const Routes = [
 		path: '/group-sessions/scheduled',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsScheduled,
 	},
@@ -437,7 +404,6 @@ export const Routes = [
 		path: '/group-sessions/scheduled/create',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsScheduledCreate,
 	},
@@ -445,7 +411,6 @@ export const Routes = [
 		path: '/group-sessions/scheduled/:groupSessionId/edit',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsScheduledCreate,
 	},
@@ -453,7 +418,6 @@ export const Routes = [
 		path: '/group-sessions/scheduled/:groupSessionId/view',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsScheduledCreate,
 	},
@@ -461,7 +425,6 @@ export const Routes = [
 		path: '/group-sessions/by-request',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsByRequest,
 	},
@@ -469,7 +432,6 @@ export const Routes = [
 		path: '/group-sessions/by-request/create',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsByRequestCreate,
 	},
@@ -477,7 +439,6 @@ export const Routes = [
 		path: '/group-sessions/by-request/:groupSessionId/edit',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: GroupSessionsByRequestCreate,
 	},
@@ -485,7 +446,6 @@ export const Routes = [
 		path: '/group-session-reservations/:groupSessionReservationId/ical',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: RedirectToBackend,
 	},
@@ -493,7 +453,6 @@ export const Routes = [
 		path: '/group-session-reservations/:groupSessionReservationId/google-calendar',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: RedirectToBackend,
 	},
@@ -515,7 +474,6 @@ export const Routes = [
 		path: '/cms/on-your-time',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: CmsOnYourTime,
 	},
@@ -523,7 +481,6 @@ export const Routes = [
 		path: '/cms/on-your-time/create',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: CreateOnYourTimeContent,
 	},
@@ -531,7 +488,6 @@ export const Routes = [
 		path: '/cms/available-content',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: CmsAvailableContent,
 	},
@@ -539,78 +495,8 @@ export const Routes = [
 		path: '/stats-dashboard',
 		exact: true,
 		private: true,
-		checkEnabled: isVanillaSubdomain,
 		header: (): ReactElement => <Header />,
 		main: StatsDashboard,
-	},
-	{
-		path: '/patient-sign-in',
-		exact: true,
-		private: false,
-		checkEnabled: isPicSubdomain,
-		main: PatientSignIn,
-	},
-	{
-		path: '/pic/home',
-		exact: true,
-		private: true,
-		unauthRedirect: '/patient-sign-in',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: PICHome,
-	},
-	{
-		path: '/pic/assessment',
-		exact: false,
-		private: true,
-		unauthRedirect: '/patient-sign-in',
-		checkEnabled: (guardProps: RouteGuardProps): boolean => {
-			return (
-				(isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps)) || isPicMhicRouteGuard(guardProps)
-			);
-		},
-		header: (): ReactElement => <Header />,
-		main: AssessmentWrapper,
-	},
-	{
-		path: '/pic/mhic',
-		exact: false,
-		private: true,
-		unauthRedirect: '/sign-in-email',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicMhicRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: DashboardWrapper,
-	},
-	{
-		path: '/pic/contact-lcsw',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: ContactLCSW,
-	},
-	{
-		path: '/pic/provider-search',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		unauthRedirect: '/patient-sign-in',
-		header: (): ReactElement => <Header />,
-		main: PicProviderSearch,
-	},
-	{
-		path: '/pic/calendar',
-		exact: true,
-		private: true,
-		unauthRedirect: '/sign-in-email',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicMhicRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: PicProviderCalendar,
 	},
 	{
 		path: '/providers/:providerId',

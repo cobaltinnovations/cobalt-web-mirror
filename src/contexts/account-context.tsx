@@ -1,4 +1,4 @@
-import React, { FC, createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { FC, createContext, useState, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
 import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
@@ -9,24 +9,7 @@ import { accountService, institutionService } from '@/lib/services';
 import useQuery from '@/hooks/use-query';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import useHandleError from '@/hooks/use-handle-error';
-import { useGetPicPatient } from '@/hooks/pic-hooks';
-import { PatientObject } from '@/pages/pic/utils';
 import useSubdomain from '@/hooks/use-subdomain';
-import { isPicPatientAccount, isPicMhicAccount } from '@/pages/pic/utils';
-
-const PicPatientAuthCtx = ({ onPatientChange, onUnauthorized }: { onPatientChange: (data: PatientObject) => void; onUnauthorized: () => void }) => {
-	const location = useLocation();
-
-	useGetPicPatient(onPatientChange, (error) => {
-		if (error.response?.status === 401) {
-			onUnauthorized();
-			const authRedirectUrl = location.pathname + (location.search || '');
-			Cookies.set('authRedirectUrl', authRedirectUrl);
-		}
-	});
-
-	return null;
-};
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
@@ -38,23 +21,19 @@ type AccountContextConfig = {
 	accountSources: AccountSource[] | undefined;
 	subdomainInstitution: Institution | undefined;
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
-	isMhic: boolean;
-	picPatient: PatientObject | undefined;
 	signOutAndClearContext: () => void;
 	isTrackedSession: boolean;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
 
-const AccountProvider: FC = (props) => {
+const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const handleError = useHandleError();
 	const [initialized, setInitialized] = useState(false);
 	const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 	const [institution, setInstitution] = useState<Institution | undefined>(undefined);
 	const [accountSources, setAccountSources] = useState<AccountSource[] | undefined>(undefined);
 	const [subdomainInstitution, setSubdomainInstitution] = useState<Institution | undefined>(undefined);
-	const [isMhic, setIsMhic] = useState(false);
-	const [picPatient, setPicPatient] = useState<PatientObject | undefined>(undefined);
 	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
 
 	const query = useQuery();
@@ -80,22 +59,11 @@ const AccountProvider: FC = (props) => {
 		setIsTrackedSession(false);
 
 		let signInPath = '/sign-in';
-		const hostname = window.location.hostname.toLowerCase();
-
-		if (hostname.indexOf('pic.') === 0) {
-			if (isMhic) {
-				const redirectUrl = hostname.indexOf('pic.dev.') === 0 ? 'https://pic.dev.cobaltinnovations.org/sign-in-email' : 'https://pic.cobaltinnovations.org/sign-in-email';
-				window.location.href = redirectUrl;
-				return;
-			}
-
-			signInPath = '/patient-sign-in';
-		}
 
 		history.push(signInPath);
 		setAccount(undefined);
 		setInstitution(undefined);
-	}, [history, isMhic]);
+	}, [history]);
 
 	// Fetch account if we have accessToken cookie
 	useEffect(() => {
@@ -164,8 +132,7 @@ const AccountProvider: FC = (props) => {
 					setAccount(response.account);
 					setInstitution(response.institution);
 
-					setInitialized(!isPicPatientAccount(response.account));
-					setIsMhic(isPicMhicAccount(response.account));
+					setInitialized(true);
 				})
 				.catch((e) => {
 					// Unable to initialize/fetch account
@@ -208,23 +175,12 @@ const AccountProvider: FC = (props) => {
 		accountSources,
 		subdomainInstitution,
 		institutionCapabilities,
-		isMhic,
-		picPatient,
 		signOutAndClearContext,
 		isTrackedSession,
 	};
 
 	return (
 		<AccountContext.Provider value={value}>
-			{subdomain === 'pic' && account && isPicPatientAccount(account) && (
-				<PicPatientAuthCtx
-					onPatientChange={(patient) => {
-						setPicPatient(patient);
-						setInitialized(true);
-					}}
-					onUnauthorized={signOutAndClearContext}
-				/>
-			)}
 			{props.children}
 		</AccountContext.Provider>
 	);
