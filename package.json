@@ -42,7 +42,6 @@
 		"react-router-dom": "^5.2.0",
 		"react-scripts": "5.0.1",
 		"react-transition-group": "^4.4.1",
-		"serialize-javascript": "^5.0.1",
 		"uuid": "^8.3.1",
 		"yn": "^4.0.0",
 		"yup": "^0.32.9"

@@ -1,6 +1,5 @@
 import React, { FC, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
-import { ThemeProvider as BootstrapThemeProvider } from 'react-bootstrap';
 
 import config from '@/lib/config';
 import useAccount from '@/hooks/use-account';
@@ -17,7 +16,6 @@ import Loader from '@/components/loader';
 
 import { Routes } from '@/routes';
 
-import prefixes from '@/jss/bootstrap-theme/_prefixes';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
 
@@ -33,6 +31,7 @@ import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
 import useUrlViewTracking from './hooks/use-url-view-tracking';
 import 'react-datepicker/dist/react-datepicker.css';
+import { CobaltThemeProvider } from './jss/theme';
 
 const AppWithProviders: FC = () => {
 	useGoogleAnalytics();
@@ -131,9 +130,9 @@ const ThemedApp: FC = () => {
 const App: FC = () => {
 	return (
 		<Router>
-			<BootstrapThemeProvider prefixes={prefixes}>
+			<CobaltThemeProvider>
 				<ThemedApp />
-			</BootstrapThemeProvider>
+			</CobaltThemeProvider>
 		</Router>
 	);
 };

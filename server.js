@@ -3,13 +3,16 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const serialize = require('serialize-javascript');
 const yn = require('yn');
 
 const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
 
-function configureReactApp(indexFilePath) {
+const BUILD_DIR = path.resolve(__dirname, 'build');
+const THEME_CONFIG_DIR = path.join(__dirname, 'src', 'jss', 'theme', 'config');
+const INDEX_FILE_PATH = path.join(BUILD_DIR, 'index.html');
+
+function configureReactApp() {
 	const fe_envVars = [
 		'COBALT_WEB_API_BASE_URL',
 		'COBALT_WEB_GA_TRACKING_ID',
@@ -28,22 +31,46 @@ function configureReactApp(indexFilePath) {
 			return env;
 		}, {});
 
-	const serializedConfig = serialize(reactAppConfig);
-
-	const indexFile = fs.readFileSync(indexFilePath, 'utf8');
+	const indexFile = fs.readFileSync(INDEX_FILE_PATH, 'utf8');
 	const $ = cheerio.load(indexFile);
-	const configScript = $('script#react-app-env-config');
+	const appConfigScript = $('script#react-app-env-config');
 
-	if (configScript.length > 0) {
-		configScript.text(serializedConfig);
-	} else {
-		$('head').append(`<script id="react-app-env-config" type="application/json">${serializedConfig}</script>`);
+	// clear config from previous start, if any
+	if (appConfigScript.length > 0) {
+		appConfigScript.remove();
 	}
 
-	fs.writeFileSync(indexFilePath, $.html());
+	$('head').append(
+		`<script id="react-app-env-config" type="application/json">${JSON.stringify(reactAppConfig)}</script>`
+	);
+
+	const themes = fs.readdirSync(THEME_CONFIG_DIR);
+	for (let themeName of themes) {
+		themeName = themeName.replace('.js', '');
+
+		const themeConfigScript = $('script#react-app-theme-config');
+		// clear theme config, if any
+		if (themeConfigScript.length > 0) {
+			themeConfigScript.remove();
+		}
+
+		const themeConfig = require(path.join(THEME_CONFIG_DIR, themeName));
+
+		$('head').append(
+			`<script id="react-app-theme-config" type="application/json">${JSON.stringify(themeConfig)}</script>`
+		);
+
+		// write the default/main theme to index.html
+		if (themeName === 'cobalt') {
+			fs.writeFileSync(INDEX_FILE_PATH, $.html());
+		} else {
+			// else write configured index.html as hidden dotfiles per theme
+			fs.writeFileSync(path.join(BUILD_DIR, `.${themeName}.index.html`), $.html());
+		}
+	}
 }
 
-configureReactApp(path.resolve(__dirname, 'build', 'index.html'));
+configureReactApp();
 
 const app = express();
 
@@ -123,14 +150,24 @@ if (basicAuthEnabled) {
 /* Serve SPA */
 /* ----------------------------------------- */
 
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(BUILD_DIR));
 
 app.get('/news/:pdfName', (_req, res) => {
 	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
 });
 
 app.get('*', (_req, res) => {
-	res.sendFile(path.join(__dirname, 'build', 'index.html'));
+	if (_req.subdomains.length) {
+		const indexFilePath = path.join(BUILD_DIR, `.${_req.subdomains.join('.')}.index.html`);
+
+		// if a subdomain has configured custom theme
+		if (fs.existsSync(indexFilePath)) {
+			// send its index.html
+			return res.sendFile(indexFilePath, { dotfiles: 'allow' });
+		}
+	}
+
+	res.sendFile(INDEX_FILE_PATH);
 });
 
 app.listen(port, () => {
