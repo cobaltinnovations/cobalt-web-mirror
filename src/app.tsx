@@ -20,7 +20,6 @@ import { Routes } from '@/routes';
 import prefixes from '@/jss/bootstrap-theme/_prefixes';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
-import useSubdomain from '@/hooks/use-subdomain';
 
 import { AccountProvider } from '@/contexts/account-context';
 import { HeaderProvider } from '@/contexts/header-context';
@@ -42,7 +41,6 @@ const AppWithProviders: FC = () => {
 	const { account, institution } = useAccount();
 
 	const { pathname } = useLocation();
-	const subdomain = useSubdomain();
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -73,9 +71,7 @@ const AppWithProviders: FC = () => {
 			<Suspense fallback={<Loader />}>
 				<Switch>
 					{Routes.map((route, index) => {
-						const isEnabled = route.checkEnabled
-							? route.checkEnabled({ subdomain, account, institution })
-							: true;
+						const isEnabled = route.checkEnabled ? route.checkEnabled({ account, institution }) : true;
 
 						if (route.private) {
 							return (

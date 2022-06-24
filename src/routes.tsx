@@ -67,7 +67,6 @@ const Interaction = React.lazy(() => import('@/pages/interaction'));
 const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 
 interface RouteGuardProps {
-	subdomain?: string;
 	account?: AccountModel;
 	institution?: Institution;
 }
