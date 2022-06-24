@@ -9,7 +9,7 @@ import { CobaltTheme } from './theme';
 export function loadTheme(): Readonly<CobaltTheme> {
 	if (__DEV__) {
 		try {
-			return require(`./config/${getSubdomain()}`).default;
+			return require(`./config/${getSubdomain()}`);
 		} catch (e) {
 			console.warn('Running with default theme');
 
