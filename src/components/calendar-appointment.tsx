@@ -1,7 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
@@ -10,22 +9,22 @@ import BackgroundImageContainer from '@/components/background-image-container';
 
 import { AppointmentModel } from '@/lib/models/appointments';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 import { BetaFeatureId, BetaStatusId, GroupSessionModel } from '@/lib/models';
 import { BetaFeatureModal, BetaFeatureAlertModal } from './beta-features-modals';
 import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useCalendarAppointmentStyles = createUseStyles({
+const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 	calendarAppointment: {
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	informationContainer: {
 		padding: 8,
 		display: 'flex',
 		alignItems: 'center',
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	informationCopyContainer: {
 		paddingLeft: 16,
@@ -38,14 +37,14 @@ const useCalendarAppointmentStyles = createUseStyles({
 	},
 	paymentPill: {
 		...fonts.xxs,
-		color: colors.dark,
+		color: theme.colors.dark,
 		display: 'inline-block',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 		borderRadius: 20,
 		marginTop: 4,
 		padding: '2px 6px',
 	},
-});
+}));
 
 interface JoinButtonProps {
 	contactEmail?: string;

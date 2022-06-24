@@ -1,13 +1,10 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableRow, TableCell } from '@/components/table';
 import SessionStatus, { SESSION_STATUS } from '@/components/session-status';
 import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
-
-import colors from '@/jss/colors';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
@@ -16,24 +13,25 @@ import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	iconPath: {
 		'& path': {
-			fill: colors.gray600,
+			fill: theme.colors.gray600,
 		},
 	},
 	iconPolygon: {
 		'& polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.gray600,
 		},
 	},
 	iconTrash: {
 		'& path': {
-			fill: colors.danger,
+			fill: theme.colors.danger,
 		},
 	},
-});
+}));
 
 interface SessionRequestRowProps {
 	session: GroupSessionRequestModel;

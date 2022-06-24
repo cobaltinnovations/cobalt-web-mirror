@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Collapse } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 import Color from 'color';
@@ -12,15 +11,15 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as UpChevron } from '@/assets/icons/icon-chevron-up.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as HipaaLogo } from '@/assets/logos/logo-hipaa.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useMenuStyles = createUseStyles({
+const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
 		top: 0,
 		left: 0,
@@ -29,7 +28,7 @@ const useMenuStyles = createUseStyles({
 		width: '100%',
 		maxWidth: 375,
 		position: 'fixed',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 
 		display: 'flex',
 		overflowY: 'auto',
@@ -51,7 +50,7 @@ const useMenuStyles = createUseStyles({
 		height: 24,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: colors.black,
+			fill: theme.colors.black,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -72,22 +71,22 @@ const useMenuStyles = createUseStyles({
 		appearance: 'none',
 		padding: '16px 20px',
 		alignItems: 'center',
-		color: colors.gray600,
+		color: theme.colors.gray600,
 		textTransform: 'uppercase',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		borderTop: `1px solid ${colors.border}`,
+		borderTop: `1px solid ${theme.colors.border}`,
 		...fonts.xxs,
 		...fonts.karlaBold,
 		'&:hover': {
-			backgroundColor: Color(colors.border).alpha(0.24).string(),
+			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	collapseOuter: {
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	menuList: {
 		margin: 0,
@@ -104,14 +103,14 @@ const useMenuStyles = createUseStyles({
 	mainMenuList: {
 		'& li a': {
 			...fonts.s,
-			color: colors.dark,
+			color: theme.colors.dark,
 			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
 		'& li a': {
 			...fonts.xxs,
-			color: colors.gray600,
+			color: theme.colors.gray600,
 			textTransform: 'uppercase',
 		},
 	},
@@ -125,13 +124,13 @@ const useMenuStyles = createUseStyles({
 	signOutButton: {
 		display: 'block',
 		padding: '8px 0 !important',
-		color: `${colors.dark} !important`,
+		color: `${theme.colors.dark} !important`,
 		backgroundColor: 'transparent !important',
-		borderBottom: `1px solid ${colors.gray300} !important`,
+		borderBottom: `1px solid ${theme.colors.gray300} !important`,
 	},
 	hipaaLogo: {
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.primary,
 		},
 	},
 	'@global': {
@@ -164,7 +163,7 @@ const useMenuStyles = createUseStyles({
 			transition: 'opacity 200ms',
 		},
 	},
-});
+}));
 
 interface MenuProps {
 	open: boolean;

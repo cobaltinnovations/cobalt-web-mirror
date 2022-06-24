@@ -1,14 +1,13 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const transitionDuration = 200;
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	floatingActionButton: {
 		bottom: 36,
 		right: 20,
@@ -19,8 +18,8 @@ const useStyles = createUseStyles({
 		width: 54,
 		height: 54,
 		borderRadius: 27,
-		color: colors.white,
-		backgroundColor: colors.black,
+		color: theme.colors.white,
+		backgroundColor: theme.colors.black,
 		transition: `${transitionDuration}ms transform`,
 		'&:focus': {
 			outline: 'none',
@@ -87,7 +86,7 @@ const useStyles = createUseStyles({
 			transition: `opacity ${transitionDuration}ms`,
 		},
 	},
-});
+}));
 
 interface ActionSheetProps extends PropsWithChildren {
 	show: boolean;

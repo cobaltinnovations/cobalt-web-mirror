@@ -2,7 +2,6 @@ import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
@@ -16,15 +15,14 @@ import OnYourTimeItem from '@/components/on-your-time-item';
 import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
 import { GroupEvent, Content, GroupSessionModel } from '@/lib/models';
 
-import colors from '@/jss/colors';
-
 import { ReactComponent as ChevronLeft } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as ChevronRight } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useIndexStyles = createUseStyles({
+const useIndexStyles = createUseThemedStyles((theme) => ({
 	inTheStudioContainer: {
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	carouselImage: {
 		width: '100%',
@@ -32,11 +30,11 @@ const useIndexStyles = createUseStyles({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
-		backgroundColor: colors.gray300,
+		backgroundColor: theme.colors.gray300,
 	},
 	carouselCaption: {
 		padding: '10px 20px 48px',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	horizontalScrollerTileContent: {
 		padding: 16,
@@ -46,7 +44,7 @@ const useIndexStyles = createUseStyles({
 		marginRight: 10,
 		position: 'relative',
 	},
-});
+}));
 
 const Index: FC = () => {
 	useHeaderTitle(null);

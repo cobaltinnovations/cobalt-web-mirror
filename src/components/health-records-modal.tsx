@@ -1,13 +1,12 @@
 import React, { FC, useState, useEffect } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import { ReactComponent as ReceptionistIllustration } from '@/assets/illustrations/receptionist.svg';
 import { ReactComponent as DoctorIllustration } from '@/assets/illustrations/doctor-with-chart.svg';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useHealthRecordsModal = createUseStyles({
+const useHealthRecordsModal = createUseThemedStyles((theme) => ({
 	healthRecordsModal: {
 		width: '90%',
 		maxWidth: 295,
@@ -18,12 +17,12 @@ const useHealthRecordsModal = createUseStyles({
 		height: 8,
 		margin: '0 4px',
 		borderRadius: 4,
-		backgroundColor: colors.background,
+		backgroundColor: theme.colors.background,
 	},
 	pageIndicatorActive: {
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.primary,
 	},
-});
+}));
 
 interface HealthRecordsModalPageProps {
 	onNextButtonClick?(): void;

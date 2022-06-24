@@ -3,8 +3,6 @@ import { Col, Container } from 'react-bootstrap';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import BackgroundImageContainer from '@/components/background-image-container';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 import { useHistory } from 'react-router-dom';
 import { providerService } from '@/lib/services';
 import { SearchResult } from '@/contexts/booking-context';
@@ -12,12 +10,13 @@ import { Provider, Clinic } from '@/lib/models';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 import classNames from 'classnames';
 import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useSearchBarStyles = createUseStyles({
+const useSearchBarStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: colors.dark,
+		fill: theme.colors.dark,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -25,9 +24,9 @@ const useSearchBarStyles = createUseStyles({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: colors.dark,
+		fill: theme.colors.dark,
 	},
-});
+}));
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';

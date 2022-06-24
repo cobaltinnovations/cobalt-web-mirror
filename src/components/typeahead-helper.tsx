@@ -1,10 +1,9 @@
 import React, { ReactElement, useState } from 'react';
-import { createUseStyles } from 'react-jss';
 import { Typeahead, TypeaheadModel, TypeaheadProps } from 'react-bootstrap-typeahead';
 
-import colors from '@/jss/colors';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface useInputHelperStylesProps {
 	isHovered: boolean;
@@ -13,12 +12,14 @@ interface useInputHelperStylesProps {
 	hasError: boolean;
 }
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
 		position: 'relative',
 		minHeight: 56,
-		backgroundColor: colors.white,
-		border: `1px solid ${hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.border}`,
+		backgroundColor: theme.colors.white,
+		border: `1px solid ${
+			hasError ? theme.colors.danger : isHovered || isFocused ? theme.colors.primary : theme.colors.border
+		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
 		top: 18,
@@ -29,11 +30,11 @@ const useStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transformOrigin: 'left top',
-		color: hasError ? colors.danger : isFocused ? colors.primary : colors.gray600,
+		color: hasError ? theme.colors.danger : isFocused ? theme.colors.primary : theme.colors.gray600,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
 	}),
-});
+}));
 
 interface TypeaheadHelperProps<T extends TypeaheadModel> extends TypeaheadProps<T> {
 	label: string;

@@ -1,15 +1,13 @@
 import React, { FC } from 'react';
 import { ButtonGroup, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useTablePaginationStyles = createUseStyles({
+const useTablePaginationStyles = createUseThemedStyles((theme) => ({
 	active: {
-		color: `${colors.black} !important`,
+		color: `${theme.colors.black} !important`,
 	},
-});
+}));
 
 interface TablePaginationProps {
 	page: number;

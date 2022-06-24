@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -13,18 +12,18 @@ import SessionRow from '@/components/session-row';
 import { groupSessionsService } from '@/lib/services/group-sessions-service';
 import { GroupSessionModel, GROUP_SESSION_STATUS_ID, GroupSessionCountModel } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	filterIcon: {
 		marginRight: 10,
 		'& polyline, & polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.gray600,
 		},
 	},
-});
+}));
 
 const GroupSessions: FC = () => {
 	const classes = useStyles();

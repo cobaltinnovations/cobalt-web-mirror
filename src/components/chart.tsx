@@ -5,8 +5,8 @@ import Color from 'color';
 
 import { Chart as ChartModel } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { useCobaltTheme } from '@/jss/theme';
 
 interface Dataset {
 	id: string;
@@ -36,6 +36,7 @@ interface Dataset {
 }
 
 export const Chart: FC<Props> = ({ configuration }) => {
+	const { colors } = useCobaltTheme();
 	const [labels, setLabels] = useState<string[]>([]);
 	const [datasets, setDatasets] = useState<Dataset[]>([]);
 

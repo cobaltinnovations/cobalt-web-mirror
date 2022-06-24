@@ -1,19 +1,18 @@
 import React, { FC } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	card: {
 		border: 0,
 		borderRadius: 0,
-		borderTop: `20px solid ${colors.success}`,
+		borderTop: `20px solid ${theme.colors.success}`,
 	},
-});
+}));
 
 const SessionRequestThankYou: FC = () => {
 	const classes = useStyles();

@@ -1,10 +1,8 @@
-import { createUseStyles } from 'react-jss';
-
 import { button, card, form, modal, modalForm } from '@/jss/bootstrap-theme';
 import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const spacerSize = 5;
 const iterations = 40;
@@ -43,16 +41,16 @@ for (let i = 0; i <= iterations; i++) {
 	px[`.px-${i}`] = { paddingLeft: `${spacerSize * i}px !important`, paddingRight: `${spacerSize * i}px !important` };
 }
 
-export const useCustomBootstrapStyles = createUseStyles({
+export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		/* ----------------------------------------------------------- */
 		/* bsPrefix overrides */
 		/* ----------------------------------------------------------- */
-		...button,
-		...card,
-		...form,
-		...modal,
-		...modalForm,
+		...button(theme),
+		...card(theme),
+		...form(theme),
+		...modal(theme),
+		...modalForm(theme),
 
 		/* ----------------------------------------------------------- */
 		/* Generic overrides */
@@ -75,31 +73,31 @@ export const useCustomBootstrapStyles = createUseStyles({
 		},
 
 		'.text-primary': {
-			color: `${colors.primary} !important`,
+			color: `${theme.colors.primary} !important`,
 		},
 		'.text-secondary': {
-			color: `${colors.secondary} !important`,
+			color: `${theme.colors.secondary} !important`,
 		},
 		'.text-success': {
-			color: `${colors.success} !important`,
+			color: `${theme.colors.success} !important`,
 		},
 		'.text-danger': {
-			color: `${colors.danger} !important`,
+			color: `${theme.colors.danger} !important`,
 		},
 		'.text-warning': {
-			color: `${colors.warning} !important`,
+			color: `${theme.colors.warning} !important`,
 		},
 		'.text-info': {
-			color: `${colors.info} !important`,
+			color: `${theme.colors.info} !important`,
 		},
 		'.text-light': {
-			color: `${colors.light} !important`,
+			color: `${theme.colors.light} !important`,
 		},
 		'.text-dark': {
-			color: `${colors.dark} !important`,
+			color: `${theme.colors.dark} !important`,
 		},
 		'.text-gray': {
-			color: `${colors.gray600} !important`,
+			color: `${theme.colors.gray600} !important`,
 		},
 
 		'.text-decoration-underline': {
@@ -110,50 +108,50 @@ export const useCustomBootstrapStyles = createUseStyles({
 		},
 
 		'.bg-primary': {
-			backgroundColor: `${colors.primary} !important`,
+			backgroundColor: `${theme.colors.primary} !important`,
 		},
 		'.bg-secondary': {
-			backgroundColor: `${colors.secondary} !important`,
+			backgroundColor: `${theme.colors.secondary} !important`,
 		},
 		'.bg-success': {
-			backgroundColor: `${colors.success} !important`,
+			backgroundColor: `${theme.colors.success} !important`,
 		},
 		'.bg-danger': {
-			backgroundColor: `${colors.danger} !important`,
+			backgroundColor: `${theme.colors.danger} !important`,
 		},
 		'.bg-warning': {
-			backgroundColor: `${colors.warning} !important`,
+			backgroundColor: `${theme.colors.warning} !important`,
 		},
 		'.bg-info': {
-			backgroundColor: `${colors.info} !important`,
+			backgroundColor: `${theme.colors.info} !important`,
 		},
 		'.bg-light': {
-			backgroundColor: `${colors.light} !important`,
+			backgroundColor: `${theme.colors.light} !important`,
 		},
 		'.bg-dark': {
-			backgroundColor: `${colors.dark} !important`,
+			backgroundColor: `${theme.colors.dark} !important`,
 		},
 		'.bg-light-gray': {
-			backgroundColor: `${colors.gray200} !important`,
+			backgroundColor: `${theme.colors.gray200} !important`,
 		},
 
 		'.border': {
-			border: `1px solid ${colors.border} !important`,
+			border: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-top': {
-			borderTop: `1px solid ${colors.border} !important`,
+			borderTop: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-right': {
-			borderRight: `1px solid ${colors.border} !important`,
+			borderRight: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-bottom': {
-			borderBottom: `1px solid ${colors.border} !important`,
+			borderBottom: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-left': {
-			borderLeft: `1px solid ${colors.border} !important`,
+			borderLeft: `1px solid ${theme.colors.border} !important`,
 		},
 		'.selected-border-bottom': {
-			borderBottom: `3px solid ${colors.secondary} !important`,
+			borderBottom: `3px solid ${theme.colors.secondary} !important`,
 		},
 		'.no-border': {
 			border: 'none',
@@ -161,7 +159,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 
 		'.carousel-item': {
 			paddingBottom: 30,
-			backgroundColor: colors.white,
+			backgroundColor: theme.colors.white,
 		},
 		'.carousel-control-prev, .carousel-control-next': {
 			zIndex: 0,
@@ -173,7 +171,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 			'& svg': {
 				width: 16,
 				height: 16,
-				fill: colors.white,
+				fill: theme.colors.white,
 			},
 		},
 		'.carousel-indicators': {
@@ -186,9 +184,9 @@ export const useCustomBootstrapStyles = createUseStyles({
 			marginLeft: 7,
 			marginRight: 7,
 			borderRadius: '50%',
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 			'&.active': {
-				backgroundColor: colors.footer,
+				backgroundColor: theme.colors.footer,
 			},
 		},
 
@@ -275,7 +273,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
-				color: colors.dark,
+				color: theme.colors.dark,
 				lineHeight: 'normal',
 				...fonts.karlaRegular,
 
@@ -284,7 +282,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 					border: 0,
 					outline: 'none',
 					boxShadow: 'none',
-					color: colors.dark,
+					color: theme.colors.dark,
 					backgroundColor: 'transparent',
 				},
 			},
@@ -316,8 +314,8 @@ export const useCustomBootstrapStyles = createUseStyles({
 				fontSize: '1.8rem',
 				lineHeight: '2rem',
 				textShadow: 'none',
-				color: colors.background,
-				backgroundColor: colors.dark,
+				color: theme.colors.background,
+				backgroundColor: theme.colors.dark,
 			},
 			'& .close:not(:disabled):not(.disabled):focus, .close:not(:disabled):not(.disabled):hover': {
 				opacity: 0.48,
@@ -356,7 +354,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 					boxShadow: 'none',
 				},
 				'&:disabled': {
-					backgroundColor: colors.background,
+					backgroundColor: theme.colors.background,
 				},
 			},
 			'& .rbt-input-wrapper': {
@@ -368,7 +366,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 				textIndent: 0,
 				fontSize: '1.5rem',
 				lineHeight: 'auto',
-				color: colors.black,
+				color: theme.colors.black,
 				...fonts.nunitoSansRegular,
 			},
 			'& .rbt-token': {
@@ -378,14 +376,14 @@ export const useCustomBootstrapStyles = createUseStyles({
 				marginRight: 5,
 				marginBottom: 5,
 				borderRadius: 500,
-				color: colors.dark,
+				color: theme.colors.dark,
 				alignItems: 'center',
 				display: 'inline-flex',
 				padding: '0 4px 0 10px',
-				border: `1px solid ${Color(colors.gray600).alpha(0.2).string()}`,
+				border: `1px solid ${Color(theme.colors.gray600).alpha(0.2).string()}`,
 				'&:focus-visible': {
 					outline: 'none',
-					border: `1px solid ${colors.primary}`,
+					border: `1px solid ${theme.colors.primary}`,
 				},
 			},
 			'& .rbt-close': {
@@ -393,7 +391,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 				height: 18,
 				marginTop: -2,
 				display: 'flex',
-				color: colors.black,
+				color: theme.colors.black,
 				alignItems: 'center',
 				justifyContent: 'center',
 				backgroundColor: 'transparent',
@@ -403,7 +401,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 				marginTop: 1,
 				'& .dropdown-item': {
 					...fonts.xs,
-					color: colors.dark,
+					color: theme.colors.dark,
 					padding: '8px 13px',
 					...fonts.karlaRegular,
 					textDecoration: 'none',
@@ -411,7 +409,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 						backgroundColor: Color('#DBD4CF').alpha(0.2).string(),
 					},
 					'&:active': {
-						color: colors.dark,
+						color: theme.colors.dark,
 						backgroundColor: Color('#DBD4CF').alpha(0.4).string(),
 					},
 				},
@@ -422,9 +420,9 @@ export const useCustomBootstrapStyles = createUseStyles({
 				},
 				'& .rbt-menu-custom-option': {
 					fontStyle: 'italic',
-					color: colors.gray600,
+					color: theme.colors.gray600,
 					'& .rbt-highlight-text': {
-						color: colors.dark,
+						color: theme.colors.dark,
 						fontStyle: 'normal',
 					},
 				},
@@ -435,7 +433,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 			padding: 0,
 			'& label': {
 				alignItems: 'center',
-				color: colors.gray600,
+				color: theme.colors.gray600,
 				display: 'inline-flex',
 				...fonts.nunitoSansSemiBold,
 				'&:before': {
@@ -456,11 +454,11 @@ export const useCustomBootstrapStyles = createUseStyles({
 				},
 			},
 			'& .custom-control-input:checked~.custom-control-label::before': {
-				backgroundColor: colors.primary,
+				backgroundColor: theme.colors.primary,
 			},
 			'& .custom-control-input:checked~.custom-control-label::after': {
 				transform: 'translateX(24px)',
 			},
 		},
 	},
-});
+}));

@@ -5,18 +5,19 @@ import { schedulingService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
 import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
-import colors from '@/jss/colors';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useParams, useRouteMatch } from 'react-router-dom';
+import { useCobaltTheme } from '@/jss/theme';
 
 interface EditAvailabilityPanelProps {
 	onClose: (logicalAvailabilityId?: string) => void;
 }
 
 export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) => {
+	const theme = useCobaltTheme();
 	const routeMatch = useRouteMatch();
 	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId?: string }>();
 	const handleError = useHandleError();
@@ -80,7 +81,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(logicalAvailabilityId)}>
-					<ChevronLeftIcon fill={colors.primary} className="mr-1" />
+					<ChevronLeftIcon fill={theme.colors.primary} className="mr-1" />
 					back
 				</Button>
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>

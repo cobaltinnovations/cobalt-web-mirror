@@ -1,8 +1,7 @@
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
-import { createUseStyles } from 'react-jss';
+import { createUseThemedStyles } from '@/jss/theme';
 
-export const useSchedulingStyles = createUseStyles({
+export const useSchedulingStyles = createUseThemedStyles((theme) => ({
 	roundBtn: {
 		width: 36,
 		height: 36,
@@ -11,10 +10,10 @@ export const useSchedulingStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: 100,
-		border: `2px solid ${colors.primary}`,
+		border: `2px solid ${theme.colors.primary}`,
 		backgroundColor: 'transparent',
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.primary,
 		},
 	},
 	roundBtnSolid: {
@@ -24,14 +23,14 @@ export const useSchedulingStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: 100,
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.primary,
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.white,
 		},
 	},
-});
+}));
 
-export const useContainerStyles = createUseStyles({
+export const useContainerStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		display: 'flex',
 		height: 'calc(100vh - 60px)', // subtracting header + footer height
@@ -39,7 +38,7 @@ export const useContainerStyles = createUseStyles({
 	sideBar: {
 		width: 440,
 		flexShrink: 0,
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 		overflowX: 'scroll',
 	},
 	blockedTimeslot: {
@@ -47,8 +46,8 @@ export const useContainerStyles = createUseStyles({
 			-45deg,
 			transparent,
 			transparent 9px,
-			${colors.black} 10px,
-			${colors.black} 11px
+			${theme.colors.black} 10px,
+			${theme.colors.black} 11px
 		) !important;`,
 	},
 	leftCalendar: {
@@ -71,7 +70,7 @@ export const useContainerStyles = createUseStyles({
 					justifyContent: 'center',
 					backgroundColor: 'transparent',
 					'& .fc-icon': {
-						color: colors.dark,
+						color: theme.colors.dark,
 					},
 				},
 				'& button.fc-prev-button': {
@@ -81,9 +80,9 @@ export const useContainerStyles = createUseStyles({
 					...fonts.xs,
 					borderRadius: 500,
 					padding: '4px 12px',
-					color: colors.primary,
+					color: theme.colors.primary,
 					backgroundColor: 'transparent',
-					border: `1px solid ${colors.gray200}`,
+					border: `1px solid ${theme.colors.gray200}`,
 				},
 			},
 		},
@@ -94,7 +93,7 @@ export const useContainerStyles = createUseStyles({
 			border: 0,
 			'& a:not([href])': {
 				...fonts.xs,
-				color: colors.gray600,
+				color: theme.colors.gray600,
 			},
 		},
 		'& .fc .fc-daygrid-day-bg .fc-bg-event': {
@@ -114,7 +113,7 @@ export const useContainerStyles = createUseStyles({
 			'& .fc-daygrid-day-number': {
 				padding: 0,
 				marginTop: -4,
-				color: colors.dark,
+				color: theme.colors.dark,
 			},
 			'& .fc-daygrid-day-events': {
 				width: 6,
@@ -124,7 +123,7 @@ export const useContainerStyles = createUseStyles({
 				flexShrink: 0,
 				borderRadius: '50%',
 				position: 'relative',
-				border: `1px solid ${colors.gray600}`,
+				border: `1px solid ${theme.colors.gray600}`,
 				'& .fc-daygrid-event-harness': {
 					width: 6,
 					height: 6,
@@ -132,7 +131,7 @@ export const useContainerStyles = createUseStyles({
 					left: -1,
 					borderRadius: '50%',
 					position: 'relative',
-					backgroundColor: colors.primary,
+					backgroundColor: theme.colors.primary,
 					'& .fc-daygrid-event': {
 						display: 'none',
 					},
@@ -144,15 +143,15 @@ export const useContainerStyles = createUseStyles({
 			'&.fc-day-today': {
 				backgroundColor: 'transparent',
 				'& .fc-daygrid-day-frame': {
-					backgroundColor: colors.secondary,
+					backgroundColor: theme.colors.secondary,
 				},
 				'& .fc-daygrid-day-number': {
-					color: colors.white,
+					color: theme.colors.white,
 				},
 				'& .fc-daygrid-day-events': {
-					border: `1px solid ${colors.white}`,
+					border: `1px solid ${theme.colors.white}`,
 					'& .fc-daygrid-event-harness': {
-						backgroundColor: colors.white,
+						backgroundColor: theme.colors.white,
 					},
 				},
 			},
@@ -164,7 +163,7 @@ export const useContainerStyles = createUseStyles({
 		'& .fc': {
 			'& .fc-col-header-cell-cushion': {
 				...fonts.s,
-				color: colors.dark,
+				color: theme.colors.dark,
 				padding: '9px 7px',
 			},
 			'& .fc-daygrid-day-events': {
@@ -183,7 +182,7 @@ export const useContainerStyles = createUseStyles({
 			},
 			'& .fc-timegrid-divider': {
 				padding: 0,
-				borderColor: colors.dark,
+				borderColor: theme.colors.dark,
 			},
 			'& .fc-timegrid-slot': {
 				height: 48,
@@ -193,17 +192,17 @@ export const useContainerStyles = createUseStyles({
 			},
 			'& .fc-timegrid-slot-label-cushion': {
 				...fonts.xxxs,
-				color: colors.gray600,
+				color: theme.colors.gray600,
 				padding: '4px 4px 0 0',
 			},
 			'& .fc-bg-event': {
-				// backgroundColor: colors.white,
+				// backgroundColor: theme.colors.white,
 			},
 			'& .fc-timegrid-now-indicator-arrow': {
 				display: 'none',
 			},
 			'& .fc-timegrid-now-indicator-line': {
-				borderColor: colors.primary,
+				borderColor: theme.colors.primary,
 				'&:before': {
 					top: -4,
 					left: 0,
@@ -212,7 +211,7 @@ export const useContainerStyles = createUseStyles({
 					content: '""',
 					borderRadius: '50%',
 					position: 'absolute',
-					backgroundColor: colors.primary,
+					backgroundColor: theme.colors.primary,
 				},
 			},
 			'& .fc-timegrid-event': {
@@ -236,4 +235,4 @@ export const useContainerStyles = createUseStyles({
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
-});
+}));

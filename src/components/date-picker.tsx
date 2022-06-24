@@ -1,12 +1,10 @@
 import React, { FC, forwardRef } from 'react';
-import { createUseStyles } from 'react-jss';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 
-import colors from '@/jss/colors';
-
 import unfoldIcon from '@/assets/icons/icon-unfold.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useDatePickerStyles = createUseStyles({
+const useDatePickerStyles = createUseThemedStyles((theme) => ({
 	datePickerWrapper: {
 		width: '100%',
 	},
@@ -20,14 +18,14 @@ const useDatePickerStyles = createUseStyles({
 		textIndent: 0,
 		paddingLeft: 15,
 		paddingRight: 15,
-		border: `1px solid ${colors.border}`,
-		backgroundColor: colors.white,
+		border: `1px solid ${theme.colors.border}`,
+		backgroundColor: theme.colors.white,
 		textAlign: 'left',
 		'&:disabled': {
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 		},
 	},
-});
+}));
 
 interface DatePickerProps extends ReactDatePickerProps {
 	selected?: Date;

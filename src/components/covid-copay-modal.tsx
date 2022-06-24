@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useCovidCopayModalStyles = createUseStyles({
+const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 	covidCopayModal: {
 		width: '90%',
 		maxWidth: 295,
@@ -17,13 +16,13 @@ const useCovidCopayModalStyles = createUseStyles({
 			height: 295,
 			width: 295,
 			borderRadius: '50%',
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.success,
 		},
 	},
 	subTitle: {
 		...fonts.xxxs,
 	},
-});
+}));
 
 interface CovidCopayModalProps extends ModalProps {}
 

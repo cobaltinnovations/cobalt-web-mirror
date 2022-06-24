@@ -2,13 +2,12 @@ import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { createUseStyles } from 'react-jss';
 import { AppointmentType, EpicDepartment } from '@/lib/models/appointments';
 import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
 import { AvailabilityTimeSlot } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useConfirmAppointmentTypeModalStyles = createUseStyles({
+const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	confirmAppointmentTypeModal: {
 		width: '90%',
 		maxWidth: 295,
@@ -16,9 +15,9 @@ const useConfirmAppointmentTypeModalStyles = createUseStyles({
 	},
 	unavaiableSlot: {
 		...fonts.xxs,
-		color: colors.gray600,
+		color: theme.colors.gray600,
 	},
-});
+}));
 
 interface ConfirmAppointmentTypeModalProps extends ModalProps {
 	appointmentTypes: (AppointmentType & { disabled: boolean })[];

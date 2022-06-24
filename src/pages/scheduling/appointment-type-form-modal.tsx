@@ -9,11 +9,11 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import Select from '@/components/select';
+import { useCobaltTheme } from '@/jss/theme';
 
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
@@ -100,12 +100,13 @@ export const AppointmentTypeFormModal = ({
 	onDelete,
 	...modalProps
 }: AppointmentTypeFormModalProps) => {
+	const theme = useCobaltTheme();
 	const { account } = useAccount();
 	const classes = useModalStyles();
 	const handleError = useHandleError();
 
 	const [title, setTitle] = useState('');
-	const [color, setColor] = useState(colors.primary);
+	const [color, setColor] = useState(theme.colors.primary);
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
@@ -144,12 +145,12 @@ export const AppointmentTypeFormModal = ({
 
 	const handleOnExited = useCallback(() => {
 		setTitle('');
-		setColor(colors.primary);
+		setColor(theme.colors.primary);
 		setDuration('');
 		setDurationInMinutes(undefined);
 		setPatientIntakeQuestions([]);
 		setScreeningQuestions([]);
-	}, []);
+	}, [theme.colors.primary]);
 
 	const handleSaveButtonClick = useCallback(async () => {
 		try {

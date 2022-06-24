@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableCell, TableRow } from '@/components/table';
 
@@ -11,22 +10,22 @@ import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
 
 import { AdminContentActions, AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: colors.secondary,
+		fill: theme.colors.secondary,
 	},
 	centerText: {
 		textAlign: 'center',
 	},
 	row: {
-		borderLeft: `1px solid ${colors.border}`,
-		borderRight: `1px solid ${colors.border}`,
+		borderLeft: `1px solid ${theme.colors.border}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	rowButton: {
 		height: 44,
@@ -43,13 +42,13 @@ const useStyles = createUseStyles({
 		display: 'inline-block',
 
 		'&.added': {
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.success,
 		},
 		'&.available': {
-			backgroundColor: colors.secondary,
+			backgroundColor: theme.colors.secondary,
 		},
 	},
-});
+}));
 
 interface AvailableContentRowProps {
 	content: AdminContentRow;

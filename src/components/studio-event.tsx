@@ -1,16 +1,14 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import colors from '@/jss/colors';
-
 import { groupEventService, groupSessionsService } from '@/lib/services';
 import { GroupEvent, ExternalGroupEventType, GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStudioEventStyles = createUseStyles({
+const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	imageContainer: {
 		paddingBottom: '56.25%',
 	},
@@ -23,11 +21,11 @@ const useStudioEventStyles = createUseStyles({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: colors.dark,
+		color: theme.colors.dark,
 		padding: '10px 20px',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
-});
+}));
 
 export type StudioEventViewModel = (
 	| GroupEvent

@@ -1,43 +1,42 @@
 import React, { FC, PropsWithChildren, useRef } from 'react';
-import { createUseStyles } from 'react-jss';
 import Color from 'color';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useFileInputButtonStyles = createUseStyles({
+const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 	fileInputButton: {
 		margin: 0,
 		...fonts.m,
 		cursor: 'pointer',
 		borderRadius: 500,
 		overflow: 'hidden',
-		color: colors.white,
+		color: theme.colors.white,
 		padding: '10px 25px',
 		position: 'relative',
 		display: 'inline-block',
 		...fonts.nunitoSansBold,
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.primary,
 		'&:hover': {
-			backgroundColor: Color(colors.primary).lighten(0.16).hex(),
+			backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
 		},
 		'&:active': {
-			backgroundColor: Color(colors.primary).darken(0.16).hex(),
+			backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
 		},
 	},
 	disabled: {
-		color: colors.gray500,
-		backgroundColor: colors.gray200,
+		color: theme.colors.gray500,
+		backgroundColor: theme.colors.gray200,
 		'&:hover': {
-			color: colors.gray500,
-			backgroundColor: colors.gray200,
+			color: theme.colors.gray500,
+			backgroundColor: theme.colors.gray200,
 		},
 	},
 	fileInput: {
 		display: 'none',
 	},
-});
+}));
 
 interface FileInputButtonProps extends PropsWithChildren {
 	accept: string;

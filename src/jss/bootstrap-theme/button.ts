@@ -1,322 +1,324 @@
 import Color from 'color';
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { CobaltTheme } from '@/jss/theme';
 
-export const button = {
-	'.cobalt-button': {
-		border: 0,
-		...fonts.l,
-		borderRadius: 500,
-		appearance: 'none',
-		color: colors.white,
-		padding: '15px 35px',
-		textDecoration: 'none',
-		...fonts.nunitoSansBold,
-		textTransform: 'none',
-		backgroundColor: colors.primary,
-		'&:hover': {
-			color: colors.white,
+export const button = (theme: CobaltTheme) => {
+	return {
+		'.cobalt-button': {
+			border: 0,
+			...fonts.l,
+			borderRadius: 500,
+			appearance: 'none',
+			color: theme.colors.white,
+			padding: '15px 35px',
 			textDecoration: 'none',
-			backgroundColor: Color(colors.primary).lighten(0.16).hex(),
-		},
-		'&:active': {
-			backgroundColor: Color(colors.primary).darken(0.16).hex(),
-		},
-		'&:focus': {
-			outline: 'none',
-		},
-		'&:disabled': {
-			color: colors.gray500,
-			backgroundColor: colors.gray200,
+			...fonts.nunitoSansBold,
+			textTransform: 'none',
+			backgroundColor: theme.colors.primary,
 			'&:hover': {
-				color: colors.gray500,
-				backgroundColor: colors.gray200,
+				color: theme.colors.white,
+				textDecoration: 'none',
+				backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
 			},
-		},
+			'&:active': {
+				backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
+			},
+			'&:focus': {
+				outline: 'none',
+			},
+			'&:disabled': {
+				color: theme.colors.gray500,
+				backgroundColor: theme.colors.gray200,
+				'&:hover': {
+					color: theme.colors.gray500,
+					backgroundColor: theme.colors.gray200,
+				},
+			},
 
-		'&-sm': {
-			...fonts.m,
-			padding: '10px 25px',
-		},
-		'&-xsm': {
-			...fonts.m,
-			padding: '5px 7px',
-		},
+			'&-sm': {
+				...fonts.m,
+				padding: '10px 25px',
+			},
+			'&-xsm': {
+				...fonts.m,
+				padding: '5px 7px',
+			},
 
-		'& svg': {
-			fill: 'currentColor',
-			'& path': {
+			'& svg': {
 				fill: 'currentColor',
+				'& path': {
+					fill: 'currentColor',
+				},
 			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Primary variant */
-		/* ----------------------------------------------------------- */
-		'&-primary': {
-			backgroundColor: colors.primary,
-			'&:hover': {
-				backgroundColor: Color(colors.primary).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Primary variant */
+			/* ----------------------------------------------------------- */
+			'&-primary': {
+				backgroundColor: theme.colors.primary,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.primary).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Secondary variant */
-		/* ----------------------------------------------------------- */
-		'&-secondary': {
-			backgroundColor: colors.secondary,
-			'&:hover': {
-				backgroundColor: Color(colors.secondary).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Secondary variant */
+			/* ----------------------------------------------------------- */
+			'&-secondary': {
+				backgroundColor: theme.colors.secondary,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.secondary).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.secondary).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.secondary).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Success variant */
-		/* ----------------------------------------------------------- */
-		'&-success': {
-			backgroundColor: colors.success,
-			'&:hover': {
-				backgroundColor: Color(colors.success).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Success variant */
+			/* ----------------------------------------------------------- */
+			'&-success': {
+				backgroundColor: theme.colors.success,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.success).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.success).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.success).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Danger variant */
-		/* ----------------------------------------------------------- */
-		'&-danger': {
-			backgroundColor: colors.danger,
-			'&:hover': {
-				backgroundColor: Color(colors.danger).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Danger variant */
+			/* ----------------------------------------------------------- */
+			'&-danger': {
+				backgroundColor: theme.colors.danger,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.danger).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.danger).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.danger).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Warning variant */
-		/* ----------------------------------------------------------- */
-		'&-warning': {
-			color: colors.dark,
-			backgroundColor: colors.warning,
-			'&:hover': {
-				backgroundColor: Color(colors.warning).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Warning variant */
+			/* ----------------------------------------------------------- */
+			'&-warning': {
+				color: theme.colors.dark,
+				backgroundColor: theme.colors.warning,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.warning).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.warning).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.warning).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Info variant */
-		/* ----------------------------------------------------------- */
-		'&-info': {
-			backgroundColor: colors.info,
-			'&:hover': {
-				backgroundColor: Color(colors.info).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Info variant */
+			/* ----------------------------------------------------------- */
+			'&-info': {
+				backgroundColor: theme.colors.info,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.info).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.info).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.info).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Light variant */
-		/* ----------------------------------------------------------- */
-		'&-light': {
-			color: colors.primary,
-			backgroundColor: colors.light,
-			'&:hover': {
-				color: colors.primary,
-				backgroundColor: Color(colors.primary).lighten(0.8).hex(),
+			/* ----------------------------------------------------------- */
+			/* Light variant */
+			/* ----------------------------------------------------------- */
+			'&-light': {
+				color: theme.colors.primary,
+				backgroundColor: theme.colors.light,
+				'&:hover': {
+					color: theme.colors.primary,
+					backgroundColor: Color(theme.colors.primary).lighten(0.8).hex(),
+				},
+				'&:active': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.secondary,
+				},
 			},
-			'&:active': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Dark variant */
-		/* ----------------------------------------------------------- */
-		'&-dark': {
-			backgroundColor: colors.dark,
-			'&:hover': {
-				backgroundColor: Color(colors.dark).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Dark variant */
+			/* ----------------------------------------------------------- */
+			'&-dark': {
+				backgroundColor: theme.colors.dark,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.dark).lighten(0.16).hex(),
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.dark).darken(0.16).hex(),
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.dark).darken(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Grey variant */
+			/* ----------------------------------------------------------- */
+			'&-grey': {
+				backgroundColor: theme.colors.gray200,
+				color: theme.colors.black,
+				'&:hover': {
+					backgroundColor: Color(theme.colors.gray300).darken(0.16).hex(),
+					color: theme.colors.black,
+				},
+				'&:active': {
+					backgroundColor: Color(theme.colors.gray300).lighten(0.16).hex(),
+					color: theme.colors.black,
+				},
 			},
-		},
-		/* ----------------------------------------------------------- */
-		/* Grey variant */
-		/* ----------------------------------------------------------- */
-		'&-grey': {
-			backgroundColor: colors.gray200,
-			color: colors.black,
-			'&:hover': {
-				backgroundColor: Color(colors.gray300).darken(0.16).hex(),
-				color: colors.black,
+			/* ----------------------------------------------------------- */
+			/* No-background variant */
+			/* ----------------------------------------------------------- */
+			'&-no-background': {
+				backgroundColor: theme.colors.background,
+				color: theme.colors.primary,
+				'&:hover': {
+					backgroundColor: theme.colors.background,
+					color: theme.colors.primary,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.background,
+					color: theme.colors.primary,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.gray300).lighten(0.16).hex(),
-				color: colors.black,
-			},
-		},
-		/* ----------------------------------------------------------- */
-		/* No-background variant */
-		/* ----------------------------------------------------------- */
-		'&-no-background': {
-			backgroundColor: colors.background,
-			color: colors.primary,
-			'&:hover': {
-				backgroundColor: colors.background,
-				color: colors.primary,
-			},
-			'&:active': {
-				backgroundColor: colors.background,
-				color: colors.primary,
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Clear variant */
-		/* ----------------------------------------------------------- */
-		'&-clear': {
-			backgroundColor: 'transparent',
-			color: colors.dark,
-			'&:hover': {
+			/* ----------------------------------------------------------- */
+			/* Clear variant */
+			/* ----------------------------------------------------------- */
+			'&-clear': {
 				backgroundColor: 'transparent',
-				color: colors.black,
+				color: theme.colors.dark,
+				'&:hover': {
+					backgroundColor: 'transparent',
+					color: theme.colors.black,
+				},
+				'&:active': {
+					backgroundColor: 'transparent',
+					color: theme.colors.black,
+				},
 			},
-			'&:active': {
-				backgroundColor: 'transparent',
-				color: colors.black,
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Icon variant */
-		/* ----------------------------------------------------------- */
-		'&-icon': {
-			padding: 0,
-			backgroundColor: 'transparent',
-			'&:hover': {
+			/* ----------------------------------------------------------- */
+			/* Icon variant */
+			/* ----------------------------------------------------------- */
+			'&-icon': {
+				padding: 0,
 				backgroundColor: 'transparent',
+				'&:hover': {
+					backgroundColor: 'transparent',
+				},
+				'&:active': {
+					backgroundColor: 'transparent',
+				},
 			},
-			'&:active': {
-				backgroundColor: 'transparent',
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Link variant */
-		/* ----------------------------------------------------------- */
-		'&-link': {
-			color: colors.primary,
-			textDecoration: 'underline',
-			backgroundColor: 'transparent',
-			'&:hover': {
-				color: colors.primary,
+			/* ----------------------------------------------------------- */
+			/* Link variant */
+			/* ----------------------------------------------------------- */
+			'&-link': {
+				color: theme.colors.primary,
 				textDecoration: 'underline',
 				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.primary,
+					textDecoration: 'underline',
+					backgroundColor: 'transparent',
+				},
+				'&:active': {
+					backgroundColor: 'transparent',
+					color: theme.colors.primary,
+				},
 			},
-			'&:active': {
+
+			'&-inverse': {
+				backgroundColor: theme.colors.white,
+				'&-primary': {
+					color: theme.colors.primary,
+				},
+			},
+
+			/* ----------------------------------------------------------- */
+			/* Outline variants */
+			/* ----------------------------------------------------------- */
+			'&-outline-primary': {
+				color: theme.colors.primary,
 				backgroundColor: 'transparent',
-				color: colors.primary,
+				border: `1px solid ${theme.colors.primary}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.primary,
+				},
+			},
+			'&-outline-secondary': {
+				color: theme.colors.secondary,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.secondary}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.secondary,
+				},
+			},
+			'&-outline-success': {
+				color: theme.colors.success,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.success}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.success,
+				},
+			},
+			'&-outline-danger': {
+				color: theme.colors.danger,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.danger}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.danger,
+				},
+			},
+			'&-outline-warning': {
+				color: theme.colors.warning,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.warning}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.warning,
+				},
+			},
+			'&-outline-info': {
+				color: theme.colors.info,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.info}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.info,
+				},
+			},
+			'&-outline-dark': {
+				color: theme.colors.dark,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.dark}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.dark,
+				},
+			},
+			'&-outline-light': {
+				color: theme.colors.primary,
+				backgroundColor: theme.colors.white,
+				border: `1px solid ${theme.colors.primary}`,
+				'&:hover': {
+					color: theme.colors.white,
+					backgroundColor: theme.colors.secondary,
+				},
 			},
 		},
-
-		'&-inverse': {
-			backgroundColor: colors.white,
-			'&-primary': {
-				color: colors.primary,
-			},
-		},
-
-		/* ----------------------------------------------------------- */
-		/* Outline variants */
-		/* ----------------------------------------------------------- */
-		'&-outline-primary': {
-			color: colors.primary,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.primary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.primary,
-			},
-		},
-		'&-outline-secondary': {
-			color: colors.secondary,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.secondary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
-		'&-outline-success': {
-			color: colors.success,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.success}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.success,
-			},
-		},
-		'&-outline-danger': {
-			color: colors.danger,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.danger}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.danger,
-			},
-		},
-		'&-outline-warning': {
-			color: colors.warning,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.warning}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.warning,
-			},
-		},
-		'&-outline-info': {
-			color: colors.info,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.info}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.info,
-			},
-		},
-		'&-outline-dark': {
-			color: colors.dark,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.dark}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.dark,
-			},
-		},
-		'&-outline-light': {
-			color: colors.primary,
-			backgroundColor: colors.white,
-			border: `1px solid ${colors.primary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
-	},
+	};
 };

@@ -1,21 +1,19 @@
 import React, { FC } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import HeroContainer from '@/components/hero-container';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useProfileStyles = createUseStyles({
+const useProfileStyles = createUseThemedStyles((theme) => ({
 	lastUpdatedContainer: {
 		padding: 0,
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
 const Profile: FC = () => {
 	useHeaderTitle('your profile');

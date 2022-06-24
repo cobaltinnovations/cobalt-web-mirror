@@ -1,11 +1,10 @@
 import React, { FC, ReactElement, PropsWithChildren } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionToggle: {
 		border: 0,
 		width: 44,
@@ -21,13 +20,13 @@ const useStyles = createUseStyles({
 		},
 	},
 	icon: {
-		fill: colors.dark,
+		fill: theme.colors.dark,
 	},
 	sessionMenu: {
 		width: 180,
 		borderRadius: 0,
 		padding: '16px 0',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 	},
 	sessionItem: {
 		display: 'flex',
@@ -43,7 +42,7 @@ const useStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-});
+}));
 
 interface SessionToggleProps extends PropsWithChildren {
 	id: string;

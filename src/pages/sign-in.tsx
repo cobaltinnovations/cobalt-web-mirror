@@ -1,25 +1,24 @@
 import React, { FC } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useSubdomain from '@/hooks/use-subdomain';
 import useHeaderTitle from '@/hooks/use-header-title';
 
 import { accountService } from '@/lib/services';
 
-import colors from '@/jss/colors';
 import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useSignInStyles = createUseStyles({
+const useSignInStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.primary,
 		},
 	},
-});
+}));
 
 const SignIn: FC = () => {
 	useHeaderTitle(null);

@@ -1,9 +1,8 @@
 import React, { FC, useRef, useEffect, useCallback } from 'react';
-import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useFooterStyles = createUseStyles({
+const useFooterStyles = createUseThemedStyles((theme) => ({
 	footer: {
 		left: 0,
 		bottom: 0,
@@ -12,9 +11,9 @@ const useFooterStyles = createUseStyles({
 
 		height: 6,
 		color: 'white',
-		backgroundColor: colors.footer,
+		backgroundColor: theme.colors.footer,
 	},
-});
+}));
 
 const Footer: FC = () => {
 	const classes = useFooterStyles();

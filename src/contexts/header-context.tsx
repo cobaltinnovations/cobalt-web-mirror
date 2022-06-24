@@ -1,17 +1,16 @@
 import React, { FC, createContext, useState, ReactElement, useCallback, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { ReactComponent as LogoText } from '@/assets/logos/logo-text.svg';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useLogoTextStyles = createUseStyles({
+const useLogoTextStyles = createUseThemedStyles((theme) => ({
 	logoText: {
 		display: 'block',
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.white,
 		},
 	},
-});
+}));
 
 const LogoTextStyled = () => {
 	const classes = useLogoTextStyles();

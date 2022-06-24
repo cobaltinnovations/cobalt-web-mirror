@@ -1,5 +1,4 @@
 import React, { FC, ReactElement } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableCell, TableRow } from '@/components/table';
 
@@ -18,26 +17,26 @@ import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
 
 import { AdminContentRow, AdminContentActions, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import SessionDropdown from '@/components/session-dropdown';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: colors.secondary,
+		fill: theme.colors.secondary,
 		'& path': {
-			fill: colors.secondary,
+			fill: theme.colors.secondary,
 		},
 	},
 	centerText: {
 		textAlign: 'center',
 	},
 	row: {
-		borderLeft: `1px solid ${colors.border}`,
-		borderRight: `1px solid ${colors.border}`,
+		borderLeft: `1px solid ${theme.colors.border}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	noWrap: {
 		whiteSpace: 'nowrap',
@@ -52,7 +51,7 @@ const useStyles = createUseStyles({
 	},
 	success: {
 		'& #Shape': {
-			fill: colors.success,
+			fill: theme.colors.success,
 		},
 	},
 	danger: {
@@ -60,7 +59,7 @@ const useStyles = createUseStyles({
 		height: 10,
 		lineHeight: 10,
 		'& polygon': {
-			fill: colors.danger,
+			fill: theme.colors.danger,
 		},
 	},
 	circleIndicator: {
@@ -71,27 +70,27 @@ const useStyles = createUseStyles({
 		display: 'inline-block',
 
 		'&.approved': {
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.success,
 		},
 		'&.rejected': {
-			backgroundColor: colors.danger,
+			backgroundColor: theme.colors.danger,
 		},
 		'&.pending': {
-			backgroundColor: colors.gray700,
+			backgroundColor: theme.colors.gray700,
 		},
 		'&.archived': {
-			backgroundColor: colors.border,
+			backgroundColor: theme.colors.border,
 		},
 	},
 	description: {
 		maxHeight: 20,
 		maxWidth: 400,
 		overflow: 'hidden',
-		color: colors.gray600,
+		color: theme.colors.gray600,
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
-});
+}));
 
 interface DropdownItem {
 	icon: ReactElement;

@@ -1,16 +1,14 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-
-import colors from '@/jss/colors';
 
 import ReactPlayer from 'react-player';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 
-const useOnYourTimePreviewStyles = createUseStyles({
+const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
 		paddingBottom: '56.25%',
 	},
@@ -23,12 +21,12 @@ const useOnYourTimePreviewStyles = createUseStyles({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: colors.dark,
+		color: theme.colors.dark,
 		padding: '5px 10px',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	bordered: {
-		border: `1px solid ${colors.border}`,
+		border: `1px solid ${theme.colors.border}`,
 		position: 'relative',
 	},
 	circleOne: {
@@ -69,9 +67,9 @@ const useOnYourTimePreviewStyles = createUseStyles({
 	},
 	descriptionOuter: {
 		overflow: 'visible !important',
-		backgroundColor: colors.background,
+		backgroundColor: theme.colors.background,
 	},
-});
+}));
 
 interface OnYourTimePreviewProps {
 	imageUrl?: string;

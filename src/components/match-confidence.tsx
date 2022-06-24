@@ -1,15 +1,14 @@
 import React, { FC, useState, useEffect } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import { ReactComponent as ConfidenceSearchIcon } from '@/assets/icons/confidence.svg';
-import colors from '@/jss/colors';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
-const useMatchConfidenceStyles = createUseStyles({
+const useMatchConfidenceStyles = createUseThemedStyles((theme) => ({
 	barOuter: {
 		height: 4,
 		width: '100%',
-		backgroundColor: colors.gray500,
+		backgroundColor: theme.colors.gray500,
 	},
 	bar: ({ percent, color }: { percent: number; color: string }) => ({
 		width: `${percent}%`,
@@ -17,7 +16,7 @@ const useMatchConfidenceStyles = createUseStyles({
 		backgroundColor: color,
 		transition: '0.2s width, 0.5s background-color',
 	}),
-});
+}));
 
 interface MatchConfidenceProps {
 	percent: number;
@@ -27,7 +26,8 @@ interface MatchConfidenceProps {
 }
 
 const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, description, hideIcon }) => {
-	const [color, setColor] = useState(colors.danger);
+	const theme = useCobaltTheme();
+	const [color, setColor] = useState(theme.colors.danger);
 
 	const classes = useMatchConfidenceStyles({
 		percent,
@@ -36,13 +36,13 @@ const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, descrip
 
 	useEffect(() => {
 		if (percent > 33 && percent <= 66) {
-			setColor(colors.warning);
+			setColor(theme.colors.warning);
 		} else if (percent > 66) {
-			setColor(colors.success);
+			setColor(theme.colors.success);
 		} else {
-			setColor(colors.danger);
+			setColor(theme.colors.danger);
 		}
-	}, [percent]);
+	}, [percent, theme.colors.danger, theme.colors.success, theme.colors.warning]);
 
 	return (
 		<>

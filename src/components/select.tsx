@@ -1,14 +1,13 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useSelectStyles = createUseStyles({
+const useSelectStyles = createUseThemedStyles((theme) => ({
 	select: {
 		position: 'relative',
 		'& select': {
@@ -18,27 +17,27 @@ const useSelectStyles = createUseStyles({
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
-			color: colors.dark,
+			color: theme.colors.dark,
 			...fonts.karlaRegular,
 			padding: '0 40px 0 15px',
-			backgroundColor: colors.white,
-			border: `1px solid ${colors.border}`,
+			backgroundColor: theme.colors.white,
+			border: `1px solid ${theme.colors.border}`,
 			'&:hover': {
-				border: `1px solid ${colors.primary}`,
+				border: `1px solid ${theme.colors.primary}`,
 			},
 			'&:disabled': {
-				color: colors.gray500,
-				backgroundColor: colors.gray200,
-				border: `1px solid ${colors.gray200}`,
+				color: theme.colors.gray500,
+				backgroundColor: theme.colors.gray200,
+				border: `1px solid ${theme.colors.gray200}`,
 				'&:hover': {
-					color: colors.gray500,
-					backgroundColor: colors.gray200,
-					border: `1px solid ${colors.gray200}`,
+					color: theme.colors.gray500,
+					backgroundColor: theme.colors.gray200,
+					border: `1px solid ${theme.colors.gray200}`,
 				},
 			},
 			'&:invalid': {
 				fontStyle: 'italic',
-				color: colors.gray600,
+				color: theme.colors.gray600,
 			},
 			'&:focus': {
 				outline: 'none',
@@ -53,9 +52,9 @@ const useSelectStyles = createUseStyles({
 		top: '50%',
 		position: 'absolute',
 		transform: 'translateY(-50%)',
-		fill: props.disabled ? colors.gray500 : colors.black,
+		fill: props.disabled ? theme.colors.gray500 : theme.colors.black,
 	}),
-});
+}));
 
 interface SelectProps extends PropsWithChildren {
 	value: string;

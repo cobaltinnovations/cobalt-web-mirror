@@ -1,7 +1,6 @@
 import React, { FC, useState, useContext, useRef, useEffect, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { HeaderContext } from '@/contexts/header-context';
@@ -12,6 +11,7 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const headerButton = {
 	top: '50%',
@@ -28,7 +28,7 @@ const headerButton = {
 	},
 };
 
-const useHeaderStyles = createUseStyles({
+const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
 		top: 0,
 		left: 0,
@@ -39,13 +39,13 @@ const useHeaderStyles = createUseStyles({
 		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.primary,
 	},
 	headerTitle: {
 		...fonts.m,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: colors.white,
+		color: theme.colors.white,
 		whiteSpace: 'nowrap',
 		...fonts.nunitoSansBold,
 		textOverflow: 'ellipsis',
@@ -60,7 +60,7 @@ const useHeaderStyles = createUseStyles({
 		right: 0,
 		width: 80,
 		paddingTop: 1,
-		color: colors.white,
+		color: theme.colors.white,
 		whiteSpace: 'nowrap',
 		flexDirection: 'column',
 		'& small': {
@@ -70,16 +70,16 @@ const useHeaderStyles = createUseStyles({
 	},
 	menuIcon: {
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.white,
 		},
 	},
 	crisisIcon: {
 		marginBottom: 3,
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.white,
 		},
 	},
-});
+}));
 
 interface HeaderProps {
 	showHeaderButtons?: boolean;

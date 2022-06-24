@@ -1,18 +1,17 @@
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import { createUseStyles } from 'react-jss';
 import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
 import { Provider } from '@/lib/models';
 import { Link } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useProviderInfoStyles = createUseStyles({
+const useProviderInfoStyles = createUseThemedStyles((theme) => ({
 	paymentPill: {
 		...fonts.xxs,
-		color: colors.dark,
+		color: theme.colors.dark,
 		display: 'inline-block',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 		borderRadius: 20,
 		marginTop: 4,
 		padding: '2px 6px',
@@ -21,7 +20,7 @@ const useProviderInfoStyles = createUseStyles({
 		display: 'inline-block',
 		transform: 'translateY(4px)',
 	},
-});
+}));
 
 interface ProviderInfoCardProps extends PropsWithChildren {
 	provider: Provider;

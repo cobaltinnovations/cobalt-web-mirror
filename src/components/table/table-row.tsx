@@ -1,15 +1,13 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useTableRowStyles = createUseStyles({
+const useTableRowStyles = createUseThemedStyles((theme) => ({
 	tableRow: {
-		backgroundColor: colors.white,
-		borderBottom: `1px solid ${colors.border}`,
+		backgroundColor: theme.colors.white,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
 interface TableRowProps extends PropsWithChildren {
 	className?: string;

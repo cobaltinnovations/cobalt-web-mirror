@@ -1,9 +1,7 @@
-import { createUseStyles } from 'react-jss';
-
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-export const useGlobalStyles = createUseStyles({
+export const useGlobalStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		'::-ms-clear': {
 			width: 0,
@@ -22,10 +20,10 @@ export const useGlobalStyles = createUseStyles({
 			...fonts.xs,
 			minHeight: '100%',
 			letterSpacing: 0.5,
-			color: colors.dark,
+			color: theme.colors.dark,
 			position: 'relative',
 			...fonts.nunitoSansRegular,
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 			backgroundImage:
 				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
 			backgroundPosition: 'top left, right 0px',
@@ -76,19 +74,19 @@ export const useGlobalStyles = createUseStyles({
 		a: {
 			wordBreak: 'break-word',
 			...fonts.karlaBold,
-			color: colors.primary,
+			color: theme.colors.primary,
 			textDecoration: 'underline',
 			'&:hover': {
-				color: colors.primary,
+				color: theme.colors.primary,
 			},
 			'&:focus': {
 				outline: 'none',
 			},
 			'&:not([href])': {
 				cursor: 'pointer',
-				color: colors.primary,
+				color: theme.colors.primary,
 				'&:hover': {
-					color: colors.white,
+					color: theme.colors.white,
 				},
 			},
 		},
@@ -135,7 +133,7 @@ export const useGlobalStyles = createUseStyles({
 			...fonts.karlaRegular,
 			boxShadow: '1px 2px 8px 0px rgba(0,0,0,0.32)',
 			'&__triangle': {
-				borderBottomColor: `${colors.primary} !important`,
+				borderBottomColor: `${theme.colors.primary} !important`,
 				'&:before': {
 					borderColor: `transparent !important`,
 				},
@@ -143,30 +141,30 @@ export const useGlobalStyles = createUseStyles({
 			'&__header': {
 				border: 0,
 				borderRadius: 0,
-				backgroundColor: colors.primary,
+				backgroundColor: theme.colors.primary,
 			},
 			'&__current-month': {
 				...fonts.xs,
-				color: colors.white,
+				color: theme.colors.white,
 			},
 			'&__day-name': {
 				margin: 0,
 				width: '3.5rem',
-				color: colors.white,
+				color: theme.colors.white,
 				lineHeight: '3.5rem',
 			},
 			'&__month': {
 				margin: 0,
-				borderLeft: colors.border,
-				borderRight: colors.border,
-				borderBottom: colors.border,
+				borderLeft: theme.colors.border,
+				borderRight: theme.colors.border,
+				borderBottom: theme.colors.border,
 			},
 			'&__navigation': {
 				'&--previous': {
-					borderRightColor: colors.white,
+					borderRightColor: theme.colors.white,
 				},
 				'&--next': {
-					borderLeftColor: colors.white,
+					borderLeftColor: theme.colors.white,
 				},
 			},
 			'&__day': {
@@ -178,12 +176,12 @@ export const useGlobalStyles = createUseStyles({
 					...fonts.karlaBold,
 				},
 				'&--selected': {
-					backgroundColor: colors.primary,
+					backgroundColor: theme.colors.primary,
 				},
 			},
 			'&__day--outside-month': {
-				color: colors.gray500,
-				backgroundColor: colors.gray200,
+				color: theme.colors.gray500,
+				backgroundColor: theme.colors.gray200,
 			},
 			'&__close-icon': {
 				marginRight: 30,
@@ -198,19 +196,19 @@ export const useGlobalStyles = createUseStyles({
 			'&__track': {
 				height: 8,
 				'&--background': {
-					backgroundColor: colors.border,
+					backgroundColor: theme.colors.border,
 					top: '20%',
 				},
 				'&--active': {
-					backgroundColor: colors.primary,
+					backgroundColor: theme.colors.primary,
 				},
 			},
 			'&__slider': {
 				width: 22,
 				height: 22,
 				marginTop: -14, // 22 - 8 === sliderSize - trackHeight
-				border: `1px solid ${colors.gray500}`,
-				backgroundColor: colors.white,
+				border: `1px solid ${theme.colors.gray500}`,
+				backgroundColor: theme.colors.white,
 				'&-container:last-of-type .input-range__label-container': {
 					left: '-20%',
 				},
@@ -233,4 +231,4 @@ export const useGlobalStyles = createUseStyles({
 			minHeight: 400,
 		},
 	},
-});
+}));

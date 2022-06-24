@@ -1,11 +1,10 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	circleIndicator: ({ size }: { size?: number }) => ({
 		flexShrink: 0,
 		borderRadius: 100,
@@ -13,12 +12,12 @@ const useStyles = createUseStyles({
 		height: size ? size : 35,
 		lineHeight: size ? `${size}px` : '35px',
 		textAlign: 'center',
-		color: colors.white,
+		color: theme.colors.white,
 		display: 'inline-block',
 		...fonts.nunitoSansBold,
-		backgroundColor: colors.secondary,
+		backgroundColor: theme.colors.secondary,
 	}),
-});
+}));
 
 interface CircleIndicatorProps extends PropsWithChildren {
 	size?: number;

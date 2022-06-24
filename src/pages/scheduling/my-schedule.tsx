@@ -1,5 +1,4 @@
 import useAccount from '@/hooks/use-account';
-import colors from '@/jss/colors';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -20,6 +19,7 @@ import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
 import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import useHeaderTitle from '@/hooks/use-header-title';
+import { useCobaltTheme } from '@/jss/theme';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -28,6 +28,7 @@ enum MainCalendarView {
 }
 
 export const MySchedule: FC = () => {
+	const theme = useCobaltTheme();
 	useHeaderTitle('my schedule');
 	const classes = useContainerStyles();
 	const { account } = useAccount();
@@ -89,10 +90,10 @@ export const MySchedule: FC = () => {
 				end: end.toDate(),
 				display: 'background',
 				allDay: true,
-				backgroundColor: colors.secondary,
+				backgroundColor: theme.colors.secondary,
 			},
 		];
-	}, [leftCalendarEvents, leftCalendarMoment]);
+	}, [leftCalendarEvents, leftCalendarMoment, theme.colors.secondary]);
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {

@@ -22,12 +22,11 @@ import {
 } from '@/lib/models';
 
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 import useAccount from '@/hooks/use-account';
 import { PersonalizationCheckbox } from '@/components/personalize-recommendations-modal';
 import OnYourTimePreview from '@/components/admin-cms/on-your-time-preview';
@@ -39,14 +38,14 @@ import Breadcrumb from '@/components/breadcrumb';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	grayText: {
-		color: colors.gray600,
+		color: theme.colors.gray600,
 	},
 	datePicker: {
 		height: 56,
 	},
-});
+}));
 
 const onYourTimeContentSchema = yup
 	.object()
@@ -74,6 +73,7 @@ export type onYourTimeFormData = yup.InferType<typeof onYourTimeContentSchema>;
 const requiredFields = getRequiredYupFields<onYourTimeFormData>(onYourTimeContentSchema);
 
 const CreateOnYourTimeContent: FC = () => {
+	const theme = useCobaltTheme();
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time - My Content');
 	const classes = useStyles();
@@ -912,60 +912,56 @@ const CreateOnYourTimeContent: FC = () => {
 															)}
 														</>
 													)}
-													{account?.roleId === ROLE_ID.ADMINISTRATOR && (
-														<>
-															{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
-																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
-																<Card className="mb-5 border-0">
+
+													{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
+														account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+														<Card className="mb-5 border-0">
+															<div
+																className="p-6"
+																style={{
+																	borderBottom: `1px solid ${theme.colors.border}`,
+																}}
+															>
+																<h5 className="mb-2">Tags</h5>
+																<p>
+																	Tags are used to determine which resources are shown
+																	first to a patient depending on how they answered
+																	the initial assessment questions. If no categories
+																	are selected, then the resource will be
+																	de-prioritized an appear lower in a patient’s list
+																	of resources.
+																</p>
+															</div>
+															{tagQuestions?.map((question, index) => {
+																return (
 																	<div
-																		className="p-6"
-																		style={{
-																			borderBottom: `1px solid ${colors.border}`,
-																		}}
+																		key={index}
+																		className={index > 0 ? 'pt-5' : 'p-5'}
+																		style={
+																			index !== tagQuestions.length - 1
+																				? {
+																						borderBottom: `1px solid ${theme.colors.border}`,
+																				  }
+																				: {}
+																		}
 																	>
-																		<h5 className="mb-2">Tags</h5>
-																		<p>
-																			Tags are used to determine which resources
-																			are shown first to a patient depending on
-																			how they answered the initial assessment
-																			questions. If no categories are selected,
-																			then the resource will be de-prioritized an
-																			appear lower in a patient’s list of
-																			resources.
-																		</p>
+																		<PersonalizationCheckbox
+																			key={question.questionId}
+																			question={question}
+																			choices={choices}
+																			onChange={(questionId, answers) => {
+																				setChoices({
+																					...choices,
+																					[questionId]: answers,
+																				});
+																			}}
+																			bottomBordered={false}
+																			fullWidth={index > 0}
+																		/>
 																	</div>
-																	{tagQuestions?.map((question, index) => {
-																		return (
-																			<div
-																				key={index}
-																				className={index > 0 ? 'pt-5' : 'p-5'}
-																				style={
-																					index !== tagQuestions.length - 1
-																						? {
-																								borderBottom: `1px solid ${colors.border}`,
-																						  }
-																						: {}
-																				}
-																			>
-																				<PersonalizationCheckbox
-																					key={question.questionId}
-																					question={question}
-																					choices={choices}
-																					onChange={(questionId, answers) => {
-																						setChoices({
-																							...choices,
-																							[questionId]: answers,
-																						});
-																					}}
-																					bottomBordered={false}
-																					fullWidth={index > 0}
-																				/>
-																			</div>
-																		);
-																	})}
-																</Card>
-															)}
-														</>
+																);
+															})}
+														</Card>
 													)}
 												</Col>
 												<Col md={2} lg={4}>

@@ -1,18 +1,17 @@
 import React, { ReactElement } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
 import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.primary,
 		},
 	},
-});
+}));
 
 const DownForMaintenance = (): ReactElement => {
 	const classes = useStyles();

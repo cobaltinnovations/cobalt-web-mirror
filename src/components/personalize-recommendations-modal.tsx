@@ -1,20 +1,19 @@
 import React, { FC, useEffect, useState, Fragment, ComponentType, useMemo } from 'react';
 import { ModalProps, Modal, Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { createUseStyles } from 'react-jss';
 import { assessmentService } from '@/lib/services';
 import { uniq } from 'lodash';
 import classNames from 'classnames';
 import { PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 import Media from 'react-media';
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { screenWidths } from '@/jss/media-queries';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const usePersonalizeRecommendationsModalStyles = createUseStyles({
+const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) => ({
 	personalizeRecommendationModal: {
 		display: 'flex',
 		alignItems: 'flex-end',
@@ -40,7 +39,7 @@ const usePersonalizeRecommendationsModalStyles = createUseStyles({
 		height: 14,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: colors.black,
+			fill: theme.colors.black,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -52,11 +51,11 @@ const usePersonalizeRecommendationsModalStyles = createUseStyles({
 	},
 	modalFooter: {
 		height: 76,
-		borderTop: `1px solid ${colors.border}`,
+		borderTop: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
-const useQuestionItemStyles = createUseStyles({
+const useQuestionItemStyles = createUseThemedStyles((theme) => ({
 	horizontalScroller: {
 		display: 'flex',
 		overflowX: 'scroll',
@@ -72,18 +71,18 @@ const useQuestionItemStyles = createUseStyles({
 		whiteSpace: 'nowrap',
 		...fonts.karlaRegular,
 		textTransform: 'uppercase',
-		backgroundColor: colors.shadedPill,
-		border: `1px solid ${colors.dark}`,
+		backgroundColor: theme.colors.shadedPill,
+		border: `1px solid ${theme.colors.dark}`,
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	selectedPill: {
-		color: colors.white,
-		backgroundColor: colors.dark,
+		color: theme.colors.white,
+		backgroundColor: theme.colors.dark,
 	},
 	borderBottom: {
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	item: {
 		padding: '10px 20px',
@@ -94,7 +93,7 @@ const useQuestionItemStyles = createUseStyles({
 	nestedItem: {
 		padding: '10px 34px',
 	},
-});
+}));
 
 interface PersonalizeRecommendationsModalProps extends ModalProps {
 	questions: PersonalizationQuestion[];

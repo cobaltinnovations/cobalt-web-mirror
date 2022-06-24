@@ -1,26 +1,24 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-
-import colors from '@/jss/colors';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useBreadcrumbStyles = createUseStyles({
+const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	breadcrumb: {
 		padding: 0,
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	breadcrumbLink: {
 		marginRight: 10,
 		position: 'relative',
 	},
 	chevron: {
-		fill: colors.border,
+		fill: theme.colors.border,
 		marginRight: 10,
 	},
-});
+}));
 
 type BreadCrumbModel = {
 	to: LinkProps['to'];

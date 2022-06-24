@@ -4,17 +4,16 @@ import Breadcrumb from '@/components/breadcrumb';
 import DayContainer from '@/components/day-container';
 import { ProviderInfoCard } from '@/components/provider-info-card';
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
-import colors from '@/jss/colors';
 import mediaQueries from '@/jss/media-queries';
+import { createUseThemedStyles } from '@/jss/theme';
 import { providerService } from '@/lib/services';
 import { Scrollspy } from '@makotot/ghostui';
 import classNames from 'classnames';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import { useParams } from 'react-router-dom';
 
-const useProviderDetailStyles = createUseStyles({
+const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 	horizontalScroller: {
 		marginTop: 10,
 		display: 'flex',
@@ -62,7 +61,7 @@ const useProviderDetailStyles = createUseStyles({
 			backgroundColor: 'transparent',
 		},
 		'& a': {
-			color: colors.gray600,
+			color: theme.colors.gray600,
 			textDecoration: 'none',
 		},
 	},
@@ -80,14 +79,14 @@ const useProviderDetailStyles = createUseStyles({
 	},
 	activeNav: {
 		'&:after': {
-			backgroundColor: colors.primary,
+			backgroundColor: theme.colors.primary,
 		},
 		'& a': {
-			color: colors.black,
+			color: theme.colors.black,
 			textDecoration: 'none',
 		},
 	},
-});
+}));
 
 const ProviderDetail = () => {
 	const classes = useProviderDetailStyles();

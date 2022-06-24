@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import ReactPlayer from 'react-player';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -11,12 +10,11 @@ import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import colors from '@/jss/colors';
-
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useOnYourTimeDetailStyles = createUseStyles({
+const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
 		paddingBottom: '56.25%',
 	},
@@ -29,21 +27,21 @@ const useOnYourTimeDetailStyles = createUseStyles({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: colors.dark,
+		color: theme.colors.dark,
 		padding: '10px 20px',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	reactPlayerOuter: {
 		position: 'relative',
 		paddingTop: '56.25%',
-		backgroundColor: colors.gray500,
+		backgroundColor: theme.colors.gray500,
 		'& > div': {
 			top: 0,
 			left: 0,
 			position: 'absolute',
 		},
 	},
-});
+}));
 
 interface RouteParams {
 	contentId: string;

@@ -1,17 +1,15 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useBackgroundImageContainerStyles = createUseStyles({
+const useBackgroundImageContainerStyles = createUseThemedStyles((theme) => ({
 	backgroundImageContainer: ({ imageUrl, size }: { imageUrl: string; size?: number }) => ({
 		flexShrink: 0,
 		position: 'relative',
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
-		backgroundColor: colors.gray300,
+		backgroundColor: theme.colors.gray300,
 		backgroundImage: `url(${imageUrl})`,
 		...(size
 			? {
@@ -20,7 +18,7 @@ const useBackgroundImageContainerStyles = createUseStyles({
 			  }
 			: {}),
 	}),
-});
+}));
 
 interface BackgroundImageContainerProps extends PropsWithChildren {
 	size?: number;

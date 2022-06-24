@@ -2,15 +2,14 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 import mediaQueries from '@/jss/media-queries';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useDayContainerStyles = createUseStyles({
+const useDayContainerStyles = createUseThemedStyles((theme) => ({
 	dayContainer: {
 		backgroundColor: 'transparent',
 		[mediaQueries.md]: {
-			backgroundColor: colors.white,
+			backgroundColor: theme.colors.white,
 		},
 	},
 	dayContainerInner: {
@@ -19,7 +18,7 @@ const useDayContainerStyles = createUseStyles({
 			padding: '5px 0',
 		},
 	},
-});
+}));
 
 interface DayContainerProps extends PropsWithChildren {
 	className?: string;

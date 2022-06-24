@@ -1,13 +1,11 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useLabelledInlineSelectStyles = createUseStyles({
+const useLabelledInlineSelectStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		display: 'flex',
 		alignItems: 'center',
@@ -24,11 +22,11 @@ const useLabelledInlineSelectStyles = createUseStyles({
 			cursor: 'pointer',
 			appearance: 'none',
 			marginLeft: 'auto',
-			color: colors.primary,
+			color: theme.colors.primary,
 			...fonts.nunitoSansBold,
 			padding: '0 16px 0 0',
 			backgroundColor: 'transparent',
-			borderBottom: `1px solid ${colors.primary}`,
+			borderBottom: `1px solid ${theme.colors.primary}`,
 			'&:focus': {
 				outline: 'none',
 			},
@@ -42,10 +40,10 @@ const useLabelledInlineSelectStyles = createUseStyles({
 		right: 0,
 		top: '50%',
 		position: 'absolute',
-		fill: colors.primary,
+		fill: theme.colors.primary,
 		transform: 'translateY(-50%)',
 	},
-});
+}));
 
 interface LabelledInlineSelectProps extends PropsWithChildren {
 	id: string;

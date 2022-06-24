@@ -1,20 +1,19 @@
 import React, { FC } from 'react';
 import { Form } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		top: '50%',
 		right: 16,
 		position: 'absolute',
 		pointerEvents: 'none',
-		fill: colors.secondary,
+		fill: theme.colors.secondary,
 		transform: 'translateY(-50%)',
 	},
-});
+}));
 
 interface SearchInputProps {
 	value: string;

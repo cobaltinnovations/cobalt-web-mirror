@@ -1,16 +1,14 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useTableHeadStyles = createUseStyles({
+const useTableHeadStyles = createUseThemedStyles((theme) => ({
 	tableHead: {
-		border: `1px solid ${colors.border}`,
+		border: `1px solid ${theme.colors.border}`,
 		'& tr': {
-			backgroundColor: colors.white,
+			backgroundColor: theme.colors.white,
 		},
 	},
-});
+}));
 
 export const TableHead: FC<PropsWithChildren> = React.memo((props) => {
 	const classes = useTableHeadStyles();

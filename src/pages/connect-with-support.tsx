@@ -14,7 +14,6 @@ import { unstable_batchedUpdates } from 'react-dom';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import { useHistory, Link, useLocation } from 'react-router-dom';
-import { createUseStyles } from 'react-jss';
 import moment from 'moment';
 import classNames from 'classnames';
 
@@ -44,13 +43,13 @@ import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.sv
 import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { BookingContext, SearchResult, BookingFilters, BookingSource } from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -71,11 +70,11 @@ const mapClinicToResult = (clinic: Clinic): SearchResult => ({
 	displayName: clinic.description,
 });
 
-const useConnectWithSupportStyles = createUseStyles({
+const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: colors.dark,
+		fill: theme.colors.dark,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -83,19 +82,19 @@ const useConnectWithSupportStyles = createUseStyles({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: colors.dark,
+		fill: theme.colors.dark,
 	},
 	filterIcon: {
 		marginTop: -1,
 		marginLeft: 5,
-		fill: colors.dark,
+		fill: theme.colors.dark,
 	},
 	infoIcon: {
 		width: 28,
 		marginLeft: 10,
-		fill: colors.white,
+		fill: theme.colors.white,
 	},
-});
+}));
 
 interface HistoryLocationState {
 	skipAssessment?: boolean;

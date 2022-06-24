@@ -1,21 +1,20 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 
 import config from '@/lib/config';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useRenderJsonStyles = createUseStyles({
+const useRenderJsonStyles = createUseThemedStyles((theme) => ({
 	renderJson: {
 		padding: 16,
 		...fonts.xxs,
 		marginTop: 24,
 		borderRadius: 4,
-		backgroundColor: colors.gray200,
-		border: `1px solid ${colors.gray400}`,
+		backgroundColor: theme.colors.gray200,
+		border: `1px solid ${theme.colors.gray400}`,
 	},
-});
+}));
 
 interface RenderJsonProps {
 	json: any;

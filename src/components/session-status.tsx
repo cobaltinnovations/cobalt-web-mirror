@@ -1,6 +1,5 @@
+import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 
 export enum SESSION_STATUS {
 	NEW = 'NEW',
@@ -9,25 +8,25 @@ export enum SESSION_STATUS {
 	CANCELED = 'CANCELED',
 }
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionStatusDot: ({ status }: { status: SESSION_STATUS | string }) => {
 		let statusColor;
 
 		switch (status) {
 			case SESSION_STATUS.NEW: // Now called "Pending"
-				statusColor = colors.gray700;
+				statusColor = theme.colors.gray700;
 				break;
 			case SESSION_STATUS.ADDED:
-				statusColor = colors.success;
+				statusColor = theme.colors.success;
 				break;
 			case SESSION_STATUS.ARCHIVED:
-				statusColor = colors.border;
+				statusColor = theme.colors.border;
 				break;
 			case SESSION_STATUS.CANCELED:
-				statusColor = colors.danger;
+				statusColor = theme.colors.danger;
 				break;
 			default:
-				statusColor = colors.gray100;
+				statusColor = theme.colors.gray100;
 		}
 
 		return {
@@ -38,7 +37,7 @@ const useStyles = createUseStyles({
 			backgroundColor: statusColor,
 		};
 	},
-});
+}));
 
 interface SessionStatusProps {
 	status: SESSION_STATUS | string;

@@ -1,10 +1,9 @@
+import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC, PropsWithChildren } from 'react';
 import { Button, Container } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import { useHistory } from 'react-router-dom';
-import colors from '@/jss/colors';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionFormSubmitBanner: {
 		left: 0,
 		right: 0,
@@ -13,10 +12,10 @@ const useStyles = createUseStyles({
 		padding: '20px 0',
 		position: 'fixed',
 		textAlign: 'center',
-		backgroundColor: colors.white,
-		borderTop: `1px solid ${colors.border}`,
+		backgroundColor: theme.colors.white,
+		borderTop: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
 interface SessionFormSubmitBannerProps extends PropsWithChildren {
 	title: string;

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import {
@@ -20,7 +19,6 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 
 import { useSchedulingStyles } from './use-scheduling-styles';
-import colors from '@/jss/colors';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -30,8 +28,9 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	appointmentsList: {
 		padding: 0,
 		margin: 0,
@@ -39,12 +38,12 @@ const useStyles = createUseStyles({
 			padding: '10px 15px',
 		},
 		'& li:nth-child(odd)': {
-			backgroundColor: colors.gray200,
+			backgroundColor: theme.colors.gray200,
 		},
 	},
 	attendedButton: {
-		color: colors.success,
-		borderColor: colors.success,
+		color: theme.colors.success,
+		borderColor: theme.colors.success,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -53,8 +52,8 @@ const useStyles = createUseStyles({
 		},
 	},
 	noShowButton: {
-		color: colors.danger,
-		borderColor: colors.danger,
+		color: theme.colors.danger,
+		borderColor: theme.colors.danger,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -64,8 +63,8 @@ const useStyles = createUseStyles({
 	},
 	attendedButtonSolid: {
 		border: 0,
-		color: colors.white,
-		backgroundColor: colors.success,
+		color: theme.colors.white,
+		backgroundColor: theme.colors.success,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -75,8 +74,8 @@ const useStyles = createUseStyles({
 	},
 	noShowButtonSolid: {
 		border: 0,
-		color: colors.white,
-		backgroundColor: colors.danger,
+		color: theme.colors.white,
+		backgroundColor: theme.colors.danger,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -84,7 +83,7 @@ const useStyles = createUseStyles({
 			outline: 'none',
 		},
 	},
-});
+}));
 
 interface AppointmentDetailPanelProps {
 	setCalendarDate: (date: Date, time?: string) => void;

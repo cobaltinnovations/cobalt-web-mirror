@@ -1,19 +1,17 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useTableStyles = createUseStyles({
+const useTableStyles = createUseThemedStyles((theme) => ({
 	tableOuter: {
 		width: '100%',
 		overflowX: 'auto',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	table: {
 		width: '100%',
 	},
-});
+}));
 
 interface TableProps extends PropsWithChildren {
 	className?: string;

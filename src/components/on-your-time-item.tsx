@@ -1,20 +1,19 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useOnYourTimeItemStyles = createUseStyles({
+const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 	onYourTimeItem: {
 		padding: 8,
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 	},
 	imageContainer: {
 		flexShrink: 0,
@@ -36,7 +35,7 @@ const useOnYourTimeItemStyles = createUseStyles({
 		left: 8,
 		...fonts.xxxs,
 		...fonts.karlaBold,
-		color: colors.white,
+		color: theme.colors.white,
 		position: 'absolute',
 		textTransform: 'uppercase',
 	},
@@ -44,10 +43,10 @@ const useOnYourTimeItemStyles = createUseStyles({
 		flex: 1,
 		paddingLeft: 16,
 		paddingRight: 8,
-		color: colors.dark,
+		color: theme.colors.dark,
 		overflow: 'hidden',
 	},
-});
+}));
 
 interface OnYourTimeItemProps {
 	className?: string;

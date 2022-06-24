@@ -1,8 +1,7 @@
+import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionAttendees: {
 		display: 'flex',
 		alignItems: 'center',
@@ -14,14 +13,14 @@ const useStyles = createUseStyles({
 		borderRadius: 7,
 		marginBottom: 4,
 		overflow: 'hidden',
-		backgroundColor: colors.gray300,
+		backgroundColor: theme.colors.gray300,
 	},
 	progressBarFill: ({ percentage }: { percentage: number }) => ({
 		height: '100%',
 		width: `${percentage * 100}%`,
-		backgroundColor: colors.success,
+		backgroundColor: theme.colors.success,
 	}),
-});
+}));
 
 interface SessionAttendeesProps {
 	currentAmount: number;

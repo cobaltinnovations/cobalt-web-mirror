@@ -1,13 +1,12 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 import Color from 'color';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useFilterPillStyles = createUseStyles({
+const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
 		margin: 5,
 		...fonts.xxs,
@@ -17,32 +16,32 @@ const useFilterPillStyles = createUseStyles({
 		...fonts.karlaRegular,
 		textTransform: 'uppercase',
 		padding: '4px 10px 4px 12px',
-		backgroundColor: Color(colors.dark).alpha(0.12).string(),
-		border: `1px solid ${colors.dark}`,
+		backgroundColor: Color(theme.colors.dark).alpha(0.12).string(),
+		border: `1px solid ${theme.colors.dark}`,
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	activePill: {
-		backgroundColor: colors.dark,
-		color: colors.white,
+		backgroundColor: theme.colors.dark,
+		color: theme.colors.white,
 	},
 	disabledPill: {
-		backgroundColor: colors.shadedPill,
-		color: colors.gray600,
+		backgroundColor: theme.colors.shadedPill,
+		color: theme.colors.gray600,
 	},
 	arrowDown: {
 		marginLeft: 2,
 		marginTop: -1,
-		fill: colors.dark,
+		fill: theme.colors.dark,
 	},
 	activeArrowDown: {
-		fill: colors.white,
+		fill: theme.colors.white,
 	},
 	disabledArrowDown: {
-		fill: colors.gray600,
+		fill: theme.colors.gray600,
 	},
-});
+}));
 
 interface FilterPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	active: boolean;

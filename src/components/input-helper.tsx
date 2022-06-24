@@ -1,10 +1,9 @@
 import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface useInputHelperStylesProps {
 	isHovered: boolean;
@@ -14,13 +13,15 @@ interface useInputHelperStylesProps {
 	hasError: boolean;
 }
 
-const useInputHelperStyles = createUseStyles({
+const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	inputHelper: ({ as, isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
 		overflow: 'hidden',
 		position: 'relative',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.white,
 		height: as === 'textarea' ? 110 : 56,
-		border: `1px solid ${hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.border}`,
+		border: `1px solid ${
+			hasError ? theme.colors.danger : isHovered || isFocused ? theme.colors.primary : theme.colors.border
+		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
 		top: 18,
@@ -31,7 +32,7 @@ const useInputHelperStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transformOrigin: 'left top',
-		color: hasError ? colors.danger : isFocused ? colors.primary : colors.gray600,
+		color: hasError ? theme.colors.danger : isFocused ? theme.colors.primary : theme.colors.gray600,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
 	}),
@@ -53,7 +54,7 @@ const useInputHelperStyles = createUseStyles({
 		},
 		opacity: as === 'select' ? (value ? 1 : 0) : 1,
 		'&:disabled': {
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 		},
 	}),
 	downChevron: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
@@ -63,9 +64,9 @@ const useInputHelperStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transform: 'translateY(-50%)',
-		fill: hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.black,
+		fill: hasError ? theme.colors.danger : isHovered || isFocused ? theme.colors.primary : theme.colors.black,
 	}),
-});
+}));
 
 interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	label: string;

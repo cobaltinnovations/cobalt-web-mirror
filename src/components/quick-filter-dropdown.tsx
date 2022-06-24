@@ -1,13 +1,12 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Dropdown, FormCheck } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import FilterPill from '@/components/filter-pill';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	quickFilterToggle: {
 		'&:after': {
 			display: 'none !important',
@@ -17,13 +16,13 @@ const useStyles = createUseStyles({
 		width: 284,
 		borderRadius: 0,
 		padding: '24px 0 20px',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 	},
 	quickFilterHeader: {
 		...fonts.s,
 		marginBottom: 15,
 		padding: '0 24px',
-		color: colors.dark,
+		color: theme.colors.dark,
 		...fonts.nunitoSansBold,
 	},
 	quickFilterItem: {
@@ -37,7 +36,7 @@ const useStyles = createUseStyles({
 			whiteSpace: 'pre-wrap',
 		},
 	},
-});
+}));
 
 interface QuickFilterToggleProps extends PropsWithChildren {
 	id: string;

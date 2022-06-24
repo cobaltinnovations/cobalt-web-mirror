@@ -1,12 +1,11 @@
 import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import ReactCrop from 'react-image-crop';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import 'react-image-crop/dist/ReactCrop.css';
-import colors from '@/jss/colors';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
 function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
 	const canvas = document.createElement('canvas');
@@ -49,7 +48,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 	});
 }
 
-const useSessionCropModalStyles = createUseStyles({
+const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	sessionCropModal: {
 		width: '90%',
 		maxWidth: 600,
@@ -59,9 +58,9 @@ const useSessionCropModalStyles = createUseStyles({
 		width: 20,
 		height: 20,
 		marginRight: 10,
-		fill: colors.warning,
+		fill: theme.colors.warning,
 	},
-});
+}));
 
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;

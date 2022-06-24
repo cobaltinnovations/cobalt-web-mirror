@@ -1,28 +1,27 @@
 import React, { FC } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import FileInputButton from '@/components/file-input-button';
 
-import colors from '@/jss/colors';
 import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	progressBar: {
 		flex: 1,
 		height: 13,
 		marginRight: 8,
 		borderRadius: 7,
 		overflow: 'hidden',
-		backgroundColor: colors.gray300,
+		backgroundColor: theme.colors.gray300,
 	},
 	progressBarFill: ({ percentage }: { percentage: number }) => ({
 		height: '100%',
 		width: `${percentage}%`,
 		transition: '0.3s width',
-		backgroundColor: colors.success,
+		backgroundColor: theme.colors.success,
 	}),
-});
+}));
 
 interface ImageUploadProps {
 	imagePreview?: string;
