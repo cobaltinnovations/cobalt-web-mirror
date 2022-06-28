@@ -2,8 +2,6 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
-
 import { SORT_DIRECTION } from '.';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -18,14 +16,14 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		},
 	}),
 	tableCellContent: (props: any) => ({
-		...fonts.s,
+		...theme.fonts.s,
 		padding: '16px 16px',
 		width: typeof props.width === 'string' ? 'auto' : props.width,
 		...(props.header
 			? {
-					...fonts.xxxs,
+					...theme.fonts.xxxs,
 					display: 'flex',
-					...fonts.karlaBold,
+					...theme.fonts.secondaryBold,
 					alignItems: 'center',
 					whiteSpace: 'nowrap',
 					color: theme.colors.gray600,

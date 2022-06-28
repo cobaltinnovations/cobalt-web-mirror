@@ -77,7 +77,7 @@ const SessionRow: FC<SessionRowProps> = ({
 			<TableCell>
 				<Link
 					to={`/in-the-studio/group-session-scheduled/${session.groupSessionId}`}
-					className="d-block font-size-xs font-karla-bold"
+					className="d-block font-size-xs font-secondary-bold"
 				>
 					{session.title}
 				</Link>

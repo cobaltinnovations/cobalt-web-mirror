@@ -700,7 +700,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<div className="d-flex align-items-center justify-content-center mb-1">
-								<small className="mb-0 text-uppercase text-muted font-karla-bold">Filters</small>
+								<small className="mb-0 text-uppercase text-muted font-secondary-bold">Filters</small>
 							</div>
 							<div className="d-flex justify-content-center flex-wrap">
 								<FilterPill
@@ -837,7 +837,7 @@ const ConnectWithSupport: FC = () => {
 					return (
 						<div key={section.date}>
 							<DayContainer className="mb-4">
-								<p className="mb-0 font-karla-bold">{section.dateDescription}</p>
+								<p className="mb-0 font-secondary-bold">{section.dateDescription}</p>
 							</DayContainer>
 
 							<Container>

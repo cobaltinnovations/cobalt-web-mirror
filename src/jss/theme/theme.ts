@@ -1,3 +1,30 @@
+export type CobaltPrimaryFont = {
+	fontFamily: string;
+	weights: {
+		regular: number;
+		semiBold: number;
+		bold: number;
+	};
+};
+
+export type CobaltSecondaryFont = {
+	fontFamily: string;
+	weights: {
+		regular: number;
+		bold: number;
+	};
+};
+
+type CobaltFontSizeConfig = {
+	fontSize: string;
+	lineHeight: string;
+};
+
+type CobaltFontConfig = {
+	fontFamily: string;
+	fontWeight: number;
+};
+
 export type CobaltTheme = {
 	colors: {
 		white: string;
@@ -26,5 +53,22 @@ export type CobaltTheme = {
 		border: string;
 		footer: string;
 		shadedPill: string;
+	};
+
+	fonts: {
+		xxxs: CobaltFontSizeConfig;
+		xxs: CobaltFontSizeConfig;
+		xs: CobaltFontSizeConfig;
+		s: CobaltFontSizeConfig;
+		m: CobaltFontSizeConfig;
+		l: CobaltFontSizeConfig;
+		xl: CobaltFontSizeConfig;
+		xxl: CobaltFontSizeConfig;
+		xxxl: CobaltFontSizeConfig;
+		primaryRegular: CobaltFontConfig;
+		primarySemiBold: CobaltFontConfig;
+		primaryBold: CobaltFontConfig;
+		secondaryRegular: CobaltFontConfig;
+		secondaryBold: CobaltFontConfig;
 	};
 };

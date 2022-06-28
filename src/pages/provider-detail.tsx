@@ -313,7 +313,7 @@ const ProviderDetail = () => {
 													return (
 														<div key={section.date}>
 															<DayContainer className="mb-4">
-																<p className="mb-0 font-karla-bold">
+																<p className="mb-0 font-secondary-bold">
 																	{section.dateDescription}
 																</p>
 															</DayContainer>

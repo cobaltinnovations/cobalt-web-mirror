@@ -8,11 +8,12 @@ import AsyncPage from '@/components/async-page';
 
 import { appointmentService } from '@/lib/services';
 import { AppointmentModel, VideoconferencePlatformId } from '@/lib/models';
-import fonts from '@/jss/fonts';
+import { useCobaltTheme } from '@/jss/theme';
 
 const AppointmentDetails: FC = () => {
 	useHeaderTitle('Appointment');
 	const history = useHistory();
+	const { fonts } = useCobaltTheme();
 	const [details, setDetails] = useState<AppointmentModel>();
 	const { appointmentId } = useParams<{ appointmentId?: string }>();
 

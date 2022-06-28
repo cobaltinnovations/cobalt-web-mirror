@@ -1,6 +1,5 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
-import fonts from '@/jss/fonts';
 
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -12,18 +11,18 @@ const useLabelledInlineSelectStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		justifyContent: 'space-between',
 		'& label': {
-			...fonts.m,
+			...theme.fonts.m,
 			marginBottom: 0,
 		},
 		'& select': {
-			...fonts.l,
+			...theme.fonts.l,
 			border: 'none',
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
 			marginLeft: 'auto',
 			color: theme.colors.primary,
-			...fonts.nunitoSansBold,
+			...theme.fonts.primaryBold,
 			padding: '0 16px 0 0',
 			backgroundColor: 'transparent',
 			borderBottom: `1px solid ${theme.colors.primary}`,

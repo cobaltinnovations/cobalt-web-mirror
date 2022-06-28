@@ -2,18 +2,17 @@ import React, { ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
 import Color from 'color';
 
-import fonts from '@/jss/fonts';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
 		margin: 5,
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		borderRadius: 500,
 		appearance: 'none',
 		whiteSpace: 'nowrap',
-		...fonts.karlaRegular,
+		...theme.fonts.secondaryRegular,
 		textTransform: 'uppercase',
 		padding: '4px 10px 4px 12px',
 		backgroundColor: Color(theme.colors.dark).alpha(0.12).string(),

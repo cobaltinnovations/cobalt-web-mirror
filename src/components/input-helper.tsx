@@ -1,7 +1,7 @@
 import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
-import fonts from '@/jss/fonts';
+
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -39,7 +39,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	input: ({ as, value }: useInputHelperStylesProps) => ({
 		margin: 0,
 		border: 0,
-		...fonts.xs,
+		...theme.fonts.xs,
 		width: '100%',
 		height: '100%',
 		resize: 'none',

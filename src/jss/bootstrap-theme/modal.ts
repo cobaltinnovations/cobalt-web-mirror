@@ -1,4 +1,3 @@
-import fonts from '@/jss/fonts';
 import { CobaltTheme } from '@/jss/theme';
 
 export const modal = (theme: CobaltTheme) => {
@@ -87,11 +86,11 @@ export const modal = (theme: CobaltTheme) => {
 			},
 			'&__title': {
 				margin: 0,
-				...fonts.m,
+				...theme.fonts.m,
 				'&--admin': {
 					margin: 0,
-					...fonts.m,
-					...fonts.nunitoSansBold,
+					...theme.fonts.m,
+					...theme.fonts.primaryBold,
 				},
 			},
 			'&__body': {

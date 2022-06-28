@@ -1,14 +1,12 @@
 import React, { FC } from 'react';
 
-import fonts from '@/jss/fonts';
-
 import config from '@/lib/config';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useRenderJsonStyles = createUseThemedStyles((theme) => ({
 	renderJson: {
 		padding: 16,
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		marginTop: 24,
 		borderRadius: 4,
 		backgroundColor: theme.colors.gray200,

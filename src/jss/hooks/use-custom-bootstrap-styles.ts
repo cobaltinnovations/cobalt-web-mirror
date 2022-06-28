@@ -1,5 +1,4 @@
 import { button, card, form, modal, modalForm } from '@/jss/bootstrap-theme';
-import fonts from '@/jss/fonts';
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -56,20 +55,20 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		/* Generic overrides */
 		/* ----------------------------------------------------------- */
 		'.font-weight-regular': {
-			...fonts.nunitoSansRegular,
+			...theme.fonts.primaryRegular,
 		},
 		'.font-weight-semi-bold': {
-			...fonts.nunitoSansSemiBold,
+			...theme.fonts.primarySemiBold,
 		},
 		'.font-weight-bold': {
-			...fonts.nunitoSansBold,
+			...theme.fonts.primaryBold,
 		},
 
-		'.font-karla-regular': {
-			...fonts.karlaRegular,
+		'.font-secondary-regular': {
+			...theme.fonts.secondaryRegular,
 		},
-		'.font-karla-bold': {
-			...fonts.karlaBold,
+		'.font-secondary-bold': {
+			...theme.fonts.secondaryBold,
 		},
 
 		'.text-primary': {
@@ -267,7 +266,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				border: 0,
 				padding: 0,
 				height: 70,
-				...fonts.xs,
+				...theme.fonts.xs,
 				width: '100%',
 				textIndent: 30,
 				borderRadius: 0,
@@ -275,7 +274,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				appearance: 'none',
 				color: theme.colors.dark,
 				lineHeight: 'normal',
-				...fonts.karlaRegular,
+				...theme.fonts.secondaryRegular,
 
 				backgroundColor: 'transparent',
 				'&:focus, &.focus': {
@@ -339,7 +338,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			'& .rbt-input': {
 				margin: 0,
 				border: 0,
-				...fonts.xs,
+				...theme.fonts.xs,
 				width: '100%',
 				minHeight: 56,
 				height: '100%',
@@ -367,11 +366,11 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				fontSize: '1.5rem',
 				lineHeight: 'auto',
 				color: theme.colors.black,
-				...fonts.nunitoSansRegular,
+				...theme.fonts.primaryRegular,
 			},
 			'& .rbt-token': {
 				height: 24,
-				...fonts.xs,
+				...theme.fonts.xs,
 				flexShrink: 0,
 				marginRight: 5,
 				marginBottom: 5,
@@ -400,10 +399,10 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				padding: 0,
 				marginTop: 1,
 				'& .dropdown-item': {
-					...fonts.xs,
+					...theme.fonts.xs,
 					color: theme.colors.dark,
 					padding: '8px 13px',
-					...fonts.karlaRegular,
+					...theme.fonts.secondaryRegular,
 					textDecoration: 'none',
 					'&:hover, &:focus, &.active': {
 						backgroundColor: Color('#DBD4CF').alpha(0.2).string(),
@@ -415,7 +414,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				},
 				'& .rbt-highlight-text': {
 					padding: 0,
-					...fonts.karlaBold,
+					...theme.fonts.secondaryBold,
 					backgroundColor: 'transparent',
 				},
 				'& .rbt-menu-custom-option': {
@@ -435,7 +434,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				alignItems: 'center',
 				color: theme.colors.gray600,
 				display: 'inline-flex',
-				...fonts.nunitoSansSemiBold,
+				...theme.fonts.primarySemiBold,
 				'&:before': {
 					top: 0,
 					left: 0,

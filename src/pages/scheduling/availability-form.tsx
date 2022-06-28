@@ -11,8 +11,8 @@ import AsyncPage from '@/components/async-page';
 import TimeInput from '@/components/time-input';
 import DatePicker from '@/components/date-picker';
 import { AppointmentTypeItem } from './appointment-type-item';
-import fonts from '@/jss/fonts';
 import { cloneDeep } from 'lodash';
+import { useCobaltTheme } from '@/jss/theme';
 
 export interface AvailabilityFormSchema {
 	appointmentTypes: string[];
@@ -52,6 +52,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 }) => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
+	const { fonts } = useCobaltTheme();
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
 
 	const hideAppointmentTypes = logicalAvailabilityTypeId === 'BLOCK';

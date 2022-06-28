@@ -21,7 +21,6 @@ import {
 	ROLE_ID,
 } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
 import { getRequiredYupFields } from '@/lib/utils';
@@ -641,7 +640,7 @@ const CreateOnYourTimeContent: FC = () => {
 																		<div className="ml-6 flex-fill">
 																			<Form.Label
 																				className="mb-2"
-																				style={{ ...fonts.xs }}
+																				style={{ ...theme.fonts.xs }}
 																			>
 																				Post Content{' '}
 																				{requiredFields.description && (
@@ -669,7 +668,7 @@ const CreateOnYourTimeContent: FC = () => {
 																			{touched.description && errors.description && (
 																				<p
 																					className="text-danger"
-																					style={{ ...fonts.xxs }}
+																					style={{ ...theme.fonts.xxs }}
 																				>
 																					description is a required field
 																				</p>
@@ -704,14 +703,14 @@ const CreateOnYourTimeContent: FC = () => {
 																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 																<Card className="mb-5 border-0 p-6">
 																	<h5 className="mb-2">Visibility *</h5>
-																	<div className="mb-5" style={{ ...fonts.xs }}>
+																	<div className="mb-5" style={{ ...theme.fonts.xs }}>
 																		Choose which institutions are allowed to share
 																		this content with their patients.
 																	</div>
 																	<Form.Group className="mb-5">
 																		<Form.Label
 																			className="mb-1"
-																			style={{ ...fonts.xs }}
+																			style={{ ...theme.fonts.xs }}
 																		>
 																			Allow other institutions to share this
 																			content?
@@ -758,7 +757,7 @@ const CreateOnYourTimeContent: FC = () => {
 																	</Form.Group>
 																	<Form.Label
 																		className="mb-1"
-																		style={{ ...fonts.xs }}
+																		style={{ ...theme.fonts.xs }}
 																	>
 																		Select the level of visibility:
 																	</Form.Label>
@@ -770,7 +769,7 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityNetwork"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>
+																					<div style={{ ...theme.fonts.xs }}>
 																						Only other Institutions in my
 																						network
 																					</div>
@@ -802,7 +801,7 @@ const CreateOnYourTimeContent: FC = () => {
 																				<div className="ml-7 mt-2 mb-3">
 																					<Form.Label
 																						className="mb-2"
-																						style={{ ...fonts.xs }}
+																						style={{ ...theme.fonts.xs }}
 																					>
 																						Select the other institutions
 																						you will allow to have access to
@@ -823,7 +822,9 @@ const CreateOnYourTimeContent: FC = () => {
 																									label={
 																										<div
 																											style={{
-																												...fonts.xs,
+																												...theme
+																													.fonts
+																													.xs,
 																											}}
 																										>
 																											{name}
@@ -884,7 +885,7 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityPublic"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>
+																					<div style={{ ...theme.fonts.xs }}>
 																						Public
 																					</div>
 																					<div className={classes.grayText}>

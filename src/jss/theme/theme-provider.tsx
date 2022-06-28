@@ -8,6 +8,7 @@ import { CobaltTheme } from './theme';
 
 export function loadTheme(): Readonly<CobaltTheme> {
 	if (__DEV__) {
+		console.log(getSubdomain());
 		try {
 			return require(`./config/${getSubdomain()}`);
 		} catch (e) {

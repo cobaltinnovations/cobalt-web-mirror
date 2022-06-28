@@ -5,7 +5,6 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
@@ -33,8 +32,8 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 	tag: {
 		top: 8,
 		left: 8,
-		...fonts.xxxs,
-		...fonts.karlaBold,
+		...theme.fonts.xxxs,
+		...theme.fonts.secondaryBold,
 		color: theme.colors.white,
 		position: 'absolute',
 		textTransform: 'uppercase',
@@ -80,10 +79,12 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 				)}
 
 				<div className="d-flex">
-					<small className="text-muted text-uppercase font-karla-bold">{props.type}</small>
+					<small className="text-muted text-uppercase font-secondary-bold">{props.type}</small>
 
 					{props.duration && (
-						<small className="text-muted text-uppercase font-karla-bold ml-auto">{props.duration}</small>
+						<small className="text-muted text-uppercase font-secondary-bold ml-auto">
+							{props.duration}
+						</small>
 					)}
 				</div>
 			</div>

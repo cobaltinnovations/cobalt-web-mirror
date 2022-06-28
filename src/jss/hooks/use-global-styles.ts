@@ -1,4 +1,3 @@
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 export const useGlobalStyles = createUseThemedStyles((theme) => ({
@@ -17,12 +16,12 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			fontSize: '10px',
 		},
 		body: {
-			...fonts.xs,
+			...theme.fonts.xs,
 			minHeight: '100%',
 			letterSpacing: 0.5,
 			color: theme.colors.dark,
 			position: 'relative',
-			...fonts.nunitoSansRegular,
+			...theme.fonts.primaryRegular,
 			backgroundColor: theme.colors.background,
 			backgroundImage:
 				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
@@ -39,41 +38,41 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		/* Headings and text */
 		/* ----------------------------------------------------------- */
 		h1: {
-			...fonts.xxxl,
-			...fonts.nunitoSansBold,
+			...theme.fonts.xxxl,
+			...theme.fonts.primaryBold,
 		},
 		h2: {
-			...fonts.xxl,
-			...fonts.nunitoSansBold,
+			...theme.fonts.xxl,
+			...theme.fonts.primaryBold,
 		},
 		h3: {
-			...fonts.xl,
-			...fonts.nunitoSansBold,
+			...theme.fonts.xl,
+			...theme.fonts.primaryBold,
 		},
 		h4: {
-			...fonts.l,
-			...fonts.nunitoSansBold,
+			...theme.fonts.l,
+			...theme.fonts.primaryBold,
 		},
 		h5: {
-			...fonts.m,
-			...fonts.nunitoSansBold,
+			...theme.fonts.m,
+			...theme.fonts.primaryBold,
 		},
 		h6: {
-			...fonts.s,
-			...fonts.nunitoSansBold,
+			...theme.fonts.s,
+			...theme.fonts.primaryBold,
 		},
 		p: {
-			...fonts.xs,
-			...fonts.karlaRegular,
+			...theme.fonts.xs,
+			...theme.fonts.secondaryRegular,
 		},
 		'small, .small': {
-			...fonts.xxs,
+			...theme.fonts.xxs,
 			display: 'block',
-			...fonts.karlaRegular,
+			...theme.fonts.secondaryRegular,
 		},
 		a: {
 			wordBreak: 'break-word',
-			...fonts.karlaBold,
+			...theme.fonts.secondaryBold,
 			color: theme.colors.primary,
 			textDecoration: 'underline',
 			'&:hover': {
@@ -92,32 +91,32 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 
 		'.font-size-xxxs': {
-			...fonts.xxxs,
+			...theme.fonts.xxxs,
 		},
 		'.font-size-xxs': {
-			...fonts.xxs,
+			...theme.fonts.xxs,
 		},
 		'.font-size-xs': {
-			fontSize: `${fonts.xs.fontSize} !important`,
-			lineHeight: `${fonts.xs.lineHeight} !important`,
+			fontSize: `${theme.fonts.xs.fontSize} !important`,
+			lineHeight: `${theme.fonts.xs.lineHeight} !important`,
 		},
 		'.font-size-s': {
-			...fonts.s,
+			...theme.fonts.s,
 		},
 		'.font-size-m': {
-			...fonts.m,
+			...theme.fonts.m,
 		},
 		'.font-size-l': {
-			...fonts.l,
+			...theme.fonts.l,
 		},
 		'.font-size-xl': {
-			...fonts.xl,
+			...theme.fonts.xl,
 		},
 		'.font-size-xxl': {
-			...fonts.xxl,
+			...theme.fonts.xxl,
 		},
 		'.font-size-xxxl': {
-			...fonts.xxxl,
+			...theme.fonts.xxxl,
 		},
 
 		/* ----------------------------------------------------------- */
@@ -128,9 +127,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 		'.react-datepicker': {
 			border: 0,
-			...fonts.xs,
+			...theme.fonts.xs,
 			borderRadius: 0,
-			...fonts.karlaRegular,
+			...theme.fonts.secondaryRegular,
 			boxShadow: '1px 2px 8px 0px rgba(0,0,0,0.32)',
 			'&__triangle': {
 				borderBottomColor: `${theme.colors.primary} !important`,
@@ -144,7 +143,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				backgroundColor: theme.colors.primary,
 			},
 			'&__current-month': {
-				...fonts.xs,
+				...theme.fonts.xs,
 				color: theme.colors.white,
 			},
 			'&__day-name': {
@@ -173,7 +172,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				width: '3.5rem',
 				lineHeight: '3.5rem',
 				'&--today': {
-					...fonts.karlaBold,
+					...theme.fonts.secondaryBold,
 				},
 				'&--selected': {
 					backgroundColor: theme.colors.primary,
@@ -222,8 +221,8 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&__label-container': {
-				...fonts.karlaBold,
-				...fonts.xxs,
+				...theme.fonts.secondaryBold,
+				...theme.fonts.xxs,
 				color: '#6c7978',
 			},
 		},

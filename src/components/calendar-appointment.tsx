@@ -9,7 +9,6 @@ import BackgroundImageContainer from '@/components/background-image-container';
 
 import { AppointmentModel } from '@/lib/models/appointments';
 
-import fonts from '@/jss/fonts';
 import { BetaFeatureId, BetaStatusId, GroupSessionModel } from '@/lib/models';
 import { BetaFeatureModal, BetaFeatureAlertModal } from './beta-features-modals';
 import { accountService } from '@/lib/services';
@@ -36,7 +35,7 @@ const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 	},
 	paymentPill: {
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		color: theme.colors.dark,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,

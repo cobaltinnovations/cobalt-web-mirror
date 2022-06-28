@@ -33,7 +33,7 @@ const Profile: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<p className="mb-0 text-white font-karla-regular text-center">
+				<p className="mb-0 text-white font-secondary-regular text-center">
 					Take a moment to review your profile and let us know if anything has changed.
 				</p>
 			</HeroContainer>

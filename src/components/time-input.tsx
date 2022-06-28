@@ -3,7 +3,6 @@ import InputMask from 'react-input-mask';
 import classNames from 'classnames';
 
 import InputHelper from '@/components/input-helper';
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
@@ -20,7 +19,7 @@ const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 		border: 'none',
 		outline: 'none !important',
 		backgroundColor: 'transparent',
-		...fonts.xxs,
+		...theme.fonts.xxs,
 	},
 	meridianButtonLeft: {
 		padding: '0 15px 0 20px',

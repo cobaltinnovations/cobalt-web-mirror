@@ -2,10 +2,11 @@ import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import fonts from '@/jss/fonts';
+import { useCobaltTheme } from '@/jss/theme';
 
 const NoMatch: FC = () => {
 	useHeaderTitle(null);
+	const { fonts } = useCobaltTheme();
 
 	return (
 		<Container>

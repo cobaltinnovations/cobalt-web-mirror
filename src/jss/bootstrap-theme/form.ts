@@ -1,4 +1,3 @@
-import fonts from '@/jss/fonts';
 import { CobaltTheme } from '@/jss/theme';
 
 export const form = (theme: CobaltTheme) => {
@@ -8,15 +7,15 @@ export const form = (theme: CobaltTheme) => {
 				marginBottom: 25,
 			},
 			'&__label': {
-				...fonts.xl,
+				...theme.fonts.xl,
 				marginBottom: 15,
 				color: theme.colors.dark,
-				...fonts.nunitoSansBold,
+				...theme.fonts.primaryBold,
 			},
 			'&__control': {
 				flex: 1,
 				padding: 0,
-				...fonts.xs,
+				...theme.fonts.xs,
 				width: '100%',
 				textIndent: 15,
 				borderRadius: 0,
@@ -24,7 +23,7 @@ export const form = (theme: CobaltTheme) => {
 				appearance: 'none',
 				color: theme.colors.dark,
 				lineHeight: 'normal',
-				...fonts.karlaRegular,
+				...theme.fonts.secondaryRegular,
 				backgroundColor: theme.colors.white,
 				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
@@ -58,14 +57,14 @@ export const form = (theme: CobaltTheme) => {
 				border: 0,
 				padding: 0,
 				height: 70,
-				...fonts.xs,
+				...theme.fonts.xs,
 				width: '100%',
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
 				color: theme.colors.dark,
 				lineHeight: 'normal',
-				...fonts.karlaRegular,
+				...theme.fonts.secondaryRegular,
 				backgroundColor: 'transparent',
 				'&:focus': {
 					outline: 'none',
@@ -82,14 +81,14 @@ export const form = (theme: CobaltTheme) => {
 					height: 0,
 					opacity: 0,
 					'& + label': {
-						...fonts.l,
+						...theme.fonts.l,
 						padding: '15px 20px 15px 60px',
 						width: '100%',
 						borderRadius: 500,
 						cursor: 'pointer',
 						position: 'relative',
 						color: theme.colors.primary,
-						...fonts.nunitoSansBold,
+						...theme.fonts.primaryBold,
 						backgroundColor: theme.colors.white,
 						'&:before': {
 							left: 15,
@@ -147,8 +146,8 @@ export const form = (theme: CobaltTheme) => {
 						padding: 16,
 						backgroundColor: 'transparent',
 						border: `1px solid ${theme.colors.border}`,
-						...fonts.xxs,
-						...fonts.karlaBold,
+						...theme.fonts.xxs,
+						...theme.fonts.secondaryBold,
 					},
 					'&:checked + label': {
 						color: theme.colors.white,
@@ -198,8 +197,8 @@ export const modalForm = (theme: CobaltTheme) => {
 					height: 0,
 					opacity: 0,
 					'& + label': {
-						...fonts.xs,
-						...fonts.karlaRegular,
+						...theme.fonts.xs,
+						...theme.fonts.secondaryRegular,
 						padding: '6px 0 6px 32px',
 						width: '100%',
 						cursor: 'pointer',

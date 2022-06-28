@@ -3,8 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 
 import FileInputButton from '@/components/file-input-button';
 
-import fonts from '@/jss/fonts';
-import { createUseThemedStyles } from '@/jss/theme';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	progressBar: {
@@ -42,6 +41,7 @@ const ImageUpload: FC<ImageUploadProps> = ({
 	className,
 	disabled = false,
 }) => {
+	const { fonts } = useCobaltTheme();
 	const classes = useStyles({
 		percentage: progress || 0,
 	});

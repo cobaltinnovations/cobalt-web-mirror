@@ -12,7 +12,6 @@ import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
-import fonts from '@/jss/fonts';
 import { imageUploader, groupSessionsService, CreateGroupSessionRequestRequestBody } from '@/lib/services';
 import ImageUpload from '@/components/image-upload';
 import useAlert from '@/hooks/use-alert';
@@ -22,6 +21,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import AsyncPage from '@/components/async-page';
+import { useCobaltTheme } from '@/jss/theme';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -46,6 +46,7 @@ const requiredFields = getRequiredYupFields<GroupSessionByRequestFormData>(group
 
 const GroupSessionsByRequestCreate: FC = () => {
 	const handleError = useHandleError();
+	const { fonts } = useCobaltTheme();
 	const { showAlert } = useAlert();
 	const { account } = useAccount();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();

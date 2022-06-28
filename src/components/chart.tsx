@@ -5,7 +5,6 @@ import Color from 'color';
 
 import { Chart as ChartModel } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
 import { useCobaltTheme } from '@/jss/theme';
 
 interface Dataset {
@@ -36,7 +35,7 @@ interface Dataset {
 }
 
 export const Chart: FC<Props> = ({ configuration }) => {
-	const { colors } = useCobaltTheme();
+	const { colors, fonts } = useCobaltTheme();
 	const [labels, setLabels] = useState<string[]>([]);
 	const [datasets, setDatasets] = useState<Dataset[]>([]);
 
@@ -81,8 +80,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					boxHeight: 6,
 					color: colors.dark,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.secondaryRegular.fontFamily,
+						weight: fonts.secondaryRegular.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -94,13 +93,13 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				backgroundColor: colors.dark,
 				bodyFontColor: colors.white,
 				titleFont: {
-					family: fonts.karlaRegular.fontFamily,
-					weight: fonts.karlaRegular.fontWeight,
+					family: fonts.secondaryRegular.fontFamily,
+					weight: fonts.secondaryRegular.fontWeight,
 					size: 12,
 				},
 				bodyFont: {
-					family: fonts.karlaRegular.fontFamily,
-					weight: fonts.karlaRegular.fontWeight,
+					family: fonts.secondaryRegular.fontFamily,
+					weight: fonts.secondaryRegular.fontWeight,
 					size: 12,
 				},
 				callbacks: {
@@ -148,8 +147,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					color: colors.dark,
 					padding: 5,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.secondaryRegular.fontFamily,
+						weight: fonts.secondaryRegular.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -174,8 +173,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					padding: 20,
 					color: colors.dark,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.secondaryRegular.fontFamily,
+						weight: fonts.secondaryRegular.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},

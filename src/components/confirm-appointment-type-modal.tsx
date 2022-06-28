@@ -3,7 +3,6 @@ import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { AppointmentType, EpicDepartment } from '@/lib/models/appointments';
-import fonts from '@/jss/fonts';
 import { AvailabilityTimeSlot } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -14,7 +13,7 @@ const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 		margin: '0 auto',
 	},
 	unavaiableSlot: {
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		color: theme.colors.gray600,
 	},
 }));

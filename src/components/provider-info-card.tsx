@@ -1,14 +1,13 @@
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import fonts from '@/jss/fonts';
 import { Provider } from '@/lib/models';
 import { Link } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useProviderInfoStyles = createUseThemedStyles((theme) => ({
 	paymentPill: {
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		color: theme.colors.dark,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,

@@ -128,7 +128,7 @@ const GroupSessionsByRequest: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">
+							<small className="mb-0 mr-2 text-uppercase text-muted font-secondary-bold">
 								Quick Filters:
 							</small>
 							<QuickFilterDropdown

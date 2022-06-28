@@ -9,8 +9,6 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
-import fonts from '@/jss/fonts';
-
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import Select from '@/components/select';
 import { useCobaltTheme } from '@/jss/theme';
@@ -233,7 +231,7 @@ export const AppointmentTypeFormModal = ({
 				/>
 
 				<Form.Group>
-					<Form.Label className="d-block" style={{ ...fonts.xs }}>
+					<Form.Label className="d-block" style={{ ...theme.fonts.xs }}>
 						Color:
 					</Form.Label>
 					<input
@@ -246,7 +244,7 @@ export const AppointmentTypeFormModal = ({
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Visit Type:</Form.Label>
+					<Form.Label style={{ ...theme.fonts.xs }}>Visit Type:</Form.Label>
 					<Select
 						value={visitTypeId}
 						onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
@@ -264,7 +262,7 @@ export const AppointmentTypeFormModal = ({
 				</Form.Group>
 
 				<Form.Group>
-					<Form.Label className="m-0" style={{ ...fonts.xs }}>
+					<Form.Label className="m-0" style={{ ...theme.fonts.xs }}>
 						Duration:
 					</Form.Label>
 					<div className="d-flex align-items-center">
@@ -331,7 +329,7 @@ export const AppointmentTypeFormModal = ({
 				<h3 className="mb-4">Client Information</h3>
 
 				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Collect:</Form.Label>
+					<Form.Label style={{ ...theme.fonts.xs }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
 							({ label, question, fontSizeId, questionContentHintId, disabled }) => {

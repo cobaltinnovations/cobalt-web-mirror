@@ -175,7 +175,7 @@ const MyCalendar: FC = () => {
 					return (
 						<div key={index}>
 							<DayContainer className={'mb-2'}>
-								<p className="mb-0 font-karla-bold">{calendarEventGroup.date}</p>
+								<p className="mb-0 font-secondary-bold">{calendarEventGroup.date}</p>
 							</DayContainer>
 							<Container>
 								<Row>

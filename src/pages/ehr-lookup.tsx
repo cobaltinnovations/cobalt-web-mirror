@@ -7,7 +7,6 @@ import { Link, useHistory, Prompt, Redirect } from 'react-router-dom';
 import { pick } from 'lodash';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import fonts from '@/jss/fonts';
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
 import moment from 'moment';
@@ -29,6 +28,7 @@ import ehrSearchAnimation from '@/assets/lottie/ehr-search.json';
 import { BookingContext } from '@/contexts/booking-context';
 import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import { useCobaltTheme } from '@/jss/theme';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -68,7 +68,7 @@ function getClearForm(account: AccountModel | undefined): EpicPatientData {
 
 const EhrLookup: FC = () => {
 	useHeaderTitle('assessment');
-
+	const { fonts } = useCobaltTheme();
 	const handleError = useHandleError();
 	const history = useHistory();
 	const [step, setStep] = useState(0);
@@ -397,6 +397,7 @@ function EhrLoading() {
 }
 
 function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
 	// const canSubmit = values.firstName && values.lastName && values.dateOfBirth;
 
 	const stepValues = pick(values, ['firstName', 'middleInitial', 'lastName', 'dateOfBirth']);
@@ -455,6 +456,8 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 }
 
 function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	const addressSearchInputRef = useRef<any>(null);
 	const [searchQuery, setSearchQuery] = useState(values.address.line1);
 	const [extractedAddress, setExtractedAddress] = useState(values.address);
@@ -606,6 +609,8 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 }
 
 function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	const canSubmit = true;
 
 	const [lastFourSSN, setLastFourSSN] = useState(
@@ -695,6 +700,8 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 }
 
 function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isBooking, numMatches }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	return (
 		<>
 			{numMatches === 0 && (

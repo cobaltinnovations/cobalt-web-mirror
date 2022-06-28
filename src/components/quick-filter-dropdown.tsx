@@ -3,7 +3,6 @@ import { Dropdown, FormCheck } from 'react-bootstrap';
 
 import FilterPill from '@/components/filter-pill';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -19,11 +18,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		border: `2px solid ${theme.colors.border}`,
 	},
 	quickFilterHeader: {
-		...fonts.s,
+		...theme.fonts.s,
 		marginBottom: 15,
 		padding: '0 24px',
 		color: theme.colors.dark,
-		...fonts.nunitoSansBold,
+		...theme.fonts.primaryBold,
 	},
 	quickFilterItem: {
 		display: 'flex',

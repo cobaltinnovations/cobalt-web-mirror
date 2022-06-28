@@ -1,7 +1,6 @@
 import React, { FC, PropsWithChildren } from 'react';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -14,7 +13,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		textAlign: 'center',
 		color: theme.colors.white,
 		display: 'inline-block',
-		...fonts.nunitoSansBold,
+		...theme.fonts.primaryBold,
 		backgroundColor: theme.colors.secondary,
 	}),
 }));

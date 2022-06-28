@@ -1,6 +1,5 @@
 import React, { FC, useContext } from 'react';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { HeaderContext } from '@/contexts/header-context';
@@ -39,7 +38,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 	},
 	link: {
-		...fonts.xl,
+		...theme.fonts.xl,
 		color: theme.colors.primary,
 		letterSpacing: 4,
 		textDecoration: 'none',
@@ -50,12 +49,12 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 	headerTitle: {
 		margin: 0,
-		...fonts.xl,
+		...theme.fonts.xl,
 		overflow: 'hidden',
 		textAlign: 'center',
 		color: theme.colors.dark,
 		whiteSpace: 'nowrap',
-		...fonts.nunitoSansBold,
+		...theme.fonts.primaryBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},

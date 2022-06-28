@@ -2,13 +2,12 @@ import React, { FC, PropsWithChildren, useRef } from 'react';
 import Color from 'color';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 	fileInputButton: {
 		margin: 0,
-		...fonts.m,
+		...theme.fonts.m,
 		cursor: 'pointer',
 		borderRadius: 500,
 		overflow: 'hidden',
@@ -16,7 +15,7 @@ const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 		padding: '10px 25px',
 		position: 'relative',
 		display: 'inline-block',
-		...fonts.nunitoSansBold,
+		...theme.fonts.primaryBold,
 		backgroundColor: theme.colors.primary,
 		'&:hover': {
 			backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),

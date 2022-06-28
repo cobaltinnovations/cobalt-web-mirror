@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
@@ -20,7 +19,7 @@ const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	subTitle: {
-		...fonts.xxxs,
+		...theme.fonts.xxxs,
 	},
 }));
 
@@ -38,7 +37,7 @@ const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
 				<h3 className="mb-0 text-center text-white">your co-pays are being waived</h3>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-2 font-karla-regular text-center text-white">
+				<p className="mb-2 font-secondary-regular text-center text-white">
 					please use our services as much as you need during this challenging time
 				</p>
 			</Modal.Body>

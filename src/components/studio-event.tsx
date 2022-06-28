@@ -69,7 +69,7 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 				>
 					{!groupEvent.isGrouped && (
 						<div className={classes.imageContent}>
-							<small className="text-white text-uppercase font-karla-bold">
+							<small className="text-white text-uppercase font-secondary-bold">
 								{groupEvent.seatsAvailableDescription}
 							</small>
 						</div>
@@ -105,7 +105,7 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 			>
 				{!groupEvent.isGrouped && (
 					<div className={classes.imageContent}>
-						<small className="text-white text-uppercase font-karla-bold">
+						<small className="text-white text-uppercase font-secondary-bold">
 							{groupEvent.seatsAvailableDescription}
 						</small>
 					</div>

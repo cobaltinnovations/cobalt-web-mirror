@@ -75,7 +75,7 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 			<TableCell>
 				<Link
 					to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`}
-					className="d-block font-size-xs font-karla-bold"
+					className="d-block font-size-xs font-secondary-bold"
 				>
 					{session.title}
 				</Link>

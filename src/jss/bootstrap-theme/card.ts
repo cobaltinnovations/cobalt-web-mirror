@@ -1,4 +1,3 @@
-import fonts from '@/jss/fonts';
 import { boxShadow } from '@/jss/mixins';
 import { CobaltTheme } from '@/jss/theme';
 
@@ -13,14 +12,14 @@ export const card = (theme: CobaltTheme) => {
 			},
 			'&__title.h5': {
 				margin: 0,
-				...fonts.m,
-				...fonts.nunitoSansBold,
+				...theme.fonts.m,
+				...theme.fonts.primaryBold,
 				textTransform: 'lowercase',
 			},
 			'&__subtitle.h6': {
 				margin: 0,
-				...fonts.xxs,
-				...fonts.karlaRegular,
+				...theme.fonts.xxs,
+				...theme.fonts.secondaryRegular,
 				textTransform: 'lowercase',
 				color: theme.colors.gray600,
 			},

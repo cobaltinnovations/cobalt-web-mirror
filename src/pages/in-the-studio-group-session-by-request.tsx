@@ -15,9 +15,9 @@ import DatePicker from '@/components/date-picker';
 import { groupSessionsService } from '@/lib/services';
 import { GroupSessionRequestModel } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
 import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
+import { useCobaltTheme } from '@/jss/theme';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -66,6 +66,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 	const handleError = useHandleError();
 	const history = useHistory();
 	const classes = useStyles();
+	const { fonts } = useCobaltTheme();
 	const { groupSessionRequestId } = useParams<{ groupSessionRequestId?: string }>();
 	const [session, setSession] = useState<GroupSessionRequestModel>();
 

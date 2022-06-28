@@ -29,8 +29,6 @@ import {
 } from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel, ROLE_ID, ScreeningQuestionV2 } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
-
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
@@ -40,6 +38,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
+import { useCobaltTheme } from '@/jss/theme';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -134,6 +133,7 @@ const GroupSessionsCreate: FC = () => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const classes = useStyles();
+	const { fonts } = useCobaltTheme();
 	const isViewMode = !!useRouteMatch({
 		path: '/group-sessions/scheduled/:groupSessionId/view',
 		exact: true,

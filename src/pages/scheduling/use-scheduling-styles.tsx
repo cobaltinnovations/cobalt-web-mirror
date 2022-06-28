@@ -1,4 +1,3 @@
-import fonts from '@/jss/fonts';
 import { createUseThemedStyles } from '@/jss/theme';
 
 export const useSchedulingStyles = createUseThemedStyles((theme) => ({
@@ -57,7 +56,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 				display: 'flex',
 				alignItems: 'center',
 				'& .fc-toolbar-title': {
-					...fonts.m,
+					...theme.fonts.m,
 				},
 				'& button.fc-prev-button, & button.fc-next-button': {
 					margin: 0,
@@ -77,7 +76,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 					marginLeft: 8,
 				},
 				'& button.fc-today-button': {
-					...fonts.xs,
+					...theme.fonts.xs,
 					borderRadius: 500,
 					padding: '4px 12px',
 					color: theme.colors.primary,
@@ -92,7 +91,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 		'& .fc-theme-standard td, .fc-theme-standard th': {
 			border: 0,
 			'& a:not([href])': {
-				...fonts.xs,
+				...theme.fonts.xs,
 				color: theme.colors.gray600,
 			},
 		},
@@ -162,7 +161,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 		height: '100%',
 		'& .fc': {
 			'& .fc-col-header-cell-cushion': {
-				...fonts.s,
+				...theme.fonts.s,
 				color: theme.colors.dark,
 				padding: '9px 7px',
 			},
@@ -191,7 +190,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 				verticalAlign: 'top',
 			},
 			'& .fc-timegrid-slot-label-cushion': {
-				...fonts.xxxs,
+				...theme.fonts.xxxs,
 				color: theme.colors.gray600,
 				padding: '4px 4px 0 0',
 			},

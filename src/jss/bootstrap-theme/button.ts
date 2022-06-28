@@ -1,18 +1,17 @@
 import Color from 'color';
-import fonts from '@/jss/fonts';
 import { CobaltTheme } from '@/jss/theme';
 
 export const button = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-button': {
 			border: 0,
-			...fonts.l,
+			...theme.fonts.l,
 			borderRadius: 500,
 			appearance: 'none',
 			color: theme.colors.white,
 			padding: '15px 35px',
 			textDecoration: 'none',
-			...fonts.nunitoSansBold,
+			...theme.fonts.primaryBold,
 			textTransform: 'none',
 			backgroundColor: theme.colors.primary,
 			'&:hover': {
@@ -36,11 +35,11 @@ export const button = (theme: CobaltTheme) => {
 			},
 
 			'&-sm': {
-				...fonts.m,
+				...theme.fonts.m,
 				padding: '10px 25px',
 			},
 			'&-xsm': {
-				...fonts.m,
+				...theme.fonts.m,
 				padding: '5px 7px',
 			},
 

@@ -6,7 +6,6 @@ import { uniq } from 'lodash';
 import classNames from 'classnames';
 import { PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 import Media from 'react-media';
-import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { screenWidths } from '@/jss/media-queries';
@@ -26,12 +25,12 @@ const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) =
 		},
 	},
 	modalTitle: {
-		...fonts.s,
-		...fonts.nunitoSansBold,
+		...theme.fonts.s,
+		...theme.fonts.primaryBold,
 	},
 	clearLink: {
-		...fonts.xs,
-		...fonts.karlaBold,
+		...theme.fonts.xs,
+		...theme.fonts.secondaryBold,
 	},
 	closeIcon: {
 		marginRight: 25,
@@ -64,12 +63,12 @@ const useQuestionItemStyles = createUseThemedStyles((theme) => ({
 	},
 	pill: {
 		margin: 5,
-		...fonts.xxs,
+		...theme.fonts.xxs,
 		borderRadius: 500,
 		appearance: 'none',
 		padding: '4px 12px',
 		whiteSpace: 'nowrap',
-		...fonts.karlaRegular,
+		...theme.fonts.secondaryRegular,
 		textTransform: 'uppercase',
 		backgroundColor: theme.colors.shadedPill,
 		border: `1px solid ${theme.colors.dark}`,

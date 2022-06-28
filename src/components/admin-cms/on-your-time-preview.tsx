@@ -4,8 +4,8 @@ import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import fonts from '@/jss/fonts';
-import { createUseThemedStyles } from '@/jss/theme';
+
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 
 const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
@@ -86,6 +86,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 	const classes = useOnYourTimePreviewStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [canEmbed, setCanEmbed] = useState(false);
+	const { fonts } = useCobaltTheme();
 
 	useEffect(() => {
 		if (!props.url) {
@@ -122,7 +123,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									{props?.title && (
 										<div
 											className="position-relative mb-0"
-											style={{ ...fonts.xxs, ...fonts.nunitoSansBold }}
+											style={{ ...fonts.xxs, ...fonts.primaryBold }}
 										>
 											<CircleIndicator size={16} className={classes.circleTwo}>
 												2
@@ -145,7 +146,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										<div className="position-relative">
 											{props?.contentTypeLabel && (
 												<span
-													className="text-muted text-uppercase font-karla-bold"
+													className="text-muted text-uppercase font-secondary-bold"
 													style={{ ...fonts.xxxs }}
 												>
 													<CircleIndicator size={16} className={classes.circleOne}>
@@ -158,7 +159,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 										{props?.duration && (
 											<span
-												className="position-relative text-muted text-uppercase font-karla-bold ml-auto "
+												className="position-relative text-muted text-uppercase font-secondary-bold ml-auto "
 												style={{ ...fonts.xxxs, whiteSpace: 'nowrap' }}
 											>
 												<CircleIndicator size={16} className={classes.circleFour}>

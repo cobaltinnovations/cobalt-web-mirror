@@ -11,8 +11,6 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
 
-import fonts from '@/jss/fonts';
-
 import { ReactComponent as UpChevron } from '@/assets/icons/icon-chevron-up.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -76,8 +74,8 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
 		borderTop: `1px solid ${theme.colors.border}`,
-		...fonts.xxs,
-		...fonts.karlaBold,
+		...theme.fonts.xxs,
+		...theme.fonts.secondaryBold,
 		'&:hover': {
 			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
@@ -102,14 +100,14 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	},
 	mainMenuList: {
 		'& li a': {
-			...fonts.s,
+			...theme.fonts.s,
 			color: theme.colors.dark,
 			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
 		'& li a': {
-			...fonts.xxs,
+			...theme.fonts.xxs,
 			color: theme.colors.gray600,
 			textTransform: 'uppercase',
 		},

@@ -2,8 +2,6 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
-
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -12,13 +10,13 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		'& select': {
 			height: 54,
-			...fonts.xs,
+			...theme.fonts.xs,
 			width: '100%',
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
 			color: theme.colors.dark,
-			...fonts.karlaRegular,
+			...theme.fonts.secondaryRegular,
 			padding: '0 40px 0 15px',
 			backgroundColor: theme.colors.white,
 			border: `1px solid ${theme.colors.border}`,
