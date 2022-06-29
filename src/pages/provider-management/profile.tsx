@@ -214,7 +214,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 								<div className="d-flex align-items-center">
 									{provider?.imageUrl && (
 										<BackgroundImageContainer
-											className="mr-4"
+											className="me-4"
 											size={90}
 											imageUrl={provider.imageUrl}
 										/>

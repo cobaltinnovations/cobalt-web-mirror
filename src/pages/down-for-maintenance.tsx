@@ -24,37 +24,37 @@ const DownForMaintenance = (): ReactElement => {
 						<LogoIconText className={classes.logoIconText} />
 					</div>
 
-					<p className="mb-2 text-center font-size-m">
+					<p className="mb-2 text-center fs-large">
 						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be
 						back online shortly.
 					</p>
-					<p className="mb-8 text-center font-size-m">
+					<p className="mb-8 text-center fs-large">
 						If you need immediate help, please contact one of the following numbers:
 					</p>
 
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:911">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
 							<span className="d-block mb-2">Call 911</span>
-							<span className="d-block font-weight-regular">24/7 emergency</span>
+							<span className="d-block font-heading-normal">24/7 emergency</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:8007238255">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
 							<span className="d-block mb-2">Call 800-273-8255</span>
-							<span className="d-block font-weight-regular">24/7 National suicide prevention line</span>
+							<span className="d-block font-heading-normal">24/7 National suicide prevention line</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-4 w-100 d-flex align-items-center" href="tel:741741">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
 							<span className="d-block mb-2">Text 741 741</span>
-							<span className="d-block font-weight-regular">24/7 Crisis Text Line</span>
+							<span className="d-block font-heading-normal">24/7 Crisis Text Line</span>
 						</div>
 					</Button>
 
-					<p className="text-center font-size-m font-weight-bold">
+					<p className="text-center fs-large font-heading-bold">
 						or go to your nearest emergency department or crisis center
 					</p>
 				</Col>

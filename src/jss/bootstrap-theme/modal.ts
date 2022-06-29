@@ -10,7 +10,7 @@ export const modal = (theme: CobaltTheme) => {
 			'&__header': {
 				position: 'relative',
 				padding: '25px 25px 0',
-				'& button.close': {
+				'& button.btn-close': {
 					top: 19,
 					right: 15,
 					width: 40,
@@ -48,7 +48,7 @@ export const modal = (theme: CobaltTheme) => {
 					padding: '17px 30px',
 					position: 'relative',
 					backgroundColor: theme.colors.gray100,
-					'& button.close': {
+					'& button.btn-close': {
 						right: 12,
 						width: 44,
 						top: '50%',
@@ -86,11 +86,11 @@ export const modal = (theme: CobaltTheme) => {
 			},
 			'&__title': {
 				margin: 0,
-				...theme.fonts.m,
+				...theme.fonts.large,
 				'&--admin': {
 					margin: 0,
-					...theme.fonts.m,
-					...theme.fonts.primaryBold,
+					...theme.fonts.large,
+					...theme.fonts.headingBold,
 				},
 			},
 			'&__body': {

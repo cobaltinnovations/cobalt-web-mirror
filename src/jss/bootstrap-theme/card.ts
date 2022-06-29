@@ -12,14 +12,14 @@ export const card = (theme: CobaltTheme) => {
 			},
 			'&__title.h5': {
 				margin: 0,
-				...theme.fonts.m,
-				...theme.fonts.primaryBold,
+				...theme.fonts.large,
+				...theme.fonts.headingBold,
 				textTransform: 'lowercase',
 			},
 			'&__subtitle.h6': {
 				margin: 0,
-				...theme.fonts.xxs,
-				...theme.fonts.secondaryRegular,
+				...theme.fonts.small,
+				...theme.fonts.bodyNormal,
 				textTransform: 'lowercase',
 				color: theme.colors.gray600,
 			},

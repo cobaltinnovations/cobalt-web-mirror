@@ -13,7 +13,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		textAlign: 'center',
 		color: theme.colors.white,
 		display: 'inline-block',
-		...theme.fonts.primaryBold,
+		...theme.fonts.headingBold,
 		backgroundColor: theme.colors.secondary,
 	}),
 }));

@@ -32,7 +32,7 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 				}}
 			>
 				<Modal.Body>
-					<p className="mb-3 font-secondary-regular">
+					<p className="mb-3 font-body-normal">
 						To book an appointment with one of our resources, please supply your email address so that we
 						can keep in contact with you.
 					</p>

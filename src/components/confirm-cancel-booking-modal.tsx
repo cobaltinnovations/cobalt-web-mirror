@@ -23,7 +23,7 @@ const ConfirmCancelBookingModal: FC<ConfirmCancelBookingModalProps> = ({ onConfi
 				<h3 className="mb-0">cancel reservation</h3>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-0 font-secondary-bold">are you sure?</p>
+				<p className="mb-0 font-body-bold">are you sure?</p>
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>

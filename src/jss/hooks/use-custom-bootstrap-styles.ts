@@ -7,16 +7,16 @@ const spacerSize = 5;
 const iterations = 40;
 
 const m: Record<string, Record<string, string>> = {};
-const ml: Record<string, Record<string, string>> = {};
-const mr: Record<string, Record<string, string>> = {};
+const ms: Record<string, Record<string, string>> = {};
+const me: Record<string, Record<string, string>> = {};
 const mt: Record<string, Record<string, string>> = {};
 const mb: Record<string, Record<string, string>> = {};
 const my: Record<string, Record<string, string>> = {};
 const mx: Record<string, Record<string, string>> = {};
 
 const p: Record<string, Record<string, string>> = {};
-const pl: Record<string, Record<string, string>> = {};
-const pr: Record<string, Record<string, string>> = {};
+const ps: Record<string, Record<string, string>> = {};
+const pe: Record<string, Record<string, string>> = {};
 const pt: Record<string, Record<string, string>> = {};
 const pb: Record<string, Record<string, string>> = {};
 const py: Record<string, Record<string, string>> = {};
@@ -24,16 +24,16 @@ const px: Record<string, Record<string, string>> = {};
 
 for (let i = 0; i <= iterations; i++) {
 	m[`.m-${i}`] = { margin: `${spacerSize * i}px !important` };
-	ml[`.ml-${i}`] = { marginLeft: `${spacerSize * i}px !important` };
-	mr[`.mr-${i}`] = { marginRight: `${spacerSize * i}px !important` };
+	ms[`.ms-${i}`] = { marginLeft: `${spacerSize * i}px !important` };
+	me[`.me-${i}`] = { marginRight: `${spacerSize * i}px !important` };
 	mt[`.mt-${i}`] = { marginTop: `${spacerSize * i}px !important` };
 	mb[`.mb-${i}`] = { marginBottom: `${spacerSize * i}px !important` };
 	my[`.my-${i}`] = { marginBottom: `${spacerSize * i}px !important`, marginTop: `${spacerSize * i}px !important` };
 	mx[`.mx-${i}`] = { marginLeft: `${spacerSize * i}px !important`, marginRight: `${spacerSize * i}px !important` };
 
 	p[`.p-${i}`] = { padding: `${spacerSize * i}px !important` };
-	pl[`.pl-${i}`] = { paddingLeft: `${spacerSize * i}px !important` };
-	pr[`.pr-${i}`] = { paddingRight: `${spacerSize * i}px !important` };
+	ps[`.ps-${i}`] = { paddingLeft: `${spacerSize * i}px !important` };
+	pe[`.pe-${i}`] = { paddingRight: `${spacerSize * i}px !important` };
 	pt[`.pt-${i}`] = { paddingTop: `${spacerSize * i}px !important` };
 	pb[`.pb-${i}`] = { paddingBottom: `${spacerSize * i}px !important` };
 	py[`.py-${i}`] = { paddingBottom: `${spacerSize * i}px !important`, paddingTop: `${spacerSize * i}px !important` };
@@ -54,21 +54,18 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		/* ----------------------------------------------------------- */
 		/* Generic overrides */
 		/* ----------------------------------------------------------- */
-		'.font-weight-regular': {
-			...theme.fonts.primaryRegular,
+		'.font-heading-normal': {
+			...theme.fonts.headingNormal,
 		},
-		'.font-weight-semi-bold': {
-			...theme.fonts.primarySemiBold,
-		},
-		'.font-weight-bold': {
-			...theme.fonts.primaryBold,
+		'.font-heading-bold': {
+			...theme.fonts.headingBold,
 		},
 
-		'.font-secondary-regular': {
-			...theme.fonts.secondaryRegular,
+		'.font-body-normal': {
+			...theme.fonts.bodyNormal,
 		},
-		'.font-secondary-bold': {
-			...theme.fonts.secondaryBold,
+		'.font-body-bold': {
+			...theme.fonts.bodyBold,
 		},
 
 		'.text-primary': {
@@ -140,13 +137,13 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.border-top': {
 			borderTop: `1px solid ${theme.colors.border} !important`,
 		},
-		'.border-right': {
+		'.border-end': {
 			borderRight: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-bottom': {
 			borderBottom: `1px solid ${theme.colors.border} !important`,
 		},
-		'.border-left': {
+		'.border-start': {
 			borderLeft: `1px solid ${theme.colors.border} !important`,
 		},
 		'.selected-border-bottom': {
@@ -239,15 +236,15 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		/* Spacer overrides */
 		/* ----------------------------------------------------------- */
 		...m,
-		...ml,
-		...mr,
+		...ms,
+		...me,
 		...mt,
 		...mb,
 		...mx,
 		...my,
 		...p,
-		...pl,
-		...pr,
+		...ps,
+		...pe,
 		...pt,
 		...pb,
 		...px,
@@ -266,7 +263,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				border: 0,
 				padding: 0,
 				height: 70,
-				...theme.fonts.xs,
+				...theme.fonts.default,
 				width: '100%',
 				textIndent: 30,
 				borderRadius: 0,
@@ -274,7 +271,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				appearance: 'none',
 				color: theme.colors.dark,
 				lineHeight: 'normal',
-				...theme.fonts.secondaryRegular,
+				...theme.fonts.bodyNormal,
 
 				backgroundColor: 'transparent',
 				'&:focus, &.focus': {
@@ -316,7 +313,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				color: theme.colors.background,
 				backgroundColor: theme.colors.dark,
 			},
-			'& .close:not(:disabled):not(.disabled):focus, .close:not(:disabled):not(.disabled):hover': {
+			'& .btn-close:not(:disabled):not(.disabled):focus, .btn-close:not(:disabled):not(.disabled):hover': {
 				opacity: 0.48,
 			},
 		},
@@ -338,7 +335,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			'& .rbt-input': {
 				margin: 0,
 				border: 0,
-				...theme.fonts.xs,
+				...theme.fonts.default,
 				width: '100%',
 				minHeight: 56,
 				height: '100%',
@@ -366,11 +363,11 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				fontSize: '1.5rem',
 				lineHeight: 'auto',
 				color: theme.colors.black,
-				...theme.fonts.primaryRegular,
+				...theme.fonts.headingNormal,
 			},
 			'& .rbt-token': {
 				height: 24,
-				...theme.fonts.xs,
+				...theme.fonts.default,
 				flexShrink: 0,
 				marginRight: 5,
 				marginBottom: 5,
@@ -399,10 +396,10 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				padding: 0,
 				marginTop: 1,
 				'& .dropdown-item': {
-					...theme.fonts.xs,
+					...theme.fonts.default,
 					color: theme.colors.dark,
 					padding: '8px 13px',
-					...theme.fonts.secondaryRegular,
+					...theme.fonts.bodyNormal,
 					textDecoration: 'none',
 					'&:hover, &:focus, &.active': {
 						backgroundColor: Color('#DBD4CF').alpha(0.2).string(),
@@ -414,7 +411,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				},
 				'& .rbt-highlight-text': {
 					padding: 0,
-					...theme.fonts.secondaryBold,
+					...theme.fonts.bodyBold,
 					backgroundColor: 'transparent',
 				},
 				'& .rbt-menu-custom-option': {
@@ -425,38 +422,6 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 						fontStyle: 'normal',
 					},
 				},
-			},
-		},
-
-		'.custom-control.custom-switch': {
-			padding: 0,
-			'& label': {
-				alignItems: 'center',
-				color: theme.colors.gray600,
-				display: 'inline-flex',
-				...theme.fonts.primarySemiBold,
-				'&:before': {
-					top: 0,
-					left: 0,
-					width: 56,
-					height: 32,
-					marginRight: 8,
-					borderRadius: 500,
-					position: 'relative',
-				},
-				'&:after': {
-					top: 4,
-					left: 4,
-					width: 24,
-					height: 24,
-					borderRadius: '50%',
-				},
-			},
-			'& .custom-control-input:checked~.custom-control-label::before': {
-				backgroundColor: theme.colors.primary,
-			},
-			'& .custom-control-input:checked~.custom-control-label::after': {
-				transform: 'translateX(24px)',
 			},
 		},
 	},

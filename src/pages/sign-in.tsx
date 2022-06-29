@@ -54,7 +54,7 @@ const SignIn: FC = () => {
 						<LogoIconText className={classes.logoIconText} />
 					</div>
 
-					<p className="mb-2 text-center font-size-m font-weight-bold">Sign in</p>
+					<p className="mb-2 text-center fs-large font-heading-bold">Sign in</p>
 					<>
 						{subdomainInstitution?.ssoEnabled && (
 							<div className="d-flex text-center mb-3 px-5">

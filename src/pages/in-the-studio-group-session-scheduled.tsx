@@ -192,7 +192,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 								</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
-										<Button as="div" variant="light" size="sm" className="mr-2">
+										<Button as="div" variant="light" size="sm" className="me-2">
 											view calendar
 										</Button>
 									</Link>
@@ -257,7 +257,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 							}}
 							text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
 						>
-							<Button className="p-3 ml-2">
+							<Button className="p-3 ms-2">
 								<ContentCopyIcon height={24} width={24} />
 							</Button>
 						</CopyToClipboard>

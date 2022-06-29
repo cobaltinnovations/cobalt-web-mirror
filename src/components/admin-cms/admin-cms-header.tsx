@@ -38,7 +38,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 	},
 	link: {
-		...theme.fonts.xl,
+		...theme.fonts.h3,
 		color: theme.colors.primary,
 		letterSpacing: 4,
 		textDecoration: 'none',
@@ -49,12 +49,12 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 	headerTitle: {
 		margin: 0,
-		...theme.fonts.xl,
+		...theme.fonts.h3,
 		overflow: 'hidden',
 		textAlign: 'center',
 		color: theme.colors.dark,
 		whiteSpace: 'nowrap',
-		...theme.fonts.primaryBold,
+		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},

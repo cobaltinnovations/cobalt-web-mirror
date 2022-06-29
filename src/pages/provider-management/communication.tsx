@@ -54,7 +54,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 										}}
 									/>
 									{index !== 0 && (
-										<div className="mt-1 text-right">
+										<div className="mt-1 text-end">
 											<Button
 												className="p-0"
 												variant="link"

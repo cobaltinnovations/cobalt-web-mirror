@@ -5,13 +5,13 @@ export const button = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-button': {
 			border: 0,
-			...theme.fonts.l,
+			...theme.fonts.h4,
 			borderRadius: 500,
 			appearance: 'none',
 			color: theme.colors.white,
 			padding: '15px 35px',
 			textDecoration: 'none',
-			...theme.fonts.primaryBold,
+			...theme.fonts.headingBold,
 			textTransform: 'none',
 			backgroundColor: theme.colors.primary,
 			'&:hover': {
@@ -35,12 +35,8 @@ export const button = (theme: CobaltTheme) => {
 			},
 
 			'&-sm': {
-				...theme.fonts.m,
+				...theme.fonts.large,
 				padding: '10px 25px',
-			},
-			'&-xsm': {
-				...theme.fonts.m,
-				padding: '5px 7px',
 			},
 
 			'& svg': {
@@ -170,51 +166,6 @@ export const button = (theme: CobaltTheme) => {
 				'&:active': {
 					backgroundColor: Color(theme.colors.gray300).lighten(0.16).hex(),
 					color: theme.colors.black,
-				},
-			},
-			/* ----------------------------------------------------------- */
-			/* No-background variant */
-			/* ----------------------------------------------------------- */
-			'&-no-background': {
-				backgroundColor: theme.colors.background,
-				color: theme.colors.primary,
-				'&:hover': {
-					backgroundColor: theme.colors.background,
-					color: theme.colors.primary,
-				},
-				'&:active': {
-					backgroundColor: theme.colors.background,
-					color: theme.colors.primary,
-				},
-			},
-
-			/* ----------------------------------------------------------- */
-			/* Clear variant */
-			/* ----------------------------------------------------------- */
-			'&-clear': {
-				backgroundColor: 'transparent',
-				color: theme.colors.dark,
-				'&:hover': {
-					backgroundColor: 'transparent',
-					color: theme.colors.black,
-				},
-				'&:active': {
-					backgroundColor: 'transparent',
-					color: theme.colors.black,
-				},
-			},
-
-			/* ----------------------------------------------------------- */
-			/* Icon variant */
-			/* ----------------------------------------------------------- */
-			'&-icon': {
-				padding: 0,
-				backgroundColor: 'transparent',
-				'&:hover': {
-					backgroundColor: 'transparent',
-				},
-				'&:active': {
-					backgroundColor: 'transparent',
 				},
 			},
 

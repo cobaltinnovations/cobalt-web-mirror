@@ -89,7 +89,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 							{fullUrl}
 						</Link>
 
-						<CopyToClipboardButton className="ml-2" text={fullUrl} />
+						<CopyToClipboardButton className="ms-2" text={fullUrl} />
 					</div>
 				</>
 			) : (

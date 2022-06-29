@@ -1,6 +1,5 @@
 const bsPrefixes = {
 	btn: 'cobalt-button',
-	'form-group': 'cobalt-form__group',
 	'form-label': 'cobalt-form__label',
 	'form-control': 'cobalt-form__control',
 	'form-check': 'cobalt-form__check',

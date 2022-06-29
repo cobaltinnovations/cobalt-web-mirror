@@ -163,7 +163,7 @@ const InTheStudioDetail: FC = () => {
 								<p className="text-white text-center mb-3">Join us at {existingAppointmentDate}</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
-										<Button as="div" variant="light" size="sm" className="mr-2">
+										<Button as="div" variant="light" size="sm" className="me-2">
 											view calendar
 										</Button>
 									</Link>

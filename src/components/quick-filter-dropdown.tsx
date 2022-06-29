@@ -18,11 +18,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		border: `2px solid ${theme.colors.border}`,
 	},
 	quickFilterHeader: {
-		...theme.fonts.s,
+		...theme.fonts.large,
 		marginBottom: 15,
 		padding: '0 24px',
 		color: theme.colors.dark,
-		...theme.fonts.primaryBold,
+		...theme.fonts.headingBold,
 	},
 	quickFilterItem: {
 		display: 'flex',
@@ -97,7 +97,7 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 	const classes = useStyles();
 
 	return (
-		<Dropdown drop="down">
+		<Dropdown drop="down" onSelect={onChange}>
 			<Dropdown.Toggle as={QuickFilterToggle} id={id} className={classes.quickFilterToggle} active={active}>
 				{title}
 			</Dropdown.Toggle>
@@ -108,7 +108,6 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 						<Dropdown.Item
 							key={`${item.value}-${index}`}
 							eventKey={item.value}
-							onSelect={onChange}
 							className={classes.quickFilterItem}
 						>
 							<div
@@ -125,7 +124,7 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 									}}
 									bsPrefix="cobalt-modal-form__check"
 								/>
-								<span className="font-size-xs text-muted">{item.count}</span>
+								<span className="fs-default text-muted">{item.count}</span>
 							</div>
 						</Dropdown.Item>
 					);

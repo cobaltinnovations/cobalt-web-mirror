@@ -151,7 +151,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 			<Container className="pt-5 pb-32">
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-2 font-size-xl">
+						<h1 className="mb-2 fs-h3">
 							{initialValues?.title ? initialValues.title : 'create studio session by request'}
 						</h1>
 						<p className="mb-0 text-danger">Required*</p>
@@ -227,7 +227,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Facilitator</h5>
 
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													Are you the facilitator of this session?
 												</Form.Label>
 												<Form.Check
@@ -305,10 +305,10 @@ const GroupSessionsByRequestCreate: FC = () => {
 													error={touched.title && errors.title ? errors.title : ''}
 												/>
 
-												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-1" style={{ ...fonts.default }}>
 													Description {requiredFields.description && <span>*</span>}
 												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.xxs }}>
+												<p className="text-muted" style={{ ...fonts.small }}>
 													How would you like to describe your session? (This will be featured
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
@@ -325,7 +325,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 													}}
 												</Field>
 												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.xxs }}>
+													<p className="text-danger" style={{ ...fonts.small }}>
 														description is a required field
 													</p>
 												)}
@@ -365,7 +365,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Session Form Customization</h5>
 												<p className="mb-0">Our standard form asks for:</p>
-												<ul className="mb-0 pl-4 font-size-xs">
+												<ul className="mb-0 ps-4 fs-default">
 													<li>Name*</li>
 													<li>Email Address*</li>
 													<li>Phone Number</li>
@@ -395,7 +395,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 													}}
 												/>
 												{values.customQuestionOne && (
-													<div className="mt-2 mb-3 pl-6">
+													<div className="mt-2 mb-3 ps-6">
 														<InputHelper
 															label="Enter Question"
 															name="customQuestionOneDescription"
@@ -420,7 +420,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 													}}
 												/>
 												{values.customQuestionTwo && (
-													<div className="mt-2 pl-6">
+													<div className="mt-2 ps-6">
 														<InputHelper
 															label="Enter Question"
 															name="customQuestionTwoDescription"

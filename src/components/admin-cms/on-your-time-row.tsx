@@ -151,7 +151,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		// 	};
 		//
 		// 	return (
-		// 		<span key={key} className={`d-block font-size-xxs font-secondary-regular ${classes.noWrap}`}>
+		// 		<span key={key} className={`d-block fs-small font-body-normal ${classes.noWrap}`}>
 		// 			{getIcon()} {item.description}
 		// 		</span>
 		// 	);
@@ -223,39 +223,37 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		return (
 			<TableRow className={classes.row}>
 				<TableCell>
-					<span className="d-block font-size-xs font-secondary-regular">
-						{content.dateCreatedDescription}
-					</span>
+					<span className="d-block fs-default font-body-normal">{content.dateCreatedDescription}</span>
 				</TableCell>
 				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
 					{getIcon(content.contentTypeId)}
 				</TableCell>
 				<TableCell width={300}>
-					<span className="d-block font-size-xs font-secondary-bold">
+					<span className="d-block fs-default font-body-bold">
 						<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 					</span>
-					<span className="d-block font-size-xs font-secondary-regular">{content.author}</span>
-					<span className={`d-block font-size-xs font-secondary-regular ${classes.description}`}>
+					<span className="d-block fs-default font-body-normal">{content.author}</span>
+					<span className={`d-block fs-default font-body-normal ${classes.description}`}>
 						{content.description ? content.description.replace(/<\/?[^>]+(>|$)/g, '') : ''}
 					</span>
 				</TableCell>
 				{isSuperAdmin && (
 					<TableCell>
-						<span className="d-block font-size-xs font-secondary-regular">{content.ownerInstitution}</span>
+						<span className="d-block fs-default font-body-normal">{content.ownerInstitution}</span>
 					</TableCell>
 				)}
 				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
-					<span className="d-block font-size-xs font-secondary-regular">{content.views}</span>
+					<span className="d-block fs-default font-body-normal">{content.views}</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-secondary-regular">
+					<span className="ms-2 fs-small font-body-normal">
 						{content.ownerInstitutionApprovalStatus.description}
 					</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-secondary-regular">
+					<span className="ms-2 fs-small font-body-normal">
 						{content.otherInstitutionApprovalStatus.description}
 					</span>
 				</TableCell>

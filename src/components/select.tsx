@@ -10,13 +10,13 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		'& select': {
 			height: 54,
-			...theme.fonts.xs,
+			...theme.fonts.default,
 			width: '100%',
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
 			color: theme.colors.dark,
-			...theme.fonts.secondaryRegular,
+			...theme.fonts.bodyNormal,
 			padding: '0 40px 0 15px',
 			backgroundColor: theme.colors.white,
 			border: `1px solid ${theme.colors.border}`,
@@ -72,8 +72,7 @@ const Select: FC<SelectProps> = ({ className, ...props }) => {
 
 	return (
 		<div className={classNames(classes.select, className)}>
-			<Form.Control
-				as="select"
+			<Form.Select
 				name={props.name}
 				value={props.value}
 				onChange={handleOnChange}
@@ -81,7 +80,7 @@ const Select: FC<SelectProps> = ({ className, ...props }) => {
 				disabled={props.disabled}
 			>
 				{props.children}
-			</Form.Control>
+			</Form.Select>
 			<DownChevron className={classes.downChevron} />
 		</div>
 	);

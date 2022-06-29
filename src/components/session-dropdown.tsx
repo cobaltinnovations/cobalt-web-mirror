@@ -99,7 +99,7 @@ const SessionDropdown: FC<SessionDropdownProps> = ({ id, items }) => {
 	const classes = useStyles();
 
 	return (
-		<Dropdown drop="left">
+		<Dropdown drop="start">
 			<Dropdown.Toggle as={SessionToggle} id={id} className={classes.sessionToggle}>
 				<MoreIcon className={classes.icon} />
 			</Dropdown.Toggle>
@@ -112,7 +112,7 @@ const SessionDropdown: FC<SessionDropdownProps> = ({ id, items }) => {
 							onClick={item.onClick}
 						>
 							<div className={classes.sessionItemIcon}>{item.icon}</div>
-							<span className="font-size-xs">{item.title}</span>
+							<span className="fs-default">{item.title}</span>
 						</Dropdown.Item>
 					);
 				})}

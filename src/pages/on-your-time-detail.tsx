@@ -142,7 +142,7 @@ const OnYourTimeDetail: FC = () => {
 								imageUrl={item?.imageUrl || placeholderImage}
 							>
 								<div className={classes.mediaContent}>
-									<small className="text-white text-uppercase font-secondary-bold">
+									<small className="text-white text-uppercase font-body-bold">
 										{item?.newFlag ? 'NEW' : ''}
 									</small>
 								</div>
@@ -153,12 +153,12 @@ const OnYourTimeDetail: FC = () => {
 							{item?.author ? <p className="mb-1">by {item?.author}</p> : <p className="mb-1">&nbsp;</p>}
 
 							<div className="d-flex">
-								<small className="text-muted text-uppercase font-secondary-bold">
+								<small className="text-muted text-uppercase font-body-bold">
 									{item?.contentTypeLabel}
 								</small>
 
 								{item?.duration && (
-									<small className="text-muted text-uppercase font-secondary-bold ml-auto">
+									<small className="text-muted text-uppercase font-body-bold ms-auto">
 										{item?.duration}
 									</small>
 								)}

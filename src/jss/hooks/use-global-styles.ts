@@ -16,12 +16,12 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			fontSize: '10px',
 		},
 		body: {
-			...theme.fonts.xs,
+			...theme.fonts.default,
 			minHeight: '100%',
 			letterSpacing: 0.5,
 			color: theme.colors.dark,
 			position: 'relative',
-			...theme.fonts.primaryRegular,
+			...theme.fonts.headingNormal,
 			backgroundColor: theme.colors.background,
 			backgroundImage:
 				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
@@ -38,41 +38,41 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		/* Headings and text */
 		/* ----------------------------------------------------------- */
 		h1: {
-			...theme.fonts.xxxl,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h1,
+			...theme.fonts.headingBold,
 		},
 		h2: {
-			...theme.fonts.xxl,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h2,
+			...theme.fonts.headingBold,
 		},
 		h3: {
-			...theme.fonts.xl,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h3,
+			...theme.fonts.headingBold,
 		},
 		h4: {
-			...theme.fonts.l,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h4,
+			...theme.fonts.headingBold,
 		},
 		h5: {
-			...theme.fonts.m,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h6,
+			...theme.fonts.headingBold,
 		},
 		h6: {
-			...theme.fonts.s,
-			...theme.fonts.primaryBold,
+			...theme.fonts.h6,
+			...theme.fonts.headingBold,
 		},
 		p: {
-			...theme.fonts.xs,
-			...theme.fonts.secondaryRegular,
+			...theme.fonts.default,
+			...theme.fonts.bodyNormal,
 		},
 		'small, .small': {
-			...theme.fonts.xxs,
+			...theme.fonts.small,
 			display: 'block',
-			...theme.fonts.secondaryRegular,
+			...theme.fonts.bodyNormal,
 		},
 		a: {
 			wordBreak: 'break-word',
-			...theme.fonts.secondaryBold,
+			...theme.fonts.bodyBold,
 			color: theme.colors.primary,
 			textDecoration: 'underline',
 			'&:hover': {
@@ -90,33 +90,47 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 
-		'.font-size-xxxs': {
-			...theme.fonts.xxxs,
+		'.fs-display1': {
+			...theme.fonts.display1,
 		},
-		'.font-size-xxs': {
-			...theme.fonts.xxs,
+		'.fs-display2': {
+			...theme.fonts.display2,
 		},
-		'.font-size-xs': {
-			fontSize: `${theme.fonts.xs.fontSize} !important`,
-			lineHeight: `${theme.fonts.xs.lineHeight} !important`,
+		'.fs-display3': {
+			...theme.fonts.display3,
 		},
-		'.font-size-s': {
-			...theme.fonts.s,
+
+		'.fs-h1': {
+			...theme.fonts.h1,
 		},
-		'.font-size-m': {
-			...theme.fonts.m,
+		'.fs-h2': {
+			...theme.fonts.h2,
 		},
-		'.font-size-l': {
-			...theme.fonts.l,
+		'.fs-h3': {
+			...theme.fonts.h3,
 		},
-		'.font-size-xl': {
-			...theme.fonts.xl,
+		'.fs-h4': {
+			...theme.fonts.h4,
 		},
-		'.font-size-xxl': {
-			...theme.fonts.xxl,
+		'.fs-h5': {
+			...theme.fonts.h5,
 		},
-		'.font-size-xxxl': {
-			...theme.fonts.xxxl,
+		'.fs-h6': {
+			...theme.fonts.h6,
+		},
+
+		'.fs-ui-small': {
+			...theme.fonts.uiSmall,
+		},
+		'.fs-small': {
+			...theme.fonts.small,
+		},
+		'.fs-default': {
+			fontSize: `${theme.fonts.default.fontSize} !important`,
+			lineHeight: `${theme.fonts.default.lineHeight} !important`,
+		},
+		'.fs-large': {
+			...theme.fonts.large,
 		},
 
 		/* ----------------------------------------------------------- */
@@ -127,9 +141,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 		'.react-datepicker': {
 			border: 0,
-			...theme.fonts.xs,
+			...theme.fonts.default,
 			borderRadius: 0,
-			...theme.fonts.secondaryRegular,
+			...theme.fonts.bodyNormal,
 			boxShadow: '1px 2px 8px 0px rgba(0,0,0,0.32)',
 			'&__triangle': {
 				borderBottomColor: `${theme.colors.primary} !important`,
@@ -143,7 +157,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				backgroundColor: theme.colors.primary,
 			},
 			'&__current-month': {
-				...theme.fonts.xs,
+				...theme.fonts.default,
 				color: theme.colors.white,
 			},
 			'&__day-name': {
@@ -172,7 +186,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				width: '3.5rem',
 				lineHeight: '3.5rem',
 				'&--today': {
-					...theme.fonts.secondaryBold,
+					...theme.fonts.bodyBold,
 				},
 				'&--selected': {
 					backgroundColor: theme.colors.primary,
@@ -221,8 +235,8 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&__label-container': {
-				...theme.fonts.secondaryBold,
-				...theme.fonts.xxs,
+				...theme.fonts.bodyBold,
+				...theme.fonts.small,
 				color: '#6c7978',
 			},
 		},

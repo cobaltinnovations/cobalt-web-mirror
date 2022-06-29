@@ -37,7 +37,7 @@ const SessionAttendees: FC<SessionAttendeesProps> = ({ currentAmount, maxAmount 
 			<div className={classes.progressBar}>
 				<div className={classes.progressBarFill} />
 			</div>
-			<span className="d-block text-muted font-size-xs">
+			<span className="d-block text-muted fs-default">
 				{currentAmount}/{maxAmount}
 			</span>
 		</div>

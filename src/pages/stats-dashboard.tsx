@@ -106,7 +106,7 @@ const StatsDashboard: FC = () => {
 								<option value={PERIODS.WEEKLY}>Weekly</option>
 								<option value={PERIODS.MONTHLY}>Monthly</option>
 							</Select>
-							<InputGroup className="ml-4">
+							<InputGroup className="ms-4">
 								{(periodicSelectValue === PERIODS.WEEKLY ? weeklyDurations : monthlyDurations).map(
 									(duration) => {
 										return (
@@ -129,7 +129,7 @@ const StatsDashboard: FC = () => {
 								)}
 							</InputGroup>
 							{isLoading && (
-								<div className="position-relative ml-9">
+								<div className="position-relative ms-9">
 									<Loader size={50} />
 								</div>
 							)}

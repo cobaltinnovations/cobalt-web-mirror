@@ -7,7 +7,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 	fileInputButton: {
 		margin: 0,
-		...theme.fonts.m,
+		...theme.fonts.large,
 		cursor: 'pointer',
 		borderRadius: 500,
 		overflow: 'hidden',
@@ -15,7 +15,7 @@ const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 		padding: '10px 25px',
 		position: 'relative',
 		display: 'inline-block',
-		...theme.fonts.primaryBold,
+		...theme.fonts.headingBold,
 		backgroundColor: theme.colors.primary,
 		'&:hover': {
 			backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),

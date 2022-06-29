@@ -4,6 +4,7 @@ import { Form, Button } from 'react-bootstrap';
 import FileInputButton from '@/components/file-input-button';
 
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
+import classNames from 'classnames';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	progressBar: {
@@ -47,8 +48,8 @@ const ImageUpload: FC<ImageUploadProps> = ({
 	});
 
 	return (
-		<Form.Group className={className}>
-			<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+		<Form.Group className={classNames('mb-5', className)}>
+			<Form.Label className="mb-2" style={{ ...fonts.default }}>
 				Lead Image
 			</Form.Label>
 			{!imagePreview && (
@@ -71,15 +72,15 @@ const ImageUpload: FC<ImageUploadProps> = ({
 					{isUploading ? 'uploading...' : imagePreview ? 'upload new image' : 'upload image'}
 				</FileInputButton>
 				{imagePreview && (
-					<Button size="sm" variant="danger" className="ml-2" onClick={onRemove} disabled={disabled}>
+					<Button size="sm" variant="danger" className="ms-2" onClick={onRemove} disabled={disabled}>
 						remove image
 					</Button>
 				)}
 			</div>
 			{!imagePreview && (
 				<>
-					<p className="font-size-xxxs text-uppercase text-muted">Tips for choosing a good image</p>
-					<ul className="mb-0 pl-4 font-size-xxs">
+					<p className="fs-ui-small text-uppercase text-muted">Tips for choosing a good image</p>
+					<ul className="mb-0 ps-4 fs-small">
 						<li>Is a minimum size of 800 x 450 px</li>
 						<li>Features a warm, bold color palette</li>
 						<li>

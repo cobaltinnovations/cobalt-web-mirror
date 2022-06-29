@@ -212,28 +212,28 @@ const ProviderDetail = () => {
 											>
 												<ul className={classes.navbar}>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 0,
 														})}
 													>
 														<a href="#about">About</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 1,
 														})}
 													>
 														<a href="#specialties">Focus</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 2,
 														})}
 													>
 														<a href="#payment">Payment</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 3,
 														})}
 													>
@@ -313,7 +313,7 @@ const ProviderDetail = () => {
 													return (
 														<div key={section.date}>
 															<DayContainer className="mb-4">
-																<p className="mb-0 font-secondary-bold">
+																<p className="mb-0 font-body-bold">
 																	{section.dateDescription}
 																</p>
 															</DayContainer>
@@ -332,7 +332,7 @@ const ProviderDetail = () => {
 																			}
 																			className={classNames(
 																				`${classes.availabilityButton}`,
-																				'mr-1',
+																				'me-1',
 																				'mb-1'
 																			)}
 																			disabled={

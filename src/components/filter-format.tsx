@@ -66,7 +66,7 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 					<Button variant="link" className="p-0" onClick={handleSelectAllButtonClick}>
 						select all
 					</Button>
-					<Button variant="link" className="ml-3 p-0" onClick={handleDeselectAllButtonClick}>
+					<Button variant="link" className="ms-3 p-0" onClick={handleDeselectAllButtonClick}>
 						deselect all
 					</Button>
 				</div>

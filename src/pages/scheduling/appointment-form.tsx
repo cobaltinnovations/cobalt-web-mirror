@@ -4,7 +4,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Formik } from 'formik';
 import moment from 'moment';
 import React from 'react';
-import { Button, Col, Form } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import TimeInput from '@/components/time-input';
 import { appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
@@ -79,7 +79,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 
 				return (
 					<Form onSubmit={handleSubmit}>
-						<Form.Group controlId="date">
+						<Form.Group controlId="date" className="mb-5">
 							<DatePicker
 								showYearDropdown
 								showMonthDropdown
@@ -92,8 +92,8 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 							/>
 						</Form.Group>
 
-						<Form.Group controlId="startTime">
-							<Form.Row>
+						<Form.Group controlId="startTime" className="mb-5">
+							<Row>
 								<Col>
 									<TimeInput
 										name="startTime"
@@ -106,7 +106,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 										}}
 									/>
 								</Col>
-							</Form.Row>
+							</Row>
 						</Form.Group>
 
 						<AppointmentTypeDropdown

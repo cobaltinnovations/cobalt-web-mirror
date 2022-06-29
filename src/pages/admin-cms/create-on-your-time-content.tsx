@@ -354,18 +354,16 @@ const CreateOnYourTimeContent: FC = () => {
 												<Col md={10} lg={8}>
 													<Card className="mb-5 border-0 p-6">
 														<h5 className="mb-5">Details</h5>
-														<Form.Row className="mb-5">
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>1</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Content Type"
 																		value={values.contentTypeId || ''}
 																		as="select"
-																		onChange={(
-																			event: React.ChangeEvent<HTMLSelectElement>
-																		) => {
+																		onChange={(event) => {
 																			setFieldValue(
 																				'contentTypeId',
 																				event.target.value
@@ -433,18 +431,16 @@ const CreateOnYourTimeContent: FC = () => {
 																	</InputHelper>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
-																<div className="pl-13">
+																<div className="ps-13">
 																	<InputHelper
 																		className="flex-fill"
 																		label="Content Type Label"
 																		value={values.contentTypeLabel || ''}
 																		as="select"
-																		onChange={(
-																			event: React.ChangeEvent<HTMLSelectElement>
-																		) => {
+																		onChange={(event) => {
 																			setFieldValue(
 																				'contentTypeLabel',
 																				event.target.value
@@ -479,13 +475,13 @@ const CreateOnYourTimeContent: FC = () => {
 																	</InputHelper>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>2</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Title"
 																		type="text"
 																		name="title"
@@ -503,13 +499,13 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>3</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Author"
 																		type="text"
 																		name="author"
@@ -527,10 +523,10 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
+														</Row>
 														{values.contentTypeId !== ContentTypeId.InternalBlog && (
-															<div className="pl-13">
-																<Form.Row className="mb-5">
+															<div className="ps-13">
+																<Row className="mb-5">
 																	<Col>
 																		<InputHelper
 																			label="URL to Content"
@@ -553,8 +549,8 @@ const CreateOnYourTimeContent: FC = () => {
 																			}
 																		/>
 																	</Col>
-																</Form.Row>
-																<Form.Row className="mb-5">
+																</Row>
+																<Row className="mb-5">
 																	<Col>
 																		<DatePicker
 																			showYearDropdown
@@ -580,13 +576,13 @@ const CreateOnYourTimeContent: FC = () => {
 																			disabled={shouldDisabledInputs}
 																		/>
 																	</Col>
-																</Form.Row>
+																</Row>
 															</div>
 														)}
 														<div className="d-flex align-items-center">
 															<CircleIndicator>4</CircleIndicator>
-															<div className="ml-6 flex-fill">
-																<Form.Row className="mb-5">
+															<div className="ms-6 flex-fill">
+																<Row className="mb-5">
 																	<Col className="position-relative">
 																		<InputHelper
 																			label="How many minutes will it take to read/listen/watch?"
@@ -605,15 +601,15 @@ const CreateOnYourTimeContent: FC = () => {
 																			}
 																		/>
 																	</Col>
-																</Form.Row>
+																</Row>
 															</div>
 														</div>
-														<Form.Row>
+														<Row>
 															<Col>
 																<div className="d-flex">
 																	<CircleIndicator>5</CircleIndicator>
 																	<ImageUpload
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		imagePreview={imagePreview}
 																		isUploading={isUploading}
 																		progress={progress}
@@ -630,17 +626,17 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex">
 																	<CircleIndicator>6</CircleIndicator>
 																	{values.contentTypeId ===
 																	ContentTypeId.InternalBlog ? (
-																		<div className="ml-6 flex-fill">
+																		<div className="ms-6 flex-fill">
 																			<Form.Label
 																				className="mb-2"
-																				style={{ ...theme.fonts.xs }}
+																				style={{ ...theme.fonts.default }}
 																			>
 																				Post Content{' '}
 																				{requiredFields.description && (
@@ -668,7 +664,7 @@ const CreateOnYourTimeContent: FC = () => {
 																			{touched.description && errors.description && (
 																				<p
 																					className="text-danger"
-																					style={{ ...theme.fonts.xxs }}
+																					style={{ ...theme.fonts.small }}
 																				>
 																					description is a required field
 																				</p>
@@ -676,7 +672,7 @@ const CreateOnYourTimeContent: FC = () => {
 																		</div>
 																	) : (
 																		<InputHelper
-																			className="ml-6 flex-fill"
+																			className="ms-6 flex-fill"
 																			label="Description"
 																			name="description"
 																			value={values.description}
@@ -695,7 +691,7 @@ const CreateOnYourTimeContent: FC = () => {
 																	)}
 																</div>
 															</Col>
-														</Form.Row>
+														</Row>
 													</Card>
 													{!isAdding && (
 														<>
@@ -703,14 +699,17 @@ const CreateOnYourTimeContent: FC = () => {
 																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 																<Card className="mb-5 border-0 p-6">
 																	<h5 className="mb-2">Visibility *</h5>
-																	<div className="mb-5" style={{ ...theme.fonts.xs }}>
+																	<div
+																		className="mb-5"
+																		style={{ ...theme.fonts.default }}
+																	>
 																		Choose which institutions are allowed to share
 																		this content with their patients.
 																	</div>
 																	<Form.Group className="mb-5">
 																		<Form.Label
 																			className="mb-1"
-																			style={{ ...theme.fonts.xs }}
+																			style={{ ...theme.fonts.default }}
 																		>
 																			Allow other institutions to share this
 																			content?
@@ -757,11 +756,11 @@ const CreateOnYourTimeContent: FC = () => {
 																	</Form.Group>
 																	<Form.Label
 																		className="mb-1"
-																		style={{ ...theme.fonts.xs }}
+																		style={{ ...theme.fonts.default }}
 																	>
 																		Select the level of visibility:
 																	</Form.Label>
-																	<Form.Group>
+																	<Form.Group className="mb-5">
 																		<Form.Check
 																			type="radio"
 																			bsPrefix="cobalt-modal-form__check"
@@ -769,7 +768,11 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityNetwork"
 																			label={
 																				<>
-																					<div style={{ ...theme.fonts.xs }}>
+																					<div
+																						style={{
+																							...theme.fonts.default,
+																						}}
+																					>
 																						Only other Institutions in my
 																						network
 																					</div>
@@ -798,10 +801,12 @@ const CreateOnYourTimeContent: FC = () => {
 																		/>
 																		{!!contentInstitutions &&
 																			contentInstitutions.length > 0 && (
-																				<div className="ml-7 mt-2 mb-3">
+																				<div className="ms-7 mt-2 mb-3">
 																					<Form.Label
 																						className="mb-2"
-																						style={{ ...theme.fonts.xs }}
+																						style={{
+																							...theme.fonts.default,
+																						}}
 																					>
 																						Select the other institutions
 																						you will allow to have access to
@@ -824,7 +829,7 @@ const CreateOnYourTimeContent: FC = () => {
 																											style={{
 																												...theme
 																													.fonts
-																													.xs,
+																													.default,
 																											}}
 																										>
 																											{name}
@@ -885,7 +890,11 @@ const CreateOnYourTimeContent: FC = () => {
 																			name="visibilityPublic"
 																			label={
 																				<>
-																					<div style={{ ...theme.fonts.xs }}>
+																					<div
+																						style={{
+																							...theme.fonts.default,
+																						}}
+																					>
 																						Public
 																					</div>
 																					<div className={classes.grayText}>

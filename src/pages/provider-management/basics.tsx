@@ -89,7 +89,9 @@ export const ProviderManagementBasics = (): ReactElement => {
 							labelKey="title"
 							options={roleOptions}
 							selected={roleSelections}
-							onChange={setRoleSelections}
+							onChange={(options) => {
+								setRoleSelections(options as RoleModel[]);
+							}}
 						/>
 
 						<div className="d-flex align-items-center justify-content-between">

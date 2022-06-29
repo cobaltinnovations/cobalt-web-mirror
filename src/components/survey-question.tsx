@@ -192,9 +192,9 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 	}
 
 	return (
-		<Form.Group key={question.questionId} controlId={question.questionId}>
+		<Form.Group key={question.questionId} controlId={question.questionId} className="mb-5">
 			<Form.Label
-				className={question.fontSizeId === 'SMALL' ? 'font-size-xs' : ''}
+				className={question.fontSizeId === 'SMALL' ? 'fs-default' : ''}
 				dangerouslySetInnerHTML={{
 					__html: question.questionTitle,
 				}}

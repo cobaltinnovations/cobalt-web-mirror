@@ -175,7 +175,7 @@ export const MySchedule: FC = () => {
 						bsPrefix="cobalt-modal-form__check"
 						id="calendarView-week"
 						label="week"
-						className="ml-2"
+						className="ms-2"
 						checked={currentMainCalendarView === MainCalendarView.Week}
 						onChange={() => {
 							setCurrentMainCalendarView(MainCalendarView.Week);
@@ -186,7 +186,7 @@ export const MySchedule: FC = () => {
 						bsPrefix="cobalt-modal-form__check"
 						id="calendarView-month"
 						label="month"
-						className="ml-2"
+						className="ms-2"
 						checked={currentMainCalendarView === MainCalendarView.Month}
 						onChange={() => {
 							setCurrentMainCalendarView(MainCalendarView.Month);
@@ -196,28 +196,24 @@ export const MySchedule: FC = () => {
 
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
-					<Button
-						as={Link}
-						to={`${routeMatch.path}/appointments/new-appointment`}
-						variant="link"
-						size="sm"
-						className="p-0 mb-5 font-size-xs"
-					>
-						new appointment
-					</Button>
+					<Link to={`${routeMatch.path}/appointments/new-appointment`}>
+						<Button variant="link" size="sm" className="p-0 mb-5 fs-default">
+							new appointment
+						</Button>
+					</Link>
 
-					<Button
-						as={Link}
-						to={`${routeMatch.path}/availabilities`}
-						variant="link"
-						size="sm"
-						className="p-0 mb-5 font-size-xs"
-						onClick={() => {
-							setManagingAvailabilties(true);
-						}}
-					>
-						manage availability
-					</Button>
+					<Link to={`${routeMatch.path}/availabilities`}>
+						<Button
+							variant="link"
+							size="sm"
+							className="p-0 mb-5 fs-default"
+							onClick={() => {
+								setManagingAvailabilties(true);
+							}}
+						>
+							manage availability
+						</Button>
+					</Link>
 				</div>
 			</div>
 

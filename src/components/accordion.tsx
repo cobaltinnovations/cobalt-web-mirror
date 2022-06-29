@@ -65,7 +65,7 @@ const Accordion: FC<AccordionProps> = ({
 	return (
 		<>
 			<div className={`${classes.accordionToggle} ${toggleClass}`} onClick={onToggle}>
-				<span className={`d-block font-weight-bold ${titleClass}`}>{title}</span>
+				<span className={`d-block font-heading-bold ${titleClass}`}>{title}</span>
 				<DownChevron className={classes.chevronIcon} />
 			</div>
 			<Collapse in={open}>

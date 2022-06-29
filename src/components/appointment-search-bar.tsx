@@ -129,14 +129,15 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 							}}
 							onInputChange={setSearchQuery}
 							onChange={(selectedOptions) => {
-								props.setSelectedSearchResult(selectedOptions);
+								props.setSelectedSearchResult(selectedOptions as SearchResult[]);
 								(typeAheadRef.current as any).blur();
 							}}
 							options={searchQuery ? searchResults : props.recentProviders}
 							selected={props.selectedSearchResult}
-							renderMenu={(results, menuProps) => {
+							renderMenu={(options, menuProps) => {
+								const results = options as SearchResult[];
 								if (!searchQuery && props.recentProviders.length === 0) {
-									return null;
+									return <></>;
 								}
 
 								return (
@@ -158,7 +159,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 															imageUrl={result.imageUrl}
 															size={43}
 														/>
-														<div className="ml-3">
+														<div className="ms-3">
 															<p className="mb-0">{result.displayName}</p>
 															{result.description && <small>{result.description}</small>}
 														</div>

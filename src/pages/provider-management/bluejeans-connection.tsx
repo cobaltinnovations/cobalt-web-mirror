@@ -25,7 +25,7 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 			<Row>
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 					<Form onSubmit={handleSubmit}>
-						<Form.Group>
+						<Form.Group className="mb-5">
 							<p className="mb-0">
 								<strong>Do they have a Bluejeans account already?</strong>
 							</p>

@@ -38,7 +38,7 @@ const SignUpVerify: FC = () => {
 						We sent a link to {history.location.state?.emailAddress}. Please follow this link to verify your
 						account.
 					</p>
-					<p className="mb-0 text-center font-secondary-bold">didn’t get an email?</p>
+					<p className="mb-0 text-center font-body-bold">didn’t get an email?</p>
 					<div className="text-center">
 						<Button variant="link" onClick={handleResendButtonClick}>
 							re-send

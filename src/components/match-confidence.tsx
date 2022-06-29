@@ -47,11 +47,11 @@ const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, descrip
 	return (
 		<>
 			<div className={classNames('d-flex', className)}>
-				{!hideIcon && <ConfidenceSearchIcon className="mr-3" />}
+				{!hideIcon && <ConfidenceSearchIcon className="me-3" />}
 
 				<div className="flex-grow-1">
-					<h6 className="mb-2 font-secondary-regular">
-						<span className="font-secondary-bold">match confidence:</span> {description}
+					<h6 className="mb-2 font-body-normal">
+						<span className="font-body-bold">match confidence:</span> {description}
 					</h6>
 
 					<div className={classes.barOuter}>

@@ -112,7 +112,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 				<ReactCrop src={imageSource} onImageLoaded={onLoad} crop={crop} onChange={handleCropChange} />
 				<div className="d-flex mt-5 align-items-center">
 					<InfoIcon className={classes.infoIcon} />
-					<p className="mb-0 font-size-xxs">Blurry images can occur if the image uploaded is too small.</p>
+					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
 				</div>
 			</Modal.Body>
 
@@ -120,7 +120,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
 					cancel
 				</Button>
-				<Button variant="primary" size="sm" className="ml-3" onClick={handleOnSaveButtonClick}>
+				<Button variant="primary" size="sm" className="ms-3" onClick={handleOnSaveButtonClick}>
 					save
 				</Button>
 			</Modal.Footer>

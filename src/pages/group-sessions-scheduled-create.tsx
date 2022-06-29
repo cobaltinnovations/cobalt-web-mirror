@@ -361,7 +361,7 @@ const GroupSessionsCreate: FC = () => {
 					<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
 						<div className="d-flex align-items-center">
 							<div>
-								<h1 className="mb-2 font-size-xl">
+								<h1 className="mb-2 fs-h3">
 									{initialValues?.title || 'create studio session'}
 									{isCopy ? ' (copy)' : ''}
 								</h1>
@@ -370,7 +370,7 @@ const GroupSessionsCreate: FC = () => {
 							{!isViewMode && groupSessionId && (
 								<>
 									<Button
-										className="ml-auto mr-2"
+										className="ms-auto me-2"
 										size="sm"
 										variant="danger"
 										onClick={handleCancelSessionButtonClick}
@@ -485,7 +485,7 @@ const GroupSessionsCreate: FC = () => {
 												<h5 className="mb-5">Scheduling</h5>
 
 												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Would you like to use Cobalt's scheduling system?
 													</Form.Label>
 													<Form.Check
@@ -516,8 +516,8 @@ const GroupSessionsCreate: FC = () => {
 													/>
 												</Form.Group>
 
-												<Form.Group controlId="date">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group controlId="date" className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Date
 													</Form.Label>
 													<DatePicker
@@ -538,13 +538,13 @@ const GroupSessionsCreate: FC = () => {
 													/>
 												</Form.Group>
 
-												<Form.Row>
+												<Row>
 													<Col>
 														<InputHelper
 															label="Start Time"
 															value={values.startTime || ''}
 															as="select"
-															onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+															onChange={(event) => {
 																setFieldTouched('startTime', true);
 																setFieldValue('startTime', event.target.value);
 															}}
@@ -572,7 +572,7 @@ const GroupSessionsCreate: FC = () => {
 															label="End Time"
 															value={values.endTime || ''}
 															as="select"
-															onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+															onChange={(event) => {
 																setFieldTouched('endTime', true);
 																setFieldValue('endTime', event.target.value);
 															}}
@@ -598,7 +598,7 @@ const GroupSessionsCreate: FC = () => {
 															})}
 														</InputHelper>
 													</Col>
-												</Form.Row>
+												</Row>
 
 												{!values.isCobaltScheduling && (
 													<InputHelper
@@ -625,7 +625,7 @@ const GroupSessionsCreate: FC = () => {
 												<h5 className="mb-5">Facilitator</h5>
 
 												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Are you the facilitator of this session?
 													</Form.Label>
 													<Form.Check
@@ -709,10 +709,10 @@ const GroupSessionsCreate: FC = () => {
 													disabled={hasReservations || isViewMode}
 												/>
 
-												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-1" style={{ ...fonts.default }}>
 													Description {requiredFields.description && <span>*</span>}
 												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.xxs }}>
+												<p className="text-muted" style={{ ...fonts.small }}>
 													How would you like to describe your session? (This will be featured
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
@@ -730,7 +730,7 @@ const GroupSessionsCreate: FC = () => {
 													}}
 												</Field>
 												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.xxs }}>
+													<p className="text-danger" style={{ ...fonts.small }}>
 														description is a required field
 													</p>
 												)}
@@ -809,8 +809,8 @@ const GroupSessionsCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Attendee Information</h5>
 
-												<Form.Group>
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Is this session restricted to certain audiences?
 													</Form.Label>
 													<Form.Check
@@ -909,7 +909,7 @@ const GroupSessionsCreate: FC = () => {
 																<div className="mb-5">
 																	<Form.Check
 																		disabled={isViewMode}
-																		type="switch"
+																		bsPrefix="cobalt-modal-form__check"
 																		id={`screening-question-toggle--${screeningQuestion.questionId}`}
 																		label="Reduce text size"
 																		value="SMALL"
@@ -942,7 +942,7 @@ const GroupSessionsCreate: FC = () => {
 														);
 													})}
 
-												<div className="text-right">
+												<div className="text-end">
 													<Button
 														disabled={isViewMode}
 														size="sm"
@@ -997,12 +997,12 @@ const GroupSessionsCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Follow-Up Email</h5>
 
-												<Form.Group>
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Do you want to include a follow-up email?{' '}
 														<span className="text-danger">*</span>
 													</Form.Label>
-													<p className="mb-2 ml-0 mr-auto text-muted font-size-xxs">
+													<p className="mb-2 ms-0 me-auto text-muted fs-small">
 														This email will be sent to attendees immediately after the
 														session.
 													</p>

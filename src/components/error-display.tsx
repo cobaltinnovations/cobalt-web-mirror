@@ -33,7 +33,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryB
 				<Row className="text-center">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						{showBackButton && (
-							<Button onClick={handleGoBackButtonClick} className="mr-2">
+							<Button onClick={handleGoBackButtonClick} className="me-2">
 								Go Back
 							</Button>
 						)}

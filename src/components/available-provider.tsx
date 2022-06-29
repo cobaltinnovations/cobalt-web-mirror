@@ -77,7 +77,7 @@ const AvailableProvider: FC<AvailableProviderProps> = forwardRef<HTMLDivElement,
 								<Button
 									size="sm"
 									variant={selectedTimeSlot === availability ? 'primary' : 'light'}
-									className={classNames(`${classes.availabilityButton}`, 'mr-1', 'mb-1')}
+									className={classNames(`${classes.availabilityButton}`, 'me-1', 'mb-1')}
 									disabled={availability.status !== 'AVAILABLE'}
 									key={availability.time}
 									onClick={() => {

@@ -382,7 +382,7 @@ const IntakeAssessment: FC = () => {
 								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
 									<Button
 										type="submit"
-										className="ml-auto"
+										className="ms-auto"
 										variant="primary"
 										onClick={() => submitAnswers(selectedQuestionAnswers)}
 									>

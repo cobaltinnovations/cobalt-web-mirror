@@ -74,8 +74,8 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
 		borderTop: `1px solid ${theme.colors.border}`,
-		...theme.fonts.xxs,
-		...theme.fonts.secondaryBold,
+		...theme.fonts.small,
+		...theme.fonts.bodyBold,
 		'&:hover': {
 			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
@@ -100,14 +100,14 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	},
 	mainMenuList: {
 		'& li a': {
-			...theme.fonts.s,
+			...theme.fonts.default,
 			color: theme.colors.dark,
 			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
 		'& li a': {
-			...theme.fonts.xxs,
+			...theme.fonts.small,
 			color: theme.colors.gray600,
 			textTransform: 'uppercase',
 		},
@@ -369,7 +369,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 					<div>
 						<div className={classes.menuHeader}>
 							<CloseIcon tabIndex={0} className={classes.closeIcon} onClick={handleCloseButtonClick} />
-							<div className="text-right">
+							<div className="text-end">
 								<h5 className="mb-0">{account?.displayName}</h5>
 							</div>
 						</div>

@@ -39,7 +39,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	input: ({ as, value }: useInputHelperStylesProps) => ({
 		margin: 0,
 		border: 0,
-		...theme.fonts.xs,
+		...theme.fonts.default,
 		width: '100%',
 		height: '100%',
 		resize: 'none',
@@ -128,17 +128,20 @@ const InputHelper: FC<InputHelperProps> = ({
 		}
 	}
 
+	const FormControlComponent = props.as === 'select' ? Form.Select : Form.Control;
+
 	return (
 		<div className={className}>
 			<Form.Group
-				className={classNames('mb-0', classes.inputHelper)}
+				className={classNames(classes.inputHelper)}
 				onMouseOver={handleMouseOver}
 				onMouseOut={handleMouseOut}
 			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>
-				<Form.Control
+				{/* @ts-expect-error Bootstrap 5 vs bootstrap 4 onChange type */}
+				<FormControlComponent
 					className={classes.input}
 					bsPrefix="input-helper__input"
 					{...props}
@@ -146,22 +149,22 @@ const InputHelper: FC<InputHelperProps> = ({
 					onBlur={handleBlur}
 				>
 					{children}
-				</Form.Control>
+				</FormControlComponent>
 				{props.as === 'select' && <DownChevron className={classes.downChevron} />}
 			</Form.Group>
 			{(helperText || characterCounter) && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					{helperText && <p className="mb-0 ml-0 mr-auto text-muted font-size-xxs">{helperText}</p>}
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
 					{characterCounter && (
-						<p className="mb-0 ml-auto mr-0 text-muted font-size-xxs">
+						<p className="mb-0 ms-auto me-0 text-muted fs-small">
 							{props.value ? (props.value as string | string[]).length : 0} / {characterCounter}
 						</p>
 					)}
 				</div>
 			)}
 			{error && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					<p className="mb-0 ml-0 mr-auto text-danger font-size-xxs">{error}</p>
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					<p className="mb-0 ms-0 me-auto text-danger fs-small">{error}</p>
 				</div>
 			)}
 		</div>

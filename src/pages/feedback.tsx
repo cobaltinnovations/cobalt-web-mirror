@@ -70,7 +70,7 @@ const Feedback: FC = () => {
 							}}
 							placeholder="Your email address"
 						/>
-						<small className="d-block pl-2 pr-2 mb-5">
+						<small className="d-block ps-2 pe-2 mb-5">
 							Enter your email address if you would like our team to follow up in the next two business
 							days
 						</small>

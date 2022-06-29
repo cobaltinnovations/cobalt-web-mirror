@@ -56,8 +56,8 @@ const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity
 					{attendees.map((attendee) => {
 						return (
 							<li key={attendee.groupSessionReservationId} className="pt-3 pb-3">
-								<p className="mb-0 font-weight-bold">{attendee.name ?? 'anonymous user'}</p>
-								<p className="mb-0 font-weight-bold">
+								<p className="mb-0 font-heading-bold">{attendee.name ?? 'anonymous user'}</p>
+								<p className="mb-0 font-heading-bold">
 									<a href="mailto:">{attendee.emailAddress}</a>
 								</p>
 							</li>

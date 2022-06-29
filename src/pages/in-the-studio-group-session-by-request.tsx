@@ -118,7 +118,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 			<Container className="pt-6 pb-6">
 				<Row>
 					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-6 font-size-xl">{session?.title}</h1>
+						<h1 className="mb-6 fs-h3">{session?.title}</h1>
 					</Col>
 				</Row>
 
@@ -198,7 +198,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 											/>
 
 											<Form.Group className="mb-5">
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													Do you have a specific date in mind for the session?
 												</Form.Label>
 												<Form.Check
@@ -231,8 +231,8 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 
 											{values.dateInMind && (
 												<>
-													<Form.Group controlId="date">
-														<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Group controlId="date" className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
 															Date
 														</Form.Label>
 														<DatePicker
@@ -268,7 +268,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 											)}
 
 											<Form.Group className="mb-5">
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													How many people do you think will participate
 												</Form.Label>
 												<Form.Check

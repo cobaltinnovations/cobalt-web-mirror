@@ -51,10 +51,10 @@ const SessionStatus: FC<SessionStatusProps> = ({ status }) => {
 	return (
 		<div className="d-flex align-items-center">
 			<div className={classes.sessionStatusDot} />
-			{status === SESSION_STATUS.NEW && <span className="font-size-xxs">Pending</span>}
-			{status === SESSION_STATUS.ADDED && <span className="font-size-xxs">Added</span>}
-			{status === SESSION_STATUS.ARCHIVED && <span className="font-size-xxs">Archived</span>}
-			{status === SESSION_STATUS.CANCELED && <span className="font-size-xxs">Cancelled</span>}
+			{status === SESSION_STATUS.NEW && <span className="fs-small">Pending</span>}
+			{status === SESSION_STATUS.ADDED && <span className="fs-small">Added</span>}
+			{status === SESSION_STATUS.ARCHIVED && <span className="fs-small">Archived</span>}
+			{status === SESSION_STATUS.CANCELED && <span className="fs-small">Cancelled</span>}
 		</div>
 	);
 };

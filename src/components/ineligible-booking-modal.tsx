@@ -27,7 +27,7 @@ const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
 				</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="primary" className="ml-auto" size="sm" onClick={props.onHide}>
+				<Button variant="primary" className="ms-auto" size="sm" onClick={props.onHide}>
 					okay
 				</Button>
 			</Modal.Footer>

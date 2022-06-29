@@ -643,14 +643,15 @@ const ConnectWithSupport: FC = () => {
 									}}
 									onInputChange={setSearchQuery}
 									onChange={(selectedOptions) => {
-										setSelectedSearchResult(selectedOptions);
+										setSelectedSearchResult(selectedOptions as SearchResult[]);
 										(typeAheadRef.current as any).blur();
 									}}
 									options={searchQuery ? searchResults : recentProviders}
 									selected={selectedSearchResult}
-									renderMenu={(results, menuProps) => {
+									renderMenu={(options, menuProps) => {
+										const results = options as SearchResult[];
 										if (!searchQuery && recentProviders.length === 0) {
-											return null;
+											return <></>;
 										}
 
 										return (
@@ -672,7 +673,7 @@ const ConnectWithSupport: FC = () => {
 																	imageUrl={result.imageUrl}
 																	size={43}
 																/>
-																<div className="ml-3">
+																<div className="ms-3">
 																	<p className="mb-0">{result.displayName}</p>
 																	{result.description && (
 																		<small>{result.description}</small>
@@ -700,7 +701,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<div className="d-flex align-items-center justify-content-center mb-1">
-								<small className="mb-0 text-uppercase text-muted font-secondary-bold">Filters</small>
+								<small className="mb-0 text-uppercase text-muted font-body-bold">Filters</small>
 							</div>
 							<div className="d-flex justify-content-center flex-wrap">
 								<FilterPill
@@ -837,7 +838,7 @@ const ConnectWithSupport: FC = () => {
 					return (
 						<div key={section.date}>
 							<DayContainer className="mb-4">
-								<p className="mb-0 font-secondary-bold">{section.dateDescription}</p>
+								<p className="mb-0 font-body-bold">{section.dateDescription}</p>
 							</DayContainer>
 
 							<Container>

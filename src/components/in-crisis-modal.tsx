@@ -36,37 +36,37 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 				)}
 				<div className="mb-5">
 					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:911">
-						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-						<div className={'d-flex flex-column font-size-s ml-2'}>
+						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
+						<div className={'d-flex flex-column fs-large ms-2'}>
 							<span className={'text-primary mb-2'}>Call 911</span>
-							<span className={'font-weight-regular'}>24/7 emergency</span>
+							<span className={'font-heading-normal'}>24/7 emergency</span>
 						</div>
 					</Button>
 					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:8007238255">
-						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-						<div className={'d-flex flex-column font-size-s ml-2'}>
+						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
+						<div className={'d-flex flex-column fs-large ms-2'}>
 							<span className={'text-primary mb-2'}>Call 800-273-8255</span>
-							<span className={'font-weight-regular'}>24/7 National suicide prevention line</span>
+							<span className={'font-heading-normal'}>24/7 National suicide prevention line</span>
 						</div>
 					</Button>
 					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:741741">
-						<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-						<div className={'d-flex flex-column font-size-s ml-2'}>
+						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
+						<div className={'d-flex flex-column fs-large ms-2'}>
 							<span className={'text-primary mb-2'}>Text 741 741</span>
-							<span className={'font-weight-regular'}>24/7 Crisis Text Line</span>
+							<span className={'font-heading-normal'}>24/7 Crisis Text Line</span>
 						</div>
 					</Button>
 					{subdomainInstitution?.institutionId === 'COBALT' && (
 						<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:2158295433">
-							<PhoneIcon className={'float-left position-relative mr-2 mt-2'} />
-							<div className={'d-flex flex-column font-size-s ml-2'}>
+							<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
+							<div className={'d-flex flex-column fs-large ms-2'}>
 								<span className={'text-primary mb-2'}>Call 215-555-1111</span>
-								<span className={'font-weight-regular'}>24/7 Cobalt Crisis Response Center</span>
+								<span className={'font-heading-normal'}>24/7 Cobalt Crisis Response Center</span>
 							</div>
 						</Button>
 					)}
 					<div
-						className={'text-center font-weight-bold'}
+						className={'text-center font-heading-bold'}
 						style={{ margin: '0 auto', marginTop: '1.5em', width: '80%' }}
 					>
 						or go to your nearest emergency department or crisis center

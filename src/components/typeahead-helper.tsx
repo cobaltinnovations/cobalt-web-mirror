@@ -1,5 +1,6 @@
 import React, { ReactElement, useState } from 'react';
-import { Typeahead, TypeaheadModel, TypeaheadProps } from 'react-bootstrap-typeahead';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypeaheadComponentProps } from 'react-bootstrap-typeahead/types/components/Typeahead';
 
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -36,7 +37,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	}),
 }));
 
-interface TypeaheadHelperProps<T extends TypeaheadModel> extends TypeaheadProps<T> {
+interface TypeaheadHelperProps extends TypeaheadComponentProps {
 	label: string;
 	required?: boolean;
 	error?: string;
@@ -45,7 +46,7 @@ interface TypeaheadHelperProps<T extends TypeaheadModel> extends TypeaheadProps<
 	className?: string;
 }
 
-export function TypeaheadHelper<T extends TypeaheadModel>({
+export function TypeaheadHelper({
 	label,
 	required,
 	error,
@@ -53,7 +54,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 	characterCounter,
 	className,
 	...props
-}: TypeaheadHelperProps<T>): ReactElement {
+}: TypeaheadHelperProps): ReactElement {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 
@@ -76,7 +77,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 		setIsHovered(false);
 	}
 
-	function handleFocus(event: Event) {
+	function handleFocus(event: React.SyntheticEvent<HTMLInputElement, Event>) {
 		setIsFocused(true);
 
 		if (props.onFocus) {
@@ -84,7 +85,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 		}
 	}
 
-	function handleBlur(event: Event) {
+	function handleBlur(event: React.FocusEvent<HTMLInputElement, Element>) {
 		setIsFocused(false);
 
 		if (props.onBlur) {
@@ -105,10 +106,10 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 				<Typeahead onFocus={handleFocus} onBlur={handleBlur} {...props} />
 			</Form.Group>
 			{(helperText || characterCounter) && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					{helperText && <p className="mb-0 ml-0 mr-auto text-muted font-size-xxs">{helperText}</p>}
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
 					{characterCounter && (
-						<p className="mb-0 ml-auto mr-0 text-muted font-size-xxs">
+						<p className="mb-0 ms-auto me-0 text-muted fs-small">
 							{props.selected ? props.selected.length : 0} / {characterCounter}
 						</p>
 					)}

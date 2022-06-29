@@ -32,11 +32,11 @@ const SignUpClaim: FC = () => {
 						)}
 
 						{inviteExpired ? (
-							<p className="mb-0 text-center font-secondary-bold">
+							<p className="mb-0 text-center font-body-bold">
 								You will need to sign up again in order to continue.
 							</p>
 						) : (
-							<p className="mb-0 text-center font-secondary-bold">
+							<p className="mb-0 text-center font-body-bold">
 								You're all set! please let us know if you need anything.
 							</p>
 						)}

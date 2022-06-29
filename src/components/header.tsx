@@ -39,12 +39,12 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.primary,
 	},
 	headerTitle: {
-		...theme.fonts.m,
+		...theme.fonts.large,
 		overflow: 'hidden',
 		textAlign: 'center',
 		color: theme.colors.white,
 		whiteSpace: 'nowrap',
-		...theme.fonts.primaryBold,
+		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},
@@ -150,7 +150,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				{showHeaderButtons && (
 					<div tabIndex={0} className={classes.inCrisisButton} onClick={handleInCrisisButtonClick}>
 						<CrisisIcon className={classes.crisisIcon} />
-						<small className="font-secondary-bold">In Crisis?</small>
+						<small className="font-body-bold">In Crisis?</small>
 					</div>
 				)}
 			</header>

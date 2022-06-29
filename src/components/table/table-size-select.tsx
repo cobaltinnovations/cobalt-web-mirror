@@ -14,8 +14,8 @@ export const TableSizeSelect: FC<TableSizeSelectProps> = React.memo(({ size, onC
 	}
 
 	return (
-		<Form.Group className="d-flex align-items-center flex-shrink-0">
-			<Form.Label className="mb-0 mr-2">show:</Form.Label>
+		<Form.Group className="d-flex align-items-center flex-shrink-0 mb-5">
+			<Form.Label className="mb-0 me-2">show:</Form.Label>
 			<Select value={size} onChange={handleSelectChange}>
 				<option value="15">15</option>
 				<option value="30">30</option>

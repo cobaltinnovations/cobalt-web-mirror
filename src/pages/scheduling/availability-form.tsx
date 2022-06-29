@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
-import { Button, Col, Form } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { Formik } from 'formik';
 
 import { LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
@@ -168,7 +168,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 					return (
 						<Form onSubmit={handleSubmit}>
-							<Form.Group controlId="date">
+							<Form.Group controlId="date" className="mb-5">
 								<DatePicker
 									showYearDropdown
 									showMonthDropdown
@@ -181,8 +181,8 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 								/>
 							</Form.Group>
 
-							<Form.Group controlId="startTime">
-								<Form.Row>
+							<Form.Group controlId="startTime" className="mb-5">
+								<Row>
 									<Col>
 										<TimeInput
 											name="startTime"
@@ -195,11 +195,11 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 											}}
 										/>
 									</Col>
-								</Form.Row>
+								</Row>
 							</Form.Group>
 
-							<Form.Group controlId="endTime">
-								<Form.Row>
+							<Form.Group controlId="endTime" className="mb-5">
+								<Row>
 									<Col>
 										<TimeInput
 											name="endTime"
@@ -212,15 +212,15 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 											}}
 										/>
 									</Col>
-								</Form.Row>
+								</Row>
 							</Form.Group>
 
-							<Form.Group controlId="recurring">
+							<Form.Group controlId="recurring" className="mb-5">
 								<Form.Check
 									id="recurring"
 									checked={values.recurring}
-									className="ml-auto"
-									type="switch"
+									className="ms-auto"
+									bsPrefix="cobalt-modal-form__check"
 									label="Recurring"
 									onChange={handleChange}
 								/>
@@ -228,13 +228,13 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 							{values.recurring && (
 								<>
-									<Form.Group>
-										<Form.Label style={{ ...fonts.xs }}>Occurs on...</Form.Label>
+									<Form.Group className="mb-5">
+										<Form.Label style={{ ...fonts.default }}>Occurs on...</Form.Label>
 										<div className="d-flex align-items-center flex-wrap">
 											{(['S', 'M', 'T', 'W', 'Th', 'F', 'Sa'] as const).map((dayOfWeek, idx) => {
 												return (
 													<Form.Check
-														className="mr-4"
+														className="me-4"
 														key={idx}
 														id={`occurance.${dayOfWeek}`}
 														bsPrefix="cobalt-modal-form__check"
@@ -253,7 +253,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 										</div>
 									</Form.Group>
 
-									<Form.Group controlId="endDate">
+									<Form.Group controlId="endDate" className="mb-5">
 										<DatePicker
 											isClearable
 											showYearDropdown
@@ -271,13 +271,15 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 							{hideAppointmentTypes ? null : (
 								<>
-									<Form.Group controlId="typesAccepted">
-										<Form.Label style={{ ...fonts.xs }}>Appointment types accepted:</Form.Label>
+									<Form.Group controlId="typesAccepted" className="mb-5">
+										<Form.Label style={{ ...fonts.default }}>
+											Appointment types accepted:
+										</Form.Label>
 										<div>
 											<Form.Check
 												name="typesAccepted"
 												id="all"
-												className="d-inline-block mr-4"
+												className="d-inline-block me-4"
 												bsPrefix="cobalt-modal-form__check"
 												type="radio"
 												label="all"
@@ -300,7 +302,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 									</Form.Group>
 
 									{values.typesAccepted === 'limited' && (
-										<Form.Group controlId="appointmentTypes">
+										<Form.Group controlId="appointmentTypes" className="mb-5">
 											{appointmentTypes.map((appointmentType, idx) => {
 												return (
 													<Form.Check

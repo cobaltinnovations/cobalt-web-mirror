@@ -16,14 +16,14 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		},
 	}),
 	tableCellContent: (props: any) => ({
-		...theme.fonts.s,
+		...theme.fonts.large,
 		padding: '16px 16px',
 		width: typeof props.width === 'string' ? 'auto' : props.width,
 		...(props.header
 			? {
-					...theme.fonts.xxxs,
+					...theme.fonts.small,
 					display: 'flex',
-					...theme.fonts.secondaryBold,
+					...theme.fonts.bodyBold,
 					alignItems: 'center',
 					whiteSpace: 'nowrap',
 					color: theme.colors.gray600,

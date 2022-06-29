@@ -230,8 +230,8 @@ export const AppointmentTypeFormModal = ({
 					required
 				/>
 
-				<Form.Group>
-					<Form.Label className="d-block" style={{ ...theme.fonts.xs }}>
+				<Form.Group className="mb-5">
+					<Form.Label className="d-block" style={{ ...theme.fonts.default }}>
 						Color:
 					</Form.Label>
 					<input
@@ -243,8 +243,8 @@ export const AppointmentTypeFormModal = ({
 					/>
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label style={{ ...theme.fonts.xs }}>Visit Type:</Form.Label>
+				<Form.Group className="mb-5">
+					<Form.Label style={{ ...theme.fonts.default }}>Visit Type:</Form.Label>
 					<Select
 						value={visitTypeId}
 						onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
@@ -261,13 +261,13 @@ export const AppointmentTypeFormModal = ({
 					</Select>
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label className="m-0" style={{ ...theme.fonts.xs }}>
+				<Form.Group className="mb-5">
+					<Form.Label className="m-0" style={{ ...theme.fonts.default }}>
 						Duration:
 					</Form.Label>
 					<div className="d-flex align-items-center">
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-30"
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -279,7 +279,7 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-45"
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -291,7 +291,7 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-60"
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -303,7 +303,7 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-other"
 							type="radio"
 							bsPrefix="cobalt-modal-form__check"
@@ -328,8 +328,8 @@ export const AppointmentTypeFormModal = ({
 
 				<h3 className="mb-4">Client Information</h3>
 
-				<Form.Group>
-					<Form.Label style={{ ...theme.fonts.xs }}>Collect:</Form.Label>
+				<Form.Group className="mb-5">
+					<Form.Label style={{ ...theme.fonts.default }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
 							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
@@ -345,7 +345,7 @@ export const AppointmentTypeFormModal = ({
 										bsPrefix="cobalt-modal-form__check"
 										type="checkbox"
 										name={`collect-${questionContentHintId}`}
-										className="mr-6"
+										className="me-6"
 										label={label}
 										checked={isChecked}
 										disabled={disabled}
@@ -410,7 +410,7 @@ export const AppointmentTypeFormModal = ({
 							/>
 							<div className="mb-5">
 								<Form.Check
-									type="switch"
+									bsPrefix="cobalt-modal-form__check"
 									id={`screening-question-toggle--${index}`}
 									label="Reduce text size"
 									value="SMALL"
@@ -431,7 +431,7 @@ export const AppointmentTypeFormModal = ({
 						</div>
 					);
 				})}
-				<div className="text-right">
+				<div className="text-end">
 					<Button
 						size="sm"
 						onClick={() => {
@@ -459,7 +459,7 @@ export const AppointmentTypeFormModal = ({
 				</div>
 				<div>
 					<Button
-						className="mr-2"
+						className="me-2"
 						size="sm"
 						variant="outline-primary"
 						onClick={() => {

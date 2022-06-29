@@ -6,7 +6,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useRenderJsonStyles = createUseThemedStyles((theme) => ({
 	renderJson: {
 		padding: 16,
-		...theme.fonts.xxs,
+		...theme.fonts.small,
 		marginTop: 24,
 		borderRadius: 4,
 		backgroundColor: theme.colors.gray200,

@@ -72,19 +72,19 @@ const SessionRow: FC<SessionRowProps> = ({
 	return (
 		<TableRow>
 			<TableCell>
-				<span className="d-block font-size-xs">{session.createdDateDescription}</span>
+				<span className="d-block fs-default">{session.createdDateDescription}</span>
 			</TableCell>
 			<TableCell>
 				<Link
 					to={`/in-the-studio/group-session-scheduled/${session.groupSessionId}`}
-					className="d-block font-size-xs font-secondary-bold"
+					className="d-block fs-default font-body-bold"
 				>
 					{session.title}
 				</Link>
-				<span className="d-block font-size-xs">{session.startDateTimeDescription}</span>
+				<span className="d-block fs-default">{session.startDateTimeDescription}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs">{session.facilitatorName}</span>
+				<span className="d-block fs-default">{session.facilitatorName}</span>
 			</TableCell>
 			<TableCell>
 				{session.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT && (

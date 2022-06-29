@@ -29,7 +29,7 @@ const SessionRemoveImageModal: FC<SessionRemoveImageModalProps> = ({ imageSource
 			<Modal.Body bsPrefix="cobalt-modal__body--admin--small">
 				<img className={classes.imagePreview} src={imageSource} alt="" />
 				<div className="mt-5">
-					<p className="mb-0 font-size-xxs text-center">
+					<p className="mb-0 fs-small text-center">
 						Are you sure you want to remove the image from your post? We’ll replace it with a default Cobalt
 						images from our collection.
 					</p>
@@ -39,7 +39,7 @@ const SessionRemoveImageModal: FC<SessionRemoveImageModalProps> = ({ imageSource
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
 					cancel
 				</Button>
-				<Button variant="danger" size="sm" className="ml-3" onClick={onRemove}>
+				<Button variant="danger" size="sm" className="ms-3" onClick={onRemove}>
 					yes, remove image
 				</Button>
 			</Modal.Footer>

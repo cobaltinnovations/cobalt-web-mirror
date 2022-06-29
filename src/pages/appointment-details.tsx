@@ -8,12 +8,10 @@ import AsyncPage from '@/components/async-page';
 
 import { appointmentService } from '@/lib/services';
 import { AppointmentModel, VideoconferencePlatformId } from '@/lib/models';
-import { useCobaltTheme } from '@/jss/theme';
 
 const AppointmentDetails: FC = () => {
 	useHeaderTitle('Appointment');
 	const history = useHistory();
-	const { fonts } = useCobaltTheme();
 	const [details, setDetails] = useState<AppointmentModel>();
 	const { appointmentId } = useParams<{ appointmentId?: string }>();
 
@@ -31,7 +29,7 @@ const AppointmentDetails: FC = () => {
 				<Container className="pt-5">
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<p className="text-center mt-5" style={{ ...fonts.l }}>
+							<p className="text-center fs-large mt-5">
 								Your telephone consultation is scheduled for {details.timeDescription}. Your intake
 								counselor will call you at that time.
 							</p>

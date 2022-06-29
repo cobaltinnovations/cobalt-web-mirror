@@ -129,22 +129,22 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 	return (
 		<TableRow className={classes.row}>
 			<TableCell>
-				<span className="d-block font-size-xs font-secondary-regular">{content.dateCreatedDescription}</span>
+				<span className="d-block fs-default font-body-normal">{content.dateCreatedDescription}</span>
 			</TableCell>
 			<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
 				{getIcon(content.contentTypeId)}
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs font-secondary-bold">
+				<span className="d-block fs-default font-body-bold">
 					<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 				</span>
-				<span className="d-block font-size-xs font-secondary-regular">{content.author}</span>
+				<span className="d-block fs-default font-body-normal">{content.author}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs font-secondary-regular">{content.ownerInstitution}</span>
+				<span className="d-block fs-default font-body-normal">{content.ownerInstitution}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-inline-block font-size-xxs font-secondary-regular" style={{ minWidth: 90 }}>
+				<span className="d-inline-block fs-small font-body-normal" style={{ minWidth: 90 }}>
 					{getStatusIcon(content.availableStatusId)}
 					<span className={classes.status}>
 						{content.availableStatusId === ContentAvailableStatusId.Added

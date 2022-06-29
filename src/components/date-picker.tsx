@@ -39,7 +39,7 @@ const CustomDateInput = forwardRef(({ value, onClick, disabled, className, label
 	return (
 		<button type="button" ref={ref} className={className} onClick={onClick} disabled={disabled}>
 			{value || label || 'Select Date'}
-			<img className="ml-auto" src={unfoldIcon} alt="unfold date picker" />
+			<img className="ms-auto" src={unfoldIcon} alt="unfold date picker" />
 		</button>
 	);
 });

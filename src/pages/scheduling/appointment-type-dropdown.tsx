@@ -89,7 +89,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 			>
 				<div className="d-flex flex-column w-100">
 					<p
-						className="mb-0 text-left"
+						className="mb-0 text-start"
 						style={{
 							marginTop: -4,
 						}}
@@ -100,7 +100,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 					{selectedAppointmentType && <AppointmentTypeItem appointmentType={selectedAppointmentType} />}
 				</div>
 
-				<UnfoldIcon className="ml-auto" />
+				<UnfoldIcon className="ms-auto" />
 			</button>
 		);
 	}

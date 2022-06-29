@@ -104,7 +104,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 				<h3 className="mb-0">available days</h3>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="my-1 font-secondary-bold">Date Range</p>
+				<p className="my-1 font-body-bold">Date Range</p>
 				<DatePicker
 					minDate={moment().toDate()}
 					selected={fromDate.toDate()}
@@ -120,7 +120,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 					}}
 				/>
 
-				<p className="my-1 font-secondary-bold">to</p>
+				<p className="my-1 font-body-bold">to</p>
 				<DatePicker
 					minDate={fromDate.toDate()}
 					selected={toDate.toDate()}

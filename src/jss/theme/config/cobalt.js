@@ -1,19 +1,18 @@
 /**
- * @type { import("../theme").CobaltPrimaryFont }
+ * @type { import("../theme").CobaltFontFamily }
  */
-const primaryFont = {
+const headingFontFamily = {
 	fontFamily: '"Nunito Sans", sans-serif',
 	weights: {
 		regular: 400,
-		semiBold: 600,
 		bold: 700,
 	},
 };
 
 /**
- * @type { import("../theme").CobaltSecondaryFont }
+ * @type { import("../theme").CobaltFontFamily }
  */
-const secondaryFont = {
+const bodyFontFamily = {
 	fontFamily: '"Karla", sans-serif',
 	weights: {
 		regular: 400,
@@ -58,61 +57,75 @@ const theme = {
 	},
 
 	fonts: {
-		xxxs: {
-			fontSize: '1.2rem',
-			lineHeight: '1.2rem',
+		display1: {
+			fontSize: '5.8rem',
+			lineHeight: '6.4rem',
 		},
-		xxs: {
-			fontSize: '1.3rem',
-			lineHeight: '1.8rem',
+		display2: {
+			fontSize: '5.0rem',
+			lineHeight: '5.6rem',
 		},
-		xs: {
-			fontSize: '1.5rem',
-			lineHeight: '2rem',
+		display3: {
+			fontSize: '4.2rem',
+			lineHeight: '4.8rem',
 		},
-		s: {
-			fontSize: '1.6rem',
-			lineHeight: '1.8rem',
+		h1: {
+			fontSize: '3.5rem',
+			lineHeight: '4.0rem',
 		},
-		m: {
-			fontSize: '1.8rem',
-			lineHeight: '2.2rem',
+		h2: {
+			fontSize: '2.9rem',
+			lineHeight: '3.2rem',
 		},
-		l: {
-			fontSize: '2rem',
-			lineHeight: '2.4rem',
-		},
-		xl: {
+		h3: {
 			fontSize: '2.4rem',
 			lineHeight: '2.8rem',
 		},
-		xxl: {
-			fontSize: '2.8rem',
-			lineHeight: '3.2rem',
+		h4: {
+			fontSize: '2.0rem',
+			lineHeight: '2.4rem',
 		},
-		xxxl: {
-			fontSize: '3rem',
-			lineHeight: '3.6rem',
+		h5: {
+			fontSize: '1.6rem',
+			lineHeight: '2.0rem',
 		},
-		primaryRegular: {
-			fontFamily: primaryFont.fontFamily,
-			fontWeight: primaryFont.weights.regular,
+		h6: {
+			fontSize: '1.4rem',
+			lineHeight: '1.6rem',
 		},
-		primarySemiBold: {
-			fontFamily: primaryFont.fontFamily,
-			fontWeight: primaryFont.weights.semiBold,
+		default: {
+			fontSize: '1.5rem',
+			lineHeight: '2rem',
 		},
-		primaryBold: {
-			fontFamily: primaryFont.fontFamily,
-			fontWeight: primaryFont.weights.bold,
+		large: {
+			fontSize: '1.8rem',
+			lineHeight: '2.2rem',
 		},
-		secondaryRegular: {
-			fontFamily: secondaryFont.fontFamily,
-			fontWeight: secondaryFont.weights.regular,
+		small: {
+			fontSize: '1.3rem',
+			lineHeight: '1.6rem',
 		},
-		secondaryBold: {
-			fontFamily: secondaryFont.fontFamily,
-			fontWeight: secondaryFont.weights.bold,
+		uiSmall: {
+			fontSize: '1.2rem',
+			lineHeight: '1.4rem',
+		},
+
+		headingNormal: {
+			fontFamily: headingFontFamily.fontFamily,
+			fontWeight: headingFontFamily.weights.regular,
+		},
+		headingBold: {
+			fontFamily: headingFontFamily.fontFamily,
+			fontWeight: headingFontFamily.weights.bold,
+		},
+
+		bodyNormal: {
+			fontFamily: bodyFontFamily.fontFamily,
+			fontWeight: bodyFontFamily.weights.regular,
+		},
+		bodyBold: {
+			fontFamily: bodyFontFamily.fontFamily,
+			fontWeight: bodyFontFamily.weights.bold,
 		},
 	},
 };

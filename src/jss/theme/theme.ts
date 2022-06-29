@@ -1,16 +1,7 @@
-export type CobaltPrimaryFont = {
+export type CobaltFontFamily = {
 	fontFamily: string;
 	weights: {
-		regular: number;
-		semiBold: number;
-		bold: number;
-	};
-};
-
-export type CobaltSecondaryFont = {
-	fontFamily: string;
-	weights: {
-		regular: number;
+		normal: number;
 		bold: number;
 	};
 };
@@ -56,19 +47,23 @@ export type CobaltTheme = {
 	};
 
 	fonts: {
-		xxxs: CobaltFontSizeConfig;
-		xxs: CobaltFontSizeConfig;
-		xs: CobaltFontSizeConfig;
-		s: CobaltFontSizeConfig;
-		m: CobaltFontSizeConfig;
-		l: CobaltFontSizeConfig;
-		xl: CobaltFontSizeConfig;
-		xxl: CobaltFontSizeConfig;
-		xxxl: CobaltFontSizeConfig;
-		primaryRegular: CobaltFontConfig;
-		primarySemiBold: CobaltFontConfig;
-		primaryBold: CobaltFontConfig;
-		secondaryRegular: CobaltFontConfig;
-		secondaryBold: CobaltFontConfig;
+		display1: CobaltFontSizeConfig;
+		display2: CobaltFontSizeConfig;
+		display3: CobaltFontSizeConfig;
+		h1: CobaltFontSizeConfig;
+		h2: CobaltFontSizeConfig;
+		h3: CobaltFontSizeConfig;
+		h4: CobaltFontSizeConfig;
+		h5: CobaltFontSizeConfig;
+		h6: CobaltFontSizeConfig;
+		default: CobaltFontSizeConfig;
+		large: CobaltFontSizeConfig;
+		small: CobaltFontSizeConfig;
+		uiSmall: CobaltFontSizeConfig;
+
+		headingNormal: CobaltFontConfig;
+		headingBold: CobaltFontConfig;
+		bodyNormal: CobaltFontConfig;
+		bodyBold: CobaltFontConfig;
 	};
 };

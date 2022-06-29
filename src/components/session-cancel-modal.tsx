@@ -33,7 +33,7 @@ const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props })
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
 					no don't cancel
 				</Button>
-				<Button variant="danger" size="sm" className="ml-3" onClick={onCancel}>
+				<Button variant="danger" size="sm" className="ms-3" onClick={onCancel}>
 					yes, cancel session
 				</Button>
 			</Modal.Footer>

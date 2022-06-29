@@ -8,11 +8,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
 		margin: 5,
-		...theme.fonts.xxs,
+		...theme.fonts.small,
 		borderRadius: 500,
 		appearance: 'none',
 		whiteSpace: 'nowrap',
-		...theme.fonts.secondaryRegular,
+		...theme.fonts.bodyNormal,
 		textTransform: 'uppercase',
 		padding: '4px 10px 4px 12px',
 		backgroundColor: Color(theme.colors.dark).alpha(0.12).string(),

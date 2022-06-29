@@ -25,12 +25,12 @@ const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) =
 		},
 	},
 	modalTitle: {
-		...theme.fonts.s,
-		...theme.fonts.primaryBold,
+		...theme.fonts.large,
+		...theme.fonts.headingBold,
 	},
 	clearLink: {
-		...theme.fonts.xs,
-		...theme.fonts.secondaryBold,
+		...theme.fonts.default,
+		...theme.fonts.bodyBold,
 	},
 	closeIcon: {
 		marginRight: 25,
@@ -63,12 +63,12 @@ const useQuestionItemStyles = createUseThemedStyles((theme) => ({
 	},
 	pill: {
 		margin: 5,
-		...theme.fonts.xxs,
+		...theme.fonts.small,
 		borderRadius: 500,
 		appearance: 'none',
 		padding: '4px 12px',
 		whiteSpace: 'nowrap',
-		...theme.fonts.secondaryRegular,
+		...theme.fonts.bodyNormal,
 		textTransform: 'uppercase',
 		backgroundColor: theme.colors.shadedPill,
 		border: `1px solid ${theme.colors.dark}`,

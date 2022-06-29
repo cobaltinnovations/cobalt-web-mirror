@@ -7,7 +7,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useProviderInfoStyles = createUseThemedStyles((theme) => ({
 	paymentPill: {
-		...theme.fonts.xxs,
+		...theme.fonts.small,
 		color: theme.colors.dark,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,
@@ -71,7 +71,7 @@ export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({
 	return (
 		<div className="d-flex align-items-center">
 			<BackgroundImageContainer size={116} imageUrl={provider.imageUrl || placeholderImage} />
-			<div className="pl-3">
+			<div className="ps-3">
 				<h5 className="mb-0">{renderedLink}</h5>
 
 				{/* {provider.schedulingSystemId !== 'EPIC' && (

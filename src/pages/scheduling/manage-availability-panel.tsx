@@ -102,14 +102,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>regular hours</h5>
-						<Button
-							as={Link}
-							variant="link"
-							to={`${routeMatch.url}/new-availability`}
-							className={classes.roundBtn}
-						>
-							<PlusIcon />
-						</Button>
+						<Link to={`${routeMatch.url}/new-availability`}>
+							<Button variant="link" className={classes.roundBtn}>
+								<PlusIcon />
+							</Button>
+						</Link>
 					</div>
 
 					<div className="mb-5">
@@ -125,14 +122,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>unavailable time block</h5>
-						<Button
-							as={Link}
-							variant="link"
-							to={`${routeMatch.url}/new-blocked-time`}
-							className={classes.roundBtn}
-						>
-							<PlusIcon />
-						</Button>
+						<Link to={`${routeMatch.url}/new-blocked-time`}>
+							<Button variant="link" className={classes.roundBtn}>
+								<PlusIcon />
+							</Button>
+						</Link>
 					</div>
 
 					<div>
@@ -164,21 +158,17 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 				<div>
 					{logicalAvailability.descriptionComponents?.map((description, index) => {
 						return (
-							<p key={index} className="m-0 font-secondary-bold">
+							<p key={index} className="m-0 font-body-bold">
 								{description}
 							</p>
 						);
 					})}
 				</div>
-				<Button
-					as={Link}
-					to={`${routeMatch.url}/${logicalAvailability.logicalAvailabilityId}/edit`}
-					variant="link"
-					size="sm"
-					className="p-0"
-				>
-					<EditIcon height={24} width={24} />
-				</Button>
+				<Link to={`${routeMatch.url}/${logicalAvailability.logicalAvailabilityId}/edit`}>
+					<Button variant="link" size="sm" className="p-0">
+						<EditIcon height={24} width={24} />
+					</Button>
+				</Link>
 			</div>
 			{logicalAvailability.appointmentTypes.map((appointmentType) => {
 				return (

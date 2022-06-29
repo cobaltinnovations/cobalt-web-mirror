@@ -171,18 +171,20 @@ export const AppointmentDetailPanel = ({
 					as="a"
 					variant="primary"
 					size="sm"
-					className="mr-1"
+					className="me-1"
 					href={appointment?.videoconferenceUrl}
 					target="_blank"
 				>
 					join now
 				</Button>
 
-				<CopyToClipboardButton className="mr-1" text={appointment?.videoconferenceUrl} />
+				<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} />
 
-				<Button as={Link} to={`${routeMatch.url}/edit`} variant="primary" size="sm" className="px-2">
-					<EditIcon />
-				</Button>
+				<Link to={`${routeMatch.url}/edit`}>
+					<Button variant="primary" size="sm" className="px-2">
+						<EditIcon />
+					</Button>
+				</Link>
 			</div>
 
 			<div className="border py-2 px-3">
@@ -341,7 +343,7 @@ const AppointmentAttendance = ({
 						<CheckIcon />
 					</button>
 					<button
-						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ml-2')}
+						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ms-2')}
 						onClick={() => {
 							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
 						}}

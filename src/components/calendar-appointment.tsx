@@ -35,7 +35,7 @@ const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 	},
 	paymentPill: {
-		...theme.fonts.xxs,
+		...theme.fonts.small,
 		color: theme.colors.dark,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,

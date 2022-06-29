@@ -66,7 +66,7 @@ const Tag: FC<TagProps> = (props) => {
 
 	return (
 		<div className={classNames(classes.tag, props.className)}>
-			<small className="font-weight-bold">{props.children}</small>
+			<small className="font-heading-bold">{props.children}</small>
 		</div>
 	);
 };

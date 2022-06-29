@@ -52,7 +52,9 @@ export const ProviderManagementPersonalDetails = (): ReactElement => {
 							labelKey="title"
 							options={strengthOptions}
 							selected={strengthSelections}
-							onChange={setStrengthSelections}
+							onChange={(options) => {
+								setStrengthSelections(options as StrengthModel[]);
+							}}
 							helperText="Choose or enter your own"
 							characterCounter={3}
 							allowNew

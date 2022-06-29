@@ -80,8 +80,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					boxHeight: 6,
 					color: colors.dark,
 					font: {
-						family: fonts.secondaryRegular.fontFamily,
-						weight: fonts.secondaryRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -93,13 +93,13 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				backgroundColor: colors.dark,
 				bodyFontColor: colors.white,
 				titleFont: {
-					family: fonts.secondaryRegular.fontFamily,
-					weight: fonts.secondaryRegular.fontWeight,
+					family: fonts.bodyNormal.fontFamily,
+					weight: fonts.bodyNormal.fontWeight,
 					size: 12,
 				},
 				bodyFont: {
-					family: fonts.secondaryRegular.fontFamily,
-					weight: fonts.secondaryRegular.fontWeight,
+					family: fonts.bodyNormal.fontFamily,
+					weight: fonts.bodyNormal.fontWeight,
 					size: 12,
 				},
 				callbacks: {
@@ -147,8 +147,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					color: colors.dark,
 					padding: 5,
 					font: {
-						family: fonts.secondaryRegular.fontFamily,
-						weight: fonts.secondaryRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -173,8 +173,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					padding: 20,
 					color: colors.dark,
 					font: {
-						family: fonts.secondaryRegular.fontFamily,
-						weight: fonts.secondaryRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},

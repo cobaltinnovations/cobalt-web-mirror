@@ -61,10 +61,10 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 					</p>
 				) : (
 					<>
-						<p className="mb-0 font-secondary-bold">in the studio event</p>
+						<p className="mb-0 font-body-bold">in the studio event</p>
 						<p className="mb-2">{groupEventName}</p>
 
-						<p className="mb-0 font-secondary-bold">scheduled for</p>
+						<p className="mb-0 font-body-bold">scheduled for</p>
 						<p className="mb-0">{dateTime}?</p>
 					</>
 				)}

@@ -123,7 +123,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									{props?.title && (
 										<div
 											className="position-relative mb-0"
-											style={{ ...fonts.xxs, ...fonts.primaryBold }}
+											style={{ ...fonts.small, ...fonts.headingBold }}
 										>
 											<CircleIndicator size={16} className={classes.circleTwo}>
 												2
@@ -132,7 +132,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										</div>
 									)}
 									{props?.author ? (
-										<p className=" position-relative mb-1" style={{ ...fonts.xxxs }}>
+										<p className=" position-relative mb-1" style={{ ...fonts.small }}>
 											<CircleIndicator size={16} className={classes.circleThree}>
 												3
 											</CircleIndicator>
@@ -146,8 +146,8 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										<div className="position-relative">
 											{props?.contentTypeLabel && (
 												<span
-													className="text-muted text-uppercase font-secondary-bold"
-													style={{ ...fonts.xxxs }}
+													className="text-muted text-uppercase font-body-bold"
+													style={{ ...fonts.uiSmall }}
 												>
 													<CircleIndicator size={16} className={classes.circleOne}>
 														1
@@ -159,8 +159,8 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 										{props?.duration && (
 											<span
-												className="position-relative text-muted text-uppercase font-secondary-bold ml-auto "
-												style={{ ...fonts.xxxs, whiteSpace: 'nowrap' }}
+												className="position-relative text-muted text-uppercase font-body-bold ms-auto "
+												style={{ ...fonts.uiSmall, whiteSpace: 'nowrap' }}
 											>
 												<CircleIndicator size={16} className={classes.circleFour}>
 													4
@@ -185,7 +185,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									</CircleIndicator>
 									<p
 										className="mb-0"
-										style={{ ...fonts.xxs }}
+										style={{ ...fonts.small }}
 										dangerouslySetInnerHTML={{ __html: props.description || '' }}
 									/>
 								</div>
