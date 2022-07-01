@@ -1,20 +1,16 @@
-import Color from 'color';
 import { CobaltTheme } from '@/jss/theme';
 
 export const button = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-button': {
 			border: 0,
-			...theme.fonts.h4,
 			borderRadius: 500,
 			appearance: 'none',
-			padding: '15px 35px',
-			textDecoration: 'none',
-			...theme.fonts.headingBold,
+			padding: '10px 20px',
+			...theme.fonts.bodyBold,
+			fontSize: '1.6rem',
+			lineHeight: '2rem',
 			textTransform: 'none',
-			// '&:hover': {
-			// 	textDecoration: 'none',
-			// },
 			'&:focus': {
 				outline: 'none',
 			},
@@ -27,9 +23,16 @@ export const button = (theme: CobaltTheme) => {
 					backgroundColor: theme.colors.n100,
 				},
 			},
+
+			'&-lg': {
+				fontSize: '1.8rem',
+				lineHeight: '2.4rem',
+				padding: '12px 28px',
+			},
+
 			'&-sm': {
-				...theme.fonts.large,
-				padding: '10px 25px',
+				fontSize: '1.4rem',
+				padding: '6px 16px',
 			},
 
 			'& svg': {
@@ -124,15 +127,13 @@ export const button = (theme: CobaltTheme) => {
 			/* Light variant */
 			/* ----------------------------------------------------------- */
 			'&-light': {
-				color: theme.colors.p500,
+				color: theme.colors.p700,
 				backgroundColor: theme.colors.n0,
 				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.p300,
+					backgroundColor: theme.colors.n50,
 				},
 				'&:active': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.a500,
+					backgroundColor: theme.colors.n75,
 				},
 			},
 
@@ -144,20 +145,13 @@ export const button = (theme: CobaltTheme) => {
 				textDecoration: 'underline',
 				backgroundColor: 'transparent',
 				'&:hover': {
-					color: theme.colors.p500,
+					color: theme.colors.p700,
 					textDecoration: 'underline',
 					backgroundColor: 'transparent',
 				},
 				'&:active': {
 					backgroundColor: 'transparent',
-					color: theme.colors.p500,
-				},
-			},
-
-			'&-inverse': {
-				backgroundColor: theme.colors.n0,
-				'&-primary': {
-					color: theme.colors.p500,
+					color: theme.colors.p700,
 				},
 			},
 
