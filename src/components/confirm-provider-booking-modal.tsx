@@ -36,7 +36,7 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 				<h3 className="mb-0">confirm your appointment</h3>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-2 font-body-normal">
+				<p className="mb-2 fw-normal">
 					Do you want to book this session with <strong>{provider?.name}</strong> for{' '}
 					<strong>{formattedDate}</strong> from <strong>{selectedTimeSlot?.timeDescription}</strong> to{' '}
 					<strong>{timeSlotEndTime}</strong>?

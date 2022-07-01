@@ -21,7 +21,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.large,
 		marginBottom: 15,
 		padding: '0 24px',
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		...theme.fonts.headingBold,
 	},
 	quickFilterItem: {

@@ -8,7 +8,7 @@ const useMatchConfidenceStyles = createUseThemedStyles((theme) => ({
 	barOuter: {
 		height: 4,
 		width: '100%',
-		backgroundColor: theme.colors.gray500,
+		backgroundColor: theme.colors.n500,
 	},
 	bar: ({ percent, color }: { percent: number; color: string }) => ({
 		width: `${percent}%`,
@@ -27,7 +27,7 @@ interface MatchConfidenceProps {
 
 const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, description, hideIcon }) => {
 	const theme = useCobaltTheme();
-	const [color, setColor] = useState(theme.colors.danger);
+	const [color, setColor] = useState(theme.colors.d500);
 
 	const classes = useMatchConfidenceStyles({
 		percent,
@@ -36,13 +36,13 @@ const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, descrip
 
 	useEffect(() => {
 		if (percent > 33 && percent <= 66) {
-			setColor(theme.colors.warning);
+			setColor(theme.colors.w500);
 		} else if (percent > 66) {
-			setColor(theme.colors.success);
+			setColor(theme.colors.s500);
 		} else {
-			setColor(theme.colors.danger);
+			setColor(theme.colors.d500);
 		}
-	}, [percent, theme.colors.danger, theme.colors.success, theme.colors.warning]);
+	}, [percent, theme.colors.d500, theme.colors.s500, theme.colors.w500]);
 
 	return (
 		<>
@@ -50,8 +50,8 @@ const MatchConfidence: FC<MatchConfidenceProps> = ({ className, percent, descrip
 				{!hideIcon && <ConfidenceSearchIcon className="me-3" />}
 
 				<div className="flex-grow-1">
-					<h6 className="mb-2 font-body-normal">
-						<span className="font-body-bold">match confidence:</span> {description}
+					<h6 className="mb-2 fw-normal">
+						<span className="fw-bold">match confidence:</span> {description}
 					</h6>
 
 					<div className={classes.barOuter}>

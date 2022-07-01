@@ -104,7 +104,7 @@ export const AppointmentTypeFormModal = ({
 	const handleError = useHandleError();
 
 	const [title, setTitle] = useState('');
-	const [color, setColor] = useState(theme.colors.primary);
+	const [color, setColor] = useState(theme.colors.p500);
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
@@ -143,12 +143,12 @@ export const AppointmentTypeFormModal = ({
 
 	const handleOnExited = useCallback(() => {
 		setTitle('');
-		setColor(theme.colors.primary);
+		setColor(theme.colors.p500);
 		setDuration('');
 		setDurationInMinutes(undefined);
 		setPatientIntakeQuestions([]);
 		setScreeningQuestions([]);
-	}, [theme.colors.primary]);
+	}, [theme.colors.p500]);
 
 	const handleSaveButtonClick = useCallback(async () => {
 		try {

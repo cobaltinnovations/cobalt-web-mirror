@@ -11,10 +11,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		height: size ? size : 35,
 		lineHeight: size ? `${size}px` : '35px',
 		textAlign: 'center',
-		color: theme.colors.white,
+		color: theme.colors.n0,
 		display: 'inline-block',
 		...theme.fonts.headingBold,
-		backgroundColor: theme.colors.secondary,
+		backgroundColor: theme.colors.a500,
 	}),
 }));
 

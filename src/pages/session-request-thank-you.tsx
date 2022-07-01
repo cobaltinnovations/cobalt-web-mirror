@@ -10,7 +10,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	card: {
 		border: 0,
 		borderRadius: 0,
-		borderTop: `20px solid ${theme.colors.success}`,
+		borderTop: `20px solid ${theme.colors.s500}`,
 	},
 }));
 

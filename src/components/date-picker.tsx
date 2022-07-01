@@ -19,7 +19,7 @@ const useDatePickerStyles = createUseThemedStyles((theme) => ({
 		paddingLeft: 15,
 		paddingRight: 15,
 		border: `1px solid ${theme.colors.border}`,
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 		textAlign: 'left',
 		'&:disabled': {
 			backgroundColor: theme.colors.background,

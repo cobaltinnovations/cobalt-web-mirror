@@ -81,7 +81,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(logicalAvailabilityId)}>
-					<ChevronLeftIcon fill={theme.colors.primary} className="me-1" />
+					<ChevronLeftIcon fill={theme.colors.p500} className="me-1" />
 					back
 				</Button>
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>

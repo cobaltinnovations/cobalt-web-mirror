@@ -5,7 +5,7 @@ const useTableHeadStyles = createUseThemedStyles((theme) => ({
 	tableHead: {
 		border: `1px solid ${theme.colors.border}`,
 		'& tr': {
-			backgroundColor: theme.colors.white,
+			backgroundColor: theme.colors.n0,
 		},
 	},
 }));

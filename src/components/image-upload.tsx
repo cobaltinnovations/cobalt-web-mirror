@@ -13,13 +13,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		marginRight: 8,
 		borderRadius: 7,
 		overflow: 'hidden',
-		backgroundColor: theme.colors.gray300,
+		backgroundColor: theme.colors.n300,
 	},
 	progressBarFill: ({ percentage }: { percentage: number }) => ({
 		height: '100%',
 		width: `${percentage}%`,
 		transition: '0.3s width',
-		backgroundColor: theme.colors.success,
+		backgroundColor: theme.colors.s500,
 	}),
 }));
 

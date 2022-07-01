@@ -158,7 +158,7 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 				<div>
 					{logicalAvailability.descriptionComponents?.map((description, index) => {
 						return (
-							<p key={index} className="m-0 font-body-bold">
+							<p key={index} className="m-0 fw-bold">
 								{description}
 							</p>
 						);

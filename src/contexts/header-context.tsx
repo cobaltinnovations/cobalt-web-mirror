@@ -7,7 +7,7 @@ const useLogoTextStyles = createUseThemedStyles((theme) => ({
 	logoText: {
 		display: 'block',
 		'& path': {
-			fill: theme.colors.white,
+			fill: theme.colors.n0,
 		},
 	},
 }));

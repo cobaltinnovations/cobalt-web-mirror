@@ -11,7 +11,7 @@ const useFooterStyles = createUseThemedStyles((theme) => ({
 
 		height: 6,
 		color: 'white',
-		backgroundColor: theme.colors.footer,
+		backgroundColor: theme.colors.a300,
 	},
 }));
 

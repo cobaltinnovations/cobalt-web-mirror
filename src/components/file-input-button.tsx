@@ -1,5 +1,4 @@
 import React, { FC, PropsWithChildren, useRef } from 'react';
-import Color from 'color';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
@@ -11,25 +10,26 @@ const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 		cursor: 'pointer',
 		borderRadius: 500,
 		overflow: 'hidden',
-		color: theme.colors.white,
+		color: theme.colors.n0,
 		padding: '10px 25px',
 		position: 'relative',
 		display: 'inline-block',
 		...theme.fonts.headingBold,
-		backgroundColor: theme.colors.primary,
+		backgroundColor: theme.colors.p500,
 		'&:hover': {
-			backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
+			backgroundColor: theme.colors.p300,
 		},
 		'&:active': {
-			backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
+			backgroundColor: theme.colors.p700,
 		},
 	},
 	disabled: {
-		color: theme.colors.gray500,
-		backgroundColor: theme.colors.gray200,
+		color: theme.colors.n500,
+		backgroundColor: theme.colors.n75,
 		'&:hover': {
-			color: theme.colors.gray500,
-			backgroundColor: theme.colors.gray200,
+			cursor: 'not-allowed',
+			color: theme.colors.n500,
+			backgroundColor: theme.colors.n75,
 		},
 	},
 	fileInput: {

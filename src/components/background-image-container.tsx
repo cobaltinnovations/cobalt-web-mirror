@@ -9,7 +9,7 @@ const useBackgroundImageContainerStyles = createUseThemedStyles((theme) => ({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
-		backgroundColor: theme.colors.gray300,
+		backgroundColor: theme.colors.n300,
 		backgroundImage: `url(${imageUrl})`,
 		...(size
 			? {

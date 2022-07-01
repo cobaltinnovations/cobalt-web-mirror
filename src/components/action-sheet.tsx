@@ -18,8 +18,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		width: 54,
 		height: 54,
 		borderRadius: 27,
-		color: theme.colors.white,
-		backgroundColor: theme.colors.black,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.n900,
 		transition: `${transitionDuration}ms transform`,
 		'&:focus': {
 			outline: 'none',

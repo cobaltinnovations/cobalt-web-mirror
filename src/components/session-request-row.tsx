@@ -18,17 +18,17 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	iconPath: {
 		'& path': {
-			fill: theme.colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconPolygon: {
 		'& polygon': {
-			fill: theme.colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconTrash: {
 		'& path': {
-			fill: theme.colors.danger,
+			fill: theme.colors.d500,
 		},
 	},
 }));
@@ -75,7 +75,7 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 			<TableCell>
 				<Link
 					to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`}
-					className="d-block fs-default font-body-bold"
+					className="d-block fs-default fw-bold"
 				>
 					{session.title}
 				</Link>

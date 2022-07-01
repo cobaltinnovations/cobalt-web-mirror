@@ -15,30 +15,33 @@ const useFilterPillStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.bodyNormal,
 		textTransform: 'uppercase',
 		padding: '4px 10px 4px 12px',
-		backgroundColor: Color(theme.colors.dark).alpha(0.12).string(),
-		border: `1px solid ${theme.colors.dark}`,
+		backgroundColor: theme.colors.n100,
+		border: `1px solid ${theme.colors.border}`,
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	activePill: {
-		backgroundColor: theme.colors.dark,
-		color: theme.colors.white,
+		backgroundColor: theme.colors.n900,
+		color: theme.colors.n0,
 	},
 	disabledPill: {
-		backgroundColor: theme.colors.shadedPill,
-		color: theme.colors.gray600,
+		backgroundColor: theme.colors.n100,
+		color: theme.colors.n500,
+		'&:hover': {
+			cursor: 'not-allowed',
+		},
 	},
 	arrowDown: {
 		marginLeft: 2,
 		marginTop: -1,
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 	},
 	activeArrowDown: {
-		fill: theme.colors.white,
+		fill: theme.colors.n0,
 	},
 	disabledArrowDown: {
-		fill: theme.colors.gray600,
+		fill: theme.colors.n500,
 	},
 }));
 

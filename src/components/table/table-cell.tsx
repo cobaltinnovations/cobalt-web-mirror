@@ -26,7 +26,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 					...theme.fonts.bodyBold,
 					alignItems: 'center',
 					whiteSpace: 'nowrap',
-					color: theme.colors.gray600,
+					color: theme.colors.n500,
 					textTransform: 'uppercase',
 					justifyContent: 'space-between',
 					...(props.sortable

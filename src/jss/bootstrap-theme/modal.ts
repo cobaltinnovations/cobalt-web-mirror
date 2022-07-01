@@ -29,7 +29,7 @@ export const modal = (theme: CobaltTheme) => {
 						content: '""',
 						display: 'block',
 						position: 'absolute',
-						backgroundColor: theme.colors.black,
+						backgroundColor: theme.colors.n900,
 					},
 					'&:before': {
 						transform: 'translate(-50%, -50%) rotate(-45deg)',
@@ -41,13 +41,13 @@ export const modal = (theme: CobaltTheme) => {
 						opacity: 1,
 					},
 					'&:not(:disabled):not(.disabled):hover': {
-						backgroundColor: theme.colors.gray100,
+						backgroundColor: theme.colors.n100,
 					},
 				},
 				'&--admin': {
 					padding: '17px 30px',
 					position: 'relative',
-					backgroundColor: theme.colors.gray100,
+					backgroundColor: theme.colors.n100,
 					'& button.btn-close': {
 						right: 12,
 						width: 44,
@@ -67,7 +67,7 @@ export const modal = (theme: CobaltTheme) => {
 							content: '""',
 							display: 'block',
 							position: 'absolute',
-							backgroundColor: theme.colors.dark,
+							backgroundColor: theme.colors.n900,
 						},
 						'&:before': {
 							transform: 'translate(-50%, -50%) rotate(-45deg)',
@@ -79,7 +79,7 @@ export const modal = (theme: CobaltTheme) => {
 							opacity: 1,
 						},
 						'&:not(:disabled):not(.disabled):hover': {
-							backgroundColor: theme.colors.gray100,
+							backgroundColor: theme.colors.n100,
 						},
 					},
 				},
@@ -97,10 +97,10 @@ export const modal = (theme: CobaltTheme) => {
 				padding: '15px 25px',
 				'&--admin': {
 					padding: '56px 30px',
-					backgroundColor: theme.colors.white,
+					backgroundColor: theme.colors.n0,
 					'&--small': {
 						padding: 30,
-						backgroundColor: theme.colors.white,
+						backgroundColor: theme.colors.n0,
 					},
 				},
 			},
@@ -112,7 +112,7 @@ export const modal = (theme: CobaltTheme) => {
 					display: 'flex',
 					padding: '17px 30px',
 					position: 'relative',
-					backgroundColor: theme.colors.gray100,
+					backgroundColor: theme.colors.n100,
 					justifyContent: 'flex-end',
 				},
 			},

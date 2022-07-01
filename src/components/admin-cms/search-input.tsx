@@ -10,7 +10,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 16,
 		position: 'absolute',
 		pointerEvents: 'none',
-		fill: theme.colors.secondary,
+		fill: theme.colors.a500,
 		transform: 'translateY(-50%)',
 	},
 }));

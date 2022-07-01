@@ -36,13 +36,13 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: theme.colors.primary,
+		backgroundColor: theme.colors.p500,
 	},
 	headerTitle: {
 		...theme.fonts.large,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: theme.colors.white,
+		color: theme.colors.n0,
 		whiteSpace: 'nowrap',
 		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
@@ -57,7 +57,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		right: 0,
 		width: 80,
 		paddingTop: 1,
-		color: theme.colors.white,
+		color: theme.colors.n0,
 		whiteSpace: 'nowrap',
 		flexDirection: 'column',
 		'& small': {
@@ -67,13 +67,13 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 	menuIcon: {
 		'& path': {
-			fill: theme.colors.white,
+			fill: theme.colors.n0,
 		},
 	},
 	crisisIcon: {
 		marginBottom: 3,
 		'& path': {
-			fill: theme.colors.white,
+			fill: theme.colors.n0,
 		},
 	},
 }));
@@ -150,7 +150,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				{showHeaderButtons && (
 					<div tabIndex={0} className={classes.inCrisisButton} onClick={handleInCrisisButtonClick}>
 						<CrisisIcon className={classes.crisisIcon} />
-						<small className="font-body-bold">In Crisis?</small>
+						<small className="fw-bold">In Crisis?</small>
 					</div>
 				)}
 			</header>

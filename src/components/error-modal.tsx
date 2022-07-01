@@ -37,11 +37,11 @@ const ErrorModal: FC = () => {
 			<Modal.Body>
 				{error?.code === 'VALIDATION_FAILED' ? (
 					<>
-						<p className="mb-1 font-body-bold">{error?.message}</p>
+						<p className="mb-1 fw-bold">{error?.message}</p>
 					</>
 				) : (
 					<>
-						<p className="mb-1 font-body-bold">Need technical support?</p>
+						<p className="mb-1 fw-bold">Need technical support?</p>
 						<Button
 							variant="link"
 							size="sm"
@@ -54,7 +54,7 @@ const ErrorModal: FC = () => {
 							Send us a note
 						</Button>
 
-						<p className="mb-1 font-body-bold">Need clinical support?</p>
+						<p className="mb-1 fw-bold">Need clinical support?</p>
 						<a
 							className="mb-4 d-block fs-large font-heading-bold text-decoration-none"
 							href="tel:866-301-4724"
@@ -62,7 +62,7 @@ const ErrorModal: FC = () => {
 							call 866-301-4724
 						</a>
 
-						<p className="mb-1 font-body-bold">Have a clinical emergency?</p>
+						<p className="mb-1 fw-bold">Have a clinical emergency?</p>
 						<Button
 							variant="link"
 							size="sm"

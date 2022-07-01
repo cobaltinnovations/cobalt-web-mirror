@@ -22,7 +22,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useIndexStyles = createUseThemedStyles((theme) => ({
 	inTheStudioContainer: {
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	carouselImage: {
 		width: '100%',
@@ -30,11 +30,11 @@ const useIndexStyles = createUseThemedStyles((theme) => ({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
-		backgroundColor: theme.colors.gray300,
+		backgroundColor: theme.colors.n300,
 	},
 	carouselCaption: {
 		padding: '10px 20px 48px',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	horizontalScrollerTileContent: {
 		padding: 16,

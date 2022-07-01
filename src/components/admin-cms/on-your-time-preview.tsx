@@ -21,9 +21,9 @@ const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		padding: '5px 10px',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	bordered: {
 		border: `1px solid ${theme.colors.border}`,
@@ -146,7 +146,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										<div className="position-relative">
 											{props?.contentTypeLabel && (
 												<span
-													className="text-muted text-uppercase font-body-bold"
+													className="text-muted text-uppercase fw-bold"
 													style={{ ...fonts.uiSmall }}
 												>
 													<CircleIndicator size={16} className={classes.circleOne}>
@@ -159,7 +159,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 										{props?.duration && (
 											<span
-												className="position-relative text-muted text-uppercase font-body-bold ms-auto "
+												className="position-relative text-muted text-uppercase fw-bold ms-auto "
 												style={{ ...fonts.uiSmall, whiteSpace: 'nowrap' }}
 											>
 												<CircleIndicator size={16} className={classes.circleFour}>

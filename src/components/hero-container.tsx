@@ -6,7 +6,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useHeroContainerStyles = createUseThemedStyles((theme) => ({
 	heroContainer: {
 		padding: 0,
-		backgroundColor: theme.colors.primary,
+		backgroundColor: theme.colors.p500,
 	},
 }));
 

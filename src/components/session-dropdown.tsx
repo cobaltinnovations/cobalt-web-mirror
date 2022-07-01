@@ -20,7 +20,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	icon: {
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 	},
 	sessionMenu: {
 		width: 180,

@@ -16,7 +16,7 @@ const useSearchBarStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -24,7 +24,7 @@ const useSearchBarStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 	},
 }));
 

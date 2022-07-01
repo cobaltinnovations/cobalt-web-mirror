@@ -90,10 +90,10 @@ export const MySchedule: FC = () => {
 				end: end.toDate(),
 				display: 'background',
 				allDay: true,
-				backgroundColor: theme.colors.secondary,
+				backgroundColor: theme.colors.a500,
 			},
 		];
-	}, [leftCalendarEvents, leftCalendarMoment, theme.colors.secondary]);
+	}, [leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {

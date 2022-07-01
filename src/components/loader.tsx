@@ -13,7 +13,7 @@ const useLoaderStyles = createUseThemedStyles((theme) => ({
 		marginTop: -(size / 2) || -28,
 		marginLeft: -(size / 2) || -28,
 		borderRadius: '50%',
-		borderTopColor: theme.colors.primary,
+		borderTopColor: theme.colors.p500,
 		border: `8px solid ${theme.colors.border}`,
 		animation: `$rotate 1000ms linear 0ms infinite normal`,
 	}),

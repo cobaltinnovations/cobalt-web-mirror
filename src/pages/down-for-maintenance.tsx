@@ -8,7 +8,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
 		'& path': {
-			fill: theme.colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
 }));

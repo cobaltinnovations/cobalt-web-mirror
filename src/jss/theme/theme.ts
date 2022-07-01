@@ -1,3 +1,5 @@
+export type CobaltColor = keyof CobaltTheme['colors'];
+
 export type CobaltFontFamily = {
 	fontFamily: string;
 	weights: {
@@ -17,33 +19,82 @@ type CobaltFontConfig = {
 };
 
 export type CobaltTheme = {
-	colors: {
-		white: string;
-		gray100: string;
-		gray200: string;
-		gray300: string;
-		gray400: string;
-		gray500: string;
-		gray600: string;
-		gray700: string;
-		gray800: string;
-		gray900: string;
-		black: string;
+	elevation: {
+		e200: string;
+		e400: string;
+	};
 
-		primary: string;
-		secondary: string;
-		success: string;
-		danger: string;
-		warning: string;
-		info: string;
-		light: string;
-		dark: string;
+	colors: {
+		// neutrals
+		n0: string;
+		n50: string;
+		n75: string;
+		n100: string;
+		n300: string;
+		n500: string;
+		n900: string;
+
+		// brand -- primary
+		p50: string;
+		p100: string;
+		p300: string;
+		p500: string;
+		p700: string;
+
+		// brand -- accent
+		a50: string;
+		a100: string;
+		a300: string;
+		a500: string;
+
+		// semantic -- danger
+		d50: string;
+		d100: string;
+		d300: string;
+		d500: string;
+
+		// semantic -- warning
+		w50: string;
+		w100: string;
+		w300: string;
+		w500: string;
+
+		// semantic -- success
+		s50: string;
+		s100: string;
+		s300: string;
+		s500: string;
+
+		// semantic -- info
+		i50: string;
+		i100: string;
+		i300: string;
+		i500: string;
+
+		// extra -- marketing1
+		m50: string;
+		m100: string;
+		m300: string;
+		m500: string;
+		m700: string;
+
+		// extra -- marketing2
+		mm50: string;
+		mm100: string;
+		mm300: string;
+		mm500: string;
+		mm700: string;
+
+		// extra -- marketing3
+		mmm50: string;
+		mmm100: string;
+		mmm300: string;
+		mmm500: string;
+		mmm700: string;
 
 		background: string;
-		background2: string;
 		border: string;
-		footer: string;
-		shadedPill: string;
+		overlay: string;
 	};
 
 	fonts: {

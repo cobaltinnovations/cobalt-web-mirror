@@ -4,45 +4,45 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useTagStyles = createUseThemedStyles((theme) => ({
 	tag: ({ variant }: any) => {
-		let textColor = theme.colors.dark;
-		let backgroundColor = theme.colors.white;
+		let textColor = theme.colors.n900;
+		let backgroundColor = theme.colors.n0;
 
 		switch (variant) {
 			case 'primary':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.primary;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.p500;
 				break;
 			case 'secondary':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.secondary;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.a500;
 				break;
 			case 'success':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.success;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.s500;
 				break;
 			case 'danger':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.danger;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.d500;
 				break;
 			case 'warning':
-				textColor = theme.colors.dark;
-				backgroundColor = theme.colors.warning;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.w500;
 				break;
 			case 'info':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.info;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.i500;
 				break;
 			case 'light':
-				textColor = theme.colors.dark;
-				backgroundColor = theme.colors.light;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.n0;
 				break;
 			case 'dark':
-				textColor = theme.colors.white;
-				backgroundColor = theme.colors.dark;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.n900;
 				break;
 			default:
-				textColor = theme.colors.dark;
-				backgroundColor = theme.colors.white;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.n0;
 		}
 
 		return {

@@ -12,7 +12,7 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 		padding: 8,
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	imageContainer: {
 		flexShrink: 0,
@@ -34,7 +34,7 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 		left: 8,
 		...theme.fonts.uiSmall,
 		...theme.fonts.bodyBold,
-		color: theme.colors.white,
+		color: theme.colors.n0,
 		position: 'absolute',
 		textTransform: 'uppercase',
 	},
@@ -42,7 +42,7 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 		flex: 1,
 		paddingLeft: 16,
 		paddingRight: 8,
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		overflow: 'hidden',
 	},
 }));
@@ -79,10 +79,10 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 				)}
 
 				<div className="d-flex">
-					<small className="text-muted text-uppercase font-body-bold">{props.type}</small>
+					<small className="text-muted text-uppercase fw-bold">{props.type}</small>
 
 					{props.duration && (
-						<small className="text-muted text-uppercase font-body-bold ms-auto">{props.duration}</small>
+						<small className="text-muted text-uppercase fw-bold ms-auto">{props.duration}</small>
 					)}
 				</div>
 			</div>

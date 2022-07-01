@@ -9,8 +9,8 @@ const useRenderJsonStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.small,
 		marginTop: 24,
 		borderRadius: 4,
-		backgroundColor: theme.colors.gray200,
-		border: `1px solid ${theme.colors.gray400}`,
+		backgroundColor: theme.colors.n100,
+		border: `1px solid ${theme.colors.border}`,
 	},
 }));
 

@@ -58,7 +58,7 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 		width: 20,
 		height: 20,
 		marginRight: 10,
-		fill: theme.colors.warning,
+		fill: theme.colors.w500,
 	},
 }));
 

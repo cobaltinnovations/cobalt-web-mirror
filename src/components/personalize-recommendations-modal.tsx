@@ -38,7 +38,7 @@ const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) =
 		height: 14,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: theme.colors.black,
+			fill: theme.colors.n900,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -70,15 +70,15 @@ const useQuestionItemStyles = createUseThemedStyles((theme) => ({
 		whiteSpace: 'nowrap',
 		...theme.fonts.bodyNormal,
 		textTransform: 'uppercase',
-		backgroundColor: theme.colors.shadedPill,
-		border: `1px solid ${theme.colors.dark}`,
+		backgroundColor: theme.colors.n100,
+		border: `1px solid ${theme.colors.border}`,
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	selectedPill: {
-		color: theme.colors.white,
-		backgroundColor: theme.colors.dark,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.n900,
 	},
 	borderBottom: {
 		borderBottom: `1px solid ${theme.colors.border}`,

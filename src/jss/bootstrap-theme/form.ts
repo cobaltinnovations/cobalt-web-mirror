@@ -6,7 +6,7 @@ export const form = (theme: CobaltTheme) => {
 			'&__label': {
 				...theme.fonts.h3,
 				marginBottom: 15,
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				...theme.fonts.headingBold,
 			},
 			'&__control': {
@@ -18,18 +18,18 @@ export const form = (theme: CobaltTheme) => {
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				lineHeight: 'normal',
 				...theme.fonts.bodyNormal,
-				backgroundColor: theme.colors.white,
+				backgroundColor: theme.colors.n0,
 				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
-					border: `1px solid ${theme.colors.primary}`,
+					border: `1px solid ${theme.colors.p500}`,
 				},
 				'&:disabled': {
-					backgroundColor: theme.colors.gray300,
+					backgroundColor: theme.colors.n300,
 					'&:hover': {
-						border: `1px solid ${theme.colors.gray500}`,
+						border: `1px solid ${theme.colors.n500}`,
 					},
 				},
 				'&:focus': {
@@ -59,7 +59,7 @@ export const form = (theme: CobaltTheme) => {
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				lineHeight: 'normal',
 				...theme.fonts.bodyNormal,
 				backgroundColor: 'transparent',
@@ -74,9 +74,7 @@ export const form = (theme: CobaltTheme) => {
 					display: 'inline-flex',
 				},
 				'& input[type=checkbox], & input[type=radio]': {
-					width: 0,
-					height: 0,
-					opacity: 0,
+					display: 'none',
 					'& + label': {
 						...theme.fonts.h4,
 						padding: '15px 20px 15px 60px',
@@ -84,9 +82,9 @@ export const form = (theme: CobaltTheme) => {
 						borderRadius: 500,
 						cursor: 'pointer',
 						position: 'relative',
-						color: theme.colors.primary,
+						color: theme.colors.p500,
 						...theme.fonts.headingBold,
-						backgroundColor: theme.colors.white,
+						backgroundColor: theme.colors.n0,
 						'&:before': {
 							left: 15,
 							width: 25,
@@ -100,14 +98,14 @@ export const form = (theme: CobaltTheme) => {
 						},
 					},
 					'&:checked + label': {
-						color: theme.colors.white,
-						backgroundColor: theme.colors.secondary,
+						color: theme.colors.n0,
+						backgroundColor: theme.colors.a500,
 						'&:before': {
 							backgroundPosition: 'center',
 							backgroundRepeat: 'no-repeat',
-							backgroundColor: theme.colors.white,
+							backgroundColor: theme.colors.n0,
 							backgroundSize: '12.5px 8.75px',
-							border: `2px solid ${theme.colors.white}`,
+							border: `2px solid ${theme.colors.n0}`,
 							backgroundImage: 'url(/static/images/icon-checkmark-orange.svg)',
 						},
 					},
@@ -147,9 +145,9 @@ export const form = (theme: CobaltTheme) => {
 						...theme.fonts.bodyBold,
 					},
 					'&:checked + label': {
-						color: theme.colors.white,
-						backgroundColor: theme.colors.secondary,
-						border: `1px solid ${theme.colors.secondary}`,
+						color: theme.colors.n0,
+						backgroundColor: theme.colors.a500,
+						border: `1px solid ${theme.colors.a500}`,
 					},
 				},
 			},
@@ -167,7 +165,7 @@ export const modalForm = (theme: CobaltTheme) => {
 				},
 				'& input[type=checkbox]': {
 					'& + label:before': {
-						backgroundColor: theme.colors.secondary,
+						backgroundColor: theme.colors.a500,
 					},
 					'&:checked + label': {
 						'&:before': {
@@ -179,7 +177,7 @@ export const modalForm = (theme: CobaltTheme) => {
 				},
 				'& input[type=radio]': {
 					'& + label:before': {
-						border: `2px solid ${theme.colors.secondary}`,
+						border: `2px solid ${theme.colors.a500}`,
 						padding: 2,
 						borderRadius: '50%',
 					},
@@ -190,9 +188,8 @@ export const modalForm = (theme: CobaltTheme) => {
 					},
 				},
 				'& input[type=checkbox], & input[type=radio]': {
-					width: 0,
-					height: 0,
-					opacity: 0,
+					display: 'none',
+
 					'& + label': {
 						...theme.fonts.default,
 						...theme.fonts.bodyNormal,
@@ -216,7 +213,7 @@ export const modalForm = (theme: CobaltTheme) => {
 						cursor: 'default',
 						color: 'inherit',
 						'&:before': {
-							backgroundColor: theme.colors.gray300,
+							backgroundColor: theme.colors.n300,
 							backgroundImage: null,
 							border: 'none',
 						},

@@ -26,9 +26,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: theme.colors.secondary,
+		fill: theme.colors.a500,
 		'& path': {
-			fill: theme.colors.secondary,
+			fill: theme.colors.a500,
 		},
 	},
 	centerText: {
@@ -51,7 +51,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	success: {
 		'& #Shape': {
-			fill: theme.colors.success,
+			fill: theme.colors.s500,
 		},
 	},
 	danger: {
@@ -59,7 +59,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		height: 10,
 		lineHeight: 10,
 		'& polygon': {
-			fill: theme.colors.danger,
+			fill: theme.colors.d500,
 		},
 	},
 	circleIndicator: {
@@ -70,13 +70,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'inline-block',
 
 		'&.approved': {
-			backgroundColor: theme.colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.rejected': {
-			backgroundColor: theme.colors.danger,
+			backgroundColor: theme.colors.d500,
 		},
 		'&.pending': {
-			backgroundColor: theme.colors.gray700,
+			backgroundColor: theme.colors.n500,
 		},
 		'&.archived': {
 			backgroundColor: theme.colors.border,
@@ -86,7 +86,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		maxHeight: 20,
 		maxWidth: 400,
 		overflow: 'hidden',
-		color: theme.colors.gray600,
+		color: theme.colors.n500,
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
@@ -151,7 +151,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		// 	};
 		//
 		// 	return (
-		// 		<span key={key} className={`d-block fs-small font-body-normal ${classes.noWrap}`}>
+		// 		<span key={key} className={`d-block fs-small fw-normal ${classes.noWrap}`}>
 		// 			{getIcon()} {item.description}
 		// 		</span>
 		// 	);
@@ -223,37 +223,37 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		return (
 			<TableRow className={classes.row}>
 				<TableCell>
-					<span className="d-block fs-default font-body-normal">{content.dateCreatedDescription}</span>
+					<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 				</TableCell>
 				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
 					{getIcon(content.contentTypeId)}
 				</TableCell>
 				<TableCell width={300}>
-					<span className="d-block fs-default font-body-bold">
+					<span className="d-block fs-default fw-bold">
 						<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 					</span>
-					<span className="d-block fs-default font-body-normal">{content.author}</span>
-					<span className={`d-block fs-default font-body-normal ${classes.description}`}>
+					<span className="d-block fs-default fw-normal">{content.author}</span>
+					<span className={`d-block fs-default fw-normal ${classes.description}`}>
 						{content.description ? content.description.replace(/<\/?[^>]+(>|$)/g, '') : ''}
 					</span>
 				</TableCell>
 				{isSuperAdmin && (
 					<TableCell>
-						<span className="d-block fs-default font-body-normal">{content.ownerInstitution}</span>
+						<span className="d-block fs-default fw-normal">{content.ownerInstitution}</span>
 					</TableCell>
 				)}
 				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
-					<span className="d-block fs-default font-body-normal">{content.views}</span>
+					<span className="d-block fs-default fw-normal">{content.views}</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ms-2 fs-small font-body-normal">
+					<span className="ms-2 fs-small fw-normal">
 						{content.ownerInstitutionApprovalStatus.description}
 					</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ms-2 fs-small font-body-normal">
+					<span className="ms-2 fs-small fw-normal">
 						{content.otherInstitutionApprovalStatus.description}
 					</span>
 				</TableCell>

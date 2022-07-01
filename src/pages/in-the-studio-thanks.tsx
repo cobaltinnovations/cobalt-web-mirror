@@ -8,7 +8,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 0,
 		textAlign: 'center',
 		padding: '40px 40px 70px',
-		borderTop: `20px solid ${theme.colors.success}`,
+		borderTop: `20px solid ${theme.colors.s500}`,
 	},
 }));
 

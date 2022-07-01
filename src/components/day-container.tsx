@@ -9,7 +9,7 @@ const useDayContainerStyles = createUseThemedStyles((theme) => ({
 	dayContainer: {
 		backgroundColor: 'transparent',
 		[mediaQueries.md]: {
-			backgroundColor: theme.colors.white,
+			backgroundColor: theme.colors.n0,
 		},
 	},
 	dayContainerInner: {

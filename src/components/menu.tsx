@@ -26,7 +26,7 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		width: '100%',
 		maxWidth: 375,
 		position: 'fixed',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 
 		display: 'flex',
 		overflowY: 'auto',
@@ -48,7 +48,7 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		height: 24,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: theme.colors.black,
+			fill: theme.colors.n900,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -69,7 +69,7 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		appearance: 'none',
 		padding: '16px 20px',
 		alignItems: 'center',
-		color: theme.colors.gray600,
+		color: theme.colors.n500,
 		textTransform: 'uppercase',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
@@ -101,14 +101,14 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	mainMenuList: {
 		'& li a': {
 			...theme.fonts.default,
-			color: theme.colors.dark,
+			color: theme.colors.n900,
 			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
 		'& li a': {
 			...theme.fonts.small,
-			color: theme.colors.gray600,
+			color: theme.colors.n500,
 			textTransform: 'uppercase',
 		},
 	},
@@ -122,13 +122,13 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	signOutButton: {
 		display: 'block',
 		padding: '8px 0 !important',
-		color: `${theme.colors.dark} !important`,
+		color: `${theme.colors.n900} !important`,
 		backgroundColor: 'transparent !important',
-		borderBottom: `1px solid ${theme.colors.gray300} !important`,
+		borderBottom: `1px solid ${theme.colors.n300} !important`,
 	},
 	hipaaLogo: {
 		'& path': {
-			fill: theme.colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
 	'@global': {

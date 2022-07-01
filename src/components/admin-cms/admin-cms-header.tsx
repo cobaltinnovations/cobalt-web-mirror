@@ -16,7 +16,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		height: '82px',
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 		justifyContent: 'space-between',
 		borderBottom: `1px solid ${theme.colors.border}`,
 	},
@@ -39,7 +39,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 	link: {
 		...theme.fonts.h3,
-		color: theme.colors.primary,
+		color: theme.colors.p500,
 		letterSpacing: 4,
 		textDecoration: 'none',
 		fontWeight: 'normal',
@@ -52,7 +52,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.h3,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		whiteSpace: 'nowrap',
 		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
@@ -70,7 +70,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		marginRight: 8,
 		marginTop: -2,
 		'& path': {
-			fill: theme.colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
 }));

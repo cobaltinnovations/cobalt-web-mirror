@@ -6,7 +6,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sessionAttendeeList: {
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	listHeader: {
 		display: 'flex',

@@ -2,6 +2,23 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 export const useGlobalStyles = createUseThemedStyles((theme) => ({
 	'@global': {
+		':root': {
+			'--bs-white': theme.colors.n0,
+			'--bs-black': theme.colors.n900,
+			'--bs-gray': theme.colors.n300,
+			'--bs-gray-dark': theme.colors.n500,
+			'--bs-gray-100': theme.colors.n100,
+			'--bs-gray-300': theme.colors.n300,
+			'--bs-gray-500': theme.colors.n500,
+			'--bs-primary': theme.colors.p500,
+			'--bs-secondary': theme.colors.a500,
+			'--bs-success': theme.colors.s500,
+			'--bs-info': theme.colors.i500,
+			'--bs-warning': theme.colors.w500,
+			'--bs-danger': theme.colors.d500,
+			'--bs-light': theme.colors.n0,
+			'--bs-dark': theme.colors.n900,
+		},
 		'::-ms-clear': {
 			width: 0,
 			height: 0,
@@ -19,9 +36,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.default,
 			minHeight: '100%',
 			letterSpacing: 0.5,
-			color: theme.colors.dark,
+			color: theme.colors.n900,
 			position: 'relative',
-			...theme.fonts.headingNormal,
+			...theme.fonts.bodyNormal,
 			backgroundColor: theme.colors.background,
 			backgroundImage:
 				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
@@ -73,19 +90,18 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		a: {
 			wordBreak: 'break-word',
 			...theme.fonts.bodyBold,
-			color: theme.colors.primary,
-			textDecoration: 'underline',
+			color: theme.colors.p500,
 			'&:hover': {
-				color: theme.colors.primary,
+				color: theme.colors.p700,
 			},
 			'&:focus': {
 				outline: 'none',
 			},
 			'&:not([href])': {
 				cursor: 'pointer',
-				color: theme.colors.primary,
+				color: theme.colors.p500,
 				'&:hover': {
-					color: theme.colors.white,
+					color: theme.colors.n0,
 				},
 			},
 		},
@@ -144,9 +160,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.default,
 			borderRadius: 0,
 			...theme.fonts.bodyNormal,
-			boxShadow: '1px 2px 8px 0px rgba(0,0,0,0.32)',
+			boxShadow: theme.elevation.e400,
 			'&__triangle': {
-				borderBottomColor: `${theme.colors.primary} !important`,
+				borderBottomColor: `${theme.colors.p500} !important`,
 				'&:before': {
 					borderColor: `transparent !important`,
 				},
@@ -154,16 +170,16 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			'&__header': {
 				border: 0,
 				borderRadius: 0,
-				backgroundColor: theme.colors.primary,
+				backgroundColor: theme.colors.p500,
 			},
 			'&__current-month': {
 				...theme.fonts.default,
-				color: theme.colors.white,
+				color: theme.colors.n0,
 			},
 			'&__day-name': {
 				margin: 0,
 				width: '3.5rem',
-				color: theme.colors.white,
+				color: theme.colors.n0,
 				lineHeight: '3.5rem',
 			},
 			'&__month': {
@@ -174,13 +190,19 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			},
 			'&__navigation': {
 				'&--previous': {
-					borderRightColor: theme.colors.white,
+					borderRightColor: theme.colors.n0,
 				},
 				'&--next': {
-					borderLeftColor: theme.colors.white,
+					borderLeftColor: theme.colors.n0,
+				},
+			},
+			'&__navigation-icon': {
+				'&:before': {
+					borderColor: theme.colors.n0,
 				},
 			},
 			'&__day': {
+				color: theme.colors.n900,
 				margin: 0,
 				borderRadius: '0 !important',
 				width: '3.5rem',
@@ -189,12 +211,33 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					...theme.fonts.bodyBold,
 				},
 				'&--selected': {
-					backgroundColor: theme.colors.primary,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p500,
 				},
-			},
-			'&__day--outside-month': {
-				color: theme.colors.gray500,
-				backgroundColor: theme.colors.gray200,
+				'&--keyboard-selected': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p700,
+				},
+				'&--outside-month': {
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n75,
+				},
+				'&--disabled': {
+					color: theme.colors.n500,
+					backgroundColor: `${theme.colors.n300} !important`,
+					'&:hover': {
+						color: `${theme.colors.n500} !important`,
+						backgroundColor: `${theme.colors.n300} !important`,
+						cursor: 'not-allowed',
+					},
+				},
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.p700,
+				},
 			},
 			'&__close-icon': {
 				marginRight: 30,
@@ -213,15 +256,15 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					top: '20%',
 				},
 				'&--active': {
-					backgroundColor: theme.colors.primary,
+					backgroundColor: theme.colors.p500,
 				},
 			},
 			'&__slider': {
 				width: 22,
 				height: 22,
 				marginTop: -14, // 22 - 8 === sliderSize - trackHeight
-				border: `1px solid ${theme.colors.gray500}`,
-				backgroundColor: theme.colors.white,
+				border: `1px solid ${theme.colors.n500}`,
+				backgroundColor: theme.colors.n0,
 				'&-container:last-of-type .input-range__label-container': {
 					left: '-20%',
 				},

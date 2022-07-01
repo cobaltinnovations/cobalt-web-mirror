@@ -5,7 +5,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useTablePaginationStyles = createUseThemedStyles((theme) => ({
 	active: {
-		color: `${theme.colors.black} !important`,
+		color: `${theme.colors.n900} !important`,
 	},
 }));
 

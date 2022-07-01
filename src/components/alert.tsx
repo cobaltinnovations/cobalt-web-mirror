@@ -17,13 +17,13 @@ const useAlertStyles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 		padding: '16px 25px',
 		'&.success': {
-			backgroundColor: theme.colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.warning': {
-			backgroundColor: theme.colors.warning,
+			backgroundColor: theme.colors.w500,
 		},
 		'&.danger': {
-			backgroundColor: theme.colors.danger,
+			backgroundColor: theme.colors.d500,
 		},
 	},
 	'@global': {

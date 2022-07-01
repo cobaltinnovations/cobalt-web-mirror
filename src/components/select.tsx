@@ -15,27 +15,27 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
-			color: theme.colors.dark,
+			color: theme.colors.n900,
 			...theme.fonts.bodyNormal,
 			padding: '0 40px 0 15px',
-			backgroundColor: theme.colors.white,
+			backgroundColor: theme.colors.n0,
 			border: `1px solid ${theme.colors.border}`,
 			'&:hover': {
-				border: `1px solid ${theme.colors.primary}`,
+				border: `1px solid ${theme.colors.p500}`,
 			},
 			'&:disabled': {
-				color: theme.colors.gray500,
-				backgroundColor: theme.colors.gray200,
-				border: `1px solid ${theme.colors.gray200}`,
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n75,
+				border: `1px solid ${theme.colors.n100}`,
 				'&:hover': {
-					color: theme.colors.gray500,
-					backgroundColor: theme.colors.gray200,
-					border: `1px solid ${theme.colors.gray200}`,
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n75,
+					border: `1px solid ${theme.colors.n100}`,
 				},
 			},
 			'&:invalid': {
 				fontStyle: 'italic',
-				color: theme.colors.gray600,
+				color: theme.colors.n500,
 			},
 			'&:focus': {
 				outline: 'none',
@@ -50,7 +50,7 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 		top: '50%',
 		position: 'absolute',
 		transform: 'translateY(-50%)',
-		fill: props.disabled ? theme.colors.gray500 : theme.colors.black,
+		fill: props.disabled ? theme.colors.n500 : theme.colors.n900,
 	}),
 }));
 

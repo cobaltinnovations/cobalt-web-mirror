@@ -28,8 +28,8 @@ const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 		padding: '0 20px 0 15px',
 	},
 	meridianSelectedButton: {
-		color: theme.colors.white,
-		backgroundColor: theme.colors.secondary,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.a500,
 	},
 }));
 

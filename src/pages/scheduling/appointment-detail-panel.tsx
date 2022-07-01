@@ -38,12 +38,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 			padding: '10px 15px',
 		},
 		'& li:nth-child(odd)': {
-			backgroundColor: theme.colors.gray200,
+			backgroundColor: theme.colors.n75,
 		},
 	},
 	attendedButton: {
-		color: theme.colors.success,
-		borderColor: theme.colors.success,
+		color: theme.colors.s500,
+		borderColor: theme.colors.s500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -52,8 +52,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	noShowButton: {
-		color: theme.colors.danger,
-		borderColor: theme.colors.danger,
+		color: theme.colors.d500,
+		borderColor: theme.colors.d500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -63,8 +63,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	attendedButtonSolid: {
 		border: 0,
-		color: theme.colors.white,
-		backgroundColor: theme.colors.success,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.s500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -74,8 +74,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	noShowButtonSolid: {
 		border: 0,
-		color: theme.colors.white,
-		backgroundColor: theme.colors.danger,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.d500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},

@@ -8,7 +8,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useProviderInfoStyles = createUseThemedStyles((theme) => ({
 	paymentPill: {
 		...theme.fonts.small,
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,
 		borderRadius: 20,
@@ -59,7 +59,7 @@ export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({
 
 		if (provider.bioUrl) {
 			return (
-				<a href={provider.bioUrl} target="_blank" rel="noreferrer">
+				<a href={provider.bioUrl} target="_blank" rel="noreferrer" className="fw-bold">
 					{linkText}
 				</a>
 			);

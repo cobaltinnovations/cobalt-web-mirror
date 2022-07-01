@@ -14,7 +14,7 @@ const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	},
 	unavaiableSlot: {
 		...theme.fonts.small,
-		color: theme.colors.gray600,
+		color: theme.colors.n500,
 	},
 }));
 

@@ -8,14 +8,18 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	breadcrumb: {
 		padding: 0,
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	breadcrumbLink: {
+		...theme.fonts.bodyBold,
+		...theme.fonts.uiSmall,
+		textDecoration: 'none',
 		marginRight: 10,
 		position: 'relative',
 	},
 	chevron: {
 		fill: theme.colors.border,
+		height: 10,
 		marginRight: 10,
 	},
 }));
@@ -55,7 +59,7 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 
 								if (isLast) {
 									return (
-										<p key={key} className="mb-0">
+										<p key={key} className="mb-0 fs-ui-small">
 											{breadcrumb.title}
 										</p>
 									);

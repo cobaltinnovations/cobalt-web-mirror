@@ -61,39 +61,39 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.headingBold,
 		},
 
-		'.font-body-normal': {
+		'.fw-normal': {
 			...theme.fonts.bodyNormal,
 		},
-		'.font-body-bold': {
+		'.fw-bold': {
 			...theme.fonts.bodyBold,
 		},
 
 		'.text-primary': {
-			color: `${theme.colors.primary} !important`,
+			color: `${theme.colors.p500} !important`,
 		},
 		'.text-secondary': {
-			color: `${theme.colors.secondary} !important`,
+			color: `${theme.colors.a500} !important`,
 		},
 		'.text-success': {
-			color: `${theme.colors.success} !important`,
+			color: `${theme.colors.s500} !important`,
 		},
 		'.text-danger': {
-			color: `${theme.colors.danger} !important`,
+			color: `${theme.colors.d500} !important`,
 		},
 		'.text-warning': {
-			color: `${theme.colors.warning} !important`,
+			color: `${theme.colors.w500} !important`,
 		},
 		'.text-info': {
-			color: `${theme.colors.info} !important`,
+			color: `${theme.colors.i500} !important`,
 		},
 		'.text-light': {
-			color: `${theme.colors.light} !important`,
+			color: `${theme.colors.n0} !important`,
 		},
 		'.text-dark': {
-			color: `${theme.colors.dark} !important`,
+			color: `${theme.colors.n900} !important`,
 		},
 		'.text-gray': {
-			color: `${theme.colors.gray600} !important`,
+			color: `${theme.colors.n500} !important`,
 		},
 
 		'.text-decoration-underline': {
@@ -104,31 +104,28 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		},
 
 		'.bg-primary': {
-			backgroundColor: `${theme.colors.primary} !important`,
+			backgroundColor: `${theme.colors.p500} !important`,
 		},
 		'.bg-secondary': {
-			backgroundColor: `${theme.colors.secondary} !important`,
+			backgroundColor: `${theme.colors.a500} !important`,
 		},
 		'.bg-success': {
-			backgroundColor: `${theme.colors.success} !important`,
+			backgroundColor: `${theme.colors.s500} !important`,
 		},
 		'.bg-danger': {
-			backgroundColor: `${theme.colors.danger} !important`,
+			backgroundColor: `${theme.colors.d500} !important`,
 		},
 		'.bg-warning': {
-			backgroundColor: `${theme.colors.warning} !important`,
+			backgroundColor: `${theme.colors.w500} !important`,
 		},
 		'.bg-info': {
-			backgroundColor: `${theme.colors.info} !important`,
+			backgroundColor: `${theme.colors.i500} !important`,
 		},
 		'.bg-light': {
-			backgroundColor: `${theme.colors.light} !important`,
+			backgroundColor: `${theme.colors.n0} !important`,
 		},
 		'.bg-dark': {
-			backgroundColor: `${theme.colors.dark} !important`,
-		},
-		'.bg-light-gray': {
-			backgroundColor: `${theme.colors.gray200} !important`,
+			backgroundColor: `${theme.colors.n900} !important`,
 		},
 
 		'.border': {
@@ -147,7 +144,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			borderLeft: `1px solid ${theme.colors.border} !important`,
 		},
 		'.selected-border-bottom': {
-			borderBottom: `3px solid ${theme.colors.secondary} !important`,
+			borderBottom: `3px solid ${theme.colors.a500} !important`,
 		},
 		'.no-border': {
 			border: 'none',
@@ -155,7 +152,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 
 		'.carousel-item': {
 			paddingBottom: 30,
-			backgroundColor: theme.colors.white,
+			backgroundColor: theme.colors.n0,
 		},
 		'.carousel-control-prev, .carousel-control-next': {
 			zIndex: 0,
@@ -167,7 +164,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			'& svg': {
 				width: 16,
 				height: 16,
-				fill: theme.colors.white,
+				fill: theme.colors.n0,
 			},
 		},
 		'.carousel-indicators': {
@@ -182,7 +179,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			borderRadius: '50%',
 			backgroundColor: theme.colors.background,
 			'&.active': {
-				backgroundColor: theme.colors.footer,
+				backgroundColor: theme.colors.a300,
 			},
 		},
 
@@ -269,7 +266,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				lineHeight: 'normal',
 				...theme.fonts.bodyNormal,
 
@@ -278,7 +275,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 					border: 0,
 					outline: 'none',
 					boxShadow: 'none',
-					color: theme.colors.dark,
+					color: theme.colors.n900,
 					backgroundColor: 'transparent',
 				},
 			},
@@ -311,9 +308,10 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				lineHeight: '2rem',
 				textShadow: 'none',
 				color: theme.colors.background,
-				backgroundColor: theme.colors.dark,
+				backgroundColor: theme.colors.n900,
 			},
 			'& .btn-close:not(:disabled):not(.disabled):focus, .btn-close:not(:disabled):not(.disabled):hover': {
+				color: theme.colors.n0,
 				opacity: 0.48,
 			},
 		},
@@ -362,7 +360,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				textIndent: 0,
 				fontSize: '1.5rem',
 				lineHeight: 'auto',
-				color: theme.colors.black,
+				color: theme.colors.n900,
 				...theme.fonts.headingNormal,
 			},
 			'& .rbt-token': {
@@ -372,14 +370,14 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				marginRight: 5,
 				marginBottom: 5,
 				borderRadius: 500,
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				alignItems: 'center',
 				display: 'inline-flex',
 				padding: '0 4px 0 10px',
-				border: `1px solid ${Color(theme.colors.gray600).alpha(0.2).string()}`,
+				border: `1px solid ${theme.colors.border}`,
 				'&:focus-visible': {
 					outline: 'none',
-					border: `1px solid ${theme.colors.primary}`,
+					border: `1px solid ${theme.colors.p500}`,
 				},
 			},
 			'& .rbt-close': {
@@ -387,7 +385,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				height: 18,
 				marginTop: -2,
 				display: 'flex',
-				color: theme.colors.black,
+				color: theme.colors.n900,
 				alignItems: 'center',
 				justifyContent: 'center',
 				backgroundColor: 'transparent',
@@ -397,7 +395,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				marginTop: 1,
 				'& .dropdown-item': {
 					...theme.fonts.default,
-					color: theme.colors.dark,
+					color: theme.colors.n900,
 					padding: '8px 13px',
 					...theme.fonts.bodyNormal,
 					textDecoration: 'none',
@@ -405,7 +403,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 						backgroundColor: Color('#DBD4CF').alpha(0.2).string(),
 					},
 					'&:active': {
-						color: theme.colors.dark,
+						color: theme.colors.n900,
 						backgroundColor: Color('#DBD4CF').alpha(0.4).string(),
 					},
 				},
@@ -416,9 +414,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				},
 				'& .rbt-menu-custom-option': {
 					fontStyle: 'italic',
-					color: theme.colors.gray600,
+					color: theme.colors.n500,
 					'& .rbt-highlight-text': {
-						color: theme.colors.dark,
+						color: theme.colors.n900,
 						fontStyle: 'normal',
 					},
 				},

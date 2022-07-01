@@ -8,32 +8,25 @@ export const button = (theme: CobaltTheme) => {
 			...theme.fonts.h4,
 			borderRadius: 500,
 			appearance: 'none',
-			color: theme.colors.white,
 			padding: '15px 35px',
 			textDecoration: 'none',
 			...theme.fonts.headingBold,
 			textTransform: 'none',
-			backgroundColor: theme.colors.primary,
-			'&:hover': {
-				color: theme.colors.white,
-				textDecoration: 'none',
-				backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
-			},
-			'&:active': {
-				backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
-			},
+			// '&:hover': {
+			// 	textDecoration: 'none',
+			// },
 			'&:focus': {
 				outline: 'none',
 			},
 			'&:disabled': {
-				color: theme.colors.gray500,
-				backgroundColor: theme.colors.gray200,
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n100,
+				cursor: 'not-allowed',
 				'&:hover': {
-					color: theme.colors.gray500,
-					backgroundColor: theme.colors.gray200,
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n100,
 				},
 			},
-
 			'&-sm': {
 				...theme.fonts.large,
 				padding: '10px 25px',
@@ -50,12 +43,13 @@ export const button = (theme: CobaltTheme) => {
 			/* Primary variant */
 			/* ----------------------------------------------------------- */
 			'&-primary': {
-				backgroundColor: theme.colors.primary,
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.p500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.primary).lighten(0.16).hex(),
+					backgroundColor: theme.colors.p300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.primary).darken(0.16).hex(),
+					backgroundColor: theme.colors.p700,
 				},
 			},
 
@@ -63,12 +57,13 @@ export const button = (theme: CobaltTheme) => {
 			/* Secondary variant */
 			/* ----------------------------------------------------------- */
 			'&-secondary': {
-				backgroundColor: theme.colors.secondary,
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.a500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.secondary).lighten(0.16).hex(),
+					backgroundColor: theme.colors.a300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.secondary).darken(0.16).hex(),
+					backgroundColor: theme.colors.a500,
 				},
 			},
 
@@ -76,12 +71,12 @@ export const button = (theme: CobaltTheme) => {
 			/* Success variant */
 			/* ----------------------------------------------------------- */
 			'&-success': {
-				backgroundColor: theme.colors.success,
+				backgroundColor: theme.colors.s500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.success).lighten(0.16).hex(),
+					backgroundColor: theme.colors.s300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.success).darken(0.16).hex(),
+					backgroundColor: theme.colors.s500,
 				},
 			},
 
@@ -89,12 +84,12 @@ export const button = (theme: CobaltTheme) => {
 			/* Danger variant */
 			/* ----------------------------------------------------------- */
 			'&-danger': {
-				backgroundColor: theme.colors.danger,
+				backgroundColor: theme.colors.d500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.danger).lighten(0.16).hex(),
+					backgroundColor: theme.colors.d300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.danger).darken(0.16).hex(),
+					backgroundColor: theme.colors.d500,
 				},
 			},
 
@@ -102,13 +97,13 @@ export const button = (theme: CobaltTheme) => {
 			/* Warning variant */
 			/* ----------------------------------------------------------- */
 			'&-warning': {
-				color: theme.colors.dark,
-				backgroundColor: theme.colors.warning,
+				color: theme.colors.n900,
+				backgroundColor: theme.colors.w500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.warning).lighten(0.16).hex(),
+					backgroundColor: theme.colors.w300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.warning).darken(0.16).hex(),
+					backgroundColor: theme.colors.w500,
 				},
 			},
 
@@ -116,12 +111,12 @@ export const button = (theme: CobaltTheme) => {
 			/* Info variant */
 			/* ----------------------------------------------------------- */
 			'&-info': {
-				backgroundColor: theme.colors.info,
+				backgroundColor: theme.colors.i500,
 				'&:hover': {
-					backgroundColor: Color(theme.colors.info).lighten(0.16).hex(),
+					backgroundColor: theme.colors.i300,
 				},
 				'&:active': {
-					backgroundColor: Color(theme.colors.info).darken(0.16).hex(),
+					backgroundColor: theme.colors.i500,
 				},
 			},
 
@@ -129,43 +124,15 @@ export const button = (theme: CobaltTheme) => {
 			/* Light variant */
 			/* ----------------------------------------------------------- */
 			'&-light': {
-				color: theme.colors.primary,
-				backgroundColor: theme.colors.light,
+				color: theme.colors.p500,
+				backgroundColor: theme.colors.n0,
 				'&:hover': {
-					color: theme.colors.primary,
-					backgroundColor: Color(theme.colors.primary).lighten(0.8).hex(),
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p300,
 				},
 				'&:active': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.secondary,
-				},
-			},
-
-			/* ----------------------------------------------------------- */
-			/* Dark variant */
-			/* ----------------------------------------------------------- */
-			'&-dark': {
-				backgroundColor: theme.colors.dark,
-				'&:hover': {
-					backgroundColor: Color(theme.colors.dark).lighten(0.16).hex(),
-				},
-				'&:active': {
-					backgroundColor: Color(theme.colors.dark).darken(0.16).hex(),
-				},
-			},
-			/* ----------------------------------------------------------- */
-			/* Grey variant */
-			/* ----------------------------------------------------------- */
-			'&-grey': {
-				backgroundColor: theme.colors.gray200,
-				color: theme.colors.black,
-				'&:hover': {
-					backgroundColor: Color(theme.colors.gray300).darken(0.16).hex(),
-					color: theme.colors.black,
-				},
-				'&:active': {
-					backgroundColor: Color(theme.colors.gray300).lighten(0.16).hex(),
-					color: theme.colors.black,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.a500,
 				},
 			},
 
@@ -173,24 +140,24 @@ export const button = (theme: CobaltTheme) => {
 			/* Link variant */
 			/* ----------------------------------------------------------- */
 			'&-link': {
-				color: theme.colors.primary,
+				color: theme.colors.p500,
 				textDecoration: 'underline',
 				backgroundColor: 'transparent',
 				'&:hover': {
-					color: theme.colors.primary,
+					color: theme.colors.p500,
 					textDecoration: 'underline',
 					backgroundColor: 'transparent',
 				},
 				'&:active': {
 					backgroundColor: 'transparent',
-					color: theme.colors.primary,
+					color: theme.colors.p500,
 				},
 			},
 
 			'&-inverse': {
-				backgroundColor: theme.colors.white,
+				backgroundColor: theme.colors.n0,
 				'&-primary': {
-					color: theme.colors.primary,
+					color: theme.colors.p500,
 				},
 			},
 
@@ -198,75 +165,79 @@ export const button = (theme: CobaltTheme) => {
 			/* Outline variants */
 			/* ----------------------------------------------------------- */
 			'&-outline-primary': {
-				color: theme.colors.primary,
+				color: theme.colors.p500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.primary}`,
+				border: `1px solid ${theme.colors.p500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.primary,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p500,
+				},
+				'&:active': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p700,
 				},
 			},
 			'&-outline-secondary': {
-				color: theme.colors.secondary,
+				color: theme.colors.a500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.secondary}`,
+				border: `1px solid ${theme.colors.a500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.secondary,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.a500,
 				},
 			},
 			'&-outline-success': {
-				color: theme.colors.success,
+				color: theme.colors.s500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.success}`,
+				border: `1px solid ${theme.colors.s500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.success,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.s500,
 				},
 			},
 			'&-outline-danger': {
-				color: theme.colors.danger,
+				color: theme.colors.d500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.danger}`,
+				border: `1px solid ${theme.colors.d500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.danger,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.d500,
 				},
 			},
 			'&-outline-warning': {
-				color: theme.colors.warning,
+				color: theme.colors.w500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.warning}`,
+				border: `1px solid ${theme.colors.w500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.warning,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.w500,
 				},
 			},
 			'&-outline-info': {
-				color: theme.colors.info,
+				color: theme.colors.i500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.info}`,
+				border: `1px solid ${theme.colors.i500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.info,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.i500,
 				},
 			},
 			'&-outline-dark': {
-				color: theme.colors.dark,
+				color: theme.colors.n900,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.dark}`,
+				border: `1px solid ${theme.colors.n900}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.dark,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.n900,
 				},
 			},
 			'&-outline-light': {
-				color: theme.colors.primary,
-				backgroundColor: theme.colors.white,
-				border: `1px solid ${theme.colors.primary}`,
+				color: theme.colors.p500,
+				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.p500}`,
 				'&:hover': {
-					color: theme.colors.white,
-					backgroundColor: theme.colors.secondary,
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.a500,
 				},
 			},
 		},

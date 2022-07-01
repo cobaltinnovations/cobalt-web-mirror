@@ -17,7 +17,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 	calendarAppointment: {
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	informationContainer: {
 		padding: 8,
@@ -36,7 +36,7 @@ const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 	},
 	paymentPill: {
 		...theme.fonts.small,
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		display: 'inline-block',
 		border: `2px solid ${theme.colors.border}`,
 		borderRadius: 20,

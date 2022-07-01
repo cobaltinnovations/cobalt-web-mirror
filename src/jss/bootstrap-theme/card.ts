@@ -1,11 +1,10 @@
-import { boxShadow } from '@/jss/mixins';
 import { CobaltTheme } from '@/jss/theme';
 
 export const card = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-card': {
-			backgroundColor: theme.colors.white,
-			...boxShadow,
+			backgroundColor: theme.colors.n0,
+			boxShadow: theme.elevation.e400,
 			'&__header': {
 				padding: '15px 30px',
 				borderBottom: `1px solid ${theme.colors.border}`,
@@ -21,7 +20,7 @@ export const card = (theme: CobaltTheme) => {
 				...theme.fonts.small,
 				...theme.fonts.bodyNormal,
 				textTransform: 'lowercase',
-				color: theme.colors.gray600,
+				color: theme.colors.n500,
 			},
 			'&__body': {
 				padding: '15px 30px',

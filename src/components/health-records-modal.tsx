@@ -20,7 +20,7 @@ const useHealthRecordsModal = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.background,
 	},
 	pageIndicatorActive: {
-		backgroundColor: theme.colors.primary,
+		backgroundColor: theme.colors.p500,
 	},
 }));
 

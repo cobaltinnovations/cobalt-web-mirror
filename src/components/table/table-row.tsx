@@ -4,7 +4,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useTableRowStyles = createUseThemedStyles((theme) => ({
 	tableRow: {
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 }));

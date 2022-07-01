@@ -21,9 +21,9 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		padding: '10px 20px',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 }));
 
@@ -69,7 +69,7 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 				>
 					{!groupEvent.isGrouped && (
 						<div className={classes.imageContent}>
-							<small className="text-white text-uppercase font-body-bold">
+							<small className="text-white text-uppercase fw-bold">
 								{groupEvent.seatsAvailableDescription}
 							</small>
 						</div>
@@ -105,7 +105,7 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 			>
 				{!groupEvent.isGrouped && (
 					<div className={classes.imageContent}>
-						<small className="text-white text-uppercase font-body-bold">
+						<small className="text-white text-uppercase fw-bold">
 							{groupEvent.seatsAvailableDescription}
 						</small>
 					</div>

@@ -2,50 +2,49 @@ import React, { FC, PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import Color from 'color';
 
-import { boxShadow } from '@/jss/mixins';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useHeroStyles = createUseThemedStyles((theme) => ({
 	hero: ({ variant }: any) => {
-		let variantColor = theme.colors.white;
+		let variantColor = theme.colors.n0;
 
 		switch (variant) {
 			case 'primary':
-				variantColor = theme.colors.primary;
+				variantColor = theme.colors.p500;
 				break;
 			case 'secondary':
-				variantColor = theme.colors.secondary;
+				variantColor = theme.colors.a500;
 				break;
 			case 'success':
-				variantColor = theme.colors.success;
+				variantColor = theme.colors.s500;
 				break;
 			case 'danger':
-				variantColor = theme.colors.danger;
+				variantColor = theme.colors.d500;
 				break;
 			case 'warning':
-				variantColor = theme.colors.warning;
+				variantColor = theme.colors.w500;
 				break;
 			case 'info':
-				variantColor = theme.colors.info;
+				variantColor = theme.colors.i500;
 				break;
 			case 'light':
-				variantColor = theme.colors.light;
+				variantColor = theme.colors.n0;
 				break;
 			case 'dark':
-				variantColor = theme.colors.dark;
+				variantColor = theme.colors.n900;
 				break;
 			default:
-				variantColor = theme.colors.white;
+				variantColor = theme.colors.n0;
 		}
 
 		return {
 			padding: 25,
-			...boxShadow,
+			boxShadow: theme.elevation.e200,
 			borderRadius: 4,
 			backgroundColor: variantColor,
 			'& button': {
 				color: variantColor,
-				backgroundColor: theme.colors.white,
+				backgroundColor: theme.colors.n0,
 				'&:hover': {
 					backgroundColor: Color(variantColor).lighten(0.64).hex(),
 				},

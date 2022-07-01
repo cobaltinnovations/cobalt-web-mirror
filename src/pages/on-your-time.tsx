@@ -193,7 +193,7 @@ const OnYourTime: FC = () => {
 			{hasFilters && (
 				<>
 					<DayContainer className="mb-5">
-						<p className="mb-0 font-body-bold">Personalized Recommendations</p>
+						<p className="mb-0 fw-bold">Personalized Recommendations</p>
 					</DayContainer>
 
 					<Container>
@@ -231,7 +231,7 @@ const OnYourTime: FC = () => {
 				<>
 					{hasFilters && (
 						<DayContainer className="my-5">
-							<p className="mb-0 font-body-bold">Recent and Popular</p>
+							<p className="mb-0 fw-bold">Recent and Popular</p>
 						</DayContainer>
 					)}
 

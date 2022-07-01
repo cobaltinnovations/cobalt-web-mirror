@@ -15,7 +15,7 @@ const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 			height: 295,
 			width: 295,
 			borderRadius: '50%',
-			backgroundColor: theme.colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 	},
 	subTitle: {
@@ -37,7 +37,7 @@ const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
 				<h3 className="mb-0 text-center text-white">your co-pays are being waived</h3>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-2 font-body-normal text-center text-white">
+				<p className="mb-2 fw-normal text-center text-white">
 					please use our services as much as you need during this challenging time
 				</p>
 			</Modal.Body>

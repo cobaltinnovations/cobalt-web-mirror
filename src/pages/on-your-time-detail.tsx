@@ -27,14 +27,14 @@ const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: theme.colors.dark,
+		color: theme.colors.n900,
 		padding: '10px 20px',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	reactPlayerOuter: {
 		position: 'relative',
 		paddingTop: '56.25%',
-		backgroundColor: theme.colors.gray500,
+		backgroundColor: theme.colors.n500,
 		'& > div': {
 			top: 0,
 			left: 0,
@@ -142,7 +142,7 @@ const OnYourTimeDetail: FC = () => {
 								imageUrl={item?.imageUrl || placeholderImage}
 							>
 								<div className={classes.mediaContent}>
-									<small className="text-white text-uppercase font-body-bold">
+									<small className="text-white text-uppercase fw-bold">
 										{item?.newFlag ? 'NEW' : ''}
 									</small>
 								</div>
@@ -153,12 +153,10 @@ const OnYourTimeDetail: FC = () => {
 							{item?.author ? <p className="mb-1">by {item?.author}</p> : <p className="mb-1">&nbsp;</p>}
 
 							<div className="d-flex">
-								<small className="text-muted text-uppercase font-body-bold">
-									{item?.contentTypeLabel}
-								</small>
+								<small className="text-muted text-uppercase fw-bold">{item?.contentTypeLabel}</small>
 
 								{item?.duration && (
-									<small className="text-muted text-uppercase font-body-bold ms-auto">
+									<small className="text-muted text-uppercase fw-bold ms-auto">
 										{item?.duration}
 									</small>
 								)}

@@ -14,19 +14,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 		switch (status) {
 			case SESSION_STATUS.NEW: // Now called "Pending"
-				statusColor = theme.colors.gray700;
+				statusColor = theme.colors.n500;
 				break;
 			case SESSION_STATUS.ADDED:
-				statusColor = theme.colors.success;
+				statusColor = theme.colors.s500;
 				break;
 			case SESSION_STATUS.ARCHIVED:
 				statusColor = theme.colors.border;
 				break;
 			case SESSION_STATUS.CANCELED:
-				statusColor = theme.colors.danger;
+				statusColor = theme.colors.d500;
 				break;
 			default:
-				statusColor = theme.colors.gray100;
+				statusColor = theme.colors.n100;
 		}
 
 		return {

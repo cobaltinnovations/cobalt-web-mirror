@@ -22,7 +22,7 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.inCrisisModal} centered>
-			<Modal.Header closeButton className={'bg-primary text-white text-center'}>
+			<Modal.Header closeButton closeVariant="white" className={'bg-primary text-white text-center'}>
 				<h3 className="mb-0">If you are in crisis</h3>
 				<p className={'mb-2 text-white p-2'}></p>
 			</Modal.Header>
@@ -35,32 +35,32 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 					</p>
 				)}
 				<div className="mb-5">
-					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:911">
+					<Button variant="outline-primary" className={'w-100 d-flex mt-2'} href="tel:911">
 						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
 						<div className={'d-flex flex-column fs-large ms-2'}>
-							<span className={'text-primary mb-2'}>Call 911</span>
+							<span className={'mb-2'}>Call 911</span>
 							<span className={'font-heading-normal'}>24/7 emergency</span>
 						</div>
 					</Button>
-					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:8007238255">
+					<Button variant="outline-primary" className={'w-100 d-flex mt-2'} href="tel:8007238255">
 						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
 						<div className={'d-flex flex-column fs-large ms-2'}>
-							<span className={'text-primary mb-2'}>Call 800-273-8255</span>
+							<span className={'mb-2'}>Call 800-273-8255</span>
 							<span className={'font-heading-normal'}>24/7 National suicide prevention line</span>
 						</div>
 					</Button>
-					<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:741741">
+					<Button variant="outline-primary" className={'w-100 d-flex mt-2'} href="tel:741741">
 						<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
 						<div className={'d-flex flex-column fs-large ms-2'}>
-							<span className={'text-primary mb-2'}>Text 741 741</span>
+							<span className={'mb-2'}>Text 741 741</span>
 							<span className={'font-heading-normal'}>24/7 Crisis Text Line</span>
 						</div>
 					</Button>
 					{subdomainInstitution?.institutionId === 'COBALT' && (
-						<Button variant="grey" className={'w-100 d-flex mt-2'} href="tel:2158295433">
+						<Button variant="outline-primary" className={'w-100 d-flex mt-2'} href="tel:2158295433">
 							<PhoneIcon className={'float-start position-relative me-2 mt-2'} />
 							<div className={'d-flex flex-column fs-large ms-2'}>
-								<span className={'text-primary mb-2'}>Call 215-555-1111</span>
+								<span className={'mb-2'}>Call 215-555-1111</span>
 								<span className={'font-heading-normal'}>24/7 Cobalt Crisis Response Center</span>
 							</div>
 						</Button>

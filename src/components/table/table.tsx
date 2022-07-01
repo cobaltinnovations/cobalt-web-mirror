@@ -6,7 +6,7 @@ const useTableStyles = createUseThemedStyles((theme) => ({
 	tableOuter: {
 		width: '100%',
 		overflowX: 'auto',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	table: {
 		width: '100%',

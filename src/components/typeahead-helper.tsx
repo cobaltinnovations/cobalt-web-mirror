@@ -17,9 +17,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
 		position: 'relative',
 		minHeight: 56,
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 		border: `1px solid ${
-			hasError ? theme.colors.danger : isHovered || isFocused ? theme.colors.primary : theme.colors.border
+			hasError ? theme.colors.d500 : isHovered || isFocused ? theme.colors.p500 : theme.colors.border
 		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
@@ -31,7 +31,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transformOrigin: 'left top',
-		color: hasError ? theme.colors.danger : isFocused ? theme.colors.primary : theme.colors.gray600,
+		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
 	}),

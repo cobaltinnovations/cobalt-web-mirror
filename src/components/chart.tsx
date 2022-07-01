@@ -78,7 +78,7 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				labels: {
 					boxWidth: 6,
 					boxHeight: 6,
-					color: colors.dark,
+					color: colors.n900,
 					font: {
 						family: fonts.bodyNormal.fontFamily,
 						weight: fonts.bodyNormal.fontWeight,
@@ -90,8 +90,8 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				},
 			},
 			tooltip: {
-				backgroundColor: colors.dark,
-				bodyFontColor: colors.white,
+				backgroundColor: colors.n900,
+				bodyFontColor: colors.n0,
 				titleFont: {
 					family: fonts.bodyNormal.fontFamily,
 					weight: fonts.bodyNormal.fontWeight,
@@ -126,7 +126,7 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				hitRadius: 15,
 				hoverRadius: 5,
 				hoverBorderWidth: 2,
-				hoverBackgroundColor: colors.white,
+				hoverBackgroundColor: colors.n0,
 			},
 			line: {
 				tension: 0,
@@ -144,7 +144,7 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					borderColor: colors.border,
 				},
 				ticks: {
-					color: colors.dark,
+					color: colors.n900,
 					padding: 5,
 					font: {
 						family: fonts.bodyNormal.fontFamily,
@@ -171,7 +171,7 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				},
 				ticks: {
 					padding: 20,
-					color: colors.dark,
+					color: colors.n900,
 					font: {
 						family: fonts.bodyNormal.fontFamily,
 						weight: fonts.bodyNormal.fontWeight,

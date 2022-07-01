@@ -38,9 +38,6 @@ import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	grayText: {
-		color: theme.colors.gray600,
-	},
 	datePicker: {
 		height: 56,
 	},
@@ -776,7 +773,7 @@ const CreateOnYourTimeContent: FC = () => {
 																						Only other Institutions in my
 																						network
 																					</div>
-																					<div className={classes.grayText}>
+																					<div className="text-gray">
 																						Visible to patients and
 																						providers from selected
 																						institutions in my network
@@ -897,7 +894,7 @@ const CreateOnYourTimeContent: FC = () => {
 																					>
 																						Public
 																					</div>
-																					<div className={classes.grayText}>
+																					<div className="text-gray">
 																						Available for use by other
 																						institutions
 																					</div>

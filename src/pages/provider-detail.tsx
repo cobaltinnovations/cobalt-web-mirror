@@ -61,7 +61,7 @@ const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: 'transparent',
 		},
 		'& a': {
-			color: theme.colors.gray600,
+			color: theme.colors.n500,
 			textDecoration: 'none',
 		},
 	},
@@ -79,10 +79,10 @@ const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 	},
 	activeNav: {
 		'&:after': {
-			backgroundColor: theme.colors.primary,
+			backgroundColor: theme.colors.p500,
 		},
 		'& a': {
-			color: theme.colors.black,
+			color: theme.colors.n900,
 			textDecoration: 'none',
 		},
 	},
@@ -212,7 +212,7 @@ const ProviderDetail = () => {
 											>
 												<ul className={classes.navbar}>
 													<li
-														className={classNames('ms-2 py-2', classes.navItem, {
+														className={classNames('py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 0,
 														})}
 													>
@@ -313,7 +313,7 @@ const ProviderDetail = () => {
 													return (
 														<div key={section.date}>
 															<DayContainer className="mb-4">
-																<p className="mb-0 font-body-bold">
+																<p className="mb-0 fw-bold">
 																	{section.dateDescription}
 																</p>
 															</DayContainer>

@@ -74,7 +74,7 @@ const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -82,17 +82,17 @@ const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 	},
 	filterIcon: {
 		marginTop: -1,
 		marginLeft: 5,
-		fill: theme.colors.dark,
+		fill: theme.colors.n900,
 	},
 	infoIcon: {
 		width: 28,
 		marginLeft: 10,
-		fill: theme.colors.white,
+		fill: theme.colors.n0,
 	},
 }));
 
@@ -701,7 +701,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<div className="d-flex align-items-center justify-content-center mb-1">
-								<small className="mb-0 text-uppercase text-muted font-body-bold">Filters</small>
+								<small className="mb-0 text-uppercase text-muted fw-bold">Filters</small>
 							</div>
 							<div className="d-flex justify-content-center flex-wrap">
 								<FilterPill
@@ -838,7 +838,7 @@ const ConnectWithSupport: FC = () => {
 					return (
 						<div key={section.date}>
 							<DayContainer className="mb-4">
-								<p className="mb-0 font-body-bold">{section.dateDescription}</p>
+								<p className="mb-0 fw-bold">{section.dateDescription}</p>
 							</DayContainer>
 
 							<Container>

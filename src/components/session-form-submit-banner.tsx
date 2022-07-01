@@ -12,7 +12,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '20px 0',
 		position: 'fixed',
 		textAlign: 'center',
-		backgroundColor: theme.colors.white,
+		backgroundColor: theme.colors.n0,
 		borderTop: `1px solid ${theme.colors.border}`,
 	},
 }));

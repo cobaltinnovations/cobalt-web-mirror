@@ -8,7 +8,6 @@ import { CobaltTheme } from './theme';
 
 export function loadTheme(): Readonly<CobaltTheme> {
 	if (__DEV__) {
-		console.log(getSubdomain());
 		try {
 			return require(`./config/${getSubdomain()}`);
 		} catch (e) {
@@ -35,7 +34,7 @@ export function loadTheme(): Readonly<CobaltTheme> {
 export const CobaltThemeProvider: FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<BootstrapThemeProvider prefixes={prefixes}>
-			<ThemeProvider theme={loadTheme()}>{children}</ThemeProvider>;
+			<ThemeProvider theme={loadTheme()}>{children}</ThemeProvider>
 		</BootstrapThemeProvider>
 	);
 };

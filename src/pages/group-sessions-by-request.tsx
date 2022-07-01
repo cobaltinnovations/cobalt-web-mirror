@@ -20,7 +20,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	filterIcon: {
 		marginRight: 10,
 		'& polyline, & polygon': {
-			fill: theme.colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 }));
@@ -128,7 +128,7 @@ const GroupSessionsByRequest: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 me-2 text-uppercase text-muted font-body-bold">Quick Filters:</small>
+							<small className="mb-0 me-2 text-uppercase text-muted fw-bold">Quick Filters:</small>
 							<QuickFilterDropdown
 								active={!!statusFilterValue}
 								value={statusFilterValue}

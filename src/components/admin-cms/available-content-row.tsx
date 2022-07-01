@@ -18,7 +18,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: theme.colors.secondary,
+		fill: theme.colors.a500,
 	},
 	centerText: {
 		textAlign: 'center',
@@ -42,10 +42,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'inline-block',
 
 		'&.added': {
-			backgroundColor: theme.colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.available': {
-			backgroundColor: theme.colors.secondary,
+			backgroundColor: theme.colors.a500,
 		},
 	},
 }));
@@ -129,22 +129,22 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 	return (
 		<TableRow className={classes.row}>
 			<TableCell>
-				<span className="d-block fs-default font-body-normal">{content.dateCreatedDescription}</span>
+				<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 			</TableCell>
 			<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
 				{getIcon(content.contentTypeId)}
 			</TableCell>
 			<TableCell>
-				<span className="d-block fs-default font-body-bold">
+				<span className="d-block fs-default fw-bold">
 					<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 				</span>
-				<span className="d-block fs-default font-body-normal">{content.author}</span>
+				<span className="d-block fs-default fw-normal">{content.author}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-block fs-default font-body-normal">{content.ownerInstitution}</span>
+				<span className="d-block fs-default fw-normal">{content.ownerInstitution}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-inline-block fs-small font-body-normal" style={{ minWidth: 90 }}>
+				<span className="d-inline-block fs-small fw-normal" style={{ minWidth: 90 }}>
 					{getStatusIcon(content.availableStatusId)}
 					<span className={classes.status}>
 						{content.availableStatusId === ContentAvailableStatusId.Added
