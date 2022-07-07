@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -16,6 +16,7 @@ import FilterPill from '@/components/filter-pill';
 import FilterFormat from '@/components/filter-format';
 import FilterLength from '@/components/filter-length';
 import ActionSheet from '@/components/action-sheet';
+import InputHelper from '@/components/input-helper';
 
 const OnYourTime: FC = () => {
 	useHeaderTitle('On Your Time');
@@ -145,9 +146,9 @@ const OnYourTime: FC = () => {
 			<Container className="pt-5 mb-3">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form.Control
+						<InputHelper
 							type="search"
-							placeholder="Find On Your Time Items"
+							label="Find On Your Time Items"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 								setSearchTerm(event.target.value);

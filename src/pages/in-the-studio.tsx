@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -12,6 +12,7 @@ import ActionSheet from '@/components/action-sheet';
 import { groupEventService, groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
 import useQuery from '@/hooks/use-query';
+import InputHelper from '@/components/input-helper';
 
 const InTheStudio: FC = () => {
 	useHeaderTitle('In the Studio');
@@ -117,9 +118,9 @@ const InTheStudio: FC = () => {
 			<Container className="pt-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form.Control
+						<InputHelper
 							type="search"
-							placeholder="Find a Studio Session"
+							label="Find a Studio Session"
 							className="mb-5"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import InputHelper from '@/components/input-helper';
 
 const useCollectContactInfoModalStyles = createUseStyles({
 	collectContactInfoModal: {
@@ -57,12 +58,12 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 					</p>
 
 					{promptForEmail && (
-						<Form.Control
+						<InputHelper
 							required
 							type="email"
 							value={emailInputValue}
 							className="mb-2"
-							placeholder="Your Email Address"
+							label="Your Email Address"
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setEmailInputValue(e.target.value);
 							}}
@@ -70,12 +71,12 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 					)}
 
 					{promptForPhoneNumber && (
-						<Form.Control
+						<InputHelper
 							required
 							type="tel"
 							className="mb-3"
 							value={phoneNumberInputValue}
-							placeholder="Your Phone Number"
+							label="Your Phone Number"
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setPhoneNumberInputValue(e.target.value);
 							}}

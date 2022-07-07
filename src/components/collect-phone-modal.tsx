@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
-import InputHelper from './input-helper';
+import InputHelper from '@/components/input-helper';
 
 const useCollectPhoneModalStyles = createUseStyles({
 	collectPhoneNumberModal: {

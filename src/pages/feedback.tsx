@@ -1,10 +1,11 @@
 import React, { FC, useState } from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import { feedbackService } from '@/lib/services/feedback-service';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useAccount from '@/hooks/use-account';
+import InputHelper from '@/components/input-helper';
 
 const Feedback: FC = () => {
 	const handleError = useHandleError();
@@ -61,22 +62,22 @@ const Feedback: FC = () => {
 								please contact these resources.
 							</span>
 						</p>
-						<Form.Control
+						<InputHelper
 							className="mb-1"
 							type="email"
 							value={feedbackEmailValue}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 								setFeedbackEmailValue(event.currentTarget.value);
 							}}
-							placeholder="Your email address"
+							label="Your email address"
 						/>
 						<small className="d-block ps-2 pe-2 mb-5">
 							Enter your email address if you would like our team to follow up in the next two business
 							days
 						</small>
-						<Form.Control
+						<InputHelper
 							as="textarea"
-							placeholder="Your technical issue or feedback"
+							label="Your technical issue or feedback"
 							value={feedbackTextareaValue}
 							onChange={(event) => {
 								setFeedbackTextareaValue(event.currentTarget.value);
