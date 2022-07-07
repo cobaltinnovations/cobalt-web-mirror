@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import InputHelper from './input-helper';
 
 const useCollectPhoneModalStyles = createUseStyles({
 	collectPhoneNumberModal: {
@@ -34,12 +35,13 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSubmit, ...props }) =
 						To take the Cobalt assessment we'd like a way to reach you if there is a need. Please enter your
 						phone number to continue.
 					</p>
-					<Form.Control
+
+					<InputHelper
 						required
 						type="tel"
 						className="mb-3"
 						value={phoneNumberInputValue}
-						placeholder="Your Phone Number"
+						label="Your Phone Number"
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setPhoneNumberInputValue(e.target.value);
 						}}

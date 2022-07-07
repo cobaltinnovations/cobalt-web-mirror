@@ -2,7 +2,7 @@ import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { ReactComponent as SelectIcon } from '@/assets/icons/icon-select.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 interface useInputHelperStylesProps {
@@ -15,16 +15,23 @@ interface useInputHelperStylesProps {
 
 const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	inputHelper: ({ as, isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+		borderRadius: 5,
 		overflow: 'hidden',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
-		height: as === 'textarea' ? 110 : 56,
+		height: as === 'textarea' ? 130 : 54,
 		border: `1px solid ${
-			hasError ? theme.colors.d500 : isHovered || isFocused ? theme.colors.p500 : theme.colors.border
+			hasError
+				? theme.colors.d500
+				: isFocused
+				? theme.colors.p500
+				: isHovered
+				? theme.colors.n300
+				: theme.colors.n100
 		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
-		top: 18,
+		top: 16,
 		left: 16,
 		margin: 0,
 		zIndex: 1,
@@ -64,7 +71,13 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transform: 'translateY(-50%)',
-		fill: hasError ? theme.colors.d500 : isHovered || isFocused ? theme.colors.p500 : theme.colors.n900,
+		fill: hasError
+			? theme.colors.d500
+			: isFocused
+			? theme.colors.p500
+			: isHovered
+			? theme.colors.n500
+			: theme.colors.n500,
 	}),
 }));
 
@@ -150,7 +163,7 @@ const InputHelper: FC<InputHelperProps> = ({
 				>
 					{children}
 				</FormControlComponent>
-				{props.as === 'select' && <DownChevron className={classes.downChevron} />}
+				{props.as === 'select' && <SelectIcon className={classes.downChevron} />}
 			</Form.Group>
 			{(helperText || characterCounter) && (
 				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
