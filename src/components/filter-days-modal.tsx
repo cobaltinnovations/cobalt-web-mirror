@@ -100,8 +100,8 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterDaysModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">available days</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>available days</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="my-1 fw-bold">Date Range</p>
@@ -154,22 +154,24 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 				</Row>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() =>
-						onSave({
-							from: fromDate,
-							to: toDate,
-							days: filterDays,
-						})
-					}
-				>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() =>
+							onSave({
+								from: fromDate,
+								to: toDate,
+								days: filterDays,
+							})
+						}
+					>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

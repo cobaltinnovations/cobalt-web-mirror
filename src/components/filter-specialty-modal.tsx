@@ -35,8 +35,8 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">focus</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>focus</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{specialties.map((specialty) => {
@@ -65,12 +65,14 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 				})}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(internalSelectedSpecialties)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(internalSelectedSpecialties)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

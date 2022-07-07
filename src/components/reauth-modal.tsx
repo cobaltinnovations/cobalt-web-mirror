@@ -44,27 +44,28 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 				<p className="mb-3">This page contains information that requires reauthentication.</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button
-					type="button"
-					variant="outline-primary"
-					size="sm"
-					onClick={() => {
-						history.goBack();
-						setShowReauthModal(false);
-					}}
-				>
-					cancel
-				</Button>
-				<Button
-					type="submit"
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						window.location.href = signOnUrl;
-					}}
-				>
-					proceed
-				</Button>
+				<div className="text-right">
+					<Button
+						type="button"
+						variant="outline-primary"
+						onClick={() => {
+							history.goBack();
+							setShowReauthModal(false);
+						}}
+					>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						type="submit"
+						variant="primary"
+						onClick={() => {
+							window.location.href = signOnUrl;
+						}}
+					>
+						proceed
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

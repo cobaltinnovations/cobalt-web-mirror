@@ -57,8 +57,8 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterTimesModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">available times</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>available times</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-2">
@@ -84,12 +84,14 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 				<p className="mb-0 mt-4 text-center">Selected times are EST</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={handleSaveClick}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={handleSaveClick}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

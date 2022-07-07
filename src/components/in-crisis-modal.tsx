@@ -22,9 +22,8 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.inCrisisModal} centered>
-			<Modal.Header closeButton closeVariant="white" className={'bg-primary text-white text-center'}>
-				<h3 className="mb-0">If you are in crisis</h3>
-				<p className={'mb-2 text-white p-2'}></p>
+			<Modal.Header closeButton>
+				<Modal.Title>If you are in crisis</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{isCall && (
@@ -74,15 +73,11 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button
-					variant="outline-primary"
-					size="sm"
-					className={'d-flex  justify-content-center align-items-center'}
-					onClick={modalProps.onHide}
-					style={{ margin: '0 auto' }}
-				>
-					dismiss
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={modalProps.onHide}>
+						dismiss
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

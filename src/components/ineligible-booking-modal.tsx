@@ -17,8 +17,8 @@ const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
 
 	return (
 		<Modal {...props} dialogClassName={classes.ineligibleBookingModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">let's find the right match</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>let's find the right match</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0">
@@ -27,9 +27,11 @@ const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
 				</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="primary" className="ms-auto" size="sm" onClick={props.onHide}>
-					okay
-				</Button>
+				<div className="text-right">
+					<Button variant="primary" onClick={props.onHide}>
+						okay
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

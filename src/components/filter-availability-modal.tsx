@@ -66,8 +66,8 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterAvailabilityModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">availability</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>availability</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-4">
@@ -114,12 +114,14 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(selected, visitTypeIds)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(selected, visitTypeIds)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);
