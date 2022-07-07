@@ -93,6 +93,7 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 						<Form.Check
 							key={`${question.questionId}-${answer.answerId}`}
 							ref={checkboxRef as any}
+							bsPrefix="cobalt-survey-form__check"
 							type="checkbox"
 							checked={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)}
 							id={`${question.questionId}-${answer.answerId}`}
@@ -114,6 +115,7 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 						<Form.Check
 							key={`${question.questionId}-${answer.answerId}`}
 							ref={radioRef as any}
+							bsPrefix="cobalt-survey-form__check"
 							type="radio"
 							checked={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)}
 							id={`${question.questionId}-${answer.answerId}`}
@@ -132,7 +134,7 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 						<Button
 							variant={
 								!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)
-									? 'secondary'
+									? 'primary'
 									: 'light'
 							}
 							className="btn-block"

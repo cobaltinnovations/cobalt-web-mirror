@@ -713,7 +713,6 @@ const CreateOnYourTimeContent: FC = () => {
 																		</Form.Label>
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="isPrivate-No"
 																			name="visibilityPrivate"
 																			label="No"
@@ -737,7 +736,6 @@ const CreateOnYourTimeContent: FC = () => {
 																		/>
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="isPrivate-Yes"
 																			name="visibilityPrivate"
 																			label="Yes"
@@ -760,7 +758,6 @@ const CreateOnYourTimeContent: FC = () => {
 																	<Form.Group className="mb-5">
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="visibilityNetwork-Yes"
 																			name="visibilityNetwork"
 																			label={
@@ -818,7 +815,6 @@ const CreateOnYourTimeContent: FC = () => {
 																								<Form.Check
 																									key={index}
 																									type="checkbox"
-																									bsPrefix="cobalt-modal-form__check"
 																									id={institutionId}
 																									name={institutionId}
 																									label={
@@ -882,7 +878,6 @@ const CreateOnYourTimeContent: FC = () => {
 																			)}
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="visibilityPublic-Yes"
 																			name="visibilityPublic"
 																			label={

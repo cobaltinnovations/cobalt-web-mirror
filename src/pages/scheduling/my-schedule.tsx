@@ -162,7 +162,6 @@ export const MySchedule: FC = () => {
 				<div className="mb-9 d-flex">
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="calendarView-day"
 						label="day"
 						checked={currentMainCalendarView === MainCalendarView.Day}
@@ -172,7 +171,6 @@ export const MySchedule: FC = () => {
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="calendarView-week"
 						label="week"
 						className="ms-2"
@@ -183,7 +181,6 @@ export const MySchedule: FC = () => {
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="calendarView-month"
 						label="month"
 						className="ms-2"

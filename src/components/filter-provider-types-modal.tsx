@@ -74,7 +74,6 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 						<Form.Check
 							key={`${providerType.supportRoleId}-${index}`}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={providerType.supportRoleId}
 							name={providerType.supportRoleId}
 							label={providerType.description}

@@ -70,7 +70,6 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 							key={apptType.appointmentTypeId}
 							type="radio"
 							disabled={apptType.disabled}
-							bsPrefix="cobalt-modal-form__check"
 							id={apptType.appointmentTypeId}
 							name={apptType.appointmentTypeId}
 							label={

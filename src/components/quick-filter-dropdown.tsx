@@ -122,7 +122,6 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 										// the "onSelect" of the Dropdown.Item
 										return;
 									}}
-									bsPrefix="cobalt-modal-form__check"
 								/>
 								<span className="fs-default text-muted">{item.count}</span>
 							</div>

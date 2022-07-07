@@ -296,7 +296,6 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 					<div key={answer.answerId} className={fullWidth ? `py-1 px-9 ${classes.borderBottom}` : ''}>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={answer.answerId}
 							name={answer.answerId}
 							label={answer.label}

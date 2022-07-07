@@ -137,7 +137,6 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 							<Col key={key} xs={6}>
 								<Form.Check
 									type="checkbox"
-									bsPrefix="cobalt-modal-form__check"
 									id={key}
 									name={key}
 									label={label}

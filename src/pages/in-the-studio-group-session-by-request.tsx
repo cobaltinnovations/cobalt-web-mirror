@@ -204,7 +204,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="dateInMind-no"
 													name="dateInMind"
 													label="No"
@@ -217,7 +216,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="dateInMind-yes"
 													name="dateInMind"
 													label="Yes"
@@ -274,7 +272,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-lessThanFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.LESS_THAN_FIVE}
@@ -285,7 +282,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-fiveToTen"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.FIVE_TO_TEN}
@@ -296,7 +292,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-tenToFifteen"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.TEN_TO_FIFTEEN}
@@ -307,7 +302,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-fifteenToTwentyFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE}
@@ -320,7 +314,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-moreThanTwentyFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE}

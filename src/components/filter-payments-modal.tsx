@@ -50,7 +50,6 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 						<Form.Check
 							key={paymentType.paymentTypeId}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={paymentType.paymentTypeId}
 							name={paymentType.paymentTypeId}
 							label={paymentType.description}

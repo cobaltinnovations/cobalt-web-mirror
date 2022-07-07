@@ -31,7 +31,6 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 							</p>
 							<Form.Check
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								name="has-bluejeans-account"
 								id="has-bluejeans-account-yes"
 								label="Yes"
@@ -43,7 +42,6 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 							/>
 							<Form.Check
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								name="has-bluejeans-account"
 								id="has-bluejeans-account-no"
 								label="No"

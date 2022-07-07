@@ -16,7 +16,6 @@ export const CalendarAccordion = () => {
 			<div className="mb-4">
 				<Form.Check
 					type="radio"
-					bsPrefix="cobalt-modal-form__check"
 					id="cal1"
 					label="Owner"
 					checked={true}
@@ -27,7 +26,6 @@ export const CalendarAccordion = () => {
 
 				<Form.Check
 					type="radio"
-					bsPrefix="cobalt-modal-form__check"
 					id="cal2"
 					label="Editor"
 					checked={false}
@@ -38,7 +36,6 @@ export const CalendarAccordion = () => {
 
 				<Form.Check
 					type="radio"
-					bsPrefix="cobalt-modal-form__check"
 					id="cal3"
 					label="Viewer"
 					checked={false}

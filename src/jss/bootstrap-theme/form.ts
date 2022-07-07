@@ -68,45 +68,151 @@ export const form = (theme: CobaltTheme) => {
 				},
 			},
 			'&__check': {
-				marginBottom: 5,
+				padding: '0.5rem 0px',
+				display: 'flex',
+				alignItems: 'center',
+
 				'&-inline': {
 					marginRight: 24,
 					display: 'inline-flex',
 				},
-				'& input[type=checkbox], & input[type=radio]': {
-					display: 'none',
-					'& + label': {
-						...theme.fonts.h4,
-						padding: '15px 20px 15px 60px',
-						width: '100%',
-						borderRadius: 500,
-						cursor: 'pointer',
-						position: 'relative',
-						color: theme.colors.p500,
-						...theme.fonts.headingBold,
-						backgroundColor: theme.colors.n0,
-						'&:before': {
-							left: 15,
-							width: 25,
-							height: 25,
-							top: '50%',
-							content: '""',
-							borderRadius: '50%',
-							position: 'absolute',
-							transform: 'translateY(-50%)',
-							border: `2px solid ${theme.colors.background}`,
+				'& .form-check-input': {
+					marginTop: 0,
+					marginRight: '1rem',
+					appearance: 'none',
+					width: 20,
+					height: 20,
+					color: theme.colors.p500,
+					backgroundColor: theme.colors.n0,
+					border: `2px solid ${theme.colors.border}`,
+					display: 'grid',
+					placeContent: 'center',
+
+					'&:before': {
+						content: '""',
+						borderRadius: '50%',
+					},
+
+					'&:focus,&:active': {
+						boxShadow: 'none',
+						borderColor: '#437DE8 !important',
+					},
+
+					'&:disabled': {
+						opacity: 1,
+
+						'& + label': {
+							opacity: 1,
 						},
 					},
-					'&:checked + label': {
-						color: theme.colors.n0,
-						backgroundColor: theme.colors.a500,
+
+					'& + label': {
+						...theme.fonts.default,
+						...theme.fonts.bodyNormal,
+						cursor: 'pointer',
+					},
+				},
+				'& input[type=checkbox]': {
+					backgroundPosition: 'center',
+					backgroundRepeat: 'no-repeat',
+					backgroundSize: '12px 12px',
+
+					'&:hover': {
+						borderColor: theme.colors.p100,
+						backgroundColor: theme.colors.p50,
+					},
+
+					'&:disabled': {
+						color: 'red',
+						borderColor: `${theme.colors.n100} !important`,
+						backgroundColor: `${theme.colors.n100} !important`,
+
+						'&:checked': {
+							backgroundImage: 'url(/static/images/icon-checkmark-dark.svg)',
+						},
+
+						'&:indeterminate': {
+							backgroundImage: 'url(/static/images/icon-minus-dark.svg)',
+						},
+					},
+
+					'&:checked,&:indeterminate': {
+						borderColor: theme.colors.p500,
+						backgroundColor: theme.colors.p500,
+
+						'&:hover': {
+							borderColor: theme.colors.p300,
+							backgroundColor: theme.colors.p300,
+						},
+					},
+
+					'&:checked': {
+						backgroundImage: 'url(/static/images/icon-checkmark-white.svg)',
+					},
+
+					'&:indeterminate': {
+						backgroundImage: 'url(/static/images/icon-minus-white.svg)',
+					},
+
+					'&.is-invalid': {
+						borderColor: `${theme.colors.d500} !important`,
+
+						'&:focus,&:active': {
+							borderColor: '#437DE8 !important',
+						},
+
+						'& + label': {
+							color: theme.colors.n900,
+						},
+					},
+				},
+				'& input[type=radio]': {
+					backgroundImage: 'initial',
+
+					'&:before': {
+						width: 10,
+						height: 10,
+					},
+
+					'&:hover': {
+						borderColor: theme.colors.p300,
+						backgroundColor: theme.colors.p50,
+					},
+
+					'&:disabled': {
+						borderColor: `${theme.colors.n300} !important`,
+						backgroundColor: `${theme.colors.n100} !important`,
+
 						'&:before': {
-							backgroundPosition: 'center',
-							backgroundRepeat: 'no-repeat',
-							backgroundColor: theme.colors.n0,
-							backgroundSize: '12.5px 8.75px',
-							border: `2px solid ${theme.colors.n0}`,
-							backgroundImage: 'url(/static/images/icon-checkmark-orange.svg)',
+							boxShadow: `inset 1em 1em ${theme.colors.n500} !important`,
+						},
+					},
+
+					'&:checked': {
+						backgroundImage: 'initial',
+						borderColor: theme.colors.p500,
+						backgroundColor: theme.colors.n0,
+
+						'&:before': {
+							boxShadow: `inset 1em 1em ${theme.colors.p500}`,
+						},
+
+						'&:hover': {
+							borderColor: theme.colors.p300,
+							'&:before': {
+								boxShadow: `inset 1em 1em ${theme.colors.p300}`,
+							},
+						},
+					},
+
+					'&.is-invalid': {
+						borderColor: `${theme.colors.d500} !important`,
+						'&:disabled': {
+							borderColor: `${theme.colors.d500} !important`,
+						},
+
+						'& + label': {
+							color: theme.colors.n900,
 						},
 					},
 				},
@@ -155,109 +261,49 @@ export const form = (theme: CobaltTheme) => {
 	};
 };
 
-export const modalForm = (theme: CobaltTheme) => {
+export const surveyForm = (theme: CobaltTheme) => {
 	return {
-		'.cobalt-modal-form': {
+		'.cobalt-survey-form': {
 			'&__check': {
+				marginBottom: 5,
 				'&-inline': {
 					marginRight: 24,
 					display: 'inline-flex',
 				},
 				'& input[type=checkbox], & input[type=radio]': {
 					display: 'none',
-
 					'& + label': {
-						...theme.fonts.default,
-						...theme.fonts.bodyNormal,
-						padding: '6px 0 6px 30px',
+						...theme.fonts.h4,
+						padding: '15px 20px 15px 60px',
 						width: '100%',
+						borderRadius: 500,
 						cursor: 'pointer',
 						position: 'relative',
+						color: theme.colors.p500,
+						...theme.fonts.headingBold,
+						backgroundColor: theme.colors.n0,
 						'&:before': {
-							left: 0,
-							width: 18,
-							height: 18,
+							left: 15,
+							width: 25,
+							height: 25,
 							top: '50%',
 							content: '""',
+							borderRadius: '50%',
 							position: 'absolute',
 							transform: 'translateY(-50%)',
+							border: `2px solid ${theme.colors.background}`,
+						},
+					},
+					'&:checked + label': {
+						color: theme.colors.n0,
+						backgroundColor: theme.colors.a500,
+						'&:before': {
 							backgroundPosition: 'center',
 							backgroundRepeat: 'no-repeat',
 							backgroundColor: theme.colors.n0,
-							border: `2px solid ${theme.colors.n300}`,
-						},
-					},
-				},
-				'& input[type=checkbox][disabled], & input[type=radio][disabled]': {
-					'& + label': {
-						cursor: 'not-allowed',
-						opacity: 1,
-
-						'&:before': {
-							backgroundColor: `${theme.colors.n100} !important`,
-							borderColor: `${theme.colors.n100} !important`,
-						},
-					},
-				},
-				'& input[type=checkbox]': {
-					'& + label:before': {
-						borderRadius: 4,
-					},
-
-					'&:checked, &:indeterminate': {
-						'& + label:before': {
-							backgroundColor: theme.colors.p500,
-							borderColor: theme.colors.p500,
-						},
-					},
-
-					'&:checked': {
-						'& + label:before': {
-							backgroundImage: 'url(/static/images/icon-checkmark-white.svg)',
-						},
-					},
-					'&:indeterminate': {
-						'& + label:before': {
-							backgroundImage: 'url(/static/images/icon-minus-white.svg)',
-						},
-					},
-
-					'&:hover': {
-						'& + label:before': {
-							backgroundColor: theme.colors.p50,
-							border: `2px solid ${theme.colors.p100}`,
-						},
-						'&:checked, &:indeterminate': {
-							'& + label:before': {
-								backgroundColor: theme.colors.p300,
-								borderColor: theme.colors.p300,
-							},
-						},
-					},
-				},
-				'& input[type=radio]': {
-					'& + label:before': {
-						borderRadius: '50%',
-					},
-
-					'&:checked': {
-						'& + label:before': {
-							backgroundColor: theme.colors.n0,
-							borderColor: theme.colors.p500,
-							backgroundImage: 'url(/static/images/icon-radio-orange.svg)',
-						},
-					},
-
-					'&:hover': {
-						'& + label:before': {
-							backgroundColor: theme.colors.p50,
-							border: `2px solid ${theme.colors.p100}`,
-						},
-						'&:checked': {
-							'& + label:before': {
-								backgroundColor: theme.colors.n0,
-								borderColor: theme.colors.p300,
-							},
+							backgroundSize: '12.5px 8.75px',
+							border: `2px solid ${theme.colors.n0}`,
+							backgroundImage: 'url(/static/images/icon-checkmark-orange.svg)',
 						},
 					},
 				},

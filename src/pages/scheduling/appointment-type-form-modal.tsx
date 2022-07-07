@@ -270,7 +270,6 @@ export const AppointmentTypeFormModal = ({
 							className="me-6"
 							id="duration-30"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="30m"
 							checked={duration === '30'}
@@ -282,7 +281,6 @@ export const AppointmentTypeFormModal = ({
 							className="me-6"
 							id="duration-45"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="45m"
 							checked={duration === '45'}
@@ -294,7 +292,6 @@ export const AppointmentTypeFormModal = ({
 							className="me-6"
 							id="duration-60"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="60m"
 							checked={duration === '60'}
@@ -306,7 +303,6 @@ export const AppointmentTypeFormModal = ({
 							className="me-6"
 							id="duration-other"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label={
 								<InputHelper
@@ -342,7 +338,6 @@ export const AppointmentTypeFormModal = ({
 									<Form.Check
 										id={`collect-${questionContentHintId}`}
 										key={questionContentHintId}
-										bsPrefix="cobalt-modal-form__check"
 										type="checkbox"
 										name={`collect-${questionContentHintId}`}
 										className="me-6"
@@ -410,7 +405,6 @@ export const AppointmentTypeFormModal = ({
 							/>
 							<div className="mb-5">
 								<Form.Check
-									bsPrefix="cobalt-modal-form__check"
 									id={`screening-question-toggle--${index}`}
 									label="Reduce text size"
 									value="SMALL"

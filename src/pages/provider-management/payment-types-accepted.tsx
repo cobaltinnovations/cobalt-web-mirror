@@ -21,14 +21,12 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 					<Form onSubmit={handleSubmit}>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							name="payment-types-accepted"
 							id="payment-types-accepted--free-of-charge"
 							label="Free of charge"
 						/>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							name="payment-types-accepted"
 							id="payment-types-accepted--out-of-pocket"
 							label="Out of poacket"

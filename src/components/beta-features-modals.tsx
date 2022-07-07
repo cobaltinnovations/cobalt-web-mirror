@@ -86,7 +86,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => 
 					<p>Would you like to hear from us when this feature is ready?</p>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert1"
 						name="betaAlert"
 						label="Yes"
@@ -95,7 +94,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert2"
 						name="betaAlert"
 						label="No"
@@ -104,7 +102,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert3"
 						name="betaAlert"
 						label="Yes, and please include me as a beta user for new feature releases"

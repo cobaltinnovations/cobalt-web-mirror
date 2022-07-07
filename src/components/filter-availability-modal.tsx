@@ -76,7 +76,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 							<Form.Check
 								key={availability}
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								id={availability}
 								name={availability}
 								label={description}
@@ -91,7 +90,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 				<div className="mb-2">
 					<h3 className="mb-3">visit type</h3>
 					<Form.Check
-						bsPrefix="cobalt-modal-form__check"
 						type="checkbox"
 						id="visit-type__initial"
 						name="visit-type"
@@ -103,7 +101,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 						}}
 					/>
 					<Form.Check
-						bsPrefix="cobalt-modal-form__check"
 						type="checkbox"
 						id="visit-type__followup"
 						name="visit-type"

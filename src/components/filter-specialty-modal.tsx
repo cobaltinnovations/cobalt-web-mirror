@@ -44,7 +44,6 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 						<Form.Check
 							key={specialty.specialtyId}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={specialty.specialtyId}
 							name={specialty.specialtyId}
 							label={specialty.description}

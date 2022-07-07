@@ -491,7 +491,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-Yes"
 														name="isCobaltScheduling"
 														label="Yes"
@@ -504,7 +503,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-No"
 														name="isCobaltScheduling"
 														label="No"
@@ -631,7 +629,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-Yes"
 														name="isModerator"
 														label="Yes"
@@ -644,7 +641,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-No"
 														name="isModerator"
 														label="No"
@@ -815,7 +811,6 @@ const GroupSessionsCreate: FC = () => {
 													</Form.Label>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="is-restricted-no"
 														name="isRestricted"
 														label="No"
@@ -828,7 +823,6 @@ const GroupSessionsCreate: FC = () => {
 													/>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="is-restricted-yes"
 														name="isRestricted"
 														label="Yes"
@@ -909,7 +903,6 @@ const GroupSessionsCreate: FC = () => {
 																<div className="mb-5">
 																	<Form.Check
 																		disabled={isViewMode}
-																		bsPrefix="cobalt-modal-form__check"
 																		id={`screening-question-toggle--${screeningQuestion.questionId}`}
 																		label="Reduce text size"
 																		value="SMALL"
@@ -1008,7 +1001,6 @@ const GroupSessionsCreate: FC = () => {
 													</p>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="follow-up-email-no"
 														name="followUpEmail"
 														label="No"
@@ -1021,7 +1013,6 @@ const GroupSessionsCreate: FC = () => {
 													/>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="follow-up-email-yes"
 														name="followUpEmail"
 														label="Yes"

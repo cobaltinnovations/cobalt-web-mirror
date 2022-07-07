@@ -76,7 +76,6 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 							<Form.Check
 								key={`${format.contentTypeLabelId}-${index}`}
 								type="checkbox"
-								bsPrefix="cobalt-modal-form__check"
 								name="on-your-time__filter-format"
 								id={`on-your-time__filter-format--${format.contentTypeLabelId}`}
 								label={format.description}

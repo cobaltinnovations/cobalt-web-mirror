@@ -232,7 +232,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 												</Form.Label>
 												<Form.Check
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="responsible-yes"
 													name="responsible"
 													label="Yes"
@@ -245,7 +244,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 												<Form.Check
 													className="mb-5"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="responsible-no"
 													name="responsible"
 													label="No"
@@ -384,7 +382,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 												<Form.Check
 													type="checkbox"
-													bsPrefix="cobalt-modal-form__check"
 													id="customQuestionOne"
 													name="customQuestionOne"
 													label="Custom Question 1"
@@ -409,7 +406,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 												<Form.Check
 													type="checkbox"
-													bsPrefix="cobalt-modal-form__check"
 													id="customQuestionTwo"
 													name="customQuestionTwo"
 													label="Custom Question 2"
