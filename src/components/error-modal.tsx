@@ -29,10 +29,10 @@ const ErrorModal: FC = () => {
 				setShow(false);
 			}}
 		>
-			<Modal.Header>
-				<h3 className="mb-0">
+			<Modal.Header closeButton>
+				<Modal.Title>
 					{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}
-				</h3>
+				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{error?.code === 'VALIDATION_FAILED' ? (
@@ -77,16 +77,17 @@ const ErrorModal: FC = () => {
 					</>
 				)}
 			</Modal.Body>
-			<Modal.Footer className="justify-content-center">
-				<Button
-					variant="outline-primary"
-					size="sm"
-					onClick={() => {
-						setShow(false);
-					}}
-				>
-					dismiss
-				</Button>
+			<Modal.Footer>
+				<div className="text-right">
+					<Button
+						variant="outline-primary"
+						onClick={() => {
+							setShow(false);
+						}}
+					>
+						dismiss
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

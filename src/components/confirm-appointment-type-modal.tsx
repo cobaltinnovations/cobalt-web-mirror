@@ -49,8 +49,8 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.confirmAppointmentTypeModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">appointment options</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>appointment options</Modal.Title>
 			</Modal.Header>
 
 			<Modal.Body>
@@ -92,18 +92,20 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 			</Modal.Body>
 
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						onConfirm(selectedId);
-					}}
-				>
-					reserve
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							onConfirm(selectedId);
+						}}
+					>
+						reserve
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

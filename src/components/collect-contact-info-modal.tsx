@@ -42,8 +42,8 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.collectContactInfoModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm your appointment</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm your appointment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
@@ -69,12 +69,10 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 							}}
 						/>
 					)}
-
 					{promptForPhoneNumber && (
 						<InputHelper
 							required
 							type="tel"
-							className="mb-3"
 							value={phoneNumberInputValue}
 							label="Your Phone Number"
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,13 +83,14 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 				</Modal.Body>
 
 				<Modal.Footer>
-					<Button type="button" variant="outline-primary" size="sm" onClick={props.onHide}>
-						cancel
-					</Button>
-
-					<Button type="submit" variant="primary" size="sm">
-						reserve
-					</Button>
+					<div className="text-right">
+						<Button type="button" variant="outline-primary" onClick={props.onHide}>
+							cancel
+						</Button>
+						<Button className="ms-2" type="submit" variant="primary">
+							reserve
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>

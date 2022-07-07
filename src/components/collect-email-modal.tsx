@@ -22,8 +22,8 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 
 	return (
 		<Modal {...props} dialogClassName={classes.collectEmailModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm your appointment</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm your appointment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
@@ -41,7 +41,6 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 						required
 						type="email"
 						value={email}
-						className="mb-2"
 						label="Your Email Address"
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setEmail(e.target.value);
@@ -50,13 +49,14 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 				</Modal.Body>
 
 				<Modal.Footer>
-					<Button type="button" variant="outline-primary" size="sm" onClick={props.onHide}>
-						cancel
-					</Button>
-
-					<Button type="submit" variant="primary" size="sm">
-						reserve
-					</Button>
+					<div className="text-right">
+						<Button type="button" variant="outline-primary" onClick={props.onHide}>
+							cancel
+						</Button>
+						<Button className="ms-2" type="submit" variant="primary">
+							reserve
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>

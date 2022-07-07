@@ -32,25 +32,25 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.confirmProviderBookingModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm your appointment</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm your appointment</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-2 fw-normal">
+				<p className="mb-0 fw-normal">
 					Do you want to book this session with <strong>{provider?.name}</strong> for{' '}
 					<strong>{formattedDate}</strong> from <strong>{selectedTimeSlot?.timeDescription}</strong> to{' '}
 					<strong>{timeSlotEndTime}</strong>?
 				</p>
 			</Modal.Body>
-
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-
-				<Button variant="primary" size="sm" onClick={onConfirm}>
-					reserve
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={onConfirm}>
+						reserve
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

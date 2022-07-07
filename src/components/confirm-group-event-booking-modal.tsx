@@ -50,8 +50,8 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.confirmGroupEventBookingModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm reservation</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm reservation</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{!!externalUrl ? (
@@ -70,22 +70,24 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 				)}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={modalProps.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						if (externalUrl) {
-							navigateToExternalUrl();
-						} else {
-							onConfirm();
-						}
-					}}
-				>
-					{externalUrl ? 'ok' : 'reserve'}
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={modalProps.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							if (externalUrl) {
+								navigateToExternalUrl();
+							} else {
+								onConfirm();
+							}
+						}}
+					>
+						{externalUrl ? 'ok' : 'reserve'}
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

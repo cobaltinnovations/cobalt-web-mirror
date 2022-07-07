@@ -99,6 +99,10 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
 		},
+		'.text-right': {
+			textAlign: 'right',
+		},
+
 		'.cursor-pointer': {
 			cursor: 'pointer !important',
 		},

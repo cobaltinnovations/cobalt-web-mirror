@@ -19,19 +19,21 @@ const ConfirmCancelBookingModal: FC<ConfirmCancelBookingModalProps> = ({ onConfi
 
 	return (
 		<Modal {...props} dialogClassName={classes.confirmCancelBookingModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">cancel reservation</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>cancel reservation</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0 fw-bold">are you sure?</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					no
-				</Button>
-				<Button variant="primary" size="sm" onClick={onConfirm}>
-					yes
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						no
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={onConfirm}>
+						yes
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);
