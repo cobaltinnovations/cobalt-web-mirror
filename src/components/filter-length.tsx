@@ -39,8 +39,8 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">length</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>length</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
@@ -110,12 +110,14 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={handleSaveButtonClick}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);
