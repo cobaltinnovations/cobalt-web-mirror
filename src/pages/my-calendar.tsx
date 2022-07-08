@@ -143,7 +143,7 @@ const MyCalendar: FC = () => {
 
 			<div className="pb-8">
 				<HeroContainer>
-					<p className="text-center mb-0 text-white">
+					<p className="text-center mb-0">
 						Your booked sessions, reserved studio seats, and more will be available here.
 					</p>
 				</HeroContainer>
@@ -151,12 +151,12 @@ const MyCalendar: FC = () => {
 				{history.location.state?.successBooking ? (
 					<HeroContainer className="bg-success">
 						{history.location.state?.emailAddress ? (
-							<h5 className="text-center mb-0 text-white">
+							<h5 className="text-center mb-0">
 								your session is reserved and we have sent a confirmation to{' '}
 								{history.location.state?.emailAddress}
 							</h5>
 						) : (
-							<h5 className="text-center mb-0 text-white">your appointment was reserved</h5>
+							<h5 className="text-center mb-0">your appointment was reserved</h5>
 						)}
 					</HeroContainer>
 				) : null}

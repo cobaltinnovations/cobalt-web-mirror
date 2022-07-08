@@ -52,8 +52,8 @@ const InteractionInstances: FC = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer className="text-center">
-				<h3 className="text-white mb-3">{interactionInstance?.caseNumber}</h3>
-				<small className="text-white text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
+				<h3 className="mb-3">{interactionInstance?.caseNumber}</h3>
+				<small className="text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
 			</HeroContainer>
 			<Container className="py-5">
 				<Row className="pb-3">

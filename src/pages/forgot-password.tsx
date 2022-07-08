@@ -39,8 +39,8 @@ const ForgotPassword: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-1 text-white text-center">we'll get you back in</h2>
-				<p className="mb-0 text-white text-center">a password reset link will be sent to your email</p>
+				<h2 className="mb-1 text-center">we'll get you back in</h2>
+				<p className="mb-0 text-center">a password reset link will be sent to your email</p>
 			</HeroContainer>
 			<Container className="pt-4 pb-4">
 				<Row>

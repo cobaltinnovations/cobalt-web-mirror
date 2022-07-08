@@ -67,7 +67,7 @@ const SignInSSO: FC = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer>
-				<h2 className="mb-0 text-white text-center">welcome!</h2>
+				<h2 className="mb-0 text-center">welcome!</h2>
 			</HeroContainer>
 			<Container className="pt-5">
 				<Row>

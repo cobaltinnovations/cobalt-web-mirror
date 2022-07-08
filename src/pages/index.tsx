@@ -88,14 +88,14 @@ const Index: FC = () => {
 		<AsyncPage fetchData={fetchData}>
 			{institution?.supportEnabled && (
 				<HeroContainer className="text-center">
-					<h3 className="text-white mb-3">recommended for you</h3>
-					<Button variant="light" className="mb-3" onClick={handleConnectWithSupportButtonClick}>
+					<h3 className="mb-3">Recommended for you</h3>
+					<p className="mb-5">
+						Peers, Resilience Coaches, Therapists, Psychiatrists, and more are here to help
+					</p>
+					<Button onClick={handleConnectWithSupportButtonClick}>
 						<CalendarIcon className={classes.calendarIcon} />
-						connect with support
+						Connect with support
 					</Button>
-					<small className="text-white text-uppercase">
-						peers, resilience coaches, therapists, psychiatrists, and more are here to help
-					</small>
 				</HeroContainer>
 			)}
 
@@ -110,9 +110,9 @@ const Index: FC = () => {
 									xl={{ span: 6, offset: 3 }}
 								>
 									<div className="d-flex justify-content-between align-items-center mb-2">
-										<h3 className="mb-0">in the studio</h3>
+										<h3 className="mb-0">In the studio</h3>
 										<p className="mb-0 text-primary">
-											<Link to="/in-the-studio">explore all</Link>
+											<Link to="/in-the-studio">Explore all</Link>
 										</p>
 									</div>
 								</Col>
@@ -164,17 +164,16 @@ const Index: FC = () => {
 			<Container className="pt-5 pb-8">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h3 className="mb-4 text-center">on your time</h3>
+						<h3 className="mb-4 text-center">On your time</h3>
 
 						<div className="d-flex justify-content-center mb-4">
 							<Button
-								size="sm"
 								variant="light"
 								onClick={() => {
 									history.push('/on-your-time', { personalize: true });
 								}}
 							>
-								personalize recommendations
+								Personalize recommendations
 							</Button>
 						</div>
 
@@ -197,8 +196,8 @@ const Index: FC = () => {
 							);
 						})}
 						<div className="mt-3 text-center">
-							<Button variant="light" onClick={handleMoreOnYourTimeButtonClick}>
-								more on your time
+							<Button variant="outline-primary" onClick={handleMoreOnYourTimeButtonClick}>
+								More on your time
 							</Button>
 						</div>
 					</Col>

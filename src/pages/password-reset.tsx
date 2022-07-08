@@ -54,7 +54,7 @@ const PasswordReset: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-white text-center">we'll get you back in</h2>
+				<h2 className="mb-0 text-center">we'll get you back in</h2>
 			</HeroContainer>
 			<Container className="pt-4 pb-4">
 				<Row>

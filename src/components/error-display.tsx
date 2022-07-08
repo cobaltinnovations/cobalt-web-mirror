@@ -26,8 +26,8 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryB
 	return (
 		<>
 			<HeroContainer>
-				<h6 className="mb-0 text-white text-center">We're sorry, an error occurred.</h6>
-				<p className="mb-0 text-white text-center">{error.message}</p>
+				<h6 className="mb-0 text-center">We're sorry, an error occurred.</h6>
+				<p className="mb-0 text-center">{error.message}</p>
 			</HeroContainer>
 			<Container className="pt-4 pb-5">
 				<Row className="text-center">

@@ -92,7 +92,7 @@ const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	infoIcon: {
 		width: 28,
 		marginLeft: 10,
-		fill: theme.colors.n0,
+		fill: theme.colors.p500,
 	},
 }));
 
@@ -581,10 +581,7 @@ const ConnectWithSupport: FC = () => {
 
 			<HeroContainer>
 				<div className="d-flex justify-content-center align-items-center">
-					<small
-						className="text-white text-center"
-						dangerouslySetInnerHTML={{ __html: recommendationHtml }}
-					/>
+					<p className="mb-0 text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
 					<Link to="/one-on-one-resources">
 						<InfoIcon className={classes.infoIcon} />
 					</Link>

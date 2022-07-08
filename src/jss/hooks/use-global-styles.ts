@@ -40,8 +40,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			position: 'relative',
 			...theme.fonts.bodyNormal,
 			backgroundColor: theme.colors.background,
-			backgroundImage:
-				'url(/static/images/background-texture@2x.png), url(/static/images/background-shadow@2x.png)',
 			backgroundPosition: 'top left, right 0px',
 			backgroundRepeat: 'repeat, no-repeat',
 			backgroundSize: '100px 100px, 881px 106px',

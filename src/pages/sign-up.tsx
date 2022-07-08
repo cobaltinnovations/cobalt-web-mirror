@@ -61,7 +61,7 @@ const SignUp: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-white text-center">welcome!</h2>
+				<h2 className="mb-0 text-center">welcome!</h2>
 			</HeroContainer>
 			<Container className="pt-4 pb-4">
 				<Row>
