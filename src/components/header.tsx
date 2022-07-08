@@ -1,4 +1,5 @@
 import React, { FC, useState, useContext, useRef, useEffect, useCallback } from 'react';
+import { Button } from 'react-bootstrap';
 
 import { HeaderContext } from '@/contexts/header-context';
 
@@ -9,21 +10,6 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
 import { createUseThemedStyles } from '@/jss/theme';
-
-const headerButton = {
-	top: '50%',
-	width: 64,
-	height: 54,
-	display: 'flex',
-	cursor: 'pointer',
-	position: 'absolute',
-	alignItems: 'center',
-	justifyContent: 'center',
-	transform: 'translateY(-50%)',
-	'&:hover': {
-		backgroundColor: 'rgba(255,255,255,0.12)',
-	},
-};
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -36,44 +22,50 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: theme.colors.p500,
+		backgroundColor: theme.colors.n0,
 	},
 	headerTitle: {
 		...theme.fonts.large,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: theme.colors.n0,
+		color: theme.colors.p500,
 		whiteSpace: 'nowrap',
 		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},
 	menuButton: {
-		...headerButton,
 		left: 0,
+		top: '50%',
+		width: 64,
+		height: 54,
+		display: 'flex',
+		cursor: 'pointer',
+		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'center',
+		transform: 'translateY(-50%)',
+		'&:hover': {
+			backgroundColor: 'rgba(255,255,255,0.12)',
+		},
 	},
 	inCrisisButton: {
-		...headerButton,
-		right: 0,
-		width: 80,
-		paddingTop: 1,
-		color: theme.colors.n0,
-		whiteSpace: 'nowrap',
-		flexDirection: 'column',
-		'& small': {
-			fontSize: '1.2rem',
-			lineHeight: '1.2rem',
-		},
+		right: 20,
+		top: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		position: 'absolute',
+		transform: 'translateY(-50%)',
 	},
 	menuIcon: {
 		'& path': {
-			fill: theme.colors.n0,
+			fill: theme.colors.p500,
 		},
 	},
 	crisisIcon: {
-		marginBottom: 3,
+		marginRight: 4,
 		'& path': {
-			fill: theme.colors.n0,
+			fill: theme.colors.p500,
 		},
 	},
 }));
@@ -148,10 +140,10 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				)}
 				<div className={classes.headerTitle}>{title}</div>
 				{showHeaderButtons && (
-					<div tabIndex={0} className={classes.inCrisisButton} onClick={handleInCrisisButtonClick}>
+					<Button className={classes.inCrisisButton} size="sm" onClick={handleInCrisisButtonClick}>
 						<CrisisIcon className={classes.crisisIcon} />
 						<small className="fw-bold">In Crisis?</small>
-					</div>
+					</Button>
 				)}
 			</header>
 		</>
