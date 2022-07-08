@@ -1,4 +1,5 @@
 const bsPrefixes = {
+	badge: 'cobalt-badge',
 	btn: 'cobalt-button',
 	'form-label': 'cobalt-form__label',
 	'form-control': 'cobalt-form__control',
