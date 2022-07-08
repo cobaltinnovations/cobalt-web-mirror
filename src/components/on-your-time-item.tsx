@@ -10,33 +10,37 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 	onYourTimeItem: {
 		padding: 8,
+		borderRadius: 5,
 		display: 'flex',
 		alignItems: 'center',
 		backgroundColor: theme.colors.n0,
+		boxShadow: '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 	},
 	imageContainer: {
 		flexShrink: 0,
 	},
 	title: {
-		marginBottom: 5,
+		marginBottom: 4,
 		overflow: 'hidden',
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
 	author: {
-		marginBottom: 10,
+		marginBottom: 8,
 		overflow: 'hidden',
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
 	tag: {
-		top: 8,
-		left: 8,
+		top: 4,
+		left: 0,
+		padding: '1px 5px',
 		...theme.fonts.uiSmall,
 		...theme.fonts.bodyBold,
 		color: theme.colors.n0,
 		position: 'absolute',
 		textTransform: 'uppercase',
+		backgroundColor: theme.colors.a500,
 	},
 	informationContainer: {
 		flex: 1,
@@ -64,7 +68,7 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 	return (
 		<div className={classNames(classes.onYourTimeItem, props.className)}>
 			<BackgroundImageContainer
-				size={82}
+				size={80}
 				className={classes.imageContainer}
 				imageUrl={props.imageUrl || placeholderImage}
 			>
@@ -80,10 +84,7 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 
 				<div className="d-flex">
 					<small className="text-muted text-uppercase fw-bold">{props.type}</small>
-
-					{props.duration && (
-						<small className="text-muted text-uppercase fw-bold ms-auto">{props.duration}</small>
-					)}
+					{props.duration && <small className="text-muted text-uppercase ms-auto">{props.duration}</small>}
 				</div>
 			</div>
 		</div>
