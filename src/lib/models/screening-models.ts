@@ -67,3 +67,5 @@ export interface ScreeningAnswer {
 	created: string;
 	createdDescription: string;
 }
+
+export type ScreeningAnswerSelection = Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>;

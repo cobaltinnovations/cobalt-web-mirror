@@ -1,41 +1,41 @@
 import { OrchestratedRequest } from '@/lib/http-client';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { ScreeningSession, ScreeningSessionDestination, ScreeningSessionDestinationId } from '@/lib/models';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 export interface UseOrchestratedRequestHookOptions {
-	enabled: boolean;
+	initialize: boolean | string;
 }
 
 export function useOrchestratedRequest<T>(
 	req: OrchestratedRequest<T>,
 	options: UseOrchestratedRequestHookOptions = {
-		enabled: true,
+		initialize: true,
 	}
 ) {
-	const { enabled } = options;
+	const { initialize } = options;
 	const [{ fetch, abort, requestComplete }, refetch] = useState(req);
 	const [response, setResponse] = useState<T>();
-	const [isLoading, setIsLoading] = useState(enabled);
-	const [initialPromise, setInitialPromise] = useState<ReturnType<typeof req['fetch']>>();
+	const [isLoading, setIsLoading] = useState(!!initialize);
+
 	const abortedRef = useRef(false);
+	const initialFetchResolver = useRef<(v: T) => void>();
 
 	const doFetch = useCallback(async () => {
 		setIsLoading(true);
 		try {
 			abortedRef.current = false;
 
-			await new Promise((res) => {
-				setTimeout(() => res(1), 2000);
-			});
+			const res = await fetch();
 
-			const promise = fetch();
+			if (initialFetchResolver.current) {
+				initialFetchResolver.current(res);
+				delete initialFetchResolver.current;
+			}
 
-			setInitialPromise((i) => {
-				return i || promise;
-			});
+			setResponse(res);
 
-			setResponse(await promise);
-
-			return promise;
+			return res;
 		} catch (e) {
 			return Promise.reject(e);
 		} finally {
@@ -48,27 +48,98 @@ export function useOrchestratedRequest<T>(
 	}, [fetch]);
 
 	const initialFetch = useCallback(() => {
-		return initialPromise || doFetch();
-	}, [doFetch, initialPromise]);
+		if (initialize) {
+			return new Promise((res) => {
+				initialFetchResolver.current = res;
+			});
+		}
+	}, [initialize]);
 
 	useEffect(() => {
-		if (enabled) {
-			initialFetch();
+		if (initialize) {
+			doFetch();
 		}
-	}, [enabled, initialFetch]);
+	}, [doFetch, initialize]);
 
 	useEffect(() => {
 		return () => {
-			if (enabled && !requestComplete) {
+			if (initialize && !requestComplete) {
 				abort();
 			}
 		};
-	}, [abort, enabled, requestComplete]);
+	}, [abort, initialize, requestComplete]);
 
 	return {
 		response,
 		refetch,
 		isLoading,
 		initialFetch,
+	};
+}
+
+export function useScreeningNavigation() {
+	const history = useHistory<{
+		routedClinicIds?: string[];
+		routedProviderId?: string;
+		routedSupportRoleIds?: string[];
+	}>();
+
+	const navigateToDestination = useCallback(
+		(destination: ScreeningSessionDestination, state?: Record<string, any>) => {
+			switch (destination.screeningSessionDestinationId) {
+				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
+				default: {
+					const params = new URLSearchParams({});
+
+					const clinicIds = history.location.state?.routedClinicIds ?? [];
+					const providerId = history.location.state?.routedProviderId;
+					const supportRoleIds = history.location.state?.routedSupportRoleIds ?? [];
+
+					if (Array.isArray(clinicIds)) {
+						for (const clinicId of clinicIds) {
+							params.append('clinicId', clinicId);
+						}
+					}
+
+					if (providerId) {
+						params.append('providerId', providerId);
+					}
+
+					if (Array.isArray(supportRoleIds)) {
+						for (const supportRoleId of supportRoleIds) {
+							params.append('supportRoleId', supportRoleId);
+						}
+					}
+
+					history.push(`/connect-with-support${params.toString() ? `?${params.toString()}` : ''}`, state);
+					return;
+				}
+			}
+		},
+		[history]
+	);
+
+	const navigateToQuestion = useCallback(
+		(contextId: string) => {
+			history.push(`/screening-questions/${contextId}`, history.location.state);
+		},
+		[history]
+	);
+
+	const navigateToNext = useCallback(
+		(session: ScreeningSession) => {
+			if (session?.nextScreeningQuestionContextId) {
+				navigateToQuestion(session.nextScreeningQuestionContextId);
+			} else if (session?.screeningSessionDestination) {
+				navigateToDestination(session.screeningSessionDestination);
+			}
+		},
+		[navigateToDestination, navigateToQuestion]
+	);
+
+	return {
+		navigateToDestination,
+		navigateToQuestion,
+		navigateToNext,
 	};
 }

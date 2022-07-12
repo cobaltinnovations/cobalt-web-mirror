@@ -37,7 +37,6 @@ const OnYourTimeDetail = React.lazy(() => import('@/pages/on-your-time-detail'))
 const Covid19Resources = React.lazy(() => import('@/pages/covid-19-resources'));
 const WellBeingResources = React.lazy(() => import('@/pages/well-being-resources'));
 const Privacy = React.lazy(() => import('@/pages/privacy'));
-const WeeklyAssessment = React.lazy(() => import('@/pages/weekly-assessment'));
 const IntakeAssessment = React.lazy(() => import('@/pages/intake-assessment'));
 const OneOnOneResources = React.lazy(() => import('@/pages/one-on-one-resources'));
 const ConnectWithSupport = React.lazy(() => import('@/pages/connect-with-support'));
@@ -63,6 +62,8 @@ const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
 const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
 const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
 const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
+const ScreeningFlows = React.lazy(() => import('@/pages/screening/screening-flows'));
+const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
 const Interaction = React.lazy(() => import('@/pages/interaction'));
 const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 
@@ -307,14 +308,6 @@ export const Routes = [
 		main: RedirectToSupport,
 	},
 	{
-		path: '/weekly-assessment',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps) => isInstitutionSupportEnabledRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: WeeklyAssessment,
-	},
-	{
 		path: '/intake-assessment',
 		exact: true,
 		private: true,
@@ -359,6 +352,18 @@ export const Routes = [
 		checkEnabled: isProviderRouteGuard,
 		header: (): ReactElement => <Header />,
 		main: MySchedule,
+	},
+	{
+		path: '/screening-flows/:screeningFlowId',
+		private: true,
+		header: (): ReactElement => <Header />,
+		main: ScreeningFlows,
+	},
+	{
+		path: '/screening-questions/:screeningQuestionContextId',
+		private: true,
+		header: (): ReactElement => <Header />,
+		main: ScreeningQuestions,
 	},
 	{
 		path: '/appointments/:appointmentId',

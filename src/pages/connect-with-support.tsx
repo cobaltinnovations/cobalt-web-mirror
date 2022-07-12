@@ -109,7 +109,7 @@ const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('connect with support');
 	const classes = useConnectWithSupportStyles();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 
 	const location = useLocation();
 	const history = useHistory<HistoryLocationState>();
@@ -282,15 +282,19 @@ const ConnectWithSupport: FC = () => {
 	useEffect(() => {
 		const isImmediate = Cookies.get('immediateAccess');
 
-		if (!isImmediate && !skipAssessment && didInit && !assessmentScore) {
+		if (institution?.providerTriageScreeningFlowId && !isImmediate && !skipAssessment && didInit) {
 			const urlQuery = new URLSearchParams(location.search);
 			const routedClinicIds = urlQuery.getAll('clinicId');
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 
-			history.replace('/weekly-assessment', { routedClinicIds, routedProviderId, routedSupportRoleIds });
+			history.replace(`/screening-flows/${institution.providerTriageScreeningFlowId}`, {
+				routedClinicIds,
+				routedProviderId,
+				routedSupportRoleIds,
+			});
 		}
-	}, [assessmentScore, didInit, history, location.search, skipAssessment]);
+	}, [didInit, history, institution?.providerTriageScreeningFlowId, location.search, skipAssessment]);
 
 	const institutionId = account?.institutionId ?? '';
 	useEffect(() => {

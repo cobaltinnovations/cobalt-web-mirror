@@ -45,4 +45,22 @@ export const screeningService = {
 			url: `/screening-question-contexts/${screeningQuestionContextId}`,
 		});
 	},
+
+	answerQuestion(
+		screeningQuestionContextId: string,
+		answers: Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>[]
+	) {
+		return httpSingleton.orchestrateRequest<{
+			screeningAnswers: ScreeningAnswer[];
+			nextScreeningQuestionContextId?: string;
+			screeningSessionDestination?: ScreeningSessionDestination;
+		}>({
+			method: 'post',
+			url: '/screening-answers',
+			data: {
+				screeningQuestionContextId,
+				answers,
+			},
+		});
+	},
 };
