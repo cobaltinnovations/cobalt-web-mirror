@@ -2,6 +2,9 @@ import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
+import useHandleError from '@/hooks/use-handle-error';
+import { accountService } from '@/lib/services';
 
 const useCollectPhoneModalStyles = createUseStyles({
 	collectPhoneNumberModal: {
@@ -12,22 +15,41 @@ const useCollectPhoneModalStyles = createUseStyles({
 });
 
 interface CollectPhoneModalProps extends ModalProps {
-	onSubmit(phoneNumber: string): void;
+	onSkip(): void;
+	onSuccess(): void;
 }
 
-const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSubmit, ...props }) => {
+const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...props }) => {
+	const handleError = useHandleError();
 	const classes = useCollectPhoneModalStyles();
+	const { account, setAccount } = useAccount();
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>('');
 
 	return (
-		<Modal {...props} dialogClassName={classes.collectPhoneNumberModal} centered>
+		<Modal {...props} dialogClassName={classes.collectPhoneNumberModal} centered onHide={() => onSkip()}>
 			<Modal.Header closeButton>
 				<Modal.Title>take our assessment</Modal.Title>
 			</Modal.Header>
 			<Form
-				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+				onSubmit={async (e) => {
 					e.preventDefault();
-					onSubmit(phoneNumberInputValue);
+
+					if (!account) {
+						return;
+					}
+
+					try {
+						const accountResponse = await accountService
+							.updatePhoneNumberForAccountId(account.accountId, {
+								phoneNumber: phoneNumberInputValue,
+							})
+							.fetch();
+
+						setAccount(accountResponse.account);
+						onSuccess();
+					} catch (error) {
+						handleError(error);
+					}
 				}}
 			>
 				<Modal.Body>
@@ -52,7 +74,9 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSubmit, ...props }) =
 							type="button"
 							variant="outline-primary"
 							size="sm"
-							onClick={props.onHide}
+							onClick={() => {
+								onSkip();
+							}}
 						>
 							skip for now
 						</Button>

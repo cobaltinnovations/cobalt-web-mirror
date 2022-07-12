@@ -181,30 +181,14 @@ const WeeklyAssessment: FC = () => {
 		<>
 			<CollectPhoneModal
 				show={showPhoneModal}
-				onHide={() => {
-					if (account?.phoneNumber) {
-						setShowPhoneModal(false);
-					} else {
-						history.push(SUPPORT_ROUTE, { skipAssessment: true });
-					}
+				onSkip={() => {
+					history.push(SUPPORT_ROUTE, { skipAssessment: true });
 				}}
-				onSubmit={async (phoneNumber) => {
-					if (!account) return;
-
-					try {
-						const accountResponse = await accountService
-							.updatePhoneNumberForAccountId(account?.accountId, {
-								phoneNumber,
-							})
-							.fetch();
-
-						setAccount(accountResponse.account);
-						setShowPhoneModal(false);
-					} catch (error) {
-						handleError(error);
-					}
+				onSuccess={() => {
+					setShowPhoneModal(false);
 				}}
 			/>
+
 			<AsyncPage fetchData={fetchData}>
 				<ProgressBar
 					current={assessment?.assessmentProgress || 0}
