@@ -5,7 +5,7 @@ import useQuery from '@/hooks/use-query';
 import { ERROR_CODES } from '@/lib/http-client';
 import { ScreeningSession } from '@/lib/models';
 import { screeningService } from '@/lib/services';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
@@ -29,6 +29,10 @@ const ScreeningFlowsPage = () => {
 		}
 	);
 
+	const incompleteSessions = useMemo(() => {
+		return response?.screeningSessions.filter((session) => !session.completed) ?? [];
+	}, [response?.screeningSessions]);
+
 	const createFlowSession = useCallback(() => {
 		const create = screeningService.createScreeningSession({ screeningFlowId, targetAccountId });
 
@@ -44,7 +48,7 @@ const ScreeningFlowsPage = () => {
 			});
 	}, [handleError, screeningFlowId, targetAccountId]);
 
-	const shouldCreateNewSession = response?.screeningSessions.length === 0;
+	const shouldCreateNewSession = incompleteSessions.length === 0;
 	useEffect(() => {
 		if (!shouldCreateNewSession) {
 			return;
@@ -53,14 +57,14 @@ const ScreeningFlowsPage = () => {
 		createFlowSession();
 	}, [createFlowSession, shouldCreateNewSession]);
 
-	const shouldDefaultSelectOnlySession = response?.screeningSessions.length === 1;
+	const shouldDefaultSelectOnlySession = incompleteSessions.length === 1;
 	useEffect(() => {
 		if (!shouldDefaultSelectOnlySession) {
 			return;
 		}
 
-		setSelectedSession(response?.screeningSessions[0]);
-	}, [response?.screeningSessions, shouldDefaultSelectOnlySession]);
+		setSelectedSession(incompleteSessions[0]);
+	}, [incompleteSessions, shouldDefaultSelectOnlySession]);
 
 	useEffect(() => {
 		if (selectedSession?.promptForPhoneNumber) {
@@ -113,39 +117,17 @@ const ScreeningFlowsPage = () => {
 						);
 					})}
 
-				<div className="text-center my-8">
-					<Button
-						onClick={() => {
-							createFlowSession();
-						}}
-					>
-						Create New
-					</Button>
-				</div>
-				<pre>{JSON.stringify({ isLoading, screeningFlowId, response }, null, 4)}</pre>
-				<p>Grab flow id from url params</p>
-
-				<p>
-					the /screening-flows/:screeningFlowId page shows a spinner and makes a GET /screening-sessions call
-					to BE with the flow ID.
-				</p>
-
-				<p>
-					If there are no screening sessions available for the flow ID, call POST /screening-sessions and
-					check the API response for collectPhoneNumber.
-				</p>
-				<ul>
-					<li>
-						If true, show popup to collect it and save it, then redirect to FE GET
-						/screening-question-contexts/screeningQuestionContextId (or whatever your “show this question”
-						endpoint is)
-					</li>
-					<li>
-						If there is one or more screening session that is not complete, show list of them with created
-						time and link to “continue” next to each, or a “start new” below. Use same collectPhoneNumber
-						logic as above.
-					</li>
-				</ul>
+				{incompleteSessions.length > 1 && (
+					<div className="text-center my-8">
+						<Button
+							onClick={() => {
+								createFlowSession();
+							}}
+						>
+							Create New
+						</Button>
+					</div>
+				)}
 			</Container>
 		</AsyncPage>
 	);

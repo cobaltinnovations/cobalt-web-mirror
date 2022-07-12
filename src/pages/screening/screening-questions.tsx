@@ -62,6 +62,7 @@ const ScreeningQuestionsPage = () => {
 			case ScreeningAnswerFormatId.SINGLE_SELECT:
 				return (
 					<ToggleButtonGroup
+						className="d-flex flex-column"
 						type="radio"
 						name="screeningAnswerOptionId"
 						value={selectedAnswers}
@@ -75,6 +76,7 @@ const ScreeningQuestionsPage = () => {
 									id={option.screeningAnswerOptionId}
 									key={option.screeningAnswerOptionId}
 									value={option.screeningAnswerOptionId}
+									className="mb-2"
 									checked={
 										!!selectedAnswers.find(
 											(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
@@ -90,6 +92,7 @@ const ScreeningQuestionsPage = () => {
 			case ScreeningAnswerFormatId.MULTI_SELECT:
 				return (
 					<ToggleButtonGroup
+						className="d-flex flex-column"
 						type="checkbox"
 						name="screeningAnswerOptionId"
 						value={selectedAnswers}
@@ -104,6 +107,7 @@ const ScreeningQuestionsPage = () => {
 									name={option.screeningAnswerOptionId}
 									key={option.screeningAnswerOptionId}
 									value={option.screeningAnswerOptionId}
+									className="mb-2"
 									checked={
 										!!selectedAnswers.find(
 											(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
