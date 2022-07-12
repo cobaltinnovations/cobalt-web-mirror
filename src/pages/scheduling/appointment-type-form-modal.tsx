@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { PatientIntakeQuestion, SchedulingAppointmentType, ScreeningQuestion } from '@/lib/models';
+import { PatientIntakeQuestion, SchedulingAppointmentType, IntakeScreeningQuestion } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
@@ -109,7 +109,7 @@ export const AppointmentTypeFormModal = ({
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
 	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([]);
-	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
+	const [screeningQuestions, setScreeningQuestions] = useState<IntakeScreeningQuestion[]>([]);
 
 	const handleOnEnter = useCallback(async () => {
 		if (!appointmentTypeId) {

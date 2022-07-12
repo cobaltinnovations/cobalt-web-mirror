@@ -13,3 +13,4 @@ export * from './interaction-models';
 export * from './provider';
 export * from './roles';
 export * from './scheduling-models';
+export * from './screening-models';
