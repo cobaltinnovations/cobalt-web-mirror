@@ -245,9 +245,11 @@ export const AppointmentTypeFormModal = ({
 
 				<Form.Group className="mb-5">
 					<Form.Label style={{ ...theme.fonts.default }}>Visit Type:</Form.Label>
-					<Select
+					<InputHelper
+						label="Visit Type"
 						value={visitTypeId}
-						onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+						as="select"
+						onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
 							setVisitTypeId(event.target.value as VisitType)
 						}
 					>
@@ -258,7 +260,7 @@ export const AppointmentTypeFormModal = ({
 								</option>
 							);
 						})}
-					</Select>
+					</InputHelper>
 				</Form.Group>
 
 				<Form.Group className="mb-5">
@@ -443,30 +445,30 @@ export const AppointmentTypeFormModal = ({
 				</div>
 			</Modal.Body>
 
-			<Modal.Footer className="border-top pt-5">
-				<div>
-					{appointmentTypeId && (
-						<Button size="sm" variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
-							delete
+			<Modal.Footer>
+				<div className="d-flex align-items-center justify-content-between">
+					<div>
+						{appointmentTypeId && (
+							<Button variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
+								delete
+							</Button>
+						)}
+					</div>
+					<div>
+						<Button
+							variant="outline-primary"
+							onClick={() => {
+								if (modalProps?.onHide) {
+									modalProps.onHide();
+								}
+							}}
+						>
+							cancel
 						</Button>
-					)}
-				</div>
-				<div>
-					<Button
-						className="me-2"
-						size="sm"
-						variant="outline-primary"
-						onClick={() => {
-							if (modalProps?.onHide) {
-								modalProps.onHide();
-							}
-						}}
-					>
-						cancel
-					</Button>
-					<Button size="sm" variant="outline" onClick={handleSaveButtonClick}>
-						save
-					</Button>
+						<Button className="ms-2" variant="outline" onClick={handleSaveButtonClick}>
+							save
+						</Button>
+					</div>
 				</div>
 			</Modal.Footer>
 		</Modal>
