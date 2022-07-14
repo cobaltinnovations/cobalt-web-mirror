@@ -2,38 +2,43 @@ import React, { FC } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import useSubdomain from '@/hooks/use-subdomain';
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import { accountService } from '@/lib/services';
-
-import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
+import useSubdomain from '@/hooks/use-subdomain';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
+import { ReactComponent as Logo } from '@/assets/logos/logo-small.svg';
+import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
-	logoIconText: {
-		'& path': {
-			fill: theme.colors.p500,
+	signInOuter: {
+		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
+	},
+	signIn: {
+		paddingTop: 96,
+		[mediaQueries.lg]: {
+			paddingTop: 32,
 		},
+	},
+	illustration: {
+		height: 'auto',
+		maxWidth: '100%',
 	},
 }));
 
 const SignIn: FC = () => {
-	useHeaderTitle(null);
-
 	const handleError = useHandleError();
 	const { accountSources, subdomainInstitution } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const history = useHistory();
 
-	async function handleEnterAnonymouslyButtonClick() {
+	const handleEnterAnonymouslyButtonClick = async () => {
 		try {
 			const { accessToken } = await accountService
 				.createAnonymousAccount({
-					...(subdomain ? { subdomain } : {}),
+					...(subdomain && { subdomain }),
 				})
 				.fetch();
 
@@ -44,22 +49,24 @@ const SignIn: FC = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}
+	};
 
 	return (
-		<Container className="pt-20">
-			<Row>
-				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-					<div className="d-flex justify-content-center mb-12">
-						<LogoIconText className={classes.logoIconText} />
-					</div>
+		<Container fluid className={classes.signInOuter}>
+			<Container className={classes.signIn}>
+				<Row>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<div className="mb-6 text-center">
+							<Logo className="text-primary" />
+						</div>
+						<h3 className="mb-4 text-center">Connecting you to mental health resources.</h3>
+						<p className="mb-8 text-center">
+							Find the right level of mental healthcare, personalized for you.
+						</p>
 
-					<p className="mb-2 text-center fs-large font-heading-bold">Sign in</p>
-					<>
 						{subdomainInstitution?.ssoEnabled && (
-							<div className="d-flex text-center mb-3 px-5">
+							<div className="text-center mb-3">
 								<Button
-									className="flex-fill"
 									variant="primary"
 									onClick={() => {
 										if (accountSources && accountSources.length === 1) {
@@ -70,39 +77,34 @@ const SignIn: FC = () => {
 										}
 									}}
 								>
-									with my Single-Sign-On Account
+									Sign in with my single-sign-on account
 								</Button>
 							</div>
 						)}
 
 						{subdomainInstitution?.emailEnabled && (
-							<div className="d-flex text-center mb-3 px-5">
+							<div className="text-center mb-3">
 								<Button
-									className="flex-fill"
-									variant="outline-primary"
+									variant="primary"
 									onClick={() => {
 										history.push('/sign-in-email');
 									}}
 								>
-									with my email
+									Sign in with my email
 								</Button>
 							</div>
 						)}
 
 						{subdomainInstitution?.anonymousEnabled && (
-							<div className="d-flex text-center mb-3 px-5">
-								<Button
-									className="flex-fill"
-									variant="outline-primary"
-									onClick={handleEnterAnonymouslyButtonClick}
-								>
-									anonymously
+							<div className="text-center">
+								<Button variant="link" onClick={handleEnterAnonymouslyButtonClick}>
+									Browse all resources anonymously
 								</Button>
 							</div>
 						)}
 
 						{subdomainInstitution?.emailEnabled && (
-							<div className="text-center mb-3 px-5">
+							<div className="text-center">
 								<Button
 									variant="link"
 									onClick={() => {
@@ -113,9 +115,16 @@ const SignIn: FC = () => {
 								</Button>
 							</div>
 						)}
-					</>
-				</Col>
-			</Row>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<div className="text-center">
+							<AppointmentIllustration className={classes.illustration} />
+						</div>
+					</Col>
+				</Row>
+			</Container>
 		</Container>
 	);
 };
