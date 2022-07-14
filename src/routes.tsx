@@ -23,6 +23,7 @@ const Onboarding = React.lazy(() => import('@/pages/onboarding'));
 const SignUp = React.lazy(() => import('@/pages/sign-up'));
 const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 const SignIn = React.lazy(() => import('@/pages/sign-in'));
+const SignIn2 = React.lazy(() => import('@/pages/sign-in-2'));
 const SignInSSO = React.lazy(() => import('@/pages/sign-in-sso'));
 const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
 const Auth = React.lazy(() => import('@/pages/auth'));
@@ -162,6 +163,13 @@ export const Routes = [
 		private: false,
 		header: HeaderUnauthenticated,
 		main: SignIn,
+	},
+	{
+		path: '/sign-in-2',
+		exact: true,
+		private: false,
+		header: HeaderUnauthenticated,
+		main: SignIn2,
 	},
 	{
 		path: '/sign-in-sso',

@@ -29,7 +29,7 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
-	const { accountSources, subdomainInstitution } = useAccount();
+	const { subdomainInstitution } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const history = useHistory();
@@ -64,54 +64,22 @@ const SignIn: FC = () => {
 							Find the right level of mental healthcare, personalized for you.
 						</p>
 
-						{subdomainInstitution?.ssoEnabled && (
-							<div className="text-center mb-3">
-								<Button
-									variant="primary"
-									onClick={() => {
-										if (accountSources && accountSources.length === 1) {
-											const firstAccountSource = accountSources[0];
-											window.location.href = firstAccountSource.ssoUrl;
-										} else {
-											history.push('/sign-in-sso');
-										}
-									}}
-								>
-									Sign in with my single-sign-on account
-								</Button>
-							</div>
-						)}
-
-						{subdomainInstitution?.emailEnabled && (
-							<div className="text-center mb-3">
-								<Button
-									variant="primary"
-									onClick={() => {
-										history.push('/sign-in-email');
-									}}
-								>
-									Sign in with my email
-								</Button>
-							</div>
-						)}
+						<div className="text-center mb-3">
+							<Button
+								className="d-block w-100"
+								variant="primary"
+								onClick={() => {
+									history.push('/sign-in-2');
+								}}
+							>
+								Sign in
+							</Button>
+						</div>
 
 						{subdomainInstitution?.anonymousEnabled && (
 							<div className="text-center">
 								<Button variant="link" onClick={handleEnterAnonymouslyButtonClick}>
 									Browse all resources anonymously
-								</Button>
-							</div>
-						)}
-
-						{subdomainInstitution?.emailEnabled && (
-							<div className="text-center">
-								<Button
-									variant="link"
-									onClick={() => {
-										history.push('/sign-up');
-									}}
-								>
-									sign up
 								</Button>
 							</div>
 						)}
