@@ -7,6 +7,7 @@ import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import useQuery from '@/hooks/use-query';
 import Header from '@/components/header';
+import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
 	ProviderManagementBluejeansConnection,
@@ -159,6 +160,7 @@ export const Routes = [
 		path: '/sign-in',
 		exact: true,
 		private: false,
+		header: HeaderUnauthenticated,
 		main: SignIn,
 	},
 	{
