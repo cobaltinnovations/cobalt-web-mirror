@@ -40,7 +40,7 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
-import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
+import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
 import { BookingContext, SearchResult, BookingFilters, BookingSource } from '@/contexts/booking-context';
@@ -109,7 +109,7 @@ const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('connect with support');
 	const classes = useConnectWithSupportStyles();
-	const { account, institution } = useAccount();
+	const { account, subdomainInstitution } = useAccount();
 
 	const location = useLocation();
 	const history = useHistory<HistoryLocationState>();
@@ -120,6 +120,7 @@ const ConnectWithSupport: FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
+	const [hasScreening, setHasScreening] = useState(false);
 
 	const [recentProviders, setRecentProviders] = useState<SearchResult[]>([]);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -282,27 +283,41 @@ const ConnectWithSupport: FC = () => {
 	useEffect(() => {
 		const isImmediate = Cookies.get('immediateAccess');
 
-		if (institution?.providerTriageScreeningFlowId && !isImmediate && !skipAssessment && didInit) {
+		if (
+			subdomainInstitution?.providerTriageScreeningFlowId &&
+			!isImmediate &&
+			!skipAssessment &&
+			didInit &&
+			!hasScreening
+		) {
 			const urlQuery = new URLSearchParams(location.search);
 			const routedClinicIds = urlQuery.getAll('clinicId');
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 
-			history.replace(`/screening-flows/${institution.providerTriageScreeningFlowId}`, {
+			history.replace(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
 				routedClinicIds,
 				routedProviderId,
 				routedSupportRoleIds,
 			});
 		}
-	}, [didInit, history, institution?.providerTriageScreeningFlowId, location.search, skipAssessment]);
+	}, [
+		didInit,
+		history,
+		subdomainInstitution?.providerTriageScreeningFlowId,
+		location.search,
+		skipAssessment,
+		hasScreening,
+	]);
 
 	const institutionId = account?.institutionId ?? '';
+	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
 	useEffect(() => {
 		const urlQuery = new URLSearchParams(location.search);
 		const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 		const routedClinicIds = urlQuery.getAll('clinicId');
 
-		if (didInit || !institutionId) {
+		if (didInit || !institutionId || !providerTriageScreeningFlowId) {
 			return () => {
 				if (routedClinicIds) {
 					setSelectedSearchResult([]);
@@ -315,18 +330,23 @@ const ConnectWithSupport: FC = () => {
 			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
+		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
+			screeningFlowId: providerTriageScreeningFlowId,
+		});
 
 		async function init() {
 			try {
-				const [findOptions, recent] = await Promise.all([
+				const [findOptions, recent, screenings] = await Promise.all([
 					findOptionsRequest.fetch(),
 					fetchRecentRequest.fetch(),
+					fetchScreeningsRequest.fetch(),
 				]);
 
 				unstable_batchedUpdates(() => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
 					setFindOptions(findOptions);
 					setFilterDefaults(findOptions, preserveFilters);
+					setHasScreening(screenings.screeningSessions.some((session) => session.completed));
 					setDidInit(true);
 				});
 			} catch (e) {
@@ -350,6 +370,7 @@ const ConnectWithSupport: FC = () => {
 		handleError,
 		institutionId,
 		setSelectedSearchResult,
+		providerTriageScreeningFlowId,
 	]);
 
 	useEffect(() => {

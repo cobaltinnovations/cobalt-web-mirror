@@ -30,7 +30,7 @@ const ScreeningFlowsPage = () => {
 	);
 
 	const incompleteSessions = useMemo(() => {
-		return response?.screeningSessions.filter((session) => !session.completed) ?? [];
+		return response?.screeningSessions.filter((session) => !session.completed);
 	}, [response?.screeningSessions]);
 
 	const createFlowSession = useCallback(() => {
@@ -48,7 +48,7 @@ const ScreeningFlowsPage = () => {
 			});
 	}, [handleError, screeningFlowId, targetAccountId]);
 
-	const shouldCreateNewSession = incompleteSessions.length === 0;
+	const shouldCreateNewSession = Array.isArray(incompleteSessions) && incompleteSessions.length === 0;
 	useEffect(() => {
 		if (!shouldCreateNewSession) {
 			return;
@@ -57,7 +57,7 @@ const ScreeningFlowsPage = () => {
 		createFlowSession();
 	}, [createFlowSession, shouldCreateNewSession]);
 
-	const shouldDefaultSelectOnlySession = incompleteSessions.length === 1;
+	const shouldDefaultSelectOnlySession = Array.isArray(incompleteSessions) && incompleteSessions.length === 1;
 	useEffect(() => {
 		if (!shouldDefaultSelectOnlySession) {
 			return;
@@ -117,7 +117,7 @@ const ScreeningFlowsPage = () => {
 						);
 					})}
 
-				{incompleteSessions.length > 1 && (
+				{incompleteSessions && incompleteSessions.length > 1 && (
 					<div className="text-center my-8">
 						<Button
 							onClick={() => {
