@@ -38,13 +38,20 @@ const SignIn2 = () => {
 	const query = useQuery();
 	const accountSourceId = query.get('accountSourceId');
 
+	// SSO
 	const [ssoModalIsOpen, setSsoModalIsOpen] = useState(false);
 	const [ssoOptions, setSsoOptions] = useState<AccountSource[]>([]);
 	const [ssoSelectValue, setSsoSelectValue] = useState<string>('');
+
+	// Sign In
 	const [signInForm, setSignInForm] = useState({
 		emailAddress: '',
 		password: '',
 	});
+
+	// Forgot Password
+	const [forgotPasswordModalIsOpen, setForgotPasswordModalIsOpen] = useState(false);
+	const [forgotPasswordEmailAddress, setForgotPasswordEmailAddress] = useState('');
 
 	async function handleSsoModelEnter() {
 		try {
@@ -89,6 +96,19 @@ const SignIn2 = () => {
 				pathname: '/auth',
 				search: '?' + new URLSearchParams({ accessToken }).toString(),
 			});
+		} catch (error) {
+			handleError(error);
+		}
+	}
+
+	async function handleForgotPasswordFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
+		try {
+			await accountService.sendForgotPasswordEmail(forgotPasswordEmailAddress).fetch();
+
+			setForgotPasswordModalIsOpen(false);
+			window.alert('Email sent!');
 		} catch (error) {
 			handleError(error);
 		}
@@ -155,6 +175,48 @@ const SignIn2 = () => {
 				</Modal.Footer>
 			</Modal>
 
+			<Modal
+				show={forgotPasswordModalIsOpen}
+				onHide={() => {
+					setForgotPasswordModalIsOpen(false);
+				}}
+				onEntering={handleSsoModelEnter}
+				centered
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Password reset</Modal.Title>
+				</Modal.Header>
+				<Form onSubmit={handleForgotPasswordFormSubmit}>
+					<Modal.Body>
+						<p className="mb-4">A password reset link will be sent to your email.</p>
+						<InputHelper
+							label="Email address"
+							type="email"
+							value={forgotPasswordEmailAddress}
+							onChange={({ currentTarget }) => {
+								setForgotPasswordEmailAddress(currentTarget.value);
+							}}
+							required
+						/>
+					</Modal.Body>
+					<Modal.Footer>
+						<div className="text-right">
+							<Button
+								variant="outline-primary"
+								onClick={() => {
+									setForgotPasswordModalIsOpen(false);
+								}}
+							>
+								Cancel
+							</Button>
+							<Button className="ms-2" variant="primary" type="submit">
+								Submit
+							</Button>
+						</div>
+					</Modal.Footer>
+				</Form>
+			</Modal>
+
 			<Container fluid className={classes.signInOuter}>
 				<Container className={classes.signIn}>
 					<Row>
@@ -217,7 +279,15 @@ const SignIn2 = () => {
 											required
 										/>
 										<div className="mb-6 text-right">
-											<Link to="/forgot-password">Forgot Password?</Link>
+											<Button
+												className="p-0"
+												variant="link"
+												onClick={() => {
+													setForgotPasswordModalIsOpen(true);
+												}}
+											>
+												Forgot Password?
+											</Button>
 										</div>
 										<Button type="submit" className="w-100 d-block" variant="outline-primary">
 											Sign in
