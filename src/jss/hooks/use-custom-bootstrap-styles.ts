@@ -1,4 +1,4 @@
-import { badge, button, card, form, modal, surveyForm } from '@/jss/bootstrap-theme';
+import { badge, button, card, form, modal, screeningButtonGroup, surveyForm } from '@/jss/bootstrap-theme';
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -51,6 +51,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		...form(theme),
 		...modal(theme),
 		...surveyForm(theme),
+		...screeningButtonGroup(theme),
 
 		/* ----------------------------------------------------------- */
 		/* Generic overrides */

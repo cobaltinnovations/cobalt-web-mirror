@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Container, Form, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
+import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -23,10 +24,20 @@ const ScreeningQuestionsPage = () => {
 		}
 	);
 
-	const [selectedAnswers, setSelectedAnswers] = useState<ScreeningAnswerSelection[]>([]);
+	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 
 	const submitAnswers = useCallback(() => {
-		const submit = screeningService.answerQuestion(screeningQuestionContextId, selectedAnswers);
+		const answers: ScreeningAnswerSelection[] = [
+			...selectedAnswers.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })),
+			...Object.entries(answerText)
+				.filter(([_, text]) => !!text)
+				.map(([screeningAnswerOptionId, text]) => ({
+					screeningAnswerOptionId,
+					text,
+				})),
+		];
+		const submit = screeningService.answerQuestion(screeningQuestionContextId, answers);
 
 		submit
 			.fetch()
@@ -42,7 +53,14 @@ const ScreeningQuestionsPage = () => {
 					handleError(e);
 				}
 			});
-	}, [handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId, selectedAnswers]);
+	}, [
+		answerText,
+		handleError,
+		navigateToDestination,
+		navigateToQuestion,
+		screeningQuestionContextId,
+		selectedAnswers,
+	]);
 
 	useEffect(() => {
 		refetch(screeningService.getScreeningQuestionContext(screeningQuestionContextId));
@@ -50,38 +68,45 @@ const ScreeningQuestionsPage = () => {
 	}, [refetch, screeningQuestionContextId]);
 
 	useEffect(() => {
-		if (!response?.screeningAnswers) {
+		if (!response?.screeningAnswers || !response?.screeningAnswerOptions) {
 			return;
 		}
 
-		setSelectedAnswers(response.screeningAnswers);
-	}, [response?.screeningAnswers]);
+		setSelectedAnswers(response.screeningAnswers.map((answer) => answer.screeningAnswerOptionId));
+		setAnswerText(
+			response.screeningAnswerOptions.reduce((texts, option) => {
+				texts[option.screeningAnswerOptionId] =
+					response.screeningAnswers.find((o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId)
+						?.text ?? '';
+				return texts;
+			}, {} as Record<string, string>)
+		);
+	}, [response?.screeningAnswerOptions, response?.screeningAnswers]);
 
 	const renderedAnswerOptions = useMemo(() => {
 		switch (response?.screeningQuestion.screeningAnswerFormatId) {
-			case ScreeningAnswerFormatId.SINGLE_SELECT:
+			case ScreeningAnswerFormatId.MULTI_SELECT:
 				return (
 					<ToggleButtonGroup
+						bsPrefix="cobalt-screening-button-group"
 						className="d-flex flex-column"
 						type="radio"
 						name="screeningAnswerOptionId"
-						value={selectedAnswers}
+						value={selectedAnswers[0] ?? ''}
 						onChange={(newId) => {
-							setSelectedAnswers([{ screeningAnswerOptionId: newId }]);
+							setSelectedAnswers([newId]);
 						}}
 					>
 						{response.screeningAnswerOptions.map((option) => {
+							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
+
 							return (
 								<ToggleButton
 									id={option.screeningAnswerOptionId}
 									key={option.screeningAnswerOptionId}
 									value={option.screeningAnswerOptionId}
 									className="mb-2"
-									checked={
-										!!selectedAnswers.find(
-											(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
-										)
-									}
+									variant={isChecked ? 'primary' : 'light'}
 								>
 									{option.answerOptionText}
 								</ToggleButton>
@@ -89,31 +114,34 @@ const ScreeningQuestionsPage = () => {
 						})}
 					</ToggleButtonGroup>
 				);
-			case ScreeningAnswerFormatId.MULTI_SELECT:
+
+			case ScreeningAnswerFormatId.SINGLE_SELECT:
 				return (
 					<ToggleButtonGroup
+						bsPrefix="cobalt-screening-button-group"
 						className="d-flex flex-column"
 						type="checkbox"
 						name="screeningAnswerOptionId"
 						value={selectedAnswers}
 						onChange={(newIds) => {
-							setSelectedAnswers(newIds.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })));
+							setSelectedAnswers(newIds);
 						}}
 					>
 						{response.screeningAnswerOptions.map((option) => {
+							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
+
 							return (
 								<ToggleButton
 									id={option.screeningAnswerOptionId}
 									name={option.screeningAnswerOptionId}
 									key={option.screeningAnswerOptionId}
 									value={option.screeningAnswerOptionId}
-									className="mb-2"
-									checked={
-										!!selectedAnswers.find(
-											(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
-										)
-									}
+									className="d-flex align-items-center mb-2"
+									variant={isChecked ? 'primary' : 'light'}
 								>
+									<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
+										{isChecked && <CheckMarkIcon />}
+									</div>
 									{option.answerOptionText}
 								</ToggleButton>
 							);
@@ -124,34 +152,32 @@ const ScreeningQuestionsPage = () => {
 			case ScreeningAnswerFormatId.FREEFORM_TEXT:
 				return response.screeningAnswerOptions.map((option) => (
 					<InputHelper
+						key={option.screeningAnswerOptionId}
 						className="mb-2"
-						label="Facilitator Email"
+						label={option.answerOptionText ?? ''}
 						type="text"
 						name={option.screeningAnswerOptionId}
-						value={
-							selectedAnswers.find((o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId)
-								?.text
-						}
+						value={answerText[option.screeningAnswerOptionId]}
 						onChange={(e) => {
-							setSelectedAnswers((current) =>
-								current.map((o) => {
-									if (o.screeningAnswerOptionId === option.screeningAnswerOptionId) {
-										return {
-											...o,
-											text: e.target.value,
-										};
-									}
-
-									return o;
-								})
-							);
+							setAnswerText((current) => {
+								return {
+									...current,
+									[option.screeningAnswerOptionId]: e.target.value,
+								};
+							});
 						}}
 					/>
 				));
+
 			default:
 				return;
 		}
-	}, [response?.screeningAnswerOptions, response?.screeningQuestion.screeningAnswerFormatId, selectedAnswers]);
+	}, [
+		answerText,
+		response?.screeningAnswerOptions,
+		response?.screeningQuestion.screeningAnswerFormatId,
+		selectedAnswers,
+	]);
 
 	return (
 		<AsyncPage fetchData={initialFetch}>
@@ -162,7 +188,6 @@ const ScreeningQuestionsPage = () => {
 					onSubmit={(e) => {
 						e.preventDefault();
 						submitAnswers();
-						console.log('selected answers', selectedAnswers);
 					}}
 				>
 					{renderedAnswerOptions}

@@ -237,3 +237,74 @@ export const button = (theme: CobaltTheme) => {
 		},
 	};
 };
+
+export const screeningButtonGroup = (theme: CobaltTheme) => {
+	return {
+		'.cobalt-screening-button-group': {
+			'& input[type=checkbox]': {
+				'& + label': {
+					paddingLeft: 15,
+					'& .checkmark-wrapper': {
+						height: 25,
+						width: 25,
+						border: `2px solid ${theme.colors.n300}`,
+						borderRadius: 500,
+						'& svg': {
+							width: 20,
+							height: 20,
+							'& polygon#Shape': {
+								fill: theme.colors.n0,
+							},
+						},
+					},
+					'&:hover': {
+						paddingLeft: '14px !important',
+
+						'& .checkmark-wrapper': {
+							borderColor: theme.colors.p500,
+						},
+					},
+				},
+
+				'&:checked': {
+					'& + label': {
+						'& .checkmark-wrapper': {
+							backgroundColor: theme.colors.p300,
+							borderColor: theme.colors.p300,
+						},
+
+						'&:hover': {
+							'& .checkmark-wrapper': {
+								borderColor: theme.colors.p300,
+							},
+						},
+					},
+				},
+			},
+
+			'& .cobalt-button': {
+				border: `1px solid ${theme.colors.n100}`,
+
+				'&:hover': {
+					padding: '9px 19px',
+					border: `2px solid ${theme.colors.p500}`,
+				},
+
+				'&.cobalt-button-light': {
+					'&:hover': {
+						backgroundColor: theme.colors.n0,
+						color: theme.colors.p500,
+					},
+				},
+
+				'&.cobalt-button-primary': {
+					borderColor: theme.colors.p500,
+
+					'&:hover': {
+						backgroundColor: theme.colors.p500,
+					},
+				},
+			},
+		},
+	};
+};

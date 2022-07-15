@@ -1,3 +1,4 @@
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { OrchestratedRequest } from '@/lib/http-client';
 import { ScreeningSession, ScreeningSessionDestination, ScreeningSessionDestinationId } from '@/lib/models';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -83,10 +84,14 @@ export function useScreeningNavigation() {
 		routedProviderId?: string;
 		routedSupportRoleIds?: string[];
 	}>();
+	const { openInCrisisModal } = useInCrisisModal();
 
 	const navigateToDestination = useCallback(
 		(destination: ScreeningSessionDestination, state?: Record<string, any>) => {
 			switch (destination.screeningSessionDestinationId) {
+				case ScreeningSessionDestinationId.CRISIS:
+					openInCrisisModal(true);
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					const params = new URLSearchParams({});
@@ -116,7 +121,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[history]
+		[history, openInCrisisModal]
 	);
 
 	const navigateToQuestion = useCallback(
