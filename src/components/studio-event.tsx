@@ -12,7 +12,7 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	studioEvent: {
 		borderRadius: 5,
 		overflow: 'hidden',
-		filter: 'drop-shadow(0px 10px 18px rgba(41, 40, 39, 0.15)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
+		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
 	},
 	imageContainer: {
 		paddingBottom: '56.25%',

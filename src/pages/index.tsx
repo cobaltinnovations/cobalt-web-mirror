@@ -8,7 +8,7 @@ import useHeaderTitle from '@/hooks/use-header-title';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
-import Carousel from '@/components/carousel';
+import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent from '@/components/studio-event';
 import OnYourTimeItem from '@/components/on-your-time-item';
 
@@ -60,10 +60,6 @@ const Index: FC = () => {
 		history.push('/connect-with-support');
 	}
 
-	function handleMoreOnYourTimeButtonClick() {
-		history.push('/on-your-time');
-	}
-
 	return (
 		<AsyncPage fetchData={fetchData}>
 			{institution?.supportEnabled && (
@@ -80,51 +76,99 @@ const Index: FC = () => {
 			)}
 
 			{inTheStudioEvents.length > 0 && (
-				<Container className="pt-20">
-					<Row>
-						<Col>
-							<h3 className="mb-4">In the studio</h3>
-							<Carousel
-								description="Explainer text goes here. What is in the studio?"
-								calloutTitle="Explore all"
-								calloutOnClick={() => {
-									history.push('/in-the-studio');
-								}}
-							>
-								{inTheStudioEvents.map((inTheStudioEvent) => {
-									if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
+				<>
+					<Container className="pt-20">
+						<Row>
+							<Col>
+								<h3 className="mb-2">In the studio</h3>
+							</Col>
+						</Row>
+					</Container>
+					<Container>
+						<Row>
+							<Col>
+								<Carousel
+									responsive={responsiveDefaults}
+									description="Explainer text goes here. What is in the studio?"
+									calloutTitle="Explore all"
+									calloutOnClick={() => {
+										history.push('/in-the-studio');
+									}}
+								>
+									{inTheStudioEvents.map((inTheStudioEvent) => {
+										if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
+											return (
+												<Link
+													key={inTheStudioEvent.groupSessionId}
+													className="text-decoration-none"
+													to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
+												>
+													<StudioEvent groupEvent={inTheStudioEvent} />
+												</Link>
+											);
+										}
+
 										return (
 											<Link
-												key={inTheStudioEvent.groupSessionId}
+												key={inTheStudioEvent.groupEventId}
 												className="text-decoration-none"
-												to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
+												to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
 											>
 												<StudioEvent groupEvent={inTheStudioEvent} />
 											</Link>
 										);
-									}
-
-									return (
-										<Link
-											key={inTheStudioEvent.groupEventId}
-											className="text-decoration-none"
-											to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
-										>
-											<StudioEvent groupEvent={inTheStudioEvent} />
-										</Link>
-									);
-								})}
-							</Carousel>
-						</Col>
-					</Row>
-				</Container>
+									})}
+								</Carousel>
+							</Col>
+						</Row>
+					</Container>
+				</>
 			)}
 
-			<Container className="pt-16 pb-8">
+			<Container className="pt-20">
 				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h3 className="mb-4 text-center">On your time</h3>
+					<Col>
+						<h3 className="mb-2">On your time</h3>
+					</Col>
+				</Row>
+			</Container>
+			<Container>
+				<Row>
+					<Col>
+						<Carousel
+							responsive={responsiveDefaults}
+							description="Explainer text goes here. What is on your time?"
+							calloutTitle="Explore all"
+							calloutOnClick={() => {
+								history.push('/on-your-time');
+							}}
+						>
+							{onYourTimeContent.map((onYourOwnTimeItem) => {
+								return (
+									<Link
+										key={onYourOwnTimeItem.contentId}
+										to={`/on-your-time/${onYourOwnTimeItem.contentId}`}
+										className="d-block mb-2 text-decoration-none"
+									>
+										<OnYourTimeItem
+											imageUrl={onYourOwnTimeItem.imageUrl}
+											tag={onYourOwnTimeItem.newFlag ? 'NEW' : ''}
+											title={onYourOwnTimeItem.title}
+											type={onYourOwnTimeItem.contentTypeLabel}
+											author={onYourOwnTimeItem.author}
+											duration={onYourOwnTimeItem.duration}
+										/>
+									</Link>
+								);
+							})}
+						</Carousel>
+					</Col>
+				</Row>
+			</Container>
 
+			<Container className="pb-20">
+				<Row>
+					<Col>
 						<div className="d-flex justify-content-center mb-4">
 							<Button
 								variant="light"
@@ -133,30 +177,6 @@ const Index: FC = () => {
 								}}
 							>
 								Personalize recommendations
-							</Button>
-						</div>
-
-						{onYourTimeContent.map((onYourOwnTimeItem) => {
-							return (
-								<Link
-									key={onYourOwnTimeItem.contentId}
-									to={`/on-your-time/${onYourOwnTimeItem.contentId}`}
-									className="d-block mb-2 text-decoration-none"
-								>
-									<OnYourTimeItem
-										imageUrl={onYourOwnTimeItem.imageUrl}
-										tag={onYourOwnTimeItem.newFlag ? 'NEW' : ''}
-										title={onYourOwnTimeItem.title}
-										type={onYourOwnTimeItem.contentTypeLabel}
-										author={onYourOwnTimeItem.author}
-										duration={onYourOwnTimeItem.duration}
-									/>
-								</Link>
-							);
-						})}
-						<div className="mt-3 text-center">
-							<Button variant="outline-primary" onClick={handleMoreOnYourTimeButtonClick}>
-								More on your time
 							</Button>
 						</div>
 					</Col>
