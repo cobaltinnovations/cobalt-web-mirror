@@ -30,8 +30,10 @@ import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
 import useUrlViewTracking from './hooks/use-url-view-tracking';
-import 'react-datepicker/dist/react-datepicker.css';
 import { CobaltThemeProvider } from './jss/theme';
+
+import 'react-datepicker/dist/react-datepicker.css';
+import 'react-multi-carousel/lib/styles.css';
 
 const AppWithProviders: FC = () => {
 	useGoogleAnalytics();

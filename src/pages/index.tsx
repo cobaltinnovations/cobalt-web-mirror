@@ -1,7 +1,8 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
@@ -9,14 +10,13 @@ import useHeaderTitle from '@/hooks/use-header-title';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
+import Carousel from '@/components/carousel';
 import StudioEvent from '@/components/studio-event';
 import OnYourTimeItem from '@/components/on-your-time-item';
 
 import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
 import { GroupEvent, Content, GroupSessionModel } from '@/lib/models';
 
-import { ReactComponent as ChevronLeft } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as ChevronRight } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -100,68 +100,47 @@ const Index: FC = () => {
 			)}
 
 			{inTheStudioEvents.length > 0 && (
-				<>
-					<Container fluid className={classNames(classes.inTheStudioContainer, 'pt-5')}>
-						<Container>
-							<Row>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<div className="d-flex justify-content-between align-items-center mb-2">
-										<h3 className="mb-0">In the studio</h3>
-										<p className="mb-0 text-primary">
-											<Link to="/in-the-studio">Explore all</Link>
-										</p>
-									</div>
-								</Col>
-							</Row>
-						</Container>
-					</Container>
-					<Container fluid className={classes.inTheStudioContainer}>
-						<Container fluid="md">
-							<Row>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<Carousel prevIcon={<ChevronLeft />} nextIcon={<ChevronRight />}>
-										{inTheStudioEvents.map((inTheStudioEvent) => {
-											if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
-												return (
-													<Carousel.Item key={inTheStudioEvent.groupSessionId}>
-														<Link
-															className="text-decoration-none"
-															to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
-														>
-															<StudioEvent groupEvent={inTheStudioEvent} />
-														</Link>
-													</Carousel.Item>
-												);
-											}
+				<Container className="pt-20">
+					<Row>
+						<Col>
+							<h3 className="mb-4">In the studio</h3>
+							<Carousel
+								description="Explainer text goes here. What is in the studio?"
+								calloutTitle="Explore all"
+								calloutOnClick={() => {
+									history.push('/in-the-studio');
+								}}
+							>
+								{inTheStudioEvents.map((inTheStudioEvent) => {
+									if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
+										return (
+											<Link
+												key={inTheStudioEvent.groupSessionId}
+												className="text-decoration-none"
+												to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
+											>
+												<StudioEvent groupEvent={inTheStudioEvent} />
+											</Link>
+										);
+									}
 
-											return (
-												<Carousel.Item key={inTheStudioEvent.groupEventId}>
-													<Link
-														className="text-decoration-none"
-														to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
-													>
-														<StudioEvent groupEvent={inTheStudioEvent} />
-													</Link>
-												</Carousel.Item>
-											);
-										})}
-									</Carousel>
-								</Col>
-							</Row>
-						</Container>
-					</Container>
-				</>
+									return (
+										<Link
+											key={inTheStudioEvent.groupEventId}
+											className="text-decoration-none"
+											to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
+										>
+											<StudioEvent groupEvent={inTheStudioEvent} />
+										</Link>
+									);
+								})}
+							</Carousel>
+						</Col>
+					</Row>
+				</Container>
 			)}
 
-			<Container className="pt-5 pb-8">
+			<Container className="pt-16 pb-8">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h3 className="mb-4 text-center">On your time</h3>
