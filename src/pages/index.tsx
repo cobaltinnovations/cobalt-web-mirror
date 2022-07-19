@@ -3,8 +3,6 @@ import React, { FC, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import classNames from 'classnames';
-
 import useAccount from '@/hooks/use-account';
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -21,24 +19,6 @@ import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useIndexStyles = createUseThemedStyles((theme) => ({
-	inTheStudioContainer: {
-		backgroundColor: theme.colors.n0,
-	},
-	carouselImage: {
-		width: '100%',
-		paddingBottom: '56.25%',
-		backgroundSize: 'cover',
-		backgroundPosition: 'center',
-		backgroundRepeat: 'no-repeat',
-		backgroundColor: theme.colors.n300,
-	},
-	carouselCaption: {
-		padding: '10px 20px 48px',
-		backgroundColor: theme.colors.n0,
-	},
-	horizontalScrollerTileContent: {
-		padding: 16,
-	},
 	calendarIcon: {
 		top: -1,
 		marginRight: 10,
