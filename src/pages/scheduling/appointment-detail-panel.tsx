@@ -25,7 +25,7 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
-import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -98,11 +98,11 @@ export const AppointmentDetailPanel = ({
 	onAddAppointment,
 	focusDateOnLoad,
 }: AppointmentDetailPanelProps) => {
-	const routeMatch = useRouteMatch();
 	const { account } = useAccount();
 	const { appointmentId } = useParams<{ appointmentId: string }>();
 	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [patient, setPatient] = useState<AccountModel>();
 	const [appointment, setAppointment] = useState<AppointmentModel>();
@@ -113,7 +113,7 @@ export const AppointmentDetailPanel = ({
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!accountId) {
+		if (!accountId || !appointmentId) {
 			return;
 		}
 
@@ -138,9 +138,11 @@ export const AppointmentDetailPanel = ({
 		};
 	}, [accountId, appointmentId, handleError]);
 
-	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
-		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
-	}
+	useEffect(() => {
+		if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
+			navigate(`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`);
+		}
+	}, [appointment?.canceledForReschedule, appointment?.rescheduledAppointmentId, navigate]);
 
 	const showIntakeResponses =
 		!!assessment && Array.isArray(assessment.assessmentQuestions) && assessment.assessmentQuestions.length > 0;
@@ -180,7 +182,7 @@ export const AppointmentDetailPanel = ({
 
 				<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} />
 
-				<Link to={`${routeMatch.url}/edit`}>
+				<Link to={'edit'}>
 					<Button variant="primary" size="sm" className="px-2">
 						<EditIcon />
 					</Button>

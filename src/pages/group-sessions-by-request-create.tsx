@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useCallback, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
@@ -51,7 +51,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 	const { account } = useAccount();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);
 	const [sessionCropModalImageSource, setSessionCropModalImageSource] = useState('');
 	const [imagePreview, setImagePreview] = useState('');
@@ -122,9 +122,9 @@ const GroupSessionsByRequestCreate: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
-				history.push('/group-sessions/by-request');
+				navigate('/group-sessions/by-request');
 			} else {
-				history.push('/in-the-studio-thanks');
+				navigate('/in-the-studio-thanks');
 			}
 		} catch (error) {
 			handleError(error);

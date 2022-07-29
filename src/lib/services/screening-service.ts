@@ -14,7 +14,7 @@ type ScreeningSessionParams = {
 };
 
 export const screeningService = {
-	getScreeningSessionsByFlowId(params: ScreeningSessionParams) {
+	getScreeningSessionsByFlowId(params: Partial<ScreeningSessionParams>) {
 		if (typeof params.targetAccountId !== 'string') {
 			delete params.targetAccountId;
 		}
@@ -33,7 +33,7 @@ export const screeningService = {
 		});
 	},
 
-	getScreeningQuestionContext(screeningQuestionContextId: string) {
+	getScreeningQuestionContext(screeningQuestionContextId?: string) {
 		return httpSingleton.orchestrateRequest<{
 			previousScreeningQuestionContextId: string;
 			screeningQuestion: ScreeningQuestion;
@@ -42,7 +42,7 @@ export const screeningService = {
 			screeningSessionDestination: ScreeningSessionDestination;
 		}>({
 			method: 'get',
-			url: `/screening-question-contexts/${screeningQuestionContextId}`,
+			url: `/screening-question-contexts/${screeningQuestionContextId || ''}`,
 		});
 	},
 

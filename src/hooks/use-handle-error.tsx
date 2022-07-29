@@ -1,5 +1,5 @@
 import { useCallback, useContext } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import { ErrorConfig } from '@/lib/http-client';
 import { isErrorConfig } from '@/lib/utils/error-utils';
@@ -8,7 +8,7 @@ import { ErrorModalContext } from '@/contexts/error-modal-context';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 
 function useHandleError(): (error: ErrorConfig | unknown) => void {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { setShow, setError } = useContext(ErrorModalContext);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
 
@@ -25,7 +25,7 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 						return;
 					}
 
-					history.replace('/sign-in');
+					navigate('/sign-in', { replace: true });
 					return;
 				} else {
 					setShow(true);
@@ -33,7 +33,7 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 				}
 			}
 		},
-		[history, setSignOnUrl, setShowReauthModal, setShow, setError]
+		[navigate, setSignOnUrl, setShowReauthModal, setShow, setError]
 	);
 
 	return handleError;

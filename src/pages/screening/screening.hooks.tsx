@@ -2,7 +2,7 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { OrchestratedRequest } from '@/lib/http-client';
 import { ScreeningSession, ScreeningSessionDestination, ScreeningSessionDestinationId } from '@/lib/models';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export interface UseOrchestratedRequestHookOptions {
 	initialize: boolean | string;
@@ -78,12 +78,15 @@ export function useOrchestratedRequest<T>(
 	};
 }
 
+interface HistoryLocationState {
+	routedClinicIds?: string[];
+	routedProviderId?: string;
+	routedSupportRoleIds?: string[];
+}
+
 export function useScreeningNavigation() {
-	const history = useHistory<{
-		routedClinicIds?: string[];
-		routedProviderId?: string;
-		routedSupportRoleIds?: string[];
-	}>();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { openInCrisisModal } = useInCrisisModal();
 
 	const navigateToDestination = useCallback(
@@ -96,9 +99,10 @@ export function useScreeningNavigation() {
 				default: {
 					const params = new URLSearchParams({});
 
-					const clinicIds = history.location.state?.routedClinicIds ?? [];
-					const providerId = history.location.state?.routedProviderId;
-					const supportRoleIds = history.location.state?.routedSupportRoleIds ?? [];
+					const locationState = location.state as HistoryLocationState;
+					const clinicIds = locationState?.routedClinicIds ?? [];
+					const providerId = locationState?.routedProviderId;
+					const supportRoleIds = locationState?.routedSupportRoleIds ?? [];
 
 					if (Array.isArray(clinicIds)) {
 						for (const clinicId of clinicIds) {
@@ -116,19 +120,19 @@ export function useScreeningNavigation() {
 						}
 					}
 
-					history.push(`/connect-with-support${params.toString() ? `?${params.toString()}` : ''}`, state);
+					navigate(`/connect-with-support${params.toString() ? `?${params.toString()}` : ''}`, { state });
 					return;
 				}
 			}
 		},
-		[history, openInCrisisModal]
+		[location.state, navigate, openInCrisisModal]
 	);
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
-			history.push(`/screening-questions/${contextId}`, history.location.state);
+			navigate(`/screening-questions/${contextId}`, { state: location.state });
 		},
-		[history]
+		[location.state, navigate]
 	);
 
 	const navigateToNext = useCallback(

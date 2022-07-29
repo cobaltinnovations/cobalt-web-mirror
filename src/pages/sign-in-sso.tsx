@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 import useSubdomain from '@/hooks/use-subdomain';
@@ -16,7 +16,7 @@ import HeroContainer from '@/components/hero-container';
 
 const SignInSSO: FC = () => {
 	const subdomain = useSubdomain();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [ssoOptions, setSsoOptions] = useState<AccountSource[]>([]);
 	const [ssoSelectValue, setSsoSelectValue] = useState<string>('');
@@ -57,11 +57,7 @@ const SignInSSO: FC = () => {
 	}
 
 	function handleBackButtonClick() {
-		if (history.length > 1) {
-			history.goBack();
-		} else {
-			window.location.pathname = '/sign-in';
-		}
+		navigate(-1);
 	}
 
 	return (

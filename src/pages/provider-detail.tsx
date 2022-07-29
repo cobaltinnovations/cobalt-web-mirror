@@ -133,6 +133,10 @@ const ProviderDetail = () => {
 	}, []);
 
 	const fetchData = useCallback(() => {
+		if (!providerId) {
+			return;
+		}
+
 		const findRequest = providerService.findProviders({ providerId });
 		const providerRequest = providerService.getProviderById(providerId);
 

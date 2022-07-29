@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
@@ -37,12 +37,6 @@ import Breadcrumb from '@/components/breadcrumb';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
 
-const useStyles = createUseThemedStyles((theme) => ({
-	datePicker: {
-		height: 56,
-	},
-}));
-
 const onYourTimeContentSchema = yup
 	.object()
 	.required()
@@ -72,9 +66,9 @@ const CreateOnYourTimeContent: FC = () => {
 	const theme = useCobaltTheme();
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time - My Content');
-	const classes = useStyles();
 	const { account } = useAccount();
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const query = useQuery();
 	const contentId = query.get('contentId');
 	const editing = query.get('editing');
@@ -229,9 +223,15 @@ const CreateOnYourTimeContent: FC = () => {
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
 				const targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
-				history.push(`${targetPath}`, { showSuccess: true, isAdding, isEditing });
+				navigate(`${targetPath}`, {
+					state: {
+						showSuccess: true,
+						isAdding,
+						isEditing,
+					},
+				});
 			} else {
-				history.push('/on-your-time-thanks');
+				navigate('/on-your-time-thanks');
 			}
 		} catch (error) {
 			handleError(error);
@@ -251,7 +251,7 @@ const CreateOnYourTimeContent: FC = () => {
 							title: isAdding ? 'available content' : 'my content',
 						},
 						{
-							to: history.location.pathname,
+							to: location.pathname,
 							title: isAdding ? 'add public post' : 'add content',
 						},
 					]}

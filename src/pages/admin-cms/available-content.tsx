@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useHeaderTitle from '@/hooks/use-header-title';
 
 import { AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
@@ -39,7 +39,8 @@ const CmsAvailableContent: FC = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time - Available Content');
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { showAlert } = useAlert();
 	const [tableIsUpdating, setTableIsUpdating] = useState(false);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -90,14 +91,13 @@ const CmsAvailableContent: FC = () => {
 
 			setTableIsUpdating(false);
 
-			// @ts-ignore
-			const locationState: AlertLocationState | undefined = history.location.state || {};
+			const locationState = (location.state as AlertLocationState) || {};
 			if (locationState?.showSuccess) {
 				showAlert({
 					text: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
 					variant: 'success',
 				});
-				history.replace({ state: {} });
+				navigate('', { replace: true, state: {} });
 			}
 		}
 
@@ -107,9 +107,10 @@ const CmsAvailableContent: FC = () => {
 		statusFilterValue,
 		typeFilterValue,
 		showAlert,
-		history,
+		navigate,
 		searchInputValueDebounced,
 		handleError,
+		location.state,
 	]);
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
@@ -127,7 +128,7 @@ const CmsAvailableContent: FC = () => {
 	}
 
 	function handleAddClick(contentId: string) {
-		history.push(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
+		navigate(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
 	}
 
 	function updateContentItem(content: AdminContentRow) {

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -18,15 +18,14 @@ const useProfileStyles = createUseThemedStyles((theme) => ({
 const Profile: FC = () => {
 	useHeaderTitle('your profile');
 
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useProfileStyles();
-	const routeMatch = useRouteMatch();
+	const location = useLocation();
 	const { account } = useAccount();
 
 	function handleUpdateMyProfileButtonClick() {
-		history.push({
-			pathname: '/intro-assessment',
-			state: { from: routeMatch.path },
+		navigate('/intro-assessment', {
+			state: { from: location.pathname },
 		});
 	}
 

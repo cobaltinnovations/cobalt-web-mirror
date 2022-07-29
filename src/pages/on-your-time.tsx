@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useMemo } from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
@@ -20,8 +20,8 @@ import InputHelper from '@/components/input-helper';
 
 const OnYourTime: FC = () => {
 	useHeaderTitle('On Your Time');
-	const history = useHistory();
-	const location = useLocation<{ personalize: boolean }>();
+	const navigate = useNavigate();
+	const location = useLocation();
 
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
@@ -30,7 +30,9 @@ const OnYourTime: FC = () => {
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
 	const [selectedLength, setSelectedLength] = useState<string>('');
 
-	const [showPersonalizeModal, setShowPersonalizeModal] = useState(location?.state?.personalize ?? false);
+	const [showPersonalizeModal, setShowPersonalizeModal] = useState(
+		(location?.state as { personalize: boolean })?.personalize ?? false
+	);
 	const [items, setItems] = useState<Content[]>([]);
 	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -99,7 +101,7 @@ const OnYourTime: FC = () => {
 			<ActionSheet
 				show={false}
 				onShow={() => {
-					history.push('/cms/on-your-time/create');
+					navigate('/cms/on-your-time/create');
 				}}
 				onHide={() => {
 					return;
@@ -113,7 +115,12 @@ const OnYourTime: FC = () => {
 				onClose={(updatedChoices) => {
 					setChoices(updatedChoices);
 					fetchContent();
-					history.replace('/on-your-time', { personalize: false });
+					navigate('/on-your-time', {
+						replace: true,
+						state: {
+							personalize: false,
+						},
+					});
 					setShowPersonalizeModal(false);
 				}}
 			/>

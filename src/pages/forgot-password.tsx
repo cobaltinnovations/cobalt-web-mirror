@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -22,7 +22,7 @@ type ForgotPasswordFormData = yup.InferType<typeof forgotPasswordSchema>;
 const requiredFields = getRequiredYupFields<ForgotPasswordFormData>(forgotPasswordSchema);
 
 const ForgotPassword: FC = () => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	async function handleFormSubmit(values: ForgotPasswordFormData) {
@@ -30,7 +30,7 @@ const ForgotPassword: FC = () => {
 			await accountService.sendForgotPasswordEmail(values.emailAddress).fetch();
 
 			window.alert('A password reset link is on its way.');
-			history.push('/sign-in');
+			navigate('/sign-in');
 		} catch (error) {
 			handleError(error);
 		}
@@ -71,7 +71,7 @@ const ForgotPassword: FC = () => {
 											<Button
 												variant="outline-primary"
 												onClick={() => {
-													history.goBack();
+													navigate(-1);
 												}}
 											>
 												back

@@ -1,5 +1,5 @@
 import React, { FC, createContext, useState, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import { useNavigate, useLocation, useMatch } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
@@ -37,9 +37,9 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
 
 	const query = useQuery();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
-	const immediateSupportRouteMatch = useRouteMatch<{ supportRoleId: string }>({
+	const immediateSupportRouteMatch = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>({
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
@@ -60,10 +60,10 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 		let signInPath = '/sign-in';
 
-		history.push(signInPath);
+		navigate(signInPath);
 		setAccount(undefined);
 		setInstitution(undefined);
-	}, [history]);
+	}, [navigate]);
 
 	// Fetch account if we have accessToken cookie
 	useEffect(() => {
@@ -111,10 +111,14 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 				.then((response) => {
 					setInitialized(true);
 
-					history.replace({
-						pathname: '/auth',
-						search: '?' + new URLSearchParams({ accessToken: response.accessToken }).toString(),
-					});
+					navigate(
+						`/auth?${new URLSearchParams({
+							accessToken: response.accessToken,
+						}).toString()}`,
+						{
+							replace: true,
+						}
+					);
 				})
 				.catch((e) => {
 					handleError(e);
@@ -143,7 +147,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [
 		handleError,
-		history,
+		navigate,
 		immediateAccess,
 		immediateSupportRouteMatch,
 		initialized,

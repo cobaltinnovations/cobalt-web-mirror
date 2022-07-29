@@ -1,34 +1,34 @@
 import React, { FC, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
-import config from '@/lib/config';
 import useAccount from '@/hooks/use-account';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useGoogleAnalytics from '@/hooks/use-google-analytics';
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+import config from '@/lib/config';
 
-import Footer from '@/components/footer';
-import PrivateRoute from '@/components/private-route';
-import InCrisisModal from '@/components/in-crisis-modal';
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
-import ReauthModal from '@/components/reauth-modal';
+import Footer from '@/components/footer';
+import InCrisisModal from '@/components/in-crisis-modal';
 import Loader from '@/components/loader';
+import PrivateRoute from '@/components/private-route';
+import ReauthModal from '@/components/reauth-modal';
 
-import { Routes } from '@/routes';
+import { AppRoutes } from '@/routes';
 
-import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
+import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
 
 import { AccountProvider } from '@/contexts/account-context';
+import { AlertProvider } from '@/contexts/alert-context';
+import { BookingProvider } from '@/contexts/booking-context';
+import { ErrorModalProvider } from '@/contexts/error-modal-context';
 import { HeaderProvider } from '@/contexts/header-context';
 import { InCrisisModalProvider } from '@/contexts/in-crisis-modal-context';
-import { BookingProvider } from '@/contexts/booking-context';
-import { AlertProvider } from '@/contexts/alert-context';
-import { ErrorModalProvider } from '@/contexts/error-modal-context';
 import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
-import NoMatch from '@/pages/no-match';
 import DownForMaintenance from '@/pages/down-for-maintenance';
+
 import useUrlViewTracking from './hooks/use-url-view-tracking';
 import { CobaltThemeProvider } from './jss/theme';
 
@@ -39,7 +39,7 @@ const AppWithProviders: FC = () => {
 	useGoogleAnalytics();
 
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { account, institution } = useAccount();
+	const { account, institution, initialized } = useAccount();
 
 	const { pathname } = useLocation();
 
@@ -49,6 +49,10 @@ const AppWithProviders: FC = () => {
 
 	useUrlViewTracking();
 
+	if (!initialized) {
+		return <Loader />;
+	}
+
 	return (
 		<>
 			<InCrisisModal show={show} isCall={isCall} onHide={closeInCrisisModal} />
@@ -57,45 +61,46 @@ const AppWithProviders: FC = () => {
 
 			<Alert />
 
-			<Switch>
-				{Routes.map((route, index) => {
+			<Routes>
+				{AppRoutes.map((config, groupIndex) => {
 					return (
-						<Route
-							key={index}
-							path={route.path}
-							exact={route.exact}
-							children={route.header ? <route.header /> : null}
-						/>
+						<Route key={groupIndex} element={<config.layout />}>
+							{config.routes.map((route, index) => {
+								const isEnabled =
+									typeof route.routeGuard === 'function'
+										? route.routeGuard({
+												account,
+												institution,
+										  })
+										: true;
+
+								if (!isEnabled) {
+									return null;
+								}
+
+								return (
+									<Route
+										key={index}
+										path={route.path}
+										element={
+											<Suspense fallback={<Loader />}>
+												{route.private ? (
+													<PrivateRoute>
+														<route.main />
+													</PrivateRoute>
+												) : (
+													<route.main />
+												)}
+											</Suspense>
+										}
+									/>
+								);
+							})}
+						</Route>
 					);
 				})}
-			</Switch>
-			<Suspense fallback={<Loader />}>
-				<Switch>
-					{Routes.map((route, index) => {
-						const isEnabled = route.checkEnabled ? route.checkEnabled({ account, institution }) : true;
+			</Routes>
 
-						if (route.private) {
-							return (
-								<PrivateRoute
-									key={index}
-									path={route.path}
-									exact={route.exact}
-									enabled={isEnabled}
-									// unauthRedirect={route.unauthRedirect}
-								>
-									<route.main />
-								</PrivateRoute>
-							);
-						} else {
-							return (
-								<Route key={index} path={route.path} exact={route.exact}>
-									{isEnabled ? <route.main /> : <NoMatch />}
-								</Route>
-							);
-						}
-					})}
-				</Switch>
-			</Suspense>
 			<Footer />
 		</>
 	);

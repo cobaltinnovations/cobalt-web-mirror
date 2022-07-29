@@ -13,6 +13,10 @@ const Interaction: FC = () => {
 	const [optionResponse, setOptionResponse] = useState('');
 
 	const fetchData = useCallback(async () => {
+		if (!interactionInstanceId || !interactionOptionId) {
+			return;
+		}
+
 		const { interactionOption } = await interactionService
 			.postInteraction(interactionInstanceId, interactionOptionId)
 			.fetch();

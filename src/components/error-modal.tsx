@@ -1,5 +1,5 @@
 import React, { FC, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -15,7 +15,7 @@ const useStyles = createUseStyles({
 });
 
 const ErrorModal: FC = () => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useStyles();
 	const { show, setShow, error } = useContext(ErrorModalContext);
 	const { openInCrisisModal } = useInCrisisModal();
@@ -48,7 +48,7 @@ const ErrorModal: FC = () => {
 							className="mb-4 p-0 text-decoration-none"
 							onClick={() => {
 								setShow(false);
-								history.push('/feedback');
+								navigate('/feedback');
 							}}
 						>
 							Send us a note

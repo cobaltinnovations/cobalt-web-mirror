@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
@@ -30,7 +30,7 @@ const Index: FC = () => {
 	useHeaderTitle(null);
 	const { account, institution } = useAccount();
 
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useIndexStyles();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupEvent | GroupSessionModel)[]>([]);
@@ -57,7 +57,7 @@ const Index: FC = () => {
 	}, [accountId]);
 
 	function handleConnectWithSupportButtonClick() {
-		history.push('/connect-with-support');
+		navigate('/connect-with-support');
 	}
 
 	return (
@@ -92,7 +92,7 @@ const Index: FC = () => {
 									description="Explainer text goes here. What is in the studio?"
 									calloutTitle="Explore all"
 									calloutOnClick={() => {
-										history.push('/in-the-studio');
+										navigate('/in-the-studio');
 									}}
 								>
 									{inTheStudioEvents.map((inTheStudioEvent) => {
@@ -140,7 +140,7 @@ const Index: FC = () => {
 							description="Explainer text goes here. What is on your time?"
 							calloutTitle="Explore all"
 							calloutOnClick={() => {
-								history.push('/on-your-time');
+								navigate('/on-your-time');
 							}}
 						>
 							{onYourTimeContent.map((onYourOwnTimeItem) => {
@@ -173,7 +173,7 @@ const Index: FC = () => {
 							<Button
 								variant="light"
 								onClick={() => {
-									history.push('/on-your-time', { personalize: true });
+									navigate('/on-your-time', { state: { personalize: true } });
 								}}
 							>
 								Personalize recommendations

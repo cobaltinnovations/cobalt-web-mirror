@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 
 export const ProviderManagementBluejeansConnection = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [hasBluejeansAccount, setHasBluejeansAccount] = useState(false);
 	const [emailAddress, setEmailAddress] = useState('');
@@ -83,7 +83,7 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

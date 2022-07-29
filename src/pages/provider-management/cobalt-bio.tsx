@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 
 export const ProviderManagementCobaltBio = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [bio, setBio] = useState('');
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +36,7 @@ export const ProviderManagementCobaltBio = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

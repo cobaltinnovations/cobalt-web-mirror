@@ -1,5 +1,5 @@
 import React, { ReactElement, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { Provider } from '@/lib/models';
@@ -9,7 +9,7 @@ import AsyncPage from '@/components/async-page';
 import BackgroundImageContainer from '@/components/background-image-container';
 
 export const ProviderManagementProfile = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { account } = useAccount();
 	const [provider, setProvider] = useState<Provider>();
 
@@ -39,7 +39,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/basics`);
+										navigate(`/providers/${provider?.providerId}/basics`);
 									}}
 								>
 									edit
@@ -75,7 +75,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/clinical-background`);
+										navigate(`/providers/${provider?.providerId}/clinical-background`);
 									}}
 								>
 									edit
@@ -116,7 +116,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/communication`);
+										navigate(`/providers/${provider?.providerId}/communication`);
 									}}
 								>
 									edit
@@ -156,7 +156,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/bluejeans-connection`);
+										navigate(`/providers/${provider?.providerId}/bluejeans-connection`);
 									}}
 								>
 									edit
@@ -182,7 +182,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/payment-types-accepted`);
+										navigate(`/providers/${provider?.providerId}/payment-types-accepted`);
 									}}
 								>
 									edit
@@ -202,7 +202,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 									variant="link"
 									size="sm"
 									onClick={() => {
-										history.push(`/providers/${provider?.providerId}/personal-details`);
+										navigate(`/providers/${provider?.providerId}/personal-details`);
 									}}
 								>
 									edit
@@ -240,7 +240,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										variant="link"
 										size="sm"
 										onClick={() => {
-											history.push(`/providers/${provider?.providerId}/cobalt-bio`);
+											navigate(`/providers/${provider?.providerId}/cobalt-bio`);
 										}}
 									>
 										edit

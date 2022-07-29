@@ -273,11 +273,11 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 										<Form.Label style={{ ...fonts.default }}>
 											Appointment types accepted:
 										</Form.Label>
-										<div>
+										<div className="d-flex">
 											<Form.Check
 												name="typesAccepted"
 												id="all"
-												className="d-inline-block me-4"
+												className="me-4"
 												type="radio"
 												label="all"
 												value="all"
@@ -287,7 +287,6 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 											<Form.Check
 												name="typesAccepted"
 												id="limited"
-												className="d-inline-block"
 												type="radio"
 												label="limit to..."
 												value="limited"

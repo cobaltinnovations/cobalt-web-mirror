@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -64,7 +64,7 @@ const useStyles = createUseStyles({
 
 const InTheStudioGroupSessionByRequest: FC = () => {
 	const handleError = useHandleError();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useStyles();
 	const { fonts } = useCobaltTheme();
 	const { groupSessionRequestId } = useParams<{ groupSessionRequestId?: string }>();
@@ -105,8 +105,10 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 				})
 				.fetch();
 
-			history.push('/thank-you', {
-				groupSessionName: session?.title,
+			navigate('/thank-you', {
+				state: {
+					groupSessionName: session?.title,
+				},
 			});
 		} catch (error) {
 			handleError(error);

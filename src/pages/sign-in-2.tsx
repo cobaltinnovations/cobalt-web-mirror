@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
 import { accountService, institutionService } from '@/lib/services';
@@ -33,7 +33,7 @@ const SignIn2 = () => {
 	const handleError = useHandleError();
 	const { accountSources, subdomainInstitution } = useAccount();
 	const classes = useSignInStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const query = useQuery();
 	const accountSourceId = query.get('accountSourceId');
@@ -92,9 +92,8 @@ const SignIn2 = () => {
 				return;
 			}
 
-			history.replace({
-				pathname: '/auth',
-				search: '?' + new URLSearchParams({ accessToken }).toString(),
+			navigate(`/auth?${new URLSearchParams({ accessToken }).toString()}`, {
+				replace: true,
 			});
 		} catch (error) {
 			handleError(error);

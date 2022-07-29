@@ -3,7 +3,7 @@ import { Col, Container } from 'react-bootstrap';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import BackgroundImageContainer from '@/components/background-image-container';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { providerService } from '@/lib/services';
 import { SearchResult } from '@/contexts/booking-context';
 import { Provider, Clinic } from '@/lib/models';
@@ -47,14 +47,6 @@ const mapClinicToResult = (clinic: Clinic): SearchResult => ({
 	displayName: clinic.description,
 });
 
-// double:
-interface HistoryLocationState {
-	skipAssessment?: boolean;
-	successBooking?: boolean;
-	routedClinicIds?: string[];
-	routedProviderId?: string;
-}
-
 interface AppointmentSearchBarProps {
 	recentProviders: SearchResult[];
 	selectedSearchResult: SearchResult[]; // selectedSearchResult
@@ -65,7 +57,8 @@ interface AppointmentSearchBarProps {
 
 const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 	const classes = useSearchBarStyles();
-	const history = useHistory<HistoryLocationState>();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
@@ -97,10 +90,10 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 			props.setSelectedSearchResult([]);
 			props.setProviderFilter(undefined);
 			props.setClinicsFilter([]);
-			const params = new URLSearchParams(history.location.search);
+			const params = new URLSearchParams(location.search);
 			params.delete('providerId');
 			params.delete('clinicId');
-			history.push(`/connect-with-support?${params.toString()}`, history.location.state);
+			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
 		}
 	}
 

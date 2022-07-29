@@ -28,6 +28,10 @@ const ScreeningQuestionsPage = () => {
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 
 	const submitAnswers = useCallback(() => {
+		if (!screeningQuestionContextId) {
+			return;
+		}
+
 		const answers: ScreeningAnswerSelection[] = [
 			...selectedAnswers.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })),
 			...Object.entries(answerText)

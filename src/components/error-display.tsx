@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 
 import HeroContainer from '@/components/hero-container';
@@ -13,10 +13,10 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryButton, onRetryButtonClick }) => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	function handleGoBackButtonClick() {
-		history.goBack();
+		navigate(-1);
 	}
 
 	function handleRetryClick() {

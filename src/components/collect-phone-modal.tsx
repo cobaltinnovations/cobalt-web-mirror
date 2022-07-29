@@ -80,9 +80,11 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 						>
 							skip for now
 						</Button>
-						<Button type="submit" variant="primary" size="sm" className="btn-block">
-							continue assessment
-						</Button>
+						<div className="d-grid">
+							<Button type="submit" variant="primary" size="sm">
+								continue assessment
+							</Button>
+						</div>
 					</div>
 				</Modal.Footer>
 			</Form>

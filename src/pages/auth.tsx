@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
@@ -17,7 +17,7 @@ type DecodedAccessToken = {
 
 const Auth: FC = () => {
 	const { account, setAccount, setInstitution } = useAccount();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const query = useQuery();
 
 	const accessTokenFromQuery = query.get('accessToken');
@@ -25,12 +25,8 @@ const Auth: FC = () => {
 	const successfulAuthRedirect = useCallback(() => {
 		const authRedirectUrl = Cookies.get('authRedirectUrl');
 
-		if (authRedirectUrl) {
-			return history.replace(authRedirectUrl);
-		}
-
-		return history.replace('/');
-	}, [history]);
+		return navigate(authRedirectUrl || '/', { replace: true });
+	}, [navigate]);
 
 	const fetchAccount = useCallback(
 		async (accountId: string) => {
@@ -39,10 +35,10 @@ const Auth: FC = () => {
 				setAccount(response.account);
 				setInstitution(response.institution);
 			} catch (error) {
-				return history.replace('/sign-in');
+				return navigate('/sign-in', { replace: true });
 			}
 		},
-		[history, setAccount, setInstitution]
+		[navigate, setAccount, setInstitution]
 	);
 
 	useEffect(() => {
@@ -62,11 +58,11 @@ const Auth: FC = () => {
 		} else if (accessTokenFromCookie) {
 			decodedAccessToken = jwtDecode(accessTokenFromCookie) as DecodedAccessToken;
 		} else {
-			return history.replace('/sign-in');
+			return navigate('/sign-in', { replace: true });
 		}
 
 		fetchAccount(decodedAccessToken.sub);
-	}, [accessTokenFromQuery, account, fetchAccount, history, successfulAuthRedirect]);
+	}, [accessTokenFromQuery, account, fetchAccount, navigate, successfulAuthRedirect]);
 
 	return <Loader />;
 };

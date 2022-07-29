@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
@@ -17,7 +17,7 @@ import InputHelper from '@/components/input-helper';
 const InTheStudio: FC = () => {
 	useHeaderTitle('In the Studio');
 	const query = useQuery();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const groupEventUrlName = query.get('class') || '';
 
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
@@ -99,7 +99,7 @@ const InTheStudio: FC = () => {
 					variant="secondary"
 					className="d-block w-100 mb-2"
 					onClick={() => {
-						history.push('/group-sessions/scheduled/create');
+						navigate('/group-sessions/scheduled/create');
 					}}
 				>
 					offer session at a set time
@@ -108,7 +108,7 @@ const InTheStudio: FC = () => {
 					variant="primary"
 					className="d-block w-100"
 					onClick={() => {
-						history.push('/group-sessions/by-request/create');
+						navigate('/group-sessions/by-request/create');
 					}}
 				>
 					make session available by request

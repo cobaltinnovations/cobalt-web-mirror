@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
@@ -33,7 +33,7 @@ interface InTheModel {
 }
 
 export const ProviderManagementClinicalBackground = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [degrees, setDegrees] = useState<DegreeModel[]>([
 		{
@@ -261,7 +261,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

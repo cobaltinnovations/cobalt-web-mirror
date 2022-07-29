@@ -2,7 +2,7 @@ import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
@@ -129,14 +129,14 @@ export type GroupSessionFormData = yup.InferType<typeof groupSessionSchema>;
 const requiredFields = getRequiredYupFields<GroupSessionFormData>(groupSessionSchema);
 
 const GroupSessionsCreate: FC = () => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const classes = useStyles();
 	const { fonts } = useCobaltTheme();
-	const isViewMode = !!useRouteMatch({
+	const isViewMode = !!useMatch({
 		path: '/group-sessions/scheduled/:groupSessionId/view',
-		exact: true,
+		end: true,
 	});
 
 	const { showAlert } = useAlert();
@@ -266,7 +266,7 @@ const GroupSessionsCreate: FC = () => {
 
 		window.alert('Studio session has been canceled.');
 		setShowSessionCancelModal(false);
-		history.push('/group-sessions/scheduled');
+		navigate('/group-sessions/scheduled');
 	}
 
 	async function handleSubmit(values: GroupSessionFormData) {
@@ -324,9 +324,9 @@ const GroupSessionsCreate: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
-				history.push('/group-sessions/scheduled');
+				navigate('/group-sessions/scheduled');
 			} else {
-				history.push('/in-the-studio-thanks');
+				navigate('/in-the-studio-thanks');
 			}
 		} catch (error) {
 			handleError(error);

@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -54,7 +54,8 @@ const CmsOnYourTime: FC = () => {
 
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time');
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { account } = useAccount();
 	const { showAlert } = useAlert();
 	const isSuperAdmin = account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR;
@@ -91,14 +92,13 @@ const CmsOnYourTime: FC = () => {
 			setTableIsUpdating(true);
 
 			try {
-				// @ts-ignore
-				const locationState: AlertLocationState | undefined = history.location.state || {};
+				const locationState = (location.state as AlertLocationState) || {};
 				if (locationState?.showSuccess) {
 					showAlert({
 						text: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
 						variant: 'success',
 					});
-					history.replace({ state: {} });
+					navigate('', { replace: true, state: {} });
 				}
 
 				const [filtersResponse, { adminContent, totalCount }] = await Promise.all([
@@ -133,13 +133,14 @@ const CmsOnYourTime: FC = () => {
 		ownerFilterValue,
 		otherStatusFilterValue,
 		showAlert,
-		history,
+		navigate,
 		searchInputValueDebounced,
 		handleError,
+		location.state,
 	]);
 
 	function handleAddContentButtonClick(): void {
-		history.push('/cms/on-your-time/create');
+		navigate('/cms/on-your-time/create');
 	}
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
@@ -200,7 +201,7 @@ const CmsOnYourTime: FC = () => {
 	}
 
 	function handleEditClick(contentId: string) {
-		history.push(`/cms/on-your-time/create?contentId=${contentId}&editing=true`);
+		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true`);
 	}
 
 	async function handleRejectClick(contentId: string) {

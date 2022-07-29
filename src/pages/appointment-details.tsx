@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -11,17 +11,17 @@ import { AppointmentModel, VideoconferencePlatformId } from '@/lib/models';
 
 const AppointmentDetails: FC = () => {
 	useHeaderTitle('Appointment');
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [details, setDetails] = useState<AppointmentModel>();
 	const { appointmentId } = useParams<{ appointmentId?: string }>();
 
 	const fetchData = useCallback(async () => {
 		const { appointment } = await appointmentService.getAppointment(appointmentId).fetch();
 		if (!appointment) {
-			history.replace({ pathname: '/404' });
+			navigate('/404', { replace: true });
 		}
 		setDetails(appointment);
-	}, [appointmentId, history]);
+	}, [appointmentId, navigate]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>

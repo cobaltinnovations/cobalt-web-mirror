@@ -17,13 +17,11 @@ import { groupEventService, appointmentService } from '@/lib/services';
 import { GroupEvent } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 
-interface RouteParams {
-	groupEventId: string;
-}
-
 const InTheStudioDetail: FC = () => {
 	const handleError = useHandleError();
-	const { groupEventId } = useParams<RouteParams>();
+	const { groupEventId } = useParams<{
+		groupEventId: string;
+	}>();
 	const { account, setAccount } = useAccount();
 
 	const [isBooking, setIsBooking] = useState(false);

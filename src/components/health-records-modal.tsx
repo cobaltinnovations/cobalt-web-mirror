@@ -48,12 +48,14 @@ const HealthRecordsModalPageOne: FC<HealthRecordsModalPageProps> = ({ onNextButt
 				To book with this provider, we'll need to find your electronic health records. We'll ask you questions
 				until we can confidently identify your record.
 			</p>
-			<Button variant="primary" size="sm" className="btn-block" onClick={onNextButtonClick}>
-				next
-			</Button>
-			<Button variant="link" size="sm" className="btn-block" onClick={onExitButtonClick}>
-				exit booking
-			</Button>
+			<div className="d-grid gap-4">
+				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
+					next
+				</Button>
+				<Button variant="link" size="sm" onClick={onExitButtonClick}>
+					exit booking
+				</Button>
+			</div>
 		</>
 	);
 };
@@ -70,12 +72,14 @@ const HealthRecordsModalPageTwo: FC<HealthRecordsModalPageProps> = ({ onNextButt
 			</ul>
 			<h1 className="mb-2">we take your privacy very seriously</h1>
 			<p className="mb-6">This information is not shared outside of the context of an appointment.</p>
-			<Button variant="primary" size="sm" className="btn-block" onClick={onNextButtonClick}>
-				continue
-			</Button>
-			<Button variant="link" size="sm" className="btn-block" onClick={onExitButtonClick}>
-				exit booking
-			</Button>
+			<div className="d-grid gap-4">
+				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
+					continue
+				</Button>
+				<Button variant="link" size="sm" onClick={onExitButtonClick}>
+					exit booking
+				</Button>
+			</div>
 		</>
 	);
 };

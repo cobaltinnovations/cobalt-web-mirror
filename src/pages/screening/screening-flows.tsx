@@ -34,6 +34,10 @@ const ScreeningFlowsPage = () => {
 	}, [response?.screeningSessions]);
 
 	const createFlowSession = useCallback(() => {
+		if (!screeningFlowId) {
+			return;
+		}
+
 		const create = screeningService.createScreeningSession({ screeningFlowId, targetAccountId });
 
 		create

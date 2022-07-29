@@ -14,7 +14,7 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		backgroundColor: theme.colors.n0,
-		boxShadow: '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)',
+		boxShadow: theme.elevation.e200,
 	},
 	imageContainer: {
 		flexShrink: 0,

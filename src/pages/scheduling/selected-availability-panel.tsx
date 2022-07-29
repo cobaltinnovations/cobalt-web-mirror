@@ -7,7 +7,7 @@ import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from 
 import { schedulingService } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { Link, useParams, useRouteMatch } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AppointmentTypeItem } from './appointment-type-item';
 
 interface SelectedAvailabilityPanelProps {
@@ -16,7 +16,6 @@ interface SelectedAvailabilityPanelProps {
 
 export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanelProps) => {
 	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId: string }>();
-	const routeMatch = useRouteMatch();
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [logicalAvailability, setLogicalAvailability] = useState<LogicalAvailability>();
@@ -88,7 +87,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 						})}
 					</div>
 
-					<Link to={`${routeMatch.url}/edit`}>
+					<Link to={`edit`}>
 						<Button variant="link" size="sm" className="p-0">
 							<EditIcon />
 						</Button>

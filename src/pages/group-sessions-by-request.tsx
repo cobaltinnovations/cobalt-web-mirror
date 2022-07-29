@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -27,7 +27,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const GroupSessionsByRequest: FC = () => {
 	const classes = useStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	const [sizeOfPage] = useState(10);
@@ -67,7 +67,7 @@ const GroupSessionsByRequest: FC = () => {
 	}, [currentPageIndex, handleError, sizeOfPage, statusFilterValue]);
 
 	function handleAddGroupSessionOptionButtonClick() {
-		history.push('/group-sessions/by-request/create');
+		navigate('/group-sessions/by-request/create');
 	}
 
 	function handleStatusFilterChange(value: GROUP_SESSION_STATUS_ID | undefined) {
@@ -75,7 +75,7 @@ const GroupSessionsByRequest: FC = () => {
 	}
 
 	function handleSessionEditClicked(groupSessionRequestId: string) {
-		history.push(`/group-sessions/by-request/${groupSessionRequestId}/edit`);
+		navigate(`/group-sessions/by-request/${groupSessionRequestId}/edit`);
 	}
 
 	async function handleSessionActionClicked(

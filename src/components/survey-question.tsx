@@ -129,24 +129,27 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 					);
 				});
 			case QUESTION_TYPE.QUAD:
-				return question.answers.map((answer) => {
-					return (
-						<Button
-							variant={
-								!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)
-									? 'primary'
-									: 'light'
-							}
-							className="btn-block"
-							key={answer.answerId}
-							onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-								handleQuadButtonClick(event, question, answer.answerId)
-							}
-						>
-							{answer.answerDescription}
-						</Button>
-					);
-				});
+				return (
+					<div className="d-grid gap-4">
+						{question.answers.map((answer) => {
+							return (
+								<Button
+									variant={
+										!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)
+											? 'primary'
+											: 'light'
+									}
+									key={answer.answerId}
+									onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+										handleQuadButtonClick(event, question, answer.answerId)
+									}
+								>
+									{answer.answerDescription}
+								</Button>
+							);
+						})}
+					</div>
+				);
 			case QUESTION_TYPE.TEXT:
 			case QUESTION_TYPE.COBALT_STUDENT_ID:
 			case QUESTION_TYPE.PHONE_NUMBER:

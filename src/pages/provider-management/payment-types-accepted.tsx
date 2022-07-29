@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -36,7 +36,7 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

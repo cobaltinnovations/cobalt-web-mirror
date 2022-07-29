@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import React, { FC } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -26,7 +26,7 @@ const requiredFields = getRequiredYupFields<PasswordResetFormData>(passwordReset
 
 const PasswordReset: FC = () => {
 	useHeaderTitle(null);
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { passwordResetToken } = useParams<{ passwordResetToken?: string }>();
 	const handleError = useHandleError();
 
@@ -45,7 +45,7 @@ const PasswordReset: FC = () => {
 				.fetch();
 
 			window.alert('Your password has been reset.');
-			history.push('/sign-in');
+			navigate('/sign-in');
 		} catch (error) {
 			handleError(error);
 		}
@@ -98,7 +98,7 @@ const PasswordReset: FC = () => {
 											<Button
 												variant="outline-primary"
 												onClick={() => {
-													history.goBack();
+													navigate(-1);
 												}}
 											>
 												back

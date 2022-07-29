@@ -1,7 +1,7 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC, PropsWithChildren } from 'react';
 import { Button, Container } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sessionFormSubmitBanner: {
@@ -24,13 +24,13 @@ interface SessionFormSubmitBannerProps extends PropsWithChildren {
 
 const SessionFormSubmitBanner: FC<SessionFormSubmitBannerProps> = ({ title, disabled = false, children }) => {
 	const classes = useStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	return (
 		<div className={classes.sessionFormSubmitBanner}>
 			<Container>
 				<div className="d-flex justify-content-between">
-					<Button size="sm" variant="outline-primary" onClick={() => history.goBack()}>
+					<Button size="sm" variant="outline-primary" onClick={() => navigate(-1)}>
 						Cancel
 					</Button>
 					<Button size="sm" type="submit" disabled={disabled}>

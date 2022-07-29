@@ -4,7 +4,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { AvailabilityTimeSlot, Provider } from '@/lib/models';
 import { accountService, CreateAppointmentData, appointmentService } from '@/lib/services';
 import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CollectContactInfoModal from './collect-contact-info-modal';
 import ConfirmAppointmentTypeModal from './confirm-appointment-type-modal';
 import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
@@ -40,7 +40,8 @@ interface HistoryLocationState {
 export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	const handleError = useHandleError();
 	const { account, setAccount, isAnonymous } = useAccount();
-	const history = useHistory<HistoryLocationState>();
+	const location = useLocation();
+	const navigate = useNavigate();
 
 	const [collectedPhoneNumebr, setCollectedPhoneNumber] = useState(account?.phoneNumber ?? '');
 	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
@@ -80,12 +81,14 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		setPreserveFilters,
 	} = useContext(BookingContext);
 
-	const skipAssessment = !!history.location.state?.skipAssessment;
+	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const navigateToEhrLookup = useCallback(() => {
-		history.push(`/ehr-lookup`, {
-			skipAssessment,
+		navigate(`/ehr-lookup`, {
+			state: {
+				skipAssessment,
+			},
 		});
-	}, [history, skipAssessment]);
+	}, [navigate, skipAssessment]);
 
 	const navigateToIntakeAssessment = useCallback(
 		(provider: Provider) => {
@@ -93,11 +96,13 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				return;
 			}
 
-			history.push(`/intake-assessment?providerId=${provider.providerId}`, {
-				skipAssessment,
+			navigate(`/intake-assessment?providerId=${provider.providerId}`, {
+				state: {
+					skipAssessment,
+				},
 			});
 		},
-		[history, skipAssessment]
+		[navigate, skipAssessment]
 	);
 
 	const continueBookingProcess = useCallback(
@@ -382,9 +387,12 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 						setSelectedProvider(undefined);
 						setSelectedTimeSlot(undefined);
 
-						history.replace(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-							successBooking: true,
-							emailAddress: response.account.emailAddress,
+						navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
+							replace: true,
+							state: {
+								successBooking: true,
+								emailAddress: response.account.emailAddress,
+							},
 						});
 					} catch (e) {
 						if ((e as any).metadata?.accountPhoneNumberRequired) {

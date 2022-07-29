@@ -13,7 +13,7 @@ import React, {
 import { unstable_batchedUpdates } from 'react-dom';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
-import { useHistory, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
 
@@ -112,7 +112,7 @@ const ConnectWithSupport: FC = () => {
 	const { account, subdomainInstitution } = useAccount();
 
 	const location = useLocation();
-	const history = useHistory<HistoryLocationState>();
+	const navigate = useNavigate();
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
@@ -183,7 +183,7 @@ const ConnectWithSupport: FC = () => {
 		[availableSections]
 	);
 
-	const skipAssessment = !!history.location.state?.skipAssessment;
+	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const recommendedTherapistPsychiatrist =
 		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Clinician ||
 		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Psychiatrist;
@@ -295,15 +295,18 @@ const ConnectWithSupport: FC = () => {
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 
-			history.replace(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
-				routedClinicIds,
-				routedProviderId,
-				routedSupportRoleIds,
+			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
+				replace: true,
+				state: {
+					routedClinicIds,
+					routedProviderId,
+					routedSupportRoleIds,
+				},
 			});
 		}
 	}, [
 		didInit,
-		history,
+		navigate,
 		subdomainInstitution?.providerTriageScreeningFlowId,
 		location.search,
 		skipAssessment,
@@ -494,10 +497,10 @@ const ConnectWithSupport: FC = () => {
 			setSelectedSearchResult([]);
 			setProviderFilter(undefined);
 			setClinicsFilter([]);
-			const params = new URLSearchParams(history.location.search);
+			const params = new URLSearchParams(location.search);
 			params.delete('providerId');
 			params.delete('clinicId');
-			history.push(`/connect-with-support?${params.toString()}`, history.location.state);
+			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
 		}
 	}
 
@@ -788,10 +791,7 @@ const ConnectWithSupport: FC = () => {
 											urlQuery.delete('endDate');
 											urlQuery.delete('clinicId');
 											urlQuery.delete('providerId');
-											history.push({
-												pathname: location.pathname,
-												search: '?' + urlQuery.toString(),
-											});
+											navigate(`${location.pathname}?${urlQuery.toString()}`);
 										} else if (findOptions) {
 											setFilterDefaults(findOptions);
 										}

@@ -20,6 +20,7 @@ const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 		outline: 'none !important',
 		backgroundColor: 'transparent',
 		...theme.fonts.small,
+		...theme.fonts.bodyBold,
 	},
 	meridianButtonLeft: {
 		padding: '0 15px 0 20px',
@@ -29,7 +30,7 @@ const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 	},
 	meridianSelectedButton: {
 		color: theme.colors.n0,
-		backgroundColor: theme.colors.a500,
+		backgroundColor: theme.colors.p500,
 	},
 }));
 

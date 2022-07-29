@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
@@ -24,7 +24,8 @@ const IntroAssessment: FC = () => {
 	useHeaderTitle('assessment');
 
 	const handleError = useHandleError();
-	const history = useHistory<HistoryLocationState>();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { account, setAccount } = useAccount();
 	const query = useQuery();
 	const questionId = query.get('questionId');
@@ -69,10 +70,8 @@ const IntroAssessment: FC = () => {
 				sessionId: assessment.sessionId,
 			});
 
-			history.push({
-				pathname: '/intro-assessment',
-				search: '?' + searchParams.toString(),
-				state: history.location.state,
+			navigate(`/intro-assessment?${searchParams.toString()}`, {
+				state: location.state,
 			});
 		} else {
 			if (account) {
@@ -83,22 +82,20 @@ const IntroAssessment: FC = () => {
 
 			const authRedirectUrl = Cookies.get('authRedirectUrl');
 
-			let redirectUrl = authRedirectUrl || history.location.state?.from || '/';
+			let redirectUrl = authRedirectUrl || (location.state as HistoryLocationState)?.from || '/';
 
-			history.push(redirectUrl);
+			navigate(redirectUrl);
 			Cookies.remove('authRedirectUrl');
 		}
-	}, [account, assessment, history, setAccount]);
+	}, [account, assessment, location.state, navigate, setAccount]);
 
 	const navigateBackwards = useCallback(() => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.push(
-				`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`
-			);
+			navigate(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
 		}
-	}, [assessment, history]);
+	}, [assessment, navigate]);
 
 	// Need to use this as a sort of psuedo click handler for QUAD question types
 	useEffect(() => {

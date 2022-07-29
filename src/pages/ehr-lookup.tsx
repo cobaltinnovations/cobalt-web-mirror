@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik, FormikProps } from 'formik';
 import InputMask from 'react-input-mask';
 import Lottie from 'lottie-web';
-import { Link, useHistory, Prompt, Redirect } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { pick } from 'lodash';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -70,7 +70,8 @@ const EhrLookup: FC = () => {
 	useHeaderTitle('assessment');
 	const { fonts } = useCobaltTheme();
 	const handleError = useHandleError();
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const [step, setStep] = useState(0);
 	const [isSearching, setIsSearching] = useState(false);
 	const [isBooking, setIsBooking] = useState(false);
@@ -94,7 +95,6 @@ const EhrLookup: FC = () => {
 		setSelectedTimeSlot,
 		formattedAvailabilityDate,
 
-		isEligible,
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
@@ -108,8 +108,8 @@ const EhrLookup: FC = () => {
 	}, [step]);
 
 	const exitUrl = useMemo(() => {
-		return getExitBookingLocation(history.location.state);
-	}, [getExitBookingLocation, history.location.state]);
+		return getExitBookingLocation(location.state);
+	}, [getExitBookingLocation, location.state]);
 
 	const searchRecords = useCallback(
 		async (data: Partial<EpicPatientData>, matchStep: EpicMatchStep) => {
@@ -176,9 +176,12 @@ const EhrLookup: FC = () => {
 			setSelectedProvider(undefined);
 			setSelectedTimeSlot(undefined);
 
-			history.replace(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
-				successBooking: true,
-				emailAddress: response.account.emailAddress,
+			navigate(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
+				replace: true,
+				state: {
+					successBooking: true,
+					emailAddress: response.account.emailAddress,
+				},
 			});
 		} catch (e) {
 			handleError(e);
@@ -187,9 +190,11 @@ const EhrLookup: FC = () => {
 		setIsBooking(false);
 	};
 
-	if (!selectedProvider || !selectedTimeSlot) {
-		return <Redirect to={exitUrl} />;
-	}
+	useEffect(() => {
+		if (!selectedProvider || !selectedTimeSlot) {
+			navigate(exitUrl);
+		}
+	}, [exitUrl, navigate, selectedProvider, selectedTimeSlot]);
 
 	return (
 		<>
@@ -200,7 +205,7 @@ const EhrLookup: FC = () => {
 				}}
 				onExitBooking={() => {
 					if (window.confirm('Are you sure you want to exit booking?')) {
-						history.replace(exitUrl);
+						navigate(exitUrl, { replace: true });
 					}
 				}}
 			/>
@@ -317,18 +322,16 @@ const EhrLookup: FC = () => {
 							</Form>
 
 							<p className="text-center my-5">
-								{isEligible && (
-									<Prompt
-										message={(location) => {
-											if (location.pathname.startsWith('/connect-with-support')) {
-												return 'Are you sure you want to exit booking?';
-											}
-
-											return true;
-										}}
-									/>
-								)}
-								<Link to={exitUrl}>exit booking</Link>
+								<Link
+									to={exitUrl}
+									onClick={(e) => {
+										if (!window.confirm('Are you sure you want to exit booking?')) {
+											e.preventDefault();
+										}
+									}}
+								>
+									exit booking
+								</Link>
 							</p>
 						</Container>
 					);

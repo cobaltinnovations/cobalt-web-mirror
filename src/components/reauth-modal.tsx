@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useCallback, useContext } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -16,7 +16,7 @@ const usStyles = createUseStyles({
 
 const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 	const classes = usStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const { showReauthModal, setShowReauthModal, signOnUrl } = useContext(ReauthModalContext);
 
@@ -32,7 +32,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 			centered
 			{...props}
 			onHide={() => {
-				history.goBack();
+				navigate(-1);
 				setShowReauthModal(false);
 			}}
 			onEnter={handleOnEnter}
@@ -49,7 +49,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 						type="button"
 						variant="outline-primary"
 						onClick={() => {
-							history.goBack();
+							navigate(-1);
 							setShowReauthModal(false);
 						}}
 					>

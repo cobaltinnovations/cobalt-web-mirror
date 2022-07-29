@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -29,7 +29,7 @@ const SignUp: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle(null);
 	const subdomain = useSubdomain();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	async function handleFormSubmit(values: SignUpFormData) {
 		try {
@@ -46,8 +46,7 @@ const SignUp: FC = () => {
 				})
 				.fetch();
 
-			history.push({
-				pathname: '/sign-up-verify',
+			navigate('/sign-up-verify', {
 				state: {
 					emailAddress: values.emailAddress,
 					accountInviteId,
@@ -103,7 +102,7 @@ const SignUp: FC = () => {
 											<Button
 												variant="outline-primary"
 												onClick={() => {
-													history.goBack();
+													navigate(-1);
 												}}
 											>
 												back

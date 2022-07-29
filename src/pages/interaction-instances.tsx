@@ -16,6 +16,10 @@ const InteractionInstances: FC = () => {
 	const [interactionOptionActions, setInteractionOptionActions] = useState<InteractionOptionAction[]>([]);
 
 	const fetchData = useCallback(async () => {
+		if (!interactionId) {
+			return;
+		}
+
 		const response = await interactionService.getInteractionInstances(interactionId).fetch();
 
 		setInteractionInstance(response.interactionInstance);

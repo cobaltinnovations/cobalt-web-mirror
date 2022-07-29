@@ -11,7 +11,7 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSchedulingStyles } from './use-scheduling-styles';
 
 interface ManageAvailabilityPanelProps {
@@ -19,7 +19,6 @@ interface ManageAvailabilityPanelProps {
 }
 
 export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProps) => {
-	const routeMatch = useRouteMatch();
 	const classes = useSchedulingStyles();
 	const { account } = useAccount();
 
@@ -102,7 +101,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>regular hours</h5>
-						<Link to={`${routeMatch.url}/new-availability`}>
+						<Link to={'new-availability'}>
 							<Button variant="link" className={classes.roundBtn}>
 								<PlusIcon />
 							</Button>
@@ -122,7 +121,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>unavailable time block</h5>
-						<Link to={`${routeMatch.url}/new-blocked-time`}>
+						<Link to={'new-blocked-time'}>
 							<Button variant="link" className={classes.roundBtn}>
 								<PlusIcon />
 							</Button>
@@ -150,8 +149,6 @@ interface LogicalAvailabilityItemProps {
 }
 
 const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityItemProps) => {
-	const routeMatch = useRouteMatch();
-
 	return (
 		<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
 			<div className="d-flex align-items-center justify-content-between">
@@ -164,7 +161,7 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 						);
 					})}
 				</div>
-				<Link to={`${routeMatch.url}/${logicalAvailability.logicalAvailabilityId}/edit`}>
+				<Link to={`${logicalAvailability.logicalAvailabilityId}/edit`}>
 					<Button variant="link" size="sm" className="p-0">
 						<EditIcon height={24} width={24} />
 					</Button>

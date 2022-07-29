@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-
 import { ManageAvailabilityPanel } from './manage-availability-panel';
 import { EditAvailabilityPanel } from './edit-availability-panel';
 
@@ -17,7 +16,7 @@ import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
-import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import useHeaderTitle from '@/hooks/use-header-title';
 import { useCobaltTheme } from '@/jss/theme';
 
@@ -32,8 +31,7 @@ export const MySchedule: FC = () => {
 	useHeaderTitle('my schedule');
 	const classes = useContainerStyles();
 	const { account } = useAccount();
-	const routeMatch = useRouteMatch();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
 
@@ -121,6 +119,49 @@ export const MySchedule: FC = () => {
 		}
 	}, []);
 
+	const renderedEditAppointmentPanel = useMemo(() => {
+		return (
+			<div className={classNames('px-5 h-100', classes.sideBar)}>
+				<EditAppointmentPanel
+					focusDateOnLoad={focusDateOnLoad}
+					setCalendarDate={setCalendarDate}
+					onClose={(updatedAppointmentId) => {
+						setFocusDateOnLoad(false);
+						if (updatedAppointmentId) {
+							navigate(`appointments/${updatedAppointmentId}`);
+						} else {
+							navigate(``);
+						}
+
+						fetchMainData();
+						fetchLeftData();
+					}}
+				/>
+			</div>
+		);
+	}, [classes.sideBar, fetchLeftData, fetchMainData, focusDateOnLoad, navigate, setCalendarDate]);
+
+	const renderedAvailabilityPanel = useMemo(() => {
+		return (
+			<div className={classNames('px-5 h-100', classes.sideBar)}>
+				<EditAvailabilityPanel
+					onClose={(logicalAvailabilityId) => {
+						if (managingAvailabilties) {
+							navigate(`availabilities`);
+						} else if (logicalAvailabilityId) {
+							navigate(`availabilities/${logicalAvailabilityId}`);
+						} else {
+							navigate(``);
+						}
+
+						fetchMainData();
+						fetchLeftData();
+					}}
+				/>
+			</div>
+		);
+	}, []);
+
 	return (
 		<div className={classes.wrapper}>
 			<div className={classNames('h-100 px-5', classes.sideBar)}>
@@ -193,13 +234,13 @@ export const MySchedule: FC = () => {
 
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
-					<Link to={`${routeMatch.path}/appointments/new-appointment`}>
+					<Link to={`appointments/new-appointment`}>
 						<Button variant="link" size="sm" className="p-0 mb-5 fs-default">
 							new appointment
 						</Button>
 					</Link>
 
-					<Link to={`${routeMatch.path}/availabilities`}>
+					<Link to={`availabilities`}>
 						<Button
 							variant="link"
 							size="sm"
@@ -256,15 +297,11 @@ export const MySchedule: FC = () => {
 							clickInfo.event.extendedProps.isBlockedTime
 						) {
 							setManagingAvailabilties(false);
-							history.push(
-								`${routeMatch.path}/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
-							);
+							navigate(`availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`);
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
 							setFocusDateOnLoad(false);
-							history.push(
-								`${routeMatch.path}/appointments/${clickInfo.event.extendedProps.appointmentId}`
-							);
+							navigate(`appointments/${clickInfo.event.extendedProps.appointmentId}`);
 						}
 					}}
 					datesSet={({ start, end }) => {
@@ -274,96 +311,62 @@ export const MySchedule: FC = () => {
 				/>
 			</div>
 
-			<Switch>
-				<Route
-					exact
-					path={[
-						`${routeMatch.path}/appointments/new-appointment`,
-						`${routeMatch.path}/appointments/:appointmentId/edit`,
-					]}
-				>
-					<div className={classNames('px-5 h-100', classes.sideBar)}>
-						<EditAppointmentPanel
-							focusDateOnLoad={focusDateOnLoad}
-							setCalendarDate={setCalendarDate}
-							onClose={(updatedAppointmentId) => {
-								setFocusDateOnLoad(false);
-								if (updatedAppointmentId) {
-									history.push(`${routeMatch.path}/appointments/${updatedAppointmentId}`);
-								} else {
-									history.push(`${routeMatch.path}`);
-								}
+			<Routes>
+				<Route element={<Outlet />}>
+					<Route path="appointments/new-appointment" element={renderedEditAppointmentPanel} />
+					<Route path="appointments/:appointmentId/edit" element={renderedEditAppointmentPanel} />
 
-								fetchMainData();
-								fetchLeftData();
-							}}
-						/>
-					</div>
+					<Route
+						path="appointments/:appointmentId"
+						element={
+							<div className={classNames('px-5 h-100', classes.sideBar)}>
+								<AppointmentDetailPanel
+									focusDateOnLoad={focusDateOnLoad}
+									setCalendarDate={setCalendarDate}
+									onAddAppointment={() => {
+										navigate(`appointments/new-appointment`);
+									}}
+									onClose={() => {
+										setFocusDateOnLoad(true);
+										navigate(``);
+									}}
+								/>
+							</div>
+						}
+					/>
+
+					<Route
+						path={`availabilities`}
+						element={
+							<div className={classNames('px-5 h-100', classes.sideBar)}>
+								<ManageAvailabilityPanel
+									onClose={() => {
+										setManagingAvailabilties(false);
+										navigate(``);
+									}}
+								/>
+							</div>
+						}
+					/>
+
+					<Route path="availabilities/new-availability" element={renderedAvailabilityPanel} />
+					<Route path="availabilities/new-blocked-time" element={renderedAvailabilityPanel} />
+					<Route path="availabilities/:logicalAvailabilityId/edit" element={renderedAvailabilityPanel} />
+
+					<Route
+						path={`availabilities/:logicalAvailabilityId`}
+						element={
+							<div className={classNames('px-5 h-100', classes.sideBar)}>
+								<SelectedAvailabilityPanel
+									onClose={() => {
+										navigate(``);
+									}}
+								/>
+							</div>
+						}
+					/>
 				</Route>
-
-				<Route exact path={`${routeMatch.path}/appointments/:appointmentId`}>
-					<div className={classNames('px-5 h-100', classes.sideBar)}>
-						<AppointmentDetailPanel
-							focusDateOnLoad={focusDateOnLoad}
-							setCalendarDate={setCalendarDate}
-							onAddAppointment={() => {
-								history.push(`${routeMatch.path}/appointments/new-appointment`);
-							}}
-							onClose={() => {
-								setFocusDateOnLoad(true);
-								history.push(`${routeMatch.path}`);
-							}}
-						/>
-					</div>
-				</Route>
-
-				<Route exact path={`${routeMatch.path}/availabilities`}>
-					<div className={classNames('px-5 h-100', classes.sideBar)}>
-						<ManageAvailabilityPanel
-							onClose={() => {
-								setManagingAvailabilties(false);
-								history.push(`${routeMatch.path}`);
-							}}
-						/>
-					</div>
-				</Route>
-
-				<Route
-					exact
-					path={[
-						`${routeMatch.path}/availabilities/new-availability`,
-						`${routeMatch.path}/availabilities/new-blocked-time`,
-						`${routeMatch.path}/availabilities/:logicalAvailabilityId/edit`,
-					]}
-				>
-					<div className={classNames('px-5 h-100', classes.sideBar)}>
-						<EditAvailabilityPanel
-							onClose={(logicalAvailabilityId) => {
-								if (managingAvailabilties) {
-									history.push(`${routeMatch.path}/availabilities`);
-								} else if (logicalAvailabilityId) {
-									history.push(`${routeMatch.path}/availabilities/${logicalAvailabilityId}`);
-								} else {
-									history.push(`${routeMatch.path}`);
-								}
-
-								fetchMainData();
-								fetchLeftData();
-							}}
-						/>
-					</div>
-				</Route>
-
-				<Route exact path={`${routeMatch.path}/availabilities/:logicalAvailabilityId`}>
-					<div className={classNames('px-5 h-100', classes.sideBar)}>
-						<SelectedAvailabilityPanel
-							onClose={() => {
-								history.push(`${routeMatch.path}`);
-							}}
-						/>
-					</div>
-				</Route>
-			</Switch>
+			</Routes>
 
 			{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel

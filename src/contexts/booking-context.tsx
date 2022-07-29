@@ -10,11 +10,12 @@ import React, {
 	useEffect,
 	PropsWithChildren,
 } from 'react';
-import { LocationDescriptor } from 'history';
+
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
+import { To } from 'react-router-dom';
 
 type Range = { min: number; max: number };
 
@@ -105,7 +106,7 @@ interface BookingState {
 	setPreserveFilters: Dispatch<SetStateAction<boolean>>;
 	getFiltersQueryString: () => string;
 	selectedAppointmentType?: AppointmentType;
-	getExitBookingLocation: (state: unknown) => LocationDescriptor;
+	getExitBookingLocation: (state: unknown) => To;
 }
 
 const BookingContext = createContext({} as BookingState);

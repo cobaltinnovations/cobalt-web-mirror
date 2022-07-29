@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObject, useLayoutEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
 import useQuery from '@/hooks/use-query';
@@ -23,7 +23,7 @@ interface PendingCancellationModel {
 const MyCalendar: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('my calendar');
-	const history = useHistory<{ successBooking?: boolean; emailAddress?: string }>();
+	const location = useLocation();
 	const query = useQuery();
 	const appointmentId = query.get('appointmentId') || '';
 	const groupSessionReservationId = query.get('groupSessionReservationId') || '';
@@ -32,6 +32,7 @@ const MyCalendar: FC = () => {
 	const [pendingCancellation, setPendingCancellation] = useState<PendingCancellationModel | undefined>(undefined);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
 	const [calendarEventGroups, setCalendarEventGroups] = useState<CalendarEventGroupsModel[]>([]);
+	const locationState = (location.state as { successBooking?: boolean; emailAddress?: string }) || {};
 
 	const eventRefs = useMemo(
 		() =>
@@ -148,12 +149,12 @@ const MyCalendar: FC = () => {
 					</p>
 				</HeroContainer>
 
-				{history.location.state?.successBooking ? (
+				{locationState?.successBooking ? (
 					<HeroContainer className="bg-success">
-						{history.location.state?.emailAddress ? (
-							<h5 className="text-center mb-0">
+						{locationState?.emailAddress ? (
+							<h5 className="text-center text-light mb-0">
 								your session is reserved and we have sent a confirmation to{' '}
-								{history.location.state?.emailAddress}
+								{locationState?.emailAddress}
 							</h5>
 						) : (
 							<h5 className="text-center mb-0">your appointment was reserved</h5>

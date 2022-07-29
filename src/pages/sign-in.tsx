@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import { accountService } from '@/lib/services';
@@ -32,7 +32,7 @@ const SignIn: FC = () => {
 	const { subdomainInstitution } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const handleEnterAnonymouslyButtonClick = async () => {
 		try {
@@ -42,9 +42,8 @@ const SignIn: FC = () => {
 				})
 				.fetch();
 
-			history.replace({
-				pathname: '/auth',
-				search: '?' + new URLSearchParams({ accessToken }).toString(),
+			navigate(`/auth?${new URLSearchParams({ accessToken }).toString()}`, {
+				replace: true,
 			});
 		} catch (error) {
 			handleError(error);
@@ -69,7 +68,7 @@ const SignIn: FC = () => {
 								className="d-block w-100"
 								variant="primary"
 								onClick={() => {
-									history.push('/sign-in-2');
+									navigate('/sign-in-2');
 								}}
 							>
 								Sign in

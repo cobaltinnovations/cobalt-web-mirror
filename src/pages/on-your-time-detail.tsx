@@ -43,12 +43,10 @@ const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface RouteParams {
-	contentId: string;
-}
-
 const OnYourTimeDetail: FC = () => {
-	const { contentId } = useParams<RouteParams>();
+	const { contentId } = useParams<{
+		contentId: string;
+	}>();
 	const classes = useOnYourTimeDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
@@ -57,6 +55,10 @@ const OnYourTimeDetail: FC = () => {
 	useHeaderTitle(item?.title ?? '');
 
 	const fetchData = useCallback(async () => {
+		if (!contentId) {
+			return;
+		}
+
 		const response = await contentService.fetchContent(contentId).fetch();
 		setItem(response.content);
 	}, [contentId]);
