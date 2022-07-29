@@ -3,43 +3,6 @@ import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
 
-const spacerSize = 5;
-const iterations = 40;
-
-const m: Record<string, Record<string, string>> = {};
-const ms: Record<string, Record<string, string>> = {};
-const me: Record<string, Record<string, string>> = {};
-const mt: Record<string, Record<string, string>> = {};
-const mb: Record<string, Record<string, string>> = {};
-const my: Record<string, Record<string, string>> = {};
-const mx: Record<string, Record<string, string>> = {};
-
-const p: Record<string, Record<string, string>> = {};
-const ps: Record<string, Record<string, string>> = {};
-const pe: Record<string, Record<string, string>> = {};
-const pt: Record<string, Record<string, string>> = {};
-const pb: Record<string, Record<string, string>> = {};
-const py: Record<string, Record<string, string>> = {};
-const px: Record<string, Record<string, string>> = {};
-
-for (let i = 0; i <= iterations; i++) {
-	m[`.m-${i}`] = { margin: `${spacerSize * i}px !important` };
-	ms[`.ms-${i}`] = { marginLeft: `${spacerSize * i}px !important` };
-	me[`.me-${i}`] = { marginRight: `${spacerSize * i}px !important` };
-	mt[`.mt-${i}`] = { marginTop: `${spacerSize * i}px !important` };
-	mb[`.mb-${i}`] = { marginBottom: `${spacerSize * i}px !important` };
-	my[`.my-${i}`] = { marginBottom: `${spacerSize * i}px !important`, marginTop: `${spacerSize * i}px !important` };
-	mx[`.mx-${i}`] = { marginLeft: `${spacerSize * i}px !important`, marginRight: `${spacerSize * i}px !important` };
-
-	p[`.p-${i}`] = { padding: `${spacerSize * i}px !important` };
-	ps[`.ps-${i}`] = { paddingLeft: `${spacerSize * i}px !important` };
-	pe[`.pe-${i}`] = { paddingRight: `${spacerSize * i}px !important` };
-	pt[`.pt-${i}`] = { paddingTop: `${spacerSize * i}px !important` };
-	pb[`.pb-${i}`] = { paddingBottom: `${spacerSize * i}px !important` };
-	py[`.py-${i}`] = { paddingBottom: `${spacerSize * i}px !important`, paddingTop: `${spacerSize * i}px !important` };
-	px[`.px-${i}`] = { paddingLeft: `${spacerSize * i}px !important`, paddingRight: `${spacerSize * i}px !important` };
-}
-
 export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		/* ----------------------------------------------------------- */
@@ -234,24 +197,6 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				overflow: 'hidden',
 			},
 		},
-
-		/* ----------------------------------------------------------- */
-		/* Spacer overrides */
-		/* ----------------------------------------------------------- */
-		...m,
-		...ms,
-		...me,
-		...mt,
-		...mb,
-		...mx,
-		...my,
-		...p,
-		...ps,
-		...pe,
-		...pt,
-		...pb,
-		...px,
-		...py,
 
 		/* ----------------------------------------------------------- */
 		/* React Bootstrap Typeahead (RBT) */

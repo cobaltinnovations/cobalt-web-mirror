@@ -34,6 +34,7 @@ import { CobaltThemeProvider } from './jss/theme';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-multi-carousel/lib/styles.css';
+import './scss/main.scss';
 
 const AppWithProviders: FC = () => {
 	useGoogleAnalytics();
