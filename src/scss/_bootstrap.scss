@@ -4,6 +4,9 @@
 // Bootstrap Variable Overrides
 $spacer: 5px;
 
+$grid-gutter-width: 3.2rem;
+
+// other variables keep their `!default` as declared:
 @import "~bootstrap/scss/variables";
 
 // Bootstrap Map Overrides
@@ -13,6 +16,7 @@ $spacer: 5px;
 	));
 }
 
+// other maps keep their `!default` as declared:
 @import "~bootstrap/scss/maps";
 @import "~bootstrap/scss/mixins";
 @import "~bootstrap/scss/utilities";
