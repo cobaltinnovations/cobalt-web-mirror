@@ -1,12 +1,11 @@
 import moment from 'moment';
 import React, { ReactElement } from 'react';
-import { Outlet, Navigate, useMatch } from 'react-router-dom';
+import { Outlet, Navigate, useMatch, useSearchParams } from 'react-router-dom';
 
 import config from '@/lib/config';
 import { queryParamDateRegex } from '@/lib/utils';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
-import useQuery from '@/hooks/use-query';
 import Header from '@/components/header';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
@@ -95,11 +94,12 @@ const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && acco
 
 const RedirectToSupport = () => {
 	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
-	const query = useQuery();
+	const [searchParams] = useSearchParams();
+
 	let routedSupportRoleId = match?.params.supportRoleId ?? '';
-	const routedStartDate = query.get('date') || '';
-	const routedProviderId = query.get('providerId');
-	const routedClinicIds = query.getAll('clinicId');
+	const routedStartDate = searchParams.get('date') || '';
+	const routedProviderId = searchParams.get('providerId');
+	const routedClinicIds = searchParams.getAll('clinicId');
 
 	if (routedSupportRoleId === 'therapist') {
 		routedSupportRoleId = 'clinician';

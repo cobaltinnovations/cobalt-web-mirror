@@ -1,9 +1,8 @@
 import React, { FC, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 import useSubdomain from '@/hooks/use-subdomain';
-import useQuery from '@/hooks/use-query';
 
 import AsyncPage from '@/components/async-page';
 import Select from '@/components/select';
@@ -21,8 +20,8 @@ const SignInSSO: FC = () => {
 	const [ssoOptions, setSsoOptions] = useState<AccountSource[]>([]);
 	const [ssoSelectValue, setSsoSelectValue] = useState<string>('');
 
-	const query = useQuery();
-	const accountSourceId = query.get('accountSourceId');
+	const [searchParams] = useSearchParams();
+	const accountSourceId = searchParams.get('accountSourceId');
 
 	const fetchData = useCallback(async () => {
 		const { accountSources } = await institutionService

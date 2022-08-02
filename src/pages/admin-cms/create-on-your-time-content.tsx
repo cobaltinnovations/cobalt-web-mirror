@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
@@ -30,7 +30,6 @@ import useAccount from '@/hooks/use-account';
 import { PersonalizationCheckbox } from '@/components/personalize-recommendations-modal';
 import OnYourTimePreview from '@/components/admin-cms/on-your-time-preview';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
-import useQuery from '@/hooks/use-query';
 import DatePicker from '@/components/date-picker';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
@@ -69,10 +68,10 @@ const CreateOnYourTimeContent: FC = () => {
 	const { account } = useAccount();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const query = useQuery();
-	const contentId = query.get('contentId');
-	const editing = query.get('editing');
-	const adding = query.get('adding');
+	const [searchParams] = useSearchParams();
+	const contentId = searchParams.get('contentId');
+	const editing = searchParams.get('editing');
+	const adding = searchParams.get('adding');
 	const [showRemoveImageModal, setShowRemoveImageModal] = useState(false);
 
 	const [contentInstitutions, setContentInstitutions] = useState<InstitutionFilters[]>();

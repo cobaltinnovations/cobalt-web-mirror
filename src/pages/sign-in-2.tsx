@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
 import { accountService, institutionService } from '@/lib/services';
@@ -10,7 +10,6 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { AccountSource } from '@/lib/models';
 import useSubdomain from '@/hooks/use-subdomain';
-import useQuery from '@/hooks/use-query';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -35,8 +34,8 @@ const SignIn2 = () => {
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
 
-	const query = useQuery();
-	const accountSourceId = query.get('accountSourceId');
+	const [searchParams] = useSearchParams();
+	const accountSourceId = searchParams.get('accountSourceId');
 
 	// SSO
 	const [ssoModalIsOpen, setSsoModalIsOpen] = useState(false);

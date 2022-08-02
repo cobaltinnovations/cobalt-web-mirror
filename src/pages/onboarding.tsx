@@ -1,13 +1,11 @@
 import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-import useQuery from '@/hooks/use-query';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Onboarding = () => {
 	const navigate = useNavigate();
-	const query = useQuery();
-	const roleId = query.get('roleId');
+	const [searchParams] = useSearchParams();
+	const roleId = searchParams.get('roleId');
 
 	useEffect(() => {
 		if (roleId) {

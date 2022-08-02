@@ -1,12 +1,11 @@
 import React, { FC, createContext, useState, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { useNavigate, useLocation, useMatch } from 'react-router-dom';
+import { useNavigate, useLocation, useMatch, useSearchParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
 import { AccountInstitutionCapabilities, AccountModel, AccountSourceId } from '@/lib/models';
 import { accountService, institutionService } from '@/lib/services';
 
-import useQuery from '@/hooks/use-query';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import useHandleError from '@/hooks/use-handle-error';
 import useSubdomain from '@/hooks/use-subdomain';
@@ -36,17 +35,19 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const [subdomainInstitution, setSubdomainInstitution] = useState<Institution | undefined>(undefined);
 	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
 
-	const query = useQuery();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const immediateSupportRouteMatch = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>({
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
-	const [isTrackedSession, setIsTrackedSession] = useState(!!query.get('track') || !!Cookies.get('trackActivity'));
-	const [sessionAccountSourceId] = useState(query.get('accountSourceId'));
+	const [isTrackedSession, setIsTrackedSession] = useState(
+		!!searchParams.get('track') || !!Cookies.get('trackActivity')
+	);
+	const [sessionAccountSourceId] = useState(searchParams.get('accountSourceId'));
 
-	const immediateAccess = query.get('immediateAccess');
+	const immediateAccess = searchParams.get('immediateAccess');
 
 	const signOutAndClearContext = useCallback(() => {
 		Cookies.remove('accessToken');

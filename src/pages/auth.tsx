@@ -1,10 +1,9 @@
 import React, { FC, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
 import useAccount from '@/hooks/use-account';
-import useQuery from '@/hooks/use-query';
 
 import Loader from '@/components/loader';
 
@@ -18,9 +17,9 @@ type DecodedAccessToken = {
 const Auth: FC = () => {
 	const { account, setAccount, setInstitution } = useAccount();
 	const navigate = useNavigate();
-	const query = useQuery();
+	const [searchParams] = useSearchParams();
 
-	const accessTokenFromQuery = query.get('accessToken');
+	const accessTokenFromQuery = searchParams.get('accessToken');
 
 	const successfulAuthRedirect = useCallback(() => {
 		const authRedirectUrl = Cookies.get('authRedirectUrl');

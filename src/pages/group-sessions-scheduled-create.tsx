@@ -2,13 +2,12 @@ import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import useHeaderTitle from '@/hooks/use-header-title';
-import useQuery from '@/hooks/use-query';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
@@ -141,8 +140,8 @@ const GroupSessionsCreate: FC = () => {
 
 	const { showAlert } = useAlert();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const query = useQuery();
-	const groupSessionIdToCopy = query.get('groupSessionIdToCopy');
+	const [searchParams] = useSearchParams();
+	const groupSessionIdToCopy = searchParams.get('groupSessionIdToCopy');
 
 	const [showSessionCancelModal, setShowSessionCancelModal] = useState(false);
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
@@ -11,14 +11,13 @@ import ActionSheet from '@/components/action-sheet';
 
 import { groupEventService, groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
-import useQuery from '@/hooks/use-query';
 import InputHelper from '@/components/input-helper';
 
 const InTheStudio: FC = () => {
 	useHeaderTitle('In the Studio');
-	const query = useQuery();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const groupEventUrlName = query.get('class') || '';
+	const groupEventUrlName = searchParams.get('class') || '';
 
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');

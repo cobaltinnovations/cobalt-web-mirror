@@ -1,9 +1,8 @@
 import React, { FC, useState, useCallback, useContext, useMemo, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import useQuery from '@/hooks/use-query';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -24,11 +23,11 @@ const IntakeAssessment: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const query = useQuery();
-	const providerId = query.get('providerId') || '';
-	const groupSessionId = query.get('groupSessionId') || '';
-	const questionId = query.get('questionId') || '';
-	const sessionId = query.get('sessionId') || '';
+	const [searchParams] = useSearchParams();
+	const providerId = searchParams.get('providerId') || '';
+	const groupSessionId = searchParams.get('groupSessionId') || '';
+	const questionId = searchParams.get('questionId') || '';
+	const sessionId = searchParams.get('sessionId') || '';
 	const { account, setAccount } = useAccount();
 
 	const [isSavingInfo, setIsSavingInfo] = useState(false);
@@ -62,7 +61,7 @@ const IntakeAssessment: FC = () => {
 		getExitBookingLocation,
 	} = useContext(BookingContext);
 
-	const appointmentTypeId = query.get('appointmentTypeId') || selectedAppointmentTypeId;
+	const appointmentTypeId = searchParams.get('appointmentTypeId') || selectedAppointmentTypeId;
 
 	const exitUrl = useMemo(() => {
 		return getExitBookingLocation(location.state);

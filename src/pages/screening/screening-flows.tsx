@@ -1,20 +1,19 @@
 import AsyncPage from '@/components/async-page';
 import CollectPhoneModal from '@/components/collect-phone-modal';
 import useHandleError from '@/hooks/use-handle-error';
-import useQuery from '@/hooks/use-query';
 import { ERROR_CODES } from '@/lib/http-client';
 import { ScreeningSession } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Container } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
 
 const ScreeningFlowsPage = () => {
 	const handleError = useHandleError();
-	const queryParams = useQuery();
+	const [searchParams] = useSearchParams();
 	const { screeningFlowId } = useParams<{ screeningFlowId: string }>();
-	const targetAccountId = queryParams.get('targetAccountId');
+	const targetAccountId = searchParams.get('targetAccountId');
 	const [showPhoneModal, setShowPhoneModal] = useState(false);
 	const [selectedSession, setSelectedSession] = useState<ScreeningSession>();
 	const { navigateToDestination, navigateToNext } = useScreeningNavigation();

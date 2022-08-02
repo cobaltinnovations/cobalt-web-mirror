@@ -1,8 +1,7 @@
 import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObject, useLayoutEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import useQuery from '@/hooks/use-query';
 import useHeaderTitle from '@/hooks/use-header-title';
 
 import AsyncPage from '@/components/async-page';
@@ -24,10 +23,10 @@ const MyCalendar: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('my calendar');
 	const location = useLocation();
-	const query = useQuery();
-	const appointmentId = query.get('appointmentId') || '';
-	const groupSessionReservationId = query.get('groupSessionReservationId') || '';
-	const action = query.get('action') || '';
+	const [searchParams] = useSearchParams();
+	const appointmentId = searchParams.get('appointmentId') || '';
+	const groupSessionReservationId = searchParams.get('groupSessionReservationId') || '';
+	const action = searchParams.get('action') || '';
 	const [isCancelling, setIsCancelling] = useState(false);
 	const [pendingCancellation, setPendingCancellation] = useState<PendingCancellationModel | undefined>(undefined);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);

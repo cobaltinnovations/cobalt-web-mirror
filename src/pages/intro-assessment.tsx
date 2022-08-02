@@ -1,13 +1,12 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
-import useQuery from '@/hooks/use-query';
 
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';
@@ -27,9 +26,9 @@ const IntroAssessment: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { account, setAccount } = useAccount();
-	const query = useQuery();
-	const questionId = query.get('questionId');
-	const sessionId = query.get('sessionId');
+	const [searchParams] = useSearchParams();
+	const questionId = searchParams.get('questionId');
+	const sessionId = searchParams.get('sessionId');
 
 	const [assessment, setAssessment] = useState<Assessment | undefined>();
 	const [answerChangedByUser, setAnswerChangedByUser] = useState<boolean>(false);
