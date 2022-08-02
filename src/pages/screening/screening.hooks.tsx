@@ -90,8 +90,8 @@ export function useScreeningNavigation() {
 	const { openInCrisisModal } = useInCrisisModal();
 
 	const navigateToDestination = useCallback(
-		(destination: ScreeningSessionDestination, state?: Record<string, any>) => {
-			switch (destination.screeningSessionDestinationId) {
+		(destination?: ScreeningSessionDestination, state?: Record<string, any>) => {
+			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					openInCrisisModal(true);
 					return;

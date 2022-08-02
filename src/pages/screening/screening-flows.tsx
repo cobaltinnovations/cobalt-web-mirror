@@ -82,11 +82,7 @@ const ScreeningFlowsPage = () => {
 			<CollectPhoneModal
 				show={showPhoneModal}
 				onSkip={() => {
-					if (!selectedSession?.screeningSessionDestination) {
-						return;
-					}
-
-					navigateToDestination(selectedSession.screeningSessionDestination, {
+					navigateToDestination(selectedSession?.screeningSessionDestination, {
 						skipAssessment: true,
 					});
 				}}
