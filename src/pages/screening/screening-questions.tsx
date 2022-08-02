@@ -186,6 +186,10 @@ const ScreeningQuestionsPage = () => {
 	return (
 		<AsyncPage fetchData={initialFetch}>
 			<Container className="py-5">
+				{!!response?.screeningQuestion.introText && (
+					<p className="mb-3">{response.screeningQuestion.introText}</p>
+				)}
+
 				<h3 className="mb-5">{response?.screeningQuestion.questionText}</h3>
 
 				<Form
