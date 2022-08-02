@@ -15,31 +15,31 @@ const useFilterDaysModalStyles = createUseStyles({
 
 const DAYS = [
 	{
-		label: 'Monday',
+		label: 'Mon.',
 		key: 'MONDAY',
 	},
 	{
-		label: 'Tuesday',
+		label: 'Tue.',
 		key: 'TUESDAY',
 	},
 	{
-		label: 'Wednesday',
+		label: 'Wed.',
 		key: 'WEDNESDAY',
 	},
 	{
-		label: 'Thursday',
+		label: 'Thu.',
 		key: 'THURSDAY',
 	},
 	{
-		label: 'Friday',
+		label: 'Fri.',
 		key: 'FRIDAY',
 	},
 	{
-		label: 'Saturday',
+		label: 'Sat.',
 		key: 'SATURDAY',
 	},
 	{
-		label: 'Sunday',
+		label: 'Sun.',
 		key: 'SUNDAY',
 	},
 ] as const;
