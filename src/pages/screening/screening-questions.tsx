@@ -89,7 +89,7 @@ const ScreeningQuestionsPage = () => {
 
 	const renderedAnswerOptions = useMemo(() => {
 		switch (response?.screeningQuestion.screeningAnswerFormatId) {
-			case ScreeningAnswerFormatId.MULTI_SELECT:
+			case ScreeningAnswerFormatId.SINGLE_SELECT:
 				return (
 					<ToggleButtonGroup
 						bsPrefix="cobalt-screening-button-group"
@@ -119,7 +119,7 @@ const ScreeningQuestionsPage = () => {
 					</ToggleButtonGroup>
 				);
 
-			case ScreeningAnswerFormatId.SINGLE_SELECT:
+			case ScreeningAnswerFormatId.MULTI_SELECT:
 				return (
 					<ToggleButtonGroup
 						bsPrefix="cobalt-screening-button-group"
