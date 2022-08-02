@@ -77,7 +77,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.h6.default,
 			...theme.fonts.headingBold,
 		},
-		[mediaQueries.sm]: {
+		[mediaQueries.md]: {
 			h1: {
 				...theme.fonts.h1.mobile,
 			},
