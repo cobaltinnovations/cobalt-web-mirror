@@ -2,7 +2,7 @@
  * @type { import("../theme").CobaltFontFamily }
  */
 const headingFontFamily = {
-	fontFamily: '"Nunito Sans", sans-serif',
+	fontFamily: '"Clarika Pro Geometric", sans-serif',
 	weights: {
 		regular: 400,
 		bold: 700,
@@ -13,7 +13,7 @@ const headingFontFamily = {
  * @type { import("../theme").CobaltFontFamily }
  */
 const bodyFontFamily = {
-	fontFamily: '"Karla", sans-serif',
+	fontFamily: '"Clarika Pro Grotesque", sans-serif',
 	weights: {
 		regular: 400,
 		bold: 700,
@@ -119,28 +119,64 @@ const theme = {
 			lineHeight: '4.8rem',
 		},
 		h1: {
-			fontSize: '3.5rem',
-			lineHeight: '4.0rem',
+			default: {
+				fontSize: '3.5rem',
+				lineHeight: '4.0rem',
+			},
+			mobile: {
+				fontSize: '2.9rem',
+				lineHeight: '3.2rem',
+			},
 		},
 		h2: {
-			fontSize: '2.9rem',
-			lineHeight: '3.2rem',
+			default: {
+				fontSize: '2.9rem',
+				lineHeight: '3.2rem',
+			},
+			mobile: {
+				fontSize: '2.4rem',
+				lineHeight: '2.8rem',
+			},
 		},
 		h3: {
-			fontSize: '2.4rem',
-			lineHeight: '2.8rem',
+			default: {
+				fontSize: '2.4rem',
+				lineHeight: '2.8rem',
+			},
+			mobile: {
+				fontSize: '2.0rem',
+				lineHeight: '2.4rem',
+			},
 		},
 		h4: {
-			fontSize: '2.0rem',
-			lineHeight: '2.4rem',
+			default: {
+				fontSize: '2.0rem',
+				lineHeight: '2.4rem',
+			},
+			mobile: {
+				fontSize: '1.6rem',
+				lineHeight: '2.0rem',
+			},
 		},
 		h5: {
-			fontSize: '1.6rem',
-			lineHeight: '2.0rem',
+			default: {
+				fontSize: '1.6rem',
+				lineHeight: '2.0rem',
+			},
+			mobile: {
+				fontSize: '1.4rem',
+				lineHeight: '1.6rem',
+			},
 		},
 		h6: {
-			fontSize: '1.4rem',
-			lineHeight: '1.6rem',
+			default: {
+				fontSize: '1.4rem',
+				lineHeight: '1.6rem',
+			},
+			mobile: {
+				fontSize: '1.2rem',
+				lineHeight: '1.6rem',
+			},
 		},
 		default: {
 			fontSize: '1.5rem',

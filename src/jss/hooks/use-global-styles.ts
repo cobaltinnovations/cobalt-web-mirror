@@ -1,4 +1,5 @@
 import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '../media-queries';
 
 export const useGlobalStyles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -53,28 +54,48 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		/* Headings and text */
 		/* ----------------------------------------------------------- */
 		h1: {
-			...theme.fonts.h1,
+			...theme.fonts.h1.default,
 			...theme.fonts.headingBold,
 		},
 		h2: {
-			...theme.fonts.h2,
+			...theme.fonts.h2.default,
 			...theme.fonts.headingBold,
 		},
 		h3: {
-			...theme.fonts.h3,
+			...theme.fonts.h3.default,
 			...theme.fonts.headingBold,
 		},
 		h4: {
-			...theme.fonts.h4,
+			...theme.fonts.h4.default,
 			...theme.fonts.headingBold,
 		},
 		h5: {
-			...theme.fonts.h6,
+			...theme.fonts.h5.default,
 			...theme.fonts.headingBold,
 		},
 		h6: {
-			...theme.fonts.h6,
+			...theme.fonts.h6.default,
 			...theme.fonts.headingBold,
+		},
+		[mediaQueries.sm]: {
+			h1: {
+				...theme.fonts.h1.mobile,
+			},
+			h2: {
+				...theme.fonts.h2.mobile,
+			},
+			h3: {
+				...theme.fonts.h3.mobile,
+			},
+			h4: {
+				...theme.fonts.h4.mobile,
+			},
+			h5: {
+				...theme.fonts.h5.mobile,
+			},
+			h6: {
+				...theme.fonts.h6.mobile,
+			},
 		},
 		p: {
 			...theme.fonts.default,

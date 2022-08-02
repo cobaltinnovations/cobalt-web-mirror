@@ -13,6 +13,11 @@ type CobaltFontSizeConfig = {
 	lineHeight: string;
 };
 
+type CobaltHeadingConfig = {
+	default: CobaltFontConfig;
+	mobile: CobaltFontConfig;
+};
+
 type CobaltFontConfig = {
 	fontFamily: string;
 	fontWeight: number;
@@ -101,12 +106,12 @@ export type CobaltTheme = {
 		display1: CobaltFontSizeConfig;
 		display2: CobaltFontSizeConfig;
 		display3: CobaltFontSizeConfig;
-		h1: CobaltFontSizeConfig;
-		h2: CobaltFontSizeConfig;
-		h3: CobaltFontSizeConfig;
-		h4: CobaltFontSizeConfig;
-		h5: CobaltFontSizeConfig;
-		h6: CobaltFontSizeConfig;
+		h1: CobaltHeadingConfig;
+		h2: CobaltHeadingConfig;
+		h3: CobaltHeadingConfig;
+		h4: CobaltHeadingConfig;
+		h5: CobaltHeadingConfig;
+		h6: CobaltHeadingConfig;
 		default: CobaltFontSizeConfig;
 		large: CobaltFontSizeConfig;
 		small: CobaltFontSizeConfig;
