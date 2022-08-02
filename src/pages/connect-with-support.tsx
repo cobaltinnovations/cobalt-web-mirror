@@ -120,7 +120,7 @@ const ConnectWithSupport: FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
-	const [hasScreening, setHasScreening] = useState(false);
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const [recentProviders, setRecentProviders] = useState<SearchResult[]>([]);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -288,7 +288,7 @@ const ConnectWithSupport: FC = () => {
 			!isImmediate &&
 			!skipAssessment &&
 			didInit &&
-			!hasScreening
+			!hasCompletedScreening
 		) {
 			const urlQuery = new URLSearchParams(location.search);
 			const routedClinicIds = urlQuery.getAll('clinicId');
@@ -310,7 +310,7 @@ const ConnectWithSupport: FC = () => {
 		subdomainInstitution?.providerTriageScreeningFlowId,
 		location.search,
 		skipAssessment,
-		hasScreening,
+		hasCompletedScreening,
 	]);
 
 	const institutionId = account?.institutionId ?? '';
@@ -349,7 +349,7 @@ const ConnectWithSupport: FC = () => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
 					setFindOptions(findOptions);
 					setFilterDefaults(findOptions, preserveFilters);
-					setHasScreening(screenings.screeningSessions.some((session) => session.completed));
+					setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
 					setDidInit(true);
 				});
 			} catch (e) {

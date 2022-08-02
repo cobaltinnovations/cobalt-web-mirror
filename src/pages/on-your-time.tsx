@@ -1,11 +1,11 @@
-import React, { FC, useState, useCallback, useMemo } from 'react';
+import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
-import { contentService, assessmentService, ContentListFormat } from '@/lib/services';
+import { contentService, assessmentService, ContentListFormat, screeningService } from '@/lib/services';
 import { Content, PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 
 import AsyncPage from '@/components/async-page';
@@ -17,12 +17,21 @@ import FilterFormat from '@/components/filter-format';
 import FilterLength from '@/components/filter-length';
 import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
+
+interface LocationState {
+	skipAssessment?: boolean;
+}
 
 const OnYourTime: FC = () => {
 	useHeaderTitle('On Your Time');
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { subdomainInstitution } = useAccount();
+	const [didInit, setDidInit] = useState(false);
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
+	const skipAssessment = !!(location.state as LocationState)?.skipAssessment;
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
 	const [selectedFormatIds, setSelectedFormatIds] = useState<string[]>([]);
@@ -93,8 +102,30 @@ const OnYourTime: FC = () => {
 	}, [selectedFormatIds, selectedLength]);
 
 	const fetchData = useCallback(async () => {
-		await Promise.all([fetchContent(), fetchFilters()]);
-	}, [fetchContent, fetchFilters]);
+		const requests = [fetchContent(), fetchFilters()];
+		if (subdomainInstitution?.contentScreeningFlowId) {
+			const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
+				screeningFlowId: subdomainInstitution.contentScreeningFlowId,
+			});
+
+			requests.push(
+				fetchScreeningsRequest.fetch().then((r) => {
+					setHasCompletedScreening(r.screeningSessions.some((session) => session.completed));
+					setDidInit(true);
+				})
+			);
+		}
+
+		await Promise.all(requests);
+	}, [fetchContent, fetchFilters, subdomainInstitution?.contentScreeningFlowId]);
+
+	useEffect(() => {
+		if (didInit && subdomainInstitution?.contentScreeningFlowId && !hasCompletedScreening && !skipAssessment) {
+			navigate(`/screening-flows/${subdomainInstitution.contentScreeningFlowId}`, {
+				replace: true,
+			});
+		}
+	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.contentScreeningFlowId]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>

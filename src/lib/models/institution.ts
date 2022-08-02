@@ -6,6 +6,7 @@ export interface Institution {
 	emailEnabled: boolean;
 	institutionId: string;
 	privacyContent: string;
+	contentScreeningFlowId?: string;
 	providerTriageScreeningFlowId: string;
 	requireConsentForm: boolean;
 	ssoEnabled: boolean;
