@@ -58,15 +58,15 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">format</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>format</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="d-flex mb-3">
 					<Button variant="link" className="p-0" onClick={handleSelectAllButtonClick}>
 						select all
 					</Button>
-					<Button variant="link" className="ml-3 p-0" onClick={handleDeselectAllButtonClick}>
+					<Button variant="link" className="ms-3 p-0" onClick={handleDeselectAllButtonClick}>
 						deselect all
 					</Button>
 				</div>
@@ -76,7 +76,6 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 							<Form.Check
 								key={`${format.contentTypeLabelId}-${index}`}
 								type="checkbox"
-								bsPrefix="cobalt-modal-form__check"
 								name="on-your-time__filter-format"
 								id={`on-your-time__filter-format--${format.contentTypeLabelId}`}
 								label={format.description}
@@ -89,12 +88,14 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={handleSaveButtonClick}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

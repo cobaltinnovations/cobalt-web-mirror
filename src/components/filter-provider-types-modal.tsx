@@ -51,8 +51,8 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterProviderTypesModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">provider type</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>provider type</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Button
@@ -74,7 +74,6 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 						<Form.Check
 							key={`${providerType.supportRoleId}-${index}`}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={providerType.supportRoleId}
 							name={providerType.supportRoleId}
 							label={providerType.description}
@@ -91,12 +90,14 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 				})}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(selected)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(selected)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

@@ -17,7 +17,13 @@ interface ConfirmGroupEventBookingModalProps extends ModalProps {
 	externalUrl?: string;
 }
 
-const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({ onConfirm, groupEventName, dateTime, externalUrl, ...modalProps }) => {
+const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
+	onConfirm,
+	groupEventName,
+	dateTime,
+	externalUrl,
+	...modalProps
+}) => {
 	const classes = useConfirmGroupEventBookingModalStyles();
 
 	const navigateToExternalUrl = useCallback(() => {
@@ -44,39 +50,44 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.confirmGroupEventBookingModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm reservation</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm reservation</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{!!externalUrl ? (
-					<p>This session is managed outside of Cobalt. Please wait a moment while we take you to the site where you can complete your booking.</p>
+					<p>
+						This session is managed outside of Cobalt. Please wait a moment while we take you to the site
+						where you can complete your booking.
+					</p>
 				) : (
 					<>
-						<p className="mb-0 font-karla-bold">in the studio event</p>
+						<p className="mb-0 fw-bold">in the studio event</p>
 						<p className="mb-2">{groupEventName}</p>
 
-						<p className="mb-0 font-karla-bold">scheduled for</p>
+						<p className="mb-0 fw-bold">scheduled for</p>
 						<p className="mb-0">{dateTime}?</p>
 					</>
 				)}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={modalProps.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						if (externalUrl) {
-							navigateToExternalUrl();
-						} else {
-							onConfirm();
-						}
-					}}
-				>
-					{externalUrl ? 'ok' : 'reserve'}
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={modalProps.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							if (externalUrl) {
+								navigateToExternalUrl();
+							} else {
+								onConfirm();
+							}
+						}}
+					>
+						{externalUrl ? 'ok' : 'reserve'}
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

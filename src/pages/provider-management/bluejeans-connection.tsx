@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 
 export const ProviderManagementBluejeansConnection = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [hasBluejeansAccount, setHasBluejeansAccount] = useState(false);
 	const [emailAddress, setEmailAddress] = useState('');
@@ -25,13 +25,12 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 			<Row>
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 					<Form onSubmit={handleSubmit}>
-						<Form.Group>
+						<Form.Group className="mb-5">
 							<p className="mb-0">
 								<strong>Do they have a Bluejeans account already?</strong>
 							</p>
 							<Form.Check
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								name="has-bluejeans-account"
 								id="has-bluejeans-account-yes"
 								label="Yes"
@@ -43,7 +42,6 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 							/>
 							<Form.Check
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								name="has-bluejeans-account"
 								id="has-bluejeans-account-no"
 								label="No"
@@ -85,7 +83,7 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

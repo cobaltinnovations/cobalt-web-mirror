@@ -17,13 +17,11 @@ import { groupEventService, appointmentService } from '@/lib/services';
 import { GroupEvent } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 
-interface RouteParams {
-	groupEventId: string;
-}
-
 const InTheStudioDetail: FC = () => {
 	const handleError = useHandleError();
-	const { groupEventId } = useParams<RouteParams>();
+	const { groupEventId } = useParams<{
+		groupEventId: string;
+	}>();
 	const { account, setAccount } = useAccount();
 
 	const [isBooking, setIsBooking] = useState(false);
@@ -163,11 +161,17 @@ const InTheStudioDetail: FC = () => {
 								<p className="text-white text-center mb-3">Join us at {existingAppointmentDate}</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
-										<Button as="div" variant="light" size="sm" className="mr-2">
+										<Button as="div" variant="light" size="sm" className="me-2">
 											view calendar
 										</Button>
 									</Link>
-									<Button as="a" variant="light" size="sm" href={groupEvent.appointment.videoconferenceUrl} target="_blank">
+									<Button
+										as="a"
+										variant="light"
+										size="sm"
+										href={groupEvent.appointment.videoconferenceUrl}
+										target="_blank"
+									>
 										join now
 									</Button>
 								</div>

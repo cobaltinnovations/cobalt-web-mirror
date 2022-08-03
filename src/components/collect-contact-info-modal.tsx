@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import InputHelper from '@/components/input-helper';
 
 const useCollectContactInfoModalStyles = createUseStyles({
 	collectContactInfoModal: {
@@ -41,8 +42,8 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.collectContactInfoModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">confirm your appointment</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>confirm your appointment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
@@ -57,25 +58,23 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 					</p>
 
 					{promptForEmail && (
-						<Form.Control
+						<InputHelper
 							required
 							type="email"
 							value={emailInputValue}
 							className="mb-2"
-							placeholder="Your Email Address"
+							label="Your Email Address"
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setEmailInputValue(e.target.value);
 							}}
 						/>
 					)}
-
 					{promptForPhoneNumber && (
-						<Form.Control
+						<InputHelper
 							required
 							type="tel"
-							className="mb-3"
 							value={phoneNumberInputValue}
-							placeholder="Your Phone Number"
+							label="Your Phone Number"
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setPhoneNumberInputValue(e.target.value);
 							}}
@@ -84,13 +83,14 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 				</Modal.Body>
 
 				<Modal.Footer>
-					<Button type="button" variant="outline-primary" size="sm" onClick={props.onHide}>
-						cancel
-					</Button>
-
-					<Button type="submit" variant="primary" size="sm">
-						reserve
-					</Button>
+					<div className="text-right">
+						<Button type="button" variant="outline-primary" onClick={props.onHide}>
+							cancel
+						</Button>
+						<Button className="ms-2" type="submit" variant="primary">
+							reserve
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>

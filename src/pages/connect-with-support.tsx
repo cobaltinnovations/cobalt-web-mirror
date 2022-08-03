@@ -13,8 +13,7 @@ import React, {
 import { unstable_batchedUpdates } from 'react-dom';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
-import { useHistory, Link, useLocation } from 'react-router-dom';
-import { createUseStyles } from 'react-jss';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
 
@@ -41,16 +40,16 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
-import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
+import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
 import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { BookingContext, SearchResult, BookingFilters, BookingSource } from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -71,11 +70,11 @@ const mapClinicToResult = (clinic: Clinic): SearchResult => ({
 	displayName: clinic.description,
 });
 
-const useConnectWithSupportStyles = createUseStyles({
+const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: colors.dark,
+		fill: theme.colors.n900,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -83,19 +82,19 @@ const useConnectWithSupportStyles = createUseStyles({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: colors.dark,
+		fill: theme.colors.n900,
 	},
 	filterIcon: {
 		marginTop: -1,
 		marginLeft: 5,
-		fill: colors.dark,
+		fill: theme.colors.n900,
 	},
 	infoIcon: {
 		width: 28,
 		marginLeft: 10,
-		fill: colors.white,
+		fill: theme.colors.p500,
 	},
-});
+}));
 
 interface HistoryLocationState {
 	skipAssessment?: boolean;
@@ -110,10 +109,10 @@ const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	useHeaderTitle('connect with support');
 	const classes = useConnectWithSupportStyles();
-	const { account } = useAccount();
+	const { account, subdomainInstitution } = useAccount();
 
 	const location = useLocation();
-	const history = useHistory<HistoryLocationState>();
+	const navigate = useNavigate();
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
@@ -121,6 +120,7 @@ const ConnectWithSupport: FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const [recentProviders, setRecentProviders] = useState<SearchResult[]>([]);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -183,7 +183,7 @@ const ConnectWithSupport: FC = () => {
 		[availableSections]
 	);
 
-	const skipAssessment = !!history.location.state?.skipAssessment;
+	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const recommendedTherapistPsychiatrist =
 		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Clinician ||
 		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Psychiatrist;
@@ -197,7 +197,7 @@ const ConnectWithSupport: FC = () => {
 	}, [getActiveFiltersState, findOptions]);
 
 	const setFilterDefaults = useCallback(
-		async (findOptions, preserveFilters = false) => {
+		async (findOptions: FindOptionsResponse, preserveFilters = false) => {
 			if (preserveFilters) {
 				setRecommendationHtml(findOptions.recommendationHtml);
 				setAssessmentScore(findOptions.scores);
@@ -205,7 +205,7 @@ const ConnectWithSupport: FC = () => {
 			}
 
 			const urlQuery = new URLSearchParams(location.search);
-			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
+			const routedSupportRoleIds = urlQuery.getAll('supportRoleId') as SupportRoleId[];
 			const routedStartDate = urlQuery.get('startDate') || '';
 			const routedEndDate = urlQuery.get('endDate') || '';
 			const routedClinicIds = urlQuery.getAll('clinicId');
@@ -261,7 +261,7 @@ const ConnectWithSupport: FC = () => {
 	);
 
 	const searchProviders = useCallback(
-		async (query) => {
+		async (query: string) => {
 			setIsSearching(true);
 
 			try {
@@ -283,23 +283,44 @@ const ConnectWithSupport: FC = () => {
 	useEffect(() => {
 		const isImmediate = Cookies.get('immediateAccess');
 
-		if (!isImmediate && !skipAssessment && didInit && !assessmentScore) {
+		if (
+			subdomainInstitution?.providerTriageScreeningFlowId &&
+			!isImmediate &&
+			!skipAssessment &&
+			didInit &&
+			!hasCompletedScreening
+		) {
 			const urlQuery = new URLSearchParams(location.search);
 			const routedClinicIds = urlQuery.getAll('clinicId');
 			const routedProviderId = urlQuery.get('providerId') || undefined;
 			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 
-			history.replace('/weekly-assessment', { routedClinicIds, routedProviderId, routedSupportRoleIds });
+			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
+				replace: true,
+				state: {
+					routedClinicIds,
+					routedProviderId,
+					routedSupportRoleIds,
+				},
+			});
 		}
-	}, [assessmentScore, didInit, history, location.search, skipAssessment]);
+	}, [
+		didInit,
+		navigate,
+		subdomainInstitution?.providerTriageScreeningFlowId,
+		location.search,
+		skipAssessment,
+		hasCompletedScreening,
+	]);
 
 	const institutionId = account?.institutionId ?? '';
+	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
 	useEffect(() => {
 		const urlQuery = new URLSearchParams(location.search);
 		const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
 		const routedClinicIds = urlQuery.getAll('clinicId');
 
-		if (didInit || !institutionId) {
+		if (didInit || !institutionId || !providerTriageScreeningFlowId) {
 			return () => {
 				if (routedClinicIds) {
 					setSelectedSearchResult([]);
@@ -312,22 +333,27 @@ const ConnectWithSupport: FC = () => {
 			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
+		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
+			screeningFlowId: providerTriageScreeningFlowId,
+		});
 
 		async function init() {
 			try {
-				const [findOptions, recent] = await Promise.all([
+				const [findOptions, recent, screenings] = await Promise.all([
 					findOptionsRequest.fetch(),
 					fetchRecentRequest.fetch(),
+					fetchScreeningsRequest.fetch(),
 				]);
 
 				unstable_batchedUpdates(() => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
 					setFindOptions(findOptions);
 					setFilterDefaults(findOptions, preserveFilters);
+					setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
 					setDidInit(true);
 				});
 			} catch (e) {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(e);
 				}
 			}
@@ -347,6 +373,7 @@ const ConnectWithSupport: FC = () => {
 		handleError,
 		institutionId,
 		setSelectedSearchResult,
+		providerTriageScreeningFlowId,
 	]);
 
 	useEffect(() => {
@@ -470,10 +497,10 @@ const ConnectWithSupport: FC = () => {
 			setSelectedSearchResult([]);
 			setProviderFilter(undefined);
 			setClinicsFilter([]);
-			const params = new URLSearchParams(history.location.search);
+			const params = new URLSearchParams(location.search);
 			params.delete('providerId');
 			params.delete('clinicId');
-			history.push(`/connect-with-support?${params.toString()}`, history.location.state);
+			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
 		}
 	}
 
@@ -582,10 +609,7 @@ const ConnectWithSupport: FC = () => {
 
 			<HeroContainer>
 				<div className="d-flex justify-content-center align-items-center">
-					<small
-						className="text-white text-center"
-						dangerouslySetInnerHTML={{ __html: recommendationHtml }}
-					/>
+					<p className="mb-0 text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
 					<Link to="/one-on-one-resources">
 						<InfoIcon className={classes.infoIcon} />
 					</Link>
@@ -644,14 +668,15 @@ const ConnectWithSupport: FC = () => {
 									}}
 									onInputChange={setSearchQuery}
 									onChange={(selectedOptions) => {
-										setSelectedSearchResult(selectedOptions);
+										setSelectedSearchResult(selectedOptions as SearchResult[]);
 										(typeAheadRef.current as any).blur();
 									}}
 									options={searchQuery ? searchResults : recentProviders}
 									selected={selectedSearchResult}
-									renderMenu={(results, menuProps) => {
+									renderMenu={(options, menuProps) => {
+										const results = options as SearchResult[];
 										if (!searchQuery && recentProviders.length === 0) {
-											return null;
+											return <></>;
 										}
 
 										return (
@@ -673,7 +698,7 @@ const ConnectWithSupport: FC = () => {
 																	imageUrl={result.imageUrl}
 																	size={43}
 																/>
-																<div className="ml-3">
+																<div className="ms-3">
 																	<p className="mb-0">{result.displayName}</p>
 																	{result.description && (
 																		<small>{result.description}</small>
@@ -701,7 +726,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<div className="d-flex align-items-center justify-content-center mb-1">
-								<small className="mb-0 text-uppercase text-muted font-karla-bold">Filters</small>
+								<small className="mb-0 text-uppercase text-muted fw-bold">Filters</small>
 							</div>
 							<div className="d-flex justify-content-center flex-wrap">
 								<FilterPill
@@ -766,11 +791,8 @@ const ConnectWithSupport: FC = () => {
 											urlQuery.delete('endDate');
 											urlQuery.delete('clinicId');
 											urlQuery.delete('providerId');
-											history.push({
-												pathname: location.pathname,
-												search: '?' + urlQuery.toString(),
-											});
-										} else {
+											navigate(`${location.pathname}?${urlQuery.toString()}`);
+										} else if (findOptions) {
 											setFilterDefaults(findOptions);
 										}
 									}}
@@ -838,7 +860,7 @@ const ConnectWithSupport: FC = () => {
 					return (
 						<div key={section.date}>
 							<DayContainer className="mb-4">
-								<p className="mb-0 font-karla-bold">{section.dateDescription}</p>
+								<p className="mb-0 fw-bold">{section.dateDescription}</p>
 							</DayContainer>
 
 							<Container>

@@ -39,14 +39,13 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">length</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>length</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--any-time"
 						label="any time"
@@ -56,7 +55,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-2-minutes"
 						label="under 2 minutes"
@@ -66,7 +64,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-5-minutes"
 						label="under 5 minutes"
@@ -76,7 +73,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-10-minutes"
 						label="under 10 minutes"
@@ -86,7 +82,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-15-minutes"
 						label="under 15 minutes"
@@ -96,7 +91,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-20-minutes"
 						label="under 20 minutes"
@@ -106,7 +100,6 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						name="on-your-time__filter-length"
 						id="on-your-time__filter-length--under-30-minutes"
 						label="under 30 minutes"
@@ -117,12 +110,14 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 				</Form>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={handleSaveButtonClick}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

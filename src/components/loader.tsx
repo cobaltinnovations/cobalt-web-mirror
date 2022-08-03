@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useLoaderStyles = createUseStyles({
+const useLoaderStyles = createUseThemedStyles((theme) => ({
 	loader: ({ size }: { size: number }) => ({
 		zIndex: 0,
 		top: '50%',
@@ -15,8 +13,8 @@ const useLoaderStyles = createUseStyles({
 		marginTop: -(size / 2) || -28,
 		marginLeft: -(size / 2) || -28,
 		borderRadius: '50%',
-		borderTopColor: colors.primary,
-		border: `8px solid ${colors.border}`,
+		borderTopColor: theme.colors.p500,
+		border: `8px solid ${theme.colors.border}`,
 		animation: `$rotate 1000ms linear 0ms infinite normal`,
 	}),
 	'@keyframes rotate': {
@@ -27,14 +25,14 @@ const useLoaderStyles = createUseStyles({
 			transform: 'rotate(360deg)',
 		},
 	},
-});
+}));
 
 interface LoaderProps {
 	size?: number;
 	className?: string;
 }
 
-const Loader: FC<LoaderProps> = React.memo(({ size, className }) => {
+const Loader: FC<LoaderProps> = React.memo(({ size = 64, className }) => {
 	const classes = useLoaderStyles({ size });
 
 	return <div className={classNames(classes.loader, className)} />;

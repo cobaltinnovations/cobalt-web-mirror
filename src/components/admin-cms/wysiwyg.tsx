@@ -1,14 +1,13 @@
-import React, { FC } from 'react';
-import * as Quill from 'quill';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, { FC, useEffect } from 'react';
+
+import 'quill/dist/quill.snow.css';
+import { useQuill } from 'react-quilljs';
 
 interface WysiwygProps {
 	className?: string;
-	value: string;
-	onChange(content: string, delta: Quill.Delta, source: Quill.Sources /* editor: UnprivilegedEditor */): void;
-	onBlur?(previousRange: Quill.RangeStatic, source: Quill.Sources /* editor: UnprivilegedEditor */): void;
-	readOnly: boolean;
+	initialValue?: string;
+	onChange(htmlContent: string): void;
+	readOnly?: boolean;
 }
 
 const modules = {
@@ -17,19 +16,35 @@ const modules = {
 
 const formats = ['bold', 'italic', 'underline', 'strike', 'list', 'bullet'];
 
-const Wysiwyg: FC<WysiwygProps> = ({ value, onChange, onBlur, readOnly, className }) => {
-	return (
-		<ReactQuill
-			className={className}
-			theme={'snow'}
-			onChange={onChange}
-			value={value}
-			modules={modules}
-			formats={formats}
-			onBlur={onBlur}
-			readOnly={readOnly}
-		/>
-	);
+const Wysiwyg: FC<WysiwygProps> = ({ initialValue, onChange, readOnly = false, className, ...props }) => {
+	const { quill, quillRef } = useQuill({
+		theme: 'snow',
+		modules,
+		formats,
+		readOnly,
+	});
+
+	useEffect(() => {
+		if (quill && onChange) {
+			const handleChange = () => {
+				onChange(quill.root.innerHTML);
+			};
+
+			quill.on('text-change', handleChange);
+
+			return () => {
+				quill.off('text-change', handleChange);
+			};
+		}
+	}, [onChange, quill]);
+
+	useEffect(() => {
+		if (quill && initialValue) {
+			quill.clipboard.dangerouslyPasteHTML(initialValue);
+		}
+	}, [quill, initialValue]);
+
+	return <div className={className} ref={quillRef} />;
 };
 
 export default Wysiwyg;

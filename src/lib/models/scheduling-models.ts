@@ -13,7 +13,7 @@ export interface SchedulingAppointmentType {
 	hexColor: string;
 	assessmentId: string;
 	patientIntakeQuestions: PatientIntakeQuestion[];
-	screeningQuestions: ScreeningQuestion[];
+	screeningQuestions: IntakeScreeningQuestion[];
 }
 
 export interface SchedulingAvailability {
@@ -31,7 +31,7 @@ export interface PatientIntakeQuestion {
 	questionContentHintId: string; // 'FIRST_NAME' | 'LAST_NAME' | 'EMAIL_ADDRESS' | 'PHONE_NUMBER';
 }
 
-export interface ScreeningQuestion {
+export interface IntakeScreeningQuestion {
 	question: string;
 	fontSizeId: 'DEFAULT' | 'SMALL';
 }

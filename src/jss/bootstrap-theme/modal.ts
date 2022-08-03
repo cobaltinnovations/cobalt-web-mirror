@@ -1,73 +1,43 @@
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { CobaltTheme } from '@/jss/theme';
 
-export const modal = {
-	'.modal-content': {
-		border: 0,
-		borderRadius: 0,
-	},
-	'.cobalt-modal': {
-		'&__header': {
-			position: 'relative',
-			padding: '25px 25px 0',
-			'& button.close': {
-				top: 19,
-				right: 15,
-				width: 40,
-				height: 40,
-				opacity: 1,
-				float: 'none',
-				borderRadius: 20,
-				textShadow: 'none',
-				color: 'transparent',
-				position: 'absolute',
-				'&:before, &:after': {
-					width: 28,
-					height: 3,
-					top: '50%',
-					left: '50%',
-					content: '""',
-					display: 'block',
-					position: 'absolute',
-					backgroundColor: colors.black,
-				},
-				'&:before': {
-					transform: 'translate(-50%, -50%) rotate(-45deg)',
-				},
-				'&:after': {
-					transform: 'translate(-50%, -50%) rotate(45deg)',
-				},
-				'&:not(:disabled):not(.disabled):focus, &:not(:disabled):not(.disabled):hover': {
-					opacity: 1,
-				},
-				'&:not(:disabled):not(.disabled):hover': {
-					backgroundColor: colors.gray100,
-				},
-			},
-			'&--admin': {
-				padding: '17px 30px',
+export const modal = (theme: CobaltTheme) => {
+	return {
+		'.modal-content': {
+			borderRadius: 5,
+			border: `1px solid ${theme.colors.n100}`,
+			filter: 'drop-shadow(0px 10px 18px rgba(41, 40, 39, 0.15)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
+		},
+		'.cobalt-modal': {
+			'&__header': {
+				padding: '14px 24px',
 				position: 'relative',
-				backgroundColor: colors.gray100,
-				'& button.close': {
-					right: 12,
-					width: 44,
+				borderTopLeftRadius: 5,
+				borderTopRightRadius: 5,
+				backgroundColor: theme.colors.n50,
+				borderBottom: `1px solid ${theme.colors.n100}`,
+				'& button.btn-close': {
 					top: '50%',
-					height: 44,
+					right: 16,
+					width: 24,
+					height: 24,
 					opacity: 1,
+					float: 'none',
+					borderRadius: 20,
+					textShadow: 'none',
+					color: 'transparent',
 					position: 'absolute',
+					background: 'transparent',
 					transform: 'translateY(-50%)',
-					'& span': {
-						display: 'none',
-					},
 					'&:before, &:after': {
-						width: 16,
+						width: 18,
 						height: 2,
 						top: '50%',
 						left: '50%',
 						content: '""',
 						display: 'block',
+						borderRadius: 500,
 						position: 'absolute',
-						backgroundColor: colors.dark,
+						backgroundColor: theme.colors.n300,
 					},
 					'&:before': {
 						transform: 'translate(-50%, -50%) rotate(-45deg)',
@@ -79,42 +49,84 @@ export const modal = {
 						opacity: 1,
 					},
 					'&:not(:disabled):not(.disabled):hover': {
-						backgroundColor: colors.gray100,
+						backgroundColor: theme.colors.n100,
+					},
+				},
+				'&--admin': {
+					padding: '17px 30px',
+					position: 'relative',
+					backgroundColor: theme.colors.n100,
+					'& button.btn-close': {
+						right: 12,
+						width: 44,
+						top: '50%',
+						height: 44,
+						opacity: 1,
+						position: 'absolute',
+						transform: 'translateY(-50%)',
+						'& span': {
+							display: 'none',
+						},
+						'&:before, &:after': {
+							width: 16,
+							height: 2,
+							top: '50%',
+							left: '50%',
+							content: '""',
+							display: 'block',
+							position: 'absolute',
+							backgroundColor: theme.colors.n900,
+						},
+						'&:before': {
+							transform: 'translate(-50%, -50%) rotate(-45deg)',
+						},
+						'&:after': {
+							transform: 'translate(-50%, -50%) rotate(45deg)',
+						},
+						'&:not(:disabled):not(.disabled):focus, &:not(:disabled):not(.disabled):hover': {
+							opacity: 1,
+						},
+						'&:not(:disabled):not(.disabled):hover': {
+							backgroundColor: theme.colors.n100,
+						},
 					},
 				},
 			},
-		},
-		'&__title': {
-			margin: 0,
-			...fonts.m,
-			'&--admin': {
+			'&__title': {
 				margin: 0,
-				...fonts.m,
-				...fonts.nunitoSansBold,
+				...theme.fonts.h5,
+				...theme.fonts.headingBold,
+				'&--admin': {
+					margin: 0,
+					...theme.fonts.large,
+					...theme.fonts.headingBold,
+				},
 			},
-		},
-		'&__body': {
-			padding: '15px 25px',
-			'&--admin': {
-				padding: '56px 30px',
-				backgroundColor: colors.white,
-				'&--small': {
-					padding: 30,
-					backgroundColor: colors.white,
+			'&__body': {
+				padding: '20px 30px',
+				'&--admin': {
+					padding: '56px 30px',
+					backgroundColor: theme.colors.n0,
+					'&--small': {
+						padding: 30,
+						backgroundColor: theme.colors.n0,
+					},
+				},
+			},
+			'&__footer': {
+				padding: '8px 24px',
+				borderBottomLeftRadius: 5,
+				borderBottomRightRadius: 5,
+				backgroundColor: theme.colors.n50,
+				borderTop: `1px solid ${theme.colors.n100}`,
+				'&--admin': {
+					display: 'flex',
+					padding: '17px 30px',
+					position: 'relative',
+					backgroundColor: theme.colors.n100,
+					justifyContent: 'flex-end',
 				},
 			},
 		},
-		'&__footer': {
-			display: 'flex',
-			padding: '0 20px 25px',
-			justifyContent: 'space-between',
-			'&--admin': {
-				display: 'flex',
-				padding: '17px 30px',
-				position: 'relative',
-				backgroundColor: colors.gray100,
-				justifyContent: 'flex-end',
-			},
-		},
-	},
+	};
 };

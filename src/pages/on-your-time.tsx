@@ -1,11 +1,11 @@
-import React, { FC, useState, useCallback, useMemo } from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
-import { contentService, assessmentService, ContentListFormat } from '@/lib/services';
+import { contentService, assessmentService, ContentListFormat, screeningService } from '@/lib/services';
 import { Content, PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 
 import AsyncPage from '@/components/async-page';
@@ -16,12 +16,22 @@ import FilterPill from '@/components/filter-pill';
 import FilterFormat from '@/components/filter-format';
 import FilterLength from '@/components/filter-length';
 import ActionSheet from '@/components/action-sheet';
+import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
+
+interface LocationState {
+	skipAssessment?: boolean;
+}
 
 const OnYourTime: FC = () => {
 	useHeaderTitle('On Your Time');
-	const history = useHistory();
-	const location = useLocation<{ personalize: boolean }>();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { subdomainInstitution } = useAccount();
+	const [didInit, setDidInit] = useState(false);
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
+	const skipAssessment = !!(location.state as LocationState)?.skipAssessment;
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
 	const [selectedFormatIds, setSelectedFormatIds] = useState<string[]>([]);
@@ -29,7 +39,9 @@ const OnYourTime: FC = () => {
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
 	const [selectedLength, setSelectedLength] = useState<string>('');
 
-	const [showPersonalizeModal, setShowPersonalizeModal] = useState(location?.state?.personalize ?? false);
+	const [showPersonalizeModal, setShowPersonalizeModal] = useState(
+		(location?.state as { personalize: boolean })?.personalize ?? false
+	);
 	const [items, setItems] = useState<Content[]>([]);
 	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -90,15 +102,37 @@ const OnYourTime: FC = () => {
 	}, [selectedFormatIds, selectedLength]);
 
 	const fetchData = useCallback(async () => {
-		await Promise.all([fetchContent(), fetchFilters()]);
-	}, [fetchContent, fetchFilters]);
+		const requests = [fetchContent(), fetchFilters()];
+		if (subdomainInstitution?.contentScreeningFlowId) {
+			const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
+				screeningFlowId: subdomainInstitution.contentScreeningFlowId,
+			});
+
+			requests.push(
+				fetchScreeningsRequest.fetch().then((r) => {
+					setHasCompletedScreening(r.screeningSessions.some((session) => session.completed));
+					setDidInit(true);
+				})
+			);
+		}
+
+		await Promise.all(requests);
+	}, [fetchContent, fetchFilters, subdomainInstitution?.contentScreeningFlowId]);
+
+	useEffect(() => {
+		if (didInit && subdomainInstitution?.contentScreeningFlowId && !hasCompletedScreening && !skipAssessment) {
+			navigate(`/screening-flows/${subdomainInstitution.contentScreeningFlowId}`, {
+				replace: true,
+			});
+		}
+	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.contentScreeningFlowId]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<ActionSheet
 				show={false}
 				onShow={() => {
-					history.push('/cms/on-your-time/create');
+					navigate('/cms/on-your-time/create');
 				}}
 				onHide={() => {
 					return;
@@ -112,7 +146,12 @@ const OnYourTime: FC = () => {
 				onClose={(updatedChoices) => {
 					setChoices(updatedChoices);
 					fetchContent();
-					history.replace('/on-your-time', { personalize: false });
+					navigate('/on-your-time', {
+						replace: true,
+						state: {
+							personalize: false,
+						},
+					});
 					setShowPersonalizeModal(false);
 				}}
 			/>
@@ -145,9 +184,9 @@ const OnYourTime: FC = () => {
 			<Container className="pt-5 mb-3">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form.Control
+						<InputHelper
 							type="search"
-							placeholder="Find On Your Time Items"
+							label="Find On Your Time Items"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 								setSearchTerm(event.target.value);
@@ -193,17 +232,23 @@ const OnYourTime: FC = () => {
 			{hasFilters && (
 				<>
 					<DayContainer className="mb-5">
-						<p className="mb-0 font-karla-bold">Personalized Recommendations</p>
+						<p className="mb-0 fw-bold">Personalized Recommendations</p>
 					</DayContainer>
 
 					<Container>
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								{filteredList.length === 0 ? (
-									<p className="text-center">There are no recommendations that match your selections.</p>
+									<p className="text-center">
+										There are no recommendations that match your selections.
+									</p>
 								) : (
 									filteredList.map((item) => (
-										<Link key={item.contentId} to={`/on-your-time/${item.contentId}`} className="d-block mb-3 text-decoration-none">
+										<Link
+											key={item.contentId}
+											to={`/on-your-time/${item.contentId}`}
+											className="d-block mb-3 text-decoration-none"
+										>
 											<OnYourTimeItem
 												imageUrl={item.imageUrl}
 												tag={item.newFlag ? 'NEW' : ''}
@@ -225,7 +270,7 @@ const OnYourTime: FC = () => {
 				<>
 					{hasFilters && (
 						<DayContainer className="my-5">
-							<p className="mb-0 font-karla-bold">Recent and Popular</p>
+							<p className="mb-0 fw-bold">Recent and Popular</p>
 						</DayContainer>
 					)}
 
@@ -233,7 +278,11 @@ const OnYourTime: FC = () => {
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								{additionalFilteredList.map((item) => (
-									<Link key={item.contentId} to={`/on-your-time/${item.contentId}`} className="d-block mb-3 text-decoration-none">
+									<Link
+										key={item.contentId}
+										to={`/on-your-time/${item.contentId}`}
+										className="d-block mb-3 text-decoration-none"
+									>
 										<OnYourTimeItem
 											imageUrl={item.imageUrl}
 											tag={item.newFlag ? 'NEW' : ''}

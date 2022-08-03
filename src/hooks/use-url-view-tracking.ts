@@ -5,13 +5,13 @@ import { AcivityTypeId, ActivityActionId } from '@/lib/models';
 import { ActivityTrackingContext, activityTrackingService } from '@/lib/services';
 
 import useAccount from './use-account';
-import useQuery from './use-query';
+import { useSearchParams } from 'react-router-dom';
 
-const TRACKED_PATHS = ['/sign-in', '/connect-with-support']
+const TRACKED_PATHS = ['/sign-in', '/connect-with-support'];
 
 export default function useUrlViewTracking(): void {
 	const { account, initialized, isTrackedSession } = useAccount();
-	const query = useQuery();
+	const [searchParams] = useSearchParams();
 	const { pathname } = useLocation();
 
 	const accountId = account?.accountId;
@@ -21,11 +21,11 @@ export default function useUrlViewTracking(): void {
 		}
 
 		if (TRACKED_PATHS.includes(pathname)) {
-			const queryParamsKeys = query.keys();
+			const queryParamsKeys = searchParams.keys();
 			const queryParamsAsObject: Record<string, string[]> = {};
 
 			for (const key of queryParamsKeys) {
-				queryParamsAsObject[key] = query.getAll(key);
+				queryParamsAsObject[key] = searchParams.getAll(key);
 			}
 
 			const context: ActivityTrackingContext = {
@@ -37,23 +37,27 @@ export default function useUrlViewTracking(): void {
 			}
 
 			if (!accountId) {
-				activityTrackingService.trackUnauthenticated({
-					activityActionId: ActivityActionId.View,
-					activityTypeId: AcivityTypeId.Url,
-					context,
-				}).fetch();
-				return
+				activityTrackingService
+					.trackUnauthenticated({
+						activityActionId: ActivityActionId.View,
+						activityTypeId: AcivityTypeId.Url,
+						context,
+					})
+					.fetch();
+				return;
 			}
 
 			if (!isTrackedSession) {
 				return;
 			}
 
-			activityTrackingService.track({
-				activityActionId: ActivityActionId.View,
-				activityTypeId: AcivityTypeId.Url,
-				context,
-			}).fetch();
+			activityTrackingService
+				.track({
+					activityActionId: ActivityActionId.View,
+					activityTypeId: AcivityTypeId.Url,
+					context,
+				})
+				.fetch();
 		}
-	}, [pathname, initialized, query, accountId, isTrackedSession]);
+	}, [pathname, initialized, searchParams, accountId, isTrackedSession]);
 }

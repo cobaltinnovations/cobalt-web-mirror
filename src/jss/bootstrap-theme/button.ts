@@ -1,322 +1,310 @@
-import Color from 'color';
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { CobaltTheme } from '@/jss/theme';
 
-export const button = {
-	'.cobalt-button': {
-		border: 0,
-		...fonts.l,
-		borderRadius: 500,
-		appearance: 'none',
-		color: colors.white,
-		padding: '15px 35px',
-		textDecoration: 'none',
-		...fonts.nunitoSansBold,
-		textTransform: 'none',
-		backgroundColor: colors.primary,
-		'&:hover': {
-			color: colors.white,
-			textDecoration: 'none',
-			backgroundColor: Color(colors.primary).lighten(0.16).hex(),
-		},
-		'&:active': {
-			backgroundColor: Color(colors.primary).darken(0.16).hex(),
-		},
-		'&:focus': {
-			outline: 'none',
-		},
-		'&:disabled': {
-			color: colors.gray500,
-			backgroundColor: colors.gray200,
-			'&:hover': {
-				color: colors.gray500,
-				backgroundColor: colors.gray200,
+export const button = (theme: CobaltTheme) => {
+	return {
+		'.cobalt-button': {
+			border: 0,
+			borderRadius: 500,
+			appearance: 'none',
+			padding: '10px 20px',
+			...theme.fonts.bodyBold,
+			fontSize: '1.6rem',
+			lineHeight: '2rem',
+			textTransform: 'none',
+			'&:focus': {
+				outline: 'none',
 			},
-		},
+			'&:disabled': {
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n100,
+				cursor: 'not-allowed',
+				'&:hover': {
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n100,
+				},
+			},
 
-		'&-sm': {
-			...fonts.m,
-			padding: '10px 25px',
-		},
-		'&-xsm': {
-			...fonts.m,
-			padding: '5px 7px',
-		},
+			'&-lg': {
+				fontSize: '1.8rem',
+				lineHeight: '2.4rem',
+				padding: '12px 28px',
+			},
 
-		'& svg': {
-			fill: 'currentColor',
-			'& path': {
+			'&-sm': {
+				fontSize: '1.4rem',
+				padding: '6px 16px',
+			},
+
+			'& svg': {
 				fill: 'currentColor',
+				'& path': {
+					fill: 'currentColor',
+				},
 			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Primary variant */
-		/* ----------------------------------------------------------- */
-		'&-primary': {
-			backgroundColor: colors.primary,
-			'&:hover': {
-				backgroundColor: Color(colors.primary).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Primary variant */
+			/* ----------------------------------------------------------- */
+			'&-primary': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.p500,
+				'&:hover': {
+					backgroundColor: theme.colors.p300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.p700,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.primary).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Secondary variant */
-		/* ----------------------------------------------------------- */
-		'&-secondary': {
-			backgroundColor: colors.secondary,
-			'&:hover': {
-				backgroundColor: Color(colors.secondary).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Secondary variant */
+			/* ----------------------------------------------------------- */
+			'&-secondary': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.a500,
+				'&:hover': {
+					backgroundColor: theme.colors.a300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.a500,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.secondary).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Success variant */
-		/* ----------------------------------------------------------- */
-		'&-success': {
-			backgroundColor: colors.success,
-			'&:hover': {
-				backgroundColor: Color(colors.success).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Success variant */
+			/* ----------------------------------------------------------- */
+			'&-success': {
+				backgroundColor: theme.colors.s500,
+				'&:hover': {
+					backgroundColor: theme.colors.s300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.s500,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.success).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Danger variant */
-		/* ----------------------------------------------------------- */
-		'&-danger': {
-			backgroundColor: colors.danger,
-			'&:hover': {
-				backgroundColor: Color(colors.danger).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Danger variant */
+			/* ----------------------------------------------------------- */
+			'&-danger': {
+				backgroundColor: theme.colors.d500,
+				'&:hover': {
+					backgroundColor: theme.colors.d300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.d500,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.danger).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Warning variant */
-		/* ----------------------------------------------------------- */
-		'&-warning': {
-			color: colors.dark,
-			backgroundColor: colors.warning,
-			'&:hover': {
-				backgroundColor: Color(colors.warning).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Warning variant */
+			/* ----------------------------------------------------------- */
+			'&-warning': {
+				color: theme.colors.n900,
+				backgroundColor: theme.colors.w500,
+				'&:hover': {
+					backgroundColor: theme.colors.w300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.w500,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.warning).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Info variant */
-		/* ----------------------------------------------------------- */
-		'&-info': {
-			backgroundColor: colors.info,
-			'&:hover': {
-				backgroundColor: Color(colors.info).lighten(0.16).hex(),
+			/* ----------------------------------------------------------- */
+			/* Info variant */
+			/* ----------------------------------------------------------- */
+			'&-info': {
+				backgroundColor: theme.colors.i500,
+				'&:hover': {
+					backgroundColor: theme.colors.i300,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.i500,
+				},
 			},
-			'&:active': {
-				backgroundColor: Color(colors.info).darken(0.16).hex(),
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Light variant */
-		/* ----------------------------------------------------------- */
-		'&-light': {
-			color: colors.primary,
-			backgroundColor: colors.light,
-			'&:hover': {
-				color: colors.primary,
-				backgroundColor: Color(colors.primary).lighten(0.8).hex(),
+			/* ----------------------------------------------------------- */
+			/* Light variant */
+			/* ----------------------------------------------------------- */
+			'&-light': {
+				color: theme.colors.p700,
+				backgroundColor: theme.colors.n0,
+				'&:hover': {
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n75,
+				},
 			},
-			'&:active': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
 
-		/* ----------------------------------------------------------- */
-		/* Dark variant */
-		/* ----------------------------------------------------------- */
-		'&-dark': {
-			backgroundColor: colors.dark,
-			'&:hover': {
-				backgroundColor: Color(colors.dark).lighten(0.16).hex(),
-			},
-			'&:active': {
-				backgroundColor: Color(colors.dark).darken(0.16).hex(),
-			},
-		},
-		/* ----------------------------------------------------------- */
-		/* Grey variant */
-		/* ----------------------------------------------------------- */
-		'&-grey': {
-			backgroundColor: colors.gray200,
-			color: colors.black,
-			'&:hover': {
-				backgroundColor: Color(colors.gray300).darken(0.16).hex(),
-				color: colors.black,
-			},
-			'&:active': {
-				backgroundColor: Color(colors.gray300).lighten(0.16).hex(),
-				color: colors.black,
-			},
-		},
-		/* ----------------------------------------------------------- */
-		/* No-background variant */
-		/* ----------------------------------------------------------- */
-		'&-no-background': {
-			backgroundColor: colors.background,
-			color: colors.primary,
-			'&:hover': {
-				backgroundColor: colors.background,
-				color: colors.primary,
-			},
-			'&:active': {
-				backgroundColor: colors.background,
-				color: colors.primary,
-			},
-		},
-
-		/* ----------------------------------------------------------- */
-		/* Clear variant */
-		/* ----------------------------------------------------------- */
-		'&-clear': {
-			backgroundColor: 'transparent',
-			color: colors.dark,
-			'&:hover': {
-				backgroundColor: 'transparent',
-				color: colors.black,
-			},
-			'&:active': {
-				backgroundColor: 'transparent',
-				color: colors.black,
-			},
-		},
-
-		/* ----------------------------------------------------------- */
-		/* Icon variant */
-		/* ----------------------------------------------------------- */
-		'&-icon': {
-			padding: 0,
-			backgroundColor: 'transparent',
-			'&:hover': {
-				backgroundColor: 'transparent',
-			},
-			'&:active': {
-				backgroundColor: 'transparent',
-			},
-		},
-
-		/* ----------------------------------------------------------- */
-		/* Link variant */
-		/* ----------------------------------------------------------- */
-		'&-link': {
-			color: colors.primary,
-			textDecoration: 'underline',
-			backgroundColor: 'transparent',
-			'&:hover': {
-				color: colors.primary,
+			/* ----------------------------------------------------------- */
+			/* Link variant */
+			/* ----------------------------------------------------------- */
+			'&-link': {
+				color: theme.colors.p500,
 				textDecoration: 'underline',
 				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.p700,
+					textDecoration: 'underline',
+					backgroundColor: 'transparent',
+				},
+				'&:active': {
+					backgroundColor: 'transparent',
+					color: theme.colors.p700,
+				},
 			},
-			'&:active': {
+
+			/* ----------------------------------------------------------- */
+			/* Outline variants */
+			/* ----------------------------------------------------------- */
+			'&-outline-primary': {
+				color: theme.colors.p500,
 				backgroundColor: 'transparent',
-				color: colors.primary,
+				border: `1px solid ${theme.colors.p500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p500,
+				},
+				'&:active': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.p700,
+				},
+			},
+			'&-outline-secondary': {
+				color: theme.colors.a500,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.a500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.a500,
+				},
+			},
+			'&-outline-success': {
+				color: theme.colors.s500,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.s500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.s500,
+				},
+			},
+			'&-outline-danger': {
+				color: theme.colors.d500,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.d500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.d500,
+				},
+			},
+			'&-outline-warning': {
+				color: theme.colors.w500,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.w500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.w500,
+				},
+			},
+			'&-outline-info': {
+				color: theme.colors.i500,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.i500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.i500,
+				},
+			},
+			'&-outline-dark': {
+				color: theme.colors.n900,
+				backgroundColor: 'transparent',
+				border: `1px solid ${theme.colors.n900}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.n900,
+				},
+			},
+			'&-outline-light': {
+				color: theme.colors.p500,
+				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.p500}`,
+				'&:hover': {
+					color: theme.colors.n0,
+					backgroundColor: theme.colors.a500,
+				},
 			},
 		},
+	};
+};
 
-		'&-inverse': {
-			backgroundColor: colors.white,
-			'&-primary': {
-				color: colors.primary,
-			},
-		},
+export const screeningButtonGroup = (theme: CobaltTheme) => {
+	return {
+		'.cobalt-screening-button-group': {
+			'& input[type=checkbox]': {
+				'& + label': {
+					paddingLeft: 15,
+					'& .checkmark-wrapper': {
+						height: 25,
+						width: 25,
+						border: `2px solid ${theme.colors.n300}`,
+						borderRadius: 500,
+						'& svg': {
+							width: 20,
+							height: 20,
+							'& polygon#Shape': {
+								fill: theme.colors.n0,
+							},
+						},
+					},
+					'&:hover': {
+						paddingLeft: '14px !important',
 
-		/* ----------------------------------------------------------- */
-		/* Outline variants */
-		/* ----------------------------------------------------------- */
-		'&-outline-primary': {
-			color: colors.primary,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.primary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.primary,
+						'& .checkmark-wrapper': {
+							borderColor: theme.colors.p500,
+						},
+					},
+				},
+
+				'&:checked': {
+					'& + label': {
+						'& .checkmark-wrapper': {
+							backgroundColor: theme.colors.p300,
+							borderColor: theme.colors.p300,
+						},
+
+						'&:hover': {
+							'& .checkmark-wrapper': {
+								borderColor: theme.colors.p300,
+							},
+						},
+					},
+				},
+			},
+
+			'& .cobalt-button': {
+				border: `1px solid ${theme.colors.n100}`,
+
+				'&:hover': {
+					padding: '9px 19px',
+					border: `2px solid ${theme.colors.p500}`,
+				},
+
+				'&.cobalt-button-light': {
+					'&:hover': {
+						backgroundColor: theme.colors.n0,
+						color: theme.colors.p500,
+					},
+				},
+
+				'&.cobalt-button-primary': {
+					borderColor: theme.colors.p500,
+
+					'&:hover': {
+						backgroundColor: theme.colors.p500,
+					},
+				},
 			},
 		},
-		'&-outline-secondary': {
-			color: colors.secondary,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.secondary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
-		'&-outline-success': {
-			color: colors.success,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.success}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.success,
-			},
-		},
-		'&-outline-danger': {
-			color: colors.danger,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.danger}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.danger,
-			},
-		},
-		'&-outline-warning': {
-			color: colors.warning,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.warning}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.warning,
-			},
-		},
-		'&-outline-info': {
-			color: colors.info,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.info}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.info,
-			},
-		},
-		'&-outline-dark': {
-			color: colors.dark,
-			backgroundColor: 'transparent',
-			border: `1px solid ${colors.dark}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.dark,
-			},
-		},
-		'&-outline-light': {
-			color: colors.primary,
-			backgroundColor: colors.white,
-			border: `1px solid ${colors.primary}`,
-			'&:hover': {
-				color: colors.white,
-				backgroundColor: colors.secondary,
-			},
-		},
-	},
+	};
 };

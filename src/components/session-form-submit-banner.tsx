@@ -1,10 +1,9 @@
-import React, {FC} from 'react';
-import {Button, Container} from 'react-bootstrap';
-import {createUseStyles} from 'react-jss';
-import {useHistory} from 'react-router-dom';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
+import React, { FC, PropsWithChildren } from 'react';
+import { Button, Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionFormSubmitBanner: {
 		left: 0,
 		right: 0,
@@ -13,25 +12,27 @@ const useStyles = createUseStyles({
 		padding: '20px 0',
 		position: 'fixed',
 		textAlign: 'center',
-		backgroundColor: colors.white,
-		borderTop: `1px solid ${colors.border}`,
+		backgroundColor: theme.colors.n0,
+		borderTop: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
-interface SessionFormSubmitBannerProps {
+interface SessionFormSubmitBannerProps extends PropsWithChildren {
 	title: string;
-	disabled?: boolean
+	disabled?: boolean;
 }
 
-const SessionFormSubmitBanner: FC<SessionFormSubmitBannerProps> = ({title, disabled = false, children}) => {
+const SessionFormSubmitBanner: FC<SessionFormSubmitBannerProps> = ({ title, disabled = false, children }) => {
 	const classes = useStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	return (
 		<div className={classes.sessionFormSubmitBanner}>
 			<Container>
 				<div className="d-flex justify-content-between">
-					<Button size="sm" variant="outline-primary" onClick={() => history.goBack()}>Cancel</Button>
+					<Button size="sm" variant="outline-primary" onClick={() => navigate(-1)}>
+						Cancel
+					</Button>
 					<Button size="sm" type="submit" disabled={disabled}>
 						{title}
 					</Button>

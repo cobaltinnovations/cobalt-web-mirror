@@ -1,12 +1,10 @@
 import React, { FC, forwardRef } from 'react';
-import { createUseStyles } from 'react-jss';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 
-import colors from '@/jss/colors';
-
 import unfoldIcon from '@/assets/icons/icon-unfold.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useDatePickerStyles = createUseStyles({
+const useDatePickerStyles = createUseThemedStyles((theme) => ({
 	datePickerWrapper: {
 		width: '100%',
 	},
@@ -20,14 +18,14 @@ const useDatePickerStyles = createUseStyles({
 		textIndent: 0,
 		paddingLeft: 15,
 		paddingRight: 15,
-		border: `1px solid ${colors.border}`,
-		backgroundColor: colors.white,
+		border: `1px solid ${theme.colors.border}`,
+		backgroundColor: theme.colors.n0,
 		textAlign: 'left',
 		'&:disabled': {
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 		},
 	},
-});
+}));
 
 interface DatePickerProps extends ReactDatePickerProps {
 	selected?: Date;
@@ -41,7 +39,7 @@ const CustomDateInput = forwardRef(({ value, onClick, disabled, className, label
 	return (
 		<button type="button" ref={ref} className={className} onClick={onClick} disabled={disabled}>
 			{value || label || 'Select Date'}
-			<img className="ml-auto" src={unfoldIcon} alt="unfold date picker" />
+			<img className="ms-auto" src={unfoldIcon} alt="unfold date picker" />
 		</button>
 	);
 });
@@ -55,7 +53,13 @@ const DatePicker: FC<DatePickerProps> = ({ selected, onChange, wrapperClass, lab
 			dateFormat="MMM d, yyyy"
 			selected={selected}
 			onChange={onChange}
-			customInput={<CustomDateInput className={classes.datePicker}  label={labelText} disabled={reactDatePickerProps.disabled} />}
+			customInput={
+				<CustomDateInput
+					className={classes.datePicker}
+					label={labelText}
+					disabled={reactDatePickerProps.disabled}
+				/>
+			}
 			{...reactDatePickerProps}
 		/>
 	);

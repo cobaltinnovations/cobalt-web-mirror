@@ -1,6 +1,6 @@
-export default {
+const bsPrefixes = {
+	badge: 'cobalt-badge',
 	btn: 'cobalt-button',
-	'form-group': 'cobalt-form__group',
 	'form-label': 'cobalt-form__label',
 	'form-control': 'cobalt-form__control',
 	'form-check': 'cobalt-form__check',
@@ -14,3 +14,5 @@ export default {
 	'card-subtitle': 'cobalt-card__subtitle',
 	'card-body': 'cobalt-card__body',
 };
+
+export default bsPrefixes;

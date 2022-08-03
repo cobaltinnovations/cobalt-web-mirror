@@ -1,5 +1,5 @@
 import React, { FC, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -15,7 +15,7 @@ const useStyles = createUseStyles({
 });
 
 const ErrorModal: FC = () => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useStyles();
 	const { show, setShow, error } = useContext(ErrorModalContext);
 	const { openInCrisisModal } = useInCrisisModal();
@@ -29,35 +29,40 @@ const ErrorModal: FC = () => {
 				setShow(false);
 			}}
 		>
-			<Modal.Header>
-				<h3 className="mb-0">{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>
+					{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}
+				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{error?.code === 'VALIDATION_FAILED' ? (
 					<>
-						<p className="mb-1 font-karla-bold">{error?.message}</p>
+						<p className="mb-1 fw-bold">{error?.message}</p>
 					</>
 				) : (
 					<>
-						<p className="mb-1 font-karla-bold">Need technical support?</p>
+						<p className="mb-1 fw-bold">Need technical support?</p>
 						<Button
 							variant="link"
 							size="sm"
 							className="mb-4 p-0 text-decoration-none"
 							onClick={() => {
 								setShow(false);
-								history.push('/feedback');
+								navigate('/feedback');
 							}}
 						>
 							Send us a note
 						</Button>
 
-						<p className="mb-1 font-karla-bold">Need clinical support?</p>
-						<a className="mb-4 d-block font-size-m font-weight-bold text-decoration-none" href="tel:866-301-4724">
+						<p className="mb-1 fw-bold">Need clinical support?</p>
+						<a
+							className="mb-4 d-block fs-large font-heading-bold text-decoration-none"
+							href="tel:866-301-4724"
+						>
 							call 866-301-4724
 						</a>
 
-						<p className="mb-1 font-karla-bold">Have a clinical emergency?</p>
+						<p className="mb-1 fw-bold">Have a clinical emergency?</p>
 						<Button
 							variant="link"
 							size="sm"
@@ -72,16 +77,17 @@ const ErrorModal: FC = () => {
 					</>
 				)}
 			</Modal.Body>
-			<Modal.Footer className="justify-content-center">
-				<Button
-					variant="outline-primary"
-					size="sm"
-					onClick={() => {
-						setShow(false);
-					}}
-				>
-					dismiss
-				</Button>
+			<Modal.Footer>
+				<div className="text-right">
+					<Button
+						variant="outline-primary"
+						onClick={() => {
+							setShow(false);
+						}}
+					>
+						dismiss
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

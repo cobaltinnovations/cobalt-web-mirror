@@ -1,10 +1,21 @@
 import moment, { Moment } from 'moment';
-import React, { Dispatch, SetStateAction, createContext, FC, useState, useMemo, useCallback, useEffect } from 'react';
-import { LocationDescriptor } from 'history';
+import React, {
+	Dispatch,
+	SetStateAction,
+	createContext,
+	FC,
+	useState,
+	useMemo,
+	useCallback,
+	useEffect,
+	PropsWithChildren,
+} from 'react';
+
 import { FilterDays } from '@/components/filter-days-modal';
 import { PaymentType, Provider, SupportRoleId, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, padStart } from 'lodash';
+import { To } from 'react-router-dom';
 
 type Range = { min: number; max: number };
 
@@ -95,12 +106,12 @@ interface BookingState {
 	setPreserveFilters: Dispatch<SetStateAction<boolean>>;
 	getFiltersQueryString: () => string;
 	selectedAppointmentType?: AppointmentType;
-	getExitBookingLocation: (state: unknown) => LocationDescriptor;
+	getExitBookingLocation: (state: unknown) => To;
 }
 
 const BookingContext = createContext({} as BookingState);
 
-const BookingProvider: FC = (props) => {
+const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
 	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);

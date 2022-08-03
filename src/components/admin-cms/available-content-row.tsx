@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableCell, TableRow } from '@/components/table';
 
@@ -11,22 +10,22 @@ import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
 
 import { AdminContentActions, AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: colors.secondary,
+		fill: theme.colors.a500,
 	},
 	centerText: {
 		textAlign: 'center',
 	},
 	row: {
-		borderLeft: `1px solid ${colors.border}`,
-		borderRight: `1px solid ${colors.border}`,
+		borderLeft: `1px solid ${theme.colors.border}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	rowButton: {
 		height: 44,
@@ -43,13 +42,13 @@ const useStyles = createUseStyles({
 		display: 'inline-block',
 
 		'&.added': {
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.available': {
-			backgroundColor: colors.secondary,
+			backgroundColor: theme.colors.a500,
 		},
 	},
-});
+}));
 
 interface AvailableContentRowProps {
 	content: AdminContentRow;
@@ -130,22 +129,22 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 	return (
 		<TableRow className={classes.row}>
 			<TableCell>
-				<span className="d-block font-size-xs font-karla-regular">{content.dateCreatedDescription}</span>
+				<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 			</TableCell>
 			<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
 				{getIcon(content.contentTypeId)}
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs font-karla-bold">
+				<span className="d-block fs-default fw-bold">
 					<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 				</span>
-				<span className="d-block font-size-xs font-karla-regular">{content.author}</span>
+				<span className="d-block fs-default fw-normal">{content.author}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs font-karla-regular">{content.ownerInstitution}</span>
+				<span className="d-block fs-default fw-normal">{content.ownerInstitution}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-inline-block font-size-xxs font-karla-regular" style={{ minWidth: 90 }}>
+				<span className="d-inline-block fs-small fw-normal" style={{ minWidth: 90 }}>
 					{getStatusIcon(content.availableStatusId)}
 					<span className={classes.status}>
 						{content.availableStatusId === ContentAvailableStatusId.Added

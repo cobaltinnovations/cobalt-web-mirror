@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 
 import AsyncPage from '@/components/async-page';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -21,38 +21,20 @@ import {
 	ROLE_ID,
 } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 import useAccount from '@/hooks/use-account';
 import { PersonalizationCheckbox } from '@/components/personalize-recommendations-modal';
 import OnYourTimePreview from '@/components/admin-cms/on-your-time-preview';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
-import useQuery from '@/hooks/use-query';
 import DatePicker from '@/components/date-picker';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
 import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
-
-interface OnYourTimeParams {
-	contentId: string;
-	editing: string;
-	adding: string;
-}
-
-const useStyles = createUseStyles({
-	grayText: {
-		color: colors.gray600,
-	},
-	datePicker: {
-		height: 56,
-	},
-});
 
 const onYourTimeContentSchema = yup
 	.object()
@@ -80,15 +62,16 @@ export type onYourTimeFormData = yup.InferType<typeof onYourTimeContentSchema>;
 const requiredFields = getRequiredYupFields<onYourTimeFormData>(onYourTimeContentSchema);
 
 const CreateOnYourTimeContent: FC = () => {
+	const theme = useCobaltTheme();
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time - My Content');
-	const classes = useStyles();
 	const { account } = useAccount();
-	const history = useHistory();
-	const query = useQuery();
-	const contentId = query.get('contentId');
-	const editing = query.get('editing');
-	const adding = query.get('adding');
+	const location = useLocation();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const contentId = searchParams.get('contentId');
+	const editing = searchParams.get('editing');
+	const adding = searchParams.get('adding');
 	const [showRemoveImageModal, setShowRemoveImageModal] = useState(false);
 
 	const [contentInstitutions, setContentInstitutions] = useState<InstitutionFilters[]>();
@@ -239,9 +222,15 @@ const CreateOnYourTimeContent: FC = () => {
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
 				const targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
-				history.push(`${targetPath}`, { showSuccess: true, isAdding, isEditing });
+				navigate(`${targetPath}`, {
+					state: {
+						showSuccess: true,
+						isAdding,
+						isEditing,
+					},
+				});
 			} else {
-				history.push('/on-your-time-thanks');
+				navigate('/on-your-time-thanks');
 			}
 		} catch (error) {
 			handleError(error);
@@ -261,7 +250,7 @@ const CreateOnYourTimeContent: FC = () => {
 							title: isAdding ? 'available content' : 'my content',
 						},
 						{
-							to: history.location.pathname,
+							to: location.pathname,
 							title: isAdding ? 'add public post' : 'add content',
 						},
 					]}
@@ -361,18 +350,16 @@ const CreateOnYourTimeContent: FC = () => {
 												<Col md={10} lg={8}>
 													<Card className="mb-5 border-0 p-6">
 														<h5 className="mb-5">Details</h5>
-														<Form.Row className="mb-5">
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>1</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Content Type"
 																		value={values.contentTypeId || ''}
 																		as="select"
-																		onChange={(
-																			event: React.ChangeEvent<HTMLSelectElement>
-																		) => {
+																		onChange={(event) => {
 																			setFieldValue(
 																				'contentTypeId',
 																				event.target.value
@@ -440,18 +427,16 @@ const CreateOnYourTimeContent: FC = () => {
 																	</InputHelper>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
-																<div className="pl-13">
+																<div className="ps-13">
 																	<InputHelper
 																		className="flex-fill"
 																		label="Content Type Label"
 																		value={values.contentTypeLabel || ''}
 																		as="select"
-																		onChange={(
-																			event: React.ChangeEvent<HTMLSelectElement>
-																		) => {
+																		onChange={(event) => {
 																			setFieldValue(
 																				'contentTypeLabel',
 																				event.target.value
@@ -486,13 +471,13 @@ const CreateOnYourTimeContent: FC = () => {
 																	</InputHelper>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>2</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Title"
 																		type="text"
 																		name="title"
@@ -510,13 +495,13 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex align-items-center">
 																	<CircleIndicator>3</CircleIndicator>
 																	<InputHelper
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		label="Author"
 																		type="text"
 																		name="author"
@@ -534,10 +519,10 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
+														</Row>
 														{values.contentTypeId !== ContentTypeId.InternalBlog && (
-															<div className="pl-13">
-																<Form.Row className="mb-5">
+															<div className="ps-13">
+																<Row className="mb-5">
 																	<Col>
 																		<InputHelper
 																			label="URL to Content"
@@ -560,8 +545,8 @@ const CreateOnYourTimeContent: FC = () => {
 																			}
 																		/>
 																	</Col>
-																</Form.Row>
-																<Form.Row className="mb-5">
+																</Row>
+																<Row className="mb-5">
 																	<Col>
 																		<DatePicker
 																			showYearDropdown
@@ -587,13 +572,13 @@ const CreateOnYourTimeContent: FC = () => {
 																			disabled={shouldDisabledInputs}
 																		/>
 																	</Col>
-																</Form.Row>
+																</Row>
 															</div>
 														)}
 														<div className="d-flex align-items-center">
 															<CircleIndicator>4</CircleIndicator>
-															<div className="ml-6 flex-fill">
-																<Form.Row className="mb-5">
+															<div className="ms-6 flex-fill">
+																<Row className="mb-5">
 																	<Col className="position-relative">
 																		<InputHelper
 																			label="How many minutes will it take to read/listen/watch?"
@@ -612,15 +597,15 @@ const CreateOnYourTimeContent: FC = () => {
 																			}
 																		/>
 																	</Col>
-																</Form.Row>
+																</Row>
 															</div>
 														</div>
-														<Form.Row>
+														<Row>
 															<Col>
 																<div className="d-flex">
 																	<CircleIndicator>5</CircleIndicator>
 																	<ImageUpload
-																		className="ml-6 flex-fill"
+																		className="ms-6 flex-fill"
 																		imagePreview={imagePreview}
 																		isUploading={isUploading}
 																		progress={progress}
@@ -637,34 +622,45 @@ const CreateOnYourTimeContent: FC = () => {
 																	/>
 																</div>
 															</Col>
-														</Form.Row>
-														<Form.Row className="mb-5">
+														</Row>
+														<Row className="mb-5">
 															<Col>
 																<div className="d-flex">
 																	<CircleIndicator>6</CircleIndicator>
 																	{values.contentTypeId ===
 																	ContentTypeId.InternalBlog ? (
-																		<div className="ml-6 flex-fill">
+																		<div className="ms-6 flex-fill">
 																			<Form.Label
 																				className="mb-2"
-																				style={{ ...fonts.xs }}
+																				style={{ ...theme.fonts.default }}
 																			>
 																				Post Content{' '}
 																				{requiredFields.description && (
 																					<span>*</span>
 																				)}
 																			</Form.Label>
-																			<Wysiwyg
-																				readOnly={shouldDisabledInputs}
-																				value={values.description}
-																				onChange={(value: string) => {
-																					setFieldValue('description', value);
+																			<Field name="description">
+																				{({ field, meta }: FieldProps) => {
+																					return (
+																						<Wysiwyg
+																							readOnly={
+																								shouldDisabledInputs
+																							}
+																							initialValue={
+																								meta.initialValue
+																							}
+																							onChange={field.onChange(
+																								field.name
+																							)}
+																						/>
+																					);
 																				}}
-																			/>
+																			</Field>
+
 																			{touched.description && errors.description && (
 																				<p
 																					className="text-danger"
-																					style={{ ...fonts.xxs }}
+																					style={{ ...theme.fonts.small }}
 																				>
 																					description is a required field
 																				</p>
@@ -672,7 +668,7 @@ const CreateOnYourTimeContent: FC = () => {
 																		</div>
 																	) : (
 																		<InputHelper
-																			className="ml-6 flex-fill"
+																			className="ms-6 flex-fill"
 																			label="Description"
 																			name="description"
 																			value={values.description}
@@ -691,7 +687,7 @@ const CreateOnYourTimeContent: FC = () => {
 																	)}
 																</div>
 															</Col>
-														</Form.Row>
+														</Row>
 													</Card>
 													{!isAdding && (
 														<>
@@ -699,21 +695,23 @@ const CreateOnYourTimeContent: FC = () => {
 																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 																<Card className="mb-5 border-0 p-6">
 																	<h5 className="mb-2">Visibility *</h5>
-																	<div className="mb-5" style={{ ...fonts.xs }}>
+																	<div
+																		className="mb-5"
+																		style={{ ...theme.fonts.default }}
+																	>
 																		Choose which institutions are allowed to share
 																		this content with their patients.
 																	</div>
 																	<Form.Group className="mb-5">
 																		<Form.Label
 																			className="mb-1"
-																			style={{ ...fonts.xs }}
+																			style={{ ...theme.fonts.default }}
 																		>
 																			Allow other institutions to share this
 																			content?
 																		</Form.Label>
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="isPrivate-No"
 																			name="visibilityPrivate"
 																			label="No"
@@ -737,7 +735,6 @@ const CreateOnYourTimeContent: FC = () => {
 																		/>
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="isPrivate-Yes"
 																			name="visibilityPrivate"
 																			label="Yes"
@@ -753,23 +750,26 @@ const CreateOnYourTimeContent: FC = () => {
 																	</Form.Group>
 																	<Form.Label
 																		className="mb-1"
-																		style={{ ...fonts.xs }}
+																		style={{ ...theme.fonts.default }}
 																	>
 																		Select the level of visibility:
 																	</Form.Label>
-																	<Form.Group>
+																	<Form.Group className="mb-5">
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="visibilityNetwork-Yes"
 																			name="visibilityNetwork"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>
+																					<div
+																						style={{
+																							...theme.fonts.default,
+																						}}
+																					>
 																						Only other Institutions in my
 																						network
 																					</div>
-																					<div className={classes.grayText}>
+																					<div className="text-gray">
 																						Visible to patients and
 																						providers from selected
 																						institutions in my network
@@ -794,10 +794,12 @@ const CreateOnYourTimeContent: FC = () => {
 																		/>
 																		{!!contentInstitutions &&
 																			contentInstitutions.length > 0 && (
-																				<div className="ml-7 mt-2 mb-3">
+																				<div className="ms-7 mt-2 mb-3">
 																					<Form.Label
 																						className="mb-2"
-																						style={{ ...fonts.xs }}
+																						style={{
+																							...theme.fonts.default,
+																						}}
 																					>
 																						Select the other institutions
 																						you will allow to have access to
@@ -812,13 +814,14 @@ const CreateOnYourTimeContent: FC = () => {
 																								<Form.Check
 																									key={index}
 																									type="checkbox"
-																									bsPrefix="cobalt-modal-form__check"
 																									id={institutionId}
 																									name={institutionId}
 																									label={
 																										<div
 																											style={{
-																												...fonts.xs,
+																												...theme
+																													.fonts
+																													.default,
 																											}}
 																										>
 																											{name}
@@ -874,15 +877,18 @@ const CreateOnYourTimeContent: FC = () => {
 																			)}
 																		<Form.Check
 																			type="radio"
-																			bsPrefix="cobalt-modal-form__check"
 																			id="visibilityPublic-Yes"
 																			name="visibilityPublic"
 																			label={
 																				<>
-																					<div style={{ ...fonts.xs }}>
+																					<div
+																						style={{
+																							...theme.fonts.default,
+																						}}
+																					>
 																						Public
 																					</div>
-																					<div className={classes.grayText}>
+																					<div className="text-gray">
 																						Available for use by other
 																						institutions
 																					</div>
@@ -907,60 +913,56 @@ const CreateOnYourTimeContent: FC = () => {
 															)}
 														</>
 													)}
-													{account?.roleId === ROLE_ID.ADMINISTRATOR && (
-														<>
-															{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
-																account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
-																<Card className="mb-5 border-0">
+
+													{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
+														account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+														<Card className="mb-5 border-0">
+															<div
+																className="p-6"
+																style={{
+																	borderBottom: `1px solid ${theme.colors.border}`,
+																}}
+															>
+																<h5 className="mb-2">Tags</h5>
+																<p>
+																	Tags are used to determine which resources are shown
+																	first to a patient depending on how they answered
+																	the initial assessment questions. If no categories
+																	are selected, then the resource will be
+																	de-prioritized an appear lower in a patient’s list
+																	of resources.
+																</p>
+															</div>
+															{tagQuestions?.map((question, index) => {
+																return (
 																	<div
-																		className="p-6"
-																		style={{
-																			borderBottom: `1px solid ${colors.border}`,
-																		}}
+																		key={index}
+																		className={index > 0 ? 'pt-5' : 'p-5'}
+																		style={
+																			index !== tagQuestions.length - 1
+																				? {
+																						borderBottom: `1px solid ${theme.colors.border}`,
+																				  }
+																				: {}
+																		}
 																	>
-																		<h5 className="mb-2">Tags</h5>
-																		<p>
-																			Tags are used to determine which resources
-																			are shown first to a patient depending on
-																			how they answered the initial assessment
-																			questions. If no categories are selected,
-																			then the resource will be de-prioritized an
-																			appear lower in a patient’s list of
-																			resources.
-																		</p>
+																		<PersonalizationCheckbox
+																			key={question.questionId}
+																			question={question}
+																			choices={choices}
+																			onChange={(questionId, answers) => {
+																				setChoices({
+																					...choices,
+																					[questionId]: answers,
+																				});
+																			}}
+																			bottomBordered={false}
+																			fullWidth={index > 0}
+																		/>
 																	</div>
-																	{tagQuestions?.map((question, index) => {
-																		return (
-																			<div
-																				key={index}
-																				className={index > 0 ? 'pt-5' : 'p-5'}
-																				style={
-																					index !== tagQuestions.length - 1
-																						? {
-																								borderBottom: `1px solid ${colors.border}`,
-																						  }
-																						: {}
-																				}
-																			>
-																				<PersonalizationCheckbox
-																					key={question.questionId}
-																					question={question}
-																					choices={choices}
-																					onChange={(questionId, answers) => {
-																						setChoices({
-																							...choices,
-																							[questionId]: answers,
-																						});
-																					}}
-																					bottomBordered={false}
-																					fullWidth={index > 0}
-																				/>
-																			</div>
-																		);
-																	})}
-																</Card>
-															)}
-														</>
+																);
+															})}
+														</Card>
 													)}
 												</Col>
 												<Col md={2} lg={4}>

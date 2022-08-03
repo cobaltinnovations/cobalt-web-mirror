@@ -2,7 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
 	SchedulingAppointmentType,
 	PatientIntakeQuestion,
-	ScreeningQuestion,
+	IntakeScreeningQuestion,
 	LogicalAvailability,
 	ProviderCalendar,
 } from '@/lib/models';
@@ -17,7 +17,7 @@ interface PostApointmentTypeRequest {
 	durationInMinutes: number;
 	hexColor: string;
 	patientIntakeQuestions: PatientIntakeQuestion[];
-	screeningQuestions: ScreeningQuestion[];
+	screeningQuestions: IntakeScreeningQuestion[];
 }
 
 export interface PostLogicalAvailabilitiesRequest {

@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useAlert from '@/hooks/use-alert';
-import colors from '@/jss/colors';
+
 import { CSSTransition } from 'react-transition-group';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const animationDuration = 200;
 
-const useAlertStyles = createUseStyles({
+const useAlertStyles = createUseThemedStyles((theme) => ({
 	alert: {
 		top: 54,
 		left: 0,
@@ -17,13 +17,13 @@ const useAlertStyles = createUseStyles({
 		position: 'fixed',
 		padding: '16px 25px',
 		'&.success': {
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.warning': {
-			backgroundColor: colors.warning,
+			backgroundColor: theme.colors.w500,
 		},
 		'&.danger': {
-			backgroundColor: colors.danger,
+			backgroundColor: theme.colors.d500,
 		},
 	},
 	'@global': {
@@ -42,11 +42,11 @@ const useAlertStyles = createUseStyles({
 			transition: `opacity ${animationDuration}ms`,
 		},
 	},
-});
+}));
 
 const Alert: FC = () => {
 	const { alertIsShowing, alertText, alertVariant } = useAlert();
-	const classes = useAlertStyles({ alertVariant });
+	const classes = useAlertStyles();
 
 	return (
 		<CSSTransition

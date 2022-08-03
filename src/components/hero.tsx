@@ -1,68 +1,62 @@
-import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
+import React, { FC, PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import Color from 'color';
 
-import colors from '@/jss/colors';
-import { boxShadow } from '@/jss/mixins';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useHeroStyles = createUseStyles({
+const useHeroStyles = createUseThemedStyles((theme) => ({
 	hero: ({ variant }: any) => {
-		let variantColor = colors.white;
+		let variantColor = theme.colors.n0;
 
 		switch (variant) {
 			case 'primary':
-				variantColor = colors.primary;
+				variantColor = theme.colors.p500;
 				break;
 			case 'secondary':
-				variantColor = colors.secondary;
+				variantColor = theme.colors.a500;
 				break;
 			case 'success':
-				variantColor = colors.success;
+				variantColor = theme.colors.s500;
 				break;
 			case 'danger':
-				variantColor = colors.danger;
+				variantColor = theme.colors.d500;
 				break;
 			case 'warning':
-				variantColor = colors.warning;
+				variantColor = theme.colors.w500;
 				break;
 			case 'info':
-				variantColor = colors.info;
+				variantColor = theme.colors.i500;
 				break;
 			case 'light':
-				variantColor = colors.light;
+				variantColor = theme.colors.n0;
 				break;
 			case 'dark':
-				variantColor = colors.dark;
+				variantColor = theme.colors.n900;
 				break;
 			default:
-				variantColor = colors.white;
+				variantColor = theme.colors.n0;
 		}
 
 		return {
 			padding: 25,
-			...boxShadow,
+			boxShadow: theme.elevation.e200,
 			borderRadius: 4,
 			backgroundColor: variantColor,
 			'& button': {
 				color: variantColor,
-				backgroundColor: colors.white,
+				backgroundColor: theme.colors.n0,
 				'&:hover': {
-					backgroundColor: Color(variantColor)
-						.lighten(0.64)
-						.hex(),
+					backgroundColor: Color(variantColor).lighten(0.64).hex(),
 				},
 				'&:active': {
-					backgroundColor: Color(variantColor)
-						.lighten(0.48)
-						.hex(),
+					backgroundColor: Color(variantColor).lighten(0.48).hex(),
 				},
 			},
 		};
 	},
-});
+}));
 
-interface HeroProps {
+interface HeroProps extends PropsWithChildren {
 	variant?: string;
 	className?: string;
 }

@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableRow, TableCell } from '@/components/table';
 import SessionAttendees from '@/components/session-attendees';
@@ -7,8 +6,6 @@ import SessionStatus, { SESSION_STATUS } from '@/components/session-status';
 import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionModel, ROLE_ID } from '@/lib/models';
-
-import colors from '@/jss/colors';
 
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -19,24 +16,25 @@ import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
 import { Link } from 'react-router-dom';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	iconPath: {
 		'& path': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconPolygon: {
 		'& polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconTrash: {
 		'& path': {
-			fill: colors.danger,
+			fill: theme.colors.d500,
 		},
 	},
-});
+}));
 
 interface SessionRowProps {
 	session: GroupSessionModel;
@@ -74,19 +72,19 @@ const SessionRow: FC<SessionRowProps> = ({
 	return (
 		<TableRow>
 			<TableCell>
-				<span className="d-block font-size-xs">{session.createdDateDescription}</span>
+				<span className="d-block fs-default">{session.createdDateDescription}</span>
 			</TableCell>
 			<TableCell>
 				<Link
 					to={`/in-the-studio/group-session-scheduled/${session.groupSessionId}`}
-					className="d-block font-size-xs font-karla-bold"
+					className="d-block fs-default fw-bold"
 				>
 					{session.title}
 				</Link>
-				<span className="d-block font-size-xs">{session.startDateTimeDescription}</span>
+				<span className="d-block fs-default">{session.startDateTimeDescription}</span>
 			</TableCell>
 			<TableCell>
-				<span className="d-block font-size-xs">{session.facilitatorName}</span>
+				<span className="d-block fs-default">{session.facilitatorName}</span>
 			</TableCell>
 			<TableCell>
 				{session.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT && (

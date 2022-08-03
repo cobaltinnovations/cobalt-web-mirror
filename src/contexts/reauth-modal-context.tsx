@@ -1,4 +1,4 @@
-import React, { FC, createContext, useState } from 'react';
+import React, { FC, createContext, useState, PropsWithChildren } from 'react';
 
 type ReauthModalContextConfig = {
 	showReauthModal: boolean;
@@ -9,7 +9,7 @@ type ReauthModalContextConfig = {
 
 const ReauthModalContext = createContext({} as ReauthModalContextConfig);
 
-const ReauthModalProvider: FC = (props) => {
+const ReauthModalProvider: FC<PropsWithChildren> = (props) => {
 	const [showReauthModal, setShowReauthModal] = useState(false);
 	const [signOnUrl, setSignOnUrl] = useState('/sign-in');
 

@@ -1,9 +1,8 @@
 import React, { FC, useState, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 import useSubdomain from '@/hooks/use-subdomain';
-import useQuery from '@/hooks/use-query';
 
 import AsyncPage from '@/components/async-page';
 import Select from '@/components/select';
@@ -16,13 +15,13 @@ import HeroContainer from '@/components/hero-container';
 
 const SignInSSO: FC = () => {
 	const subdomain = useSubdomain();
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [ssoOptions, setSsoOptions] = useState<AccountSource[]>([]);
 	const [ssoSelectValue, setSsoSelectValue] = useState<string>('');
 
-	const query = useQuery();
-	const accountSourceId = query.get('accountSourceId');
+	const [searchParams] = useSearchParams();
+	const accountSourceId = searchParams.get('accountSourceId');
 
 	const fetchData = useCallback(async () => {
 		const { accountSources } = await institutionService
@@ -57,17 +56,13 @@ const SignInSSO: FC = () => {
 	}
 
 	function handleBackButtonClick() {
-		if (history.length > 1) {
-			history.goBack();
-		} else {
-			window.location.pathname = '/sign-in';
-		}
+		navigate(-1);
 	}
 
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer>
-				<h2 className="mb-0 text-white text-center">welcome!</h2>
+				<h2 className="mb-0 text-center">welcome!</h2>
 			</HeroContainer>
 			<Container className="pt-5">
 				<Row>

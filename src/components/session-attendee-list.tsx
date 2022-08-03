@@ -1,13 +1,12 @@
 import React, { FC } from 'react';
 import { Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
 import { GroupSessionReservationModel } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionAttendeeList: {
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	listHeader: {
 		display: 'flex',
@@ -19,20 +18,20 @@ const useStyles = createUseStyles({
 		margin: 0,
 		padding: 0,
 		listStyle: 'none',
-		borderTop: `1px solid ${colors.border}`,
+		borderTop: `1px solid ${theme.colors.border}`,
 		'& li': {
 			padding: '15px 30px',
-			borderBottom: `1px solid ${colors.border}`,
+			borderBottom: `1px solid ${theme.colors.border}`,
 		},
 	},
-});
+}));
 
-interface SessionAttendeeList {
+interface SessionAttendeeListProps {
 	attendees: GroupSessionReservationModel[];
 	capacity: number;
 }
 
-const SessionAttendeeList: FC<SessionAttendeeList> = ({ attendees, capacity }) => {
+const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity }) => {
 	const classes = useStyles();
 
 	function handleEmailAllButtonClick() {
@@ -57,8 +56,8 @@ const SessionAttendeeList: FC<SessionAttendeeList> = ({ attendees, capacity }) =
 					{attendees.map((attendee) => {
 						return (
 							<li key={attendee.groupSessionReservationId} className="pt-3 pb-3">
-								<p className="mb-0 font-weight-bold">{attendee.name ?? 'anonymous user'}</p>
-								<p className="mb-0 font-weight-bold">
+								<p className="mb-0 font-heading-bold">{attendee.name ?? 'anonymous user'}</p>
+								<p className="mb-0 font-heading-bold">
 									<a href="mailto:">{attendee.emailAddress}</a>
 								</p>
 							</li>

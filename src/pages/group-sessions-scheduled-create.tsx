@@ -2,13 +2,12 @@ import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
+import { useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import useHeaderTitle from '@/hooks/use-header-title';
-import useQuery from '@/hooks/use-query';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
@@ -29,8 +28,6 @@ import {
 } from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel, ROLE_ID, ScreeningQuestionV2 } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
-
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
@@ -40,6 +37,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
+import { useCobaltTheme } from '@/jss/theme';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -130,19 +128,20 @@ export type GroupSessionFormData = yup.InferType<typeof groupSessionSchema>;
 const requiredFields = getRequiredYupFields<GroupSessionFormData>(groupSessionSchema);
 
 const GroupSessionsCreate: FC = () => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const classes = useStyles();
-	const isViewMode = !!useRouteMatch({
+	const { fonts } = useCobaltTheme();
+	const isViewMode = !!useMatch({
 		path: '/group-sessions/scheduled/:groupSessionId/view',
-		exact: true,
+		end: true,
 	});
 
 	const { showAlert } = useAlert();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const query = useQuery();
-	const groupSessionIdToCopy = query.get('groupSessionIdToCopy');
+	const [searchParams] = useSearchParams();
+	const groupSessionIdToCopy = searchParams.get('groupSessionIdToCopy');
 
 	const [showSessionCancelModal, setShowSessionCancelModal] = useState(false);
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);
@@ -266,7 +265,7 @@ const GroupSessionsCreate: FC = () => {
 
 		window.alert('Studio session has been canceled.');
 		setShowSessionCancelModal(false);
-		history.push('/group-sessions/scheduled');
+		navigate('/group-sessions/scheduled');
 	}
 
 	async function handleSubmit(values: GroupSessionFormData) {
@@ -324,9 +323,9 @@ const GroupSessionsCreate: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
-				history.push('/group-sessions/scheduled');
+				navigate('/group-sessions/scheduled');
 			} else {
-				history.push('/in-the-studio-thanks');
+				navigate('/in-the-studio-thanks');
 			}
 		} catch (error) {
 			handleError(error);
@@ -361,7 +360,7 @@ const GroupSessionsCreate: FC = () => {
 					<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
 						<div className="d-flex align-items-center">
 							<div>
-								<h1 className="mb-2 font-size-xl">
+								<h1 className="mb-2 fs-h3">
 									{initialValues?.title || 'create studio session'}
 									{isCopy ? ' (copy)' : ''}
 								</h1>
@@ -370,7 +369,7 @@ const GroupSessionsCreate: FC = () => {
 							{!isViewMode && groupSessionId && (
 								<>
 									<Button
-										className="ml-auto mr-2"
+										className="ms-auto me-2"
 										size="sm"
 										variant="danger"
 										onClick={handleCancelSessionButtonClick}
@@ -485,13 +484,12 @@ const GroupSessionsCreate: FC = () => {
 												<h5 className="mb-5">Scheduling</h5>
 
 												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Would you like to use Cobalt's scheduling system?
 													</Form.Label>
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-Yes"
 														name="isCobaltScheduling"
 														label="Yes"
@@ -504,7 +502,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isCobaltScheduling-No"
 														name="isCobaltScheduling"
 														label="No"
@@ -516,8 +513,8 @@ const GroupSessionsCreate: FC = () => {
 													/>
 												</Form.Group>
 
-												<Form.Group controlId="date">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group controlId="date" className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Date
 													</Form.Label>
 													<DatePicker
@@ -538,13 +535,13 @@ const GroupSessionsCreate: FC = () => {
 													/>
 												</Form.Group>
 
-												<Form.Row>
+												<Row>
 													<Col>
 														<InputHelper
 															label="Start Time"
 															value={values.startTime || ''}
 															as="select"
-															onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+															onChange={(event) => {
 																setFieldTouched('startTime', true);
 																setFieldValue('startTime', event.target.value);
 															}}
@@ -572,7 +569,7 @@ const GroupSessionsCreate: FC = () => {
 															label="End Time"
 															value={values.endTime || ''}
 															as="select"
-															onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+															onChange={(event) => {
 																setFieldTouched('endTime', true);
 																setFieldValue('endTime', event.target.value);
 															}}
@@ -598,7 +595,7 @@ const GroupSessionsCreate: FC = () => {
 															})}
 														</InputHelper>
 													</Col>
-												</Form.Row>
+												</Row>
 
 												{!values.isCobaltScheduling && (
 													<InputHelper
@@ -625,13 +622,12 @@ const GroupSessionsCreate: FC = () => {
 												<h5 className="mb-5">Facilitator</h5>
 
 												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Are you the facilitator of this session?
 													</Form.Label>
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-Yes"
 														name="isModerator"
 														label="Yes"
@@ -644,7 +640,6 @@ const GroupSessionsCreate: FC = () => {
 													<Form.Check
 														disabled={isViewMode}
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="isModerator-No"
 														name="isModerator"
 														label="No"
@@ -709,26 +704,28 @@ const GroupSessionsCreate: FC = () => {
 													disabled={hasReservations || isViewMode}
 												/>
 
-												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-1" style={{ ...fonts.default }}>
 													Description {requiredFields.description && <span>*</span>}
 												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.xxs }}>
+												<p className="text-muted" style={{ ...fonts.small }}>
 													How would you like to describe your session? (This will be featured
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
 												</p>
-												<Wysiwyg
-													className={
-														touched.description && errors.description ? 'mb-2' : 'mb-5'
-													}
-													readOnly={isViewMode}
-													value={values.description}
-													onChange={(value) => {
-														setFieldValue('description', value);
+												<Field name="description">
+													{({ field, meta }: FieldProps) => {
+														return (
+															<Wysiwyg
+																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
+																readOnly={isViewMode}
+																initialValue={meta.initialValue}
+																onChange={field.onChange(field.name)}
+															/>
+														);
 													}}
-												/>
+												</Field>
 												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.xxs }}>
+													<p className="text-danger" style={{ ...fonts.small }}>
 														description is a required field
 													</p>
 												)}
@@ -807,13 +804,12 @@ const GroupSessionsCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Attendee Information</h5>
 
-												<Form.Group>
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Is this session restricted to certain audiences?
 													</Form.Label>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="is-restricted-no"
 														name="isRestricted"
 														label="No"
@@ -826,7 +822,6 @@ const GroupSessionsCreate: FC = () => {
 													/>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="is-restricted-yes"
 														name="isRestricted"
 														label="Yes"
@@ -842,7 +837,7 @@ const GroupSessionsCreate: FC = () => {
 												{values.screeningQuestions &&
 													values.screeningQuestions.map((screeningQuestion, index) => {
 														const touchedScreenQuestions =
-															((touched.screeningQuestions as unknown) as []) || [];
+															(touched.screeningQuestions as unknown as []) || [];
 														const sqTouched = !!touchedScreenQuestions.length
 															? touchedScreenQuestions[index]
 															: false;
@@ -907,7 +902,6 @@ const GroupSessionsCreate: FC = () => {
 																<div className="mb-5">
 																	<Form.Check
 																		disabled={isViewMode}
-																		type="switch"
 																		id={`screening-question-toggle--${screeningQuestion.questionId}`}
 																		label="Reduce text size"
 																		value="SMALL"
@@ -940,7 +934,7 @@ const GroupSessionsCreate: FC = () => {
 														);
 													})}
 
-												<div className="text-right">
+												<div className="text-end">
 													<Button
 														disabled={isViewMode}
 														size="sm"
@@ -995,18 +989,17 @@ const GroupSessionsCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Follow-Up Email</h5>
 
-												<Form.Group>
-													<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Group className="mb-5">
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Do you want to include a follow-up email?{' '}
 														<span className="text-danger">*</span>
 													</Form.Label>
-													<p className="mb-2 ml-0 mr-auto text-muted font-size-xxs">
+													<p className="mb-2 ms-0 me-auto text-muted fs-small">
 														This email will be sent to attendees immediately after the
 														session.
 													</p>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="follow-up-email-no"
 														name="followUpEmail"
 														label="No"
@@ -1019,7 +1012,6 @@ const GroupSessionsCreate: FC = () => {
 													/>
 													<Form.Check
 														type="radio"
-														bsPrefix="cobalt-modal-form__check"
 														id="follow-up-email-yes"
 														name="followUpEmail"
 														label="Yes"

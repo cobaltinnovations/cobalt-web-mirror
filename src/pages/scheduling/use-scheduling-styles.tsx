@@ -1,8 +1,6 @@
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
-import { createUseStyles } from 'react-jss';
+import { createUseThemedStyles } from '@/jss/theme';
 
-export const useSchedulingStyles = createUseStyles({
+export const useSchedulingStyles = createUseThemedStyles((theme) => ({
 	roundBtn: {
 		width: 36,
 		height: 36,
@@ -11,10 +9,10 @@ export const useSchedulingStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: 100,
-		border: `2px solid ${colors.primary}`,
+		border: `2px solid ${theme.colors.p500}`,
 		backgroundColor: 'transparent',
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
 	roundBtnSolid: {
@@ -24,14 +22,14 @@ export const useSchedulingStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: 100,
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.p500,
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.n0,
 		},
 	},
-});
+}));
 
-export const useContainerStyles = createUseStyles({
+export const useContainerStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		display: 'flex',
 		height: 'calc(100vh - 60px)', // subtracting header + footer height
@@ -39,7 +37,7 @@ export const useContainerStyles = createUseStyles({
 	sideBar: {
 		width: 440,
 		flexShrink: 0,
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
 		overflowX: 'scroll',
 	},
 	blockedTimeslot: {
@@ -47,43 +45,108 @@ export const useContainerStyles = createUseStyles({
 			-45deg,
 			transparent,
 			transparent 9px,
-			${colors.black} 10px,
-			${colors.black} 11px
+			${theme.colors.n900} 10px,
+			${theme.colors.n900} 11px
 		) !important;`,
 	},
 	leftCalendar: {
-		'& .fc .fc-toolbar.fc-header-toolbar': {
-			marginBottom: 12,
-			'& .fc-toolbar-chunk': {
-				display: 'flex',
-				alignItems: 'center',
-				'& .fc-toolbar-title': {
-					...fonts.m,
-				},
-				'& button.fc-prev-button, & button.fc-next-button': {
-					margin: 0,
-					border: 0,
-					width: 32,
-					height: 32,
-					padding: 0,
+		'& .fc': {
+			'& a': {
+				textDecoration: 'none',
+			},
+			'& .fc-toolbar.fc-header-toolbar': {
+				marginBottom: 12,
+				'& .fc-toolbar-chunk': {
 					display: 'flex',
 					alignItems: 'center',
-					justifyContent: 'center',
-					backgroundColor: 'transparent',
-					'& .fc-icon': {
-						color: colors.dark,
+					'& .fc-toolbar-title': {
+						...theme.fonts.large,
+					},
+					'& button.fc-prev-button, & button.fc-next-button': {
+						margin: 0,
+						border: 0,
+						width: 32,
+						height: 32,
+						padding: 0,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: 'transparent',
+						'& .fc-icon': {
+							color: theme.colors.n900,
+						},
+					},
+					'& button.fc-prev-button': {
+						marginLeft: 8,
+					},
+					'& button.fc-today-button': {
+						...theme.fonts.default,
+						borderRadius: 500,
+						padding: '4px 12px',
+						color: theme.colors.p500,
+						backgroundColor: 'transparent',
+						border: `1px solid ${theme.colors.border}`,
 					},
 				},
-				'& button.fc-prev-button': {
-					marginLeft: 8,
+			},
+			'& .fc-daygrid-day-bg .fc-bg-event': {
+				borderRadius: 50,
+			},
+			'& .fc-daygrid-day': {
+				'& .fc-daygrid-day-frame': {
+					width: 45,
+					height: 45,
+					display: 'flex',
+					borderRadius: '50%',
+					alignItems: 'center',
+					flexDirection: 'column',
+					justifyContent: 'center',
+					margin: '0 auto',
 				},
-				'& button.fc-today-button': {
-					...fonts.xs,
-					borderRadius: 500,
-					padding: '4px 12px',
-					color: colors.primary,
+				'& .fc-daygrid-day-number': {
+					padding: 0,
+					marginTop: -4,
+					color: theme.colors.n900,
+				},
+				'& .fc-daygrid-day-events': {
+					width: 6,
+					height: 6,
+					margin: 0,
+					minHeight: 0,
+					flexShrink: 0,
+					borderRadius: '50%',
+					position: 'relative',
+					border: `1px solid ${theme.colors.border}`,
+					'& .fc-daygrid-event-harness': {
+						width: 6,
+						height: 6,
+						top: -1,
+						left: -1,
+						borderRadius: '50%',
+						position: 'relative',
+						backgroundColor: theme.colors.p500,
+						'& .fc-daygrid-event': {
+							display: 'none',
+						},
+					},
+					'& .fc-daygrid-event-harness:not(:first-of-type)': {
+						display: 'none',
+					},
+				},
+				'&.fc-day-today': {
 					backgroundColor: 'transparent',
-					border: `1px solid ${colors.gray200}`,
+					'& .fc-daygrid-day-frame': {
+						backgroundColor: theme.colors.a500,
+					},
+					'& .fc-daygrid-day-number': {
+						color: theme.colors.n0,
+					},
+					'& .fc-daygrid-day-events': {
+						border: `1px solid ${theme.colors.n0}`,
+						'& .fc-daygrid-event-harness': {
+							backgroundColor: theme.colors.n0,
+						},
+					},
 				},
 			},
 		},
@@ -93,68 +156,8 @@ export const useContainerStyles = createUseStyles({
 		'& .fc-theme-standard td, .fc-theme-standard th': {
 			border: 0,
 			'& a:not([href])': {
-				...fonts.xs,
-				color: colors.gray600,
-			},
-		},
-		'& .fc .fc-daygrid-day-bg .fc-bg-event': {
-			borderRadius: 50,
-		},
-		'& .fc .fc-daygrid-day': {
-			'& .fc-daygrid-day-frame': {
-				width: 45,
-				height: 45,
-				display: 'flex',
-				borderRadius: '50%',
-				alignItems: 'center',
-				flexDirection: 'column',
-				justifyContent: 'center',
-				margin: '0 auto',
-			},
-			'& .fc-daygrid-day-number': {
-				padding: 0,
-				marginTop: -4,
-				color: colors.dark,
-			},
-			'& .fc-daygrid-day-events': {
-				width: 6,
-				height: 6,
-				margin: 0,
-				minHeight: 0,
-				flexShrink: 0,
-				borderRadius: '50%',
-				position: 'relative',
-				border: `1px solid ${colors.gray600}`,
-				'& .fc-daygrid-event-harness': {
-					width: 6,
-					height: 6,
-					top: -1,
-					left: -1,
-					borderRadius: '50%',
-					position: 'relative',
-					backgroundColor: colors.primary,
-					'& .fc-daygrid-event': {
-						display: 'none',
-					},
-				},
-				'& .fc-daygrid-event-harness:not(:first-of-type)': {
-					display: 'none',
-				},
-			},
-			'&.fc-day-today': {
-				backgroundColor: 'transparent',
-				'& .fc-daygrid-day-frame': {
-					backgroundColor: colors.secondary,
-				},
-				'& .fc-daygrid-day-number': {
-					color: colors.white,
-				},
-				'& .fc-daygrid-day-events': {
-					border: `1px solid ${colors.white}`,
-					'& .fc-daygrid-event-harness': {
-						backgroundColor: colors.white,
-					},
-				},
+				...theme.fonts.default,
+				color: theme.colors.n500,
 			},
 		},
 	},
@@ -162,9 +165,12 @@ export const useContainerStyles = createUseStyles({
 		flex: 1,
 		height: '100%',
 		'& .fc': {
+			'& a': {
+				textDecoration: 'none',
+			},
 			'& .fc-col-header-cell-cushion': {
-				...fonts.s,
-				color: colors.dark,
+				...theme.fonts.large,
+				color: theme.colors.n900,
 				padding: '9px 7px',
 			},
 			'& .fc-daygrid-day-events': {
@@ -183,7 +189,7 @@ export const useContainerStyles = createUseStyles({
 			},
 			'& .fc-timegrid-divider': {
 				padding: 0,
-				borderColor: colors.dark,
+				borderColor: theme.colors.n900,
 			},
 			'& .fc-timegrid-slot': {
 				height: 48,
@@ -192,18 +198,18 @@ export const useContainerStyles = createUseStyles({
 				verticalAlign: 'top',
 			},
 			'& .fc-timegrid-slot-label-cushion': {
-				...fonts.xxxs,
-				color: colors.gray600,
+				...theme.fonts.uiSmall,
+				color: theme.colors.n500,
 				padding: '4px 4px 0 0',
 			},
 			'& .fc-bg-event': {
-				// backgroundColor: colors.white,
+				// backgroundColor: theme.colors.n0,
 			},
 			'& .fc-timegrid-now-indicator-arrow': {
 				display: 'none',
 			},
 			'& .fc-timegrid-now-indicator-line': {
-				borderColor: colors.primary,
+				borderColor: theme.colors.p500,
 				'&:before': {
 					top: -4,
 					left: 0,
@@ -212,7 +218,7 @@ export const useContainerStyles = createUseStyles({
 					content: '""',
 					borderRadius: '50%',
 					position: 'absolute',
-					backgroundColor: colors.primary,
+					backgroundColor: theme.colors.p500,
 				},
 			},
 			'& .fc-timegrid-event': {
@@ -236,4 +242,4 @@ export const useContainerStyles = createUseStyles({
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
-});
+}));

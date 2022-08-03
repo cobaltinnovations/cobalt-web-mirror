@@ -38,5 +38,5 @@ export const activityTrackingService = {
 				context: JSON.stringify(data.context),
 			},
 		});
-	}
+	},
 };

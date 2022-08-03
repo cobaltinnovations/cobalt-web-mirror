@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -15,9 +15,9 @@ import DatePicker from '@/components/date-picker';
 import { groupSessionsService } from '@/lib/services';
 import { GroupSessionRequestModel } from '@/lib/models';
 
-import fonts from '@/jss/fonts';
 import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
+import { useCobaltTheme } from '@/jss/theme';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -64,8 +64,9 @@ const useStyles = createUseStyles({
 
 const InTheStudioGroupSessionByRequest: FC = () => {
 	const handleError = useHandleError();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useStyles();
+	const { fonts } = useCobaltTheme();
 	const { groupSessionRequestId } = useParams<{ groupSessionRequestId?: string }>();
 	const [session, setSession] = useState<GroupSessionRequestModel>();
 
@@ -104,8 +105,10 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 				})
 				.fetch();
 
-			history.push('/thank-you', {
-				groupSessionName: session?.title,
+			navigate('/thank-you', {
+				state: {
+					groupSessionName: session?.title,
+				},
 			});
 		} catch (error) {
 			handleError(error);
@@ -117,7 +120,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 			<Container className="pt-6 pb-6">
 				<Row>
 					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-6 font-size-xl">{session?.title}</h1>
+						<h1 className="mb-6 fs-h3">{session?.title}</h1>
 					</Col>
 				</Row>
 
@@ -197,13 +200,12 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 											/>
 
 											<Form.Group className="mb-5">
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													Do you have a specific date in mind for the session?
 												</Form.Label>
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="dateInMind-no"
 													name="dateInMind"
 													label="No"
@@ -216,7 +218,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="dateInMind-yes"
 													name="dateInMind"
 													label="Yes"
@@ -230,8 +231,8 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 
 											{values.dateInMind && (
 												<>
-													<Form.Group controlId="date">
-														<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+													<Form.Group controlId="date" className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
 															Date
 														</Form.Label>
 														<DatePicker
@@ -267,13 +268,12 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 											)}
 
 											<Form.Group className="mb-5">
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													How many people do you think will participate
 												</Form.Label>
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-lessThanFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.LESS_THAN_FIVE}
@@ -284,7 +284,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-fiveToTen"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.FIVE_TO_TEN}
@@ -295,7 +294,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-tenToFifteen"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.TEN_TO_FIFTEEN}
@@ -306,7 +304,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-fifteenToTwentyFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.FIFTEEN_TO_TWENTYFIVE}
@@ -319,7 +316,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 												<Form.Check
 													className="mb-0"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="numberOfPeople-moreThanTwentyFive"
 													name="numberOfPeople"
 													label={NUMBER_OF_PEOPLE.MORE_THAN_TWENTY_FIVE}

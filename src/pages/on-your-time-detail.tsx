@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import ReactPlayer from 'react-player';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -11,12 +10,11 @@ import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import colors from '@/jss/colors';
-
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useOnYourTimeDetailStyles = createUseStyles({
+const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
 		paddingBottom: '56.25%',
 	},
@@ -29,28 +27,26 @@ const useOnYourTimeDetailStyles = createUseStyles({
 		position: 'absolute',
 	},
 	informationContainer: {
-		color: colors.dark,
+		color: theme.colors.n900,
 		padding: '10px 20px',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
 	},
 	reactPlayerOuter: {
 		position: 'relative',
 		paddingTop: '56.25%',
-		backgroundColor: colors.gray500,
+		backgroundColor: theme.colors.n500,
 		'& > div': {
 			top: 0,
 			left: 0,
 			position: 'absolute',
 		},
 	},
-});
-
-interface RouteParams {
-	contentId: string;
-}
+}));
 
 const OnYourTimeDetail: FC = () => {
-	const { contentId } = useParams<RouteParams>();
+	const { contentId } = useParams<{
+		contentId: string;
+	}>();
 	const classes = useOnYourTimeDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
@@ -59,6 +55,10 @@ const OnYourTimeDetail: FC = () => {
 	useHeaderTitle(item?.title ?? '');
 
 	const fetchData = useCallback(async () => {
+		if (!contentId) {
+			return;
+		}
+
 		const response = await contentService.fetchContent(contentId).fetch();
 		setItem(response.content);
 	}, [contentId]);
@@ -74,7 +74,7 @@ const OnYourTimeDetail: FC = () => {
 				activityTypeId: AcivityTypeId.Content,
 				context: {
 					contentId: item.contentId,
-				}
+				},
 			})
 			.fetch()
 			.catch((e) => {
@@ -139,9 +139,14 @@ const OnYourTimeDetail: FC = () => {
 								/>
 							</div>
 						) : (
-							<BackgroundImageContainer className={classes.mediaContainer} imageUrl={item?.imageUrl || placeholderImage}>
+							<BackgroundImageContainer
+								className={classes.mediaContainer}
+								imageUrl={item?.imageUrl || placeholderImage}
+							>
 								<div className={classes.mediaContent}>
-									<small className="text-white text-uppercase font-karla-bold">{item?.newFlag ? 'NEW' : ''}</small>
+									<small className="text-white text-uppercase fw-bold">
+										{item?.newFlag ? 'NEW' : ''}
+									</small>
 								</div>
 							</BackgroundImageContainer>
 						)}
@@ -150,9 +155,13 @@ const OnYourTimeDetail: FC = () => {
 							{item?.author ? <p className="mb-1">by {item?.author}</p> : <p className="mb-1">&nbsp;</p>}
 
 							<div className="d-flex">
-								<small className="text-muted text-uppercase font-karla-bold">{item?.contentTypeLabel}</small>
+								<small className="text-muted text-uppercase fw-bold">{item?.contentTypeLabel}</small>
 
-								{item?.duration && <small className="text-muted text-uppercase font-karla-bold ml-auto">{item?.duration}</small>}
+								{item?.duration && (
+									<small className="text-muted text-uppercase fw-bold ms-auto">
+										{item?.duration}
+									</small>
+								)}
 							</div>
 						</div>
 					</Col>

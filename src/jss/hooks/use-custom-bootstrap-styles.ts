@@ -1,159 +1,119 @@
-import { createUseStyles } from 'react-jss';
-
-import { button, card, form, modal, modalForm } from '@/jss/bootstrap-theme';
-import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
+import { badge, button, card, form, modal, screeningButtonGroup, surveyForm } from '@/jss/bootstrap-theme';
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const spacerSize = 5;
-const iterations = 40;
-
-const m: Record<string, Record<string, string>> = {};
-const ml: Record<string, Record<string, string>> = {};
-const mr: Record<string, Record<string, string>> = {};
-const mt: Record<string, Record<string, string>> = {};
-const mb: Record<string, Record<string, string>> = {};
-const my: Record<string, Record<string, string>> = {};
-const mx: Record<string, Record<string, string>> = {};
-
-const p: Record<string, Record<string, string>> = {};
-const pl: Record<string, Record<string, string>> = {};
-const pr: Record<string, Record<string, string>> = {};
-const pt: Record<string, Record<string, string>> = {};
-const pb: Record<string, Record<string, string>> = {};
-const py: Record<string, Record<string, string>> = {};
-const px: Record<string, Record<string, string>> = {};
-
-for (let i = 0; i <= iterations; i++) {
-	m[`.m-${i}`] = { margin: `${spacerSize * i}px !important` };
-	ml[`.ml-${i}`] = { marginLeft: `${spacerSize * i}px !important` };
-	mr[`.mr-${i}`] = { marginRight: `${spacerSize * i}px !important` };
-	mt[`.mt-${i}`] = { marginTop: `${spacerSize * i}px !important` };
-	mb[`.mb-${i}`] = { marginBottom: `${spacerSize * i}px !important` };
-	my[`.my-${i}`] = { marginBottom: `${spacerSize * i}px !important`, marginTop: `${spacerSize * i}px !important` };
-	mx[`.mx-${i}`] = { marginLeft: `${spacerSize * i}px !important`, marginRight: `${spacerSize * i}px !important` };
-
-	p[`.p-${i}`] = { padding: `${spacerSize * i}px !important` };
-	pl[`.pl-${i}`] = { paddingLeft: `${spacerSize * i}px !important` };
-	pr[`.pr-${i}`] = { paddingRight: `${spacerSize * i}px !important` };
-	pt[`.pt-${i}`] = { paddingTop: `${spacerSize * i}px !important` };
-	pb[`.pb-${i}`] = { paddingBottom: `${spacerSize * i}px !important` };
-	py[`.py-${i}`] = { paddingBottom: `${spacerSize * i}px !important`, paddingTop: `${spacerSize * i}px !important` };
-	px[`.px-${i}`] = { paddingLeft: `${spacerSize * i}px !important`, paddingRight: `${spacerSize * i}px !important` };
-}
-
-export const useCustomBootstrapStyles = createUseStyles({
+export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		/* ----------------------------------------------------------- */
 		/* bsPrefix overrides */
 		/* ----------------------------------------------------------- */
-		...button,
-		...card,
-		...form,
-		...modal,
-		...modalForm,
+		...badge(theme),
+		...button(theme),
+		...card(theme),
+		...form(theme),
+		...modal(theme),
+		...surveyForm(theme),
+		...screeningButtonGroup(theme),
 
 		/* ----------------------------------------------------------- */
 		/* Generic overrides */
 		/* ----------------------------------------------------------- */
-		'.font-weight-regular': {
-			...fonts.nunitoSansRegular,
+		'.font-heading-normal': {
+			...theme.fonts.headingNormal,
 		},
-		'.font-weight-semi-bold': {
-			...fonts.nunitoSansSemiBold,
-		},
-		'.font-weight-bold': {
-			...fonts.nunitoSansBold,
+		'.font-heading-bold': {
+			...theme.fonts.headingBold,
 		},
 
-		'.font-karla-regular': {
-			...fonts.karlaRegular,
+		'.fw-normal': {
+			...theme.fonts.bodyNormal,
 		},
-		'.font-karla-bold': {
-			...fonts.karlaBold,
+		'.fw-bold': {
+			...theme.fonts.bodyBold,
 		},
 
 		'.text-primary': {
-			color: `${colors.primary} !important`,
+			color: `${theme.colors.p500} !important`,
 		},
 		'.text-secondary': {
-			color: `${colors.secondary} !important`,
+			color: `${theme.colors.a500} !important`,
 		},
 		'.text-success': {
-			color: `${colors.success} !important`,
+			color: `${theme.colors.s500} !important`,
 		},
 		'.text-danger': {
-			color: `${colors.danger} !important`,
+			color: `${theme.colors.d500} !important`,
 		},
 		'.text-warning': {
-			color: `${colors.warning} !important`,
+			color: `${theme.colors.w500} !important`,
 		},
 		'.text-info': {
-			color: `${colors.info} !important`,
+			color: `${theme.colors.i500} !important`,
 		},
 		'.text-light': {
-			color: `${colors.light} !important`,
+			color: `${theme.colors.n0} !important`,
 		},
 		'.text-dark': {
-			color: `${colors.dark} !important`,
+			color: `${theme.colors.n900} !important`,
 		},
 		'.text-gray': {
-			color: `${colors.gray600} !important`,
+			color: `${theme.colors.n500} !important`,
 		},
 
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
 		},
+		'.text-right': {
+			textAlign: 'right',
+		},
+
 		'.cursor-pointer': {
 			cursor: 'pointer !important',
 		},
 
 		'.bg-primary': {
-			backgroundColor: `${colors.primary} !important`,
+			backgroundColor: `${theme.colors.p500} !important`,
 		},
 		'.bg-secondary': {
-			backgroundColor: `${colors.secondary} !important`,
+			backgroundColor: `${theme.colors.a500} !important`,
 		},
 		'.bg-success': {
-			backgroundColor: `${colors.success} !important`,
+			backgroundColor: `${theme.colors.s500} !important`,
 		},
 		'.bg-danger': {
-			backgroundColor: `${colors.danger} !important`,
+			backgroundColor: `${theme.colors.d500} !important`,
 		},
 		'.bg-warning': {
-			backgroundColor: `${colors.warning} !important`,
+			backgroundColor: `${theme.colors.w500} !important`,
 		},
 		'.bg-info': {
-			backgroundColor: `${colors.info} !important`,
+			backgroundColor: `${theme.colors.i500} !important`,
 		},
 		'.bg-light': {
-			backgroundColor: `${colors.light} !important`,
+			backgroundColor: `${theme.colors.n0} !important`,
 		},
 		'.bg-dark': {
-			backgroundColor: `${colors.dark} !important`,
-		},
-		'.bg-light-gray': {
-			backgroundColor: `${colors.gray200} !important`,
+			backgroundColor: `${theme.colors.n900} !important`,
 		},
 
 		'.border': {
-			border: `1px solid ${colors.border} !important`,
+			border: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-top': {
-			borderTop: `1px solid ${colors.border} !important`,
+			borderTop: `1px solid ${theme.colors.border} !important`,
 		},
-		'.border-right': {
-			borderRight: `1px solid ${colors.border} !important`,
+		'.border-end': {
+			borderRight: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-bottom': {
-			borderBottom: `1px solid ${colors.border} !important`,
+			borderBottom: `1px solid ${theme.colors.border} !important`,
 		},
-		'.border-left': {
-			borderLeft: `1px solid ${colors.border} !important`,
+		'.border-start': {
+			borderLeft: `1px solid ${theme.colors.border} !important`,
 		},
 		'.selected-border-bottom': {
-			borderBottom: `3px solid ${colors.secondary} !important`,
+			borderBottom: `3px solid ${theme.colors.a500} !important`,
 		},
 		'.no-border': {
 			border: 'none',
@@ -161,7 +121,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 
 		'.carousel-item': {
 			paddingBottom: 30,
-			backgroundColor: colors.white,
+			backgroundColor: theme.colors.n0,
 		},
 		'.carousel-control-prev, .carousel-control-next': {
 			zIndex: 0,
@@ -173,7 +133,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 			'& svg': {
 				width: 16,
 				height: 16,
-				fill: colors.white,
+				fill: theme.colors.n0,
 			},
 		},
 		'.carousel-indicators': {
@@ -186,9 +146,9 @@ export const useCustomBootstrapStyles = createUseStyles({
 			marginLeft: 7,
 			marginRight: 7,
 			borderRadius: '50%',
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 			'&.active': {
-				backgroundColor: colors.footer,
+				backgroundColor: theme.colors.a300,
 			},
 		},
 
@@ -239,24 +199,6 @@ export const useCustomBootstrapStyles = createUseStyles({
 		},
 
 		/* ----------------------------------------------------------- */
-		/* Spacer overrides */
-		/* ----------------------------------------------------------- */
-		...m,
-		...ml,
-		...mr,
-		...mt,
-		...mb,
-		...mx,
-		...my,
-		...p,
-		...pl,
-		...pr,
-		...pt,
-		...pb,
-		...px,
-		...py,
-
-		/* ----------------------------------------------------------- */
 		/* React Bootstrap Typeahead (RBT) */
 		/* ----------------------------------------------------------- */
 		'.rbt': {
@@ -269,22 +211,22 @@ export const useCustomBootstrapStyles = createUseStyles({
 				border: 0,
 				padding: 0,
 				height: 70,
-				...fonts.xs,
+				...theme.fonts.default,
 				width: '100%',
 				textIndent: 30,
 				borderRadius: 0,
 				display: 'block',
 				appearance: 'none',
-				color: colors.dark,
+				color: theme.colors.n900,
 				lineHeight: 'normal',
-				...fonts.karlaRegular,
+				...theme.fonts.bodyNormal,
 
 				backgroundColor: 'transparent',
 				'&:focus, &.focus': {
 					border: 0,
 					outline: 'none',
 					boxShadow: 'none',
-					color: colors.dark,
+					color: theme.colors.n900,
 					backgroundColor: 'transparent',
 				},
 			},
@@ -316,10 +258,11 @@ export const useCustomBootstrapStyles = createUseStyles({
 				fontSize: '1.8rem',
 				lineHeight: '2rem',
 				textShadow: 'none',
-				color: colors.background,
-				backgroundColor: colors.dark,
+				color: theme.colors.background,
+				backgroundColor: theme.colors.n900,
 			},
-			'& .close:not(:disabled):not(.disabled):focus, .close:not(:disabled):not(.disabled):hover': {
+			'& .btn-close:not(:disabled):not(.disabled):focus, .btn-close:not(:disabled):not(.disabled):hover': {
+				color: theme.colors.n0,
 				opacity: 0.48,
 			},
 		},
@@ -341,7 +284,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 			'& .rbt-input': {
 				margin: 0,
 				border: 0,
-				...fonts.xs,
+				...theme.fonts.default,
 				width: '100%',
 				minHeight: 56,
 				height: '100%',
@@ -356,7 +299,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 					boxShadow: 'none',
 				},
 				'&:disabled': {
-					backgroundColor: colors.background,
+					backgroundColor: theme.colors.background,
 				},
 			},
 			'& .rbt-input-wrapper': {
@@ -368,24 +311,24 @@ export const useCustomBootstrapStyles = createUseStyles({
 				textIndent: 0,
 				fontSize: '1.5rem',
 				lineHeight: 'auto',
-				color: colors.black,
-				...fonts.nunitoSansRegular,
+				color: theme.colors.n900,
+				...theme.fonts.headingNormal,
 			},
 			'& .rbt-token': {
 				height: 24,
-				...fonts.xs,
+				...theme.fonts.default,
 				flexShrink: 0,
 				marginRight: 5,
 				marginBottom: 5,
 				borderRadius: 500,
-				color: colors.dark,
+				color: theme.colors.n900,
 				alignItems: 'center',
 				display: 'inline-flex',
 				padding: '0 4px 0 10px',
-				border: `1px solid ${Color(colors.gray600).alpha(0.2).string()}`,
+				border: `1px solid ${theme.colors.border}`,
 				'&:focus-visible': {
 					outline: 'none',
-					border: `1px solid ${colors.primary}`,
+					border: `1px solid ${theme.colors.p500}`,
 				},
 			},
 			'& .rbt-close': {
@@ -393,7 +336,7 @@ export const useCustomBootstrapStyles = createUseStyles({
 				height: 18,
 				marginTop: -2,
 				display: 'flex',
-				color: colors.black,
+				color: theme.colors.n900,
 				alignItems: 'center',
 				justifyContent: 'center',
 				backgroundColor: 'transparent',
@@ -402,65 +345,33 @@ export const useCustomBootstrapStyles = createUseStyles({
 				padding: 0,
 				marginTop: 1,
 				'& .dropdown-item': {
-					...fonts.xs,
-					color: colors.dark,
+					...theme.fonts.default,
+					color: theme.colors.n900,
 					padding: '8px 13px',
-					...fonts.karlaRegular,
+					...theme.fonts.bodyNormal,
 					textDecoration: 'none',
 					'&:hover, &:focus, &.active': {
 						backgroundColor: Color('#DBD4CF').alpha(0.2).string(),
 					},
 					'&:active': {
-						color: colors.dark,
+						color: theme.colors.n900,
 						backgroundColor: Color('#DBD4CF').alpha(0.4).string(),
 					},
 				},
 				'& .rbt-highlight-text': {
 					padding: 0,
-					...fonts.karlaBold,
+					...theme.fonts.bodyBold,
 					backgroundColor: 'transparent',
 				},
 				'& .rbt-menu-custom-option': {
 					fontStyle: 'italic',
-					color: colors.gray600,
+					color: theme.colors.n500,
 					'& .rbt-highlight-text': {
-						color: colors.dark,
+						color: theme.colors.n900,
 						fontStyle: 'normal',
 					},
 				},
 			},
 		},
-
-		'.custom-control.custom-switch': {
-			padding: 0,
-			'& label': {
-				alignItems: 'center',
-				color: colors.gray600,
-				display: 'inline-flex',
-				...fonts.nunitoSansSemiBold,
-				'&:before': {
-					top: 0,
-					left: 0,
-					width: 56,
-					height: 32,
-					marginRight: 8,
-					borderRadius: 500,
-					position: 'relative',
-				},
-				'&:after': {
-					top: 4,
-					left: 4,
-					width: 24,
-					height: 24,
-					borderRadius: '50%',
-				},
-			},
-			'& .custom-control-input:checked~.custom-control-label::before': {
-				backgroundColor: colors.primary,
-			},
-			'& .custom-control-input:checked~.custom-control-label::after': {
-				transform: 'translateX(24px)',
-			},
-		},
 	},
-});
+}));

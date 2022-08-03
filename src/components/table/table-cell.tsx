@@ -1,14 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import fonts from '@/jss/fonts';
-
 import { SORT_DIRECTION } from '.';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useTableCellStyles = createUseStyles({
+const useTableCellStyles = createUseThemedStyles((theme) => ({
 	tableCell: (props: any) => ({
 		padding: 0,
 		backgroundColor: 'inherit',
@@ -19,17 +16,17 @@ const useTableCellStyles = createUseStyles({
 		},
 	}),
 	tableCellContent: (props: any) => ({
-		...fonts.s,
+		...theme.fonts.large,
 		padding: '16px 16px',
 		width: typeof props.width === 'string' ? 'auto' : props.width,
 		...(props.header
 			? {
-					...fonts.xxxs,
+					...theme.fonts.small,
 					display: 'flex',
-					...fonts.karlaBold,
+					...theme.fonts.bodyBold,
 					alignItems: 'center',
 					whiteSpace: 'nowrap',
-					color: colors.gray600,
+					color: theme.colors.n500,
 					textTransform: 'uppercase',
 					justifyContent: 'space-between',
 					...(props.sortable
@@ -55,9 +52,9 @@ const useTableCellStyles = createUseStyles({
 	sortableIcon: {
 		display: 'block',
 	},
-});
+}));
 
-interface TableCellProps {
+interface TableCellProps extends PropsWithChildren {
 	header?: boolean;
 	width?: number | string;
 	fixed?: boolean;

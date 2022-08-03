@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, PropsWithChildren, useRef, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import moment from 'moment';
 
@@ -7,12 +7,12 @@ import DatePicker from '@/components/date-picker';
 
 import { AssessmentQuestion, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 
-interface SurveyQuestion {
+interface SurveyQuestionProps extends PropsWithChildren {
 	question: AssessmentQuestion;
 	onChange(questionId: string, answerIds: SelectedQuestionAnswer[]): void;
 }
 
-const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) => {
+const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children }) => {
 	const checkboxRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
 	const radioRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
 	const [answersTextValues, setAnswersTextValues] = useState(
@@ -46,7 +46,11 @@ const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) =>
 		onChange(questionId, checkedAnswer ? [{ answerId: checkedAnswer }] : []);
 	}
 
-	function handleQuadButtonClick(event: React.MouseEvent<HTMLButtonElement>, question: AssessmentQuestion, answerId: string) {
+	function handleQuadButtonClick(
+		event: React.MouseEvent<HTMLButtonElement>,
+		question: AssessmentQuestion,
+		answerId: string
+	) {
 		event.preventDefault();
 
 		const { questionId } = question;
@@ -89,13 +93,16 @@ const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) =>
 						<Form.Check
 							key={`${question.questionId}-${answer.answerId}`}
 							ref={checkboxRef as any}
+							bsPrefix="cobalt-survey-form__check"
 							type="checkbox"
 							checked={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)}
 							id={`${question.questionId}-${answer.answerId}`}
 							value={answer.answerId}
 							name={question.questionId}
 							label={answer.answerDescription}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCheckboxChange(event, question)}
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								handleCheckboxChange(event, question)
+							}
 						/>
 					);
 				});
@@ -108,29 +115,41 @@ const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) =>
 						<Form.Check
 							key={`${question.questionId}-${answer.answerId}`}
 							ref={radioRef as any}
+							bsPrefix="cobalt-survey-form__check"
 							type="radio"
 							checked={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)}
 							id={`${question.questionId}-${answer.answerId}`}
 							value={answer.answerId}
 							name={question.questionId}
 							label={answer.answerDescription}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleRadioChange(event, question)}
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+								handleRadioChange(event, question)
+							}
 						/>
 					);
 				});
 			case QUESTION_TYPE.QUAD:
-				return question.answers.map((answer) => {
-					return (
-						<Button
-							variant={!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId) ? 'secondary' : 'light'}
-							className="btn-block"
-							key={answer.answerId}
-							onClick={(event: React.MouseEvent<HTMLButtonElement>) => handleQuadButtonClick(event, question, answer.answerId)}
-						>
-							{answer.answerDescription}
-						</Button>
-					);
-				});
+				return (
+					<div className="d-grid gap-4">
+						{question.answers.map((answer) => {
+							return (
+								<Button
+									variant={
+										!!question.selectedAssessmentAnswers.find((a) => a.answerId === answer.answerId)
+											? 'primary'
+											: 'light'
+									}
+									key={answer.answerId}
+									onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+										handleQuadButtonClick(event, question, answer.answerId)
+									}
+								>
+									{answer.answerDescription}
+								</Button>
+							);
+						})}
+					</div>
+				);
 			case QUESTION_TYPE.TEXT:
 			case QUESTION_TYPE.COBALT_STUDENT_ID:
 			case QUESTION_TYPE.PHONE_NUMBER:
@@ -157,9 +176,17 @@ const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) =>
 							showMonthDropdown
 							dropdownMode="select"
 							key={answer.answerId}
-							selected={answersTextValues[answer.answerId] ? moment(answersTextValues[answer.answerId]).toDate() : undefined}
+							selected={
+								answersTextValues[answer.answerId]
+									? moment(answersTextValues[answer.answerId]).toDate()
+									: undefined
+							}
 							onChange={(date) => {
-								handleAnswerTextChange(question.questionId, answer.answerId, date ? moment(date).format('YYYY-MM-DD') : '');
+								handleAnswerTextChange(
+									question.questionId,
+									answer.answerId,
+									date ? moment(date).format('YYYY-MM-DD') : ''
+								);
 							}}
 						/>
 					);
@@ -170,9 +197,9 @@ const SurveyQuestion: FC<SurveyQuestion> = ({ question, onChange, children }) =>
 	}
 
 	return (
-		<Form.Group key={question.questionId} controlId={question.questionId}>
+		<Form.Group key={question.questionId} controlId={question.questionId} className="mb-5">
 			<Form.Label
-				className={question.fontSizeId === 'SMALL' ? 'font-size-xs' : ''}
+				className={question.fontSizeId === 'SMALL' ? 'fs-default' : ''}
 				dangerouslySetInnerHTML={{
 					__html: question.questionTitle,
 				}}

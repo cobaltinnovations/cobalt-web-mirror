@@ -1,6 +1,10 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
+import useHandleError from '@/hooks/use-handle-error';
+import { accountService } from '@/lib/services';
 
 const useCollectPhoneModalStyles = createUseStyles({
 	collectPhoneNumberModal: {
@@ -11,22 +15,41 @@ const useCollectPhoneModalStyles = createUseStyles({
 });
 
 interface CollectPhoneModalProps extends ModalProps {
-	onSubmit(phoneNumber: string): void;
+	onSkip(): void;
+	onSuccess(): void;
 }
 
-const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSubmit, ...props }) => {
+const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...props }) => {
+	const handleError = useHandleError();
 	const classes = useCollectPhoneModalStyles();
+	const { account, setAccount } = useAccount();
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>('');
 
 	return (
-		<Modal {...props} dialogClassName={classes.collectPhoneNumberModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">take our assessment</h3>
+		<Modal {...props} dialogClassName={classes.collectPhoneNumberModal} centered onHide={() => onSkip()}>
+			<Modal.Header closeButton>
+				<Modal.Title>take our assessment</Modal.Title>
 			</Modal.Header>
 			<Form
-				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+				onSubmit={async (e) => {
 					e.preventDefault();
-					onSubmit(phoneNumberInputValue);
+
+					if (!account) {
+						return;
+					}
+
+					try {
+						const accountResponse = await accountService
+							.updatePhoneNumberForAccountId(account.accountId, {
+								phoneNumber: phoneNumberInputValue,
+							})
+							.fetch();
+
+						setAccount(accountResponse.account);
+						onSuccess();
+					} catch (error) {
+						handleError(error);
+					}
 				}}
 			>
 				<Modal.Body>
@@ -34,24 +57,36 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSubmit, ...props }) =
 						To take the Cobalt assessment we'd like a way to reach you if there is a need. Please enter your
 						phone number to continue.
 					</p>
-					<Form.Control
+					<InputHelper
 						required
 						type="tel"
-						className="mb-3"
 						value={phoneNumberInputValue}
-						placeholder="Your Phone Number"
+						label="Your Phone Number"
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setPhoneNumberInputValue(e.target.value);
 						}}
 					/>
-
-					<Button type="submit" variant="primary" size="sm" className="btn-block">
-						continue assessment
-					</Button>
-					<Button type="button" variant="link" size="sm" className="btn-block" onClick={props.onHide}>
-						skip for now
-					</Button>
 				</Modal.Body>
+				<Modal.Footer>
+					<div className="text-center">
+						<Button
+							className="mb-2"
+							type="button"
+							variant="outline-primary"
+							size="sm"
+							onClick={() => {
+								onSkip();
+							}}
+						>
+							skip for now
+						</Button>
+						<div className="d-grid">
+							<Button type="submit" variant="primary" size="sm">
+								continue assessment
+							</Button>
+						</div>
+					</div>
+				</Modal.Footer>
 			</Form>
 		</Modal>
 	);

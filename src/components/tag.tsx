@@ -1,50 +1,48 @@
-import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
+import React, { FC, PropsWithChildren } from 'react';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useTagStyles = createUseStyles({
+const useTagStyles = createUseThemedStyles((theme) => ({
 	tag: ({ variant }: any) => {
-		let textColor = colors.dark;
-		let backgroundColor = colors.white;
+		let textColor = theme.colors.n900;
+		let backgroundColor = theme.colors.n0;
 
 		switch (variant) {
 			case 'primary':
-				textColor = colors.white;
-				backgroundColor = colors.primary;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.p500;
 				break;
 			case 'secondary':
-				textColor = colors.white;
-				backgroundColor = colors.secondary;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.a500;
 				break;
 			case 'success':
-				textColor = colors.white;
-				backgroundColor = colors.success;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.s500;
 				break;
 			case 'danger':
-				textColor = colors.white;
-				backgroundColor = colors.danger;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.d500;
 				break;
 			case 'warning':
-				textColor = colors.dark;
-				backgroundColor = colors.warning;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.w500;
 				break;
 			case 'info':
-				textColor = colors.white;
-				backgroundColor = colors.info;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.i500;
 				break;
 			case 'light':
-				textColor = colors.dark;
-				backgroundColor = colors.light;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.n0;
 				break;
 			case 'dark':
-				textColor = colors.white;
-				backgroundColor = colors.dark;
+				textColor = theme.colors.n0;
+				backgroundColor = theme.colors.n900;
 				break;
 			default:
-				textColor = colors.dark;
-				backgroundColor = colors.white;
+				textColor = theme.colors.n900;
+				backgroundColor = theme.colors.n0;
 		}
 
 		return {
@@ -56,9 +54,9 @@ const useTagStyles = createUseStyles({
 			backgroundColor: backgroundColor,
 		};
 	},
-});
+}));
 
-interface TagProps {
+interface TagProps extends PropsWithChildren {
 	variant?: string;
 	className?: string;
 }
@@ -68,7 +66,7 @@ const Tag: FC<TagProps> = (props) => {
 
 	return (
 		<div className={classNames(classes.tag, props.className)}>
-			<small className="font-weight-bold">{props.children}</small>
+			<small className="font-heading-bold">{props.children}</small>
 		</div>
 	);
 };

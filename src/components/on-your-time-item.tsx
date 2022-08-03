@@ -1,53 +1,55 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useOnYourTimeItemStyles = createUseStyles({
+const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 	onYourTimeItem: {
 		padding: 8,
+		borderRadius: 5,
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
+		boxShadow: theme.elevation.e200,
 	},
 	imageContainer: {
 		flexShrink: 0,
 	},
 	title: {
-		marginBottom: 5,
+		marginBottom: 4,
 		overflow: 'hidden',
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
 	author: {
-		marginBottom: 10,
+		marginBottom: 8,
 		overflow: 'hidden',
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
 	tag: {
-		top: 8,
-		left: 8,
-		...fonts.xxxs,
-		...fonts.karlaBold,
-		color: colors.white,
+		top: 4,
+		left: 0,
+		padding: '1px 5px',
+		...theme.fonts.uiSmall,
+		...theme.fonts.bodyBold,
+		color: theme.colors.n0,
 		position: 'absolute',
 		textTransform: 'uppercase',
+		backgroundColor: theme.colors.a500,
 	},
 	informationContainer: {
 		flex: 1,
 		paddingLeft: 16,
 		paddingRight: 8,
-		color: colors.dark,
+		color: theme.colors.n900,
 		overflow: 'hidden',
 	},
-});
+}));
 
 interface OnYourTimeItemProps {
 	className?: string;
@@ -66,7 +68,7 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 	return (
 		<div className={classNames(classes.onYourTimeItem, props.className)}>
 			<BackgroundImageContainer
-				size={82}
+				size={80}
 				className={classes.imageContainer}
 				imageUrl={props.imageUrl || placeholderImage}
 			>
@@ -81,11 +83,8 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 				)}
 
 				<div className="d-flex">
-					<small className="text-muted text-uppercase font-karla-bold">{props.type}</small>
-
-					{props.duration && (
-						<small className="text-muted text-uppercase font-karla-bold ml-auto">{props.duration}</small>
-					)}
+					<small className="text-muted text-uppercase fw-bold">{props.type}</small>
+					{props.duration && <small className="text-muted text-uppercase ms-auto">{props.duration}</small>}
 				</div>
 			</div>
 		</div>

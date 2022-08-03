@@ -1,49 +1,43 @@
-import React, { FC, useRef } from 'react';
-import { createUseStyles } from 'react-jss';
-import Color from 'color';
+import React, { FC, PropsWithChildren, useRef } from 'react';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useFileInputButtonStyles = createUseStyles({
+const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
 	fileInputButton: {
 		margin: 0,
-		...fonts.m,
+		...theme.fonts.large,
 		cursor: 'pointer',
 		borderRadius: 500,
 		overflow: 'hidden',
-		color: colors.white,
+		color: theme.colors.n0,
 		padding: '10px 25px',
 		position: 'relative',
 		display: 'inline-block',
-		...fonts.nunitoSansBold,
-		backgroundColor: colors.primary,
+		...theme.fonts.headingBold,
+		backgroundColor: theme.colors.p500,
 		'&:hover': {
-			backgroundColor: Color(colors.primary)
-				.lighten(0.16)
-				.hex(),
+			backgroundColor: theme.colors.p300,
 		},
 		'&:active': {
-			backgroundColor: Color(colors.primary)
-				.darken(0.16)
-				.hex(),
+			backgroundColor: theme.colors.p700,
 		},
 	},
 	disabled: {
-		color: colors.gray500,
-		backgroundColor: colors.gray200,
+		color: theme.colors.n500,
+		backgroundColor: theme.colors.n75,
 		'&:hover': {
-			color: colors.gray500,
-			backgroundColor: colors.gray200,
+			cursor: 'not-allowed',
+			color: theme.colors.n500,
+			backgroundColor: theme.colors.n75,
 		},
 	},
 	fileInput: {
 		display: 'none',
 	},
-});
+}));
 
-interface FileInputButtonProps {
+interface FileInputButtonProps extends PropsWithChildren {
 	accept: string;
 	onChange(file: File): void;
 	className?: string;

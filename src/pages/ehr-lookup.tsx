@@ -3,15 +3,21 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik, FormikProps } from 'formik';
 import InputMask from 'react-input-mask';
 import Lottie from 'lottie-web';
-import { Link, useHistory, Prompt, Redirect } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { pick } from 'lodash';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import fonts from '@/jss/fonts';
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
 import moment from 'moment';
-import { EpicPatientData, googlePlacesService, accountService, CreateAppointmentData, appointmentService, EpicMatchStep } from '@/lib/services';
+import {
+	EpicPatientData,
+	googlePlacesService,
+	accountService,
+	CreateAppointmentData,
+	appointmentService,
+	EpicMatchStep,
+} from '@/lib/services';
 import { AccountModel } from '@/lib/models';
 import HealthRecordsModal from '@/components/health-records-modal';
 import MatchConfidence from '@/components/match-confidence';
@@ -22,6 +28,7 @@ import ehrSearchAnimation from '@/assets/lottie/ehr-search.json';
 import { BookingContext } from '@/contexts/booking-context';
 import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import { useCobaltTheme } from '@/jss/theme';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -61,9 +68,10 @@ function getClearForm(account: AccountModel | undefined): EpicPatientData {
 
 const EhrLookup: FC = () => {
 	useHeaderTitle('assessment');
-
+	const { fonts } = useCobaltTheme();
 	const handleError = useHandleError();
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const [step, setStep] = useState(0);
 	const [isSearching, setIsSearching] = useState(false);
 	const [isBooking, setIsBooking] = useState(false);
@@ -87,7 +95,6 @@ const EhrLookup: FC = () => {
 		setSelectedTimeSlot,
 		formattedAvailabilityDate,
 
-		isEligible,
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
@@ -101,8 +108,8 @@ const EhrLookup: FC = () => {
 	}, [step]);
 
 	const exitUrl = useMemo(() => {
-		return getExitBookingLocation(history.location.state);
-	}, [getExitBookingLocation, history.location.state]);
+		return getExitBookingLocation(location.state);
+	}, [getExitBookingLocation, location.state]);
 
 	const searchRecords = useCallback(
 		async (data: Partial<EpicPatientData>, matchStep: EpicMatchStep) => {
@@ -169,9 +176,12 @@ const EhrLookup: FC = () => {
 			setSelectedProvider(undefined);
 			setSelectedTimeSlot(undefined);
 
-			history.replace(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
-				successBooking: true,
-				emailAddress: response.account.emailAddress,
+			navigate(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
+				replace: true,
+				state: {
+					successBooking: true,
+					emailAddress: response.account.emailAddress,
+				},
 			});
 		} catch (e) {
 			handleError(e);
@@ -180,9 +190,11 @@ const EhrLookup: FC = () => {
 		setIsBooking(false);
 	};
 
-	if (!selectedProvider || !selectedTimeSlot) {
-		return <Redirect to={exitUrl} />;
-	}
+	useEffect(() => {
+		if (!selectedProvider || !selectedTimeSlot) {
+			navigate(exitUrl);
+		}
+	}, [exitUrl, navigate, selectedProvider, selectedTimeSlot]);
 
 	return (
 		<>
@@ -193,7 +205,7 @@ const EhrLookup: FC = () => {
 				}}
 				onExitBooking={() => {
 					if (window.confirm('Are you sure you want to exit booking?')) {
-						history.replace(exitUrl);
+						navigate(exitUrl, { replace: true });
 					}
 				}}
 			/>
@@ -273,7 +285,9 @@ const EhrLookup: FC = () => {
 
 								{step === 2 && (
 									<>
-										<Form.Label>we've found a few possible matches, help us narrow it down</Form.Label>
+										<Form.Label>
+											we've found a few possible matches, help us narrow it down
+										</Form.Label>
 
 										<MatchConfidence {...confidenceState} className="mb-8" />
 
@@ -308,18 +322,16 @@ const EhrLookup: FC = () => {
 							</Form>
 
 							<p className="text-center my-5">
-								{isEligible && (
-									<Prompt
-										message={(location) => {
-											if (location.pathname.startsWith('/connect-with-support')) {
-												return 'Are you sure you want to exit booking?';
-											}
-
-											return true;
-										}}
-									/>
-								)}
-								<Link to={exitUrl}>exit booking</Link>
+								<Link
+									to={exitUrl}
+									onClick={(e) => {
+										if (!window.confirm('Are you sure you want to exit booking?')) {
+											e.preventDefault();
+										}
+									}}
+								>
+									exit booking
+								</Link>
 							</p>
 						</Container>
 					);
@@ -329,19 +341,27 @@ const EhrLookup: FC = () => {
 			{__DEV__ && (
 				<Container className="pt-5">
 					<Row>
-						{Object.entries<EpicPatientData[]>(require('../lib/utils/ehr-test-cases.json')).map(([scenario, data]) => {
-							return (
-								<Col key={scenario} className="my-4 d-flex flex-column" md={3}>
-									<Form.Label style={{ ...fonts.xs }}>{scenario}</Form.Label>
+						{Object.entries<EpicPatientData[]>(require('../lib/utils/ehr-test-cases.json')).map(
+							([scenario, data]) => {
+								return (
+									<Col key={scenario} className="my-4 d-flex flex-column" md={3}>
+										<Form.Label style={{ ...fonts.default }}>{scenario}</Form.Label>
 
-									{data.map((testCase, idx) => (
-										<Button key={idx} className="my-1" size="sm" onClick={() => setInitialValues(testCase)} style={{ ...fonts.xxs }}>
-											{`${testCase.firstName} ${testCase.lastName}`}
-										</Button>
-									))}
-								</Col>
-							);
-						})}
+										{data.map((testCase, idx) => (
+											<Button
+												key={idx}
+												className="my-1"
+												size="sm"
+												onClick={() => setInitialValues(testCase)}
+												style={{ ...fonts.small }}
+											>
+												{`${testCase.firstName} ${testCase.lastName}`}
+											</Button>
+										))}
+									</Col>
+								);
+							}
+						)}
 					</Row>
 				</Container>
 			)}
@@ -380,6 +400,7 @@ function EhrLoading() {
 }
 
 function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
 	// const canSubmit = values.firstName && values.lastName && values.dateOfBirth;
 
 	const stepValues = pick(values, ['firstName', 'middleInitial', 'lastName', 'dateOfBirth']);
@@ -390,23 +411,23 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 
 	return (
 		<>
-			<Form.Group controlId="firstName">
-				<Form.Label style={{ ...fonts.xs }}>First Name</Form.Label>
+			<Form.Group controlId="firstName" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>First Name</Form.Label>
 				<Form.Control required type="text" name="firstName" value={values.firstName} onChange={handleChange} />
 			</Form.Group>
 
-			<Form.Group controlId="middleInitial">
-				<Form.Label style={{ ...fonts.xs }}>M.I.</Form.Label>
+			<Form.Group controlId="middleInitial" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>M.I.</Form.Label>
 				<Form.Control type="text" name="middleInitial" value={values.middleInitial} onChange={handleChange} />
 			</Form.Group>
 
-			<Form.Group controlId="lastName">
-				<Form.Label style={{ ...fonts.xs }}>Last Name</Form.Label>
+			<Form.Group controlId="lastName" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Last Name</Form.Label>
 				<Form.Control required type="text" name="lastName" value={values.lastName} onChange={handleChange} />
 			</Form.Group>
 
-			<Form.Group controlId="dateOfBirth">
-				<Form.Label style={{ ...fonts.xs }}>Date of Birth</Form.Label>
+			<Form.Group controlId="dateOfBirth" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Date of Birth</Form.Label>
 				<DatePicker
 					showYearDropdown
 					showMonthDropdown
@@ -418,9 +439,9 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 				/>
 			</Form.Group>
 
-			<Form.Row>
+			<Row>
 				<Button
-					className="ml-auto"
+					className="ms-auto"
 					type="button"
 					onClick={async () => {
 						if (!stepValues) {
@@ -432,12 +453,14 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 				>
 					search records
 				</Button>
-			</Form.Row>
+			</Row>
 		</>
 	);
 }
 
 function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	const addressSearchInputRef = useRef<any>(null);
 	const [searchQuery, setSearchQuery] = useState(values.address.line1);
 	const [extractedAddress, setExtractedAddress] = useState(values.address);
@@ -479,18 +502,24 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 
 	return (
 		<>
-			<Form.Group controlId="phoneNumber">
-				<Form.Label style={{ ...fonts.xs }}>Phone Number</Form.Label>
-				<Form.Control required type="text" name="phoneNumber" value={values.phoneNumber} onChange={handleChange} />
+			<Form.Group controlId="phoneNumber" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Phone Number</Form.Label>
+				<Form.Control
+					required
+					type="text"
+					name="phoneNumber"
+					value={values.phoneNumber}
+					onChange={handleChange}
+				/>
 			</Form.Group>
 
-			<Form.Group controlId="emailAddress">
-				<Form.Label style={{ ...fonts.xs }}>Email</Form.Label>
+			<Form.Group controlId="emailAddress" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Email</Form.Label>
 				<Form.Control type="text" name="emailAddress" value={values.emailAddress} onChange={handleChange} />
 			</Form.Group>
 
-			<Form.Group controlId="line1">
-				<Form.Label style={{ ...fonts.xs }}>Address Line 1</Form.Label>
+			<Form.Group controlId="line1" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Address Line 1</Form.Label>
 				<Form.Control
 					ref={addressSearchInputRef}
 					type="text"
@@ -508,27 +537,47 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 				/>
 			</Form.Group>
 
-			<Form.Group controlId="line2">
-				<Form.Label style={{ ...fonts.xs }}>Address Line 2</Form.Label>
-				<Form.Control type="text" name="line2" value={values.address.line2 || ''} onChange={handleAddressInputChange('line2')} />
+			<Form.Group controlId="line2" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Address Line 2</Form.Label>
+				<Form.Control
+					type="text"
+					name="line2"
+					value={values.address.line2 || ''}
+					onChange={handleAddressInputChange('line2')}
+				/>
 			</Form.Group>
 
-			<Form.Group controlId="city">
-				<Form.Label style={{ ...fonts.xs }}>City</Form.Label>
-				<Form.Control type="text" name="city" value={values.address.city} onChange={handleAddressInputChange('city')} />
+			<Form.Group controlId="city" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>City</Form.Label>
+				<Form.Control
+					type="text"
+					name="city"
+					value={values.address.city}
+					onChange={handleAddressInputChange('city')}
+				/>
 			</Form.Group>
 
-			<Form.Group controlId="state">
-				<Form.Label style={{ ...fonts.xs }}>State</Form.Label>
-				<Form.Control type="text" name="state" value={values.address.state} onChange={handleAddressInputChange('state')} />
+			<Form.Group controlId="state" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>State</Form.Label>
+				<Form.Control
+					type="text"
+					name="state"
+					value={values.address.state}
+					onChange={handleAddressInputChange('state')}
+				/>
 			</Form.Group>
 
-			<Form.Group controlId="postalCode">
-				<Form.Label style={{ ...fonts.xs }}>Postal Code</Form.Label>
-				<Form.Control type="text" value={values.address.postalCode} placeholder="ex. 19123" onChange={handleAddressInputChange('postalCode')} />
+			<Form.Group controlId="postalCode" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Postal Code</Form.Label>
+				<Form.Control
+					type="text"
+					value={values.address.postalCode}
+					placeholder="ex. 19123"
+					onChange={handleAddressInputChange('postalCode')}
+				/>
 			</Form.Group>
 
-			<Form.Row>
+			<Row>
 				<Button
 					type="button"
 					variant="outline-primary"
@@ -540,7 +589,7 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 				</Button>
 
 				<Button
-					className="ml-auto"
+					className="ms-auto"
 					type="button"
 					onClick={async () => {
 						if (!canSubmit) {
@@ -557,15 +606,19 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 				>
 					search records
 				</Button>
-			</Form.Row>
+			</Row>
 		</>
 	);
 }
 
 function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSearching }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	const canSubmit = true;
 
-	const [lastFourSSN, setLastFourSSN] = useState(values.nationalIdentifier.substr(values.nationalIdentifier.length - 5));
+	const [lastFourSSN, setLastFourSSN] = useState(
+		values.nationalIdentifier.substr(values.nationalIdentifier.length - 5)
+	);
 
 	if (isSearching) {
 		return <EhrLoading />;
@@ -573,8 +626,8 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 
 	return (
 		<>
-			<Form.Group controlId="nationalIdentifier">
-				<Form.Label style={{ ...fonts.xs }}>SSN</Form.Label>
+			<Form.Group controlId="nationalIdentifier" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>SSN</Form.Label>
 				<Form.Control
 					as={InputMask}
 					type="text"
@@ -590,8 +643,8 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 				/>
 			</Form.Group>
 
-			<Form.Group controlId="gender">
-				<Form.Label style={{ ...fonts.xs }}>Gender</Form.Label>
+			<Form.Group controlId="gender" className="mb-5">
+				<Form.Label style={{ ...fonts.default }}>Gender</Form.Label>
 				<Select
 					value={values.gender || ''}
 					onChange={(e) => {
@@ -604,7 +657,7 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 				</Select>
 			</Form.Group>
 
-			<Form.Row>
+			<Row>
 				<Button
 					type="button"
 					variant="outline-primary"
@@ -616,7 +669,7 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 				</Button>
 
 				<Button
-					className="ml-auto"
+					className="ms-auto"
 					type="button"
 					onClick={async () => {
 						if (!canSubmit) {
@@ -644,12 +697,14 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 				>
 					search records
 				</Button>
-			</Form.Row>
+			</Row>
 		</>
 	);
 }
 
 function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isBooking, numMatches }: StepProps) {
+	const { fonts } = useCobaltTheme();
+
 	return (
 		<>
 			{numMatches === 0 && (
@@ -658,8 +713,8 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 
 					<RecordCard fullInfo confidenceState={confidenceState} data={values} showConfidence={false} />
 
-					<Form.Group className="mt-4" controlId="nationalIdentifier">
-						<Form.Label style={{ ...fonts.xs }}>Full social security number</Form.Label>
+					<Form.Group className="mt-4 mb-5" controlId="nationalIdentifier">
+						<Form.Label style={{ ...fonts.default }}>Full social security number</Form.Label>
 						<Form.Control
 							type="text"
 							name="nationalIdentifier"
@@ -677,7 +732,9 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 
 					<RecordCard confidenceState={confidenceState} data={values} fullInfo={false} showConfidence />
 
-					<p className="pt-3">If this record doesn't look right, please email cobaltplatform@xmog.com for help.</p>
+					<p className="pt-3">
+						If this record doesn't look right, please email cobaltplatform@xmog.com for help.
+					</p>
 				</>
 			)}
 
@@ -685,12 +742,12 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 				<>
 					<Form.Label>we'll call to confirm your booking</Form.Label>
 					<p className="pt-3">
-						We found multiple records that match your information. We'll forward your booking request to someone who will sort this out and call you
-						once your booking is confirmed.
+						We found multiple records that match your information. We'll forward your booking request to
+						someone who will sort this out and call you once your booking is confirmed.
 					</p>
 				</>
 			) : (
-				<Form.Row>
+				<Row>
 					<Button
 						variant="outline-primary"
 						type="button"
@@ -703,7 +760,7 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 
 					<Button
 						disabled={isBooking}
-						className="ml-auto"
+						className="ms-auto"
 						type="button"
 						onClick={async () => {
 							onNext(values);
@@ -711,7 +768,7 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 					>
 						finish booking
 					</Button>
-				</Form.Row>
+				</Row>
 			)}
 		</>
 	);
@@ -735,7 +792,7 @@ function RecordCard({
 	fullName += ' ' + data.lastName;
 	return (
 		<div className="d-flex bg-white p-3">
-			<ProfileIcon className="mr-3" style={{ height: 80, width: 80 }} />
+			<ProfileIcon className="me-3" style={{ height: 80, width: 80 }} />
 
 			<div className="d-flex flex-column flex-grow-1">
 				<h4>{fullName}</h4>

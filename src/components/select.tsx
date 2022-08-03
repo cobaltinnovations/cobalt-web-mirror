@@ -1,44 +1,41 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
-
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useSelectStyles = createUseStyles({
+const useSelectStyles = createUseThemedStyles((theme) => ({
 	select: {
 		position: 'relative',
 		'& select': {
 			height: 54,
-			...fonts.xs,
+			...theme.fonts.default,
 			width: '100%',
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
-			color: colors.dark,
-			...fonts.karlaRegular,
+			color: theme.colors.n900,
+			...theme.fonts.bodyNormal,
 			padding: '0 40px 0 15px',
-			backgroundColor: colors.white,
-			border: `1px solid ${colors.border}`,
+			backgroundColor: theme.colors.n0,
+			border: `1px solid ${theme.colors.border}`,
 			'&:hover': {
-				border: `1px solid ${colors.primary}`,
+				border: `1px solid ${theme.colors.p500}`,
 			},
 			'&:disabled': {
-				color: colors.gray500,
-				backgroundColor: colors.gray200,
-				border: `1px solid ${colors.gray200}`,
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n75,
+				border: `1px solid ${theme.colors.n100}`,
 				'&:hover': {
-					color: colors.gray500,
-					backgroundColor: colors.gray200,
-					border: `1px solid ${colors.gray200}`,
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n75,
+					border: `1px solid ${theme.colors.n100}`,
 				},
 			},
 			'&:invalid': {
 				fontStyle: 'italic',
-				color: colors.gray600,
+				color: theme.colors.n500,
 			},
 			'&:focus': {
 				outline: 'none',
@@ -53,11 +50,11 @@ const useSelectStyles = createUseStyles({
 		top: '50%',
 		position: 'absolute',
 		transform: 'translateY(-50%)',
-		fill: props.disabled ? colors.gray500 : colors.black,
+		fill: props.disabled ? theme.colors.n500 : theme.colors.n900,
 	}),
-});
+}));
 
-interface SelectProps {
+interface SelectProps extends PropsWithChildren {
 	value: string;
 	onChange(event: React.ChangeEvent<HTMLSelectElement>): void;
 	required?: boolean;
@@ -75,8 +72,7 @@ const Select: FC<SelectProps> = ({ className, ...props }) => {
 
 	return (
 		<div className={classNames(classes.select, className)}>
-			<Form.Control
-				as="select"
+			<Form.Select
 				name={props.name}
 				value={props.value}
 				onChange={handleOnChange}
@@ -84,7 +80,7 @@ const Select: FC<SelectProps> = ({ className, ...props }) => {
 				disabled={props.disabled}
 			>
 				{props.children}
-			</Form.Control>
+			</Form.Select>
 			<DownChevron className={classes.downChevron} />
 		</div>
 	);

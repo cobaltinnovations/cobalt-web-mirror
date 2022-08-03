@@ -1,18 +1,16 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useHeroContainerStyles = createUseStyles({
+const useHeroContainerStyles = createUseThemedStyles((theme) => ({
 	heroContainer: {
 		padding: 0,
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.p50,
 	},
-});
+}));
 
-interface HeroContainerProps {
+interface HeroContainerProps extends PropsWithChildren {
 	className?: string;
 }
 

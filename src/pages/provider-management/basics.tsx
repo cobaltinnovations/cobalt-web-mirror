@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
@@ -11,7 +11,7 @@ interface RoleModel {
 }
 
 export const ProviderManagementBasics = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -89,14 +89,16 @@ export const ProviderManagementBasics = (): ReactElement => {
 							labelKey="title"
 							options={roleOptions}
 							selected={roleSelections}
-							onChange={setRoleSelections}
+							onChange={(options) => {
+								setRoleSelections(options as RoleModel[]);
+							}}
 						/>
 
 						<div className="d-flex align-items-center justify-content-between">
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

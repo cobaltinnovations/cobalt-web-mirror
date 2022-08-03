@@ -1,5 +1,4 @@
 import React, { FC, ReactElement } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableCell, TableRow } from '@/components/table';
 
@@ -18,26 +17,26 @@ import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
 
 import { AdminContentRow, AdminContentActions, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import SessionDropdown from '@/components/session-dropdown';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
 		width: 20,
 		height: 20,
-		fill: colors.secondary,
+		fill: theme.colors.a500,
 		'& path': {
-			fill: colors.secondary,
+			fill: theme.colors.a500,
 		},
 	},
 	centerText: {
 		textAlign: 'center',
 	},
 	row: {
-		borderLeft: `1px solid ${colors.border}`,
-		borderRight: `1px solid ${colors.border}`,
+		borderLeft: `1px solid ${theme.colors.border}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	noWrap: {
 		whiteSpace: 'nowrap',
@@ -52,7 +51,7 @@ const useStyles = createUseStyles({
 	},
 	success: {
 		'& #Shape': {
-			fill: colors.success,
+			fill: theme.colors.s500,
 		},
 	},
 	danger: {
@@ -60,7 +59,7 @@ const useStyles = createUseStyles({
 		height: 10,
 		lineHeight: 10,
 		'& polygon': {
-			fill: colors.danger,
+			fill: theme.colors.d500,
 		},
 	},
 	circleIndicator: {
@@ -71,27 +70,27 @@ const useStyles = createUseStyles({
 		display: 'inline-block',
 
 		'&.approved': {
-			backgroundColor: colors.success,
+			backgroundColor: theme.colors.s500,
 		},
 		'&.rejected': {
-			backgroundColor: colors.danger,
+			backgroundColor: theme.colors.d500,
 		},
 		'&.pending': {
-			backgroundColor: colors.gray700,
+			backgroundColor: theme.colors.n500,
 		},
 		'&.archived': {
-			backgroundColor: colors.border,
+			backgroundColor: theme.colors.border,
 		},
 	},
 	description: {
 		maxHeight: 20,
 		maxWidth: 400,
 		overflow: 'hidden',
-		color: colors.gray600,
+		color: theme.colors.n500,
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 	},
-});
+}));
 
 interface DropdownItem {
 	icon: ReactElement;
@@ -152,7 +151,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		// 	};
 		//
 		// 	return (
-		// 		<span key={key} className={`d-block font-size-xxs font-karla-regular ${classes.noWrap}`}>
+		// 		<span key={key} className={`d-block fs-small fw-normal ${classes.noWrap}`}>
 		// 			{getIcon()} {item.description}
 		// 		</span>
 		// 	);
@@ -224,33 +223,39 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		return (
 			<TableRow className={classes.row}>
 				<TableCell>
-					<span className="d-block font-size-xs font-karla-regular">{content.dateCreatedDescription}</span>
+					<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 				</TableCell>
-				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>{getIcon(content.contentTypeId)}</TableCell>
+				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
+					{getIcon(content.contentTypeId)}
+				</TableCell>
 				<TableCell width={300}>
-					<span className="d-block font-size-xs font-karla-bold">
+					<span className="d-block fs-default fw-bold">
 						<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
 					</span>
-					<span className="d-block font-size-xs font-karla-regular">{content.author}</span>
-					<span className={`d-block font-size-xs font-karla-regular ${classes.description}`}>
+					<span className="d-block fs-default fw-normal">{content.author}</span>
+					<span className={`d-block fs-default fw-normal ${classes.description}`}>
 						{content.description ? content.description.replace(/<\/?[^>]+(>|$)/g, '') : ''}
 					</span>
 				</TableCell>
 				{isSuperAdmin && (
 					<TableCell>
-						<span className="d-block font-size-xs font-karla-regular">{content.ownerInstitution}</span>
+						<span className="d-block fs-default fw-normal">{content.ownerInstitution}</span>
 					</TableCell>
 				)}
 				<TableCell className={`justify-content-center align-items-center ${classes.centerText}`}>
-					<span className="d-block font-size-xs font-karla-regular">{content.views}</span>
+					<span className="d-block fs-default fw-normal">{content.views}</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-karla-regular">{content.ownerInstitutionApprovalStatus.description}</span>
+					<span className="ms-2 fs-small fw-normal">
+						{content.ownerInstitutionApprovalStatus.description}
+					</span>
 				</TableCell>
 				<TableCell>
 					{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ml-2 font-size-xxs font-karla-regular">{content.otherInstitutionApprovalStatus.description}</span>
+					<span className="ms-2 fs-small fw-normal">
+						{content.otherInstitutionApprovalStatus.description}
+					</span>
 				</TableCell>
 				<TableCell>
 					<SessionDropdown

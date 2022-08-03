@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 
 import HeroContainer from '@/components/hero-container';
@@ -13,10 +13,10 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryButton, onRetryButtonClick }) => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	function handleGoBackButtonClick() {
-		history.goBack();
+		navigate(-1);
 	}
 
 	function handleRetryClick() {
@@ -26,14 +26,14 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryB
 	return (
 		<>
 			<HeroContainer>
-				<h6 className="mb-0 text-white text-center">We're sorry, an error occurred.</h6>
-				<p className="mb-0 text-white text-center">{error.message}</p>
+				<h6 className="mb-0 text-center">We're sorry, an error occurred.</h6>
+				<p className="mb-0 text-center">{error.message}</p>
 			</HeroContainer>
 			<Container className="pt-4 pb-5">
 				<Row className="text-center">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						{showBackButton && (
-							<Button onClick={handleGoBackButtonClick} className="mr-2">
+							<Button onClick={handleGoBackButtonClick} className="me-2">
 								Go Back
 							</Button>
 						)}

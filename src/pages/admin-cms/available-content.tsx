@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useHeaderTitle from '@/hooks/use-header-title';
 
 import { AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
@@ -39,7 +39,8 @@ const CmsAvailableContent: FC = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	useHeaderTitle('On Your Time - Available Content');
-	const history = useHistory();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { showAlert } = useAlert();
 	const [tableIsUpdating, setTableIsUpdating] = useState(false);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -49,7 +50,9 @@ const CmsAvailableContent: FC = () => {
 
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [searchInputValueDebounced, setSearchInputValueDebounced] = useState('');
-	const setDebouncedSearchInputValue = useRef(debounce((value: string) => setSearchInputValueDebounced(value), 500)).current;
+	const setDebouncedSearchInputValue = useRef(
+		debounce((value: string) => setSearchInputValueDebounced(value), 500)
+	).current;
 
 	const [typeFilterValue, setTypeFilterValue] = useState<ContentTypeId | undefined>(undefined);
 	const [statusFilterValue, setStatusFilterValue] = useState<ContentAvailableStatusId | undefined>(undefined);
@@ -88,19 +91,27 @@ const CmsAvailableContent: FC = () => {
 
 			setTableIsUpdating(false);
 
-			// @ts-ignore
-			const locationState: AlertLocationState | undefined = history.location.state || {};
+			const locationState = (location.state as AlertLocationState) || {};
 			if (locationState?.showSuccess) {
 				showAlert({
 					text: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
 					variant: 'success',
 				});
-				history.replace({ state: {} });
+				navigate('', { replace: true, state: {} });
 			}
 		}
 
 		getTablePage();
-	}, [currentPageIndex, statusFilterValue, typeFilterValue, showAlert, history, searchInputValueDebounced, handleError]);
+	}, [
+		currentPageIndex,
+		statusFilterValue,
+		typeFilterValue,
+		showAlert,
+		navigate,
+		searchInputValueDebounced,
+		handleError,
+		location.state,
+	]);
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
 		setTypeFilterValue(value);
@@ -117,7 +128,7 @@ const CmsAvailableContent: FC = () => {
 	}
 
 	function handleAddClick(contentId: string) {
-		history.push(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
+		navigate(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
 	}
 
 	function updateContentItem(content: AdminContentRow) {
@@ -192,7 +203,9 @@ const CmsAvailableContent: FC = () => {
 											};
 										}),
 									]}
-									onChange={(value) => handleStatusFilterChange(value as ContentAvailableStatusId | undefined)}
+									onChange={(value) =>
+										handleStatusFilterChange(value as ContentAvailableStatusId | undefined)
+									}
 								/>
 							)}
 						</div>
@@ -233,7 +246,12 @@ const CmsAvailableContent: FC = () => {
 				<Col>
 					{content && content.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={15} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={15}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 				</Col>

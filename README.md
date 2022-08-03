@@ -14,6 +14,21 @@ In the project directory, you can run:
 Installs dependencies from NPM.<br />
 You must do this before running any other scripts.
 
+#### Apple Silicon (arm64) Notes
+
+You might need to install Chromium in order to have `npm install` complete successfully.
+
+```shell
+brew install chromium --no-quarantine
+```
+
+Then, tell Puppeteer where Chromium lives:
+
+```shell
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+```
+
 ### `npm run dev`
 
 Runs the app in development mode.<br />
@@ -66,44 +81,22 @@ If you ever need to test your code against the server, create a production build
 
 ## Environment Variables
 
-| Name                                         | Description                                                   |
-| -------------------------------------------- | ------------------------------------------------------------- |
-| WEBAPP_ENABLE_BASIC_AUTH                     | flag Basic Auth on NodeJS webapp server                       |
-| WEBAPP_BASIC_AUTH_USERNAME                   | Accepted Basic Auth username                                  |
-| WEBAPP_BASIC_AUTH_PASSWORD                   | Accepted Basic Auth password                                  |
-| WEBAPP_BASIC_AUTH_SECRET                     | Secret string to sign Basic Auth session cookies              |
-| COBALT_WEB_API_BASE_URL                      | API base url                                                  |
-| COBALT_WEB_SSO_URL                           | sso url                                                       |
-| COBALT_WEB_GA_TRACKING_ID                    | Google Analytics Tracking ID `UA-000000-01`                   |
-| COBALT_WEB_DISABLE_SIGN_IN                   | string to disable sign-in UI ("true" or "false")              |
-| COBALT_WEB_SHOW_DEBUG                        | string to show debug UI ("true" or "false")                   |
-| COBALT_WEB_LOCALHOST_SUBDOMAIN               | subdomain to use for localhost dev, DO NOT SET IN PROD        |
-| COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true  | string to turn on/off provider features ("true" or "false")   |
-| COBALT_WEB_DOWN_FOR_MAINTENANCE              | string to turn on/off DownForService page ("true" or "false") |
+| Name                                        | Description                                                   |
+| ------------------------------------------- | ------------------------------------------------------------- |
+| WEBAPP_ENABLE_BASIC_AUTH                    | flag Basic Auth on NodeJS webapp server                       |
+| WEBAPP_BASIC_AUTH_USERNAME                  | Accepted Basic Auth username                                  |
+| WEBAPP_BASIC_AUTH_PASSWORD                  | Accepted Basic Auth password                                  |
+| WEBAPP_BASIC_AUTH_SECRET                    | Secret string to sign Basic Auth session cookies              |
+| COBALT_WEB_API_BASE_URL                     | API base url                                                  |
+| COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                   |
+| COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")              |
+| COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                   |
+| COBALT_WEB_LOCALHOST_SUBDOMAIN              | subdomain to use for localhost dev, DO NOT SET IN PROD        |
+| COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")   |
+| COBALT_WEB_DOWN_FOR_MAINTENANCE             | string to turn on/off DownForService page ("true" or "false") |
 
 Copy `.env.local.example` to `.env.local` at the root of the repo
 
 All local development environment variables must start with `REACT_APP_`. This prefix can be ignored in production as it is only used by create-react-app's bundlers to set environment variables at build-time.
 
 In production, the variables are controlled by the node.js server run-time and this file is irrelevant.
-
-## Internationalization (i18n)
-
-We are using the internationalization library `i18next`, and it's react extension, `react-i18next`
-
-Usage: 1. add text strings to the files in `./src/assets/i18n/` 2. in the component: import the useTranslation Hook, then use the `t` method to translate the strings from the translation library.
-
-    ```
-    import { useTranslation } from 'react-i18next';
-
-    const exampleComponent = () => {
-        const { t, i18n } = useTranslation();
-        return (
-            <span>
-                {t('examplePage.spanText')}
-            </span>
-        )
-    };
-    ```
-
-

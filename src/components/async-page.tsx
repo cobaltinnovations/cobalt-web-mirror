@@ -1,5 +1,5 @@
-import React, { FC, useState, useEffect, useCallback, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { FC, useState, useEffect, useCallback, useContext, PropsWithChildren } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Loader from '@/components/loader';
 import ErrorDisplay from '@/components/error-display';
@@ -13,7 +13,7 @@ enum DISPLAY_STATES {
 	ERROR = 'ERROR',
 }
 
-interface AsyncPageProps {
+interface AsyncPageProps extends PropsWithChildren {
 	fetchData(): void;
 	abortFetch?(): void;
 	showBackButton?: boolean;
@@ -27,7 +27,7 @@ const AsyncPage: FC<AsyncPageProps> = ({
 	showBackButton = true,
 	showRetryButton = true,
 }) => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
@@ -57,7 +57,7 @@ const AsyncPage: FC<AsyncPageProps> = ({
 						return;
 					}
 
-					history.replace('/sign-in');
+					navigate('/sign-in', { replace: true });
 					return;
 				}
 			}
@@ -65,7 +65,7 @@ const AsyncPage: FC<AsyncPageProps> = ({
 			setFetchPageDataError(error);
 			setDisplayState(DISPLAY_STATES.ERROR);
 		}
-	}, [fetchData, history, setShowReauthModal, setSignOnUrl]);
+	}, [fetchData, navigate, setShowReauthModal, setSignOnUrl]);
 
 	useEffect(() => {
 		fetchPageData();

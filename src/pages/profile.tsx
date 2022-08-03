@@ -1,41 +1,38 @@
 import React, { FC } from 'react';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import HeroContainer from '@/components/hero-container';
+import { createUseThemedStyles } from '@/jss/theme';
 
-import colors from '@/jss/colors';
-
-const useProfileStyles = createUseStyles({
+const useProfileStyles = createUseThemedStyles((theme) => ({
 	lastUpdatedContainer: {
 		padding: 0,
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
 const Profile: FC = () => {
 	useHeaderTitle('your profile');
 
-	const history = useHistory();
+	const navigate = useNavigate();
 	const classes = useProfileStyles();
-	const routeMatch = useRouteMatch();
+	const location = useLocation();
 	const { account } = useAccount();
 
 	function handleUpdateMyProfileButtonClick() {
-		history.push({
-			pathname: '/intro-assessment',
-			state: { from: routeMatch.path },
+		navigate('/intro-assessment', {
+			state: { from: location.pathname },
 		});
 	}
 
 	return (
 		<>
 			<HeroContainer>
-				<p className="mb-0 text-white font-karla-regular text-center">
+				<p className="mb-0 fw-normal text-center">
 					Take a moment to review your profile and let us know if anything has changed.
 				</p>
 			</HeroContainer>

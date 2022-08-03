@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import {
@@ -20,19 +19,18 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 
 import { useSchedulingStyles } from './use-scheduling-styles';
-import colors from '@/jss/colors';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
-import { cloneDeep } from 'lodash';
-import { Link, useParams, useRouteMatch, Redirect } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	appointmentsList: {
 		padding: 0,
 		margin: 0,
@@ -40,12 +38,12 @@ const useStyles = createUseStyles({
 			padding: '10px 15px',
 		},
 		'& li:nth-child(odd)': {
-			backgroundColor: colors.gray200,
+			backgroundColor: theme.colors.n75,
 		},
 	},
 	attendedButton: {
-		color: colors.success,
-		borderColor: colors.success,
+		color: theme.colors.s500,
+		borderColor: theme.colors.s500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -54,8 +52,8 @@ const useStyles = createUseStyles({
 		},
 	},
 	noShowButton: {
-		color: colors.danger,
-		borderColor: colors.danger,
+		color: theme.colors.d500,
+		borderColor: theme.colors.d500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -65,8 +63,8 @@ const useStyles = createUseStyles({
 	},
 	attendedButtonSolid: {
 		border: 0,
-		color: colors.white,
-		backgroundColor: colors.success,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.s500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -76,8 +74,8 @@ const useStyles = createUseStyles({
 	},
 	noShowButtonSolid: {
 		border: 0,
-		color: colors.white,
-		backgroundColor: colors.danger,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.d500,
 		'& path, & polygon#Shape': {
 			fill: 'currentColor',
 		},
@@ -85,7 +83,7 @@ const useStyles = createUseStyles({
 			outline: 'none',
 		},
 	},
-});
+}));
 
 interface AppointmentDetailPanelProps {
 	setCalendarDate: (date: Date, time?: string) => void;
@@ -100,11 +98,11 @@ export const AppointmentDetailPanel = ({
 	onAddAppointment,
 	focusDateOnLoad,
 }: AppointmentDetailPanelProps) => {
-	const routeMatch = useRouteMatch();
 	const { account } = useAccount();
 	const { appointmentId } = useParams<{ appointmentId: string }>();
 	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [patient, setPatient] = useState<AccountModel>();
 	const [appointment, setAppointment] = useState<AppointmentModel>();
@@ -115,7 +113,7 @@ export const AppointmentDetailPanel = ({
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!accountId) {
+		if (!accountId || !appointmentId) {
 			return;
 		}
 
@@ -140,9 +138,11 @@ export const AppointmentDetailPanel = ({
 		};
 	}, [accountId, appointmentId, handleError]);
 
-	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
-		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`} />;
-	}
+	useEffect(() => {
+		if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
+			navigate(`/scheduling/appointments/${appointment?.rescheduledAppointmentId}`);
+		}
+	}, [appointment?.canceledForReschedule, appointment?.rescheduledAppointmentId, navigate]);
 
 	const showIntakeResponses =
 		!!assessment && Array.isArray(assessment.assessmentQuestions) && assessment.assessmentQuestions.length > 0;
@@ -173,18 +173,20 @@ export const AppointmentDetailPanel = ({
 					as="a"
 					variant="primary"
 					size="sm"
-					className="mr-1"
+					className="me-1"
 					href={appointment?.videoconferenceUrl}
 					target="_blank"
 				>
 					join now
 				</Button>
 
-				<CopyToClipboardButton className="mr-1" text={appointment?.videoconferenceUrl} />
+				<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} />
 
-				<Button as={Link} to={`${routeMatch.url}/edit`} variant="primary" size="sm" className="px-2">
-					<EditIcon />
-				</Button>
+				<Link to={'edit'}>
+					<Button variant="primary" size="sm" className="px-2">
+						<EditIcon />
+					</Button>
+				</Link>
 			</div>
 
 			<div className="border py-2 px-3">
@@ -343,7 +345,7 @@ const AppointmentAttendance = ({
 						<CheckIcon />
 					</button>
 					<button
-						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ml-2')}
+						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ms-2')}
 						onClick={() => {
 							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
 						}}

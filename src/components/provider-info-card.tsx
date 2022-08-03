@@ -1,18 +1,16 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, PropsWithChildren, useMemo } from 'react';
 import BackgroundImageContainer from '@/components/background-image-container';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import { createUseStyles } from 'react-jss';
-import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
 import { Provider } from '@/lib/models';
 import { Link } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useProviderInfoStyles = createUseStyles({
+const useProviderInfoStyles = createUseThemedStyles((theme) => ({
 	paymentPill: {
-		...fonts.xxs,
-		color: colors.dark,
+		...theme.fonts.small,
+		color: theme.colors.n900,
 		display: 'inline-block',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 		borderRadius: 20,
 		marginTop: 4,
 		padding: '2px 6px',
@@ -21,13 +19,20 @@ const useProviderInfoStyles = createUseStyles({
 		display: 'inline-block',
 		transform: 'translateY(4px)',
 	},
-});
+}));
 
-export const ProviderInfoCard: FC<{
+interface ProviderInfoCardProps extends PropsWithChildren {
 	provider: Provider;
 	linkToExternalBio?: boolean;
 	hideSpecifics?: boolean;
-}> = ({ provider, linkToExternalBio = false, hideSpecifics = false, children }) => {
+}
+
+export const ProviderInfoCard: FC<ProviderInfoCardProps> = ({
+	provider,
+	linkToExternalBio = false,
+	hideSpecifics = false,
+	children,
+}) => {
 	const classes = useProviderInfoStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const finalTitle = provider.title ? provider.title : provider.supportRolesDescription;
@@ -54,7 +59,7 @@ export const ProviderInfoCard: FC<{
 
 		if (provider.bioUrl) {
 			return (
-				<a href={provider.bioUrl} target="_blank" rel="noreferrer">
+				<a href={provider.bioUrl} target="_blank" rel="noreferrer" className="fw-bold">
 					{linkText}
 				</a>
 			);
@@ -66,7 +71,7 @@ export const ProviderInfoCard: FC<{
 	return (
 		<div className="d-flex align-items-center">
 			<BackgroundImageContainer size={116} imageUrl={provider.imageUrl || placeholderImage} />
-			<div className="pl-3">
+			<div className="ps-3">
 				<h5 className="mb-0">{renderedLink}</h5>
 
 				{/* {provider.schedulingSystemId !== 'EPIC' && (

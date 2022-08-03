@@ -1,27 +1,26 @@
 import React, { FC } from 'react';
 import InputMask from 'react-input-mask';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import InputHelper from '@/components/input-helper';
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useMeridianSwitchStyles = createUseStyles({
+const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 	meridianToggleWrapper: {
 		height: 56,
 		flexShrink: 0,
 		display: 'flex',
 		borderRadius: 50,
 		overflow: 'hidden',
-		border: `1px solid ${colors.border}`,
+		border: `1px solid ${theme.colors.border}`,
 	},
 	meridianButton: {
 		flex: 1,
 		border: 'none',
 		outline: 'none !important',
 		backgroundColor: 'transparent',
-		...fonts.xxs,
+		...theme.fonts.small,
+		...theme.fonts.bodyBold,
 	},
 	meridianButtonLeft: {
 		padding: '0 15px 0 20px',
@@ -30,10 +29,10 @@ const useMeridianSwitchStyles = createUseStyles({
 		padding: '0 20px 0 15px',
 	},
 	meridianSelectedButton: {
-		color: colors.white,
-		backgroundColor: colors.secondary,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.p500,
 	},
-});
+}));
 
 type MeridianValue = string | 'am' | 'pm';
 
@@ -92,7 +91,7 @@ interface TimeInputProps {
 	required?: boolean;
 }
 
-const useTimeInputStyles = createUseStyles({
+const useTimeInputStyles = createUseThemedStyles({
 	timeInput: {
 		flex: 1,
 		marginRight: 8,

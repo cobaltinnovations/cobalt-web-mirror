@@ -1,6 +1,5 @@
+import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 
 export enum SESSION_STATUS {
 	NEW = 'NEW',
@@ -9,25 +8,25 @@ export enum SESSION_STATUS {
 	CANCELED = 'CANCELED',
 }
 
-const useStyles = createUseStyles({
-	sessionStatusDot: ({ status }: { status: SESSION_STATUS }) => {
+const useStyles = createUseThemedStyles((theme) => ({
+	sessionStatusDot: ({ status }: { status: SESSION_STATUS | string }) => {
 		let statusColor;
 
 		switch (status) {
 			case SESSION_STATUS.NEW: // Now called "Pending"
-				statusColor = colors.gray700;
+				statusColor = theme.colors.n500;
 				break;
 			case SESSION_STATUS.ADDED:
-				statusColor = colors.success;
+				statusColor = theme.colors.s500;
 				break;
 			case SESSION_STATUS.ARCHIVED:
-				statusColor = colors.border;
+				statusColor = theme.colors.border;
 				break;
 			case SESSION_STATUS.CANCELED:
-				statusColor = colors.danger;
+				statusColor = theme.colors.d500;
 				break;
 			default:
-				statusColor = colors.gray100;
+				statusColor = theme.colors.n100;
 		}
 
 		return {
@@ -38,7 +37,7 @@ const useStyles = createUseStyles({
 			backgroundColor: statusColor,
 		};
 	},
-});
+}));
 
 interface SessionStatusProps {
 	status: SESSION_STATUS | string;
@@ -52,10 +51,10 @@ const SessionStatus: FC<SessionStatusProps> = ({ status }) => {
 	return (
 		<div className="d-flex align-items-center">
 			<div className={classes.sessionStatusDot} />
-			{status === SESSION_STATUS.NEW && <span className="font-size-xxs">Pending</span>}
-			{status === SESSION_STATUS.ADDED && <span className="font-size-xxs">Added</span>}
-			{status === SESSION_STATUS.ARCHIVED && <span className="font-size-xxs">Archived</span>}
-			{status === SESSION_STATUS.CANCELED && <span className="font-size-xxs">Cancelled</span>}
+			{status === SESSION_STATUS.NEW && <span className="fs-small">Pending</span>}
+			{status === SESSION_STATUS.ADDED && <span className="fs-small">Added</span>}
+			{status === SESSION_STATUS.ARCHIVED && <span className="fs-small">Archived</span>}
+			{status === SESSION_STATUS.CANCELED && <span className="fs-small">Cancelled</span>}
 		</div>
 	);
 };

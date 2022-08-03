@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import React, { FC } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -25,7 +25,7 @@ const requiredFields = getRequiredYupFields<SignInFormData>(signInSchema);
 
 const SignInEmail: FC = () => {
 	useHeaderTitle(null);
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	async function handleSubmit(values: SignInFormData) {
@@ -42,9 +42,8 @@ const SignInEmail: FC = () => {
 				return;
 			}
 
-			history.replace({
-				pathname: '/auth',
-				search: '?' + new URLSearchParams({ accessToken }).toString(),
+			navigate(`/auth?${new URLSearchParams({ accessToken }).toString()}`, {
+				replace: true,
 			});
 		} catch (error) {
 			handleError(error);
@@ -52,17 +51,13 @@ const SignInEmail: FC = () => {
 	}
 
 	function handleBackButtonClick() {
-		if (history.length > 1) {
-			history.goBack();
-		} else {
-			window.location.pathname = '/sign-in';
-		}
+		navigate(-1);
 	}
 
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-white text-center">welcome back!</h2>
+				<h2 className="mb-0 text-center">welcome back!</h2>
 			</HeroContainer>
 			<Container className="pt-4 pb-4">
 				<Row>
@@ -86,7 +81,11 @@ const SignInEmail: FC = () => {
 												value={values.emailAddress}
 												onChange={handleChange}
 												required={requiredFields.emailAddress}
-												error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+												error={
+													touched.emailAddress && errors.emailAddress
+														? errors.emailAddress
+														: ''
+												}
 											/>
 											<InputHelper
 												className="mb-1"

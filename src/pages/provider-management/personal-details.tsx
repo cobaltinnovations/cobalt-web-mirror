@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
@@ -11,7 +11,7 @@ interface StrengthModel {
 }
 
 export const ProviderManagementPersonalDetails = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [strengthOptions] = useState<StrengthModel[]>([
 		{
@@ -52,7 +52,9 @@ export const ProviderManagementPersonalDetails = (): ReactElement => {
 							labelKey="title"
 							options={strengthOptions}
 							selected={strengthSelections}
-							onChange={setStrengthSelections}
+							onChange={(options) => {
+								setStrengthSelections(options as StrengthModel[]);
+							}}
 							helperText="Choose or enter your own"
 							characterCounter={3}
 							allowNew
@@ -108,7 +110,7 @@ export const ProviderManagementPersonalDetails = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

@@ -15,31 +15,31 @@ const useFilterDaysModalStyles = createUseStyles({
 
 const DAYS = [
 	{
-		label: 'Monday',
+		label: 'Mon.',
 		key: 'MONDAY',
 	},
 	{
-		label: 'Tuesday',
+		label: 'Tue.',
 		key: 'TUESDAY',
 	},
 	{
-		label: 'Wednesday',
+		label: 'Wed.',
 		key: 'WEDNESDAY',
 	},
 	{
-		label: 'Thursday',
+		label: 'Thu.',
 		key: 'THURSDAY',
 	},
 	{
-		label: 'Friday',
+		label: 'Fri.',
 		key: 'FRIDAY',
 	},
 	{
-		label: 'Saturday',
+		label: 'Sat.',
 		key: 'SATURDAY',
 	},
 	{
-		label: 'Sunday',
+		label: 'Sun.',
 		key: 'SUNDAY',
 	},
 ] as const;
@@ -100,11 +100,11 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterDaysModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">available days</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>available days</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="my-1 font-karla-bold">Date Range</p>
+				<p className="my-1 fw-bold">Date Range</p>
 				<DatePicker
 					minDate={moment().toDate()}
 					selected={fromDate.toDate()}
@@ -120,7 +120,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 					}}
 				/>
 
-				<p className="my-1 font-karla-bold">to</p>
+				<p className="my-1 fw-bold">to</p>
 				<DatePicker
 					minDate={fromDate.toDate()}
 					selected={toDate.toDate()}
@@ -137,7 +137,6 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 							<Col key={key} xs={6}>
 								<Form.Check
 									type="checkbox"
-									bsPrefix="cobalt-modal-form__check"
 									id={key}
 									name={key}
 									label={label}
@@ -155,22 +154,24 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 				</Row>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() =>
-						onSave({
-							from: fromDate,
-							to: toDate,
-							days: filterDays,
-						})
-					}
-				>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() =>
+							onSave({
+								from: fromDate,
+								to: toDate,
+								days: filterDays,
+							})
+						}
+					>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

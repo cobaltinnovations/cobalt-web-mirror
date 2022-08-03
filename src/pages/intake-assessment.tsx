@@ -1,9 +1,8 @@
-import React, { FC, useState, useCallback, useContext, useMemo } from 'react';
-import { useHistory, Link, Redirect, Prompt } from 'react-router-dom';
+import React, { FC, useState, useCallback, useContext, useMemo, useEffect } from 'react';
+import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
-import useQuery from '@/hooks/use-query';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -22,12 +21,13 @@ const IntakeAssessment: FC = () => {
 	useHeaderTitle('assessment');
 
 	const handleError = useHandleError();
-	const history = useHistory();
-	const query = useQuery();
-	const providerId = query.get('providerId') || '';
-	const groupSessionId = query.get('groupSessionId') || '';
-	const questionId = query.get('questionId') || '';
-	const sessionId = query.get('sessionId') || '';
+	const location = useLocation();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const providerId = searchParams.get('providerId') || '';
+	const groupSessionId = searchParams.get('groupSessionId') || '';
+	const questionId = searchParams.get('questionId') || '';
+	const sessionId = searchParams.get('sessionId') || '';
 	const { account, setAccount } = useAccount();
 
 	const [isSavingInfo, setIsSavingInfo] = useState(false);
@@ -57,16 +57,15 @@ const IntakeAssessment: FC = () => {
 		promptForPhoneNumber,
 		setPromptForPhoneNumber,
 
-		isEligible,
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
 
-	const appointmentTypeId = query.get('appointmentTypeId') || selectedAppointmentTypeId;
+	const appointmentTypeId = searchParams.get('appointmentTypeId') || selectedAppointmentTypeId;
 
 	const exitUrl = useMemo(() => {
-		return getExitBookingLocation(history.location.state);
-	}, [getExitBookingLocation, history.location.state]);
+		return getExitBookingLocation(location.state);
+	}, [getExitBookingLocation, location.state]);
 
 	const fetchData = useCallback(async () => {
 		let response;
@@ -111,26 +110,23 @@ const IntakeAssessment: FC = () => {
 
 			if (isGroupSessionAssessment) {
 				if (typeof response.assessment.bookingAllowed === 'boolean') {
-					history.push({
-						pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
+					navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
 						state: {
-							...(history.location.state as Record<string, unknown>),
+							...(location.state as Record<string, unknown>),
 							passedAssessment: response.assessment.bookingAllowed ? true : false,
 						},
 					});
 					if (response.assessment.bookingAllowed) {
-						history.push({
-							pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
+						navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
 							state: {
-								...(history.location.state as Record<string, unknown>),
+								...(location.state as Record<string, unknown>),
 								passedAssessment: true,
 							},
 						});
 					} else {
-						history.push({
-							pathname: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
+						navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
 							state: {
-								...(history.location.state as Record<string, unknown>),
+								...(location.state as Record<string, unknown>),
 								passedAssessment: false,
 							},
 						});
@@ -139,17 +135,16 @@ const IntakeAssessment: FC = () => {
 					return;
 				}
 
-				history.push(
+				navigate(
 					`/intake-assessment?groupSessionId=${groupSessionId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
-					history.location.state
+					{ state: location.state }
 				);
 			} else {
 				if (typeof response.assessment.bookingAllowed === 'boolean') {
 					if (response.assessment.bookingAllowed) {
 						if (selectedProvider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-							history.push({
-								pathname: '/ehr-lookup',
-								state: history.location.state,
+							navigate('/ehr-lookup', {
+								state: location.state,
 							});
 						} else if (promptForEmail || promptForPhoneNumber) {
 							setShowCollectInfoModal(true);
@@ -158,15 +153,15 @@ const IntakeAssessment: FC = () => {
 						}
 					} else {
 						setIsEligible(false);
-						history.push(exitUrl);
+						navigate(exitUrl);
 					}
 
 					return;
 				}
 
-				history.push(
+				navigate(
 					`/intake-assessment?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
-					history.location.state
+					{ state: location.state }
 				);
 			}
 		} catch (e) {
@@ -174,9 +169,11 @@ const IntakeAssessment: FC = () => {
 		}
 	};
 
-	if (!groupSessionId && (!providerId || !selectedProvider || !selectedTimeSlot)) {
-		return <Redirect to={exitUrl} />;
-	}
+	useEffect(() => {
+		if (!groupSessionId && (!providerId || !selectedProvider || !selectedTimeSlot)) {
+			navigate(exitUrl);
+		}
+	}, [exitUrl, groupSessionId, navigate, providerId, selectedProvider, selectedTimeSlot]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
@@ -269,12 +266,14 @@ const IntakeAssessment: FC = () => {
 							setSelectedProvider(undefined);
 							setSelectedTimeSlot(undefined);
 
-							history.push(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-								successBooking: true,
-								emailAddress: response.account.emailAddress,
+							navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
+								state: {
+									successBooking: true,
+									emailAddress: response.account.emailAddress,
+								},
 							});
 						} catch (e) {
-							if (e.metadata?.accountPhoneNumberRequired) {
+							if ((e as any).metadata?.accountPhoneNumberRequired) {
 								setPromptForPhoneNumber(true);
 								setShowConfirmationModal(false);
 								setShowCollectInfoModal(true);
@@ -369,9 +368,9 @@ const IntakeAssessment: FC = () => {
 										type="button"
 										variant="outline-primary"
 										onClick={() => {
-											history.push(
+											navigate(
 												`/intake-assessment?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
-												history.location.state
+												{ state: location.state }
 											);
 										}}
 									>
@@ -382,7 +381,7 @@ const IntakeAssessment: FC = () => {
 								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
 									<Button
 										type="submit"
-										className="ml-auto"
+										className="ms-auto"
 										variant="primary"
 										onClick={() => submitAnswers(selectedQuestionAnswers)}
 									>
@@ -395,25 +394,20 @@ const IntakeAssessment: FC = () => {
 				</Row>
 
 				<p className="text-center">
-					{!isGroupSessionAssessment && isEligible && (
-						<Prompt
-							message={(location) => {
-								if (
-									location.pathname.startsWith('/connect-with-support') ||
-									location.pathname.startsWith('/providers')
-								) {
-									return 'Are you sure you want to exit booking?';
-								}
-
-								return true;
-							}}
-						/>
-					)}
-
-					{isGroupSessionAssessment && (
-						<Link to={`/in-the-studio/group-session-scheduled/${groupSessionId}`}>exit booking</Link>
-					)}
-					{!isGroupSessionAssessment && <Link to={exitUrl}>exit booking</Link>}
+					<Link
+						to={
+							isGroupSessionAssessment
+								? `/in-the-studio/group-session-scheduled/${groupSessionId}`
+								: exitUrl
+						}
+						onClick={(e) => {
+							if (!window.confirm('Are you sure you want to exit booking?')) {
+								e.preventDefault();
+							}
+						}}
+					>
+						exit booking
+					</Link>
 				</p>
 			</Container>
 		</AsyncPage>

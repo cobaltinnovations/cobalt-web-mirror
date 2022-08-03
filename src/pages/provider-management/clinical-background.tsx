@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
@@ -33,7 +33,7 @@ interface InTheModel {
 }
 
 export const ProviderManagementClinicalBackground = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [degrees, setDegrees] = useState<DegreeModel[]>([
 		{
@@ -124,7 +124,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 						{degrees.map((degree, index) => {
 							return (
 								<div key={index} className="mb-3">
-									<Form.Row>
+									<Row>
 										<Col xs={4}>
 											<InputHelper
 												className="mb-1"
@@ -152,7 +152,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 												}}
 											/>
 										</Col>
-									</Form.Row>
+									</Row>
 									<InputHelper
 										type="text"
 										label="From where?"
@@ -165,7 +165,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 										required
 									/>
 									{index !== 0 && (
-										<div className="mt-1 text-right">
+										<div className="mt-1 text-end">
 											<Button
 												className="p-0"
 												variant="link"
@@ -210,7 +210,9 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							labelKey="title"
 							options={specialtyOptions}
 							selected={specialtySelections}
-							onChange={setSpecialtySelections}
+							onChange={(options) => {
+								setSpecialtySelections(options as SpecialtyModel[]);
+							}}
 						/>
 
 						<TypeaheadHelper
@@ -221,7 +223,9 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							labelKey="title"
 							options={workplaceOptions}
 							selected={workplaceSelections}
-							onChange={setWorkplaceSelections}
+							onChange={(options) => {
+								setWorkplaceSelections(options as WorkplaceModel[]);
+							}}
 							allowNew
 						/>
 
@@ -233,7 +237,9 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							labelKey="title"
 							options={atOptions}
 							selected={atSelections}
-							onChange={setAtSelections}
+							onChange={(options) => {
+								setAtSelections(options as AtModel[]);
+							}}
 							allowNew
 						/>
 
@@ -245,7 +251,9 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							labelKey="title"
 							options={inTheOptions}
 							selected={inTheSelections}
-							onChange={setInTheSelections}
+							onChange={(options) => {
+								setInTheSelections(options as InTheModel[]);
+							}}
 							allowNew
 						/>
 
@@ -253,7 +261,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

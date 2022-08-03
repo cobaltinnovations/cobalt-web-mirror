@@ -11,12 +11,10 @@ import Breadcrumb from '@/components/breadcrumb';
 import { groupEventService } from '@/lib/services';
 import { ExternalGroupEventType } from '@/lib/models';
 
-interface RouteParams {
-	externalGroupEventTypeId: string;
-}
-
 const InTheStudioExternalDetail: FC = () => {
-	const { externalGroupEventTypeId } = useParams<RouteParams>();
+	const { externalGroupEventTypeId } = useParams<{
+		externalGroupEventTypeId: string;
+	}>();
 
 	const [groupEvent, setGroupEvent] = useState<ExternalGroupEventType | null>(null);
 

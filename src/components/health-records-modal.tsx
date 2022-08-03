@@ -1,13 +1,12 @@
 import React, { FC, useState, useEffect } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import { ReactComponent as ReceptionistIllustration } from '@/assets/illustrations/receptionist.svg';
 import { ReactComponent as DoctorIllustration } from '@/assets/illustrations/doctor-with-chart.svg';
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useHealthRecordsModal = createUseStyles({
+const useHealthRecordsModal = createUseThemedStyles((theme) => ({
 	healthRecordsModal: {
 		width: '90%',
 		maxWidth: 295,
@@ -18,12 +17,12 @@ const useHealthRecordsModal = createUseStyles({
 		height: 8,
 		margin: '0 4px',
 		borderRadius: 4,
-		backgroundColor: colors.background,
+		backgroundColor: theme.colors.background,
 	},
 	pageIndicatorActive: {
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.p500,
 	},
-});
+}));
 
 interface HealthRecordsModalPageProps {
 	onNextButtonClick?(): void;
@@ -49,12 +48,14 @@ const HealthRecordsModalPageOne: FC<HealthRecordsModalPageProps> = ({ onNextButt
 				To book with this provider, we'll need to find your electronic health records. We'll ask you questions
 				until we can confidently identify your record.
 			</p>
-			<Button variant="primary" size="sm" className="btn-block" onClick={onNextButtonClick}>
-				next
-			</Button>
-			<Button variant="link" size="sm" className="btn-block" onClick={onExitButtonClick}>
-				exit booking
-			</Button>
+			<div className="d-grid gap-4">
+				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
+					next
+				</Button>
+				<Button variant="link" size="sm" onClick={onExitButtonClick}>
+					exit booking
+				</Button>
+			</div>
 		</>
 	);
 };
@@ -71,12 +72,14 @@ const HealthRecordsModalPageTwo: FC<HealthRecordsModalPageProps> = ({ onNextButt
 			</ul>
 			<h1 className="mb-2">we take your privacy very seriously</h1>
 			<p className="mb-6">This information is not shared outside of the context of an appointment.</p>
-			<Button variant="primary" size="sm" className="btn-block" onClick={onNextButtonClick}>
-				continue
-			</Button>
-			<Button variant="link" size="sm" className="btn-block" onClick={onExitButtonClick}>
-				exit booking
-			</Button>
+			<div className="d-grid gap-4">
+				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
+					continue
+				</Button>
+				<Button variant="link" size="sm" onClick={onExitButtonClick}>
+					exit booking
+				</Button>
+			</div>
 		</>
 	);
 };

@@ -20,7 +20,13 @@ interface FilterAvailabilityModalProps extends ModalProps {
 	onSave(availability: ProviderAvailability['availability'], visitTypeIds: string[]): void;
 }
 
-const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilities, selectedAvailability, selectedVisitTypeIds, onSave, ...props }) => {
+const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
+	availabilities,
+	selectedAvailability,
+	selectedVisitTypeIds,
+	onSave,
+	...props
+}) => {
 	const classes = useFilterAvailabilityModalStyles();
 
 	const [allAvailabilites, setAllAvailabilities] = useState<ProviderAvailability[]>([]);
@@ -60,8 +66,8 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilit
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterAvailabilityModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">availability</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>availability</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-4">
@@ -70,7 +76,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilit
 							<Form.Check
 								key={availability}
 								type="radio"
-								bsPrefix="cobalt-modal-form__check"
 								id={availability}
 								name={availability}
 								label={description}
@@ -85,7 +90,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilit
 				<div className="mb-2">
 					<h3 className="mb-3">visit type</h3>
 					<Form.Check
-						bsPrefix="cobalt-modal-form__check"
 						type="checkbox"
 						id="visit-type__initial"
 						name="visit-type"
@@ -97,7 +101,6 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilit
 						}}
 					/>
 					<Form.Check
-						bsPrefix="cobalt-modal-form__check"
 						type="checkbox"
 						id="visit-type__followup"
 						name="visit-type"
@@ -111,12 +114,14 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({ availabilit
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(selected, visitTypeIds)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(selected, visitTypeIds)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

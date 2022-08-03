@@ -1,24 +1,26 @@
 import React, { ReactElement, useState } from 'react';
-import { createUseStyles } from 'react-jss';
-import { Typeahead, TypeaheadModel, TypeaheadProps } from 'react-bootstrap-typeahead';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypeaheadComponentProps } from 'react-bootstrap-typeahead/types/components/Typeahead';
 
-import colors from '@/jss/colors';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface useInputHelperStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
-	value: string;
+	value: boolean;
 	hasError: boolean;
 }
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
 		position: 'relative',
 		minHeight: 56,
-		backgroundColor: colors.white,
-		border: `1px solid ${hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.border}`,
+		backgroundColor: theme.colors.n0,
+		border: `1px solid ${
+			hasError ? theme.colors.d500 : isHovered || isFocused ? theme.colors.p500 : theme.colors.border
+		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
 		top: 18,
@@ -29,13 +31,13 @@ const useStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transformOrigin: 'left top',
-		color: hasError ? colors.danger : isFocused ? colors.primary : colors.gray600,
+		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
 	}),
-});
+}));
 
-interface TypeaheadHelperProps<T extends TypeaheadModel> extends TypeaheadProps<T> {
+interface TypeaheadHelperProps extends TypeaheadComponentProps {
 	label: string;
 	required?: boolean;
 	error?: string;
@@ -44,7 +46,7 @@ interface TypeaheadHelperProps<T extends TypeaheadModel> extends TypeaheadProps<
 	className?: string;
 }
 
-export function TypeaheadHelper<T extends TypeaheadModel>({
+export function TypeaheadHelper({
 	label,
 	required,
 	error,
@@ -52,7 +54,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 	characterCounter,
 	className,
 	...props
-}: TypeaheadHelperProps<T>): ReactElement {
+}: TypeaheadHelperProps): ReactElement {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 
@@ -75,7 +77,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 		setIsHovered(false);
 	}
 
-	function handleFocus(event: Event) {
+	function handleFocus(event: React.SyntheticEvent<HTMLInputElement, Event>) {
 		setIsFocused(true);
 
 		if (props.onFocus) {
@@ -83,7 +85,7 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 		}
 	}
 
-	function handleBlur(event: Event) {
+	function handleBlur(event: React.FocusEvent<HTMLInputElement, Element>) {
 		setIsFocused(false);
 
 		if (props.onBlur) {
@@ -93,17 +95,21 @@ export function TypeaheadHelper<T extends TypeaheadModel>({
 
 	return (
 		<div className={classNames('typeahead-helper', className)}>
-			<Form.Group className={classNames('mb-0', classes.typeaheadHelper)} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+			<Form.Group
+				className={classNames('mb-0', classes.typeaheadHelper)}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
+			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>
 				<Typeahead onFocus={handleFocus} onBlur={handleBlur} {...props} />
 			</Form.Group>
 			{(helperText || characterCounter) && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					{helperText && <p className="mb-0 ml-0 mr-auto text-muted font-size-xxs">{helperText}</p>}
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
 					{characterCounter && (
-						<p className="mb-0 ml-auto mr-0 text-muted font-size-xxs">
+						<p className="mb-0 ms-auto me-0 text-muted fs-small">
 							{props.selected ? props.selected.length : 0} / {characterCounter}
 						</p>
 					)}

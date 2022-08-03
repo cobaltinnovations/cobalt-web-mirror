@@ -1,12 +1,12 @@
 import { cloneDeep } from 'lodash';
 import React, { ReactElement, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 
 export const ProviderManagementCommunication = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const [primaryEmail, setPrimaryEmail] = useState('');
 	const [additionalEmails, setAdditionalEmails] = useState<string[]>(['']);
@@ -54,7 +54,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 										}}
 									/>
 									{index !== 0 && (
-										<div className="mt-1 text-right">
+										<div className="mt-1 text-end">
 											<Button
 												className="p-0"
 												variant="link"
@@ -127,7 +127,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

@@ -1,28 +1,27 @@
 import React, { FC } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import FileInputButton from '@/components/file-input-button';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
+import classNames from 'classnames';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	progressBar: {
 		flex: 1,
 		height: 13,
 		marginRight: 8,
 		borderRadius: 7,
 		overflow: 'hidden',
-		backgroundColor: colors.gray300,
+		backgroundColor: theme.colors.n300,
 	},
 	progressBarFill: ({ percentage }: { percentage: number }) => ({
 		height: '100%',
 		width: `${percentage}%`,
 		transition: '0.3s width',
-		backgroundColor: colors.success,
+		backgroundColor: theme.colors.s500,
 	}),
-});
+}));
 
 interface ImageUploadProps {
 	imagePreview?: string;
@@ -34,14 +33,23 @@ interface ImageUploadProps {
 	disabled?: boolean;
 }
 
-const ImageUpload: FC<ImageUploadProps> = ({ imagePreview, isUploading, progress, onChange, onRemove, className, disabled= false}) => {
+const ImageUpload: FC<ImageUploadProps> = ({
+	imagePreview,
+	isUploading,
+	progress,
+	onChange,
+	onRemove,
+	className,
+	disabled = false,
+}) => {
+	const { fonts } = useCobaltTheme();
 	const classes = useStyles({
 		percentage: progress || 0,
 	});
 
 	return (
-		<Form.Group className={className}>
-			<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+		<Form.Group className={classNames('mb-5', className)}>
+			<Form.Label className="mb-2" style={{ ...fonts.default }}>
 				Lead Image
 			</Form.Label>
 			{!imagePreview && (
@@ -64,15 +72,15 @@ const ImageUpload: FC<ImageUploadProps> = ({ imagePreview, isUploading, progress
 					{isUploading ? 'uploading...' : imagePreview ? 'upload new image' : 'upload image'}
 				</FileInputButton>
 				{imagePreview && (
-					<Button size="sm" variant="danger" className="ml-2" onClick={onRemove} disabled={disabled}>
+					<Button size="sm" variant="danger" className="ms-2" onClick={onRemove} disabled={disabled}>
 						remove image
 					</Button>
 				)}
 			</div>
 			{!imagePreview && (
 				<>
-					<p className="font-size-xxxs text-uppercase text-muted">Tips for choosing a good image</p>
-					<ul className="mb-0 pl-4 font-size-xxs">
+					<p className="fs-ui-small text-uppercase text-muted">Tips for choosing a good image</p>
+					<ul className="mb-0 ps-4 fs-small">
 						<li>Is a minimum size of 800 x 450 px</li>
 						<li>Features a warm, bold color palette</li>
 						<li>

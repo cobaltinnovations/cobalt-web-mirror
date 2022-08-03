@@ -39,8 +39,8 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterPaymentsModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">payment type</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>payment type</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{allTypes.map((paymentType) => {
@@ -50,7 +50,6 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 						<Form.Check
 							key={paymentType.paymentTypeId}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={paymentType.paymentTypeId}
 							name={paymentType.paymentTypeId}
 							label={paymentType.description}
@@ -67,12 +66,14 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 				})}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(selected)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(selected)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

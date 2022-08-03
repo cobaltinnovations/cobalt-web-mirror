@@ -3,17 +3,15 @@ import React, { useCallback, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { PatientIntakeQuestion, SchedulingAppointmentType, ScreeningQuestion } from '@/lib/models';
+import { PatientIntakeQuestion, SchedulingAppointmentType, IntakeScreeningQuestion } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
-
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import Select from '@/components/select';
+import { useCobaltTheme } from '@/jss/theme';
 
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
@@ -100,17 +98,18 @@ export const AppointmentTypeFormModal = ({
 	onDelete,
 	...modalProps
 }: AppointmentTypeFormModalProps) => {
+	const theme = useCobaltTheme();
 	const { account } = useAccount();
 	const classes = useModalStyles();
 	const handleError = useHandleError();
 
 	const [title, setTitle] = useState('');
-	const [color, setColor] = useState(colors.primary);
+	const [color, setColor] = useState(theme.colors.p500);
 	const [duration, setDuration] = useState('');
 	const [durationInMinutes, setDurationInMinutes] = useState<number>();
 	const [visitTypeId, setVisitTypeId] = useState<VisitType>('INITIAL');
 	const [patientIntakeQuestions, setPatientIntakeQuestions] = useState<PatientIntakeQuestion[]>([]);
-	const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
+	const [screeningQuestions, setScreeningQuestions] = useState<IntakeScreeningQuestion[]>([]);
 
 	const handleOnEnter = useCallback(async () => {
 		if (!appointmentTypeId) {
@@ -144,12 +143,12 @@ export const AppointmentTypeFormModal = ({
 
 	const handleOnExited = useCallback(() => {
 		setTitle('');
-		setColor(colors.primary);
+		setColor(theme.colors.p500);
 		setDuration('');
 		setDurationInMinutes(undefined);
 		setPatientIntakeQuestions([]);
 		setScreeningQuestions([]);
-	}, []);
+	}, [theme.colors.p500]);
 
 	const handleSaveButtonClick = useCallback(async () => {
 		try {
@@ -231,8 +230,8 @@ export const AppointmentTypeFormModal = ({
 					required
 				/>
 
-				<Form.Group>
-					<Form.Label className="d-block" style={{ ...fonts.xs }}>
+				<Form.Group className="mb-5">
+					<Form.Label className="d-block" style={{ ...theme.fonts.default }}>
 						Color:
 					</Form.Label>
 					<input
@@ -244,11 +243,13 @@ export const AppointmentTypeFormModal = ({
 					/>
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Visit Type:</Form.Label>
-					<Select
+				<Form.Group className="mb-5">
+					<Form.Label style={{ ...theme.fonts.default }}>Visit Type:</Form.Label>
+					<InputHelper
+						label="Visit Type"
 						value={visitTypeId}
-						onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+						as="select"
+						onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
 							setVisitTypeId(event.target.value as VisitType)
 						}
 					>
@@ -259,19 +260,18 @@ export const AppointmentTypeFormModal = ({
 								</option>
 							);
 						})}
-					</Select>
+					</InputHelper>
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label className="m-0" style={{ ...fonts.xs }}>
+				<Form.Group className="mb-5">
+					<Form.Label className="m-0" style={{ ...theme.fonts.default }}>
 						Duration:
 					</Form.Label>
 					<div className="d-flex align-items-center">
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-30"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="30m"
 							checked={duration === '30'}
@@ -280,10 +280,9 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-45"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="45m"
 							checked={duration === '45'}
@@ -292,10 +291,9 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-60"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label="60m"
 							checked={duration === '60'}
@@ -304,10 +302,9 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
-							className="mr-6"
+							className="me-6"
 							id="duration-other"
 							type="radio"
-							bsPrefix="cobalt-modal-form__check"
 							name="duration"
 							label={
 								<InputHelper
@@ -329,8 +326,8 @@ export const AppointmentTypeFormModal = ({
 
 				<h3 className="mb-4">Client Information</h3>
 
-				<Form.Group>
-					<Form.Label style={{ ...fonts.xs }}>Collect:</Form.Label>
+				<Form.Group className="mb-5">
+					<Form.Label style={{ ...theme.fonts.default }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
 							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
@@ -343,10 +340,9 @@ export const AppointmentTypeFormModal = ({
 									<Form.Check
 										id={`collect-${questionContentHintId}`}
 										key={questionContentHintId}
-										bsPrefix="cobalt-modal-form__check"
 										type="checkbox"
 										name={`collect-${questionContentHintId}`}
-										className="mr-6"
+										className="me-6"
 										label={label}
 										checked={isChecked}
 										disabled={disabled}
@@ -411,7 +407,6 @@ export const AppointmentTypeFormModal = ({
 							/>
 							<div className="mb-5">
 								<Form.Check
-									type="switch"
 									id={`screening-question-toggle--${index}`}
 									label="Reduce text size"
 									value="SMALL"
@@ -432,7 +427,7 @@ export const AppointmentTypeFormModal = ({
 						</div>
 					);
 				})}
-				<div className="text-right">
+				<div className="text-end">
 					<Button
 						size="sm"
 						onClick={() => {
@@ -450,28 +445,30 @@ export const AppointmentTypeFormModal = ({
 				</div>
 			</Modal.Body>
 
-			<Modal.Footer className="border-top pt-5">
-				<div>
-					{appointmentTypeId && (
-						<Button size="sm" variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
-							delete
+			<Modal.Footer>
+				<div className="d-flex align-items-center justify-content-between">
+					<div>
+						{appointmentTypeId && (
+							<Button variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
+								delete
+							</Button>
+						)}
+					</div>
+					<div>
+						<Button
+							variant="outline-primary"
+							onClick={() => {
+								if (modalProps?.onHide) {
+									modalProps.onHide();
+								}
+							}}
+						>
+							cancel
 						</Button>
-					)}
-				</div>
-				<div>
-					<Button
-						className="mr-2"
-						size="sm"
-						variant="outline-primary"
-						onClick={() => {
-							modalProps.onHide();
-						}}
-					>
-						cancel
-					</Button>
-					<Button size="sm" variant="outline" onClick={handleSaveButtonClick}>
-						save
-					</Button>
+						<Button className="ms-2" variant="outline" onClick={handleSaveButtonClick}>
+							save
+						</Button>
+					</div>
 				</div>
 			</Modal.Footer>
 		</Modal>

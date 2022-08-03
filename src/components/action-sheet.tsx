@@ -1,14 +1,13 @@
-import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
+import React, { FC, PropsWithChildren } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import colors from '@/jss/colors';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const transitionDuration = 200;
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	floatingActionButton: {
 		bottom: 36,
 		right: 20,
@@ -19,8 +18,8 @@ const useStyles = createUseStyles({
 		width: 54,
 		height: 54,
 		borderRadius: 27,
-		color: colors.white,
-		backgroundColor: colors.black,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.n900,
 		transition: `${transitionDuration}ms transform`,
 		'&:focus': {
 			outline: 'none',
@@ -87,9 +86,9 @@ const useStyles = createUseStyles({
 			transition: `opacity ${transitionDuration}ms`,
 		},
 	},
-});
+}));
 
-interface ActionSheetProps {
+interface ActionSheetProps extends PropsWithChildren {
 	show: boolean;
 	onShow(): void;
 	onHide(): void;
@@ -112,14 +111,29 @@ const ActionSheet: FC<ActionSheetProps> = ({ show, onShow, onHide, children }) =
 
 	return (
 		<>
-			<CSSTransition in={show} timeout={transitionDuration} mountOnEnter={true} unmountOnExit={true} classNames={'slide-fade'}>
+			<CSSTransition
+				in={show}
+				timeout={transitionDuration}
+				mountOnEnter={true}
+				unmountOnExit={true}
+				classNames={'slide-fade'}
+			>
 				<div className={classes.actionSheet}>{children}</div>
 			</CSSTransition>
-			<CSSTransition in={show} timeout={transitionDuration} mountOnEnter={true} unmountOnExit={true} classNames={'fade'}>
+			<CSSTransition
+				in={show}
+				timeout={transitionDuration}
+				mountOnEnter={true}
+				unmountOnExit={true}
+				classNames={'fade'}
+			>
 				<div className={classes.shadow} onClick={handleShadowClick} />
 			</CSSTransition>
 			<button
-				className={classNames({ [classes.floatingActionButton]: true, [classes.floatingActionButtonOpen]: show })}
+				className={classNames({
+					[classes.floatingActionButton]: true,
+					[classes.floatingActionButtonOpen]: show,
+				})}
 				onClick={handleAddSessionButtonClick}
 			>
 				<AddIcon width={25} height={25} className={classes.addIcon} />

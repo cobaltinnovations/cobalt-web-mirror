@@ -19,8 +19,8 @@ const ConfirmIntakeAssessmentModal: FC<ConfirmIntakeAssessmentModalProps> = ({ o
 
 	return (
 		<Modal {...props} dialogClassName={classes.confirmIntakeAssessmentModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">first, a few questions</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>first, a few questions</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0">
@@ -28,12 +28,14 @@ const ConfirmIntakeAssessmentModal: FC<ConfirmIntakeAssessmentModalProps> = ({ o
 				</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={onConfirm}>
-					next
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={onConfirm}>
+						next
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

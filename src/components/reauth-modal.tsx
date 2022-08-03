@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useCallback, useContext } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -16,7 +16,7 @@ const usStyles = createUseStyles({
 
 const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 	const classes = usStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const { showReauthModal, setShowReauthModal, signOnUrl } = useContext(ReauthModalContext);
 
@@ -32,7 +32,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 			centered
 			{...props}
 			onHide={() => {
-				history.goBack();
+				navigate(-1);
 				setShowReauthModal(false);
 			}}
 			onEnter={handleOnEnter}
@@ -44,27 +44,28 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 				<p className="mb-3">This page contains information that requires reauthentication.</p>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button
-					type="button"
-					variant="outline-primary"
-					size="sm"
-					onClick={() => {
-						history.goBack();
-						setShowReauthModal(false);
-					}}
-				>
-					cancel
-				</Button>
-				<Button
-					type="submit"
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						window.location.href = signOnUrl;
-					}}
-				>
-					proceed
-				</Button>
+				<div className="text-right">
+					<Button
+						type="button"
+						variant="outline-primary"
+						onClick={() => {
+							navigate(-1);
+							setShowReauthModal(false);
+						}}
+					>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						type="submit"
+						variant="primary"
+						onClick={() => {
+							window.location.href = signOnUrl;
+						}}
+					>
+						proceed
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

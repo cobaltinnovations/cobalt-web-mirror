@@ -1,29 +1,37 @@
-import React, { FC, useState } from 'react';
+import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+
+import { ReactComponent as SelectIcon } from '@/assets/icons/icon-select.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface useInputHelperStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
-	as?: 'input' | 'select' | 'textarea';
-	value: string;
+	as?: ElementType<any> | undefined;
+	value: string | number | string[] | undefined;
 	hasError: boolean;
 }
 
-const useInputHelperStyles = createUseStyles({
+const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	inputHelper: ({ as, isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+		borderRadius: 5,
 		overflow: 'hidden',
 		position: 'relative',
-		backgroundColor: colors.white,
-		height: as === 'textarea' ? 110 : 56,
-		border: `1px solid ${hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.border}`,
+		backgroundColor: theme.colors.n0,
+		height: as === 'textarea' ? 130 : 54,
+		border: `1px solid ${
+			hasError
+				? theme.colors.d500
+				: isFocused
+				? theme.colors.p500
+				: isHovered
+				? theme.colors.n300
+				: theme.colors.n100
+		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
-		top: 18,
+		top: 16,
 		left: 16,
 		margin: 0,
 		zIndex: 1,
@@ -31,14 +39,14 @@ const useInputHelperStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transformOrigin: 'left top',
-		color: hasError ? colors.danger : isFocused ? colors.primary : colors.gray600,
+		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
 		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
 	}),
 	input: ({ as, value }: useInputHelperStylesProps) => ({
 		margin: 0,
 		border: 0,
-		...fonts.xs,
+		...theme.fonts.default,
 		width: '100%',
 		height: '100%',
 		resize: 'none',
@@ -53,7 +61,7 @@ const useInputHelperStyles = createUseStyles({
 		},
 		opacity: as === 'select' ? (value ? 1 : 0) : 1,
 		'&:disabled': {
-			backgroundColor: colors.background,
+			backgroundColor: theme.colors.background,
 		},
 	}),
 	downChevron: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
@@ -63,13 +71,18 @@ const useInputHelperStyles = createUseStyles({
 		position: 'absolute',
 		pointerEvents: 'none',
 		transform: 'translateY(-50%)',
-		fill: hasError ? colors.danger : isHovered || isFocused ? colors.primary : colors.black,
+		fill: hasError
+			? theme.colors.d500
+			: isFocused
+			? theme.colors.p500
+			: isHovered
+			? theme.colors.n500
+			: theme.colors.n500,
 	}),
-});
+}));
 
-interface InputHelperProps extends FormControlProps {
+interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	label: string;
-	as?: 'input' | 'select' | 'textarea' | React.ElementType;
 	name?: string;
 	onFocus?: (...args: any[]) => void;
 	onBlur?: (...args: any[]) => void;
@@ -80,7 +93,16 @@ interface InputHelperProps extends FormControlProps {
 	required?: boolean;
 }
 
-const InputHelper: FC<InputHelperProps> = ({ label, children, className, helperText, characterCounter, required, error, ...props }) => {
+const InputHelper: FC<InputHelperProps> = ({
+	label,
+	children,
+	className,
+	helperText,
+	characterCounter,
+	required,
+	error,
+	...props
+}) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 	const classes = useInputHelperStyles({
@@ -119,30 +141,43 @@ const InputHelper: FC<InputHelperProps> = ({ label, children, className, helperT
 		}
 	}
 
+	const FormControlComponent = props.as === 'select' ? Form.Select : Form.Control;
+
 	return (
 		<div className={className}>
-			<Form.Group className={classNames('mb-0', classes.inputHelper)} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+			<Form.Group
+				className={classNames(classes.inputHelper)}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
+			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>
-				<Form.Control className={classes.input} bsPrefix="input-helper__input" {...props} onFocus={handleFocus} onBlur={handleBlur}>
+				{/* @ts-expect-error Bootstrap 5 vs bootstrap 4 onChange type */}
+				<FormControlComponent
+					className={classes.input}
+					bsPrefix="input-helper__input"
+					{...props}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
+				>
 					{children}
-				</Form.Control>
-				{props.as === 'select' && <DownChevron className={classes.downChevron} />}
+				</FormControlComponent>
+				{props.as === 'select' && <SelectIcon className={classes.downChevron} />}
 			</Form.Group>
 			{(helperText || characterCounter) && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					{helperText && <p className="mb-0 ml-0 mr-auto text-muted font-size-xxs">{helperText}</p>}
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
 					{characterCounter && (
-						<p className="mb-0 ml-auto mr-0 text-muted font-size-xxs">
+						<p className="mb-0 ms-auto me-0 text-muted fs-small">
 							{props.value ? (props.value as string | string[]).length : 0} / {characterCounter}
 						</p>
 					)}
 				</div>
 			)}
 			{error && (
-				<div className="mt-2 pl-3 pr-3 d-flex justify-content-between">
-					<p className="mb-0 ml-0 mr-auto text-danger font-size-xxs">{error}</p>
+				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+					<p className="mb-0 ms-0 me-auto text-danger fs-small">{error}</p>
 				</div>
 			)}
 		</div>

@@ -5,19 +5,20 @@ import { schedulingService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
 import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
-import colors from '@/jss/colors';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
 import useHandleError from '@/hooks/use-handle-error';
-import { useParams, useRouteMatch } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import { useCobaltTheme } from '@/jss/theme';
 
 interface EditAvailabilityPanelProps {
 	onClose: (logicalAvailabilityId?: string) => void;
 }
 
 export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) => {
-	const routeMatch = useRouteMatch();
+	const theme = useCobaltTheme();
+	const location = useLocation();
 	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId?: string }>();
 	const handleError = useHandleError();
 	const [initialValues, setInitialValues] = useState<AvailabilityFormSchema>();
@@ -25,10 +26,10 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 	const [closePanel, setClosePanel] = useState(false);
 
 	useEffect(() => {
-		if (routeMatch.path.endsWith('new-blocked-time')) {
+		if (location.pathname.endsWith('new-blocked-time')) {
 			setIsBlockedSlot(true);
 		}
-	}, [routeMatch.path]);
+	}, [location.pathname]);
 
 	const fetchData = useCallback(async () => {
 		// Return instead of throwing error
@@ -44,7 +45,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 			setInitialValues(AvailabilityFormDataFromLogicalAvailability(logicalAvailability));
 			setIsBlockedSlot(logicalAvailability.logicalAvailabilityTypeId === 'BLOCK');
 		} catch (e) {
-			if (e.code === 'NOT_FOUND') {
+			if ((e as any).code === 'NOT_FOUND') {
 				setClosePanel(true);
 				return;
 			}
@@ -80,7 +81,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(logicalAvailabilityId)}>
-					<ChevronLeftIcon fill={colors.primary} className="mr-1" />
+					<ChevronLeftIcon fill={theme.colors.p500} className="me-1" />
 					back
 				</Button>
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>

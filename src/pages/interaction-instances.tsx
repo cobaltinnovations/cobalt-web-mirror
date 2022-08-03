@@ -16,6 +16,10 @@ const InteractionInstances: FC = () => {
 	const [interactionOptionActions, setInteractionOptionActions] = useState<InteractionOptionAction[]>([]);
 
 	const fetchData = useCallback(async () => {
+		if (!interactionId) {
+			return;
+		}
+
 		const response = await interactionService.getInteractionInstances(interactionId).fetch();
 
 		setInteractionInstance(response.interactionInstance);
@@ -24,7 +28,12 @@ const InteractionInstances: FC = () => {
 	}, [interactionId]);
 
 	const handleInteractionOptionButtonClick = async (interactionOption: InteractionOption) => {
-		if(!window.confirm('Are you sure you want to record a followup of "' + interactionOption.optionDescription + '"?')) return;
+		if (
+			!window.confirm(
+				'Are you sure you want to record a followup of "' + interactionOption.optionDescription + '"?'
+			)
+		)
+			return;
 
 		try {
 			if (!interactionInstance) {
@@ -47,8 +56,8 @@ const InteractionInstances: FC = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer className="text-center">
-				<h3 className="text-white mb-3">{interactionInstance?.caseNumber}</h3>
-				<small className="text-white text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
+				<h3 className="mb-3">{interactionInstance?.caseNumber}</h3>
+				<small className="text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
 			</HeroContainer>
 			<Container className="py-5">
 				<Row className="pb-3">

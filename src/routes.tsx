@@ -1,13 +1,13 @@
 import moment from 'moment';
 import React, { ReactElement } from 'react';
-import { Redirect, useRouteMatch } from 'react-router-dom';
+import { Outlet, Navigate, useMatch, useSearchParams } from 'react-router-dom';
+
 import config from '@/lib/config';
 import { queryParamDateRegex } from '@/lib/utils';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
-import useQuery from '@/hooks/use-query';
 import Header from '@/components/header';
-import { isPicPatientAccount, isPicMhicAccount } from '@/pages/pic/utils';
+import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
 	ProviderManagementBluejeansConnection,
@@ -19,63 +19,61 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 
-const Onboarding = React.lazy(() => import('@/pages/onboarding'));
-const SignUp = React.lazy(() => import('@/pages/sign-up'));
-const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
-const SignIn = React.lazy(() => import('@/pages/sign-in'));
-const SignInSSO = React.lazy(() => import('@/pages/sign-in-sso'));
-const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
-const Auth = React.lazy(() => import('@/pages/auth'));
-const Index = React.lazy(() => import('@/pages'));
-const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
-const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
-const InTheStudioExternalDetail = React.lazy(() => import('@/pages/in-the-studio-external-detail'));
-const InTheStudioGroupSessionScheduled = React.lazy(() => import('@/pages/in-the-studio-group-session-scheduled'));
-const InTheStudioGroupSessionByRequest = React.lazy(() => import('@/pages/in-the-studio-group-session-by-request'));
-const OnYourTime = React.lazy(() => import('@/pages/on-your-time'));
-const SessionRequestThankYou = React.lazy(() => import('@/pages/session-request-thank-you'));
-const OnYourTimeDetail = React.lazy(() => import('@/pages/on-your-time-detail'));
-const Covid19Resources = React.lazy(() => import('@/pages/covid-19-resources'));
-const WellBeingResources = React.lazy(() => import('@/pages/well-being-resources'));
-const Privacy = React.lazy(() => import('@/pages/privacy'));
-const WeeklyAssessment = React.lazy(() => import('@/pages/weekly-assessment'));
-const IntakeAssessment = React.lazy(() => import('@/pages/intake-assessment'));
-const OneOnOneResources = React.lazy(() => import('@/pages/one-on-one-resources'));
-const ConnectWithSupport = React.lazy(() => import('@/pages/connect-with-support'));
-const EhrLookup = React.lazy(() => import('@/pages/ehr-lookup'));
-const MyCalendar = React.lazy(() => import('@/pages/my-calendar'));
-const AppointmentDetails = React.lazy(() => import('@/pages/appointment-details'));
-const Feedback = React.lazy(() => import('@/pages/feedback'));
-const AccountSessionDetails = React.lazy(() => import('@/pages/account-session-details'));
-const GroupSessionsScheduled = React.lazy(() => import('@/pages/group-sessions-scheduled'));
-const GroupSessionsScheduledCreate = React.lazy(() => import('@/pages/group-sessions-scheduled-create'));
-const GroupSessionsByRequest = React.lazy(() => import('@/pages/group-sessions-by-request'));
-const GroupSessionsByRequestCreate = React.lazy(() => import('@/pages/group-sessions-by-request-create'));
-const RedirectToBackend = React.lazy(() => import('@/pages/redirect-to-backend'));
-const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-time'));
-const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
-const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
-const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
-const NoMatch = React.lazy(() => import('@/pages/no-match'));
-const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
-const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
-const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
-const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
-const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
-const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
-const PatientSignIn = React.lazy(() => import('@/pages/pic/patient-sign-in/patient-sign-in'));
-const PICHome = React.lazy(() => import('@/pages/pic/home/home'));
-const AssessmentWrapper = React.lazy(() => import('@/pages/pic/assessment/assessment-wrapper'));
-const DashboardWrapper = React.lazy(() => import('@/pages/pic/mhic-dashboard/dashboard-wrapper'));
-const PicProviderSearch = React.lazy(() => import('@/pages/pic/provider-search'));
-const PicProviderCalendar = React.lazy(() => import('@/pages/pic/provider-calendar'));
-const ContactLCSW = React.lazy(() => import('@/pages/pic/contact-lcsw/contact-lcsw'));
-const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
-const Interaction = React.lazy(() => import('@/pages/interaction'));
-const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
+export const Onboarding = React.lazy(() => import('@/pages/onboarding'));
+export const SignUp = React.lazy(() => import('@/pages/sign-up'));
+export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
+export const SignIn = React.lazy(() => import('@/pages/sign-in'));
+export const SignIn2 = React.lazy(() => import('@/pages/sign-in-2'));
+export const SignInSSO = React.lazy(() => import('@/pages/sign-in-sso'));
+export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
+export const Auth = React.lazy(() => import('@/pages/auth'));
+export const Index = React.lazy(() => import('@/pages'));
+export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
+export const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
+export const InTheStudioExternalDetail = React.lazy(() => import('@/pages/in-the-studio-external-detail'));
+export const InTheStudioGroupSessionScheduled = React.lazy(
+	() => import('@/pages/in-the-studio-group-session-scheduled')
+);
+export const InTheStudioGroupSessionByRequest = React.lazy(
+	() => import('@/pages/in-the-studio-group-session-by-request')
+);
+export const OnYourTime = React.lazy(() => import('@/pages/on-your-time'));
+export const SessionRequestThankYou = React.lazy(() => import('@/pages/session-request-thank-you'));
+export const OnYourTimeDetail = React.lazy(() => import('@/pages/on-your-time-detail'));
+export const Covid19Resources = React.lazy(() => import('@/pages/covid-19-resources'));
+export const WellBeingResources = React.lazy(() => import('@/pages/well-being-resources'));
+export const Privacy = React.lazy(() => import('@/pages/privacy'));
+export const IntakeAssessment = React.lazy(() => import('@/pages/intake-assessment'));
+export const OneOnOneResources = React.lazy(() => import('@/pages/one-on-one-resources'));
+export const ConnectWithSupport = React.lazy(() => import('@/pages/connect-with-support'));
+export const EhrLookup = React.lazy(() => import('@/pages/ehr-lookup'));
+export const MyCalendar = React.lazy(() => import('@/pages/my-calendar'));
+export const AppointmentDetails = React.lazy(() => import('@/pages/appointment-details'));
+export const Feedback = React.lazy(() => import('@/pages/feedback'));
+export const AccountSessionDetails = React.lazy(() => import('@/pages/account-session-details'));
+export const GroupSessionsScheduled = React.lazy(() => import('@/pages/group-sessions-scheduled'));
+export const GroupSessionsScheduledCreate = React.lazy(() => import('@/pages/group-sessions-scheduled-create'));
+export const GroupSessionsByRequest = React.lazy(() => import('@/pages/group-sessions-by-request'));
+export const GroupSessionsByRequestCreate = React.lazy(() => import('@/pages/group-sessions-by-request-create'));
+export const RedirectToBackend = React.lazy(() => import('@/pages/redirect-to-backend'));
+export const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-time'));
+export const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
+export const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
+export const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
+export const NoMatch = React.lazy(() => import('@/pages/no-match'));
+export const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
+export const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
+export const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
+export const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
+export const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
+export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
+export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
+export const ScreeningFlows = React.lazy(() => import('@/pages/screening/screening-flows'));
+export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
+export const Interaction = React.lazy(() => import('@/pages/interaction'));
+export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 
 interface RouteGuardProps {
-	subdomain?: string;
 	account?: AccountModel;
 	institution?: Institution;
 }
@@ -84,8 +82,7 @@ export interface RouteConfig {
 	path: string;
 	exact: boolean;
 	private: boolean;
-	checkEnabled?: (guardProps: RouteGuardProps) => boolean;
-	unauthRedirect?: string;
+	routeGuard?: (guardProps: RouteGuardProps) => boolean;
 	header?: () => ReactElement;
 	nav?: () => ReactElement;
 	main: () => ReactElement;
@@ -93,19 +90,16 @@ export interface RouteConfig {
 
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
-const isVanillaSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomain !== 'pic';
-const isPicSubdomain = ({ subdomain }: RouteGuardProps): boolean => subdomain === 'pic';
-const isPicPatientRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicPatientAccount(account);
-const isPicMhicRouteGuard = ({ account }: RouteGuardProps) => !!account && isPicMhicAccount(account);
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 
 const RedirectToSupport = () => {
-	const match = useRouteMatch<{ supportRoleId: string }>();
-	const query = useQuery();
-	let routedSupportRoleId = match.params.supportRoleId ?? '';
-	const routedStartDate = query.get('date') || '';
-	const routedProviderId = query.get('providerId');
-	const routedClinicIds = query.getAll('clinicId');
+	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
+	const [searchParams] = useSearchParams();
+
+	let routedSupportRoleId = match?.params.supportRoleId ?? '';
+	const routedStartDate = searchParams.get('date') || '';
+	const routedProviderId = searchParams.get('providerId');
+	const routedClinicIds = searchParams.getAll('clinicId');
 
 	if (routedSupportRoleId === 'therapist') {
 		routedSupportRoleId = 'clinician';
@@ -135,569 +129,385 @@ const RedirectToSupport = () => {
 		params.append('clinicId', clinicId);
 	}
 
-	return <Redirect to={`/connect-with-support?${params.toString()}`} />;
+	return <Navigate to={`/connect-with-support?${params.toString()}`} />;
 };
 
-export const Routes = [
+const ButtonlessHeaderLayout = () => {
+	return (
+		<>
+			<Header showHeaderButtons={false} />
+			<Outlet />
+		</>
+	);
+};
+
+const UnauthenticatedHeaderLayout = () => {
+	return (
+		<>
+			<HeaderUnauthenticated />
+			<Outlet />
+		</>
+	);
+};
+
+const DefaultLayout = () => {
+	return (
+		<>
+			<Header />
+			<Outlet />
+		</>
+	);
+};
+
+export const AppRoutes = [
 	{
-		path: '/onboarding',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: Onboarding,
+		layout: ButtonlessHeaderLayout,
+		routes: [
+			{
+				path: '/onboarding',
+				private: false,
+				main: Onboarding,
+			},
+			{
+				path: '/sign-up',
+				private: false,
+				main: SignUp,
+			},
+			{
+				path: '/sign-up-verify',
+				private: false,
+				main: SignUpVerify,
+			},
+			{
+				path: '/accounts/claim-invite/:accountInviteId',
+				private: false,
+				main: SignUpClaim,
+			},
+			{
+				path: '/sign-in-sso',
+				private: false,
+				main: SignInSSO,
+			},
+			{
+				path: '/sign-in-email',
+				private: false,
+				main: SignInEmail,
+			},
+			{
+				path: '/forgot-password',
+				private: false,
+				main: ForgotPassword,
+			},
+			{
+				path: '/accounts/reset-password/:passwordResetToken',
+				private: false,
+				main: PasswordReset,
+			},
+		],
 	},
+
 	{
-		path: '/sign-up',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: SignUp,
+		layout: UnauthenticatedHeaderLayout,
+		routes: [
+			{
+				path: '/sign-in',
+				private: false,
+				main: SignIn,
+			},
+			{
+				path: '/sign-in-2',
+				private: false,
+				main: SignIn2,
+			},
+		],
 	},
+
 	{
-		path: '/sign-up-verify',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: SignUpVerify,
-	},
-	{
-		path: '/accounts/claim-invite/:accountInviteId',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: SignUpClaim,
-	},
-	{
-		path: '/sign-in',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		main: SignIn,
-	},
-	{
-		path: '/sign-in-sso',
-		exact: true,
-		private: false,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: SignInSSO,
-	},
-	{
-		path: '/sign-in-email',
-		exact: true,
-		private: false,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: SignInEmail,
-	},
-	{
-		path: '/forgot-password',
-		exact: true,
-		private: false,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: ForgotPassword,
-	},
-	{
-		path: '/accounts/reset-password/:passwordResetToken',
-		exact: true,
-		private: false,
-		header: (): ReactElement => <Header showHeaderButtons={false} />,
-		main: PasswordReset,
-	},
-	{
-		path: '/auth',
-		exact: true,
-		private: false,
-		header: (): ReactElement => <Header />,
-		main: Auth,
-	},
-	{
-		path: '/',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: Index,
-	},
-	// {
-	// 	path: '/intro-assessment',
-	// 	exact: true,
-	// 	private: true,
-	// 	main: () => <IntroAssessment /,
-	// },
-	{
-		path: '/in-the-studio',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudio,
-	},
-	{
-		path: '/in-the-studio-thanks',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudioThanks,
-	},
-	{
-		path: '/in-the-studio/:groupEventId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudioDetail,
-	},
-	{
-		path: '/in-the-studio/external/:externalGroupEventTypeId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudioExternalDetail,
-	},
-	{
-		path: '/in-the-studio/group-session-scheduled/:groupSessionId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudioGroupSessionScheduled,
-	},
-	{
-		path: '/in-the-studio/group-session-by-request/:groupSessionRequestId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: InTheStudioGroupSessionByRequest,
-	},
-	{
-		path: '/on-your-time',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: OnYourTime,
-	},
-	{
-		path: '/on-your-time-thanks',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: OnYourTimeThanks,
-	},
-	{
-		path: '/thank-you',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: SessionRequestThankYou,
-	},
-	{
-		path: '/on-your-time/:contentId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: OnYourTimeDetail,
-	},
-	{
-		path: '/covid-19-resources',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: Covid19Resources,
-	},
-	{
-		path: '/well-being-resources',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: WellBeingResources,
-	},
-	{
-		path: '/privacy',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: Privacy,
-	},
-	{
-		path: '/immediate-support/:supportRoleId',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: RedirectToSupport,
-	},
-	{
-		path: '/weekly-assessment',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
-		header: (): ReactElement => <Header />,
-		main: WeeklyAssessment,
-	},
-	{
-		path: '/intake-assessment',
-		exact: true,
-		private: true,
-		checkEnabled: isInstitutionSupportEnabledRouteGuard,
-		header: (): ReactElement => <Header />,
-		main: IntakeAssessment,
-	},
-	{
-		path: '/one-on-one-resources',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
-		header: (): ReactElement => <Header />,
-		main: OneOnOneResources,
-	},
-	{
-		path: '/connect-with-support',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
-		header: (): ReactElement => <Header />,
-		main: ConnectWithSupport,
-	},
-	{
-		path: '/ehr-lookup',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isInstitutionSupportEnabledRouteGuard(guardProps) && isVanillaSubdomain(guardProps),
-		header: (): ReactElement => <Header />,
-		main: EhrLookup,
-	},
-	{
-		path: '/my-calendar',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: MyCalendar,
-	},
-	{
-		path: '/scheduling',
-		private: true,
-		checkEnabled: isProviderRouteGuard,
-		header: (): ReactElement => <Header />,
-		main: MySchedule,
-	},
-	{
-		path: '/appointments/:appointmentId',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: AppointmentDetails,
-	},
-	{
-		path: '/feedback',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: Feedback,
-	},
-	{
-		path: '/account-sessions/:accountSessionId/text',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: AccountSessionDetails,
-	},
-	{
-		path: '/account-sessions/:accountSessionId/text',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: AccountSessionDetails,
-	},
-	{
-		path: '/group-sessions/scheduled',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsScheduled,
-	},
-	{
-		path: '/group-sessions/scheduled/create',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsScheduledCreate,
-	},
-	{
-		path: '/group-sessions/scheduled/:groupSessionId/edit',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsScheduledCreate,
-	},
-	{
-		path: '/group-sessions/scheduled/:groupSessionId/view',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsScheduledCreate,
-	},
-	{
-		path: '/group-sessions/by-request',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsByRequest,
-	},
-	{
-		path: '/group-sessions/by-request/create',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsByRequestCreate,
-	},
-	{
-		path: '/group-sessions/by-request/:groupSessionId/edit',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: GroupSessionsByRequestCreate,
-	},
-	{
-		path: '/group-session-reservations/:groupSessionReservationId/ical',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: RedirectToBackend,
-	},
-	{
-		path: '/group-session-reservations/:groupSessionReservationId/google-calendar',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: RedirectToBackend,
-	},
-	{
-		path: '/appointments/:appointmentId/ical',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: RedirectToBackend,
-	},
-	{
-		path: '/appointments/:appointmentId/google-calendar',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: RedirectToBackend,
-	},
-	{
-		path: '/cms/on-your-time',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: CmsOnYourTime,
-	},
-	{
-		path: '/cms/on-your-time/create',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: CreateOnYourTimeContent,
-	},
-	{
-		path: '/cms/available-content',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: CmsAvailableContent,
-	},
-	{
-		path: '/stats-dashboard',
-		exact: true,
-		private: true,
-		checkEnabled: isVanillaSubdomain,
-		header: (): ReactElement => <Header />,
-		main: StatsDashboard,
-	},
-	{
-		path: '/patient-sign-in',
-		exact: true,
-		private: false,
-		checkEnabled: isPicSubdomain,
-		main: PatientSignIn,
-	},
-	{
-		path: '/pic/home',
-		exact: true,
-		private: true,
-		unauthRedirect: '/patient-sign-in',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: PICHome,
-	},
-	{
-		path: '/pic/assessment',
-		exact: false,
-		private: true,
-		unauthRedirect: '/patient-sign-in',
-		checkEnabled: (guardProps: RouteGuardProps): boolean => {
-			return (
-				(isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps)) || isPicMhicRouteGuard(guardProps)
-			);
-		},
-		header: (): ReactElement => <Header />,
-		main: AssessmentWrapper,
-	},
-	{
-		path: '/pic/mhic',
-		exact: false,
-		private: true,
-		unauthRedirect: '/sign-in-email',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicMhicRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: DashboardWrapper,
-	},
-	{
-		path: '/pic/contact-lcsw',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: ContactLCSW,
-	},
-	{
-		path: '/pic/provider-search',
-		exact: true,
-		private: true,
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicPatientRouteGuard(guardProps),
-		unauthRedirect: '/patient-sign-in',
-		header: (): ReactElement => <Header />,
-		main: PicProviderSearch,
-	},
-	{
-		path: '/pic/calendar',
-		exact: true,
-		private: true,
-		unauthRedirect: '/sign-in-email',
-		checkEnabled: (guardProps: RouteGuardProps): boolean =>
-			isPicSubdomain(guardProps) && isPicMhicRouteGuard(guardProps),
-		header: (): ReactElement => <Header />,
-		main: PicProviderCalendar,
-	},
-	{
-		path: '/providers/:providerId',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: ProviderDetail,
-	},
-	...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
-		? [
-				{
-					path: `/providers/:providerId/profile`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementProfile,
-				},
-				{
-					path: `/providers/:providerId/basics`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementBasics,
-				},
-				{
-					path: `/providers/:providerId/clinical-background`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementClinicalBackground,
-				},
-				{
-					path: `/providers/:providerId/communication`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementCommunication,
-				},
-				{
-					path: `/providers/:providerId/bluejeans-connection`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementBluejeansConnection,
-				},
-				{
-					path: `/providers/:providerId/payment-types-accepted`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementPaymentTypesAccepted,
-				},
-				{
-					path: `/providers/:providerId/personal-details`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementPersonalDetails,
-				},
-				{
-					path: `/providers/:providerId/cobalt-bio`,
-					exact: true,
-					private: true,
-					header: (): ReactElement => <Header />,
-					main: ProviderManagementCobaltBio,
-				},
-		  ]
-		: []),
-	{
-		path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: Interaction,
-	},
-	{
-		path: '/interaction-instances/:interactionId',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: InteractionInstances,
-	},
-	{
-		path: '*',
-		exact: true,
-		private: true,
-		header: (): ReactElement => <Header />,
-		main: NoMatch,
+		layout: DefaultLayout,
+		routes: [
+			{
+				path: '/auth',
+				private: false,
+				main: Auth,
+			},
+			{
+				path: '/',
+				private: true,
+				main: Index,
+			},
+			{
+				path: '/in-the-studio',
+				private: true,
+				main: InTheStudio,
+			},
+			{
+				path: '/in-the-studio-thanks',
+				private: true,
+				main: InTheStudioThanks,
+			},
+			{
+				path: '/in-the-studio/:groupEventId',
+				private: true,
+				main: InTheStudioDetail,
+			},
+			{
+				path: '/in-the-studio/external/:externalGroupEventTypeId',
+				private: true,
+				main: InTheStudioExternalDetail,
+			},
+			{
+				path: '/in-the-studio/group-session-scheduled/:groupSessionId',
+				private: true,
+				main: InTheStudioGroupSessionScheduled,
+			},
+			{
+				path: '/in-the-studio/group-session-by-request/:groupSessionRequestId',
+				private: true,
+				main: InTheStudioGroupSessionByRequest,
+			},
+			{
+				path: '/on-your-time',
+				private: true,
+				main: OnYourTime,
+			},
+			{
+				path: '/on-your-time-thanks',
+				private: true,
+				main: OnYourTimeThanks,
+			},
+			{
+				path: '/thank-you',
+				private: true,
+				main: SessionRequestThankYou,
+			},
+			{
+				path: '/on-your-time/:contentId',
+				private: true,
+				main: OnYourTimeDetail,
+			},
+			{
+				path: '/covid-19-resources',
+				private: true,
+				main: Covid19Resources,
+			},
+			{
+				path: '/well-being-resources',
+				private: true,
+				main: WellBeingResources,
+			},
+			{
+				path: '/privacy',
+				private: true,
+				main: Privacy,
+			},
+			{
+				path: '/immediate-support/:supportRoleId',
+				private: true,
+				main: RedirectToSupport,
+			},
+			{
+				path: '/intake-assessment',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: IntakeAssessment,
+			},
+			{
+				path: '/one-on-one-resources',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: OneOnOneResources,
+			},
+			{
+				path: '/connect-with-support',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: ConnectWithSupport,
+			},
+			{
+				path: '/ehr-lookup',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: EhrLookup,
+			},
+			{
+				path: '/my-calendar',
+				private: true,
+				main: MyCalendar,
+			},
+			{
+				path: '/scheduling/*',
+				private: true,
+				routeGuard: isProviderRouteGuard,
+				main: MySchedule,
+			},
+			{
+				path: '/screening-flows/:screeningFlowId',
+				private: true,
+				main: ScreeningFlows,
+			},
+			{
+				path: '/screening-questions/:screeningQuestionContextId',
+				private: true,
+				main: ScreeningQuestions,
+			},
+			{
+				path: '/appointments/:appointmentId',
+				private: true,
+				main: AppointmentDetails,
+			},
+			{
+				path: '/feedback',
+				private: true,
+				main: Feedback,
+			},
+			{
+				path: '/account-sessions/:accountSessionId/text',
+				private: true,
+				main: AccountSessionDetails,
+			},
+			{
+				path: '/account-sessions/:accountSessionId/text',
+				private: true,
+				main: AccountSessionDetails,
+			},
+			{
+				path: '/group-sessions/scheduled',
+				private: true,
+				main: GroupSessionsScheduled,
+			},
+			{
+				path: '/group-sessions/scheduled/create',
+				private: true,
+				main: GroupSessionsScheduledCreate,
+			},
+			{
+				path: '/group-sessions/scheduled/:groupSessionId/edit',
+				private: true,
+				main: GroupSessionsScheduledCreate,
+			},
+			{
+				path: '/group-sessions/scheduled/:groupSessionId/view',
+				private: true,
+				main: GroupSessionsScheduledCreate,
+			},
+			{
+				path: '/group-sessions/by-request',
+				private: true,
+				main: GroupSessionsByRequest,
+			},
+			{
+				path: '/group-sessions/by-request/create',
+				private: true,
+				main: GroupSessionsByRequestCreate,
+			},
+			{
+				path: '/group-sessions/by-request/:groupSessionId/edit',
+				private: true,
+				main: GroupSessionsByRequestCreate,
+			},
+			{
+				path: '/group-session-reservations/:groupSessionReservationId/ical',
+				private: true,
+				main: RedirectToBackend,
+			},
+			{
+				path: '/group-session-reservations/:groupSessionReservationId/google-calendar',
+				private: true,
+				main: RedirectToBackend,
+			},
+			{
+				path: '/appointments/:appointmentId/ical',
+				private: true,
+				main: RedirectToBackend,
+			},
+			{
+				path: '/appointments/:appointmentId/google-calendar',
+				private: true,
+				main: RedirectToBackend,
+			},
+			{
+				path: '/cms/on-your-time',
+				private: true,
+				main: CmsOnYourTime,
+			},
+			{
+				path: '/cms/on-your-time/create',
+				private: true,
+				main: CreateOnYourTimeContent,
+			},
+			{
+				path: '/cms/available-content',
+				private: true,
+				main: CmsAvailableContent,
+			},
+			{
+				path: '/stats-dashboard',
+				private: true,
+				main: StatsDashboard,
+			},
+			{
+				path: '/providers/:providerId',
+				private: true,
+				main: ProviderDetail,
+			},
+			...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
+				? [
+						{
+							path: `/providers/:providerId/profile`,
+							private: true,
+							main: ProviderManagementProfile,
+						},
+						{
+							path: `/providers/:providerId/basics`,
+							private: true,
+							main: ProviderManagementBasics,
+						},
+						{
+							path: `/providers/:providerId/clinical-background`,
+							private: true,
+							main: ProviderManagementClinicalBackground,
+						},
+						{
+							path: `/providers/:providerId/communication`,
+							private: true,
+							main: ProviderManagementCommunication,
+						},
+						{
+							path: `/providers/:providerId/bluejeans-connection`,
+							private: true,
+							main: ProviderManagementBluejeansConnection,
+						},
+						{
+							path: `/providers/:providerId/payment-types-accepted`,
+							private: true,
+							main: ProviderManagementPaymentTypesAccepted,
+						},
+						{
+							path: `/providers/:providerId/personal-details`,
+							private: true,
+							main: ProviderManagementPersonalDetails,
+						},
+						{
+							path: `/providers/:providerId/cobalt-bio`,
+							private: true,
+							main: ProviderManagementCobaltBio,
+						},
+				  ]
+				: []),
+			{
+				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
+				private: true,
+				main: Interaction,
+			},
+			{
+				path: '/interaction-instances/:interactionId',
+				private: true,
+				main: InteractionInstances,
+			},
+			{
+				path: '*',
+				main: NoMatch,
+			},
+		],
 	},
 ];

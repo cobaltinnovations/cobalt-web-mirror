@@ -1,13 +1,10 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import { TableRow, TableCell } from '@/components/table';
 import SessionStatus, { SESSION_STATUS } from '@/components/session-status';
 import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
-
-import colors from '@/jss/colors';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
@@ -16,24 +13,25 @@ import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	iconPath: {
 		'& path': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconPolygon: {
 		'& polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
 	iconTrash: {
 		'& path': {
-			fill: colors.danger,
+			fill: theme.colors.d500,
 		},
 	},
-});
+}));
 
 interface SessionRequestRowProps {
 	session: GroupSessionRequestModel;
@@ -44,27 +42,41 @@ interface SessionRequestRowProps {
 	onDeleteClick(groupSessionRequestId: string): void;
 }
 
-const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, onAddClick, onArchiveClick, onUnarchiveClick, onDeleteClick }) => {
+const SessionRequestRow: FC<SessionRequestRowProps> = ({
+	session,
+	onEditClick,
+	onAddClick,
+	onArchiveClick,
+	onUnarchiveClick,
+	onDeleteClick,
+}) => {
 	const classes = useStyles();
 	const { account } = useAccount();
 
-	const canEditSession = (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
-		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW || session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
+	const canEditSession =
+		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
+		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW ||
+			session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
 
 	const canAddSession =
 		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
 		session.groupSessionRequestStatusId === SESSION_STATUS.NEW;
 
 	const hasDropdown =
-		canAddSession || session.groupSessionRequestStatusId === SESSION_STATUS.ADDED || session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED;
+		canAddSession ||
+		session.groupSessionRequestStatusId === SESSION_STATUS.ADDED ||
+		session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED;
 
 	return (
 		<TableRow>
 			<TableCell>
-				<span className="d-block font-size-xs">{session.createdDateDescription}</span>
+				<span className="d-block fs-default">{session.createdDateDescription}</span>
 			</TableCell>
 			<TableCell>
-				<Link to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`} className="d-block font-size-xs font-karla-bold">
+				<Link
+					to={`/in-the-studio/group-session-by-request/${session.groupSessionRequestId}`}
+					className="d-block fs-default fw-bold"
+				>
 					{session.title}
 				</Link>
 			</TableCell>
@@ -77,16 +89,16 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({ session, onEditClick, o
 						id={session.groupSessionRequestId}
 						items={[
 							...(canEditSession
-									? [
-											{
-												icon: <EditIcon className={classes.iconPath} />,
-												title: 'Edit',
-												onClick: () => {
-													onEditClick(session.groupSessionRequestId);
-												},
+								? [
+										{
+											icon: <EditIcon className={classes.iconPath} />,
+											title: 'Edit',
+											onClick: () => {
+												onEditClick(session.groupSessionRequestId);
 											},
-									  ]
-									: []),
+										},
+								  ]
+								: []),
 							...(canAddSession
 								? [
 										{

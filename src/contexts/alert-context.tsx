@@ -1,4 +1,4 @@
-import React, { FC, createContext, useState, useRef, useCallback } from 'react';
+import React, { FC, createContext, useState, useRef, useCallback, PropsWithChildren } from 'react';
 
 export type AlertVariant = '' | 'success' | 'warning' | 'danger';
 
@@ -17,7 +17,7 @@ interface AlertContextConfig {
 
 const AlertContext = createContext({} as AlertContextConfig);
 
-const AlertProvider: FC = (props) => {
+const AlertProvider: FC<PropsWithChildren> = (props) => {
 	const hideTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
 	const [alertText, setAlertText] = useState('');

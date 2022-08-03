@@ -1,27 +1,23 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Collapse } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 import Color from 'color';
 
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import useSubdomain from '@/hooks/use-subdomain';
 
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
-
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
 
 import { ReactComponent as UpChevron } from '@/assets/icons/icon-chevron-up.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as HipaaLogo } from '@/assets/logos/logo-hipaa.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useMenuStyles = createUseStyles({
+const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
 		top: 0,
 		left: 0,
@@ -30,7 +26,7 @@ const useMenuStyles = createUseStyles({
 		width: '100%',
 		maxWidth: 375,
 		position: 'fixed',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
 
 		display: 'flex',
 		overflowY: 'auto',
@@ -52,7 +48,7 @@ const useMenuStyles = createUseStyles({
 		height: 24,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: colors.black,
+			fill: theme.colors.n900,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -73,22 +69,22 @@ const useMenuStyles = createUseStyles({
 		appearance: 'none',
 		padding: '16px 20px',
 		alignItems: 'center',
-		color: colors.gray600,
+		color: theme.colors.n500,
 		textTransform: 'uppercase',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		borderTop: `1px solid ${colors.border}`,
-		...fonts.xxs,
-		...fonts.karlaBold,
+		borderTop: `1px solid ${theme.colors.border}`,
+		...theme.fonts.small,
+		...theme.fonts.bodyBold,
 		'&:hover': {
-			backgroundColor: Color(colors.border).alpha(0.24).string(),
+			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	collapseOuter: {
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	menuList: {
 		margin: 0,
@@ -104,15 +100,15 @@ const useMenuStyles = createUseStyles({
 	},
 	mainMenuList: {
 		'& li a': {
-			...fonts.s,
-			color: colors.dark,
+			...theme.fonts.default,
+			color: theme.colors.n900,
 			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
 		'& li a': {
-			...fonts.xxs,
-			color: colors.gray600,
+			...theme.fonts.small,
+			color: theme.colors.n500,
 			textTransform: 'uppercase',
 		},
 	},
@@ -126,13 +122,13 @@ const useMenuStyles = createUseStyles({
 	signOutButton: {
 		display: 'block',
 		padding: '8px 0 !important',
-		color: `${colors.dark} !important`,
+		color: `${theme.colors.n900} !important`,
 		backgroundColor: 'transparent !important',
-		borderBottom: `1px solid ${colors.gray300} !important`,
+		borderBottom: `1px solid ${theme.colors.n300} !important`,
 	},
 	hipaaLogo: {
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
 	'@global': {
@@ -165,7 +161,7 @@ const useMenuStyles = createUseStyles({
 			transition: 'opacity 200ms',
 		},
 	},
-});
+}));
 
 interface MenuProps {
 	open: boolean;
@@ -173,7 +169,7 @@ interface MenuProps {
 }
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
-	const { account, institution, institutionCapabilities, setAccount, isMhic, signOutAndClearContext } = useAccount();
+	const { account, institution, institutionCapabilities, setAccount, signOutAndClearContext } = useAccount();
 	const classes = useMenuStyles();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [personalMenuIsOpen, setPersonalMenuIsOpen] = useState(true);
@@ -285,7 +281,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 							well-being resources
 						</Link>
 					</li>
-					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
+					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId && (
 						<li>
 							<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
 								Provider Profile
@@ -366,91 +362,6 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 		</>
 	);
 
-	const picOptions = () => (
-		<ul className={classes.menuList}>
-			<li>
-				<Link to="/pic/home" onClick={handleLinkClick}>
-					Home
-				</Link>
-			</li>
-			{/*  TODO: remove scheduling link from menu for now */}
-			{/* <li>
-				<Link to="/pic/schedule" onClick={handleLinkClick}>
-					Schedule an appointment
-				</Link>
-			</li> */}
-			<li>
-				{/* TODO update with link to pic resources when that's done */}
-				<Link to="/well-being-resources" onClick={handleLinkClick}>
-					Resources for you
-				</Link>
-			</li>
-			<li>
-				<Link to="/pic/contact-lcsw" onClick={handleLinkClick}>
-					If you are in crisis
-				</Link>
-			</li>
-			<li>
-				<Link to="/my-calendar" onClick={handleLinkClick}>
-					My calendar
-				</Link>
-			</li>
-
-			{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
-				<li>
-					<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
-						Provider Profile
-					</Link>
-				</li>
-			)}
-
-			<li>
-				<Link to="/privacy" onClick={handleLinkClick}>
-					Privacy
-				</Link>
-			</li>
-			<li>
-				<Link to="/patient-sign-in" onClick={handleSignOutLinkClick}>
-					Sign out
-				</Link>
-			</li>
-		</ul>
-	);
-
-	const mhicOptions = () => (
-		<ul className={classes.menuList}>
-			<li>
-				<Link to="/pic/mhic" onClick={handleLinkClick}>
-					Panel Manager
-				</Link>
-			</li>
-			<li>
-				<Link to="/pic/calendar" onClick={handleLinkClick}>
-					My Calendar
-				</Link>
-			</li>
-
-			{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && (
-				<li>
-					<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
-						Provider Profile
-					</Link>
-				</li>
-			)}
-
-			<li>
-				<Link to="/patient-sign-in" onClick={handleSignOutLinkClick}>
-					Sign out
-				</Link>
-			</li>
-		</ul>
-	);
-
-	const subdomain = useSubdomain();
-	const hamburgerOptions = () => {
-		return subdomain === 'pic' ? (isMhic ? mhicOptions() : picOptions()) : cobaltOptions();
-	};
-
 	return (
 		<>
 			<CSSTransition in={open} timeout={200} classNames="menu-animation" unmountOnExit={true}>
@@ -458,23 +369,22 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 					<div>
 						<div className={classes.menuHeader}>
 							<CloseIcon tabIndex={0} className={classes.closeIcon} onClick={handleCloseButtonClick} />
-							<div className="text-right">
+							<div className="text-end">
 								<h5 className="mb-0">{account?.displayName}</h5>
 							</div>
 						</div>
-						{hamburgerOptions()}
+						{cobaltOptions()}
 					</div>
 					<div className={classes.menuFooter}>
-						{subdomain !== 'pic' && (
-							<div>
-								<small>
-									<Link to="/feedback" onClick={handleLinkClick}>
-										Submit Feedback
-									</Link>
-								</small>
-								<small>&copy; {new Date().getFullYear()} Cobalt Platform</small>
-							</div>
-						)}
+						<div>
+							<small>
+								<Link to="/feedback" onClick={handleLinkClick}>
+									Submit Feedback
+								</Link>
+							</small>
+							<small>&copy; {new Date().getFullYear()} Cobalt Platform</small>
+						</div>
+
 						<HipaaLogo className={classes.hipaaLogo} />
 					</div>
 				</div>

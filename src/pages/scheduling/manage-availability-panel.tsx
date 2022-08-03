@@ -11,7 +11,7 @@ import { AppointmentTypeItem } from './appointment-type-item';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSchedulingStyles } from './use-scheduling-styles';
 
 interface ManageAvailabilityPanelProps {
@@ -19,7 +19,6 @@ interface ManageAvailabilityPanelProps {
 }
 
 export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProps) => {
-	const routeMatch = useRouteMatch();
 	const classes = useSchedulingStyles();
 	const { account } = useAccount();
 
@@ -102,14 +101,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>regular hours</h5>
-						<Button
-							as={Link}
-							variant="link"
-							to={`${routeMatch.url}/new-availability`}
-							className={classes.roundBtn}
-						>
-							<PlusIcon />
-						</Button>
+						<Link to={'new-availability'}>
+							<Button variant="link" className={classes.roundBtn}>
+								<PlusIcon />
+							</Button>
+						</Link>
 					</div>
 
 					<div className="mb-5">
@@ -125,14 +121,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>unavailable time block</h5>
-						<Button
-							as={Link}
-							variant="link"
-							to={`${routeMatch.url}/new-blocked-time`}
-							className={classes.roundBtn}
-						>
-							<PlusIcon />
-						</Button>
+						<Link to={'new-blocked-time'}>
+							<Button variant="link" className={classes.roundBtn}>
+								<PlusIcon />
+							</Button>
+						</Link>
 					</div>
 
 					<div>
@@ -156,29 +149,23 @@ interface LogicalAvailabilityItemProps {
 }
 
 const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityItemProps) => {
-	const routeMatch = useRouteMatch();
-
 	return (
 		<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
 			<div className="d-flex align-items-center justify-content-between">
 				<div>
 					{logicalAvailability.descriptionComponents?.map((description, index) => {
 						return (
-							<p key={index} className="m-0 font-karla-bold">
+							<p key={index} className="m-0 fw-bold">
 								{description}
 							</p>
 						);
 					})}
 				</div>
-				<Button
-					as={Link}
-					to={`${routeMatch.url}/${logicalAvailability.logicalAvailabilityId}/edit`}
-					variant="link"
-					size="sm"
-					className="p-0"
-				>
-					<EditIcon height={24} width={24} />
-				</Button>
+				<Link to={`${logicalAvailability.logicalAvailabilityId}/edit`}>
+					<Button variant="link" size="sm" className="p-0">
+						<EditIcon height={24} width={24} />
+					</Button>
+				</Link>
 			</div>
 			{logicalAvailability.appointmentTypes.map((appointmentType) => {
 				return (

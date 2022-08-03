@@ -7,20 +7,21 @@ import { Button } from 'react-bootstrap';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
-import { Link, Redirect, useParams, useRouteMatch } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { AppointmentForm } from './appointment-form';
 import { useScrollCalendar } from './use-scroll-calendar';
 
 interface EditAppointmentPanelProps {
 	setCalendarDate: (date: Date, time?: string) => void;
-	onClose: (updatedAppointmentId: string) => void;
+	onClose: (updatedAppointmentId?: string) => void;
 	focusDateOnLoad: boolean;
 }
 
 export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad }: EditAppointmentPanelProps) => {
 	const { appointmentId } = useParams<{ appointmentId: string }>();
-	const routeMatch = useRouteMatch();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const relativeUrl = `/providers/${account?.providerId}?&immediateAccess=true`;
@@ -28,7 +29,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 
 	const [appointment, setAppointment] = useState<AppointmentModel>();
 
-	const isCreate = routeMatch.path.endsWith('new-appointment');
+	const isCreate = location.pathname.endsWith('new-appointment');
 
 	const initialValues = useMemo(() => {
 		const appointmentMoment = appointment?.startTime ? moment(appointment?.startTime) : null;
@@ -66,16 +67,25 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 		};
 	}, [appointmentId, handleError, isCreate]);
 
-	if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
-		return <Redirect to={`/scheduling/appointments/${appointment?.rescheduledAppointmentId}/edit`} />;
-	}
+	useEffect(() => {
+		if (appointment?.canceledForReschedule && appointment?.rescheduledAppointmentId) {
+			navigate(`/scheduling/appointments/${appointment?.rescheduledAppointmentId}/edit`);
+		}
+	}, [appointment?.canceledForReschedule, appointment?.rescheduledAppointmentId, navigate]);
 
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
 				<h4>{isCreate ? 'New' : 'Edit'} appointment</h4>
 
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(appointmentId)}>
+				<Button
+					variant="link"
+					size="sm"
+					className="p-0"
+					onClick={() => {
+						onClose(appointmentId);
+					}}
+				>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -89,7 +99,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 							{fullUrl}
 						</Link>
 
-						<CopyToClipboardButton className="ml-2" text={fullUrl} />
+						<CopyToClipboardButton className="ms-2" text={fullUrl} />
 					</div>
 				</>
 			) : (
@@ -97,9 +107,16 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 					appointmentId={appointmentId}
 					initialValues={initialValues}
 					onBack={() => {
+						if (!appointmentId) {
+							return;
+						}
 						onClose(appointmentId);
 					}}
 					onSuccess={(newAppointmentId) => {
+						if (!newAppointmentId || !appointmentId) {
+							return;
+						}
+
 						onClose(newAppointmentId || appointmentId);
 					}}
 				/>

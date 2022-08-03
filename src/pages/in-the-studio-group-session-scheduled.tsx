@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect } from 'react';
-import { useParams, Link, useHistory, useLocation } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -21,7 +21,7 @@ import useHandleError from '@/hooks/use-handle-error';
 const InTheStudioGroupSessionScheduled: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
-	const history = useHistory<{ passedAssessment?: boolean }>();
+	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { account, setAccount } = useAccount();
 	const { showAlert } = useAlert();
@@ -56,19 +56,25 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 		/* --------------------------------------------------------- */
 		/* This fires after you complete the sessions assessment */
 		/* --------------------------------------------------------- */
-		if (typeof history.location.state?.passedAssessment !== 'boolean') {
+		const locationState = (location.state as { passedAssessment?: boolean }) || {};
+		if (typeof locationState?.passedAssessment !== 'boolean') {
 			return;
 		}
 
-		if (history.location.state.passedAssessment) {
+		if (locationState.passedAssessment) {
 			setShowCollectEmailModal(true);
-			history.replace(location.pathname, { passedAssessment: undefined });
+			navigate(location.pathname, {
+				replace: true,
+				state: {
+					passedAssessment: undefined,
+				},
+			});
 		} else {
 			window.alert(
 				'Based on your answer(s), this session does not seem like a good match. Please join us in another.'
 			);
 		}
-	}, [groupSessionId, history, location.pathname]);
+	}, [groupSessionId, location.state, location.pathname, navigate]);
 
 	/* --------------------------------------------------------- */
 	/* Prepopulate the email modal with the accounts email */
@@ -81,7 +87,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
-			history.push(`/intake-assessment?groupSessionId=${session.groupSessionId}`);
+			navigate(`/intake-assessment?groupSessionId=${session.groupSessionId}`);
 		}
 
 		setShowCollectEmailModal(true);
@@ -153,7 +159,12 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 							.cancelGroupSessionReservation(reservation.groupSessionReservationId)
 							.fetch();
 						await fetchData();
-						history.replace(location.pathname, { passedAssessment: undefined });
+						navigate(location.pathname, {
+							replace: true,
+							state: {
+								passedAssessment: undefined,
+							},
+						});
 
 						setShowConfirmCancelModal(false);
 					} catch (error) {
@@ -192,7 +203,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 								</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
-										<Button as="div" variant="light" size="sm" className="mr-2">
+										<Button as="div" variant="light" size="sm" className="me-2">
 											view calendar
 										</Button>
 									</Link>
@@ -257,7 +268,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 							}}
 							text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
 						>
-							<Button className="p-3 ml-2">
+							<Button className="p-3 ms-2">
 								<ContentCopyIcon height={24} width={24} />
 							</Button>
 						</CopyToClipboard>

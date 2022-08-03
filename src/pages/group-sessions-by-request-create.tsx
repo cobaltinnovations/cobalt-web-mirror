@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useCallback, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -12,7 +12,6 @@ import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
-import fonts from '@/jss/fonts';
 import { imageUploader, groupSessionsService, CreateGroupSessionRequestRequestBody } from '@/lib/services';
 import ImageUpload from '@/components/image-upload';
 import useAlert from '@/hooks/use-alert';
@@ -22,6 +21,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import AsyncPage from '@/components/async-page';
+import { useCobaltTheme } from '@/jss/theme';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -46,11 +46,12 @@ const requiredFields = getRequiredYupFields<GroupSessionByRequestFormData>(group
 
 const GroupSessionsByRequestCreate: FC = () => {
 	const handleError = useHandleError();
+	const { fonts } = useCobaltTheme();
 	const { showAlert } = useAlert();
 	const { account } = useAccount();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);
 	const [sessionCropModalImageSource, setSessionCropModalImageSource] = useState('');
 	const [imagePreview, setImagePreview] = useState('');
@@ -121,9 +122,9 @@ const GroupSessionsByRequestCreate: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
-				history.push('/group-sessions/by-request');
+				navigate('/group-sessions/by-request');
 			} else {
-				history.push('/in-the-studio-thanks');
+				navigate('/in-the-studio-thanks');
 			}
 		} catch (error) {
 			handleError(error);
@@ -150,7 +151,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 			<Container className="pt-5 pb-32">
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-2 font-size-xl">
+						<h1 className="mb-2 fs-h3">
 							{initialValues?.title ? initialValues.title : 'create studio session by request'}
 						</h1>
 						<p className="mb-0 text-danger">Required*</p>
@@ -226,12 +227,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Facilitator</h5>
 
-												<Form.Label className="mb-2" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-2" style={{ ...fonts.default }}>
 													Are you the facilitator of this session?
 												</Form.Label>
 												<Form.Check
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="responsible-yes"
 													name="responsible"
 													label="Yes"
@@ -244,7 +244,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 												<Form.Check
 													className="mb-5"
 													type="radio"
-													bsPrefix="cobalt-modal-form__check"
 													id="responsible-no"
 													name="responsible"
 													label="No"
@@ -304,26 +303,27 @@ const GroupSessionsByRequestCreate: FC = () => {
 													error={touched.title && errors.title ? errors.title : ''}
 												/>
 
-												<Form.Label className="mb-1" style={{ ...fonts.xs }}>
+												<Form.Label className="mb-1" style={{ ...fonts.default }}>
 													Description {requiredFields.description && <span>*</span>}
 												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.xxs }}>
+												<p className="text-muted" style={{ ...fonts.small }}>
 													How would you like to describe your session? (This will be featured
 													on the Cobalt Platform, should be 2-3 sentences long, and should
 													highlight the benefit for participants).
 												</p>
-												<Wysiwyg
-													className={
-														touched.description && errors.description ? 'mb-2' : 'mb-5'
-													}
-													readOnly={false}
-													value={values.description}
-													onChange={(value) => {
-														setFieldValue('description', value);
+												<Field name="description">
+													{({ field, meta }: FieldProps) => {
+														return (
+															<Wysiwyg
+																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
+																initialValue={meta.initialValue}
+																onChange={field.onChange(field.name)}
+															/>
+														);
 													}}
-												/>
+												</Field>
 												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.xxs }}>
+													<p className="text-danger" style={{ ...fonts.small }}>
 														description is a required field
 													</p>
 												)}
@@ -363,7 +363,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Session Form Customization</h5>
 												<p className="mb-0">Our standard form asks for:</p>
-												<ul className="mb-0 pl-4 font-size-xs">
+												<ul className="mb-0 ps-4 fs-default">
 													<li>Name*</li>
 													<li>Email Address*</li>
 													<li>Phone Number</li>
@@ -382,7 +382,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 												<Form.Check
 													type="checkbox"
-													bsPrefix="cobalt-modal-form__check"
 													id="customQuestionOne"
 													name="customQuestionOne"
 													label="Custom Question 1"
@@ -393,7 +392,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 													}}
 												/>
 												{values.customQuestionOne && (
-													<div className="mt-2 mb-3 pl-6">
+													<div className="mt-2 mb-3 ps-6">
 														<InputHelper
 															label="Enter Question"
 															name="customQuestionOneDescription"
@@ -407,7 +406,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 												<Form.Check
 													type="checkbox"
-													bsPrefix="cobalt-modal-form__check"
 													id="customQuestionTwo"
 													name="customQuestionTwo"
 													label="Custom Question 2"
@@ -418,7 +416,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 													}}
 												/>
 												{values.customQuestionTwo && (
-													<div className="mt-2 pl-6">
+													<div className="mt-2 ps-6">
 														<InputHelper
 															label="Enter Question"
 															name="customQuestionTwoDescription"

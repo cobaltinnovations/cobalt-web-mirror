@@ -1,8 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -13,22 +12,22 @@ import QuickFilterDropdown from '@/components/quick-filter-dropdown';
 import { groupSessionsService } from '@/lib/services/group-sessions-service';
 import { GroupSessionRequestModel, GROUP_SESSION_STATUS_ID } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	filterIcon: {
 		marginRight: 10,
 		'& polyline, & polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
-});
+}));
 
 const GroupSessionsByRequest: FC = () => {
 	const classes = useStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	const [sizeOfPage] = useState(10);
@@ -68,7 +67,7 @@ const GroupSessionsByRequest: FC = () => {
 	}, [currentPageIndex, handleError, sizeOfPage, statusFilterValue]);
 
 	function handleAddGroupSessionOptionButtonClick() {
-		history.push('/group-sessions/by-request/create');
+		navigate('/group-sessions/by-request/create');
 	}
 
 	function handleStatusFilterChange(value: GROUP_SESSION_STATUS_ID | undefined) {
@@ -76,7 +75,7 @@ const GroupSessionsByRequest: FC = () => {
 	}
 
 	function handleSessionEditClicked(groupSessionRequestId: string) {
-		history.push(`/group-sessions/by-request/${groupSessionRequestId}/edit`);
+		navigate(`/group-sessions/by-request/${groupSessionRequestId}/edit`);
 	}
 
 	async function handleSessionActionClicked(
@@ -90,12 +89,16 @@ const GroupSessionsByRequest: FC = () => {
 		}
 
 		const sessionsClone = cloneDeep(sessions);
-		const replacementIndex = sessions.findIndex((session) => session.groupSessionRequestId === groupSessionRequestId);
+		const replacementIndex = sessions.findIndex(
+			(session) => session.groupSessionRequestId === groupSessionRequestId
+		);
 
 		setTableIsUpdating(true);
 
 		try {
-			const { groupSessionRequest } = await groupSessionsService.updateGroupSessionRequestStatusById(groupSessionRequestId, actionId).fetch();
+			const { groupSessionRequest } = await groupSessionsService
+				.updateGroupSessionRequestStatusById(groupSessionRequestId, actionId)
+				.fetch();
 
 			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
 				sessionsClone.splice(replacementIndex, 1);
@@ -125,7 +128,7 @@ const GroupSessionsByRequest: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">Quick Filters:</small>
+							<small className="mb-0 me-2 text-uppercase text-muted fw-bold">Quick Filters:</small>
 							<QuickFilterDropdown
 								active={!!statusFilterValue}
 								value={statusFilterValue}
@@ -149,7 +152,9 @@ const GroupSessionsByRequest: FC = () => {
 										label: 'Archived',
 									},
 								]}
-								onChange={(value) => handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)}
+								onChange={(value) =>
+									handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)
+								}
 							/>
 						</div>
 					</div>
@@ -194,7 +199,12 @@ const GroupSessionsByRequest: FC = () => {
 					</Table>
 					{sessions && sessions.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={sizeOfPage} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={sizeOfPage}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 					{(!sessions || sessions.length <= 0) && (
@@ -212,7 +222,9 @@ const GroupSessionsByRequest: FC = () => {
 									</Button>
 								</div>
 							)}
-							{!statusFilterValue && <p className="text-center">There are no studio session requests yet.</p>}
+							{!statusFilterValue && (
+								<p className="text-center">There are no studio session requests yet.</p>
+							)}
 						</>
 					)}
 				</Col>

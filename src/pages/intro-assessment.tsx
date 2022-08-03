@@ -1,13 +1,12 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
-import useQuery from '@/hooks/use-query';
 
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';
@@ -24,11 +23,12 @@ const IntroAssessment: FC = () => {
 	useHeaderTitle('assessment');
 
 	const handleError = useHandleError();
-	const history = useHistory<HistoryLocationState>();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const { account, setAccount } = useAccount();
-	const query = useQuery();
-	const questionId = query.get('questionId');
-	const sessionId = query.get('sessionId');
+	const [searchParams] = useSearchParams();
+	const questionId = searchParams.get('questionId');
+	const sessionId = searchParams.get('sessionId');
 
 	const [assessment, setAssessment] = useState<Assessment | undefined>();
 	const [answerChangedByUser, setAnswerChangedByUser] = useState<boolean>(false);
@@ -69,10 +69,8 @@ const IntroAssessment: FC = () => {
 				sessionId: assessment.sessionId,
 			});
 
-			history.push({
-				pathname: '/intro-assessment',
-				search: '?' + searchParams.toString(),
-				state: history.location.state,
+			navigate(`/intro-assessment?${searchParams.toString()}`, {
+				state: location.state,
 			});
 		} else {
 			if (account) {
@@ -83,20 +81,20 @@ const IntroAssessment: FC = () => {
 
 			const authRedirectUrl = Cookies.get('authRedirectUrl');
 
-			let redirectUrl = authRedirectUrl || history.location.state?.from || '/';
+			let redirectUrl = authRedirectUrl || (location.state as HistoryLocationState)?.from || '/';
 
-			history.push(redirectUrl);
+			navigate(redirectUrl);
 			Cookies.remove('authRedirectUrl');
 		}
-	}, [account, assessment, history, setAccount]);
+	}, [account, assessment, location.state, navigate, setAccount]);
 
 	const navigateBackwards = useCallback(() => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			history.push(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
+			navigate(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
 		}
-	}, [assessment, history]);
+	}, [assessment, navigate]);
 
 	// Need to use this as a sort of psuedo click handler for QUAD question types
 	useEffect(() => {
@@ -166,7 +164,11 @@ const IntroAssessment: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Form>
 							{assessment?.question && (
-								<SurveyQuestion key={assessment.question.questionId} question={assessment.question} onChange={handleSurveyQuestionChange} />
+								<SurveyQuestion
+									key={assessment.question.questionId}
+									question={assessment.question}
+									onChange={handleSurveyQuestionChange}
+								/>
 							)}
 							<div
 								className={classNames({

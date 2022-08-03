@@ -1,8 +1,8 @@
-import React, {FC, useEffect} from 'react';
-import {Collapse} from 'react-bootstrap';
-import {createUseStyles} from 'react-jss';
+import React, { FC, PropsWithChildren, useEffect } from 'react';
+import { Collapse } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
 
-import {ReactComponent as DownChevron} from '@/assets/icons/icon-chevron-down.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 
 interface AccordionStyleProps {
 	open: boolean;
@@ -26,7 +26,7 @@ const useAccordionStyles = createUseStyles({
 	}),
 });
 
-interface AccordionProps {
+interface AccordionProps extends PropsWithChildren {
 	title: string;
 	open: boolean;
 
@@ -36,11 +36,20 @@ interface AccordionProps {
 
 	onDidClose?(): void;
 
-	toggleClass?: string,
-	titleClass?: string,
+	toggleClass?: string;
+	titleClass?: string;
 }
 
-const Accordion: FC<AccordionProps> = ({title, open, onToggle, onDidOpen, onDidClose, titleClass, toggleClass, children}) => {
+const Accordion: FC<AccordionProps> = ({
+	title,
+	open,
+	onToggle,
+	onDidOpen,
+	onDidClose,
+	titleClass,
+	toggleClass,
+	children,
+}) => {
 	const classes = useAccordionStyles({
 		open,
 	});
@@ -56,8 +65,8 @@ const Accordion: FC<AccordionProps> = ({title, open, onToggle, onDidOpen, onDidC
 	return (
 		<>
 			<div className={`${classes.accordionToggle} ${toggleClass}`} onClick={onToggle}>
-				<span className={`d-block font-weight-bold ${titleClass}`}>{title}</span>
-				<DownChevron className={classes.chevronIcon}/>
+				<span className={`d-block font-heading-bold ${titleClass}`}>{title}</span>
+				<DownChevron className={classes.chevronIcon} />
 			</div>
 			<Collapse in={open}>
 				<div className="overflow-hidden">{children}</div>

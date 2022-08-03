@@ -1,20 +1,18 @@
 import React, { FC, useEffect, useState, Fragment, ComponentType, useMemo } from 'react';
 import { ModalProps, Modal, Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { createUseStyles } from 'react-jss';
 import { assessmentService } from '@/lib/services';
 import { uniq } from 'lodash';
 import classNames from 'classnames';
 import { PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 import Media from 'react-media';
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { screenWidths } from '@/jss/media-queries';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const usePersonalizeRecommendationsModalStyles = createUseStyles({
+const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) => ({
 	personalizeRecommendationModal: {
 		display: 'flex',
 		alignItems: 'flex-end',
@@ -27,12 +25,12 @@ const usePersonalizeRecommendationsModalStyles = createUseStyles({
 		},
 	},
 	modalTitle: {
-		...fonts.s,
-		...fonts.nunitoSansBold,
+		...theme.fonts.large,
+		...theme.fonts.headingBold,
 	},
 	clearLink: {
-		...fonts.xs,
-		...fonts.karlaBold,
+		...theme.fonts.default,
+		...theme.fonts.bodyBold,
 	},
 	closeIcon: {
 		marginRight: 25,
@@ -40,7 +38,7 @@ const usePersonalizeRecommendationsModalStyles = createUseStyles({
 		height: 14,
 		cursor: 'pointer',
 		'& polygon': {
-			fill: colors.black,
+			fill: theme.colors.n900,
 		},
 		'&:focus': {
 			outline: 'none',
@@ -52,11 +50,11 @@ const usePersonalizeRecommendationsModalStyles = createUseStyles({
 	},
 	modalFooter: {
 		height: 76,
-		borderTop: `1px solid ${colors.border}`,
+		borderTop: `1px solid ${theme.colors.border}`,
 	},
-});
+}));
 
-const useQuestionItemStyles = createUseStyles({
+const useQuestionItemStyles = createUseThemedStyles((theme) => ({
 	horizontalScroller: {
 		display: 'flex',
 		overflowX: 'scroll',
@@ -65,25 +63,25 @@ const useQuestionItemStyles = createUseStyles({
 	},
 	pill: {
 		margin: 5,
-		...fonts.xxs,
+		...theme.fonts.small,
 		borderRadius: 500,
 		appearance: 'none',
 		padding: '4px 12px',
 		whiteSpace: 'nowrap',
-		...fonts.karlaRegular,
+		...theme.fonts.bodyNormal,
 		textTransform: 'uppercase',
-		backgroundColor: colors.shadedPill,
-		border: `1px solid ${colors.dark}`,
+		backgroundColor: theme.colors.n100,
+		border: `1px solid ${theme.colors.border}`,
 		'&:focus': {
 			outline: 'none',
 		},
 	},
 	selectedPill: {
-		color: colors.white,
-		backgroundColor: colors.dark,
+		color: theme.colors.n0,
+		backgroundColor: theme.colors.n900,
 	},
 	borderBottom: {
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	item: {
 		padding: '10px 20px',
@@ -94,7 +92,7 @@ const useQuestionItemStyles = createUseStyles({
 	nestedItem: {
 		padding: '10px 34px',
 	},
-});
+}));
 
 interface PersonalizeRecommendationsModalProps extends ModalProps {
 	questions: PersonalizationQuestion[];
@@ -102,7 +100,12 @@ interface PersonalizeRecommendationsModalProps extends ModalProps {
 	onClose: (updatedChoices: Record<string, PersonalizationChoice['selectedAnswers']>) => void;
 }
 
-const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> = ({ questions, initialChoices, onClose, ...props }) => {
+const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> = ({
+	questions,
+	initialChoices,
+	onClose,
+	...props
+}) => {
 	const handleError = useHandleError();
 	const classes = usePersonalizeRecommendationsModalStyles();
 
@@ -179,7 +182,9 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 								let Komponent: ComponentType<PersonalizationQuestionProps> | null = null;
 
 								if (question.questionType === 'HORIZONTAL_CHECKBOX') {
-									Komponent = mq.isDesktop ? PersonalizationCheckbox : PersonalizationHorizontalCheckbox;
+									Komponent = mq.isDesktop
+										? PersonalizationCheckbox
+										: PersonalizationHorizontalCheckbox;
 								} else if (question.questionType === 'CHECKBOX') {
 									Komponent = PersonalizationCheckbox;
 								}
@@ -276,7 +281,9 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 
 	return (
 		<div
-			className={`${nested ? classes.nestedItem : ''} ${bottomBordered ? classes.borderBottom : ''} ${fullWidth ? classes.fullWidthItem : classes.item}`}
+			className={`${nested ? classes.nestedItem : ''} ${bottomBordered ? classes.borderBottom : ''} ${
+				fullWidth ? classes.fullWidthItem : classes.item
+			}`}
 		>
 			<p className={fullWidth ? 'px-9' : ''}>
 				<strong>{question.label}</strong>
@@ -289,7 +296,6 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 					<div key={answer.answerId} className={fullWidth ? `py-1 px-9 ${classes.borderBottom}` : ''}>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={answer.answerId}
 							name={answer.answerId}
 							label={answer.label}
@@ -304,7 +310,13 @@ export const PersonalizationCheckbox: FC<PersonalizationQuestionProps> = ({
 						/>
 
 						{answer.question && answerIsSelected && (
-							<PersonalizationCheckbox nested question={answer.question} choices={choices} onChange={onChange} bottomBordered={false} />
+							<PersonalizationCheckbox
+								nested
+								question={answer.question}
+								choices={choices}
+								onChange={onChange}
+								bottomBordered={false}
+							/>
 						)}
 					</div>
 				);

@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
 import useHeaderTitle from '@/hooks/use-header-title';
@@ -11,13 +11,13 @@ import ActionSheet from '@/components/action-sheet';
 
 import { groupEventService, groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
-import useQuery from '@/hooks/use-query';
+import InputHelper from '@/components/input-helper';
 
 const InTheStudio: FC = () => {
 	useHeaderTitle('In the Studio');
-	const query = useQuery();
-	const history = useHistory();
-	const groupEventUrlName = query.get('class') || '';
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
+	const groupEventUrlName = searchParams.get('class') || '';
 
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -54,27 +54,33 @@ const InTheStudio: FC = () => {
 			}, [] as typeof data);
 		}
 
-		const [{ externalGroupEventTypes }, { groupEvents }, { groupSessions }, { groupSessionRequests }] = await Promise.all([
-			groupEventService.fetchExternalGroupEventTypes({ urlName: groupEventUrlName }).fetch(),
-			groupEventService.fetchGroupEvents({ urlName: groupEventUrlName }).fetch(),
-			groupSessionsService
-				.getGroupSessions({
-					viewType: 'PATIENT',
-					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-					urlName: groupEventUrlName,
-				})
-				.fetch(),
-			groupSessionsService
-				.getGroupSessionRequests({
-					viewType: 'PATIENT',
-					groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					urlName: groupEventUrlName,
-				})
-				.fetch(),
-		]);
+		const [{ externalGroupEventTypes }, { groupEvents }, { groupSessions }, { groupSessionRequests }] =
+			await Promise.all([
+				groupEventService.fetchExternalGroupEventTypes({ urlName: groupEventUrlName }).fetch(),
+				groupEventService.fetchGroupEvents({ urlName: groupEventUrlName }).fetch(),
+				groupSessionsService
+					.getGroupSessions({
+						viewType: 'PATIENT',
+						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+						urlName: groupEventUrlName,
+					})
+					.fetch(),
+				groupSessionsService
+					.getGroupSessionRequests({
+						viewType: 'PATIENT',
+						groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						urlName: groupEventUrlName,
+					})
+					.fetch(),
+			]);
 
-		setEventList([...groupByUrlName(externalGroupEventTypes), ...groupEvents, ...groupByUrlName(groupSessionRequests), ...groupByUrlName(groupSessions)]);
+		setEventList([
+			...groupByUrlName(externalGroupEventTypes),
+			...groupEvents,
+			...groupByUrlName(groupSessionRequests),
+			...groupByUrlName(groupSessions),
+		]);
 	}, [groupEventUrlName]);
 
 	return (
@@ -92,7 +98,7 @@ const InTheStudio: FC = () => {
 					variant="secondary"
 					className="d-block w-100 mb-2"
 					onClick={() => {
-						history.push('/group-sessions/scheduled/create');
+						navigate('/group-sessions/scheduled/create');
 					}}
 				>
 					offer session at a set time
@@ -101,7 +107,7 @@ const InTheStudio: FC = () => {
 					variant="primary"
 					className="d-block w-100"
 					onClick={() => {
-						history.push('/group-sessions/by-request/create');
+						navigate('/group-sessions/by-request/create');
 					}}
 				>
 					make session available by request
@@ -111,9 +117,9 @@ const InTheStudio: FC = () => {
 			<Container className="pt-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form.Control
+						<InputHelper
 							type="search"
-							placeholder="Find a Studio Session"
+							label="Find a Studio Session"
 							className="mb-5"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,14 +177,19 @@ const InTheStudio: FC = () => {
 
 							return (
 								<Col md={6} lg={4} key={groupEvent.groupEventId}>
-									<Link className="mb-2 d-block text-decoration-none" to={`/in-the-studio/${groupEvent.groupEventId}`}>
+									<Link
+										className="mb-2 d-block text-decoration-none"
+										to={`/in-the-studio/${groupEvent.groupEventId}`}
+									>
 										<StudioEvent groupEvent={groupEvent} />
 									</Link>
 								</Col>
 							);
 						})
 					) : (
-						<p className="text-center mb-0">{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}</p>
+						<p className="text-center mb-0">
+							{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}
+						</p>
 					)}
 				</Row>
 			</Container>

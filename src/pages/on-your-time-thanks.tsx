@@ -1,17 +1,16 @@
-import colors from '@/jss/colors';
+import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	thankYouCard: {
 		border: 0,
 		borderRadius: 0,
 		textAlign: 'center',
 		padding: '40px 40px 70px',
-		borderTop: `20px solid ${colors.success}`,
+		borderTop: `20px solid ${theme.colors.s500}`,
 	},
-});
+}));
 
 const OnYourTimeThanks: FC = () => {
 	const classes = useStyles();

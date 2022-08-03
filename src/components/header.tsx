@@ -1,8 +1,5 @@
 import React, { FC, useState, useContext, useRef, useEffect, useCallback } from 'react';
-import { createUseStyles } from 'react-jss';
-
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { Button } from 'react-bootstrap';
 
 import { HeaderContext } from '@/contexts/header-context';
 
@@ -12,23 +9,9 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const headerButton = {
-	top: '50%',
-	width: 64,
-	height: 54,
-	display: 'flex',
-	cursor: 'pointer',
-	position: 'absolute',
-	alignItems: 'center',
-	justifyContent: 'center',
-	transform: 'translateY(-50%)',
-	'&:hover': {
-		backgroundColor: 'rgba(255,255,255,0.12)',
-	},
-};
-
-const useHeaderStyles = createUseStyles({
+const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
 		top: 0,
 		left: 0,
@@ -39,47 +22,53 @@ const useHeaderStyles = createUseStyles({
 		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: colors.primary,
+		backgroundColor: theme.colors.n0,
 	},
 	headerTitle: {
-		...fonts.m,
+		...theme.fonts.large,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: colors.white,
+		color: theme.colors.p500,
 		whiteSpace: 'nowrap',
-		...fonts.nunitoSansBold,
+		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},
 	menuButton: {
-		...headerButton,
 		left: 0,
+		top: '50%',
+		width: 64,
+		height: 54,
+		display: 'flex',
+		cursor: 'pointer',
+		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'center',
+		transform: 'translateY(-50%)',
+		'&:hover': {
+			backgroundColor: 'rgba(255,255,255,0.12)',
+		},
 	},
 	inCrisisButton: {
-		...headerButton,
-		right: 0,
-		width: 80,
-		paddingTop: 1,
-		color: colors.white,
-		whiteSpace: 'nowrap',
-		flexDirection: 'column',
-		'& small': {
-			fontSize: '1.2rem',
-			lineHeight: '1.2rem',
-		},
+		right: 20,
+		top: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		position: 'absolute',
+		transform: 'translateY(-50%)',
 	},
 	menuIcon: {
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.p500,
 		},
 	},
 	crisisIcon: {
-		marginBottom: 3,
+		marginRight: 4,
 		'& path': {
-			fill: colors.white,
+			fill: theme.colors.p500,
 		},
 	},
-});
+}));
 
 interface HeaderProps {
 	showHeaderButtons?: boolean;
@@ -151,10 +140,10 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				)}
 				<div className={classes.headerTitle}>{title}</div>
 				{showHeaderButtons && (
-					<div tabIndex={0} className={classes.inCrisisButton} onClick={handleInCrisisButtonClick}>
+					<Button className={classes.inCrisisButton} size="sm" onClick={handleInCrisisButtonClick}>
 						<CrisisIcon className={classes.crisisIcon} />
-						<small className="font-karla-bold">In Crisis?</small>
-					</div>
+						<small className="fw-bold">In Crisis?</small>
+					</Button>
 				)}
 			</header>
 		</>

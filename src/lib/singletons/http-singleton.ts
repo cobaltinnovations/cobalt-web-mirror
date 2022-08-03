@@ -8,6 +8,7 @@ export const httpSingleton = new HttpClient({
 	baseUrl: config.COBALT_WEB_API_BASE_URL,
 	defaultHeaders: {
 		'Content-Type': 'application/json',
+		'X-Cobalt-Webapp-Base-Url': window.location.origin,
 	},
 	tokenHeaderKey: 'X-Cobalt-Access-Token',
 	getToken: () => {

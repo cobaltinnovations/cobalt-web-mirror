@@ -1,13 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Dropdown, FormCheck } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import FilterPill from '@/components/filter-pill';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	quickFilterToggle: {
 		'&:after': {
 			display: 'none !important',
@@ -17,14 +15,14 @@ const useStyles = createUseStyles({
 		width: 284,
 		borderRadius: 0,
 		padding: '24px 0 20px',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 	},
 	quickFilterHeader: {
-		...fonts.s,
+		...theme.fonts.large,
 		marginBottom: 15,
 		padding: '0 24px',
-		color: colors.dark,
-		...fonts.nunitoSansBold,
+		color: theme.colors.n900,
+		...theme.fonts.headingBold,
 	},
 	quickFilterItem: {
 		display: 'flex',
@@ -37,9 +35,9 @@ const useStyles = createUseStyles({
 			whiteSpace: 'pre-wrap',
 		},
 	},
-});
+}));
 
-interface QuickFilterToggleProps {
+interface QuickFilterToggleProps extends PropsWithChildren {
 	id: string;
 	active: boolean;
 	className?: string;
@@ -64,7 +62,7 @@ const QuickFilterToggle = React.forwardRef<HTMLButtonElement, QuickFilterToggleP
 	}
 );
 
-interface QuickFilterMenuProps {
+interface QuickFilterMenuProps extends PropsWithChildren {
 	style?: any;
 	className?: string;
 	'aria-labelledby'?: string;
@@ -99,7 +97,7 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 	const classes = useStyles();
 
 	return (
-		<Dropdown drop="down">
+		<Dropdown drop="down" onSelect={onChange}>
 			<Dropdown.Toggle as={QuickFilterToggle} id={id} className={classes.quickFilterToggle} active={active}>
 				{title}
 			</Dropdown.Toggle>
@@ -110,7 +108,6 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 						<Dropdown.Item
 							key={`${item.value}-${index}`}
 							eventKey={item.value}
-							onSelect={onChange}
 							className={classes.quickFilterItem}
 						>
 							<div
@@ -125,9 +122,8 @@ const QuickFilterDropdown: FC<QuickFilterDropdownProps> = ({ id, active, title, 
 										// the "onSelect" of the Dropdown.Item
 										return;
 									}}
-									bsPrefix="cobalt-modal-form__check"
 								/>
-								<span className="font-size-xs text-muted">{item.count}</span>
+								<span className="fs-default text-muted">{item.count}</span>
 							</div>
 						</Dropdown.Item>
 					);

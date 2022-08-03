@@ -14,11 +14,16 @@ const useStyles = createUseStyles({
 
 interface FilterSpecialtyModalProps extends ModalProps {
 	specialties: Specialty[];
-	selectedSpecialties: string[]
+	selectedSpecialties: string[];
 	onSave(selectedSpecialties: string[]): void;
 }
 
-const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, selectedSpecialties, onSave, ...props }) => {
+const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
+	specialties,
+	selectedSpecialties,
+	onSave,
+	...props
+}) => {
 	const classes = useStyles();
 	const [internalSelectedSpecialties, setInternalSelectedSpecialties] = useState<string[]>([]);
 
@@ -30,8 +35,8 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, sele
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">focus</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>focus</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{specialties.map((specialty) => {
@@ -39,16 +44,20 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, sele
 						<Form.Check
 							key={specialty.specialtyId}
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							id={specialty.specialtyId}
 							name={specialty.specialtyId}
 							label={specialty.description}
 							checked={internalSelectedSpecialties.includes(specialty.specialtyId)}
 							onChange={(event) => {
 								if (event.currentTarget.checked) {
-									setInternalSelectedSpecialties([...internalSelectedSpecialties, specialty.specialtyId]);
+									setInternalSelectedSpecialties([
+										...internalSelectedSpecialties,
+										specialty.specialtyId,
+									]);
 								} else {
-									setInternalSelectedSpecialties(internalSelectedSpecialties.filter((s) => s !== specialty.specialtyId))
+									setInternalSelectedSpecialties(
+										internalSelectedSpecialties.filter((s) => s !== specialty.specialtyId)
+									);
 								}
 							}}
 						/>
@@ -56,12 +65,14 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, sele
 				})}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button variant="primary" size="sm" onClick={() => onSave(internalSelectedSpecialties)}>
-					save
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button className="ms-2" variant="primary" onClick={() => onSave(internalSelectedSpecialties)}>
+						save
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);

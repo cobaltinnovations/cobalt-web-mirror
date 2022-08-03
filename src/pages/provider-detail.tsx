@@ -4,17 +4,16 @@ import Breadcrumb from '@/components/breadcrumb';
 import DayContainer from '@/components/day-container';
 import { ProviderInfoCard } from '@/components/provider-info-card';
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
-import colors from '@/jss/colors';
 import mediaQueries from '@/jss/media-queries';
+import { createUseThemedStyles } from '@/jss/theme';
 import { providerService } from '@/lib/services';
 import { Scrollspy } from '@makotot/ghostui';
 import classNames from 'classnames';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import { useParams } from 'react-router-dom';
 
-const useProviderDetailStyles = createUseStyles({
+const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 	horizontalScroller: {
 		marginTop: 10,
 		display: 'flex',
@@ -62,7 +61,7 @@ const useProviderDetailStyles = createUseStyles({
 			backgroundColor: 'transparent',
 		},
 		'& a': {
-			color: colors.gray600,
+			color: theme.colors.n500,
 			textDecoration: 'none',
 		},
 	},
@@ -80,14 +79,14 @@ const useProviderDetailStyles = createUseStyles({
 	},
 	activeNav: {
 		'&:after': {
-			backgroundColor: colors.primary,
+			backgroundColor: theme.colors.p500,
 		},
 		'& a': {
-			color: colors.black,
+			color: theme.colors.n900,
 			textDecoration: 'none',
 		},
 	},
-});
+}));
 
 const ProviderDetail = () => {
 	const classes = useProviderDetailStyles();
@@ -134,6 +133,10 @@ const ProviderDetail = () => {
 	}, []);
 
 	const fetchData = useCallback(() => {
+		if (!providerId) {
+			return;
+		}
+
 		const findRequest = providerService.findProviders({ providerId });
 		const providerRequest = providerService.getProviderById(providerId);
 
@@ -213,28 +216,28 @@ const ProviderDetail = () => {
 											>
 												<ul className={classes.navbar}>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 0,
 														})}
 													>
 														<a href="#about">About</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 1,
 														})}
 													>
 														<a href="#specialties">Focus</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 2,
 														})}
 													>
 														<a href="#payment">Payment</a>
 													</li>
 													<li
-														className={classNames('ml-2 py-2', classes.navItem, {
+														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 3,
 														})}
 													>
@@ -314,7 +317,7 @@ const ProviderDetail = () => {
 													return (
 														<div key={section.date}>
 															<DayContainer className="mb-4">
-																<p className="mb-0 font-karla-bold">
+																<p className="mb-0 fw-bold">
 																	{section.dateDescription}
 																</p>
 															</DayContainer>
@@ -333,7 +336,7 @@ const ProviderDetail = () => {
 																			}
 																			className={classNames(
 																				`${classes.availabilityButton}`,
-																				'mr-1',
+																				'me-1',
 																				'mb-1'
 																			)}
 																			disabled={
@@ -343,8 +346,7 @@ const ProviderDetail = () => {
 																			onClick={() => {
 																				bookingRef.current?.kickoffBookingProcess(
 																					{
-																						source:
-																							BookingSource.ProviderDetail,
+																						source: BookingSource.ProviderDetail,
 																						timeSlot: availability,
 																						date: section.date,
 																						provider: sectionProvider,

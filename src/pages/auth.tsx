@@ -1,15 +1,13 @@
 import React, { FC, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
 import useAccount from '@/hooks/use-account';
-import useQuery from '@/hooks/use-query';
 
 import Loader from '@/components/loader';
 
 import { accountService } from '@/lib/services';
-import { isPicMhicAccount } from './pic/utils';
 
 type DecodedAccessToken = {
 	sub: string;
@@ -18,34 +16,28 @@ type DecodedAccessToken = {
 
 const Auth: FC = () => {
 	const { account, setAccount, setInstitution } = useAccount();
-	const history = useHistory();
-	const query = useQuery();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 
-	const accessTokenFromQuery = query.get('accessToken');
+	const accessTokenFromQuery = searchParams.get('accessToken');
 
 	const successfulAuthRedirect = useCallback(() => {
 		const authRedirectUrl = Cookies.get('authRedirectUrl');
 
-		if (authRedirectUrl) {
-			return history.replace(authRedirectUrl);
-		}
-
-		const defaultRedirectUrl = account && isPicMhicAccount(account) ? '/pic/mhic' : '/';
-
-		return history.replace(defaultRedirectUrl);
-	}, [history, account]);
+		return navigate(authRedirectUrl || '/', { replace: true });
+	}, [navigate]);
 
 	const fetchAccount = useCallback(
-		async (accountId) => {
+		async (accountId: string) => {
 			try {
 				const response = await accountService.account(accountId).fetch();
 				setAccount(response.account);
 				setInstitution(response.institution);
 			} catch (error) {
-				return history.replace('/sign-in');
+				return navigate('/sign-in', { replace: true });
 			}
 		},
-		[history, setAccount, setInstitution]
+		[navigate, setAccount, setInstitution]
 	);
 
 	useEffect(() => {
@@ -65,11 +57,11 @@ const Auth: FC = () => {
 		} else if (accessTokenFromCookie) {
 			decodedAccessToken = jwtDecode(accessTokenFromCookie) as DecodedAccessToken;
 		} else {
-			return history.replace('/sign-in');
+			return navigate('/sign-in', { replace: true });
 		}
 
 		fetchAccount(decodedAccessToken.sub);
-	}, [accessTokenFromQuery, account, fetchAccount, history, successfulAuthRedirect]);
+	}, [accessTokenFromQuery, account, fetchAccount, navigate, successfulAuthRedirect]);
 
 	return <Loader />;
 };

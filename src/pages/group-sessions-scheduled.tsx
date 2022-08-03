@@ -1,8 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 
@@ -13,22 +12,22 @@ import SessionRow from '@/components/session-row';
 import { groupSessionsService } from '@/lib/services/group-sessions-service';
 import { GroupSessionModel, GROUP_SESSION_STATUS_ID, GroupSessionCountModel } from '@/lib/models';
 
-import colors from '@/jss/colors';
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	filterIcon: {
 		marginRight: 10,
 		'& polyline, & polygon': {
-			fill: colors.gray600,
+			fill: theme.colors.n500,
 		},
 	},
-});
+}));
 
 const GroupSessions: FC = () => {
 	const classes = useStyles();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	const [sizeOfPage] = useState(10);
@@ -73,7 +72,7 @@ const GroupSessions: FC = () => {
 	}, [currentPageIndex, handleError, sizeOfPage, statusFilterValue]);
 
 	function handleAddGroupSessionButtonClick() {
-		history.push('/group-sessions/scheduled/create');
+		navigate('/group-sessions/scheduled/create');
 	}
 
 	function handleStatusFilterChange(value: GROUP_SESSION_STATUS_ID | undefined) {
@@ -82,15 +81,15 @@ const GroupSessions: FC = () => {
 	}
 
 	function handleSessionEditClicked(groupSessionId: string) {
-		history.push(`/group-sessions/scheduled/${groupSessionId}/edit`);
+		navigate(`/group-sessions/scheduled/${groupSessionId}/edit`);
 	}
 
 	function handleSessionViewClicked(groupSessionId: string) {
-		history.push(`/group-sessions/scheduled/${groupSessionId}/view`);
+		navigate(`/group-sessions/scheduled/${groupSessionId}/view`);
 	}
 
 	function handleSessionCreateCopyClicked(groupSessionId: string) {
-		history.push(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
+		navigate(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
 	}
 
 	async function handleSessionActionClicked(
@@ -115,7 +114,9 @@ const GroupSessions: FC = () => {
 		setTableIsUpdating(true);
 
 		try {
-			const { groupSession } = await groupSessionsService.updateGroupSessionStatusById(groupSessionId, actionId).fetch();
+			const { groupSession } = await groupSessionsService
+				.updateGroupSessionStatusById(groupSessionId, actionId)
+				.fetch();
 			const { groupSessionCounts } = await groupSessionsService.getGroupSessionCounts().fetch();
 
 			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
@@ -147,7 +148,7 @@ const GroupSessions: FC = () => {
 						</Button>
 						<div className="d-flex align-items-center justify-content-center">
 							<FilterIcon className={classes.filterIcon} />
-							<small className="mb-0 mr-2 text-uppercase text-muted font-karla-bold">Quick Filters:</small>
+							<small className="mb-0 me-2 text-uppercase text-muted fw-bold">Quick Filters:</small>
 							<QuickFilterDropdown
 								active={!!statusFilterValue}
 								value={statusFilterValue}
@@ -161,25 +162,39 @@ const GroupSessions: FC = () => {
 									{
 										value: GROUP_SESSION_STATUS_ID.NEW,
 										label: 'New',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.NEW),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.NEW
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.ADDED,
 										label: 'Live',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.ADDED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.ADDED
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.ARCHIVED,
 										label: 'Archived',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.ARCHIVED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.ARCHIVED
+										),
 									},
 									{
 										value: GROUP_SESSION_STATUS_ID.CANCELED,
 										label: 'Canceled',
-										count: groupSessionsService.getGroupSessionCountByStatusId(sessionCounts, GROUP_SESSION_STATUS_ID.CANCELED),
+										count: groupSessionsService.getGroupSessionCountByStatusId(
+											sessionCounts,
+											GROUP_SESSION_STATUS_ID.CANCELED
+										),
 									},
 								]}
-								onChange={(value) => handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)}
+								onChange={(value) =>
+									handleStatusFilterChange(value as GROUP_SESSION_STATUS_ID | undefined)
+								}
 							/>
 						</div>
 					</div>
@@ -227,7 +242,12 @@ const GroupSessions: FC = () => {
 					</Table>
 					{sessions && sessions.length > 0 && (
 						<div className="d-flex justify-content-center">
-							<TablePagination total={totalNumberOfItems} page={currentPageIndex} size={sizeOfPage} onClick={handlePaginationClick} />
+							<TablePagination
+								total={totalNumberOfItems}
+								page={currentPageIndex}
+								size={sizeOfPage}
+								onClick={handlePaginationClick}
+							/>
 						</div>
 					)}
 					{(!sessions || sessions.length <= 0) && (
@@ -246,7 +266,9 @@ const GroupSessions: FC = () => {
 									</Button>
 								</div>
 							)}
-							{!statusFilterValue && <p className="text-center">There are no scheduled studio sessions yet.</p>}
+							{!statusFilterValue && (
+								<p className="text-center">There are no scheduled studio sessions yet.</p>
+							)}
 						</>
 					)}
 				</Col>

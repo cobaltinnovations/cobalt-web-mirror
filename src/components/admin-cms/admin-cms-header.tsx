@@ -1,19 +1,13 @@
-import React, { FC, useState, useContext, useRef, useEffect, useCallback } from 'react';
-import { createUseStyles } from 'react-jss';
+import React, { FC, useContext } from 'react';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { createUseThemedStyles } from '@/jss/theme';
 
 import { HeaderContext } from '@/contexts/header-context';
 
-import Menu from '@/components/menu';
-import useAccount from '@/hooks/use-account';
-import Container from 'react-bootstrap/Container';
 import { ReactComponent as CobaltLogo } from '@/assets/logos/logo-icon.svg';
-import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const useHeaderStyles = createUseStyles({
+const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
 		top: 0,
 		left: 0,
@@ -22,9 +16,9 @@ const useHeaderStyles = createUseStyles({
 		height: '82px',
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: colors.white,
+		backgroundColor: theme.colors.n0,
 		justifyContent: 'space-between',
-		borderBottom: `1px solid ${colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	logoOuter: {
 		width: 270,
@@ -33,7 +27,7 @@ const useHeaderStyles = createUseStyles({
 		display: 'flex',
 		padding: '0 30px',
 		alignItems: 'center',
-		borderRight: `1px solid ${colors.border}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	titleOuter: {
 		flex: 1,
@@ -44,8 +38,8 @@ const useHeaderStyles = createUseStyles({
 		justifyContent: 'space-between',
 	},
 	link: {
-		...fonts.xl,
-		color: colors.primary,
+		...theme.fonts.h3,
+		color: theme.colors.p500,
 		letterSpacing: 4,
 		textDecoration: 'none',
 		fontWeight: 'normal',
@@ -55,12 +49,12 @@ const useHeaderStyles = createUseStyles({
 	},
 	headerTitle: {
 		margin: 0,
-		...fonts.xl,
+		...theme.fonts.h3,
 		overflow: 'hidden',
 		textAlign: 'center',
-		color: colors.dark,
+		color: theme.colors.n900,
 		whiteSpace: 'nowrap',
-		...fonts.nunitoSansBold,
+		...theme.fonts.headingBold,
 		textOverflow: 'ellipsis',
 		maxWidth: 'calc(100% - 160px)',
 	},
@@ -76,13 +70,12 @@ const useHeaderStyles = createUseStyles({
 		marginRight: 8,
 		marginTop: -2,
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
-});
+}));
 
 const AdminCmsHeader: FC = () => {
-	const { account } = useAccount();
 	const headerContext = useContext(HeaderContext);
 	const classes = useHeaderStyles();
 

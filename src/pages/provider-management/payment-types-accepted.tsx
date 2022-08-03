@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -21,14 +21,12 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 					<Form onSubmit={handleSubmit}>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							name="payment-types-accepted"
 							id="payment-types-accepted--free-of-charge"
 							label="Free of charge"
 						/>
 						<Form.Check
 							type="checkbox"
-							bsPrefix="cobalt-modal-form__check"
 							name="payment-types-accepted"
 							id="payment-types-accepted--out-of-pocket"
 							label="Out of poacket"
@@ -38,7 +36,7 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 							<Button
 								variant="outline-primary"
 								onClick={() => {
-									history.goBack();
+									navigate(-1);
 								}}
 							>
 								back

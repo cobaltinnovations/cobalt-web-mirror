@@ -1,23 +1,22 @@
 import React, { FC, Dispatch, SetStateAction, useState, useCallback, useRef } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container } from 'react-bootstrap';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import BackgroundImageContainer from '@/components/background-image-container';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { providerService } from '@/lib/services';
 import { SearchResult } from '@/contexts/booking-context';
 import { Provider, Clinic } from '@/lib/models';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 import classNames from 'classnames';
 import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useSearchBarStyles = createUseStyles({
+const useSearchBarStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
 		left: 0,
 		top: '50%',
-		fill: colors.dark,
+		fill: theme.colors.n900,
 		position: 'absolute',
 		transform: 'translateY(-50%)',
 	},
@@ -25,9 +24,9 @@ const useSearchBarStyles = createUseStyles({
 		flexShrink: 0,
 		opacity: 0.32,
 		cursor: 'pointer',
-		fill: colors.dark,
+		fill: theme.colors.n900,
 	},
-});
+}));
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -48,14 +47,6 @@ const mapClinicToResult = (clinic: Clinic): SearchResult => ({
 	displayName: clinic.description,
 });
 
-// double:
-interface HistoryLocationState {
-	skipAssessment?: boolean;
-	successBooking?: boolean;
-	routedClinicIds?: string[];
-	routedProviderId?: string;
-}
-
 interface AppointmentSearchBarProps {
 	recentProviders: SearchResult[];
 	selectedSearchResult: SearchResult[]; // selectedSearchResult
@@ -66,14 +57,15 @@ interface AppointmentSearchBarProps {
 
 const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 	const classes = useSearchBarStyles();
-	const history = useHistory<HistoryLocationState>();
+	const location = useLocation();
+	const navigate = useNavigate();
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const typeAheadRef = useRef<any>(null);
 
-	const searchProviders = useCallback(async (query) => {
+	const searchProviders = useCallback(async (query: string) => {
 		setIsSearching(true);
 
 		try {
@@ -84,7 +76,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 				})
 			);
 		} catch (e) {
-			alert(e.message);
+			alert((e as any).message);
 		}
 
 		setIsSearching(false);
@@ -98,10 +90,10 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 			props.setSelectedSearchResult([]);
 			props.setProviderFilter(undefined);
 			props.setClinicsFilter([]);
-			const params = new URLSearchParams(history.location.search);
+			const params = new URLSearchParams(location.search);
 			params.delete('providerId');
 			params.delete('clinicId');
-			history.push(`/connect-with-support?${params.toString()}`, history.location.state);
+			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
 		}
 	}
 
@@ -130,14 +122,15 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 							}}
 							onInputChange={setSearchQuery}
 							onChange={(selectedOptions) => {
-								props.setSelectedSearchResult(selectedOptions);
+								props.setSelectedSearchResult(selectedOptions as SearchResult[]);
 								(typeAheadRef.current as any).blur();
 							}}
 							options={searchQuery ? searchResults : props.recentProviders}
 							selected={props.selectedSearchResult}
-							renderMenu={(results, menuProps) => {
+							renderMenu={(options, menuProps) => {
+								const results = options as SearchResult[];
 								if (!searchQuery && props.recentProviders.length === 0) {
-									return null;
+									return <></>;
 								}
 
 								return (
@@ -159,7 +152,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 															imageUrl={result.imageUrl}
 															size={43}
 														/>
-														<div className="ml-3">
+														<div className="ms-3">
 															<p className="mb-0">{result.displayName}</p>
 															{result.description && <small>{result.description}</small>}
 														</div>

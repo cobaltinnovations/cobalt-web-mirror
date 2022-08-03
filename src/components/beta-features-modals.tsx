@@ -13,11 +13,11 @@ const useBetaFeaturesModalStyles = createUseStyles({
 	},
 });
 
-interface BetaFeatureModal extends ModalProps {
+interface BetaFeatureModalProps extends ModalProps {
 	contactEmail?: string;
 }
 
-export const BetaFeatureModal: FC<BetaFeatureModal> = (props) => {
+export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
 	const classes = useBetaFeaturesModalStyles();
 
 	return (
@@ -37,11 +37,11 @@ export const BetaFeatureModal: FC<BetaFeatureModal> = (props) => {
 	);
 };
 
-interface BetaFeatureAlertModal extends ModalProps {
+interface BetaFeatureAlertModalProps extends ModalProps {
 	betaFeatureId: BetaFeatureId;
 }
 
-export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
+export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => {
 	const classes = useBetaFeaturesModalStyles();
 	const { account } = useAccount();
 	const [selection, setSelection] = useState<'yes' | 'no' | 'yesAlert'>('yes');
@@ -54,18 +54,26 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
 		try {
 			selection === 'yesAlert'
 				? await Promise.all([
-						accountService.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, BetaStatusId.ENABLED).fetch(),
+						accountService
+							.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, BetaStatusId.ENABLED)
+							.fetch(),
 
 						accountService.updateBetaStatus(account.accountId, BetaStatusId.ENABLED).fetch(),
 				  ])
 				: await accountService
-						.updateBetaFeatureAlert(account.accountId, props.betaFeatureId, selection === 'no' ? BetaStatusId.DISABLED : BetaStatusId.ENABLED)
+						.updateBetaFeatureAlert(
+							account.accountId,
+							props.betaFeatureId,
+							selection === 'no' ? BetaStatusId.DISABLED : BetaStatusId.ENABLED
+						)
 						.fetch();
 		} catch (e) {
 			// do nothing
 		}
 
-		props.onHide();
+		if (props.onHide) {
+			props.onHide();
+		}
 	};
 
 	return (
@@ -78,7 +86,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
 					<p>Would you like to hear from us when this feature is ready?</p>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert1"
 						name="betaAlert"
 						label="Yes"
@@ -87,7 +94,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert2"
 						name="betaAlert"
 						label="No"
@@ -96,7 +102,6 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModal> = (props) => {
 					/>
 					<Form.Check
 						type="radio"
-						bsPrefix="cobalt-modal-form__check"
 						id="betaAlert3"
 						name="betaAlert"
 						label="Yes, and please include me as a beta user for new feature releases"

@@ -1,23 +1,20 @@
 import React, { ReactElement } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 
-import colors from '@/jss/colors';
 import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
 		'& path': {
-			fill: colors.primary,
+			fill: theme.colors.p500,
 		},
 	},
-});
+}));
 
 const DownForMaintenance = (): ReactElement => {
 	const classes = useStyles();
-	const { t } = useTranslation();
 
 	return (
 		<Container className="pt-20">
@@ -27,34 +24,39 @@ const DownForMaintenance = (): ReactElement => {
 						<LogoIconText className={classes.logoIconText} />
 					</div>
 
-					<p className="mb-2 text-center font-size-m">
-						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be back online shortly.
+					<p className="mb-2 text-center fs-large">
+						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be
+						back online shortly.
 					</p>
-					<p className="mb-8 text-center font-size-m">If you need immediate help, please contact one of the following numbers:</p>
+					<p className="mb-8 text-center fs-large">
+						If you need immediate help, please contact one of the following numbers:
+					</p>
 
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:911">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.call911Prompt')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.call911Subtext')}</span>
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
+							<span className="d-block mb-2">Call 911</span>
+							<span className="d-block font-heading-normal">24/7 emergency</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:8007238255">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.callSuicideHotline')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.callSuicideHotlineSubtext')}</span>
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
+							<span className="d-block mb-2">Call 800-273-8255</span>
+							<span className="d-block font-heading-normal">24/7 National suicide prevention line</span>
 						</div>
 					</Button>
 					<Button variant="primary" className="mb-4 w-100 d-flex align-items-center" href="tel:741741">
-						<PhoneIcon className="mr-4" />
-						<div className="font-size-s">
-							<span className="d-block mb-2">{t('inCrisisResources.textLine')}</span>
-							<span className="d-block font-weight-regular">{t('inCrisisResources.textLineSubtext')}</span>
+						<PhoneIcon className="me-4" />
+						<div className="fs-large">
+							<span className="d-block mb-2">Text 741 741</span>
+							<span className="d-block font-heading-normal">24/7 Crisis Text Line</span>
 						</div>
 					</Button>
 
-					<p className="text-center font-size-m font-weight-bold">{t('inCrisisResources.orOption')}</p>
+					<p className="text-center fs-large font-heading-bold">
+						or go to your nearest emergency department or crisis center
+					</p>
 				</Col>
 			</Row>
 		</Container>

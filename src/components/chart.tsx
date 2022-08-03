@@ -5,8 +5,7 @@ import Color from 'color';
 
 import { Chart as ChartModel } from '@/lib/models';
 
-import colors from '@/jss/colors';
-import fonts from '@/jss/fonts';
+import { useCobaltTheme } from '@/jss/theme';
 
 interface Dataset {
 	id: string;
@@ -36,6 +35,7 @@ interface Dataset {
 }
 
 export const Chart: FC<Props> = ({ configuration }) => {
+	const { colors, fonts } = useCobaltTheme();
 	const [labels, setLabels] = useState<string[]>([]);
 	const [datasets, setDatasets] = useState<Dataset[]>([]);
 
@@ -78,10 +78,10 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				labels: {
 					boxWidth: 6,
 					boxHeight: 6,
-					color: colors.dark,
+					color: colors.n900,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -90,16 +90,16 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				},
 			},
 			tooltip: {
-				backgroundColor: colors.dark,
-				bodyFontColor: colors.white,
+				backgroundColor: colors.n900,
+				bodyFontColor: colors.n0,
 				titleFont: {
-					family: fonts.karlaRegular.fontFamily,
-					weight: fonts.karlaRegular.fontWeight,
+					family: fonts.bodyNormal.fontFamily,
+					weight: fonts.bodyNormal.fontWeight,
 					size: 12,
 				},
 				bodyFont: {
-					family: fonts.karlaRegular.fontFamily,
-					weight: fonts.karlaRegular.fontWeight,
+					family: fonts.bodyNormal.fontFamily,
+					weight: fonts.bodyNormal.fontWeight,
 					size: 12,
 				},
 				callbacks: {
@@ -126,7 +126,7 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				hitRadius: 15,
 				hoverRadius: 5,
 				hoverBorderWidth: 2,
-				hoverBackgroundColor: colors.white,
+				hoverBackgroundColor: colors.n0,
 			},
 			line: {
 				tension: 0,
@@ -144,11 +144,11 @@ export const Chart: FC<Props> = ({ configuration }) => {
 					borderColor: colors.border,
 				},
 				ticks: {
-					color: colors.dark,
+					color: colors.n900,
 					padding: 5,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -171,10 +171,10 @@ export const Chart: FC<Props> = ({ configuration }) => {
 				},
 				ticks: {
 					padding: 20,
-					color: colors.dark,
+					color: colors.n900,
 					font: {
-						family: fonts.karlaRegular.fontFamily,
-						weight: fonts.karlaRegular.fontWeight,
+						family: fonts.bodyNormal.fontFamily,
+						weight: fonts.bodyNormal.fontWeight,
 						size: 11,
 						lineHeight: '14px',
 					},
@@ -217,9 +217,11 @@ export const Chart: FC<Props> = ({ configuration }) => {
 			</Card.Header>
 			<Card.Body>
 				{configuration.displayPreferenceId === CHART_TYPE_ID.LINE && (
+					// @ts-ignore
 					<Line height={340} data={chartData} options={chartOptions} />
 				)}
 				{configuration.displayPreferenceId === CHART_TYPE_ID.BAR && (
+					// @ts-ignore
 					<Bar height={340} data={chartData} options={chartOptions} />
 				)}
 			</Card.Body>

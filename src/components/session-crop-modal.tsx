@@ -1,12 +1,11 @@
 import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
 import ReactCrop from 'react-image-crop';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import 'react-image-crop/dist/ReactCrop.css';
-import colors from '@/jss/colors';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
 
 function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
 	const canvas = document.createElement('canvas');
@@ -22,7 +21,17 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 	canvas.width = crop.width * scaleX;
 	canvas.height = crop.height * scaleY;
 
-	ctx.drawImage(image, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY, 0, 0, crop.width * scaleX, crop.height * scaleY);
+	ctx.drawImage(
+		image,
+		crop.x * scaleX,
+		crop.y * scaleY,
+		crop.width * scaleX,
+		crop.height * scaleY,
+		0,
+		0,
+		crop.width * scaleX,
+		crop.height * scaleY
+	);
 
 	return new Promise((resolve, reject) => {
 		canvas.toBlob(
@@ -39,7 +48,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 	});
 }
 
-const useSessionCropModalStyles = createUseStyles({
+const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	sessionCropModal: {
 		width: '90%',
 		maxWidth: 600,
@@ -49,9 +58,9 @@ const useSessionCropModalStyles = createUseStyles({
 		width: 20,
 		height: 20,
 		marginRight: 10,
-		fill: colors.warning,
+		fill: theme.colors.w500,
 	},
-});
+}));
 
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
@@ -103,7 +112,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 				<ReactCrop src={imageSource} onImageLoaded={onLoad} crop={crop} onChange={handleCropChange} />
 				<div className="d-flex mt-5 align-items-center">
 					<InfoIcon className={classes.infoIcon} />
-					<p className="mb-0 font-size-xxs">Blurry images can occur if the image uploaded is too small.</p>
+					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
 				</div>
 			</Modal.Body>
 
@@ -111,7 +120,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
 					cancel
 				</Button>
-				<Button variant="primary" size="sm" className="ml-3" onClick={handleOnSaveButtonClick}>
+				<Button variant="primary" size="sm" className="ms-3" onClick={handleOnSaveButtonClick}>
 					save
 				</Button>
 			</Modal.Footer>

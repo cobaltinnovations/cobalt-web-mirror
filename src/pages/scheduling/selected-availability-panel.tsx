@@ -7,7 +7,7 @@ import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from 
 import { schedulingService } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { Link, useParams, useRouteMatch } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AppointmentTypeItem } from './appointment-type-item';
 
 interface SelectedAvailabilityPanelProps {
@@ -16,7 +16,6 @@ interface SelectedAvailabilityPanelProps {
 
 export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanelProps) => {
 	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId: string }>();
-	const routeMatch = useRouteMatch();
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [logicalAvailability, setLogicalAvailability] = useState<LogicalAvailability>();
@@ -71,7 +70,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 					<h4 className="mb-0">{isBlockedTime ? 'Blocked Time' : 'Open Availability'}</h4>
 				)}
 
-				<Button variant="link" size="sm" className="ml-auto p-0" onClick={() => onClose()}>
+				<Button variant="link" size="sm" className="ms-auto p-0" onClick={() => onClose()}>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -88,9 +87,11 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 						})}
 					</div>
 
-					<Button as={Link} to={`${routeMatch.url}/edit`} variant="link" size="sm" className="p-0">
-						<EditIcon />
-					</Button>
+					<Link to={`edit`}>
+						<Button variant="link" size="sm" className="p-0">
+							<EditIcon />
+						</Button>
+					</Link>
 				</div>
 
 				{!isBlockedTime &&

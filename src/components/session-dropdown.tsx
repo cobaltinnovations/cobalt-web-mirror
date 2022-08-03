@@ -1,11 +1,10 @@
-import React, { FC, ReactElement } from 'react';
+import React, { FC, ReactElement, PropsWithChildren } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-import colors from '@/jss/colors';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useStyles = createUseStyles({
+const useStyles = createUseThemedStyles((theme) => ({
 	sessionToggle: {
 		border: 0,
 		width: 44,
@@ -21,13 +20,13 @@ const useStyles = createUseStyles({
 		},
 	},
 	icon: {
-		fill: colors.dark,
+		fill: theme.colors.n900,
 	},
 	sessionMenu: {
 		width: 180,
 		borderRadius: 0,
 		padding: '16px 0',
-		border: `2px solid ${colors.border}`,
+		border: `2px solid ${theme.colors.border}`,
 	},
 	sessionItem: {
 		display: 'flex',
@@ -43,9 +42,9 @@ const useStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-});
+}));
 
-interface SessionToggleProps {
+interface SessionToggleProps extends PropsWithChildren {
 	id: string;
 	className?: string;
 	onClick?(event: React.MouseEvent): void;
@@ -68,7 +67,7 @@ const SessionToggle: FC<SessionToggleProps> = React.forwardRef(({ children, clas
 	);
 });
 
-interface SessionMenuProps {
+interface SessionMenuProps extends PropsWithChildren {
 	style?: any;
 	className?: string;
 	'aria-labelledby'?: string;
@@ -100,7 +99,7 @@ const SessionDropdown: FC<SessionDropdownProps> = ({ id, items }) => {
 	const classes = useStyles();
 
 	return (
-		<Dropdown drop="left">
+		<Dropdown drop="start">
 			<Dropdown.Toggle as={SessionToggle} id={id} className={classes.sessionToggle}>
 				<MoreIcon className={classes.icon} />
 			</Dropdown.Toggle>
@@ -113,7 +112,7 @@ const SessionDropdown: FC<SessionDropdownProps> = ({ id, items }) => {
 							onClick={item.onClick}
 						>
 							<div className={classes.sessionItemIcon}>{item.icon}</div>
-							<span className="font-size-xs">{item.title}</span>
+							<span className="fs-default">{item.title}</span>
 						</Dropdown.Item>
 					);
 				})}

@@ -2,23 +2,21 @@ import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { createUseStyles } from 'react-jss';
 import { AppointmentType, EpicDepartment } from '@/lib/models/appointments';
-import fonts from '@/jss/fonts';
-import colors from '@/jss/colors';
 import { AvailabilityTimeSlot } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const useConfirmAppointmentTypeModalStyles = createUseStyles({
+const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	confirmAppointmentTypeModal: {
 		width: '90%',
 		maxWidth: 295,
 		margin: '0 auto',
 	},
 	unavaiableSlot: {
-		...fonts.xxs,
-		color: colors.gray600,
+		...theme.fonts.small,
+		color: theme.colors.n500,
 	},
-});
+}));
 
 interface ConfirmAppointmentTypeModalProps extends ModalProps {
 	appointmentTypes: (AppointmentType & { disabled: boolean })[];
@@ -51,8 +49,8 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 
 	return (
 		<Modal {...props} dialogClassName={classes.confirmAppointmentTypeModal} centered>
-			<Modal.Header>
-				<h3 className="mb-0">appointment options</h3>
+			<Modal.Header closeButton>
+				<Modal.Title>appointment options</Modal.Title>
 			</Modal.Header>
 
 			<Modal.Body>
@@ -72,7 +70,6 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 							key={apptType.appointmentTypeId}
 							type="radio"
 							disabled={apptType.disabled}
-							bsPrefix="cobalt-modal-form__check"
 							id={apptType.appointmentTypeId}
 							name={apptType.appointmentTypeId}
 							label={
@@ -95,18 +92,20 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 			</Modal.Body>
 
 			<Modal.Footer>
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
-				</Button>
-				<Button
-					variant="primary"
-					size="sm"
-					onClick={() => {
-						onConfirm(selectedId);
-					}}
-				>
-					reserve
-				</Button>
+				<div className="text-right">
+					<Button variant="outline-primary" onClick={props.onHide}>
+						cancel
+					</Button>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							onConfirm(selectedId);
+						}}
+					>
+						reserve
+					</Button>
+				</div>
 			</Modal.Footer>
 		</Modal>
 	);
