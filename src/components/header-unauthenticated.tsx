@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import { Link } from 'react-router-dom';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -53,7 +54,9 @@ const HeaderUnauthenticated = () => {
 
 	return (
 		<header ref={header} className={classes.header}>
-			<Logo className="text-primary" />
+			<Link className="d-block" to="/sign-in">
+				<Logo className="text-primary d-block" />
+			</Link>
 		</header>
 	);
 };
