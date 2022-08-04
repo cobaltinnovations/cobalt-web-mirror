@@ -219,7 +219,7 @@ const SignInOptions = () => {
 				<Container className={classes.signIn}>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<h3 className="mb-4 text-center">Sign in to Cobalt</h3>
+							<h1 className="mb-4 text-center">Sign in to Cobalt</h1>
 
 							{subdomainInstitution?.ssoEnabled && (
 								<>

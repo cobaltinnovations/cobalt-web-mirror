@@ -64,7 +64,7 @@ const Index: FC = () => {
 		<AsyncPage fetchData={fetchData}>
 			{institution?.supportEnabled && (
 				<HeroContainer className="text-center">
-					<h3 className="mb-3">Recommended for you</h3>
+					<h1 className="mb-3">Recommended for you</h1>
 					<p className="mb-5">
 						Peers, Resilience Coaches, Therapists, Psychiatrists, and more are here to help
 					</p>

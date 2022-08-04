@@ -36,7 +36,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		body: {
 			...theme.fonts.default,
 			minHeight: '100%',
-			letterSpacing: 0.5,
 			color: theme.colors.n900,
 			position: 'relative',
 			...theme.fonts.bodyNormal,
