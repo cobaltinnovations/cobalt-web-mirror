@@ -54,14 +54,6 @@ const HeaderUnauthenticated = () => {
 	return (
 		<header ref={header} className={classes.header}>
 			<Logo className="text-primary" />
-			<Button
-				size="sm"
-				onClick={() => {
-					window.alert('TODO: sign in from header (which kind? email? anonymous?)');
-				}}
-			>
-				Sign In
-			</Button>
 		</header>
 	);
 };

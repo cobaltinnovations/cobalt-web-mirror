@@ -27,7 +27,7 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const SignIn2 = () => {
+const SignInOptions = () => {
 	const subdomain = useSubdomain();
 	const handleError = useHandleError();
 	const { accountSources, subdomainInstitution } = useAccount();
@@ -304,4 +304,4 @@ const SignIn2 = () => {
 	);
 };
 
-export default SignIn2;
+export default SignInOptions;
