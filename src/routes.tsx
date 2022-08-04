@@ -23,9 +23,7 @@ export const Onboarding = React.lazy(() => import('@/pages/onboarding'));
 export const SignUp = React.lazy(() => import('@/pages/sign-up'));
 export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
-export const SignIn2 = React.lazy(() => import('@/pages/sign-in-2'));
-export const SignInSSO = React.lazy(() => import('@/pages/sign-in-sso'));
-export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
+export const SignInOptions = React.lazy(() => import('@/pages/sign-in-options'));
 export const Auth = React.lazy(() => import('@/pages/auth'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
@@ -186,12 +184,12 @@ export const AppRoutes = [
 			{
 				path: '/sign-in-sso',
 				private: false,
-				main: SignInSSO,
+				main: () => <Navigate to="/sign-in/options" replace />,
 			},
 			{
 				path: '/sign-in-email',
 				private: false,
-				main: SignInEmail,
+				main: () => <Navigate to="/sign-in/options" replace />,
 			},
 			{
 				path: '/forgot-password',
@@ -215,9 +213,9 @@ export const AppRoutes = [
 				main: SignIn,
 			},
 			{
-				path: '/sign-in-2',
+				path: '/sign-in/options',
 				private: false,
-				main: SignIn2,
+				main: SignInOptions,
 			},
 		],
 	},

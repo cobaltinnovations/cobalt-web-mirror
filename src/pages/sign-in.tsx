@@ -68,7 +68,7 @@ const SignIn: FC = () => {
 								className="d-block w-100"
 								variant="primary"
 								onClick={() => {
-									navigate('/sign-in-2');
+									navigate('/sign-in/options');
 								}}
 							>
 								Sign in
