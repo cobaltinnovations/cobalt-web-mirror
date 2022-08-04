@@ -24,8 +24,6 @@ export const SignUp = React.lazy(() => import('@/pages/sign-up'));
 export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignIn2 = React.lazy(() => import('@/pages/sign-in-2'));
-export const SignInSSO = React.lazy(() => import('@/pages/sign-in-sso'));
-export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
 export const Auth = React.lazy(() => import('@/pages/auth'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
