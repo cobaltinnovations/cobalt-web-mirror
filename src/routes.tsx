@@ -186,12 +186,12 @@ export const AppRoutes = [
 			{
 				path: '/sign-in-sso',
 				private: false,
-				main: SignInSSO,
+				main: () => <Navigate to="/sign-in-2" replace />,
 			},
 			{
 				path: '/sign-in-email',
 				private: false,
-				main: SignInEmail,
+				main: () => <Navigate to="/sign-in-2" replace />,
 			},
 			{
 				path: '/forgot-password',
