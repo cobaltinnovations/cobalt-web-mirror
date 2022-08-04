@@ -1,19 +1,33 @@
 import * as yup from 'yup';
 
 import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
 import useHeaderTitle from '@/hooks/use-header-title';
 import useSubdomain from '@/hooks/use-subdomain';
 
-import HeroContainer from '@/components/hero-container';
 import InputHelper from '@/components/input-helper';
 
 import { getRequiredYupFields } from '@/lib/utils';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+
+import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
+
+const useSignUpStyles = createUseThemedStyles((theme) => ({
+	signUpOuter: {
+		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
+	},
+	signUp: {
+		paddingTop: 96,
+		[mediaQueries.lg]: {
+			paddingTop: 32,
+		},
+	},
+}));
 
 const signUpSchema = yup
 	.object()
@@ -30,6 +44,7 @@ const SignUp: FC = () => {
 	useHeaderTitle(null);
 	const subdomain = useSubdomain();
 	const navigate = useNavigate();
+	const classes = useSignUpStyles();
 
 	async function handleFormSubmit(values: SignUpFormData) {
 		try {
@@ -58,12 +73,10 @@ const SignUp: FC = () => {
 	}
 
 	return (
-		<>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">welcome!</h2>
-			</HeroContainer>
-			<Container className="pt-4 pb-4">
+		<Container fluid className={classes.signUpOuter}>
+			<Container className={classes.signUp}>
 				<Row>
+					<h3 className="mb-4 text-center">Sign up</h3>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Formik<SignUpFormData>
 							enableReinitialize
@@ -74,12 +87,12 @@ const SignUp: FC = () => {
 							{(formikBag) => {
 								const { values, handleChange, handleSubmit, touched, errors } = formikBag;
 								return (
-									<Form onSubmit={handleSubmit}>
+									<Form className="mb-6" onSubmit={handleSubmit}>
 										<InputHelper
-											className="mb-1"
+											className="mb-2"
 											name="emailAddress"
 											type="email"
-											label="Your email"
+											label="Email address"
 											value={values.emailAddress}
 											onChange={handleChange}
 											required={requiredFields.emailAddress}
@@ -88,7 +101,7 @@ const SignUp: FC = () => {
 											}
 										/>
 										<InputHelper
-											className="mb-7"
+											className="mb-4"
 											name="password"
 											type="password"
 											label="Create your password"
@@ -98,27 +111,22 @@ const SignUp: FC = () => {
 											required={requiredFields.password}
 											error={touched.password && errors.password ? errors.password : ''}
 										/>
-										<div className="mb-3 d-flex flex-row justify-content-between">
-											<Button
-												variant="outline-primary"
-												onClick={() => {
-													navigate(-1);
-												}}
-											>
-												back
-											</Button>
-											<Button variant="primary" type="submit">
-												next
+										<div className="text-center mb-3">
+											<Button className="d-block w-100" variant="primary" type="submit">
+												Sign up
 											</Button>
 										</div>
 									</Form>
 								);
 							}}
 						</Formik>
+						<p className="text-center">
+							Already have an account? <Link to="/sign-in/options">Sign in</Link>
+						</p>
 					</Col>
 				</Row>
 			</Container>
-		</>
+		</Container>
 	);
 };
 

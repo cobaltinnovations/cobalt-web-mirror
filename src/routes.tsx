@@ -167,11 +167,6 @@ export const AppRoutes = [
 				main: Onboarding,
 			},
 			{
-				path: '/sign-up',
-				private: false,
-				main: SignUp,
-			},
-			{
 				path: '/sign-up-verify',
 				private: false,
 				main: SignUpVerify,
@@ -207,6 +202,11 @@ export const AppRoutes = [
 	{
 		layout: UnauthenticatedHeaderLayout,
 		routes: [
+			{
+				path: '/sign-up',
+				private: false,
+				main: SignUp,
+			},
 			{
 				path: '/sign-in',
 				private: false,
