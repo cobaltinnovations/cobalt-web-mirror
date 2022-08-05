@@ -53,7 +53,7 @@ const InTheStudioExternalDetail: FC = () => {
 			)}
 
 			<HeroContainer>
-				<h2 className="mb-0 text-center">{groupEvent?.name ?? ''}</h2>
+				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
 			</HeroContainer>
 
 			<Container className="pt-5 pb-5">

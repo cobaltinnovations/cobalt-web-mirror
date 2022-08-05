@@ -95,7 +95,7 @@ const InTheStudioDetail: FC = () => {
 			/>
 
 			<HeroContainer>
-				<h2 className="mb-0 text-center">{groupEvent?.name ?? ''}</h2>
+				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
 			</HeroContainer>
 
 			{groupEvent && (

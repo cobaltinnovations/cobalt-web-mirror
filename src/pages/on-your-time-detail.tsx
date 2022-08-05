@@ -106,7 +106,7 @@ const OnYourTimeDetail: FC = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">On Your Time</h2>
+				<h2 className="mb-0 text-center">{item?.title}</h2>
 			</HeroContainer>
 			<Breadcrumb
 				breadcrumbs={[

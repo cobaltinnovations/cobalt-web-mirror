@@ -37,6 +37,7 @@ import { cloneDeep } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import { useCobaltTheme } from '@/jss/theme';
+import HeroContainer from '@/components/hero-container';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -337,6 +338,12 @@ const GroupSessionsCreate: FC = () => {
 				onHide={handleCancelSessionModalHide}
 			/>
 
+			<HeroContainer>
+				<h2 className="mb-0 text-center">
+					{initialValues?.title ? initialValues.title : 'Create Studio Session'}
+					{isCopy ? ' (copy)' : ''}
+				</h2>
+			</HeroContainer>
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 				<Breadcrumb
 					breadcrumbs={[
