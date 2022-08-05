@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
@@ -25,7 +25,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface HeaderUnauthenticatedProps {
+export interface HeaderUnauthenticatedProps {
 	showSignInButton?: boolean;
 }
 
@@ -33,6 +33,10 @@ const HeaderUnauthenticated = ({ showSignInButton }: HeaderUnauthenticatedProps)
 	const navigate = useNavigate();
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
+	const match = !!useMatch({
+		path: '/sign-in/options',
+		end: true,
+	});
 
 	const handleWindowResize = useCallback(() => {
 		setBodyPadding();
@@ -62,7 +66,7 @@ const HeaderUnauthenticated = ({ showSignInButton }: HeaderUnauthenticatedProps)
 			<Link className="d-block" to="/sign-in">
 				<Logo className="text-primary d-block" />
 			</Link>
-			{showSignInButton && (
+			{!match && (
 				<Button
 					size="sm"
 					onClick={() => {
