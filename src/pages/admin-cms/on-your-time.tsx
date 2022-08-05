@@ -229,7 +229,7 @@ const CmsOnYourTime: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">On Your Time</h2>
+				<h2 className="mb-0 text-center">On Your Time - My Content</h2>
 			</HeroContainer>
 			<Container className="pt-5 mb-5">
 				<Row>

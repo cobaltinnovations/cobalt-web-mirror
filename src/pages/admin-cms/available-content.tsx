@@ -157,7 +157,7 @@ const CmsAvailableContent: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">Available Content</h2>
+				<h2 className="mb-0 text-center">On Your Time - Available Content</h2>
 			</HeroContainer>
 			<Container className="py-5">
 				<Row>
