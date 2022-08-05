@@ -304,6 +304,10 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 						backgroundColor: theme.colors.p500,
 					},
 				},
+
+				'&.disabled': {
+					opacity: 0.5,
+				},
 			},
 		},
 	};
