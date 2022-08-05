@@ -61,6 +61,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 						required
 						type="tel"
 						value={phoneNumberInputValue}
+						autoFocus
 						label="Your Phone Number"
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setPhoneNumberInputValue(e.target.value);

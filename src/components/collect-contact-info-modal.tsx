@@ -64,6 +64,7 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 							value={emailInputValue}
 							className="mb-2"
 							label="Your Email Address"
+							autoFocus
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setEmailInputValue(e.target.value);
 							}}
@@ -75,6 +76,7 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 							type="tel"
 							value={phoneNumberInputValue}
 							label="Your Phone Number"
+							autoFocus={!promptForEmail}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								setPhoneNumberInputValue(e.target.value);
 							}}
