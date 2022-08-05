@@ -19,7 +19,7 @@ const HeroContainer: FC<HeroContainerProps> = (props) => {
 
 	return (
 		<Container className={classNames(props.className, classes.heroContainer)} fluid>
-			<Container className="pt-4 pb-5">
+			<Container className="py-20">
 				<section>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
