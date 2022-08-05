@@ -2,11 +2,15 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
 
 const useHeroContainerStyles = createUseThemedStyles((theme) => ({
 	heroContainer: {
-		padding: 0,
+		padding: '80px 0',
 		backgroundColor: theme.colors.p50,
+		[mediaQueries.lg]: {
+			padding: '32px 0',
+		},
 	},
 }));
 
@@ -19,7 +23,7 @@ const HeroContainer: FC<HeroContainerProps> = (props) => {
 
 	return (
 		<Container className={classNames(props.className, classes.heroContainer)} fluid>
-			<Container className="py-20">
+			<Container>
 				<section>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
