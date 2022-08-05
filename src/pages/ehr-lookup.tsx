@@ -6,7 +6,6 @@ import Lottie from 'lottie-web';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { pick } from 'lodash';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
 import moment from 'moment';
@@ -29,6 +28,7 @@ import { BookingContext } from '@/contexts/booking-context';
 import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
+import HeroContainer from '@/components/hero-container';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -67,7 +67,6 @@ function getClearForm(account: AccountModel | undefined): EpicPatientData {
 }
 
 const EhrLookup: FC = () => {
-	useHeaderTitle('assessment');
 	const { fonts } = useCobaltTheme();
 	const handleError = useHandleError();
 	const location = useLocation();
@@ -228,6 +227,10 @@ const EhrLookup: FC = () => {
 			/>
 
 			<ProgressBar current={step} max={NUM_STEPS + 1} />
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">Assessment</h2>
+			</HeroContainer>
 
 			<Formik
 				enableReinitialize

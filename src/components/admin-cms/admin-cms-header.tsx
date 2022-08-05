@@ -2,8 +2,6 @@ import React, { FC, useContext } from 'react';
 
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { HeaderContext } from '@/contexts/header-context';
-
 import { ReactComponent as CobaltLogo } from '@/assets/logos/logo-icon.svg';
 import { Link } from 'react-router-dom';
 
@@ -76,7 +74,6 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 }));
 
 const AdminCmsHeader: FC = () => {
-	const headerContext = useContext(HeaderContext);
 	const classes = useHeaderStyles();
 
 	return (
@@ -88,7 +85,7 @@ const AdminCmsHeader: FC = () => {
 				</Link>
 			</div>
 			<div className={classes.titleOuter}>
-				<div className={classes.headerTitle}>{headerContext.title}</div>
+				<div className={classes.headerTitle}>Admin</div>
 				<div className={classes.avatar}>
 					<img alt="profile" src={'https://placebear.com/60/60'} />
 				</div>

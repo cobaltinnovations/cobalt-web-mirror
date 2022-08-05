@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
-import useHeaderTitle from '@/hooks/use-header-title';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
@@ -27,7 +26,6 @@ const useIndexStyles = createUseThemedStyles((theme) => ({
 }));
 
 const Index: FC = () => {
-	useHeaderTitle(null);
 	const { account, institution } = useAccount();
 
 	const navigate = useNavigate();

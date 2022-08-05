@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import AsyncPage from '@/components/async-page';
@@ -13,6 +12,7 @@ import BackgroundImageContainer from '@/components/background-image-container';
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import HeroContainer from '@/components/hero-container';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -52,7 +52,6 @@ const OnYourTimeDetail: FC = () => {
 
 	const [canEmbed, setCanEmbed] = useState(false);
 	const [item, setItem] = useState<Content>();
-	useHeaderTitle(item?.title ?? '');
 
 	const fetchData = useCallback(async () => {
 		if (!contentId) {
@@ -106,6 +105,9 @@ const OnYourTimeDetail: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">On Your Time</h2>
+			</HeroContainer>
 			<Breadcrumb
 				breadcrumbs={[
 					{

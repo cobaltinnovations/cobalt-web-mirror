@@ -5,7 +5,6 @@ import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -14,14 +13,13 @@ import SurveyQuestion from '@/components/survey-question';
 import { assessmentService, accountService } from '@/lib/services';
 import { Assessment, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 interface HistoryLocationState {
 	from?: string;
 }
 
 const IntroAssessment: FC = () => {
-	useHeaderTitle('assessment');
-
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -159,6 +157,9 @@ const IntroAssessment: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData} abortFetch={questionRequest.abort}>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">Assessment</h2>
+			</HeroContainer>
 			<Container className="pt-5 pb-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>

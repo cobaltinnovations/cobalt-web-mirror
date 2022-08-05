@@ -3,8 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import { contentService, assessmentService, ContentListFormat, screeningService } from '@/lib/services';
 import { Content, PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
 
@@ -18,13 +16,13 @@ import FilterLength from '@/components/filter-length';
 import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
+import HeroContainer from '@/components/hero-container';
 
 interface LocationState {
 	skipAssessment?: boolean;
 }
 
 const OnYourTime: FC = () => {
-	useHeaderTitle('On Your Time');
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { subdomainInstitution } = useAccount();
@@ -180,6 +178,10 @@ const OnYourTime: FC = () => {
 					setShowFilterLengthModal(false);
 				}}
 			/>
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">On Your Time</h2>
+			</HeroContainer>
 
 			<Container className="pt-5 mb-3">
 				<Row>

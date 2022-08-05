@@ -1,15 +1,17 @@
-import React, { FC, useState, useContext, useRef, useEffect, useCallback } from 'react';
+import React, { FC, useState, useRef, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-
-import { HeaderContext } from '@/contexts/header-context';
 
 import Menu from '@/components/menu';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
-import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+
+import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
+import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
+import mediaQueries from '@/jss/media-queries';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -20,42 +22,28 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		height: 54,
 		display: 'flex',
 		position: 'fixed',
+		padding: '0 40px 0 20px',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-	},
-	headerTitle: {
-		...theme.fonts.large,
-		overflow: 'hidden',
-		textAlign: 'center',
-		color: theme.colors.p500,
-		whiteSpace: 'nowrap',
-		...theme.fonts.headingBold,
-		textOverflow: 'ellipsis',
-		maxWidth: 'calc(100% - 160px)',
+		[mediaQueries.lg]: {
+			padding: '0 20px 0 8px',
+		},
 	},
 	menuButton: {
-		left: 0,
-		top: '50%',
-		width: 64,
-		height: 54,
+		width: 44,
+		height: 44,
 		display: 'flex',
 		cursor: 'pointer',
-		position: 'absolute',
 		alignItems: 'center',
 		justifyContent: 'center',
-		transform: 'translateY(-50%)',
 		'&:hover': {
 			backgroundColor: 'rgba(255,255,255,0.12)',
 		},
 	},
 	inCrisisButton: {
-		right: 20,
-		top: '50%',
 		display: 'flex',
 		alignItems: 'center',
-		position: 'absolute',
-		transform: 'translateY(-50%)',
 	},
 	menuIcon: {
 		'& path': {
@@ -76,7 +64,6 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	const { account } = useAccount();
-	const { title } = useContext(HeaderContext);
 	const classes = useHeaderStyles();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -133,12 +120,16 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 			<Menu open={menuOpen} onHide={handleMenuHide} />
 
 			<header ref={header} className={classes.header}>
-				{showHeaderButtons && (
-					<div tabIndex={0} className={classes.menuButton} onClick={handleMenuButtonClick}>
-						<MenuIcon className={classes.menuIcon} />
-					</div>
-				)}
-				<div className={classes.headerTitle}>{title}</div>
+				<div className="d-flex align-items-center">
+					{showHeaderButtons && (
+						<div tabIndex={0} className={classes.menuButton} onClick={handleMenuButtonClick}>
+							<MenuIcon className={classes.menuIcon} />
+						</div>
+					)}
+					<Link className="d-block" to="/">
+						<LogoSmallText className="text-primary d-block" />
+					</Link>
+				</div>
 				{showHeaderButtons && (
 					<Button className={classes.inCrisisButton} size="sm" onClick={handleInCrisisButtonClick}>
 						<CrisisIcon className={classes.crisisIcon} />

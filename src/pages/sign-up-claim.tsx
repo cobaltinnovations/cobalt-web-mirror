@@ -2,12 +2,10 @@ import React, { FC, useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import AsyncPage from '@/components/async-page';
 import { accountService } from '@/lib/services';
 
 const SignUpClaim: FC = () => {
-	useHeaderTitle(null);
 	const { accountInviteId } = useParams<{ accountInviteId?: string }>();
 	const [inviteExpired, setInviteExpired] = useState(false);
 

@@ -1,20 +1,20 @@
 import React, { FC, useCallback } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
+import HeroContainer from '@/components/hero-container';
 
 const OneOnOneResources: FC = () => {
-	useHeaderTitle('1:1 resources');
-
 	const fetchData = useCallback(() => {
 		return;
 	}, []);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">1:1 Resources</h2>
+			</HeroContainer>
 			<Breadcrumb
 				breadcrumbs={[
 					{

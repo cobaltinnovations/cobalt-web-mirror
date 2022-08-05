@@ -5,8 +5,6 @@ import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import Breadcrumb from '@/components/breadcrumb';
 import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -60,8 +58,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 	const [isEdit, setIsEdit] = useState(false);
 	const [initialValues, setInitialValues] = useState<GroupSessionByRequestFormData>();
-
-	useHeaderTitle(initialValues?.title ? initialValues?.title : 'Create Studio Session');
 
 	const fetchData = useCallback(async () => {
 		if (!groupSessionId) {

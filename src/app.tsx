@@ -23,7 +23,6 @@ import { AccountProvider } from '@/contexts/account-context';
 import { AlertProvider } from '@/contexts/alert-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import { ErrorModalProvider } from '@/contexts/error-modal-context';
-import { HeaderProvider } from '@/contexts/header-context';
 import { InCrisisModalProvider } from '@/contexts/in-crisis-modal-context';
 import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
@@ -119,17 +118,15 @@ const ThemedApp: FC = () => {
 	return (
 		<ErrorModalProvider>
 			<ReauthModalProvider>
-				<HeaderProvider>
-					<AccountProvider>
-						<AlertProvider>
-							<BookingProvider>
-								<InCrisisModalProvider>
-									<AppWithProviders />
-								</InCrisisModalProvider>
-							</BookingProvider>
-						</AlertProvider>
-					</AccountProvider>
-				</HeaderProvider>
+				<AccountProvider>
+					<AlertProvider>
+						<BookingProvider>
+							<InCrisisModalProvider>
+								<AppWithProviders />
+							</InCrisisModalProvider>
+						</BookingProvider>
+					</AlertProvider>
+				</AccountProvider>
 			</ReauthModalProvider>
 		</ErrorModalProvider>
 	);

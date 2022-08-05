@@ -2,8 +2,6 @@ import React, { FC } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
-
-import useHeaderTitle from '@/hooks/use-header-title';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -17,8 +15,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 const SessionRequestThankYou: FC = () => {
 	const classes = useStyles();
 	const location = useLocation();
-
-	useHeaderTitle('Request Studio Session');
 
 	return (
 		<Container className="pt-16">

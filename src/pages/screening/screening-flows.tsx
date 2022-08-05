@@ -1,17 +1,16 @@
-import AsyncPage from '@/components/async-page';
-import CollectPhoneModal from '@/components/collect-phone-modal';
-import useHandleError from '@/hooks/use-handle-error';
-import useHeaderTitle from '@/hooks/use-header-title';
-import { ERROR_CODES } from '@/lib/http-client';
-import { ScreeningSession } from '@/lib/models';
-import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Container } from 'react-bootstrap';
 import { useParams, useSearchParams } from 'react-router-dom';
+
+import AsyncPage from '@/components/async-page';
+import CollectPhoneModal from '@/components/collect-phone-modal';
+import useHandleError from '@/hooks/use-handle-error';
+import { ERROR_CODES } from '@/lib/http-client';
+import { ScreeningSession } from '@/lib/models';
+import { screeningService } from '@/lib/services';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
 
 const ScreeningFlowsPage = () => {
-	useHeaderTitle(null);
 	const handleError = useHandleError();
 	const [searchParams] = useSearchParams();
 	const { screeningFlowId } = useParams<{ screeningFlowId: string }>();

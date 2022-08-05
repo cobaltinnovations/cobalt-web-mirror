@@ -1,11 +1,7 @@
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 const NoMatch: FC = () => {
-	useHeaderTitle(null);
-
 	return (
 		<Container>
 			<Row>

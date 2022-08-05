@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useSubdomain from '@/hooks/use-subdomain';
 
 import InputHelper from '@/components/input-helper';
@@ -41,7 +40,6 @@ const requiredFields = getRequiredYupFields<SignUpFormData>(signUpSchema);
 
 const SignUp: FC = () => {
 	const handleError = useHandleError();
-	useHeaderTitle(null);
 	const subdomain = useSubdomain();
 	const navigate = useNavigate();
 	const classes = useSignUpStyles();

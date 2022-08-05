@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import useHeaderTitle from '@/hooks/use-header-title';
 
 import { AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
@@ -15,6 +14,7 @@ import { createUseStyles } from 'react-jss';
 import mediaQueries from '@/jss/media-queries';
 import SearchInput from '@/components/admin-cms/search-input';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -38,7 +38,6 @@ const useStyles = createUseStyles({
 const CmsAvailableContent: FC = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	useHeaderTitle('On Your Time - Available Content');
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { showAlert } = useAlert();
@@ -156,107 +155,112 @@ const CmsAvailableContent: FC = () => {
 
 	// @ts-ignore
 	return (
-		<Container className="py-5">
-			<Row>
-				<Col>
-					<div className={classes.controlBar}>
-						<div className={classes.searchBarOuter}>
-							<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
-						</div>
-						<div className="d-flex align-items-center justify-content-center">
-							{!!filters?.contentTypes && (
-								<QuickFilterDropdown
-									active={!!typeFilterValue}
-									value={typeFilterValue}
-									id="type-quick-filter"
-									title="Type"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.contentTypes?.map(({ contentTypeId, description }) => {
-											return {
-												value: contentTypeId,
-												label: description,
-											};
-										}),
-									]}
-									onChange={(value) => handleTypeFilterChange(value as ContentTypeId | undefined)}
-								/>
-							)}
-							{!!filters?.availableStatuses && (
-								<QuickFilterDropdown
-									active={!!statusFilterValue}
-									value={statusFilterValue}
-									id="status-quick-filter"
-									title="My Institution"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.availableStatuses.map(({ availableStatusId, description }) => {
-											return {
-												value: availableStatusId,
-												label: description,
-											};
-										}),
-									]}
-									onChange={(value) =>
-										handleStatusFilterChange(value as ContentAvailableStatusId | undefined)
-									}
-								/>
-							)}
-						</div>
-					</div>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					<Table className="mb-5" style={{ opacity: tableIsUpdating ? 0.5 : 1 }}>
-						<TableHead>
-							<TableRow>
-								<TableCell header>Submitted</TableCell>
-								<TableCell header className="justify-content-center">
-									Type
-								</TableCell>
-								<TableCell header>Title & Author</TableCell>
-								<TableCell header>Owner</TableCell>
-								<TableCell header>Status</TableCell>
-								<TableCell />
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{content.map((content) => {
-								return (
-									<AvailableContentRow
-										key={content.contentId}
-										content={content}
-										onAddClick={handleAddClick}
-										onRemoveClick={handleRemoveClick}
+		<>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">Available Content</h2>
+			</HeroContainer>
+			<Container className="py-5">
+				<Row>
+					<Col>
+						<div className={classes.controlBar}>
+							<div className={classes.searchBarOuter}>
+								<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
+							</div>
+							<div className="d-flex align-items-center justify-content-center">
+								{!!filters?.contentTypes && (
+									<QuickFilterDropdown
+										active={!!typeFilterValue}
+										value={typeFilterValue}
+										id="type-quick-filter"
+										title="Type"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.contentTypes?.map(({ contentTypeId, description }) => {
+												return {
+													value: contentTypeId,
+													label: description,
+												};
+											}),
+										]}
+										onChange={(value) => handleTypeFilterChange(value as ContentTypeId | undefined)}
 									/>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					{content && content.length > 0 && (
-						<div className="d-flex justify-content-center">
-							<TablePagination
-								total={totalNumberOfItems}
-								page={currentPageIndex}
-								size={15}
-								onClick={handlePaginationClick}
-							/>
+								)}
+								{!!filters?.availableStatuses && (
+									<QuickFilterDropdown
+										active={!!statusFilterValue}
+										value={statusFilterValue}
+										id="status-quick-filter"
+										title="My Institution"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.availableStatuses.map(({ availableStatusId, description }) => {
+												return {
+													value: availableStatusId,
+													label: description,
+												};
+											}),
+										]}
+										onChange={(value) =>
+											handleStatusFilterChange(value as ContentAvailableStatusId | undefined)
+										}
+									/>
+								)}
+							</div>
 						</div>
-					)}
-				</Col>
-			</Row>
-		</Container>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<Table className="mb-5" style={{ opacity: tableIsUpdating ? 0.5 : 1 }}>
+							<TableHead>
+								<TableRow>
+									<TableCell header>Submitted</TableCell>
+									<TableCell header className="justify-content-center">
+										Type
+									</TableCell>
+									<TableCell header>Title & Author</TableCell>
+									<TableCell header>Owner</TableCell>
+									<TableCell header>Status</TableCell>
+									<TableCell />
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{content.map((content) => {
+									return (
+										<AvailableContentRow
+											key={content.contentId}
+											content={content}
+											onAddClick={handleAddClick}
+											onRemoveClick={handleRemoveClick}
+										/>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						{content && content.length > 0 && (
+							<div className="d-flex justify-content-center">
+								<TablePagination
+									total={totalNumberOfItems}
+									page={currentPageIndex}
+									size={15}
+									onClick={handlePaginationClick}
+								/>
+							</div>
+						)}
+					</Col>
+				</Row>
+			</Container>
+		</>
 	);
 };
 

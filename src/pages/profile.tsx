@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import HeroContainer from '@/components/hero-container';
@@ -16,8 +15,6 @@ const useProfileStyles = createUseThemedStyles((theme) => ({
 }));
 
 const Profile: FC = () => {
-	useHeaderTitle('your profile');
-
 	const navigate = useNavigate();
 	const classes = useProfileStyles();
 	const location = useLocation();
@@ -32,6 +29,7 @@ const Profile: FC = () => {
 	return (
 		<>
 			<HeroContainer>
+				<h2 className="mb-2 text-center">Your Profile</h2>
 				<p className="mb-0 fw-normal text-center">
 					Take a moment to review your profile and let us know if anything has changed.
 				</p>

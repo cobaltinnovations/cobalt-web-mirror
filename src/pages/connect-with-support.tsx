@@ -17,7 +17,6 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 import { queryParamDateRegex } from '@/lib/utils';
@@ -107,7 +106,6 @@ interface HistoryLocationState {
 
 const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
-	useHeaderTitle('connect with support');
 	const classes = useConnectWithSupportStyles();
 	const { account, subdomainInstitution } = useAccount();
 
@@ -608,6 +606,7 @@ const ConnectWithSupport: FC = () => {
 			<BookingModals ref={bookingRef} />
 
 			<HeroContainer>
+				<h2 className="mb-2 text-center">Connect with Support</h2>
 				<div className="d-flex justify-content-center align-items-center">
 					<p className="mb-0 text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
 					<Link to="/one-on-one-resources">

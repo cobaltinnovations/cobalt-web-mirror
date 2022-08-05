@@ -7,7 +7,6 @@ import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import useHeaderTitle from '@/hooks/use-header-title';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
@@ -159,8 +158,6 @@ const GroupSessionsCreate: FC = () => {
 	const [imagePreview, setImagePreview] = useState(initialValues ? initialValues.imageUrl : '');
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
-
-	useHeaderTitle(`${initialValues?.title ? initialValues.title : 'Create Studio Session'}${isCopy ? ' (copy)' : ''}`);
 
 	const accountId = account?.accountId;
 	const fetchData = useCallback(async () => {
