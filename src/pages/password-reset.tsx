@@ -5,8 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import HeroContainer from '@/components/hero-container';
 import InputHelper from '@/components/input-helper';
 
@@ -25,7 +23,6 @@ type PasswordResetFormData = yup.InferType<typeof passwordResetSchema>;
 const requiredFields = getRequiredYupFields<PasswordResetFormData>(passwordResetSchema);
 
 const PasswordReset: FC = () => {
-	useHeaderTitle(null);
 	const navigate = useNavigate();
 	const { passwordResetToken } = useParams<{ passwordResetToken?: string }>();
 	const handleError = useHandleError();
@@ -54,7 +51,7 @@ const PasswordReset: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">we'll get you back in</h2>
+				<h2 className="mb-0 text-center">We'll get you back in.</h2>
 			</HeroContainer>
 			<Container className="pt-4 pb-4">
 				<Row>

@@ -5,8 +5,6 @@ import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import Breadcrumb from '@/components/breadcrumb';
 import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -22,6 +20,7 @@ import { getRequiredYupFields } from '@/lib/utils';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import AsyncPage from '@/components/async-page';
 import { useCobaltTheme } from '@/jss/theme';
+import HeroContainer from '@/components/hero-container';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -60,8 +59,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 	const [isEdit, setIsEdit] = useState(false);
 	const [initialValues, setInitialValues] = useState<GroupSessionByRequestFormData>();
-
-	useHeaderTitle(initialValues?.title ? initialValues?.title : 'Create Studio Session');
 
 	const fetchData = useCallback(async () => {
 		if (!groupSessionId) {
@@ -133,6 +130,12 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">
+					{initialValues?.title ? initialValues?.title : 'Create Studio Session'}
+				</h2>
+			</HeroContainer>
+
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 				<Breadcrumb
 					breadcrumbs={[
@@ -147,7 +150,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 					]}
 				/>
 			)}
-
 			<Container className="pt-5 pb-32">
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>

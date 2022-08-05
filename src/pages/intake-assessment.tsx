@@ -2,7 +2,6 @@ import React, { FC, useState, useCallback, useContext, useMemo, useEffect } from
 import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -16,10 +15,9 @@ import { BookingContext } from '@/contexts/booking-context';
 import CollectContactInfoModal from '@/components/collect-contact-info-modal';
 import ConfirmProviderBookingModal from '@/components/confirm-provider-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 const IntakeAssessment: FC = () => {
-	useHeaderTitle('assessment');
-
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -329,6 +327,10 @@ const IntakeAssessment: FC = () => {
 			)}
 
 			<ProgressBar current={assessment?.assessmentProgress || 0} max={assessment?.assessmentProgressTotal || 0} />
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">Assessment</h2>
+			</HeroContainer>
 
 			<Container className="pt-5 pb-5">
 				<Row>

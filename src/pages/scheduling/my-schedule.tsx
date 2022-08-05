@@ -17,7 +17,6 @@ import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
 import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
-import useHeaderTitle from '@/hooks/use-header-title';
 import { useCobaltTheme } from '@/jss/theme';
 
 enum MainCalendarView {
@@ -28,7 +27,6 @@ enum MainCalendarView {
 
 export const MySchedule: FC = () => {
 	const theme = useCobaltTheme();
-	useHeaderTitle('my schedule');
 	const classes = useContainerStyles();
 	const { account } = useAccount();
 	const navigate = useNavigate();

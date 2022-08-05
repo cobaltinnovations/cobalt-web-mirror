@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useCallback } from 'react';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { Link } from 'react-router-dom';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -25,9 +25,18 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const HeaderUnauthenticated = () => {
+export interface HeaderUnauthenticatedProps {
+	showSignInButton?: boolean;
+}
+
+const HeaderUnauthenticated = ({ showSignInButton }: HeaderUnauthenticatedProps) => {
+	const navigate = useNavigate();
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
+	const match = !!useMatch({
+		path: '/sign-in/options',
+		end: true,
+	});
 
 	const handleWindowResize = useCallback(() => {
 		setBodyPadding();
@@ -57,6 +66,16 @@ const HeaderUnauthenticated = () => {
 			<Link className="d-block" to="/sign-in">
 				<Logo className="text-primary d-block" />
 			</Link>
+			{!match && (
+				<Button
+					size="sm"
+					onClick={() => {
+						navigate('/sign-in/options');
+					}}
+				>
+					Sign In
+				</Button>
+			)}
 		</header>
 	);
 };

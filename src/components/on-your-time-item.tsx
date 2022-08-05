@@ -49,6 +49,11 @@ const useOnYourTimeItemStyles = createUseThemedStyles((theme) => ({
 		color: theme.colors.n900,
 		overflow: 'hidden',
 	},
+	typeTitle: {
+		overflow: 'hidden',
+		whiteSpace: 'nowrap',
+		textOverflow: 'ellipsis',
+	},
 }));
 
 interface OnYourTimeItemProps {
@@ -75,16 +80,20 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 				{props.tag && <div className={classes.tag}>{props.tag}</div>}
 			</BackgroundImageContainer>
 			<div className={classes.informationContainer}>
-				<h6 className={classes.title}>{props.title}</h6>
+				<h4 className={classes.title}>{props.title}</h4>
 				{props.author ? (
-					<p className={classes.author}>by {props.author}</p>
+					<p className={classes.author}>By {props.author}</p>
 				) : (
 					<p className={classes.author}>&nbsp;</p>
 				)}
 
 				<div className="d-flex">
-					<small className="text-muted text-uppercase fw-bold">{props.type}</small>
-					{props.duration && <small className="text-muted text-uppercase ms-auto">{props.duration}</small>}
+					<small className={classNames(classes.typeTitle, 'text-muted text-uppercase fw-bold')}>
+						{props.type}
+					</small>
+					{props.duration && (
+						<small className="flex-shrink-0 text-muted text-uppercase ms-auto">{props.duration}</small>
+					)}
 				</div>
 			</div>
 		</div>

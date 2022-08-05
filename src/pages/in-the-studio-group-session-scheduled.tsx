@@ -2,7 +2,6 @@ import React, { FC, useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -17,6 +16,7 @@ import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal
 import { groupSessionsService } from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 const InTheStudioGroupSessionScheduled: FC = () => {
 	const handleError = useHandleError();
@@ -35,8 +35,6 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [showConfirmReservationModal, setShowConfirmReservationModal] = useState(false);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
-
-	useHeaderTitle(session?.title || '');
 
 	/* --------------------------------------------------------- */
 	/* Page blocking data call */
@@ -191,6 +189,10 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 					},
 				]}
 			/>
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">{session?.title}</h2>
+			</HeroContainer>
 
 			{reservation && (
 				<Container fluid className="bg-success p-0">

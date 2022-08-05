@@ -2,13 +2,11 @@ import React, { FC, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
 const SignUpVerify: FC = () => {
 	const handleError = useHandleError();
-	useHeaderTitle(null);
 	const location = useLocation();
 	const navigate = useNavigate();
 

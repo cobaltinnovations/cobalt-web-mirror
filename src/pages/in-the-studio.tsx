@@ -3,8 +3,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import AsyncPage from '@/components/async-page';
 import StudioEvent, { StudioEventViewModel } from '@/components/studio-event';
 import ActionSheet from '@/components/action-sheet';
@@ -12,9 +10,9 @@ import ActionSheet from '@/components/action-sheet';
 import { groupEventService, groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
+import HeroContainer from '@/components/hero-container';
 
 const InTheStudio: FC = () => {
-	useHeaderTitle('In the Studio');
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const groupEventUrlName = searchParams.get('class') || '';
@@ -113,6 +111,10 @@ const InTheStudio: FC = () => {
 					make session available by request
 				</Button>
 			</ActionSheet>
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">In the Studio</h2>
+			</HeroContainer>
 
 			<Container className="pt-5">
 				<Row>

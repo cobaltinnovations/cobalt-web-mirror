@@ -2,8 +2,6 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import { AdminContentRow, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
@@ -16,6 +14,7 @@ import { createUseStyles } from 'react-jss';
 import mediaQueries from '@/jss/media-queries';
 import SearchInput from '@/components/admin-cms/search-input';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -53,7 +52,6 @@ const CmsOnYourTime: FC = () => {
 	const classes = useStyles();
 
 	const handleError = useHandleError();
-	useHeaderTitle('On Your Time');
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { account } = useAccount();
@@ -229,165 +227,172 @@ const CmsOnYourTime: FC = () => {
 	}
 
 	return (
-		<Container className="pt-5 mb-5">
-			<Row>
-				<Col>
-					<div className={classes.controlBar}>
-						<div className={classes.searchBarOuter}>
-							<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
-						</div>
-						<div className={classes.filtersOuter}>
-							{!!filters?.contentTypes && (
-								<QuickFilterDropdown
-									active={!!typeFilterValue}
-									value={typeFilterValue}
-									id="type-quick-filter"
-									title="Type"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.contentTypes?.map(({ contentTypeId, description }) => {
-											return {
-												value: contentTypeId,
-												label: description,
-											};
-										}),
-									]}
-									onChange={(value) => handleTypeFilterChange(value as ContentTypeId | undefined)}
-								/>
-							)}
-							{isSuperAdmin && !!filters?.institutions && (
-								<QuickFilterDropdown
-									active={!!ownerFilterValue}
-									value={ownerFilterValue}
-									id="owner-quick-filter"
-									title="Owner"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.institutions?.map(({ institutionId, name }) => {
-											return {
-												value: institutionId,
-												label: name,
-											};
-										}),
-									]}
-									onChange={(value) => handleOwnerFilterChange(value as string | undefined)}
-								/>
-							)}
-							{!!filters?.myApprovalStatuses && (
-								<QuickFilterDropdown
-									active={!!statusFilterValue}
-									value={statusFilterValue}
-									id="my-status-quick-filter"
-									title="My Institution"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.myApprovalStatuses?.map(({ approvalStatusId, description }) => {
-											return {
-												value: approvalStatusId,
-												label: description,
-											};
-										}),
-									]}
-									onChange={(value) =>
-										handleStatusFilterChange(value as ContentApprovalStatusId | undefined)
-									}
-								/>
-							)}
-							{!!filters?.otherApprovalStatuses && (
-								<QuickFilterDropdown
-									active={!!otherStatusFilterValue}
-									value={otherStatusFilterValue}
-									id="other-status-quick-filter"
-									title="Other Institutions"
-									items={[
-										{
-											value: undefined,
-											label: 'No Filter',
-										},
-										...filters?.otherApprovalStatuses?.map(({ approvalStatusId, description }) => {
-											return {
-												value: approvalStatusId,
-												label: description,
-											};
-										}),
-									]}
-									onChange={(value) =>
-										handleVisibilityFilterChange(value as ContentApprovalStatusId | undefined)
-									}
-								/>
-							)}
-						</div>
-						<div className="text-center">
-							<Button size="sm" onClick={handleAddContentButtonClick}>
-								+ add content
-							</Button>
-						</div>
-					</div>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					<Table className="mb-5 mt-5" style={{ opacity: tableIsUpdating ? 0.5 : 1 }}>
-						<TableHead>
-							<TableRow>
-								<TableCell header>Submitted</TableCell>
-								<TableCell header className="justify-content-center">
-									Type
-								</TableCell>
-								<TableCell header width={300}>
-									Post Details
-								</TableCell>
-								{isSuperAdmin && <TableCell header>Owner</TableCell>}
-								<TableCell header className="justify-content-center">
-									Views
-								</TableCell>
-								<TableCell header>My Institution</TableCell>
-								<TableCell header>Other Institutions</TableCell>
-								<TableCell />
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{content.map((content, index) => {
-								return (
-									<OnYourTimeContentRow
-										key={index}
-										content={content}
-										onApproveClick={handleApproveClick}
-										onArchiveToggle={handleArchiveToggle}
-										onDeleteClick={handleDeleteClick}
-										onEditClick={handleEditClick}
-										onRejectClick={handleRejectClick}
+		<>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">On Your Time - My Content</h2>
+			</HeroContainer>
+			<Container className="pt-5 mb-5">
+				<Row>
+					<Col>
+						<div className={classes.controlBar}>
+							<div className={classes.searchBarOuter}>
+								<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
+							</div>
+							<div className={classes.filtersOuter}>
+								{!!filters?.contentTypes && (
+									<QuickFilterDropdown
+										active={!!typeFilterValue}
+										value={typeFilterValue}
+										id="type-quick-filter"
+										title="Type"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.contentTypes?.map(({ contentTypeId, description }) => {
+												return {
+													value: contentTypeId,
+													label: description,
+												};
+											}),
+										]}
+										onChange={(value) => handleTypeFilterChange(value as ContentTypeId | undefined)}
 									/>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					{content && content.length > 0 && (
-						<div className="d-flex justify-content-center">
-							<TablePagination
-								total={totalNumberOfItems}
-								page={currentPageIndex}
-								size={15}
-								onClick={handlePaginationClick}
-							/>
+								)}
+								{isSuperAdmin && !!filters?.institutions && (
+									<QuickFilterDropdown
+										active={!!ownerFilterValue}
+										value={ownerFilterValue}
+										id="owner-quick-filter"
+										title="Owner"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.institutions?.map(({ institutionId, name }) => {
+												return {
+													value: institutionId,
+													label: name,
+												};
+											}),
+										]}
+										onChange={(value) => handleOwnerFilterChange(value as string | undefined)}
+									/>
+								)}
+								{!!filters?.myApprovalStatuses && (
+									<QuickFilterDropdown
+										active={!!statusFilterValue}
+										value={statusFilterValue}
+										id="my-status-quick-filter"
+										title="My Institution"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.myApprovalStatuses?.map(({ approvalStatusId, description }) => {
+												return {
+													value: approvalStatusId,
+													label: description,
+												};
+											}),
+										]}
+										onChange={(value) =>
+											handleStatusFilterChange(value as ContentApprovalStatusId | undefined)
+										}
+									/>
+								)}
+								{!!filters?.otherApprovalStatuses && (
+									<QuickFilterDropdown
+										active={!!otherStatusFilterValue}
+										value={otherStatusFilterValue}
+										id="other-status-quick-filter"
+										title="Other Institutions"
+										items={[
+											{
+												value: undefined,
+												label: 'No Filter',
+											},
+											...filters?.otherApprovalStatuses?.map(
+												({ approvalStatusId, description }) => {
+													return {
+														value: approvalStatusId,
+														label: description,
+													};
+												}
+											),
+										]}
+										onChange={(value) =>
+											handleVisibilityFilterChange(value as ContentApprovalStatusId | undefined)
+										}
+									/>
+								)}
+							</div>
+							<div className="text-center">
+								<Button size="sm" onClick={handleAddContentButtonClick}>
+									+ add content
+								</Button>
+							</div>
 						</div>
-					)}
-				</Col>
-			</Row>
-		</Container>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<Table className="mb-5 mt-5" style={{ opacity: tableIsUpdating ? 0.5 : 1 }}>
+							<TableHead>
+								<TableRow>
+									<TableCell header>Submitted</TableCell>
+									<TableCell header className="justify-content-center">
+										Type
+									</TableCell>
+									<TableCell header width={300}>
+										Post Details
+									</TableCell>
+									{isSuperAdmin && <TableCell header>Owner</TableCell>}
+									<TableCell header className="justify-content-center">
+										Views
+									</TableCell>
+									<TableCell header>My Institution</TableCell>
+									<TableCell header>Other Institutions</TableCell>
+									<TableCell />
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{content.map((content, index) => {
+									return (
+										<OnYourTimeContentRow
+											key={index}
+											content={content}
+											onApproveClick={handleApproveClick}
+											onArchiveToggle={handleArchiveToggle}
+											onDeleteClick={handleDeleteClick}
+											onEditClick={handleEditClick}
+											onRejectClick={handleRejectClick}
+										/>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						{content && content.length > 0 && (
+							<div className="d-flex justify-content-center">
+								<TablePagination
+									total={totalNumberOfItems}
+									page={currentPageIndex}
+									size={15}
+									onClick={handlePaginationClick}
+								/>
+							</div>
+						)}
+					</Col>
+				</Row>
+			</Container>
+		</>
 	);
 };
 

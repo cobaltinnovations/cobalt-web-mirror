@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import moment from 'moment';
 
-import useHeaderTitle from '@/hooks/use-header-title';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -16,6 +15,7 @@ import Breadcrumb from '@/components/breadcrumb';
 import { groupEventService, appointmentService } from '@/lib/services';
 import { GroupEvent } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
+import HeroContainer from '@/components/hero-container';
 
 const InTheStudioDetail: FC = () => {
 	const handleError = useHandleError();
@@ -31,8 +31,6 @@ const InTheStudioDetail: FC = () => {
 	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [showConfirmReservationModal, setShowConfirmReservationModal] = useState<boolean>(false);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
-
-	useHeaderTitle(groupEvent?.name ?? '');
 
 	const fetchData = useCallback(async () => {
 		if (!groupEventId) return;
@@ -95,6 +93,10 @@ const InTheStudioDetail: FC = () => {
 					setIsCancelling(false);
 				}}
 			/>
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
+			</HeroContainer>
 
 			{groupEvent && (
 				<ConfirmGroupEventBookingModal

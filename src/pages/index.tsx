@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
-import useHeaderTitle from '@/hooks/use-header-title';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
@@ -27,7 +26,6 @@ const useIndexStyles = createUseThemedStyles((theme) => ({
 }));
 
 const Index: FC = () => {
-	useHeaderTitle(null);
 	const { account, institution } = useAccount();
 
 	const navigate = useNavigate();
@@ -64,7 +62,7 @@ const Index: FC = () => {
 		<AsyncPage fetchData={fetchData}>
 			{institution?.supportEnabled && (
 				<HeroContainer className="text-center">
-					<h3 className="mb-3">Recommended for you</h3>
+					<h1 className="mb-3">Recommended for you</h1>
 					<p className="mb-5">
 						Peers, Resilience Coaches, Therapists, Psychiatrists, and more are here to help
 					</p>

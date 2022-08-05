@@ -2,8 +2,6 @@ import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObj
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import CalendarAppointment from '@/components/calendar-appointment';
@@ -21,7 +19,6 @@ interface PendingCancellationModel {
 
 const MyCalendar: FC = () => {
 	const handleError = useHandleError();
-	useHeaderTitle('my calendar');
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
 	const appointmentId = searchParams.get('appointmentId') || '';
@@ -141,13 +138,14 @@ const MyCalendar: FC = () => {
 				}}
 			/>
 
-			<div className="pb-8">
-				<HeroContainer>
-					<p className="text-center mb-0">
-						Your booked sessions, reserved studio seats, and more will be available here.
-					</p>
-				</HeroContainer>
+			<HeroContainer>
+				<h2 className="mb-2 text-center">My Calendar</h2>
+				<p className="text-center mb-0">
+					Your booked sessions, reserved studio seats, and more will be available here.
+				</p>
+			</HeroContainer>
 
+			<div className="pb-8">
 				{locationState?.successBooking ? (
 					<HeroContainer className="bg-success">
 						{locationState?.emailAddress ? (

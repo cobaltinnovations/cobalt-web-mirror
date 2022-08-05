@@ -6,8 +6,6 @@ import * as yup from 'yup';
 import { Formik } from 'formik';
 import { createUseStyles } from 'react-jss';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
@@ -18,6 +16,7 @@ import { GroupSessionRequestModel } from '@/lib/models';
 import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
+import HeroContainer from '@/components/hero-container';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -70,8 +69,6 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 	const { groupSessionRequestId } = useParams<{ groupSessionRequestId?: string }>();
 	const [session, setSession] = useState<GroupSessionRequestModel>();
 
-	useHeaderTitle(session?.title ?? '');
-
 	const fetchData = useCallback(async () => {
 		if (!groupSessionRequestId) {
 			throw new Error();
@@ -117,6 +114,9 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">{session?.title}</h2>
+			</HeroContainer>
 			<Container className="pt-6 pb-6">
 				<Row>
 					<Col lg={{ span: 8, offset: 2 }}>

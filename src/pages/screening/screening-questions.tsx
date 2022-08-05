@@ -5,7 +5,7 @@ import { ERROR_CODES } from '@/lib/http-client';
 import { ScreeningAnswerFormatId, ScreeningAnswerSelection } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Container, Form, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
@@ -186,37 +186,41 @@ const ScreeningQuestionsPage = () => {
 	return (
 		<AsyncPage fetchData={initialFetch}>
 			<Container className="py-5">
-				{!!response?.screeningQuestion.introText && (
-					<p className="mb-3">{response.screeningQuestion.introText}</p>
-				)}
-
-				<h3 className="mb-5">{response?.screeningQuestion.questionText}</h3>
-
-				<Form
-					onSubmit={(e) => {
-						e.preventDefault();
-						submitAnswers();
-					}}
-				>
-					{renderedAnswerOptions}
-
-					<div className="d-flex">
-						{response?.previousScreeningQuestionContextId && (
-							<Button
-								type="button"
-								onClick={() => {
-									navigateToQuestion(response.previousScreeningQuestionContextId);
-								}}
-							>
-								Previous
-							</Button>
+				<Row>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						{!!response?.screeningQuestion.introText && (
+							<p className="mb-3">{response.screeningQuestion.introText}</p>
 						)}
 
-						<Button className="ms-auto" type="submit">
-							Next
-						</Button>
-					</div>
-				</Form>
+						<h3 className="mb-5">{response?.screeningQuestion.questionText}</h3>
+
+						<Form
+							onSubmit={(e) => {
+								e.preventDefault();
+								submitAnswers();
+							}}
+						>
+							{renderedAnswerOptions}
+
+							<div className="d-flex">
+								{response?.previousScreeningQuestionContextId && (
+									<Button
+										type="button"
+										onClick={() => {
+											navigateToQuestion(response.previousScreeningQuestionContextId);
+										}}
+									>
+										Previous
+									</Button>
+								)}
+
+								<Button className="ms-auto" type="submit">
+									Next
+								</Button>
+							</div>
+						</Form>
+					</Col>
+				</Row>
 			</Container>
 		</AsyncPage>
 	);

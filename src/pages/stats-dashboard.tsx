@@ -12,6 +12,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Chart } from '@/components/chart';
 import Select from '@/components/select';
 import Loader from '@/components/loader';
+import HeroContainer from '@/components/hero-container';
 
 enum PERIODS {
 	WEEKLY = 'WEEKLY',
@@ -85,77 +86,82 @@ const StatsDashboard: FC = () => {
 	}
 
 	return (
-		<Container className="py-5">
-			<Row className="mb-4">
-				<Col>
-					<div className="d-flex align-items-center justify-content-between">
-						<div className="d-flex align-items-center">
-							<Select
-								className="flex-shrink-0"
-								value={periodicSelectValue}
-								onChange={(event) => {
-									if (event.currentTarget.value === PERIODS.WEEKLY) {
-										setPeriodicSelectValue(PERIODS.WEEKLY);
-										setReportingWindowId(weeklyDurations[0].value);
-									} else {
-										setPeriodicSelectValue(PERIODS.MONTHLY);
-										setReportingWindowId(monthlyDurations[0].value);
-									}
-								}}
-							>
-								<option value={PERIODS.WEEKLY}>Weekly</option>
-								<option value={PERIODS.MONTHLY}>Monthly</option>
-							</Select>
-							<InputGroup className="ms-4">
-								{(periodicSelectValue === PERIODS.WEEKLY ? weeklyDurations : monthlyDurations).map(
-									(duration) => {
-										return (
-											<Form.Check
-												key={duration.value}
-												bsPrefix="input-group__radio"
-												type="radio"
-												name="time-period"
-												id={`time-period--${duration.value}`}
-												value={duration.value}
-												label={duration.label}
-												inline
-												checked={reportingWindowId === duration.value}
-												onChange={() => {
-													setReportingWindowId(duration.value);
-												}}
-											/>
-										);
-									}
+		<>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">Stats Dashboard</h2>
+			</HeroContainer>
+			<Container className="py-5">
+				<Row className="mb-4">
+					<Col>
+						<div className="d-flex align-items-center justify-content-between">
+							<div className="d-flex align-items-center">
+								<Select
+									className="flex-shrink-0"
+									value={periodicSelectValue}
+									onChange={(event) => {
+										if (event.currentTarget.value === PERIODS.WEEKLY) {
+											setPeriodicSelectValue(PERIODS.WEEKLY);
+											setReportingWindowId(weeklyDurations[0].value);
+										} else {
+											setPeriodicSelectValue(PERIODS.MONTHLY);
+											setReportingWindowId(monthlyDurations[0].value);
+										}
+									}}
+								>
+									<option value={PERIODS.WEEKLY}>Weekly</option>
+									<option value={PERIODS.MONTHLY}>Monthly</option>
+								</Select>
+								<InputGroup className="ms-4">
+									{(periodicSelectValue === PERIODS.WEEKLY ? weeklyDurations : monthlyDurations).map(
+										(duration) => {
+											return (
+												<Form.Check
+													key={duration.value}
+													bsPrefix="input-group__radio"
+													type="radio"
+													name="time-period"
+													id={`time-period--${duration.value}`}
+													value={duration.value}
+													label={duration.label}
+													inline
+													checked={reportingWindowId === duration.value}
+													onChange={() => {
+														setReportingWindowId(duration.value);
+													}}
+												/>
+											);
+										}
+									)}
+								</InputGroup>
+								{isLoading && (
+									<div className="position-relative ms-9">
+										<Loader size={50} />
+									</div>
 								)}
-							</InputGroup>
-							{isLoading && (
-								<div className="position-relative ms-9">
-									<Loader size={50} />
-								</div>
-							)}
+							</div>
+							<Button size="sm" onClick={handleDownloadCsvButtonClick}>
+								download .csv
+							</Button>
 						</div>
-						<Button size="sm" onClick={handleDownloadCsvButtonClick}>
-							download .csv
-						</Button>
-					</div>
-				</Col>
-			</Row>
-			<hr className="mb-4" />
-			<Row className="mb-4">
-				<Col>
-					<h2 className="mb-0">utilization</h2>
-				</Col>
-			</Row>
-			{charts.map((chart) => {
-				return (
-					<Row className="mb-6" key={chart.chartTypeId}>
-						<Col>
-							<Chart configuration={chart} />
-						</Col>
-					</Row>
-				);
-			})}
-		</Container>
+					</Col>
+				</Row>
+				<hr className="mb-4" />
+				<Row className="mb-4">
+					<Col>
+						<h2 className="mb-0">utilization</h2>
+					</Col>
+				</Row>
+				{charts.map((chart) => {
+					return (
+						<Row className="mb-6" key={chart.chartTypeId}>
+							<Col>
+								<Chart configuration={chart} />
+							</Col>
+						</Row>
+					);
+				})}
+			</Container>
+		</>
 	);
 };
 

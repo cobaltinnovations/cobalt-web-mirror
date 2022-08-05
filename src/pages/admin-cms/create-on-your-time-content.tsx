@@ -21,7 +21,7 @@ import {
 	ROLE_ID,
 } from '@/lib/models';
 
-import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
+import { useCobaltTheme } from '@/jss/theme';
 
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
@@ -33,7 +33,6 @@ import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
-import useHeaderTitle from '@/hooks/use-header-title';
 import useHandleError from '@/hooks/use-handle-error';
 
 const onYourTimeContentSchema = yup
@@ -64,7 +63,6 @@ const requiredFields = getRequiredYupFields<onYourTimeFormData>(onYourTimeConten
 const CreateOnYourTimeContent: FC = () => {
 	const theme = useCobaltTheme();
 	const handleError = useHandleError();
-	useHeaderTitle('On Your Time - My Content');
 	const { account } = useAccount();
 	const location = useLocation();
 	const navigate = useNavigate();

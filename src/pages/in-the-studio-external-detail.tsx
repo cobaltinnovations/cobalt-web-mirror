@@ -2,23 +2,19 @@ import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import useHeaderTitle from '@/hooks/use-header-title';
-
 import AsyncPage from '@/components/async-page';
 import StudioEvent from '@/components/studio-event';
 import Breadcrumb from '@/components/breadcrumb';
 
 import { groupEventService } from '@/lib/services';
 import { ExternalGroupEventType } from '@/lib/models';
+import HeroContainer from '@/components/hero-container';
 
 const InTheStudioExternalDetail: FC = () => {
 	const { externalGroupEventTypeId } = useParams<{
 		externalGroupEventTypeId: string;
 	}>();
-
 	const [groupEvent, setGroupEvent] = useState<ExternalGroupEventType | null>(null);
-
-	useHeaderTitle(groupEvent?.name ?? '');
 
 	const fetchData = useCallback(async () => {
 		if (!externalGroupEventTypeId) return;
@@ -55,6 +51,10 @@ const InTheStudioExternalDetail: FC = () => {
 					</Row>
 				</Container>
 			)}
+
+			<HeroContainer>
+				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
+			</HeroContainer>
 
 			<Container className="pt-5 pb-5">
 				<Row>

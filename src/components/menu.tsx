@@ -102,7 +102,6 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		'& li a': {
 			...theme.fonts.default,
 			color: theme.colors.n900,
-			textTransform: 'lowercase',
 		},
 	},
 	subMenuList: {
@@ -234,51 +233,51 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 				<ul className={classNames(classes.menuList, classes.mainMenuList)}>
 					<li>
 						<Link to="/" onClick={handleLinkClick}>
-							home
+							Home
 						</Link>
 					</li>
 					{institution?.supportEnabled && (
 						<li>
 							<Link to="/connect-with-support" onClick={handleLinkClick}>
-								connect with support
+								Connect with Support
 							</Link>
 						</li>
 					)}
 					<li>
 						<Link to="/my-calendar" onClick={handleLinkClick}>
-							my calendar
+							My Calendar
 						</Link>
 					</li>
 					{account?.roleId === 'PROVIDER' ? (
 						<li>
 							<Link to="/scheduling" onClick={handleLinkClick}>
-								my schedule
+								My Schedule
 							</Link>
 						</li>
 					) : null}
 					<li>
 						<Link to="/in-the-studio" onClick={handleLinkClick}>
-							in the studio
+							In the Studio
 						</Link>
 					</li>
 					<li>
 						<Link to="/on-your-time" onClick={handleLinkClick}>
-							on Your time
+							On Your Time
 						</Link>
 					</li>
 					<li>
 						<Link to="/crisis-resources" onClick={handleInCrisisLinkClick}>
-							crisis resources
+							Crisis Resources
 						</Link>
 					</li>
 					<li>
 						<Link to="/covid-19-resources" onClick={handleLinkClick}>
-							covid-19 resources
+							Covid-19 Resources
 						</Link>
 					</li>
 					<li>
 						<Link to="/well-being-resources" onClick={handleLinkClick}>
-							well-being resources
+							Well-Being Resources
 						</Link>
 					</li>
 					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId && (
@@ -310,7 +309,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 							<ul className={classNames(classes.menuList, classes.mainMenuList)}>
 								<li>
 									<Link to="/stats-dashboard" onClick={handleLinkClick}>
-										stats dashboard
+										Stats Dashboard
 									</Link>
 								</li>
 								{institutionCapabilities?.viewNavAdminMyContent && (
@@ -349,13 +348,13 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 			<ul className={classNames(classes.menuList, classes.subMenuList)}>
 				<li>
 					<Link to="/privacy" onClick={handleLinkClick}>
-						privacy
+						Privacy
 					</Link>
 				</li>
 
 				<li>
 					<Link to="/#" onClick={handleSignOutLinkClick}>
-						sign out
+						Sign Out
 					</Link>
 				</li>
 			</ul>
