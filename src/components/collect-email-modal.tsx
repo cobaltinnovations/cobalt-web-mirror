@@ -42,6 +42,7 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 						type="email"
 						value={email}
 						label="Your Email Address"
+						autoFocus
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setEmail(e.target.value);
 						}}

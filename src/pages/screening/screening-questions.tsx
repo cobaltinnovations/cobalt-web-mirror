@@ -12,6 +12,7 @@ import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
@@ -27,44 +28,44 @@ const ScreeningQuestionsPage = () => {
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 
-	const submitAnswers = useCallback(() => {
-		if (!screeningQuestionContextId) {
-			return;
-		}
+	const submitAnswers = useCallback(
+		(answers: string[]) => {
+			if (!screeningQuestionContextId) {
+				return;
+			}
 
-		const answers: ScreeningAnswerSelection[] = [
-			...selectedAnswers.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })),
-			...Object.entries(answerText)
-				.filter(([_, text]) => !!text)
-				.map(([screeningAnswerOptionId, text]) => ({
-					screeningAnswerOptionId,
-					text,
-				})),
-		];
-		const submit = screeningService.answerQuestion(screeningQuestionContextId, answers);
+			const selections: ScreeningAnswerSelection[] = [
+				...answers.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })),
+				...Object.entries(answerText)
+					.filter(([_, text]) => !!text)
+					.map(([screeningAnswerOptionId, text]) => ({
+						screeningAnswerOptionId,
+						text,
+					})),
+			];
+			const submit = screeningService.answerQuestion(screeningQuestionContextId, selections);
 
-		submit
-			.fetch()
-			.then((r) => {
-				if (r.nextScreeningQuestionContextId) {
-					navigateToQuestion(r.nextScreeningQuestionContextId);
-				} else if (r.screeningSessionDestination) {
-					navigateToDestination(r.screeningSessionDestination);
-				}
-			})
-			.catch((e) => {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
-			});
-	}, [
-		answerText,
-		handleError,
-		navigateToDestination,
-		navigateToQuestion,
-		screeningQuestionContextId,
-		selectedAnswers,
-	]);
+			setIsSubmitting(true);
+			submit
+				.fetch()
+				.then((r) => {
+					if (r.nextScreeningQuestionContextId) {
+						navigateToQuestion(r.nextScreeningQuestionContextId);
+					} else if (r.screeningSessionDestination) {
+						navigateToDestination(r.screeningSessionDestination);
+					}
+				})
+				.catch((e) => {
+					if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+						handleError(e);
+					}
+				})
+				.finally(() => {
+					setIsSubmitting(false);
+				});
+		},
+		[answerText, handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId]
+	);
 
 	useEffect(() => {
 		refetch(screeningService.getScreeningQuestionContext(screeningQuestionContextId));
@@ -98,7 +99,9 @@ const ScreeningQuestionsPage = () => {
 						name="screeningAnswerOptionId"
 						value={selectedAnswers[0] ?? ''}
 						onChange={(newId) => {
-							setSelectedAnswers([newId]);
+							const selection = [newId];
+							setSelectedAnswers(selection);
+							submitAnswers(selection);
 						}}
 					>
 						{response.screeningAnswerOptions.map((option) => {
@@ -111,6 +114,7 @@ const ScreeningQuestionsPage = () => {
 									value={option.screeningAnswerOptionId}
 									className="mb-2"
 									variant={isChecked ? 'primary' : 'light'}
+									disabled={isSubmitting}
 								>
 									{option.answerOptionText}
 								</ToggleButton>
@@ -142,6 +146,7 @@ const ScreeningQuestionsPage = () => {
 									value={option.screeningAnswerOptionId}
 									className="d-flex align-items-center mb-2"
 									variant={isChecked ? 'primary' : 'light'}
+									disabled={isSubmitting}
 								>
 									<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
 										{isChecked && <CheckMarkIcon />}
@@ -157,6 +162,7 @@ const ScreeningQuestionsPage = () => {
 				return response.screeningAnswerOptions.map((option) => (
 					<InputHelper
 						key={option.screeningAnswerOptionId}
+						disabled={isSubmitting}
 						className="mb-2"
 						label={option.answerOptionText ?? ''}
 						type="text"
@@ -178,9 +184,11 @@ const ScreeningQuestionsPage = () => {
 		}
 	}, [
 		answerText,
+		isSubmitting,
 		response?.screeningAnswerOptions,
 		response?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
+		submitAnswers,
 	]);
 
 	return (
@@ -197,7 +205,7 @@ const ScreeningQuestionsPage = () => {
 						<Form
 							onSubmit={(e) => {
 								e.preventDefault();
-								submitAnswers();
+								submitAnswers(selectedAnswers);
 							}}
 						>
 							{renderedAnswerOptions}
@@ -205,6 +213,7 @@ const ScreeningQuestionsPage = () => {
 							<div className="d-flex">
 								{response?.previousScreeningQuestionContextId && (
 									<Button
+										disabled={isSubmitting}
 										type="button"
 										onClick={() => {
 											navigateToQuestion(response.previousScreeningQuestionContextId);
@@ -214,7 +223,7 @@ const ScreeningQuestionsPage = () => {
 									</Button>
 								)}
 
-								<Button className="ms-auto" type="submit">
+								<Button disabled={isSubmitting} className="ms-auto" type="submit">
 									Next
 								</Button>
 							</div>

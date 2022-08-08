@@ -91,6 +91,7 @@ interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	characterCounter?: number;
 	error?: string;
 	required?: boolean;
+	autoFocus?: boolean;
 }
 
 const InputHelper: FC<InputHelperProps> = ({
@@ -101,6 +102,7 @@ const InputHelper: FC<InputHelperProps> = ({
 	characterCounter,
 	required,
 	error,
+	autoFocus,
 	...props
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
@@ -160,6 +162,7 @@ const InputHelper: FC<InputHelperProps> = ({
 					{...props}
 					onFocus={handleFocus}
 					onBlur={handleBlur}
+					autoFocus={autoFocus}
 				>
 					{children}
 				</FormControlComponent>
