@@ -222,29 +222,30 @@ const SignInOptions = () => {
 							<h1 className="mb-4 text-center">Sign in to Cobalt</h1>
 
 							{subdomainInstitution?.ssoEnabled && (
-								<>
-									<div className="mb-6 text-center">
-										<Button
-											className="w-100 d-block"
-											variant="primary"
-											onClick={() => {
-												if (accountSources && accountSources.length === 1) {
-													const firstAccountSource = accountSources[0];
-													window.location.href = firstAccountSource.ssoUrl;
-												} else {
-													setSsoModalIsOpen(true);
-												}
-											}}
-										>
-											Continue with SSO
-										</Button>
-									</div>
-									<div className="mb-6 d-flex align-items-center">
-										<hr className="flex-grow-1" />
-										<p className="m-0 px-4 flex-shrink-0">or</p>
-										<hr className="flex-grow-1" />
-									</div>
-								</>
+								<div className="mb-6 text-center">
+									<Button
+										className="w-100 d-block"
+										variant="primary"
+										onClick={() => {
+											if (accountSources && accountSources.length === 1) {
+												const firstAccountSource = accountSources[0];
+												window.location.href = firstAccountSource.ssoUrl;
+											} else {
+												setSsoModalIsOpen(true);
+											}
+										}}
+									>
+										Continue with SSO
+									</Button>
+								</div>
+							)}
+
+							{subdomainInstitution?.ssoEnabled && subdomainInstitution?.emailEnabled && (
+								<div className="mb-6 d-flex align-items-center">
+									<hr className="flex-grow-1" />
+									<p className="m-0 px-4 flex-shrink-0">or</p>
+									<hr className="flex-grow-1" />
+								</div>
 							)}
 
 							{subdomainInstitution?.emailEnabled && (
