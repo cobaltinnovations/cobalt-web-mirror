@@ -196,7 +196,7 @@ const OnYourTimeDetail: FC = () => {
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<Button
 								as="a"
-								className="d-inline-block"
+								className="d-inline-block text-decoration-none"
 								variant="primary"
 								href={item.url}
 								target="_blank"

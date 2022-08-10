@@ -131,7 +131,7 @@ const InTheStudio: FC = () => {
 					</Col>
 				</Row>
 			</Container>
-			<Container fluid="md">
+			<Container>
 				<Row>
 					{filteredList.length > 0 ? (
 						filteredList.map((groupEvent) => {
