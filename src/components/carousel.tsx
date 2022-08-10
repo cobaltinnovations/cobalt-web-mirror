@@ -127,7 +127,7 @@ const CustomButtonGroup = ({
 	return (
 		<div ref={customButtonGroupRef} className={classes.customButtonGroupOuter}>
 			<div className={classes.customButtonGroup}>
-				{description && <p className={classes.descriptionText}>{description}</p>}
+				<div>{description && <p className={classes.descriptionText}>{description}</p>}</div>
 				<div className="d-flex align-items-center justify-content-between">
 					<div className="d-flex align-items-center">
 						<Button

@@ -44,7 +44,7 @@ const Profile: FC = () => {
 				</Container>
 			</Container>
 			<Container className="pt-5 pb-5">
-				<Row className="mb-4">
+				{/* <Row className="mb-4">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						{account?.introAssessment.questions.map((question, index) => {
 							return (
@@ -55,7 +55,7 @@ const Profile: FC = () => {
 							);
 						})}
 					</Col>
-				</Row>
+				</Row> */}
 				<Row className="text-center">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Button onClick={handleUpdateMyProfileButtonClick}>update my profile</Button>
