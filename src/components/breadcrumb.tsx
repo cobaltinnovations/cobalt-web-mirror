@@ -1,6 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -8,19 +9,21 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	breadcrumb: {
 		padding: 0,
+		overflow: 'hidden',
 		backgroundColor: theme.colors.n0,
 	},
 	breadcrumbLink: {
-		...theme.fonts.bodyBold,
-		...theme.fonts.uiSmall,
-		textDecoration: 'none',
 		marginRight: 10,
 		position: 'relative',
+		textDecoration: 'none',
+		...theme.fonts.uiSmall,
+		...theme.fonts.bodyBold,
 	},
 	chevron: {
-		fill: theme.colors.border,
 		height: 10,
+		flexShrink: 0,
 		marginRight: 10,
+		fill: theme.colors.border,
 	},
 }));
 
@@ -53,27 +56,25 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 						xl={props.xl || { span: 6, offset: 3 }}
 					>
 						<div className="d-flex align-items-center">
-							{props.breadcrumbs.map((breadcrumb, index) => {
-								const isLast = index === props.breadcrumbs.length - 1;
-								const key = breadcrumb.title;
+							<p className="mb-0 fs-ui-small">
+								{props.breadcrumbs.map((breadcrumb, index) => {
+									const isLast = index === props.breadcrumbs.length - 1;
+									const key = breadcrumb.title;
 
-								if (isLast) {
+									if (isLast) {
+										return <span key={index}>{breadcrumb.title}</span>;
+									}
+
 									return (
-										<p key={key} className="mb-0 fs-ui-small">
-											{breadcrumb.title}
-										</p>
+										<React.Fragment key={key}>
+											<Link className={classes.breadcrumbLink} to={breadcrumb.to}>
+												{breadcrumb.title}
+											</Link>
+											<RightChevron className={classes.chevron} />
+										</React.Fragment>
 									);
-								}
-
-								return (
-									<React.Fragment key={key}>
-										<Link className={classes.breadcrumbLink} to={breadcrumb.to}>
-											{breadcrumb.title}
-										</Link>
-										<RightChevron className={classes.chevron} />
-									</React.Fragment>
-								);
-							})}
+								})}
+							</p>
 						</div>
 					</Col>
 				</Row>

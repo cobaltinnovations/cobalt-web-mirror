@@ -177,11 +177,11 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 				breadcrumbs={[
 					{
 						to: '/',
-						title: 'home',
+						title: 'Home',
 					},
 					{
 						to: '/in-the-studio',
-						title: 'in the studio',
+						title: 'In the studio',
 					},
 					{
 						to: `/group-session-scheduled/${session?.groupSessionId}`,
@@ -190,7 +190,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 				]}
 			/>
 
-			<HeroContainer>
+			<HeroContainer className="mb-4">
 				<h2 className="mb-0 text-center">{session?.title}</h2>
 			</HeroContainer>
 
@@ -226,7 +226,7 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			)}
 
 			{session && (
-				<Container fluid="md">
+				<Container>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<StudioEvent groupEvent={session} />
