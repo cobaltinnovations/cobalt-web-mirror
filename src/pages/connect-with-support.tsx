@@ -183,8 +183,8 @@ const ConnectWithSupport: FC = () => {
 
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const recommendedTherapistPsychiatrist =
-		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Clinician ||
-		findOptions?.recommendationLevel.recommendationLevelId === SupportRoleId.Psychiatrist;
+		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Clinician) ||
+		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Psychiatrist);
 	const filterEapTherapistPsychiatrist =
 		providerTypeFilter.includes(SupportRoleId.CareManager) ||
 		providerTypeFilter.includes(SupportRoleId.Clinician) ||

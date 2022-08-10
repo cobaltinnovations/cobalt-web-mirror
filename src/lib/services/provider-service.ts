@@ -2,7 +2,6 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
 	Provider,
 	SupportRoleId,
-	RecommendationLevel,
 	SupportRole,
 	ProviderAvailability,
 	LogicalAvailability,
@@ -32,7 +31,7 @@ export interface FindOptionsResponse {
 	paymentTypes: PaymentType[];
 	recommendation: string;
 	recommendationHtml: string;
-	recommendationLevel: RecommendationLevel;
+	recommendedSupportRoleIds: SupportRoleId[];
 	scores: AssessmentScore;
 	supportRoles: SupportRole[];
 	specialties: Specialty[];
