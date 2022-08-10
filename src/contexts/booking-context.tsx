@@ -16,6 +16,7 @@ import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, sortBy } from 'lodash';
 import { To, useSearchParams } from 'react-router-dom';
 import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
+import useAccount from '@/hooks/use-account';
 
 export enum BookingSource {
 	ProviderSearch,
@@ -132,6 +133,7 @@ interface BookingState {
 const BookingContext = createContext({} as BookingState);
 
 const BookingProvider: FC<PropsWithChildren> = (props) => {
+	const { account } = useAccount();
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
 	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);
@@ -251,6 +253,25 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 			setPreviousProviderId(selectedProvider.providerId);
 		}
 	}, [selectedProvider?.providerId]);
+
+	// reset booking context when accountId changes
+	const accountId = account?.accountId;
+	useEffect(() => {
+		setAppointmentTypes([]);
+		setSpecialties([]);
+		setEpicDepartments([]);
+		setAvailableSections([]);
+		setPreservedFilterQueryString('');
+		setSelectedAppointmentTypeId(undefined);
+		setSelectedDate(undefined);
+		setSelectedProvider(undefined);
+		setSelectedTimeSlot(undefined);
+		setPromptForEmail(false);
+		setPromptForPhoneNumber(false);
+		setIsEligible(true);
+		setBookingSource(BookingSource.ProviderSearch);
+		setPreviousProviderId(undefined);
+	}, [accountId]);
 
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
 	const getExitBookingLocation = useCallback(
