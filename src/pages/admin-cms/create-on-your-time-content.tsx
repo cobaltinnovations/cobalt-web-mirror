@@ -245,11 +245,11 @@ const CreateOnYourTimeContent: FC = () => {
 					breadcrumbs={[
 						{
 							to: isAdding ? '/cms/available-content' : '/cms/on-your-time',
-							title: isAdding ? 'available content' : 'my content',
+							title: isAdding ? 'Available Content' : 'My Content',
 						},
 						{
 							to: location.pathname,
-							title: isAdding ? 'add public post' : 'add content',
+							title: isAdding ? 'Add Public Post' : 'Add Content',
 						},
 					]}
 				/>
@@ -339,7 +339,7 @@ const CreateOnYourTimeContent: FC = () => {
 											<Row>
 												<Col className="mb-5">
 													<h3 className="mb-2">
-														{isAdding ? 'add public post' : 'add on your time content'}
+														{isAdding ? 'Add Public Post' : 'Add on Your Time Content'}
 													</h3>
 													<span>Required *</span>
 												</Col>
@@ -983,7 +983,7 @@ const CreateOnYourTimeContent: FC = () => {
 											</Row>
 
 											<SessionFormSubmitBanner
-												title={isEditing ? 'update content' : 'add content'}
+												title={isEditing ? 'Update Content' : 'Add Content'}
 												disabled={Object.keys(errors).length > 0}
 											/>
 										</Form>
