@@ -87,7 +87,7 @@ const Index: FC = () => {
 							<Col>
 								<Carousel
 									responsive={responsiveDefaults}
-									description="Explainer text goes here. What is in the studio?"
+									// description="Explainer text goes here. What is in the studio?"
 									calloutTitle="Explore all"
 									calloutOnClick={() => {
 										navigate('/in-the-studio');
@@ -135,7 +135,7 @@ const Index: FC = () => {
 					<Col>
 						<Carousel
 							responsive={responsiveDefaults}
-							description="Explainer text goes here. What is on your time?"
+							// description="Explainer text goes here. What is on your time?"
 							calloutTitle="Explore all"
 							calloutOnClick={() => {
 								navigate('/on-your-time');

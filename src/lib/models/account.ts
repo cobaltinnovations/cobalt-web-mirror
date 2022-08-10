@@ -18,7 +18,6 @@ export interface AccountModel {
 	lastName?: string;
 	displayName?: string;
 	phoneNumber?: string;
-	completedIntroAssessment?: boolean;
 	timeZone: string;
 	locale: string;
 	consentFormAccepted?: boolean;
@@ -28,9 +27,6 @@ export interface AccountModel {
 	createdDescription: string;
 	lastUpdated?: string;
 	lastUpdatedDescription?: string;
-	introAssessment: {
-		questions: AccountQuestionModel[];
-	};
 	roleId: string;
 	sourceSystemId: string;
 }
