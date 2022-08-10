@@ -1,7 +1,6 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import classNames from 'classnames';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { createUseThemedStyles } from '@/jss/theme';
