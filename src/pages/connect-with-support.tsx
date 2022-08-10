@@ -17,7 +17,6 @@ import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-do
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
-import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import FilterAvailabilityModal from '@/components/filter-availability-modal';
@@ -38,34 +37,24 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
 import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
-import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
+import { AssessmentScore, SupportRoleId } from '@/lib/models';
 
-import { BookingContext, SearchResult, BookingFilters, BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
+import {
+	BookingContext,
+	ProviderSearchResult,
+	BookingFilters,
+	BookingSource,
+	FILTER_DAYS,
+	isClinicResult,
+	mapClinicToResult,
+	mapProviderToResult,
+} from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import { createUseThemedStyles } from '@/jss/theme';
-
-const isClinicResult = (result: Provider | Clinic): result is Clinic => {
-	return typeof (result as Clinic).clinicId === 'string';
-};
-
-const mapProviderToResult = (provider: Provider): SearchResult => ({
-	id: provider.providerId,
-	imageUrl: provider.imageUrl,
-	type: 'provider',
-	displayName: provider.name + (provider.license ? `, ${provider.license}` : ''),
-	description: provider.supportRolesDescription,
-});
-
-const mapClinicToResult = (clinic: Clinic): SearchResult => ({
-	id: clinic.clinicId,
-	type: 'clinic',
-	imageUrl: getRandomPlaceholderImage() as any,
-	displayName: clinic.description,
-});
 
 const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
@@ -115,8 +104,9 @@ const ConnectWithSupport: FC = () => {
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
-	const [recentProviders, setRecentProviders] = useState<SearchResult[]>([]);
-	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [recentProviders, setRecentProviders] = useState<ProviderSearchResult[]>([]);
+	const [searchResults, setSearchResults] = useState<ProviderSearchResult[]>([]);
+	const [selectedSearchResult, setSelectedSearchResult] = useState<ProviderSearchResult[]>([]);
 	const [recommendationHtml, setRecommendationHtml] = useState<string>('');
 
 	const [assessmentScore, setAssessmentScore] = useState<AssessmentScore>();
@@ -127,8 +117,6 @@ const ConnectWithSupport: FC = () => {
 		availableSections,
 		setAvailableSections,
 
-		selectedSearchResult,
-		setSelectedSearchResult,
 		preservedFilterQueryString,
 		setPreservedFilterQueryString,
 
@@ -205,14 +193,7 @@ const ConnectWithSupport: FC = () => {
 				replace: true,
 			});
 		}
-	}, [
-		didInit,
-		navigate,
-		subdomainInstitution?.providerTriageScreeningFlowId,
-		location.search,
-		skipAssessment,
-		hasCompletedScreening,
-	]);
+	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.providerTriageScreeningFlowId]);
 
 	const institutionId = account?.institutionId ?? '';
 	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
@@ -267,27 +248,14 @@ const ConnectWithSupport: FC = () => {
 			return;
 		}
 
-		const selectedSearchEntityId = selectedSearchResult[0] ? selectedSearchResult[0].id : undefined;
 		const providerId = searchParams.get('providerId');
 		const clinicIds = searchParams.getAll('clinicId');
-
-		if (
-			(providerId && providerId === selectedSearchEntityId) ||
-			(clinicIds.length && clinicIds[0] === selectedSearchEntityId)
-		) {
-			setIsLoading(false);
-			return;
-		}
 
 		setIsLoading(true);
 
 		let findFilters: FindFilters;
 
-		if (selectedSearchEntityId && selectedSearchResult[0].type === 'provider') {
-			findFilters = { providerId: selectedSearchEntityId };
-		} else if (selectedSearchEntityId) {
-			findFilters = { clinicIds: [selectedSearchEntityId] };
-		} else if (providerId) {
+		if (providerId) {
 			findFilters = { providerId };
 		} else if (clinicIds.length > 0) {
 			findFilters = { clinicIds };
@@ -350,11 +318,9 @@ const ConnectWithSupport: FC = () => {
 		findOptions?.defaultVisitTypeIds,
 		handleError,
 		searchParams,
-		selectedSearchResult,
 		setAppointmentTypes,
 		setAvailableSections,
 		setEpicDepartments,
-		setSelectedSearchResult,
 	]);
 
 	useEffect(() => {
@@ -529,14 +495,21 @@ const ConnectWithSupport: FC = () => {
 										setIsSearchFocused(false);
 									}}
 									onInputChange={setSearchQuery}
-									onChange={(selectedOptions) => {
-										setSelectedSearchResult(selectedOptions as SearchResult[]);
+									//@ts-expect-error option type
+									onChange={([selectedOption]: ProviderSearchResult[]) => {
+										const paramName = selectedOption.type === 'clinic' ? 'clinicId' : 'providerId';
+
+										setSearchParams({ [paramName]: selectedOption.id }, { state: location.state });
+
 										(typeAheadRef.current as any).blur();
 									}}
 									options={searchQuery ? searchResults : recentProviders}
 									selected={selectedSearchResult}
-									renderMenu={(options, menuProps) => {
-										const results = options as SearchResult[];
+									renderMenu={(
+										options,
+										{ newSelectionPrefix, paginationText, renderMenuItemChildren, ...menuProps }
+									) => {
+										const results = options as ProviderSearchResult[];
 										if (!searchQuery && recentProviders.length === 0) {
 											return <></>;
 										}
@@ -655,7 +628,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<AvailableProvider
-								className="mb-5"
+								className="my-5"
 								provider={{
 									fullyBooked: false,
 									providerId: 'xxxx-xxxx-xxxx-xxxx',

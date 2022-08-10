@@ -11,10 +11,11 @@ import React, {
 	PropsWithChildren,
 } from 'react';
 
-import { Provider, AvailabilityTimeSlot, AppointmentType } from '@/lib/models';
+import { Provider, AvailabilityTimeSlot, AppointmentType, Clinic } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, sortBy } from 'lodash';
 import { To, useSearchParams } from 'react-router-dom';
+import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 
 export enum BookingSource {
 	ProviderSearch,
@@ -62,7 +63,26 @@ export enum BookingFilters {
 	Specialty,
 }
 
-export interface SearchResult {
+export const isClinicResult = (result: Provider | Clinic): result is Clinic => {
+	return typeof (result as Clinic).clinicId === 'string';
+};
+
+export const mapProviderToResult = (provider: Provider): ProviderSearchResult => ({
+	id: provider.providerId,
+	imageUrl: provider.imageUrl,
+	type: 'provider',
+	displayName: provider.name + (provider.license ? `, ${provider.license}` : ''),
+	description: provider.supportRolesDescription,
+});
+
+export const mapClinicToResult = (clinic: Clinic): ProviderSearchResult => ({
+	id: clinic.clinicId,
+	type: 'clinic',
+	imageUrl: getRandomPlaceholderImage() as any,
+	displayName: clinic.description,
+});
+
+export interface ProviderSearchResult {
 	id: string;
 	type: 'provider' | 'clinic';
 	imageUrl: string;
@@ -80,8 +100,6 @@ interface BookingState {
 	availableSections: FindProvidersResponse['sections'];
 	setAvailableSections: Dispatch<SetStateAction<FindProvidersResponse['sections']>>;
 
-	selectedSearchResult: SearchResult[];
-	setSelectedSearchResult: Dispatch<SetStateAction<SearchResult[]>>;
 	preservedFilterQueryString: string;
 	setPreservedFilterQueryString: Dispatch<SetStateAction<string>>;
 
@@ -119,7 +137,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);
 	const [availableSections, setAvailableSections] = useState<FindProvidersResponse['sections']>([]);
 
-	const [selectedSearchResult, setSelectedSearchResult] = useState<SearchResult[]>([]);
 	const [searchParams] = useSearchParams();
 	const [preservedFilterQueryString, setPreservedFilterQueryString] = useState('');
 
@@ -266,8 +283,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				availableSections,
 				setAvailableSections,
 
-				selectedSearchResult,
-				setSelectedSearchResult,
 				preservedFilterQueryString,
 				setPreservedFilterQueryString,
 
