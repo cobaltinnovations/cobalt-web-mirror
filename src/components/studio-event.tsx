@@ -94,7 +94,7 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
 				/>
 				<div className={classes.informationContainer}>
-					<h5 className="mb-0">{groupEvent.title}</h5>
+					<h4 className="mb-0">{groupEvent.title}</h4>
 				</div>
 			</div>
 		);

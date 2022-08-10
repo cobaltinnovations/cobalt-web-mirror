@@ -94,10 +94,6 @@ const InTheStudioDetail: FC = () => {
 				}}
 			/>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
-			</HeroContainer>
-
 			{groupEvent && (
 				<ConfirmGroupEventBookingModal
 					show={showConfirmReservationModal}
@@ -141,18 +137,22 @@ const InTheStudioDetail: FC = () => {
 				breadcrumbs={[
 					{
 						to: '/',
-						title: 'home',
+						title: 'Home',
 					},
 					{
 						to: '/in-the-studio',
-						title: 'in the studio',
+						title: 'In the Studio',
 					},
 					{
 						to: '/#',
-						title: 'event',
+						title: 'Event',
 					},
 				]}
 			/>
+
+			<HeroContainer className="mb-4">
+				<h2 className="mb-0 text-center">{groupEvent?.name}</h2>
+			</HeroContainer>
 
 			{groupEvent?.appointment && (
 				<Container fluid className="bg-success p-0">
@@ -184,7 +184,7 @@ const InTheStudioDetail: FC = () => {
 			)}
 
 			{groupEvent && (
-				<Container fluid="md">
+				<Container>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<StudioEvent groupEvent={groupEvent} />

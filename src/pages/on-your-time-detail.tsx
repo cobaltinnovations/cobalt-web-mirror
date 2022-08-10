@@ -15,6 +15,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
+	card: {
+		borderRadius: 5,
+		overflow: 'hidden',
+		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
+	},
 	mediaContainer: {
 		paddingBottom: '56.25%',
 	},
@@ -105,65 +110,74 @@ const OnYourTimeDetail: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">{item?.title}</h2>
-			</HeroContainer>
 			<Breadcrumb
 				breadcrumbs={[
 					{
 						to: '/',
-						title: 'home',
+						title: 'Home',
 					},
 					{
 						to: '/on-your-time',
-						title: 'on your time',
+						title: 'On Your Time',
 					},
 					{
 						to: '/#',
-						title: item?.contentTypeDescription ?? 'content',
+						title: item?.contentTypeDescription ?? 'Content',
 					},
 				]}
 			/>
 
-			<Container fluid="md">
+			<HeroContainer className="mb-4">
+				<h2 className="mb-0 text-center">{item?.title}</h2>
+			</HeroContainer>
+
+			<Container>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{canEmbed ? (
-							<div className={classes.reactPlayerOuter}>
-								<ReactPlayer
-									width="100%"
-									height="100%"
-									controls
-									url={item?.url}
-									onPlay={() => {
-										trackActivity();
-									}}
-								/>
-							</div>
-						) : (
-							<BackgroundImageContainer
-								className={classes.mediaContainer}
-								imageUrl={item?.imageUrl || placeholderImage}
-							>
-								<div className={classes.mediaContent}>
-									<small className="text-white text-uppercase fw-bold">
-										{item?.newFlag ? 'NEW' : ''}
-									</small>
+						<div className={classes.card}>
+							{canEmbed ? (
+								<div className={classes.reactPlayerOuter}>
+									<ReactPlayer
+										width="100%"
+										height="100%"
+										controls
+										url={item?.url}
+										onPlay={() => {
+											trackActivity();
+										}}
+									/>
 								</div>
-							</BackgroundImageContainer>
-						)}
-						<div className={classes.informationContainer}>
-							<h5 className="mb-0">{item?.title}</h5>
-							{item?.author ? <p className="mb-1">by {item?.author}</p> : <p className="mb-1">&nbsp;</p>}
-
-							<div className="d-flex">
-								<small className="text-muted text-uppercase fw-bold">{item?.contentTypeLabel}</small>
-
-								{item?.duration && (
-									<small className="text-muted text-uppercase fw-bold ms-auto">
-										{item?.duration}
-									</small>
+							) : (
+								<BackgroundImageContainer
+									className={classes.mediaContainer}
+									imageUrl={item?.imageUrl || placeholderImage}
+								>
+									<div className={classes.mediaContent}>
+										<small className="text-white text-uppercase fw-bold">
+											{item?.newFlag ? 'NEW' : ''}
+										</small>
+									</div>
+								</BackgroundImageContainer>
+							)}
+							<div className={classes.informationContainer}>
+								<h4 className="mb-0">{item?.title}</h4>
+								{item?.author ? (
+									<p className="mb-1">by {item?.author}</p>
+								) : (
+									<p className="mb-1">&nbsp;</p>
 								)}
+
+								<div className="d-flex">
+									<small className="text-muted text-uppercase fw-bold">
+										{item?.contentTypeLabel}
+									</small>
+
+									{item?.duration && (
+										<small className="text-muted text-uppercase fw-bold ms-auto">
+											{item?.duration}
+										</small>
+									)}
+								</div>
 							</div>
 						</div>
 					</Col>
@@ -182,7 +196,7 @@ const OnYourTimeDetail: FC = () => {
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<Button
 								as="a"
-								className="d-inline-block"
+								className="d-inline-block text-decoration-none"
 								variant="primary"
 								href={item.url}
 								target="_blank"
