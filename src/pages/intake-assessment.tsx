@@ -151,7 +151,9 @@ const IntakeAssessment: FC = () => {
 						}
 					} else {
 						setIsEligible(false);
-						navigate(exitUrl);
+						navigate(exitUrl, {
+							state: location.state,
+						});
 					}
 
 					return;
