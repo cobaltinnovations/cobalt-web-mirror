@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Collapse } from 'react-bootstrap';
+import { Button, Collapse } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 import Color from 'color';
@@ -22,9 +22,9 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		top: 0,
 		left: 0,
 		bottom: 0,
-		zIndex: 5,
+		zIndex: 6,
 		width: '100%',
-		maxWidth: 375,
+		maxWidth: 286,
 		position: 'fixed',
 		backgroundColor: theme.colors.n0,
 
@@ -38,7 +38,7 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		right: 0,
 		bottom: 0,
-		zIndex: 3,
+		zIndex: 5,
 		cursor: 'pointer',
 		position: 'fixed',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -61,6 +61,12 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
+	sectionHeader: {
+		padding: '8px 20px',
+		backgroundColor: theme.colors.n50,
+		borderTop: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.n100}`,
+	},
 	collapseButton: {
 		border: 0,
 		width: '100%',
@@ -69,22 +75,16 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		appearance: 'none',
 		padding: '16px 20px',
 		alignItems: 'center',
-		color: theme.colors.n500,
-		textTransform: 'uppercase',
+		...theme.fonts.bodyBold,
+		color: theme.colors.n900,
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		borderTop: `1px solid ${theme.colors.border}`,
-		...theme.fonts.small,
-		...theme.fonts.bodyBold,
 		'&:hover': {
 			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
 		'&:focus': {
 			outline: 'none',
 		},
-	},
-	collapseOuter: {
-		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	menuList: {
 		margin: 0,
@@ -94,8 +94,11 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		'& li a': {
 			display: 'block',
-			padding: '16px 20px',
+			padding: '14px 20px',
 			textDecoration: 'none',
+			'&:hover': {
+				textDecoration: 'underline',
+			},
 		},
 	},
 	mainMenuList: {
@@ -106,24 +109,17 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	},
 	subMenuList: {
 		'& li a': {
-			...theme.fonts.small,
+			...theme.fonts.default,
+			...theme.fonts.bodyNormal,
 			color: theme.colors.n500,
-			textTransform: 'uppercase',
 		},
 	},
 	menuFooter: {
 		width: '100%',
 		display: 'flex',
-		padding: '32px 20px',
+		padding: '16px 20px',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-	},
-	signOutButton: {
-		display: 'block',
-		padding: '8px 0 !important',
-		color: `${theme.colors.n900} !important`,
-		backgroundColor: 'transparent !important',
-		borderBottom: `1px solid ${theme.colors.n300} !important`,
 	},
 	hipaaLogo: {
 		'& path': {
@@ -171,8 +167,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const { account, institution, institutionCapabilities, setAccount, signOutAndClearContext } = useAccount();
 	const classes = useMenuStyles();
 	const { openInCrisisModal } = useInCrisisModal();
-	const [personalMenuIsOpen, setPersonalMenuIsOpen] = useState(true);
-	const [adminMenuIsOpen, setAdminMenuIsOpen] = useState(true);
+	const [adminMenuIsOpen, setAdminMenuIsOpen] = useState(false);
 
 	function handleOverlayClick() {
 		onHide();
@@ -193,7 +188,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 		openInCrisisModal();
 	}
 
-	function handleSignOutLinkClick(event: React.MouseEvent<HTMLAnchorElement>) {
+	function handleSignOutLinkClick(event: React.MouseEvent<HTMLButtonElement>) {
 		event.preventDefault();
 
 		onHide();
@@ -216,97 +211,49 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 		}
 	}, [accountId, open, setAccount]);
 
+	const showAdmin =
+		institutionCapabilities?.viewNavAdminMyContent ||
+		institutionCapabilities?.viewNavAdminAvailableContent ||
+		institutionCapabilities?.viewNavAdminGroupSession ||
+		institutionCapabilities?.viewNavAdminGroupSessionRequest;
+
 	const cobaltOptions = () => (
 		<>
-			<button
-				className={classes.collapseButton}
-				onClick={() => {
-					setPersonalMenuIsOpen(!personalMenuIsOpen);
-				}}
-			>
-				Personal
-				{personalMenuIsOpen && <UpChevron />}
-				{!personalMenuIsOpen && <DownChevron />}
-			</button>
-
-			<Collapse in={personalMenuIsOpen}>
-				<ul className={classNames(classes.menuList, classes.mainMenuList)}>
+			<div className="px-5">
+				<hr />
+			</div>
+			<ul className={classNames(classes.menuList, classes.mainMenuList)}>
+				<li>
+					<Link to="/" onClick={handleLinkClick}>
+						Home
+					</Link>
+				</li>
+				<li>
+					<Link to="/my-calendar" onClick={handleLinkClick}>
+						My Calendar
+					</Link>
+				</li>
+				{account?.roleId === 'PROVIDER' ? (
 					<li>
-						<Link to="/" onClick={handleLinkClick}>
-							Home
+						<Link to="/scheduling" onClick={handleLinkClick}>
+							My Schedule
 						</Link>
 					</li>
-					{institution?.supportEnabled && (
-						<li>
-							<Link to="/connect-with-support" onClick={handleLinkClick}>
-								Connect with Support
-							</Link>
-						</li>
-					)}
+				) : null}
+				{showAdmin && (
 					<li>
-						<Link to="/my-calendar" onClick={handleLinkClick}>
-							My Calendar
-						</Link>
-					</li>
-					{account?.roleId === 'PROVIDER' ? (
-						<li>
-							<Link to="/scheduling" onClick={handleLinkClick}>
-								My Schedule
-							</Link>
-						</li>
-					) : null}
-					<li>
-						<Link to="/in-the-studio" onClick={handleLinkClick}>
-							In the Studio
-						</Link>
-					</li>
-					<li>
-						<Link to="/on-your-time" onClick={handleLinkClick}>
-							On Your Time
-						</Link>
-					</li>
-					<li>
-						<Link to="/crisis-resources" onClick={handleInCrisisLinkClick}>
-							Crisis Resources
-						</Link>
-					</li>
-					<li>
-						<Link to="/covid-19-resources" onClick={handleLinkClick}>
-							Covid-19 Resources
-						</Link>
-					</li>
-					<li>
-						<Link to="/well-being-resources" onClick={handleLinkClick}>
-							Well-Being Resources
-						</Link>
-					</li>
-					{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId && (
-						<li>
-							<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
-								Provider Profile
-							</Link>
-						</li>
-					)}
-				</ul>
-			</Collapse>
-			{(institutionCapabilities?.viewNavAdminMyContent ||
-				institutionCapabilities?.viewNavAdminAvailableContent ||
-				institutionCapabilities?.viewNavAdminGroupSession ||
-				institutionCapabilities?.viewNavAdminGroupSessionRequest) && (
-				<>
-					<button
-						className={classes.collapseButton}
-						onClick={() => {
-							setAdminMenuIsOpen(!adminMenuIsOpen);
-						}}
-					>
-						Admin
-						{adminMenuIsOpen && <UpChevron />}
-						{!adminMenuIsOpen && <DownChevron />}
-					</button>
-					<div className={classes.collapseOuter}>
+						<button
+							className={classes.collapseButton}
+							onClick={() => {
+								setAdminMenuIsOpen(!adminMenuIsOpen);
+							}}
+						>
+							Admin
+							{adminMenuIsOpen && <UpChevron />}
+							{!adminMenuIsOpen && <DownChevron />}
+						</button>
 						<Collapse in={adminMenuIsOpen}>
-							<ul className={classNames(classes.menuList, classes.mainMenuList)}>
+							<ul className={classNames(classes.menuList)}>
 								<li>
 									<Link to="/stats-dashboard" onClick={handleLinkClick}>
 										Stats Dashboard
@@ -342,22 +289,76 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 								)}
 							</ul>
 						</Collapse>
-					</div>
-				</>
-			)}
-			<ul className={classNames(classes.menuList, classes.subMenuList)}>
+					</li>
+				)}
+			</ul>
+
+			<div className={classes.sectionHeader}>
+				<small>Resources</small>
+			</div>
+			<ul className={classNames(classes.menuList, classes.mainMenuList)}>
+				{institution?.supportEnabled && (
+					<li>
+						<Link to="/connect-with-support" onClick={handleLinkClick}>
+							Connect with Support
+						</Link>
+					</li>
+				)}
+				<li>
+					<Link to="/on-your-time" onClick={handleLinkClick}>
+						On Your Time
+					</Link>
+				</li>
+				<li>
+					<Link to="/in-the-studio" onClick={handleLinkClick}>
+						In the Studio
+					</Link>
+				</li>
+			</ul>
+
+			<div className={classes.sectionHeader}>
+				<small>Resource Centers</small>
+			</div>
+			<ul className={classNames(classes.menuList, classes.mainMenuList)}>
+				<li>
+					<Link to="/crisis-resources" onClick={handleInCrisisLinkClick}>
+						Crisis Resources
+					</Link>
+				</li>
+				<li>
+					<Link to="/covid-19-resources" onClick={handleLinkClick}>
+						Covid-19 Resources
+					</Link>
+				</li>
+				<li>
+					<Link to="/well-being-resources" onClick={handleLinkClick}>
+						Well-Being Resources
+					</Link>
+				</li>
+			</ul>
+
+			<div className="px-5 mb-4">
+				<hr />
+			</div>
+
+			<ul className={classNames(classes.menuList, classes.subMenuList, 'mb-4')}>
 				<li>
 					<Link to="/privacy" onClick={handleLinkClick}>
 						Privacy
 					</Link>
 				</li>
-
 				<li>
-					<Link to="/#" onClick={handleSignOutLinkClick}>
-						Sign Out
+					<Link to="/feedback" onClick={handleLinkClick}>
+						Contact us
 					</Link>
 				</li>
 			</ul>
+
+			<div className="px-5">
+				<Button className="d-block w-100" variant="outline-primary" onClick={handleSignOutLinkClick}>
+					Sign out
+				</Button>
+			</div>
 		</>
 	);
 
@@ -368,20 +369,16 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 					<div>
 						<div className={classes.menuHeader}>
 							<CloseIcon tabIndex={0} className={classes.closeIcon} onClick={handleCloseButtonClick} />
-							<div className="text-end">
-								<h5 className="mb-0">{account?.displayName}</h5>
-							</div>
 						</div>
+						<h5 className="px-5 mb-5">{account?.displayName}</h5>
 						{cobaltOptions()}
 					</div>
 					<div className={classes.menuFooter}>
 						<div>
-							<small>
-								<Link to="/feedback" onClick={handleLinkClick}>
-									Submit Feedback
-								</Link>
-							</small>
-							<small>&copy; {new Date().getFullYear()} Cobalt Platform</small>
+							<Link to="/feedback" onClick={handleLinkClick}>
+								Submit Feedback
+							</Link>
+							<small>&copy; {new Date().getFullYear()} Cobalt</small>
 						</div>
 
 						<HipaaLogo className={classes.hipaaLogo} />
