@@ -339,7 +339,7 @@ const CreateOnYourTimeContent: FC = () => {
 											<Row>
 												<Col className="mb-5">
 													<h3 className="mb-2">
-														{isAdding ? 'Add Public Post' : 'Add on Your Time Content'}
+														{isAdding ? 'Add Public Post' : 'Add On Your Time Content'}
 													</h3>
 													<span>Required *</span>
 												</Col>

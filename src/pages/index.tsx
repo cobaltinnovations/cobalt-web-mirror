@@ -126,7 +126,7 @@ const Index: FC = () => {
 			<Container className="pt-20">
 				<Row>
 					<Col>
-						<h3 className="mb-2">On your time</h3>
+						<h3 className="mb-2">On Your Time</h3>
 					</Col>
 				</Row>
 			</Container>
