@@ -12,10 +12,14 @@ import BackgroundImageContainer from '@/components/background-image-container';
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
 		height: 400,
+		[mediaQueries.lg]: {
+			height: 210,
+		},
 	},
 	informationContainer: {
 		padding: '10px 20px',
@@ -26,6 +30,9 @@ const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 		paddingBottom: 400,
 		position: 'relative',
 		backgroundColor: theme.colors.n500,
+		[mediaQueries.lg]: {
+			paddingBottom: 210,
+		},
 		'& > div': {
 			top: 0,
 			left: 0,
@@ -116,14 +123,14 @@ const OnYourTimeDetail: FC = () => {
 				]}
 			/>
 
-			<Container fluid className="mb-10">
+			<Container fluid className="mb-4 mb-lg-10">
 				<Row>
 					<Col>
 						{canEmbed ? (
 							<div className={classes.reactPlayerOuter}>
 								<ReactPlayer
 									width="100%"
-									height={400}
+									height="100%"
 									controls
 									url={item?.url}
 									onPlay={() => {
@@ -146,14 +153,14 @@ const OnYourTimeDetail: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h4 className={item?.author ? 'mb-1' : 'mb-4'}>{item?.title}</h4>
 
-						{item?.author && <p className="mb-4">By {item?.author}</p>}
+						{item?.author && <p className="mb-2 mb-lg-4">By {item?.author}</p>}
 
-						<small className="mb-6 d-block text-muted text-uppercase">
+						<small className="mb-4 mb-lg-6 d-block text-muted text-uppercase">
 							<span className="fw-bold">{item?.contentTypeLabel}</span>{' '}
 							{item?.duration && <>&bull; {item?.duration}</>}
 						</small>
 
-						<hr className="mb-4" />
+						<hr className="mb-3 mb-lg-4" />
 
 						<p className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
 
