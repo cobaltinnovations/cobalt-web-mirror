@@ -11,6 +11,16 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
 
+import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
+import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
+import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
+import { ReactComponent as OnYourTimeIcon } from '@/assets/icons/icon-on-your-time.svg';
+import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
+import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
+import { ReactComponent as Covid19Icon } from '@/assets/icons/icon-covid-19.svg';
+import { ReactComponent as WellBeingIcon } from '@/assets/icons/icon-well-being.svg';
+
 import { ReactComponent as UpChevron } from '@/assets/icons/icon-chevron-up.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -79,6 +89,10 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		color: theme.colors.n900,
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
+		'& .icon': {
+			marginRight: 16,
+			color: theme.colors.p300,
+		},
 		'&:hover': {
 			backgroundColor: Color(theme.colors.border).alpha(0.24).string(),
 		},
@@ -93,9 +107,14 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		listStyle: 'none',
 		overflow: 'hidden',
 		'& li a': {
-			display: 'block',
+			display: 'flex',
 			padding: '14px 20px',
+			alignItems: 'center',
 			textDecoration: 'none',
+			'& svg': {
+				marginRight: 16,
+				color: theme.colors.p300,
+			},
 			'&:hover': {
 				textDecoration: 'underline',
 			},
@@ -225,6 +244,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 			<ul className={classNames(classes.menuList, classes.mainMenuList)}>
 				<li>
 					<Link to="/" onClick={handleLinkClick}>
+						<HomeIcon />
 						Home
 					</Link>
 				</li>
@@ -237,12 +257,14 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 				)}
 				<li>
 					<Link to="/my-calendar" onClick={handleLinkClick}>
+						<CalendarIcon />
 						My Calendar
 					</Link>
 				</li>
 				{account?.roleId === 'PROVIDER' ? (
 					<li>
 						<Link to="/scheduling" onClick={handleLinkClick}>
+							<CalendarIcon />
 							My Schedule
 						</Link>
 					</li>
@@ -255,7 +277,10 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 								setAdminMenuIsOpen(!adminMenuIsOpen);
 							}}
 						>
-							Admin
+							<div className="d-flex align-items-center">
+								<AdminIcon className="icon" />
+								Admin
+							</div>
 							{adminMenuIsOpen && <UpChevron />}
 							{!adminMenuIsOpen && <DownChevron />}
 						</button>
@@ -307,17 +332,20 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 				{institution?.supportEnabled && (
 					<li>
 						<Link to="/connect-with-support" onClick={handleLinkClick}>
+							<ConnectWithSupportIcon />
 							Connect with Support
 						</Link>
 					</li>
 				)}
 				<li>
 					<Link to="/on-your-time" onClick={handleLinkClick}>
+						<OnYourTimeIcon />
 						On Your Time
 					</Link>
 				</li>
 				<li>
 					<Link to="/in-the-studio" onClick={handleLinkClick}>
+						<GroupSessionsIcon />
 						In the Studio
 					</Link>
 				</li>
@@ -329,16 +357,19 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 			<ul className={classNames(classes.menuList, classes.mainMenuList)}>
 				<li>
 					<Link to="/crisis-resources" onClick={handleInCrisisLinkClick}>
+						<CrisisIcon />
 						Crisis Resources
 					</Link>
 				</li>
 				<li>
 					<Link to="/covid-19-resources" onClick={handleLinkClick}>
+						<Covid19Icon />
 						Covid-19 Resources
 					</Link>
 				</li>
 				<li>
 					<Link to="/well-being-resources" onClick={handleLinkClick}>
+						<WellBeingIcon />
 						Well-Being Resources
 					</Link>
 				</li>
