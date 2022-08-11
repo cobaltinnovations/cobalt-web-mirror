@@ -12,34 +12,27 @@ import BackgroundImageContainer from '@/components/background-image-container';
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
-import HeroContainer from '@/components/hero-container';
+import mediaQueries from '@/jss/media-queries';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
-	card: {
-		borderRadius: 5,
-		overflow: 'hidden',
-		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
-	},
 	mediaContainer: {
-		paddingBottom: '56.25%',
-	},
-	mediaContent: {
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		padding: '15px 20px',
-		position: 'absolute',
+		height: 400,
+		[mediaQueries.lg]: {
+			height: 210,
+		},
 	},
 	informationContainer: {
-		color: theme.colors.n900,
 		padding: '10px 20px',
+		color: theme.colors.n900,
 		backgroundColor: theme.colors.n0,
 	},
 	reactPlayerOuter: {
+		paddingBottom: 400,
 		position: 'relative',
-		paddingTop: '56.25%',
 		backgroundColor: theme.colors.n500,
+		[mediaQueries.lg]: {
+			paddingBottom: 210,
+		},
 		'& > div': {
 			top: 0,
 			left: 0,
@@ -111,6 +104,9 @@ const OnYourTimeDetail: FC = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<Breadcrumb
+				xs={{ span: 12 }}
+				lg={{ span: 12 }}
+				xl={{ span: 12 }}
 				breadcrumbs={[
 					{
 						to: '/',
@@ -118,97 +114,74 @@ const OnYourTimeDetail: FC = () => {
 					},
 					{
 						to: '/on-your-time',
-						title: 'On Your Time',
+						title: 'On your time',
 					},
 					{
 						to: '/#',
-						title: item?.contentTypeDescription ?? 'Content',
+						title: item?.title ?? 'Content',
 					},
 				]}
 			/>
 
-			<HeroContainer className="mb-4">
-				<h2 className="mb-0 text-center">{item?.title}</h2>
-			</HeroContainer>
-
-			<Container>
+			<Container fluid className="mb-4 mb-lg-10">
 				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<div className={classes.card}>
-							{canEmbed ? (
-								<div className={classes.reactPlayerOuter}>
-									<ReactPlayer
-										width="100%"
-										height="100%"
-										controls
-										url={item?.url}
-										onPlay={() => {
-											trackActivity();
-										}}
-									/>
-								</div>
-							) : (
-								<BackgroundImageContainer
-									className={classes.mediaContainer}
-									imageUrl={item?.imageUrl || placeholderImage}
-								>
-									<div className={classes.mediaContent}>
-										<small className="text-white text-uppercase fw-bold">
-											{item?.newFlag ? 'NEW' : ''}
-										</small>
-									</div>
-								</BackgroundImageContainer>
-							)}
-							<div className={classes.informationContainer}>
-								<h4 className="mb-0">{item?.title}</h4>
-								{item?.author ? (
-									<p className="mb-1">by {item?.author}</p>
-								) : (
-									<p className="mb-1">&nbsp;</p>
-								)}
-
-								<div className="d-flex">
-									<small className="text-muted text-uppercase fw-bold">
-										{item?.contentTypeLabel}
-									</small>
-
-									{item?.duration && (
-										<small className="text-muted text-uppercase fw-bold ms-auto">
-											{item?.duration}
-										</small>
-									)}
-								</div>
+					<Col>
+						{canEmbed ? (
+							<div className={classes.reactPlayerOuter}>
+								<ReactPlayer
+									width="100%"
+									height="100%"
+									controls
+									url={item?.url}
+									onPlay={() => {
+										trackActivity();
+									}}
+								/>
 							</div>
-						</div>
+						) : (
+							<BackgroundImageContainer
+								className={classes.mediaContainer}
+								imageUrl={item?.imageUrl || placeholderImage}
+							/>
+						)}
 					</Col>
 				</Row>
 			</Container>
 
-			<Container className="pt-5 pb-5">
+			<Container className="pb-10">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<h4 className={item?.author ? 'mb-1' : 'mb-4'}>{item?.title}</h4>
+
+						{item?.author && <p className="mb-2 mb-lg-4">By {item?.author}</p>}
+
+						<small className="mb-4 mb-lg-6 d-block text-muted text-uppercase">
+							<span className="fw-bold">{item?.contentTypeLabel}</span>{' '}
+							{item?.duration && <>&bull; {item?.duration}</>}
+						</small>
+
+						<hr className="mb-3 mb-lg-4" />
+
 						<p className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
+
+						{!canEmbed && item?.url && (
+							<div className="mt-10 text-center">
+								<Button
+									as="a"
+									className="d-inline-block text-decoration-none"
+									variant="primary"
+									href={item.url}
+									target="_blank"
+									onClick={() => {
+										trackActivity();
+									}}
+								>
+									{item.callToAction}
+								</Button>
+							</div>
+						)}
 					</Col>
 				</Row>
-
-				{!canEmbed && item?.url && (
-					<Row className="mt-5 text-center">
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<Button
-								as="a"
-								className="d-inline-block text-decoration-none"
-								variant="primary"
-								href={item.url}
-								target="_blank"
-								onClick={() => {
-									trackActivity();
-								}}
-							>
-								{item.callToAction}
-							</Button>
-						</Col>
-					</Row>
-				)}
 			</Container>
 		</AsyncPage>
 	);

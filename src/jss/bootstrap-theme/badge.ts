@@ -31,6 +31,10 @@ export const badge = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.n500,
 			},
+			'&.bg-light': {
+				color: theme.colors.n900,
+				backgroundColor: theme.colors.n0,
+			},
 			'&.bg-outline-primary': {
 				color: theme.colors.p500,
 				backgroundColor: theme.colors.p50,
@@ -60,6 +64,11 @@ export const badge = (theme: CobaltTheme) => {
 				color: theme.colors.n500,
 				backgroundColor: theme.colors.n50,
 				border: `1px solid ${theme.colors.n100}`,
+			},
+			'&.bg-outline-light': {
+				color: theme.colors.n900,
+				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.n500}`,
 			},
 		},
 	};
