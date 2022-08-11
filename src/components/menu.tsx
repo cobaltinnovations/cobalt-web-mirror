@@ -228,6 +228,13 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 						Home
 					</Link>
 				</li>
+				{config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId && (
+					<li>
+						<Link to={`/providers/${account?.providerId}/profile`} onClick={handleLinkClick}>
+							Provider Profile
+						</Link>
+					</li>
+				)}
 				<li>
 					<Link to="/my-calendar" onClick={handleLinkClick}>
 						My Calendar
