@@ -26,6 +26,7 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
+		borderBottom: `1px solid ${theme.colors.n100}`,
 		[mediaQueries.lg]: {
 			padding: '0 20px 0 8px',
 		},

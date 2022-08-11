@@ -239,13 +239,19 @@ const OnYourTime: FC = () => {
 
 					<Container>
 						<Row>
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								{filteredList.length === 0 ? (
+							{filteredList.length === 0 ? (
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
 									<p className="text-center">
 										There are no recommendations that match your selections.
 									</p>
-								) : (
-									filteredList.map((item) => (
+								</Col>
+							) : (
+								filteredList.map((item) => (
+									<Col xs={6} md={4} lg={3}>
 										<Link
 											key={item.contentId}
 											to={`/on-your-time/${item.contentId}`}
@@ -260,9 +266,9 @@ const OnYourTime: FC = () => {
 												duration={item.duration}
 											/>
 										</Link>
-									))
-								)}
-							</Col>{' '}
+									</Col>
+								))
+							)}
 						</Row>
 					</Container>
 				</>
@@ -278,12 +284,12 @@ const OnYourTime: FC = () => {
 
 					<Container>
 						<Row>
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								{additionalFilteredList.map((item) => (
+							{additionalFilteredList.map((item) => (
+								<Col xs={6} md={4} lg={3}>
 									<Link
 										key={item.contentId}
 										to={`/on-your-time/${item.contentId}`}
-										className="d-block mb-3 text-decoration-none"
+										className="d-block mb-7 text-decoration-none"
 									>
 										<OnYourTimeItem
 											imageUrl={item.imageUrl}
@@ -294,8 +300,8 @@ const OnYourTime: FC = () => {
 											duration={item.duration}
 										/>
 									</Link>
-								))}
-							</Col>
+								</Col>
+							))}
 						</Row>
 					</Container>
 				</>

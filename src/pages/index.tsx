@@ -134,7 +134,29 @@ const Index: FC = () => {
 				<Row>
 					<Col>
 						<Carousel
-							responsive={responsiveDefaults}
+							responsive={{
+								externalMonitor: {
+									...responsiveDefaults.externalMonitor,
+									items: 4,
+								},
+								desktopExtraLarge: {
+									...responsiveDefaults.desktopExtraLarge,
+									items: 4,
+								},
+								desktop: {
+									...responsiveDefaults.desktop,
+									items: 3,
+								},
+								tablet: {
+									...responsiveDefaults.tablet,
+									items: 2,
+								},
+								mobile: {
+									...responsiveDefaults.mobile,
+									items: 2,
+									partialVisibilityGutter: 16,
+								},
+							}}
 							// description="Explainer text goes here. What is on your time?"
 							calloutTitle="Explore all"
 							calloutOnClick={() => {

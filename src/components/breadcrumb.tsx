@@ -47,7 +47,7 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 
 	return (
 		<Container fluid className={classes.breadcrumb}>
-			<Container className="pt-2 pb-2">
+			<Container className="py-3">
 				<Row>
 					<Col
 						md={props.md || { span: 10, offset: 1 }}
