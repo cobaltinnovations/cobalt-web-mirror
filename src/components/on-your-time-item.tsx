@@ -63,7 +63,7 @@ const OnYourTimeItem: FC<OnYourTimeItemProps> = (props) => {
 		<div className={classNames(classes.onYourTimeItem, props.className)}>
 			<BackgroundImageContainer className={classes.imageContainer} imageUrl={props.imageUrl || placeholderImage}>
 				{props.tag && (
-					<Badge className={classes.tag} bg="secondary" pill>
+					<Badge className={classes.tag} bg="light" pill>
 						{props.tag}
 					</Badge>
 				)}
