@@ -13,13 +13,10 @@ import React, {
 import { unstable_batchedUpdates } from 'react-dom';
 import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import moment from 'moment';
+import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
-import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
-import { queryParamDateRegex } from '@/lib/utils';
 
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import FilterAvailabilityModal from '@/components/filter-availability-modal';
@@ -40,34 +37,24 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
 import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
-import { Provider, AssessmentScore, Clinic, SupportRoleId } from '@/lib/models';
+import { AssessmentScore, SupportRoleId } from '@/lib/models';
 
-import { BookingContext, SearchResult, BookingFilters, BookingSource } from '@/contexts/booking-context';
+import {
+	BookingContext,
+	ProviderSearchResult,
+	BookingFilters,
+	BookingSource,
+	FILTER_DAYS,
+	isClinicResult,
+	mapClinicToResult,
+	mapProviderToResult,
+} from '@/contexts/booking-context';
 import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import { createUseThemedStyles } from '@/jss/theme';
-
-const isClinicResult = (result: Provider | Clinic): result is Clinic => {
-	return typeof (result as Clinic).clinicId === 'string';
-};
-
-const mapProviderToResult = (provider: Provider): SearchResult => ({
-	id: provider.providerId,
-	imageUrl: provider.imageUrl,
-	type: 'provider',
-	displayName: provider.name + (provider.license ? `, ${provider.license}` : ''),
-	description: provider.supportRolesDescription,
-});
-
-const mapClinicToResult = (clinic: Clinic): SearchResult => ({
-	id: clinic.clinicId,
-	type: 'clinic',
-	imageUrl: getRandomPlaceholderImage() as any,
-	displayName: clinic.description,
-});
 
 const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
@@ -98,9 +85,6 @@ const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 interface HistoryLocationState {
 	skipAssessment?: boolean;
 	successBooking?: boolean;
-	routedClinicIds?: string[];
-	routedProviderId?: string;
-	routedSupportRoleIds?: string[];
 	emailAddress?: string;
 }
 
@@ -108,7 +92,7 @@ const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	const classes = useConnectWithSupportStyles();
 	const { account, subdomainInstitution } = useAccount();
-
+	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const bookingRef = useRef<BookingRefHandle>(null);
@@ -120,8 +104,9 @@ const ConnectWithSupport: FC = () => {
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
-	const [recentProviders, setRecentProviders] = useState<SearchResult[]>([]);
-	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [recentProviders, setRecentProviders] = useState<ProviderSearchResult[]>([]);
+	const [searchResults, setSearchResults] = useState<ProviderSearchResult[]>([]);
+	const [selectedSearchResult, setSelectedSearchResult] = useState<ProviderSearchResult[]>([]);
 	const [recommendationHtml, setRecommendationHtml] = useState<string>('');
 
 	const [assessmentScore, setAssessmentScore] = useState<AssessmentScore>();
@@ -132,36 +117,15 @@ const ConnectWithSupport: FC = () => {
 		availableSections,
 		setAvailableSections,
 
-		selectedSearchResult,
-		setSelectedSearchResult,
-		dateFilter,
-		setDateFilter,
-		timeFilter,
-		setTimeFilter,
-		providerTypeFilter,
-		setProviderTypeFilter,
-		availabilityFilter,
-		setAvailabilityFilter,
-		visitTypeIdsFilter,
-		setVisitTypeIdsFilter,
-		paymentTypeFilter,
-		setPaymentTypeFilter,
-		clinicsFilter,
-		setClinicsFilter,
-		providerFilter,
-		setProviderFilter,
-		specialtyFilter,
-		setSpecialtyFilter,
+		preservedFilterQueryString,
+		setPreservedFilterQueryString,
 
 		selectedDate,
 		selectedProvider,
-		formattedTimeFilter,
 
 		getActiveFiltersState,
 		isEligible,
 		setIsEligible,
-		preserveFilters,
-		setPreserveFilters,
 	} = useContext(BookingContext);
 	const [searchQuery, setSearchQuery] = useState('');
 
@@ -185,6 +149,7 @@ const ConnectWithSupport: FC = () => {
 	const recommendedTherapistPsychiatrist =
 		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Clinician) ||
 		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Psychiatrist);
+	const providerTypeFilter = searchParams.getAll('supportRoleId');
 	const filterEapTherapistPsychiatrist =
 		providerTypeFilter.includes(SupportRoleId.CareManager) ||
 		providerTypeFilter.includes(SupportRoleId.Clinician) ||
@@ -193,70 +158,6 @@ const ConnectWithSupport: FC = () => {
 	const activeFilters = useMemo(() => {
 		return getActiveFiltersState(findOptions);
 	}, [getActiveFiltersState, findOptions]);
-
-	const setFilterDefaults = useCallback(
-		async (findOptions: FindOptionsResponse, preserveFilters = false) => {
-			if (preserveFilters) {
-				setRecommendationHtml(findOptions.recommendationHtml);
-				setAssessmentScore(findOptions.scores);
-				return;
-			}
-
-			const urlQuery = new URLSearchParams(location.search);
-			const routedSupportRoleIds = urlQuery.getAll('supportRoleId') as SupportRoleId[];
-			const routedStartDate = urlQuery.get('startDate') || '';
-			const routedEndDate = urlQuery.get('endDate') || '';
-			const routedClinicIds = urlQuery.getAll('clinicId');
-			const routedProviderId = urlQuery.get('providerId') || undefined;
-
-			const dateRange =
-				queryParamDateRegex.test(routedStartDate) && queryParamDateRegex.test(routedEndDate)
-					? { from: moment(routedStartDate), to: moment(routedEndDate) }
-					: { from: moment(findOptions.defaultStartDate), to: moment(findOptions.defaultEndDate) };
-
-			setRecommendationHtml(findOptions.recommendationHtml);
-			setAssessmentScore(findOptions.scores);
-			setDateFilter({
-				...dateRange,
-				days: {
-					SUNDAY: true,
-					MONDAY: true,
-					TUESDAY: true,
-					WEDNESDAY: true,
-					THURSDAY: true,
-					FRIDAY: true,
-					SATURDAY: true,
-				},
-			});
-			setTimeFilter({
-				min: parseInt(findOptions.defaultStartTime, 10),
-				max: parseInt(findOptions.defaultEndTime, 10),
-			});
-			setProviderTypeFilter(
-				routedSupportRoleIds.length ? routedSupportRoleIds : findOptions.defaultSupportRoleIds
-			);
-			setAvailabilityFilter(findOptions.defaultAvailability);
-			setVisitTypeIdsFilter(findOptions.defaultVisitTypeIds);
-			setPaymentTypeFilter([]);
-			setSpecialtyFilter([]);
-			setClinicsFilter(routedClinicIds.length ? routedClinicIds : findOptions.defaultClinicIds);
-			if (routedProviderId) {
-				setProviderFilter(routedProviderId);
-			}
-		},
-		[
-			location.search,
-			setAvailabilityFilter,
-			setVisitTypeIdsFilter,
-			setClinicsFilter,
-			setDateFilter,
-			setPaymentTypeFilter,
-			setProviderFilter,
-			setProviderTypeFilter,
-			setTimeFilter,
-			setSpecialtyFilter,
-		]
-	);
 
 	const searchProviders = useCallback(
 		async (query: string) => {
@@ -288,46 +189,21 @@ const ConnectWithSupport: FC = () => {
 			didInit &&
 			!hasCompletedScreening
 		) {
-			const urlQuery = new URLSearchParams(location.search);
-			const routedClinicIds = urlQuery.getAll('clinicId');
-			const routedProviderId = urlQuery.get('providerId') || undefined;
-			const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
-
 			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
 				replace: true,
-				state: {
-					routedClinicIds,
-					routedProviderId,
-					routedSupportRoleIds,
-				},
 			});
 		}
-	}, [
-		didInit,
-		navigate,
-		subdomainInstitution?.providerTriageScreeningFlowId,
-		location.search,
-		skipAssessment,
-		hasCompletedScreening,
-	]);
+	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.providerTriageScreeningFlowId]);
 
 	const institutionId = account?.institutionId ?? '';
 	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
 	useEffect(() => {
-		const urlQuery = new URLSearchParams(location.search);
-		const routedSupportRoleIds = urlQuery.getAll('supportRoleId');
-		const routedClinicIds = urlQuery.getAll('clinicId');
-
 		if (didInit || !institutionId || !providerTriageScreeningFlowId) {
-			return () => {
-				if (routedClinicIds) {
-					setSelectedSearchResult([]);
-				}
-			};
+			return;
 		}
 
 		const findOptionsRequest = providerService.fetchFindOptions({
-			supportRoleIds: routedSupportRoleIds,
+			supportRoleIds: searchParams.getAll('supportRoleId'),
 			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
@@ -346,7 +222,8 @@ const ConnectWithSupport: FC = () => {
 				unstable_batchedUpdates(() => {
 					setRecentProviders(recent.providers.map(mapProviderToResult));
 					setFindOptions(findOptions);
-					setFilterDefaults(findOptions, preserveFilters);
+					setRecommendationHtml(findOptions.recommendationHtml);
+					setAssessmentScore(findOptions.scores);
 					setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
 					setDidInit(true);
 				});
@@ -362,60 +239,45 @@ const ConnectWithSupport: FC = () => {
 		return () => {
 			findOptionsRequest.abort();
 			fetchRecentRequest.abort();
+			fetchScreeningsRequest.abort();
 		};
-	}, [
-		didInit,
-		preserveFilters,
-		location.search,
-		setFilterDefaults,
-		handleError,
-		institutionId,
-		setSelectedSearchResult,
-		providerTriageScreeningFlowId,
-	]);
+	}, [didInit, handleError, institutionId, providerTriageScreeningFlowId, searchParams]);
 
 	useEffect(() => {
 		if (!didInit) {
 			return;
 		}
 
-		const selectedSearchEntityId = selectedSearchResult[0] ? selectedSearchResult[0].id : undefined;
-
-		if (
-			(providerFilter && providerFilter === selectedSearchEntityId) ||
-			(clinicsFilter.length && clinicsFilter[0] === selectedSearchEntityId)
-		) {
-			setIsLoading(false);
-			return;
-		}
+		const providerId = searchParams.get('providerId');
+		const clinicIds = searchParams.getAll('clinicId');
 
 		setIsLoading(true);
 
 		let findFilters: FindFilters;
 
-		if (selectedSearchResult[0]) {
-			findFilters =
-				selectedSearchResult[0].type === 'provider'
-					? { providerId: selectedSearchResult[0].id }
-					: { clinicIds: [selectedSearchResult[0].id] };
+		if (providerId) {
+			findFilters = { providerId };
+		} else if (clinicIds.length > 0) {
+			findFilters = { clinicIds };
 		} else {
-			findFilters = providerFilter
-				? { providerId: providerFilter }
-				: {
-						startDate: moment(dateFilter.from).format('YYYY-MM-DD'),
-						endDate: moment(dateFilter.to).format('YYYY-MM-DD'),
-						daysOfWeek: Object.entries(dateFilter.days)
-							.filter(([_, isSelected]) => isSelected)
-							.map(([day]) => day),
-						startTime: formattedTimeFilter.startTime,
-						endTime: formattedTimeFilter.endTime,
-						availability: availabilityFilter,
-						visitTypeIds: visitTypeIdsFilter,
-						supportRoleIds: providerTypeFilter,
-						paymentTypeIds: paymentTypeFilter,
-						clinicIds: clinicsFilter,
-						specialtyIds: specialtyFilter,
-				  };
+			const daysOfWeek = searchParams.getAll('dayOfWeek');
+			const supportRoleIds = searchParams.getAll('supportRoleId') as SupportRoleId[];
+			const visitTypeIds = searchParams.getAll('visitTypeId');
+			const specialtyIds = searchParams.getAll('specialtyId');
+			const paymentTypeIds = searchParams.getAll('paymentTypeId');
+
+			findFilters = {
+				startDate: searchParams.get('startDate') || findOptions?.defaultStartDate,
+				endDate: searchParams.get('endDate') || findOptions?.defaultEndDate,
+				daysOfWeek: daysOfWeek.length > 0 ? daysOfWeek : FILTER_DAYS.map((d) => d.key),
+				startTime: searchParams.get('startTime') || findOptions?.defaultStartTime,
+				endTime: searchParams.get('endTime') || findOptions?.defaultEndTime,
+				supportRoleIds: supportRoleIds.length > 0 ? supportRoleIds : findOptions?.defaultSupportRoleIds ?? [],
+				availability: searchParams.get('availability') || findOptions?.defaultAvailability,
+				visitTypeIds: visitTypeIds.length > 0 ? visitTypeIds : findOptions?.defaultVisitTypeIds ?? [],
+				specialtyIds,
+				paymentTypeIds,
+			};
 		}
 
 		const findRequest = providerService.findProviders(findFilters);
@@ -430,10 +292,8 @@ const ConnectWithSupport: FC = () => {
 				setAvailableSections(sections);
 
 				if (provider) {
-					setProviderFilter(provider.providerId);
 					setSelectedSearchResult([mapProviderToResult(provider)]);
 				} else if (clinics && clinics.length) {
-					setClinicsFilter([clinics[0].clinicId]);
 					setSelectedSearchResult([mapClinicToResult(clinics[0])]);
 				}
 			})
@@ -448,31 +308,33 @@ const ConnectWithSupport: FC = () => {
 			findRequest.abort();
 		};
 	}, [
-		availabilityFilter,
-		visitTypeIdsFilter,
-		clinicsFilter,
-		dateFilter.days,
-		dateFilter.from,
-		dateFilter.to,
 		didInit,
-		formattedTimeFilter.endTime,
-		formattedTimeFilter.startTime,
+		findOptions?.defaultAvailability,
+		findOptions?.defaultEndDate,
+		findOptions?.defaultEndTime,
+		findOptions?.defaultStartDate,
+		findOptions?.defaultStartTime,
+		findOptions?.defaultSupportRoleIds,
+		findOptions?.defaultVisitTypeIds,
 		handleError,
-		paymentTypeFilter,
-		providerFilter,
-		specialtyFilter,
-		providerTypeFilter,
-		selectedSearchResult,
+		searchParams,
 		setAppointmentTypes,
 		setAvailableSections,
-		setClinicsFilter,
 		setEpicDepartments,
-		setProviderFilter,
-		setSelectedSearchResult,
 	]);
 
+	useEffect(() => {
+		if (preservedFilterQueryString) {
+			setSearchParams(preservedFilterQueryString, {
+				replace: true,
+				state: location.state,
+			});
+			setPreservedFilterQueryString('');
+		}
+	}, [location.state, preservedFilterQueryString, setPreservedFilterQueryString, setSearchParams]);
+
 	useLayoutEffect(() => {
-		if (!preserveFilters || availableSections.length === 0 || !selectedDate || !selectedProvider) {
+		if (availableSections.length === 0 || !selectedDate || !selectedProvider) {
 			return;
 		}
 
@@ -482,10 +344,8 @@ const ConnectWithSupport: FC = () => {
 				behavior: 'smooth',
 				block: 'center',
 			});
-
-			setPreserveFilters(false);
 		}, 200);
-	}, [availableSections.length, preserveFilters, providerRefs, selectedDate, selectedProvider, setPreserveFilters]);
+	}, [availableSections.length, providerRefs, selectedDate, selectedProvider]);
 
 	function handleClearSearchButtonClick() {
 		if (typeAheadRef && typeAheadRef.current) {
@@ -493,12 +353,8 @@ const ConnectWithSupport: FC = () => {
 			typeAheadRef.current.blur();
 			setSearchQuery('');
 			setSelectedSearchResult([]);
-			setProviderFilter(undefined);
-			setClinicsFilter([]);
-			const params = new URLSearchParams(location.search);
-			params.delete('providerId');
-			params.delete('clinicId');
-			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
+
+			navigate(`/connect-with-support`, { state: location.state });
 		}
 	}
 
@@ -523,83 +379,56 @@ const ConnectWithSupport: FC = () => {
 			/> */}
 
 			<FilterDaysModal
-				from={dateFilter.from}
-				to={dateFilter.to}
+				defaultFrom={findOptions?.defaultStartDate}
+				defaultTo={findOptions?.defaultEndDate}
 				show={openFilterModal === BookingFilters.Date}
-				days={dateFilter.days}
 				onHide={() => {
-					setOpenFilterModal(null);
-				}}
-				onSave={(params) => {
-					setDateFilter(params);
 					setOpenFilterModal(null);
 				}}
 			/>
 
 			<FilterTimesModal
-				range={timeFilter}
+				defaultStartTime={findOptions?.defaultStartTime}
+				defaultEndTime={findOptions?.defaultEndTime}
 				show={openFilterModal === BookingFilters.Time}
 				onHide={() => {
-					setOpenFilterModal(null);
-				}}
-				onSave={(range) => {
-					setTimeFilter(range);
 					setOpenFilterModal(null);
 				}}
 			/>
 
 			<FilterProviderTypesModal
 				providerTypes={findOptions?.supportRoles ?? []}
-				recommendedTypes={findOptions ? findOptions.defaultSupportRoleIds : []}
-				selectedTypes={providerTypeFilter}
+				recommendedTypes={findOptions?.defaultSupportRoleIds ?? []}
 				show={openFilterModal === BookingFilters.Provider}
 				onHide={() => {
 					setOpenFilterModal(null);
-				}}
-				onSave={(selectedTypes) => {
-					setOpenFilterModal(null);
-					setProviderTypeFilter(selectedTypes);
 				}}
 			/>
 
 			<FilterAvailabilityModal
 				availabilities={findOptions?.availabilities ?? []}
-				selectedAvailability={availabilityFilter}
-				selectedVisitTypeIds={visitTypeIdsFilter}
+				visitTypes={findOptions?.visitTypes ?? []}
+				defaultAvailability={findOptions?.defaultAvailability}
+				defaultVisitTypeIds={findOptions?.defaultVisitTypeIds ?? []}
 				show={openFilterModal === BookingFilters.Availability}
 				onHide={() => {
 					setOpenFilterModal(null);
-				}}
-				onSave={(selectedAvailability, visitTypeIds) => {
-					setOpenFilterModal(null);
-					setAvailabilityFilter(selectedAvailability);
-					setVisitTypeIdsFilter(visitTypeIds);
 				}}
 			/>
 
 			<FilterPaymentsModal
 				paymentTypes={findOptions?.paymentTypes ?? []}
-				selectedTypes={paymentTypeFilter}
 				show={openFilterModal === BookingFilters.Payment}
 				onHide={() => {
 					setOpenFilterModal(null);
-				}}
-				onSave={(selectedTypes) => {
-					setOpenFilterModal(null);
-					setPaymentTypeFilter(selectedTypes);
 				}}
 			/>
 
 			<FilterSpecialtyModal
 				specialties={findOptions?.specialties ?? []}
-				selectedSpecialties={specialtyFilter}
 				show={openFilterModal === BookingFilters.Specialty}
 				onHide={() => {
 					setOpenFilterModal(null);
-				}}
-				onSave={(selectedSpecialties) => {
-					setOpenFilterModal(null);
-					setSpecialtyFilter(selectedSpecialties);
 				}}
 			/>
 
@@ -666,14 +495,21 @@ const ConnectWithSupport: FC = () => {
 										setIsSearchFocused(false);
 									}}
 									onInputChange={setSearchQuery}
-									onChange={(selectedOptions) => {
-										setSelectedSearchResult(selectedOptions as SearchResult[]);
+									//@ts-expect-error option type
+									onChange={([selectedOption]: ProviderSearchResult[]) => {
+										const paramName = selectedOption.type === 'clinic' ? 'clinicId' : 'providerId';
+
+										setSearchParams({ [paramName]: selectedOption.id }, { state: location.state });
+
 										(typeAheadRef.current as any).blur();
 									}}
 									options={searchQuery ? searchResults : recentProviders}
 									selected={selectedSearchResult}
-									renderMenu={(options, menuProps) => {
-										const results = options as SearchResult[];
+									renderMenu={(
+										options,
+										{ newSelectionPrefix, paginationText, renderMenuItemChildren, ...menuProps }
+									) => {
+										const results = options as ProviderSearchResult[];
 										if (!searchQuery && recentProviders.length === 0) {
 											return <></>;
 										}
@@ -776,24 +612,7 @@ const ConnectWithSupport: FC = () => {
 									className="p-0 mb-1"
 									size="sm"
 									onClick={() => {
-										const urlQuery = new URLSearchParams(location.search);
-
-										if (
-											urlQuery.has('supportRoleId') ||
-											urlQuery.has('startDate') ||
-											urlQuery.has('endDate') ||
-											urlQuery.has('clinicId') ||
-											urlQuery.has('providerId')
-										) {
-											urlQuery.delete('supportRoleId');
-											urlQuery.delete('startDate');
-											urlQuery.delete('endDate');
-											urlQuery.delete('clinicId');
-											urlQuery.delete('providerId');
-											navigate(`${location.pathname}?${urlQuery.toString()}`);
-										} else if (findOptions) {
-											setFilterDefaults(findOptions);
-										}
+										setSearchParams({}, { state: location.state });
 									}}
 								>
 									Reset Filters
@@ -809,7 +628,7 @@ const ConnectWithSupport: FC = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<AvailableProvider
-								className="mb-5"
+								className="my-5"
 								provider={{
 									fullyBooked: false,
 									providerId: 'xxxx-xxxx-xxxx-xxxx',

@@ -1,9 +1,7 @@
-import moment from 'moment';
 import React, { ReactElement } from 'react';
 import { Outlet, Navigate, useMatch, useSearchParams } from 'react-router-dom';
 
 import config from '@/lib/config';
-import { queryParamDateRegex } from '@/lib/utils';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
@@ -95,39 +93,22 @@ const RedirectToSupport = () => {
 	const [searchParams] = useSearchParams();
 
 	let routedSupportRoleId = match?.params.supportRoleId ?? '';
-	const routedStartDate = searchParams.get('date') || '';
-	const routedProviderId = searchParams.get('providerId');
-	const routedClinicIds = searchParams.getAll('clinicId');
 
 	if (routedSupportRoleId === 'therapist') {
 		routedSupportRoleId = 'clinician';
 	}
 
-	const params = new URLSearchParams({
-		supportRoleId: routedSupportRoleId.toUpperCase(),
-		immediateAccess: 'true',
-	});
+	searchParams.set('supportRoleId', routedSupportRoleId.toUpperCase());
+	searchParams.set('immediateAccess', 'true');
 
-	if (queryParamDateRegex.test(routedStartDate)) {
-		const startDate = moment(routedStartDate);
-
-		if (startDate.isValid()) {
-			const endDate = startDate.clone().add(6, 'days');
-
-			params.set('startDate', startDate.format('YYYY-MM-DD'));
-			params.set('endDate', endDate.format('YYYY-MM-DD'));
-		}
-	}
-
-	if (routedProviderId) {
-		params.append('providerId', routedProviderId);
-	}
-
-	for (const clinicId of routedClinicIds) {
-		params.append('clinicId', clinicId);
-	}
-
-	return <Navigate to={`/connect-with-support?${params.toString()}`} />;
+	return (
+		<Navigate
+			to={{
+				pathname: `/connect-with-support`,
+				search: searchParams.toString(),
+			}}
+		/>
+	);
 };
 
 const ButtonlessHeaderLayout = () => {

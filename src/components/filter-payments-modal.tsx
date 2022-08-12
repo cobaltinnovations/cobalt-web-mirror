@@ -2,6 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { PaymentType } from '@/lib/models';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const useFilterPaymentsModalStyles = createUseStyles({
 	filterPaymentsModal: {
@@ -13,29 +14,21 @@ const useFilterPaymentsModalStyles = createUseStyles({
 
 interface FilterPaymentsModalProps extends ModalProps {
 	paymentTypes: PaymentType[];
-	selectedTypes: PaymentType['paymentTypeId'][];
-	onSave(selectedTypes: PaymentType['paymentTypeId'][]): void;
 }
 
-const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selectedTypes, onSave, ...props }) => {
+const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, ...props }) => {
 	const classes = useFilterPaymentsModalStyles();
 
-	const [allTypes, setAllTypes] = useState<PaymentType[]>([]);
-	const [selected, setSelected] = useState<PaymentType['paymentTypeId'][]>([]);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
+	const [selected, setSelected] = useState(searchParams.getAll('paymentTypeId') as PaymentType['paymentTypeId'][]);
 
 	useEffect(() => {
 		if (props.show) {
-			setSelected(selectedTypes);
+			const selections = searchParams.getAll('paymentTypeId') as PaymentType['paymentTypeId'][];
+			setSelected(selections.length > 0 ? selections : []);
 		}
-	}, [props.show, selectedTypes]);
-
-	useEffect(() => {
-		setAllTypes(paymentTypes);
-	}, [paymentTypes]);
-
-	useEffect(() => {
-		setSelected(selectedTypes);
-	}, [selectedTypes]);
+	}, [props.show, searchParams]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterPaymentsModal} centered>
@@ -43,7 +36,7 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 				<Modal.Title>payment type</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				{allTypes.map((paymentType) => {
+				{paymentTypes.map((paymentType) => {
 					const isSelected = selected.includes(paymentType.paymentTypeId);
 
 					return (
@@ -70,7 +63,21 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 					<Button variant="outline-primary" onClick={props.onHide}>
 						cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(selected)}>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							searchParams.delete('paymentTypeId');
+
+							for (const paymentTypeId of selected) {
+								searchParams.append('paymentTypeId', paymentTypeId);
+							}
+
+							setSearchParams(searchParams, { state: location.state });
+
+							props.onHide?.();
+						}}
+					>
 						save
 					</Button>
 				</div>
