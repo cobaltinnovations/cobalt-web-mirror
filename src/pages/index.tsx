@@ -123,85 +123,89 @@ const Index: FC = () => {
 				</>
 			)}
 
-			<Container className="pt-20">
-				<Row>
-					<Col>
-						<h3 className="mb-2">On Your Time</h3>
-					</Col>
-				</Row>
-			</Container>
-			<Container>
-				<Row>
-					<Col>
-						<Carousel
-							responsive={{
-								externalMonitor: {
-									...responsiveDefaults.externalMonitor,
-									items: 4,
-								},
-								desktopExtraLarge: {
-									...responsiveDefaults.desktopExtraLarge,
-									items: 4,
-								},
-								desktop: {
-									...responsiveDefaults.desktop,
-									items: 3,
-								},
-								tablet: {
-									...responsiveDefaults.tablet,
-									items: 2,
-								},
-								mobile: {
-									...responsiveDefaults.mobile,
-									items: 2,
-									partialVisibilityGutter: 16,
-								},
-							}}
-							// description="Explainer text goes here. What is on your time?"
-							calloutTitle="Explore all"
-							calloutOnClick={() => {
-								navigate('/on-your-time');
-							}}
-						>
-							{onYourTimeContent.map((onYourOwnTimeItem) => {
-								return (
-									<Link
-										key={onYourOwnTimeItem.contentId}
-										to={`/on-your-time/${onYourOwnTimeItem.contentId}`}
-										className="d-block mb-2 text-decoration-none"
-									>
-										<OnYourTimeItem
-											imageUrl={onYourOwnTimeItem.imageUrl}
-											tag={onYourOwnTimeItem.newFlag ? 'NEW' : ''}
-											title={onYourOwnTimeItem.title}
-											type={onYourOwnTimeItem.contentTypeLabel}
-											author={onYourOwnTimeItem.author}
-											duration={onYourOwnTimeItem.duration}
-										/>
-									</Link>
-								);
-							})}
-						</Carousel>
-					</Col>
-				</Row>
-			</Container>
+			{onYourTimeContent.length > 0 && (
+				<>
+					<Container className="pt-20">
+						<Row>
+							<Col>
+								<h3 className="mb-2">On Your Time</h3>
+							</Col>
+						</Row>
+					</Container>
+					<Container>
+						<Row>
+							<Col>
+								<Carousel
+									responsive={{
+										externalMonitor: {
+											...responsiveDefaults.externalMonitor,
+											items: 4,
+										},
+										desktopExtraLarge: {
+											...responsiveDefaults.desktopExtraLarge,
+											items: 4,
+										},
+										desktop: {
+											...responsiveDefaults.desktop,
+											items: 3,
+										},
+										tablet: {
+											...responsiveDefaults.tablet,
+											items: 2,
+										},
+										mobile: {
+											...responsiveDefaults.mobile,
+											items: 2,
+											partialVisibilityGutter: 16,
+										},
+									}}
+									// description="Explainer text goes here. What is on your time?"
+									calloutTitle="Explore all"
+									calloutOnClick={() => {
+										navigate('/on-your-time');
+									}}
+								>
+									{onYourTimeContent.map((onYourOwnTimeItem) => {
+										return (
+											<Link
+												key={onYourOwnTimeItem.contentId}
+												to={`/on-your-time/${onYourOwnTimeItem.contentId}`}
+												className="d-block mb-2 text-decoration-none"
+											>
+												<OnYourTimeItem
+													imageUrl={onYourOwnTimeItem.imageUrl}
+													tag={onYourOwnTimeItem.newFlag ? 'NEW' : ''}
+													title={onYourOwnTimeItem.title}
+													type={onYourOwnTimeItem.contentTypeLabel}
+													author={onYourOwnTimeItem.author}
+													duration={onYourOwnTimeItem.duration}
+												/>
+											</Link>
+										);
+									})}
+								</Carousel>
+							</Col>
+						</Row>
+					</Container>
 
-			<Container className="pb-20">
-				<Row>
-					<Col>
-						<div className="d-flex justify-content-center mb-4">
-							<Button
-								variant="light"
-								onClick={() => {
-									navigate('/on-your-time', { state: { personalize: true } });
-								}}
-							>
-								Personalize recommendations
-							</Button>
-						</div>
-					</Col>
-				</Row>
-			</Container>
+					<Container className="pb-20">
+						<Row>
+							<Col>
+								<div className="d-flex justify-content-center mb-4">
+									<Button
+										variant="light"
+										onClick={() => {
+											navigate('/on-your-time', { state: { personalize: true } });
+										}}
+									>
+										Personalize recommendations
+									</Button>
+								</div>
+							</Col>
+						</Row>
+					</Container>
+				</>
+			)}
 		</AsyncPage>
 	);
 };
