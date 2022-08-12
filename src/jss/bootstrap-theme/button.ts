@@ -87,6 +87,7 @@ export const button = (theme: CobaltTheme) => {
 			/* Danger variant */
 			/* ----------------------------------------------------------- */
 			'&-danger': {
+				color: theme.colors.n0,
 				backgroundColor: theme.colors.d500,
 				'&:hover': {
 					backgroundColor: theme.colors.d300,
