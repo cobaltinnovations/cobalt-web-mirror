@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -15,6 +16,7 @@ interface SessionCancelModalProps extends ModalProps {
 }
 
 const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props }) => {
+	useTrackModalView('SessionCancelModal', props.show);
 	const classes = useSessionCancelModalStyles();
 
 	return (

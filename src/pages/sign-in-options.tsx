@@ -10,6 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { AccountSource } from '@/lib/models';
 import useSubdomain from '@/hooks/use-subdomain';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -111,6 +112,9 @@ const SignInOptions = () => {
 			handleError(error);
 		}
 	}
+
+	useTrackModalView('AccountSourceModal', ssoModalIsOpen);
+	useTrackModalView('ForgotPasswordModal', forgotPasswordModalIsOpen);
 
 	return (
 		<>

@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -13,6 +14,7 @@ const useIneligibleBookingModal = createUseStyles({
 interface IneligibleBookingModalProps extends ModalProps {}
 
 const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
+	useTrackModalView('IneligibleBookingModal', props.show);
 	const classes = useIneligibleBookingModal();
 
 	return (

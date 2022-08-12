@@ -110,7 +110,8 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		});
 
 		if (__DEV__) {
-			// expose this to test/debug ReactGA.testModeAPI.calls
+			// exposing this to test/debug in browser console:
+			// access window.__REACT_GA__.testModeAPI.calls for results
 			//@ts-expect-error
 			window.__REACT_GA__ = ReactGA;
 		}

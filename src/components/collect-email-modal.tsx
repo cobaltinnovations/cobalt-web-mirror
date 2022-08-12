@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import InputHelper from '@/components/input-helper';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCollectEmailModalStyles = createUseStyles({
 	collectEmailModal: {
@@ -17,6 +18,7 @@ interface CollectEmailModalProps extends ModalProps {
 }
 
 const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collectedEmail, ...props }) => {
+	useTrackModalView('CollectEmailModal', props.show);
 	const classes = useCollectEmailModalStyles();
 	const [email, setEmail] = useState(collectedEmail);
 

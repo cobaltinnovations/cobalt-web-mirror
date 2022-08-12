@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -19,6 +20,7 @@ interface SessionRemoveImageModalProps extends ModalProps {
 }
 
 const SessionRemoveImageModal: FC<SessionRemoveImageModalProps> = ({ imageSource, onRemove, ...props }) => {
+	useTrackModalView('SessionRemoveImageModal', props.show);
 	const classes = useSessionCropModalStyles();
 
 	return (
