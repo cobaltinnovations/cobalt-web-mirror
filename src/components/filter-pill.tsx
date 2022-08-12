@@ -1,44 +1,51 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
-import Color from 'color';
 
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
-		margin: 5,
-		...theme.fonts.small,
+		margin: '0 4px',
 		borderRadius: 500,
 		appearance: 'none',
 		whiteSpace: 'nowrap',
-		...theme.fonts.bodyNormal,
-		textTransform: 'uppercase',
-		padding: '4px 10px 4px 12px',
-		backgroundColor: theme.colors.n100,
-		border: `1px solid ${theme.colors.border}`,
+		...theme.fonts.small,
+		...theme.fonts.bodyBold,
+		color: theme.colors.p500,
+		padding: '6px 5px 4px 14px',
+		backgroundColor: 'transparent',
+		border: `2px solid ${theme.colors.p500}`,
 		'&:focus': {
 			outline: 'none',
 		},
+		'&:hover': {
+			color: theme.colors.n0,
+			backgroundColor: theme.colors.p500,
+		},
 	},
 	activePill: {
-		backgroundColor: theme.colors.n900,
 		color: theme.colors.n0,
+		borderColor: theme.colors.p700,
+		backgroundColor: theme.colors.p700,
+		'&:hover': {
+			borderColor: theme.colors.p500,
+			backgroundColor: theme.colors.p500,
+		},
 	},
 	disabledPill: {
-		backgroundColor: theme.colors.n100,
 		color: theme.colors.n500,
+		borderColor: theme.colors.n100,
+		backgroundColor: theme.colors.n100,
 		'&:hover': {
 			cursor: 'not-allowed',
+			color: theme.colors.n500,
+			backgroundColor: theme.colors.n100,
 		},
 	},
 	arrowDown: {
 		marginLeft: 2,
-		marginTop: -1,
-		fill: theme.colors.n900,
-	},
-	activeArrowDown: {
-		fill: theme.colors.n0,
+		marginTop: -2,
 	},
 	disabledArrowDown: {
 		fill: theme.colors.n500,
@@ -65,7 +72,6 @@ const FilterPill = React.forwardRef<HTMLButtonElement, FilterPillProps>(
 				{children}
 				<ArrowDown
 					className={classNames(classes.arrowDown, {
-						[classes.activeArrowDown]: active,
 						[classes.disabledArrowDown]: props.disabled,
 					})}
 				/>
