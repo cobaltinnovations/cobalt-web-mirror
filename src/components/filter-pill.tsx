@@ -6,7 +6,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
-		margin: '0 4px',
+		margin: 4,
 		borderRadius: 500,
 		appearance: 'none',
 		whiteSpace: 'nowrap',

@@ -185,7 +185,7 @@ const OnYourTime: FC = () => {
 
 			<Container>
 				<Row className="align-items-center">
-					<Col lg={6} xl={5} className="mb-4 mb-lg-8">
+					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper
 							type="search"
 							label="Find On Your Time items"
@@ -195,7 +195,7 @@ const OnYourTime: FC = () => {
 							}}
 						/>
 					</Col>
-					<Col lg={6} xl={7} className="mb-5 mb-lg-8">
+					<Col lg={6} xl={7} className="mb-4 mb-lg-7">
 						<div className="text-start text-lg-end">
 							<FilterPill
 								active={hasFilters}
