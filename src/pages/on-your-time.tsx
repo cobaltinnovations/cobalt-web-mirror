@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
@@ -28,24 +28,22 @@ const OnYourTime: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { trackEvent } = useAnalytics();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const selectedFormatIds = searchParams.getAll('formatId');
+	const selectedLength = searchParams.get('length') ?? '';
+	const searchTerm = searchParams.get('q') ?? '';
 	const { subdomainInstitution } = useAccount();
 	const [didInit, setDidInit] = useState(false);
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
-
 	const skipAssessment = !!(location.state as LocationState)?.skipAssessment;
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
-	const [selectedFormatIds, setSelectedFormatIds] = useState<string[]>([]);
-
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
-	const [selectedLength, setSelectedLength] = useState<string>('');
-
 	const [showPersonalizeModal, setShowPersonalizeModal] = useState(
 		(location?.state as { personalize: boolean })?.personalize ?? false
 	);
 	const [items, setItems] = useState<Content[]>([]);
 	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
-	const [searchTerm, setSearchTerm] = useState('');
 
 	const [questions, setQuestions] = useState<PersonalizationQuestion[]>([]);
 	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
@@ -88,10 +86,11 @@ const OnYourTime: FC = () => {
 			});
 	}, []);
 
+	const format = selectedFormatIds.join(',');
 	const fetchContent = useCallback(() => {
 		return contentService
 			.fetchContentList({
-				format: selectedFormatIds.join(','),
+				format,
 				maxLengthMinutes: selectedLength,
 			})
 			.fetch()
@@ -100,7 +99,7 @@ const OnYourTime: FC = () => {
 				setItems(response.content);
 				setAdditionalItems(response.additionalContent);
 			});
-	}, [selectedFormatIds, selectedLength]);
+	}, [format, selectedLength]);
 
 	const fetchData = useCallback(async () => {
 		const requests = [fetchContent(), fetchFilters()];
@@ -165,7 +164,13 @@ const OnYourTime: FC = () => {
 					setShowFilterFormatModal(false);
 				}}
 				onSave={(selectedIds) => {
-					setSelectedFormatIds(selectedIds);
+					searchParams.delete('formatId');
+
+					for (const formatId of selectedIds) {
+						searchParams.append('formatId', formatId);
+					}
+
+					setSearchParams(searchParams);
 					setShowFilterFormatModal(false);
 				}}
 			/>
@@ -177,7 +182,9 @@ const OnYourTime: FC = () => {
 					setShowFilterLengthModal(false);
 				}}
 				onSave={(length) => {
-					setSelectedLength(length);
+					searchParams.set('length', 'length');
+
+					setSearchParams(searchParams);
 					setShowFilterLengthModal(false);
 				}}
 			/>
@@ -194,7 +201,8 @@ const OnYourTime: FC = () => {
 							label="Find On Your Time items"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								setSearchTerm(event.target.value);
+								searchParams.set('q', event.target.value);
+								setSearchParams(searchParams, { replace: true });
 							}}
 						/>
 					</Col>

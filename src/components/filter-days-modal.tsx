@@ -4,6 +4,8 @@ import { createUseStyles } from 'react-jss';
 import moment, { Moment } from 'moment';
 
 import DatePicker from '@/components/date-picker';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { FILTER_DAYS } from '@/contexts/booking-context';
 import useAnalytics from '@/hooks/use-analytics';
 import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
 import useTrackModalView from '@/hooks/use-track-modal-view';
@@ -16,37 +18,6 @@ const useFilterDaysModalStyles = createUseStyles({
 	},
 });
 
-const DAYS = [
-	{
-		label: 'Mon.',
-		key: 'MONDAY',
-	},
-	{
-		label: 'Tue.',
-		key: 'TUESDAY',
-	},
-	{
-		label: 'Wed.',
-		key: 'WEDNESDAY',
-	},
-	{
-		label: 'Thu.',
-		key: 'THURSDAY',
-	},
-	{
-		label: 'Fri.',
-		key: 'FRIDAY',
-	},
-	{
-		label: 'Sat.',
-		key: 'SATURDAY',
-	},
-	{
-		label: 'Sun.',
-		key: 'SUNDAY',
-	},
-] as const;
-
 export interface FilterDays {
 	SUNDAY: boolean;
 	MONDAY: boolean;
@@ -58,50 +29,45 @@ export interface FilterDays {
 }
 
 interface FilterDaysModalProps extends ModalProps {
-	onSave(params: { from: Moment; to: Moment; days: FilterDays }): void;
-	from: Moment;
-	to: Moment;
-	days: Partial<FilterDays>;
+	defaultFrom?: string;
+	defaultTo?: string;
 }
 
-const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...props }) => {
+const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...props }) => {
 	useTrackModalView('FilterDaysModal', props.show);
 	const classes = useFilterDaysModalStyles();
 	const { trackEvent } = useAnalytics();
 
+	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
 	const [fromDate, setFromDate] = useState<Moment>(moment());
 	const [toDate, setToDate] = useState<Moment>(moment());
-	const [filterDays, setFilterDays] = useState<FilterDays>({} as FilterDays);
+	const [filterDays, setFilterDays] = useState<FilterDays>(
+		FILTER_DAYS.reduce((acc, day) => {
+			acc[day.key] = true;
+			return acc;
+		}, {} as FilterDays)
+	);
 
 	useEffect(() => {
-		if (props.show) {
-			setFromDate(from);
-			setToDate(to);
-			setFilterDays(
-				DAYS.reduce((acc, { key }) => {
-					acc[key] = !!days[key];
-					return acc;
-				}, {} as FilterDays)
-			);
+		if (!props.show) {
+			return;
 		}
-	}, [props.show, from, to, days]);
 
-	useEffect(() => {
-		setFromDate(from);
-	}, [from]);
+		const startDate = searchParams.get('startDate');
+		const endDate = searchParams.get('endDate');
+		const daysOfWeek = searchParams.getAll('dayOfWeek');
 
-	useEffect(() => {
-		setToDate(to);
-	}, [to]);
-
-	useEffect(() => {
+		setFromDate(startDate ? moment(startDate) : defaultFrom ? moment(defaultFrom) : moment());
+		setToDate(endDate ? moment(endDate) : defaultTo ? moment(defaultTo) : moment());
 		setFilterDays(
-			DAYS.reduce((acc, { key }) => {
-				acc[key] = !!days[key];
+			FILTER_DAYS.reduce((acc, day) => {
+				acc[day.key] = daysOfWeek.length === 0 || daysOfWeek.includes(day.key);
+
 				return acc;
 			}, {} as FilterDays)
 		);
-	}, [days]);
+	}, [defaultFrom, defaultTo, props.show, searchParams]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterDaysModal} centered>
@@ -137,7 +103,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 				/>
 
 				<Row className="mt-2">
-					{DAYS.map(({ label, key }) => {
+					{FILTER_DAYS.map(({ label, key }) => {
 						return (
 							<Col key={key} xs={6}>
 								<Form.Check
@@ -169,11 +135,20 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 						onClick={() => {
 							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Days'));
 
-							onSave({
-								from: fromDate,
-								to: toDate,
-								days: filterDays,
-							});
+							searchParams.set('startDate', fromDate.format('YYYY-MM-DD'));
+							searchParams.set('endDate', toDate.format('YYYY-MM-DD'));
+
+							searchParams.delete('dayOfWeek');
+
+							for (const dayOfWeek of Object.entries(filterDays)
+								.filter(([_, isSelected]) => isSelected)
+								.map(([day]) => day)) {
+								searchParams.append('dayOfWeek', dayOfWeek);
+							}
+
+							setSearchParams(searchParams, { state: location.state });
+
+							props.onHide?.();
 						}}
 					>
 						save

@@ -15,6 +15,7 @@ import {
 	AppointmentModel,
 	FollowupModel,
 	Specialty,
+	ProviderVisitType,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -35,6 +36,7 @@ export interface FindOptionsResponse {
 	scores: AssessmentScore;
 	supportRoles: SupportRole[];
 	specialties: Specialty[];
+	visitTypes: ProviderVisitType[];
 }
 
 export interface FindFilters {

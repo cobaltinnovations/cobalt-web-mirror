@@ -5,11 +5,14 @@ import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import BackgroundImageContainer from '@/components/background-image-container';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { providerService } from '@/lib/services';
-import { SearchResult } from '@/contexts/booking-context';
-import { Provider, Clinic } from '@/lib/models';
+import {
+	isClinicResult,
+	mapClinicToResult,
+	mapProviderToResult,
+	ProviderSearchResult,
+} from '@/contexts/booking-context';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 import classNames from 'classnames';
-import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useSearchBarStyles = createUseThemedStyles((theme) => ({
@@ -28,29 +31,10 @@ const useSearchBarStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const isClinicResult = (result: Provider | Clinic): result is Clinic => {
-	return typeof (result as Clinic).clinicId === 'string';
-};
-
-const mapProviderToResult = (provider: Provider): SearchResult => ({
-	id: provider.providerId,
-	imageUrl: provider.imageUrl,
-	type: 'provider',
-	displayName: provider.name + (provider.license ? `, ${provider.license}` : ''),
-	description: provider.supportRolesDescription,
-});
-
-const mapClinicToResult = (clinic: Clinic): SearchResult => ({
-	id: clinic.clinicId,
-	type: 'clinic',
-	imageUrl: getRandomPlaceholderImage() as any,
-	displayName: clinic.description,
-});
-
 interface AppointmentSearchBarProps {
-	recentProviders: SearchResult[];
-	selectedSearchResult: SearchResult[]; // selectedSearchResult
-	setSelectedSearchResult: Dispatch<SetStateAction<SearchResult[]>>; // setSelectedSearchResult
+	recentProviders: ProviderSearchResult[];
+	selectedSearchResult: ProviderSearchResult[]; // selectedSearchResult
+	setSelectedSearchResult: Dispatch<SetStateAction<ProviderSearchResult[]>>; // setSelectedSearchResult
 	setProviderFilter: Dispatch<SetStateAction<string | undefined>>;
 	setClinicsFilter: Dispatch<SetStateAction<string[]>>;
 }
@@ -62,7 +46,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearching, setIsSearching] = useState(false);
-	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [searchResults, setSearchResults] = useState<ProviderSearchResult[]>([]);
 	const typeAheadRef = useRef<any>(null);
 
 	const searchProviders = useCallback(async (query: string) => {
@@ -122,13 +106,16 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 							}}
 							onInputChange={setSearchQuery}
 							onChange={(selectedOptions) => {
-								props.setSelectedSearchResult(selectedOptions as SearchResult[]);
+								props.setSelectedSearchResult(selectedOptions as ProviderSearchResult[]);
 								(typeAheadRef.current as any).blur();
 							}}
 							options={searchQuery ? searchResults : props.recentProviders}
 							selected={props.selectedSearchResult}
-							renderMenu={(options, menuProps) => {
-								const results = options as SearchResult[];
+							renderMenu={(
+								options,
+								{ newSelectionPrefix, paginationText, renderMenuItemChildren, ...menuProps }
+							) => {
+								const results = options as ProviderSearchResult[];
 								if (!searchQuery && props.recentProviders.length === 0) {
 									return <></>;
 								}
