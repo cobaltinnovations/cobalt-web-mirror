@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { ReactComponent as ReceptionistIllustration } from '@/assets/illustrations/receptionist.svg';
 import { ReactComponent as DoctorIllustration } from '@/assets/illustrations/doctor-with-chart.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useHealthRecordsModal = createUseThemedStyles((theme) => ({
 	healthRecordsModal: {
@@ -85,6 +86,7 @@ const HealthRecordsModalPageTwo: FC<HealthRecordsModalPageProps> = ({ onNextButt
 };
 
 const HealthRecordsModal: FC<HealthRecordsModalProps> = ({ onExitBooking, ...props }) => {
+	useTrackModalView('HealthRecordsModal', props.show);
 	const classes = useHealthRecordsModal();
 	const [page, setPage] = useState(1);
 

@@ -4,6 +4,9 @@ import { createUseStyles } from 'react-jss';
 
 import { Specialty } from '@/lib/models';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -18,10 +21,12 @@ interface FilterSpecialtyModalProps extends ModalProps {
 }
 
 const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...props }) => {
+	useTrackModalView('FilterSpecialtyModal', props.show);
 	const classes = useStyles();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [selected, setSelected] = useState(searchParams.getAll('specialtyId'));
 
 	useEffect(() => {
@@ -66,6 +71,8 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...p
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Focus'));
+
 							searchParams.delete('specialtyId');
 
 							for (const specialtyId of selected) {

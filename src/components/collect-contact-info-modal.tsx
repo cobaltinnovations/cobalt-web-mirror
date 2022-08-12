@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import InputHelper from '@/components/input-helper';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCollectContactInfoModalStyles = createUseStyles({
 	collectContactInfoModal: {
@@ -27,6 +28,8 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 	promptForPhoneNumber,
 	...props
 }) => {
+	useTrackModalView('CollectContactInfoModal', props.show);
+
 	const classes = useCollectContactInfoModalStyles();
 	const [emailInputValue, setEmailInputValue] = useState(collectedEmail || '');
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>(collectedPhoneNumber || '');

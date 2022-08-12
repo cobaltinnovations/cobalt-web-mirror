@@ -3,6 +3,9 @@ import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { PaymentType } from '@/lib/models';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterPaymentsModalStyles = createUseStyles({
 	filterPaymentsModal: {
@@ -17,10 +20,12 @@ interface FilterPaymentsModalProps extends ModalProps {
 }
 
 const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, ...props }) => {
+	useTrackModalView('FilterPaymentsModal', props.show);
 	const classes = useFilterPaymentsModalStyles();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [selected, setSelected] = useState(searchParams.getAll('paymentTypeId') as PaymentType['paymentTypeId'][]);
 
 	useEffect(() => {
@@ -67,6 +72,8 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, ...pr
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Payment Type'));
+
 							searchParams.delete('paymentTypeId');
 
 							for (const paymentTypeId of selected) {

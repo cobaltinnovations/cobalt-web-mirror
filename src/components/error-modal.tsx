@@ -5,6 +5,7 @@ import { createUseStyles } from 'react-jss';
 
 import { ErrorModalContext } from '@/contexts/error-modal-context';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useStyles = createUseStyles({
 	errorModal: {
@@ -18,6 +19,7 @@ const ErrorModal: FC = () => {
 	const navigate = useNavigate();
 	const classes = useStyles();
 	const { show, setShow, error } = useContext(ErrorModalContext);
+	useTrackModalView('ErrorModal', show);
 	const { openInCrisisModal } = useInCrisisModal();
 
 	return (

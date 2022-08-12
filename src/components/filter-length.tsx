@@ -1,3 +1,6 @@
+import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
+import useAnalytics from '@/hooks/use-analytics';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC, useEffect, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -16,8 +19,10 @@ interface FilterLengthProps extends ModalProps {
 }
 
 const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props }) => {
+	useTrackModalView('FilterLength', props.show);
 	const classes = useStyles();
 	const [internalSelectedLength, setInternalSelectedLength] = useState<string>('');
+	const { trackEvent } = useAnalytics();
 
 	useEffect(() => {
 		if (props.show) {
@@ -34,6 +39,7 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 	}
 
 	function handleSaveButtonClick() {
+		trackEvent(ContentAnalyticsEvent.applyFilter('Length'));
 		onSave(internalSelectedLength);
 	}
 

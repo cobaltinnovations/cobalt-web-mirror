@@ -3,6 +3,9 @@ import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { SupportRole, SupportRoleId } from '@/lib/models';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterProviderTypesModalStyles = createUseStyles({
 	filterProviderTypesModal: {
@@ -18,10 +21,12 @@ interface FilterProviderTypesModalProps extends ModalProps {
 }
 
 const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerTypes, recommendedTypes, ...props }) => {
+	useTrackModalView('FilterProviderTypesModal', props.show);
 	const classes = useFilterProviderTypesModalStyles();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [selected, setSelected] = useState(searchParams.getAll('supportRoleId') as SupportRoleId[]);
 
 	useEffect(() => {
@@ -78,6 +83,8 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerT
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Provider Type'));
+
 							searchParams.delete('supportRoleId');
 							for (const role of selected) {
 								searchParams.append('supportRoleId', role);

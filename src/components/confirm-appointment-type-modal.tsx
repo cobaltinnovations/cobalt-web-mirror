@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { AppointmentType, EpicDepartment } from '@/lib/models/appointments';
 import { AvailabilityTimeSlot } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	confirmAppointmentTypeModal: {
@@ -34,6 +35,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 	epicDepartment,
 	...props
 }) => {
+	useTrackModalView('ConfirmAppointmentTypeModal', props.show);
 	const classes = useConfirmAppointmentTypeModalStyles();
 
 	const [selectedId, setSelectedId] = useState('');

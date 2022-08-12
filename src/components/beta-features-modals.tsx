@@ -1,4 +1,5 @@
 import useAccount from '@/hooks/use-account';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import { BetaFeatureId, BetaStatusId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
@@ -18,6 +19,7 @@ interface BetaFeatureModalProps extends ModalProps {
 }
 
 export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
+	useTrackModalView('BetaFeatureModal', props.show);
 	const classes = useBetaFeaturesModalStyles();
 
 	return (

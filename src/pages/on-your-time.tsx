@@ -17,6 +17,8 @@ import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
+import useAnalytics from '@/hooks/use-analytics';
+import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 
 interface LocationState {
 	skipAssessment?: boolean;
@@ -25,6 +27,7 @@ interface LocationState {
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedFormatIds = searchParams.getAll('formatId');
 	const selectedLength = searchParams.get('length') ?? '';
@@ -208,6 +211,7 @@ const OnYourTime: FC = () => {
 							<FilterPill
 								active={hasFilters}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Focus'));
 									setShowPersonalizeModal(true);
 								}}
 							>
@@ -216,6 +220,7 @@ const OnYourTime: FC = () => {
 							<FilterPill
 								active={selectedFormatIds.length > 0}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Format'));
 									setShowFilterFormatModal(true);
 								}}
 							>
@@ -224,6 +229,7 @@ const OnYourTime: FC = () => {
 							<FilterPill
 								active={!!selectedLength}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Length'));
 									setShowFilterLengthModal(true);
 								}}
 							>

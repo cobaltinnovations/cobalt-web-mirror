@@ -5,6 +5,9 @@ import { createUseStyles } from 'react-jss';
 import TimeInput from '@/components/time-input';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { padStart } from 'lodash';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterTimesModalStyles = createUseStyles({
 	filterTimesModal: {
@@ -20,10 +23,12 @@ interface FilterTimesModalProps extends ModalProps {
 }
 
 const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, defaultEndTime, ...props }) => {
+	useTrackModalView('FilterTimesModal', props.show);
 	const classes = useFilterTimesModalStyles();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [fromTime, setFromTime] = useState('06:00');
 	const [fromMeridian, setFromMeridian] = useState('am');
 	const [toTime, setToTime] = useState('08:00');
@@ -91,6 +96,8 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, default
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Times'));
+
 							const [fromHrs, fromMins] = fromTime.split(':');
 							const [toHrs, toMins] = toTime.split(':');
 

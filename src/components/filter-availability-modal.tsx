@@ -4,6 +4,9 @@ import { createUseStyles } from 'react-jss';
 
 import { ProviderAvailability, ProviderVisitType } from '@/lib/models';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterAvailabilityModalStyles = createUseStyles({
 	filterAvailabilityModal: {
@@ -27,8 +30,10 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 	defaultVisitTypeIds,
 	...props
 }) => {
+	useTrackModalView('FilterAvailabilityModal', props.show);
 	const classes = useFilterAvailabilityModalStyles();
 
+	const { trackEvent } = useAnalytics();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
 	const [selectedAvailability, setSelectedAvailability] = useState(
@@ -103,6 +108,7 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Availability'));
 							searchParams.set('availability', selectedAvailability);
 							searchParams.delete('visitTypeId');
 

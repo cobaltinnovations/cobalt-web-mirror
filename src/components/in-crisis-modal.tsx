@@ -3,6 +3,7 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import useAccount from '@/hooks/use-account';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useInCrisisModalStyles = createUseStyles({
 	inCrisisModal: {
@@ -19,6 +20,7 @@ interface InCrisisModalProps extends ModalProps {
 const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 	const classes = useInCrisisModalStyles();
 	const { subdomainInstitution } = useAccount();
+	useTrackModalView('InCrisisModal', modalProps.show);
 
 	return (
 		<Modal {...modalProps} dialogClassName={classes.inCrisisModal} centered>

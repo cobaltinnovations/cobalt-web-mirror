@@ -6,6 +6,9 @@ import moment, { Moment } from 'moment';
 import DatePicker from '@/components/date-picker';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { FILTER_DAYS } from '@/contexts/booking-context';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterDaysModalStyles = createUseStyles({
 	filterDaysModal: {
@@ -31,7 +34,9 @@ interface FilterDaysModalProps extends ModalProps {
 }
 
 const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...props }) => {
+	useTrackModalView('FilterDaysModal', props.show);
 	const classes = useFilterDaysModalStyles();
+	const { trackEvent } = useAnalytics();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
@@ -128,6 +133,8 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Days'));
+
 							searchParams.set('startDate', fromDate.format('YYYY-MM-DD'));
 							searchParams.set('endDate', toDate.format('YYYY-MM-DD'));
 

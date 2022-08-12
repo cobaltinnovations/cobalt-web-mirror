@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -15,6 +16,7 @@ interface ConfirmCancelBookingModalProps extends ModalProps {
 }
 
 const ConfirmCancelBookingModal: FC<ConfirmCancelBookingModalProps> = ({ onConfirm, ...props }) => {
+	useTrackModalView('ConfirmCancelBookingModal', props.show);
 	const classes = useConfirmCancelBookingModalStyles();
 
 	return (

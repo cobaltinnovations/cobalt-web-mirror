@@ -9,8 +9,11 @@ import { ERROR_CODES } from '@/lib/http-client';
 import { ScreeningSession } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
+import useAnalytics from '@/hooks/use-analytics';
+import { ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
 
 const ScreeningFlowsPage = () => {
+	const { trackEvent } = useAnalytics();
 	const handleError = useHandleError();
 	const [searchParams] = useSearchParams();
 	const { screeningFlowId } = useParams<{ screeningFlowId: string }>();
@@ -72,17 +75,21 @@ const ScreeningFlowsPage = () => {
 
 	useEffect(() => {
 		if (selectedSession?.promptForPhoneNumber) {
+			trackEvent(ScreeningAnalyticsEvent.promptForPhoneNumber());
+
 			setShowPhoneModal(true);
 		} else if (selectedSession) {
 			navigateToNext(selectedSession);
 		}
-	}, [navigateToNext, selectedSession]);
+	}, [navigateToNext, selectedSession, trackEvent]);
 
 	return (
 		<AsyncPage fetchData={initialFetch}>
 			<CollectPhoneModal
 				show={showPhoneModal}
 				onSkip={() => {
+					trackEvent(ScreeningAnalyticsEvent.skipPhoneNumberPrompt());
+
 					navigateToDestination(selectedSession?.screeningSessionDestination, {
 						skipAssessment: true,
 					});
