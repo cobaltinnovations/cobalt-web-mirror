@@ -1,24 +1,27 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
+import CopyToClipboard from 'react-copy-to-clipboard';
+
+import { groupSessionsService } from '@/lib/services';
+import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
 
 import useAccount from '@/hooks/use-account';
-import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import useHandleError from '@/hooks/use-handle-error';
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import useAlert from '@/hooks/use-alert';
+
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import CollectEmailModal from '@/components/collect-email-modal';
 import ConfirmGroupEventBookingModal from '@/components/confirm-group-event-booking-modal';
 import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
-
-import { groupSessionsService } from '@/lib/services';
-import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
-import useHandleError from '@/hooks/use-handle-error';
 import BackgroundImageContainer from '@/components/background-image-container';
+
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
+
+import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -296,7 +299,7 @@ const InTheStudioGroupSessionScheduled = () => {
 										setShowConfirmCancelModal(true);
 									}}
 								>
-									Cancel Reservation
+									Cancel reservation
 								</Button>
 							) : (
 								<Button
@@ -304,7 +307,7 @@ const InTheStudioGroupSessionScheduled = () => {
 									variant="primary"
 									onClick={handleReserveButtonClick}
 								>
-									{session?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a Place'}
+									{session?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a place'}
 								</Button>
 							)}
 							<CopyToClipboard
