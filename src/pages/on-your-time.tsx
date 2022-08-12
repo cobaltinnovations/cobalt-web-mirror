@@ -179,13 +179,13 @@ const OnYourTime: FC = () => {
 				}}
 			/>
 
-			<HeroContainer>
+			<HeroContainer className="mb-4 mb-lg-8">
 				<h2 className="mb-0 text-center">On Your Time</h2>
 			</HeroContainer>
 
-			<Container className="pt-5 mb-3">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+			<Container>
+				<Row className="align-items-center">
+					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper
 							type="search"
 							label="Find On Your Time items"
@@ -195,13 +195,8 @@ const OnYourTime: FC = () => {
 							}}
 						/>
 					</Col>
-				</Row>
-			</Container>
-
-			<Container className="mb-3">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<div className="text-center">
+					<Col lg={6} xl={7} className="mb-4 mb-lg-7">
+						<div className="text-start text-lg-end">
 							<FilterPill
 								active={hasFilters}
 								onClick={() => {
