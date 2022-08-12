@@ -49,6 +49,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useAnalytics from '@/hooks/use-analytics';
 
 const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 	return typeof (result as Clinic).clinicId === 'string';
@@ -111,6 +113,7 @@ const ConnectWithSupport: FC = () => {
 
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { trackEvent } = useAnalytics();
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
@@ -730,38 +733,56 @@ const ConnectWithSupport: FC = () => {
 							<div className="d-flex justify-content-center flex-wrap">
 								<FilterPill
 									active={activeFilters[BookingFilters.Date] || activeFilters[BookingFilters.Days]}
-									onClick={() => setOpenFilterModal(BookingFilters.Date)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Days'));
+										setOpenFilterModal(BookingFilters.Date);
+									}}
 								>
 									Days
 								</FilterPill>
 								<FilterPill
 									active={activeFilters[BookingFilters.Time]}
-									onClick={() => setOpenFilterModal(BookingFilters.Time)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Times'));
+										setOpenFilterModal(BookingFilters.Time);
+									}}
 								>
 									Times
 								</FilterPill>
 								<FilterPill
 									active={activeFilters[BookingFilters.Provider]}
-									onClick={() => setOpenFilterModal(BookingFilters.Provider)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Provider Type'));
+										setOpenFilterModal(BookingFilters.Provider);
+									}}
 								>
 									Provider Type
 								</FilterPill>
 								<FilterPill
 									active={activeFilters[BookingFilters.Availability]}
-									onClick={() => setOpenFilterModal(BookingFilters.Availability)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Availability'));
+										setOpenFilterModal(BookingFilters.Availability);
+									}}
 								>
 									Availability
 								</FilterPill>
 								<FilterPill
 									disabled={!isSpecialtiesFilterEnabled}
 									active={activeFilters[BookingFilters.Specialty]}
-									onClick={() => setOpenFilterModal(BookingFilters.Specialty)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Focus'));
+										setOpenFilterModal(BookingFilters.Specialty);
+									}}
 								>
 									Focus
 								</FilterPill>
 								<FilterPill
 									active={activeFilters[BookingFilters.Payment]}
-									onClick={() => setOpenFilterModal(BookingFilters.Payment)}
+									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Payment Type'));
+										setOpenFilterModal(BookingFilters.Payment);
+									}}
 								>
 									Payment Type
 								</FilterPill>
@@ -776,6 +797,8 @@ const ConnectWithSupport: FC = () => {
 									className="p-0 mb-1"
 									size="sm"
 									onClick={() => {
+										trackEvent(ProviderSearchAnalyticsEvent.resetFilters());
+
 										const urlQuery = new URLSearchParams(location.search);
 
 										if (

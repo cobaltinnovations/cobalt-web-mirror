@@ -2,6 +2,9 @@ import React, { FC, useState, useEffect } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { SupportRole, SupportRoleId } from '@/lib/models';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterProviderTypesModalStyles = createUseStyles({
 	filterProviderTypesModal: {
@@ -25,8 +28,10 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 	onSave,
 	...props
 }) => {
+	useTrackModalView('FilterProviderTypesModal', props.show);
 	const classes = useFilterProviderTypesModalStyles();
 
+	const { trackEvent } = useAnalytics();
 	const [allTypes, setAllTypes] = useState<SupportRole[]>([]);
 	const [defaults, setDefaults] = useState<SupportRoleId[]>([]);
 	const [selected, setSelected] = useState<SupportRoleId[]>([]);
@@ -94,7 +99,14 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({
 					<Button variant="outline-primary" onClick={props.onHide}>
 						cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(selected)}>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Provider Type'));
+							onSave(selected);
+						}}
+					>
 						save
 					</Button>
 				</div>

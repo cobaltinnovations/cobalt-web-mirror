@@ -2,6 +2,9 @@ import React, { FC, useState, useEffect } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { PaymentType } from '@/lib/models';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterPaymentsModalStyles = createUseStyles({
 	filterPaymentsModal: {
@@ -18,8 +21,10 @@ interface FilterPaymentsModalProps extends ModalProps {
 }
 
 const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selectedTypes, onSave, ...props }) => {
+	useTrackModalView('FilterPaymentsModal', props.show);
 	const classes = useFilterPaymentsModalStyles();
 
+	const { trackEvent } = useAnalytics();
 	const [allTypes, setAllTypes] = useState<PaymentType[]>([]);
 	const [selected, setSelected] = useState<PaymentType['paymentTypeId'][]>([]);
 
@@ -70,7 +75,14 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, selec
 					<Button variant="outline-primary" onClick={props.onHide}>
 						cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(selected)}>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Payment Type'));
+							onSave(selected);
+						}}
+					>
 						save
 					</Button>
 				</div>

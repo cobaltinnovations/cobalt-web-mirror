@@ -4,6 +4,9 @@ import { createUseStyles } from 'react-jss';
 
 import { ProviderAvailability } from '@/lib/models';
 import { cloneDeep } from 'lodash';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterAvailabilityModalStyles = createUseStyles({
 	filterAvailabilityModal: {
@@ -27,11 +30,13 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 	onSave,
 	...props
 }) => {
+	useTrackModalView('FilterAvailabilityModal', props.show);
 	const classes = useFilterAvailabilityModalStyles();
 
 	const [allAvailabilites, setAllAvailabilities] = useState<ProviderAvailability[]>([]);
 	const [selected, setSelected] = useState(selectedAvailability);
 	const [visitTypeIds, setVisitTypeIds] = useState<string[]>([]);
+	const { trackEvent } = useAnalytics();
 
 	useEffect(() => {
 		if (props.show) {
@@ -118,7 +123,14 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 					<Button variant="outline-primary" onClick={props.onHide}>
 						cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(selected, visitTypeIds)}>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Availability'));
+							onSave(selected, visitTypeIds);
+						}}
+					>
 						save
 					</Button>
 				</div>

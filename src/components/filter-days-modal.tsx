@@ -4,6 +4,9 @@ import { createUseStyles } from 'react-jss';
 import moment, { Moment } from 'moment';
 
 import DatePicker from '@/components/date-picker';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterDaysModalStyles = createUseStyles({
 	filterDaysModal: {
@@ -62,7 +65,9 @@ interface FilterDaysModalProps extends ModalProps {
 }
 
 const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...props }) => {
+	useTrackModalView('FilterDaysModal', props.show);
 	const classes = useFilterDaysModalStyles();
+	const { trackEvent } = useAnalytics();
 
 	const [fromDate, setFromDate] = useState<Moment>(moment());
 	const [toDate, setToDate] = useState<Moment>(moment());
@@ -161,13 +166,15 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ onSave, from, to, days, ...
 					<Button
 						className="ms-2"
 						variant="primary"
-						onClick={() =>
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Days'));
+
 							onSave({
 								from: fromDate,
 								to: toDate,
 								days: filterDays,
-							})
-						}
+							});
+						}}
 					>
 						save
 					</Button>

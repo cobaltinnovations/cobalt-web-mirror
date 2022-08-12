@@ -3,6 +3,9 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import TimeInput from '@/components/time-input';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterTimesModalStyles = createUseStyles({
 	filterTimesModal: {
@@ -18,8 +21,10 @@ interface FilterTimesModalProps extends ModalProps {
 }
 
 const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }) => {
+	useTrackModalView('FilterTimesModal', props.show);
 	const classes = useFilterTimesModalStyles();
 
+	const { trackEvent } = useAnalytics();
 	const [fromTime, setFromTime] = useState('06:00');
 	const [fromMeridian, setFromMeridian] = useState('am');
 	const [toTime, setToTime] = useState('08:00');
@@ -46,6 +51,8 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 	}, [props.show, range.max, range.min]);
 
 	const handleSaveClick = useCallback(() => {
+		trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Times'));
+
 		const fromHour = parseInt(fromTime.split(':')[0]);
 		const min = fromMeridian === 'am' ? fromHour : fromHour + 12;
 
@@ -53,7 +60,7 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 		const max = toMeridian === 'am' ? toHour : toHour + 12;
 
 		onSave({ min, max });
-	}, [fromMeridian, fromTime, onSave, toMeridian, toTime]);
+	}, [fromMeridian, fromTime, onSave, toMeridian, toTime, trackEvent]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterTimesModal} centered>

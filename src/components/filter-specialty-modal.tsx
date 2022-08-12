@@ -3,6 +3,9 @@ import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { Specialty } from '@/lib/models';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -24,7 +27,10 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 	onSave,
 	...props
 }) => {
+	useTrackModalView('FilterSpecialtyModal', props.show);
+
 	const classes = useStyles();
+	const { trackEvent } = useAnalytics();
 	const [internalSelectedSpecialties, setInternalSelectedSpecialties] = useState<string[]>([]);
 
 	useEffect(() => {
@@ -69,7 +75,14 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 					<Button variant="outline-primary" onClick={props.onHide}>
 						cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(internalSelectedSpecialties)}>
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Focus'));
+							onSave(internalSelectedSpecialties);
+						}}
+					>
 						save
 					</Button>
 				</div>
