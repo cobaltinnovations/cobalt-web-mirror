@@ -1,6 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -23,6 +24,11 @@ const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		marginRight: 10,
 		fill: theme.colors.border,
+	},
+	p: {
+		overflow: 'hidden',
+		whiteSpace: 'nowrap',
+		textOverflow: 'ellipsis',
 	},
 }));
 
@@ -55,7 +61,7 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 						xl={props.xl || { span: 6, offset: 3 }}
 					>
 						<div className="d-flex align-items-center">
-							<p className="mb-0 fs-ui-small">
+							<p className={classNames(classes.p, 'mb-0 fs-ui-small')}>
 								{props.breadcrumbs.map((breadcrumb, index) => {
 									const isLast = index === props.breadcrumbs.length - 1;
 									const key = breadcrumb.title;
