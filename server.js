@@ -150,13 +150,7 @@ if (basicAuthEnabled) {
 /* Serve SPA */
 /* ----------------------------------------- */
 
-app.use(express.static(BUILD_DIR));
-
-app.get('/news/:pdfName', (_req, res) => {
-	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
-});
-
-app.get('*', (_req, res) => {
+function serveThemedIndexFile(_req, res) {
 	if (_req.subdomains.length) {
 		const indexFilePath = path.join(BUILD_DIR, `.${_req.subdomains.join('.')}.index.html`);
 
@@ -168,7 +162,17 @@ app.get('*', (_req, res) => {
 	}
 
 	res.sendFile(INDEX_FILE_PATH);
+}
+
+app.get('/', serveThemedIndexFile);
+
+app.use(express.static(BUILD_DIR));
+
+app.get('/news/:pdfName', (_req, res) => {
+	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
 });
+
+app.get('*', serveThemedIndexFile);
 
 app.listen(port, () => {
 	console.log(`> App Ready on http://localhost:${port}.`);
