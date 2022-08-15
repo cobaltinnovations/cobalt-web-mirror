@@ -349,11 +349,11 @@ const GroupSessionsCreate: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/group-sessions/scheduled',
-							title: 'studio sessions',
+							title: 'Studio Sessions',
 						},
 						{
 							to: '/group-sessions/scheduled/create',
-							title: `${initialValues?.title || 'create studio session'}${isCopy ? ' (copy)' : ''}`,
+							title: `${initialValues?.title || 'Create Studio Session'}${isCopy ? ' (Copy)' : ''}`,
 						},
 					]}
 				/>

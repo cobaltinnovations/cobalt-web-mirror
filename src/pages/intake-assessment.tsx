@@ -292,19 +292,19 @@ const IntakeAssessment: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/',
-							title: 'home',
+							title: 'Home',
 						},
 						{
 							to: '/in-the-studio',
-							title: 'in the studio',
+							title: 'In the Studio',
 						},
 						{
 							to: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
-							title: 'studio session',
+							title: 'Studio Session',
 						},
 						{
 							to: '/#',
-							title: 'appointment',
+							title: 'Appointment',
 						},
 					]}
 				/>
@@ -314,15 +314,15 @@ const IntakeAssessment: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/',
-							title: 'home',
+							title: 'Home',
 						},
 						{
 							to: exitUrl,
-							title: 'connect with support',
+							title: 'Connect with Support',
 						},
 						{
 							to: '/#',
-							title: 'appointment',
+							title: 'Appointment',
 						},
 					]}
 				/>

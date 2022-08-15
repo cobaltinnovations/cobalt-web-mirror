@@ -213,15 +213,15 @@ const EhrLookup: FC = () => {
 				breadcrumbs={[
 					{
 						to: '/',
-						title: 'home',
+						title: 'Home',
 					},
 					{
 						to: exitUrl,
-						title: 'connect with support',
+						title: 'Connect with Support',
 					},
 					{
 						to: '/#',
-						title: 'appointment',
+						title: 'Appointment',
 					},
 				]}
 			/>

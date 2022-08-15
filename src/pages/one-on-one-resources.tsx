@@ -12,25 +12,25 @@ const OneOnOneResources: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">1:1 Resources</h2>
-			</HeroContainer>
 			<Breadcrumb
 				breadcrumbs={[
 					{
 						to: '/',
-						title: 'home',
+						title: 'Home',
 					},
 					{
 						to: '/connect-with-support',
-						title: 'connect with support',
+						title: 'Connect with Support',
 					},
 					{
 						to: '/#',
-						title: '1:1 resources',
+						title: '1:1 Resources',
 					},
 				]}
 			/>
+			<HeroContainer>
+				<h2 className="mb-0 text-center">1:1 Resources</h2>
+			</HeroContainer>
 			<Container className="pt-5 pb-8">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
