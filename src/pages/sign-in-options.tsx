@@ -297,7 +297,7 @@ const SignInOptions = () => {
 										</Button>
 									</Form>
 									<p className="text-center">
-										Don't have an account? <Link to="/sign-up">Sign up</Link>
+										Don't have an account? <Link to="/sign-up">Create account</Link>
 									</p>
 								</>
 							)}
