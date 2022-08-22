@@ -603,7 +603,7 @@ const ConnectWithSupport: FC = () => {
 								>
 									Availability
 								</FilterPill>
-								<FilterPill
+								{/* <FilterPill
 									disabled={!isSpecialtiesFilterEnabled}
 									active={activeFilters[BookingFilters.Specialty]}
 									onClick={() => {
@@ -612,7 +612,7 @@ const ConnectWithSupport: FC = () => {
 									}}
 								>
 									Focus
-								</FilterPill>
+								</FilterPill> */}
 								<FilterPill
 									active={activeFilters[BookingFilters.Payment]}
 									onClick={() => {
