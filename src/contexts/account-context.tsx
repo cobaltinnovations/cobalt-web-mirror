@@ -66,14 +66,15 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(account.accountId).fetch();
 
+			setAccount(undefined);
+			setInstitution(undefined);
+
 			if (federatedLogoutUrl) {
 				window.location.href = federatedLogoutUrl;
 				return;
 			}
 
 			navigate('/sign-in');
-			setAccount(undefined);
-			setInstitution(undefined);
 		} catch (error) {
 			// Fail silently and just log the user normally
 
