@@ -74,7 +74,7 @@ const SignUp: FC = () => {
 		<Container fluid className={classes.signUpOuter}>
 			<Container className={classes.signUp}>
 				<Row>
-					<h1 className="mb-4 text-center">Sign up</h1>
+					<h1 className="mb-4 text-center">Create account</h1>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Formik<SignUpFormData>
 							enableReinitialize
@@ -111,7 +111,7 @@ const SignUp: FC = () => {
 										/>
 										<div className="text-center mb-3">
 											<Button className="d-block w-100" variant="primary" type="submit">
-												Sign up
+												Create account
 											</Button>
 										</div>
 									</Form>
