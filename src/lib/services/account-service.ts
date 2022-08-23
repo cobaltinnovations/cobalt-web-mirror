@@ -225,4 +225,10 @@ export const accountService = {
 			data: { roleId },
 		});
 	},
+	getFederatedLogoutUrl(accountId: string) {
+		return httpSingleton.orchestrateRequest<{ federatedLogoutUrl?: string }>({
+			method: 'GET',
+			url: `/accounts/${accountId}/federated-logout-url`,
+		});
+	},
 };
