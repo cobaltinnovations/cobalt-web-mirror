@@ -49,7 +49,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 	const immediateAccess = searchParams.get('immediateAccess');
 
-	const signOutAndClearContext = useCallback(() => {
+	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
 		Cookies.remove('authRedirectUrl');
 		Cookies.remove('immediateAccess');
@@ -59,12 +59,30 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('trackActivity');
 		setIsTrackedSession(false);
 
-		let signInPath = '/sign-in';
+		try {
+			if (!account) {
+				throw new Error('account is required.');
+			}
 
-		navigate(signInPath);
-		setAccount(undefined);
-		setInstitution(undefined);
-	}, [navigate]);
+			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(account.accountId).fetch();
+
+			setAccount(undefined);
+			setInstitution(undefined);
+
+			if (federatedLogoutUrl) {
+				window.location.href = federatedLogoutUrl;
+				return;
+			}
+
+			navigate('/sign-in');
+		} catch (error) {
+			// Fail silently and just log the user normally
+
+			navigate('/sign-in');
+			setAccount(undefined);
+			setInstitution(undefined);
+		}
+	}, [account, navigate]);
 
 	// Fetch account if we have accessToken cookie
 	useEffect(() => {
