@@ -459,7 +459,7 @@ const ConnectWithSupport: FC = () => {
 								onDidClose={() => {
 									handlePaymentDisclaimerDidClose();
 								}}
-								title="payment options vary by provider"
+								title="Payment options vary by provider"
 							>
 								<p className="pb-4 m-0">
 									Payment options vary by provider. Services may be free of charge, covered by
@@ -480,7 +480,7 @@ const ConnectWithSupport: FC = () => {
 							<div className="position-relative d-flex align-items-center">
 								<SearchIcon className={classes.searchIcon} />
 								<AsyncTypeahead
-									placeholder="search for provider or entity"
+									placeholder="Search for provider or entity"
 									ref={typeAheadRef}
 									id="search-providers"
 									filterBy={[]}
