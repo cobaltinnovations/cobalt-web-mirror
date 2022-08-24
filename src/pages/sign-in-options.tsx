@@ -182,7 +182,6 @@ const SignInOptions = () => {
 				onHide={() => {
 					setForgotPasswordModalIsOpen(false);
 				}}
-				onEntering={handleSsoModelEnter}
 				centered
 			>
 				<Modal.Header closeButton>
