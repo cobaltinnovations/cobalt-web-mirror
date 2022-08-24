@@ -296,10 +296,12 @@ const SignInOptions = () => {
 											Sign in
 										</Button>
 									</Form>
-									<p className="text-center">
-										Don't have an account? <Link to="/sign-up">Create account</Link>
-									</p>
 								</>
+							)}
+							{subdomainInstitution?.emailSignupEnabled && (
+								<p className="text-center">
+									Don't have an account? <Link to="/sign-up">Create account</Link>
+								</p>
 							)}
 						</Col>
 					</Row>
