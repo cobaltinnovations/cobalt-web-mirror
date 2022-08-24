@@ -4,6 +4,7 @@ export interface Institution {
 	covidContent: string;
 	crisisContent: string;
 	emailEnabled: boolean;
+	emailSignupEnabled: boolean;
 	institutionId: string;
 	privacyContent: string;
 	contentScreeningFlowId?: string;
