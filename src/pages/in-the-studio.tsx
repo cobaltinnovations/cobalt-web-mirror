@@ -1,29 +1,30 @@
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import Fuse from 'fuse.js';
+
+import { groupEventService, groupSessionsService } from '@/lib/services';
+import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
+import useDebouncedState from '@/hooks/use-debounced-state';
 
 import AsyncPage from '@/components/async-page';
 import StudioEvent, { StudioEventViewModel } from '@/components/studio-event';
 import ActionSheet from '@/components/action-sheet';
-
-import { groupEventService, groupSessionsService } from '@/lib/services';
-import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import HeroContainer from '@/components/hero-container';
 
 const InTheStudio: FC = () => {
-	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const groupEventUrlName = searchParams.get('class') || '';
-
+	const [searchParams, setSearchParams] = useSearchParams();
+	const groupEventUrlName = searchParams.get('class') ?? '';
+	const [searchTerm, setSearchTerm] = useState(groupEventUrlName);
+	const debouncedSearchValue = useDebouncedState(searchTerm);
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
-	const [searchTerm, setSearchTerm] = useState('');
-
-	const fuse = new Fuse(eventList, { threshold: 0.2, keys: ['name', 'provider.name'] });
-	const filteredList = searchTerm ? fuse.search(searchTerm).map((r) => r.item) : eventList;
-
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
+
+	useEffect(() => {
+		searchParams.set('class', debouncedSearchValue);
+		setSearchParams(searchParams, { replace: true });
+	}, [debouncedSearchValue, searchParams, setSearchParams]);
 
 	const fetchData = useCallback(async () => {
 		function groupByUrlName(data: StudioEventViewModel[]): StudioEventViewModel[] {
@@ -82,7 +83,7 @@ const InTheStudio: FC = () => {
 	}, [groupEventUrlName]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			<ActionSheet
 				show={actionSheetIsOpen}
 				onShow={() => {
@@ -125,77 +126,79 @@ const InTheStudio: FC = () => {
 							className="mb-5"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								setSearchTerm(event.target.value);
+								setSearchTerm(event.currentTarget.value);
 							}}
 						/>
 					</Col>
 				</Row>
 			</Container>
-			<Container>
-				<Row>
-					{filteredList.length > 0 ? (
-						filteredList.map((groupEvent) => {
-							if (groupEventService.isEventExternal(groupEvent)) {
-								const link = groupEvent.isGrouped
-									? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
-									: `/in-the-studio/external/${groupEvent.externalGroupEventTypeId}`;
+			<AsyncPage fetchData={fetchData}>
+				<Container>
+					<Row>
+						{eventList.length > 0 ? (
+							eventList.map((groupEvent) => {
+								if (groupEventService.isEventExternal(groupEvent)) {
+									const link = groupEvent.isGrouped
+										? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
+										: `/in-the-studio/external/${groupEvent.externalGroupEventTypeId}`;
+
+									return (
+										<Col md={6} lg={4} key={groupEvent.externalGroupEventTypeId}>
+											<Link className="mb-2 d-block text-decoration-none" to={link}>
+												<StudioEvent groupEvent={groupEvent} />
+											</Link>
+										</Col>
+									);
+								}
+
+								if (groupSessionsService.isGroupSession(groupEvent)) {
+									const link = groupEvent.isGrouped
+										? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
+										: `/in-the-studio/group-session-scheduled/${groupEvent.groupSessionId}`;
+
+									return (
+										<Col md={6} lg={4} key={groupEvent.groupSessionId}>
+											<Link className="mb-2 d-block text-decoration-none" to={link}>
+												<StudioEvent groupEvent={groupEvent} />
+											</Link>
+										</Col>
+									);
+								}
+
+								if (groupSessionsService.isGroupSessionByRequest(groupEvent)) {
+									const link = groupEvent.isGrouped
+										? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
+										: `/in-the-studio/group-session-by-request/${groupEvent.groupSessionRequestId}`;
+
+									return (
+										<Col md={6} lg={4} key={groupEvent.groupSessionRequestId}>
+											<Link className="mb-2 d-block text-decoration-none" to={link}>
+												<StudioEvent groupEvent={groupEvent} />
+											</Link>
+										</Col>
+									);
+								}
 
 								return (
-									<Col md={6} lg={4} key={groupEvent.externalGroupEventTypeId}>
-										<Link className="mb-2 d-block text-decoration-none" to={link}>
+									<Col md={6} lg={4} key={groupEvent.groupEventId}>
+										<Link
+											className="mb-2 d-block text-decoration-none"
+											to={`/in-the-studio/${groupEvent.groupEventId}`}
+										>
 											<StudioEvent groupEvent={groupEvent} />
 										</Link>
 									</Col>
 								);
-							}
-
-							if (groupSessionsService.isGroupSession(groupEvent)) {
-								const link = groupEvent.isGrouped
-									? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
-									: `/in-the-studio/group-session-scheduled/${groupEvent.groupSessionId}`;
-
-								return (
-									<Col md={6} lg={4} key={groupEvent.groupSessionId}>
-										<Link className="mb-2 d-block text-decoration-none" to={link}>
-											<StudioEvent groupEvent={groupEvent} />
-										</Link>
-									</Col>
-								);
-							}
-
-							if (groupSessionsService.isGroupSessionByRequest(groupEvent)) {
-								const link = groupEvent.isGrouped
-									? `/in-the-studio?class=${encodeURIComponent(groupEvent.urlName)}`
-									: `/in-the-studio/group-session-by-request/${groupEvent.groupSessionRequestId}`;
-
-								return (
-									<Col md={6} lg={4} key={groupEvent.groupSessionRequestId}>
-										<Link className="mb-2 d-block text-decoration-none" to={link}>
-											<StudioEvent groupEvent={groupEvent} />
-										</Link>
-									</Col>
-								);
-							}
-
-							return (
-								<Col md={6} lg={4} key={groupEvent.groupEventId}>
-									<Link
-										className="mb-2 d-block text-decoration-none"
-										to={`/in-the-studio/${groupEvent.groupEventId}`}
-									>
-										<StudioEvent groupEvent={groupEvent} />
-									</Link>
-								</Col>
-							);
-						})
-					) : (
-						<p className="text-center mb-0">
-							{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}
-						</p>
-					)}
-				</Row>
-			</Container>
-		</AsyncPage>
+							})
+						) : (
+							<p className="text-center mb-0">
+								{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}
+							</p>
+						)}
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 
