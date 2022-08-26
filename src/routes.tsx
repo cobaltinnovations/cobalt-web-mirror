@@ -68,6 +68,7 @@ export const ScreeningFlows = React.lazy(() => import('@/pages/screening/screeni
 export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
 export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
+export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -482,6 +483,11 @@ export const AppRoutes = [
 				path: '/interaction-instances/:interactionId',
 				private: true,
 				main: InteractionInstances,
+			},
+			{
+				path: '/in-crisis',
+				private: false,
+				main: InCrisis,
 			},
 			{
 				path: '*',
