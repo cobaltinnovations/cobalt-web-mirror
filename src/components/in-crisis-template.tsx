@@ -57,9 +57,9 @@ export const InCrisisTemplate = () => {
 		...(subdomainInstitution?.institutionId === 'COBALT'
 			? [
 					{
-						title: 'Call 215-829-5433',
-						description: '24/7 Penn Crisis Response Center',
-						href: 'tel:2158295433',
+						title: 'Call 215-555-9999',
+						description: '24/7 Cobalt Crisis Response Center',
+						href: 'tel:2155559999',
 					},
 			  ]
 			: []),
