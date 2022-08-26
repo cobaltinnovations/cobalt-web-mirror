@@ -124,10 +124,10 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 									onBack();
 								}}
 							>
-								cancel
+								Cancel
 							</Button>
 							<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
-								save
+								Save
 							</Button>
 						</div>
 					</Form>

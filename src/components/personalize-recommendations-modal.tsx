@@ -221,7 +221,7 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 
 			<div className={classNames('d-flex justify-content-center align-items-center', classes.modalFooter)}>
 				<Button size="sm" onClick={handleApplyFilters}>
-					apply filters
+					Apply Filters
 				</Button>
 			</div>
 		</Modal>

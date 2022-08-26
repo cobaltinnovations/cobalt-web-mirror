@@ -145,7 +145,7 @@ const GroupSessions: FC = () => {
 					<Col>
 						<div className="d-flex justify-content-between">
 							<Button size="sm" onClick={handleAddGroupSessionButtonClick}>
-								+ add studio session
+								+ Add Studio Session
 							</Button>
 							<div className="d-flex align-items-center justify-content-center">
 								<FilterIcon className={classes.filterIcon} />
@@ -272,7 +272,7 @@ const GroupSessions: FC = () => {
 												setCurrentPageIndex(0);
 											}}
 										>
-											clear filter
+											Clear Filter
 										</Button>
 									</div>
 								)}

@@ -49,7 +49,7 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerT
 						setSelected([...recommendedTypes]);
 					}}
 				>
-					recommended for you
+					Recommended for You
 				</Button>
 
 				{providerTypes.map((providerType, index) => {
@@ -77,7 +77,7 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerT
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -94,7 +94,7 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerT
 							props.onHide?.();
 						}}
 					>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

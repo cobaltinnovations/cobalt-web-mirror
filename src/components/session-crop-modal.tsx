@@ -120,10 +120,10 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 
 			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
+					Cancel
 				</Button>
 				<Button variant="primary" size="sm" className="ms-3" onClick={handleOnSaveButtonClick}>
-					save
+					Save
 				</Button>
 			</Modal.Footer>
 		</Modal>

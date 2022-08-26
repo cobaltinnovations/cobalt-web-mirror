@@ -140,7 +140,7 @@ const StatsDashboard: FC = () => {
 								)}
 							</div>
 							<Button size="sm" onClick={handleDownloadCsvButtonClick}>
-								download .csv
+								Download .csv
 							</Button>
 						</div>
 					</Col>

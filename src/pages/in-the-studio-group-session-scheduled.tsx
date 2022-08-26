@@ -231,7 +231,7 @@ const InTheStudioGroupSessionScheduled = () => {
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
 										<Button as="div" variant="light" className="me-2">
-											View calendar
+											View Calendar
 										</Button>
 									</Link>
 									<Button
@@ -242,7 +242,7 @@ const InTheStudioGroupSessionScheduled = () => {
 										target="_blank"
 										rel="noreferrer noopener"
 									>
-										Join now
+										Join Now
 									</Button>
 								</div>
 							</Col>
@@ -299,7 +299,7 @@ const InTheStudioGroupSessionScheduled = () => {
 										setShowConfirmCancelModal(true);
 									}}
 								>
-									Cancel reservation
+									Cancel Reservation
 								</Button>
 							) : (
 								<Button
@@ -307,7 +307,7 @@ const InTheStudioGroupSessionScheduled = () => {
 									variant="primary"
 									onClick={handleReserveButtonClick}
 								>
-									{session?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a place'}
+									{session?.seatsAvailable === 0 ? 'No Seats Available' : 'Reserve a Place'}
 								</Button>
 							)}
 							<CopyToClipboard

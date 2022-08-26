@@ -31,7 +31,7 @@ const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="primary" onClick={props.onHide}>
-						okay
+						Okay
 					</Button>
 				</div>
 			</Modal.Footer>

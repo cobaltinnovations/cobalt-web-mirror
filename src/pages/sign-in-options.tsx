@@ -292,7 +292,7 @@ const SignInOptions = () => {
 											</Button>
 										</div>
 										<Button type="submit" className="w-100 d-block" variant="outline-primary">
-											Sign in
+											Sign In
 										</Button>
 									</Form>
 								</>

@@ -96,7 +96,7 @@ export const TableCell: FC<TableCellProps> = React.memo((props) => {
 				{props.children}
 				{props.header && props.sortable && (
 					<Button variant="link" className={classes.sortableButton} onClick={handleSortButtonClick}>
-						{!props.sortDirection && <>Not soriting</>}
+						{!props.sortDirection && <>Not Sorting</>}
 						{props.sortDirection === SORT_DIRECTION.ASC && <>Sorting ASC</>}
 						{props.sortDirection === SORT_DIRECTION.DESC && <>Sorting DESC</>}
 					</Button>

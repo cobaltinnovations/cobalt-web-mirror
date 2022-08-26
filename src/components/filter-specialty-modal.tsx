@@ -65,7 +65,7 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...p
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -84,7 +84,7 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...p
 							props.onHide?.();
 						}}
 					>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

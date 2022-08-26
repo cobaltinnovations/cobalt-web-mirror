@@ -102,7 +102,7 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -120,7 +120,7 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 							props.onHide?.();
 						}}
 					>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

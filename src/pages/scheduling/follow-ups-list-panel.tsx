@@ -51,7 +51,7 @@ export const FollowUpsListPanel = ({ onClose }: FollowUpsListPanelProps) => {
 										//
 									}}
 								>
-									mark done
+									Mark Done
 								</Button>
 							)}
 						</div>

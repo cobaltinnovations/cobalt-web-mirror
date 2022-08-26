@@ -32,7 +32,7 @@ export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
 			</Modal.Body>
 			<Modal.Footer className="justify-content-center">
 				<Button className="w-75" variant="primary" size="sm" onClick={props.onHide}>
-					ok
+					Ok
 				</Button>
 			</Modal.Footer>
 		</Modal>
@@ -121,7 +121,7 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => 
 						updateAlertStatuses();
 					}}
 				>
-					submit
+					Submit
 				</Button>
 			</Modal.Footer>
 		</Modal>

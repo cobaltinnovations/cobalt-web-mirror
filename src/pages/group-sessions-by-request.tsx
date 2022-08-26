@@ -125,7 +125,7 @@ const GroupSessionsByRequest: FC = () => {
 					<Col>
 						<div className="d-flex justify-content-between">
 							<Button size="sm" onClick={handleAddGroupSessionOptionButtonClick}>
-								+ add studio session by request
+								+ Add Studio Session by Request
 							</Button>
 							<div className="d-flex align-items-center justify-content-center">
 								<FilterIcon className={classes.filterIcon} />
@@ -231,7 +231,7 @@ const GroupSessionsByRequest: FC = () => {
 												setStatusFilterValue(undefined);
 											}}
 										>
-											clear filter
+											Clear Filter
 										</Button>
 									</div>
 								)}

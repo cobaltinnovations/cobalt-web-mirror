@@ -67,7 +67,7 @@ const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity
 			</ul>
 			<div className="pt-5 pb-5 d-flex justify-content-center">
 				<Button size="sm" onClick={handleEmailAllButtonClick}>
-					email all attendees
+					Email All Attendees
 				</Button>
 			</div>
 		</aside>

@@ -46,7 +46,7 @@ const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
 
 			<Modal.Footer className="justify-content-center">
 				<Button variant="light" size="sm" onClick={props.onHide}>
-					okay
+					Okay
 				</Button>
 			</Modal.Footer>
 		</Modal>

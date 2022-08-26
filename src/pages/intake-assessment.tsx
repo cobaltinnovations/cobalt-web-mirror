@@ -378,7 +378,7 @@ const IntakeAssessment: FC = () => {
 											);
 										}}
 									>
-										back
+										Back
 									</Button>
 								)}
 
@@ -389,7 +389,7 @@ const IntakeAssessment: FC = () => {
 										variant="primary"
 										onClick={() => submitAnswers(selectedQuestionAnswers)}
 									>
-										{assessment?.nextQuestionId ? 'next' : 'done'}
+										{assessment?.nextQuestionId ? 'Next' : 'Done'}
 									</Button>
 								)}
 							</div>

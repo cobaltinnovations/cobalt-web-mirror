@@ -55,7 +55,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 							setShowReauthModal(false);
 						}}
 					>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -65,7 +65,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 							window.location.href = signOnUrl;
 						}}
 					>
-						proceed
+						Proceed
 					</Button>
 				</div>
 			</Modal.Footer>

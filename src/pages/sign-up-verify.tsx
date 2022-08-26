@@ -41,7 +41,7 @@ const SignUpVerify: FC = () => {
 					<p className="mb-0 text-center fw-bold">didn’t get an email?</p>
 					<div className="text-center">
 						<Button variant="link" onClick={handleResendButtonClick}>
-							re-send
+							Resend
 						</Button>
 					</div>
 				</Col>

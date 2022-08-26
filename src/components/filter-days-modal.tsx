@@ -127,7 +127,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -151,7 +151,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 							props.onHide?.();
 						}}
 					>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

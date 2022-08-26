@@ -94,7 +94,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 							marginTop: -4,
 						}}
 					>
-						Appointment type
+						Appointment Type
 					</p>
 
 					{selectedAppointmentType && <AppointmentTypeItem appointmentType={selectedAppointmentType} />}

@@ -70,10 +70,10 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 			<Modal.Body>
 				<div className="d-flex mb-3">
 					<Button variant="link" className="p-0" onClick={handleSelectAllButtonClick}>
-						select all
+						Select All
 					</Button>
 					<Button variant="link" className="ms-3 p-0" onClick={handleDeselectAllButtonClick}>
-						deselect all
+						Deselect All
 					</Button>
 				</div>
 				<Form>
@@ -96,10 +96,10 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

@@ -96,7 +96,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -105,7 +105,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 							onConfirm(selectedId);
 						}}
 					>
-						reserve
+						Reserve
 					</Button>
 				</div>
 			</Modal.Footer>

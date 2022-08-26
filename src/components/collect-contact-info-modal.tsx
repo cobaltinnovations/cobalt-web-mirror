@@ -90,10 +90,10 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 				<Modal.Footer>
 					<div className="text-right">
 						<Button type="button" variant="outline-primary" onClick={props.onHide}>
-							cancel
+							Cancel
 						</Button>
 						<Button className="ms-2" type="submit" variant="primary">
-							reserve
+							Reserve
 						</Button>
 					</div>
 				</Modal.Footer>

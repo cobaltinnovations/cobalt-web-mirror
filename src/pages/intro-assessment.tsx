@@ -185,7 +185,7 @@ const IntroAssessment: FC = () => {
 								)}
 								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
 									<Button variant="primary" onClick={handleNextButtonClick}>
-										{assessment?.nextQuestionId ? 'next' : 'done'}
+										{assessment?.nextQuestionId ? 'Next' : 'Done'}
 									</Button>
 								)}
 							</div>

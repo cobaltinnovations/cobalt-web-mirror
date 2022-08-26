@@ -53,7 +53,7 @@ const ErrorModal: FC = () => {
 								navigate('/feedback');
 							}}
 						>
-							Send us a note
+							Send Us a Note
 						</Button>
 
 						<p className="mb-1 fw-bold">Need clinical support?</p>
@@ -61,7 +61,7 @@ const ErrorModal: FC = () => {
 							className="mb-4 d-block fs-large font-heading-bold text-decoration-none"
 							href="tel:866-301-4724"
 						>
-							call 866-301-4724
+							Call 866-301-4724
 						</a>
 
 						<p className="mb-1 fw-bold">Have a clinical emergency?</p>
@@ -87,7 +87,7 @@ const ErrorModal: FC = () => {
 							setShow(false);
 						}}
 					>
-						dismiss
+						Dismiss
 					</Button>
 				</div>
 			</Modal.Footer>

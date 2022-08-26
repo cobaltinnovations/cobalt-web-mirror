@@ -118,10 +118,10 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>
