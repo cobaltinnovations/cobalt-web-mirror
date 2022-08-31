@@ -155,7 +155,7 @@ const CreateOnYourTimeContent: FC = () => {
 			}
 			if (adding) {
 				setIsAdding(true);
-				setShouldDisabledInputs(true);
+				// setShouldDisabledInputs(true);
 			}
 
 			if (contentToSet) {
