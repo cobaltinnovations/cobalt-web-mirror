@@ -45,9 +45,9 @@ export const InCrisisTemplate = () => {
 			href: 'tel:911',
 		},
 		{
-			title: 'Call 800-273-8255',
-			description: '24/7 National Suicide Prevention Line',
-			href: 'tel:8007238255',
+			title: 'Call 988',
+			description: 'Suicide & Crisis Lifeline',
+			href: 'tel:988',
 		},
 		{
 			title: 'Text 741741',
