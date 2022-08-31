@@ -42,7 +42,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/basics`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -78,7 +78,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/clinical-background`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -119,7 +119,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/communication`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -159,7 +159,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/bluejeans-connection`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -185,7 +185,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/payment-types-accepted`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -205,7 +205,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 										navigate(`/providers/${provider?.providerId}/personal-details`);
 									}}
 								>
-									edit
+									Edit
 								</Button>
 							</div>
 
@@ -221,10 +221,10 @@ export const ProviderManagementProfile = (): ReactElement => {
 									)}
 									<div>
 										<Button className="d-block p-0 mb-3" variant="link" size="sm">
-											upload a new photo
+											Upload a New Photo
 										</Button>
 										<Button className="d-block p-0" variant="link" size="sm">
-											remove photo
+											Remove Photo
 										</Button>
 									</div>
 								</div>
@@ -243,7 +243,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 											navigate(`/providers/${provider?.providerId}/cobalt-bio`);
 										}}
 									>
-										edit
+										Edit
 									</Button>
 								</div>
 								<p>[TODO]</p>

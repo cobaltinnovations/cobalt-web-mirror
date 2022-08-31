@@ -98,10 +98,10 @@ const PasswordReset: FC = () => {
 													navigate(-1);
 												}}
 											>
-												back
+												Back
 											</Button>
 											<Button variant="primary" type="submit">
-												next
+												Next
 											</Button>
 										</div>
 									</Form>

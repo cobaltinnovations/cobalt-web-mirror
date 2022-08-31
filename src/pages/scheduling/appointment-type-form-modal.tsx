@@ -442,7 +442,7 @@ export const AppointmentTypeFormModal = ({
 							setScreeningQuestions(screeningQuestionsClone);
 						}}
 					>
-						add question
+						Add Question
 					</Button>
 				</div>
 			</Modal.Body>
@@ -452,7 +452,7 @@ export const AppointmentTypeFormModal = ({
 					<div>
 						{appointmentTypeId && (
 							<Button variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
-								delete
+								Delete
 							</Button>
 						)}
 					</div>
@@ -465,10 +465,10 @@ export const AppointmentTypeFormModal = ({
 								}
 							}}
 						>
-							cancel
+							Cancel
 						</Button>
 						<Button className="ms-2" variant="outline" onClick={handleSaveButtonClick}>
-							save
+							Save
 						</Button>
 					</div>
 				</div>

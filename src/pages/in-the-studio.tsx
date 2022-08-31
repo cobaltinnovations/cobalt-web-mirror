@@ -100,7 +100,7 @@ const InTheStudio: FC = () => {
 						navigate('/group-sessions/scheduled/create');
 					}}
 				>
-					offer session at a set time
+					Offer Session at a Set Time
 				</Button>
 				<Button
 					variant="primary"
@@ -109,7 +109,7 @@ const InTheStudio: FC = () => {
 						navigate('/group-sessions/by-request/create');
 					}}
 				>
-					make session available by request
+					Make Session Available by Request
 				</Button>
 			</ActionSheet>
 

@@ -47,10 +47,10 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={onConfirm}>
-						reserve
+						Reserve
 					</Button>
 				</div>
 			</Modal.Footer>

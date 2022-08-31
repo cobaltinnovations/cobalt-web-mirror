@@ -81,11 +81,11 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 								onSkip();
 							}}
 						>
-							skip for now
+							Skip for Now
 						</Button>
 						<div className="d-grid">
 							<Button type="submit" variant="primary" size="sm">
-								continue assessment
+								Continue Assessment
 							</Button>
 						</div>
 					</div>

@@ -111,7 +111,7 @@ const SignUp: FC = () => {
 										/>
 										<div className="text-center mb-3">
 											<Button className="d-block w-100" variant="primary" type="submit">
-												Create account
+												Create Account
 											</Button>
 										</div>
 									</Form>
@@ -119,7 +119,7 @@ const SignUp: FC = () => {
 							}}
 						</Formik>
 						<p className="text-center">
-							Already have an account? <Link to="/sign-in/options">Sign in</Link>
+							Already have an account? <Link to="/sign-in/options">Sign In</Link>
 						</p>
 					</Col>
 				</Row>

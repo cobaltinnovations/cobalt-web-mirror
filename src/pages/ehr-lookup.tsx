@@ -454,7 +454,7 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 						onNext(stepValues);
 					}}
 				>
-					search records
+					Search Records
 				</Button>
 			</Row>
 		</>
@@ -588,7 +588,7 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 						onPrev && onPrev();
 					}}
 				>
-					back
+					Back
 				</Button>
 
 				<Button
@@ -607,7 +607,7 @@ function SecondStep({ values, handleChange, setFieldValue, onNext, onPrev, isSea
 						onNext(stepValues);
 					}}
 				>
-					search records
+					Search Records
 				</Button>
 			</Row>
 		</>
@@ -668,7 +668,7 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 						onPrev && onPrev();
 					}}
 				>
-					back
+					Back
 				</Button>
 
 				<Button
@@ -698,7 +698,7 @@ function ThirdStep({ values, handleChange, setFieldValue, onNext, onPrev, isSear
 						onNext(stepValues);
 					}}
 				>
-					search records
+					Search Records
 				</Button>
 			</Row>
 		</>
@@ -758,7 +758,7 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 							onPrev && onPrev();
 						}}
 					>
-						back
+						Back
 					</Button>
 
 					<Button
@@ -769,7 +769,7 @@ function FourthStep({ values, handleChange, confidenceState, onNext, onPrev, isB
 							onNext(values);
 						}}
 					>
-						finish booking
+						Finish Booking
 					</Button>
 				</Row>
 			)}

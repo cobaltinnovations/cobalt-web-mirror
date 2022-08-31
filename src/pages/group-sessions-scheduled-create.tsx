@@ -378,7 +378,7 @@ const GroupSessionsCreate: FC = () => {
 										variant="danger"
 										onClick={handleCancelSessionButtonClick}
 									>
-										cancel session
+										Cancel Session
 									</Button>
 
 									<CopyToClipboard
@@ -961,7 +961,7 @@ const GroupSessionsCreate: FC = () => {
 															);
 														}}
 													>
-														add question
+														Add Question
 													</Button>
 												</div>
 											</Card>

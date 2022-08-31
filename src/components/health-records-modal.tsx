@@ -51,10 +51,10 @@ const HealthRecordsModalPageOne: FC<HealthRecordsModalPageProps> = ({ onNextButt
 			</p>
 			<div className="d-grid gap-4">
 				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
-					next
+					Next
 				</Button>
 				<Button variant="link" size="sm" onClick={onExitButtonClick}>
-					exit booking
+					Exit Booking
 				</Button>
 			</div>
 		</>
@@ -75,10 +75,10 @@ const HealthRecordsModalPageTwo: FC<HealthRecordsModalPageProps> = ({ onNextButt
 			<p className="mb-6">This information is not shared outside of the context of an appointment.</p>
 			<div className="d-grid gap-4">
 				<Button variant="primary" size="sm" onClick={onNextButtonClick}>
-					continue
+					Continue
 				</Button>
 				<Button variant="link" size="sm" onClick={onExitButtonClick}>
-					exit booking
+					Exit Booking
 				</Button>
 			</div>
 		</>

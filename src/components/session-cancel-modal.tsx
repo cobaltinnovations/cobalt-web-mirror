@@ -33,10 +33,10 @@ const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props })
 			</Modal.Body>
 			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					no don't cancel
+					No Don't Cancel
 				</Button>
 				<Button variant="danger" size="sm" className="ms-3" onClick={onCancel}>
-					yes, cancel session
+					Yes, Cancel Session
 				</Button>
 			</Modal.Footer>
 		</Modal>

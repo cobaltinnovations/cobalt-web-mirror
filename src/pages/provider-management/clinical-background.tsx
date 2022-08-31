@@ -176,7 +176,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 													setDegrees(degreesClone);
 												}}
 											>
-												Remove this degree
+												Remove This Degree
 											</Button>
 										</div>
 									)}
@@ -198,7 +198,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 								setDegrees(degreesClone);
 							}}
 						>
-							Add a degree
+							Add a Degree
 						</Button>
 
 						<TypeaheadHelper
@@ -264,10 +264,10 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 									navigate(-1);
 								}}
 							>
-								back
+								Back
 							</Button>
 							<Button variant="primary" type="submit">
-								submit
+								Submit
 							</Button>
 						</div>
 					</Form>

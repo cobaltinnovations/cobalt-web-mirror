@@ -68,7 +68,7 @@ const Index: FC = () => {
 					</p>
 					<Button onClick={handleConnectWithSupportButtonClick}>
 						<CalendarIcon className={classes.calendarIcon} />
-						Connect with support
+						Connect With Support
 					</Button>
 				</HeroContainer>
 			)}
@@ -198,7 +198,7 @@ const Index: FC = () => {
 											navigate('/on-your-time', { state: { personalize: true } });
 										}}
 									>
-										Personalize recommendations
+										Personalize Recommendations
 									</Button>
 								</div>
 							</Col>

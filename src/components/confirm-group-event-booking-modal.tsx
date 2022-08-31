@@ -74,7 +74,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={modalProps.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -87,7 +87,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 							}
 						}}
 					>
-						{externalUrl ? 'ok' : 'reserve'}
+						{externalUrl ? 'Ok' : 'Reserve'}
 					</Button>
 				</div>
 			</Modal.Footer>

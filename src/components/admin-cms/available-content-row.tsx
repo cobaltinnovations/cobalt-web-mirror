@@ -106,7 +106,7 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 						variant={'success'}
 						onClick={() => onAddClick(content.contentId)}
 					>
-						add
+						Add
 					</Button>
 				);
 			} else if (action === AdminContentActions.REMOVE) {
@@ -118,7 +118,7 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 						variant={'danger'}
 						onClick={() => onRemoveClick(content.contentId)}
 					>
-						remove
+						Remove
 					</Button>
 				);
 			}

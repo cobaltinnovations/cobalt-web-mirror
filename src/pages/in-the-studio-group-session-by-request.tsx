@@ -382,7 +382,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 										</Card>
 										<div className="text-center">
 											<Button variant="primary" type="submit">
-												reserve a place
+												Reserve a Place
 											</Button>
 										</div>
 									</Form>

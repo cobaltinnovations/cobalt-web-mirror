@@ -90,7 +90,7 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, default
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -121,7 +121,7 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, default
 							props.onHide?.();
 						}}
 					>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>
