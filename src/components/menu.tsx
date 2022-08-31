@@ -10,8 +10,8 @@ import { AccountInstitutionCapabilities, AccountModel, Institution } from '@/lib
 import { accountService } from '@/lib/services';
 
 import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
-import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-calendar.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-calendar.svg';
+import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import { ReactComponent as OnYourTimeIcon } from '@/assets/icons/icon-on-your-time.svg';
