@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import Color from 'color';
 
 import useAccount from '@/hooks/use-account';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import config from '@/lib/config';
 import { accountService } from '@/lib/services';
@@ -170,7 +169,6 @@ interface MenuProps {
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const { account, institution, institutionCapabilities, setAccount, signOutAndClearContext } = useAccount();
 	const classes = useMenuStyles();
-	const { openInCrisisModal } = useInCrisisModal();
 	const [personalMenuIsOpen, setPersonalMenuIsOpen] = useState(true);
 	const [adminMenuIsOpen, setAdminMenuIsOpen] = useState(true);
 
@@ -184,13 +182,6 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 
 	function handleLinkClick() {
 		onHide();
-	}
-
-	function handleInCrisisLinkClick(event: React.MouseEvent<HTMLAnchorElement>) {
-		event.preventDefault();
-
-		onHide();
-		openInCrisisModal();
 	}
 
 	function handleSignOutLinkClick(event: React.MouseEvent<HTMLAnchorElement>) {
@@ -266,7 +257,7 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 						</Link>
 					</li>
 					<li>
-						<Link to="/crisis-resources" onClick={handleInCrisisLinkClick}>
+						<Link to="/in-crisis" onClick={handleLinkClick}>
 							Crisis Resources
 						</Link>
 					</li>

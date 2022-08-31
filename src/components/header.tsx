@@ -10,7 +10,7 @@ import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
-import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import mediaQueries from '@/jss/media-queries';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
@@ -51,11 +51,8 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 			fill: theme.colors.p500,
 		},
 	},
-	crisisIcon: {
+	phoneIcon: {
 		marginRight: 4,
-		'& path': {
-			fill: theme.colors.p500,
-		},
 	},
 }));
 
@@ -133,7 +130,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				</div>
 				{showHeaderButtons && (
 					<Button className={classes.inCrisisButton} size="sm" onClick={handleInCrisisButtonClick}>
-						<CrisisIcon className={classes.crisisIcon} />
+						<PhoneIcon className={classes.phoneIcon} />
 						<small className="fw-bold">In Crisis?</small>
 					</Button>
 				)}
