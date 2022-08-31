@@ -14,22 +14,12 @@ import OnYourTimeItem from '@/components/on-your-time-item';
 import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
 import { GroupEvent, Content, GroupSessionModel } from '@/lib/models';
 
-import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
-import { createUseThemedStyles } from '@/jss/theme';
-
-const useIndexStyles = createUseThemedStyles((theme) => ({
-	calendarIcon: {
-		top: -1,
-		marginRight: 10,
-		position: 'relative',
-	},
-}));
+import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
 
 	const navigate = useNavigate();
-	const classes = useIndexStyles();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupEvent | GroupSessionModel)[]>([]);
 	const [onYourTimeContent, setOnYourTimeContent] = useState<Content[]>([]);
@@ -66,10 +56,12 @@ const Index: FC = () => {
 					<p className="mb-5">
 						Peers, Resilience Coaches, Therapists, Psychiatrists, and more are here to help
 					</p>
-					<Button onClick={handleConnectWithSupportButtonClick}>
-						<CalendarIcon className={classes.calendarIcon} />
-						Connect With Support
-					</Button>
+					<div className="d-flex justify-content-center">
+						<Button className="d-flex align-items-center" onClick={handleConnectWithSupportButtonClick}>
+							<ConnectWithSupportIcon className="me-2" />
+							Connect with support
+						</Button>
+					</div>
 				</HeroContainer>
 			)}
 

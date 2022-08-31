@@ -37,8 +37,6 @@ const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) =
 	},
 	closeIcon: {
 		marginRight: 25,
-		width: 14,
-		height: 14,
 		cursor: 'pointer',
 		'& polygon': {
 			fill: theme.colors.n900,
