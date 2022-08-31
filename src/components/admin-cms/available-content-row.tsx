@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import classNames from 'classnames';
 
 import { TableCell, TableRow } from '@/components/table';
 
@@ -52,13 +53,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface AvailableContentRowProps {
 	content: AdminContentRow;
-
 	onAddClick(contentId: string): void;
-
+	onEditClick(contentId: string): void;
 	onRemoveClick(contentId: string): void;
 }
 
-const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick, onRemoveClick }) => {
+const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick, onEditClick, onRemoveClick }) => {
 	const classes = useStyles();
 
 	function getIcon(contentTypeId: ContentTypeId) {
@@ -111,18 +111,27 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 				);
 			} else if (action === AdminContentActions.REMOVE) {
 				return (
-					<Button
-						key={index}
-						size={'sm'}
-						className={classes.rowButton}
-						variant={'danger'}
-						onClick={() => onRemoveClick(content.contentId)}
-					>
-						Remove
-					</Button>
+					<React.Fragment key={index}>
+						<Button
+							size={'sm'}
+							className={classNames(classes.rowButton, 'me-2')}
+							variant={'success'}
+							onClick={() => onEditClick(content.contentId)}
+						>
+							Edit
+						</Button>
+						<Button
+							size={'sm'}
+							className={classes.rowButton}
+							variant={'danger'}
+							onClick={() => onRemoveClick(content.contentId)}
+						>
+							Remove
+						</Button>
+					</React.Fragment>
 				);
 			}
-			return <></>;
+			return <React.Fragment key={index} />;
 		});
 	}
 

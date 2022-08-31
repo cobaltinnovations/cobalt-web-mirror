@@ -130,6 +130,10 @@ const CmsAvailableContent: FC = () => {
 		navigate(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
 	}
 
+	function handleEditClick(contentId: string) {
+		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true`);
+	}
+
 	function updateContentItem(content: AdminContentRow) {
 		setContent((adminContent) => {
 			return adminContent.map((ac) => {
@@ -237,6 +241,7 @@ const CmsAvailableContent: FC = () => {
 											key={content.contentId}
 											content={content}
 											onAddClick={handleAddClick}
+											onEditClick={handleEditClick}
 											onRemoveClick={handleRemoveClick}
 										/>
 									);

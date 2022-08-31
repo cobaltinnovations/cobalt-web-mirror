@@ -153,6 +153,7 @@ const CreateOnYourTimeContent: FC = () => {
 					setChoices(choicesToSet);
 				}
 			}
+
 			if (adding) {
 				setIsAdding(true);
 				// setShouldDisabledInputs(true);
