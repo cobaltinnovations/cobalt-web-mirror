@@ -3,6 +3,7 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 	covidCopayModal: {
@@ -26,6 +27,7 @@ const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 interface CovidCopayModalProps extends ModalProps {}
 
 const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
+	useTrackModalView('CovidCopayModal', props.show);
 	const classes = useCovidCopayModalStyles();
 
 	return (
@@ -44,7 +46,7 @@ const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
 
 			<Modal.Footer className="justify-content-center">
 				<Button variant="light" size="sm" onClick={props.onHide}>
-					okay
+					Okay
 				</Button>
 			</Modal.Footer>
 		</Modal>

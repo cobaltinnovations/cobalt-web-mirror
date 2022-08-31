@@ -164,7 +164,7 @@ const InTheStudioDetail: FC = () => {
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
 										<Button as="div" variant="light" size="sm" className="me-2">
-											view calendar
+											View Calendar
 										</Button>
 									</Link>
 									<Button
@@ -174,7 +174,7 @@ const InTheStudioDetail: FC = () => {
 										href={groupEvent.appointment.videoconferenceUrl}
 										target="_blank"
 									>
-										join now
+										Join Now
 									</Button>
 								</div>
 							</Col>

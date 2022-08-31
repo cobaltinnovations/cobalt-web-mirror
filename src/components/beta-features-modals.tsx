@@ -1,4 +1,5 @@
 import useAccount from '@/hooks/use-account';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import { BetaFeatureId, BetaStatusId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
@@ -18,6 +19,7 @@ interface BetaFeatureModalProps extends ModalProps {
 }
 
 export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
+	useTrackModalView('BetaFeatureModal', props.show);
 	const classes = useBetaFeaturesModalStyles();
 
 	return (
@@ -30,7 +32,7 @@ export const BetaFeatureModal: FC<BetaFeatureModalProps> = (props) => {
 			</Modal.Body>
 			<Modal.Footer className="justify-content-center">
 				<Button className="w-75" variant="primary" size="sm" onClick={props.onHide}>
-					ok
+					Ok
 				</Button>
 			</Modal.Footer>
 		</Modal>
@@ -119,7 +121,7 @@ export const BetaFeatureAlertModal: FC<BetaFeatureAlertModalProps> = (props) => 
 						updateAlertStatuses();
 					}}
 				>
-					submit
+					Submit
 				</Button>
 			</Modal.Footer>
 		</Modal>

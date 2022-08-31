@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -15,6 +16,7 @@ interface ConfirmIntakeAssessmentModalProps extends ModalProps {
 }
 
 const ConfirmIntakeAssessmentModal: FC<ConfirmIntakeAssessmentModalProps> = ({ onConfirm, ...props }) => {
+	useTrackModalView('ConfirmIntakeAssessmentModal', props.show);
 	const classes = useConfirmIntakeAssessmentModalStyles();
 
 	return (
@@ -30,10 +32,10 @@ const ConfirmIntakeAssessmentModal: FC<ConfirmIntakeAssessmentModalProps> = ({ o
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={onConfirm}>
-						next
+						Next
 					</Button>
 				</div>
 			</Modal.Footer>

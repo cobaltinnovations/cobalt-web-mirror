@@ -107,7 +107,7 @@ const JoinButton = ({ joinUrl, contactEmail }: JoinButtonProps) => {
 					}
 				}}
 			>
-				join now
+				Join Now
 			</Button>
 		</>
 	);
@@ -180,7 +180,7 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					</div>
 					<div className={classes.optionsContainer}>
 						<Link to="#" onClick={onCancel}>
-							cancel reservation
+							Cancel Reservation
 						</Link>
 						<Button
 							as="a"
@@ -189,7 +189,7 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 							variant="outline-primary"
 							size="sm"
 						>
-							join now
+							Join Now
 						</Button>
 					</div>
 				</div>

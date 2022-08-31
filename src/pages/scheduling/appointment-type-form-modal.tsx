@@ -12,6 +12,7 @@ import InputHelper from '@/components/input-helper';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import Select from '@/components/select';
 import { useCobaltTheme } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
@@ -98,6 +99,7 @@ export const AppointmentTypeFormModal = ({
 	onDelete,
 	...modalProps
 }: AppointmentTypeFormModalProps) => {
+	useTrackModalView('AppointmentTypeFormModal', modalProps.show);
 	const theme = useCobaltTheme();
 	const { account } = useAccount();
 	const classes = useModalStyles();
@@ -440,7 +442,7 @@ export const AppointmentTypeFormModal = ({
 							setScreeningQuestions(screeningQuestionsClone);
 						}}
 					>
-						add question
+						Add Question
 					</Button>
 				</div>
 			</Modal.Body>
@@ -450,7 +452,7 @@ export const AppointmentTypeFormModal = ({
 					<div>
 						{appointmentTypeId && (
 							<Button variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
-								delete
+								Delete
 							</Button>
 						)}
 					</div>
@@ -463,10 +465,10 @@ export const AppointmentTypeFormModal = ({
 								}
 							}}
 						>
-							cancel
+							Cancel
 						</Button>
 						<Button className="ms-2" variant="outline" onClick={handleSaveButtonClick}>
-							save
+							Save
 						</Button>
 					</div>
 				</div>

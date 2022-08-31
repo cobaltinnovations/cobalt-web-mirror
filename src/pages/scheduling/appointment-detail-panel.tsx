@@ -177,7 +177,7 @@ export const AppointmentDetailPanel = ({
 					href={appointment?.videoconferenceUrl}
 					target="_blank"
 				>
-					join now
+					Join Now
 				</Button>
 
 				<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} />

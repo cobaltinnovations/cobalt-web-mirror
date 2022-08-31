@@ -4,6 +4,9 @@ import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { ContentListFormat } from '@/lib/services';
+import useAnalytics from '@/hooks/use-analytics';
+import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -20,7 +23,9 @@ interface FilterFormatProps extends ModalProps {
 }
 
 const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSave, ...props }) => {
+	useTrackModalView('FilterFormat', props.show);
 	const classes = useStyles();
+	const { trackEvent } = useAnalytics();
 	const [internalSelectedFormatIds, setInternalSelectedFormatIds] = useState<string[]>([]);
 
 	useEffect(() => {
@@ -53,6 +58,7 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 	}
 
 	function handleSaveButtonClick() {
+		trackEvent(ContentAnalyticsEvent.applyFilter('Format'));
 		onSave(internalSelectedFormatIds);
 	}
 
@@ -64,10 +70,10 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 			<Modal.Body>
 				<div className="d-flex mb-3">
 					<Button variant="link" className="p-0" onClick={handleSelectAllButtonClick}>
-						select all
+						Select All
 					</Button>
 					<Button variant="link" className="ms-3 p-0" onClick={handleDeselectAllButtonClick}>
-						deselect all
+						Deselect All
 					</Button>
 				</div>
 				<Form>
@@ -90,10 +96,10 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={handleSaveButtonClick}>
-						save
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

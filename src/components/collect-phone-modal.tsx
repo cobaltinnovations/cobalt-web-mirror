@@ -5,6 +5,7 @@ import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { accountService } from '@/lib/services';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCollectPhoneModalStyles = createUseStyles({
 	collectPhoneNumberModal: {
@@ -20,6 +21,7 @@ interface CollectPhoneModalProps extends ModalProps {
 }
 
 const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...props }) => {
+	useTrackModalView('CollectPhoneModal', props.show);
 	const handleError = useHandleError();
 	const classes = useCollectPhoneModalStyles();
 	const { account, setAccount } = useAccount();
@@ -79,11 +81,11 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 								onSkip();
 							}}
 						>
-							skip for now
+							Skip for Now
 						</Button>
 						<div className="d-grid">
 							<Button type="submit" variant="primary" size="sm">
-								continue assessment
+								Continue Assessment
 							</Button>
 						</div>
 					</div>

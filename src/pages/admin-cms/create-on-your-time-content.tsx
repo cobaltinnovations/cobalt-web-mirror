@@ -70,6 +70,7 @@ const CreateOnYourTimeContent: FC = () => {
 	const contentId = searchParams.get('contentId');
 	const editing = searchParams.get('editing');
 	const adding = searchParams.get('adding');
+	const returnToAvailable = (searchParams.get('returnToAvailable') ?? '').toLowerCase() === 'true';
 	const [showRemoveImageModal, setShowRemoveImageModal] = useState(false);
 
 	const [contentInstitutions, setContentInstitutions] = useState<InstitutionFilters[]>();
@@ -153,9 +154,10 @@ const CreateOnYourTimeContent: FC = () => {
 					setChoices(choicesToSet);
 				}
 			}
+
 			if (adding) {
 				setIsAdding(true);
-				setShouldDisabledInputs(true);
+				// setShouldDisabledInputs(true);
 			}
 
 			if (contentToSet) {
@@ -219,7 +221,12 @@ const CreateOnYourTimeContent: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
-				const targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
+				let targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
+
+				if (returnToAvailable) {
+					targetPath = '/cms/available-content';
+				}
+
 				navigate(`${targetPath}`, {
 					state: {
 						showSuccess: true,
@@ -339,7 +346,7 @@ const CreateOnYourTimeContent: FC = () => {
 											<Row>
 												<Col className="mb-5">
 													<h3 className="mb-2">
-														{isAdding ? 'Add Public Post' : 'Add on Your Time Content'}
+														{isAdding ? 'Add Public Post' : 'Add On Your Time Content'}
 													</h3>
 													<span>Required *</span>
 												</Col>

@@ -344,10 +344,10 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 										onBack();
 									}}
 								>
-									cancel
+									Cancel
 								</Button>
 								<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
-									save
+									Save
 								</Button>
 							</div>
 						</Form>

@@ -6,6 +6,7 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import 'react-image-crop/dist/ReactCrop.css';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
 	const canvas = document.createElement('canvas');
@@ -68,6 +69,7 @@ interface SessionCropModalProps extends ModalProps {
 }
 
 const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...props }) => {
+	useTrackModalView('SessionCropModal', props.show);
 	const handleError = useHandleError();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
@@ -118,10 +120,10 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 
 			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
+					Cancel
 				</Button>
 				<Button variant="primary" size="sm" className="ms-3" onClick={handleOnSaveButtonClick}>
-					save
+					Save
 				</Button>
 			</Modal.Footer>
 		</Modal>

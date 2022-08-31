@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -19,6 +20,7 @@ interface SessionRemoveImageModalProps extends ModalProps {
 }
 
 const SessionRemoveImageModal: FC<SessionRemoveImageModalProps> = ({ imageSource, onRemove, ...props }) => {
+	useTrackModalView('SessionRemoveImageModal', props.show);
 	const classes = useSessionCropModalStyles();
 
 	return (
@@ -37,10 +39,10 @@ const SessionRemoveImageModal: FC<SessionRemoveImageModalProps> = ({ imageSource
 			</Modal.Body>
 			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					cancel
+					Cancel
 				</Button>
 				<Button variant="danger" size="sm" className="ms-3" onClick={onRemove}>
-					yes, remove image
+					Yes, Remove Image
 				</Button>
 			</Modal.Footer>
 		</Modal>

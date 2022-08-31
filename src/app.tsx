@@ -2,7 +2,6 @@ import React, { FC, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
-import useGoogleAnalytics from '@/hooks/use-google-analytics';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import config from '@/lib/config';
 
@@ -21,6 +20,7 @@ import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
 
 import { AccountProvider } from '@/contexts/account-context';
 import { AlertProvider } from '@/contexts/alert-context';
+import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import { ErrorModalProvider } from '@/contexts/error-modal-context';
 import { InCrisisModalProvider } from '@/contexts/in-crisis-modal-context';
@@ -36,8 +36,6 @@ import 'react-multi-carousel/lib/styles.css';
 import './scss/main.scss';
 
 const AppWithProviders: FC = () => {
-	useGoogleAnalytics();
-
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
 	const { account, institution, initialized } = useAccount();
 
@@ -122,7 +120,9 @@ const ThemedApp: FC = () => {
 					<AlertProvider>
 						<BookingProvider>
 							<InCrisisModalProvider>
-								<AppWithProviders />
+								<AnalyticsProvider>
+									<AppWithProviders />
+								</AnalyticsProvider>
 							</InCrisisModalProvider>
 						</BookingProvider>
 					</AlertProvider>

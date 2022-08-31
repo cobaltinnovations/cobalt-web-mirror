@@ -4,7 +4,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { AvailabilityTimeSlot, Provider } from '@/lib/models';
 import { accountService, CreateAppointmentData, appointmentService } from '@/lib/services';
 import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import CollectContactInfoModal from './collect-contact-info-modal';
 import ConfirmAppointmentTypeModal from './confirm-appointment-type-modal';
 import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
@@ -31,15 +31,13 @@ export type BookingRefHandle = {
 interface HistoryLocationState {
 	skipAssessment?: boolean;
 	successBooking?: boolean;
-	routedClinicIds?: string[];
-	routedProviderId?: string;
-	routedSupportRoleIds?: string[];
 	emailAddress?: string;
 }
 
 export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	const handleError = useHandleError();
 	const { account, setAccount, isAnonymous } = useAccount();
+	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -78,22 +76,31 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 		bookingSource,
 		setBookingSource,
-		setPreserveFilters,
+		setPreservedFilterQueryString,
 	} = useContext(BookingContext);
 
+	const currentSearchString = searchParams.toString();
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const navigateToEhrLookup = useCallback(() => {
+		if (bookingSource === BookingSource.ProviderSearch) {
+			setPreservedFilterQueryString(currentSearchString);
+		}
+
 		navigate(`/ehr-lookup`, {
 			state: {
 				skipAssessment,
 			},
 		});
-	}, [navigate, skipAssessment]);
+	}, [bookingSource, currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]);
 
 	const navigateToIntakeAssessment = useCallback(
 		(provider: Provider) => {
 			if (!provider) {
 				return;
+			}
+
+			if (bookingSource === BookingSource.ProviderSearch) {
+				setPreservedFilterQueryString(currentSearchString);
 			}
 
 			navigate(`/intake-assessment?providerId=${provider.providerId}`, {
@@ -102,16 +109,14 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				},
 			});
 		},
-		[navigate, skipAssessment]
+		[bookingSource, currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]
 	);
 
 	const continueBookingProcess = useCallback(
 		({ provider, requireAssessment = false, promptForInfo = false }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-				setPreserveFilters(bookingSource === BookingSource.ProviderSearch);
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
-				setPreserveFilters(bookingSource === BookingSource.ProviderSearch);
 				navigateToIntakeAssessment(provider);
 			} else if (provider?.intakeAssessmentRequired || requireAssessment) {
 				setShowConfirmIntakeAssessmentModal(true);
@@ -121,15 +126,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				setShowConfirmationModal(true);
 			}
 		},
-		[
-			account?.epicPatientId,
-			bookingSource,
-			navigateToEhrLookup,
-			navigateToIntakeAssessment,
-			promptForEmail,
-			promptForPhoneNumber,
-			setPreserveFilters,
-		]
+		[account?.epicPatientId, navigateToEhrLookup, navigateToIntakeAssessment, promptForEmail, promptForPhoneNumber]
 	);
 
 	const kickoffBookingProcess = useCallback(

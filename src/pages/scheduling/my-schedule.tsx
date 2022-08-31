@@ -234,7 +234,7 @@ export const MySchedule: FC = () => {
 				<div className="d-flex flex-column align-items-start">
 					<Link to={`appointments/new-appointment`}>
 						<Button variant="link" size="sm" className="p-0 mb-5 fs-default">
-							new appointment
+							New Appointment
 						</Button>
 					</Link>
 
@@ -247,7 +247,7 @@ export const MySchedule: FC = () => {
 								setManagingAvailabilties(true);
 							}}
 						>
-							manage availability
+							Manage Availability
 						</Button>
 					</Link>
 				</div>

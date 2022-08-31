@@ -31,7 +31,7 @@ const SignUpClaim: FC = () => {
 
 						{inviteExpired ? (
 							<p className="mb-0 text-center fw-bold">
-								You will need to sign up again in order to continue.
+								You will need to create an account again in order to continue.
 							</p>
 						) : (
 							<p className="mb-0 text-center fw-bold">
@@ -41,11 +41,11 @@ const SignUpClaim: FC = () => {
 
 						{inviteExpired ? (
 							<div className="text-center">
-								<Link to="/sign-up">Sign Up</Link>
+								<Link to="/sign-up">Create account</Link>
 							</div>
 						) : (
 							<div className="text-center">
-								<Link to="/sign-in-email">Sign In</Link>
+								<Link to="/sign-in-email">Sign in</Link>
 							</div>
 						)}
 					</Col>

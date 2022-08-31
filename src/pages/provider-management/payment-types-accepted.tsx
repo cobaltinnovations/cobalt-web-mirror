@@ -39,10 +39,10 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 									navigate(-1);
 								}}
 							>
-								back
+								Back
 							</Button>
 							<Button variant="primary" type="submit">
-								submit
+								Submit
 							</Button>
 						</div>
 					</Form>

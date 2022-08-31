@@ -3,6 +3,10 @@ import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { Specialty } from '@/lib/models';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -14,24 +18,23 @@ const useStyles = createUseStyles({
 
 interface FilterSpecialtyModalProps extends ModalProps {
 	specialties: Specialty[];
-	selectedSpecialties: string[];
-	onSave(selectedSpecialties: string[]): void;
 }
 
-const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
-	specialties,
-	selectedSpecialties,
-	onSave,
-	...props
-}) => {
+const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...props }) => {
+	useTrackModalView('FilterSpecialtyModal', props.show);
 	const classes = useStyles();
-	const [internalSelectedSpecialties, setInternalSelectedSpecialties] = useState<string[]>([]);
+
+	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
+	const { trackEvent } = useAnalytics();
+	const [selected, setSelected] = useState(searchParams.getAll('specialtyId'));
 
 	useEffect(() => {
 		if (props.show) {
-			setInternalSelectedSpecialties(selectedSpecialties);
+			const selections = searchParams.getAll('specialtyId');
+			setSelected(selections.length > 0 ? selections : []);
 		}
-	}, [props.show, selectedSpecialties]);
+	}, [props.show, searchParams]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
@@ -47,17 +50,12 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 							id={specialty.specialtyId}
 							name={specialty.specialtyId}
 							label={specialty.description}
-							checked={internalSelectedSpecialties.includes(specialty.specialtyId)}
+							checked={selected.includes(specialty.specialtyId)}
 							onChange={(event) => {
 								if (event.currentTarget.checked) {
-									setInternalSelectedSpecialties([
-										...internalSelectedSpecialties,
-										specialty.specialtyId,
-									]);
+									setSelected([...selected, specialty.specialtyId]);
 								} else {
-									setInternalSelectedSpecialties(
-										internalSelectedSpecialties.filter((s) => s !== specialty.specialtyId)
-									);
+									setSelected(selected.filter((s) => s !== specialty.specialtyId));
 								}
 							}}
 						/>
@@ -67,10 +65,26 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(internalSelectedSpecialties)}>
-						save
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Focus'));
+
+							searchParams.delete('specialtyId');
+
+							for (const specialtyId of selected) {
+								searchParams.append('specialtyId', specialtyId);
+							}
+
+							setSearchParams(searchParams, { state: location.state });
+
+							props.onHide?.();
+						}}
+					>
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

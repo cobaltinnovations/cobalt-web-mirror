@@ -2,8 +2,11 @@ import React, { FC, useState, useEffect } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { ProviderAvailability } from '@/lib/models';
-import { cloneDeep } from 'lodash';
+import { ProviderAvailability, ProviderVisitType } from '@/lib/models';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterAvailabilityModalStyles = createUseStyles({
 	filterAvailabilityModal: {
@@ -15,54 +18,37 @@ const useFilterAvailabilityModalStyles = createUseStyles({
 
 interface FilterAvailabilityModalProps extends ModalProps {
 	availabilities: ProviderAvailability[];
-	selectedAvailability: ProviderAvailability['availability'];
-	selectedVisitTypeIds: string[];
-	onSave(availability: ProviderAvailability['availability'], visitTypeIds: string[]): void;
+	visitTypes: ProviderVisitType[];
+	defaultAvailability?: string;
+	defaultVisitTypeIds: string[];
 }
 
 const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 	availabilities,
-	selectedAvailability,
-	selectedVisitTypeIds,
-	onSave,
+	visitTypes,
+	defaultAvailability,
+	defaultVisitTypeIds,
 	...props
 }) => {
+	useTrackModalView('FilterAvailabilityModal', props.show);
 	const classes = useFilterAvailabilityModalStyles();
 
-	const [allAvailabilites, setAllAvailabilities] = useState<ProviderAvailability[]>([]);
-	const [selected, setSelected] = useState(selectedAvailability);
-	const [visitTypeIds, setVisitTypeIds] = useState<string[]>([]);
+	const { trackEvent } = useAnalytics();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
+	const [selectedAvailability, setSelectedAvailability] = useState(
+		searchParams.get('availability') || defaultAvailability || ''
+	);
+	const [selectedVisitTypeIds, setSelectedVisitTypeIds] = useState(searchParams.getAll('visitTypeId'));
 
 	useEffect(() => {
 		if (props.show) {
-			setSelected(selectedAvailability);
+			setSelectedAvailability(searchParams.get('availability') || defaultAvailability || '');
+
+			const selections = searchParams.getAll('visitTypeId');
+			setSelectedVisitTypeIds(selections.length > 0 ? selections : [...defaultVisitTypeIds]);
 		}
-	}, [props.show, selectedAvailability]);
-
-	useEffect(() => {
-		setAllAvailabilities(availabilities);
-	}, [availabilities]);
-
-	useEffect(() => {
-		setSelected(selectedAvailability);
-	}, [selectedAvailability]);
-
-	useEffect(() => {
-		setVisitTypeIds(selectedVisitTypeIds);
-	}, [selectedVisitTypeIds]);
-
-	function handleVisitTypeCheckboxChange(value: string) {
-		const visitTypeIdsClone = cloneDeep(visitTypeIds);
-		const indexToRemove = visitTypeIdsClone.findIndex((id) => id === value);
-
-		if (indexToRemove > -1) {
-			visitTypeIdsClone.splice(indexToRemove, 1);
-		} else {
-			visitTypeIdsClone.push(value);
-		}
-
-		setVisitTypeIds(visitTypeIdsClone);
-	}
+	}, [defaultAvailability, defaultVisitTypeIds, props.show, searchParams]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterAvailabilityModal} centered>
@@ -71,7 +57,7 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-4">
-					{allAvailabilites.map(({ availability, description }) => {
+					{availabilities.map(({ availability, description }) => {
 						return (
 							<Form.Check
 								key={availability}
@@ -79,9 +65,9 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 								id={availability}
 								name={availability}
 								label={description}
-								checked={availability === selected}
+								checked={availability === selectedAvailability}
 								onChange={() => {
-									setSelected(availability);
+									setSelectedAvailability(availability);
 								}}
 							/>
 						);
@@ -89,37 +75,52 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 				</div>
 				<div className="mb-2">
 					<h3 className="mb-3">visit type</h3>
-					<Form.Check
-						type="checkbox"
-						id="visit-type__initial"
-						name="visit-type"
-						label="First session"
-						value="INITIAL"
-						checked={visitTypeIds.includes('INITIAL')}
-						onChange={() => {
-							handleVisitTypeCheckboxChange('INITIAL');
-						}}
-					/>
-					<Form.Check
-						type="checkbox"
-						id="visit-type__followup"
-						name="visit-type"
-						label="Follow-up session"
-						value="FOLLOWUP"
-						checked={visitTypeIds.includes('FOLLOWUP')}
-						onChange={() => {
-							handleVisitTypeCheckboxChange('FOLLOWUP');
-						}}
-					/>
+					{visitTypes.map((visitType) => {
+						return (
+							<Form.Check
+								type="checkbox"
+								key={visitType.visitTypeId}
+								id={visitType.visitTypeId}
+								name="visit-type"
+								label={visitType.description}
+								value={visitType.visitTypeId}
+								checked={selectedVisitTypeIds.includes(visitType.visitTypeId)}
+								onChange={(event) => {
+									if (event.currentTarget.checked) {
+										setSelectedVisitTypeIds([...selectedVisitTypeIds, visitType.visitTypeId]);
+									} else {
+										setSelectedVisitTypeIds(
+											selectedVisitTypeIds.filter((v) => v !== visitType.visitTypeId)
+										);
+									}
+								}}
+							/>
+						);
+					})}
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={() => onSave(selected, visitTypeIds)}>
-						save
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Availability'));
+							searchParams.set('availability', selectedAvailability);
+							searchParams.delete('visitTypeId');
+
+							for (const visitTypeId of selectedVisitTypeIds) {
+								searchParams.append('visitTypeId', visitTypeId);
+							}
+
+							setSearchParams(searchParams, { state: location.state });
+							props.onHide?.();
+						}}
+					>
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

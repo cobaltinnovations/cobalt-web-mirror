@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
@@ -17,6 +17,8 @@ import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
+import useAnalytics from '@/hooks/use-analytics';
+import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 
 interface LocationState {
 	skipAssessment?: boolean;
@@ -25,24 +27,23 @@ interface LocationState {
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { trackEvent } = useAnalytics();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const selectedFormatIds = searchParams.getAll('formatId');
+	const selectedLength = searchParams.get('length') ?? '';
+	const searchTerm = searchParams.get('q') ?? '';
 	const { subdomainInstitution } = useAccount();
 	const [didInit, setDidInit] = useState(false);
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
-
 	const skipAssessment = !!(location.state as LocationState)?.skipAssessment;
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
-	const [selectedFormatIds, setSelectedFormatIds] = useState<string[]>([]);
-
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
-	const [selectedLength, setSelectedLength] = useState<string>('');
-
 	const [showPersonalizeModal, setShowPersonalizeModal] = useState(
 		(location?.state as { personalize: boolean })?.personalize ?? false
 	);
 	const [items, setItems] = useState<Content[]>([]);
 	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
-	const [searchTerm, setSearchTerm] = useState('');
 
 	const [questions, setQuestions] = useState<PersonalizationQuestion[]>([]);
 	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
@@ -85,10 +86,11 @@ const OnYourTime: FC = () => {
 			});
 	}, []);
 
+	const format = selectedFormatIds.join(',');
 	const fetchContent = useCallback(() => {
 		return contentService
 			.fetchContentList({
-				format: selectedFormatIds.join(','),
+				format,
 				maxLengthMinutes: selectedLength,
 			})
 			.fetch()
@@ -97,7 +99,7 @@ const OnYourTime: FC = () => {
 				setItems(response.content);
 				setAdditionalItems(response.additionalContent);
 			});
-	}, [selectedFormatIds, selectedLength]);
+	}, [format, selectedLength]);
 
 	const fetchData = useCallback(async () => {
 		const requests = [fetchContent(), fetchFilters()];
@@ -162,7 +164,13 @@ const OnYourTime: FC = () => {
 					setShowFilterFormatModal(false);
 				}}
 				onSave={(selectedIds) => {
-					setSelectedFormatIds(selectedIds);
+					searchParams.delete('formatId');
+
+					for (const formatId of selectedIds) {
+						searchParams.append('formatId', formatId);
+					}
+
+					setSearchParams(searchParams);
 					setShowFilterFormatModal(false);
 				}}
 			/>
@@ -174,37 +182,36 @@ const OnYourTime: FC = () => {
 					setShowFilterLengthModal(false);
 				}}
 				onSave={(length) => {
-					setSelectedLength(length);
+					searchParams.set('length', 'length');
+
+					setSearchParams(searchParams);
 					setShowFilterLengthModal(false);
 				}}
 			/>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">On your time</h2>
+			<HeroContainer className="mb-4 mb-lg-8">
+				<h2 className="mb-0 text-center">On Your Time</h2>
 			</HeroContainer>
 
-			<Container className="pt-5 mb-3">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+			<Container>
+				<Row className="align-items-center">
+					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper
 							type="search"
-							label="Find on your time items"
+							label="Find On Your Time items"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								setSearchTerm(event.target.value);
+								searchParams.set('q', event.target.value);
+								setSearchParams(searchParams, { replace: true });
 							}}
 						/>
 					</Col>
-				</Row>
-			</Container>
-
-			<Container className="mb-3">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<div className="text-center">
+					<Col lg={6} xl={7} className="mb-4 mb-lg-7">
+						<div className="text-start text-lg-end">
 							<FilterPill
 								active={hasFilters}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Focus'));
 									setShowPersonalizeModal(true);
 								}}
 							>
@@ -213,6 +220,7 @@ const OnYourTime: FC = () => {
 							<FilterPill
 								active={selectedFormatIds.length > 0}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Format'));
 									setShowFilterFormatModal(true);
 								}}
 							>
@@ -221,6 +229,7 @@ const OnYourTime: FC = () => {
 							<FilterPill
 								active={!!selectedLength}
 								onClick={() => {
+									trackEvent(ContentAnalyticsEvent.clickFilterPill('Length'));
 									setShowFilterLengthModal(true);
 								}}
 							>

@@ -5,6 +5,7 @@ import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const usStyles = createUseStyles({
 	modal: {
@@ -15,6 +16,7 @@ const usStyles = createUseStyles({
 });
 
 const ReauthModal: FC<ModalProps> = ({ ...props }) => {
+	useTrackModalView('ReauthModal', props.show);
 	const classes = usStyles();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -53,7 +55,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 							setShowReauthModal(false);
 						}}
 					>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -63,7 +65,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 							window.location.href = signOnUrl;
 						}}
 					>
-						proceed
+						Proceed
 					</Button>
 				</div>
 			</Modal.Footer>

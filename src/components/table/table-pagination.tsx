@@ -99,7 +99,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 		<ButtonGroup aria-label="Pagination">
 			{page !== 0 && (
 				<Button variant="link" size="sm" onClick={handlePreviousButtonClick}>
-					previous
+					Previous
 				</Button>
 			)}
 			{pageButtonsToShow.length > 1 &&
@@ -122,7 +122,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 				})}
 			{page !== buttonIndices.length - 1 && (
 				<Button variant="link" size="sm" onClick={handleNextButtonClick}>
-					next
+					Next
 				</Button>
 			)}
 		</ButtonGroup>

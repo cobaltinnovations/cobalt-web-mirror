@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { AppointmentType, EpicDepartment } from '@/lib/models/appointments';
 import { AvailabilityTimeSlot } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	confirmAppointmentTypeModal: {
@@ -34,6 +35,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 	epicDepartment,
 	...props
 }) => {
+	useTrackModalView('ConfirmAppointmentTypeModal', props.show);
 	const classes = useConfirmAppointmentTypeModalStyles();
 
 	const [selectedId, setSelectedId] = useState('');
@@ -94,7 +96,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -103,7 +105,7 @@ const ConfirmAppointmentTypeModal: FC<ConfirmAppointmentTypeModalProps> = ({
 							onConfirm(selectedId);
 						}}
 					>
-						reserve
+						Reserve
 					</Button>
 				</div>
 			</Modal.Footer>

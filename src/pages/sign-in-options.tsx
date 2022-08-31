@@ -10,6 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { AccountSource } from '@/lib/models';
 import useSubdomain from '@/hooks/use-subdomain';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -112,6 +113,9 @@ const SignInOptions = () => {
 		}
 	}
 
+	useTrackModalView('AccountSourceModal', ssoModalIsOpen);
+	useTrackModalView('ForgotPasswordModal', forgotPasswordModalIsOpen);
+
 	return (
 		<>
 			<Modal
@@ -178,7 +182,6 @@ const SignInOptions = () => {
 				onHide={() => {
 					setForgotPasswordModalIsOpen(false);
 				}}
-				onEntering={handleSsoModelEnter}
 				centered
 			>
 				<Modal.Header closeButton>
@@ -289,13 +292,15 @@ const SignInOptions = () => {
 											</Button>
 										</div>
 										<Button type="submit" className="w-100 d-block" variant="outline-primary">
-											Sign in
+											Sign In
 										</Button>
 									</Form>
-									<p className="text-center">
-										Don't have an account? <Link to="/sign-up">Sign up</Link>
-									</p>
 								</>
+							)}
+							{subdomainInstitution?.emailSignupEnabled && (
+								<p className="text-center">
+									Don't have an account? <Link to="/sign-up">Create account</Link>
+								</p>
 							)}
 						</Col>
 					</Row>

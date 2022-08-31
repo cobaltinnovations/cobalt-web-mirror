@@ -349,11 +349,11 @@ const GroupSessionsCreate: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/group-sessions/scheduled',
-							title: 'studio sessions',
+							title: 'Studio Sessions',
 						},
 						{
 							to: '/group-sessions/scheduled/create',
-							title: `${initialValues?.title || 'create studio session'}${isCopy ? ' (copy)' : ''}`,
+							title: `${initialValues?.title || 'Create Studio Session'}${isCopy ? ' (Copy)' : ''}`,
 						},
 					]}
 				/>
@@ -378,7 +378,7 @@ const GroupSessionsCreate: FC = () => {
 										variant="danger"
 										onClick={handleCancelSessionButtonClick}
 									>
-										cancel session
+										Cancel Session
 									</Button>
 
 									<CopyToClipboard
@@ -961,7 +961,7 @@ const GroupSessionsCreate: FC = () => {
 															);
 														}}
 													>
-														add question
+														Add Question
 													</Button>
 												</div>
 											</Card>

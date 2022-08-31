@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 
-import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import InCrisisTemplate from '@/components/in-crisis-template';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
@@ -24,39 +24,18 @@ const DownForMaintenance = (): ReactElement => {
 						<LogoIconText className={classes.logoIconText} />
 					</div>
 
-					<p className="mb-2 text-center fs-large">
+					<p className="mb-2 text-center">
 						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be
 						back online shortly.
 					</p>
-					<p className="mb-8 text-center fs-large">
+					<p className="mb-8 text-center">
 						If you need immediate help, please contact one of the following numbers:
 					</p>
 
-					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:911">
-						<PhoneIcon className="me-4" />
-						<div className="fs-large">
-							<span className="d-block mb-2">Call 911</span>
-							<span className="d-block font-heading-normal">24/7 emergency</span>
-						</div>
-					</Button>
-					<Button variant="primary" className="mb-2 w-100 d-flex align-items-center" href="tel:8007238255">
-						<PhoneIcon className="me-4" />
-						<div className="fs-large">
-							<span className="d-block mb-2">Call 800-273-8255</span>
-							<span className="d-block font-heading-normal">24/7 National suicide prevention line</span>
-						</div>
-					</Button>
-					<Button variant="primary" className="mb-4 w-100 d-flex align-items-center" href="tel:741741">
-						<PhoneIcon className="me-4" />
-						<div className="fs-large">
-							<span className="d-block mb-2">Text 741 741</span>
-							<span className="d-block font-heading-normal">24/7 Crisis Text Line</span>
-						</div>
-					</Button>
+					<InCrisisTemplate />
+					<div className="mb-8" />
 
-					<p className="text-center fs-large font-heading-bold">
-						or go to your nearest emergency department or crisis center
-					</p>
+					<h5 className="text-center">or go to your nearest emergency department or crisis center</h5>
 				</Col>
 			</Row>
 		</Container>

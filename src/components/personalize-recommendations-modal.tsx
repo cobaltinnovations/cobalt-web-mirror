@@ -11,6 +11,9 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { screenWidths } from '@/jss/media-queries';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
+import useAnalytics from '@/hooks/use-analytics';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const usePersonalizeRecommendationsModalStyles = createUseThemedStyles((theme) => ({
 	personalizeRecommendationModal: {
@@ -104,8 +107,10 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 	onClose,
 	...props
 }) => {
+	useTrackModalView('PersonalizeRecommendationsModal', props.show);
 	const handleError = useHandleError();
 	const classes = usePersonalizeRecommendationsModalStyles();
+	const { trackEvent } = useAnalytics();
 
 	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
 	const hasSelectedChoices = useMemo(() => {
@@ -121,6 +126,8 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 	}, [props.show, initialChoices]);
 
 	const handleApplyFilters = () => {
+		trackEvent(ContentAnalyticsEvent.applyFilter('Focus'));
+
 		const updatedChoices = Object.entries(choices).map(([questionId, selectedAnswers]) => ({
 			questionId,
 			selectedAnswers,
@@ -212,7 +219,7 @@ const PersonalizeRecommendationsModal: FC<PersonalizeRecommendationsModalProps> 
 
 			<div className={classNames('d-flex justify-content-center align-items-center', classes.modalFooter)}>
 				<Button size="sm" onClick={handleApplyFilters}>
-					apply filters
+					Apply Filters
 				</Button>
 			</div>
 		</Modal>

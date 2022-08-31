@@ -1,30 +1,54 @@
-import React, { FC, useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-
-import useAccount from '@/hooks/use-account';
-import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import useAlert from '@/hooks/use-alert';
-import AsyncPage from '@/components/async-page';
-import Breadcrumb from '@/components/breadcrumb';
-import StudioEvent from '@/components/studio-event';
-import CollectEmailModal from '@/components/collect-email-modal';
-import ConfirmGroupEventBookingModal from '@/components/confirm-group-event-booking-modal';
-import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
 
 import { groupSessionsService } from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
-import useHandleError from '@/hooks/use-handle-error';
-import HeroContainer from '@/components/hero-container';
 
-const InTheStudioGroupSessionScheduled: FC = () => {
+import useAccount from '@/hooks/use-account';
+import useHandleError from '@/hooks/use-handle-error';
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
+import useAlert from '@/hooks/use-alert';
+
+import AsyncPage from '@/components/async-page';
+import Breadcrumb from '@/components/breadcrumb';
+import CollectEmailModal from '@/components/collect-email-modal';
+import ConfirmGroupEventBookingModal from '@/components/confirm-group-event-booking-modal';
+import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
+import BackgroundImageContainer from '@/components/background-image-container';
+
+import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
+
+import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	mediaContainer: {
+		height: 400,
+		[mediaQueries.lg]: {
+			height: 210,
+		},
+	},
+	badge: {
+		right: 0,
+		bottom: 32,
+		position: 'absolute',
+		[mediaQueries.lg]: {
+			bottom: 16,
+		},
+	},
+}));
+
+const InTheStudioGroupSessionScheduled = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { account, setAccount } = useAccount();
 	const { showAlert } = useAlert();
+	const classes = useStyles();
+	const placeholderImage = useRandomPlaceholderImage();
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
 
@@ -174,6 +198,9 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 			/>
 
 			<Breadcrumb
+				xs={{ span: 12 }}
+				lg={{ span: 12 }}
+				xl={{ span: 12 }}
 				breadcrumbs={[
 					{
 						to: '/',
@@ -190,33 +217,32 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 				]}
 			/>
 
-			<HeroContainer className="mb-4">
-				<h2 className="mb-0 text-center">{session?.title}</h2>
-			</HeroContainer>
-
 			{reservation && (
 				<Container fluid className="bg-success p-0">
-					<Container className="pt-4 pb-5">
+					<Container className="py-5">
 						<Row>
 							<Col>
-								<h6 className="text-white text-center mb-1">you've reserved a place for this event</h6>
-								<p className="text-white text-center mb-3">
-									Join us at {session?.startDateTimeDescription}
+								<h6 className="mb-1 text-white text-center">
+									You've reserved a place for this session
+								</h6>
+								<p className="mb-4 text-white text-center">
+									Join us {session?.startDateTimeDescription}
 								</p>
 								<div className="d-flex align-items-center justify-content-center">
 									<Link className="text-decoration-none" to="/my-calendar">
-										<Button as="div" variant="light" size="sm" className="me-2">
-											view calendar
+										<Button as="div" variant="light" className="me-2">
+											View Calendar
 										</Button>
 									</Link>
 									<Button
 										as="a"
 										variant="light"
-										size="sm"
+										className="text-decoration-none"
 										href={session?.videoconferenceUrl || ''}
 										target="_blank"
+										rel="noreferrer noopener"
 									>
-										join now
+										Join Now
 									</Button>
 								</div>
 							</Col>
@@ -225,55 +251,79 @@ const InTheStudioGroupSessionScheduled: FC = () => {
 				</Container>
 			)}
 
-			{session && (
-				<Container>
-					<Row>
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<StudioEvent groupEvent={session} />
-						</Col>
-					</Row>
-				</Container>
-			)}
-
-			<Container className="pt-5 pb-5">
+			<Container fluid className="mb-4 mb-lg-10">
 				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<div dangerouslySetInnerHTML={{ __html: session?.description || '' }}></div>
+					<Col>
+						<BackgroundImageContainer
+							className={classes.mediaContainer}
+							imageUrl={session?.imageUrl || placeholderImage}
+						>
+							<Container className="h-100">
+								<Row className="h-100">
+									<Col
+										className="h-100"
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<div className="h-100 position-relative">
+											<Badge className={classes.badge} as="div" bg="outline-secondary" pill>
+												{session?.seatsAvailableDescription}
+											</Badge>
+										</div>
+									</Col>
+								</Row>
+							</Container>
+						</BackgroundImageContainer>
 					</Col>
 				</Row>
-				<Row className="mt-5 text-center">
+			</Container>
+
+			<Container className="pb-10">
+				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{reservation ? (
-							<Button
-								variant="outline-primary"
-								onClick={() => {
-									setShowConfirmCancelModal(true);
-								}}
-							>
-								Cancel Reservation
-							</Button>
-						) : (
-							<Button
-								disabled={session?.seatsAvailable === 0}
-								variant="primary"
-								onClick={handleReserveButtonClick}
-							>
-								{session?.seatsAvailable === 0 ? 'No seats available' : 'Reserve a Place'}
-							</Button>
+						<h4 className="mb-0 mb-lg-1">{session?.title}</h4>
+						<p className={session?.facilitatorName ? 'mb-0 mb-lg-1' : 'mb-3 mb-lg-5'}>
+							{session?.appointmentTimeDescription}
+						</p>
+						{session?.facilitatorName && (
+							<p className="mb-3 mb-lg-5 text-muted">with {session?.facilitatorName}</p>
 						)}
-						<CopyToClipboard
-							onCopy={() => {
-								showAlert({
-									variant: 'success',
-									text: 'the link was copied to your clipboard',
-								});
-							}}
-							text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
-						>
-							<Button className="p-3 ms-2">
-								<ContentCopyIcon height={24} width={24} />
-							</Button>
-						</CopyToClipboard>
+						<hr className="mb-2 mb-lg-4" />
+						<p className="mb-0" dangerouslySetInnerHTML={{ __html: session?.description || '' }} />
+						<div className="mt-10 text-center">
+							{reservation ? (
+								<Button
+									variant="danger"
+									onClick={() => {
+										setShowConfirmCancelModal(true);
+									}}
+								>
+									Cancel Reservation
+								</Button>
+							) : (
+								<Button
+									disabled={session?.seatsAvailable === 0}
+									variant="primary"
+									onClick={handleReserveButtonClick}
+								>
+									{session?.seatsAvailable === 0 ? 'No Seats Available' : 'Reserve a Place'}
+								</Button>
+							)}
+							<CopyToClipboard
+								onCopy={() => {
+									showAlert({
+										variant: 'success',
+										text: 'The link was copied to your clipboard',
+									});
+								}}
+								text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
+							>
+								<Button variant="outline-primary" className="ms-2 p-2">
+									<ContentCopyIcon />
+								</Button>
+							</CopyToClipboard>
+						</div>
 					</Col>
 				</Row>
 			</Container>

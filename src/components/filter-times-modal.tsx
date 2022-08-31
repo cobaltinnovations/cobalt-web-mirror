@@ -1,8 +1,13 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import TimeInput from '@/components/time-input';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { padStart } from 'lodash';
+import useAnalytics from '@/hooks/use-analytics';
+import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterTimesModalStyles = createUseStyles({
 	filterTimesModal: {
@@ -13,13 +18,17 @@ const useFilterTimesModalStyles = createUseStyles({
 });
 
 interface FilterTimesModalProps extends ModalProps {
-	onSave(range: { min: number; max: number }): void;
-	range: { min: number; max: number };
+	defaultStartTime?: string;
+	defaultEndTime?: string;
 }
 
-const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }) => {
+const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, defaultEndTime, ...props }) => {
+	useTrackModalView('FilterTimesModal', props.show);
 	const classes = useFilterTimesModalStyles();
 
+	const [searchParams, setSearchParams] = useSearchParams();
+	const location = useLocation();
+	const { trackEvent } = useAnalytics();
 	const [fromTime, setFromTime] = useState('06:00');
 	const [fromMeridian, setFromMeridian] = useState('am');
 	const [toTime, setToTime] = useState('08:00');
@@ -30,30 +39,25 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 			return;
 		}
 
-		const parsedFromHour = range.min > 12 ? range.min - 12 : range.min;
-		const parsedFromMeridian = range.min > 12 ? 'pm' : 'am';
-		const formattedFromHour = parsedFromHour < 10 ? `0${parsedFromHour}:00` : `${parsedFromHour}:00`;
+		function getTimeComponents(timeString = '') {
+			const [hrs, mins] = timeString.split(':');
+			const parsedHrs = parseInt(hrs);
+			const meridian = parsedHrs >= 12 ? 'pm' : 'am';
+			const formattedHrs = parsedHrs >= 12 ? parsedHrs - 12 : parsedHrs;
+			const formattedTime = `${padStart(formattedHrs.toString(), 2, '0')}:${mins}`;
 
-		const parsedToHour = range.max > 12 ? range.max - 12 : range.max;
-		const parsedToMeridian = range.max > 12 ? 'pm' : 'am';
-		const formattedToHour = parsedToHour < 10 ? `0${parsedToHour}:00` : `${parsedToHour}:00`;
+			return [formattedTime, meridian];
+		}
 
-		setFromTime(formattedFromHour);
-		setFromMeridian(parsedFromMeridian);
+		const [start, startMeridian] = getTimeComponents(searchParams.get('startTime') || defaultStartTime);
+		const [end, endMeridian] = getTimeComponents(searchParams.get('endTime') || defaultEndTime);
 
-		setToTime(formattedToHour);
-		setToMeridian(parsedToMeridian);
-	}, [props.show, range.max, range.min]);
+		setFromTime(start);
+		setFromMeridian(startMeridian);
 
-	const handleSaveClick = useCallback(() => {
-		const fromHour = parseInt(fromTime.split(':')[0]);
-		const min = fromMeridian === 'am' ? fromHour : fromHour + 12;
-
-		const toHour = parseInt(toTime.split(':')[0]);
-		const max = toMeridian === 'am' ? toHour : toHour + 12;
-
-		onSave({ min, max });
-	}, [fromMeridian, fromTime, onSave, toMeridian, toTime]);
+		setToTime(end);
+		setToMeridian(endMeridian);
+	}, [defaultEndTime, defaultStartTime, props.show, searchParams]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.filterTimesModal} centered>
@@ -86,10 +90,38 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ onSave, range, ...props }
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
-					<Button className="ms-2" variant="primary" onClick={handleSaveClick}>
-						save
+					<Button
+						className="ms-2"
+						variant="primary"
+						onClick={() => {
+							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Times'));
+
+							const [fromHrs, fromMins] = fromTime.split(':');
+							const [toHrs, toMins] = toTime.split(':');
+
+							const parsedFromHrs = parseInt(fromHrs);
+							const adjustedFromHrs = fromMeridian === 'am' ? parsedFromHrs : parsedFromHrs + 12;
+
+							const parsedToHrs = parseInt(toHrs);
+							const adjustedToHrs = toMeridian === 'am' ? parsedToHrs : parsedToHrs + 12;
+
+							const startTime = padStart(adjustedFromHrs.toString(), 2, '0') + ':' + fromMins;
+							const endTime =
+								adjustedToHrs === 24
+									? '23:59'
+									: padStart(adjustedToHrs.toString(), 2, '0') + ':' + toMins;
+
+							searchParams.set('startTime', startTime);
+							searchParams.set('endTime', endTime);
+
+							setSearchParams(searchParams, { state: location.state });
+
+							props.onHide?.();
+						}}
+					>
+						Save
 					</Button>
 				</div>
 			</Modal.Footer>

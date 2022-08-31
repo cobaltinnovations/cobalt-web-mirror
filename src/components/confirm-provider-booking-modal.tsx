@@ -3,6 +3,7 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { Provider, AvailabilityTimeSlot } from '@/lib/models';
+import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useconfirmProviderBookingModalStyles = createUseStyles({
 	confirmProviderBookingModal: {
@@ -28,6 +29,7 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 	timeSlotEndTime,
 	...props
 }) => {
+	useTrackModalView('ConfirmProviderBookingModal', props.show);
 	const classes = useconfirmProviderBookingModalStyles();
 
 	return (
@@ -45,10 +47,10 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={props.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button className="ms-2" variant="primary" onClick={onConfirm}>
-						reserve
+						Reserve
 					</Button>
 				</div>
 			</Modal.Footer>

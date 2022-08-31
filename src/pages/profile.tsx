@@ -58,7 +58,7 @@ const Profile: FC = () => {
 				</Row> */}
 				<Row className="text-center">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Button onClick={handleUpdateMyProfileButtonClick}>update my profile</Button>
+						<Button onClick={handleUpdateMyProfileButtonClick}>Update My Profile</Button>
 					</Col>
 				</Row>
 			</Container>

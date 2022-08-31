@@ -141,11 +141,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/group-sessions/by-request',
-							title: 'studio sessions by request',
+							title: 'Studio Sessions by Request',
 						},
 						{
 							to: '/group-sessions/by-request/create',
-							title: initialValues?.title ? initialValues.title : 'create studio session',
+							title: initialValues?.title ? initialValues.title : 'Create Studio Session',
 						},
 					]}
 				/>
@@ -154,7 +154,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>
 						<h1 className="mb-2 fs-h3">
-							{initialValues?.title ? initialValues.title : 'create studio session by request'}
+							{initialValues?.title ? initialValues.title : 'Create Studio Session by Request'}
 						</h1>
 						<p className="mb-0 text-danger">Required*</p>
 					</Col>

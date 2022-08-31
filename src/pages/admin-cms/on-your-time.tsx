@@ -332,7 +332,7 @@ const CmsOnYourTime: FC = () => {
 							</div>
 							<div className="text-center">
 								<Button size="sm" onClick={handleAddContentButtonClick}>
-									+ add content
+									+ Add Content
 								</Button>
 							</div>
 						</div>

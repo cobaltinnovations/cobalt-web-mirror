@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC, useCallback, useEffect } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -24,6 +25,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 	externalUrl,
 	...modalProps
 }) => {
+	useTrackModalView('ConfirmGroupEventBookingModal', modalProps.show);
 	const classes = useConfirmGroupEventBookingModalStyles();
 
 	const navigateToExternalUrl = useCallback(() => {
@@ -72,7 +74,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 			<Modal.Footer>
 				<div className="text-right">
 					<Button variant="outline-primary" onClick={modalProps.onHide}>
-						cancel
+						Cancel
 					</Button>
 					<Button
 						className="ms-2"
@@ -85,7 +87,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 							}
 						}}
 					>
-						{externalUrl ? 'ok' : 'reserve'}
+						{externalUrl ? 'Ok' : 'Reserve'}
 					</Button>
 				</div>
 			</Modal.Footer>

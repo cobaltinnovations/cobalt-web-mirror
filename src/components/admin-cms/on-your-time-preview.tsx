@@ -205,7 +205,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										target="_blank"
 										onClick={() => {}}
 									>
-										{'call to action'}
+										{'Call to Action'}
 									</Button>
 								</div>
 							</Col>

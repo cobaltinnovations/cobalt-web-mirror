@@ -16,6 +16,11 @@ export interface ProviderAvailability {
 	description: string;
 }
 
+export interface ProviderVisitType {
+	visitTypeId: string;
+	description: string;
+}
+
 export interface LogicalAvailability {
 	logicalAvailabilityId: string;
 	providerId: string;

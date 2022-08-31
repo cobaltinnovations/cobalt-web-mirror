@@ -71,14 +71,14 @@ const SignIn: FC = () => {
 									navigate('/sign-in/options');
 								}}
 							>
-								Sign in
+								Sign In
 							</Button>
 						</div>
 
 						{subdomainInstitution?.anonymousEnabled && (
 							<div className="text-center">
 								<Button variant="link" onClick={handleEnterAnonymouslyButtonClick}>
-									Browse all resources anonymously
+									Browse All Resources Anonymously
 								</Button>
 							</div>
 						)}

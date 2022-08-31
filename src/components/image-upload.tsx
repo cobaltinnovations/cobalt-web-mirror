@@ -73,7 +73,7 @@ const ImageUpload: FC<ImageUploadProps> = ({
 				</FileInputButton>
 				{imagePreview && (
 					<Button size="sm" variant="danger" className="ms-2" onClick={onRemove} disabled={disabled}>
-						remove image
+						Remove Image
 					</Button>
 				)}
 			</div>

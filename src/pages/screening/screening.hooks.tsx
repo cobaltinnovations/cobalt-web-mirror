@@ -78,12 +78,6 @@ export function useOrchestratedRequest<T>(
 	};
 }
 
-interface HistoryLocationState {
-	routedClinicIds?: string[];
-	routedProviderId?: string;
-	routedSupportRoleIds?: string[];
-}
-
 export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -97,35 +91,12 @@ export function useScreeningNavigation() {
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
-					const params = new URLSearchParams({});
-
-					const locationState = location.state as HistoryLocationState;
-					const clinicIds = locationState?.routedClinicIds ?? [];
-					const providerId = locationState?.routedProviderId;
-					const supportRoleIds = locationState?.routedSupportRoleIds ?? [];
-
-					if (Array.isArray(clinicIds)) {
-						for (const clinicId of clinicIds) {
-							params.append('clinicId', clinicId);
-						}
-					}
-
-					if (providerId) {
-						params.append('providerId', providerId);
-					}
-
-					if (Array.isArray(supportRoleIds)) {
-						for (const supportRoleId of supportRoleIds) {
-							params.append('supportRoleId', supportRoleId);
-						}
-					}
-
-					navigate(`/connect-with-support${params.toString() ? `?${params.toString()}` : ''}`, { state });
+					navigate(`/connect-with-support`, { state });
 					return;
 				}
 			}
 		},
-		[location.state, navigate, openInCrisisModal]
+		[navigate, openInCrisisModal]
 	);
 
 	const navigateToQuestion = useCallback(

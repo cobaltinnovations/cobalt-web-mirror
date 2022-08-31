@@ -65,7 +65,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 													setAdditionalEmails(additionalEmailsClone);
 												}}
 											>
-												Remove this email
+												Remove This Email
 											</Button>
 										</div>
 									)}
@@ -83,7 +83,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 								setAdditionalEmails(additionalEmailsClone);
 							}}
 						>
-							Add another email
+							Add Another Email
 						</Button>
 
 						<InputHelper
@@ -130,10 +130,10 @@ export const ProviderManagementCommunication = (): ReactElement => {
 									navigate(-1);
 								}}
 							>
-								back
+								Back
 							</Button>
 							<Button variant="primary" type="submit">
-								submit
+								Submit
 							</Button>
 						</div>
 					</Form>

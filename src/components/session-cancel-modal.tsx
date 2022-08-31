@@ -1,3 +1,4 @@
+import useTrackModalView from '@/hooks/use-track-modal-view';
 import React, { FC } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -15,6 +16,7 @@ interface SessionCancelModalProps extends ModalProps {
 }
 
 const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props }) => {
+	useTrackModalView('SessionCancelModal', props.show);
 	const classes = useSessionCancelModalStyles();
 
 	return (
@@ -31,10 +33,10 @@ const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props })
 			</Modal.Body>
 			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
-					no don't cancel
+					No Don't Cancel
 				</Button>
 				<Button variant="danger" size="sm" className="ms-3" onClick={onCancel}>
-					yes, cancel session
+					Yes, Cancel Session
 				</Button>
 			</Modal.Footer>
 		</Modal>
