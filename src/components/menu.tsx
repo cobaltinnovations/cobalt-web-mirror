@@ -308,7 +308,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 			{
 				label: 'On Your Time',
 				icon: <OnYourTimeIcon />,
-				to: () => '/connect-with-support',
+				to: () => '/on-your-time',
 			},
 			{
 				label: 'Group Sessions',
