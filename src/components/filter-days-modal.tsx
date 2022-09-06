@@ -72,7 +72,7 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 	return (
 		<Modal {...props} dialogClassName={classes.filterDaysModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>available days</Modal.Title>
+				<Modal.Title>Available Days</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="my-1 fw-bold">Date Range</p>

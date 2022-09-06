@@ -62,7 +62,7 @@ const FilterTimesModal: FC<FilterTimesModalProps> = ({ defaultStartTime, default
 	return (
 		<Modal {...props} dialogClassName={classes.filterTimesModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>available times</Modal.Title>
+				<Modal.Title>Available Times</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-2">

@@ -38,7 +38,7 @@ const FilterPaymentsModal: FC<FilterPaymentsModalProps> = ({ paymentTypes, ...pr
 	return (
 		<Modal {...props} dialogClassName={classes.filterPaymentsModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>payment type</Modal.Title>
+				<Modal.Title>Payment Type</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{paymentTypes.map((paymentType) => {

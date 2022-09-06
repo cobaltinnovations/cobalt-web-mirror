@@ -37,7 +37,7 @@ const FilterProviderTypesModal: FC<FilterProviderTypesModalProps> = ({ providerT
 	return (
 		<Modal {...props} dialogClassName={classes.filterProviderTypesModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>provider type</Modal.Title>
+				<Modal.Title>Provider Type</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Button
