@@ -80,7 +80,7 @@ const GroupSessionsByRequest: FC = () => {
 		actionId: GROUP_SESSION_STATUS_ID.ADDED | GROUP_SESSION_STATUS_ID.ARCHIVED | GROUP_SESSION_STATUS_ID.DELETED
 	) {
 		if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
-			if (!window.confirm('Are you sure you want to delete this studio session?')) {
+			if (!window.confirm('Are you sure you want to delete this group session?')) {
 				return;
 			}
 		}
@@ -118,14 +118,14 @@ const GroupSessionsByRequest: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">Studio Sessions - By Request</h2>
+				<h2 className="mb-0 text-center">Group Sessions - By Request</h2>
 			</HeroContainer>
 			<Container className="pt-6">
 				<Row className="mb-5">
 					<Col>
 						<div className="d-flex justify-content-between">
 							<Button size="sm" onClick={handleAddGroupSessionOptionButtonClick}>
-								+ Add Studio Session by Request
+								+ Add Group Session by Request
 							</Button>
 							<div className="d-flex align-items-center justify-content-center">
 								<FilterIcon className={classes.filterIcon} />
@@ -236,7 +236,7 @@ const GroupSessionsByRequest: FC = () => {
 									</div>
 								)}
 								{!statusFilterValue && (
-									<p className="text-center">There are no studio session requests yet.</p>
+									<p className="text-center">There are no group session requests yet.</p>
 								)}
 							</>
 						)}

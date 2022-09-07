@@ -296,11 +296,11 @@ const IntakeAssessment: FC = () => {
 						},
 						{
 							to: '/in-the-studio',
-							title: 'In the Studio',
+							title: 'Group Sessions',
 						},
 						{
 							to: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
-							title: 'Studio Session',
+							title: 'Group Session',
 						},
 						{
 							to: '/#',

@@ -208,7 +208,7 @@ const InTheStudioGroupSessionScheduled = () => {
 					},
 					{
 						to: '/in-the-studio',
-						title: 'In the studio',
+						title: 'Group Sessions',
 					},
 					{
 						to: `/group-session-scheduled/${session?.groupSessionId}`,

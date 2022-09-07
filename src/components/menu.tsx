@@ -228,13 +228,13 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Content Management',
 		items: () => [
 			{
-				label: 'On Your Time - My Content',
+				label: 'My Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminMyContent ? '/cms/on-your-time' : null,
 			},
 			{
-				label: 'On Your Time - Available Content',
+				label: 'Available Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminAvailableContent ? '/cms/available-content' : null,
@@ -306,7 +306,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 				to: ({ institution }) => (institution?.supportEnabled ? '/connect-with-support' : null),
 			},
 			{
-				label: 'On Your Time',
+				label: 'On Your Time Content',
 				icon: <OnYourTimeIcon />,
 				to: () => '/on-your-time',
 			},
