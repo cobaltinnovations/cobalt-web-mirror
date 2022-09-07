@@ -39,7 +39,7 @@ const FilterSpecialtyModal: FC<FilterSpecialtyModalProps> = ({ specialties, ...p
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>focus</Modal.Title>
+				<Modal.Title>Focus</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{specialties.map((specialty) => {

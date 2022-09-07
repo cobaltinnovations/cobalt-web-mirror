@@ -53,7 +53,7 @@ const FilterAvailabilityModal: FC<FilterAvailabilityModalProps> = ({
 	return (
 		<Modal {...props} dialogClassName={classes.filterAvailabilityModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>availability</Modal.Title>
+				<Modal.Title>Availability</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-4">

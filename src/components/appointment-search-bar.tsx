@@ -88,7 +88,7 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 					<div className="position-relative d-flex align-items-center">
 						<SearchIcon className={classes.searchIcon} />
 						<AsyncTypeahead
-							placeholder="Search for provider or entity"
+							placeholder="Search for Provider or Entity"
 							ref={typeAheadRef}
 							id="search-providers"
 							filterBy={[]}

@@ -65,7 +65,7 @@ const FilterFormat: FC<FilterFormatProps> = ({ formats, selectedFormatIds, onSav
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>format</Modal.Title>
+				<Modal.Title>Format</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="d-flex mb-3">

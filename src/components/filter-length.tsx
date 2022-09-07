@@ -46,7 +46,7 @@ const FilterLength: FC<FilterLengthProps> = ({ selectedLength, onSave, ...props 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>length</Modal.Title>
+				<Modal.Title>Length</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Form>
