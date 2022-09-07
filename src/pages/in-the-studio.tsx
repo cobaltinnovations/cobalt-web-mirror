@@ -114,7 +114,7 @@ const InTheStudio: FC = () => {
 			</ActionSheet>
 
 			<HeroContainer>
-				<h2 className="mb-0 text-center">In the Studio</h2>
+				<h2 className="mb-0 text-center">Group Sessions</h2>
 			</HeroContainer>
 
 			<Container className="pt-5">
@@ -122,7 +122,7 @@ const InTheStudio: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<InputHelper
 							type="search"
-							label="Find a Studio Session"
+							label="Find a Group Session"
 							className="mb-5"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

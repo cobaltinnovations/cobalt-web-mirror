@@ -20,7 +20,7 @@ const SessionRequestThankYou: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">Request Studio Session</h2>
+				<h2 className="mb-0 text-center">Request Group Session</h2>
 			</HeroContainer>
 			<Container className="pt-16">
 				<Row>

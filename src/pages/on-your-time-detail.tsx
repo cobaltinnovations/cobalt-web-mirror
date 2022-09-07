@@ -114,7 +114,7 @@ const OnYourTimeDetail: FC = () => {
 					},
 					{
 						to: '/on-your-time',
-						title: 'On Your Time',
+						title: 'On Your Time Content',
 					},
 					{
 						to: '/#',

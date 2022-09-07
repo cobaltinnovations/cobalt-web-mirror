@@ -107,14 +107,14 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 				showAlert({
 					variant: 'success',
-					text: 'Your studio session was updated!',
+					text: 'Your group session was updated!',
 				});
 			} else {
 				await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
 
 				showAlert({
 					variant: 'success',
-					text: 'Your studio session was added!',
+					text: 'Your group session was added!',
 				});
 			}
 
@@ -132,7 +132,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 		<AsyncPage fetchData={fetchData}>
 			<HeroContainer>
 				<h2 className="mb-0 text-center">
-					{initialValues?.title ? initialValues?.title : 'Create Studio Session'}
+					{initialValues?.title ? initialValues?.title : 'Create Group Session'}
 				</h2>
 			</HeroContainer>
 
@@ -141,11 +141,11 @@ const GroupSessionsByRequestCreate: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/group-sessions/by-request',
-							title: 'Studio Sessions by Request',
+							title: 'Group Sessions by Request',
 						},
 						{
 							to: '/group-sessions/by-request/create',
-							title: initialValues?.title ? initialValues.title : 'Create Studio Session',
+							title: initialValues?.title ? initialValues.title : 'Create Group Session',
 						},
 					]}
 				/>
@@ -154,7 +154,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 				<Row className="mb-5">
 					<Col lg={{ span: 8, offset: 2 }}>
 						<h1 className="mb-2 fs-h3">
-							{initialValues?.title ? initialValues.title : 'Create Studio Session by Request'}
+							{initialValues?.title ? initialValues.title : 'Create Group Session by Request'}
 						</h1>
 						<p className="mb-0 text-danger">Required*</p>
 					</Col>
@@ -434,8 +434,8 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<SessionFormSubmitBanner
 												title={
 													isEdit
-														? 'update studio session by request'
-														: 'add studio session by request'
+														? 'update group session by request'
+														: 'add group session by request'
 												}
 											/>
 										</Form>

@@ -261,7 +261,7 @@ const GroupSessionsCreate: FC = () => {
 
 		await groupSessionsService.updateGroupSessionStatusById(session.groupSessionId, 'CANCELED').fetch();
 
-		window.alert('Studio session has been canceled.');
+		window.alert('Group session has been canceled.');
 		setShowSessionCancelModal(false);
 		navigate('/group-sessions/scheduled');
 	}
@@ -316,7 +316,7 @@ const GroupSessionsCreate: FC = () => {
 				await groupSessionsService.createGroupSession(submissionValues).fetch();
 				showAlert({
 					variant: 'success',
-					text: 'Your studio session was added!',
+					text: 'Your group session was added!',
 				});
 			}
 
@@ -340,7 +340,7 @@ const GroupSessionsCreate: FC = () => {
 
 			<HeroContainer>
 				<h2 className="mb-0 text-center">
-					{initialValues?.title ? initialValues.title : 'Create Studio Session'}
+					{initialValues?.title ? initialValues.title : 'Create Group Session'}
 					{isCopy ? ' (copy)' : ''}
 				</h2>
 			</HeroContainer>
@@ -349,11 +349,11 @@ const GroupSessionsCreate: FC = () => {
 					breadcrumbs={[
 						{
 							to: '/group-sessions/scheduled',
-							title: 'Studio Sessions',
+							title: 'Group Sessions',
 						},
 						{
 							to: '/group-sessions/scheduled/create',
-							title: `${initialValues?.title || 'Create Studio Session'}${isCopy ? ' (Copy)' : ''}`,
+							title: `${initialValues?.title || 'Create Group Session'}${isCopy ? ' (Copy)' : ''}`,
 						},
 					]}
 				/>
@@ -365,7 +365,7 @@ const GroupSessionsCreate: FC = () => {
 						<div className="d-flex align-items-center">
 							<div>
 								<h1 className="mb-2 fs-h3">
-									{initialValues?.title || 'create studio session'}
+									{initialValues?.title || 'create group session'}
 									{isCopy ? ' (copy)' : ''}
 								</h1>
 								<p className="mb-0 text-danger">Required*</p>
@@ -1063,7 +1063,7 @@ const GroupSessionsCreate: FC = () => {
 
 											<SessionFormSubmitBanner
 												disabled={isViewMode}
-												title={isEdit ? 'update studio session' : 'add studio session'}
+												title={isEdit ? 'update group session' : 'add group session'}
 											>
 												{!isViewMode && isEdit && (
 													<p className="mb-0 mt-2">

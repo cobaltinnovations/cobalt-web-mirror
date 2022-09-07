@@ -141,7 +141,7 @@ const InTheStudioDetail: FC = () => {
 					},
 					{
 						to: '/in-the-studio',
-						title: 'In the Studio',
+						title: 'Group Sessions',
 					},
 					{
 						to: '/#',

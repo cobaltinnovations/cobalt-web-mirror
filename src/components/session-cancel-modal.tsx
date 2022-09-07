@@ -22,10 +22,10 @@ const SessionCancelModal: FC<SessionCancelModalProps> = ({ onCancel, ...props })
 	return (
 		<Modal {...props} dialogClassName={classes.sessionCancelModal} centered>
 			<Modal.Header closeButton bsPrefix="cobalt-modal__header--admin">
-				<Modal.Title bsPrefix="cobalt-modal__title--admin">cancel studio session</Modal.Title>
+				<Modal.Title bsPrefix="cobalt-modal__title--admin">cancel group session</Modal.Title>
 			</Modal.Header>
 			<Modal.Body bsPrefix="cobalt-modal__body--admin">
-				<h5 className="mb-5 text-center">Are you sure you want to cancel this studio session?</h5>
+				<h5 className="mb-5 text-center">Are you sure you want to cancel this group session?</h5>
 				<p className="text-center">
 					Sessions cannot be un-cancelled. Any attendees of this session will be sent an email notifying them
 					of the cancellation.

@@ -38,7 +38,7 @@ const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity
 		const recipients = attendees.map((attendee) => {
 			return encodeURIComponent(attendee.emailAddress);
 		});
-		const subject = 'Cobalt - Regarding your studio session';
+		const subject = 'Cobalt - Regarding your group session';
 
 		window.open(`mailto:?bcc=${recipients}&subject=${subject}`);
 	}

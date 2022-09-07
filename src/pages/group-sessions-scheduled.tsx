@@ -94,13 +94,13 @@ const GroupSessions: FC = () => {
 		actionId: GROUP_SESSION_STATUS_ID.ADDED | GROUP_SESSION_STATUS_ID.CANCELED | GROUP_SESSION_STATUS_ID.DELETED
 	) {
 		if (actionId === GROUP_SESSION_STATUS_ID.CANCELED) {
-			if (!window.confirm('Are you sure you want to cancel this studio session?')) {
+			if (!window.confirm('Are you sure you want to cancel this group session?')) {
 				return;
 			}
 		}
 
 		if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
-			if (!window.confirm('Are you sure you want to delete this studio session?')) {
+			if (!window.confirm('Are you sure you want to delete this group session?')) {
 				return;
 			}
 		}
@@ -138,14 +138,14 @@ const GroupSessions: FC = () => {
 	return (
 		<>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">Studio Sessions - Scheduled</h2>
+				<h2 className="mb-0 text-center">Group Sessions - Scheduled</h2>
 			</HeroContainer>
 			<Container className="pt-6">
 				<Row className="mb-5">
 					<Col>
 						<div className="d-flex justify-content-between">
 							<Button size="sm" onClick={handleAddGroupSessionButtonClick}>
-								+ Add Studio Session
+								+ Add Group Session
 							</Button>
 							<div className="d-flex align-items-center justify-content-center">
 								<FilterIcon className={classes.filterIcon} />
@@ -264,7 +264,7 @@ const GroupSessions: FC = () => {
 							<>
 								{statusFilterValue && (
 									<div className="text-center">
-										<p>No studio sessions found for filter.</p>
+										<p>No group sessions found for filter.</p>
 										<Button
 											size="sm"
 											onClick={() => {
@@ -277,7 +277,7 @@ const GroupSessions: FC = () => {
 									</div>
 								)}
 								{!statusFilterValue && (
-									<p className="text-center">There are no scheduled studio sessions yet.</p>
+									<p className="text-center">There are no scheduled group sessions yet.</p>
 								)}
 							</>
 						)}
