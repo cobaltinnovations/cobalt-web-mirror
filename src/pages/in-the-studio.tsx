@@ -192,7 +192,9 @@ const InTheStudio: FC = () => {
 							})
 						) : (
 							<p className="text-center mb-0">
-								{searchTerm ? 'There are no matching results.' : 'There are no classes available.'}
+								{searchTerm
+									? 'There are no matching results.'
+									: 'There are no group sessions available.'}
 							</p>
 						)}
 					</Row>
