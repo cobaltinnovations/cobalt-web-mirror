@@ -37,4 +37,4 @@ yarn-error.log*
 
 # Institution overrides
 /src/institution-overrides/*
-!/src/institution-overrides/.gitkeep
+!/src/institution-overrides/README.md
