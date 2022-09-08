@@ -57,6 +57,7 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
+import ProviderListHeader from '@/components/provider-list-header';
 
 const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
@@ -149,14 +150,6 @@ const ConnectWithSupport: FC = () => {
 	);
 
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
-	const recommendedTherapistPsychiatrist =
-		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Clinician) ||
-		findOptions?.recommendedSupportRoleIds.includes(SupportRoleId.Psychiatrist);
-	const providerTypeFilter = searchParams.getAll('supportRoleId');
-	const filterEapTherapistPsychiatrist =
-		providerTypeFilter.includes(SupportRoleId.CareManager) ||
-		providerTypeFilter.includes(SupportRoleId.Clinician) ||
-		providerTypeFilter.includes(SupportRoleId.Psychiatrist);
 
 	const activeFilters = useMemo(() => {
 		return getActiveFiltersState(findOptions);
@@ -646,51 +639,7 @@ const ConnectWithSupport: FC = () => {
 				</Container>
 			)}
 
-			{(skipAssessment || recommendedTherapistPsychiatrist || filterEapTherapistPsychiatrist) && (
-				<Container>
-					<Row>
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<AvailableProvider
-								className="my-5"
-								provider={{
-									fullyBooked: false,
-									providerId: 'xxxx-xxxx-xxxx-xxxx',
-									institutionId: 'xxxx-xxxx-xxxx-xxxx',
-									schedulingSystemId: '',
-									name: 'Cobalt Medicine’s TEAMs Clinic',
-									title: '',
-									entity: '',
-									clinic: '',
-									license: '',
-									specialty: '',
-									imageUrl:
-										'https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/providers/cobalt-medicine-teams-clinic.jpg',
-									isDefaultImageUrl: true,
-									timeZone: '',
-									locale: '',
-									tags: [],
-									times: [],
-									supportRoles: [],
-									appointmentTypeIds: [],
-									treatmentDescription: '* Available Mon-Fri, 8:30-2 & 2:30-5',
-									supportRolesDescription:
-										'Time Efficient, Accessible, and Multidisciplinary approach to therapy and/or medication',
-									paymentFundingDescriptions: ['Accepts Insurance'],
-									intakeAssessmentRequired: false,
-									skipIntakePrompt: true,
-								}}
-								onTimeSlotClick={() => {
-									return;
-								}}
-							>
-								<Button className="d-block" as="a" href="tel:+12155551212" variant="light" size="sm">
-									Call (215) 555-1212
-								</Button>
-							</AvailableProvider>
-						</Col>
-					</Row>
-				</Container>
-			)}
+			<ProviderListHeader {...{ skipAssessment, findOptions }} />
 
 			{isLoading ? (
 				<div className="position-relative mt-5 h-100" style={{ minHeight: 100 }}>
