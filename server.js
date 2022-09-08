@@ -21,7 +21,6 @@ function configureReactApp() {
 		'COBALT_WEB_DISABLE_SIGN_IN',
 		'COBALT_WEB_SHOW_DEBUG',
 		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
-		'COBALT_WEB_LOCALHOST_SUBDOMAIN',
 		'COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE',
 		'COBALT_WEB_DOWN_FOR_MAINTENANCE',
 	];
@@ -132,9 +131,20 @@ if (basicAuthEnabled) {
 /* Serve SPA */
 /* ----------------------------------------- */
 
+const subdomainMappingString = process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt';
+const subdomainBuildMap = subdomainMappingString.split(',').reduce((map, mappingStr) => {
+	const [subdomain, buildFolder] = mappingStr.split(':');
+
+	map.set(subdomain.toLowerCase(), buildFolder);
+
+	return map;
+}, new Map());
+
 function serveIndexFile(_req, res) {
-	if (_req.subdomains.length) {
-		const indexFile = path.join(BUILD_DIR, ..._req.subdomains, 'index.html');
+	const subdomainBuildFolder = subdomainBuildMap.get(_req.subdomains.join('.'));
+
+	if (subdomainBuildFolder) {
+		const indexFile = path.join(BUILD_DIR, subdomainBuildFolder, 'index.html');
 
 		// if a subdomain has configured custom build
 		if (fs.existsSync(indexFile)) {
@@ -144,7 +154,7 @@ function serveIndexFile(_req, res) {
 	}
 
 	// send default cobalt build
-	res.sendFile(path.join(BUILD_DIR, 'cobalt', 'index.html'));
+	res.sendFile(path.join(BUILD_DIR, subdomainBuildMap.get('*'), 'index.html'));
 }
 
 app.get('/', serveIndexFile);
