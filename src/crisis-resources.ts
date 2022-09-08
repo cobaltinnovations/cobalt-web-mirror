@@ -14,9 +14,4 @@ export const CRISIS_RESOURCES = [
 		description: '24/7 Crisis Text Line',
 		href: 'sms:741741',
 	},
-	{
-		title: 'Call 215-555-9999',
-		description: '24/7 Cobalt Crisis Response Center',
-		href: 'tel:2155559999',
-	},
 ];
