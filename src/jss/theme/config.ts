@@ -1,7 +1,6 @@
-/**
- * @type { import("../theme").CobaltFontFamily }
- */
-const headingFontFamily = {
+import { CobaltFontFamily, CobaltTheme } from './theme';
+
+const headingFontFamily: CobaltFontFamily = {
 	fontFamily: '"Clarika Pro Geometric", sans-serif',
 	weights: {
 		regular: 400,
@@ -9,10 +8,7 @@ const headingFontFamily = {
 	},
 };
 
-/**
- * @type { import("../theme").CobaltFontFamily }
- */
-const bodyFontFamily = {
+const bodyFontFamily: CobaltFontFamily = {
 	fontFamily: '"Clarika Pro Grotesque", sans-serif',
 	weights: {
 		regular: 400,
@@ -20,10 +16,7 @@ const bodyFontFamily = {
 	},
 };
 
-/**
- * @type { import("../theme").CobaltTheme }
- */
-const theme = {
+const theme: CobaltTheme = {
 	elevation: {
 		e200: '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 		e400: '0px 10px 18px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
@@ -215,4 +208,4 @@ const theme = {
 	},
 };
 
-module.exports = theme;
+export default theme;

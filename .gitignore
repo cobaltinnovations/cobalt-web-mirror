@@ -35,6 +35,6 @@ yarn-error.log*
 #Visual Studio Code
 .vscode
 
-# Theme configurations
-/src/jss/theme/config/*
-!/src/jss/theme/config/cobalt.js
+# Institution overrides
+/src/institution-overrides/*
+!/src/institution-overrides/.gitkeep

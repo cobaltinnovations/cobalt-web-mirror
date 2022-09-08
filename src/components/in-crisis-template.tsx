@@ -1,12 +1,12 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import { CRISIS_RESOURCES } from '@/crisis-resources';
 
 const useStyles = createUseThemedStyles(
 	(theme) => ({
@@ -36,42 +36,15 @@ const useStyles = createUseThemedStyles(
 
 export const InCrisisTemplate = () => {
 	const classes = useStyles();
-	const { subdomainInstitution } = useAccount();
-
-	const links = useRef([
-		{
-			title: 'Call 911',
-			description: '24/7 Emergency',
-			href: 'tel:911',
-		},
-		{
-			title: 'Call 988',
-			description: 'Suicide & Crisis Lifeline',
-			href: 'tel:988',
-		},
-		{
-			title: 'Text 741741',
-			description: '24/7 Crisis Text Line',
-			href: 'sms:741741',
-		},
-		...(subdomainInstitution?.institutionId === 'COBALT'
-			? [
-					{
-						title: 'Call 215-555-9999',
-						description: '24/7 Cobalt Crisis Response Center',
-						href: 'tel:2155559999',
-					},
-			  ]
-			: []),
-	]).current;
 
 	return (
 		<>
-			{links.map((link, index) => {
-				const isLast = links.length - 1 === index;
+			{CRISIS_RESOURCES.map((link, index) => {
+				const isLast = CRISIS_RESOURCES.length - 1 === index;
 
 				return (
 					<Button
+						key={index}
 						variant="light"
 						className={classNames(classes.linkButton, {
 							'mb-4': !isLast,

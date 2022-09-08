@@ -14,21 +14,6 @@ In the project directory, you can run:
 Installs dependencies from NPM.<br />
 You must do this before running any other scripts.
 
-#### Apple Silicon (arm64) Notes
-
-You might need to install Chromium in order to have `npm install` complete successfully.
-
-```shell
-brew install chromium --no-quarantine
-```
-
-Then, tell Puppeteer where Chromium lives:
-
-```shell
-export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-export PUPPETEER_EXECUTABLE_PATH=`which chromium`
-```
-
 ### `npm run dev`
 
 Runs the app in development mode.<br />
@@ -44,13 +29,6 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 Jest configuration can be found in the package.json.
 
-### `npm run test:static`
-
-Launches jest in static mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-Jest configuration can be found in the package.json.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br />
@@ -59,6 +37,10 @@ Correctly bundles React in production mode and optimizes the build for performan
 Build is minified and the filenames are hashed.
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+Build script and Webpack config are modified from the default `react-scripts` behavior to support overriding modules and therefore generating separate bundles per institution.
+
+Read more [here](src/institution-overrides/README.md)
 
 ### `npm run eject`
 
@@ -81,19 +63,19 @@ If you ever need to test your code against the server, create a production build
 
 ## Environment Variables
 
-| Name                                        | Description                                                   |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| WEBAPP_ENABLE_BASIC_AUTH                    | flag Basic Auth on NodeJS webapp server                       |
-| WEBAPP_BASIC_AUTH_USERNAME                  | Accepted Basic Auth username                                  |
-| WEBAPP_BASIC_AUTH_PASSWORD                  | Accepted Basic Auth password                                  |
-| WEBAPP_BASIC_AUTH_SECRET                    | Secret string to sign Basic Auth session cookies              |
-| COBALT_WEB_API_BASE_URL                     | API base url                                                  |
-| COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                   |
-| COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")              |
-| COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                   |
-| COBALT_WEB_LOCALHOST_SUBDOMAIN              | subdomain to use for localhost dev, DO NOT SET IN PROD        |
-| COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")   |
-| COBALT_WEB_DOWN_FOR_MAINTENANCE             | string to turn on/off DownForService page ("true" or "false") |
+| Name                                        | Description                                                                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| WEBAPP_ENABLE_BASIC_AUTH                    | flag Basic Auth on NodeJS webapp server                                                                                  |
+| WEBAPP_BASIC_AUTH_USERNAME                  | Accepted Basic Auth username                                                                                             |
+| WEBAPP_BASIC_AUTH_PASSWORD                  | Accepted Basic Auth password                                                                                             |
+| WEBAPP_BASIC_AUTH_SECRET                    | Secret string to sign Basic Auth session cookies                                                                         |
+| COBALT_WEB_API_BASE_URL                     | API base url                                                                                                             |
+| COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                                                                              |
+| COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")                                                                         |
+| COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                                                                              |
+| COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")                                                              |
+| COBALT_WEB_DOWN_FOR_MAINTENANCE             | string to turn on/off DownForService page ("true" or "false")                                                            |
+| TARGET_INSTITUTION                          | Control which `institution-overrides` to bundle when running local dev server. Optional. Defaults to `cobalt` if not set |
 
 Copy `.env.local.example` to `.env.local` at the root of the repo
 
