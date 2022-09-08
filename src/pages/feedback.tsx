@@ -4,13 +4,12 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { feedbackService } from '@/lib/services/feedback-service';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
+import FeedbackSupplement from '@/components/feedback-supplement';
 
 const Feedback: FC = () => {
 	const handleError = useHandleError();
 	const { openInCrisisModal } = useInCrisisModal();
-	const { subdomainInstitution } = useAccount();
 
 	const [feedbackEmailValue, setFeedbackEmailValue] = useState('');
 	const [feedbackTextareaValue, setFeedbackTextareaValue] = useState<string>('');
@@ -44,14 +43,7 @@ const Feedback: FC = () => {
 			<Container className="pt-4">
 				<Row className="mb-4">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{subdomainInstitution?.institutionId === 'COBALT' && (
-							<p className="mb-4">
-								<strong>
-									This form is not for clinical concerns. If you'd like mental health support, please{' '}
-									<a href="tel:215-555-1212">call 215-555-1212</a>.
-								</strong>
-							</p>
-						)}
+						<FeedbackSupplement />
 						<p className="mb-4">
 							If you are in immediate crisis,{' '}
 							<span
