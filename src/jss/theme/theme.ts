@@ -3,7 +3,7 @@ export type CobaltColor = keyof CobaltTheme['colors'];
 export type CobaltFontFamily = {
 	fontFamily: string;
 	weights: {
-		normal: number;
+		regular: number;
 		bold: number;
 	};
 };
@@ -14,8 +14,8 @@ type CobaltFontSizeConfig = {
 };
 
 type CobaltHeadingConfig = {
-	default: CobaltFontConfig;
-	mobile: CobaltFontConfig;
+	default: CobaltFontSizeConfig;
+	mobile: CobaltFontSizeConfig;
 };
 
 type CobaltFontConfig = {

@@ -9,8 +9,10 @@ const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
-const THEME_CONFIG_DIR = path.join(__dirname, 'src', 'jss', 'theme', 'config');
-const INDEX_FILE_PATH = path.join(BUILD_DIR, 'index.html');
+const INSTITUTION_BUILDS = fs
+	.readdirSync(BUILD_DIR, { withFileTypes: true })
+	.filter((file) => file.isDirectory())
+	.map((dir) => dir.name);
 
 function configureReactApp() {
 	const fe_envVars = [
@@ -19,7 +21,6 @@ function configureReactApp() {
 		'COBALT_WEB_DISABLE_SIGN_IN',
 		'COBALT_WEB_SHOW_DEBUG',
 		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
-		'COBALT_WEB_LOCALHOST_SUBDOMAIN',
 		'COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE',
 		'COBALT_WEB_DOWN_FOR_MAINTENANCE',
 	];
@@ -31,42 +32,22 @@ function configureReactApp() {
 			return env;
 		}, {});
 
-	const indexFile = fs.readFileSync(INDEX_FILE_PATH, 'utf8');
-	const $ = cheerio.load(indexFile);
-	const appConfigScript = $('script#react-app-env-config');
+	for (const institutionBuild of INSTITUTION_BUILDS) {
+		const INDEX_FILE_PATH = path.join(BUILD_DIR, institutionBuild, 'index.html');
+		const indexFile = fs.readFileSync(INDEX_FILE_PATH, 'utf8');
+		const $ = cheerio.load(indexFile);
+		const appConfigScript = $('script#react-app-env-config');
 
-	// clear config from previous start, if any
-	if (appConfigScript.length > 0) {
-		appConfigScript.remove();
-	}
-
-	$('head').append(
-		`<script id="react-app-env-config" type="application/json">${JSON.stringify(reactAppConfig)}</script>`
-	);
-
-	const themes = fs.readdirSync(THEME_CONFIG_DIR);
-	for (let themeName of themes) {
-		themeName = themeName.replace('.js', '');
-
-		const themeConfigScript = $('script#react-app-theme-config');
-		// clear theme config, if any
-		if (themeConfigScript.length > 0) {
-			themeConfigScript.remove();
+		// clear config from previous start, if any
+		if (appConfigScript.length > 0) {
+			appConfigScript.remove();
 		}
-
-		const themeConfig = require(path.join(THEME_CONFIG_DIR, themeName));
 
 		$('head').append(
-			`<script id="react-app-theme-config" type="application/json">${JSON.stringify(themeConfig)}</script>`
+			`<script id="react-app-env-config" type="application/json">${JSON.stringify(reactAppConfig)}</script>`
 		);
 
-		// write the default/main theme to index.html
-		if (themeName === 'cobalt') {
-			fs.writeFileSync(INDEX_FILE_PATH, $.html());
-		} else {
-			// else write configured index.html as hidden dotfiles per theme
-			fs.writeFileSync(path.join(BUILD_DIR, `.${themeName}.index.html`), $.html());
-		}
+		fs.writeFileSync(INDEX_FILE_PATH, $.html());
 	}
 }
 
@@ -150,21 +131,33 @@ if (basicAuthEnabled) {
 /* Serve SPA */
 /* ----------------------------------------- */
 
-function serveThemedIndexFile(_req, res) {
-	if (_req.subdomains.length) {
-		const indexFilePath = path.join(BUILD_DIR, `.${_req.subdomains.join('.')}.index.html`);
+const subdomainMappingString = process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt';
+const subdomainBuildMap = subdomainMappingString.split(',').reduce((map, mappingStr) => {
+	const [subdomain, buildFolder] = mappingStr.split(':');
 
-		// if a subdomain has configured custom theme
-		if (fs.existsSync(indexFilePath)) {
+	map.set(subdomain.toLowerCase(), buildFolder);
+
+	return map;
+}, new Map());
+
+function serveIndexFile(_req, res) {
+	const subdomainBuildFolder = subdomainBuildMap.get(_req.subdomains.join('.'));
+
+	if (subdomainBuildFolder) {
+		const indexFile = path.join(BUILD_DIR, subdomainBuildFolder, 'index.html');
+
+		// if a subdomain has configured custom build
+		if (fs.existsSync(indexFile)) {
 			// send its index.html
-			return res.sendFile(indexFilePath, { dotfiles: 'allow' });
+			return res.sendFile(indexFile);
 		}
 	}
 
-	res.sendFile(INDEX_FILE_PATH);
+	// send default cobalt build
+	res.sendFile(path.join(BUILD_DIR, subdomainBuildMap.get('*'), 'index.html'));
 }
 
-app.get('/', serveThemedIndexFile);
+app.get('/', serveIndexFile);
 
 app.use(express.static(BUILD_DIR));
 
@@ -172,7 +165,7 @@ app.get('/news/:pdfName', (_req, res) => {
 	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
 });
 
-app.get('*', serveThemedIndexFile);
+app.get('*', serveIndexFile);
 
 app.listen(port, () => {
 	console.log(`> App Ready on http://localhost:${port}.`);
