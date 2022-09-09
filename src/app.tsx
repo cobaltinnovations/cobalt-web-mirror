@@ -72,9 +72,13 @@ const AppWithProviders: FC = () => {
 										  })
 										: true;
 
-								if (!isEnabled) {
-									return null;
-								}
+								const renderMainRouteComponent = () => {
+									if (!isEnabled) {
+										return null;
+									}
+
+									return <route.main />;
+								};
 
 								return (
 									<Route
@@ -83,11 +87,9 @@ const AppWithProviders: FC = () => {
 										element={
 											<Suspense fallback={<Loader />}>
 												{route.private ? (
-													<PrivateRoute>
-														<route.main />
-													</PrivateRoute>
+													<PrivateRoute>{renderMainRouteComponent()}</PrivateRoute>
 												) : (
-													<route.main />
+													renderMainRouteComponent()
 												)}
 											</Suspense>
 										}
