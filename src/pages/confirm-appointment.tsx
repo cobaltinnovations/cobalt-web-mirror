@@ -85,6 +85,22 @@ const ConfirmAppointment = () => {
 		try {
 			setSubmitting(true);
 
+			// Should we still update account before appointment creation?
+
+			// const accountResponse = await accountService
+			// 	.updateEmailAddressForAccountId(account.accountId, {
+			// 		emailAddress: emailInputValue,
+			// 	})
+			// 	.fetch();
+
+			// const accountResponse = await accountService
+			// 	.updatePhoneNumberForAccountId(account.accountId, {
+			// 		phoneNumber: phoneNumberInputValue,
+			// 	})
+			// 	.fetch();
+
+			// setAccount(accountResponse.account);
+
 			const response = await appointmentService
 				.createAppointment({
 					providerId,
