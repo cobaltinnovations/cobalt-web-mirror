@@ -36,6 +36,7 @@ const IntakeAssessment: FC = () => {
 		selectedProvider,
 		selectedTimeSlot,
 		formattedAvailabilityDate,
+		promptForPhoneNumber,
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
@@ -127,7 +128,7 @@ const IntakeAssessment: FC = () => {
 							});
 						} else {
 							const params = new URLSearchParams();
-							params.set('promptForPhoneNumber', 'true');
+							params.set('promptForPhoneNumber', String(promptForPhoneNumber));
 							params.set('providerId', selectedProvider?.providerId ?? '');
 							params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
 							params.set('date', formattedAvailabilityDate);
