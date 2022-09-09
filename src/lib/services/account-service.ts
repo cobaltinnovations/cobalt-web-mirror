@@ -231,4 +231,21 @@ export const accountService = {
 			url: `/accounts/${accountId}/federated-logout-url`,
 		});
 	},
+	postEmailVerificationCode(
+		accountId: string,
+		data: { emailAddress: string; accountEmailVerificationFlowTypeId: string }
+	) {
+		return httpSingleton.orchestrateRequest<{ verified: boolean }>({
+			method: 'POST',
+			url: `/accounts/${accountId}/email-verification-code`,
+			data,
+		});
+	},
+	postApplyEmailVerificationCode(accountId: string, data: { code: string }) {
+		return httpSingleton.orchestrateRequest<{ verified: boolean }>({
+			method: 'POST',
+			url: `/accounts/${accountId}/apply-email-verification-code`,
+			data,
+		});
+	},
 };

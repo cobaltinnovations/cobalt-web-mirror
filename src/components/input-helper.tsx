@@ -163,6 +163,7 @@ const InputHelper: FC<InputHelperProps> = ({
 					onFocus={handleFocus}
 					onBlur={handleBlur}
 					autoFocus={autoFocus}
+					required={required}
 				>
 					{children}
 				</FormControlComponent>

@@ -144,10 +144,16 @@ const IntakeAssessment: FC = () => {
 							navigate('/ehr-lookup', {
 								state: location.state,
 							});
-						} else if (promptForEmail || promptForPhoneNumber) {
-							setShowCollectInfoModal(true);
 						} else {
-							setShowConfirmationModal(true);
+							const params = new URLSearchParams();
+							params.set('promptForPhoneNumber', 'true');
+							params.set('providerId', selectedProvider?.providerId ?? '');
+							params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
+							params.set('date', formattedAvailabilityDate);
+							params.set('time', selectedTimeSlot?.time ?? '');
+							params.set('intakeAssessmentId', assessment?.assessmentId);
+
+							navigate(`/confirm-appointment?${params.toString()}`);
 						}
 					} else {
 						setIsEligible(false);
@@ -177,7 +183,7 @@ const IntakeAssessment: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<CollectContactInfoModal
+			{/* <CollectContactInfoModal
 				promptForEmail={promptForEmail}
 				promptForPhoneNumber={promptForPhoneNumber}
 				show={showCollectInfoModal}
@@ -285,7 +291,7 @@ const IntakeAssessment: FC = () => {
 						setIsBooking(false);
 					}}
 				/>
-			)}
+			)} */}
 
 			{isGroupSessionAssessment && (
 				<Breadcrumb
