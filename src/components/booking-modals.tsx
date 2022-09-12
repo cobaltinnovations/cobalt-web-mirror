@@ -113,20 +113,38 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const continueBookingProcess = useCallback(
-		({ provider, requireAssessment = false, promptForInfo = false }: ContinueBookingOptions) => {
+		({ provider, requireAssessment = false }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
 				navigateToIntakeAssessment(provider);
 			} else if (provider?.intakeAssessmentRequired || requireAssessment) {
 				setShowConfirmIntakeAssessmentModal(true);
-			} else if (promptForInfo || promptForEmail || promptForPhoneNumber) {
-				setShowCollectInfoModal(true);
 			} else {
 				setShowConfirmationModal(true);
+
+				const params = new URLSearchParams();
+				params.set('promptForPhoneNumber', String(promptForPhoneNumber));
+				params.set('providerId', selectedProvider?.providerId ?? '');
+				params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
+				params.set('date', formattedAvailabilityDate);
+				params.set('time', selectedTimeSlot?.time ?? '');
+				params.set('intakeAssessmentId', ''); // WHAT DO I PUT HERE?
+
+				navigate(`/confirm-appointment?${params.toString()}`);
 			}
 		},
-		[account?.epicPatientId, navigateToEhrLookup, navigateToIntakeAssessment, promptForEmail, promptForPhoneNumber]
+		[
+			account?.epicPatientId,
+			formattedAvailabilityDate,
+			navigate,
+			navigateToEhrLookup,
+			navigateToIntakeAssessment,
+			promptForPhoneNumber,
+			selectedAppointmentTypeId,
+			selectedProvider?.providerId,
+			selectedTimeSlot?.time,
+		]
 	);
 
 	const kickoffBookingProcess = useCallback(
