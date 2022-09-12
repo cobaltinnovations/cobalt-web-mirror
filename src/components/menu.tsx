@@ -534,7 +534,6 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 						<Link to="/feedback" onClick={onHide}>
 							Submit Feedback
 						</Link>
-						<small>&copy; {new Date().getFullYear()} Cobalt</small>
 					</div>
 
 					<HipaaLogo className={classes.hipaaLogo} />
