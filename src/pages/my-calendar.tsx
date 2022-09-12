@@ -139,9 +139,9 @@ const MyCalendar: FC = () => {
 			/>
 
 			<HeroContainer>
-				<h2 className="mb-2 text-center">My Calendar</h2>
+				<h2 className="mb-2 text-center">My Events</h2>
 				<p className="text-center mb-0">
-					Your booked sessions, reserved studio seats, and more will be available here.
+					Your booked appointments, group session seats, and more will be available here.
 				</p>
 			</HeroContainer>
 
@@ -163,7 +163,7 @@ const MyCalendar: FC = () => {
 					<Container className="pt-5 pb-5">
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								<p className="text-center mb-0">There are no scheduled appointents.</p>
+								<p className="text-center mb-0">There are no scheduled events on your calendar.</p>
 							</Col>
 						</Row>
 					</Container>
