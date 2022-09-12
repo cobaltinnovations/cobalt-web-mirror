@@ -121,8 +121,6 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 			} else if (provider?.intakeAssessmentRequired || requireAssessment) {
 				setShowConfirmIntakeAssessmentModal(true);
 			} else {
-				setShowConfirmationModal(true);
-
 				const params = new URLSearchParams();
 				params.set('promptForPhoneNumber', String(promptForPhoneNumber));
 				params.set('providerId', selectedProvider?.providerId ?? '');
