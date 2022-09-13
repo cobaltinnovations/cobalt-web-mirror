@@ -102,7 +102,8 @@ const ConnectWithSupport: FC = () => {
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
-	const [didInit, setDidInit] = useState(false);
+	const [didCheckSessions, setDidCheckSessions] = useState(false);
+	const [didInitSearch, setDidInitSearch] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
@@ -182,19 +183,53 @@ const ConnectWithSupport: FC = () => {
 			subdomainInstitution?.providerTriageScreeningFlowId &&
 			!isImmediate &&
 			!skipAssessment &&
-			didInit &&
+			didCheckSessions &&
 			!hasCompletedScreening
 		) {
 			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
 				replace: true,
 			});
 		}
-	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.providerTriageScreeningFlowId]);
+	}, [
+		didCheckSessions,
+		hasCompletedScreening,
+		navigate,
+		skipAssessment,
+		subdomainInstitution?.providerTriageScreeningFlowId,
+	]);
+
+	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId;
+	useEffect(() => {
+		if (!providerTriageScreeningFlowId) {
+			return;
+		}
+
+		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
+			screeningFlowId: providerTriageScreeningFlowId,
+		});
+
+		fetchScreeningsRequest
+			.fetch()
+			.then((screenings) => {
+				setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
+			})
+			.catch((e) => {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					handleError(e);
+				}
+			})
+			.finally(() => {
+				setDidCheckSessions(true);
+			});
+
+		return () => {
+			fetchScreeningsRequest.abort();
+		};
+	}, [handleError, providerTriageScreeningFlowId]);
 
 	const institutionId = account?.institutionId ?? '';
-	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
 	useEffect(() => {
-		if (didInit || !institutionId || !providerTriageScreeningFlowId) {
+		if (didInitSearch || !didCheckSessions || !institutionId) {
 			return;
 		}
 
@@ -203,16 +238,12 @@ const ConnectWithSupport: FC = () => {
 			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
-		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
-			screeningFlowId: providerTriageScreeningFlowId,
-		});
 
 		async function init() {
 			try {
-				const [findOptions, recent, screenings] = await Promise.all([
+				const [findOptions, recent] = await Promise.all([
 					findOptionsRequest.fetch(),
 					fetchRecentRequest.fetch(),
-					fetchScreeningsRequest.fetch(),
 				]);
 
 				unstable_batchedUpdates(() => {
@@ -220,8 +251,7 @@ const ConnectWithSupport: FC = () => {
 					setFindOptions(findOptions);
 					setRecommendationHtml(findOptions.recommendationHtml);
 					setAssessmentScore(findOptions.scores);
-					setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
-					setDidInit(true);
+					setDidInitSearch(true);
 				});
 			} catch (e) {
 				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -235,12 +265,11 @@ const ConnectWithSupport: FC = () => {
 		return () => {
 			findOptionsRequest.abort();
 			fetchRecentRequest.abort();
-			fetchScreeningsRequest.abort();
 		};
-	}, [didInit, handleError, institutionId, providerTriageScreeningFlowId, searchParams]);
+	}, [didCheckSessions, didInitSearch, handleError, institutionId, providerTriageScreeningFlowId, searchParams]);
 
 	useEffect(() => {
-		if (!didInit) {
+		if (!didInitSearch) {
 			return;
 		}
 
@@ -304,7 +333,7 @@ const ConnectWithSupport: FC = () => {
 			findRequest.abort();
 		};
 	}, [
-		didInit,
+		didInitSearch,
 		findOptions?.defaultAvailability,
 		findOptions?.defaultEndDate,
 		findOptions?.defaultEndTime,
@@ -358,7 +387,7 @@ const ConnectWithSupport: FC = () => {
 		Cookies.set('paymentDisclaimerSeen', 'true');
 	}, []);
 
-	if (!didInit) {
+	if (!didInitSearch) {
 		return <Loader />;
 	}
 
