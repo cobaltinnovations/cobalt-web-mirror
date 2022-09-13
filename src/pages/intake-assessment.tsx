@@ -7,13 +7,11 @@ import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';
 
-import { assessmentService, accountService, CreateAppointmentData, appointmentService } from '@/lib/services';
+import { assessmentService } from '@/lib/services';
 import { Assessment, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 import ProgressBar from '@/components/progress-bar';
 import Breadcrumb from '@/components/breadcrumb';
 import { BookingContext } from '@/contexts/booking-context';
-import CollectContactInfoModal from '@/components/collect-contact-info-modal';
-import ConfirmProviderBookingModal from '@/components/confirm-provider-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
 
@@ -26,35 +24,19 @@ const IntakeAssessment: FC = () => {
 	const groupSessionId = searchParams.get('groupSessionId') || '';
 	const questionId = searchParams.get('questionId') || '';
 	const sessionId = searchParams.get('sessionId') || '';
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 
-	const [isSavingInfo, setIsSavingInfo] = useState(false);
-	const [isBooking, setIsBooking] = useState(false);
 	const [assessment, setAssessment] = useState<Assessment>();
 	const [selectedQuestionAnswers, setSelectedQuestionAnswers] = useState<SelectedQuestionAnswer[]>([]);
-
-	const [collectedPhoneNumebr, setCollectedPhoneNumber] = useState(account?.phoneNumber ?? '');
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
-	const [showCollectInfoModal, setShowCollectInfoModal] = useState(false);
-	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
 	const [isGroupSessionAssessment, setIsGroupSessionAssessment] = useState(false);
 
 	const {
 		selectedAppointmentTypeId,
-		setSelectedDate,
 		selectedProvider,
-		setSelectedProvider,
 		selectedTimeSlot,
-		setSelectedTimeSlot,
-		timeSlotEndTime,
 		formattedAvailabilityDate,
-		formattedModalDate,
-
-		promptForEmail,
 		promptForPhoneNumber,
-		setPromptForPhoneNumber,
-
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
@@ -144,10 +126,16 @@ const IntakeAssessment: FC = () => {
 							navigate('/ehr-lookup', {
 								state: location.state,
 							});
-						} else if (promptForEmail || promptForPhoneNumber) {
-							setShowCollectInfoModal(true);
 						} else {
-							setShowConfirmationModal(true);
+							const params = new URLSearchParams();
+							params.set('promptForPhoneNumber', String(promptForPhoneNumber));
+							params.set('providerId', selectedProvider?.providerId ?? '');
+							params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
+							params.set('date', formattedAvailabilityDate);
+							params.set('time', selectedTimeSlot?.time ?? '');
+							params.set('intakeAssessmentId', assessment?.assessmentId);
+
+							navigate(`/confirm-appointment?${params.toString()}`);
 						}
 					} else {
 						setIsEligible(false);
@@ -177,116 +165,6 @@ const IntakeAssessment: FC = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<CollectContactInfoModal
-				promptForEmail={promptForEmail}
-				promptForPhoneNumber={promptForPhoneNumber}
-				show={showCollectInfoModal}
-				collectedEmail={collectedEmail}
-				collectedPhoneNumber={collectedPhoneNumebr}
-				onHide={() => {
-					setShowCollectInfoModal(false);
-				}}
-				onSubmit={async ({ email, phoneNumber }) => {
-					if (!account || isSavingInfo) {
-						return;
-					}
-
-					setIsSavingInfo(true);
-
-					try {
-						if (promptForEmail) {
-							const accountResponse = await accountService
-								.updateEmailAddressForAccountId(account.accountId, {
-									emailAddress: email,
-								})
-								.fetch();
-
-							setCollectedEmail(email);
-							setAccount(accountResponse.account);
-						}
-
-						if (promptForPhoneNumber) {
-							const accountResponse = await accountService
-								.updatePhoneNumberForAccountId(account.accountId, {
-									phoneNumber,
-								})
-								.fetch();
-
-							setCollectedPhoneNumber(phoneNumber);
-							setAccount(accountResponse.account);
-						}
-
-						setShowCollectInfoModal(false);
-						setShowConfirmationModal(true);
-					} catch (error) {
-						handleError(error);
-					}
-
-					setIsSavingInfo(false);
-				}}
-			/>
-
-			{providerId && selectedProvider && selectedTimeSlot && (
-				<ConfirmProviderBookingModal
-					show={showConfirmationModal}
-					formattedDate={formattedModalDate}
-					provider={selectedProvider}
-					selectedTimeSlot={selectedTimeSlot}
-					timeSlotEndTime={timeSlotEndTime}
-					onHide={() => {
-						setShowConfirmationModal(false);
-					}}
-					onConfirm={async () => {
-						if (isBooking) {
-							return;
-						}
-
-						try {
-							setIsBooking(true);
-							const appointmentData: CreateAppointmentData = {
-								providerId: selectedProvider.providerId,
-								appointmentTypeId: selectedAppointmentTypeId,
-								date: formattedAvailabilityDate,
-								time: selectedTimeSlot.time,
-								intakeAssessmentId: assessment?.assessmentId,
-							};
-
-							if (promptForEmail) {
-								appointmentData.emailAddress = collectedEmail;
-							}
-
-							if (promptForPhoneNumber) {
-								appointmentData.phoneNumber = collectedPhoneNumebr;
-							}
-
-							const response = await appointmentService.createAppointment(appointmentData).fetch();
-
-							setShowConfirmationModal(false);
-							setSelectedDate(undefined);
-							setSelectedProvider(undefined);
-							setSelectedTimeSlot(undefined);
-
-							navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-								state: {
-									successBooking: true,
-									emailAddress: response.account.emailAddress,
-								},
-							});
-						} catch (e) {
-							if ((e as any).metadata?.accountPhoneNumberRequired) {
-								setPromptForPhoneNumber(true);
-								setShowConfirmationModal(false);
-								setShowCollectInfoModal(true);
-							} else {
-								handleError(e);
-							}
-						}
-
-						setIsBooking(false);
-					}}
-				/>
-			)}
-
 			{isGroupSessionAssessment && (
 				<Breadcrumb
 					breadcrumbs={[

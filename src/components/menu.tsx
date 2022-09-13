@@ -342,7 +342,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const { account, setAccount } = useAccount();
 	const match = useMatch({ path: '/admin' });
-	console.log({ match });
+	// console.log({ match });
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 

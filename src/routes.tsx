@@ -69,6 +69,7 @@ export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/scr
 export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
+export const ConfirmAppointment = React.lazy(() => import('@/pages/confirm-appointment'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -290,6 +291,12 @@ export const AppRoutes = [
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
 				main: IntakeAssessment,
+			},
+			{
+				path: '/confirm-appointment',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: ConfirmAppointment,
 			},
 			{
 				path: '/one-on-one-resources',
