@@ -16,11 +16,12 @@ const useCollectPhoneModalStyles = createUseStyles({
 });
 
 interface CollectPhoneModalProps extends ModalProps {
+	skippable?: boolean;
 	onSkip(): void;
 	onSuccess(): void;
 }
 
-const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...props }) => {
+const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ skippable, onSkip, onSuccess, ...props }) => {
 	useTrackModalView('CollectPhoneModal', props.show);
 	const handleError = useHandleError();
 	const classes = useCollectPhoneModalStyles();
@@ -28,9 +29,15 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>('');
 
 	return (
-		<Modal {...props} dialogClassName={classes.collectPhoneNumberModal} centered onHide={() => onSkip()}>
-			<Modal.Header closeButton>
-				<Modal.Title>take our assessment</Modal.Title>
+		<Modal
+			{...props}
+			backdrop="static"
+			dialogClassName={classes.collectPhoneNumberModal}
+			centered
+			onHide={() => onSkip()}
+		>
+			<Modal.Header closeButton={skippable}>
+				<Modal.Title>Take Our Assessment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={async (e) => {
@@ -72,17 +79,20 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ onSkip, onSuccess, ...p
 				</Modal.Body>
 				<Modal.Footer>
 					<div className="text-center">
-						<Button
-							className="mb-2"
-							type="button"
-							variant="outline-primary"
-							size="sm"
-							onClick={() => {
-								onSkip();
-							}}
-						>
-							Skip for Now
-						</Button>
+						{skippable && (
+							<Button
+								className="mb-2"
+								type="button"
+								variant="outline-primary"
+								size="sm"
+								onClick={() => {
+									onSkip();
+								}}
+							>
+								Skip for Now
+							</Button>
+						)}
+
 						<div className="d-grid">
 							<Button type="submit" variant="primary" size="sm">
 								Continue Assessment

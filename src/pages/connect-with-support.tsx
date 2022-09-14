@@ -36,7 +36,7 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
-import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
+import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
 import { AssessmentScore, SupportRoleId } from '@/lib/models';
 
 import {
@@ -58,6 +58,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import ProviderListHeader from '@/components/provider-list-header';
+import { useScreeningFlow } from './screening/screening.hooks';
 
 const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
@@ -99,14 +100,16 @@ const ConnectWithSupport: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
+	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow(
+		subdomainInstitution?.providerTriageScreeningFlowId
+	);
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
-	const [didInit, setDidInit] = useState(false);
+	const [didInitSearch, setDidInitSearch] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
-	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const [recentProviders, setRecentProviders] = useState<ProviderSearchResult[]>([]);
 	const [searchResults, setSearchResults] = useState<ProviderSearchResult[]>([]);
@@ -175,26 +178,9 @@ const ConnectWithSupport: FC = () => {
 		[handleError]
 	);
 
-	useEffect(() => {
-		const isImmediate = Cookies.get('immediateAccess');
-
-		if (
-			subdomainInstitution?.providerTriageScreeningFlowId &&
-			!isImmediate &&
-			!skipAssessment &&
-			didInit &&
-			!hasCompletedScreening
-		) {
-			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
-				replace: true,
-			});
-		}
-	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.providerTriageScreeningFlowId]);
-
 	const institutionId = account?.institutionId ?? '';
-	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId ?? '';
 	useEffect(() => {
-		if (didInit || !institutionId || !providerTriageScreeningFlowId) {
+		if (didInitSearch || !didCheckScreeningSessions || !institutionId) {
 			return;
 		}
 
@@ -203,16 +189,12 @@ const ConnectWithSupport: FC = () => {
 			institutionId,
 		});
 		const fetchRecentRequest = providerService.fetchRecentProviders();
-		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
-			screeningFlowId: providerTriageScreeningFlowId,
-		});
 
 		async function init() {
 			try {
-				const [findOptions, recent, screenings] = await Promise.all([
+				const [findOptions, recent] = await Promise.all([
 					findOptionsRequest.fetch(),
 					fetchRecentRequest.fetch(),
-					fetchScreeningsRequest.fetch(),
 				]);
 
 				unstable_batchedUpdates(() => {
@@ -220,8 +202,7 @@ const ConnectWithSupport: FC = () => {
 					setFindOptions(findOptions);
 					setRecommendationHtml(findOptions.recommendationHtml);
 					setAssessmentScore(findOptions.scores);
-					setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
-					setDidInit(true);
+					setDidInitSearch(true);
 				});
 			} catch (e) {
 				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -235,12 +216,11 @@ const ConnectWithSupport: FC = () => {
 		return () => {
 			findOptionsRequest.abort();
 			fetchRecentRequest.abort();
-			fetchScreeningsRequest.abort();
 		};
-	}, [didInit, handleError, institutionId, providerTriageScreeningFlowId, searchParams]);
+	}, [didCheckScreeningSessions, didInitSearch, handleError, institutionId, searchParams]);
 
 	useEffect(() => {
-		if (!didInit) {
+		if (!didInitSearch) {
 			return;
 		}
 
@@ -304,7 +284,7 @@ const ConnectWithSupport: FC = () => {
 			findRequest.abort();
 		};
 	}, [
-		didInit,
+		didInitSearch,
 		findOptions?.defaultAvailability,
 		findOptions?.defaultEndDate,
 		findOptions?.defaultEndTime,
@@ -358,8 +338,13 @@ const ConnectWithSupport: FC = () => {
 		Cookies.set('paymentDisclaimerSeen', 'true');
 	}, []);
 
-	if (!didInit) {
-		return <Loader />;
+	if (!didInitSearch) {
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
 	}
 
 	return (

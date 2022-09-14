@@ -20,7 +20,7 @@ const IneligibleBookingModal: FC<IneligibleBookingModalProps> = (props) => {
 	return (
 		<Modal {...props} dialogClassName={classes.ineligibleBookingModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>let's find the right match</Modal.Title>
+				<Modal.Title>Let's Find the Right Match</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0">

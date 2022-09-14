@@ -35,7 +35,7 @@ const ConfirmProviderBookingModal: FC<ConfirmProviderBookingModalProps> = ({
 	return (
 		<Modal {...props} dialogClassName={classes.confirmProviderBookingModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>confirm your appointment</Modal.Title>
+				<Modal.Title>Confirm Your Appointment</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0 fw-normal">

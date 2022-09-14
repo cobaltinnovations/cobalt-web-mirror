@@ -33,7 +33,7 @@ const ErrorModal: FC = () => {
 		>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					{error?.code === 'VALIDATION_FAILED' ? 'oops!' : 'oh no! something went wrong'}
+					{error?.code === 'VALIDATION_FAILED' ? 'Oops!' : 'Oh no! Something went wrong'}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>

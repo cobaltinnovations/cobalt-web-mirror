@@ -18,12 +18,13 @@ const ScreeningQuestionsPage = () => {
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
 
 	const [requestInitializer, setRequestInitializer] = useState<string>();
-	const { response, initialFetch, refetch } = useOrchestratedRequest(
-		screeningService.getScreeningQuestionContext(screeningQuestionContextId),
-		{
-			initialize: requestInitializer || false,
-		}
-	);
+	const {
+		response: screeningQuestionContextResponse,
+		initialFetch,
+		refetch,
+	} = useOrchestratedRequest(screeningService.getScreeningQuestionContext(screeningQuestionContextId), {
+		initialize: requestInitializer || false,
+	});
 
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
@@ -73,23 +74,29 @@ const ScreeningQuestionsPage = () => {
 	}, [refetch, screeningQuestionContextId]);
 
 	useEffect(() => {
-		if (!response?.screeningAnswers || !response?.screeningAnswerOptions) {
+		if (
+			!screeningQuestionContextResponse?.screeningAnswers ||
+			!screeningQuestionContextResponse?.screeningAnswerOptions
+		) {
 			return;
 		}
 
-		setSelectedAnswers(response.screeningAnswers.map((answer) => answer.screeningAnswerOptionId));
+		setSelectedAnswers(
+			screeningQuestionContextResponse.screeningAnswers.map((answer) => answer.screeningAnswerOptionId)
+		);
 		setAnswerText(
-			response.screeningAnswerOptions.reduce((texts, option) => {
+			screeningQuestionContextResponse.screeningAnswerOptions.reduce((texts, option) => {
 				texts[option.screeningAnswerOptionId] =
-					response.screeningAnswers.find((o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId)
-						?.text ?? '';
+					screeningQuestionContextResponse.screeningAnswers.find(
+						(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
+					)?.text ?? '';
 				return texts;
 			}, {} as Record<string, string>)
 		);
-	}, [response?.screeningAnswerOptions, response?.screeningAnswers]);
+	}, [screeningQuestionContextResponse?.screeningAnswerOptions, screeningQuestionContextResponse?.screeningAnswers]);
 
 	const renderedAnswerOptions = useMemo(() => {
-		switch (response?.screeningQuestion.screeningAnswerFormatId) {
+		switch (screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId) {
 			case ScreeningAnswerFormatId.SINGLE_SELECT:
 				return (
 					<ToggleButtonGroup
@@ -104,7 +111,7 @@ const ScreeningQuestionsPage = () => {
 							submitAnswers(selection);
 						}}
 					>
-						{response.screeningAnswerOptions.map((option) => {
+						{screeningQuestionContextResponse.screeningAnswerOptions.map((option) => {
 							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
 
 							return (
@@ -135,7 +142,7 @@ const ScreeningQuestionsPage = () => {
 							setSelectedAnswers(newIds);
 						}}
 					>
-						{response.screeningAnswerOptions.map((option) => {
+						{screeningQuestionContextResponse.screeningAnswerOptions.map((option) => {
 							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
 
 							return (
@@ -159,7 +166,7 @@ const ScreeningQuestionsPage = () => {
 				);
 
 			case ScreeningAnswerFormatId.FREEFORM_TEXT:
-				return response.screeningAnswerOptions.map((option) => (
+				return screeningQuestionContextResponse.screeningAnswerOptions.map((option) => (
 					<InputHelper
 						key={option.screeningAnswerOptionId}
 						disabled={isSubmitting}
@@ -185,8 +192,8 @@ const ScreeningQuestionsPage = () => {
 	}, [
 		answerText,
 		isSubmitting,
-		response?.screeningAnswerOptions,
-		response?.screeningQuestion.screeningAnswerFormatId,
+		screeningQuestionContextResponse?.screeningAnswerOptions,
+		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 		submitAnswers,
 	]);
@@ -196,11 +203,11 @@ const ScreeningQuestionsPage = () => {
 			<Container className="py-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{!!response?.screeningQuestion.introText && (
-							<p className="mb-3">{response.screeningQuestion.introText}</p>
+						{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
+							<p className="mb-3">{screeningQuestionContextResponse.screeningQuestion.introText}</p>
 						)}
 
-						<h3 className="mb-5">{response?.screeningQuestion.questionText}</h3>
+						<h3 className="mb-5">{screeningQuestionContextResponse?.screeningQuestion.questionText}</h3>
 
 						<Form
 							onSubmit={(e) => {
@@ -211,12 +218,14 @@ const ScreeningQuestionsPage = () => {
 							{renderedAnswerOptions}
 
 							<div className="d-flex">
-								{response?.previousScreeningQuestionContextId && (
+								{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
 									<Button
 										disabled={isSubmitting}
 										type="button"
 										onClick={() => {
-											navigateToQuestion(response.previousScreeningQuestionContextId);
+											navigateToQuestion(
+												screeningQuestionContextResponse.previousScreeningQuestionContextId
+											);
 										}}
 									>
 										Previous
@@ -225,6 +234,36 @@ const ScreeningQuestionsPage = () => {
 
 								<Button disabled={isSubmitting} className="ms-auto" type="submit">
 									Next
+								</Button>
+							</div>
+
+							<div className="d-flex">
+								<Button
+									variant="link"
+									className="mx-auto"
+									type="button"
+									onClick={() => {
+										if (!screeningQuestionContextId) {
+											return;
+										}
+
+										screeningService
+											.skipScreeningQuestionContext(screeningQuestionContextId)
+											.fetch()
+											.then((response) => {
+												navigateToDestination(
+													response.screeningSession.screeningSessionDestination,
+													{ skipped: true }
+												);
+											})
+											.catch((e) => {
+												if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+													handleError(e);
+												}
+											});
+									}}
+								>
+									skip assessment
 								</Button>
 							</div>
 						</Form>
