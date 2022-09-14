@@ -4,6 +4,7 @@ export interface ScreeningSession {
 	targetAccountId: string;
 	createdByAccountId: string;
 	completed: boolean;
+	skipped: boolean;
 	crisisIndicated: boolean;
 	created: string;
 	createdDescription: string;

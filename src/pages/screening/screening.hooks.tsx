@@ -151,7 +151,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 	}, [screeningSessions]);
 
 	const hasCompletedScreening = useMemo(() => {
-		return screeningSessions.some((session) => session.completed);
+		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
 	useEffect(() => {
