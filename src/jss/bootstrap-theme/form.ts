@@ -128,11 +128,11 @@ export const form = (theme: CobaltTheme) => {
 						backgroundColor: `${theme.colors.n100} !important`,
 
 						'&:checked': {
-							backgroundImage: 'url(/static/images/icon-checkmark-dark.svg)',
+							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-dark.svg)`,
 						},
 
 						'&:indeterminate': {
-							backgroundImage: 'url(/static/images/icon-minus-dark.svg)',
+							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-minus-dark.svg)`,
 						},
 					},
 
@@ -147,11 +147,11 @@ export const form = (theme: CobaltTheme) => {
 					},
 
 					'&:checked': {
-						backgroundImage: 'url(/static/images/icon-checkmark-white.svg)',
+						backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-white.svg)`,
 					},
 
 					'&:indeterminate': {
-						backgroundImage: 'url(/static/images/icon-minus-white.svg)',
+						backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-minus-white.svg)`,
 					},
 
 					'&.is-invalid': {
@@ -303,7 +303,7 @@ export const surveyForm = (theme: CobaltTheme) => {
 							backgroundColor: theme.colors.n0,
 							backgroundSize: '12.5px 8.75px',
 							border: `2px solid ${theme.colors.n0}`,
-							backgroundImage: 'url(/static/images/icon-checkmark-orange.svg)',
+							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-orange.svg)`,
 						},
 					},
 				},

@@ -6,8 +6,14 @@ const aliasOptions = {};
 module.exports.webpack = function (config, env) {
 	config = aliasWebpack(aliasOptions)(config);
 
-	// Expose a dev flag for configuration of environment variables
-	config.plugins.push(new webpack.DefinePlugin({ __DEV__: env !== 'production' }));
+	config.plugins.push(
+		new webpack.DefinePlugin({
+			// Expose a dev flag for configuration of environment variables
+			__DEV__: env !== 'production',
+			// Expose public URL in TS for referencing static files correctly
+			__PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
+		})
+	);
 
 	const targetInstitution = process.env.TARGET_INSTITUTION || 'cobalt';
 

@@ -25,7 +25,7 @@ for (const institution of buildConfigs) {
 
 			// these two are CRA configurations:
 			// https://create-react-app.dev/docs/advanced-configuration/
-			`PUBLIC_URL=${institution}`, // referenced in public/index.html
+			`PUBLIC_URL=${institution}`, // referenced in public/index.html & config-overrides
 			`BUILD_PATH=build/${institution}`, // modifies build ouputs
 		];
 
