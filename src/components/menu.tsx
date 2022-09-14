@@ -117,6 +117,13 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 			color: theme.colors.n900,
 		},
 	},
+	supplementalMenuList: {
+		'& li a': {
+			...theme.fonts.default,
+			...theme.fonts.bodyNormal,
+			color: theme.colors.n500,
+		},
+	},
 	menuFooter: {
 		borderTop: `1px solid ${theme.colors.border}`,
 		width: '100%',
@@ -298,7 +305,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 		],
 	},
 	{
-		title: 'Resources',
+		title: 'Connect',
 		items: () => [
 			{
 				label: 'Connect with Support',
@@ -306,24 +313,24 @@ const MENU_SECTIONS: MenuNavSection[] = [
 				to: ({ institution }) => (institution?.supportEnabled ? '/connect-with-support' : null),
 			},
 			{
-				label: 'On Your Time Content',
-				icon: <OnYourTimeIcon />,
-				to: () => '/on-your-time',
-			},
-			{
 				label: 'Group Sessions',
 				icon: <GroupSessionsIcon />,
 				to: () => '/in-the-studio',
 			},
-		],
-	},
-	{
-		title: 'Resource Centers',
-		items: () => [
 			{
 				label: 'Crisis Resources',
 				icon: <PhoneIcon />,
 				to: () => '/in-crisis',
+			},
+		],
+	},
+	{
+		title: 'Explore',
+		items: () => [
+			{
+				label: 'On Your Time Content',
+				icon: <OnYourTimeIcon />,
+				to: () => '/on-your-time',
 			},
 			{
 				label: 'COVID-19',
@@ -502,7 +509,7 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 					<>
 						<hr className="mx-5 mb-4" />
 
-						<ul className={classNames(classes.menuList, classes.subMenuList, 'mb-4')}>
+						<ul className={classNames(classes.menuList, classes.supplementalMenuList, 'mb-4')}>
 							<li>
 								<Link to="/privacy" onClick={onHide}>
 									Privacy
@@ -528,7 +535,7 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 				)}
 			</div>
 
-			{!isSubNav && (
+			{/* {!isSubNav && (
 				<div className={classes.menuFooter}>
 					<div className="text-center">
 						<Link to="/feedback" onClick={onHide}>
@@ -538,7 +545,7 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 
 					<HipaaLogo className={classes.hipaaLogo} />
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 };

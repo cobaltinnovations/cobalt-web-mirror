@@ -241,7 +241,15 @@ export const accountService = {
 			data,
 		});
 	},
-	postApplyEmailVerificationCode(accountId: string, data: { code: string }) {
+	getCheckEmailVerification(accountId: string, searchParams?: { emailAddress?: string }) {
+		const params = new URLSearchParams(searchParams);
+
+		return httpSingleton.orchestrateRequest<{ verified: boolean }>({
+			method: 'GET',
+			url: `/accounts/${accountId}/check-email-verification?${params.toString()}`,
+		});
+	},
+	postApplyEmailVerificationCode(accountId: string, data: { emailAddress: string; code: string }) {
 		return httpSingleton.orchestrateRequest<{ verified: boolean }>({
 			method: 'POST',
 			url: `/accounts/${accountId}/apply-email-verification-code`,
