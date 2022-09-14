@@ -37,7 +37,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ skippable, onSkip, onSu
 			onHide={() => onSkip()}
 		>
 			<Modal.Header closeButton={skippable}>
-				<Modal.Title>take our assessment</Modal.Title>
+				<Modal.Title>Take Our Assessment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={async (e) => {

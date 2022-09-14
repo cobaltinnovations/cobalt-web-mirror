@@ -46,7 +46,7 @@ const CollectContactInfoModal: FC<CollectContactInfoModalProps> = ({
 	return (
 		<Modal {...props} dialogClassName={classes.collectContactInfoModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>confirm your appointment</Modal.Title>
+				<Modal.Title>Confirm Your Appointment</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {

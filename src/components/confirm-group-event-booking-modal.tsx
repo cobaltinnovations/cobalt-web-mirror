@@ -53,7 +53,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 	return (
 		<Modal {...modalProps} dialogClassName={classes.confirmGroupEventBookingModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>confirm reservation</Modal.Title>
+				<Modal.Title>Confirm Reservation</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{!!externalUrl ? (

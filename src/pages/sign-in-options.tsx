@@ -127,7 +127,7 @@ const SignInOptions = () => {
 				centered
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>Select account type</Modal.Title>
+					<Modal.Title>Select Account Type</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<InputHelper
@@ -185,7 +185,7 @@ const SignInOptions = () => {
 				centered
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>Password reset</Modal.Title>
+					<Modal.Title>Password Reset</Modal.Title>
 				</Modal.Header>
 				<Form onSubmit={handleForgotPasswordFormSubmit}>
 					<Modal.Body>

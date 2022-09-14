@@ -22,7 +22,7 @@ const ConfirmIntakeAssessmentModal: FC<ConfirmIntakeAssessmentModalProps> = ({ o
 	return (
 		<Modal {...props} dialogClassName={classes.confirmIntakeAssessmentModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>first, a few questions</Modal.Title>
+				<Modal.Title>First, a Few Questions...</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0">

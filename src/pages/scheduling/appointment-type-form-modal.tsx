@@ -216,7 +216,7 @@ export const AppointmentTypeFormModal = ({
 	return (
 		<Modal centered size="lg" onEnter={handleOnEnter} onExited={handleOnExited} {...modalProps}>
 			<Modal.Header closeButton>
-				<Modal.Title>{appointmentTypeId ? 'Edit appointment type' : 'New appointment type'}</Modal.Title>
+				<Modal.Title>{appointmentTypeId ? 'Edit Appointment Type' : 'New Appointment Type'}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<h3 className="mb-4">Setup</h3>
