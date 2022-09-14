@@ -14,7 +14,7 @@ import { screeningService } from '@/lib/services';
 import Cookies from 'js-cookie';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 export interface UseOrchestratedRequestHookOptions {
 	initialize: boolean | string;
@@ -96,14 +96,17 @@ export function useScreeningNavigation() {
 	const { openInCrisisModal } = useInCrisisModal();
 
 	const navigateToDestination = useCallback(
-		(destination?: ScreeningSessionDestination, state?: Record<string, any>) => {
+		(destination?: ScreeningSessionDestination, params?: Record<string, any>) => {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					openInCrisisModal(true);
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
-					navigate(`/connect-with-support`, { state });
+					navigate({
+						pathname: '/connect-with-support',
+						search: new URLSearchParams(params).toString(),
+					});
 					return;
 				}
 			}
@@ -137,7 +140,10 @@ export function useScreeningNavigation() {
 }
 
 export function useScreeningFlow(screeningFlowId?: string) {
-	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(!screeningFlowId);
+	const [searchParams] = useSearchParams();
+	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(
+		!screeningFlowId || searchParams.get('skipped') === 'true'
+	);
 	const [screeningSessions, setScreeningSessions] = useState<ScreeningSession[]>([]);
 	const [showPhoneModal, setShowPhoneModal] = useState(false);
 	const { trackEvent } = useAnalytics();
