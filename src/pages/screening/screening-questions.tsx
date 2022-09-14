@@ -252,7 +252,8 @@ const ScreeningQuestionsPage = () => {
 											.fetch()
 											.then((response) => {
 												navigateToDestination(
-													response.screeningSession.screeningSessionDestination
+													response.screeningSession.screeningSessionDestination,
+													{ skipped: true }
 												);
 											})
 											.catch((e) => {
