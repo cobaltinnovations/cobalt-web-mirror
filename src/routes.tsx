@@ -64,7 +64,6 @@ export const ForgotPassword = React.lazy(() => import('@/pages/forgot-password')
 export const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
 export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
 export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
-export const ScreeningFlows = React.lazy(() => import('@/pages/screening/screening-flows'));
 export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
 export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
@@ -326,11 +325,6 @@ export const AppRoutes = [
 				private: true,
 				routeGuard: isProviderRouteGuard,
 				main: MySchedule,
-			},
-			{
-				path: '/screening-flows/:screeningFlowId',
-				private: true,
-				main: ScreeningFlows,
 			},
 			{
 				path: '/screening-questions/:screeningQuestionContextId',

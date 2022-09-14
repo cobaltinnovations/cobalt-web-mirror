@@ -1,15 +1,15 @@
-import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
-import { contentService, assessmentService, ContentListFormat, screeningService } from '@/lib/services';
+import { contentService, assessmentService, ContentListFormat } from '@/lib/services';
 import { Content, PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
-
 import AsyncPage from '@/components/async-page';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import PersonalizeRecommendationsModal from '@/components/personalize-recommendations-modal';
 import DayContainer from '@/components/day-container';
+import Loader from '@/components/loader';
 import FilterPill from '@/components/filter-pill';
 import FilterFormat from '@/components/filter-format';
 import FilterLength from '@/components/filter-length';
@@ -19,10 +19,7 @@ import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import useAnalytics from '@/hooks/use-analytics';
 import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
-
-interface LocationState {
-	skipAssessment?: boolean;
-}
+import { useScreeningFlow } from './screening/screening.hooks';
 
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
@@ -33,9 +30,10 @@ const OnYourTime: FC = () => {
 	const selectedLength = searchParams.get('length') ?? '';
 	const searchTerm = searchParams.get('q') ?? '';
 	const { subdomainInstitution } = useAccount();
-	const [didInit, setDidInit] = useState(false);
-	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
-	const skipAssessment = !!(location.state as LocationState)?.skipAssessment;
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
+		subdomainInstitution?.contentScreeningFlowId
+	);
+
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
@@ -102,30 +100,17 @@ const OnYourTime: FC = () => {
 	}, [format, selectedLength]);
 
 	const fetchData = useCallback(async () => {
-		const requests = [fetchContent(), fetchFilters()];
-		if (subdomainInstitution?.contentScreeningFlowId) {
-			const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
-				screeningFlowId: subdomainInstitution.contentScreeningFlowId,
-			});
+		return Promise.all([fetchContent(), fetchFilters()]);
+	}, [fetchContent, fetchFilters]);
 
-			requests.push(
-				fetchScreeningsRequest.fetch().then((r) => {
-					setHasCompletedScreening(r.screeningSessions.some((session) => session.completed));
-					setDidInit(true);
-				})
-			);
-		}
-
-		await Promise.all(requests);
-	}, [fetchContent, fetchFilters, subdomainInstitution?.contentScreeningFlowId]);
-
-	useEffect(() => {
-		if (didInit && subdomainInstitution?.contentScreeningFlowId && !hasCompletedScreening && !skipAssessment) {
-			navigate(`/screening-flows/${subdomainInstitution.contentScreeningFlowId}`, {
-				replace: true,
-			});
-		}
-	}, [didInit, hasCompletedScreening, navigate, skipAssessment, subdomainInstitution?.contentScreeningFlowId]);
+	if (!didCheckScreeningSessions) {
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
+	}
 
 	return (
 		<AsyncPage fetchData={fetchData}>
@@ -260,9 +245,8 @@ const OnYourTime: FC = () => {
 								</Col>
 							) : (
 								filteredList.map((item) => (
-									<Col xs={6} md={4} lg={3}>
+									<Col key={item.contentId} xs={6} md={4} lg={3}>
 										<Link
-											key={item.contentId}
 											to={`/on-your-time/${item.contentId}`}
 											className="d-block mb-3 text-decoration-none"
 										>
@@ -294,9 +278,8 @@ const OnYourTime: FC = () => {
 					<Container>
 						<Row>
 							{additionalFilteredList.map((item) => (
-								<Col xs={6} md={4} lg={3}>
+								<Col key={item.contentId} xs={6} md={4} lg={3}>
 									<Link
-										key={item.contentId}
 										to={`/on-your-time/${item.contentId}`}
 										className="d-block mb-7 text-decoration-none"
 									>

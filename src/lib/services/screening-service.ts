@@ -1,6 +1,7 @@
 import {
 	ScreeningAnswer,
 	ScreeningAnswerOption,
+	ScreeningFlowVersion,
 	ScreeningQuestion,
 	ScreeningSession,
 	ScreeningSessionDestination,
@@ -8,13 +9,14 @@ import {
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 
-type ScreeningSessionParams = {
-	screeningFlowId: string;
+type ScreeningFlowParams = {
+	screeningFlowId?: string;
 	targetAccountId?: string | null;
+	screeningFlowVersionId?: string;
 };
 
 export const screeningService = {
-	getScreeningSessionsByFlowId(params: Partial<ScreeningSessionParams>) {
+	getScreeningSessionsByFlowId(params: ScreeningFlowParams) {
 		if (typeof params.targetAccountId !== 'string') {
 			delete params.targetAccountId;
 		}
@@ -25,7 +27,26 @@ export const screeningService = {
 		});
 	},
 
-	createScreeningSession(data: ScreeningSessionParams) {
+	getScreeningFlowVersionsByFlowId(params: ScreeningFlowParams) {
+		return httpSingleton.orchestrateRequest<{
+			activeScreeningFlowVersionId: string;
+			screeningFlowVersions: ScreeningFlowVersion[];
+		}>({
+			method: 'get',
+			url: buildQueryParamUrl('/screening-flow-versions', params),
+		});
+	},
+
+	skipScreeningFlowVersion(screeningFlowVersionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			screeningSession: ScreeningSession;
+		}>({
+			method: 'post',
+			url: `/screening-flow-versions/${screeningFlowVersionId}/skip`,
+		});
+	},
+
+	createScreeningSession(data: ScreeningFlowParams) {
 		return httpSingleton.orchestrateRequest<{ screeningSession: ScreeningSession }>({
 			method: 'post',
 			url: '/screening-sessions',
@@ -43,6 +64,15 @@ export const screeningService = {
 		}>({
 			method: 'get',
 			url: `/screening-question-contexts/${screeningQuestionContextId || ''}`,
+		});
+	},
+
+	skipScreeningQuestionContext(screeningQuestionContextId: string) {
+		return httpSingleton.orchestrateRequest<{
+			screeningSession: ScreeningSession;
+		}>({
+			method: 'post',
+			url: `/screening-question-contexts/${screeningQuestionContextId}/skip`,
 		});
 	},
 

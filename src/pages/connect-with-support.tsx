@@ -36,7 +36,7 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as ClearIcon } from '@/assets/icons/icon-search-close.svg';
 
-import { providerService, FindOptionsResponse, FindFilters, screeningService } from '@/lib/services';
+import { providerService, FindOptionsResponse, FindFilters } from '@/lib/services';
 import { AssessmentScore, SupportRoleId } from '@/lib/models';
 
 import {
@@ -58,6 +58,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import ProviderListHeader from '@/components/provider-list-header';
+import { useScreeningFlow } from './screening/screening.hooks';
 
 const useConnectWithSupportStyles = createUseThemedStyles((theme) => ({
 	searchIcon: {
@@ -99,15 +100,16 @@ const ConnectWithSupport: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
+	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow(
+		subdomainInstitution?.providerTriageScreeningFlowId
+	);
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
-	const [didCheckSessions, setDidCheckSessions] = useState(false);
 	const [didInitSearch, setDidInitSearch] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSearching, setIsSearching] = useState(false);
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
-	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const [recentProviders, setRecentProviders] = useState<ProviderSearchResult[]>([]);
 	const [searchResults, setSearchResults] = useState<ProviderSearchResult[]>([]);
@@ -176,60 +178,9 @@ const ConnectWithSupport: FC = () => {
 		[handleError]
 	);
 
-	useEffect(() => {
-		const isImmediate = Cookies.get('immediateAccess');
-
-		if (
-			subdomainInstitution?.providerTriageScreeningFlowId &&
-			!isImmediate &&
-			!skipAssessment &&
-			didCheckSessions &&
-			!hasCompletedScreening
-		) {
-			navigate(`/screening-flows/${subdomainInstitution.providerTriageScreeningFlowId}`, {
-				replace: true,
-			});
-		}
-	}, [
-		didCheckSessions,
-		hasCompletedScreening,
-		navigate,
-		skipAssessment,
-		subdomainInstitution?.providerTriageScreeningFlowId,
-	]);
-
-	const providerTriageScreeningFlowId = subdomainInstitution?.providerTriageScreeningFlowId;
-	useEffect(() => {
-		if (!providerTriageScreeningFlowId) {
-			return;
-		}
-
-		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
-			screeningFlowId: providerTriageScreeningFlowId,
-		});
-
-		fetchScreeningsRequest
-			.fetch()
-			.then((screenings) => {
-				setHasCompletedScreening(screenings.screeningSessions.some((session) => session.completed));
-			})
-			.catch((e) => {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
-			})
-			.finally(() => {
-				setDidCheckSessions(true);
-			});
-
-		return () => {
-			fetchScreeningsRequest.abort();
-		};
-	}, [handleError, providerTriageScreeningFlowId]);
-
 	const institutionId = account?.institutionId ?? '';
 	useEffect(() => {
-		if (didInitSearch || !didCheckSessions || !institutionId) {
+		if (didInitSearch || !didCheckScreeningSessions || !institutionId) {
 			return;
 		}
 
@@ -266,7 +217,7 @@ const ConnectWithSupport: FC = () => {
 			findOptionsRequest.abort();
 			fetchRecentRequest.abort();
 		};
-	}, [didCheckSessions, didInitSearch, handleError, institutionId, providerTriageScreeningFlowId, searchParams]);
+	}, [didCheckScreeningSessions, didInitSearch, handleError, institutionId, searchParams]);
 
 	useEffect(() => {
 		if (!didInitSearch) {
@@ -388,7 +339,12 @@ const ConnectWithSupport: FC = () => {
 	}, []);
 
 	if (!didInitSearch) {
-		return <Loader />;
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
 	}
 
 	return (

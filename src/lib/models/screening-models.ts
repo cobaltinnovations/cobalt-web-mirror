@@ -5,11 +5,19 @@ export interface ScreeningSession {
 	createdByAccountId: string;
 	completed: boolean;
 	crisisIndicated: boolean;
-	promptForPhoneNumber: boolean;
 	created: string;
 	createdDescription: string;
 	nextScreeningQuestionContextId?: string;
 	screeningSessionDestination?: ScreeningSessionDestination;
+}
+
+export interface ScreeningFlowVersion {
+	screeningFlowVersionId: string;
+	screeningFlowId: string;
+	initialScreeningId: string;
+	phoneNumberRequired: boolean;
+	skippable: boolean;
+	versionNumber: number;
 }
 
 export enum ScreeningSessionDestinationId {
