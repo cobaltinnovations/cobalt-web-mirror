@@ -36,5 +36,5 @@ yarn-error.log*
 .vscode
 
 # Institution overrides
-/src/institution-overrides/*
-!/src/institution-overrides/README.md
+/institution-overrides/*
+!/institution-overrides/README.md

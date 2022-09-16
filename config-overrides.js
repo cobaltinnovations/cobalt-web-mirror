@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const { aliasJest, aliasWebpack } = require('react-app-alias');
+const path = require('path');
 
 const aliasOptions = {};
 
@@ -16,6 +17,10 @@ module.exports.webpack = function (config, env) {
 	);
 
 	const targetInstitution = process.env.TARGET_INSTITUTION || 'cobalt';
+	const srcPath = path.join(__dirname, 'src');
+	const srcOverridesPath = path.join(__dirname, 'institution-overrides', targetInstitution, 'src');
+
+	config = extendModuleScopePlugin(config, srcOverridesPath);
 
 	const fileReplaceLoader = {
 		loader: 'file-replace-loader',
@@ -25,7 +30,7 @@ module.exports.webpack = function (config, env) {
 			replacement: (resourcePath) => {
 				// instruct loader to lookup files matching this replacement strategy
 				// if they exist- they're bundled instead of the original
-				return resourcePath.replace('/src/', `/src/institution-overrides/${targetInstitution}/`);
+				return resourcePath.replace(srcPath, srcOverridesPath);
 			},
 		},
 	};
@@ -43,6 +48,15 @@ module.exports.webpack = function (config, env) {
 };
 
 module.exports.jest = aliasJest(aliasOptions);
+
+// mutate webpack's ModuleScopePlugin config
+// to allow imports from resolved modules external to `src`
+function extendModuleScopePlugin(config, srcOverridesPath) {
+	config.resolve.plugins[0].appSrcs.push(srcOverridesPath);
+	config.resolve.plugins[0].allowedFiles.add(srcOverridesPath);
+
+	return config;
+}
 
 function extendSourceMapLoader(config, fileReplaceLoader) {
 	// this rule is configured for one loader
@@ -74,7 +88,16 @@ function extendInternalBabelLoader(config, fileReplaceLoader) {
 	// modify it to _use_ multiple so we can include file-replace-loader config
 	config.module.rules[1].oneOf[3] = {
 		test,
-		include,
+		// updated included paths
+		include: [
+			...include,
+			...include.map((includePath) => {
+				const tokenized = includePath.split('/');
+				// adding overrides folder _before_ src
+				tokenized.splice(tokenized.length - 1, 0, 'institution-overrides');
+				return tokenized.join('/');
+			}),
+		],
 		use: [babelInternalLoader, fileReplaceLoader],
 	};
 
