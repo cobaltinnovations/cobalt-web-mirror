@@ -233,7 +233,7 @@ export const accountService = {
 	},
 	postEmailVerificationCode(
 		accountId: string,
-		data: { emailAddress: string; accountEmailVerificationFlowTypeId: string }
+		data: { emailAddress: string; accountEmailVerificationFlowTypeId: string; forceVerification?: boolean }
 	) {
 		return httpSingleton.orchestrateRequest<{ verified: boolean }>({
 			method: 'POST',
