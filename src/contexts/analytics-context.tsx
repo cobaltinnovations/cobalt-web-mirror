@@ -1,12 +1,16 @@
-import { ProviderSearchEventActions } from './../lib/models/ga-events';
-import { ContentEventActions } from './../lib/models/ga-events';
-import { ScreeningEventActions } from './../lib/models/ga-events';
-import { AnalyticsEventCategory } from './../lib/models/ga-events';
 import useAccount from '@/hooks/use-account';
 import React, { FC, createContext, PropsWithChildren, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
 import config from '@/lib/config';
+
+import {
+	AnalyticsEventCategory,
+	ContentEventActions,
+	CrisisEventActions,
+	ProviderSearchEventActions,
+	ScreeningEventActions,
+} from '@/lib/models/ga-events';
 
 /**
  * Screening Analytics
@@ -72,7 +76,54 @@ export class ProviderSearchAnalyticsEvent {
 	constructor(public action: ProviderSearchEventActions, public label?: ProviderFilterPill) {}
 }
 
-export type AnalyticsEvent = ScreeningAnalyticsEvent | ContentAnalyticsEvent | ProviderSearchAnalyticsEvent;
+export class CrisisAnalyticsEvent {
+	static clickCrisisHeader() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisHeader);
+
+		return event;
+	}
+
+	static clickCrisisMenu() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisMenu);
+
+		return event;
+	}
+
+	static clickCrisisFeedback() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisFeedback);
+
+		return event;
+	}
+
+	static clickCrisisError() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisError);
+
+		return event;
+	}
+
+	static clickCrisisTelResource(label: string) {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisTelResource, label);
+
+		return event;
+	}
+
+	static presentScreeningCrisis() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.PresentScreeningCrisis);
+		event.nonInteractive = true;
+
+		return event;
+	}
+
+	nonInteractive = false;
+	category = AnalyticsEventCategory.Crisis;
+	constructor(public action: CrisisEventActions, public label?: string) {}
+}
+
+export type AnalyticsEvent =
+	| ScreeningAnalyticsEvent
+	| ContentAnalyticsEvent
+	| ProviderSearchAnalyticsEvent
+	| CrisisAnalyticsEvent;
 
 const AnalyticsContext = createContext<
 	| {
