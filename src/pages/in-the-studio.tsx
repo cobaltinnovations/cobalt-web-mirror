@@ -29,9 +29,13 @@ const InTheStudio: FC = () => {
 	);
 
 	useEffect(() => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		searchParams.set('class', debouncedSearchValue);
 		setSearchParams(searchParams, { replace: true });
-	}, [debouncedSearchValue, searchParams, setSearchParams]);
+	}, [debouncedSearchValue, didCheckScreeningSessions, searchParams, setSearchParams]);
 
 	const fetchData = useCallback(async () => {
 		function groupByUrlName(data: StudioEventViewModel[]): StudioEventViewModel[] {
