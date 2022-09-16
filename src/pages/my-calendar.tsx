@@ -150,11 +150,11 @@ const MyCalendar: FC = () => {
 					<HeroContainer className="bg-success">
 						{locationState?.emailAddress ? (
 							<h5 className="text-center text-light mb-0">
-								your session is reserved and we have sent a confirmation to{' '}
-								{locationState?.emailAddress}
+								Your session is reserved and we have sent a confirmation to{' '}
+								{locationState?.emailAddress}.
 							</h5>
 						) : (
-							<h5 className="text-center mb-0">your appointment was reserved</h5>
+							<h5 className="text-center mb-0">Your appointment was reserved.</h5>
 						)}
 					</HeroContainer>
 				) : null}

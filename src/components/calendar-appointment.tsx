@@ -155,7 +155,7 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					</div>
 					<div className={classes.optionsContainer}>
 						<Link to="#" onClick={onCancel}>
-							cancel reservation
+							Cancel Reservation
 						</Link>
 						<JoinButton
 							contactEmail={appointment.provider?.emailAddress}
