@@ -64,6 +64,7 @@ interface GetGroupSessionsQueryParameters {
 	groupSessionStatusId?: GROUP_SESSION_STATUS_ID;
 	orderBy?: GROUP_SESSION_SORT_ORDER;
 	urlName?: string;
+	searchQuery?: string;
 }
 
 interface GetGroupSessionsResponseBody {
@@ -118,6 +119,7 @@ interface GetGroupSessionRequestsQueryParameters {
 	viewType?: 'ADMINISTRATOR' | 'PATIENT';
 	groupSessionRequestStatusId?: GROUP_SESSION_STATUS_ID;
 	urlName?: string;
+	searchQuery?: string;
 }
 
 interface GetGroupSessionRequestByIdResponseBody {

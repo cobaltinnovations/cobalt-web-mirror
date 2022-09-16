@@ -62,14 +62,14 @@ const InTheStudio: FC = () => {
 						viewType: 'PATIENT',
 						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-						urlName: groupEventUrlName,
+						searchQuery: groupEventUrlName,
 					})
 					.fetch(),
 				groupSessionsService
 					.getGroupSessionRequests({
 						viewType: 'PATIENT',
 						groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-						urlName: groupEventUrlName,
+						searchQuery: groupEventUrlName,
 					})
 					.fetch(),
 			]);
