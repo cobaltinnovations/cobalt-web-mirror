@@ -24,6 +24,8 @@ export interface ScreeningFlowVersion {
 export enum ScreeningSessionDestinationId {
 	CRISIS = 'CRISIS',
 	ONE_ON_ONE_PROVIDER_LIST = 'ONE_ON_ONE_PROVIDER_LIST',
+	CONTENT_LIST = 'CONTENT_LIST',
+	GROUP_SESSION_LIST = 'GROUP_SESSION_LIST',
 }
 
 export interface ScreeningSessionDestination {
