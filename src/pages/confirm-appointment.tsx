@@ -2,11 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
-import InputHelper from '@/components/input-helper';
 import { accountService, appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useAlert from '@/hooks/use-alert';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
+import InputHelper from '@/components/input-helper';
 
 const ConfirmAppointment = () => {
 	const navigate = useNavigate();
@@ -18,6 +19,7 @@ const ConfirmAppointment = () => {
 	const time = searchParams.get('time') ?? '';
 	const intakeAssessmentId = searchParams.get('intakeAssessmentId') ?? '';
 
+	const { showAlert } = useAlert();
 	const { account } = useAccount();
 	const handleError = useHandleError();
 
@@ -146,6 +148,38 @@ const ConfirmAppointment = () => {
 		}
 	};
 
+	const handleResendCodeButtonClick = async () => {
+		try {
+			if (!account) {
+				throw new Error('account is undefined.');
+			}
+
+			setSubmitting(true);
+
+			const response = await accountService
+				.postEmailVerificationCode(account.accountId, {
+					emailAddress: emailInputValue,
+					accountEmailVerificationFlowTypeId: 'APPOINTMENT_BOOKING',
+					forceVerification: true,
+				})
+				.fetch();
+
+			if (response.verified) {
+				createAppointmentAndNavigate();
+				return;
+			}
+
+			showAlert({
+				variant: 'success',
+				text: 'Verification code sent.',
+			});
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<Container className="py-6">
@@ -218,6 +252,15 @@ const ConfirmAppointment = () => {
 										disabled={submitting}
 									/>
 									<div className="text-right">
+										<Button
+											className="me-4"
+											variant="light"
+											size="lg"
+											onClick={handleResendCodeButtonClick}
+											disabled={submitting}
+										>
+											Resend Code
+										</Button>
 										<Button type="submit" size="lg" disabled={submitting}>
 											Continue
 										</Button>
