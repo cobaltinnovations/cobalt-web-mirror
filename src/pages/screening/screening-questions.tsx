@@ -198,6 +198,23 @@ const ScreeningQuestionsPage = () => {
 		submitAnswers,
 	]);
 
+	const disableNextBtn = useMemo(() => {
+		if (!screeningQuestionContextResponse) {
+			return isSubmitting;
+		} else if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
+			return (
+				isSubmitting ||
+				selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount
+			);
+		}
+
+		return (
+			isSubmitting ||
+			selectedAnswers.length < screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount ||
+			selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount
+		);
+	}, [isSubmitting, screeningQuestionContextResponse, selectedAnswers.length]);
+
 	return (
 		<AsyncPage fetchData={initialFetch}>
 			<Container className="py-5">
@@ -232,7 +249,7 @@ const ScreeningQuestionsPage = () => {
 									</Button>
 								)}
 
-								<Button disabled={isSubmitting} className="ms-auto" type="submit">
+								<Button disabled={disableNextBtn} className="ms-auto" type="submit">
 									Next
 								</Button>
 							</div>
