@@ -16,7 +16,7 @@ import mediaQueries from '@/jss/media-queries';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
-		height: 400,
+		height: 350,
 		[mediaQueries.lg]: {
 			height: 210,
 		},
@@ -123,9 +123,9 @@ const OnYourTimeDetail: FC = () => {
 				]}
 			/>
 
-			<Container fluid className="mb-4 mb-lg-10">
+			<Container className="mb-4 mb-lg-10">
 				<Row>
-					<Col>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						{canEmbed ? (
 							<div className={classes.reactPlayerOuter}>
 								<ReactPlayer
