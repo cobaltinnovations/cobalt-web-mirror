@@ -336,12 +336,12 @@ const MENU_SECTIONS: MenuNavSection[] = [
 				to: () => '/on-your-time',
 			},
 			{
-				label: 'COVID-19',
+				label: 'COVID-19 Resources',
 				icon: <Covid19Icon />,
 				to: () => '/covid-19-resources',
 			},
 			{
-				label: 'Well-being',
+				label: 'Well-Being Resources',
 				icon: <WellBeingIcon />,
 				to: () => '/well-being-resources',
 			},
