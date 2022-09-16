@@ -1,23 +1,16 @@
+import { ProviderSearchEventActions } from './../lib/models/ga-events';
+import { ContentEventActions } from './../lib/models/ga-events';
+import { ScreeningEventActions } from './../lib/models/ga-events';
+import { AnalyticsEventCategory } from './../lib/models/ga-events';
 import useAccount from '@/hooks/use-account';
 import React, { FC, createContext, PropsWithChildren, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
 import config from '@/lib/config';
 
-enum AnalyticsEventCategory {
-	Screening = 'Screening',
-	Content = 'Content',
-	ProviderSearch = 'Provider Search',
-}
-
 /**
  * Screening Analytics
  */
-enum ScreeningEventActions {
-	PromptForPhoneNumber = 'Prompted for Phone Number',
-	UserSkipPhoneNumberPrompt = 'User Skipped Phone Number Prompt',
-}
-
 export class ScreeningAnalyticsEvent {
 	static promptForPhoneNumber() {
 		const event = new ScreeningAnalyticsEvent(ScreeningEventActions.PromptForPhoneNumber);
@@ -40,11 +33,6 @@ export class ScreeningAnalyticsEvent {
 /**
  * Content Analytics
  */
-enum ContentEventActions {
-	UserClickFilterPill = 'User Clicked Filter Pill',
-	UserApplyFilter = 'User Applied Filter',
-}
-
 type ContentFilterPill = 'Focus' | 'Format' | 'Length';
 
 export class ContentAnalyticsEvent {
@@ -64,12 +52,6 @@ export class ContentAnalyticsEvent {
 /**
  * Provider Search Analytics
  */
-export enum ProviderSearchEventActions {
-	UserClickFilterPill = 'User Clicked Filter Pill',
-	UserApplyFilter = 'User Applied Filter',
-	UserResetFilters = 'User Reset Filters',
-}
-
 type ProviderFilterPill = 'Days' | 'Times' | 'Provider Type' | 'Availability' | 'Focus' | 'Payment Type';
 
 export class ProviderSearchAnalyticsEvent {
