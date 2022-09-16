@@ -8,6 +8,7 @@ export interface Institution {
 	institutionId: string;
 	privacyContent: string;
 	contentScreeningFlowId?: string;
+	groupSessionsScreeningFlowId?: string;
 	providerTriageScreeningFlowId: string;
 	requireConsentForm: boolean;
 	ssoEnabled: boolean;

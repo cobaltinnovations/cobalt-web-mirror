@@ -11,6 +11,9 @@ import StudioEvent, { StudioEventViewModel } from '@/components/studio-event';
 import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from './screening/screening.hooks';
+import Loader from '@/components/loader';
 
 const InTheStudio: FC = () => {
 	const navigate = useNavigate();
@@ -20,11 +23,19 @@ const InTheStudio: FC = () => {
 	const debouncedSearchValue = useDebouncedState(searchTerm);
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
+	const { subdomainInstitution } = useAccount();
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
+		subdomainInstitution?.groupSessionsScreeningFlowId
+	);
 
 	useEffect(() => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		searchParams.set('class', debouncedSearchValue);
 		setSearchParams(searchParams, { replace: true });
-	}, [debouncedSearchValue, searchParams, setSearchParams]);
+	}, [debouncedSearchValue, didCheckScreeningSessions, searchParams, setSearchParams]);
 
 	const fetchData = useCallback(async () => {
 		function groupByUrlName(data: StudioEventViewModel[]): StudioEventViewModel[] {
@@ -81,6 +92,15 @@ const InTheStudio: FC = () => {
 			...groupByUrlName(groupSessions),
 		]);
 	}, [groupEventUrlName]);
+
+	if (!didCheckScreeningSessions) {
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
+	}
 
 	return (
 		<>

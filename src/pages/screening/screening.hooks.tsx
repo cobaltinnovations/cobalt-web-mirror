@@ -103,6 +103,18 @@ export function useScreeningNavigation() {
 					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
 					openInCrisisModal(true);
 					return;
+				case ScreeningSessionDestinationId.CONTENT_LIST:
+					navigate({
+						pathname: '/on-your-time',
+						search: new URLSearchParams(params).toString(),
+					});
+					return;
+				case ScreeningSessionDestinationId.GROUP_SESSION_LIST:
+					navigate({
+						pathname: '/in-the-studio',
+						search: new URLSearchParams(params).toString(),
+					});
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					navigate({
