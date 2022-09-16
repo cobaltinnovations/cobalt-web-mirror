@@ -331,7 +331,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Explore',
 		items: () => [
 			{
-				label: 'On Your Time Content',
+				label: 'On Your Time',
 				icon: <OnYourTimeIcon />,
 				to: () => '/on-your-time',
 			},

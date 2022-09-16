@@ -175,7 +175,7 @@ const OnYourTime: FC = () => {
 			/>
 
 			<HeroContainer className="mb-4 mb-lg-8">
-				<h2 className="mb-0 text-center">On Your Time Content</h2>
+				<h2 className="mb-0 text-center">On Your Time</h2>
 			</HeroContainer>
 
 			<Container>
@@ -183,7 +183,7 @@ const OnYourTime: FC = () => {
 					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper
 							type="search"
-							label="Find On Your Time Content items"
+							label="Find On Your Time items"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 								searchParams.set('q', event.target.value);
