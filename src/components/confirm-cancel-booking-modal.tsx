@@ -25,7 +25,7 @@ const ConfirmCancelBookingModal: FC<ConfirmCancelBookingModalProps> = ({ onConfi
 				<Modal.Title>Cancel Reservation</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-0 fw-bold">are you sure?</p>
+				<p className="mb-0 fw-bold">Are you sure?</p>
 			</Modal.Body>
 			<Modal.Footer>
 				<div className="text-right">
