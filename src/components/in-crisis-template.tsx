@@ -7,6 +7,8 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { CRISIS_RESOURCES } from '@/crisis-resources';
+import useAnalytics from '@/hooks/use-analytics';
+import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const useStyles = createUseThemedStyles(
 	(theme) => ({
@@ -36,6 +38,7 @@ const useStyles = createUseThemedStyles(
 
 export const InCrisisTemplate = () => {
 	const classes = useStyles();
+	const { trackEvent } = useAnalytics();
 
 	return (
 		<>
@@ -50,6 +53,11 @@ export const InCrisisTemplate = () => {
 							'mb-4': !isLast,
 						})}
 						href={link.href}
+						onClick={() => {
+							if (link.href.includes('tel:')) {
+								trackEvent(CrisisAnalyticsEvent.clickCrisisTelResource(link.href));
+							}
+						}}
 					>
 						<div>
 							<h4 className="mb-2">{link.title}</h4>

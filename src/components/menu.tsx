@@ -26,6 +26,8 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as HipaaLogo } from '@/assets/logos/logo-hipaa.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
+import { AnalyticsEvent, CrisisAnalyticsEvent } from '@/contexts/analytics-context';
+import useAnalytics from '@/hooks/use-analytics';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
@@ -216,7 +218,7 @@ interface MenuNavSection {
 interface MenuNavItem {
 	label: string;
 	icon: ReactNode;
-	customAction?: 'toggle-in-crisis';
+	analyticsEvent?: () => AnalyticsEvent;
 	to?: (ctx: MenuNavContext) => To | null;
 	subNavSections?: (ctx: MenuNavContext) => MenuNavSection[] | null;
 }
@@ -320,6 +322,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 			{
 				label: 'Crisis Resources',
 				icon: <PhoneIcon />,
+				analyticsEvent: () => CrisisAnalyticsEvent.clickCrisisMenu(),
 				to: () => '/in-crisis',
 			},
 		],
@@ -421,6 +424,7 @@ interface CobaltMenuProps {
 const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) => {
 	const classes = useMenuStyles();
 	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
+	const { trackEvent } = useAnalytics();
 
 	function handleSignOutLinkClick(event: React.MouseEvent<HTMLButtonElement>) {
 		event.preventDefault();
@@ -482,14 +486,19 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 										<li key={itemIndex}>
 											<Link
 												to={to || ''}
-												onClick={
-													hasSubNav
-														? (event) => {
-																event.preventDefault();
-																onSubNav(subNavSections);
-														  }
-														: onHide
-												}
+												onClick={(event) => {
+													const analyticsEvent = item.analyticsEvent?.();
+													if (analyticsEvent) {
+														trackEvent(analyticsEvent);
+													}
+
+													if (hasSubNav) {
+														event.preventDefault();
+														onSubNav(subNavSections);
+													} else {
+														onHide();
+													}
+												}}
 											>
 												{item.icon}
 

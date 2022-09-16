@@ -6,6 +6,8 @@ import { createUseStyles } from 'react-jss';
 import { ErrorModalContext } from '@/contexts/error-modal-context';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import useAnalytics from '@/hooks/use-analytics';
+import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const useStyles = createUseStyles({
 	errorModal: {
@@ -21,6 +23,7 @@ const ErrorModal: FC = () => {
 	const { show, setShow, error } = useContext(ErrorModalContext);
 	useTrackModalView('ErrorModal', show);
 	const { openInCrisisModal } = useInCrisisModal();
+	const { trackEvent } = useAnalytics();
 
 	return (
 		<Modal
@@ -71,6 +74,7 @@ const ErrorModal: FC = () => {
 							className="mb-2 p-0 text-decoration-none"
 							onClick={() => {
 								setShow(false);
+								trackEvent(CrisisAnalyticsEvent.clickCrisisError());
 								openInCrisisModal(true);
 							}}
 						>
