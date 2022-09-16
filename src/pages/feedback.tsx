@@ -6,10 +6,13 @@ import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
+import useAnalytics from '@/hooks/use-analytics';
+import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const Feedback: FC = () => {
 	const handleError = useHandleError();
 	const { openInCrisisModal } = useInCrisisModal();
+	const { trackEvent } = useAnalytics();
 
 	const [feedbackEmailValue, setFeedbackEmailValue] = useState('');
 	const [feedbackTextareaValue, setFeedbackTextareaValue] = useState<string>('');
@@ -49,7 +52,10 @@ const Feedback: FC = () => {
 							<span
 								className="text-primary text-decoration-underline cursor-pointer"
 								tabIndex={0}
-								onClick={() => openInCrisisModal()}
+								onClick={() => {
+									trackEvent(CrisisAnalyticsEvent.clickCrisisFeedback());
+									openInCrisisModal();
+								}}
 							>
 								please contact these resources.
 							</span>

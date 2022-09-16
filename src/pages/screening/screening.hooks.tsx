@@ -1,5 +1,5 @@
 import CollectPhoneModal from '@/components/collect-phone-modal';
-import { ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
+import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
@@ -94,11 +94,13 @@ export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { openInCrisisModal } = useInCrisisModal();
+	const { trackEvent } = useAnalytics();
 
 	const navigateToDestination = useCallback(
 		(destination?: ScreeningSessionDestination, params?: Record<string, any>) => {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
+					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
 					openInCrisisModal(true);
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
@@ -111,7 +113,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[navigate, openInCrisisModal]
+		[navigate, openInCrisisModal, trackEvent]
 	);
 
 	const navigateToQuestion = useCallback(

@@ -4,20 +4,17 @@ import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
 import config from '@/lib/config';
 
-enum AnalyticsEventCategory {
-	Screening = 'Screening',
-	Content = 'Content',
-	ProviderSearch = 'Provider Search',
-}
+import {
+	AnalyticsEventCategory,
+	ContentEventActions,
+	CrisisEventActions,
+	ProviderSearchEventActions,
+	ScreeningEventActions,
+} from '@/lib/models/ga-events';
 
 /**
  * Screening Analytics
  */
-enum ScreeningEventActions {
-	PromptForPhoneNumber = 'Prompted for Phone Number',
-	UserSkipPhoneNumberPrompt = 'User Skipped Phone Number Prompt',
-}
-
 export class ScreeningAnalyticsEvent {
 	static promptForPhoneNumber() {
 		const event = new ScreeningAnalyticsEvent(ScreeningEventActions.PromptForPhoneNumber);
@@ -40,11 +37,6 @@ export class ScreeningAnalyticsEvent {
 /**
  * Content Analytics
  */
-enum ContentEventActions {
-	UserClickFilterPill = 'User Clicked Filter Pill',
-	UserApplyFilter = 'User Applied Filter',
-}
-
 type ContentFilterPill = 'Focus' | 'Format' | 'Length';
 
 export class ContentAnalyticsEvent {
@@ -64,12 +56,6 @@ export class ContentAnalyticsEvent {
 /**
  * Provider Search Analytics
  */
-export enum ProviderSearchEventActions {
-	UserClickFilterPill = 'User Clicked Filter Pill',
-	UserApplyFilter = 'User Applied Filter',
-	UserResetFilters = 'User Reset Filters',
-}
-
 type ProviderFilterPill = 'Days' | 'Times' | 'Provider Type' | 'Availability' | 'Focus' | 'Payment Type';
 
 export class ProviderSearchAnalyticsEvent {
@@ -90,7 +76,54 @@ export class ProviderSearchAnalyticsEvent {
 	constructor(public action: ProviderSearchEventActions, public label?: ProviderFilterPill) {}
 }
 
-export type AnalyticsEvent = ScreeningAnalyticsEvent | ContentAnalyticsEvent | ProviderSearchAnalyticsEvent;
+export class CrisisAnalyticsEvent {
+	static clickCrisisHeader() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisHeader);
+
+		return event;
+	}
+
+	static clickCrisisMenu() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisMenu);
+
+		return event;
+	}
+
+	static clickCrisisFeedback() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisFeedback);
+
+		return event;
+	}
+
+	static clickCrisisError() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisError);
+
+		return event;
+	}
+
+	static clickCrisisTelResource(label: string) {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisTelResource, label);
+
+		return event;
+	}
+
+	static presentScreeningCrisis() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.PresentScreeningCrisis);
+		event.nonInteractive = true;
+
+		return event;
+	}
+
+	nonInteractive = false;
+	category = AnalyticsEventCategory.Crisis;
+	constructor(public action: CrisisEventActions, public label?: string) {}
+}
+
+export type AnalyticsEvent =
+	| ScreeningAnalyticsEvent
+	| ContentAnalyticsEvent
+	| ProviderSearchAnalyticsEvent
+	| CrisisAnalyticsEvent;
 
 const AnalyticsContext = createContext<
 	| {

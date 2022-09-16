@@ -12,6 +12,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import mediaQueries from '@/jss/media-queries';
+import useAnalytics from '@/hooks/use-analytics';
+import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -65,6 +67,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	const classes = useHeaderStyles();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
+	const { trackEvent } = useAnalytics();
 
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
@@ -106,6 +109,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	}
 
 	function handleInCrisisButtonClick() {
+		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
 		openInCrisisModal();
 	}
 
