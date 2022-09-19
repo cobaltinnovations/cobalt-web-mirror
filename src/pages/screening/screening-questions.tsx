@@ -198,6 +198,18 @@ const ScreeningQuestionsPage = () => {
 		submitAnswers,
 	]);
 
+	const hideNextBtn = useMemo(() => {
+		const isSingleSelect =
+			screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId ===
+			ScreeningAnswerFormatId.SINGLE_SELECT;
+		const previouslyAnswered = (screeningQuestionContextResponse?.screeningAnswers.length ?? 0) > 0;
+
+		return isSingleSelect && !previouslyAnswered;
+	}, [
+		screeningQuestionContextResponse?.screeningAnswers.length,
+		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
+	]);
+
 	const disableNextBtn = useMemo(() => {
 		if (!screeningQuestionContextResponse) {
 			return isSubmitting;
@@ -249,9 +261,11 @@ const ScreeningQuestionsPage = () => {
 									</Button>
 								)}
 
-								<Button disabled={disableNextBtn} className="ms-auto" type="submit">
-									Next
-								</Button>
+								{!hideNextBtn && (
+									<Button disabled={disableNextBtn} className="ms-auto" type="submit">
+										Next
+									</Button>
+								)}
 							</div>
 
 							<div className="d-flex">
