@@ -18,5 +18,5 @@
 		"downlevelIteration": true,
 		"noImplicitThis": false
 	},
-	"include": ["src"]
+	"include": ["src", "institution-overrides"]
 }

@@ -6,7 +6,7 @@ Current build/Webpack configuration will replace imported modules files from mai
 
 #### Example:
 
-If there's only a `src/institution-overrides/custom/on-your-time.tsx` file in this folder, then Webpack will generate _two_ separate bundles:
+If there's only a `institution-overrides/custom/src/pages/on-your-time.tsx` file in this folder, then Webpack will generate _two_ separate bundles:
 
 -   `build/cobalt` (default)
 -   `build/custom` (named after the child folder of `institution-overrides`)
