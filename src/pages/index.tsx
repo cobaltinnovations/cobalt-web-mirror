@@ -108,8 +108,7 @@ const Index: FC = () => {
 												</Link>
 											);
 										} else {
-											// eslint-disable-next-line no-throw-literal
-											throw 'Unrecognized session';
+											throw new Error('Unrecognized group session type');
 										}
 									})}
 								</Carousel>
