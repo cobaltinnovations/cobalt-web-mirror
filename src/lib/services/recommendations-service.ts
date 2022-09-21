@@ -1,10 +1,10 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { GroupEvent, GroupSessionModel } from '@/lib/models';
+import { GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
 import { Content } from '@/lib/models';
 
 interface getRecommendationsResponse {
 	groupSessions: GroupSessionModel[];
-	groupEvents: GroupEvent[];
+	groupSessionRequests: GroupSessionRequestModel[];
 	contents: Content[];
 }
 

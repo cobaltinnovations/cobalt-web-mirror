@@ -12,16 +12,17 @@ import StudioEvent from '@/components/studio-event';
 import OnYourTimeItem from '@/components/on-your-time-item';
 
 import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
-import { GroupEvent, Content, GroupSessionModel } from '@/lib/models';
+import { GroupSessionRequestModel, Content, GroupSessionModel } from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
+import { Exception } from 'sass';
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
 
 	const navigate = useNavigate();
 
-	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupEvent | GroupSessionModel)[]>([]);
+	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
 	const [onYourTimeContent, setOnYourTimeContent] = useState<Content[]>([]);
 
 	const accountId = account?.accountId;
@@ -30,7 +31,7 @@ const Index: FC = () => {
 
 		const response = await recommendationsService.getRecommendations(accountId).fetch();
 
-		setInTheStudioEvents([...response.groupSessions, ...response.groupEvents]);
+		setInTheStudioEvents([...response.groupSessionRequests, ...response.groupSessions]);
 		setOnYourTimeContent(response.contents);
 
 		const roleId = Cookies.get('roleId');
@@ -96,17 +97,20 @@ const Index: FC = () => {
 													<StudioEvent groupEvent={inTheStudioEvent} />
 												</Link>
 											);
+										} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
+											return (
+												<Link
+													key={inTheStudioEvent.groupSessionRequestId}
+													className="text-decoration-none"
+													to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
+												>
+													<StudioEvent groupEvent={inTheStudioEvent} />
+												</Link>
+											);
+										} else {
+											// eslint-disable-next-line no-throw-literal
+											throw 'Unrecognized session';
 										}
-
-										return (
-											<Link
-												key={inTheStudioEvent.groupEventId}
-												className="text-decoration-none"
-												to={`/in-the-studio/${inTheStudioEvent.groupEventId}`}
-											>
-												<StudioEvent groupEvent={inTheStudioEvent} />
-											</Link>
-										);
 									})}
 								</Carousel>
 							</Col>
