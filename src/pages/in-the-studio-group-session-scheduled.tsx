@@ -25,16 +25,17 @@ import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-c
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
-		height: 400,
+		height: 350,
 		[mediaQueries.lg]: {
 			height: 210,
 		},
 	},
 	badge: {
-		right: 0,
-		bottom: 32,
+		right: 32,
+		bottom: 24,
 		position: 'absolute',
 		[mediaQueries.lg]: {
+			right: 16,
 			bottom: 16,
 		},
 	},
@@ -251,29 +252,18 @@ const InTheStudioGroupSessionScheduled = () => {
 				</Container>
 			)}
 
-			<Container fluid className="mb-4 mb-lg-10">
+			<Container className="mb-4 mb-lg-10">
 				<Row>
-					<Col>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<BackgroundImageContainer
 							className={classes.mediaContainer}
 							imageUrl={session?.imageUrl || placeholderImage}
 						>
-							<Container className="h-100">
-								<Row className="h-100">
-									<Col
-										className="h-100"
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<div className="h-100 position-relative">
-											<Badge className={classes.badge} as="div" bg="outline-secondary" pill>
-												{session?.seatsAvailableDescription}
-											</Badge>
-										</div>
-									</Col>
-								</Row>
-							</Container>
+							<div className="h-100 position-relative">
+								<Badge className={classes.badge} as="div" bg="outline-secondary" pill>
+									{session?.seatsAvailableDescription}
+								</Badge>
+							</div>
 						</BackgroundImageContainer>
 					</Col>
 				</Row>
