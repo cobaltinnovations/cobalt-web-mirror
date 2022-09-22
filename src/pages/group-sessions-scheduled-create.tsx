@@ -341,7 +341,7 @@ const GroupSessionsCreate: FC = () => {
 			<HeroContainer>
 				<h2 className="mb-0 text-center">
 					{initialValues?.title ? initialValues.title : 'Create Group Session'}
-					{isCopy ? ' (copy)' : ''}
+					{isCopy ? ' (Copy)' : ''}
 				</h2>
 			</HeroContainer>
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
@@ -365,8 +365,8 @@ const GroupSessionsCreate: FC = () => {
 						<div className="d-flex align-items-center">
 							<div>
 								<h1 className="mb-2 fs-h3">
-									{initialValues?.title || 'create group session'}
-									{isCopy ? ' (copy)' : ''}
+									{initialValues?.title || 'Create Group Session'}
+									{isCopy ? ' (Copy)' : ''}
 								</h1>
 								<p className="mb-0 text-danger">Required*</p>
 							</div>
@@ -1063,7 +1063,7 @@ const GroupSessionsCreate: FC = () => {
 
 											<SessionFormSubmitBanner
 												disabled={isViewMode}
-												title={isEdit ? 'update group session' : 'add group session'}
+												title={isEdit ? 'Update group session' : 'Add group session'}
 											>
 												{!isViewMode && isEdit && (
 													<p className="mb-0 mt-2">
