@@ -24,7 +24,7 @@ const CatchAll = () => {
 					search: new URLSearchParams(redirectConfig.searchParams).toString(),
 				},
 				{
-					replace: true,
+					replace: false,
 				}
 			);
 		}
