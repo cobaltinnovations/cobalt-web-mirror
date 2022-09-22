@@ -40,10 +40,10 @@ const OneOnOneResources: FC = () => {
 							individuals seeking reduced isolation and acknowledgement of challenges and difficulties
 							unique to their work through brief one-on-one sessions and offer for follow up.
 						</p>
-						<h6>Resilience Coaches</h6>
+						<h6>Coping First Aid Coaches</h6>
 						<p className="mb-5">
-							Coping First Aid is one-to-one support with a trained and supervised Resilience Coach for
-							anyone in the Cobalt Platform Community who needs support with coping, resilience
+							Coping First Aid is one-to-one support with a trained and supervised Coping First Aid Coach
+							for anyone in the Cobalt Platform Community who needs support with coping, resilience
 							strategies, or finding mental health resources through brief one-on-one sessions, with
 							follow-up appointments as needed.
 						</p>
