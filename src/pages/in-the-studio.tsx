@@ -19,8 +19,9 @@ const InTheStudio: FC = () => {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupEventUrlName = searchParams.get('class') ?? '';
-	const [searchTerm, setSearchTerm] = useState(groupEventUrlName);
-	const debouncedSearchValue = useDebouncedState(searchTerm);
+	const groupEventSearchQuery = searchParams.get('q') ?? '';
+	const [searchTerm, setSearchTerm] = useState(groupEventSearchQuery);
+	const [debouncedSearchValue, setDebouncedSearchValue] = useDebouncedState(searchTerm);
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
 	const { subdomainInstitution } = useAccount();
@@ -33,7 +34,12 @@ const InTheStudio: FC = () => {
 			return;
 		}
 
-		searchParams.set('class', debouncedSearchValue);
+		if (debouncedSearchValue) {
+			searchParams.set('q', debouncedSearchValue);
+		} else {
+			searchParams.delete('q');
+		}
+
 		setSearchParams(searchParams, { replace: true });
 	}, [debouncedSearchValue, didCheckScreeningSessions, searchParams, setSearchParams]);
 
@@ -64,34 +70,28 @@ const InTheStudio: FC = () => {
 			}, [] as typeof data);
 		}
 
-		const [{ externalGroupEventTypes }, { groupEvents }, { groupSessions }, { groupSessionRequests }] =
-			await Promise.all([
-				groupEventService.fetchExternalGroupEventTypes({ urlName: groupEventUrlName }).fetch(),
-				groupEventService.fetchGroupEvents({ urlName: groupEventUrlName }).fetch(),
-				groupSessionsService
-					.getGroupSessions({
-						viewType: 'PATIENT',
-						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-						searchQuery: groupEventUrlName,
-					})
-					.fetch(),
-				groupSessionsService
-					.getGroupSessionRequests({
-						viewType: 'PATIENT',
-						groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-						searchQuery: groupEventUrlName,
-					})
-					.fetch(),
-			]);
-
-		setEventList([
-			...groupByUrlName(externalGroupEventTypes),
-			...groupEvents,
-			...groupByUrlName(groupSessionRequests),
-			...groupByUrlName(groupSessions),
+		const [{ groupSessions }, { groupSessionRequests }] = await Promise.all([
+			groupSessionsService
+				.getGroupSessions({
+					viewType: 'PATIENT',
+					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+					urlName: groupEventUrlName,
+					searchQuery: debouncedSearchValue,
+				})
+				.fetch(),
+			groupSessionsService
+				.getGroupSessionRequests({
+					viewType: 'PATIENT',
+					groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+					urlName: groupEventUrlName,
+					searchQuery: debouncedSearchValue,
+				})
+				.fetch(),
 		]);
-	}, [groupEventUrlName]);
+
+		setEventList([...groupByUrlName(groupSessionRequests), ...groupByUrlName(groupSessions)]);
+	}, [groupEventUrlName, debouncedSearchValue]);
 
 	if (!didCheckScreeningSessions) {
 		return (
@@ -146,7 +146,13 @@ const InTheStudio: FC = () => {
 							className="mb-5"
 							value={searchTerm}
 							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								setSearchTerm(event.currentTarget.value);
+								const value = event.currentTarget.value;
+								// immediately clear
+								if (!value) {
+									setDebouncedSearchValue('');
+								}
+
+								setSearchTerm(value);
 							}}
 						/>
 					</Col>
@@ -211,11 +217,29 @@ const InTheStudio: FC = () => {
 								);
 							})
 						) : (
-							<p className="text-center mb-0">
-								{searchTerm
-									? 'There are no matching results.'
-									: 'There are no group sessions available.'}
-							</p>
+							<>
+								<p className="text-center mb-0">
+									{searchTerm ? (
+										'There are no matching results.'
+									) : groupEventUrlName ? (
+										<>
+											There are no group sessions available for the selected type.
+											<Button
+												size="sm"
+												variant="link"
+												onClick={() => {
+													searchParams.delete('class');
+													setSearchParams(searchParams, { replace: true });
+												}}
+											>
+												Click here to view all available group sessions.
+											</Button>
+										</>
+									) : (
+										'There are no group sessions available.'
+									)}
+								</p>
+							</>
 						)}
 					</Row>
 				</Container>
