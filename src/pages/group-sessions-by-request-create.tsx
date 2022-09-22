@@ -434,8 +434,8 @@ const GroupSessionsByRequestCreate: FC = () => {
 											<SessionFormSubmitBanner
 												title={
 													isEdit
-														? 'update group session by request'
-														: 'add group session by request'
+														? 'Update group session by request'
+														: 'Add group session by request'
 												}
 											/>
 										</Form>
