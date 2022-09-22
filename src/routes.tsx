@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { Outlet, Navigate, useMatch, useSearchParams } from 'react-router-dom';
 
 import config from '@/lib/config';
@@ -56,7 +56,7 @@ export const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-
 export const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
 export const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
 export const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
-export const NoMatch = React.lazy(() => import('@/pages/no-match'));
+export const CatchAll = React.lazy(() => import('@/pages/catch-all'));
 export const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
 export const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
 export const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
@@ -77,12 +77,16 @@ interface RouteGuardProps {
 
 export interface RouteConfig {
 	path: string;
-	exact: boolean;
 	private: boolean;
 	routeGuard?: (guardProps: RouteGuardProps) => boolean;
-	header?: () => ReactElement;
-	nav?: () => ReactElement;
-	main: () => ReactElement;
+	header?: React.ComponentType<any>;
+	nav?: React.ComponentType<any>;
+	main: React.ComponentType<any>;
+}
+
+export interface AppRoutesConfig {
+	layout: React.ComponentType<any>;
+	routes: RouteConfig[];
 }
 
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
@@ -139,7 +143,7 @@ const DefaultLayout = () => {
 	);
 };
 
-export const AppRoutes = [
+export const AppRoutes: AppRoutesConfig[] = [
 	{
 		layout: ButtonlessHeaderLayout,
 		routes: [
@@ -492,7 +496,8 @@ export const AppRoutes = [
 			},
 			{
 				path: '*',
-				main: NoMatch,
+				private: false,
+				main: CatchAll,
 			},
 		],
 	},
