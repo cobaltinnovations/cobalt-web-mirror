@@ -236,7 +236,13 @@ const ScreeningQuestionsPage = () => {
 							<p className="mb-3">{screeningQuestionContextResponse.screeningQuestion.introText}</p>
 						)}
 
-						<h3 className="mb-5">{screeningQuestionContextResponse?.screeningQuestion.questionText}</h3>
+						<h3 className="mb-5">
+							<div
+								dangerouslySetInnerHTML={{
+									__html: screeningQuestionContextResponse?.screeningQuestion.questionText!,
+								}}
+							/>
+						</h3>
 
 						<Form
 							onSubmit={(e) => {
