@@ -174,6 +174,26 @@ export function useScreeningFlow(screeningFlowId?: string) {
 		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
+	const startScreeningFlow = useCallback(() => {
+		if (incompleteSessions.length === 0) {
+			screeningService
+				.createScreeningSession({
+					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+				})
+				.fetch()
+				.then((sessionResponse) => {
+					navigateToNext(sessionResponse.screeningSession);
+				})
+				.catch((e) => {
+					if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+						handleError(e);
+					}
+				});
+		} else {
+			navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
+		}
+	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext]);
+
 	useEffect(() => {
 		const isImmediate = Cookies.get('immediateAccess');
 
@@ -218,10 +238,12 @@ export function useScreeningFlow(screeningFlowId?: string) {
 
 		if (!hasCompletedScreening && activeFlowVersion.phoneNumberRequired) {
 			setShowPhoneModal(true);
+		} else if (!hasCompletedScreening) {
+			startScreeningFlow();
 		} else {
 			setDidCheckScreeningSessions(true);
 		}
-	}, [activeFlowVersion, hasCompletedScreening]);
+	}, [activeFlowVersion, hasCompletedScreening, startScreeningFlow]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
@@ -252,23 +274,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 
 				setShowPhoneModal(false);
 
-				if (incompleteSessions.length === 0) {
-					screeningService
-						.createScreeningSession({
-							screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
-						})
-						.fetch()
-						.then((sessionResponse) => {
-							navigateToNext(sessionResponse.screeningSession);
-						})
-						.catch((e) => {
-							if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-								handleError(e);
-							}
-						});
-				} else {
-					navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
-				}
+				startScreeningFlow();
 			}}
 		/>
 	);
