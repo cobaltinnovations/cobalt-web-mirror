@@ -17,6 +17,7 @@ import { AppRoutes } from '@/routes';
 
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
+import NoMatch from '@/components/no-match';
 
 import { AccountProvider } from '@/contexts/account-context';
 import { AlertProvider } from '@/contexts/alert-context';
@@ -28,7 +29,8 @@ import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
 import DownForMaintenance from '@/pages/down-for-maintenance';
 
-import useUrlViewTracking from './hooks/use-url-view-tracking';
+import useUrlViewTracking from '@/hooks/use-url-view-tracking';
+import useConsentRedirect from '@/hooks/use-consent-redirect';
 import { CobaltThemeProvider } from './jss/theme';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -45,6 +47,7 @@ const AppWithProviders: FC = () => {
 		window.scrollTo(0, 0);
 	}, [pathname]);
 
+	useConsentRedirect();
 	useUrlViewTracking();
 
 	if (!initialized) {
@@ -74,7 +77,7 @@ const AppWithProviders: FC = () => {
 
 								const renderMainRouteComponent = () => {
 									if (!isEnabled) {
-										return null;
+										return <NoMatch />;
 									}
 
 									return <route.main />;

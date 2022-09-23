@@ -23,6 +23,7 @@ export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignInOptions = React.lazy(() => import('@/pages/sign-in-options'));
 export const Auth = React.lazy(() => import('@/pages/auth'));
+export const Consent = React.lazy(() => import('@/pages/consent'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
 export const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
@@ -91,6 +92,7 @@ export interface AppRoutesConfig {
 
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
+const isConsentRequiredRouteGuard = ({ institution }: RouteGuardProps) => !!institution?.requireConsentForm;
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 
 const RedirectToSupport = () => {
@@ -218,6 +220,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/',
 				private: true,
 				main: Index,
+			},
+			{
+				path: '/consent',
+				private: true,
+				main: Consent,
+				routeGuard: isConsentRequiredRouteGuard,
 			},
 			{
 				path: '/in-the-studio',

@@ -14,6 +14,7 @@ export interface Institution {
 	ssoEnabled: boolean;
 	supportEnabled: boolean;
 	wellBeingContent: string;
+	supportEmailAddress: string;
 }
 
 export interface AccountSource {
