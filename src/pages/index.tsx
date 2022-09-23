@@ -55,7 +55,7 @@ const Index: FC = () => {
 				<HeroContainer className="text-center">
 					<h1 className="mb-3">Recommended for you</h1>
 					<p className="mb-5">
-						Peers, Resilience Coaches, Therapists, Psychiatrists, and more are here to help
+						Peers, Coping First Aid Coaches, Therapists, Psychiatrists, and more are here to help
 					</p>
 					<div className="d-flex justify-content-center">
 						<Button className="d-flex align-items-center" onClick={handleConnectWithSupportButtonClick}>
