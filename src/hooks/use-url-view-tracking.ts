@@ -10,13 +10,13 @@ import { useSearchParams } from 'react-router-dom';
 const TRACKED_PATHS = ['/sign-in', '/connect-with-support'];
 
 export default function useUrlViewTracking(): void {
-	const { account, initialized, isTrackedSession } = useAccount();
+	const { account, initialized, isTrackedSession, didCheckImmediateFlag } = useAccount();
 	const [searchParams] = useSearchParams();
 	const { pathname } = useLocation();
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!initialized) {
+		if (!initialized || !didCheckImmediateFlag) {
 			return;
 		}
 
@@ -59,5 +59,5 @@ export default function useUrlViewTracking(): void {
 				})
 				.fetch();
 		}
-	}, [pathname, initialized, searchParams, accountId, isTrackedSession]);
+	}, [accountId, didCheckImmediateFlag, initialized, isTrackedSession, pathname, searchParams]);
 }

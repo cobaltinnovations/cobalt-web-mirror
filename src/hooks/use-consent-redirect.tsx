@@ -1,9 +1,10 @@
+import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAccount from './use-account';
 
 function useConsentRedirect() {
-	const { institution, account } = useAccount();
+	const { institution, account, didCheckImmediateFlag } = useAccount();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -11,7 +12,8 @@ function useConsentRedirect() {
 	useEffect(() => {
 		if (location.pathname.startsWith('/consent')) {
 			return;
-		} else if (institution?.requireConsentForm && requireConsent) {
+			// routes aren't mounted until imemdiateState is determined
+		} else if (institution?.requireConsentForm && didCheckImmediateFlag && requireConsent) {
 			let destinationUrl = location.pathname + location.search;
 
 			navigate(
@@ -22,7 +24,14 @@ function useConsentRedirect() {
 				{ replace: true }
 			);
 		}
-	}, [institution?.requireConsentForm, location.pathname, location.search, navigate, requireConsent]);
+	}, [
+		didCheckImmediateFlag,
+		institution?.requireConsentForm,
+		location.pathname,
+		location.search,
+		navigate,
+		requireConsent,
+	]);
 }
 
 export default useConsentRedirect;

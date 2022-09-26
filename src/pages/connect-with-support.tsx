@@ -95,13 +95,13 @@ interface HistoryLocationState {
 const ConnectWithSupport: FC = () => {
 	const handleError = useHandleError();
 	const classes = useConnectWithSupportStyles();
-	const { account, subdomainInstitution } = useAccount();
+	const { account, institution } = useAccount();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
 	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow(
-		subdomainInstitution?.providerTriageScreeningFlowId
+		institution?.providerTriageScreeningFlowId
 	);
 	const bookingRef = useRef<BookingRefHandle>(null);
 

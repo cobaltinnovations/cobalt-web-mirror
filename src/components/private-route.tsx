@@ -1,29 +1,18 @@
 import Cookies from 'js-cookie';
-import React, { PropsWithChildren, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 
 import useAccount from '@/hooks/use-account';
+import Loader from './loader';
 
 const PrivateRoute = ({ children }: PropsWithChildren) => {
-	const location = useLocation();
-	const navigate = useNavigate();
 	const { initialized, account } = useAccount();
-	const notAuthRedirectPath = '/sign-in';
+	const [canRender, setCanRender] = useState(false);
 
 	useEffect(() => {
-		if (initialized && !account) {
-			const redirectUrl = location.pathname + (location.search || '');
-			if (redirectUrl !== '/') {
-				Cookies.set('authRedirectUrl', redirectUrl);
-			}
+		setCanRender(initialized && !!account);
+	}, [account, initialized]);
 
-			navigate(notAuthRedirectPath);
-		} else {
-			Cookies.remove('authRedirectUrl');
-		}
-	}, [account, initialized, location.pathname, location.search, navigate]);
-
-	return <>{children}</>;
+	return <>{canRender ? children : <Loader />}</>;
 };
 
 export default PrivateRoute;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Outlet, Navigate, useMatch, useSearchParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, Navigate, useMatch, useSearchParams, useNavigate } from 'react-router-dom';
 
 import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
@@ -16,13 +16,13 @@ import {
 	ProviderManagementPersonalDetails,
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
+import Cookies from 'js-cookie';
 
 export const Onboarding = React.lazy(() => import('@/pages/onboarding'));
 export const SignUp = React.lazy(() => import('@/pages/sign-up'));
 export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignInOptions = React.lazy(() => import('@/pages/sign-in-options'));
-export const Auth = React.lazy(() => import('@/pages/auth'));
 export const Consent = React.lazy(() => import('@/pages/consent'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
@@ -57,7 +57,7 @@ export const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-
 export const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
 export const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
 export const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
-export const CatchAll = React.lazy(() => import('@/pages/catch-all'));
+export const NoMatch = React.lazy(() => import('@/pages/no-match'));
 export const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
 export const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
 export const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
@@ -98,6 +98,7 @@ const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && acco
 const RedirectToSupport = () => {
 	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
 	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
 
 	let routedSupportRoleId = match?.params.supportRoleId ?? '';
 
@@ -108,14 +109,23 @@ const RedirectToSupport = () => {
 	searchParams.set('supportRoleId', routedSupportRoleId.toUpperCase());
 	searchParams.set('immediateAccess', 'true');
 
-	return (
-		<Navigate
-			to={{
-				pathname: `/connect-with-support`,
-				search: searchParams.toString(),
-			}}
-		/>
-	);
+	const searchString = searchParams.toString();
+	useEffect(() => {
+		const authRedirectUrl = `/connect-with-support?${searchString}`;
+
+		Cookies.set('authRedirectUrl', authRedirectUrl);
+		navigate(
+			{
+				pathname: '/connect-with-support',
+				search: searchString,
+			},
+			{
+				replace: true,
+			}
+		);
+	}, [navigate, searchString]);
+
+	return null;
 };
 
 const ButtonlessHeaderLayout = () => {
@@ -212,11 +222,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 		layout: DefaultLayout,
 		routes: [
 			{
-				path: '/auth',
-				private: false,
-				main: Auth,
-			},
-			{
 				path: '/',
 				private: true,
 				main: Index,
@@ -294,7 +299,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			},
 			{
 				path: '/immediate-support/:supportRoleId',
-				private: true,
+				private: false,
 				main: RedirectToSupport,
 			},
 			{
@@ -505,7 +510,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			{
 				path: '*',
 				private: false,
-				main: CatchAll,
+				main: NoMatch,
 			},
 		],
 	},

@@ -13,11 +13,10 @@ import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
 import ReauthModal from '@/components/reauth-modal';
 
-import { AppRoutes } from '@/routes';
+import { AppRoutes, NoMatch } from '@/routes';
 
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
-import NoMatch from '@/components/no-match';
 
 import { AccountProvider } from '@/contexts/account-context';
 import { AlertProvider } from '@/contexts/alert-context';
@@ -39,7 +38,7 @@ import './scss/main.scss';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { account, institution, initialized } = useAccount();
+	const { account, institution, initialized, didCheckImmediateFlag } = useAccount();
 
 	const { pathname } = useLocation();
 
@@ -67,6 +66,12 @@ const AppWithProviders: FC = () => {
 					return (
 						<Route key={groupIndex} element={<config.layout />}>
 							{config.routes.map((route, index) => {
+								// hold-off registering/rendering routes until
+								// immediate flags/param is checked & proessed
+								if (!didCheckImmediateFlag) {
+									return null;
+								}
+
 								const isEnabled =
 									typeof route.routeGuard === 'function'
 										? route.routeGuard({

@@ -1,5 +1,6 @@
 import CollectPhoneModal from '@/components/collect-phone-modal';
 import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
+import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
@@ -11,7 +12,6 @@ import {
 	ScreeningSessionDestinationId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
-import Cookies from 'js-cookie';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -154,6 +154,7 @@ export function useScreeningNavigation() {
 }
 
 export function useScreeningFlow(screeningFlowId?: string) {
+	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
 	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(
 		!screeningFlowId || searchParams.get('skipped') === 'true'
@@ -175,9 +176,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 	}, [screeningSessions]);
 
 	useEffect(() => {
-		const isImmediate = Cookies.get('immediateAccess');
-
-		if (isImmediate) {
+		if (isImmediateSession) {
 			setDidCheckScreeningSessions(true);
 			return;
 		}
@@ -209,7 +208,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [handleError, screeningFlowId]);
+	}, [handleError, isImmediateSession, screeningFlowId]);
 
 	useEffect(() => {
 		if (!activeFlowVersion) {

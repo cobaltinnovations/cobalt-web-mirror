@@ -29,9 +29,9 @@ const OnYourTime: FC = () => {
 	const selectedFormatIds = searchParams.getAll('formatId');
 	const selectedLength = searchParams.get('length') ?? '';
 	const searchTerm = searchParams.get('q') ?? '';
-	const { subdomainInstitution } = useAccount();
+	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		subdomainInstitution?.contentScreeningFlowId
+		institution?.contentScreeningFlowId
 	);
 
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
