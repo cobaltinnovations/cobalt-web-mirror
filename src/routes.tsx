@@ -17,6 +17,7 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
+import useAccount from './hooks/use-account';
 
 export const Onboarding = React.lazy(() => import('@/pages/onboarding'));
 export const SignUp = React.lazy(() => import('@/pages/sign-up'));
@@ -99,6 +100,7 @@ const RedirectToSupport = () => {
 	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
+	const { account } = useAccount();
 
 	let routedSupportRoleId = match?.params.supportRoleId ?? '';
 
@@ -113,7 +115,10 @@ const RedirectToSupport = () => {
 	useEffect(() => {
 		const authRedirectUrl = `/connect-with-support?${searchString}`;
 
-		Cookies.set('authRedirectUrl', authRedirectUrl);
+		if (!account) {
+			Cookies.set('authRedirectUrl', authRedirectUrl);
+		}
+
 		navigate(
 			{
 				pathname: '/connect-with-support',
@@ -123,12 +128,21 @@ const RedirectToSupport = () => {
 				replace: true,
 			}
 		);
-	}, [navigate, searchString]);
+	}, [account, navigate, searchString]);
 
 	return null;
 };
 
 const ButtonlessHeaderLayout = () => {
+	const { account } = useAccount();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (account) {
+			navigate('/');
+		}
+	}, [account, navigate]);
+
 	return (
 		<>
 			<Header showHeaderButtons={false} />
@@ -138,6 +152,15 @@ const ButtonlessHeaderLayout = () => {
 };
 
 const UnauthenticatedHeaderLayout = () => {
+	const { account } = useAccount();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (account) {
+			navigate('/');
+		}
+	}, [account, navigate]);
+
 	return (
 		<>
 			<HeaderUnauthenticated />

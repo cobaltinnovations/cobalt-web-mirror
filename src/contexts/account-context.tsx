@@ -36,7 +36,6 @@ const AccountContext = createContext({} as AccountContextConfig);
 
 const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const match = useMatch('*');
-	const handleError = useHandleError();
 	const [initialized, setInitialized] = useState(false);
 	const [didCheckAccessToken, setDidCheckAccessToken] = useState(false);
 	const [didCheckTrackFlag, setDidCheckTrackFlag] = useState(false);
@@ -50,16 +49,13 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const location = useLocation();
 	const immediateSupportRouteMatch = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>({
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
-	const [accessToken, setAccessToken] = useState(searchParams.get('accessToken'));
+	const [accessToken, setAccessToken] = useState(searchParams.get('accessToken') || Cookies.get('accessToken'));
 	const [isTrackedSession, setIsTrackedSession] = useState(!!searchParams.get('track'));
-	const [isImmediateSession, setIsImmediateSession] = useState(
-		!!searchParams.get('immediateAccess') || !!immediateSupportRouteMatch
-	);
+	const [isImmediateSession, setIsImmediateSession] = useState(false);
 	const [sessionAccountSourceId] = useState(searchParams.get('accountSourceId'));
 
 	const institutionCapabilities = useMemo(() => {
@@ -88,7 +84,6 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(account.accountId).fetch();
 
 			setAccount(undefined);
-			setInstitution(undefined);
 
 			if (federatedLogoutUrl) {
 				window.location.href = federatedLogoutUrl;
@@ -101,7 +96,6 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 			navigate('/sign-in');
 			setAccount(undefined);
-			setInstitution(undefined);
 		}
 	}, [account, navigate]);
 
@@ -127,8 +121,11 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 			const authRedirectUrl = Cookies.get('authRedirectUrl');
 			Cookies.remove('authRedirectUrl');
+
 			setDidCheckImmediateFlag(true);
-			navigate(authRedirectUrl || '/', { replace: true });
+			if (authRedirectUrl) {
+				navigate(authRedirectUrl, { replace: true });
+			}
 		},
 		[navigate]
 	);
@@ -172,12 +169,16 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const immediateAccess = searchParams.get('immediateAccess');
 	const isImmediateRouteMatch = !!immediateSupportRouteMatch;
 	useEffect(() => {
-		if (isImmediateSession) {
+		if (!institution) {
+			return;
+		} else if (isImmediateSession) {
 			Cookies.set('immediateAccess', '1');
 		} else {
-			setIsImmediateSession(!!immediateAccess || isImmediateRouteMatch);
+			setIsImmediateSession(
+				!!institution?.immediateAccessEnabled && (!!immediateAccess || isImmediateRouteMatch)
+			);
 		}
-	}, [immediateAccess, isImmediateRouteMatch, isImmediateSession]);
+	}, [immediateAccess, institution, isImmediateRouteMatch, isImmediateSession]);
 
 	// Process configured route redirects
 	useEffect(() => {
@@ -215,13 +216,10 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	// after determinining enabled routes/redirects
 	searchParams.delete('accessToken');
 	const accessTokenFromCookie = Cookies.get('accessToken');
-	const redirectTo = `${location.pathname}?${searchParams.toString()}`;
 	useEffect(() => {
 		if (!institution || !didProcessRedirects || didCheckAccessToken) {
 			return;
 		}
-
-		Cookies.set('authRedirectUrl', redirectTo.startsWith('/auth') ? '/' : redirectTo);
 
 		if (accessTokenFromCookie && accessToken === accessTokenFromCookie) {
 			processAccessToken(accessTokenFromCookie);
@@ -231,53 +229,11 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		if (!accessToken) {
 			setDidCheckAccessToken(true);
 			setDidCheckImmediateFlag(true);
-
-			if (institution.immediateAccessEnabled && isImmediateSession && !isTrackedSession) {
-				return;
-			}
-
-			navigate('/sign-in', { replace: true });
 			return;
 		}
 
 		processAccessToken(accessToken);
-	}, [
-		accessToken,
-		accessTokenFromCookie,
-		didCheckAccessToken,
-		didProcessRedirects,
-		institution,
-		isImmediateSession,
-		isTrackedSession,
-		navigate,
-		processAccessToken,
-		redirectTo,
-	]);
-
-	// Handle/start anonymous/immediate sessions when appropriate
-	useEffect(() => {
-		if (!institution?.immediateAccessEnabled || !immediateAccess || isTrackedSession || account) {
-			return;
-		}
-
-		accountService
-			.createAnonymousAccount()
-			.fetch()
-			.then((response) => {
-				processAccessToken(response.accessToken, false);
-				setAccount(response.account);
-			})
-			.catch((e) => {
-				handleError(e);
-			});
-	}, [
-		account,
-		handleError,
-		immediateAccess,
-		institution?.immediateAccessEnabled,
-		isTrackedSession,
-		processAccessToken,
-	]);
+	}, [accessToken, accessTokenFromCookie, didCheckAccessToken, didProcessRedirects, institution, processAccessToken]);
 
 	const value = {
 		account,
