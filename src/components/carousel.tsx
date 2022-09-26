@@ -121,7 +121,12 @@ const CustomButtonGroup = ({
 
 	if (carouselState) {
 		noMorePreviousSlides = carouselState.currentSlide === 0;
-		noMoreNextSlides = carouselState.currentSlide === carouselState.totalItems - carouselState.slidesToShow;
+
+		if (carouselState.totalItems - carouselState.slidesToShow < 0) {
+			noMoreNextSlides = true;
+		} else {
+			noMoreNextSlides = carouselState.currentSlide === carouselState.totalItems - carouselState.slidesToShow;
+		}
 	}
 
 	return (
