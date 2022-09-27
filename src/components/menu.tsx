@@ -77,7 +77,7 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		width: '100%',
 		display: 'flex',
 		flexDirection: 'column',
-		padding: '16px 20px',
+		padding: '16px 20px 0',
 	},
 	menuContent: {
 		flex: 1,
@@ -448,15 +448,12 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 					<CloseIcon tabIndex={0} className={classes.closeIcon} onClick={onHide} />
 				)}
 
-				{!isSubNav
-					? account?.displayName && (
-							<>
-								<h5 className="my-4">{account.displayName}</h5>
-
-								<hr />
-							</>
-					  )
-					: null}
+				{!isSubNav && (
+					<>
+						<h5 className="my-4">{account?.displayName ?? 'Anonymous'}</h5>
+						<hr />
+					</>
+				)}
 			</div>
 
 			<div className={classes.menuContent}>
@@ -472,7 +469,7 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 						<React.Fragment key={index}>
 							{section.title && <div className={classes.sectionHeader}>{section.title}</div>}
 
-							<ul className={classNames(classes.menuList, classes.subMenuList, 'mb-4')}>
+							<ul className={classNames(classes.menuList, classes.subMenuList, 'my-2')}>
 								{items.map((item, itemIndex) => {
 									const to = item.to?.(ctx);
 									const subNavSections = item.subNavSections?.(ctx);
