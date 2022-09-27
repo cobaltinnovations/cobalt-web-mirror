@@ -10,11 +10,14 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	studioEvent: {
+		display: 'flex',
 		borderRadius: 5,
 		overflow: 'hidden',
+		flexDirection: 'column',
 		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
 	},
 	imageContainer: {
+		flexShrink: 0,
 		paddingBottom: '56.25%',
 	},
 	imageContent: {
@@ -24,6 +27,7 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		position: 'absolute',
 	},
 	informationContainer: {
+		flex: 1,
 		padding: 20,
 		color: theme.colors.n900,
 		backgroundColor: theme.colors.n0,
@@ -80,7 +84,16 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 				</BackgroundImageContainer>
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{groupEvent.title}</h4>
-					{!groupEvent.isGrouped && <p className="mb-0">{groupEvent.appointmentTimeDescription}</p>}
+					{!groupEvent.isGrouped && (
+						<p className="mb-0 text-muted fw-bold text-uppercase">
+							{groupEvent.appointmentTimeDescription}
+						</p>
+					)}
+					{groupEvent.facilitatorName && (
+						<p className="mb-0 text-muted">
+							<>with {groupEvent.facilitatorName}</>
+						</p>
+					)}
 				</div>
 			</div>
 		);
@@ -95,6 +108,11 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 				/>
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{groupEvent.title}</h4>
+					{groupEvent.facilitatorName && (
+						<p className="mb-0 text-muted">
+							<>with {groupEvent.facilitatorName}</>
+						</p>
+					)}
 				</div>
 			</div>
 		);
@@ -116,7 +134,14 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 			</BackgroundImageContainer>
 			<div className={classes.informationContainer}>
 				<h4 className="mb-0">{groupEvent.name}</h4>
-				{!groupEvent.isGrouped && <p className="mb-0">{groupEvent.timeDescription}</p>}
+				{!groupEvent.isGrouped && (
+					<p className="mb-0 text-muted fw-bold text-uppercase">{groupEvent.timeDescription}</p>
+				)}
+				{groupEvent.provider && (
+					<p className="mb-0 text-muted">
+						<>with {groupEvent.provider}</>
+					</p>
+				)}
 			</div>
 		</div>
 	);
