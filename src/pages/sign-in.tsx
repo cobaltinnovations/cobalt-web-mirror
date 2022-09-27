@@ -29,7 +29,7 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
-	const { subdomainInstitution } = useAccount();
+	const { institution, processAccessToken } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
@@ -42,9 +42,7 @@ const SignIn: FC = () => {
 				})
 				.fetch();
 
-			navigate(`/auth?${new URLSearchParams({ accessToken }).toString()}`, {
-				replace: true,
-			});
+			processAccessToken(accessToken);
 		} catch (error) {
 			handleError(error);
 		}
@@ -75,7 +73,7 @@ const SignIn: FC = () => {
 							</Button>
 						</div>
 
-						{subdomainInstitution?.anonymousEnabled && (
+						{institution?.anonymousEnabled && (
 							<div className="text-center">
 								<Button variant="link" onClick={handleEnterAnonymouslyButtonClick}>
 									Browse All Resources Anonymously

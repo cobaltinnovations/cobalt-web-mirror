@@ -1,5 +1,5 @@
 import React, { FC, createContext, useState, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { useNavigate, useLocation, useMatch, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams, useMatch } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
@@ -9,45 +9,62 @@ import { accountService, institutionService } from '@/lib/services';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import useHandleError from '@/hooks/use-handle-error';
 import useSubdomain from '@/hooks/use-subdomain';
+import { routeRedirects } from '@/route-redirects';
+
+type DecodedAccessToken = {
+	sub: string;
+	exp: number;
+};
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
 	setAccount: React.Dispatch<React.SetStateAction<AccountModel | undefined>>;
+	processAccessToken: (token: string, shouldFetchAccount?: boolean) => void;
 	initialized: boolean;
+	didCheckImmediateFlag: boolean;
 	isAnonymous: boolean;
 	institution: Institution | undefined;
 	setInstitution: React.Dispatch<React.SetStateAction<Institution | undefined>>;
 	accountSources: AccountSource[] | undefined;
-	subdomainInstitution: Institution | undefined;
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
 	signOutAndClearContext: () => void;
 	isTrackedSession: boolean;
+	isImmediateSession: boolean;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
 
 const AccountProvider: FC<PropsWithChildren> = (props) => {
-	const handleError = useHandleError();
+	const match = useMatch('*');
 	const [initialized, setInitialized] = useState(false);
+	const [didCheckAccessToken, setDidCheckAccessToken] = useState(false);
+	const [didCheckTrackFlag, setDidCheckTrackFlag] = useState(false);
+	const [didProcessRedirects, setDidProcessRedirects] = useState(false);
+	const [didCheckImmediateFlag, setDidCheckImmediateFlag] = useState(false);
 	const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 	const [institution, setInstitution] = useState<Institution | undefined>(undefined);
 	const [accountSources, setAccountSources] = useState<AccountSource[] | undefined>(undefined);
-	const [subdomainInstitution, setSubdomainInstitution] = useState<Institution | undefined>(undefined);
+
 	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
 
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const location = useLocation();
 	const immediateSupportRouteMatch = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>({
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
-	const [isTrackedSession, setIsTrackedSession] = useState(
-		!!searchParams.get('track') || !!Cookies.get('trackActivity')
-	);
+	const [accessToken, setAccessToken] = useState(searchParams.get('accessToken') || Cookies.get('accessToken'));
+	const [isTrackedSession, setIsTrackedSession] = useState(!!searchParams.get('track'));
+	const [isImmediateSession, setIsImmediateSession] = useState(false);
 	const [sessionAccountSourceId] = useState(searchParams.get('accountSourceId'));
 
-	const immediateAccess = searchParams.get('immediateAccess');
+	const institutionCapabilities = useMemo(() => {
+		if (!account || !institution || !account.capabilities) {
+			return;
+		}
+
+		return account.capabilities[institution.institutionId];
+	}, [account, institution]);
 
 	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
@@ -67,7 +84,6 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(account.accountId).fetch();
 
 			setAccount(undefined);
-			setInstitution(undefined);
 
 			if (federatedLogoutUrl) {
 				window.location.href = federatedLogoutUrl;
@@ -80,101 +96,39 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 			navigate('/sign-in');
 			setAccount(undefined);
-			setInstitution(undefined);
 		}
 	}, [account, navigate]);
 
-	// Fetch account if we have accessToken cookie
-	useEffect(() => {
-		if (initialized) {
-			return;
-		}
+	const processAccessToken = useCallback(
+		async (token: string, shouldFetchAccount = true) => {
+			const decodedAccessToken = jwtDecode(token) as DecodedAccessToken;
+			const expirationDate = new Date(decodedAccessToken.exp * 1000);
+			Cookies.set('accessToken', token, { expires: expirationDate });
+			setAccessToken(token);
 
-		const accessTokenFromCookie = Cookies.get('accessToken');
-
-		if (!accessTokenFromCookie && !immediateAccess && !immediateSupportRouteMatch) {
-			setInitialized(true);
-			return;
-		} else if (!accessTokenFromCookie && (immediateAccess || immediateSupportRouteMatch)) {
-			let authRedirectUrl = location.pathname + (location.search || '');
-
-			if (immediateSupportRouteMatch) {
-				let supportRoleId = immediateSupportRouteMatch.params.supportRoleId ?? '';
-
-				if (supportRoleId === 'therapist') {
-					supportRoleId = 'clinician';
-				}
-
-				const params = new URLSearchParams({
-					supportRoleId: supportRoleId.toUpperCase(),
-					immediateAccess: 'true',
-				});
-
-				authRedirectUrl = `/connect-with-support?${params.toString()}`;
-			}
-
-			Cookies.set('authRedirectUrl', authRedirectUrl);
-			Cookies.set('immediateAccess', '1');
-
-			if (isTrackedSession) {
-				// force sign-in flow for tracked sessions
-				Cookies.set('trackActivity', '1');
-				setInitialized(true);
-
-				return;
-			}
-
-			accountService
-				.createAnonymousAccount()
-				.fetch()
-				.then((response) => {
-					setInitialized(true);
-
-					navigate(
-						`/auth?${new URLSearchParams({
-							accessToken: response.accessToken,
-						}).toString()}`,
-						{
-							replace: true,
-						}
-					);
-				})
-				.catch((e) => {
-					handleError(e);
-				});
-		} else if (accessTokenFromCookie) {
-			if (immediateAccess || immediateSupportRouteMatch) {
-				Cookies.set('immediateAccess', '1');
-			}
-
-			const accountId = (jwtDecode(accessTokenFromCookie) as any).sub;
-			accountService
-				.account(accountId)
-				.fetch()
-				.then((response) => {
+			if (shouldFetchAccount) {
+				const accountId = decodedAccessToken.sub;
+				try {
+					const response = await accountService.account(accountId).fetch();
 					setAccount(response.account);
 					setInstitution(response.institution);
 
-					setInitialized(true);
-				})
-				.catch((e) => {
-					// Unable to initialize/fetch account
-					// from stored cookie
-					setInitialized(true);
-					signOutAndClearContext();
-				});
-		}
-	}, [
-		handleError,
-		navigate,
-		immediateAccess,
-		immediateSupportRouteMatch,
-		initialized,
-		location.pathname,
-		location.search,
-		signOutAndClearContext,
-		isTrackedSession,
-	]);
+					setDidCheckAccessToken(true);
+				} catch (error) {
+					return navigate('/sign-in', { replace: true });
+				}
+			}
+
+			const authRedirectUrl = Cookies.get('authRedirectUrl');
+			Cookies.remove('authRedirectUrl');
+
+			setDidCheckImmediateFlag(true);
+			if (authRedirectUrl) {
+				navigate(authRedirectUrl, { replace: true });
+			}
+		},
+		[navigate]
+	);
 
 	// Fetch subdomain instituion on mount
 	useEffect(() => {
@@ -186,30 +140,115 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			.fetch()
 			.then((response) => {
 				setAccountSources(response.accountSources);
-				setSubdomainInstitution(response.institution);
+				setInstitution(response.institution);
 			});
 	}, [sessionAccountSourceId, subdomain]);
 
-	const institutionCapabilities = useMemo(() => {
-		if (!account || !subdomainInstitution || !account.capabilities) {
+	// Route rendering is gated behind `initialized`
+	// Enabled after app gets institution & determines session state
+	useEffect(() => {
+		if (initialized) {
 			return;
 		}
 
-		return account.capabilities[subdomainInstitution.institutionId];
-	}, [account, subdomainInstitution]);
+		setInitialized(!!institution && didCheckAccessToken && didCheckTrackFlag);
+	}, [didCheckAccessToken, didCheckTrackFlag, initialized, institution]);
+
+	// Determine trackedSession state
+	useEffect(() => {
+		if (isTrackedSession) {
+			Cookies.set('trackActivity', '1');
+		} else {
+			setIsTrackedSession(!!Cookies.get('trackActivity'));
+		}
+
+		setDidCheckTrackFlag(true);
+	}, [isTrackedSession]);
+
+	// Determine immediateSession state
+	const immediateAccess = searchParams.get('immediateAccess');
+	const isImmediateRouteMatch = !!immediateSupportRouteMatch;
+	useEffect(() => {
+		if (!institution) {
+			return;
+		} else if (isImmediateSession) {
+			Cookies.set('immediateAccess', '1');
+		} else {
+			setIsImmediateSession(
+				!!institution?.immediateAccessEnabled && (!!immediateAccess || isImmediateRouteMatch)
+			);
+		}
+	}, [immediateAccess, institution, isImmediateRouteMatch, isImmediateSession]);
+
+	// Process configured route redirects
+	useEffect(() => {
+		if (!didCheckTrackFlag) {
+			return;
+		}
+
+		const redirectConfig = routeRedirects.find((c) => {
+			if (c.caseSensitive) {
+				return c.fromPath === match?.pathname;
+			}
+
+			return c.fromPath.toLowerCase() === match?.pathname.toLowerCase();
+		});
+
+		if (redirectConfig) {
+			navigate(
+				{
+					pathname: redirectConfig.toPath,
+					search: new URLSearchParams({
+						...redirectConfig.searchParams,
+						track: '' + isTrackedSession,
+					}).toString(),
+				},
+				{
+					replace: false,
+				}
+			);
+		}
+
+		setDidProcessRedirects(true);
+	}, [didCheckTrackFlag, isTrackedSession, match?.pathname, navigate]);
+
+	// Process accessToken (cookie/queryParam)
+	// after determinining enabled routes/redirects
+	searchParams.delete('accessToken');
+	const accessTokenFromCookie = Cookies.get('accessToken');
+	useEffect(() => {
+		if (!institution || !didProcessRedirects || didCheckAccessToken) {
+			return;
+		}
+
+		if (accessTokenFromCookie && accessToken === accessTokenFromCookie) {
+			processAccessToken(accessTokenFromCookie);
+			return;
+		}
+
+		if (!accessToken) {
+			setDidCheckAccessToken(true);
+			setDidCheckImmediateFlag(true);
+			return;
+		}
+
+		processAccessToken(accessToken);
+	}, [accessToken, accessTokenFromCookie, didCheckAccessToken, didProcessRedirects, institution, processAccessToken]);
 
 	const value = {
 		account,
 		setAccount,
+		processAccessToken,
 		initialized,
+		didCheckImmediateFlag,
 		isAnonymous,
 		institution,
 		setInstitution,
 		accountSources,
-		subdomainInstitution,
 		institutionCapabilities,
 		signOutAndClearContext,
 		isTrackedSession,
+		isImmediateSession,
 	};
 
 	return <AccountContext.Provider value={value}>{props.children}</AccountContext.Provider>;

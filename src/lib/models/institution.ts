@@ -4,6 +4,7 @@ export interface Institution {
 	covidContent: string;
 	crisisContent: string;
 	emailEnabled: boolean;
+	immediateAccessEnabled: boolean;
 	emailSignupEnabled: boolean;
 	institutionId: string;
 	privacyContent: string;
@@ -14,6 +15,7 @@ export interface Institution {
 	ssoEnabled: boolean;
 	supportEnabled: boolean;
 	wellBeingContent: string;
+	supportEmailAddress: string;
 }
 
 export interface AccountSource {

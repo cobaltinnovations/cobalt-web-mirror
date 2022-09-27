@@ -1,29 +1,63 @@
 import Cookies from 'js-cookie';
-import React, { PropsWithChildren, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 
 import useAccount from '@/hooks/use-account';
+import Loader from './loader';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { accountService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 
 const PrivateRoute = ({ children }: PropsWithChildren) => {
-	const location = useLocation();
+	const handleError = useHandleError();
+	const { institution, isImmediateSession, isTrackedSession, initialized, account, processAccessToken, setAccount } =
+		useAccount();
+	const [canRender, setCanRender] = useState(false);
 	const navigate = useNavigate();
-	const { initialized, account } = useAccount();
-	const notAuthRedirectPath = '/sign-in';
+	const location = useLocation();
+	const [searchParams] = useSearchParams();
+
+	const redirectTo = `${location.pathname}?${searchParams.toString()}`;
+	useEffect(() => {
+		if (!institution) {
+			return;
+		}
+
+		if (!account && (!isImmediateSession || isTrackedSession)) {
+			Cookies.set('authRedirectUrl', redirectTo.startsWith('/auth') ? '/' : redirectTo);
+
+			navigate('/sign-in', { replace: true });
+		}
+	}, [account, institution, isImmediateSession, isTrackedSession, navigate, redirectTo]);
+
+	// Handle/start anonymous/immediate sessions when appropriate
+	const immediateAccess = searchParams.get('immediateAccess');
+	useEffect(() => {
+		if (institution?.immediateAccessEnabled && immediateAccess && !isTrackedSession) {
+			accountService
+				.createAnonymousAccount()
+				.fetch()
+				.then((response) => {
+					processAccessToken(response.accessToken, false);
+					setAccount(response.account);
+				})
+				.catch((e) => {
+					handleError(e);
+				});
+		}
+	}, [
+		handleError,
+		institution?.immediateAccessEnabled,
+		immediateAccess,
+		isTrackedSession,
+		processAccessToken,
+		setAccount,
+	]);
 
 	useEffect(() => {
-		if (initialized && !account) {
-			const redirectUrl = location.pathname + (location.search || '');
-			if (redirectUrl !== '/') {
-				Cookies.set('authRedirectUrl', redirectUrl);
-			}
+		setCanRender(initialized && !!account);
+	}, [account, initialized]);
 
-			navigate(notAuthRedirectPath);
-		} else {
-			Cookies.remove('authRedirectUrl');
-		}
-	}, [account, initialized, location.pathname, location.search, navigate]);
-
-	return <>{children}</>;
+	return <>{canRender ? children : <Loader />}</>;
 };
 
 export default PrivateRoute;

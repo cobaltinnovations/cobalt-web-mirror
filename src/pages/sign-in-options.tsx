@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
 import { accountService, institutionService } from '@/lib/services';
@@ -31,9 +31,8 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 const SignInOptions = () => {
 	const subdomain = useSubdomain();
 	const handleError = useHandleError();
-	const { accountSources, subdomainInstitution } = useAccount();
+	const { accountSources, institution, processAccessToken } = useAccount();
 	const classes = useSignInStyles();
-	const navigate = useNavigate();
 
 	const [searchParams] = useSearchParams();
 	const accountSourceId = searchParams.get('accountSourceId');
@@ -92,9 +91,7 @@ const SignInOptions = () => {
 				return;
 			}
 
-			navigate(`/auth?${new URLSearchParams({ accessToken }).toString()}`, {
-				replace: true,
-			});
+			processAccessToken(accessToken);
 		} catch (error) {
 			handleError(error);
 		}
@@ -224,7 +221,7 @@ const SignInOptions = () => {
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<h1 className="mb-4 text-center">Sign in to Cobalt</h1>
 
-							{subdomainInstitution?.ssoEnabled && (
+							{institution?.ssoEnabled && (
 								<div className="mb-6 text-center">
 									<Button
 										className="w-100 d-block"
@@ -243,7 +240,7 @@ const SignInOptions = () => {
 								</div>
 							)}
 
-							{subdomainInstitution?.ssoEnabled && subdomainInstitution?.emailEnabled && (
+							{institution?.ssoEnabled && institution?.emailEnabled && (
 								<div className="mb-6 d-flex align-items-center">
 									<hr className="flex-grow-1" />
 									<p className="m-0 px-4 flex-shrink-0">or</p>
@@ -251,7 +248,7 @@ const SignInOptions = () => {
 								</div>
 							)}
 
-							{subdomainInstitution?.emailEnabled && (
+							{institution?.emailEnabled && (
 								<>
 									<Form className="mb-6" onSubmit={handleSignInFormSubmit}>
 										<InputHelper
@@ -297,7 +294,7 @@ const SignInOptions = () => {
 									</Form>
 								</>
 							)}
-							{subdomainInstitution?.emailSignupEnabled && (
+							{institution?.emailSignupEnabled && (
 								<p className="text-center">
 									Don't have an account? <Link to="/sign-up">Create account</Link>
 								</p>

@@ -13,7 +13,7 @@ import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
 import ReauthModal from '@/components/reauth-modal';
 
-import { AppRoutes } from '@/routes';
+import { AppRoutes, NoMatch } from '@/routes';
 
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
@@ -28,7 +28,8 @@ import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 
 import DownForMaintenance from '@/pages/down-for-maintenance';
 
-import useUrlViewTracking from './hooks/use-url-view-tracking';
+import useUrlViewTracking from '@/hooks/use-url-view-tracking';
+import useConsentRedirect from '@/hooks/use-consent-redirect';
 import { CobaltThemeProvider } from './jss/theme';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -37,7 +38,7 @@ import './scss/main.scss';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { account, institution, initialized } = useAccount();
+	const { account, institution, initialized, didCheckImmediateFlag } = useAccount();
 
 	const { pathname } = useLocation();
 
@@ -45,6 +46,7 @@ const AppWithProviders: FC = () => {
 		window.scrollTo(0, 0);
 	}, [pathname]);
 
+	useConsentRedirect();
 	useUrlViewTracking();
 
 	if (!initialized) {
@@ -64,6 +66,12 @@ const AppWithProviders: FC = () => {
 					return (
 						<Route key={groupIndex} element={<config.layout />}>
 							{config.routes.map((route, index) => {
+								// hold-off registering/rendering routes until
+								// immediate flags/param is checked & proessed
+								if (!didCheckImmediateFlag) {
+									return null;
+								}
+
 								const isEnabled =
 									typeof route.routeGuard === 'function'
 										? route.routeGuard({
@@ -74,7 +82,7 @@ const AppWithProviders: FC = () => {
 
 								const renderMainRouteComponent = () => {
 									if (!isEnabled) {
-										return null;
+										return <NoMatch />;
 									}
 
 									return <route.main />;

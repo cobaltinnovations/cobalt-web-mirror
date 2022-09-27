@@ -24,9 +24,9 @@ const InTheStudio: FC = () => {
 	const [debouncedSearchValue, setDebouncedSearchValue] = useDebouncedState(searchTerm);
 	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
-	const { subdomainInstitution } = useAccount();
+	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		subdomainInstitution?.groupSessionsScreeningFlowId
+		institution?.groupSessionsScreeningFlowId
 	);
 
 	useEffect(() => {

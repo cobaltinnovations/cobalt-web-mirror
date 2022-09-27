@@ -256,4 +256,10 @@ export const accountService = {
 			data,
 		});
 	},
+	acceptConsent(accountId: string) {
+		return httpSingleton.orchestrateRequest<AccountResponse>({
+			method: 'PUT',
+			url: `/accounts/${accountId}/consent-form-accepted`,
+		});
+	},
 };
