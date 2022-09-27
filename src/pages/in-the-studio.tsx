@@ -169,9 +169,9 @@ const InTheStudio: FC = () => {
 										: `/in-the-studio/external/${groupEvent.externalGroupEventTypeId}`;
 
 									return (
-										<Col md={6} lg={4} key={groupEvent.externalGroupEventTypeId}>
-											<Link className="mb-2 d-block text-decoration-none" to={link}>
-												<StudioEvent groupEvent={groupEvent} />
+										<Col md={6} lg={4} key={groupEvent.externalGroupEventTypeId} className="mb-8">
+											<Link className="d-block text-decoration-none h-100" to={link}>
+												<StudioEvent className="h-100" groupEvent={groupEvent} />
 											</Link>
 										</Col>
 									);
@@ -183,9 +183,9 @@ const InTheStudio: FC = () => {
 										: `/in-the-studio/group-session-scheduled/${groupEvent.groupSessionId}`;
 
 									return (
-										<Col md={6} lg={4} key={groupEvent.groupSessionId}>
-											<Link className="mb-2 d-block text-decoration-none" to={link}>
-												<StudioEvent groupEvent={groupEvent} />
+										<Col md={6} lg={4} key={groupEvent.groupSessionId} className="mb-8">
+											<Link className="d-block text-decoration-none h-100" to={link}>
+												<StudioEvent className="h-100" groupEvent={groupEvent} />
 											</Link>
 										</Col>
 									);
@@ -197,21 +197,21 @@ const InTheStudio: FC = () => {
 										: `/in-the-studio/group-session-by-request/${groupEvent.groupSessionRequestId}`;
 
 									return (
-										<Col md={6} lg={4} key={groupEvent.groupSessionRequestId}>
-											<Link className="mb-2 d-block text-decoration-none" to={link}>
-												<StudioEvent groupEvent={groupEvent} />
+										<Col md={6} lg={4} key={groupEvent.groupSessionRequestId} className="mb-8">
+											<Link className="d-block text-decoration-none h-100" to={link}>
+												<StudioEvent className="h-100" groupEvent={groupEvent} />
 											</Link>
 										</Col>
 									);
 								}
 
 								return (
-									<Col md={6} lg={4} key={groupEvent.groupEventId}>
+									<Col md={6} lg={4} key={groupEvent.groupEventId} className="mb-8">
 										<Link
-											className="mb-2 d-block text-decoration-none"
+											className="d-block text-decoration-none h-100"
 											to={`/in-the-studio/${groupEvent.groupEventId}`}
 										>
-											<StudioEvent groupEvent={groupEvent} />
+											<StudioEvent className="h-100" groupEvent={groupEvent} />
 										</Link>
 									</Col>
 								);

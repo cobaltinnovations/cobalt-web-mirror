@@ -91,20 +91,20 @@ const Index: FC = () => {
 											return (
 												<Link
 													key={inTheStudioEvent.groupSessionId}
-													className="text-decoration-none"
+													className="d-block text-decoration-none h-100"
 													to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
 												>
-													<StudioEvent groupEvent={inTheStudioEvent} />
+													<StudioEvent className="h-100" groupEvent={inTheStudioEvent} />
 												</Link>
 											);
 										} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
 											return (
 												<Link
 													key={inTheStudioEvent.groupSessionRequestId}
-													className="text-decoration-none"
+													className="d-block text-decoration-none h-100"
 													to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
 												>
-													<StudioEvent groupEvent={inTheStudioEvent} />
+													<StudioEvent className="h-100" groupEvent={inTheStudioEvent} />
 												</Link>
 											);
 										} else {
