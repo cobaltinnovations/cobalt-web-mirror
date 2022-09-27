@@ -151,7 +151,9 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	}, []);
 
 	// track pageviews on navigation
-	const page = location.pathname;
+	// discard any search information on /auth, as it may be sensitive (access token redirect)
+	const page = location.pathname === '/auth' ? location.pathname : location.pathname + location.search;
+
 	const accountId = account?.accountId;
 	useEffect(() => {
 		if (!authCtxDidInit) {
