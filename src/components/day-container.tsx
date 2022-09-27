@@ -31,9 +31,7 @@ const DayContainer: FC<DayContainerProps> = (props) => {
 		<Container fluid className={classNames(props.className, classes.dayContainer)}>
 			<Container className={classes.dayContainerInner}>
 				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{props.children}
-					</Col>
+					<Col>{props.children}</Col>
 				</Row>
 			</Container>
 		</Container>
