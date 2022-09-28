@@ -32,6 +32,10 @@ const PrivateRoute = ({ children }: PropsWithChildren) => {
 	// Handle/start anonymous/immediate sessions when appropriate
 	const immediateAccess = searchParams.get('immediateAccess');
 	useEffect(() => {
+		if (account) {
+			return;
+		}
+
 		if (institution?.immediateAccessEnabled && immediateAccess && !isTrackedSession) {
 			accountService
 				.createAnonymousAccount()
@@ -51,6 +55,7 @@ const PrivateRoute = ({ children }: PropsWithChildren) => {
 		isTrackedSession,
 		processAccessToken,
 		setAccount,
+		account,
 	]);
 
 	useEffect(() => {

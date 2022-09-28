@@ -7,7 +7,6 @@ import { AccountInstitutionCapabilities, AccountModel, AccountSourceId } from '@
 import { accountService, institutionService } from '@/lib/services';
 
 import { AccountSource, Institution } from '@/lib/models/institution';
-import useHandleError from '@/hooks/use-handle-error';
 import useSubdomain from '@/hooks/use-subdomain';
 import { routeRedirects } from '@/route-redirects';
 
@@ -21,6 +20,7 @@ type AccountContextConfig = {
 	setAccount: React.Dispatch<React.SetStateAction<AccountModel | undefined>>;
 	processAccessToken: (token: string, shouldFetchAccount?: boolean) => void;
 	initialized: boolean;
+	failedToInit: boolean;
 	didCheckImmediateFlag: boolean;
 	isAnonymous: boolean;
 	institution: Institution | undefined;
@@ -37,6 +37,7 @@ const AccountContext = createContext({} as AccountContextConfig);
 const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const match = useMatch('*');
 	const [initialized, setInitialized] = useState(false);
+	const [failedToInit, setFailedToInit] = useState(false);
 	const [didCheckAccessToken, setDidCheckAccessToken] = useState(false);
 	const [didCheckTrackFlag, setDidCheckTrackFlag] = useState(false);
 	const [didProcessRedirects, setDidProcessRedirects] = useState(false);
@@ -44,6 +45,8 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 	const [institution, setInstitution] = useState<Institution | undefined>(undefined);
 	const [accountSources, setAccountSources] = useState<AccountSource[] | undefined>(undefined);
+	const location = useLocation();
+	const [redirectTo, setRedirectTo] = useState(location.pathname + location.search);
 
 	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
 
@@ -74,6 +77,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('x-mhic-cobalt-token');
 		Cookies.remove('piccobalt_patientcontext');
 		Cookies.remove('trackActivity');
+		setRedirectTo('/');
 		setIsTrackedSession(false);
 
 		try {
@@ -104,30 +108,31 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			const decodedAccessToken = jwtDecode(token) as DecodedAccessToken;
 			const expirationDate = new Date(decodedAccessToken.exp * 1000);
 			Cookies.set('accessToken', token, { expires: expirationDate });
-			setAccessToken(token);
+			const authRedirectUrl = Cookies.get('authRedirectUrl') || redirectTo;
 
 			if (shouldFetchAccount) {
 				const accountId = decodedAccessToken.sub;
+
 				try {
 					const response = await accountService.account(accountId).fetch();
 					setAccount(response.account);
 					setInstitution(response.institution);
-
-					setDidCheckAccessToken(true);
+					setAccessToken(token);
+					Cookies.remove('authRedirectUrl');
+					navigate(authRedirectUrl, { replace: true });
 				} catch (error) {
-					return navigate('/sign-in', { replace: true });
+					signOutAndClearContext();
+					Cookies.set('authRedirectUrl', authRedirectUrl);
+					if (isTrackedSession) {
+						Cookies.set('trackActivity', '1');
+					}
+				} finally {
+					setDidCheckAccessToken(true);
+					setDidCheckImmediateFlag(true);
 				}
 			}
-
-			const authRedirectUrl = Cookies.get('authRedirectUrl');
-			Cookies.remove('authRedirectUrl');
-
-			setDidCheckImmediateFlag(true);
-			if (authRedirectUrl) {
-				navigate(authRedirectUrl, { replace: true });
-			}
 		},
-		[navigate]
+		[redirectTo, navigate, signOutAndClearContext, isTrackedSession]
 	);
 
 	// Fetch subdomain instituion on mount
@@ -141,6 +146,9 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			.then((response) => {
 				setAccountSources(response.accountSources);
 				setInstitution(response.institution);
+			})
+			.catch((e) => {
+				setFailedToInit(true);
 			});
 	}, [sessionAccountSourceId, subdomain]);
 
@@ -240,6 +248,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		setAccount,
 		processAccessToken,
 		initialized,
+		failedToInit,
 		didCheckImmediateFlag,
 		isAnonymous,
 		institution,

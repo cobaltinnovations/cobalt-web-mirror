@@ -26,10 +26,10 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 }));
 
 export interface HeaderUnauthenticatedProps {
-	showSignInButton?: boolean;
+	hideSignInButton?: boolean;
 }
 
-const HeaderUnauthenticated = ({ showSignInButton }: HeaderUnauthenticatedProps) => {
+const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps) => {
 	const navigate = useNavigate();
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
@@ -66,7 +66,8 @@ const HeaderUnauthenticated = ({ showSignInButton }: HeaderUnauthenticatedProps)
 			<Link className="d-block" to="/sign-in">
 				<Logo className="text-primary d-block" />
 			</Link>
-			{!match && (
+
+			{!hideSignInButton && !match && (
 				<Button
 					size="sm"
 					onClick={() => {
