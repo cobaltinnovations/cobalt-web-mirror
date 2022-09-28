@@ -73,6 +73,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
 		Cookies.remove('authRedirectUrl');
+		Cookies.remove('ssoRedirectUrl');
 		Cookies.remove('immediateAccess');
 		Cookies.remove('seenWaivedCopay');
 		Cookies.remove('x-mhic-cobalt-token');
@@ -109,7 +110,13 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			const decodedAccessToken = jwtDecode(token) as DecodedAccessToken;
 			const expirationDate = new Date(decodedAccessToken.exp * 1000);
 			Cookies.set('accessToken', token, { expires: expirationDate });
-			const authRedirectUrl = Cookies.get('authRedirectUrl') || redirectTo;
+			const ssoRedirectUrl = Cookies.get('ssoRedirectUrl');
+
+			let authRedirectUrl = ssoRedirectUrl || Cookies.get('authRedirectUrl') || redirectTo;
+
+			if (authRedirectUrl.startsWith('/auth')) {
+				authRedirectUrl = '/';
+			}
 
 			if (shouldFetchAccount) {
 				const accountId = decodedAccessToken.sub;
@@ -119,7 +126,9 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					setAccount(response.account);
 					setInstitution(response.institution);
 					setAccessToken(token);
+					Cookies.remove('ssoRedirectUrl');
 					Cookies.remove('authRedirectUrl');
+
 					navigate(authRedirectUrl, { replace: true });
 				} catch (error) {
 					signOutAndClearContext();
