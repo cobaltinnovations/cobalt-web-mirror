@@ -9,6 +9,7 @@ import { accountService, institutionService } from '@/lib/services';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import useSubdomain from '@/hooks/use-subdomain';
 import { routeRedirects } from '@/route-redirects';
+import { isErrorConfig } from '@/lib/utils/error-utils';
 
 type DecodedAccessToken = {
 	sub: string;
@@ -122,7 +123,11 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					navigate(authRedirectUrl, { replace: true });
 				} catch (error) {
 					signOutAndClearContext();
-					Cookies.set('authRedirectUrl', authRedirectUrl);
+
+					if (!isErrorConfig(error) || error.code !== 'AUTHENTICATION_REQUIRED') {
+						Cookies.set('authRedirectUrl', authRedirectUrl);
+					}
+
 					if (isTrackedSession) {
 						Cookies.set('trackActivity', '1');
 					}

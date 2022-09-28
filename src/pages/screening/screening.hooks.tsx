@@ -4,7 +4,7 @@ import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import { ERROR_CODES, OrchestratedRequest } from '@/lib/http-client';
+import { ERROR_CODES } from '@/lib/http-client';
 import {
 	ScreeningFlowVersion,
 	ScreeningSession,
@@ -13,82 +13,8 @@ import {
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-
-export interface UseOrchestratedRequestHookOptions {
-	initialize: boolean | string;
-}
-
-export function useOrchestratedRequest<T>(
-	req: OrchestratedRequest<T>,
-	options: UseOrchestratedRequestHookOptions = {
-		initialize: true,
-	}
-) {
-	const { initialize } = options;
-	const [{ fetch, abort, requestComplete }, refetch] = useState(req);
-	const [response, setResponse] = useState<T>();
-	const [isLoading, setIsLoading] = useState(!!initialize);
-
-	const abortedRef = useRef(false);
-	const initialFetchResolver = useRef<(v: T) => void>();
-
-	const doFetch = useCallback(async () => {
-		setIsLoading(true);
-		try {
-			abortedRef.current = false;
-
-			const res = await fetch();
-
-			if (initialFetchResolver.current) {
-				initialFetchResolver.current(res);
-				delete initialFetchResolver.current;
-			}
-
-			setResponse(res);
-
-			return res;
-		} catch (e) {
-			return Promise.reject(e);
-		} finally {
-			if (abortedRef.current) {
-				return;
-			}
-
-			setIsLoading(false);
-		}
-	}, [fetch]);
-
-	const initialFetch = useCallback(() => {
-		if (initialize) {
-			return new Promise((res) => {
-				initialFetchResolver.current = res;
-			});
-		}
-	}, [initialize]);
-
-	useEffect(() => {
-		if (initialize) {
-			doFetch();
-		}
-	}, [doFetch, initialize]);
-
-	useEffect(() => {
-		return () => {
-			if (initialize && !requestComplete) {
-				abort();
-			}
-		};
-	}, [abort, initialize, requestComplete]);
-
-	return {
-		response,
-		refetch,
-		isLoading,
-		initialFetch,
-	};
-}
 
 export function useScreeningNavigation() {
 	const location = useLocation();
@@ -97,30 +23,45 @@ export function useScreeningNavigation() {
 	const { trackEvent } = useAnalytics();
 
 	const navigateToDestination = useCallback(
-		(destination?: ScreeningSessionDestination, params?: Record<string, any>) => {
+		(destination?: ScreeningSessionDestination, params?: Record<string, any>, replace = false) => {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
 					openInCrisisModal(true);
 					return;
 				case ScreeningSessionDestinationId.CONTENT_LIST:
-					navigate({
-						pathname: '/on-your-time',
-						search: new URLSearchParams(params).toString(),
-					});
+					navigate(
+						{
+							pathname: '/on-your-time',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
 					return;
 				case ScreeningSessionDestinationId.GROUP_SESSION_LIST:
-					navigate({
-						pathname: '/in-the-studio',
-						search: new URLSearchParams(params).toString(),
-					});
+					navigate(
+						{
+							pathname: '/in-the-studio',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
-					navigate({
-						pathname: '/connect-with-support',
-						search: new URLSearchParams(params).toString(),
-					});
+					navigate(
+						{
+							pathname: '/connect-with-support',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
 					return;
 				}
 			}
@@ -156,16 +97,15 @@ export function useScreeningNavigation() {
 export function useScreeningFlow(screeningFlowId?: string) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
-	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(
-		!screeningFlowId || searchParams.get('skipped') === 'true'
-	);
+	const isSkipped = searchParams.get('skipped') === 'true';
+	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(!screeningFlowId || isSkipped);
 	const [screeningSessions, setScreeningSessions] = useState<ScreeningSession[]>([]);
 	const [showPhoneModal, setShowPhoneModal] = useState(false);
 	const { trackEvent } = useAnalytics();
 
 	const [activeFlowVersion, setActiveFlowVersion] = useState<ScreeningFlowVersion>();
 	const handleError = useHandleError();
-	const { navigateToNext } = useScreeningNavigation();
+	const { navigateToNext, navigateToDestination } = useScreeningNavigation();
 
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
@@ -196,7 +136,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext]);
 
 	useEffect(() => {
-		if (isImmediateSession) {
+		if (isImmediateSession || isSkipped) {
 			setDidCheckScreeningSessions(true);
 			return;
 		}
@@ -228,7 +168,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [handleError, isImmediateSession, screeningFlowId]);
+	}, [handleError, isImmediateSession, isSkipped, screeningFlowId]);
 
 	useEffect(() => {
 		if (!activeFlowVersion) {
@@ -255,11 +195,16 @@ export function useScreeningFlow(screeningFlowId?: string) {
 					return;
 				}
 
-				setDidCheckScreeningSessions(true);
-
 				screeningService
 					.skipScreeningFlowVersion(activeFlowVersion?.screeningFlowVersionId)
 					.fetch()
+					.then((response) => {
+						navigateToDestination(
+							response.screeningSession.screeningSessionDestination,
+							{ skipped: true },
+							true // replace
+						);
+					})
 					.catch((e) => {
 						if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 							handleError(e);

@@ -80,3 +80,11 @@ export interface ScreeningAnswer {
 }
 
 export type ScreeningAnswerSelection = Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>;
+
+export interface ScreeningQuestionContextResponse {
+	previousScreeningQuestionContextId: string;
+	screeningQuestion: ScreeningQuestion;
+	screeningAnswerOptions: ScreeningAnswerOption[];
+	screeningAnswers: ScreeningAnswer[];
+	screeningSessionDestination: ScreeningSessionDestination;
+}

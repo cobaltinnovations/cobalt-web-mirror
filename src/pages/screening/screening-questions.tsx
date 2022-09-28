@@ -2,29 +2,28 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
-import { ScreeningAnswerFormatId, ScreeningAnswerSelection } from '@/lib/models';
+import { ScreeningAnswerFormatId, ScreeningAnswerSelection, ScreeningQuestionContextResponse } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { useOrchestratedRequest, useScreeningNavigation } from './screening.hooks';
+import { useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [screeningQuestionContextResponse, setScreeningQuestionContextResponse] =
+		useState<ScreeningQuestionContextResponse>();
 
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
 
-	const [requestInitializer, setRequestInitializer] = useState<string>();
-	const {
-		response: screeningQuestionContextResponse,
-		initialFetch,
-		refetch,
-	} = useOrchestratedRequest(screeningService.getScreeningQuestionContext(screeningQuestionContextId), {
-		initialize: requestInitializer || false,
-	});
+	const fetchData = useCallback(async () => {
+		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
+		const response = await request.fetch();
+		setScreeningQuestionContextResponse(response);
+	}, [screeningQuestionContextId]);
 
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
@@ -67,11 +66,6 @@ const ScreeningQuestionsPage = () => {
 		},
 		[answerText, handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId]
 	);
-
-	useEffect(() => {
-		refetch(screeningService.getScreeningQuestionContext(screeningQuestionContextId));
-		setRequestInitializer(screeningQuestionContextId);
-	}, [refetch, screeningQuestionContextId]);
 
 	useEffect(() => {
 		if (
@@ -228,7 +222,7 @@ const ScreeningQuestionsPage = () => {
 	}, [isSubmitting, screeningQuestionContextResponse, selectedAnswers.length]);
 
 	return (
-		<AsyncPage fetchData={initialFetch}>
+		<AsyncPage fetchData={fetchData}>
 			<Container className="py-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
