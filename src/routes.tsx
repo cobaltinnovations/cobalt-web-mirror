@@ -95,6 +95,7 @@ const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps)
 	!!institution?.supportEnabled;
 const isConsentRequiredRouteGuard = ({ institution }: RouteGuardProps) => !!institution?.requireConsentForm;
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
+const isContactUsEnabledGuard = ({ institution }: RouteGuardProps) => !!institution?.contactUsEnabled;
 
 const RedirectToSupport = () => {
 	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
@@ -379,6 +380,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			{
 				path: '/feedback',
 				private: true,
+				routeGuard: isContactUsEnabledGuard,
 				main: Feedback,
 			},
 			{

@@ -521,11 +521,13 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 									Privacy
 								</Link>
 							</li>
-							<li>
-								<Link to="/feedback" onClick={onHide}>
-									Contact us
-								</Link>
-							</li>
+							{institution?.contactUsEnabled && (
+								<li>
+									<Link to="/feedback" onClick={onHide}>
+										Contact us
+									</Link>
+								</li>
+							)}
 						</ul>
 
 						<div className="px-5">
