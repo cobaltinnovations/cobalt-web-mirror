@@ -11,6 +11,7 @@ import mediaQueries from '@/jss/media-queries';
 import { AccountSource } from '@/lib/models';
 import useSubdomain from '@/hooks/use-subdomain';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import Cookies from 'js-cookie';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -165,6 +166,8 @@ const SignInOptions = () => {
 									return;
 								}
 
+								Cookies.set('ssoRedirectUrl', Cookies.get('authRedirectUrl') || '/');
+
 								window.location.href = option.ssoUrl;
 							}}
 						>
@@ -229,6 +232,8 @@ const SignInOptions = () => {
 										onClick={() => {
 											if (accountSources && accountSources.length === 1) {
 												const firstAccountSource = accountSources[0];
+												Cookies.set('ssoRedirectUrl', Cookies.get('authRedirectUrl') || '/');
+
 												window.location.href = firstAccountSource.ssoUrl;
 											} else {
 												setSsoModalIsOpen(true);

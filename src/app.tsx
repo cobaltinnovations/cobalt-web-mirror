@@ -35,10 +35,12 @@ import { CobaltThemeProvider } from './jss/theme';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-multi-carousel/lib/styles.css';
 import './scss/main.scss';
+import ErrorDisplay from './components/error-display';
+import HeaderUnauthenticated from './components/header-unauthenticated';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { account, institution, initialized, didCheckImmediateFlag } = useAccount();
+	const { account, institution, failedToInit, initialized, didCheckImmediateFlag } = useAccount();
 
 	const { pathname } = useLocation();
 
@@ -48,6 +50,22 @@ const AppWithProviders: FC = () => {
 
 	useConsentRedirect();
 	useUrlViewTracking();
+
+	if (failedToInit) {
+		return (
+			<>
+				<HeaderUnauthenticated hideSignInButton />
+				<ErrorDisplay
+					error={{}}
+					showBackButton={false}
+					showRetryButton={true}
+					onRetryButtonClick={() => {
+						window.location.reload();
+					}}
+				/>
+			</>
+		);
+	}
 
 	if (!initialized) {
 		return <Loader />;

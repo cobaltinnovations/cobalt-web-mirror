@@ -1,8 +1,7 @@
 import {
 	ScreeningAnswer,
-	ScreeningAnswerOption,
 	ScreeningFlowVersion,
-	ScreeningQuestion,
+	ScreeningQuestionContextResponse,
 	ScreeningSession,
 	ScreeningSessionDestination,
 } from '@/lib/models';
@@ -55,13 +54,7 @@ export const screeningService = {
 	},
 
 	getScreeningQuestionContext(screeningQuestionContextId?: string) {
-		return httpSingleton.orchestrateRequest<{
-			previousScreeningQuestionContextId: string;
-			screeningQuestion: ScreeningQuestion;
-			screeningAnswerOptions: ScreeningAnswerOption[];
-			screeningAnswers: ScreeningAnswer[];
-			screeningSessionDestination: ScreeningSessionDestination;
-		}>({
+		return httpSingleton.orchestrateRequest<ScreeningQuestionContextResponse>({
 			method: 'get',
 			url: `/screening-question-contexts/${screeningQuestionContextId || ''}`,
 		});
