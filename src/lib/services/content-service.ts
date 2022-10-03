@@ -27,7 +27,7 @@ interface GetPresignedUploadUrlResponseBody {
 
 interface FetchContentListQueryParams {
 	format?: string;
-	maxLengthMinutes?: string;
+	maxLengthMinutes?: number;
 }
 
 export const contentService = {
