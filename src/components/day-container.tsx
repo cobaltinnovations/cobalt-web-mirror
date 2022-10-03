@@ -13,9 +13,9 @@ const useDayContainerStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	dayContainerInner: {
-		paddingTop: 15,
 		[mediaQueries.md]: {
-			padding: '5px 0',
+			paddingTop: 5,
+			paddingBottom: 5,
 		},
 	},
 }));
