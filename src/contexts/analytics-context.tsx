@@ -1,5 +1,5 @@
 import useAccount from '@/hooks/use-account';
-import React, { FC, createContext, PropsWithChildren, useEffect, useCallback } from 'react';
+import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
 import config from '@/lib/config';
@@ -31,7 +31,7 @@ export class ScreeningAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Screening;
-	constructor(public action: ScreeningEventActions) {}
+	constructor(public action: ScreeningEventActions, public label?: string) {}
 }
 
 /**
@@ -133,11 +133,94 @@ const AnalyticsContext = createContext<
 	| undefined
 >(undefined);
 
+let gtag = function (...args: unknown[]) {
+	//@ts-expect-error googtagmanager expects `arguments` not an Array
+	window.dataLayer.push(arguments);
+};
+
+if (__DEV__) {
+	// exposing this to test/debug in browser console:
+	//@ts-expect-error
+	window.__GA4__ = window.__GA4__ || [];
+	const original = gtag;
+	gtag = function devGtag() {
+		original(...arguments);
+		//@ts-expect-error
+		window.__GA4__.push(arguments);
+	};
+}
+
 const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	const location = useLocation();
-	const { account, initialized: authCtxDidInit } = useAccount();
+	const { institution, account, initialized } = useAccount();
+
+	const enabledVersionsRef = useRef({
+		reactGa: false,
+		ga4: false,
+	});
+	const isReactGAEnabled = enabledVersionsRef.current.reactGa;
+	const isGA4Enabled = enabledVersionsRef.current.ga4;
+	const configuredMeasurementIdsRef = useRef<Record<string, boolean>>({});
+
+	const configureMeasurementId = useCallback((measurementId: string) => {
+		if (!enabledVersionsRef.current.ga4 || configuredMeasurementIdsRef.current[measurementId]) {
+			return;
+		}
+
+		gtag('config', measurementId, {
+			send_page_view: false,
+		});
+
+		configuredMeasurementIdsRef.current[measurementId] = true;
+	}, []);
+
+	const gtagPageView = useCallback((measurementId: string, page: string) => {
+		gtag('event', 'page_view', {
+			page_title: document.title,
+			page_location: document.location.href,
+			page_path: page,
+			send_to: measurementId,
+		});
+	}, []);
+
+	const initialMeasurementId = config.COBALT_WEB_GA4_MEASUREMENT_ID || institution?.ga4MeasurementId;
+	useEffect(() => {
+		if (!initialMeasurementId) {
+			return;
+		}
+
+		enabledVersionsRef.current.ga4 = true;
+		//@ts-expect-error
+		window.dataLayer = window.dataLayer || [];
+
+		const script = document.createElement('script');
+		script.async = true;
+		script.type = 'text/javascript';
+		script.src = `https://www.googletagmanager.com/gtag/js?id=${initialMeasurementId}`;
+
+		document.head.insertBefore(script, document.head.firstChild);
+
+		gtag('js', new Date());
+		configureMeasurementId(initialMeasurementId);
+	}, [configureMeasurementId, initialMeasurementId]);
 
 	useEffect(() => {
+		if (!institution?.ga4MeasurementId) {
+			return;
+		} else if (!isGA4Enabled) {
+			enabledVersionsRef.current.ga4 = true;
+		}
+
+		configureMeasurementId(institution.ga4MeasurementId);
+	}, [isGA4Enabled, configureMeasurementId, institution?.ga4MeasurementId]);
+
+	useEffect(() => {
+		if (!config.COBALT_WEB_GA_TRACKING_ID) {
+			return;
+		}
+
+		enabledVersionsRef.current.reactGa = true;
+
 		ReactGA.initialize(config.COBALT_WEB_GA_TRACKING_ID, {
 			testMode: __DEV__,
 		});
@@ -150,27 +233,87 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, []);
 
+	const accountId = account?.accountId;
+	useEffect(() => {
+		if (!initialized) {
+			return;
+		}
+
+		if (enabledVersionsRef.current.reactGa) {
+			ReactGA.set({ accountId });
+		}
+
+		if (enabledVersionsRef.current.ga4) {
+			gtag('set', { accountId });
+		}
+	}, [accountId, initialized]);
+
 	// track pageviews on navigation
 	// discard any search information on /auth, as it may be sensitive (access token redirect)
 	const page = location.pathname === '/auth' ? location.pathname : location.pathname + location.search;
 
-	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!authCtxDidInit) {
+		if (!initialized || !isReactGAEnabled) {
 			return;
 		}
 
-		ReactGA.set({ page, accountId });
+		ReactGA.set({ page });
 		ReactGA.pageview(page);
-	}, [accountId, authCtxDidInit, page]);
+	}, [initialized, isReactGAEnabled, page]);
 
-	const trackEvent = useCallback((event: AnalyticsEvent) => {
-		ReactGA.event(event);
-	}, []);
+	useEffect(() => {
+		if (!initialized || !isGA4Enabled) {
+			return;
+		}
 
-	const trackModalView = useCallback((modalName: string) => {
-		ReactGA.modalview(modalName);
-	}, []);
+		gtag('set', { page });
+		for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
+			gtagPageView(measurementId, page);
+		}
+	}, [initialized, gtagPageView, isGA4Enabled, page]);
+
+	const trackEvent = useCallback(
+		(event: AnalyticsEvent) => {
+			if (!initialized) {
+				return;
+			}
+
+			if (enabledVersionsRef.current.reactGa) {
+				ReactGA.event(event);
+			}
+
+			if (enabledVersionsRef.current.ga4) {
+				for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
+					gtag('event', event.action, {
+						event_category: event.category,
+						event_label: event.label,
+						non_interaction: event.nonInteractive,
+						send_to: measurementId,
+					});
+				}
+			}
+		},
+		[initialized]
+	);
+
+	const trackModalView = useCallback(
+		(modalName: string) => {
+			if (!initialized) {
+				return;
+			}
+
+			if (enabledVersionsRef.current.reactGa) {
+				ReactGA.modalview(modalName);
+			}
+
+			if (enabledVersionsRef.current.ga4) {
+				for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
+					gtagPageView(measurementId, `/modal/${modalName}`);
+				}
+			}
+		},
+		[initialized, gtagPageView]
+	);
 
 	return (
 		<AnalyticsContext.Provider
