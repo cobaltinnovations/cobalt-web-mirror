@@ -133,6 +133,8 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 					return <Worksheet className={classes.icon} />;
 				case ContentTypeId.Podcast:
 					return <Podcast className={classes.icon} />;
+				case ContentTypeId.App:
+					return <Article className={classes.icon} />;
 				default:
 					return <></>;
 			}

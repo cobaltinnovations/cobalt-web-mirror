@@ -9,6 +9,7 @@ export enum ContentTypeId {
 	Article = 'ARTICLE',
 	Worksheet = 'WORKSHEET',
 	Podcast = 'PODCAST',
+	App = 'APP',
 }
 
 export enum ContentTypeIdLabel {
@@ -19,6 +20,7 @@ export enum ContentTypeIdLabel {
 	ARTICLE = 'Article',
 	WORKSHEET = 'Worksheet',
 	PODCAST = 'Podcast',
+	APP = 'App',
 }
 
 export enum ContentApprovalStatusId {
