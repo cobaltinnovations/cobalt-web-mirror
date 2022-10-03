@@ -429,6 +429,9 @@ const CreateOnYourTimeContent: FC = () => {
 																		>
 																			Worksheet
 																		</option>
+																		<option key={'App'} value={ContentTypeId.App}>
+																			App
+																		</option>
 																	</InputHelper>
 																</div>
 															</Col>
