@@ -72,6 +72,7 @@ If you ever need to test your code against the server, create a production build
 | WEBAPP_SUBDOMAIN_MAPPING                    | a comma-separated list mapping `subdomain:build` for NodeJS webapp.                                                      |
 | COBALT_WEB_API_BASE_URL                     | API base url                                                                                                             |
 | COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                                                                              |
+| COBALT_WEB_GA4_MEASUREMENT_ID               | Google Analytics 4 Measurement ID `G-XYZ123ABC`                                                                          |
 | COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")                                                                         |
 | COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                                                                              |
 | COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")                                                              |

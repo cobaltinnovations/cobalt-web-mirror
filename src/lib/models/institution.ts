@@ -14,6 +14,7 @@ export interface Institution {
 	providerTriageScreeningFlowId: string;
 	requireConsentForm: boolean;
 	ssoEnabled: boolean;
+	ga4MeasurementId: string;
 	supportEmailAddress: string;
 	supportEnabled: boolean;
 	wellBeingContent: string;
