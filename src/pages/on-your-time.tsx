@@ -3,8 +3,14 @@ import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-do
 import { Container, Row, Col } from 'react-bootstrap';
 import Fuse from 'fuse.js';
 
-import { contentService, assessmentService, ContentListFormat } from '@/lib/services';
-import { Content, PersonalizationQuestion, PersonalizationChoice } from '@/lib/models';
+import { contentService, assessmentService, ContentListFormat, callToActionService } from '@/lib/services';
+import {
+	Content,
+	PersonalizationQuestion,
+	PersonalizationChoice,
+	CALL_TO_ACTION_DISPLAY_AREA_ID,
+	CallToActionModel,
+} from '@/lib/models';
 import AsyncPage from '@/components/async-page';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import PersonalizeRecommendationsModal from '@/components/personalize-recommendations-modal';
@@ -20,6 +26,7 @@ import HeroContainer from '@/components/hero-container';
 import useAnalytics from '@/hooks/use-analytics';
 import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 import { useScreeningFlow } from './screening/screening.hooks';
+import CallToAction from '@/components/call-to-action';
 
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
@@ -34,6 +41,7 @@ const OnYourTime: FC = () => {
 		institution?.contentScreeningFlowId
 	);
 
+	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
@@ -71,6 +79,14 @@ const OnYourTime: FC = () => {
 	const additionalFilteredList: Content[] = useMemo(() => {
 		return searchTerm ? additionalFuse.search(searchTerm).map((r) => r.item) : additionalItems;
 	}, [additionalFuse, additionalItems, searchTerm]);
+
+	const fetchCallsToAction = useCallback(async () => {
+		const response = await callToActionService
+			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.CONTENT_LIST })
+			.fetch();
+
+		setCallsToAction(response.callsToAction);
+	}, []);
 
 	const fetchFilters = useCallback(() => {
 		return assessmentService
@@ -179,6 +195,25 @@ const OnYourTime: FC = () => {
 			</HeroContainer>
 
 			<Container>
+				<AsyncPage fetchData={fetchCallsToAction}>
+					{callsToAction.length > 0 && (
+						<Row className="mb-4 mb-lg-8">
+							<Col>
+								{callsToAction.map((cta, index) => {
+									const isLast = callsToAction.length - 1 === index;
+									return (
+										<CallToAction
+											key={`cta-${index}`}
+											className={!isLast ? 'mb-4' : ''}
+											callToAction={cta}
+										/>
+									);
+								})}
+							</Col>
+						</Row>
+					)}
+				</AsyncPage>
+
 				<Row className="align-items-center">
 					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper

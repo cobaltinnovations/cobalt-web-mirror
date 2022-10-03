@@ -10,12 +10,18 @@ import HeroContainer from '@/components/hero-container';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent from '@/components/studio-event';
 import OnYourTimeItem from '@/components/on-your-time-item';
+import CallToAction from '@/components/call-to-action';
 
-import { recommendationsService, groupSessionsService, accountService } from '@/lib/services';
-import { GroupSessionRequestModel, Content, GroupSessionModel } from '@/lib/models';
+import { recommendationsService, groupSessionsService, accountService, callToActionService } from '@/lib/services';
+import {
+	GroupSessionRequestModel,
+	Content,
+	GroupSessionModel,
+	CALL_TO_ACTION_DISPLAY_AREA_ID,
+	CallToActionModel,
+} from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
-import { Exception } from 'sass';
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
@@ -24,12 +30,12 @@ const Index: FC = () => {
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
 	const [onYourTimeContent, setOnYourTimeContent] = useState<Content[]>([]);
+	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 
-	const accountId = account?.accountId;
 	const fetchData = useCallback(async () => {
-		if (!accountId) return;
+		if (!account?.accountId) return;
 
-		const response = await recommendationsService.getRecommendations(accountId).fetch();
+		const response = await recommendationsService.getRecommendations(account?.accountId).fetch();
 
 		setInTheStudioEvents([...response.groupSessionRequests, ...response.groupSessions]);
 		setOnYourTimeContent(response.contents);
@@ -37,13 +43,21 @@ const Index: FC = () => {
 		const roleId = Cookies.get('roleId');
 		if (roleId) {
 			try {
-				await accountService.postRoleRequest(accountId, roleId).fetch();
+				await accountService.postRoleRequest(account?.accountId, roleId).fetch();
 				Cookies.remove('roleId');
 			} catch (error) {
 				// dont throw
 			}
 		}
-	}, [accountId]);
+	}, [account?.accountId]);
+
+	const fetchCallsToAction = useCallback(async () => {
+		const response = await callToActionService
+			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.HOME })
+			.fetch();
+
+		setCallsToAction(response.callsToAction);
+	}, []);
 
 	function handleConnectWithSupportButtonClick() {
 		navigate('/connect-with-support');
@@ -65,6 +79,27 @@ const Index: FC = () => {
 					</div>
 				</HeroContainer>
 			)}
+
+			<AsyncPage fetchData={fetchCallsToAction}>
+				{callsToAction.length > 0 && (
+					<Container className="pt-4 pt-lg-8">
+						<Row>
+							<Col>
+								{callsToAction.map((cta, index) => {
+									const isLast = callsToAction.length - 1 === index;
+									return (
+										<CallToAction
+											key={`cta-${index}`}
+											className={!isLast ? 'mb-4' : ''}
+											callToAction={cta}
+										/>
+									);
+								})}
+							</Col>
+						</Row>
+					</Container>
+				)}
+			</AsyncPage>
 
 			{inTheStudioEvents.length > 0 && (
 				<>
