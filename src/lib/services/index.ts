@@ -4,6 +4,7 @@ export * from './admin-service';
 export * from './appointment-service';
 export * from './assessment-service';
 export * from './calendar-events-service';
+export * from './call-to-action-service';
 export * from './content-service';
 export * from './feedback-service';
 export * from './google-places-service';
