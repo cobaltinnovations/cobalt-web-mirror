@@ -65,7 +65,10 @@ const SignInOptions = () => {
 			const firstAccountSource = accountSources[0];
 
 			if (accountSources.length === 1) {
-				window.location.href = firstAccountSource.ssoUrl;
+				if (firstAccountSource.ssoUrl) {
+					window.location.href = firstAccountSource.ssoUrl;
+				}
+
 				return;
 			}
 
@@ -168,7 +171,9 @@ const SignInOptions = () => {
 
 								Cookies.set('ssoRedirectUrl', Cookies.get('authRedirectUrl') || '/');
 
-								window.location.href = option.ssoUrl;
+								if (option.ssoUrl) {
+									window.location.href = option.ssoUrl;
+								}
 							}}
 						>
 							Continue
@@ -234,7 +239,9 @@ const SignInOptions = () => {
 												const firstAccountSource = accountSources[0];
 												Cookies.set('ssoRedirectUrl', Cookies.get('authRedirectUrl') || '/');
 
-												window.location.href = firstAccountSource.ssoUrl;
+												if (firstAccountSource.ssoUrl) {
+													window.location.href = firstAccountSource.ssoUrl;
+												}
 											} else {
 												setSsoModalIsOpen(true);
 											}
