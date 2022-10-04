@@ -119,7 +119,7 @@ const SignUp: FC = () => {
 							}}
 						</Formik>
 						<p className="text-center">
-							Already have an account? <Link to="/sign-in/options">Sign In</Link>
+							Already have an account? <Link to="/sign-in/email">Sign In</Link>
 						</p>
 					</Col>
 				</Row>

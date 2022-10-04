@@ -26,7 +26,7 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const SignInOptions = () => {
+const SignInEmail = () => {
 	const handleError = useHandleError();
 	const { institution, processAccessToken } = useAccount();
 	const classes = useSignInStyles();
@@ -177,4 +177,4 @@ const SignInOptions = () => {
 	);
 };
 
-export default SignInOptions;
+export default SignInEmail;

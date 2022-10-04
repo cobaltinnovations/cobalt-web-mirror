@@ -123,7 +123,7 @@ const SignIn: FC = () => {
 														accountSource.accountSourceId ===
 														ACOUNT_SOURCE_ID.EMAIL_PASSWORD
 													) {
-														navigate('/sign-in/options');
+														navigate('/sign-in/email');
 													} else if (accountSource.ssoUrl) {
 														window.location.href = accountSource.ssoUrl;
 													}

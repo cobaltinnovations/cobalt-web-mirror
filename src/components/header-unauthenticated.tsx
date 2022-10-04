@@ -34,7 +34,7 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
 	const match = !!useMatch({
-		path: '/sign-in/options',
+		path: '/sign-in/email',
 		end: true,
 	});
 
@@ -71,7 +71,7 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 				<Button
 					size="sm"
 					onClick={() => {
-						navigate('/sign-in/options');
+						navigate('/sign-in/email');
 					}}
 				>
 					Sign In
