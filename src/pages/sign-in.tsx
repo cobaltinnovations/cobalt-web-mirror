@@ -24,14 +24,14 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	signInInner: {
-		maxWidth: 368,
+		maxWidth: 408,
 		margin: '0 auto',
 	},
 }));
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
-	const { processAccessToken } = useAccount();
+	const { institution, processAccessToken } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
@@ -80,7 +80,9 @@ const SignIn: FC = () => {
 								<Logo className="text-primary" />
 							</div>
 
-							<h1 className="mb-4 text-center">Connecting Penn employees to mental health resources</h1>
+							<h1 className="mb-4 text-center">
+								Connecting {institution?.name} employees to mental health resources
+							</h1>
 							<p className="mb-6 mb-lg-8 fs-large text-center">
 								Find the right level of mental healthcare, personalized for you.
 							</p>

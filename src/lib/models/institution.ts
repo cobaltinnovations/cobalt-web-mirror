@@ -3,7 +3,6 @@ export interface Institution {
 	providerTriageScreeningFlowId?: string;
 	contentScreeningFlowId?: string;
 	groupSessionsScreeningFlowId?: string;
-	description: string;
 	/** @deprecated */
 	crisisContent?: string;
 	/** @deprecated */
@@ -28,6 +27,7 @@ export interface Institution {
 	immediateAccessEnabled: boolean;
 	contactUsEnabled: boolean;
 	ga4MeasurementId?: string;
+	name: string;
 }
 
 export enum ACOUNT_SOURCE_ID {
