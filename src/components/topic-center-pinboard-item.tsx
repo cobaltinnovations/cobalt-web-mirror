@@ -39,6 +39,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	moreButton: {
 		padding: 0,
 		flexShrink: 0,
+		marginLeft: 24,
 		textDecoration: 'none',
 		color: theme.colors.n500,
 		...theme.fonts.bodyNormal,
@@ -80,6 +81,8 @@ const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, className }: Props) => {
 	const classes = useStyles();
 	const [isClamped, setIsClamped] = useState(false);
+
+	// TODO: watch window.resize to automatically clamp below lg, and unclamp above lg
 
 	return (
 		<div className={classNames(classes.topicCenterPinboard, className)}>
