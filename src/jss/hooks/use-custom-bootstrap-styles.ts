@@ -93,6 +93,12 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.bg-light': {
 			backgroundColor: `${theme.colors.n0} !important`,
 		},
+		'.bg-n50': {
+			backgroundColor: `${theme.colors.n50} !important`,
+		},
+		'.bg-n75': {
+			backgroundColor: `${theme.colors.n75} !important`,
+		},
 		'.bg-dark': {
 			backgroundColor: `${theme.colors.n900} !important`,
 		},

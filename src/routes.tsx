@@ -71,6 +71,7 @@ export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
 export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = React.lazy(() => import('@/pages/confirm-appointment'));
+export const SpacesOfColor = React.lazy(() => import('@/pages/spaces-of-color'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -531,6 +532,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/in-crisis',
 				private: false,
 				main: InCrisis,
+			},
+			{
+				path: '/spaces-of-color',
+				private: true,
+				main: SpacesOfColor,
 			},
 			{
 				path: '*',
