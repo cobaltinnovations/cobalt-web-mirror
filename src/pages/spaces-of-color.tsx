@@ -55,7 +55,7 @@ const SpacesOfColor = () => {
 			</Container>
 
 			<Container fluid className="bg-n50">
-				<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+				<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 					<Row>
 						<Col>
 							<h2 className="mb-2 mb-lg-4 text-center">Topic Center: Pinboard</h2>
@@ -65,7 +65,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 									description={
-										'<p className="mb-0">Fusce id est eu augue lobortis luctus faucibus consectetur quam. Nam vestibulum, leo eget condimentum tincidunt, tellus sem dictum diam, vel fringilla felis magna vel mauris. Donec euismod sodales mi et convallis. Suspendisse ac tortor eu purus posuere pulvinar id sit amet urna. Mauris tristique malesuada mauris quis lobortis. Nam blandit purus ut enim eleifend pharetra. Phasellus sed ultricies tellus, eu placerat odio.</p>'
+										'Fusce id est eu augue lobortis luctus faucibus consectetur quam. Nam vestibulum, leo eget condimentum tincidunt, tellus sem dictum diam, vel fringilla felis magna vel mauris. Donec euismod sodales mi et convallis. Suspendisse ac tortor eu purus posuere pulvinar id sit amet urna. Mauris tristique malesuada mauris quis lobortis. Nam blandit purus ut enim eleifend pharetra. Phasellus sed ultricies tellus, eu placerat odio.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
@@ -74,7 +74,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Vestibulum sed mauris in lorem suscipit porttitor sollicitudin vel lectus."
 									description={
-										'<p className="mb-0">Mauris semper aliquam sem in facilisis. Duis ut lacinia ante. Nam tempus nec turpis quis viverra. Morbi vitae malesuada quam, ac iaculis tellus. Maecenas ex enim, interdum eget rutrum commodo, viverra at felis. Nullam accumsan, velit a ultricies eleifend, urna orci facilisis ligula, eget mollis justo nulla eget quam. Fusce vel mattis mi. Nulla malesuada, nibh vel laoreet sodales, urna ante ullamcorper enim, in ornare nunc ante et turpis. Fusce arcu mi, venenatis tristique ex in, interdum condimentum neque.</p>'
+										'Mauris semper aliquam sem in facilisis. Duis ut lacinia ante. Nam tempus nec turpis quis viverra. Morbi vitae malesuada quam, ac iaculis tellus. Maecenas ex enim, interdum eget rutrum commodo, viverra at felis. Nullam accumsan, velit a ultricies eleifend, urna orci facilisis ligula, eget mollis justo nulla eget quam. Fusce vel mattis mi. Nulla malesuada, nibh vel laoreet sodales, urna ante ullamcorper enim, in ornare nunc ante et turpis. Fusce arcu mi, venenatis tristique ex in, interdum condimentum neque.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
@@ -83,7 +83,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Aenean porttitor dui nec est finibus, ullamcorper commodo enim gravida."
 									description={
-										'<p className="mb-0">Duis tempus semper justo vel lacinia. Donec sollicitudin, massa sit amet sodales finibus, arcu risus interdum enim, eget vestibulum mauris felis in risus. Nunc ac viverra justo. In in luctus quam. Quisque augue risus, finibus at lectus vitae, cursus posuere neque. Nullam feugiat enim nec lacinia imperdiet. Integer varius volutpat ante sit amet congue.</p>'
+										'Duis tempus semper justo vel lacinia. Donec sollicitudin, massa sit amet sodales finibus, arcu risus interdum enim, eget vestibulum mauris felis in risus. Nunc ac viverra justo. In in luctus quam. Quisque augue risus, finibus at lectus vitae, cursus posuere neque. Nullam feugiat enim nec lacinia imperdiet. Integer varius volutpat ante sit amet congue.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
@@ -92,7 +92,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Nunc dapibus ipsum vel lectus tincidunt placerat."
 									description={
-										'<p className="mb-0">Quisque condimentum auctor felis, sit amet vehicula dolor laoreet hendrerit. Aliquam id mi tristique, tincidunt lectus non, dignissim arcu. Sed quam magna, interdum a risus nec, vestibulum volutpat libero. Sed placerat convallis malesuada. In hac habitasse platea dictumst. Etiam eget quam efficitur, euismod mi at, posuere turpis. Ut commodo nibh in ullamcorper scelerisque. Curabitur id ornare urna. Aliquam fermentum enim nec purus placerat, sed porta sem tincidunt. Vestibulum varius sodales libero sit amet iaculis. Vivamus efficitur sagittis dolor et ullamcorper. Duis pretium consequat dolor, et cursus lacus scelerisque vel. Morbi viverra porttitor nibh tempus efficitur.</p>'
+										'Quisque condimentum auctor felis, sit amet vehicula dolor laoreet hendrerit. Aliquam id mi tristique, tincidunt lectus non, dignissim arcu. Sed quam magna, interdum a risus nec, vestibulum volutpat libero. Sed placerat convallis malesuada. In hac habitasse platea dictumst. Etiam eget quam efficitur, euismod mi at, posuere turpis. Ut commodo nibh in ullamcorper scelerisque. Curabitur id ornare urna. Aliquam fermentum enim nec purus placerat, sed porta sem tincidunt. Vestibulum varius sodales libero sit amet iaculis. Vivamus efficitur sagittis dolor et ullamcorper. Duis pretium consequat dolor, et cursus lacus scelerisque vel. Morbi viverra porttitor nibh tempus efficitur.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
@@ -101,7 +101,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Pellentesque eget enim scelerisque nunc egestas vehicula sit amet id lectus."
 									description={
-										'<p className="mb-0">Etiam sem dui, rhoncus at dolor non, sodales dapibus tellus. Proin et risus eget quam pulvinar rutrum. Integer rhoncus, est in gravida ornare, metus est sagittis tellus, vitae feugiat ligula odio a neque. Praesent malesuada tortor ullamcorper, lacinia eros eget, posuere leo. Cras rutrum tempor ligula, ac cursus urna rhoncus quis. Phasellus vel placerat tortor. Donec ante urna, lacinia sit amet egestas sit amet, pellentesque et urna. Curabitur gravida aliquam ante, sit amet fringilla lorem. Cras quis tempor augue, sed fermentum orci. Donec commodo, velit ut euismod accumsan, tortor turpis pretium elit, nec efficitur nunc lacus vel augue. Vestibulum et congue arcu.</p>'
+										'Etiam sem dui, rhoncus at dolor non, sodales dapibus tellus. Proin et risus eget quam pulvinar rutrum. Integer rhoncus, est in gravida ornare, metus est sagittis tellus, vitae feugiat ligula odio a neque. Praesent malesuada tortor ullamcorper, lacinia eros eget, posuere leo. Cras rutrum tempor ligula, ac cursus urna rhoncus quis. Phasellus vel placerat tortor. Donec ante urna, lacinia sit amet egestas sit amet, pellentesque et urna. Curabitur gravida aliquam ante, sit amet fringilla lorem. Cras quis tempor augue, sed fermentum orci. Donec commodo, velit ut euismod accumsan, tortor turpis pretium elit, nec efficitur nunc lacus vel augue. Vestibulum et congue arcu.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
@@ -110,7 +110,7 @@ const SpacesOfColor = () => {
 									className="mb-lg-8"
 									title="Cras porttitor diam nec dapibus ultrices."
 									description={
-										'<p className="mb-0">In non elit dignissim, imperdiet enim vitae, tincidunt nibh. Morbi quis purus ultrices, suscipit tortor sed, vehicula mi. Nullam augue ante, sagittis ac tortor sit amet, feugiat suscipit ipsum. Mauris in mi vel risus egestas dapibus. Praesent cursus ante at ipsum aliquam egestas. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum eu sapien purus. In hac habitasse platea dictumst. In dignissim mauris in sagittis eleifend. Ut cursus libero ac malesuada porttitor. Nunc sodales urna orci, eget semper nisl aliquam vitae. Sed eget mauris sed nisl faucibus molestie. Maecenas ac tincidunt orci.</p>'
+										'In non elit dignissim, imperdiet enim vitae, tincidunt nibh. Morbi quis purus ultrices, suscipit tortor sed, vehicula mi. Nullam augue ante, sagittis ac tortor sit amet, feugiat suscipit ipsum. Mauris in mi vel risus egestas dapibus. Praesent cursus ante at ipsum aliquam egestas. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum eu sapien purus. In hac habitasse platea dictumst. In dignissim mauris in sagittis eleifend. Ut cursus libero ac malesuada porttitor. Nunc sodales urna orci, eget semper nisl aliquam vitae. Sed eget mauris sed nisl faucibus molestie. Maecenas ac tincidunt orci.'
 									}
 									url="https://www.google.com/"
 									imageUrl="https://via.placeholder.com/160x160"
