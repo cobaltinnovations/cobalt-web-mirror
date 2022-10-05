@@ -25,6 +25,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		borderRadius: 5,
 		position: 'relative',
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		backgroundRepeat: 'no-repeat',
 		backgroundColor: theme.colors.n300,
 		'& .cobalt-badge': {
 			right: 8,
@@ -53,6 +56,7 @@ interface Props {
 	badgeTitle?: string;
 	buttonTitle: string;
 	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	imageUrl: string;
 	className?: string;
 }
 
@@ -66,13 +70,14 @@ export const TopicCenterGroupSession = ({
 	badgeTitle,
 	buttonTitle,
 	onClick,
+	imageUrl,
 	className,
 }: Props) => {
 	const classes = useStyles();
 
 	return (
 		<div className={classNames(classes.topicCenterGroupSession, className)}>
-			<div className={classes.imageOuter}>
+			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl})` }}>
 				{badgeTitle && (
 					<Badge className="d-lg-none" as="div" bg="outline-secondary" pill>
 						{badgeTitle}

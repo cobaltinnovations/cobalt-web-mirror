@@ -38,6 +38,7 @@
 		"react-input-mask": "^2.0.4",
 		"react-jss": "^10.4.0",
 		"react-lines-ellipsis": "^0.15.3",
+		"react-masonry-css": "^1.0.16",
 		"react-media": "^1.10.0",
 		"react-multi-carousel": "^2.8.2",
 		"react-player": "^2.6.2",
