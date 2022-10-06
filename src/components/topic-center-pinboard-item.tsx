@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import { debounce } from 'lodash';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	topicCenterPinboard: {
@@ -82,7 +83,26 @@ export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, cla
 	const classes = useStyles();
 	const [isClamped, setIsClamped] = useState(false);
 
-	// TODO: watch window.resize to automatically clamp below lg, and unclamp above lg
+	const setClamp = () => {
+		if (window.innerWidth >= 992) {
+			setIsClamped(false);
+		} else {
+			setIsClamped(true);
+		}
+	};
+
+	const handleWindowResize = debounce(setClamp, 200);
+
+	useEffect(() => {
+		setClamp();
+	}, []);
+
+	useEffect(() => {
+		window.addEventListener('resize', handleWindowResize);
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, [handleWindowResize]);
 
 	return (
 		<div className={classNames(classes.topicCenterPinboard, className)}>
