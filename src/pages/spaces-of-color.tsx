@@ -1,13 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
-import { Masonry } from '@/components/masonry';
+import HeroContainer from '@/components/hero-container';
 import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
+import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
+import OnYourTimeItem from '@/components/on-your-time-item';
 
 const SpacesOfColor = () => {
 	return (
 		<>
+			<HeroContainer>
+				<h1 className="mb-0 text-center fs-display2">Topic Center</h1>
+			</HeroContainer>
+
 			<Container fluid className="bg-n50">
 				<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 					<Row>
@@ -55,7 +62,7 @@ const SpacesOfColor = () => {
 			</Container>
 
 			<Container fluid className="bg-n50">
-				<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+				<Container fluid="lg" className="pt-10 pb-4 pt-lg-14 pb-lg-22">
 					<Row>
 						<Col>
 							<h2 className="mb-2 mb-lg-4 text-center">Topic Center: Pinboard</h2>
@@ -116,6 +123,115 @@ const SpacesOfColor = () => {
 									imageUrl="https://via.placeholder.com/160x160"
 								/>
 							</Masonry>
+						</Col>
+					</Row>
+				</Container>
+			</Container>
+
+			<Container fluid className="bg-n50">
+				<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+					<Row>
+						<Col>
+							<h2 className="mb-2 mb-lg-4 text-center">Topic Center: On Your Time</h2>
+							<p className="mb-6 mb-lg-12 fs-large text-center">Explainer text goes here.</p>
+						</Col>
+					</Row>
+					<Row>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
+						</Col>
+						<Col xs={6} md={4} lg={3}>
+							<Link to={`/on-your-time/xxx`} className="d-block mb-8 text-decoration-none">
+								<OnYourTimeItem
+									imageUrl="https://via.placeholder.com/592x395"
+									tag={'NEW'}
+									title="Title"
+									author="Kathleen Murphy, MD"
+									type="Video"
+									duration="2 min"
+								/>
+							</Link>
 						</Col>
 					</Row>
 				</Container>
