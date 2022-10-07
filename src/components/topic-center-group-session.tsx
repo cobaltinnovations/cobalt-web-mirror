@@ -4,6 +4,7 @@ import LinesEllipsis from 'react-lines-ellipsis';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
@@ -61,7 +62,7 @@ interface Props {
 	badgeTitle?: string;
 	buttonTitle: string;
 	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-	imageUrl: string;
+	imageUrl?: string;
 	className?: string;
 }
 
@@ -79,10 +80,14 @@ export const TopicCenterGroupSession = ({
 	className,
 }: Props) => {
 	const classes = useStyles();
+	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
 		<div className={classNames(classes.topicCenterGroupSession, className)}>
-			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl})` }}>
+			<div
+				className={classes.imageOuter}
+				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
+			>
 				{badgeTitle && (
 					<Badge className="d-lg-none" as="div" bg="outline-secondary" pill>
 						{badgeTitle}

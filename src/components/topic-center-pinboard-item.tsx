@@ -1,12 +1,13 @@
+import { debounce } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import { debounce } from 'lodash';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	topicCenterPinboard: {
@@ -73,7 +74,7 @@ interface Props {
 	title: string;
 	description: string;
 	url: string;
-	imageUrl: string;
+	imageUrl?: string;
 	className?: string;
 }
 
@@ -81,6 +82,7 @@ const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 
 export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, className }: Props) => {
 	const classes = useStyles();
+	const placeholderImage = useRandomPlaceholderImage();
 	const [isClamped, setIsClamped] = useState(false);
 
 	const setClamp = () => {
@@ -108,7 +110,7 @@ export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, cla
 		<div className={classNames(classes.topicCenterPinboard, className)}>
 			<div
 				className={classNames(classes.imageOuter, 'd-none d-lg-block')}
-				style={{ backgroundImage: `url(${imageUrl})` }}
+				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
 			/>
 			<div className={classes.informationOuter}>
 				<Container>

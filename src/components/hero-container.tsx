@@ -18,16 +18,16 @@ interface HeroContainerProps extends PropsWithChildren {
 	className?: string;
 }
 
-const HeroContainer: FC<HeroContainerProps> = (props) => {
+const HeroContainer: FC<HeroContainerProps> = ({ className, children }) => {
 	const classes = useHeroContainerStyles();
 
 	return (
-		<Container className={classNames(props.className, classes.heroContainer)} fluid>
+		<Container className={classNames(classes.heroContainer, className)} fluid>
 			<Container>
 				<section>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							{props.children}
+							{children}
 						</Col>
 					</Row>
 				</section>

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import { TopicCenterModel } from '@/lib/models';
-import { groupSessionsService, topicCenterService } from '@/lib/services';
+import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
@@ -11,6 +11,7 @@ import { TopicCenterGroupSession } from '@/components/topic-center-group-session
 import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
 import OnYourTimeItem from '@/components/on-your-time-item';
+import classNames from 'classnames';
 
 const TopicCenter = () => {
 	const navigate = useNavigate();
@@ -54,10 +55,16 @@ const TopicCenter = () => {
 											lg={{ span: 10, offset: 1 }}
 											xl={{ span: 8, offset: 2 }}
 										>
-											{topicCenterRow.groupSessions.map((groupSession) => {
+											{topicCenterRow.groupSessions.map((groupSession, groupSessionIndex) => {
+												const isLast =
+													topicCenterRow.groupSessions.length - 1 === groupSessionIndex;
+
 												return (
 													<TopicCenterGroupSession
 														key={groupSession.groupSessionId}
+														className={classNames({
+															'mb-8': !isLast,
+														})}
 														title={groupSession.title}
 														titleSecondary={groupSession.appointmentTimeDescription}
 														titleTertiary={`Hosted by: ${groupSession.facilitatorName}`}
@@ -69,7 +76,7 @@ const TopicCenter = () => {
 																`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
 															);
 														}}
-														imageUrl="https://via.placeholder.com/670x420"
+														imageUrl={groupSession.imageUrl}
 													/>
 												);
 											})}
@@ -78,6 +85,7 @@ const TopicCenter = () => {
 								</Container>
 							</Container>
 						)}
+
 						{topicCenterRow.groupSessionRequests.length > 0 && (
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
@@ -95,28 +103,38 @@ const TopicCenter = () => {
 											lg={{ span: 10, offset: 1 }}
 											xl={{ span: 8, offset: 2 }}
 										>
-											{topicCenterRow.groupSessionRequests.map((groupSessionRequest) => {
-												return (
-													<TopicCenterGroupSession
-														key={groupSessionRequest.groupSessionRequestId}
-														title={groupSessionRequest.title}
-														titleSecondary="By Request"
-														description={groupSessionRequest.description}
-														buttonTitle="Request Session"
-														onClick={() => {
-															navigate(
-																`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
-															);
-														}}
-														imageUrl="https://via.placeholder.com/670x420"
-													/>
-												);
-											})}
+											{topicCenterRow.groupSessionRequests.map(
+												(groupSessionRequest, groupSessionRequestIndex) => {
+													const isLast =
+														topicCenterRow.groupSessionRequests.length - 1 ===
+														groupSessionRequestIndex;
+
+													return (
+														<TopicCenterGroupSession
+															key={groupSessionRequest.groupSessionRequestId}
+															className={classNames({
+																'mb-8': !isLast,
+															})}
+															title={groupSessionRequest.title}
+															titleSecondary="By Request"
+															description={groupSessionRequest.description}
+															buttonTitle="Request Session"
+															onClick={() => {
+																navigate(
+																	`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
+																);
+															}}
+															imageUrl={groupSessionRequest.imageUrl}
+														/>
+													);
+												}
+											)}
 										</Col>
 									</Row>
 								</Container>
 							</Container>
 						)}
+
 						{topicCenterRow.pinboardNotes.length > 0 && (
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
@@ -139,7 +157,7 @@ const TopicCenter = () => {
 															title={pinboardNote.title}
 															description={pinboardNote.description}
 															url={pinboardNote.url}
-															imageUrl="https://via.placeholder.com/160x160"
+															imageUrl={undefined}
 														/>
 													);
 												})}
@@ -149,6 +167,7 @@ const TopicCenter = () => {
 								</Container>
 							</Container>
 						)}
+
 						{topicCenterRow.contents.length > 0 && (
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
