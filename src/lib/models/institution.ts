@@ -28,6 +28,13 @@ export interface Institution {
 	contactUsEnabled: boolean;
 	ga4MeasurementId?: string;
 	name: string;
+	additionalNavigationItems: AdditionalNavigationItem[];
+}
+
+export interface AdditionalNavigationItem {
+	url: string;
+	name: string;
+	iconName: string;
 }
 
 export enum ACOUNT_SOURCE_ID {

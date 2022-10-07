@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
-import { Link, To, useMatch } from 'react-router-dom';
+import { Link, To } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
@@ -15,6 +15,7 @@ import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import { ReactComponent as OnYourTimeIcon } from '@/assets/icons/icon-on-your-time.svg';
+import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as Covid19Icon } from '@/assets/icons/icon-covid-19.svg';
@@ -23,7 +24,6 @@ import { ReactComponent as WellBeingIcon } from '@/assets/icons/icon-well-being.
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as HipaaLogo } from '@/assets/logos/logo-hipaa.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
 import { AnalyticsEvent, CrisisAnalyticsEvent } from '@/contexts/analytics-context';
@@ -223,6 +223,15 @@ interface MenuNavItem {
 	subNavSections?: (ctx: MenuNavContext) => MenuNavSection[] | null;
 }
 
+const AdditionalNavigationItemIcon = ({ iconName }: { iconName: string }) => {
+	switch (iconName) {
+		case 'diversity_1':
+			return <SpacesOfColorIcon />;
+		default:
+			return <AdminIcon />;
+	}
+};
+
 const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	{
 		items: () => [
@@ -329,12 +338,21 @@ const MENU_SECTIONS: MenuNavSection[] = [
 	},
 	{
 		title: 'Explore',
-		items: () => [
+		items: (context) => [
 			{
 				label: 'On Your Time',
 				icon: <OnYourTimeIcon />,
 				to: () => '/on-your-time',
 			},
+			...(context?.institution
+				? context.institution.additionalNavigationItems.map((additionalNavigationItem) => {
+						return {
+							label: additionalNavigationItem.name,
+							icon: <AdditionalNavigationItemIcon iconName={additionalNavigationItem.iconName} />,
+							to: () => additionalNavigationItem.url,
+						};
+				  })
+				: []),
 			{
 				label: 'COVID-19 Resources',
 				icon: <Covid19Icon />,
@@ -351,8 +369,6 @@ const MENU_SECTIONS: MenuNavSection[] = [
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const { account, setAccount } = useAccount();
-	const match = useMatch({ path: '/admin' });
-	// console.log({ match });
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 
