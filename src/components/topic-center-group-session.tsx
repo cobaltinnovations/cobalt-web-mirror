@@ -22,6 +22,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	imageOuter: {
 		width: 240,
+		minHeight: 170,
 		flexShrink: 0,
 		borderRadius: 5,
 		position: 'relative',
@@ -41,7 +42,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	informationOuter: {
+		flex: 1,
+		display: 'flex',
 		paddingLeft: 24,
+		flexDirection: 'column',
+		justifyContent: 'space-between',
 		[mediaQueries.lg]: {
 			padding: 20,
 		},
@@ -85,17 +90,26 @@ export const TopicCenterGroupSession = ({
 				)}
 			</div>
 			<div className={classes.informationOuter}>
-				<div className="mb-lg-4">
-					<h3 className="mb-1">{title}</h3>
-					<p className="mb-1 text-muted text-uppercase fw-bold">{titleSecondary}</p>
-					{titleTertiary && <p className="mb-0 text-muted">{titleTertiary}</p>}
+				<div>
+					<div className="mb-lg-4">
+						<h3 className="mb-1">{title}</h3>
+						<p
+							className={classNames('text-muted text-uppercase fw-bold', {
+								'mb-1': titleTertiary,
+								'mb-0': !titleTertiary,
+							})}
+						>
+							{titleSecondary}
+						</p>
+						{titleTertiary && <p className="mb-0 text-muted">{titleTertiary}</p>}
+					</div>
+					<ResponsiveEllipsis
+						className="d-none d-lg-block mb-4"
+						text={description}
+						maxLine={titleTertiary ? '2' : '3'}
+						component="p"
+					/>
 				</div>
-				<ResponsiveEllipsis
-					className="d-none d-lg-block mb-4"
-					text={description}
-					maxLine={titleTertiary ? '2' : '3'}
-					component="p"
-				/>
 				<div className="d-none d-lg-flex justify-content-between align-items-end">
 					<div>
 						{badgeTitle && (

@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
-import { Link, To, useMatch } from 'react-router-dom';
+import { Link, To } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
@@ -23,7 +23,6 @@ import { ReactComponent as WellBeingIcon } from '@/assets/icons/icon-well-being.
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as HipaaLogo } from '@/assets/logos/logo-hipaa.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
 import { AnalyticsEvent, CrisisAnalyticsEvent } from '@/contexts/analytics-context';
@@ -351,8 +350,6 @@ const MENU_SECTIONS: MenuNavSection[] = [
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const { account, setAccount } = useAccount();
-	const match = useMatch({ path: '/admin' });
-	// console.log({ match });
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 
@@ -510,6 +507,19 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 						</React.Fragment>
 					);
 				})}
+
+				<div className={classes.sectionHeader}>Additional Navigation Items</div>
+				<ul className={classNames(classes.menuList, classes.subMenuList, 'my-2')}>
+					{institution?.additionalNavigationItems.map((navItem) => {
+						return (
+							<li>
+								<Link to={navItem.url} onClick={onHide}>
+									{navItem.name}
+								</Link>
+							</li>
+						);
+					})}
+				</ul>
 
 				{!isSubNav && (
 					<>

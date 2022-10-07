@@ -18,3 +18,4 @@ export * from './recommendations-service';
 export * from './reporting-service';
 export * from './scheduling-service';
 export * from './screening-service';
+export * from './topic-center-service';

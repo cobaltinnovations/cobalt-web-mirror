@@ -15,3 +15,4 @@ export * from './provider';
 export * from './roles';
 export * from './scheduling-models';
 export * from './screening-models';
+export * from './topic-center-models';
