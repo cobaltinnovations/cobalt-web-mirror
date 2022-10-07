@@ -22,4 +22,5 @@ export interface PinboardNoteModel {
 	pinboardNoteId: string;
 	title: string;
 	url: string;
+	imageUrl?: string;
 }

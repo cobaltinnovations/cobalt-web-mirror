@@ -157,7 +157,7 @@ const TopicCenter = () => {
 															title={pinboardNote.title}
 															description={pinboardNote.description}
 															url={pinboardNote.url}
-															imageUrl={undefined}
+															imageUrl={pinboardNote.imageUrl}
 														/>
 													);
 												})}
