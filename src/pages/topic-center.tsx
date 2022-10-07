@@ -29,8 +29,8 @@ const TopicCenter = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<HeroContainer>
-				<h1 className="mb-0 text-center fs-display2">{topicCenter?.name}</h1>
+			<HeroContainer className="bg-primary">
+				<h1 className="mb-0 text-white text-center fs-display2">{topicCenter?.name}</h1>
 			</HeroContainer>
 
 			{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
