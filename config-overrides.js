@@ -13,6 +13,8 @@ module.exports.webpack = function (config, env) {
 			__DEV__: env !== 'production',
 			// Expose public URL in TS for referencing static files correctly
 			__PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
+			__SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN || ''),
+			__SENTRY_RELEASE__: JSON.stringify(process.env.SENTRY_RELEASE || ''),
 		})
 	);
 

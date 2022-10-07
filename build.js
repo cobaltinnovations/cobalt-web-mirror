@@ -1,8 +1,17 @@
 #!/usr/bin/env node
 
 const path = require('path');
+const yargs = require('yargs');
 const fse = require('fs-extra');
 const { rm, exec } = require('shelljs');
+
+const argv = yargs(process.argv).argv;
+
+const sentryInput = argv.sentry;
+const targetInput = argv.target;
+
+const sentryDSN = !!sentryInput && !Array.isArray(sentryInput) ? sentryInput : null;
+const buildTargets = targetInput ? (Array.isArray(targetInput) ? targetInput : [targetInput]) : [];
 
 rm('-rf', 'build');
 
@@ -16,6 +25,11 @@ const buildConfigs = ['cobalt', ...srcOverrides];
 console.log(`=> Building ${buildConfigs.length} Configurations`);
 
 for (const institution of buildConfigs) {
+	if (buildTargets.length !== 0 && !buildTargets.includes(institution)) {
+		console.log(`==> Skipping '${institution}' Configuration ...`);
+		continue;
+	}
+
 	try {
 		console.log(`==> Building '${institution}' Configuration ...`);
 
@@ -28,6 +42,12 @@ for (const institution of buildConfigs) {
 			`PUBLIC_URL=${institution}`, // referenced in public/index.html & config-overrides
 			`BUILD_PATH=build/${institution}`, // modifies build ouputs
 		];
+
+		if (sentryDSN) {
+			buildEnvArgs.push(`SENTRY_DSN=${sentryDSN}`);
+			const gitRev = exec('git rev-parse --short HEAD');
+			buildEnvArgs.push(`SENTRY_RELEASE=${gitRev}-${institution}`);
+		}
 
 		// generate separate bundles per supported institution
 		exec(`${buildEnvArgs.join(' ')} npx react-app-rewired build`);
