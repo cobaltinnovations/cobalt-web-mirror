@@ -32,119 +32,159 @@ const TopicCenter = () => {
 				<h1 className="mb-0 text-center fs-display2">{topicCenter?.name}</h1>
 			</HeroContainer>
 
-			{topicCenter?.topicCenterRows.map((topicCenterRow) => {
-				return (
-					<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
-						<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-							<Row>
-								<Col>
-									<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-									<p className="mb-6 mb-lg-12 fs-large text-center">{topicCenterRow.description}</p>
-								</Col>
-							</Row>
-							{topicCenterRow.groupSessions.length > 0 && (
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										{topicCenterRow.groupSessions.map((groupSession) => {
-											return (
-												<TopicCenterGroupSession
-													key={groupSession.groupSessionId}
-													title={groupSession.title}
-													titleSecondary={groupSession.appointmentTimeDescription}
-													titleTertiary={`Hosted by: ${groupSession.facilitatorName}`}
-													description={groupSession.description}
-													badgeTitle={groupSession.seatsAvailableDescription}
-													buttonTitle="Join Session"
-													onClick={() => {
-														navigate(
-															`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
-														);
-													}}
-													imageUrl="https://via.placeholder.com/670x420"
-												/>
-											);
-										})}
-									</Col>
-								</Row>
-							)}
-							{topicCenterRow.groupSessionRequests.length > 0 && (
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										{topicCenterRow.groupSessionRequests.map((groupSessionRequest) => {
-											console.log(groupSessionRequest);
+			{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
+				const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 
-											return (
-												<TopicCenterGroupSession
-													key={groupSessionRequest.groupSessionRequestId}
-													title={groupSessionRequest.title}
-													titleSecondary="By Request"
-													description={groupSessionRequest.description}
-													buttonTitle="Request Session"
-													onClick={() => {
-														navigate(
-															`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
-														);
-													}}
-													imageUrl="https://via.placeholder.com/670x420"
-												/>
-											);
-										})}
-									</Col>
-								</Row>
-							)}
-							{topicCenterRow.pinboardNotes.length > 0 && (
-								<Row>
-									<Col>
-										<Masonry>
-											{topicCenterRow.pinboardNotes.map((pinboardNote) => {
+				return (
+					<React.Fragment key={topicCenterRow.topicCenterRowId}>
+						{topicCenterRow.groupSessions.length > 0 && (
+							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+									<Row>
+										<Col>
+											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+											<p className="mb-6 mb-lg-12 fs-large text-center">
+												{topicCenterRow.description}
+											</p>
+										</Col>
+									</Row>
+									<Row>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 10, offset: 1 }}
+											xl={{ span: 8, offset: 2 }}
+										>
+											{topicCenterRow.groupSessions.map((groupSession) => {
 												return (
-													<TopicCenterPinboardItem
-														key={pinboardNote.pinboardNoteId}
-														className="mb-lg-8"
-														title={pinboardNote.title}
-														description={pinboardNote.description}
-														url={pinboardNote.url}
-														imageUrl="https://via.placeholder.com/160x160"
+													<TopicCenterGroupSession
+														key={groupSession.groupSessionId}
+														title={groupSession.title}
+														titleSecondary={groupSession.appointmentTimeDescription}
+														titleTertiary={`Hosted by: ${groupSession.facilitatorName}`}
+														description={groupSession.description}
+														badgeTitle={groupSession.seatsAvailableDescription}
+														buttonTitle="Join Session"
+														onClick={() => {
+															navigate(
+																`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
+															);
+														}}
+														imageUrl="https://via.placeholder.com/670x420"
 													/>
 												);
 											})}
-										</Masonry>
-									</Col>
-								</Row>
-							)}
-							{topicCenterRow.contents.length > 0 && (
-								<Row>
-									{topicCenterRow.contents.map((content) => {
-										return (
-											<Col xs={6} md={4} lg={3} key={content.contentId}>
-												<Link
-													to={`/on-your-time/${content.contentId}`}
-													className="d-block mb-8 text-decoration-none"
-												>
-													<OnYourTimeItem
-														imageUrl={content.imageUrl}
-														tag={content.newFlag ? 'NEW' : ''}
-														title={content.title}
-														author={content.author}
-														type={content.contentTypeLabel}
-														duration={content.duration}
+										</Col>
+									</Row>
+								</Container>
+							</Container>
+						)}
+						{topicCenterRow.groupSessionRequests.length > 0 && (
+							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+									<Row>
+										<Col>
+											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+											<p className="mb-6 mb-lg-12 fs-large text-center">
+												{topicCenterRow.description}
+											</p>
+										</Col>
+									</Row>
+									<Row>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 10, offset: 1 }}
+											xl={{ span: 8, offset: 2 }}
+										>
+											{topicCenterRow.groupSessionRequests.map((groupSessionRequest) => {
+												return (
+													<TopicCenterGroupSession
+														key={groupSessionRequest.groupSessionRequestId}
+														title={groupSessionRequest.title}
+														titleSecondary="By Request"
+														description={groupSessionRequest.description}
+														buttonTitle="Request Session"
+														onClick={() => {
+															navigate(
+																`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
+															);
+														}}
+														imageUrl="https://via.placeholder.com/670x420"
 													/>
-												</Link>
-											</Col>
-										);
-									})}
-								</Row>
-							)}
-						</Container>
-					</Container>
+												);
+											})}
+										</Col>
+									</Row>
+								</Container>
+							</Container>
+						)}
+						{topicCenterRow.pinboardNotes.length > 0 && (
+							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+									<Row>
+										<Col>
+											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+											<p className="mb-6 mb-lg-12 fs-large text-center">
+												{topicCenterRow.description}
+											</p>
+										</Col>
+									</Row>
+									<Row>
+										<Col>
+											<Masonry>
+												{topicCenterRow.pinboardNotes.map((pinboardNote) => {
+													return (
+														<TopicCenterPinboardItem
+															key={pinboardNote.pinboardNoteId}
+															className="mb-lg-8"
+															title={pinboardNote.title}
+															description={pinboardNote.description}
+															url={pinboardNote.url}
+															imageUrl="https://via.placeholder.com/160x160"
+														/>
+													);
+												})}
+											</Masonry>
+										</Col>
+									</Row>
+								</Container>
+							</Container>
+						)}
+						{topicCenterRow.contents.length > 0 && (
+							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+									<Row>
+										<Col>
+											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+											<p className="mb-6 mb-lg-12 fs-large text-center">
+												{topicCenterRow.description}
+											</p>
+										</Col>
+									</Row>
+									<Row>
+										{topicCenterRow.contents.map((content) => {
+											return (
+												<Col xs={6} md={4} lg={3} key={content.contentId}>
+													<Link
+														to={`/on-your-time/${content.contentId}`}
+														className="d-block mb-8 text-decoration-none"
+													>
+														<OnYourTimeItem
+															imageUrl={content.imageUrl}
+															tag={content.newFlag ? 'NEW' : ''}
+															title={content.title}
+															author={content.author}
+															type={content.contentTypeLabel}
+															duration={content.duration}
+														/>
+													</Link>
+												</Col>
+											);
+										})}
+									</Row>
+								</Container>
+							</Container>
+						)}
+					</React.Fragment>
 				);
 			})}
 		</AsyncPage>
