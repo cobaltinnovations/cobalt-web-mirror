@@ -15,6 +15,7 @@ import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import { ReactComponent as OnYourTimeIcon } from '@/assets/icons/icon-on-your-time.svg';
+import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as Covid19Icon } from '@/assets/icons/icon-covid-19.svg';
@@ -222,6 +223,15 @@ interface MenuNavItem {
 	subNavSections?: (ctx: MenuNavContext) => MenuNavSection[] | null;
 }
 
+const AdditionalNavigationItemIcon = ({ iconName }: { iconName: string }) => {
+	switch (iconName) {
+		case 'diversity_1':
+			return <SpacesOfColorIcon />;
+		default:
+			return <AdminIcon />;
+	}
+};
+
 const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	{
 		items: () => [
@@ -328,12 +338,21 @@ const MENU_SECTIONS: MenuNavSection[] = [
 	},
 	{
 		title: 'Explore',
-		items: () => [
+		items: (context) => [
 			{
 				label: 'On Your Time',
 				icon: <OnYourTimeIcon />,
 				to: () => '/on-your-time',
 			},
+			...(context?.institution
+				? context.institution.additionalNavigationItems.map((additionalNavigationItem) => {
+						return {
+							label: additionalNavigationItem.name,
+							icon: <AdditionalNavigationItemIcon iconName={additionalNavigationItem.iconName} />,
+							to: () => additionalNavigationItem.url,
+						};
+				  })
+				: []),
 			{
 				label: 'COVID-19 Resources',
 				icon: <Covid19Icon />,
@@ -507,19 +526,6 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 						</React.Fragment>
 					);
 				})}
-
-				<div className={classes.sectionHeader}>Additional Navigation Items</div>
-				<ul className={classNames(classes.menuList, classes.subMenuList, 'my-2')}>
-					{institution?.additionalNavigationItems.map((navItem) => {
-						return (
-							<li>
-								<Link to={navItem.url} onClick={onHide}>
-									{navItem.name}
-								</Link>
-							</li>
-						);
-					})}
-				</ul>
 
 				{!isSubNav && (
 					<>
