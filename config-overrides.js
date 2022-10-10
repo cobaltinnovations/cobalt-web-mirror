@@ -1,11 +1,18 @@
 const webpack = require('webpack');
 const { aliasJest, aliasWebpack } = require('react-app-alias');
 const path = require('path');
+const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 const aliasOptions = {};
 
 module.exports.webpack = function (config, env) {
 	config = aliasWebpack(aliasOptions)(config);
+
+	const sentryDsn = JSON.stringify(process.env.SENTRY_DSN || '');
+	const sentryRelease = JSON.stringify(process.env.SENTRY_RELEASE || '');
+	const sentryAuthToken = JSON.stringify(process.env.SENTRY_AUTH_TOKEN || '');
+	const sentryOrg = JSON.stringify(process.env.SENTRY_ORG || '');
+	const sentryProject = JSON.stringify(process.env.SENTRY_PROJECT || '');
 
 	config.plugins.push(
 		new webpack.DefinePlugin({
@@ -13,10 +20,20 @@ module.exports.webpack = function (config, env) {
 			__DEV__: env !== 'production',
 			// Expose public URL in TS for referencing static files correctly
 			__PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
-			__SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN || ''),
-			__SENTRY_RELEASE__: JSON.stringify(process.env.SENTRY_RELEASE || ''),
+			__SENTRY_DSN__: sentryDsn,
+			__SENTRY_RELEASE__: sentryRelease,
 		})
 	);
+
+	// just validating variables are defined
+	if (sentryDsn && sentryRelease && sentryAuthToken && sentryOrg && sentryProject) {
+		config.plugins.push(
+			// plugin reads them from process.env set by build.js
+			new SentryCliPlugin({
+				ignore: ['node_modules', '.env', '.env.local', 'build.js', 'config-overrides.js', 'server.js'],
+			})
+		);
+	}
 
 	const targetInstitution = process.env.TARGET_INSTITUTION || 'cobalt';
 	const srcPath = path.join(__dirname, 'src');

@@ -40,7 +40,26 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 Build script and Webpack config are modified from the default `react-scripts` behavior to support overriding modules and therefore generating separate bundles per institution.
 
-Read more [here](src/institution-overrides/README.md)
+Read more [here](institution-overrides/README.md)
+
+The default behavior is to build all institutions. To specify the target institutions to build for pass them as additional arg:
+
+```
+npm run build -- --target "custom" --target "another-custom"
+```
+
+To enable Sentry reporting/monitoring in the generated react app bundles, pass the following arguments to configure build script:
+
+| Argument           |                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `--sentry-dsn`     | DSN for Sentry Project/client                                                     |
+| `--sentry-token`   | Auth token for uploading build sourcemaps<br/>(requires `project:releases` scope) |
+| `--sentry-org`     | Sentry Organization Slug for sourcemaps upload                                    |
+| `--sentry-project` | Sentry Organization Project for sourcemaps upload                                 |
+
+```
+npm run build -- --sentry-dsn=https://dsn.sentry --sentry-token=authtoken --sentry-org=my-org --sentry-project=my-project
+```
 
 ### `npm run eject`
 

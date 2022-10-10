@@ -1,17 +1,41 @@
 #!/usr/bin/env node
 
 const path = require('path');
-const yargs = require('yargs');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const fse = require('fs-extra');
 const { rm, exec } = require('shelljs');
 
-const argv = yargs(process.argv).argv;
-
-const sentryInput = argv.sentry;
-const targetInput = argv.target;
-
-const sentryDSN = !!sentryInput && !Array.isArray(sentryInput) ? sentryInput : null;
-const buildTargets = targetInput ? (Array.isArray(targetInput) ? targetInput : [targetInput]) : [];
+const argv = yargs(hideBin(process.argv))
+	.version(false)
+	.option('target', {
+		array: true,
+		type: 'string',
+		default: [],
+		description:
+			'Target specific institutions when generating assets. Generates assets for all institutions by default.',
+	})
+	.option('sentryDsn', {
+		alias: ['sentry-dsn'],
+		type: 'string',
+		description: 'DSN to use for connecting react app to Sentry',
+	})
+	.option('sentryToken', {
+		alias: ['sentry-token'],
+		type: 'string',
+		description: 'Sentry Auth token to use for upload build/release sourcemaps',
+	})
+	.option('sentryOrg', {
+		alias: ['sentry-org'],
+		type: 'string',
+		description: 'Sentry Organization to use for sourcemap uploads',
+	})
+	.option('sentryProject', {
+		alias: ['sentry-project'],
+		type: 'string',
+		description: 'Sentry Project to use for sourcemap uploads',
+	})
+	.parse();
 
 rm('-rf', 'build');
 
@@ -25,7 +49,7 @@ const buildConfigs = ['cobalt', ...srcOverrides];
 console.log(`=> Building ${buildConfigs.length} Configurations`);
 
 for (const institution of buildConfigs) {
-	if (buildTargets.length !== 0 && !buildTargets.includes(institution)) {
+	if (argv.target.length !== 0 && !argv.target.includes(institution)) {
 		console.log(`==> Skipping '${institution}' Configuration ...`);
 		continue;
 	}
@@ -43,10 +67,18 @@ for (const institution of buildConfigs) {
 			`BUILD_PATH=build/${institution}`, // modifies build ouputs
 		];
 
-		if (sentryDSN) {
-			buildEnvArgs.push(`SENTRY_DSN=${sentryDSN}`);
-			const gitRev = exec('git rev-parse --short HEAD');
+		if (argv.sentryDsn) {
+			// react-app variables
+			buildEnvArgs.push(`SENTRY_DSN=${argv.sentryDsn}`);
+			const gitRev = exec('git rev-parse --short HEAD').stdout.trim();
 			buildEnvArgs.push(`SENTRY_RELEASE=${gitRev}-${institution}`);
+
+			// sourceupload variables
+			if (argv.sentryToken && argv.sentryOrg && argv.sentryProject) {
+				buildEnvArgs.push(`SENTRY_AUTH_TOKEN=${argv.sentryToken}`);
+				buildEnvArgs.push(`SENTRY_ORG=${argv.sentryOrg}`);
+				buildEnvArgs.push(`SENTRY_PROJECT=${argv.sentryProject}`);
+			}
 		}
 
 		// generate separate bundles per supported institution
