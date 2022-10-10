@@ -1,5 +1,5 @@
 import React, { FC, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, useLocation } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
@@ -7,6 +7,7 @@ import config from '@/lib/config';
 
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
+import SentryRoutes from '@/components/sentry-routes';
 import Footer from '@/components/footer';
 import InCrisisModal from '@/components/in-crisis-modal';
 import Loader from '@/components/loader';
@@ -79,7 +80,7 @@ const AppWithProviders: FC = () => {
 
 			<Alert />
 
-			<Routes>
+			<SentryRoutes>
 				{AppRoutes.map((config, groupIndex) => {
 					return (
 						<Route key={groupIndex} element={<config.layout />}>
@@ -125,7 +126,7 @@ const AppWithProviders: FC = () => {
 						</Route>
 					);
 				})}
-			</Routes>
+			</SentryRoutes>
 
 			<Footer />
 		</>

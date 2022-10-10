@@ -16,8 +16,9 @@ import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
-import { Link, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Outlet, Route, useNavigate } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
+import SentryRoutes from '@/components/sentry-routes';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -309,7 +310,7 @@ export const MySchedule: FC = () => {
 				/>
 			</div>
 
-			<Routes>
+			<SentryRoutes>
 				<Route element={<Outlet />}>
 					<Route path="appointments/new-appointment" element={renderedEditAppointmentPanel} />
 					<Route path="appointments/:appointmentId/edit" element={renderedEditAppointmentPanel} />
@@ -364,7 +365,7 @@ export const MySchedule: FC = () => {
 						}
 					/>
 				</Route>
-			</Routes>
+			</SentryRoutes>
 
 			{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel

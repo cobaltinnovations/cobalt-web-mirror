@@ -40,7 +40,28 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 Build script and Webpack config are modified from the default `react-scripts` behavior to support overriding modules and therefore generating separate bundles per institution.
 
-Read more [here](src/institution-overrides/README.md)
+Read more [here](institution-overrides/README.md)
+
+The default behavior is to build all institutions. To specify the target institutions to build for pass them as additional arg:
+
+```
+npm run build -- --target "custom" --target "another-custom"
+```
+
+To enable Sentry reporting/monitoring in the generated react app bundles, pass the following arguments to configure build script:
+
+| Argument                   |                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| `--sentry-token`           | Auth token for uploading build sourcemaps<br/>(requires `project:releases` scope) |
+| `--sentry-org`             | Sentry Organization Slug for sourcemaps upload                                    |
+| `--sentry-dsn-react`       | DSN for react Sentry client                                                       |
+| `--sentry-project-react`   | Sentry Project for react app sourcemaps upload                                    |
+| `--sentry-dsn-express`     | DSN for node/express Sentry client                                                |
+| `--sentry-project-express` | Sentry Project for artifact/release tagging                                       |
+
+```
+npm run build -- --sentry-dsn=https://dsn.sentry --sentry-token=authtoken --sentry-org=my-org --sentry-project=my-project
+```
 
 ### `npm run eject`
 
@@ -70,6 +91,7 @@ If you ever need to test your code against the server, create a production build
 | WEBAPP_BASIC_AUTH_PASSWORD                  | Accepted Basic Auth password                                                                                             |
 | WEBAPP_BASIC_AUTH_SECRET                    | Secret string to sign Basic Auth session cookies                                                                         |
 | WEBAPP_SUBDOMAIN_MAPPING                    | a comma-separated list mapping `subdomain:build` for NodeJS webapp.                                                      |
+| WEBAPP_SENTRY_DSN                           | Sentry DSN value. if present, enables sentry tracing for the nodejs server at runtime.                                   |
 | COBALT_WEB_API_BASE_URL                     | API base url                                                                                                             |
 | COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                                                                              |
 | COBALT_WEB_GA4_MEASUREMENT_ID               | Google Analytics 4 Measurement ID `G-XYZ123ABC`                                                                          |
