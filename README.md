@@ -50,12 +50,14 @@ npm run build -- --target "custom" --target "another-custom"
 
 To enable Sentry reporting/monitoring in the generated react app bundles, pass the following arguments to configure build script:
 
-| Argument           |                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------- |
-| `--sentry-dsn`     | DSN for Sentry Project/client                                                     |
-| `--sentry-token`   | Auth token for uploading build sourcemaps<br/>(requires `project:releases` scope) |
-| `--sentry-org`     | Sentry Organization Slug for sourcemaps upload                                    |
-| `--sentry-project` | Sentry Organization Project for sourcemaps upload                                 |
+| Argument                   |                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| `--sentry-token`           | Auth token for uploading build sourcemaps<br/>(requires `project:releases` scope) |
+| `--sentry-org`             | Sentry Organization Slug for sourcemaps upload                                    |
+| `--sentry-dsn-react`       | DSN for react Sentry client                                                       |
+| `--sentry-project-react`   | Sentry Project for react app sourcemaps upload                                    |
+| `--sentry-dsn-express`     | DSN for node/express Sentry client                                                |
+| `--sentry-project-express` | Sentry Project for artifact/release tagging                                       |
 
 ```
 npm run build -- --sentry-dsn=https://dsn.sentry --sentry-token=authtoken --sentry-org=my-org --sentry-project=my-project
