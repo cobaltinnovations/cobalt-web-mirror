@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const yn = require('yn');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
 const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
@@ -54,7 +56,19 @@ function configureReactApp() {
 
 configureReactApp();
 
+const sentryDsn = process.env.WEBAPP_SENTRY_DSN;
 const app = express();
+
+if (sentryDsn) {
+	Sentry.init({
+		dsn: sentryDsn,
+		integrations: [new Sentry.Integrations.Http({ tracing: true }), new Tracing.Integrations.Express({ app })],
+		tracesSampleRate: 0.2,
+	});
+
+	app.use(Sentry.Handlers.requestHandler());
+	app.use(Sentry.Handlers.tracingHandler());
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -167,6 +181,10 @@ app.get('/news/:pdfName', (_req, res) => {
 });
 
 app.get('*', serveIndexFile);
+
+if (sentryDsn) {
+	app.use(Sentry.Handlers.errorHandler());
+}
 
 app.listen(port, () => {
 	console.log(`> App Ready on http://localhost:${port}.`);
