@@ -9,6 +9,11 @@ const SentryCli = require('@sentry/cli');
 
 const argv = yargs(hideBin(process.argv))
 	.version(false)
+	.option('commitHash', {
+		alias: ['commit-hash'],
+		type: 'string',
+		description: 'Commit hash. Used for tagging Sentry releases.',
+	})
 	.option('target', {
 		array: true,
 		type: 'string',
@@ -58,7 +63,6 @@ const srcOverrides = fse
 	.map((dir) => dir.name);
 
 const buildConfigs = ['cobalt', ...srcOverrides];
-const gitRev = exec('git rev-parse --short HEAD', { silent: true }).stdout.trim();
 
 console.log(`=> Building ${buildConfigs.length} Configurations`);
 
@@ -96,7 +100,7 @@ async function buildInstitutionTarget(institution) {
 		if (argv.sentryDsnReact) {
 			// react-app variables
 			buildEnvArgs.push(`SENTRY_DSN=${argv.sentryDsnReact}`);
-			buildEnvArgs.push(`SENTRY_RELEASE=${gitRev}-${institution}`);
+			buildEnvArgs.push(`SENTRY_RELEASE=${argv.commitHash}-${institution}`);
 
 			// sourcemap upload variables
 			if (argv.sentryToken && argv.sentryOrg && argv.sentryDsnReact) {
@@ -151,19 +155,19 @@ async function createSentryReleaseForNodeApp() {
 		project: argv.sentryProjectExpress,
 	});
 
-	await sentryCli.releases.new(gitRev, {
+	await sentryCli.releases.new(argv.commitHash, {
 		projects: [argv.sentryProjectExpress],
 	});
 
 	console.log('==> Sentry release Created. uploading server artifacts...');
 
-	await sentryCli.releases.uploadSourceMaps(gitRev, {
+	await sentryCli.releases.uploadSourceMaps(argv.commitHash, {
 		include: ['server.js', 'build'],
 	});
 
 	console.log('==> Artifacts uploaded. Finalizing release...');
 
-	await sentryCli.releases.finalize(gitRev);
+	await sentryCli.releases.finalize(argv.commitHash);
 
 	console.log('==> Node Release finalized');
 }
