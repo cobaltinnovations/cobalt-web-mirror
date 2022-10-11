@@ -7,6 +7,21 @@ const yn = require('yn');
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
 
+const configNamespace = process.env.COBALT_WEB_NAMESPACE;
+const configEnv = process.env.COBALT_WEB_ENV;
+
+let settings = {
+	sentry: {
+		dsn: '',
+	},
+};
+
+try {
+	settings = require(path.resolve(__dirname, 'config', configNamespace, configEnv, 'settings'));
+} catch (e) {
+	console.warn(`settings not available for Namesapce: ${configNamespace}, Env: ${configEnv}`);
+}
+
 const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
 
@@ -56,12 +71,11 @@ function configureReactApp() {
 
 configureReactApp();
 
-const sentryDsn = process.env.WEBAPP_SENTRY_DSN;
 const app = express();
 
-if (sentryDsn) {
+if (settings.sentry.dsn) {
 	Sentry.init({
-		dsn: sentryDsn,
+		dsn: settings.sentry.dsn,
 		integrations: [new Sentry.Integrations.Http({ tracing: true }), new Tracing.Integrations.Express({ app })],
 		tracesSampleRate: 0.2,
 	});
@@ -182,7 +196,7 @@ app.get('/news/:pdfName', (_req, res) => {
 
 app.get('*', serveIndexFile);
 
-if (sentryDsn) {
+if (settings.sentry.dsn) {
 	app.use(Sentry.Handlers.errorHandler());
 }
 
