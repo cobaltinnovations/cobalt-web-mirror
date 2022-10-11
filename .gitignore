@@ -38,3 +38,7 @@ yarn-error.log*
 # Institution overrides
 /institution-overrides/*
 !/institution-overrides/README.md
+
+# Server configuration
+/config/*
+!/config/README.md
