@@ -29,8 +29,8 @@ const TopicCenter = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<HeroContainer className="bg-primary">
-				<h1 className="mb-0 text-white text-center fs-display2">{topicCenter?.name}</h1>
+			<HeroContainer className="bg-p700">
+				<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
 			</HeroContainer>
 
 			{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
@@ -42,7 +42,11 @@ const TopicCenter = () => {
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 									<Row>
-										<Col>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
 											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
 											<p className="mb-6 mb-lg-12 fs-large text-center">
 												{topicCenterRow.description}
@@ -90,7 +94,11 @@ const TopicCenter = () => {
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 									<Row>
-										<Col>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
 											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
 											<p className="mb-6 mb-lg-12 fs-large text-center">
 												{topicCenterRow.description}
@@ -139,7 +147,11 @@ const TopicCenter = () => {
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 									<Row>
-										<Col>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
 											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
 											<p className="mb-6 mb-lg-12 fs-large text-center">
 												{topicCenterRow.description}
@@ -172,7 +184,11 @@ const TopicCenter = () => {
 							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 								<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 									<Row>
-										<Col>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
 											<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
 											<p className="mb-6 mb-lg-12 fs-large text-center">
 												{topicCenterRow.description}

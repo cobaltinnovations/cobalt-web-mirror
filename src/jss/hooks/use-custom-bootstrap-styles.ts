@@ -75,6 +75,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.bg-primary': {
 			backgroundColor: `${theme.colors.p500} !important`,
 		},
+		'.bg-p700': {
+			backgroundColor: `${theme.colors.p700} !important`,
+		},
 		'.bg-secondary': {
 			backgroundColor: `${theme.colors.a500} !important`,
 		},
