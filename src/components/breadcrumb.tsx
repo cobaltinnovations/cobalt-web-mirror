@@ -3,8 +3,9 @@ import { Link, LinkProps } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	breadcrumb: {
@@ -14,13 +15,11 @@ const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	},
 	breadcrumbLink: {
 		marginRight: 10,
-		position: 'relative',
 		textDecoration: 'none',
 		...theme.fonts.uiSmall,
 		...theme.fonts.bodyBold,
 	},
 	chevron: {
-		height: 10,
 		flexShrink: 0,
 		marginRight: 10,
 		fill: theme.colors.border,
@@ -29,6 +28,10 @@ const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
+	},
+	breadcrumbTitle: {
+		top: 2,
+		position: 'relative',
 	},
 }));
 
@@ -64,18 +67,25 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 							<p className={classNames(classes.p, 'mb-0 fs-ui-small')}>
 								{props.breadcrumbs.map((breadcrumb, index) => {
 									const isLast = index === props.breadcrumbs.length - 1;
-									const key = breadcrumb.title;
 
 									if (isLast) {
-										return <span key={index}>{breadcrumb.title}</span>;
+										return (
+											<span key={index} className={classes.breadcrumbTitle}>
+												{breadcrumb.title}
+											</span>
+										);
 									}
 
 									return (
-										<React.Fragment key={key}>
+										<React.Fragment key={breadcrumb.title}>
 											<Link className={classes.breadcrumbLink} to={breadcrumb.to}>
-												{breadcrumb.title}
+												{breadcrumb.to === '/' ? (
+													<HomeIcon width={16} height={16} />
+												) : (
+													<span className={classes.breadcrumbTitle}>{breadcrumb.title}</span>
+												)}
 											</Link>
-											<RightChevron className={classes.chevron} />
+											<RightChevron className={classes.chevron} width={16} height={16} />
 										</React.Fragment>
 									);
 								})}
