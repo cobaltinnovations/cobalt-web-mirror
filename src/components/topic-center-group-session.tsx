@@ -97,7 +97,7 @@ export const TopicCenterGroupSession = ({
 			<div className={classes.informationOuter}>
 				<div>
 					<div className="mb-lg-4">
-						<h3 className="mb-1">{title}</h3>
+						<h4 className="mb-1">{title}</h4>
 						<p
 							className={classNames('text-muted text-uppercase fw-bold', {
 								'mb-1': titleTertiary,
