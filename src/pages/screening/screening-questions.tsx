@@ -278,6 +278,10 @@ const ScreeningQuestionsPage = () => {
 											return;
 										}
 
+										if (!window.confirm('Are you sure you want to skip this assessment?')) {
+											return;
+										}
+
 										screeningService
 											.skipScreeningQuestionContext(screeningQuestionContextId)
 											.fetch()
@@ -294,7 +298,7 @@ const ScreeningQuestionsPage = () => {
 											});
 									}}
 								>
-									skip assessment
+									Skip Assessment
 								</Button>
 							</div>
 						</Form>
