@@ -69,7 +69,12 @@ const TopicCenter = () => {
 														titleSecondary={groupSession.appointmentTimeDescription}
 														titleTertiary={`Hosted by: ${groupSession.facilitatorName}`}
 														description={groupSession.description}
-														badgeTitle={groupSession.seatsAvailableDescription}
+														badgeTitle={
+															groupSession.seatsAvailable &&
+															groupSession.seatsAvailable <= 20
+																? groupSession.seatsAvailableDescription
+																: ''
+														}
 														buttonTitle="Join Session"
 														onClick={() => {
 															navigate(
