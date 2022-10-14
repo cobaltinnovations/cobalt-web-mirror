@@ -183,7 +183,7 @@ const OnYourTime: FC = () => {
 					setShowFilterLengthModal(false);
 				}}
 				onSave={(length) => {
-					searchParams.set('length', 'length');
+					searchParams.set('length', length);
 
 					setSearchParams(searchParams);
 					setShowFilterLengthModal(false);
