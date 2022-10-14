@@ -147,12 +147,18 @@ const OnYourTime: FC = () => {
 				onClose={(updatedChoices) => {
 					setChoices(updatedChoices);
 					fetchContent();
-					navigate('/on-your-time', {
-						replace: true,
-						state: {
-							personalize: false,
+					navigate(
+						{
+							pathname: '/on-your-time',
+							search: searchParams.toString(),
 						},
-					});
+						{
+							replace: true,
+							state: {
+								personalize: false,
+							},
+						}
+					);
 					setShowPersonalizeModal(false);
 				}}
 			/>
