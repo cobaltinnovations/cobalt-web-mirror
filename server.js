@@ -13,6 +13,7 @@ const configEnv = process.env.COBALT_WEB_ENV;
 let settings = {
 	sentry: {
 		dsn: '',
+		showDebug: false,
 	},
 };
 
@@ -38,6 +39,7 @@ function configureReactApp() {
 		'COBALT_WEB_GA4_MEASUREMENT_ID',
 		'COBALT_WEB_DISABLE_SIGN_IN',
 		'COBALT_WEB_SHOW_DEBUG',
+		'COBALT_WEB_SENTRY_SHOW_DEBUG',
 		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
 		'COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE',
 		'COBALT_WEB_DOWN_FOR_MAINTENANCE',
@@ -45,10 +47,16 @@ function configureReactApp() {
 
 	const reactAppConfig = Object.entries(process.env)
 		.filter(([envVar]) => fe_envVars.includes(envVar))
-		.reduce((env, [envVar, value]) => {
-			env[envVar] = value;
-			return env;
-		}, {});
+		.reduce(
+			(env, [envVar, value]) => {
+				env[envVar] = value;
+				return env;
+			},
+			// starts with settings from file -- allows env to override
+			{
+				COBALT_WEB_SENTRY_SHOW_DEBUG: settings.sentry.showDebug,
+			}
+		);
 
 	for (const institutionBuild of INSTITUTION_BUILDS) {
 		const INDEX_FILE_PATH = path.join(BUILD_DIR, institutionBuild, 'index.html');

@@ -97,6 +97,7 @@ If you ever need to test your code against the server, create a production build
 | COBALT_WEB_GA4_MEASUREMENT_ID               | Google Analytics 4 Measurement ID `G-XYZ123ABC`                                                                          |
 | COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")                                                                         |
 | COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                                                                              |
+| COBALT_WEB_SENTRY_SHOW_DEBUG                | string to show buttons on home page (throwing Sentry errors)                                                             |
 | COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")                                                              |
 | COBALT_WEB_DOWN_FOR_MAINTENANCE             | string to turn on/off DownForService page ("true" or "false")                                                            |
 | TARGET_INSTITUTION                          | Control which `institution-overrides` to bundle when running local dev server. Optional. Defaults to `cobalt` if not set |

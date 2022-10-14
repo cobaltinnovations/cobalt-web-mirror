@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useEffect } from 'react';
+import React, { FC, Suspense, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Route, useLocation } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
@@ -7,6 +7,7 @@ import config from '@/lib/config';
 
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
+import SentryErrorBoundary from '@/components/sentry-error-boundary';
 import SentryRoutes from '@/components/sentry-routes';
 import Footer from '@/components/footer';
 import InCrisisModal from '@/components/in-crisis-modal';
@@ -14,7 +15,7 @@ import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
 import ReauthModal from '@/components/reauth-modal';
 
-import { AppRoutes, NoMatch } from '@/routes';
+import { AppRoutes, RouteConfig, NoMatch } from '@/routes';
 
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';
 import { useGlobalStyles } from '@/jss/hooks/use-global-styles';
@@ -41,16 +42,13 @@ import HeaderUnauthenticated from './components/header-unauthenticated';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { account, institution, failedToInit, initialized, didCheckImmediateFlag } = useAccount();
+	const { failedToInit, initialized, didCheckImmediateFlag } = useAccount();
 
 	const { pathname } = useLocation();
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [pathname]);
-
-	useConsentRedirect();
-	useUrlViewTracking();
 
 	if (failedToInit) {
 		return (
@@ -85,43 +83,7 @@ const AppWithProviders: FC = () => {
 					return (
 						<Route key={groupIndex} element={<config.layout />}>
 							{config.routes.map((route, index) => {
-								// hold-off registering/rendering routes until
-								// immediate flags/param is checked & proessed
-								if (!didCheckImmediateFlag) {
-									return null;
-								}
-
-								const isEnabled =
-									typeof route.routeGuard === 'function'
-										? route.routeGuard({
-												account,
-												institution,
-										  })
-										: true;
-
-								const renderMainRouteComponent = () => {
-									if (!isEnabled) {
-										return <NoMatch />;
-									}
-
-									return <route.main />;
-								};
-
-								return (
-									<Route
-										key={index}
-										path={route.path}
-										element={
-											<Suspense fallback={<Loader />}>
-												{route.private ? (
-													<PrivateRoute>{renderMainRouteComponent()}</PrivateRoute>
-												) : (
-													renderMainRouteComponent()
-												)}
-											</Suspense>
-										}
-									/>
-								);
+								return <Route key={index} path={route.path} element={<AppRoute route={route} />} />;
 							})}
 						</Route>
 					);
@@ -130,6 +92,46 @@ const AppWithProviders: FC = () => {
 
 			<Footer />
 		</>
+	);
+};
+
+const AppRoute = ({ route }: { route: RouteConfig }) => {
+	const { account, institution, didCheckImmediateFlag } = useAccount();
+
+	useConsentRedirect();
+	useUrlViewTracking();
+
+	const isEnabled = useMemo(() => {
+		return typeof route.routeGuard === 'function'
+			? route.routeGuard({
+					account,
+					institution,
+			  })
+			: true;
+	}, [account, institution, route]);
+
+	const RouteElement = useMemo(() => {
+		return isEnabled ? route.main : NoMatch;
+	}, [isEnabled, route.main]);
+
+	// hold-off registering/rendering routes until
+	// immediate flags/param is checked & proessed
+	if (!didCheckImmediateFlag) {
+		return null;
+	}
+
+	return (
+		<Suspense fallback={<Loader />}>
+			<SentryErrorBoundary>
+				{route.private ? (
+					<PrivateRoute>
+						<RouteElement />
+					</PrivateRoute>
+				) : (
+					<RouteElement />
+				)}
+			</SentryErrorBoundary>
+		</Suspense>
 	);
 };
 
