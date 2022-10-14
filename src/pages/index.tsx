@@ -22,6 +22,8 @@ import {
 } from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
+import config from '@/lib/config';
+import SentryDebugButtons from '@/components/sentry-debug-buttons';
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
@@ -236,6 +238,8 @@ const Index: FC = () => {
 					</Container>
 				</>
 			)}
+
+			{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
 		</AsyncPage>
 	);
 };
