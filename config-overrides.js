@@ -8,11 +8,11 @@ const aliasOptions = {};
 module.exports.webpack = function (config, env) {
 	config = aliasWebpack(aliasOptions)(config);
 
-	const sentryDsn = JSON.stringify(process.env.SENTRY_DSN || '');
-	const sentryRelease = JSON.stringify(process.env.SENTRY_RELEASE || '');
-	const sentryAuthToken = JSON.stringify(process.env.SENTRY_AUTH_TOKEN || '');
-	const sentryOrg = JSON.stringify(process.env.SENTRY_ORG || '');
-	const sentryProject = JSON.stringify(process.env.SENTRY_PROJECT || '');
+	const sentryDsn = process.env.SENTRY_DSN || '';
+	const sentryRelease = process.env.SENTRY_RELEASE || '';
+	const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN || '';
+	const sentryOrg = process.env.SENTRY_ORG || '';
+	const sentryProject = process.env.SENTRY_PROJECT || '';
 
 	config.plugins.push(
 		new webpack.DefinePlugin({
@@ -20,8 +20,8 @@ module.exports.webpack = function (config, env) {
 			__DEV__: env !== 'production',
 			// Expose public URL in TS for referencing static files correctly
 			__PUBLIC_URL__: JSON.stringify(process.env.PUBLIC_URL || ''),
-			__SENTRY_DSN__: sentryDsn,
-			__SENTRY_RELEASE__: sentryRelease,
+			__SENTRY_DSN__: JSON.stringify(sentryDsn),
+			__SENTRY_RELEASE__: JSON.stringify(sentryRelease),
 		})
 	);
 
