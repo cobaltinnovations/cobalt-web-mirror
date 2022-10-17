@@ -79,7 +79,7 @@ const TopicCenter = () => {
 																? groupSession.seatsAvailableDescription
 																: ''
 														}
-														buttonTitle="Join Session"
+														buttonTitle="Reserve a Place"
 														onClick={() => {
 															navigate(
 																`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
