@@ -261,7 +261,7 @@ const InTheStudioGroupSessionScheduled = () => {
 						>
 							<div className="h-100 position-relative">
 								{session?.seatsAvailable && session.seatsAvailable <= 20 ? (
-									<Badge as="div" bg="outline-secondary" pill>
+									<Badge as="div" bg="outline-secondary" pill className={classes.badge}>
 										{session.seatsAvailableDescription}
 									</Badge>
 								) : null}
