@@ -260,9 +260,11 @@ const InTheStudioGroupSessionScheduled = () => {
 							imageUrl={session?.imageUrl || placeholderImage}
 						>
 							<div className="h-100 position-relative">
-								<Badge className={classes.badge} as="div" bg="outline-secondary" pill>
-									{session?.seatsAvailableDescription}
-								</Badge>
+								{session?.seatsAvailable && session.seatsAvailable <= 20 ? (
+									<Badge as="div" bg="outline-secondary" pill>
+										{session.seatsAvailableDescription}
+									</Badge>
+								) : null}
 							</div>
 						</BackgroundImageContainer>
 					</Col>

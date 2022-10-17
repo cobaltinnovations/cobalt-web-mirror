@@ -76,9 +76,11 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 				>
 					{!groupEvent.isGrouped && (
 						<div className={classes.imageContent}>
-							<Badge as="div" bg="outline-secondary" pill>
-								{groupEvent.seatsAvailableDescription}
-							</Badge>
+							{groupEvent.seatsAvailable && groupEvent.seatsAvailable <= 20 ? (
+								<Badge as="div" bg="outline-secondary" pill>
+									{groupEvent.seatsAvailableDescription}
+								</Badge>
+							) : null}
 						</div>
 					)}
 				</BackgroundImageContainer>
@@ -126,9 +128,11 @@ const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
 			>
 				{!groupEvent.isGrouped && (
 					<div className={classes.imageContent}>
-						<Badge as="div" bg="outline-secondary" pill>
-							{groupEvent.seatsAvailableDescription}
-						</Badge>
+						{groupEvent.seatsAvailable && groupEvent.seatsAvailable <= 20 ? (
+							<Badge as="div" bg="outline-secondary" pill>
+								{groupEvent.seatsAvailableDescription}
+							</Badge>
+						) : null}
 					</div>
 				)}
 			</BackgroundImageContainer>
