@@ -11,10 +11,11 @@ import {
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	CallToActionModel,
 } from '@/lib/models';
+
 import AsyncPage from '@/components/async-page';
+import OnYourTimeSectionHeader from '@/components/on-your-time-section-header';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import PersonalizeRecommendationsModal from '@/components/personalize-recommendations-modal';
-import DayContainer from '@/components/day-container';
 import Loader from '@/components/loader';
 import FilterPill from '@/components/filter-pill';
 import FilterFormat from '@/components/filter-format';
@@ -268,9 +269,9 @@ const OnYourTime: FC = () => {
 
 			{hasFilters && (
 				<>
-					<DayContainer className="mb-5">
+					<OnYourTimeSectionHeader className="mb-5">
 						<p className="mb-0 fw-bold">Personalized Recommendations</p>
-					</DayContainer>
+					</OnYourTimeSectionHeader>
 
 					<Container>
 						<Row>
@@ -311,9 +312,9 @@ const OnYourTime: FC = () => {
 			{additionalFilteredList.length > 0 && (
 				<>
 					{hasFilters && (
-						<DayContainer className="my-5">
+						<OnYourTimeSectionHeader className="my-5">
 							<p className="mb-0 fw-bold">Recent and Popular</p>
-						</DayContainer>
+						</OnYourTimeSectionHeader>
 					)}
 
 					<Container>
