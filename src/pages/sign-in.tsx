@@ -1,17 +1,16 @@
-import React, { FC, useCallback, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { accountService, institutionService } from '@/lib/services';
+import { accountService } from '@/lib/services';
 import useSubdomain from '@/hooks/use-subdomain';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-small.svg';
-import { AccountSource, ACCOUNT_SOURCE_DISPLAY_STYLE_ID, ACOUNT_SOURCE_ID } from '@/lib/models';
-import AsyncPage from '@/components/async-page';
+import { ACCOUNT_SOURCE_DISPLAY_STYLE_ID, ACOUNT_SOURCE_ID } from '@/lib/models';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -31,30 +30,10 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
-	const { institution, processAccessToken } = useAccount();
+	const { institution, processAccessToken, accountSources } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
-
-	const [searchParams] = useSearchParams();
-	const accountSourceId = searchParams.get('accountSourceId');
-
-	const [accountSources, setAccountSources] = useState<AccountSource[]>([]);
-
-	const fetchAccountSources = useCallback(async () => {
-		try {
-			const response = await institutionService
-				.getAccountSources({
-					...(subdomain && { subdomain }),
-					...(accountSourceId && { accountSourceId }),
-				})
-				.fetch();
-
-			setAccountSources(response.accountSources);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [accountSourceId, handleError, subdomain]);
 
 	const handleEnterAnonymouslyButtonClick = async () => {
 		try {
@@ -89,52 +68,49 @@ const SignIn: FC = () => {
 							<hr className="mb-6" />
 							<h2 className="mb-6 text-center">Sign in with</h2>
 
-							<AsyncPage fetchData={fetchAccountSources}>
-								<div className="text-center mb-3">
-									{accountSources.map((accountSource, index) => {
-										const isLast = accountSources.length - 1 === index;
-										let variant = 'primary';
+							<div className="text-center mb-3">
+								{accountSources.map((accountSource, index) => {
+									const isLast = accountSources.length - 1 === index;
+									let variant = 'primary';
 
-										switch (accountSource.accountSourceDisplayStyleId) {
-											case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.PRIMARY:
-												variant = 'primary';
-												break;
-											case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.SECONDARY:
-												variant = 'outline-primary';
-												break;
-											case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.TERTIARY:
-												variant = 'link';
-												break;
-											default:
-												variant = 'primary';
-										}
+									switch (accountSource.accountSourceDisplayStyleId) {
+										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.PRIMARY:
+											variant = 'primary';
+											break;
+										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.SECONDARY:
+											variant = 'outline-primary';
+											break;
+										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.TERTIARY:
+											variant = 'link';
+											break;
+										default:
+											variant = 'primary';
+									}
 
-										return (
-											<Button
-												key={`account-source-${index}`}
-												className={classNames('d-block w-100', {
-													'mb-4': !isLast,
-												})}
-												variant={variant}
-												onClick={() => {
-													if (accountSource.accountSourceId === ACOUNT_SOURCE_ID.ANONYMOUS) {
-														handleEnterAnonymouslyButtonClick();
-													} else if (
-														accountSource.accountSourceId ===
-														ACOUNT_SOURCE_ID.EMAIL_PASSWORD
-													) {
-														navigate('/sign-in/email');
-													} else if (accountSource.ssoUrl) {
-														window.location.href = accountSource.ssoUrl;
-													}
-												}}
-											>
-												{accountSource.authenticationDescription}
-											</Button>
-										);
-									})}
-								</div>
-							</AsyncPage>
+									return (
+										<Button
+											key={`account-source-${index}`}
+											className={classNames('d-block w-100', {
+												'mb-4': !isLast,
+											})}
+											variant={variant}
+											onClick={() => {
+												if (accountSource.accountSourceId === ACOUNT_SOURCE_ID.ANONYMOUS) {
+													handleEnterAnonymouslyButtonClick();
+												} else if (
+													accountSource.accountSourceId === ACOUNT_SOURCE_ID.EMAIL_PASSWORD
+												) {
+													navigate('/sign-in/email');
+												} else if (accountSource.ssoUrl) {
+													window.location.href = accountSource.ssoUrl;
+												}
+											}}
+										>
+											{accountSource.authenticationDescription}
+										</Button>
+									);
+								})}
+							</div>
 						</div>
 					</Col>
 				</Row>
