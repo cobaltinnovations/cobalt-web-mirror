@@ -26,7 +26,7 @@ type AccountContextConfig = {
 	isAnonymous: boolean;
 	institution: Institution | undefined;
 	setInstitution: React.Dispatch<React.SetStateAction<Institution | undefined>>;
-	accountSources: AccountSource[] | undefined;
+	accountSources: AccountSource[];
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
 	signOutAndClearContext: () => void;
 	isTrackedSession: boolean;
@@ -45,7 +45,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const [didCheckImmediateFlag, setDidCheckImmediateFlag] = useState(false);
 	const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 	const [institution, setInstitution] = useState<Institution | undefined>(undefined);
-	const [accountSources, setAccountSources] = useState<AccountSource[] | undefined>(undefined);
+	const [accountSources, setAccountSources] = useState<AccountSource[]>([]);
 	const location = useLocation();
 	const [redirectTo, setRedirectTo] = useState(location.pathname + location.search);
 
