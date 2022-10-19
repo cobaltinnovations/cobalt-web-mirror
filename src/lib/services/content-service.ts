@@ -27,10 +27,17 @@ interface GetPresignedUploadUrlResponseBody {
 
 interface FetchContentListQueryParams {
 	format?: string;
+	searchQuery?: string;
 	maxLengthMinutes?: number;
 }
 
 export const contentService = {
+	fetchContentTypeLabels() {
+		return httpSingleton.orchestrateRequest<{ contentTypeLabels: ContentListFormat[] }>({
+			method: 'get',
+			url: '/content-type-labels',
+		});
+	},
 	fetchContentList(queryParameters?: FetchContentListQueryParams) {
 		let queryString;
 		let url = '/content';

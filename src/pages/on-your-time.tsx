@@ -1,7 +1,6 @@
-import React, { FC, useState, useCallback, useMemo } from 'react';
+import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import Fuse from 'fuse.js';
 
 import { contentService, assessmentService, ContentListFormat, callToActionService } from '@/lib/services';
 import {
@@ -28,58 +27,44 @@ import useAnalytics from '@/hooks/use-analytics';
 import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 import { useScreeningFlow } from './screening/screening.hooks';
 import CallToAction from '@/components/call-to-action';
+import useDebouncedState from '@/hooks/use-debounced-state';
 
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { trackEvent } = useAnalytics();
-	const [searchParams, setSearchParams] = useSearchParams();
-	const selectedFormatIds = searchParams.getAll('formatId');
-	const selectedLength = searchParams.get('length') ?? '';
-	const searchTerm = searchParams.get('q') ?? '';
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
 		institution?.contentScreeningFlowId
 	);
 
+	const [searchParams, setSearchParams] = useSearchParams();
+	const selectedFormatIds = searchParams.getAll('formatId');
+	const joinedSelectedFormatIds = selectedFormatIds.join(',') ?? '';
+	const selectedLength = searchParams.get('length') ?? '';
+	const searchQuery = searchParams.get('searchQuery') ?? '';
+
+	const [searchTerm, setSearchTerm] = useState(searchQuery);
+	const [debouncedSearchValue] = useDebouncedState(searchTerm);
+
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
-	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
+
 	const [showFilterFormatModal, setShowFilterFormatModal] = useState(false);
 	const [showFilterLengthModal, setShowFilterLengthModal] = useState(false);
 	const [showPersonalizeModal, setShowPersonalizeModal] = useState(
 		(location?.state as { personalize: boolean })?.personalize ?? false
 	);
-	const [items, setItems] = useState<Content[]>([]);
-	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
 
 	const [questions, setQuestions] = useState<PersonalizationQuestion[]>([]);
 	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
+	const [availableFormatFilters, setAvailableFormatFilters] = useState<ContentListFormat[]>([]);
+
+	const [items, setItems] = useState<Content[]>([]);
+	const [additionalItems, setAdditionalItems] = useState<Content[]>([]);
 
 	const hasFilters = useMemo(() => {
 		return Object.values(choices).some((answers) => answers.length > 0);
 	}, [choices]);
-
-	const fuse = useMemo(() => {
-		return new Fuse(items, {
-			threshold: 0.2,
-			keys: ['title', 'description', 'author'],
-		});
-	}, [items]);
-
-	const filteredList: Content[] = useMemo(() => {
-		return searchTerm ? fuse.search(searchTerm).map((r) => r.item) : items;
-	}, [fuse, items, searchTerm]);
-
-	const additionalFuse = useMemo(() => {
-		return new Fuse(additionalItems, {
-			threshold: 0.2,
-			keys: ['title', 'description', 'author'],
-		});
-	}, [additionalItems]);
-
-	const additionalFilteredList: Content[] = useMemo(() => {
-		return searchTerm ? additionalFuse.search(searchTerm).map((r) => r.item) : additionalItems;
-	}, [additionalFuse, additionalItems, searchTerm]);
 
 	const fetchCallsToAction = useCallback(async () => {
 		const response = await callToActionService
@@ -89,7 +74,7 @@ const OnYourTime: FC = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
-	const fetchFilters = useCallback(() => {
+	const fetchPersonalizationDetails = useCallback(() => {
 		return assessmentService
 			.getPersonalizationDetails()
 			.fetch()
@@ -101,24 +86,33 @@ const OnYourTime: FC = () => {
 			});
 	}, []);
 
-	const format = selectedFormatIds.join(',');
-	const fetchContent = useCallback(() => {
-		return contentService
+	const fetchFormatFilters = useCallback(async () => {
+		const response = await contentService.fetchContentTypeLabels().fetch();
+		setAvailableFormatFilters(response.contentTypeLabels);
+	}, []);
+
+	const fetchContent = useCallback(async () => {
+		const response = await contentService
 			.fetchContentList({
-				format,
+				...(joinedSelectedFormatIds ? { format: joinedSelectedFormatIds } : {}),
+				...(debouncedSearchValue && { searchQuery: debouncedSearchValue }),
 				...(selectedLength && { maxLengthMinutes: parseInt(selectedLength, 10) }),
 			})
-			.fetch()
-			.then((response) => {
-				setAvailableFormatFilters(response.formats);
-				setItems(response.content);
-				setAdditionalItems(response.additionalContent);
-			});
-	}, [format, selectedLength]);
+			.fetch();
 
-	const fetchData = useCallback(async () => {
-		return Promise.all([fetchContent(), fetchFilters()]);
-	}, [fetchContent, fetchFilters]);
+		setItems(response.content);
+		setAdditionalItems(response.additionalContent);
+	}, [debouncedSearchValue, joinedSelectedFormatIds, selectedLength]);
+
+	useEffect(() => {
+		if (debouncedSearchValue) {
+			searchParams.set('searchQuery', debouncedSearchValue);
+		} else {
+			searchParams.delete('searchQuery');
+		}
+
+		setSearchParams(searchParams, { replace: true });
+	}, [debouncedSearchValue, searchParams, setSearchParams]);
 
 	if (!didCheckScreeningSessions) {
 		return (
@@ -130,7 +124,7 @@ const OnYourTime: FC = () => {
 	}
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			<ActionSheet
 				show={false}
 				onShow={() => {
@@ -141,47 +135,51 @@ const OnYourTime: FC = () => {
 				}}
 			/>
 
-			<PersonalizeRecommendationsModal
-				questions={questions}
-				show={showPersonalizeModal}
-				initialChoices={choices}
-				onClose={(updatedChoices) => {
-					setChoices(updatedChoices);
-					fetchContent();
-					navigate(
-						{
-							pathname: '/on-your-time',
-							search: searchParams.toString(),
-						},
-						{
-							replace: true,
-							state: {
-								personalize: false,
+			<AsyncPage fetchData={fetchPersonalizationDetails}>
+				<PersonalizeRecommendationsModal
+					questions={questions}
+					show={showPersonalizeModal}
+					initialChoices={choices}
+					onClose={(updatedChoices) => {
+						setChoices(updatedChoices);
+						fetchContent();
+						navigate(
+							{
+								pathname: '/on-your-time',
+								search: searchParams.toString(),
 							},
+							{
+								replace: true,
+								state: {
+									personalize: false,
+								},
+							}
+						);
+						setShowPersonalizeModal(false);
+					}}
+				/>
+			</AsyncPage>
+
+			<AsyncPage fetchData={fetchFormatFilters}>
+				<FilterFormat
+					formats={availableFormatFilters}
+					show={showFilterFormatModal}
+					selectedFormatIds={selectedFormatIds}
+					onHide={() => {
+						setShowFilterFormatModal(false);
+					}}
+					onSave={(selectedIds) => {
+						searchParams.delete('formatId');
+
+						for (const formatId of selectedIds) {
+							searchParams.append('formatId', formatId);
 						}
-					);
-					setShowPersonalizeModal(false);
-				}}
-			/>
 
-			<FilterFormat
-				formats={availableFormatFilters}
-				show={showFilterFormatModal}
-				selectedFormatIds={selectedFormatIds}
-				onHide={() => {
-					setShowFilterFormatModal(false);
-				}}
-				onSave={(selectedIds) => {
-					searchParams.delete('formatId');
-
-					for (const formatId of selectedIds) {
-						searchParams.append('formatId', formatId);
-					}
-
-					setSearchParams(searchParams);
-					setShowFilterFormatModal(false);
-				}}
-			/>
+						setSearchParams(searchParams);
+						setShowFilterFormatModal(false);
+					}}
+				/>
+			</AsyncPage>
 
 			<FilterLength
 				selectedLength={selectedLength}
@@ -190,7 +188,11 @@ const OnYourTime: FC = () => {
 					setShowFilterLengthModal(false);
 				}}
 				onSave={(length) => {
-					searchParams.set('length', length);
+					if (length) {
+						searchParams.set('length', length);
+					} else {
+						searchParams.delete('length');
+					}
 
 					setSearchParams(searchParams);
 					setShowFilterLengthModal(false);
@@ -225,11 +227,10 @@ const OnYourTime: FC = () => {
 					<Col lg={6} xl={5} className="mb-3 mb-lg-7">
 						<InputHelper
 							type="search"
-							label="Find On Your Time items"
+							label="Find On Your Time Items"
 							value={searchTerm}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								searchParams.set('q', event.target.value);
-								setSearchParams(searchParams, { replace: true });
+							onChange={({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+								setSearchTerm(currentTarget.value);
 							}}
 						/>
 					</Col>
@@ -267,30 +268,64 @@ const OnYourTime: FC = () => {
 				</Row>
 			</Container>
 
-			{hasFilters && (
-				<>
-					<OnYourTimeSectionHeader className="mb-5">
-						<p className="mb-0 fw-bold">Personalized Recommendations</p>
-					</OnYourTimeSectionHeader>
+			<AsyncPage fetchData={fetchContent}>
+				{hasFilters && (
+					<>
+						<OnYourTimeSectionHeader className="mb-5">
+							<p className="mb-0 fw-bold">Personalized Recommendations</p>
+						</OnYourTimeSectionHeader>
 
-					<Container>
-						<Row>
-							{filteredList.length === 0 ? (
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<p className="text-center">
-										There are no recommendations that match your selections.
-									</p>
-								</Col>
-							) : (
-								filteredList.map((item) => (
+						<Container>
+							<Row>
+								{items.length === 0 ? (
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<p className="text-center">
+											There are no recommendations that match your selections.
+										</p>
+									</Col>
+								) : (
+									items.map((item) => (
+										<Col key={item.contentId} xs={6} md={4} lg={3}>
+											<Link
+												to={`/on-your-time/${item.contentId}`}
+												className="d-block mb-3 text-decoration-none"
+											>
+												<OnYourTimeItem
+													imageUrl={item.imageUrl}
+													tag={item.newFlag ? 'NEW' : ''}
+													title={item.title}
+													author={item.author}
+													type={item.contentTypeLabel}
+													duration={item.duration}
+												/>
+											</Link>
+										</Col>
+									))
+								)}
+							</Row>
+						</Container>
+					</>
+				)}
+
+				{additionalItems.length > 0 && (
+					<>
+						{hasFilters && (
+							<OnYourTimeSectionHeader className="my-5">
+								<p className="mb-0 fw-bold">Recent and Popular</p>
+							</OnYourTimeSectionHeader>
+						)}
+
+						<Container>
+							<Row>
+								{additionalItems.map((item) => (
 									<Col key={item.contentId} xs={6} md={4} lg={3}>
 										<Link
 											to={`/on-your-time/${item.contentId}`}
-											className="d-block mb-3 text-decoration-none"
+											className="d-block mb-7 text-decoration-none"
 										>
 											<OnYourTimeItem
 												imageUrl={item.imageUrl}
@@ -302,45 +337,13 @@ const OnYourTime: FC = () => {
 											/>
 										</Link>
 									</Col>
-								))
-							)}
-						</Row>
-					</Container>
-				</>
-			)}
-
-			{additionalFilteredList.length > 0 && (
-				<>
-					{hasFilters && (
-						<OnYourTimeSectionHeader className="my-5">
-							<p className="mb-0 fw-bold">Recent and Popular</p>
-						</OnYourTimeSectionHeader>
-					)}
-
-					<Container>
-						<Row>
-							{additionalFilteredList.map((item) => (
-								<Col key={item.contentId} xs={6} md={4} lg={3}>
-									<Link
-										to={`/on-your-time/${item.contentId}`}
-										className="d-block mb-7 text-decoration-none"
-									>
-										<OnYourTimeItem
-											imageUrl={item.imageUrl}
-											tag={item.newFlag ? 'NEW' : ''}
-											title={item.title}
-											author={item.author}
-											type={item.contentTypeLabel}
-											duration={item.duration}
-										/>
-									</Link>
-								</Col>
-							))}
-						</Row>
-					</Container>
-				</>
-			)}
-		</AsyncPage>
+								))}
+							</Row>
+						</Container>
+					</>
+				)}
+			</AsyncPage>
+		</>
 	);
 };
 
