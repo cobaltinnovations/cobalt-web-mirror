@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge, Button } from 'react-bootstrap';
-import LinesEllipsis from 'react-lines-ellipsis';
+import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
@@ -66,7 +66,7 @@ interface Props {
 	className?: string;
 }
 
-const ResponsiveEllipsis = responsiveHOC()(LinesEllipsis);
+const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 
 export const TopicCenterGroupSession = ({
 	title,
@@ -110,9 +110,8 @@ export const TopicCenterGroupSession = ({
 					</div>
 					<ResponsiveEllipsis
 						className="d-none d-lg-block mb-4"
-						text={description}
+						unsafeHTML={description}
 						maxLine={titleTertiary ? '2' : '3'}
-						component="p"
 					/>
 				</div>
 				<div className="d-none d-lg-flex justify-content-between align-items-end">
