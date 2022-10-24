@@ -42,34 +42,42 @@ export const responsiveDefaults = {
 /* -------------------------------------------------------------------- */
 /* Button Group */
 /* -------------------------------------------------------------------- */
+interface UseCustomButtonGroupStylesProps {
+	floatingButtonGroup?: boolean;
+}
+
 const useCustomButtonGroupStyles = createUseStyles({
-	customButtonGroupOuter: {
+	customButtonGroupOuter: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
 		top: 0,
 		left: 0,
 		right: 0,
 		position: 'absolute',
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
-	},
-	customButtonGroup: {
+		...(floatingButtonGroup && { transform: 'translateY(-50%)' }),
+	}),
+	customButtonGroup: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		[mediaQueries.lg]: {
-			display: 'block',
+			display: floatingButtonGroup ? 'flex' : 'block',
 		},
-	},
+	}),
 	descriptionText: {
 		marginBottom: 0,
 		[mediaQueries.lg]: {
 			marginBottom: 16,
 		},
 	},
-	carouselButtons: {
-		width: 32,
-		height: 32,
+	carouselButtons: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
 		padding: 0,
-	},
+		width: floatingButtonGroup ? 48 : 32,
+		height: floatingButtonGroup ? 48 : 32,
+		...(floatingButtonGroup && {
+			boxShadow: '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)',
+		}),
+	}),
 });
 
 interface CustomButtonGroupProps extends ButtonGroupProps {
@@ -77,6 +85,7 @@ interface CustomButtonGroupProps extends ButtonGroupProps {
 	calloutTitle?: string;
 	calloutOnClick?(): void;
 	onElementHeightChange(height: number): void;
+	floatingButtonGroup?: boolean;
 }
 
 const CustomButtonGroup = ({
@@ -87,8 +96,11 @@ const CustomButtonGroup = ({
 	calloutTitle,
 	calloutOnClick,
 	onElementHeightChange,
+	floatingButtonGroup,
 }: CustomButtonGroupProps) => {
-	const classes = useCustomButtonGroupStyles();
+	const classes = useCustomButtonGroupStyles({
+		floatingButtonGroup,
+	});
 	const customButtonGroupRef = useRef<HTMLDivElement>(null);
 
 	const getElementHeight = useCallback(() => {
@@ -176,11 +188,12 @@ const CustomButtonGroup = ({
 interface UseCarouselStylesProps {
 	customButtonGroupHeight: number;
 	trackStyles?: React.CSSProperties;
+	floatingButtonGroup?: boolean;
 }
 
 const useCarouselStyles = createUseStyles({
-	carouselOuter: ({ customButtonGroupHeight, trackStyles }: UseCarouselStylesProps) => ({
-		paddingTop: customButtonGroupHeight,
+	carouselOuter: ({ customButtonGroupHeight, trackStyles, floatingButtonGroup }: UseCarouselStylesProps) => ({
+		paddingTop: floatingButtonGroup ? 0 : customButtonGroupHeight,
 		position: 'relative',
 		marginLeft: -gutterWidth / 2,
 		marginRight: -gutterWidth / 2,
@@ -201,6 +214,7 @@ interface CarouselProps extends MultiCarouselProps {
 	calloutTitle?: string;
 	calloutOnClick?(): void;
 	trackStyles?: React.CSSProperties;
+	floatingButtonGroup?: boolean;
 }
 
 const Carousel = ({
@@ -209,12 +223,14 @@ const Carousel = ({
 	calloutTitle,
 	calloutOnClick,
 	trackStyles,
+	floatingButtonGroup,
 	...rest
 }: PropsWithChildren<CarouselProps>) => {
 	const [customButtonGroupHeight, setCustomButtonGroupHeight] = useState(0);
 	const classes = useCarouselStyles({
 		customButtonGroupHeight,
 		trackStyles,
+		floatingButtonGroup,
 	});
 
 	return (
@@ -229,6 +245,7 @@ const Carousel = ({
 						calloutTitle={calloutTitle}
 						calloutOnClick={calloutOnClick}
 						onElementHeightChange={setCustomButtonGroupHeight}
+						floatingButtonGroup={floatingButtonGroup}
 					/>
 				}
 				renderButtonGroupOutside={true}

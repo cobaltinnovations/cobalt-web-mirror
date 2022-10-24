@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import LinesEllipsis from 'react-lines-ellipsis';
@@ -6,6 +6,7 @@ import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
+import { COLOR_IDS } from '@/lib/models';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -52,6 +53,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
+	colorId: COLOR_IDS;
 	subtopic: string;
 	title: string;
 	author: string;
@@ -65,6 +67,7 @@ interface Props {
 const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 
 const ResourceLibraryCard = ({
+	colorId,
 	subtopic,
 	title,
 	author,
@@ -78,10 +81,27 @@ const ResourceLibraryCard = ({
 	const placeholderImage = useRandomPlaceholderImage();
 	const [descriptionMaxLine, setDescriptionMaxLine] = useState(2);
 
-	const handleTitleReflow = useCallback((state: { clamped: boolean; text: string }) => {
-		const { clamped, text } = state;
+	const subtopicTitleClass = useMemo(() => {
+		switch (colorId) {
+			case COLOR_IDS.BRAND_PRIMARY:
+				return 'text-primary';
+			case COLOR_IDS.BRAND_ACCENT:
+				return 'text-secondary';
+			case COLOR_IDS.SEMANTIC_DANGER:
+				return 'text-danger';
+			case COLOR_IDS.SEMANTIC_WARNING:
+				return 'text-warning';
+			case COLOR_IDS.SEMANTIC_SUCCESS:
+				return 'text-success';
+			case COLOR_IDS.SEMANTIC_INFO:
+				return 'text-info';
+			default:
+				return 'text-muted';
+		}
+	}, [colorId]);
 
-		console.log('text', text);
+	const handleTitleReflow = useCallback((state: { clamped: boolean; text: string }) => {
+		const { clamped } = state;
 
 		if (clamped) {
 			setDescriptionMaxLine(2);
@@ -104,7 +124,7 @@ const ResourceLibraryCard = ({
 			</div>
 			<div className={classes.informationOuter}>
 				<p className="mb-2 fw-bold">
-					<Link to={'/'} className={classNames(classes.subtopicLink, 'text-warning')}>
+					<Link to={'/'} className={classNames(classes.subtopicLink, subtopicTitleClass)}>
 						{subtopic}
 					</Link>
 				</p>

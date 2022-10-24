@@ -5,6 +5,7 @@ export * from './assessment';
 export * from './calendar-event-models';
 export * from './call-to-action-models';
 export * from './chart-models';
+export * from './color-ids';
 export * from './content';
 export * from './external-group-event-type';
 export * from './group-event';
