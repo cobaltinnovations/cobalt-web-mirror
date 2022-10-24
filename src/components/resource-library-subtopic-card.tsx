@@ -29,10 +29,11 @@ interface Props {
 	colorId: COLOR_IDS;
 	title: string;
 	description: string;
+	to: string;
 	className?: string;
 }
 
-const ResourceLibrarySubtopicCard = ({ colorId, title, description, className }: Props) => {
+const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, className }: Props) => {
 	const classes = useStyles();
 
 	const backgroundColorClass = useMemo(() => {
@@ -62,7 +63,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, className }:
 			</div>
 			<div>
 				<p className="mb-0">
-					<Link to="/" className={classNames(classes.exploreAllLink, 'fw-normal')}>
+					<Link to={to} className={classNames(classes.exploreAllLink, 'fw-normal')}>
 						Explore all {title.toLowerCase()} content
 					</Link>
 				</p>

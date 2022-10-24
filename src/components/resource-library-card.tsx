@@ -55,6 +55,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface Props {
 	colorId: COLOR_IDS;
 	subtopic: string;
+	subtopicTo: string;
 	title: string;
 	author: string;
 	description: string;
@@ -69,6 +70,7 @@ const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 const ResourceLibraryCard = ({
 	colorId,
 	subtopic,
+	subtopicTo,
 	title,
 	author,
 	description,
@@ -124,7 +126,7 @@ const ResourceLibraryCard = ({
 			</div>
 			<div className={classes.informationOuter}>
 				<p className="mb-2 fw-bold">
-					<Link to={'/'} className={classNames(classes.subtopicLink, subtopicTitleClass)}>
+					<Link to={subtopicTo} className={classNames(classes.subtopicLink, subtopicTitleClass)}>
 						{subtopic}
 					</Link>
 				</p>

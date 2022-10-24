@@ -39,6 +39,7 @@ const carouselConfig = {
 
 interface ResourceSubtopic {
 	title: string;
+	tagGroupId: string;
 	description: string;
 	resources: Resource[];
 	colorId: COLOR_IDS;
@@ -63,6 +64,7 @@ const ResourceLibrary = () => {
 		{
 			colorId: COLOR_IDS.BRAND_ACCENT,
 			title: 'Symptoms',
+			tagGroupId: 'symptoms',
 			description:
 				'Browse content tailored to symptoms you or others in your life may be experiencing, including concerns about mood, anxiety, sleep, fatigue or substance abuse.',
 			resources: [
@@ -124,6 +126,7 @@ const ResourceLibrary = () => {
 		{
 			colorId: COLOR_IDS.SEMANTIC_WARNING,
 			title: 'Personal Life',
+			tagGroupId: 'personal-life',
 			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			resources: [
 				{
@@ -155,6 +158,7 @@ const ResourceLibrary = () => {
 		{
 			colorId: COLOR_IDS.SEMANTIC_SUCCESS,
 			title: 'Work Life',
+			tagGroupId: 'work-life',
 			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			resources: [
 				{
@@ -186,6 +190,7 @@ const ResourceLibrary = () => {
 		{
 			colorId: COLOR_IDS.SEMANTIC_INFO,
 			title: 'Identity',
+			tagGroupId: 'identity',
 			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			resources: [
 				{
@@ -217,6 +222,7 @@ const ResourceLibrary = () => {
 		{
 			colorId: COLOR_IDS.SEMANTIC_DANGER,
 			title: 'World Events',
+			tagGroupId: 'world-events',
 			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			resources: [
 				{
@@ -278,6 +284,7 @@ const ResourceLibrary = () => {
 									colorId={subtopic.colorId}
 									title={subtopic.title}
 									description={subtopic.description}
+									to={`/resource-library/tag-groups/${subtopic.tagGroupId}`}
 								/>
 							</Col>
 							<Col lg={9}>
@@ -294,6 +301,7 @@ const ResourceLibrary = () => {
 												className="h-100"
 												badgeTitle={resource.new ? 'New' : ''}
 												subtopic={resource.subtopic}
+												subtopicTo={`/resource-library/tag-groups/${subtopic.tagGroupId}`}
 												title={resource.title}
 												author={resource.author}
 												description={resource.description}
