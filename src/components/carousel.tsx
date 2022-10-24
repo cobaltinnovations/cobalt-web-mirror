@@ -175,10 +175,11 @@ const CustomButtonGroup = ({
 /* -------------------------------------------------------------------- */
 interface UseCarouselStylesProps {
 	customButtonGroupHeight: number;
+	trackStyles?: React.CSSProperties;
 }
 
 const useCarouselStyles = createUseStyles({
-	carouselOuter: ({ customButtonGroupHeight }: UseCarouselStylesProps) => ({
+	carouselOuter: ({ customButtonGroupHeight, trackStyles }: UseCarouselStylesProps) => ({
 		paddingTop: customButtonGroupHeight,
 		position: 'relative',
 		marginLeft: -gutterWidth / 2,
@@ -186,6 +187,7 @@ const useCarouselStyles = createUseStyles({
 		'& .react-multi-carousel-track': {
 			paddingTop: 16,
 			paddingBottom: 24,
+			...(trackStyles ? trackStyles : {}),
 		},
 	}),
 	carouselItem: {
@@ -198,6 +200,7 @@ interface CarouselProps extends MultiCarouselProps {
 	description?: string;
 	calloutTitle?: string;
 	calloutOnClick?(): void;
+	trackStyles?: React.CSSProperties;
 }
 
 const Carousel = ({
@@ -205,11 +208,13 @@ const Carousel = ({
 	children,
 	calloutTitle,
 	calloutOnClick,
+	trackStyles,
 	...rest
 }: PropsWithChildren<CarouselProps>) => {
 	const [customButtonGroupHeight, setCustomButtonGroupHeight] = useState(0);
 	const classes = useCarouselStyles({
 		customButtonGroupHeight,
+		trackStyles,
 	});
 
 	return (
