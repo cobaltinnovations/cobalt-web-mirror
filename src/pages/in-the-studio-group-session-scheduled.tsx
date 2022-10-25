@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -46,7 +46,7 @@ const InTheStudioGroupSessionScheduled = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const { account, setAccount } = useAccount();
+	const { setAccount } = useAccount();
 	const { showAlert } = useAlert();
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -55,7 +55,7 @@ const InTheStudioGroupSessionScheduled = () => {
 
 	const [session, setSession] = useState<GroupSessionModel>();
 	const [reservation, setReservation] = useState<GroupSessionReservationModel>();
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
+	const [collectedEmail, setCollectedEmail] = useState('');
 
 	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [showConfirmReservationModal, setShowConfirmReservationModal] = useState(false);
@@ -98,15 +98,6 @@ const InTheStudioGroupSessionScheduled = () => {
 			);
 		}
 	}, [groupSessionId, location.state, location.pathname, navigate]);
-
-	/* --------------------------------------------------------- */
-	/* Prepopulate the email modal with the accounts email */
-	/* --------------------------------------------------------- */
-	useEffect(() => {
-		if (account?.emailAddress) {
-			setCollectedEmail(account.emailAddress);
-		}
-	}, [account]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
