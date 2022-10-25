@@ -106,9 +106,7 @@ const ResourceLibraryCard = ({
 		}
 	}, [colorId]);
 
-	const handleTitleReflow = useCallback((state: { clamped: boolean; text: string }) => {
-		const { clamped } = state;
-
+	const handleTitleReflow = useCallback(({ clamped }: { clamped: boolean; text: string }) => {
 		if (clamped) {
 			setDescriptionMaxLine(2);
 		} else {
@@ -118,10 +116,7 @@ const ResourceLibraryCard = ({
 
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
-			<div
-				className={classes.imageOuter}
-				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
-			>
+			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
 				{badgeTitle && (
 					<Badge as="div" bg="light" pill>
 						{badgeTitle}
@@ -162,7 +157,7 @@ const ResourceLibraryCard = ({
 										bg="outline-dark"
 										pill
 										as="div"
-										className="me-1 mt-1 fs-ui-small text-capitalize"
+										className="me-1 mt-1 fs-ui-small text-capitalize fw-normal"
 									>
 										{tag.description}
 									</Badge>
