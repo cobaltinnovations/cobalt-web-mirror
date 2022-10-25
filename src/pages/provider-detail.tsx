@@ -224,13 +224,6 @@ const ProviderDetail = () => {
 													</li>
 													<li
 														className={classNames('ms-2 py-2', classes.navItem, {
-															[classes.activeNav]: currentElementIndexInViewport === 1,
-														})}
-													>
-														<a href="#specialties">Focus</a>
-													</li>
-													<li
-														className={classNames('ms-2 py-2', classes.navItem, {
 															[classes.activeNav]: currentElementIndexInViewport === 2,
 														})}
 													>
@@ -264,22 +257,6 @@ const ProviderDetail = () => {
 													__html: selectedProvider?.bio ?? '<p>Not available.</p>',
 												}}
 											></div>
-										</div>
-
-										<div className="mb-8" ref={sectionRefs[1]}>
-											<div id="specialties" className={classes.sectionAnchor} />
-											<h4>Focus</h4>
-											{!!specialties?.length ? (
-												<ul>
-													{specialties?.map((specialty) => {
-														return (
-															<li key={specialty.specialtyId}>{specialty.description}</li>
-														);
-													})}
-												</ul>
-											) : (
-												<p>Not available.</p>
-											)}
 										</div>
 
 										<div ref={sectionRefs[2]}>
