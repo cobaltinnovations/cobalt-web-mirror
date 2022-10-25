@@ -25,38 +25,59 @@ interface ResourceTag {
 	description: string;
 }
 
+enum FILTER_IDS {
+	SUBTOPIC = 'SUBTOPIC',
+	TYPE = 'TYPE',
+	LENGTH = 'LENGTH',
+}
+
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [colorId] = useState<COLOR_IDS>(COLOR_IDS.BRAND_ACCENT);
 
-	const [subtopicFilters] = useState([
-		{ title: 'Mood', value: 'MOOD' },
-		{ title: 'Anxiety', value: 'ANXIETY' },
-		{ title: 'Sleep/Fatigue', value: 'SLEEP_FATIGUE' },
-		{ title: 'Substance Use', value: 'SUBSTANCE_USE' },
-	]);
-	const [typeFilters] = useState([
-		{ title: 'Video', value: 'VIDEO' },
-		{ title: 'Podcast', value: 'PODCAST' },
-		{ title: 'Article', value: 'ARTICLE' },
-		{ title: 'Website', value: 'WEBSITE' },
-		{ title: 'App', value: 'APP' },
-	]);
-	const [lengthFilters] = useState([
-		{ title: '<5 Minutes', value: 'LESS_THAN_FIVE_MINUTES' },
-		{ title: '5-10 Minutes', value: 'FIVE_TO_TEN_MINUTES' },
-		{ title: '10-30 Minutes', value: 'TEN_TO_THIRTY_MINUTES' },
-		{ title: '>30 Minutes', value: 'GREATER_THAN_THIRTY_MINUTES' },
-	]);
-
-	const [selectedSubtopicFilters, setSelectedSubtopicFilters] = useState<string[]>(searchParams.getAll('subtopicId'));
-	const [selectedTypeFilters, setSelectedTypeFilters] = useState<string[]>(searchParams.getAll('typeId'));
-	const [selectedLengthFilters, setSelectedLengthFilters] = useState<string[]>(searchParams.getAll('lengthId'));
-
-	const [subtopicFilterIsShowing, setSubtopicFilterIsShowing] = useState(false);
-	const [typeFilterIsShowing, setTypeFilterIsShowing] = useState(false);
-	const [lengthFilterIsShowing, setLengthFilterIsShowing] = useState(false);
+	const [filters, setFilters] = useState({
+		[FILTER_IDS.SUBTOPIC]: {
+			id: FILTER_IDS.SUBTOPIC,
+			title: 'Subtopic',
+			searchParam: 'subtopicId',
+			value: searchParams.getAll('subtopicId'),
+			options: [
+				{ title: 'Mood', value: 'MOOD' },
+				{ title: 'Anxiety', value: 'ANXIETY' },
+				{ title: 'Sleep/Fatigue', value: 'SLEEP_FATIGUE' },
+				{ title: 'Substance Use', value: 'SUBSTANCE_USE' },
+			],
+			isShowing: false,
+		},
+		[FILTER_IDS.TYPE]: {
+			id: FILTER_IDS.TYPE,
+			title: 'Type',
+			searchParam: 'typeId',
+			value: searchParams.getAll('typeId'),
+			options: [
+				{ title: 'Video', value: 'VIDEO' },
+				{ title: 'Podcast', value: 'PODCAST' },
+				{ title: 'Article', value: 'ARTICLE' },
+				{ title: 'Website', value: 'WEBSITE' },
+				{ title: 'App', value: 'APP' },
+			],
+			isShowing: false,
+		},
+		[FILTER_IDS.LENGTH]: {
+			id: FILTER_IDS.LENGTH,
+			title: 'Length',
+			searchParam: 'lengthId',
+			value: searchParams.getAll('lengthId'),
+			options: [
+				{ title: '<5 Minutes', value: 'LESS_THAN_FIVE_MINUTES' },
+				{ title: '5-10 Minutes', value: 'FIVE_TO_TEN_MINUTES' },
+				{ title: '10-30 Minutes', value: 'TEN_TO_THIRTY_MINUTES' },
+				{ title: '>30 Minutes', value: 'GREATER_THAN_THIRTY_MINUTES' },
+			],
+			isShowing: false,
+		},
+	});
 
 	const [resources] = useState<Resource[]>([
 		{
@@ -121,19 +142,6 @@ const ResourceLibraryTopic = () => {
 		return null;
 	}, []);
 
-	const getUpdatedValueForFilter = (valueToAddOrRemove: string, filter: string[]) => {
-		const filterClone = cloneDeep(filter);
-		const indexToRemove = filterClone.findIndex((v) => v === valueToAddOrRemove);
-
-		if (indexToRemove > -1) {
-			filterClone.splice(indexToRemove, 1);
-		} else {
-			filterClone.push(valueToAddOrRemove);
-		}
-
-		return filterClone;
-	};
-
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
 
@@ -156,134 +164,76 @@ const ResourceLibraryTopic = () => {
 			<Container className="pt-8 pb-24">
 				<Row className="mb-8">
 					<Col>
-						<SimpleFilter
-							className="me-2"
-							title="Subtopic"
-							show={subtopicFilterIsShowing}
-							active={searchParams.getAll('subtopicId').length > 0}
-							onClick={() => {
-								setSubtopicFilterIsShowing(true);
-							}}
-							onHide={() => {
-								setSelectedSubtopicFilters(searchParams.getAll('subtopicId'));
-								setSubtopicFilterIsShowing(false);
-							}}
-							onClear={() => {
-								applyValuesToSearchParam([], 'subtopicId');
-								setSelectedSubtopicFilters([]);
-								setSubtopicFilterIsShowing(false);
-							}}
-							onApply={() => {
-								applyValuesToSearchParam(selectedSubtopicFilters, 'subtopicId');
-								setSubtopicFilterIsShowing(false);
-							}}
-						>
-							{subtopicFilters.map((filter) => {
-								return (
-									<Form.Check
-										key={filter.value}
-										type="checkbox"
-										name="subtopic"
-										id={`subtopic--${filter.value}`}
-										label={filter.title}
-										value={filter.value}
-										checked={selectedSubtopicFilters.includes(filter.value)}
-										onChange={({ currentTarget }) => {
-											const updatedValue = getUpdatedValueForFilter(
-												currentTarget.value,
-												selectedSubtopicFilters
-											);
-											setSelectedSubtopicFilters(updatedValue);
-										}}
-									/>
-								);
-							})}
-						</SimpleFilter>
-						<SimpleFilter
-							className="me-2"
-							title="Type"
-							show={typeFilterIsShowing}
-							active={searchParams.getAll('typeId').length > 0}
-							onClick={() => {
-								setTypeFilterIsShowing(true);
-							}}
-							onHide={() => {
-								setSelectedTypeFilters(searchParams.getAll('typeId'));
-								setTypeFilterIsShowing(false);
-							}}
-							onClear={() => {
-								applyValuesToSearchParam([], 'typeId');
-								setSelectedTypeFilters([]);
-								setTypeFilterIsShowing(false);
-							}}
-							onApply={() => {
-								applyValuesToSearchParam(selectedTypeFilters, 'typeId');
-								setTypeFilterIsShowing(false);
-							}}
-						>
-							{typeFilters.map((filter) => {
-								return (
-									<Form.Check
-										key={filter.value}
-										type="checkbox"
-										name="type"
-										id={`type--${filter.value}`}
-										label={filter.title}
-										value={filter.value}
-										checked={selectedTypeFilters.includes(filter.value)}
-										onChange={({ currentTarget }) => {
-											const updatedValue = getUpdatedValueForFilter(
-												currentTarget.value,
-												selectedTypeFilters
-											);
-											setSelectedTypeFilters(updatedValue);
-										}}
-									/>
-								);
-							})}
-						</SimpleFilter>
-						<SimpleFilter
-							title="Length"
-							show={lengthFilterIsShowing}
-							active={searchParams.getAll('lengthId').length > 0}
-							onClick={() => {
-								setLengthFilterIsShowing(true);
-							}}
-							onHide={() => {
-								setSelectedLengthFilters(searchParams.getAll('lengthId'));
-								setLengthFilterIsShowing(false);
-							}}
-							onClear={() => {
-								applyValuesToSearchParam([], 'lengthId');
-								setSelectedLengthFilters([]);
-								setLengthFilterIsShowing(false);
-							}}
-							onApply={() => {
-								applyValuesToSearchParam(selectedLengthFilters, 'lengthId');
-								setLengthFilterIsShowing(false);
-							}}
-						>
-							{lengthFilters.map((filter) => {
-								return (
-									<Form.Check
-										key={filter.value}
-										type="checkbox"
-										name="length"
-										id={`length--${filter.value}`}
-										label={filter.title}
-										value={filter.value}
-										checked={selectedLengthFilters.includes(filter.value)}
-										onChange={({ currentTarget }) => {
-											const updatedValue = getUpdatedValueForFilter(
-												currentTarget.value,
-												selectedLengthFilters
-											);
-											setSelectedLengthFilters(updatedValue);
-										}}
-									/>
-								);
-							})}
-						</SimpleFilter>
+						{Object.values(filters).map((filter) => {
+							return (
+								<SimpleFilter
+									key={filter.id}
+									className="me-2"
+									title={filter.title}
+									show={filter.isShowing}
+									active={searchParams.getAll(filter.searchParam).length > 0}
+									onClick={() => {
+										const filtersClone = cloneDeep(filters);
+										filtersClone[filter.id].isShowing = true;
+										setFilters(filtersClone);
+									}}
+									onHide={() => {
+										const filtersClone = cloneDeep(filters);
+										filtersClone[filter.id].value = searchParams.getAll(
+											filtersClone[filter.id].searchParam
+										);
+										filtersClone[filter.id].isShowing = false;
+										setFilters(filtersClone);
+									}}
+									onClear={() => {
+										const filtersClone = cloneDeep(filters);
+										filtersClone[filter.id].value = [];
+										filtersClone[filter.id].isShowing = false;
+										setFilters(filtersClone);
+
+										applyValuesToSearchParam([], filtersClone[filter.id].searchParam);
+									}}
+									onApply={() => {
+										const filtersClone = cloneDeep(filters);
+										filtersClone[filter.id].isShowing = false;
+										setFilters(filtersClone);
+
+										applyValuesToSearchParam(
+											filtersClone[filter.id].value,
+											filtersClone[filter.id].searchParam
+										);
+									}}
+								>
+									{filter.options.map((option) => {
+										return (
+											<Form.Check
+												key={option.value}
+												type="checkbox"
+												name="subtopic"
+												id={`subtopic--${option.value}`}
+												label={option.title}
+												value={option.value}
+												checked={filter.value.includes(option.value)}
+												onChange={({ currentTarget }) => {
+													const filtersClone = cloneDeep(filters);
+													const indexToRemove = filtersClone[filter.id].value.findIndex(
+														(v) => v === currentTarget.value
+													);
+
+													if (indexToRemove > -1) {
+														filtersClone[filter.id].value.splice(indexToRemove, 1);
+													} else {
+														filtersClone[filter.id].value.push(currentTarget.value);
+													}
+
+													setFilters(filtersClone);
+												}}
+											/>
+										);
+									})}
+								</SimpleFilter>
+							);
+						})}
 					</Col>
 				</Row>
 				<Row>
