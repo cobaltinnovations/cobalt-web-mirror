@@ -67,6 +67,8 @@ export interface ScreeningAnswerOption {
 	screeningQuestionId: string;
 	answerOptionText?: string;
 	displayOrder: number;
+	freeformSupplement?: boolean;
+	freeformSupplementDescription?: string;
 }
 
 export interface ScreeningAnswer {
@@ -75,11 +77,15 @@ export interface ScreeningAnswer {
 	screeningSessionAnsweredScreeningQuestionId: string;
 	createdByAccountId: string;
 	text?: string;
+	freeformSupplementText?: string;
 	created: string;
 	createdDescription: string;
 }
 
-export type ScreeningAnswerSelection = Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>;
+export type ScreeningAnswerSelection = Pick<
+	ScreeningAnswer,
+	'screeningAnswerOptionId' | 'text' | 'freeformSupplementText'
+>;
 
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;

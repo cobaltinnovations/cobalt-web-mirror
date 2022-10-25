@@ -27,6 +27,7 @@ const ScreeningQuestionsPage = () => {
 
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
+	const [supplementText, setSupplementText] = useState({} as Record<string, string>);
 
 	const submitAnswers = useCallback(
 		(answers: string[]) => {
@@ -35,7 +36,20 @@ const ScreeningQuestionsPage = () => {
 			}
 
 			const selections: ScreeningAnswerSelection[] = [
-				...answers.map((screeningAnswerOptionId) => ({ screeningAnswerOptionId })),
+				...answers.map((screeningAnswerOptionId) => {
+					const answer: ScreeningAnswerSelection = {
+						screeningAnswerOptionId,
+					};
+
+					const freeformSupplementText = supplementText[screeningAnswerOptionId];
+
+					if (freeformSupplementText) {
+						answer.freeformSupplementText = freeformSupplementText;
+					}
+
+					return answer;
+				}),
+				// answers to text questions
 				...Object.entries(answerText)
 					.filter(([_, text]) => !!text)
 					.map(([screeningAnswerOptionId, text]) => ({
@@ -64,7 +78,7 @@ const ScreeningQuestionsPage = () => {
 					setIsSubmitting(false);
 				});
 		},
-		[answerText, handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId]
+		[answerText, handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId, supplementText]
 	);
 
 	useEffect(() => {
@@ -78,15 +92,23 @@ const ScreeningQuestionsPage = () => {
 		setSelectedAnswers(
 			screeningQuestionContextResponse.screeningAnswers.map((answer) => answer.screeningAnswerOptionId)
 		);
-		setAnswerText(
-			screeningQuestionContextResponse.screeningAnswerOptions.reduce((texts, option) => {
-				texts[option.screeningAnswerOptionId] =
-					screeningQuestionContextResponse.screeningAnswers.find(
-						(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
-					)?.text ?? '';
-				return texts;
-			}, {} as Record<string, string>)
+		const { texts, supplements } = screeningQuestionContextResponse.screeningAnswerOptions.reduce(
+			(acc, option) => {
+				const answer = screeningQuestionContextResponse.screeningAnswers.find(
+					(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
+				);
+				acc.texts[option.screeningAnswerOptionId] = answer?.text ?? '';
+				acc.supplements[option.screeningAnswerOptionId] = answer?.freeformSupplementText ?? '';
+
+				return acc;
+			},
+			{
+				texts: {} as Record<string, string>,
+				supplements: {} as Record<string, string>,
+			}
 		);
+		setAnswerText(texts);
+		setSupplementText(supplements);
 	}, [screeningQuestionContextResponse?.screeningAnswerOptions, screeningQuestionContextResponse?.screeningAnswers]);
 
 	const renderedAnswerOptions = useMemo(() => {
@@ -99,26 +121,51 @@ const ScreeningQuestionsPage = () => {
 						type="radio"
 						name="screeningAnswerOptionId"
 						value={selectedAnswers[0] ?? ''}
-						onChange={(newId) => {
-							const selection = [newId];
-							setSelectedAnswers(selection);
-							submitAnswers(selection);
-						}}
 					>
 						{screeningQuestionContextResponse.screeningAnswerOptions.map((option) => {
-							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
+							const optionId = option.screeningAnswerOptionId;
+							const isChecked = !!selectedAnswers.includes(optionId);
 
 							return (
-								<ToggleButton
-									id={option.screeningAnswerOptionId}
-									key={option.screeningAnswerOptionId}
-									value={option.screeningAnswerOptionId}
-									className="mb-2"
-									variant={isChecked ? 'primary' : 'light'}
-									disabled={isSubmitting}
-								>
-									{option.answerOptionText}
-								</ToggleButton>
+								<React.Fragment key={optionId}>
+									<ToggleButton
+										id={optionId}
+										key={optionId}
+										value={optionId}
+										className="mb-2"
+										variant={isChecked ? 'primary' : 'light'}
+										disabled={isSubmitting}
+										checked={isChecked}
+										onClick={() => {
+											const selection = [optionId];
+											setSelectedAnswers(selection);
+
+											if (!option.freeformSupplement) {
+												submitAnswers(selection);
+											}
+										}}
+									>
+										{option.answerOptionText}
+									</ToggleButton>
+
+									{option.freeformSupplement && isChecked && (
+										<InputHelper
+											id={'' + Math.random()}
+											as="textarea"
+											className="mb-4"
+											value={supplementText[optionId] ?? ''}
+											label={option.freeformSupplementDescription ?? ''}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+												setSupplementText((curr) => {
+													return {
+														...curr,
+														[optionId]: e.target.value,
+													};
+												});
+											}}
+										/>
+									)}
+								</React.Fragment>
 							);
 						})}
 					</ToggleButtonGroup>
@@ -132,34 +179,66 @@ const ScreeningQuestionsPage = () => {
 						type="checkbox"
 						name="screeningAnswerOptionId"
 						value={selectedAnswers}
-						onChange={(newIds) => {
-							setSelectedAnswers(newIds);
-						}}
 					>
 						{screeningQuestionContextResponse.screeningAnswerOptions.map((option) => {
-							const isChecked = !!selectedAnswers.includes(option.screeningAnswerOptionId);
+							const optionId = option.screeningAnswerOptionId;
+							const isChecked = !!selectedAnswers.includes(optionId);
 
 							return (
-								<ToggleButton
-									id={option.screeningAnswerOptionId}
-									name={option.screeningAnswerOptionId}
-									key={option.screeningAnswerOptionId}
-									value={option.screeningAnswerOptionId}
-									className="d-flex align-items-center mb-2"
-									variant={isChecked ? 'primary' : 'light'}
-									disabled={isSubmitting}
-								>
-									<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
-										{isChecked && <CheckMarkIcon />}
-									</div>
-									{option.answerOptionText}
-								</ToggleButton>
+								<React.Fragment key={optionId}>
+									<ToggleButton
+										id={optionId}
+										name={optionId}
+										key={optionId}
+										value={optionId}
+										className="d-flex align-items-center mb-2"
+										variant={isChecked ? 'primary' : 'light'}
+										disabled={isSubmitting}
+										onClick={() => {
+											setSelectedAnswers((curr) => {
+												if (isChecked) {
+													return curr.filter((v) => v !== optionId);
+												}
+												return [...curr, optionId];
+											});
+										}}
+									>
+										<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
+											{isChecked && <CheckMarkIcon />}
+										</div>
+										{option.answerOptionText}
+									</ToggleButton>
+
+									{option.freeformSupplement && isChecked && (
+										<InputHelper
+											as="textarea"
+											className="mb-4"
+											value={supplementText[option.screeningAnswerOptionId] ?? ''}
+											label={option.freeformSupplementDescription ?? ''}
+											autoFocus
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+												setSupplementText((curr) => {
+													return {
+														...curr,
+														[option.screeningAnswerOptionId]: e.target.value,
+													};
+												});
+											}}
+										/>
+									)}
+								</React.Fragment>
 							);
 						})}
 					</ToggleButtonGroup>
 				);
 
 			case ScreeningAnswerFormatId.FREEFORM_TEXT:
+				if (
+					screeningQuestionContextResponse.screeningAnswerOptions.some((option) => option.freeformSupplement)
+				) {
+					throw new Error('Unable to handle Supplements with Text questions');
+				}
+
 				return screeningQuestionContextResponse.screeningAnswerOptions.map((option) => (
 					<InputHelper
 						key={option.screeningAnswerOptionId}
@@ -190,6 +269,7 @@ const ScreeningQuestionsPage = () => {
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 		submitAnswers,
+		supplementText,
 	]);
 
 	const hideNextBtn = useMemo(() => {
@@ -197,11 +277,20 @@ const ScreeningQuestionsPage = () => {
 			screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId ===
 			ScreeningAnswerFormatId.SINGLE_SELECT;
 		const previouslyAnswered = (screeningQuestionContextResponse?.screeningAnswers.length ?? 0) > 0;
+		const selectedAnswersHaveSupplements = selectedAnswers.some((optionId) => {
+			const option = screeningQuestionContextResponse?.screeningAnswerOptions.find(
+				(o) => o.screeningAnswerOptionId === optionId
+			);
 
-		return isSingleSelect && !previouslyAnswered;
+			return option?.freeformSupplement;
+		});
+
+		return isSingleSelect && !previouslyAnswered && !selectedAnswersHaveSupplements;
 	}, [
+		screeningQuestionContextResponse?.screeningAnswerOptions,
 		screeningQuestionContextResponse?.screeningAnswers.length,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
+		selectedAnswers,
 	]);
 
 	const disableNextBtn = useMemo(() => {
