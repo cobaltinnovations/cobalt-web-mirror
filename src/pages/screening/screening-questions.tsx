@@ -2,7 +2,12 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
-import { ScreeningAnswerFormatId, ScreeningAnswerSelection, ScreeningQuestionContextResponse } from '@/lib/models';
+import {
+	ScreeningAnswerFormatId,
+	ScreeningAnswerSelection,
+	ScreeningQuestionContextResponse,
+	ScreeningQuestionPrompt,
+} from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
@@ -19,15 +24,28 @@ const ScreeningQuestionsPage = () => {
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
 
-	const fetchData = useCallback(async () => {
-		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
-		const response = await request.fetch();
-		setScreeningQuestionContextResponse(response);
-	}, [screeningQuestionContextId]);
-
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 	const [supplementText, setSupplementText] = useState({} as Record<string, string>);
+
+	const [questionPrompt, setQuestionPrompt] = useState<ScreeningQuestionPrompt | null>(null);
+	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
+
+	const fetchData = useCallback(async () => {
+		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
+		const response = await request.fetch();
+
+		setScreeningQuestionContextResponse(response);
+
+		if (response.screeningQuestionPrompt) {
+			setQuestionPrompt(response.screeningQuestionPrompt);
+		}
+	}, [screeningQuestionContextId]);
+
+	const clearPrompt = useCallback(() => {
+		setQuestionPrompt(null);
+		setIsSubmitPrompt(false);
+	}, []);
 
 	const submitAnswers = useCallback(
 		(answers: string[]) => {
@@ -70,7 +88,10 @@ const ScreeningQuestionsPage = () => {
 					}
 				})
 				.catch((e) => {
-					if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					if (e?.metadata?.screeningQuestionPrompt) {
+						setIsSubmitPrompt(true);
+						setQuestionPrompt(e.metadata.screeningQuestionPrompt as ScreeningQuestionPrompt);
+					} else if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 						handleError(e);
 					}
 				})
@@ -299,98 +320,154 @@ const ScreeningQuestionsPage = () => {
 		} else if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
 			return (
 				isSubmitting ||
-				selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount
+				(!questionPrompt &&
+					selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount)
 			);
 		}
 
-		return (
-			isSubmitting ||
+		const answerCountMismatch =
 			selectedAnswers.length < screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount ||
-			selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount
-		);
-	}, [isSubmitting, screeningQuestionContextResponse, selectedAnswers.length]);
+			selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount;
+
+		return isSubmitting || (!questionPrompt && answerCountMismatch);
+	}, [isSubmitting, questionPrompt, screeningQuestionContextResponse, selectedAnswers.length]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<Container className="py-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
-							<p className="mb-3">{screeningQuestionContextResponse.screeningQuestion.introText}</p>
-						)}
+						{questionPrompt ? (
+							<>
+								<img src={questionPrompt.image} className="mt-6 mx-auto d-block" alt="Prompt" />
 
-						<h3 className="mb-5">
-							<div
-								dangerouslySetInnerHTML={{
-									__html: screeningQuestionContextResponse?.screeningQuestion.questionText!,
-								}}
-							/>
-						</h3>
+								<div
+									className="my-6"
+									dangerouslySetInnerHTML={{
+										__html: questionPrompt.text,
+									}}
+								/>
 
-						<Form
-							onSubmit={(e) => {
-								e.preventDefault();
-								submitAnswers(selectedAnswers);
-							}}
-						>
-							{renderedAnswerOptions}
+								<div className="d-flex">
+									{(isSubmitPrompt ||
+										screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
+										<Button
+											disabled={isSubmitting}
+											type="button"
+											onClick={() => {
+												clearPrompt();
 
-							<div className="d-flex">
-								{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
+												if (
+													!isSubmitPrompt &&
+													screeningQuestionContextResponse?.previousScreeningQuestionContextId
+												) {
+													navigateToQuestion(
+														screeningQuestionContextResponse.previousScreeningQuestionContextId
+													);
+												}
+											}}
+										>
+											Previous
+										</Button>
+									)}
+
 									<Button
-										disabled={isSubmitting}
-										type="button"
-										onClick={() => {
-											navigateToQuestion(
-												screeningQuestionContextResponse.previousScreeningQuestionContextId
-											);
+										disabled={disableNextBtn}
+										className="ms-auto"
+										onClick={async () => {
+											if (isSubmitPrompt) {
+												submitAnswers(selectedAnswers);
+											} else {
+												clearPrompt();
+											}
 										}}
 									>
-										Previous
+										{questionPrompt.action}
 									</Button>
+								</div>
+							</>
+						) : (
+							<>
+								{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
+									<p className="mb-3">
+										{screeningQuestionContextResponse.screeningQuestion.introText}
+									</p>
 								)}
 
-								{!hideNextBtn && (
-									<Button disabled={disableNextBtn} className="ms-auto" type="submit">
-										Next
-									</Button>
-								)}
-							</div>
+								<h3 className="mb-5">
+									<div
+										dangerouslySetInnerHTML={{
+											__html: screeningQuestionContextResponse?.screeningQuestion.questionText!,
+										}}
+									/>
+								</h3>
 
-							<div className="d-flex">
-								<Button
-									variant="link"
-									className="mx-auto"
-									type="button"
-									onClick={() => {
-										if (!screeningQuestionContextId) {
-											return;
-										}
-
-										if (!window.confirm('Are you sure you want to skip this assessment?')) {
-											return;
-										}
-
-										screeningService
-											.skipScreeningQuestionContext(screeningQuestionContextId)
-											.fetch()
-											.then((response) => {
-												navigateToDestination(
-													response.screeningSession.screeningSessionDestination,
-													{ skipped: true }
-												);
-											})
-											.catch((e) => {
-												if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-													handleError(e);
-												}
-											});
+								<Form
+									onSubmit={(e) => {
+										e.preventDefault();
+										submitAnswers(selectedAnswers);
 									}}
 								>
-									Skip Assessment
-								</Button>
-							</div>
-						</Form>
+									{renderedAnswerOptions}
+
+									<div className="d-flex">
+										{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
+											<Button
+												disabled={isSubmitting}
+												type="button"
+												onClick={() => {
+													navigateToQuestion(
+														screeningQuestionContextResponse.previousScreeningQuestionContextId
+													);
+												}}
+											>
+												Previous
+											</Button>
+										)}
+
+										{!hideNextBtn && (
+											<Button disabled={disableNextBtn} className="ms-auto" type="submit">
+												Next
+											</Button>
+										)}
+									</div>
+
+									<div className="d-flex">
+										<Button
+											variant="link"
+											className="mx-auto"
+											type="button"
+											onClick={() => {
+												if (!screeningQuestionContextId) {
+													return;
+												}
+
+												if (!window.confirm('Are you sure you want to skip this assessment?')) {
+													return;
+												}
+
+												screeningService
+													.skipScreeningQuestionContext(screeningQuestionContextId)
+													.fetch()
+													.then((response) => {
+														navigateToDestination(
+															response.screeningSession.screeningSessionDestination,
+															{ skipped: true }
+														);
+													})
+													.catch((e) => {
+														if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+															handleError(e);
+														}
+													});
+											}}
+										>
+											Skip Assessment
+										</Button>
+									</div>
+								</Form>
+							</>
+						)}
 					</Col>
 				</Row>
 			</Container>

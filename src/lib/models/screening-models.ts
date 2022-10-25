@@ -87,10 +87,17 @@ export type ScreeningAnswerSelection = Pick<
 	'screeningAnswerOptionId' | 'text' | 'freeformSupplementText'
 >;
 
+export interface ScreeningQuestionPrompt {
+	image?: string;
+	text: string;
+	action: string;
+}
+
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
 	screeningAnswers: ScreeningAnswer[];
 	screeningSessionDestination: ScreeningSessionDestination;
+	screeningQuestionPrompt?: ScreeningQuestionPrompt;
 }
