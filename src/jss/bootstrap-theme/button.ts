@@ -162,7 +162,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-primary': {
 				color: theme.colors.p500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.p500}`,
+				border: `2px solid ${theme.colors.p500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.p500,
@@ -175,7 +175,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-secondary': {
 				color: theme.colors.a500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.a500}`,
+				border: `2px solid ${theme.colors.a500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.a500,
@@ -184,7 +184,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-success': {
 				color: theme.colors.s500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.s500}`,
+				border: `2px solid ${theme.colors.s500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.s500,
@@ -193,7 +193,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-danger': {
 				color: theme.colors.d500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.d500}`,
+				border: `2px solid ${theme.colors.d500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.d500,
@@ -202,7 +202,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-warning': {
 				color: theme.colors.w500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.w500}`,
+				border: `2px solid ${theme.colors.w500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.w500,
@@ -211,7 +211,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-info': {
 				color: theme.colors.i500,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.i500}`,
+				border: `2px solid ${theme.colors.i500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.i500,
@@ -220,7 +220,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-dark': {
 				color: theme.colors.n900,
 				backgroundColor: 'transparent',
-				border: `1px solid ${theme.colors.n900}`,
+				border: `2px solid ${theme.colors.n900}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.n900,
@@ -229,7 +229,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-light': {
 				color: theme.colors.p500,
 				backgroundColor: theme.colors.n0,
-				border: `1px solid ${theme.colors.p500}`,
+				border: `2px solid ${theme.colors.p500}`,
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.a500,
