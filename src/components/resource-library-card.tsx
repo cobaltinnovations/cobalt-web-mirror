@@ -65,7 +65,8 @@ interface Props {
 	className?: string;
 }
 
-const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
+const ResponsiveLineEllipsis = responsiveHOC()(LinesEllipsis);
+const ResponsiveHtmlEllipsis = responsiveHOC()(HTMLEllipsis);
 
 const ResourceLibraryCard = ({
 	colorId,
@@ -130,9 +131,15 @@ const ResourceLibraryCard = ({
 						{subtopic}
 					</Link>
 				</p>
-				<LinesEllipsis className="mb-1" text={title} component="h4" maxLine={2} onReflow={handleTitleReflow} />
+				<ResponsiveLineEllipsis
+					className="mb-1"
+					text={title}
+					component="h4"
+					maxLine={2}
+					onReflow={handleTitleReflow}
+				/>
 				<p className="mb-2 text-muted">by {author}</p>
-				<ResponsiveEllipsis
+				<ResponsiveHtmlEllipsis
 					className="d-none d-lg-block"
 					unsafeHTML={description}
 					maxLine={descriptionMaxLine}
