@@ -17,11 +17,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	button: {
+		minHeight: 40,
 		borderRadius: 500,
 		appearance: 'none',
 		alignItems: 'center',
 		display: 'inline-flex',
-		padding: '6px 12px 6px 20px',
+		padding: '0 12px 0 20px',
 		backgroundColor: 'transparent',
 		border: `2px solid ${theme.colors.p500}`,
 		'& span': {
@@ -45,6 +46,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	buttonActive: {
+		padding: '0 20px',
 		backgroundColor: theme.colors.p500,
 		'& span, & svg': {
 			color: theme.colors.n0,
@@ -59,7 +61,7 @@ interface Props {
 	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onClear(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onApply(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-	active?: boolean;
+	activeLength?: number;
 	className?: string;
 }
 
@@ -70,7 +72,7 @@ const SimpleFilter = ({
 	onClick,
 	onClear,
 	onApply,
-	active,
+	activeLength,
 	className,
 	children,
 }: PropsWithChildren<Props>) => {
@@ -81,7 +83,7 @@ const SimpleFilter = ({
 			<Modal show={show} dialogClassName={classes.modal} centered onHide={onHide}>
 				<Modal.Body>{children}</Modal.Body>
 				<Modal.Footer className="text-right">
-					{active && (
+					{!!activeLength && (
 						<Button size="sm" variant="outline-primary" onClick={onClear}>
 							Clear
 						</Button>
@@ -97,14 +99,18 @@ const SimpleFilter = ({
 				className={classNames(
 					classes.button,
 					{
-						[classes.buttonActive]: active,
+						[classes.buttonActive]: activeLength,
 					},
 					className
 				)}
 				onClick={onClick}
 			>
 				<span>{title}</span>
-				<ArrowDown className="ms-1" width={24} height={24} />
+				{activeLength && activeLength > 0 ? (
+					<span>&nbsp;&bull; {activeLength}</span>
+				) : (
+					<ArrowDown className="ms-1" width={24} height={24} />
+				)}
 			</button>
 		</>
 	);

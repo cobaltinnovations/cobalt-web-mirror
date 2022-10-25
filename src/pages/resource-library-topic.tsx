@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React, { useCallback, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
@@ -8,7 +9,6 @@ import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import SimpleFilter from '@/components/simple-filter';
 import ResourceLibraryCard from '@/components/resource-library-card';
-import { cloneDeep } from 'lodash';
 
 interface Resource {
 	new?: boolean;
@@ -153,7 +153,7 @@ const ResourceLibraryTopic = () => {
 	};
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			<HeroContainer className={getBackgroundClassForColorId(colorId)}>
 				<h1 className="mb-4 text-center">Symptoms</h1>
 				<p className="mb-0 text-center fs-large">
@@ -171,7 +171,7 @@ const ResourceLibraryTopic = () => {
 									className="me-2"
 									title={filter.title}
 									show={filter.isShowing}
-									active={searchParams.getAll(filter.searchParam).length > 0}
+									activeLength={searchParams.getAll(filter.searchParam).length}
 									onClick={() => {
 										const filtersClone = cloneDeep(filters);
 										filtersClone[filter.id].isShowing = true;
@@ -209,8 +209,8 @@ const ResourceLibraryTopic = () => {
 											<Form.Check
 												key={option.value}
 												type="checkbox"
-												name="subtopic"
-												id={`subtopic--${option.value}`}
+												name={filter.id}
+												id={`${filter.id}--${option.value}`}
 												label={option.title}
 												value={option.value}
 												checked={filter.value.includes(option.value)}
@@ -236,28 +236,30 @@ const ResourceLibraryTopic = () => {
 						})}
 					</Col>
 				</Row>
-				<Row>
-					{resources.map((resource, resourceIndex) => {
-						return (
-							<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
-								<ResourceLibraryCard
-									colorId={colorId}
-									className="h-100"
-									badgeTitle={resource.new ? 'New' : ''}
-									subtopic={resource.subtopic}
-									subtopicTo={`/resource-library/tag-groups/${tagGroupId}`}
-									title={resource.title}
-									author={resource.author}
-									description={resource.description}
-									tags={resource.tags}
-									contentTypeId={resource.contentTypeId}
-								/>
-							</Col>
-						);
-					})}
-				</Row>
+				<AsyncPage fetchData={fetchData}>
+					<Row>
+						{resources.map((resource, resourceIndex) => {
+							return (
+								<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
+									<ResourceLibraryCard
+										colorId={colorId}
+										className="h-100"
+										badgeTitle={resource.new ? 'New' : ''}
+										subtopic={resource.subtopic}
+										subtopicTo={`/resource-library/tag-groups/${tagGroupId}`}
+										title={resource.title}
+										author={resource.author}
+										description={resource.description}
+										tags={resource.tags}
+										contentTypeId={resource.contentTypeId}
+									/>
+								</Col>
+							);
+						})}
+					</Row>
+				</AsyncPage>
 			</Container>
-		</AsyncPage>
+		</>
 	);
 };
 
