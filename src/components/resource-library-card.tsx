@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import LinesEllipsis from 'react-lines-ellipsis';
@@ -7,6 +7,7 @@ import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
 import { COLOR_IDS, ContentTypeId } from '@/lib/models';
+import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -87,25 +88,6 @@ const ResourceLibraryCard = ({
 	const placeholderImage = useRandomPlaceholderImage();
 	const [descriptionMaxLine, setDescriptionMaxLine] = useState(2);
 
-	const subtopicTitleClass = useMemo(() => {
-		switch (colorId) {
-			case COLOR_IDS.BRAND_PRIMARY:
-				return 'text-primary';
-			case COLOR_IDS.BRAND_ACCENT:
-				return 'text-secondary';
-			case COLOR_IDS.SEMANTIC_DANGER:
-				return 'text-danger';
-			case COLOR_IDS.SEMANTIC_WARNING:
-				return 'text-warning';
-			case COLOR_IDS.SEMANTIC_SUCCESS:
-				return 'text-success';
-			case COLOR_IDS.SEMANTIC_INFO:
-				return 'text-info';
-			default:
-				return 'text-gray';
-		}
-	}, [colorId]);
-
 	const handleTitleReflow = useCallback(({ clamped }: { clamped: boolean; text: string }) => {
 		if (clamped) {
 			setDescriptionMaxLine(2);
@@ -126,7 +108,7 @@ const ResourceLibraryCard = ({
 			<div className={classes.informationOuter}>
 				<div>
 					<p className="mb-2 fw-bold">
-						<Link to={subtopicTo} className={classNames(classes.link, subtopicTitleClass)}>
+						<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
 							{subtopic}
 						</Link>
 					</p>
