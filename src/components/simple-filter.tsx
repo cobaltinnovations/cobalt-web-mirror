@@ -9,6 +9,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
 		width: '90%',
 		maxWidth: 220,
+		margin: '0 auto',
 		'& .cobalt-modal__body': {
 			padding: 24,
 		},
