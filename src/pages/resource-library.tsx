@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 
-import { COLOR_IDS } from '@/lib/models';
+import { COLOR_IDS, ContentTypeId } from '@/lib/models';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import InputHelper from '@/components/input-helper';
@@ -52,6 +52,7 @@ interface Resource {
 	author: string;
 	description: string;
 	tags: ResourceTag[];
+	contentTypeId: ContentTypeId;
 }
 interface ResourceTag {
 	tagId: string;
@@ -85,6 +86,7 @@ const ResourceLibrary = () => {
 							description: 'Anxiety',
 						},
 					],
+					contentTypeId: ContentTypeId.Audio,
 				},
 				{
 					subtopic: 'Symptoms',
@@ -102,6 +104,7 @@ const ResourceLibrary = () => {
 							description: 'Substance Use',
 						},
 					],
+					contentTypeId: ContentTypeId.Video,
 				},
 				{
 					new: true,
@@ -120,6 +123,7 @@ const ResourceLibrary = () => {
 							description: 'Anxiety',
 						},
 					],
+					contentTypeId: ContentTypeId.Podcast,
 				},
 			],
 		},
@@ -136,6 +140,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Article,
 				},
 				{
 					subtopic: 'Personal Life',
@@ -144,6 +149,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.ExternalBlog,
 				},
 				{
 					subtopic: 'Personal Life',
@@ -152,6 +158,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.InternalBlog,
 				},
 			],
 		},
@@ -168,6 +175,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Worksheet,
 				},
 				{
 					subtopic: 'Work Life',
@@ -176,6 +184,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.App,
 				},
 				{
 					subtopic: 'Work Life',
@@ -184,6 +193,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Video,
 				},
 			],
 		},
@@ -200,6 +210,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Audio,
 				},
 				{
 					subtopic: 'Identity',
@@ -208,6 +219,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Video,
 				},
 				{
 					subtopic: 'Identity',
@@ -216,6 +228,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Podcast,
 				},
 			],
 		},
@@ -232,6 +245,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Podcast,
 				},
 				{
 					subtopic: 'World Events',
@@ -240,6 +254,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Article,
 				},
 				{
 					subtopic: 'World Events',
@@ -248,6 +263,7 @@ const ResourceLibrary = () => {
 					description:
 						'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
 					tags: [],
+					contentTypeId: ContentTypeId.Video,
 				},
 			],
 		},
@@ -306,6 +322,7 @@ const ResourceLibrary = () => {
 												author={resource.author}
 												description={resource.description}
 												tags={resource.tags}
+												contentTypeId={resource.contentTypeId}
 											/>
 										);
 									})}

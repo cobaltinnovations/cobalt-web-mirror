@@ -6,8 +6,9 @@ import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
-import { COLOR_IDS } from '@/lib/models';
+import { COLOR_IDS, ContentTypeId } from '@/lib/models';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
+import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -60,6 +61,7 @@ interface Props {
 	author: string;
 	description: string;
 	tags: { tagId: string; description: string }[];
+	contentTypeId: ContentTypeId;
 	badgeTitle?: string;
 	imageUrl?: string;
 	className?: string;
@@ -76,6 +78,7 @@ const ResourceLibraryCard = ({
 	author,
 	description,
 	tags,
+	contentTypeId,
 	badgeTitle,
 	imageUrl,
 	className,
@@ -99,7 +102,7 @@ const ResourceLibraryCard = ({
 			case COLOR_IDS.SEMANTIC_INFO:
 				return 'text-info';
 			default:
-				return 'text-muted';
+				return 'text-gray';
 		}
 	}, [colorId]);
 
@@ -139,7 +142,7 @@ const ResourceLibraryCard = ({
 						maxLine={2}
 						onReflow={handleTitleReflow}
 					/>
-					<p className="mb-2 text-muted">by {author}</p>
+					<p className="mb-2 text-gray">by {author}</p>
 					<ResponsiveHtmlEllipsis
 						className="d-none d-lg-block"
 						unsafeHTML={description}
@@ -167,8 +170,14 @@ const ResourceLibraryCard = ({
 							);
 						})}
 					</div>
-					<div className="d-flex flex-shrink-0">
-						<span className="fs-ui-small fw-bold text-muted">5 min</span>
+					<div className="d-flex align-items-center flex-shrink-0">
+						<ContentTypeIcon
+							contentTypeId={contentTypeId}
+							width={16}
+							height={16}
+							className="me-1 text-gray"
+						/>
+						<span className="fs-ui-small fw-bold text-gray">5 min</span>
 					</div>
 				</div>
 			</div>
