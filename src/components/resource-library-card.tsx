@@ -18,6 +18,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flexDirection: 'column',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
+		transition: '0.2s all',
+		'&:hover': {
+			transform: 'translateY(-16px)',
+			boxShadow: theme.elevation.e400,
+		},
 	},
 	imageOuter: {
 		position: 'relative',
@@ -35,20 +40,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 	informationOuter: {
 		flex: 1,
 		display: 'flex',
-		padding: '16px 20px 10px',
+		padding: '16px 20px',
 		flexDirection: 'column',
+		justifyContent: 'space-between',
 	},
-	subtopicLink: {
+	link: {
 		textDecoration: 'none',
 		'&:hover': {
 			textDecoration: 'underline',
 		},
-	},
-	tagsOuter: {
-		display: 'flex',
-		flewWrap: 'wrap',
-		overflow: 'hidden',
-		padding: '0px 20px 12px',
 	},
 }));
 
@@ -126,39 +126,51 @@ const ResourceLibraryCard = ({
 				)}
 			</div>
 			<div className={classes.informationOuter}>
-				<p className="mb-2 fw-bold">
-					<Link to={subtopicTo} className={classNames(classes.subtopicLink, subtopicTitleClass)}>
-						{subtopic}
-					</Link>
-				</p>
-				<ResponsiveLineEllipsis
-					className="mb-1"
-					text={title}
-					component="h4"
-					maxLine={2}
-					onReflow={handleTitleReflow}
-				/>
-				<p className="mb-2 text-muted">by {author}</p>
-				<ResponsiveHtmlEllipsis
-					className="d-none d-lg-block"
-					unsafeHTML={description}
-					maxLine={descriptionMaxLine}
-				/>
-			</div>
-			<div className={classes.tagsOuter}>
-				{tags.map((tag) => {
-					return (
-						<Badge
-							key={tag.tagId}
-							bg="outline-dark"
-							pill
-							as="div"
-							className="me-1 mb-1 fs-ui-small text-capitalize"
-						>
-							{tag.description}
-						</Badge>
-					);
-				})}
+				<div>
+					<p className="mb-2 fw-bold">
+						<Link to={subtopicTo} className={classNames(classes.link, subtopicTitleClass)}>
+							{subtopic}
+						</Link>
+					</p>
+					<ResponsiveLineEllipsis
+						className="mb-1"
+						text={title}
+						component="h4"
+						maxLine={2}
+						onReflow={handleTitleReflow}
+					/>
+					<p className="mb-2 text-muted">by {author}</p>
+					<ResponsiveHtmlEllipsis
+						className="d-none d-lg-block"
+						unsafeHTML={description}
+						maxLine={descriptionMaxLine}
+					/>
+				</div>
+				<div className="d-flex justify-content-between align-items-end">
+					<div className="d-none d-lg-flex flex-wrap">
+						{tags.map((tag) => {
+							return (
+								<Link
+									key={tag.tagId}
+									to={`/resource-library/tags/${tag.tagId}`}
+									className={classes.link}
+								>
+									<Badge
+										bg="outline-dark"
+										pill
+										as="div"
+										className="me-1 mt-1 fs-ui-small text-capitalize"
+									>
+										{tag.description}
+									</Badge>
+								</Link>
+							);
+						})}
+					</div>
+					<div className="d-flex flex-shrink-0">
+						<span className="fs-ui-small fw-bold text-muted">5 min</span>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

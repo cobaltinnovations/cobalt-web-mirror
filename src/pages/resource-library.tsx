@@ -278,7 +278,7 @@ const ResourceLibrary = () => {
 				{resourceSubtopics.map((subtopic, subtopicIndex) => {
 					return (
 						<Row key={subtopicIndex} className="mb-11 mb-lg-18">
-							<Col lg={3} className="mb-10 mb-lg-0">
+							<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 								<ResourceLibrarySubtopicCard
 									className="h-100"
 									colorId={subtopic.colorId}
@@ -290,7 +290,7 @@ const ResourceLibrary = () => {
 							<Col lg={9}>
 								<Carousel
 									responsive={carouselConfig}
-									trackStyles={{ paddingTop: 0, paddingBottom: 0 }}
+									trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
 									floatingButtonGroup
 								>
 									{subtopic.resources.map((resource, resourceIndex) => {
