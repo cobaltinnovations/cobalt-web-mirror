@@ -67,7 +67,7 @@ const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
 	},
 	descriptionOuter: {
 		overflow: 'visible !important',
-		backgroundColor: theme.colors.background,
+		backgroundColor: theme.colors.n0,
 	},
 }));
 
@@ -105,8 +105,20 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 				<Container fluid className="overflow-visible">
 					<Row>
 						<Col xs={{ span: 12 }}>
-							<div>
+							<div className="p-1 bg-white">
 								<div className="position-relative">
+									{props?.title && (
+										<div
+											className="position-relative mb-0"
+											style={{ ...fonts.small, ...fonts.headingBold }}
+										>
+											<CircleIndicator size={16} className={classes.circleTwo}>
+												2
+											</CircleIndicator>
+											{props.title}
+										</div>
+									)}
+
 									{canEmbed ? (
 										<ReactPlayer width="100%" height="160px" url={props?.url} onPlay={() => {}} />
 									) : (
@@ -120,28 +132,6 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									</CircleIndicator>
 								</div>
 								<div className={classes.informationContainer}>
-									{props?.title && (
-										<div
-											className="position-relative mb-0"
-											style={{ ...fonts.small, ...fonts.headingBold }}
-										>
-											<CircleIndicator size={16} className={classes.circleTwo}>
-												2
-											</CircleIndicator>
-											{props.title}
-										</div>
-									)}
-									{props?.author ? (
-										<p className=" position-relative mb-1" style={{ ...fonts.small }}>
-											<CircleIndicator size={16} className={classes.circleThree}>
-												3
-											</CircleIndicator>
-											by {props?.author}
-										</p>
-									) : (
-										<p className="mb-1">&nbsp;</p>
-									)}
-
 									<div className="d-flex">
 										<div className="position-relative">
 											{props?.contentTypeLabel && (
@@ -170,6 +160,18 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 										)}
 									</div>
 								</div>
+
+								{props?.author ? (
+									<p className=" position-relative mb-1" style={{ ...fonts.small }}>
+										<CircleIndicator size={16} className={classes.circleThree}>
+											3
+										</CircleIndicator>
+										by {props?.author}
+									</p>
+								) : (
+									<p className="mb-1">&nbsp;</p>
+								)}
+								<hr />
 							</div>
 						</Col>
 					</Row>

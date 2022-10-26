@@ -13,6 +13,7 @@ import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import classNames from 'classnames';
 
 const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -123,9 +124,11 @@ const OnYourTimeDetail: FC = () => {
 				]}
 			/>
 
-			<Container className="mb-4 mb-lg-10">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+			<Container className="bg-white py-12">
+				<Row className="justify-content-center">
+					<Col md={10} lg={8} xl={6}>
+						<h2 className="mb-6">{item?.title}</h2>
+
 						{canEmbed ? (
 							<div className={classes.reactPlayerOuter}>
 								<ReactPlayer
@@ -140,29 +143,24 @@ const OnYourTimeDetail: FC = () => {
 							</div>
 						) : (
 							<BackgroundImageContainer
-								className={classes.mediaContainer}
+								className={classNames(classes.mediaContainer, 'mb-6')}
 								imageUrl={item?.imageUrl || placeholderImage}
 							/>
 						)}
+
+						<p className="text-muted fw-bold mb-0">
+							{item?.contentTypeLabel} {item?.duration && <>&bull; {item?.duration}</>}
+						</p>
+
+						{item?.author && <p className="text-muted mb-6">By {item?.author}</p>}
+
+						<hr className="mb-6" />
 					</Col>
 				</Row>
-			</Container>
 
-			<Container className="pb-10">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h4 className={item?.author ? 'mb-1' : 'mb-4'}>{item?.title}</h4>
-
-						{item?.author && <p className="mb-2 mb-lg-4">By {item?.author}</p>}
-
-						<small className="mb-4 mb-lg-6 d-block text-muted text-uppercase">
-							<span className="fw-bold">{item?.contentTypeLabel}</span>{' '}
-							{item?.duration && <>&bull; {item?.duration}</>}
-						</small>
-
-						<hr className="mb-3 mb-lg-4" />
-
-						<p className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
+				<Row className="justify-content-center">
+					<Col md={10} lg={8} xl={6}>
+						<div className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
 
 						{!canEmbed && item?.url && (
 							<div className="mt-10 text-center">
