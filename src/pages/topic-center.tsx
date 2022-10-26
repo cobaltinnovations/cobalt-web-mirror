@@ -131,7 +131,7 @@ const TopicCenter = () => {
 															title={groupSessionRequest.title}
 															titleSecondary="By Request"
 															description={groupSessionRequest.description}
-															buttonTitle="Request Session"
+															buttonTitle="Submit a Request"
 															onClick={() => {
 																navigate(
 																	`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
