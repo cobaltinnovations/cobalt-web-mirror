@@ -55,6 +55,7 @@ export interface ScreeningQuestion {
 	screeningAnswerContentHintId: ScreeningAnswerContentHintId;
 	introText?: string;
 	questionText: string;
+	footerText?: string;
 	minimumAnswerCount: number;
 	minimumAnswerCountDescription: string;
 	maximumAnswerCount: number;

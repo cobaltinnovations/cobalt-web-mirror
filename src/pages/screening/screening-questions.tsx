@@ -410,6 +410,15 @@ const ScreeningQuestionsPage = () => {
 								>
 									{renderedAnswerOptions}
 
+									{screeningQuestionContextResponse?.screeningQuestion.footerText && (
+										<div
+											className="mt-3 mb-5"
+											dangerouslySetInnerHTML={{
+												__html: screeningQuestionContextResponse?.screeningQuestion.footerText,
+											}}
+										/>
+									)}
+
 									<div className="d-flex">
 										{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
 											<Button
