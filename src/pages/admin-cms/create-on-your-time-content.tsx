@@ -637,7 +637,7 @@ const CreateOnYourTimeContent: FC = () => {
 																	<CircleIndicator>6</CircleIndicator>
 																	{values.contentTypeId ===
 																	ContentTypeId.InternalBlog ? (
-																		<div className="ms-6 flex-fill">
+																		<div className="d-flex flex-column ms-6 flex-fill">
 																			<Form.Label
 																				className="mb-2"
 																				style={{ ...theme.fonts.default }}
