@@ -1,6 +1,12 @@
-import React, { FC, useRef, useEffect, useCallback } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
+import { Col, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
+
+import FooterContent from './footer-content';
+import FooterLogo from './footer-logo';
+import FooterNav from './footer-nav';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
 	footer: {
@@ -8,10 +14,8 @@ const useFooterStyles = createUseThemedStyles((theme) => ({
 		bottom: 0,
 		width: '100%',
 		position: 'absolute',
-
-		height: 6,
-		color: 'white',
-		backgroundColor: theme.colors.a300,
+		borderTop: `6px solid ${theme.colors.a300}`,
+		backgroundColor: theme.colors.n0,
 	},
 }));
 
@@ -19,27 +23,37 @@ const Footer: FC = () => {
 	const classes = useFooterStyles();
 	const footer = useRef<HTMLElement | null>(null);
 
-	const handleWindowResize = useCallback(() => {
-		setBodyPadding();
-	}, []);
-
 	useEffect(() => {
-		setBodyPadding();
-		window.addEventListener('resize', handleWindowResize);
+		function handleResize() {
+			if (!footer.current) return;
+
+			const footerHeight = footer.current.clientHeight;
+			document.body.style.paddingBottom = `${footerHeight}px`;
+		}
+
+		handleResize();
+		window.addEventListener('resize', handleResize);
 
 		return () => {
-			window.removeEventListener('resize', handleWindowResize);
+			window.removeEventListener('resize', handleResize);
 		};
-	}, [handleWindowResize]);
+	}, []);
 
-	function setBodyPadding() {
-		if (!footer.current) return;
+	return (
+		<footer ref={footer} className={classNames(classes.footer, 'py-10 py-md-12')}>
+			<Row>
+				<Col className="px-10 px-md-19" xs={12} md={6}>
+					<FooterLogo />
 
-		const footerHeight = footer.current.clientHeight;
-		document.body.style.paddingBottom = `${footerHeight}px`;
-	}
+					<FooterContent />
+				</Col>
 
-	return <footer ref={footer} className={classes.footer} />;
+				<Col className="px-10 px-md-19" xs={12} md={6}>
+					<FooterNav />
+				</Col>
+			</Row>
+		</footer>
+	);
 };
 
 export default Footer;

@@ -5,6 +5,7 @@ import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
+import Footer from '@/components/footer';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
@@ -173,7 +174,17 @@ const UnauthenticatedHeaderLayout = () => {
 	);
 };
 
-const DefaultLayout = () => {
+const DefaultFooterLayout = () => {
+	return (
+		<>
+			<Header />
+			<Outlet />
+			<Footer />
+		</>
+	);
+};
+
+const DefaultNoFooterLayout = () => {
 	return (
 		<>
 			<Header />
@@ -246,18 +257,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 	},
 
 	{
-		layout: DefaultLayout,
+		layout: DefaultFooterLayout,
 		routes: [
 			{
 				path: '/',
 				private: true,
 				main: Index,
-			},
-			{
-				path: '/consent',
-				private: true,
-				main: Consent,
-				routeGuard: isConsentRequiredRouteGuard,
 			},
 			{
 				path: '/in-the-studio',
@@ -330,12 +335,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: RedirectToSupport,
 			},
 			{
-				path: '/intake-assessment',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: IntakeAssessment,
-			},
-			{
 				path: '/confirm-appointment',
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
@@ -354,26 +353,9 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: ConnectWithSupport,
 			},
 			{
-				path: '/ehr-lookup',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: EhrLookup,
-			},
-			{
 				path: '/my-calendar',
 				private: true,
 				main: MyCalendar,
-			},
-			{
-				path: '/scheduling/*',
-				private: true,
-				routeGuard: isProviderRouteGuard,
-				main: MySchedule,
-			},
-			{
-				path: '/screening-questions/:screeningQuestionContextId',
-				private: true,
-				main: ScreeningQuestions,
 			},
 			{
 				path: '/appointments/:appointmentId',
@@ -452,6 +434,81 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: RedirectToBackend,
 			},
 			{
+				path: '/providers/:providerId',
+				private: true,
+				main: ProviderDetail,
+			},
+			{
+				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
+				private: true,
+				main: Interaction,
+			},
+			{
+				path: '/interaction-instances/:interactionId',
+				private: true,
+				main: InteractionInstances,
+			},
+			{
+				path: '/in-crisis',
+				private: false,
+				main: InCrisis,
+			},
+			{
+				path: '/topic-centers/:topicCenterId',
+				private: true,
+				main: TopicCenter,
+			},
+			{
+				path: '/resource-library',
+				private: true,
+				main: ResourceLibrary,
+			},
+			{
+				path: '/resource-library/tag-groups/:tagGroupId',
+				private: true,
+				main: ResourceLibraryTopic,
+			},
+			{
+				path: '*',
+				private: false,
+				main: NoMatch,
+			},
+		],
+	},
+
+	{
+		layout: DefaultNoFooterLayout,
+		routes: [
+			{
+				path: '/consent',
+				private: true,
+				main: Consent,
+				routeGuard: isConsentRequiredRouteGuard,
+			},
+			{
+				path: '/intake-assessment',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: IntakeAssessment,
+			},
+			{
+				path: '/ehr-lookup',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: EhrLookup,
+			},
+			{
+				path: '/scheduling/*',
+				private: true,
+				routeGuard: isProviderRouteGuard,
+				main: MySchedule,
+			},
+			{
+				path: '/screening-questions/:screeningQuestionContextId',
+				private: true,
+				main: ScreeningQuestions,
+			},
+			{
 				path: '/cms/on-your-time',
 				private: true,
 				main: CmsOnYourTime,
@@ -470,11 +527,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/stats-dashboard',
 				private: true,
 				main: StatsDashboard,
-			},
-			{
-				path: '/providers/:providerId',
-				private: true,
-				main: ProviderDetail,
 			},
 			...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
 				? [
@@ -520,41 +572,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 						},
 				  ]
 				: []),
-			{
-				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
-				private: true,
-				main: Interaction,
-			},
-			{
-				path: '/interaction-instances/:interactionId',
-				private: true,
-				main: InteractionInstances,
-			},
-			{
-				path: '/in-crisis',
-				private: false,
-				main: InCrisis,
-			},
-			{
-				path: '/topic-centers/:topicCenterId',
-				private: true,
-				main: TopicCenter,
-			},
-			{
-				path: '/resource-library',
-				private: true,
-				main: ResourceLibrary,
-			},
-			{
-				path: '/resource-library/tag-groups/:tagGroupId',
-				private: true,
-				main: ResourceLibraryTopic,
-			},
-			{
-				path: '*',
-				private: false,
-				main: NoMatch,
-			},
 		],
 	},
 ];

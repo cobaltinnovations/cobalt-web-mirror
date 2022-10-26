@@ -9,7 +9,6 @@ import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
 import SentryErrorBoundary from '@/components/sentry-error-boundary';
 import SentryRoutes from '@/components/sentry-routes';
-import Footer from '@/components/footer';
 import InCrisisModal from '@/components/in-crisis-modal';
 import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
@@ -89,8 +88,6 @@ const AppWithProviders: FC = () => {
 					);
 				})}
 			</SentryRoutes>
-
-			<Footer />
 		</>
 	);
 };
