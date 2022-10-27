@@ -1,8 +1,9 @@
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { AvailabilityTimeSlot, Provider } from '@/lib/models';
+import { AppointmentType, AvailabilityTimeSlot, Provider } from '@/lib/models';
 import { accountService, CreateAppointmentData, appointmentService } from '@/lib/services';
+import moment from 'moment';
 import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import CollectContactInfoModal from './collect-contact-info-modal';
@@ -19,8 +20,10 @@ export type KickoffBookingOptions = {
 
 export type ContinueBookingOptions = {
 	provider?: Provider;
-	requireAssessment?: boolean;
-	promptForInfo?: boolean;
+	appointmentType?: AppointmentType;
+	timeSlot?: AvailabilityTimeSlot;
+	date?: string;
+	needsPhoneNumber?: boolean;
 };
 
 export type BookingRefHandle = {
@@ -113,36 +116,43 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const continueBookingProcess = useCallback(
-		({ provider, requireAssessment = false }: ContinueBookingOptions) => {
+		({ provider, appointmentType, timeSlot, date, needsPhoneNumber }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
 				navigateToIntakeAssessment(provider);
-			} else if (provider?.intakeAssessmentRequired || requireAssessment) {
+			} else if (provider?.intakeAssessmentRequired || !!appointmentType?.assessmentId) {
 				setShowConfirmIntakeAssessmentModal(true);
 			} else {
 				const params = new URLSearchParams();
-				params.set('promptForPhoneNumber', String(promptForPhoneNumber));
-				params.set('providerId', selectedProvider?.providerId ?? '');
-				params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
-				params.set('date', formattedAvailabilityDate);
-				params.set('time', selectedTimeSlot?.time ?? '');
-				params.set('intakeAssessmentId', ''); // WHAT DO I PUT HERE?
+				if (needsPhoneNumber) {
+					params.set('promptForPhoneNumber', String(needsPhoneNumber));
+				}
+
+				if (provider?.providerId) {
+					params.set('providerId', provider?.providerId);
+				}
+
+				if (appointmentType?.appointmentTypeId) {
+					params.set('appointmentTypeId', appointmentType?.appointmentTypeId);
+				}
+
+				if (date) {
+					params.set('date', moment(date).format('YYYY-MM-DD'));
+				}
+
+				if (timeSlot?.time) {
+					params.set('time', timeSlot?.time);
+				}
+
+				if (appointmentType?.assessmentId) {
+					params.set('intakeAssessmentId', appointmentType?.assessmentId);
+				}
 
 				navigate(`/confirm-appointment?${params.toString()}`);
 			}
 		},
-		[
-			account?.epicPatientId,
-			formattedAvailabilityDate,
-			navigate,
-			navigateToEhrLookup,
-			navigateToIntakeAssessment,
-			promptForPhoneNumber,
-			selectedAppointmentTypeId,
-			selectedProvider?.providerId,
-			selectedTimeSlot?.time,
-		]
+		[account?.epicPatientId, navigate, navigateToEhrLookup, navigateToIntakeAssessment]
 	);
 
 	const kickoffBookingProcess = useCallback(
@@ -178,8 +188,9 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				setSelectedAppointmentTypeId(confirmedApptType?.appointmentTypeId);
 				continueBookingProcess({
 					provider,
-					requireAssessment: !!confirmedApptType?.assessmentId,
-					promptForInfo: needsEmail || needsPhoneNumber,
+					appointmentType: confirmedApptType,
+					timeSlot,
+					needsPhoneNumber,
 				});
 			} else {
 				setShowConfirmAppointmentTypeModal(true);
@@ -304,7 +315,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					setShowConfirmAppointmentTypeModal(false);
 					continueBookingProcess({
 						provider: selectedProvider,
-						requireAssessment: !!confirmedApptType?.assessmentId,
+						appointmentType: confirmedApptType,
 					});
 				}}
 			/>
