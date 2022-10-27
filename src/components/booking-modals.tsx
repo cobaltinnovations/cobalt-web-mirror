@@ -1,15 +1,11 @@
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
-import useHandleError from '@/hooks/use-handle-error';
 import { AppointmentType, AvailabilityTimeSlot, Provider } from '@/lib/models';
-import { accountService, CreateAppointmentData, appointmentService } from '@/lib/services';
 import moment from 'moment';
-import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef, useEffect } from 'react';
+import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import CollectContactInfoModal from './collect-contact-info-modal';
 import ConfirmAppointmentTypeModal from './confirm-appointment-type-modal';
 import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
-import ConfirmProviderBookingModal from './confirm-provider-booking-modal';
 
 export type KickoffBookingOptions = {
 	source: BookingSource;
@@ -23,7 +19,6 @@ export type ContinueBookingOptions = {
 	appointmentType?: AppointmentType;
 	timeSlot?: AvailabilityTimeSlot;
 	date?: string;
-	needsPhoneNumber?: boolean;
 };
 
 export type BookingRefHandle = {
@@ -38,44 +33,23 @@ interface HistoryLocationState {
 }
 
 export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
-	const handleError = useHandleError();
-	const { account, setAccount, isAnonymous } = useAccount();
+	const { account } = useAccount();
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
 
-	const [collectedPhoneNumebr, setCollectedPhoneNumber] = useState(account?.phoneNumber ?? '');
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
-
-	const [isBooking, setIsBooking] = useState(false);
-	const [isSavingInfo, setIsSavingInfo] = useState(false);
-	const [showCollectInfoModal, setShowCollectInfoModal] = useState(false);
 	const [showConfirmAppointmentTypeModal, setShowConfirmAppointmentTypeModal] = useState(false);
 	const [showConfirmIntakeAssessmentModal, setShowConfirmIntakeAssessmentModal] = useState(false);
-	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
 	const {
 		appointmentTypes,
 		epicDepartments,
-		availableSections,
-		setAvailableSections,
-
-		selectedAppointmentTypeId,
 		setSelectedAppointmentTypeId,
-		selectedDate,
 		setSelectedDate,
 		selectedProvider,
 		setSelectedProvider,
 		selectedTimeSlot,
 		setSelectedTimeSlot,
-		timeSlotEndTime,
-		formattedAvailabilityDate,
-		formattedModalDate,
-
-		promptForEmail,
-		setPromptForEmail,
-		promptForPhoneNumber,
-		setPromptForPhoneNumber,
 
 		bookingSource,
 		setBookingSource,
@@ -116,7 +90,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const continueBookingProcess = useCallback(
-		({ provider, appointmentType, timeSlot, date, needsPhoneNumber }: ContinueBookingOptions) => {
+		({ provider, appointmentType, timeSlot, date }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
@@ -125,8 +99,8 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				setShowConfirmIntakeAssessmentModal(true);
 			} else {
 				const params = new URLSearchParams();
-				if (needsPhoneNumber) {
-					params.set('promptForPhoneNumber', String(needsPhoneNumber));
+				if (provider?.phoneNumberRequiredForAppointment) {
+					params.set('promptForPhoneNumber', 'true');
 				}
 
 				if (provider?.providerId) {
@@ -162,14 +136,6 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 			setSelectedDate(date);
 			setSelectedTimeSlot(timeSlot);
 
-			// const needsEmail = isAnonymous || !account?.emailAddress;
-			const needsEmail = true;
-			const needsPhoneNumber =
-				!!provider.phoneNumberRequiredForAppointment && (isAnonymous || !account?.phoneNumber);
-
-			setPromptForEmail(needsEmail);
-			setPromptForPhoneNumber(needsPhoneNumber);
-
 			if (provider.appointmentTypeIds.length === 1) {
 				const confirmedApptType = appointmentTypes.find(
 					(aT) => aT.appointmentTypeId === provider.appointmentTypeIds[0]
@@ -190,20 +156,15 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					provider,
 					appointmentType: confirmedApptType,
 					timeSlot,
-					needsPhoneNumber,
 				});
 			} else {
 				setShowConfirmAppointmentTypeModal(true);
 			}
 		},
 		[
-			account?.phoneNumber,
 			appointmentTypes,
 			continueBookingProcess,
-			isAnonymous,
 			setBookingSource,
-			setPromptForEmail,
-			setPromptForPhoneNumber,
 			setSelectedAppointmentTypeId,
 			setSelectedDate,
 			setSelectedProvider,
@@ -218,67 +179,8 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		};
 	});
 
-	useEffect(() => {
-		if (account?.emailAddress) {
-			setCollectedEmail(account.emailAddress);
-		}
-
-		if (account?.phoneNumber) {
-			setCollectedPhoneNumber(account.phoneNumber);
-		}
-	}, [account]);
-
 	return (
 		<>
-			<CollectContactInfoModal
-				promptForEmail={promptForEmail}
-				promptForPhoneNumber={promptForPhoneNumber}
-				show={showCollectInfoModal}
-				collectedEmail={collectedEmail}
-				collectedPhoneNumber={collectedPhoneNumebr}
-				onHide={() => {
-					setShowCollectInfoModal(false);
-				}}
-				onSubmit={async ({ email, phoneNumber }) => {
-					if (!account || isSavingInfo) {
-						return;
-					}
-
-					setIsSavingInfo(true);
-
-					try {
-						if (promptForEmail) {
-							const accountResponse = await accountService
-								.updateEmailAddressForAccountId(account.accountId, {
-									emailAddress: email,
-								})
-								.fetch();
-
-							setCollectedEmail(email);
-							setAccount(accountResponse.account);
-						}
-
-						if (promptForPhoneNumber) {
-							const accountResponse = await accountService
-								.updatePhoneNumberForAccountId(account.accountId, {
-									phoneNumber,
-								})
-								.fetch();
-
-							setCollectedPhoneNumber(phoneNumber);
-							setAccount(accountResponse.account);
-						}
-
-						setShowCollectInfoModal(false);
-						setShowConfirmationModal(true);
-					} catch (error) {
-						handleError(error);
-					}
-
-					setIsSavingInfo(false);
-				}}
-			/>
-
 			<ConfirmAppointmentTypeModal
 				show={showConfirmAppointmentTypeModal}
 				appointmentTypes={appointmentTypes
@@ -331,104 +233,6 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					}
 
 					navigateToIntakeAssessment(selectedProvider);
-				}}
-			/>
-
-			<ConfirmProviderBookingModal
-				show={showConfirmationModal}
-				formattedDate={formattedModalDate}
-				provider={selectedProvider}
-				selectedTimeSlot={selectedTimeSlot}
-				timeSlotEndTime={timeSlotEndTime}
-				onHide={() => {
-					setShowConfirmationModal(false);
-				}}
-				onConfirm={async () => {
-					if (isBooking || !selectedProvider || !selectedTimeSlot) {
-						return;
-					}
-
-					try {
-						setIsBooking(true);
-						const appointmentData: CreateAppointmentData = {
-							providerId: selectedProvider.providerId,
-							appointmentTypeId: selectedAppointmentTypeId,
-							date: formattedAvailabilityDate,
-							time: selectedTimeSlot.time,
-						};
-
-						if (promptForEmail) {
-							appointmentData.emailAddress = collectedEmail;
-						}
-
-						if (promptForPhoneNumber) {
-							appointmentData.phoneNumber = collectedPhoneNumebr;
-						}
-
-						const response = await appointmentService.createAppointment(appointmentData).fetch();
-
-						// Update slot status in UI 🤮
-						setAvailableSections(
-							availableSections.map((aS) => {
-								if (aS.date === selectedDate) {
-									const updatedProviders = aS.providers.map((p) => {
-										if (p.providerId === selectedProvider.providerId) {
-											const updatedTimes = p.times.map((time) => {
-												if (time.time === selectedTimeSlot.time) {
-													return {
-														...time,
-														status: 'BOOKED',
-													};
-												}
-
-												return time;
-											});
-
-											return {
-												...p,
-												times: updatedTimes,
-												fullyBooked: updatedTimes.every((t) => t.status === 'BOOKED'),
-											};
-										}
-
-										return p;
-									});
-
-									return {
-										...aS,
-										providers: updatedProviders,
-										fullyBooked: updatedProviders.every((uP) => uP.fullyBooked),
-									};
-								}
-
-								return aS;
-							})
-						);
-
-						setShowConfirmationModal(false);
-
-						setSelectedDate(undefined);
-						setSelectedProvider(undefined);
-						setSelectedTimeSlot(undefined);
-
-						navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-							replace: true,
-							state: {
-								successBooking: true,
-								emailAddress: response.account.emailAddress,
-							},
-						});
-					} catch (e) {
-						if ((e as any).metadata?.accountPhoneNumberRequired) {
-							setPromptForPhoneNumber(true);
-							setShowConfirmationModal(false);
-							setShowCollectInfoModal(true);
-						} else {
-							handleError(e);
-						}
-					}
-
-					setIsBooking(false);
 				}}
 			/>
 		</>
