@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useMemo } from 'react';
 import { useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
@@ -12,6 +12,7 @@ import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-c
 import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
+import { SESSION_STATUS } from '@/components/session-status';
 import SessionAttendeeList from '@/components/session-attendee-list';
 import SessionCancelModal from '@/components/session-cancel-modal';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -329,6 +330,14 @@ const GroupSessionsCreate: FC = () => {
 			handleError(error);
 		}
 	}
+
+	const isFollowupEmailFlagEditable = useMemo(() => {
+		return (
+			!isViewMode &&
+			(!session?.groupSessionStatusId ||
+				[SESSION_STATUS.NEW, SESSION_STATUS.ADDED].includes(session.groupSessionStatusId as SESSION_STATUS))
+		);
+	}, [isViewMode, session?.groupSessionStatusId]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
@@ -1012,7 +1021,7 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('followUpEmail', false);
 														}}
-														disabled={hasReservations || isViewMode}
+														disabled={!isFollowupEmailFlagEditable}
 													/>
 													<Form.Check
 														type="radio"
@@ -1024,7 +1033,7 @@ const GroupSessionsCreate: FC = () => {
 														onChange={() => {
 															setFieldValue('followUpEmail', true);
 														}}
-														disabled={hasReservations || isViewMode}
+														disabled={!isFollowupEmailFlagEditable}
 													/>
 												</Form.Group>
 												<InputHelper
