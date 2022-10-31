@@ -182,10 +182,6 @@ export const form = (theme: CobaltTheme) => {
 					'&:disabled': {
 						borderColor: `${theme.colors.n300} !important`,
 						backgroundColor: `${theme.colors.n100} !important`,
-
-						'&:before': {
-							boxShadow: `inset 1em 1em ${theme.colors.n500} !important`,
-						},
 					},
 
 					'&:checked': {
@@ -195,6 +191,12 @@ export const form = (theme: CobaltTheme) => {
 
 						'&:before': {
 							boxShadow: `inset 1em 1em ${theme.colors.p500}`,
+						},
+
+						'&:disabled': {
+							'&:before': {
+								boxShadow: `inset 1em 1em ${theme.colors.n500} !important`,
+							},
 						},
 
 						'&:hover': {
