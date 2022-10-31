@@ -242,9 +242,11 @@ export const button = (theme: CobaltTheme) => {
 export const screeningButtonGroup = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-screening-button-group': {
-			'& input[type=checkbox]': {
+			'& input.btn-check': {
 				'& + label': {
 					paddingLeft: 15,
+					cursor: 'pointer',
+
 					'& .checkmark-wrapper': {
 						height: 25,
 						width: 25,
@@ -258,17 +260,9 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 							},
 						},
 					},
-					'&:hover': {
-						paddingLeft: '14px !important',
 
-						'& .checkmark-wrapper': {
-							borderColor: theme.colors.p500,
-						},
-					},
-				},
-
-				'&:checked': {
-					'& + label': {
+					// when checked
+					'&.cobalt-button-primary': {
 						'& .checkmark-wrapper': {
 							backgroundColor: theme.colors.p300,
 							borderColor: theme.colors.p300,
