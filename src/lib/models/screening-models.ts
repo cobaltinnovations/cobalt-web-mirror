@@ -88,17 +88,34 @@ export type ScreeningAnswerSelection = Pick<
 	'screeningAnswerOptionId' | 'text' | 'freeformSupplementText'
 >;
 
+export enum ScreeningImageId {
+	Appointment = 'APPOINTMENT',
+	ConnectedToCare = 'CONNECTED_TO_CARE',
+	ConnectingToCare = 'CONNECTING_TO_CARE',
+	FeelingRecently = 'FEELING_RECENTLY',
+	Goals = 'GOALS',
+	KeepGoing = 'KEEP_GOING',
+	NextAppointmentScheduled = 'NEXT_APPOINTMENT_SCHEDULED',
+	Resources = 'RESOURCES',
+	Safety = 'SAFETY',
+	ScreeningComplete = 'SCREENING_COMPLETE',
+	ScreeningToDo = 'SCREENING_TO_DO',
+	Welcome = 'WELCOME',
+}
+
 export interface ScreeningQuestionPrompt {
-	image?: string;
+	screeningConfirmationPromptId: string;
+	screeningImageId?: ScreeningImageId;
 	text: string;
-	action: string;
+	actionText: string;
 }
 
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
+	previouslyAnswered: boolean;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
 	screeningAnswers: ScreeningAnswer[];
 	screeningSessionDestination: ScreeningSessionDestination;
-	screeningQuestionPrompt?: ScreeningQuestionPrompt;
+	preQuestionScreeningConfirmationPrompt?: ScreeningQuestionPrompt;
 }
