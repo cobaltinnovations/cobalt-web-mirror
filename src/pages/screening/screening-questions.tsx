@@ -1,5 +1,6 @@
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
+import ScreeningPromptImage from '@/components/screening-prompt-image';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
 import {
@@ -14,6 +15,7 @@ import { Button, Col, Container, Form, Row, ToggleButton, ToggleButtonGroup } fr
 import { useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
+import classNames from 'classnames';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -31,35 +33,42 @@ const ScreeningQuestionsPage = () => {
 	const [questionPrompt, setQuestionPrompt] = useState<ScreeningQuestionPrompt | null>(null);
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 
+	const clearPrompt = useCallback(() => {
+		setQuestionPrompt(null);
+		setIsSubmitPrompt(false);
+	}, []);
+
 	const fetchData = useCallback(async () => {
 		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
 		const response = await request.fetch();
 
 		setScreeningQuestionContextResponse(response);
 
-		if (response.screeningQuestionPrompt) {
-			setQuestionPrompt(response.screeningQuestionPrompt);
+		if (response.preQuestionScreeningConfirmationPrompt) {
+			setQuestionPrompt(response.preQuestionScreeningConfirmationPrompt);
+		} else {
+			clearPrompt();
 		}
-	}, [screeningQuestionContextId]);
-
-	const clearPrompt = useCallback(() => {
-		setQuestionPrompt(null);
-		setIsSubmitPrompt(false);
-	}, []);
+	}, [clearPrompt, screeningQuestionContextId]);
 
 	const submitAnswers = useCallback(
-		(answers: string[]) => {
+		(submission: {
+			answers: string[];
+			answerText: Record<string, string>;
+			supplementText: Record<string, string>;
+			force?: boolean;
+		}) => {
 			if (!screeningQuestionContextId) {
 				return;
 			}
 
 			const selections: ScreeningAnswerSelection[] = [
-				...answers.map((screeningAnswerOptionId) => {
+				...submission.answers.map((screeningAnswerOptionId) => {
 					const answer: ScreeningAnswerSelection = {
 						screeningAnswerOptionId,
 					};
 
-					const freeformSupplementText = supplementText[screeningAnswerOptionId];
+					const freeformSupplementText = submission.supplementText[screeningAnswerOptionId];
 
 					if (freeformSupplementText) {
 						answer.freeformSupplementText = freeformSupplementText;
@@ -68,14 +77,14 @@ const ScreeningQuestionsPage = () => {
 					return answer;
 				}),
 				// answers to text questions
-				...Object.entries(answerText)
+				...Object.entries(submission.answerText)
 					.filter(([_, text]) => !!text)
 					.map(([screeningAnswerOptionId, text]) => ({
 						screeningAnswerOptionId,
 						text,
 					})),
 			];
-			const submit = screeningService.answerQuestion(screeningQuestionContextId, selections);
+			const submit = screeningService.answerQuestion(screeningQuestionContextId, selections, submission.force);
 
 			setIsSubmitting(true);
 			submit
@@ -88,9 +97,11 @@ const ScreeningQuestionsPage = () => {
 					}
 				})
 				.catch((e) => {
-					if (e?.metadata?.screeningQuestionPrompt) {
+					if (e?.apiError?.metadata?.screeningConfirmationPrompt) {
+						const newConfirmationPrompt: ScreeningQuestionPrompt =
+							e?.apiError?.metadata?.screeningConfirmationPrompt;
 						setIsSubmitPrompt(true);
-						setQuestionPrompt(e.metadata.screeningQuestionPrompt as ScreeningQuestionPrompt);
+						setQuestionPrompt(newConfirmationPrompt);
 					} else if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 						handleError(e);
 					}
@@ -99,7 +110,7 @@ const ScreeningQuestionsPage = () => {
 					setIsSubmitting(false);
 				});
 		},
-		[answerText, handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId, supplementText]
+		[handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId]
 	);
 
 	useEffect(() => {
@@ -162,7 +173,11 @@ const ScreeningQuestionsPage = () => {
 											setSelectedAnswers(selection);
 
 											if (!option.freeformSupplement) {
-												submitAnswers(selection);
+												submitAnswers({
+													answers: selection,
+													answerText,
+													supplementText,
+												});
 											}
 										}}
 									>
@@ -297,7 +312,8 @@ const ScreeningQuestionsPage = () => {
 		const isSingleSelect =
 			screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId ===
 			ScreeningAnswerFormatId.SINGLE_SELECT;
-		const previouslyAnswered = (screeningQuestionContextResponse?.screeningAnswers.length ?? 0) > 0;
+		const previouslyAnswered = screeningQuestionContextResponse?.previouslyAnswered;
+		const previouslySkipped = previouslyAnswered && screeningQuestionContextResponse?.screeningAnswers.length === 0;
 		const selectedAnswersHaveSupplements = selectedAnswers.some((optionId) => {
 			const option = screeningQuestionContextResponse?.screeningAnswerOptions.find(
 				(o) => o.screeningAnswerOptionId === optionId
@@ -306,13 +322,18 @@ const ScreeningQuestionsPage = () => {
 			return option?.freeformSupplement;
 		});
 
-		return isSingleSelect && !previouslyAnswered && !selectedAnswersHaveSupplements;
+		return isSingleSelect && (!previouslyAnswered || previouslySkipped) && !selectedAnswersHaveSupplements;
 	}, [
+		screeningQuestionContextResponse?.previouslyAnswered,
 		screeningQuestionContextResponse?.screeningAnswerOptions,
 		screeningQuestionContextResponse?.screeningAnswers.length,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 	]);
+
+	const showSkipBtn = useMemo(() => {
+		return screeningQuestionContextResponse?.screeningQuestion.minimumAnswerCount === 0;
+	}, [screeningQuestionContextResponse?.screeningQuestion.minimumAnswerCount]);
 
 	const disableNextBtn = useMemo(() => {
 		if (!screeningQuestionContextResponse) {
@@ -339,7 +360,12 @@ const ScreeningQuestionsPage = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						{questionPrompt ? (
 							<>
-								<img src={questionPrompt.image} className="mt-6 mx-auto d-block" alt="Prompt" />
+								{questionPrompt.screeningImageId && (
+									<ScreeningPromptImage
+										screeningImageId={questionPrompt.screeningImageId}
+										className="mt-6 mx-auto d-block"
+									/>
+								)}
 
 								<div
 									className="my-6"
@@ -355,8 +381,6 @@ const ScreeningQuestionsPage = () => {
 											disabled={isSubmitting}
 											type="button"
 											onClick={() => {
-												clearPrompt();
-
 												if (
 													!isSubmitPrompt &&
 													screeningQuestionContextResponse?.previousScreeningQuestionContextId
@@ -376,13 +400,18 @@ const ScreeningQuestionsPage = () => {
 										className="ms-auto"
 										onClick={async () => {
 											if (isSubmitPrompt) {
-												submitAnswers(selectedAnswers);
+												submitAnswers({
+													answers: selectedAnswers,
+													answerText,
+													supplementText,
+													force: true,
+												});
 											} else {
 												clearPrompt();
 											}
 										}}
 									>
-										{questionPrompt.action}
+										{questionPrompt.actionText}
 									</Button>
 								</div>
 							</>
@@ -405,7 +434,11 @@ const ScreeningQuestionsPage = () => {
 								<Form
 									onSubmit={(e) => {
 										e.preventDefault();
-										submitAnswers(selectedAnswers);
+										submitAnswers({
+											answers: selectedAnswers,
+											answerText,
+											supplementText,
+										});
 									}}
 								>
 									{renderedAnswerOptions}
@@ -434,11 +467,33 @@ const ScreeningQuestionsPage = () => {
 											</Button>
 										)}
 
-										{!hideNextBtn && (
-											<Button disabled={disableNextBtn} className="ms-auto" type="submit">
-												Next
-											</Button>
-										)}
+										<div className="ms-auto">
+											{showSkipBtn && (
+												<Button
+													variant="outline-primary"
+													disabled={isSubmitting}
+													className={classNames({
+														'me-2': !hideNextBtn,
+													})}
+													type="button"
+													onClick={() => {
+														submitAnswers({
+															answers: [],
+															answerText: {},
+															supplementText: {},
+														});
+													}}
+												>
+													Skip Question
+												</Button>
+											)}
+
+											{!hideNextBtn && (
+												<Button disabled={disableNextBtn} type="submit">
+													Next
+												</Button>
+											)}
+										</div>
 									</div>
 
 									<div className="d-flex">

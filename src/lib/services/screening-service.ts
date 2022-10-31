@@ -71,7 +71,8 @@ export const screeningService = {
 
 	answerQuestion(
 		screeningQuestionContextId: string,
-		answers: Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>[]
+		answers: Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>[],
+		force?: boolean
 	) {
 		return httpSingleton.orchestrateRequest<{
 			screeningAnswers: ScreeningAnswer[];
@@ -83,6 +84,7 @@ export const screeningService = {
 			data: {
 				screeningQuestionContextId,
 				answers,
+				force,
 			},
 		});
 	},
