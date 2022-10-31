@@ -27,7 +27,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		width: 20,
 		height: 20,
 		fill: theme.colors.a500,
-		'& path': {
+		'& path, polygon#Shape': {
 			fill: theme.colors.a500,
 		},
 	},
