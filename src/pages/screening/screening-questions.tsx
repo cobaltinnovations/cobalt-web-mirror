@@ -68,10 +68,10 @@ const ScreeningQuestionsPage = () => {
 						screeningAnswerOptionId,
 					};
 
-					const freeformSupplementText = submission.supplementText[screeningAnswerOptionId];
+					const answerText = submission.supplementText[screeningAnswerOptionId];
 
-					if (freeformSupplementText) {
-						answer.freeformSupplementText = freeformSupplementText;
+					if (answerText) {
+						answer.text = answerText;
 					}
 
 					return answer;
@@ -129,8 +129,12 @@ const ScreeningQuestionsPage = () => {
 				const answer = screeningQuestionContextResponse.screeningAnswers.find(
 					(o) => o.screeningAnswerOptionId === option.screeningAnswerOptionId
 				);
-				acc.texts[option.screeningAnswerOptionId] = answer?.text ?? '';
-				acc.supplements[option.screeningAnswerOptionId] = answer?.freeformSupplementText ?? '';
+
+				if (option.freeformSupplement) {
+					acc.supplements[option.screeningAnswerOptionId] = answer?.text ?? '';
+				} else {
+					acc.texts[option.screeningAnswerOptionId] = answer?.text ?? '';
+				}
 
 				return acc;
 			},
@@ -190,7 +194,7 @@ const ScreeningQuestionsPage = () => {
 											as="textarea"
 											className="mb-4"
 											value={supplementText[optionId] ?? ''}
-											label={option.freeformSupplementDescription ?? ''}
+											label={option.freeformSupplementText ?? ''}
 											onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 												setSupplementText((curr) => {
 													return {
@@ -250,7 +254,7 @@ const ScreeningQuestionsPage = () => {
 											as="textarea"
 											className="mb-4"
 											value={supplementText[option.screeningAnswerOptionId] ?? ''}
-											label={option.freeformSupplementDescription ?? ''}
+											label={option.freeformSupplementText ?? ''}
 											autoFocus
 											onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 												setSupplementText((curr) => {
