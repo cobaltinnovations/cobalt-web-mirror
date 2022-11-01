@@ -69,7 +69,7 @@ export interface ScreeningAnswerOption {
 	answerOptionText?: string;
 	displayOrder: number;
 	freeformSupplement?: boolean;
-	freeformSupplementDescription?: string;
+	freeformSupplementText?: string;
 }
 
 export interface ScreeningAnswer {
@@ -78,15 +78,11 @@ export interface ScreeningAnswer {
 	screeningSessionAnsweredScreeningQuestionId: string;
 	createdByAccountId: string;
 	text?: string;
-	freeformSupplementText?: string;
 	created: string;
 	createdDescription: string;
 }
 
-export type ScreeningAnswerSelection = Pick<
-	ScreeningAnswer,
-	'screeningAnswerOptionId' | 'text' | 'freeformSupplementText'
->;
+export type ScreeningAnswerSelection = Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>;
 
 export enum ScreeningImageId {
 	Appointment = 'APPOINTMENT',
