@@ -12,8 +12,11 @@ import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import classNames from 'classnames';
+import useAnalytics from '@/hooks/use-analytics';
+import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 
 const TopicCenter = () => {
+	const { trackEvent } = useAnalytics();
 	const navigate = useNavigate();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
@@ -81,6 +84,14 @@ const TopicCenter = () => {
 														}
 														buttonTitle="Reserve a Place"
 														onClick={() => {
+															const eventLabel = `${groupSession.title} - ${groupSession.startDateTimeDescription}`;
+															trackEvent(
+																TopicCenterAnalyticsEvent.clickGroupSession(
+																	topicCenter.name,
+																	eventLabel
+																)
+															);
+
 															navigate(
 																`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
 															);
@@ -133,6 +144,13 @@ const TopicCenter = () => {
 															description={groupSessionRequest.description}
 															buttonTitle="Submit a Request"
 															onClick={() => {
+																trackEvent(
+																	TopicCenterAnalyticsEvent.clickGroupSessionByRequest(
+																		topicCenter.name,
+																		groupSessionRequest.title
+																	)
+																);
+
 																navigate(
 																	`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
 																);
@@ -170,6 +188,7 @@ const TopicCenter = () => {
 													return (
 														<TopicCenterPinboardItem
 															key={pinboardNote.pinboardNoteId}
+															topicCenterName={topicCenter.name}
 															className="mb-lg-8"
 															title={pinboardNote.title}
 															description={pinboardNote.description}
@@ -207,6 +226,14 @@ const TopicCenter = () => {
 													<Link
 														to={`/on-your-time/${content.contentId}`}
 														className="d-block mb-8 text-decoration-none"
+														onClick={() => {
+															trackEvent(
+																TopicCenterAnalyticsEvent.clickOnYourTimeContent(
+																	topicCenter.name,
+																	content.title
+																)
+															);
+														}}
 													>
 														<OnYourTimeItem
 															imageUrl={content.imageUrl}
