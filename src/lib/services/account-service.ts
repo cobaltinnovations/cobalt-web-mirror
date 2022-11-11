@@ -6,11 +6,33 @@ import {
 	BetaFeatureId,
 	BetaStatusId,
 	PersonalizationDetails,
+	Institution,
+	ReferenceDataResponse,
 } from '@/lib/models';
-import { Institution } from '../models/institution';
 
 export interface AccountResponse {
 	account: AccountModel;
+}
+
+export interface PatientAccountFormData {
+	firstName: string;
+	lastName: string;
+	birthdate: string;
+	phoneNumber: string;
+	emailAddress: string;
+	genderIdentityId: string;
+	raceId: string;
+	ethnicityId: string;
+	languageCode: string;
+	timeZone: string;
+	insuranceId: string;
+	address: {
+		streetAddress1: string;
+		streetAddress2: string;
+		locality: string;
+		region: string;
+		postalCode: string;
+	};
 }
 
 export type EpicMatchStep = 'STEP_1' | 'STEP_2' | 'STEP_3' | 'FINISH';
@@ -101,6 +123,15 @@ export const accountService = {
 			method: 'post',
 			url: '/accounts',
 			data,
+		});
+	},
+	getMyChartAccount(myChartAccessToken: string) {
+		return httpSingleton.orchestrateRequest<AccountWithTokenResponse>({
+			method: 'post',
+			url: `/accounts/mychart`,
+			data: {
+				myChartAccessToken,
+			},
 		});
 	},
 	updateEmailAddressForAccountId(accountId: string, data: UpdateEmailAddressForAccountIdData) {
@@ -260,6 +291,19 @@ export const accountService = {
 		return httpSingleton.orchestrateRequest<AccountResponse>({
 			method: 'PUT',
 			url: `/accounts/${accountId}/consent-form-accepted`,
+		});
+	},
+	getReferenceData() {
+		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
+			method: 'GET',
+			url: `/accounts/reference-data`,
+		});
+	},
+	patchPatientAccount(accountId: string, data: PatientAccountFormData) {
+		return httpSingleton.orchestrateRequest<AccountResponse>({
+			method: 'PATCH',
+			url: `/accounts/${accountId}`,
+			data,
 		});
 	},
 };

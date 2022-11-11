@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
@@ -8,6 +8,8 @@ import classNames from 'classnames';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import useAnalytics from '@/hooks/use-analytics';
+import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	topicCenterPinboard: {
@@ -71,6 +73,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
+	topicCenterName: string;
 	title: string;
 	description: string;
 	url: string;
@@ -80,10 +83,12 @@ interface Props {
 
 const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 
-export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, className }: Props) => {
+export const TopicCenterPinboardItem = ({ topicCenterName, title, description, url, imageUrl, className }: Props) => {
 	const classes = useStyles();
+	const { trackEvent } = useAnalytics();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isClamped, setIsClamped] = useState(false);
+	const dynamicContentRef = useRef<HTMLEllipsis>(null);
 
 	const setClamp = () => {
 		if (window.innerWidth >= 992) {
@@ -106,6 +111,38 @@ export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, cla
 		};
 	}, [handleWindowResize]);
 
+	useEffect(() => {
+		if (!dynamicContentRef.current) {
+			return;
+		}
+
+		function handleDynamicLinkClick(e: MouseEvent) {
+			const linkEl = e.target as HTMLAnchorElement;
+
+			if (!linkEl) {
+				return;
+			}
+
+			const eventLabel = `${linkEl.innerText} - ${linkEl.href}`;
+
+			trackEvent(TopicCenterAnalyticsEvent.clickPinboardNoteContentUrl(topicCenterName, eventLabel));
+		}
+
+		//@ts-expect-error ref type
+		const noteContentWrapper: HTMLDivElement = dynamicContentRef.current.target;
+		const linkElements = noteContentWrapper.querySelectorAll<HTMLAnchorElement>('a[href]');
+
+		for (const linkElement of linkElements) {
+			linkElement.addEventListener('click', handleDynamicLinkClick);
+		}
+
+		return () => {
+			for (const linkElement of linkElements) {
+				linkElement.removeEventListener('click', handleDynamicLinkClick);
+			}
+		};
+	}, [description, topicCenterName, trackEvent]);
+
 	return (
 		<div className={classNames(classes.topicCenterPinboard, className)}>
 			<div
@@ -118,7 +155,21 @@ export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, cla
 						<Col>
 							<div className="d-flex align-items-start justify-content-between">
 								<h5 className="mb-2">
-									<a href={url} target="_blank" rel="noreferrer">
+									<a
+										href={url}
+										target="_blank"
+										rel="noreferrer"
+										onClick={() => {
+											const eventLabel = `${title} - ${url}`;
+
+											trackEvent(
+												TopicCenterAnalyticsEvent.clickPinboardNoteTitleUrl(
+													topicCenterName,
+													eventLabel
+												)
+											);
+										}}
+									>
 										{title}
 									</a>
 								</h5>
@@ -133,6 +184,8 @@ export const TopicCenterPinboardItem = ({ title, description, url, imageUrl, cla
 								</Button>
 							</div>
 							<ResponsiveEllipsis
+								//@ts-expect-error ref type
+								innerRef={dynamicContentRef}
 								className={classes.description}
 								unsafeHTML={description}
 								maxLine={isClamped ? '2' : '10000'}

@@ -6,6 +6,7 @@ import Loader from './loader';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 
 const PrivateRoute = ({ children }: PropsWithChildren) => {
 	const handleError = useHandleError();
@@ -23,7 +24,10 @@ const PrivateRoute = ({ children }: PropsWithChildren) => {
 		}
 
 		if (!account && (!isImmediateSession || isTrackedSession)) {
-			Cookies.set('authRedirectUrl', redirectTo.startsWith('/auth') ? '/' : redirectTo);
+			Cookies.set(
+				'authRedirectUrl',
+				AUTH_REDIRECT_URLS.some((url) => redirectTo.startsWith(url)) ? '/' : redirectTo
+			);
 
 			navigate('/sign-in', { replace: true });
 		}

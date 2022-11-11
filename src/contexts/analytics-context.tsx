@@ -8,9 +8,27 @@ import {
 	AnalyticsEventCategory,
 	ContentEventActions,
 	CrisisEventActions,
+	LeftNavEventActions,
 	ProviderSearchEventActions,
 	ScreeningEventActions,
+	TopicCenterEventActions,
 } from '@/lib/models/ga-events';
+import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
+
+/**
+ * LeftNav Analytics
+ */
+export class LeftNavAnalyticsEvent {
+	static clickLeftNavItem(label: string) {
+		const event = new LeftNavAnalyticsEvent(LeftNavEventActions.UserClickLeftNavItem, label);
+
+		return event;
+	}
+
+	nonInteractive = false;
+	category = AnalyticsEventCategory.LeftNav;
+	constructor(public action: LeftNavEventActions, public label?: string) {}
+}
 
 /**
  * Screening Analytics
@@ -51,6 +69,37 @@ export class ContentAnalyticsEvent {
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Content;
 	constructor(public action: ContentEventActions, public label?: ContentFilterPill) {}
+}
+
+export class TopicCenterAnalyticsEvent {
+	static clickGroupSession(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickReserveGroupSession, category, label);
+	}
+
+	static clickGroupSessionByRequest(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(
+			TopicCenterEventActions.UserClickReserveGroupSessionByRequest,
+			category,
+			label
+		);
+	}
+
+	static clickPinboardNoteTitleUrl(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNoteTitleUrl, category, label);
+	}
+
+	static clickPinboardNoteContentUrl(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNoteContentUrl, category, label);
+	}
+
+	static clickOnYourTimeContent(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickOnYourTimeContent, category, label);
+	}
+
+	nonInteractive = false;
+	constructor(public action: TopicCenterEventActions, public category: string, public label?: string) {
+		this.category = `${AnalyticsEventCategory.TopicCenter} - ${category}`;
+	}
 }
 
 /**
@@ -95,6 +144,12 @@ export class CrisisAnalyticsEvent {
 		return event;
 	}
 
+	static clickCrisisICAssessment() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisICAssessment);
+
+		return event;
+	}
+
 	static clickCrisisError() {
 		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisError);
 
@@ -120,8 +175,10 @@ export class CrisisAnalyticsEvent {
 }
 
 export type AnalyticsEvent =
+	| LeftNavAnalyticsEvent
 	| ScreeningAnalyticsEvent
 	| ContentAnalyticsEvent
+	| TopicCenterAnalyticsEvent
 	| ProviderSearchAnalyticsEvent
 	| CrisisAnalyticsEvent;
 
@@ -249,8 +306,10 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	}, [accountId, initialized]);
 
 	// track pageviews on navigation
-	// discard any search information on /auth, as it may be sensitive (access token redirect)
-	const page = location.pathname === '/auth' ? location.pathname : location.pathname + location.search;
+	// discard any search information on auth urls, as it may be sensitive (access token redirect)
+	const page = AUTH_REDIRECT_URLS.some((url) => location.pathname === url)
+		? location.pathname
+		: location.pathname + location.search;
 
 	useEffect(() => {
 		if (!initialized || !isReactGAEnabled) {

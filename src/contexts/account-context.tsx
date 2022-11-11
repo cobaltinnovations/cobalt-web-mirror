@@ -10,6 +10,7 @@ import { AccountSource, Institution } from '@/lib/models/institution';
 import useSubdomain from '@/hooks/use-subdomain';
 import { routeRedirects } from '@/route-redirects';
 import { isErrorConfig } from '@/lib/utils/error-utils';
+import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 
 type DecodedAccessToken = {
 	sub: string;
@@ -39,6 +40,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const match = useMatch('*');
 	const [initialized, setInitialized] = useState(false);
 	const [failedToInit, setFailedToInit] = useState(false);
+	const [didCheckMyChartAccessToken, setDidCheckMyChartAccessToken] = useState(false);
 	const [didCheckAccessToken, setDidCheckAccessToken] = useState(false);
 	const [didCheckTrackFlag, setDidCheckTrackFlag] = useState(false);
 	const [didProcessRedirects, setDidProcessRedirects] = useState(false);
@@ -57,6 +59,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		path: '/immediate-support/:supportRoleId',
 	});
 	const subdomain = useSubdomain();
+	const [myChartAccessToken] = useState(searchParams.get('myChartAccessToken'));
 	const [accessToken, setAccessToken] = useState(searchParams.get('accessToken') || Cookies.get('accessToken'));
 	const [isTrackedSession, setIsTrackedSession] = useState(!!searchParams.get('track'));
 	const [isImmediateSession, setIsImmediateSession] = useState(false);
@@ -114,7 +117,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 			let authRedirectUrl = ssoRedirectUrl || Cookies.get('authRedirectUrl') || redirectTo;
 
-			if (authRedirectUrl.startsWith('/auth')) {
+			if (AUTH_REDIRECT_URLS.some((url) => authRedirectUrl.startsWith(url))) {
 				authRedirectUrl = '/';
 			}
 
@@ -165,6 +168,24 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 				setFailedToInit(true);
 			});
 	}, [sessionAccountSourceId, subdomain]);
+
+	useEffect(() => {
+		// Get patient account if landing with a chart token
+		if (!myChartAccessToken) {
+			setDidCheckMyChartAccessToken(true);
+			return;
+		}
+
+		accountService
+			.getMyChartAccount(myChartAccessToken)
+			.fetch()
+			.then((response) => {
+				setAccessToken(response.accessToken);
+			})
+			.finally(() => {
+				setDidCheckMyChartAccessToken(true);
+			});
+	}, [myChartAccessToken]);
 
 	// Route rendering is gated behind `initialized`
 	// Enabled after app gets institution & determines session state
@@ -239,7 +260,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	searchParams.delete('accessToken');
 	const accessTokenFromCookie = Cookies.get('accessToken');
 	useEffect(() => {
-		if (!institution || !didProcessRedirects || didCheckAccessToken) {
+		if (!institution || !didProcessRedirects || !didCheckMyChartAccessToken || didCheckAccessToken) {
 			return;
 		}
 
@@ -255,7 +276,15 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}
 
 		processAccessToken(accessToken);
-	}, [accessToken, accessTokenFromCookie, didCheckAccessToken, didProcessRedirects, institution, processAccessToken]);
+	}, [
+		accessToken,
+		accessTokenFromCookie,
+		didCheckAccessToken,
+		didCheckMyChartAccessToken,
+		didProcessRedirects,
+		institution,
+		processAccessToken,
+	]);
 
 	const value = {
 		account,

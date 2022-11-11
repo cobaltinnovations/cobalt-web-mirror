@@ -26,7 +26,7 @@ import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
-import { AnalyticsEvent, CrisisAnalyticsEvent } from '@/contexts/analytics-context';
+import { AnalyticsEvent, CrisisAnalyticsEvent, LeftNavAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
@@ -500,6 +500,8 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 											<Link
 												to={to || ''}
 												onClick={(event) => {
+													trackEvent(LeftNavAnalyticsEvent.clickLeftNavItem(item.label));
+
 													const analyticsEvent = item.analyticsEvent?.();
 													if (analyticsEvent) {
 														trackEvent(analyticsEvent);

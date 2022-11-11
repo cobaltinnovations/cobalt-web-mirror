@@ -10,7 +10,8 @@ import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-small.svg';
-import { ACCOUNT_SOURCE_DISPLAY_STYLE_ID, ACOUNT_SOURCE_ID } from '@/lib/models';
+import { AccountSourceId, AccountSourceDisplayStyleId } from '@/lib/models';
+import config from '@/lib/config';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -27,6 +28,12 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 		margin: '0 auto',
 	},
 }));
+
+const accountSourceVariantMap = {
+	[AccountSourceDisplayStyleId.PRIMARY]: 'primary',
+	[AccountSourceDisplayStyleId.SECONDARY]: 'outline-primary',
+	[AccountSourceDisplayStyleId.TERTIARY]: 'link',
+};
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
@@ -71,21 +78,8 @@ const SignIn: FC = () => {
 							<div className="text-center mb-3">
 								{accountSources.map((accountSource, index) => {
 									const isLast = accountSources.length - 1 === index;
-									let variant = 'primary';
-
-									switch (accountSource.accountSourceDisplayStyleId) {
-										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.PRIMARY:
-											variant = 'primary';
-											break;
-										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.SECONDARY:
-											variant = 'outline-primary';
-											break;
-										case ACCOUNT_SOURCE_DISPLAY_STYLE_ID.TERTIARY:
-											variant = 'link';
-											break;
-										default:
-											variant = 'primary';
-									}
+									let variant =
+										accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] || 'primary';
 
 									return (
 										<Button
@@ -95,12 +89,18 @@ const SignIn: FC = () => {
 											})}
 											variant={variant}
 											onClick={() => {
-												if (accountSource.accountSourceId === ACOUNT_SOURCE_ID.ANONYMOUS) {
+												if (accountSource.accountSourceId === AccountSourceId.ANONYMOUS) {
 													handleEnterAnonymouslyButtonClick();
 												} else if (
-													accountSource.accountSourceId === ACOUNT_SOURCE_ID.EMAIL_PASSWORD
+													accountSource.accountSourceId === AccountSourceId.EMAIL_PASSWORD
 												) {
 													navigate('/sign-in/email');
+												} else if (accountSource.accountSourceId === AccountSourceId.MYCHART) {
+													const mychartUrl = new URL(config.COBALT_WEB_API_BASE_URL);
+													mychartUrl.pathname = `/institutions/${institution?.institutionId}/mychart-authentication-url`;
+													mychartUrl.search = `redirectImmediately=true`;
+
+													window.location.href = mychartUrl.toString();
 												} else if (accountSource.ssoUrl) {
 													window.location.href = accountSource.ssoUrl;
 												}
