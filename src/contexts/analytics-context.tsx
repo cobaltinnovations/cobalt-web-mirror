@@ -11,6 +11,7 @@ import {
 	ProviderSearchEventActions,
 	ScreeningEventActions,
 } from '@/lib/models/ga-events';
+import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 
 /**
  * Screening Analytics
@@ -249,8 +250,10 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	}, [accountId, initialized]);
 
 	// track pageviews on navigation
-	// discard any search information on /auth, as it may be sensitive (access token redirect)
-	const page = location.pathname === '/auth' ? location.pathname : location.pathname + location.search;
+	// discard any search information on auth urls, as it may be sensitive (access token redirect)
+	const page = AUTH_REDIRECT_URLS.some((url) => location.pathname === url)
+		? location.pathname
+		: location.pathname + location.search;
 
 	useEffect(() => {
 		if (!initialized || !isReactGAEnabled) {

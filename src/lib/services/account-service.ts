@@ -103,6 +103,15 @@ export const accountService = {
 			data,
 		});
 	},
+	getMyChartAccount(myChartAccessToken: string) {
+		return httpSingleton.orchestrateRequest<AccountWithTokenResponse>({
+			method: 'post',
+			url: `/accounts/mychart`,
+			data: {
+				myChartAccessToken,
+			},
+		});
+	},
 	updateEmailAddressForAccountId(accountId: string, data: UpdateEmailAddressForAccountIdData) {
 		return httpSingleton.orchestrateRequest<AccountResponse>({
 			method: 'put',
