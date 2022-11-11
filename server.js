@@ -15,6 +15,24 @@ let settings = {
 		dsn: '',
 		showDebug: false,
 	},
+	nodeApp: {
+		basicAuth: {
+			enabled: process.env.WEBAPP_ENABLE_BASIC_AUTH,
+			username: process.env.WEBAPP_BASIC_AUTH_USERNAME || 'dev_admin',
+			password: process.env.WEBAPP_BASIC_AUTH_PASSWORD || 'dev_password',
+			secret: '',
+		},
+		subdomainMapping: process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt',
+	},
+	reactApp: {
+		apiBaseUrl: '',
+		gaTrackingId: '',
+		ga4MeasurementId: '',
+		showDebug: false,
+		googleMapsApiKey: '',
+		providerManagementFeatureEnabled: false,
+		downForMaintenance: false,
+	},
 };
 
 try {
@@ -37,7 +55,6 @@ function configureReactApp() {
 		'COBALT_WEB_API_BASE_URL',
 		'COBALT_WEB_GA_TRACKING_ID',
 		'COBALT_WEB_GA4_MEASUREMENT_ID',
-		'COBALT_WEB_DISABLE_SIGN_IN',
 		'COBALT_WEB_SHOW_DEBUG',
 		'COBALT_WEB_SENTRY_SHOW_DEBUG',
 		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
@@ -54,7 +71,14 @@ function configureReactApp() {
 			},
 			// starts with settings from file -- allows env to override
 			{
+				COBALT_WEB_API_BASE_URL: settings.reactApp.apiBaseUrl,
+				COBALT_WEB_GA_TRACKING_ID: settings.reactApp.gaTrackingId,
+				COBALT_WEB_GA4_MEASUREMENT_ID: settings.reactApp.ga4MeasurementId,
+				COBALT_WEB_SHOW_DEBUG: settings.reactApp.showDebug,
 				COBALT_WEB_SENTRY_SHOW_DEBUG: settings.sentry.showDebug,
+				COBALT_WEB_GOOGLE_MAPS_API_KEY: settings.reactApp.googleMapsApiKey,
+				COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE: settings.reactApp.providerManagementFeatureEnabled,
+				COBALT_WEB_DOWN_FOR_MAINTENANCE: settings.reactApp.downForMaintenance,
 			}
 		);
 
@@ -113,11 +137,11 @@ app.get('/configuration', (_req, res) => {
 /* Basic HTTP Auth */
 /* ----------------------------------------- */
 
-const basicAuthEnabled = yn(process.env.WEBAPP_ENABLE_BASIC_AUTH, { default: false });
+const basicAuthEnabled = yn(settings.nodeApp.basicAuth.enabled, { default: false });
 
 if (basicAuthEnabled) {
-	const USERNAME = process.env.WEBAPP_BASIC_AUTH_USERNAME || 'dev_admin';
-	const PASSWORD = process.env.WEBAPP_BASIC_AUTH_PASSWORD || 'dev_password';
+	const USERNAME = settings.nodeApp.basicAuth.username;
+	const PASSWORD = settings.nodeApp.basicAuth.password;
 
 	if (USERNAME === 'dev_admin' && PASSWORD === 'dev_password') {
 		setInterval(() => {
@@ -168,7 +192,7 @@ if (basicAuthEnabled) {
 /* Serve SPA */
 /* ----------------------------------------- */
 
-const subdomainMappingString = process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt';
+const subdomainMappingString = settings.nodeApp.subdomainMapping;
 const subdomainBuildMap = subdomainMappingString.split(',').reduce((map, mappingStr) => {
 	const [subdomain, buildFolder] = mappingStr.split(':');
 
