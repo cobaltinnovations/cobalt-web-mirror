@@ -1,8 +1,13 @@
 export enum AnalyticsEventCategory {
+	LeftNav = 'LeftNav',
 	Screening = 'Screening',
 	Content = 'Content',
 	ProviderSearch = 'Provider Search',
 	Crisis = 'Crisis',
+}
+
+export enum LeftNavEventActions {
+	UserClickLeftNavItem = 'User Clicked Left Nav item',
 }
 
 export enum ScreeningEventActions {

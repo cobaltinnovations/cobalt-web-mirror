@@ -8,10 +8,26 @@ import {
 	AnalyticsEventCategory,
 	ContentEventActions,
 	CrisisEventActions,
+	LeftNavEventActions,
 	ProviderSearchEventActions,
 	ScreeningEventActions,
 } from '@/lib/models/ga-events';
 import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
+
+/**
+ * LeftNav Analytics
+ */
+export class LeftNavAnalyticsEvent {
+	static clickLeftNavItem(label: string) {
+		const event = new LeftNavAnalyticsEvent(LeftNavEventActions.UserClickLeftNavItem, label);
+
+		return event;
+	}
+
+	nonInteractive = false;
+	category = AnalyticsEventCategory.LeftNav;
+	constructor(public action: LeftNavEventActions, public label?: string) {}
+}
 
 /**
  * Screening Analytics
@@ -127,6 +143,7 @@ export class CrisisAnalyticsEvent {
 }
 
 export type AnalyticsEvent =
+	| LeftNavAnalyticsEvent
 	| ScreeningAnalyticsEvent
 	| ContentAnalyticsEvent
 	| ProviderSearchAnalyticsEvent
