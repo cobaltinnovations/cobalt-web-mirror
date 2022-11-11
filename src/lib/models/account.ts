@@ -17,6 +17,7 @@ export interface AccountModel {
 		postalName?: string;
 		region?: string;
 		streetAddress1?: string;
+		streetAddress2?: string;
 	};
 	betaStatusId?: string;
 	birthSexId?: string;

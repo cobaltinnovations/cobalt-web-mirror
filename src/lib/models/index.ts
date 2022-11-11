@@ -12,6 +12,7 @@ export * from './group-session-models';
 export * from './institution';
 export * from './interaction-models';
 export * from './provider';
+export * from './reference-data';
 export * from './roles';
 export * from './scheduling-models';
 export * from './screening-models';

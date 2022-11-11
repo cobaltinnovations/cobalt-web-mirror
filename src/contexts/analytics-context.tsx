@@ -96,6 +96,12 @@ export class CrisisAnalyticsEvent {
 		return event;
 	}
 
+	static clickCrisisICAssessment() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisICAssessment);
+
+		return event;
+	}
+
 	static clickCrisisError() {
 		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisError);
 

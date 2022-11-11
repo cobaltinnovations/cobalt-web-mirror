@@ -26,6 +26,7 @@ export enum CrisisEventActions {
 	UserClickCrisisMenu = 'User Clicked Crisis Link in Menu',
 	UserClickCrisisError = 'User Clicked Crisis Link in Error Modal',
 	UserClickCrisisFeedback = 'User Clicked Crisis Link on Feedback Form',
+	UserClickCrisisICAssessment = 'User Clicked Crisis Link in IC Assessment Intro',
 	UserClickCrisisTelResource = 'User Clicked Crisis Resource Telephone Link',
 	PresentScreeningCrisis = 'Presented Crisis from Screening',
 }
