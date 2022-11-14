@@ -4,6 +4,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
+import useReactPlayerSettings from '@/hooks/use-react-player-settings';
 
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
@@ -48,8 +49,9 @@ const OnYourTimeDetail: FC = () => {
 	const classes = useOnYourTimeDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
-	const [canEmbed, setCanEmbed] = useState(false);
 	const [item, setItem] = useState<Content>();
+
+	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(item?.url);
 
 	const fetchData = useCallback(async () => {
 		if (!contentId) {
@@ -77,15 +79,6 @@ const OnYourTimeDetail: FC = () => {
 			.catch((e) => {
 				// TODO: Swallowing error silently for now
 			});
-	}, [item]);
-
-	useEffect(() => {
-		if (!item || !item.url) {
-			setCanEmbed(false);
-			return;
-		}
-
-		setCanEmbed(ReactPlayer.canPlay(item.url));
 	}, [item]);
 
 	// Activity Tracking
@@ -132,7 +125,8 @@ const OnYourTimeDetail: FC = () => {
 									width="100%"
 									height="100%"
 									controls
-									url={item?.url}
+									url={embedUrl}
+									config={playerConfig}
 									onPlay={() => {
 										trackActivity();
 									}}

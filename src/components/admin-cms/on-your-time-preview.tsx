@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
 import ReactPlayer from 'react-player';
@@ -7,6 +7,7 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
+import useReactPlayerSettings from '@/hooks/use-react-player-settings';
 
 const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -85,17 +86,9 @@ interface OnYourTimePreviewProps {
 const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 	const classes = useOnYourTimePreviewStyles();
 	const placeholderImage = useRandomPlaceholderImage();
-	const [canEmbed, setCanEmbed] = useState(false);
+	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(props.url);
+
 	const { fonts } = useCobaltTheme();
-
-	useEffect(() => {
-		if (!props.url) {
-			setCanEmbed(false);
-			return;
-		}
-
-		setCanEmbed(ReactPlayer.canPlay(props.url));
-	}, [props.url]);
 
 	return (
 		<Card className="border-0 p-6">
@@ -108,7 +101,13 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 							<div>
 								<div className="position-relative">
 									{canEmbed ? (
-										<ReactPlayer width="100%" height="160px" url={props?.url} onPlay={() => {}} />
+										<ReactPlayer
+											width="100%"
+											height="160px"
+											url={embedUrl}
+											config={playerConfig}
+											onPlay={() => {}}
+										/>
 									) : (
 										<BackgroundImageContainer
 											className={classes.mediaContainer}
