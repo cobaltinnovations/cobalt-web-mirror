@@ -94,6 +94,7 @@ If you ever need to test your code against the server, create a production build
 | COBALT_WEB_API_BASE_URL                     | API base url                                                                                                             |
 | COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                                                                              |
 | COBALT_WEB_GA4_MEASUREMENT_ID               | Google Analytics 4 Measurement ID `G-XYZ123ABC`                                                                          |
+| COBALT_WEB_MIXPANEL_ID                      | Mix Panel Identifier                                                                                                     |
 | COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                                                                              |
 | COBALT_WEB_SENTRY_SHOW_DEBUG                | string to show buttons on home page (throwing Sentry errors)                                                             |
 | COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")                                                              |

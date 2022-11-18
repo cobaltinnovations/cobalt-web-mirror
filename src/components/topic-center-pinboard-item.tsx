@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
@@ -10,6 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
+import { PinboardNoteModel, TopicCenterModel, TopicCenterRowModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	topicCenterPinboard: {
@@ -73,43 +74,38 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
-	topicCenterName: string;
-	title: string;
-	description: string;
-	url: string;
-	imageUrl?: string;
+	topicCenter: TopicCenterModel;
+	topicCenterRow: TopicCenterRowModel;
+	pinboardNote: PinboardNoteModel;
 	className?: string;
 }
 
 const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
 
-export const TopicCenterPinboardItem = ({ topicCenterName, title, description, url, imageUrl, className }: Props) => {
+export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardNote, className }: Props) => {
 	const classes = useStyles();
-	const { trackEvent } = useAnalytics();
+	const { mixpanel, trackEvent } = useAnalytics();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isClamped, setIsClamped] = useState(false);
 	const dynamicContentRef = useRef<HTMLEllipsis>(null);
 
-	const setClamp = () => {
+	const setClamp = useCallback(() => {
 		if (window.innerWidth >= 992) {
 			setIsClamped(false);
 		} else {
 			setIsClamped(true);
 		}
-	};
-
-	const handleWindowResize = debounce(setClamp, 200);
-
-	useEffect(() => {
-		setClamp();
 	}, []);
 
 	useEffect(() => {
+		const handleWindowResize = debounce(setClamp, 200);
 		window.addEventListener('resize', handleWindowResize);
+
+		setClamp();
 		return () => {
 			window.removeEventListener('resize', handleWindowResize);
 		};
-	}, [handleWindowResize]);
+	}, [setClamp]);
 
 	useEffect(() => {
 		if (!dynamicContentRef.current) {
@@ -123,9 +119,17 @@ export const TopicCenterPinboardItem = ({ topicCenterName, title, description, u
 				return;
 			}
 
-			const eventLabel = `${linkEl.innerText} - ${linkEl.href}`;
+			const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${linkEl.href}`;
+			trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));
 
-			trackEvent(TopicCenterAnalyticsEvent.clickPinboardNoteContentUrl(topicCenterName, eventLabel));
+			mixpanel.track('Topic Center Pinboard Item Content Link Click', {
+				'Topic Center ID': topicCenter.topicCenterId,
+				'Topic Center Title': topicCenter.name,
+				'Section Title': topicCenterRow.title,
+				'Pinboard Item ID': pinboardNote.pinboardNoteId,
+				'Pinboard Item Title': pinboardNote.title,
+				'Pinboard Item Content Link': pinboardNote.url,
+			});
 		}
 
 		//@ts-expect-error ref type
@@ -141,13 +145,22 @@ export const TopicCenterPinboardItem = ({ topicCenterName, title, description, u
 				linkElement.removeEventListener('click', handleDynamicLinkClick);
 			}
 		};
-	}, [description, topicCenterName, trackEvent]);
+	}, [
+		mixpanel,
+		pinboardNote.pinboardNoteId,
+		pinboardNote.title,
+		pinboardNote.url,
+		topicCenter.name,
+		topicCenter.topicCenterId,
+		topicCenterRow.title,
+		trackEvent,
+	]);
 
 	return (
 		<div className={classNames(classes.topicCenterPinboard, className)}>
 			<div
 				className={classNames(classes.imageOuter, 'd-none d-lg-block')}
-				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
+				style={{ backgroundImage: `url(${pinboardNote.imageUrl ? pinboardNote.imageUrl : placeholderImage})` }}
 			/>
 			<div className={classes.informationOuter}>
 				<Container>
@@ -156,21 +169,24 @@ export const TopicCenterPinboardItem = ({ topicCenterName, title, description, u
 							<div className="d-flex align-items-start justify-content-between">
 								<h5 className="mb-2">
 									<a
-										href={url}
+										href={pinboardNote.url}
 										target="_blank"
 										rel="noreferrer"
 										onClick={() => {
-											const eventLabel = `${title} - ${url}`;
+											const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${pinboardNote.url}`;
 
-											trackEvent(
-												TopicCenterAnalyticsEvent.clickPinboardNoteTitleUrl(
-													topicCenterName,
-													eventLabel
-												)
-											);
+											trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));
+
+											mixpanel.track('Topic Center Pinboard Item Click', {
+												'Topic Center ID': topicCenter.topicCenterId,
+												'Topic Center Title': topicCenter.name,
+												'Section Title': topicCenterRow.title,
+												'Pinboard Item ID': pinboardNote.pinboardNoteId,
+												'Pinboard Item Title': pinboardNote.title,
+											});
 										}}
 									>
-										{title}
+										{pinboardNote.title}
 									</a>
 								</h5>
 								<Button
@@ -187,7 +203,7 @@ export const TopicCenterPinboardItem = ({ topicCenterName, title, description, u
 								//@ts-expect-error ref type
 								innerRef={dynamicContentRef}
 								className={classes.description}
-								unsafeHTML={description}
+								unsafeHTML={pinboardNote.description}
 								maxLine={isClamped ? '2' : '10000'}
 							/>
 						</Col>

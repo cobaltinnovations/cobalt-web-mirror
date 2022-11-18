@@ -37,6 +37,7 @@ module.exports = {
 		apiBaseUrl: '',
 		gaTrackingId: '',
 		ga4MeasurementId: '',
+		mixpanelId: '',
 		showDebug: false,
 		googleMapsApiKey: '',
 		providerManagementFeatureEnabled: false,

@@ -26,7 +26,7 @@ import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
-import { AnalyticsEvent, CrisisAnalyticsEvent, LeftNavAnalyticsEvent } from '@/contexts/analytics-context';
+import { AnalyticsEvent, CrisisAnalyticsEvent, MainNavAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
@@ -440,7 +440,7 @@ interface CobaltMenuProps {
 const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) => {
 	const classes = useMenuStyles();
 	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
-	const { trackEvent } = useAnalytics();
+	const { mixpanel, trackEvent } = useAnalytics();
 
 	function handleSignOutLinkClick(event: React.MouseEvent<HTMLButtonElement>) {
 		event.preventDefault();
@@ -500,7 +500,11 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 											<Link
 												to={to || ''}
 												onClick={(event) => {
-													trackEvent(LeftNavAnalyticsEvent.clickLeftNavItem(item.label));
+													trackEvent(MainNavAnalyticsEvent.clickMainNavItem(item.label));
+
+													mixpanel.track('Main Navigation Click', {
+														'Navigation Item Title': item.label,
+													});
 
 													const analyticsEvent = item.analyticsEvent?.();
 													if (analyticsEvent) {
