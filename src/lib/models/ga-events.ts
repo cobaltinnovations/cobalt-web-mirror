@@ -7,8 +7,8 @@ export enum AnalyticsEventCategory {
 	Crisis = 'Crisis',
 }
 
-export enum LeftNavEventActions {
-	UserClickLeftNavItem = 'User Clicked Left Nav item',
+export enum MainNavEventActions {
+	UserClickNavItem = 'nav-click',
 }
 
 export enum ScreeningEventActions {
@@ -22,11 +22,10 @@ export enum ContentEventActions {
 }
 
 export enum TopicCenterEventActions {
-	UserClickReserveGroupSession = 'User Clicked on Group Session',
-	UserClickReserveGroupSessionByRequest = 'User Clicked on Group Session By Request',
-	UserClickPinboardNoteTitleUrl = 'User Clicked on Pinboard Note Title Link',
-	UserClickPinboardNoteContentUrl = 'User Clicked on Pinboard Note Content Link',
-	UserClickOnYourTimeContent = 'User Clicked on Link to On Your Time',
+	UserClickGroupSession = 'topic-center-group-session-click',
+	UserClickGroupSessionByRequest = 'topic-center-group-session-by-request-click',
+	UserClickPinboardNote = 'topic-center-community-connections-click',
+	UserClickOnYourTimeContent = 'topic-center-resources-click',
 }
 
 export enum ProviderSearchEventActions {

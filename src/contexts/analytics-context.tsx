@@ -2,13 +2,14 @@ import useAccount from '@/hooks/use-account';
 import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
+import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import config from '@/lib/config';
 
 import {
 	AnalyticsEventCategory,
 	ContentEventActions,
 	CrisisEventActions,
-	LeftNavEventActions,
+	MainNavEventActions,
 	ProviderSearchEventActions,
 	ScreeningEventActions,
 	TopicCenterEventActions,
@@ -18,16 +19,16 @@ import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 /**
  * LeftNav Analytics
  */
-export class LeftNavAnalyticsEvent {
-	static clickLeftNavItem(label: string) {
-		const event = new LeftNavAnalyticsEvent(LeftNavEventActions.UserClickLeftNavItem, label);
+export class MainNavAnalyticsEvent {
+	static clickMainNavItem(label: string) {
+		const event = new MainNavAnalyticsEvent(MainNavEventActions.UserClickNavItem, label);
 
 		return event;
 	}
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.LeftNav;
-	constructor(public action: LeftNavEventActions, public label?: string) {}
+	constructor(public action: MainNavEventActions, public label?: string) {}
 }
 
 /**
@@ -73,27 +74,23 @@ export class ContentAnalyticsEvent {
 
 export class TopicCenterAnalyticsEvent {
 	static clickGroupSession(category: string, label: string) {
-		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickReserveGroupSession, category, label);
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickGroupSession, category, label);
 	}
 
 	static clickGroupSessionByRequest(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickGroupSessionByRequest, category, label);
+	}
+
+	static clickPinboardNote(label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNote, 'topic centers', label);
+	}
+
+	static clickOnYourTimeContent(label: string) {
 		return new TopicCenterAnalyticsEvent(
-			TopicCenterEventActions.UserClickReserveGroupSessionByRequest,
-			category,
+			TopicCenterEventActions.UserClickOnYourTimeContent,
+			'topic centers',
 			label
 		);
-	}
-
-	static clickPinboardNoteTitleUrl(category: string, label: string) {
-		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNoteTitleUrl, category, label);
-	}
-
-	static clickPinboardNoteContentUrl(category: string, label: string) {
-		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNoteContentUrl, category, label);
-	}
-
-	static clickOnYourTimeContent(category: string, label: string) {
-		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickOnYourTimeContent, category, label);
 	}
 
 	nonInteractive = false;
@@ -175,7 +172,7 @@ export class CrisisAnalyticsEvent {
 }
 
 export type AnalyticsEvent =
-	| LeftNavAnalyticsEvent
+	| MainNavAnalyticsEvent
 	| ScreeningAnalyticsEvent
 	| ContentAnalyticsEvent
 	| TopicCenterAnalyticsEvent
@@ -184,6 +181,7 @@ export type AnalyticsEvent =
 
 const AnalyticsContext = createContext<
 	| {
+			mixpanel: Mixpanel;
 			trackEvent: (event: AnalyticsEvent) => void;
 			trackModalView: (modalName: string) => void;
 	  }
@@ -238,6 +236,15 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			page_path: page,
 			send_to: measurementId,
 		});
+	}, []);
+
+	useEffect(() => {
+		const mixpanelId = config.COBALT_WEB_MIXPANEL_ID;
+		if (!mixpanelId) {
+			return;
+		}
+
+		mixpanel.init(mixpanelId);
 	}, []);
 
 	const initialMeasurementId = config.COBALT_WEB_GA4_MEASUREMENT_ID || institution?.ga4MeasurementId;
@@ -377,6 +384,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	return (
 		<AnalyticsContext.Provider
 			value={{
+				mixpanel,
 				trackEvent,
 				trackModalView,
 			}}
