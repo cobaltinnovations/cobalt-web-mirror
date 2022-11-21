@@ -210,6 +210,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	const { institution, account, initialized } = useAccount();
 
 	const enabledVersionsRef = useRef({
+		mixpanel: false,
 		reactGa: false,
 		ga4: false,
 	});
@@ -244,6 +245,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			return;
 		}
 
+		enabledVersionsRef.current.mixpanel = true;
 		mixpanel.init(mixpanelId);
 	}, []);
 
@@ -311,6 +313,21 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			gtag('set', { accountId });
 		}
 	}, [accountId, initialized]);
+
+	const institutionId = institution?.institutionId;
+	useEffect(() => {
+		if (!initialized || !enabledVersionsRef.current.mixpanel || !institutionId) {
+			return;
+		}
+
+		if (!accountId) {
+			mixpanel.reset();
+		} else {
+			mixpanel.identify(accountId);
+		}
+
+		mixpanel.register({ 'Institution ID': institutionId });
+	}, [accountId, initialized, institutionId]);
 
 	// track pageviews on navigation
 	// discard any search information on auth urls, as it may be sensitive (access token redirect)
