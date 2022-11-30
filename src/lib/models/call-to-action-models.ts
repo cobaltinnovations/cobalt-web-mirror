@@ -6,6 +6,7 @@ export enum CALL_TO_ACTION_DISPLAY_AREA_ID {
 export enum ACTION_LINK_TYPE_ID {
 	EXTERNAL = 'EXTERNAL',
 	INTERNAL = 'INTERNAL',
+	CRISIS = 'CRISIS',
 }
 
 export interface ActionLinkModel {

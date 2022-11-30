@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { ActionLinkModel, ACTION_LINK_TYPE_ID, CallToActionModel } from '@/lib/models';
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
@@ -47,6 +48,7 @@ interface Props {
 
 const CallToAction = ({ callToAction, className }: Props) => {
 	const classes = useStyles();
+	const { openInCrisisModal } = useInCrisisModal();
 
 	const handleActionLinkClick = (actionLink: ActionLinkModel) => {
 		// TODO: Track event?
@@ -60,6 +62,9 @@ const CallToAction = ({ callToAction, className }: Props) => {
 				break;
 			case ACTION_LINK_TYPE_ID.INTERNAL:
 				window.open(actionLink.link, '_self');
+				break;
+			case ACTION_LINK_TYPE_ID.CRISIS:
+				openInCrisisModal();
 				break;
 			default:
 				return;
