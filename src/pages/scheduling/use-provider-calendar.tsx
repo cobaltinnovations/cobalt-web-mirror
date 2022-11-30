@@ -107,6 +107,7 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 			borderColor: appointment.appointmentType.hexColor,
 			textColor: '#21312A',
 			extendedProps: {
+				accountId: appointment.accountId,
 				appointmentId: appointment.appointmentId,
 			},
 		};
