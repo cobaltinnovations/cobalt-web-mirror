@@ -27,7 +27,6 @@ import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
-import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -90,6 +89,7 @@ interface AppointmentDetailPanelProps {
 	onClose: () => void;
 	onAddAppointment: () => void;
 	focusDateOnLoad: boolean;
+	accountId?: string;
 }
 
 export const AppointmentDetailPanel = ({
@@ -97,8 +97,8 @@ export const AppointmentDetailPanel = ({
 	onClose,
 	onAddAppointment,
 	focusDateOnLoad,
+	accountId,
 }: AppointmentDetailPanelProps) => {
-	const { account } = useAccount();
 	const { appointmentId } = useParams<{ appointmentId: string }>();
 	const classes = useStyles();
 	const schedulingClasses = useSchedulingStyles();
@@ -111,7 +111,6 @@ export const AppointmentDetailPanel = ({
 
 	useScrollCalendar(setCalendarDate, focusDateOnLoad, appointment);
 
-	const accountId = account?.accountId;
 	useEffect(() => {
 		if (!accountId || !appointmentId) {
 			return;

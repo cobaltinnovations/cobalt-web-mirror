@@ -36,6 +36,7 @@ export const MySchedule: FC = () => {
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
 	const [focusDateOnLoad, setFocusDateOnLoad] = useState(true);
+	const [accountIdForDetailsPanel, setAccountIdForDetailsPanel] = useState('');
 	const [managingAvailabilties, setManagingAvailabilties] = useState(false);
 	const [mainStartDate, setMainStartDate] = useState<string>();
 	const [mainEndDate, setMainEndDate] = useState<string>();
@@ -300,6 +301,7 @@ export const MySchedule: FC = () => {
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
 							setFocusDateOnLoad(false);
+							setAccountIdForDetailsPanel(clickInfo.event.extendedProps.accountId);
 							navigate(`appointments/${clickInfo.event.extendedProps.appointmentId}`);
 						}
 					}}
@@ -329,6 +331,7 @@ export const MySchedule: FC = () => {
 										setFocusDateOnLoad(true);
 										navigate(``);
 									}}
+									accountId={accountIdForDetailsPanel}
 								/>
 							</div>
 						}
