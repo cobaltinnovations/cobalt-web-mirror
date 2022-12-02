@@ -159,12 +159,12 @@ export const AppointmentDetailPanel = ({
 			}
 
 			await appointmentService.cancelAppointment(appointment.appointmentId).fetch();
+			setConfirmDialogIsShowing(false);
+			onClose();
 		} catch (error) {
 			handleError(error);
-		} finally {
-			setConfirmDialogIsShowing(false);
 		}
-	}, [appointment, handleError]);
+	}, [appointment, handleError, onClose]);
 
 	return (
 		<>
