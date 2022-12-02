@@ -28,6 +28,7 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import { createUseThemedStyles } from '@/jss/theme';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	appointmentsList: {
@@ -108,6 +109,7 @@ export const AppointmentDetailPanel = ({
 	const [appointment, setAppointment] = useState<AppointmentModel>();
 	const [assessment, setAssessment] = useState<PersonalizationDetails>();
 	const [allAppointments, setAllAppointments] = useState<AppointmentModel[]>([]);
+	const [confirmDialogIsShowing, setConfirmDialogIsShowing] = useState(false);
 
 	useScrollCalendar(setCalendarDate, focusDateOnLoad, appointment);
 
@@ -146,54 +148,90 @@ export const AppointmentDetailPanel = ({
 	const showIntakeResponses =
 		!!assessment && Array.isArray(assessment.assessmentQuestions) && assessment.assessmentQuestions.length > 0;
 
-	return (
-		<div>
-			<div className="d-flex align-items-center justify-content-between py-4">
-				<div>
-					<h4>
-						{patient?.firstName || patient?.lastName
-							? `${patient?.firstName} ${patient?.lastName}`
-							: 'Anonymous'}
-					</h4>
+	const handleCancelAppointmentButtonClick = useCallback(async () => {
+		setConfirmDialogIsShowing(true);
+	}, []);
 
-					<p className="mb-0">{appointment?.startTimeDescription}</p>
-					{appointment?.appointmentType && (
-						<AppointmentTypeItem appointmentType={appointment.appointmentType} />
-					)}
+	const handleCancelAppointmentConfirm = useCallback(async () => {
+		try {
+			if (!appointment) {
+				throw new Error('appointment is undefined.');
+			}
+
+			await appointmentService.cancelAppointment(appointment.appointmentId).fetch();
+			setConfirmDialogIsShowing(false);
+			onClose();
+		} catch (error) {
+			handleError(error);
+		}
+	}, [appointment, handleError, onClose]);
+
+	return (
+		<>
+			<ConfirmDialog
+				show={confirmDialogIsShowing}
+				onHide={() => {
+					setConfirmDialogIsShowing(false);
+				}}
+				titleText="Cancel Appointment"
+				bodyText={`Are you sure you want to cancel this appointment? An email will be sent to ${patient?.emailAddress} letting them know the appointment has been canceled.`}
+				dismissText="Do Not Cancel"
+				confirmText="Cancel Appointment"
+				onConfirm={handleCancelAppointmentConfirm}
+				displayButtonsBlock
+			/>
+
+			<div>
+				<div className="d-flex align-items-center justify-content-between py-4">
+					<div>
+						<h4>
+							{patient?.firstName || patient?.lastName
+								? `${patient?.firstName} ${patient?.lastName}`
+								: 'Anonymous'}
+						</h4>
+
+						<p className="mb-0">{appointment?.startTimeDescription}</p>
+						{appointment?.appointmentType && (
+							<AppointmentTypeItem appointmentType={appointment.appointmentType} />
+						)}
+					</div>
+
+					<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+						<CloseIcon />
+					</Button>
 				</div>
 
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
-				</Button>
-			</div>
-
-			<div className="mb-4">
-				<Button
-					as="a"
-					variant="primary"
-					size="sm"
-					className="me-1"
-					href={appointment?.videoconferenceUrl}
-					target="_blank"
-				>
-					Join Now
-				</Button>
-
-				<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} />
-
-				<Link to={'edit'}>
-					<Button variant="primary" size="sm" className="px-2">
-						<EditIcon />
+				<div className="mb-4">
+					<Button
+						as="a"
+						variant="primary"
+						size="sm"
+						className="py-2 me-1 text-decoration-none"
+						href={appointment?.videoconferenceUrl}
+						target="_blank"
+					>
+						Join Now
 					</Button>
-				</Link>
-			</div>
 
-			<div className="border py-2 px-3">
-				<div className="mb-2 d-flex justify-content-between align-items-center">
-					<p className="mb-0">
-						<strong>Contact Information</strong>
-					</p>
-					{/* <Button
+					<Button variant="danger" size="sm" className="me-1" onClick={handleCancelAppointmentButtonClick}>
+						Cancel Appointment
+					</Button>
+
+					<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} iconSize={18} />
+
+					<Link to={'edit'}>
+						<Button variant="primary" size="sm" className="px-2">
+							<EditIcon width={18} height={18} />
+						</Button>
+					</Link>
+				</div>
+
+				<div className="border py-2 px-3">
+					<div className="mb-2 d-flex justify-content-between align-items-center">
+						<p className="mb-0">
+							<strong>Contact Information</strong>
+						</p>
+						{/* <Button
 						variant="link"
 						size="sm"
 						className="p-0"
@@ -203,86 +241,86 @@ export const AppointmentDetailPanel = ({
 					>
 						<EditIcon />
 					</Button> */}
-				</div>
-
-				<p className="mb-0">
-					<strong>Phone</strong>
-				</p>
-				<p>{patient?.phoneNumber || 'Not available'}</p>
-
-				<p className="mb-0">
-					<strong>Email</strong>
-				</p>
-				<p>{patient?.emailAddress || 'Not available'}</p>
-			</div>
-
-			{showIntakeResponses && (
-				<div className="border py-2 px-3 mt-2">
-					<div className="d-flex mb-1 justify-content-between align-items-center">
-						<p className="mb-0">
-							<strong>Intake Responses</strong>
-						</p>
 					</div>
 
-					<div className="mb-1 justify-content-between align-items-center">
-						{assessment?.assessmentQuestions.map((question) => {
-							const answersMap = question.answers.reduce((acc, answer) => {
-								acc[answer.answerId] = answer;
-
-								return acc;
-							}, {} as Record<string, PersonalizationAnswer>);
-
-							return (
-								<React.Fragment key={question.questionId}>
-									<p className="mb-0">
-										<strong>{question.label}</strong>
-									</p>
-									{question.selectedAnswers.map((answer) => {
-										const answerText =
-											question.questionType === 'TEXT'
-												? answer.answerText
-												: answersMap[answer.answerId].label;
-
-										return <p>{answerText}</p>;
-									})}
-								</React.Fragment>
-							);
-						})}
-					</div>
-				</div>
-			)}
-
-			<div className="border mt-2">
-				<div className="py-2 px-3 d-flex justify-content-between align-items-center">
 					<p className="mb-0">
-						<strong>All Appointments</strong>
+						<strong>Phone</strong>
 					</p>
+					<p>{patient?.phoneNumber || 'Not available'}</p>
 
-					<button
-						className={schedulingClasses.roundBtn}
-						onClick={() => {
-							onAddAppointment();
-						}}
-					>
-						<PlusIcon />
-					</button>
+					<p className="mb-0">
+						<strong>Email</strong>
+					</p>
+					<p>{patient?.emailAddress || 'Not available'}</p>
 				</div>
-				{allAppointments.length > 0 && (
-					<ul className={classes.appointmentsList}>
-						{allAppointments.map((appointment) => {
-							return (
-								<li
-									key={appointment.appointmentId}
-									className="d-flex align-items-center justify-content-between"
-								>
-									<div>
-										<p className="mb-0">
-											<strong>{appointment.startTimeDescription}</strong>
-										</p>
-										<AppointmentTypeItem appointmentType={appointment.appointmentType} />
-									</div>
 
-									{/* <AppointmentAttendance
+				{showIntakeResponses && (
+					<div className="border py-2 px-3 mt-2">
+						<div className="d-flex mb-1 justify-content-between align-items-center">
+							<p className="mb-0">
+								<strong>Intake Responses</strong>
+							</p>
+						</div>
+
+						<div className="mb-1 justify-content-between align-items-center">
+							{assessment?.assessmentQuestions.map((question) => {
+								const answersMap = question.answers.reduce((acc, answer) => {
+									acc[answer.answerId] = answer;
+
+									return acc;
+								}, {} as Record<string, PersonalizationAnswer>);
+
+								return (
+									<React.Fragment key={question.questionId}>
+										<p className="mb-0">
+											<strong>{question.label}</strong>
+										</p>
+										{question.selectedAnswers.map((answer) => {
+											const answerText =
+												question.questionType === 'TEXT'
+													? answer.answerText
+													: answersMap[answer.answerId].label;
+
+											return <p>{answerText}</p>;
+										})}
+									</React.Fragment>
+								);
+							})}
+						</div>
+					</div>
+				)}
+
+				<div className="border mt-2">
+					<div className="py-2 px-3 d-flex justify-content-between align-items-center">
+						<p className="mb-0">
+							<strong>All Appointments</strong>
+						</p>
+
+						<button
+							className={schedulingClasses.roundBtn}
+							onClick={() => {
+								onAddAppointment();
+							}}
+						>
+							<PlusIcon />
+						</button>
+					</div>
+					{allAppointments.length > 0 && (
+						<ul className={classes.appointmentsList}>
+							{allAppointments.map((appointment) => {
+								return (
+									<li
+										key={appointment.appointmentId}
+										className="d-flex align-items-center justify-content-between"
+									>
+										<div>
+											<p className="mb-0">
+												<strong>{appointment.startTimeDescription}</strong>
+											</p>
+											<AppointmentTypeItem appointmentType={appointment.appointmentType} />
+										</div>
+
+										{/* <AppointmentAttendance
 										appointment={appointment}
 										onUpdate={(updatedAppointment) => {
 											const allAppointmentsClone = cloneDeep(allAppointments);
@@ -296,13 +334,14 @@ export const AppointmentDetailPanel = ({
 											}
 										}}
 									/> */}
-								</li>
-							);
-						})}
-					</ul>
-				)}
+									</li>
+								);
+							})}
+						</ul>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
