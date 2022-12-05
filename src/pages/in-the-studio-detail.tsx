@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import moment from 'moment';
@@ -22,12 +22,12 @@ const InTheStudioDetail: FC = () => {
 	const { groupEventId } = useParams<{
 		groupEventId: string;
 	}>();
-	const { account, setAccount } = useAccount();
+	const { setAccount } = useAccount();
 
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
 	const [groupEvent, setGroupEvent] = useState<GroupEvent | null>(null);
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
+	const [collectedEmail, setCollectedEmail] = useState('');
 	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [showConfirmReservationModal, setShowConfirmReservationModal] = useState<boolean>(false);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
@@ -38,12 +38,6 @@ const InTheStudioDetail: FC = () => {
 		const response = await groupEventService.fetchGroupEvent(groupEventId).fetch();
 		setGroupEvent(response.groupEvent);
 	}, [groupEventId]);
-
-	useEffect(() => {
-		if (account?.emailAddress) {
-			setCollectedEmail(account.emailAddress);
-		}
-	}, [account]);
 
 	const existingAppointmentDate = useMemo(() => {
 		const startMoment = moment(groupEvent?.appointment?.localStartDate);

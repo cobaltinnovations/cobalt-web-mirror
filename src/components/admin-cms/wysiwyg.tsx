@@ -11,10 +11,14 @@ interface WysiwygProps {
 }
 
 const modules = {
-	toolbar: [['bold', 'italic', 'underline', 'strike'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
+	toolbar: [
+		['bold', 'italic', 'underline', 'strike'],
+		[{ list: 'ordered' }, { list: 'bullet' }],
+		['link', 'clean'],
+	],
 };
 
-const formats = ['bold', 'italic', 'underline', 'strike', 'list', 'bullet'];
+const formats = ['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
 
 const Wysiwyg: FC<WysiwygProps> = ({ initialValue, onChange, readOnly = false, className, ...props }) => {
 	const { quill, quillRef } = useQuill({
