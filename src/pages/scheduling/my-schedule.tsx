@@ -77,21 +77,50 @@ export const MySchedule: FC = () => {
 	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
-		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
-		const end = start.clone().weekday(7);
+		let start = leftCalendarMoment || moment();
+		let end;
+		let backgroundConfig;
 
-		return [
-			...leftCalendarEvents,
-			{
-				id: 'current-week',
-				start: start.toDate(),
-				end: end.toDate(),
-				display: 'background',
-				allDay: true,
-				backgroundColor: theme.colors.a500,
-			},
-		];
-	}, [leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
+		const baseBackgroundConfig = {
+			id: 'current-view-select',
+			display: 'background',
+			allDay: true,
+			backgroundColor: theme.colors.a500,
+		};
+
+		switch (currentMainCalendarView) {
+			case MainCalendarView.Day:
+				start = start.clone().startOf('day');
+				end = start.clone().endOf('day');
+				backgroundConfig = {
+					...baseBackgroundConfig,
+					start: start.toDate(),
+					end: end.toDate(),
+				};
+				break;
+			case MainCalendarView.Month:
+				start = start.clone().startOf('month');
+				end = start.clone().endOf('month').add(1, 'day');
+				backgroundConfig = {
+					...baseBackgroundConfig,
+					start: start.toDate(),
+					end: end.toDate(),
+				};
+				break;
+			case MainCalendarView.Week:
+			default:
+				start = start.clone().weekday(0);
+				end = start.clone().weekday(7);
+				backgroundConfig = {
+					...baseBackgroundConfig,
+					start: start.toDate(),
+					end: end.toDate(),
+				};
+				break;
+		}
+
+		return [...leftCalendarEvents, { ...backgroundConfig }];
+	}, [currentMainCalendarView, leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -175,8 +204,8 @@ export const MySchedule: FC = () => {
 						initialView={MainCalendarView.Month}
 						events={renderedLeftCalendarEvents}
 						headerToolbar={{
-							left: 'title prev next',
-							right: 'today',
+							left: 'title',
+							right: 'today prev next',
 						}}
 						dateClick={(clickInfo) => {
 							const mainCalendarApi = mainCalendarRef.current?.getApi();
