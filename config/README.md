@@ -22,6 +22,26 @@ with an example settings.js:
 module.exports = {
 	sentry: {
 		dsn: '',
+		showDebug: false,
+	},
+	nodeApp: {
+		basicAuth: {
+			enabled: false,
+			username: '',
+			password: '',
+			secret: '',
+		},
+		subdomainMapping: '*:cobalt',
+	},
+	reactApp: {
+		apiBaseUrl: '',
+		gaTrackingId: '',
+		ga4MeasurementId: '',
+		mixpanelId: '',
+		showDebug: false,
+		googleMapsApiKey: '',
+		providerManagementFeatureEnabled: false,
+		downForMaintenance: false,
 	},
 };
 ```

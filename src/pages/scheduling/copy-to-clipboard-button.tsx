@@ -5,9 +5,15 @@ import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 
 interface CopyToClipboardButtonProps extends ButtonProps {
 	text?: string;
+	iconSize?: number;
 }
 
-export const CopyToClipboardButton = ({ text, className, ...buttonProps }: CopyToClipboardButtonProps) => {
+export const CopyToClipboardButton = ({
+	text,
+	iconSize = 24,
+	className,
+	...buttonProps
+}: CopyToClipboardButtonProps) => {
 	if (!navigator?.clipboard) {
 		return null;
 	}
@@ -26,7 +32,7 @@ export const CopyToClipboardButton = ({ text, className, ...buttonProps }: CopyT
 			className={classNames('px-2', className)}
 			{...buttonProps}
 		>
-			<CopyIcon />
+			<CopyIcon width={iconSize} height={iconSize} />
 		</Button>
 	);
 };

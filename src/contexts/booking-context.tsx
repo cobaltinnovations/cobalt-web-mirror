@@ -11,7 +11,7 @@ import React, {
 	PropsWithChildren,
 } from 'react';
 
-import { Provider, AvailabilityTimeSlot, AppointmentType, Clinic } from '@/lib/models';
+import { Provider, AvailabilityTimeSlot, Clinic } from '@/lib/models';
 import { FindOptionsResponse, FindProvidersResponse } from '@/lib/services';
 import { isEqual, sortBy } from 'lodash';
 import { To, useSearchParams } from 'react-router-dom';
@@ -112,21 +112,13 @@ interface BookingState {
 	setSelectedProvider: Dispatch<SetStateAction<Provider | undefined>>;
 	selectedTimeSlot?: AvailabilityTimeSlot;
 	setSelectedTimeSlot: Dispatch<SetStateAction<AvailabilityTimeSlot | undefined>>;
-	timeSlotEndTime?: string;
 	formattedAvailabilityDate: string;
-	formattedModalDate: string;
-
-	promptForEmail: boolean;
-	setPromptForEmail: Dispatch<SetStateAction<boolean>>;
-	promptForPhoneNumber: boolean;
-	setPromptForPhoneNumber: Dispatch<SetStateAction<boolean>>;
 
 	setBookingSource: Dispatch<SetStateAction<BookingSource>>;
 	bookingSource: BookingSource;
 	getActiveFiltersState: (findOptions?: FindOptionsResponse) => Record<BookingFilters, boolean>;
 	isEligible: boolean;
 	setIsEligible: Dispatch<SetStateAction<boolean>>;
-	selectedAppointmentType?: AppointmentType;
 	getExitBookingLocation: (state: unknown) => To;
 }
 
@@ -147,41 +139,11 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [selectedProvider, setSelectedProvider] = useState<Provider>();
 	const [selectedTimeSlot, setSelectedTimeSlot] = useState<AvailabilityTimeSlot>();
 
-	const [promptForEmail, setPromptForEmail] = useState(false);
-	const [promptForPhoneNumber, setPromptForPhoneNumber] = useState(false);
-
 	const [isEligible, setIsEligible] = useState(true);
 	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
 	const [previousProviderId, setPreviousProviderId] = useState<string>();
 
-	const timeSlotEndTime = useMemo(() => {
-		if (!selectedTimeSlot || !appointmentTypes.length || !selectedAppointmentTypeId) {
-			return;
-		}
-
-		const apptType = appointmentTypes.find((type) => type.appointmentTypeId === selectedAppointmentTypeId);
-
-		if (!apptType) {
-			return;
-		}
-
-		const tempMoment = moment();
-		const [hours, minutes] = selectedTimeSlot.time
-			.replace('am', '')
-			.replace('pm', '')
-			.split(':')
-			.map((value) => parseInt(value, 10));
-
-		tempMoment.set('hours', hours);
-		tempMoment.set('minutes', minutes);
-		tempMoment.add(apptType.durationInMinutes, 'minutes');
-
-		return tempMoment.format('h:mma');
-	}, [selectedTimeSlot, appointmentTypes, selectedAppointmentTypeId]);
-
 	const formattedAvailabilityDate = useMemo(() => moment(selectedDate).format('YYYY-MM-DD'), [selectedDate]);
-
-	const formattedModalDate = useMemo(() => moment(selectedDate).format('dddd, MMMM Do'), [selectedDate]);
 
 	const getActiveFiltersState = useCallback(
 		(findOptions?: FindOptionsResponse) => {
@@ -240,14 +202,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		[searchParams]
 	);
 
-	const selectedAppointmentType = useMemo(() => {
-		if (!selectedAppointmentTypeId) {
-			return;
-		}
-
-		return appointmentTypes.find((aT) => aT.appointmentTypeId === selectedAppointmentTypeId);
-	}, [appointmentTypes, selectedAppointmentTypeId]);
-
 	useEffect(() => {
 		if (selectedProvider?.providerId) {
 			setPreviousProviderId(selectedProvider.providerId);
@@ -266,8 +220,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		setSelectedDate(undefined);
 		setSelectedProvider(undefined);
 		setSelectedTimeSlot(undefined);
-		setPromptForEmail(false);
-		setPromptForPhoneNumber(false);
 		setIsEligible(true);
 		setBookingSource(BookingSource.ProviderSearch);
 		setPreviousProviderId(undefined);
@@ -307,9 +259,7 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				preservedFilterQueryString,
 				setPreservedFilterQueryString,
 
-				timeSlotEndTime,
 				formattedAvailabilityDate,
-				formattedModalDate,
 
 				selectedAppointmentTypeId,
 				setSelectedAppointmentTypeId,
@@ -320,17 +270,11 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				selectedTimeSlot,
 				setSelectedTimeSlot,
 
-				promptForEmail,
-				setPromptForEmail,
-				promptForPhoneNumber,
-				setPromptForPhoneNumber,
-
 				bookingSource,
 				setBookingSource,
 				getActiveFiltersState,
 				isEligible,
 				setIsEligible,
-				selectedAppointmentType,
 				getExitBookingLocation,
 			}}
 		>

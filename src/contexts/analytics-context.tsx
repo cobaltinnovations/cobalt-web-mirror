@@ -2,15 +2,34 @@ import useAccount from '@/hooks/use-account';
 import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
+import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import config from '@/lib/config';
 
 import {
 	AnalyticsEventCategory,
 	ContentEventActions,
 	CrisisEventActions,
+	MainNavEventActions,
 	ProviderSearchEventActions,
 	ScreeningEventActions,
+	TopicCenterEventActions,
 } from '@/lib/models/ga-events';
+import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
+
+/**
+ * LeftNav Analytics
+ */
+export class MainNavAnalyticsEvent {
+	static clickMainNavItem(label: string) {
+		const event = new MainNavAnalyticsEvent(MainNavEventActions.UserClickNavItem, label);
+
+		return event;
+	}
+
+	nonInteractive = false;
+	category = AnalyticsEventCategory.LeftNav;
+	constructor(public action: MainNavEventActions, public label?: string) {}
+}
 
 /**
  * Screening Analytics
@@ -51,6 +70,33 @@ export class ContentAnalyticsEvent {
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Content;
 	constructor(public action: ContentEventActions, public label?: ContentFilterPill) {}
+}
+
+export class TopicCenterAnalyticsEvent {
+	static clickGroupSession(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickGroupSession, category, label);
+	}
+
+	static clickGroupSessionByRequest(category: string, label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickGroupSessionByRequest, category, label);
+	}
+
+	static clickPinboardNote(label: string) {
+		return new TopicCenterAnalyticsEvent(TopicCenterEventActions.UserClickPinboardNote, 'topic centers', label);
+	}
+
+	static clickOnYourTimeContent(label: string) {
+		return new TopicCenterAnalyticsEvent(
+			TopicCenterEventActions.UserClickOnYourTimeContent,
+			'topic centers',
+			label
+		);
+	}
+
+	nonInteractive = false;
+	constructor(public action: TopicCenterEventActions, public category: string, public label?: string) {
+		this.category = `${AnalyticsEventCategory.TopicCenter} - ${category}`;
+	}
 }
 
 /**
@@ -95,6 +141,12 @@ export class CrisisAnalyticsEvent {
 		return event;
 	}
 
+	static clickCrisisICAssessment() {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisICAssessment);
+
+		return event;
+	}
+
 	static clickCrisisError() {
 		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisError);
 
@@ -120,13 +172,16 @@ export class CrisisAnalyticsEvent {
 }
 
 export type AnalyticsEvent =
+	| MainNavAnalyticsEvent
 	| ScreeningAnalyticsEvent
 	| ContentAnalyticsEvent
+	| TopicCenterAnalyticsEvent
 	| ProviderSearchAnalyticsEvent
 	| CrisisAnalyticsEvent;
 
 const AnalyticsContext = createContext<
 	| {
+			mixpanel: Mixpanel;
 			trackEvent: (event: AnalyticsEvent) => void;
 			trackModalView: (modalName: string) => void;
 	  }
@@ -155,6 +210,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	const { institution, account, initialized } = useAccount();
 
 	const enabledVersionsRef = useRef({
+		mixpanel: false,
 		reactGa: false,
 		ga4: false,
 	});
@@ -181,6 +237,16 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			page_path: page,
 			send_to: measurementId,
 		});
+	}, []);
+
+	useEffect(() => {
+		const mixpanelId = config.COBALT_WEB_MIXPANEL_ID;
+		if (!mixpanelId) {
+			return;
+		}
+
+		enabledVersionsRef.current.mixpanel = true;
+		mixpanel.init(mixpanelId);
 	}, []);
 
 	const initialMeasurementId = config.COBALT_WEB_GA4_MEASUREMENT_ID || institution?.ga4MeasurementId;
@@ -248,9 +314,26 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [accountId, initialized]);
 
+	const institutionId = institution?.institutionId;
+	useEffect(() => {
+		if (!initialized || !enabledVersionsRef.current.mixpanel || !institutionId) {
+			return;
+		}
+
+		if (!accountId) {
+			mixpanel.reset();
+		} else {
+			mixpanel.identify(accountId);
+		}
+
+		mixpanel.register({ 'Institution ID': institutionId });
+	}, [accountId, initialized, institutionId]);
+
 	// track pageviews on navigation
-	// discard any search information on /auth, as it may be sensitive (access token redirect)
-	const page = location.pathname === '/auth' ? location.pathname : location.pathname + location.search;
+	// discard any search information on auth urls, as it may be sensitive (access token redirect)
+	const page = AUTH_REDIRECT_URLS.some((url) => location.pathname === url)
+		? location.pathname
+		: location.pathname + location.search;
 
 	useEffect(() => {
 		if (!initialized || !isReactGAEnabled) {
@@ -318,6 +401,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	return (
 		<AnalyticsContext.Provider
 			value={{
+				mixpanel,
 				trackEvent,
 				trackModalView,
 			}}

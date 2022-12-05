@@ -12,8 +12,11 @@ import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import classNames from 'classnames';
+import useAnalytics from '@/hooks/use-analytics';
+import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 
 const TopicCenter = () => {
+	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
@@ -25,7 +28,11 @@ const TopicCenter = () => {
 
 		const response = await topicCenterService.getTopicCenterById(topicCenterId).fetch();
 		setTopicCenter(response.topicCenter);
-	}, [topicCenterId]);
+		mixpanel.track('Topic Center Page View', {
+			'Topic Center ID': response.topicCenter.topicCenterId,
+			'Topic Center Title': response.topicCenter.name,
+		});
+	}, [mixpanel, topicCenterId]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
@@ -81,6 +88,22 @@ const TopicCenter = () => {
 														}
 														buttonTitle="Reserve a Place"
 														onClick={() => {
+															trackEvent(
+																TopicCenterAnalyticsEvent.clickGroupSession(
+																	topicCenter.name,
+																	topicCenterRow.title
+																)
+															);
+
+															mixpanel.track('Topic Center Group Session Click', {
+																'Topic Center ID': topicCenter.topicCenterId,
+																'Topic Center Title': topicCenter.name,
+																'Section Title': topicCenterRow.title,
+																'Group Session ID': groupSession.groupSessionId,
+																'Group Session Title': groupSession.title,
+																'Group Session Start Time': groupSession.startDateTime,
+															});
+
 															navigate(
 																`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
 															);
@@ -131,8 +154,28 @@ const TopicCenter = () => {
 															title={groupSessionRequest.title}
 															titleSecondary="By Request"
 															description={groupSessionRequest.description}
-															buttonTitle="Request Session"
+															buttonTitle="Submit a Request"
 															onClick={() => {
+																trackEvent(
+																	TopicCenterAnalyticsEvent.clickGroupSessionByRequest(
+																		topicCenter.name,
+																		topicCenterRow.title
+																	)
+																);
+
+																mixpanel.track(
+																	'Topic Center Group Session By Request Click',
+																	{
+																		'Topic Center ID': topicCenter.topicCenterId,
+																		'Topic Center Title': topicCenter.name,
+																		'Section Title': topicCenterRow.title,
+																		'Group Session By Request ID':
+																			groupSessionRequest.groupSessionRequestId,
+																		'Group Session By Request Title':
+																			groupSessionRequest.title,
+																	}
+																);
+
 																navigate(
 																	`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
 																);
@@ -170,11 +213,10 @@ const TopicCenter = () => {
 													return (
 														<TopicCenterPinboardItem
 															key={pinboardNote.pinboardNoteId}
+															topicCenter={topicCenter}
+															topicCenterRow={topicCenterRow}
+															pinboardNote={pinboardNote}
 															className="mb-lg-8"
-															title={pinboardNote.title}
-															description={pinboardNote.description}
-															url={pinboardNote.url}
-															imageUrl={pinboardNote.imageUrl}
 														/>
 													);
 												})}
@@ -202,11 +244,28 @@ const TopicCenter = () => {
 									</Row>
 									<Row>
 										{topicCenterRow.contents.map((content) => {
+											const contentUrl = `/on-your-time/${content.contentId}`;
 											return (
 												<Col xs={6} md={4} lg={3} key={content.contentId}>
 													<Link
-														to={`/on-your-time/${content.contentId}`}
+														to={contentUrl}
 														className="d-block mb-8 text-decoration-none"
+														onClick={() => {
+															const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${content.title}, url:${contentUrl}`;
+															trackEvent(
+																TopicCenterAnalyticsEvent.clickOnYourTimeContent(
+																	eventLabel
+																)
+															);
+
+															mixpanel.track('Topic Center Content Click', {
+																'Topic Center ID': topicCenter.topicCenterId,
+																'Topic Center Title': topicCenter.name,
+																'Section Title': topicCenterRow.title,
+																'Content ID': content.contentId,
+																'Content Title': content.title,
+															});
+														}}
 													>
 														<OnYourTimeItem
 															imageUrl={content.imageUrl}

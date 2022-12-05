@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
@@ -64,6 +64,12 @@ const Index: FC = () => {
 	function handleConnectWithSupportButtonClick() {
 		navigate('/connect-with-support');
 	}
+
+	useEffect(() => {
+		if (institution?.integratedCareEnabled) {
+			navigate('/ic');
+		}
+	}, [institution?.integratedCareEnabled, navigate]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>

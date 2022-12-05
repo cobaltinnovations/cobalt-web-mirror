@@ -66,6 +66,7 @@ export const ForgotPassword = React.lazy(() => import('@/pages/forgot-password')
 export const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
 export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
 export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
+export const IntegratedCare = React.lazy(() => import('@/pages/ic/landing'));
 export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
 export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
@@ -96,6 +97,7 @@ export interface AppRoutesConfig {
 
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
+const isIntegratedCareRouteGuard = ({ institution, account }: RouteGuardProps) => !!institution?.integratedCareEnabled;
 const isConsentRequiredRouteGuard = ({ institution }: RouteGuardProps) => !!institution?.requireConsentForm;
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 const isContactUsEnabledGuard = ({ institution }: RouteGuardProps) => !!institution?.contactUsEnabled;
@@ -369,6 +371,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isProviderRouteGuard,
 				main: MySchedule,
+			},
+			{
+				path: '/ic/*',
+				private: true,
+				routeGuard: isIntegratedCareRouteGuard,
+				main: IntegratedCare,
 			},
 			{
 				path: '/screening-questions/:screeningQuestionContextId',

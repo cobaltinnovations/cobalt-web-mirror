@@ -55,6 +55,7 @@ export interface ScreeningQuestion {
 	screeningAnswerContentHintId: ScreeningAnswerContentHintId;
 	introText?: string;
 	questionText: string;
+	footerText?: string;
 	minimumAnswerCount: number;
 	minimumAnswerCountDescription: string;
 	maximumAnswerCount: number;
@@ -67,6 +68,8 @@ export interface ScreeningAnswerOption {
 	screeningQuestionId: string;
 	answerOptionText?: string;
 	displayOrder: number;
+	freeformSupplement?: boolean;
+	freeformSupplementText?: string;
 }
 
 export interface ScreeningAnswer {
@@ -81,10 +84,34 @@ export interface ScreeningAnswer {
 
 export type ScreeningAnswerSelection = Pick<ScreeningAnswer, 'screeningAnswerOptionId' | 'text'>;
 
+export enum ScreeningImageId {
+	Appointment = 'APPOINTMENT',
+	ConnectedToCare = 'CONNECTED_TO_CARE',
+	ConnectingToCare = 'CONNECTING_TO_CARE',
+	FeelingRecently = 'FEELING_RECENTLY',
+	Goals = 'GOALS',
+	KeepGoing = 'KEEP_GOING',
+	NextAppointmentScheduled = 'NEXT_APPOINTMENT_SCHEDULED',
+	Resources = 'RESOURCES',
+	Safety = 'SAFETY',
+	ScreeningComplete = 'SCREENING_COMPLETE',
+	ScreeningToDo = 'SCREENING_TO_DO',
+	Welcome = 'WELCOME',
+}
+
+export interface ScreeningQuestionPrompt {
+	screeningConfirmationPromptId: string;
+	screeningImageId?: ScreeningImageId;
+	text: string;
+	actionText: string;
+}
+
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
+	previouslyAnswered: boolean;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
 	screeningAnswers: ScreeningAnswer[];
 	screeningSessionDestination: ScreeningSessionDestination;
+	preQuestionScreeningConfirmationPrompt?: ScreeningQuestionPrompt;
 }

@@ -89,13 +89,12 @@ If you ever need to test your code against the server, create a production build
 | WEBAPP_ENABLE_BASIC_AUTH                    | flag Basic Auth on NodeJS webapp server                                                                                  |
 | WEBAPP_BASIC_AUTH_USERNAME                  | Accepted Basic Auth username                                                                                             |
 | WEBAPP_BASIC_AUTH_PASSWORD                  | Accepted Basic Auth password                                                                                             |
-| WEBAPP_BASIC_AUTH_SECRET                    | Secret string to sign Basic Auth session cookies                                                                         |
 | WEBAPP_SUBDOMAIN_MAPPING                    | a comma-separated list mapping `subdomain:build` for NodeJS webapp.                                                      |
 | WEBAPP_SENTRY_DSN                           | Sentry DSN value. if present, enables sentry tracing for the nodejs server at runtime.                                   |
 | COBALT_WEB_API_BASE_URL                     | API base url                                                                                                             |
 | COBALT_WEB_GA_TRACKING_ID                   | Google Analytics Tracking ID `UA-000000-01`                                                                              |
 | COBALT_WEB_GA4_MEASUREMENT_ID               | Google Analytics 4 Measurement ID `G-XYZ123ABC`                                                                          |
-| COBALT_WEB_DISABLE_SIGN_IN                  | string to disable sign-in UI ("true" or "false")                                                                         |
+| COBALT_WEB_MIXPANEL_ID                      | Mix Panel Identifier                                                                                                     |
 | COBALT_WEB_SHOW_DEBUG                       | string to show debug UI ("true" or "false")                                                                              |
 | COBALT_WEB_SENTRY_SHOW_DEBUG                | string to show buttons on home page (throwing Sentry errors)                                                             |
 | COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE=true | string to turn on/off provider features ("true" or "false")                                                              |

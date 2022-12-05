@@ -3,6 +3,6 @@
     <title>icons/check</title>
     <g id="icons/check" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
-        <polygon id="Shape" fill="#6C7978" points="9.71428571 17.2 4 11.8257198 5.61142857 10.3101727 9.71428571 14.1581574 18.3885714 6 20 7.52629559"></polygon>
+        <polygon id="Shape" points="9.71428571 17.2 4 11.8257198 5.61142857 10.3101727 9.71428571 14.1581574 18.3885714 6 20 7.52629559"></polygon>
     </g>
 </svg>
