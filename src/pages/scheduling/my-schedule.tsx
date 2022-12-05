@@ -77,49 +77,37 @@ export const MySchedule: FC = () => {
 	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
-		let start = leftCalendarMoment || moment();
+		let currentMoment = leftCalendarMoment || moment();
+		let start;
 		let end;
-		let backgroundConfig;
-
-		const baseBackgroundConfig = {
-			id: 'current-view-select',
-			display: 'background',
-			allDay: true,
-			backgroundColor: theme.colors.a500,
-		};
 
 		switch (currentMainCalendarView) {
 			case MainCalendarView.Day:
-				start = start.clone().startOf('day');
-				end = start.clone().endOf('day');
-				backgroundConfig = {
-					...baseBackgroundConfig,
-					start: start.toDate(),
-					end: end.toDate(),
-				};
+				start = currentMoment.clone().startOf('day');
+				end = currentMoment.clone().endOf('day');
 				break;
 			case MainCalendarView.Month:
-				start = start.clone().startOf('month');
-				end = start.clone().endOf('month').add(1, 'day');
-				backgroundConfig = {
-					...baseBackgroundConfig,
-					start: start.toDate(),
-					end: end.toDate(),
-				};
+				start = currentMoment.clone().startOf('month');
+				end = currentMoment.clone().endOf('month').add(1, 'day');
 				break;
 			case MainCalendarView.Week:
 			default:
-				start = start.clone().weekday(0);
-				end = start.clone().weekday(7);
-				backgroundConfig = {
-					...baseBackgroundConfig,
-					start: start.toDate(),
-					end: end.toDate(),
-				};
+				start = currentMoment.clone().weekday(0);
+				end = currentMoment.clone().weekday(7);
 				break;
 		}
 
-		return [...leftCalendarEvents, { ...backgroundConfig }];
+		return [
+			...leftCalendarEvents,
+			{
+				id: 'current-view-select',
+				display: 'background',
+				allDay: true,
+				backgroundColor: theme.colors.a500,
+				start: start.toDate(),
+				end: end.toDate(),
+			},
+		];
 	}, [currentMainCalendarView, leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
 
 	useEffect(() => {
