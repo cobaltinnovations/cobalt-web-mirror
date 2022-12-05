@@ -1,4 +1,5 @@
-import React from 'react';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
@@ -18,6 +19,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		boxShadow: '0px 10px 18px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 		[mediaQueries.lg]: {
 			padding: 0,
+			cursor: 'pointer',
 			flexDirection: 'column',
 		},
 	},
@@ -61,7 +63,7 @@ interface Props {
 	description: string;
 	badgeTitle?: string;
 	buttonTitle: string;
-	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onClick(event: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>): void;
 	imageUrl?: string;
 	className?: string;
 }
@@ -81,9 +83,31 @@ export const TopicCenterGroupSession = ({
 }: Props) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
+	const [isMobile, setIsMobile] = useState(false);
+
+	const setIsMobileFlag = useCallback(() => {
+		if (window.innerWidth >= 992) {
+			setIsMobile(false);
+		} else {
+			setIsMobile(true);
+		}
+	}, [setIsMobile]);
+
+	useEffect(() => {
+		const handleWindowResize = debounce(setIsMobileFlag, 200);
+		window.addEventListener('resize', handleWindowResize);
+
+		setIsMobileFlag();
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, [setIsMobileFlag]);
 
 	return (
-		<div className={classNames(classes.topicCenterGroupSession, className)}>
+		<div
+			className={classNames(classes.topicCenterGroupSession, className)}
+			onClick={isMobile ? onClick : undefined}
+		>
 			<div
 				className={classes.imageOuter}
 				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
