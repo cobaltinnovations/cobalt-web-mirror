@@ -65,6 +65,7 @@ interface Props {
 	contentTypeId: ContentTypeId;
 	badgeTitle?: string;
 	imageUrl?: string;
+	duration?: string;
 	className?: string;
 }
 
@@ -82,6 +83,7 @@ const ResourceLibraryCard = ({
 	contentTypeId,
 	badgeTitle,
 	imageUrl,
+	duration,
 	className,
 }: Props) => {
 	const classes = useStyles();
@@ -148,13 +150,8 @@ const ResourceLibraryCard = ({
 						})}
 					</div>
 					<div className="d-flex align-items-center flex-shrink-0">
-						<ContentTypeIcon
-							contentTypeId={contentTypeId}
-							width={16}
-							height={16}
-							className="me-1 text-gray"
-						/>
-						<span className="fs-ui-small fw-bold text-gray">5 min</span>
+						<ContentTypeIcon contentTypeId={contentTypeId} width={16} height={16} className="text-gray" />
+						{duration && <span className="ms-1 fs-ui-small fw-bold text-gray">{duration}</span>}
 					</div>
 				</div>
 			</div>

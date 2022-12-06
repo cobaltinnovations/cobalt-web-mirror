@@ -191,6 +191,7 @@ const ResourceLibraryTopic = () => {
 										description={resource.description}
 										tags={resource.tags}
 										contentTypeId={resource.contentTypeId}
+										duration={'5 min'}
 									/>
 								</Col>
 							);

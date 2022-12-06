@@ -13,6 +13,7 @@ export interface ResourceLibraryContentModel {
 	tagIds: string[];
 	title: string;
 	url: string;
+	duration?: string;
 }
 
 export interface TagGroupModel {

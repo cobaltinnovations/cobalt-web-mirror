@@ -95,6 +95,7 @@ const ResourceLibrary = () => {
 													key={content.contentId}
 													colorId={COLOR_IDS.SEMANTIC_WARNING}
 													className="h-100"
+													imageUrl={content.imageUrl}
 													badgeTitle={true ? 'New' : ''}
 													subtopic={tagGroup.name}
 													subtopicTo={`/resource-library/tag-groups/${tagGroup.urlName}`}
@@ -109,6 +110,7 @@ const ResourceLibrary = () => {
 															: []
 													}
 													contentTypeId={content.contentTypeId}
+													duration={content.duration}
 												/>
 											);
 										})}
