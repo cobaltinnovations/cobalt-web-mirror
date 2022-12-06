@@ -14,6 +14,7 @@ export * from './institution';
 export * from './interaction-models';
 export * from './provider';
 export * from './reference-data';
+export * from './resource-library-models';
 export * from './roles';
 export * from './scheduling-models';
 export * from './screening-models';

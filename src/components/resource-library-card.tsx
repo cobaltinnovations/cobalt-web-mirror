@@ -6,7 +6,7 @@ import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
-import { COLOR_IDS, ContentTypeId } from '@/lib/models';
+import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
 import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
@@ -61,7 +61,7 @@ interface Props {
 	title: string;
 	author: string;
 	description: string;
-	tags: { tagId: string; description: string }[];
+	tags: TagModel[];
 	contentTypeId: ContentTypeId;
 	badgeTitle?: string;
 	imageUrl?: string;
@@ -132,7 +132,7 @@ const ResourceLibraryCard = ({
 							return (
 								<Link
 									key={tag.tagId}
-									to={`/resource-library/tags/${tag.tagId}`}
+									to={`/resource-library/tags/${tag.urlName}`}
 									className={classes.link}
 								>
 									<Badge
@@ -141,7 +141,7 @@ const ResourceLibraryCard = ({
 										as="div"
 										className="me-1 mt-1 fs-ui-small text-capitalize fw-normal"
 									>
-										{tag.description}
+										{tag.name}
 									</Badge>
 								</Link>
 							);

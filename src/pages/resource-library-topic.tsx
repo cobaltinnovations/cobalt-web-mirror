@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { COLOR_IDS, ContentTypeId } from '@/lib/models';
+import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
@@ -17,12 +17,8 @@ interface Resource {
 	title: string;
 	author: string;
 	description: string;
-	tags: ResourceTag[];
+	tags: TagModel[];
 	contentTypeId: ContentTypeId;
-}
-interface ResourceTag {
-	tagId: string;
-	description: string;
 }
 
 enum FILTER_IDS {
@@ -79,64 +75,7 @@ const ResourceLibraryTopic = () => {
 		},
 	});
 
-	const [resources] = useState<Resource[]>([
-		{
-			new: true,
-			subtopic: 'Symptoms',
-			title: 'This is the Title of the Content',
-			author: 'Kathleen Murphy, MD',
-			description:
-				'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
-			tags: [
-				{
-					tagId: 'MOOD',
-					description: 'Mood',
-				},
-				{
-					tagId: 'ANXIETY',
-					description: 'Anxiety',
-				},
-			],
-			contentTypeId: ContentTypeId.Audio,
-		},
-		{
-			subtopic: 'Symptoms',
-			title: 'This is a title that has multiple lines. It can run on to two lines, but not more than that. Two is the maximum line length that titles can have.',
-			author: 'Kathleen Murphy, MD',
-			description:
-				'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
-			tags: [
-				{
-					tagId: 'SLEEP',
-					description: 'Sleep',
-				},
-				{
-					tagId: 'SUBSTANCE_USE',
-					description: 'Substance Use',
-				},
-			],
-			contentTypeId: ContentTypeId.Video,
-		},
-		{
-			new: true,
-			subtopic: 'Symptoms',
-			title: 'This is the Title of the Content',
-			author: 'Kathleen Murphy, MD',
-			description:
-				'<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Feugiat nisl nunc eget pellentesque quis facilisis. Feugiat nisl nunc eget pellentesque quis facilisis.</p>',
-			tags: [
-				{
-					tagId: 'MOOD',
-					description: 'Mood',
-				},
-				{
-					tagId: 'ANXIETY',
-					description: 'Anxiety',
-				},
-			],
-			contentTypeId: ContentTypeId.Podcast,
-		},
-	]);
+	const [resources] = useState<Resource[]>([]);
 
 	const fetchData = useCallback(() => {
 		return null;
