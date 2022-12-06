@@ -96,7 +96,7 @@ const ResourceLibrary = () => {
 													colorId={COLOR_IDS.SEMANTIC_WARNING}
 													className="h-100"
 													imageUrl={content.imageUrl}
-													badgeTitle={true ? 'New' : ''}
+													badgeTitle={content.newFlag ? 'New' : ''}
 													subtopic={tagGroup.name}
 													subtopicTo={`/resource-library/tag-groups/${tagGroup.urlName}`}
 													title={content.title}

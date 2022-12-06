@@ -1,20 +1,8 @@
-import { ContentTypeId } from '@/lib/models';
+import { Content } from '@/lib/models';
 
-export interface ResourceLibraryContentModel {
-	author: string;
-	contentId: string;
-	contentTypeId: ContentTypeId;
-	created: string;
-	createdDescription: string;
-	description: string;
-	imageUrl: string;
-	lastUpdated: string;
-	lastUpdatedDescription: string;
+export type ResourceLibraryContentModel = {
 	tagIds: string[];
-	title: string;
-	url: string;
-	duration?: string;
-}
+} & Content;
 
 export interface TagGroupModel {
 	description: string;
