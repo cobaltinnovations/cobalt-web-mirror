@@ -42,31 +42,15 @@ const ResourceLibrary = () => {
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
-	const [tags, setTags] = useState<TagModel[]>([]);
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
 	const fetchData = useCallback(async () => {
 		const response = await resourceLibraryService.getResourceLibrary().fetch();
 
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
-		setTags(response.tags);
+		setTagsByTagId(response.tagsByTagId);
 	}, []);
-
-	const getTagsForContent = useCallback(
-		(content: ResourceLibraryContentModel) => {
-			const tagArr: TagModel[] = [];
-
-			content.tagIds.forEach((tagId) => {
-				const tag = tags.find((tag) => tag.tagId === tagId);
-				if (tag) {
-					tagArr.push(tag);
-				}
-			});
-
-			return tagArr;
-		},
-		[tags]
-	);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
@@ -117,7 +101,13 @@ const ResourceLibrary = () => {
 													title={content.title}
 													author={content.author}
 													description={content.description}
-													tags={getTagsForContent(content)}
+													tags={
+														tagsByTagId
+															? content.tagIds.map((tagId) => {
+																	return tagsByTagId[tagId];
+															  })
+															: []
+													}
 													contentTypeId={content.contentTypeId}
 												/>
 											);

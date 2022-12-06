@@ -6,7 +6,7 @@ export const resourceLibraryService = {
 		return httpSingleton.orchestrateRequest<{
 			contentsByTagGroupId: Record<string, ResourceLibraryContentModel[]>;
 			tagGroups: TagGroupModel[];
-			tags: TagModel[];
+			tagsByTagId: Record<string, TagModel>;
 		}>({
 			method: 'GET',
 			url: '/resource-library',
