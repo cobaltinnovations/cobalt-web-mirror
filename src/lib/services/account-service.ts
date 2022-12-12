@@ -293,6 +293,12 @@ export const accountService = {
 			url: `/accounts/${accountId}/consent-form-accepted`,
 		});
 	},
+	rejectConsent(accountId: string) {
+		return httpSingleton.orchestrateRequest<AccountResponse>({
+			method: 'PUT',
+			url: `/accounts/${accountId}/consent-form-rejected`,
+		});
+	},
 	getReferenceData() {
 		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
 			method: 'GET',
