@@ -16,6 +16,7 @@ interface Props extends ModalProps {
 	bodyText: string;
 	dismissText: string;
 	confirmText: string;
+	detailText?: string;
 	onConfirm(): void;
 	displayButtonsBlock?: boolean;
 }
@@ -25,6 +26,7 @@ const ConfirmDialog = ({
 	bodyText,
 	dismissText,
 	confirmText,
+	detailText,
 	onConfirm,
 	displayButtonsBlock,
 	...props
@@ -38,6 +40,7 @@ const ConfirmDialog = ({
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0 fw-bold">{bodyText}</p>
+				{detailText && <p className="mt-2">{detailText}</p>}
 			</Modal.Body>
 			<Modal.Footer>
 				<div className="text-right">

@@ -24,7 +24,6 @@ export const SignUp = React.lazy(() => import('@/pages/sign-up'));
 export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
-export const Consent = React.lazy(() => import('@/pages/consent'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
 export const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
@@ -73,6 +72,7 @@ export const InteractionInstances = React.lazy(() => import('@/pages/interaction
 export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = React.lazy(() => import('@/pages/confirm-appointment'));
 export const TopicCenter = React.lazy(() => import('@/pages/topic-center'));
+export const UserSettings = React.lazy(() => import('@/pages/user-settings'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -96,7 +96,6 @@ export interface AppRoutesConfig {
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
 const isIntegratedCareRouteGuard = ({ institution, account }: RouteGuardProps) => !!institution?.integratedCareEnabled;
-const isConsentRequiredRouteGuard = ({ institution }: RouteGuardProps) => !!institution?.requireConsentForm;
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 const isContactUsEnabledGuard = ({ institution }: RouteGuardProps) => !!institution?.contactUsEnabled;
 
@@ -252,12 +251,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/',
 				private: true,
 				main: Index,
-			},
-			{
-				path: '/consent',
-				private: true,
-				main: Consent,
-				routeGuard: isConsentRequiredRouteGuard,
 			},
 			{
 				path: '/in-the-studio',
@@ -545,6 +538,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/topic-centers/:topicCenterId',
 				private: true,
 				main: TopicCenter,
+			},
+			{
+				path: '/user-settings',
+				private: true,
+				main: UserSettings,
 			},
 			{
 				path: '*',
