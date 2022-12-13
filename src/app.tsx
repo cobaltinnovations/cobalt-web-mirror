@@ -13,6 +13,7 @@ import InCrisisModal from '@/components/in-crisis-modal';
 import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
 import ReauthModal from '@/components/reauth-modal';
+import ConsentModal from '@/components/consent-modal';
 
 import { AppRoutes, RouteConfig, NoMatch } from '@/routes';
 
@@ -30,7 +31,7 @@ import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
 import DownForMaintenance from '@/pages/down-for-maintenance';
 
 import useUrlViewTracking from '@/hooks/use-url-view-tracking';
-import useConsentRedirect from '@/hooks/use-consent-redirect';
+import useConsentState from '@/hooks/use-consent-state';
 import { CobaltThemeProvider } from './jss/theme';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -42,7 +43,7 @@ import HeaderUnauthenticated from './components/header-unauthenticated';
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
 	const { failedToInit, initialized, didCheckImmediateFlag } = useAccount();
-
+	const { showConsentModal } = useConsentState();
 	const { pathname } = useLocation();
 
 	useEffect(() => {
@@ -71,6 +72,7 @@ const AppWithProviders: FC = () => {
 
 	return (
 		<>
+			<ConsentModal show={showConsentModal} />
 			<InCrisisModal show={show} isCall={isCall} onHide={closeInCrisisModal} />
 			<ErrorModal />
 			<ReauthModal />
@@ -95,7 +97,6 @@ const AppWithProviders: FC = () => {
 const AppRoute = ({ route }: { route: RouteConfig }) => {
 	const { account, institution, didCheckImmediateFlag } = useAccount();
 
-	useConsentRedirect();
 	useUrlViewTracking();
 
 	const isEnabled = useMemo(() => {

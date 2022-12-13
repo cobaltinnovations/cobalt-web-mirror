@@ -5,7 +5,6 @@ import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
-import Footer from '@/components/footer';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
@@ -25,7 +24,6 @@ export const SignUp = React.lazy(() => import('@/pages/sign-up'));
 export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
 export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
-export const Consent = React.lazy(() => import('@/pages/consent'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
 export const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
@@ -74,6 +72,7 @@ export const InteractionInstances = React.lazy(() => import('@/pages/interaction
 export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = React.lazy(() => import('@/pages/confirm-appointment'));
 export const TopicCenter = React.lazy(() => import('@/pages/topic-center'));
+export const UserSettings = React.lazy(() => import('@/pages/user-settings'));
 export const ResourceLibrary = React.lazy(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-library-topic'));
 
@@ -99,7 +98,6 @@ export interface AppRoutesConfig {
 const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
 	!!institution?.supportEnabled;
 const isIntegratedCareRouteGuard = ({ institution, account }: RouteGuardProps) => !!institution?.integratedCareEnabled;
-const isConsentRequiredRouteGuard = ({ institution }: RouteGuardProps) => !!institution?.requireConsentForm;
 const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
 const isContactUsEnabledGuard = ({ institution }: RouteGuardProps) => !!institution?.contactUsEnabled;
 
@@ -176,17 +174,7 @@ const UnauthenticatedHeaderLayout = () => {
 	);
 };
 
-const DefaultFooterLayout = () => {
-	return (
-		<>
-			<Header />
-			<Outlet />
-			<Footer />
-		</>
-	);
-};
-
-const DefaultNoFooterLayout = () => {
+const DefaultLayout = () => {
 	return (
 		<>
 			<Header />
@@ -259,7 +247,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 	},
 
 	{
-		layout: DefaultFooterLayout,
+		layout: DefaultLayout,
 		routes: [
 			{
 				path: '/',
@@ -337,6 +325,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: RedirectToSupport,
 			},
 			{
+				path: '/intake-assessment',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: IntakeAssessment,
+			},
+			{
 				path: '/confirm-appointment',
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
@@ -353,6 +347,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
 				main: ConnectWithSupport,
+			},
+			{
+				path: '/ehr-lookup',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: EhrLookup,
 			},
 			{
 				path: '/my-calendar',
@@ -453,81 +453,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: RedirectToBackend,
 			},
 			{
-				path: '/providers/:providerId',
-				private: true,
-				main: ProviderDetail,
-			},
-			{
-				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
-				private: true,
-				main: Interaction,
-			},
-			{
-				path: '/interaction-instances/:interactionId',
-				private: true,
-				main: InteractionInstances,
-			},
-			{
-				path: '/in-crisis',
-				private: false,
-				main: InCrisis,
-			},
-			{
-				path: '/topic-centers/:topicCenterId',
-				private: true,
-				main: TopicCenter,
-			},
-			{
-				path: '/resource-library',
-				private: true,
-				main: ResourceLibrary,
-			},
-			{
-				path: '/resource-library/tag-groups/:tagGroupId',
-				private: true,
-				main: ResourceLibraryTopic,
-			},
-			{
-				path: '*',
-				private: false,
-				main: NoMatch,
-			},
-		],
-	},
-
-	{
-		layout: DefaultNoFooterLayout,
-		routes: [
-			{
-				path: '/consent',
-				private: true,
-				main: Consent,
-				routeGuard: isConsentRequiredRouteGuard,
-			},
-			{
-				path: '/intake-assessment',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: IntakeAssessment,
-			},
-			{
-				path: '/ehr-lookup',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: EhrLookup,
-			},
-			{
-				path: '/scheduling/*',
-				private: true,
-				routeGuard: isProviderRouteGuard,
-				main: MySchedule,
-			},
-			{
-				path: '/screening-questions/:screeningQuestionContextId',
-				private: true,
-				main: ScreeningQuestions,
-			},
-			{
 				path: '/cms/on-your-time',
 				private: true,
 				main: CmsOnYourTime,
@@ -546,6 +471,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/stats-dashboard',
 				private: true,
 				main: StatsDashboard,
+			},
+			{
+				path: '/providers/:providerId',
+				private: true,
+				main: ProviderDetail,
 			},
 			...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
 				? [
@@ -591,6 +521,46 @@ export const AppRoutes: AppRoutesConfig[] = [
 						},
 				  ]
 				: []),
+			{
+				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
+				private: true,
+				main: Interaction,
+			},
+			{
+				path: '/interaction-instances/:interactionId',
+				private: true,
+				main: InteractionInstances,
+			},
+			{
+				path: '/in-crisis',
+				private: false,
+				main: InCrisis,
+			},
+			{
+				path: '/topic-centers/:topicCenterId',
+				private: true,
+				main: TopicCenter,
+			},
+			{
+				path: '/user-settings',
+				private: true,
+				main: UserSettings,
+			},
+			{
+				path: '/resource-library',
+				private: true,
+				main: ResourceLibrary,
+			},
+			{
+				path: '/resource-library/tag-groups/:tagGroupId',
+				private: true,
+				main: ResourceLibraryTopic,
+			},
+			{
+				path: '*',
+				private: false,
+				main: NoMatch,
+			},
 		],
 	},
 ];

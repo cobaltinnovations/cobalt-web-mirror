@@ -104,6 +104,7 @@ export const modal = (theme: CobaltTheme) => {
 			},
 			'&__body': {
 				padding: '20px 30px',
+				overflow: 'scroll',
 				'&--admin': {
 					padding: '56px 30px',
 					backgroundColor: theme.colors.n0,
