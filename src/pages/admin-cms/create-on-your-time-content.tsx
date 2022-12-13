@@ -133,8 +133,6 @@ const CreateOnYourTimeContent: FC = () => {
 				// setShouldDisabledInputs(true);
 			}
 
-			console.log(contentToSet);
-
 			if (contentToSet) {
 				setImagePreview(contentToSet.imageUrl);
 				setInitialValues({
@@ -172,7 +170,7 @@ const CreateOnYourTimeContent: FC = () => {
 				contentTypeLabelId: values.contentTypeLabel,
 				title: values.title,
 				author: values.author,
-				...(values.url ? { url: values.url } : {}),
+				...(values.url && { url: values.url }),
 				imageUrl: values.imageUrl,
 				description: values.description,
 				durationInMinutes: values.duration,
