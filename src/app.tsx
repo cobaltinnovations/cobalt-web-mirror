@@ -42,7 +42,7 @@ import HeaderUnauthenticated from './components/header-unauthenticated';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
-	const { failedToInit, initialized, didCheckImmediateFlag } = useAccount();
+	const { failedToInit, initialized } = useAccount();
 	const { showConsentModal } = useConsentState();
 	const { pathname } = useLocation();
 
