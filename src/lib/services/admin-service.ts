@@ -8,6 +8,8 @@ import {
 	ContentVisibilityTypeId,
 	PersonalizationQuestion,
 	PresignedUploadModel,
+	TagGroupModel,
+	TagModel,
 } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
@@ -70,10 +72,6 @@ interface ContentIdResponse {
 
 interface ContentTags {
 	assessmentQuestions?: PersonalizationQuestion[];
-}
-
-interface ContentTagsResponse {
-	contentTags: ContentTags;
 }
 
 interface GetPreSignedUploadUrlRequestBody {
@@ -188,7 +186,11 @@ export const adminService = {
 	},
 
 	fetchContentTags() {
-		return httpSingleton.orchestrateRequest<ContentTagsResponse>({
+		return httpSingleton.orchestrateRequest<{
+			contentTags: ContentTags;
+			tagGroups: TagGroupModel[];
+			tags: TagModel[];
+		}>({
 			method: 'get',
 			url: '/admin/content-tags',
 		});

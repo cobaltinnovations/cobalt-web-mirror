@@ -12,14 +12,7 @@ import InputHelper from '@/components/input-helper';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
 import { adminService, ContentTypeLabel, imageUploader, InstitutionFilters } from '@/lib/services';
-import {
-	Content,
-	ContentTypeId,
-	ContentVisibilityTypeId,
-	PersonalizationChoice,
-	PersonalizationQuestion,
-	ROLE_ID,
-} from '@/lib/models';
+import { Content, ContentTypeId, ContentVisibilityTypeId, ROLE_ID, TagGroupModel, TagModel } from '@/lib/models';
 
 import { useCobaltTheme } from '@/jss/theme';
 
@@ -27,13 +20,13 @@ import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
 import useAccount from '@/hooks/use-account';
-import { PersonalizationCheckbox } from '@/components/personalize-recommendations-modal';
 import OnYourTimePreview from '@/components/admin-cms/on-your-time-preview';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
 import useHandleError from '@/hooks/use-handle-error';
+import { cloneDeep } from 'lodash';
 
 const onYourTimeContentSchema = yup
 	.object()
@@ -55,6 +48,7 @@ const onYourTimeContentSchema = yup
 		visibilityPrivate: yup.boolean().default(false),
 		visibilityNetwork: yup.boolean().default(false),
 		visibilityPublic: yup.boolean().default(true),
+		tagIds: yup.array().of(yup.string().required().default('')).required().default([]),
 	});
 
 export type onYourTimeFormData = yup.InferType<typeof onYourTimeContentSchema>;
@@ -79,9 +73,10 @@ const CreateOnYourTimeContent: FC = () => {
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isAdding, setIsAdding] = useState(false);
-	const [shouldDisabledInputs, setShouldDisabledInputs] = useState(false);
-	const [tagQuestions, setTagQuestions] = useState<PersonalizationQuestion[] | undefined>([]);
-	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
+	const [shouldDisabledInputs] = useState(false);
+
+	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
+	const [tags, setTags] = useState<TagModel[]>([]);
 	const [contentTypeLabelOptions, setContentTypeLabelOptions] = useState<ContentTypeLabel[]>([]);
 
 	const [contentCropModalImageSource, setContentCropModalImageSource] = useState('');
@@ -94,12 +89,16 @@ const CreateOnYourTimeContent: FC = () => {
 		setIsEditing(!!editing && editing.toLowerCase() === 'true');
 		setIsAdding(!!adding && adding.toLowerCase() === 'true');
 
-		const { contentTags } = await adminService.fetchContentTags().fetch();
-		const { institutions } = await adminService.fetchInstitutions().fetch();
-		const { contentTypeLabels } = await adminService.fetchContentTypeLabels().fetch();
-		setTagQuestions(contentTags?.assessmentQuestions);
-		setContentInstitutions(institutions);
-		setContentTypeLabelOptions(contentTypeLabels);
+		const [contentTagsResponse, institutionsResponse, contentTypeLabelsResponse] = await Promise.all([
+			adminService.fetchContentTags().fetch(),
+			adminService.fetchInstitutions().fetch(),
+			adminService.fetchContentTypeLabels().fetch(),
+		]);
+
+		setTagGroups(contentTagsResponse.tagGroups ?? []);
+		setTags(contentTagsResponse.tags ?? []);
+		setContentInstitutions(institutionsResponse.institutions);
+		setContentTypeLabelOptions(contentTypeLabelsResponse.contentTypeLabels);
 
 		if (!contentId) {
 			return;
@@ -126,33 +125,6 @@ const CreateOnYourTimeContent: FC = () => {
 						})
 					);
 				}
-
-				if (!!content?.contentTagIds && content.contentTagIds.length > 0) {
-					let choicesToSet = {};
-					const buildChoices = (question: PersonalizationQuestion) => {
-						const selectedAnswers: { answerId: string }[] = [];
-						question.answers.forEach((answer) => {
-							if (content.contentTagIds?.includes(answer.answerId)) {
-								selectedAnswers.push({ answerId: answer.answerId });
-							}
-							if (answer?.question) {
-								buildChoices(answer.question);
-							}
-						});
-
-						if (selectedAnswers.length > 0) {
-							choicesToSet = { ...choicesToSet, [question.questionId]: selectedAnswers };
-						}
-					};
-
-					if (!!contentTags?.assessmentQuestions && contentTags.assessmentQuestions.length > 0) {
-						contentTags.assessmentQuestions.forEach((question) => {
-							buildChoices(question);
-						});
-					}
-
-					setChoices(choicesToSet);
-				}
 			}
 
 			if (adding) {
@@ -175,6 +147,7 @@ const CreateOnYourTimeContent: FC = () => {
 					visibilityPrivate: !content?.visibleToOtherInstitutions || false,
 					visibilityPublic: content?.visibilityId === ContentVisibilityTypeId.Public,
 					visibilityNetwork: content?.visibilityId === ContentVisibilityTypeId.Network,
+					tagIds: contentToSet.tagIds,
 				} as onYourTimeFormData);
 			}
 		}
@@ -204,14 +177,7 @@ const CreateOnYourTimeContent: FC = () => {
 				addToInstitution: isAdding,
 				visibilityId,
 				institutionIdList: selectedInstitutions,
-				contentTags: {
-					choices: Object.keys(choices).map((key) => {
-						return {
-							questionId: key,
-							selectedAnswers: choices[key],
-						};
-					}),
-				},
+				tagIds: values.tagIds,
 			};
 
 			if (isEditing || isAdding) {
@@ -937,37 +903,72 @@ const CreateOnYourTimeContent: FC = () => {
 																	first to a patient depending on how they answered
 																	the initial assessment questions. If no categories
 																	are selected, then the resource will be
-																	de-prioritized an appear lower in a patient’s list
+																	de-prioritized an appear lower in a patient's list
 																	of resources.
 																</p>
 															</div>
-															{tagQuestions?.map((question, index) => {
+
+															{tagGroups.map((tagGroup) => {
 																return (
-																	<div
-																		key={index}
-																		className={index > 0 ? 'pt-5' : 'p-5'}
-																		style={
-																			index !== tagQuestions.length - 1
-																				? {
-																						borderBottom: `1px solid ${theme.colors.border}`,
-																				  }
-																				: {}
-																		}
-																	>
-																		<PersonalizationCheckbox
-																			key={question.questionId}
-																			question={question}
-																			choices={choices}
-																			onChange={(questionId, answers) => {
-																				setChoices({
-																					...choices,
-																					[questionId]: answers,
-																				});
-																			}}
-																			bottomBordered={false}
-																			fullWidth={index > 0}
-																		/>
-																	</div>
+																	<p>
+																		<strong>{tagGroup.name}</strong>
+																		<ul>
+																			{tags.map((tag) => {
+																				if (
+																					tag.tagGroupId ===
+																					tagGroup.tagGroupId
+																				) {
+																					return (
+																						<li>
+																							<Form.Check
+																								id={tag.tagId}
+																								label={tag.name}
+																								value={tag.tagId}
+																								checked={values.tagIds.includes(
+																									tag.tagId
+																								)}
+																								onChange={({
+																									currentTarget,
+																								}) => {
+																									const tagIdsClone =
+																										cloneDeep(
+																											values.tagIds
+																										);
+
+																									const targetIndex =
+																										tagIdsClone.findIndex(
+																											(tid) =>
+																												tid ===
+																												currentTarget.value
+																										);
+
+																									if (
+																										targetIndex > -1
+																									) {
+																										tagIdsClone.splice(
+																											targetIndex,
+																											1
+																										);
+																									} else {
+																										tagIdsClone.push(
+																											currentTarget.value
+																										);
+																									}
+
+																									setFieldValue(
+																										'tagIds',
+																										tagIdsClone
+																									);
+																								}}
+																							/>
+																						</li>
+																					);
+																				}
+
+																				return null;
+																			})}
+																		</ul>
+																	</p>
 																);
 															})}
 														</Card>
