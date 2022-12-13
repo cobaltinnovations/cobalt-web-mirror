@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 
-import { COLOR_IDS, ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
+import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import InputHelper from '@/components/input-helper';
