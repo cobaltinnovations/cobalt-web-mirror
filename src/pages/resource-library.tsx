@@ -76,7 +76,7 @@ const ResourceLibrary = () => {
 							<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 								<ResourceLibrarySubtopicCard
 									className="h-100"
-									colorId={COLOR_IDS.SEMANTIC_WARNING}
+									colorId={tagGroup.colorId}
 									title={tagGroup.name}
 									description={tagGroup.description}
 									to={`/resource-library/tag-groups/${tagGroup.urlName}`}
@@ -93,7 +93,7 @@ const ResourceLibrary = () => {
 											return (
 												<ResourceLibraryCard
 													key={content.contentId}
-													colorId={COLOR_IDS.SEMANTIC_WARNING}
+													colorId={tagGroup.colorId}
 													className="h-100"
 													imageUrl={content.imageUrl}
 													badgeTitle={content.newFlag ? 'New' : ''}
