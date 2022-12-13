@@ -1,4 +1,6 @@
 import { CobaltTheme } from '@/jss/theme';
+import plusIcon from '@/assets/icons/icon-plus.svg';
+import checkIcon from '@/assets/icons/icon-check.svg';
 
 export const form = (theme: CobaltTheme) => {
 	return {
@@ -215,6 +217,51 @@ export const form = (theme: CobaltTheme) => {
 
 						'& + label': {
 							color: theme.colors.n900,
+						},
+					},
+				},
+				'&--pill': {
+					'&-inline': {
+						marginRight: 8,
+						marginBottom: 8,
+						display: 'inline-block',
+					},
+					'& input': {
+						width: 0,
+						height: 0,
+						display: 'none',
+						appearance: 'none',
+						'& + label': {
+							display: 'flex',
+
+							cursor: 'pointer',
+							borderRadius: 500,
+							alignItems: 'center',
+							...theme.fonts.small,
+							...theme.fonts.bodyBold,
+							color: theme.colors.p500,
+							padding: '6px 16px 6px 12px',
+							border: `2px solid ${theme.colors.p500}`,
+							'&:before': {
+								width: 20,
+								height: 20,
+								content: '""',
+								marginRight: 4,
+								maskSize: '20 20',
+								display: 'inline-flex',
+								maskPosition: 'center',
+								maskRepeat: 'no-repeat',
+								maskImage: `url(${plusIcon})`,
+								backgroundColor: theme.colors.p500,
+							},
+						},
+						'&:checked + label': {
+							color: theme.colors.n0,
+							backgroundColor: theme.colors.p700,
+							'&:before': {
+								backgroundColor: theme.colors.n0,
+								maskImage: `url(${checkIcon})`,
+							},
 						},
 					},
 				},

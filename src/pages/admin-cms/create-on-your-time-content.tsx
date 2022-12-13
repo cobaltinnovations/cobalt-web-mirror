@@ -933,6 +933,7 @@ const CreateOnYourTimeContent: FC = () => {
 																					return (
 																						<Form.Check
 																							inline
+																							bsPrefix="cobalt-form__check--pill"
 																							key={tag.tagId}
 																							id={tag.tagId}
 																							label={tag.name}
