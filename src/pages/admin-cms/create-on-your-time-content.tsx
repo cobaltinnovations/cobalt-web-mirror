@@ -27,6 +27,7 @@ import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
 import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
+import classNames from 'classnames';
 
 const onYourTimeContentSchema = yup
 	.object()
@@ -132,6 +133,8 @@ const CreateOnYourTimeContent: FC = () => {
 				// setShouldDisabledInputs(true);
 			}
 
+			console.log(contentToSet);
+
 			if (contentToSet) {
 				setImagePreview(contentToSet.imageUrl);
 				setInitialValues({
@@ -147,7 +150,7 @@ const CreateOnYourTimeContent: FC = () => {
 					visibilityPrivate: !content?.visibleToOtherInstitutions || false,
 					visibilityPublic: content?.visibilityId === ContentVisibilityTypeId.Public,
 					visibilityNetwork: content?.visibilityId === ContentVisibilityTypeId.Network,
-					tagIds: contentToSet.tagIds,
+					tagIds: contentToSet.tagIds ?? [],
 				} as onYourTimeFormData);
 			}
 		}
@@ -908,69 +911,78 @@ const CreateOnYourTimeContent: FC = () => {
 																</p>
 															</div>
 
-															{tagGroups.map((tagGroup) => {
-																return (
-																	<p>
-																		<strong>{tagGroup.name}</strong>
-																		<ul>
+															<div className="py-6">
+																{tagGroups.map((tagGroup, tagGroupIndex) => {
+																	const isLast =
+																		tagGroupIndex === tagGroups.length - 1;
+
+																	return (
+																		<div
+																			key={tagGroup.tagGroupId}
+																			className={classNames('px-6', {
+																				'mb-6': !isLast,
+																			})}
+																		>
+																			<p>
+																				<strong>{tagGroup.name}</strong>
+																			</p>
+
 																			{tags.map((tag) => {
 																				if (
 																					tag.tagGroupId ===
 																					tagGroup.tagGroupId
 																				) {
 																					return (
-																						<li>
-																							<Form.Check
-																								id={tag.tagId}
-																								label={tag.name}
-																								value={tag.tagId}
-																								checked={values.tagIds.includes(
-																									tag.tagId
-																								)}
-																								onChange={({
-																									currentTarget,
-																								}) => {
-																									const tagIdsClone =
-																										cloneDeep(
-																											values.tagIds
-																										);
-
-																									const targetIndex =
-																										tagIdsClone.findIndex(
-																											(tid) =>
-																												tid ===
-																												currentTarget.value
-																										);
-
-																									if (
-																										targetIndex > -1
-																									) {
-																										tagIdsClone.splice(
-																											targetIndex,
-																											1
-																										);
-																									} else {
-																										tagIdsClone.push(
-																											currentTarget.value
-																										);
-																									}
-
-																									setFieldValue(
-																										'tagIds',
-																										tagIdsClone
+																						<Form.Check
+																							inline
+																							key={tag.tagId}
+																							id={tag.tagId}
+																							label={tag.name}
+																							value={tag.tagId}
+																							checked={values.tagIds.includes(
+																								tag.tagId
+																							)}
+																							onChange={({
+																								currentTarget,
+																							}) => {
+																								const tagIdsClone =
+																									cloneDeep(
+																										values.tagIds
 																									);
-																								}}
-																							/>
-																						</li>
+
+																								const targetIndex =
+																									tagIdsClone.findIndex(
+																										(tid) =>
+																											tid ===
+																											currentTarget.value
+																									);
+
+																								if (targetIndex > -1) {
+																									tagIdsClone.splice(
+																										targetIndex,
+																										1
+																									);
+																								} else {
+																									tagIdsClone.push(
+																										currentTarget.value
+																									);
+																								}
+
+																								setFieldValue(
+																									'tagIds',
+																									tagIdsClone
+																								);
+																							}}
+																						/>
 																					);
 																				}
 
 																				return null;
 																			})}
-																		</ul>
-																	</p>
-																);
-															})}
+																		</div>
+																	);
+																})}
+															</div>
 														</Card>
 													)}
 												</Col>
