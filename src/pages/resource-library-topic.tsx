@@ -3,23 +3,13 @@ import React, { useCallback, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
+import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
+import { resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import SimpleFilter from '@/components/simple-filter';
 import ResourceLibraryCard from '@/components/resource-library-card';
-
-interface Resource {
-	new?: boolean;
-	imageUrl?: string;
-	subtopic: string;
-	title: string;
-	author: string;
-	description: string;
-	tags: TagModel[];
-	contentTypeId: ContentTypeId;
-}
 
 enum FILTER_IDS {
 	SUBTOPIC = 'SUBTOPIC',
@@ -30,8 +20,6 @@ enum FILTER_IDS {
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [colorId] = useState<COLOR_IDS>(COLOR_IDS.BRAND_ACCENT);
-
 	const [filters, setFilters] = useState({
 		[FILTER_IDS.SUBTOPIC]: {
 			id: FILTER_IDS.SUBTOPIC,
@@ -74,12 +62,21 @@ const ResourceLibraryTopic = () => {
 			isShowing: false,
 		},
 	});
+	const [resources, setResources] = useState<ResourceLibraryContentModel[]>([]);
+	const [tagGroup, setTagGroup] = useState<TagGroupModel>();
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
-	const [resources] = useState<Resource[]>([]);
+	const fetchData = useCallback(async () => {
+		if (!tagGroupId) {
+			throw new Error('tagGroupId is undefined.');
+		}
 
-	const fetchData = useCallback(() => {
-		return null;
-	}, []);
+		const response = await resourceLibraryService.getResourceLibraryContentByTagGroupId(tagGroupId).fetch();
+
+		setResources(response.findResult.contents);
+		setTagGroup(response.tagGroup);
+		setTagsByTagId(response.tagsByTagId);
+	}, [tagGroupId]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
@@ -92,14 +89,16 @@ const ResourceLibraryTopic = () => {
 	};
 
 	return (
-		<>
-			<HeroContainer className={getBackgroundClassForColorId(colorId)}>
-				<h1 className="mb-4 text-center">Symptoms</h1>
-				<p className="mb-0 text-center fs-large">
-					Browse content tailored to symptoms you or others in your life may be experiencing, including
-					concerns about mood, anxiety, sleep, fatigue or substance abuse
-				</p>
-			</HeroContainer>
+		<AsyncPage fetchData={fetchData}>
+			{tagGroup && (
+				<HeroContainer className={getBackgroundClassForColorId(tagGroup.colorId)}>
+					<h1 className="mb-4 text-center">Symptoms</h1>
+					<p className="mb-0 text-center fs-large">
+						Browse content tailored to symptoms you or others in your life may be experiencing, including
+						concerns about mood, anxiety, sleep, fatigue or substance abuse
+					</p>
+				</HeroContainer>
+			)}
 			<Container className="pt-8 pb-24">
 				<Row className="mb-8">
 					<Col>
@@ -175,31 +174,37 @@ const ResourceLibraryTopic = () => {
 						})}
 					</Col>
 				</Row>
-				<AsyncPage fetchData={fetchData}>
+				{tagGroup && (
 					<Row>
 						{resources.map((resource, resourceIndex) => {
 							return (
 								<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
 									<ResourceLibraryCard
-										colorId={colorId}
+										colorId={tagGroup.colorId}
 										className="h-100"
-										badgeTitle={resource.new ? 'New' : ''}
-										subtopic={resource.subtopic}
-										subtopicTo={`/resource-library/tag-groups/${tagGroupId}`}
+										badgeTitle={resource.newFlag ? 'New' : ''}
+										subtopic={tagGroup?.name ?? ''}
+										subtopicTo={`/resource-library/tag-groups/${tagGroup?.tagGroupId}`}
 										title={resource.title}
 										author={resource.author}
 										description={resource.description}
-										tags={resource.tags}
+										tags={
+											tagsByTagId
+												? resource.tagIds.map((tagId) => {
+														return tagsByTagId[tagId];
+												  })
+												: []
+										}
 										contentTypeId={resource.contentTypeId}
-										duration={'5 min'}
+										duration={resource.duration}
 									/>
 								</Col>
 							);
 						})}
 					</Row>
-				</AsyncPage>
+				)}
 			</Container>
-		</>
+		</AsyncPage>
 	);
 };
 
