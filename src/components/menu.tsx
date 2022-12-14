@@ -466,7 +466,19 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 
 				{!isSubNav && (
 					<>
-						<h5 className="my-4">{account?.displayName ?? 'Anonymous'}</h5>
+						<div className="my-4">
+							<h5 className="mb-0">{account?.displayName ?? 'Anonymous'}</h5>
+
+							{institution?.requireConsentForm && (
+								<Link
+									to="/user-settings"
+									className="d-block mt-1 fs-default fw-normal"
+									onClick={onHide}
+								>
+									Profile
+								</Link>
+							)}
+						</div>
 						<hr />
 					</>
 				)}
