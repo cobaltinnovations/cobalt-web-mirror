@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
-// import LinesEllipsis from 'react-lines-ellipsis';
-// import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
-// import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
 import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
@@ -52,6 +49,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 			textDecoration: 'underline',
 		},
 	},
+	title: {
+		display: '-webkit-box',
+		'-webkit-line-clamp': 2,
+		'line-clamp': 2,
+		'-webkit-box-orient': 'vertical',
+		'box-orient': 'vertical',
+		overflow: 'hidden',
+	},
+	description: {
+		display: '-webkit-box',
+		'-webkit-line-clamp': 3,
+		'line-clamp': 3,
+		'-webkit-box-orient': 'vertical',
+		'box-orient': 'vertical',
+		overflow: 'hidden',
+	},
 }));
 
 interface Props {
@@ -69,9 +82,6 @@ interface Props {
 	className?: string;
 }
 
-// const ResponsiveLineEllipsis = responsiveHOC()(LinesEllipsis);
-// const ResponsiveHtmlEllipsis = responsiveHOC()(HTMLEllipsis);
-
 const ResourceLibraryCard = ({
 	colorId,
 	subtopic,
@@ -88,15 +98,6 @@ const ResourceLibraryCard = ({
 }: Props) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
-	// const [descriptionMaxLine, setDescriptionMaxLine] = useState(2);
-
-	// const handleTitleReflow = useCallback(({ clamped }: { clamped: boolean; text: string }) => {
-	// 	if (clamped) {
-	// 		setDescriptionMaxLine(2);
-	// 	} else {
-	// 		setDescriptionMaxLine(3);
-	// 	}
-	// }, []);
 
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
@@ -114,21 +115,9 @@ const ResourceLibraryCard = ({
 							{subtopic}
 						</Link>
 					</p>
-					<h4 className="mb-1">{title}</h4>
-					{/* <ResponsiveLineEllipsis
-						className="mb-1"
-						text={title}
-						component="h4"
-						maxLine={2}
-						onReflow={handleTitleReflow}
-					/> */}
+					<h4 className={classNames(classes.title, 'mb-1')}>{title}</h4>
 					<p className="mb-2 text-gray">by {author}</p>
-					<p className="mb-0">{description}</p>
-					{/* <ResponsiveHtmlEllipsis
-						className="d-none d-lg-block"
-						unsafeHTML={description}
-						maxLine={descriptionMaxLine}
-					/> */}
+					<p className={classNames(classes.description, 'mb-0')}>{description}</p>
 				</div>
 				<div className="d-flex justify-content-between align-items-end">
 					<div className="d-none d-lg-flex flex-wrap">

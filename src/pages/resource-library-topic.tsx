@@ -7,6 +7,7 @@ import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/mode
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import { resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
+import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
 import SimpleFilter from '@/components/simple-filter';
 import ResourceLibraryCard from '@/components/resource-library-card';
@@ -93,10 +94,31 @@ const ResourceLibraryTopic = () => {
 	return (
 		<AsyncPage fetchData={fetchData}>
 			{tagGroup && (
-				<HeroContainer className={getBackgroundClassForColorId(tagGroup.colorId)}>
-					<h1 className="mb-4 text-center">{tagGroup.name}</h1>
-					<p className="mb-0 text-center fs-large">{tagGroup.description}</p>
-				</HeroContainer>
+				<>
+					<Breadcrumb
+						xs={{ span: 12 }}
+						lg={{ span: 12 }}
+						xl={{ span: 12 }}
+						breadcrumbs={[
+							{
+								to: '/',
+								title: 'Home',
+							},
+							{
+								to: '/resource-library',
+								title: 'Resource Library',
+							},
+							{
+								to: `/resource-library/tag-groups/${tagGroup.urlName}`,
+								title: tagGroup.name,
+							},
+						]}
+					/>
+					<HeroContainer className={getBackgroundClassForColorId(tagGroup.colorId)}>
+						<h1 className="mb-4 text-center">{tagGroup.name}</h1>
+						<p className="mb-0 text-center fs-large">{tagGroup.description}</p>
+					</HeroContainer>
+				</>
 			)}
 			<Container className="pt-8 pb-24">
 				<Row className="mb-8">
