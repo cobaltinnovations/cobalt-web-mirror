@@ -198,7 +198,7 @@ const ResourceLibraryTags = () => {
 										imageUrl={resource.imageUrl}
 										badgeTitle={resource.newFlag ? 'New' : ''}
 										subtopic={tagGroup?.name ?? ''}
-										subtopicTo={`/resource-library/tag-groups/${tagGroup?.tagGroupId}`}
+										subtopicTo={`/resource-library/tag-groups/${tagGroup?.urlName}`}
 										title={resource.title}
 										author={resource.author}
 										description={resource.description}
