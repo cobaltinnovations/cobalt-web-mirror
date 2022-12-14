@@ -6,16 +6,38 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
+import ConsentModal from '@/components/consent-modal';
 
 const UserSettings: FC = () => {
 	const { institution, account, signOutAndClearContext } = useAccount();
 	const [showRevokeConfirmation, setShowRevokeConfirmation] = useState(false);
+	const [isViewingAgreement, setIsViewingAgreement] = useState(false);
+	const [isRejectingConsent, setIsRejectingConsent] = useState(false);
 	const handleError = useHandleError();
 
 	return (
 		<>
+			<ConsentModal
+				readOnly
+				show={isViewingAgreement}
+				onHide={() => {
+					setIsViewingAgreement(false);
+				}}
+			/>
+
 			<Container className="py-10 py-lg-14">
-				<h2 className="mb-4">Profile</h2>
+				<h2 className="mb-10">Profile</h2>
+
+				{account?.emailAddress && (
+					<ProfileSection title="Contact email">
+						<p className="my-2 fs-large">{account?.emailAddress}</p>
+						<p className="mb-0 text-muted">
+							This is the email address that receives all communication from Cobalt including appointment
+							and group session reminders.
+						</p>
+					</ProfileSection>
+				)}
+
 				{institution?.requireConsentForm && (
 					<ProfileSection
 						title="User Agreement"
@@ -30,6 +52,17 @@ const UserSettings: FC = () => {
 								>
 									Revoke
 								</Button>
+
+								<Button
+									size="sm"
+									className="ms-2"
+									variant="outline-primary"
+									onClick={() => {
+										setIsViewingAgreement(true);
+									}}
+								>
+									View
+								</Button>
 							</div>
 						}
 					>
@@ -43,10 +76,13 @@ const UserSettings: FC = () => {
 							detailText="You will be signed out of Cobalt and will not be able to sign in again until you accept the User Agreement."
 							dismissText="Cancel"
 							confirmText="Continue"
+							isConfirming={isRejectingConsent}
 							onConfirm={() => {
 								if (!account?.accountId) {
 									return;
 								}
+
+								setIsRejectingConsent(true);
 
 								accountService
 									.rejectConsent(account.accountId)
@@ -58,10 +94,15 @@ const UserSettings: FC = () => {
 										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
 											handleError(e);
 										}
+									})
+									.finally(() => {
+										setIsRejectingConsent(false);
 									});
 							}}
 						/>
-						<div>test</div>
+						{account?.consentFormAcceptedDateDescription && (
+							<p>Accepted: {account.consentFormAcceptedDateDescription}</p>
+						)}
 					</ProfileSection>
 				)}
 			</Container>
@@ -71,20 +112,24 @@ const UserSettings: FC = () => {
 
 interface ProfileSectionProps {
 	title: string;
-	actions: ReactNode;
+	actions?: ReactNode;
 	children: ReactNode;
 }
 
 const ProfileSection = ({ title, actions, children }: ProfileSectionProps) => {
 	return (
-		<div className="d-flex">
-			<div className="flex-grow-1">
-				<h4>{title}</h4>
-				{children}
+		<>
+			<div className="d-flex">
+				<div className="flex-grow-1">
+					<h4>{title}</h4>
+					{children}
+				</div>
+
+				{actions}
 			</div>
 
-			{actions}
-		</div>
+			<hr className="my-6" />
+		</>
 	);
 };
 
