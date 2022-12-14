@@ -25,6 +25,8 @@ export interface AccountModel {
 	birthdateDescription?: string;
 	capabilities?: Record<string, AccountInstitutionCapabilities>;
 	consentFormAccepted: false;
+	consentFormAcceptedDate?: string;
+	consentFormAcceptedDateDescription?: string;
 	countryCode?: string;
 	created: string;
 	createdDescription: string;
