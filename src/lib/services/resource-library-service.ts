@@ -13,6 +13,19 @@ export const resourceLibraryService = {
 			url: '/resource-library',
 		});
 	},
+	searchResourceLibrary(queryParameters?: { searchQuery?: string; pageNumber?: number; pageSize?: number }) {
+		return httpSingleton.orchestrateRequest<{
+			findResult: {
+				contents: ResourceLibraryContentModel[];
+				totalCount: number;
+				totalCountDescription: string;
+			};
+			tagsByTagId: Record<string, TagModel>;
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/resource-library/search', queryParameters),
+		});
+	},
 	getResourceLibraryContentByTagGroupId(
 		tagGroupId: string,
 		queryParameters?: {
