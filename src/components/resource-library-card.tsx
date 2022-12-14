@@ -4,7 +4,7 @@ import { Badge } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
-import { getTextClassForColorId } from '@/lib/utils/color-utils';
+// import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -110,11 +110,11 @@ const ResourceLibraryCard = ({
 			</div>
 			<div className={classes.informationOuter}>
 				<div className="mb-2">
-					<p className="mb-2 fw-bold">
+					{/* <p className="mb-2 fw-bold">
 						<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
 							{subtopic}
 						</Link>
-					</p>
+					</p> */}
 					<h4 className={classNames(classes.title, 'mb-1')}>{title}</h4>
 					<p className="mb-2 text-gray">by {author}</p>
 					<p className={classNames(classes.description, 'mb-0')}>{description}</p>
