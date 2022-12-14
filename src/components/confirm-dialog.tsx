@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
+import LoadingButton from './loading-button';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -17,6 +18,7 @@ interface Props extends ModalProps {
 	dismissText: string;
 	confirmText: string;
 	detailText?: string;
+	isConfirming?: boolean;
 	onConfirm(): void;
 	displayButtonsBlock?: boolean;
 }
@@ -28,6 +30,7 @@ const ConfirmDialog = ({
 	confirmText,
 	detailText,
 	onConfirm,
+	isConfirming = false,
 	displayButtonsBlock,
 	...props
 }: Props) => {
@@ -55,7 +58,8 @@ const ConfirmDialog = ({
 					>
 						{dismissText}
 					</Button>
-					<Button
+					<LoadingButton
+						isLoading={isConfirming}
 						className={classNames({
 							'ms-2': !displayButtonsBlock,
 							'd-block': displayButtonsBlock,
@@ -65,7 +69,7 @@ const ConfirmDialog = ({
 						onClick={onConfirm}
 					>
 						{confirmText}
-					</Button>
+					</LoadingButton>
 				</div>
 			</Modal.Footer>
 		</Modal>

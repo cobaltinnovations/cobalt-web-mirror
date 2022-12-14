@@ -16,10 +16,18 @@ const useStyles = createUseStyles({
 		width: '90%',
 		maxWidth: 400,
 	},
+	clearHeader: {
+		border: 0,
+		backgroundColor: 'transparent',
+	},
 });
 
-const ConsentModal: FC<ModalProps> = ({ ...props }) => {
-	useTrackModalView('ConsentModal', props.show);
+interface ConsentModalProps extends ModalProps {
+	readOnly?: boolean;
+}
+
+const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }) => {
+	useTrackModalView('ConsentModal', modalProps.show);
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const { account, setAccount, signOutAndClearContext } = useAccount();
@@ -28,84 +36,88 @@ const ConsentModal: FC<ModalProps> = ({ ...props }) => {
 	const [isRejecting, setIsRejecting] = useState(false);
 
 	return (
-		<Modal {...props} scrollable backdrop="static" centered dialogClassName={classes.modal}>
+		<Modal {...modalProps} scrollable backdrop="static" centered dialogClassName={classes.modal}>
+			{readOnly && <Modal.Header className={classes.clearHeader} closeButton closeVariant="white" />}
+
 			<Modal.Body>
 				<ConsentContent />
 			</Modal.Body>
 
-			<Modal.Footer>
-				<div className="my-4 d-flex">
-					<LoadingButton
-						isLoading={isRejecting}
-						className="me-2 w-100"
-						type="button"
-						variant="outline-primary"
-						size="sm"
-						onClick={() => {
-							if (!account?.accountId) {
-								return;
-							}
+			{!readOnly && (
+				<Modal.Footer>
+					<div className="my-4 d-flex">
+						<LoadingButton
+							isLoading={isRejecting}
+							className="me-2 w-100"
+							type="button"
+							variant="outline-primary"
+							size="sm"
+							onClick={() => {
+								if (!account?.accountId || isRejecting) {
+									return;
+								}
 
-							setIsRejecting(true);
+								setIsRejecting(true);
 
-							accountService
-								.rejectConsent(account.accountId)
-								.fetch()
-								.then((response) => {
-									signOutAndClearContext();
-								})
-								.catch((e) => {
-									if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-										handleError(e);
-									}
-								})
-								.finally(() => {
-									setIsRejecting(false);
-								});
-						}}
-					>
-						Do not accept
-					</LoadingButton>
+								accountService
+									.rejectConsent(account.accountId)
+									.fetch()
+									.then((response) => {
+										signOutAndClearContext();
+									})
+									.catch((e) => {
+										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+											handleError(e);
+										}
+									})
+									.finally(() => {
+										setIsRejecting(false);
+									});
+							}}
+						>
+							Do not accept
+						</LoadingButton>
 
-					<LoadingButton
-						isLoading={isAccepting}
-						className="ms-2 w-100"
-						type="button"
-						size="sm"
-						onClick={() => {
-							if (!account?.accountId) {
-								return;
-							}
+						<LoadingButton
+							isLoading={isAccepting}
+							className="ms-2 w-100"
+							type="button"
+							size="sm"
+							onClick={() => {
+								if (!account?.accountId || isAccepting) {
+									return;
+								}
 
-							setIsAccepting(true);
+								setIsAccepting(true);
 
-							accountService
-								.acceptConsent(account.accountId)
-								.fetch()
-								.then((response) => {
-									setAccount(response.account);
-								})
-								.catch((e) => {
-									if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-										handleError(e);
-									}
-								})
-								.finally(() => {
-									setIsAccepting(false);
-								});
-						}}
-					>
-						Accept
-					</LoadingButton>
-				</div>
+								accountService
+									.acceptConsent(account.accountId)
+									.fetch()
+									.then((response) => {
+										setAccount(response.account);
+									})
+									.catch((e) => {
+										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+											handleError(e);
+										}
+									})
+									.finally(() => {
+										setIsAccepting(false);
+									});
+							}}
+						>
+							Accept
+						</LoadingButton>
+					</div>
 
-				<p className="text-muted text-center">
-					By clicking "Accept" you agree to the above User Consent Terms and{' '}
-					<Link to="/privacy" className="text-muted">
-						Privacy Policy
-					</Link>
-				</p>
-			</Modal.Footer>
+					<p className="text-muted text-center">
+						By clicking "Accept" you agree to the above User Consent Terms and{' '}
+						<Link to="/privacy" target="_blank" className="text-muted">
+							Privacy Policy
+						</Link>
+					</p>
+				</Modal.Footer>
+			)}
 		</Modal>
 	);
 };
