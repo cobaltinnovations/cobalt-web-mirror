@@ -181,6 +181,7 @@ const ResourceLibraryTopic = () => {
 									<ResourceLibraryCard
 										colorId={tagGroup.colorId}
 										className="h-100"
+										imageUrl={resource.imageUrl}
 										badgeTitle={resource.newFlag ? 'New' : ''}
 										subtopic={tagGroup?.name ?? ''}
 										subtopicTo={`/resource-library/tag-groups/${tagGroup?.tagGroupId}`}
@@ -195,7 +196,7 @@ const ResourceLibraryTopic = () => {
 												: []
 										}
 										contentTypeId={resource.contentTypeId}
-										duration={resource.duration}
+										duration={resource.durationInMinutesDescription}
 									/>
 								</Col>
 							);

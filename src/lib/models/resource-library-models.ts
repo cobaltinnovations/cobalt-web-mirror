@@ -2,6 +2,9 @@ import { COLOR_IDS, Content } from '@/lib/models';
 
 export type ResourceLibraryContentModel = {
 	tagIds: string[];
+	duration: string;
+	durationInMinutes: number;
+	durationInMinutesDescription: string;
 } & Content;
 
 export interface TagGroupModel {

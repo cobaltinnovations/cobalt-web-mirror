@@ -108,7 +108,7 @@ const ResourceLibraryCard = ({
 				)}
 			</div>
 			<div className={classes.informationOuter}>
-				<div>
+				<div className="mb-2">
 					<p className="mb-2 fw-bold">
 						<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
 							{subtopic}

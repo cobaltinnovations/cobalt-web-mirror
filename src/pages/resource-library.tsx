@@ -110,7 +110,7 @@ const ResourceLibrary = () => {
 															: []
 													}
 													contentTypeId={content.contentTypeId}
-													duration={content.duration}
+													duration={content.durationInMinutesDescription}
 												/>
 											);
 										})}
