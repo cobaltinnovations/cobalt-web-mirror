@@ -91,7 +91,7 @@ const ResourceLibrary = () => {
 	};
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-4 text-center">Resource Library</h1>
 				<p className="mb-6 text-center fs-large">
@@ -109,94 +109,96 @@ const ResourceLibrary = () => {
 					/>
 				</Form>
 			</HeroContainer>
-			<Container className="pt-16 pb-32">
-				{tagGroups.map((tagGroup) => {
-					return (
-						<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
-							<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-								<ResourceLibrarySubtopicCard
-									className="h-100"
-									colorId={tagGroup.colorId}
-									title={tagGroup.name}
-									description={tagGroup.description}
-									to={`/resource-library/tag-groups/${tagGroup.urlName}`}
-								/>
-							</Col>
-							<Col lg={9}>
-								<Carousel
-									responsive={carouselConfig}
-									trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-									floatingButtonGroup
-								>
-									{contentsByTagGroupId?.[tagGroup.tagGroupId]?.map((content) => {
-										return (
+			<AsyncPage fetchData={fetchData}>
+				<Container className="pt-16 pb-32">
+					{tagGroups.map((tagGroup) => {
+						return (
+							<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
+								<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+									<ResourceLibrarySubtopicCard
+										className="h-100"
+										colorId={tagGroup.colorId}
+										title={tagGroup.name}
+										description={tagGroup.description}
+										to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+									/>
+								</Col>
+								<Col lg={9}>
+									<Carousel
+										responsive={carouselConfig}
+										trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+										floatingButtonGroup
+									>
+										{contentsByTagGroupId?.[tagGroup.tagGroupId]?.map((content) => {
+											return (
+												<ResourceLibraryCard
+													key={content.contentId}
+													colorId={tagGroup.colorId}
+													className="h-100"
+													imageUrl={content.imageUrl}
+													badgeTitle={content.newFlag ? 'New' : ''}
+													subtopic={tagGroup.name}
+													subtopicTo={`/resource-library/tag-groups/${tagGroup.urlName}`}
+													title={content.title}
+													author={content.author}
+													description={content.description}
+													tags={
+														tagsByTagId
+															? content.tagIds.map((tagId) => {
+																	return tagsByTagId[tagId];
+															  })
+															: []
+													}
+													contentTypeId={content.contentTypeId}
+													duration={content.durationInMinutesDescription}
+												/>
+											);
+										})}
+									</Carousel>
+								</Col>
+							</Row>
+						);
+					})}
+					{searchQuery && (
+						<>
+							<Row className="mb-10">
+								<h3 className="mb-0">
+									{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
+								</h3>
+							</Row>
+							<Row>
+								{contents.map((resource, resourceIndex) => {
+									return (
+										<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
 											<ResourceLibraryCard
-												key={content.contentId}
-												colorId={tagGroup.colorId}
+												colorId={COLOR_IDS.BRAND_ACCENT}
 												className="h-100"
-												imageUrl={content.imageUrl}
-												badgeTitle={content.newFlag ? 'New' : ''}
-												subtopic={tagGroup.name}
-												subtopicTo={`/resource-library/tag-groups/${tagGroup.urlName}`}
-												title={content.title}
-												author={content.author}
-												description={content.description}
+												imageUrl={resource.imageUrl}
+												badgeTitle={resource.newFlag ? 'New' : ''}
+												subtopic={'[TODO: TagGroupName]'}
+												subtopicTo={`/resource-library/tag-groups/TODOTagGroupId`}
+												title={resource.title}
+												author={resource.author}
+												description={resource.description}
 												tags={
 													tagsByTagId
-														? content.tagIds.map((tagId) => {
+														? resource.tagIds.map((tagId) => {
 																return tagsByTagId[tagId];
 														  })
 														: []
 												}
-												contentTypeId={content.contentTypeId}
-												duration={content.durationInMinutesDescription}
+												contentTypeId={resource.contentTypeId}
+												duration={resource.durationInMinutesDescription}
 											/>
-										);
-									})}
-								</Carousel>
-							</Col>
-						</Row>
-					);
-				})}
-				{searchQuery && (
-					<>
-						<Row className="mb-10">
-							<h3 className="mb-0">
-								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
-							</h3>
-						</Row>
-						<Row>
-							{contents.map((resource, resourceIndex) => {
-								return (
-									<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
-										<ResourceLibraryCard
-											colorId={COLOR_IDS.BRAND_ACCENT}
-											className="h-100"
-											imageUrl={resource.imageUrl}
-											badgeTitle={resource.newFlag ? 'New' : ''}
-											subtopic={'[TODO: TagGroupName]'}
-											subtopicTo={`/resource-library/tag-groups/TODOTagGroupId`}
-											title={resource.title}
-											author={resource.author}
-											description={resource.description}
-											tags={
-												tagsByTagId
-													? resource.tagIds.map((tagId) => {
-															return tagsByTagId[tagId];
-													  })
-													: []
-											}
-											contentTypeId={resource.contentTypeId}
-											duration={resource.durationInMinutesDescription}
-										/>
-									</Col>
-								);
-							})}
-						</Row>
-					</>
-				)}
-			</Container>
-		</AsyncPage>
+										</Col>
+									);
+								})}
+							</Row>
+						</>
+					)}
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 
