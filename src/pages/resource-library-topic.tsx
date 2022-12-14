@@ -71,7 +71,9 @@ const ResourceLibraryTopic = () => {
 			throw new Error('tagGroupId is undefined.');
 		}
 
-		const response = await resourceLibraryService.getResourceLibraryContentByTagGroupId(tagGroupId).fetch();
+		const response = await resourceLibraryService
+			.getResourceLibraryContentByTagGroupId(tagGroupId, { pageSize: 100 })
+			.fetch();
 
 		setResources(response.findResult.contents);
 		setTagGroup(response.tagGroup);
@@ -92,11 +94,8 @@ const ResourceLibraryTopic = () => {
 		<AsyncPage fetchData={fetchData}>
 			{tagGroup && (
 				<HeroContainer className={getBackgroundClassForColorId(tagGroup.colorId)}>
-					<h1 className="mb-4 text-center">Symptoms</h1>
-					<p className="mb-0 text-center fs-large">
-						Browse content tailored to symptoms you or others in your life may be experiencing, including
-						concerns about mood, anxiety, sleep, fatigue or substance abuse
-					</p>
+					<h1 className="mb-4 text-center">{tagGroup.name}</h1>
+					<p className="mb-0 text-center fs-large">{tagGroup.description}</p>
 				</HeroContainer>
 			)}
 			<Container className="pt-8 pb-24">
