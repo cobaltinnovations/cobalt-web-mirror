@@ -75,6 +75,7 @@ export const TopicCenter = React.lazy(() => import('@/pages/topic-center'));
 export const UserSettings = React.lazy(() => import('@/pages/user-settings'));
 export const ResourceLibrary = React.lazy(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-library-topic'));
+export const ResourceLibraryTags = React.lazy(() => import('@/pages/resource-library-tags'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -555,6 +556,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/resource-library/tag-groups/:tagGroupId',
 				private: true,
 				main: ResourceLibraryTopic,
+			},
+			{
+				path: '/resource-library/tags/:tagId',
+				private: true,
+				main: ResourceLibraryTags,
 			},
 			{
 				path: '*',
