@@ -59,27 +59,7 @@ const Index: FC = () => {
 			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.HOME })
 			.fetch();
 
-		//setCallsToAction(response.callsToAction);
-		setCallsToAction([
-			{
-				message:
-					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec efficitur tincidunt massa et molestie. In pretium ultrices tortor at rutrum. Aenean condimentum dapibus diam id gravida. Nulla eu volutpat lacus. Aenean sem justo, volutpat eu eros ut, dictum placerat magna. Sed ornare eros sit amet semper consectetur. Pellentesque maximus purus id nisl tincidunt euismod. Cras ac rutrum augue, non sollicitudin velit. Nam luctus sapien vitae cursus sagittis. Sed non enim a magna tincidunt placerat nec nec felis. Aenean a dictum enim. Etiam pulvinar quis justo et consequat.',
-				messageAsHtml:
-					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec efficitur tincidunt massa et molestie. In pretium ultrices tortor at rutrum. Aenean condimentum dapibus diam id gravida. Nulla eu volutpat lacus. Aenean sem justo, volutpat eu eros ut, dictum placerat magna. Sed ornare eros sit amet semper consectetur. Pellentesque maximus purus id nisl tincidunt euismod. Cras ac rutrum augue, non sollicitudin velit. Nam luctus sapien vitae cursus sagittis. Sed non enim a magna tincidunt placerat nec nec felis. Aenean a dictum enim. Etiam pulvinar quis justo et consequat.',
-				actionLinks: [
-					{
-						actionLinkTypeId: ACTION_LINK_TYPE_ID.EXTERNAL,
-						link: 'www.google.com',
-						description: 'Google',
-					},
-					{
-						actionLinkTypeId: ACTION_LINK_TYPE_ID.EXTERNAL,
-						link: 'www.twitter.com',
-						description: 'Twitter',
-					},
-				],
-			},
-		]);
+		setCallsToAction(response.callsToAction);
 	}, []);
 
 	function handleConnectWithSupportButtonClick() {
