@@ -19,7 +19,6 @@ import {
 	GroupSessionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	CallToActionModel,
-	ACTION_LINK_TYPE_ID,
 } from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
