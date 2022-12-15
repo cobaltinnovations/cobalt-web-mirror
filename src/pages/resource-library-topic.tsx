@@ -10,6 +10,7 @@ import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
 import SimpleFilter from '@/components/simple-filter';
+import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard from '@/components/resource-library-card';
 
 enum FILTER_IDS {
@@ -21,6 +22,9 @@ enum FILTER_IDS {
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const searchQuery = searchParams.get('searchQuery') ?? '';
+
+	const [searchInputValue, setSearchInputValue] = useState('');
 	const [filters, setFilters] = useState({
 		[FILTER_IDS.SUBTOPIC]: {
 			id: FILTER_IDS.SUBTOPIC,
@@ -68,24 +72,40 @@ const ResourceLibraryTopic = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
 	const fetchData = useCallback(async () => {
+		if (searchQuery) {
+			setSearchInputValue(searchQuery);
+		}
+
 		if (!tagGroupId) {
 			throw new Error('tagGroupId is undefined.');
 		}
 
 		const response = await resourceLibraryService
-			.getResourceLibraryContentByTagGroupId(tagGroupId, { pageSize: 100 })
+			.getResourceLibraryContentByTagGroupId(tagGroupId, { searchQuery, pageNumber: 0, pageSize: 100 })
 			.fetch();
 
 		setResources(response.findResult.contents);
 		setTagGroup(response.tagGroup);
 		setTagsByTagId(response.tagsByTagId);
-	}, [tagGroupId]);
+	}, [searchQuery, tagGroupId]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
 
 		for (const value of values) {
 			searchParams.append(searchParam, value);
+		}
+
+		setSearchParams(searchParams, { replace: true });
+	};
+
+	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (searchInputValue) {
+			searchParams.set('searchQuery', searchInputValue);
+		} else {
+			searchParams.delete('searchQuery');
 		}
 
 		setSearchParams(searchParams, { replace: true });
@@ -193,6 +213,19 @@ const ResourceLibraryTopic = () => {
 								</SimpleFilter>
 							);
 						})}
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col>
+						<Form onSubmit={handleSearchFormSubmit}>
+							<InputHelperSearch
+								placeholder="Search Resources"
+								value={searchInputValue}
+								onChange={({ currentTarget }) => {
+									setSearchInputValue(currentTarget.value);
+								}}
+							/>
+						</Form>
 					</Col>
 				</Row>
 				{tagGroup && (

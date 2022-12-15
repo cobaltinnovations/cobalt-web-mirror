@@ -81,13 +81,14 @@ const ResourceLibrary = () => {
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		setSearchParams(
-			{
-				...searchParams,
-				...(searchInputValue && { searchQuery: searchInputValue }),
-			},
-			{ replace: true }
-		);
+
+		if (searchInputValue) {
+			searchParams.set('searchQuery', searchInputValue);
+		} else {
+			searchParams.delete('searchQuery');
+		}
+
+		setSearchParams(searchParams, { replace: true });
 	};
 
 	return (
