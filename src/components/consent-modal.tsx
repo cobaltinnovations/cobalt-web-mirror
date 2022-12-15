@@ -112,9 +112,14 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 
 					<p className="text-muted text-center">
 						By clicking "Accept" you agree to the above User Consent Terms and{' '}
-						<Link to="/privacy" target="_blank" className="text-muted">
+						<a
+							href="https://cobalt-shared-media.s3.amazonaws.com/legal/privacy-policy-2022-12-06.pdf"
+							rel="noopener noreferrer"
+							target="_blank"
+							className="text-muted"
+						>
 							Privacy Policy
-						</Link>
+						</a>
 					</p>
 				</Modal.Footer>
 			)}
