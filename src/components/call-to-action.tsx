@@ -32,11 +32,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	actionLinksOuter: {
+		paddingLeft: 24,
 		'& button': {
 			whiteSpace: 'nowrap',
 		},
 		[mediaQueries.lg]: {
 			marginTop: 16,
+			paddingLeft: 0,
 		},
 	},
 }));
@@ -79,8 +81,16 @@ const CallToAction = ({ callToAction, className }: Props) => {
 			</div>
 			<div className={classes.actionLinksOuter}>
 				{callToAction.actionLinks.map((actionLink, index) => {
+					const isLast = index === callToAction.actionLinks.length - 1;
+
 					return (
-						<Button key={`action-link-${index}`} onClick={() => handleActionLinkClick(actionLink)}>
+						<Button
+							key={`action-link-${index}`}
+							className={classNames('d-block', {
+								'mb-1': !isLast,
+							})}
+							onClick={() => handleActionLinkClick(actionLink)}
+						>
 							{actionLink.description}
 						</Button>
 					);
