@@ -10,6 +10,7 @@ export const button = (theme: CobaltTheme) => {
 			...theme.fonts.bodyBold,
 			fontSize: '1.6rem',
 			lineHeight: '2rem',
+			position: 'relative',
 			textTransform: 'none',
 			'&:focus': {
 				outline: 'none',
@@ -162,7 +163,17 @@ export const button = (theme: CobaltTheme) => {
 			'&-outline-primary': {
 				color: theme.colors.p500,
 				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.p500}`,
+				'&:after': {
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					content: '""',
+					position: 'absolute',
+					pointerEvents: 'none',
+					borderRadius: 'inherit',
+					border: `2px solid ${theme.colors.p500}`,
+				},
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.p500,
