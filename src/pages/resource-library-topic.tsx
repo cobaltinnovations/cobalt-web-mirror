@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -31,9 +31,12 @@ const useResourceLibraryTopicStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		overflowX: 'auto',
 		flexWrap: 'nowrap',
+		alignItems: 'center',
+		paddingBottom: 8,
 	},
 	searchButtonOuter: {
 		flexShrink: 0,
+		paddingBottom: 8,
 		position: 'relative',
 		'&:before': {
 			top: 0,
@@ -194,8 +197,8 @@ const ResourceLibraryTopic = () => {
 				<Container className="pt-8">
 					<Row
 						className={classNames({
-							'mb-5': searchIsOpen,
-							'mb-8': !searchIsOpen,
+							'mb-3': searchIsOpen,
+							'mb-6': !searchIsOpen,
 						})}
 					>
 						<Col>
@@ -308,6 +311,7 @@ const ResourceLibraryTopic = () => {
 							<Col>
 								<Form onSubmit={handleSearchFormSubmit}>
 									<InputHelperSearch
+										autoFocus
 										placeholder="Search Resources"
 										value={searchInputValue}
 										onChange={({ currentTarget }) => {

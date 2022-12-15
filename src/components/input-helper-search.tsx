@@ -67,7 +67,7 @@ interface InputHelperSearchProps extends FormControlProps {
 	autoFocus?: boolean;
 }
 
-const InputHelperSearch = ({ className, autoFocus, ...props }: InputHelperSearchProps) => {
+const InputHelperSearch = React.forwardRef(({ className, autoFocus, ...props }: InputHelperSearchProps, ref) => {
 	const classes = useInputHelperSearchStyles();
 
 	return (
@@ -75,6 +75,7 @@ const InputHelperSearch = ({ className, autoFocus, ...props }: InputHelperSearch
 			<Form.Group className={classNames(classes.inputHelper)}>
 				<SearchIcon width={20} height={20} className={classes.searchIcon} />
 				<Form.Control
+					ref={ref}
 					className={classes.input}
 					bsPrefix="input-helper__input--search"
 					type="search"
@@ -84,6 +85,6 @@ const InputHelperSearch = ({ className, autoFocus, ...props }: InputHelperSearch
 			</Form.Group>
 		</div>
 	);
-};
+});
 
 export default InputHelperSearch;
