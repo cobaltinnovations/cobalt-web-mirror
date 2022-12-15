@@ -4,12 +4,12 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { COLOR_IDS, ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
-import InputHelper from '@/components/input-helper';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import { resourceLibraryService } from '@/lib/services';
 import { useSearchParams } from 'react-router-dom';
+import InputHelperSearch from '@/components/input-helper-search';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -99,9 +99,8 @@ const ResourceLibrary = () => {
 					rhoncus massa.
 				</p>
 				<Form onSubmit={handleSearchFormSubmit}>
-					<InputHelper
-						type="search"
-						label="Search Resources"
+					<InputHelperSearch
+						placeholder="Search Resources"
 						value={searchInputValue}
 						onChange={({ currentTarget }) => {
 							setSearchInputValue(currentTarget.value);
