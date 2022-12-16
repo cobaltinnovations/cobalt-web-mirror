@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { COLOR_IDS, ContentTypeId, TagModel } from '@/lib/models';
+import { ContentTypeId, TagModel } from '@/lib/models';
 // import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
@@ -18,6 +18,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
 		transition: '0.2s all',
+		textDecoration: 'none',
 		'&:hover': {
 			transform: 'translateY(-16px)',
 			boxShadow: theme.elevation.e400,
@@ -68,9 +69,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
-	colorId: COLOR_IDS;
-	subtopic: string;
-	subtopicTo: string;
+	// colorId: COLOR_IDS;
+	// subtopic: string;
+	// subtopicTo: string;
+	contentId: string;
 	title: string;
 	author: string;
 	description: string;
@@ -83,9 +85,10 @@ interface Props {
 }
 
 const ResourceLibraryCard = ({
-	colorId,
-	subtopic,
-	subtopicTo,
+	// colorId,
+	// subtopic,
+	// subtopicTo,
+	contentId,
 	title,
 	author,
 	description,
@@ -100,7 +103,7 @@ const ResourceLibraryCard = ({
 	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
-		<div className={classNames(classes.resourceLibraryCard, className)}>
+		<Link to={`/on-your-time/${contentId}`} className={classNames(classes.resourceLibraryCard, className)}>
 			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
 				{badgeTitle && (
 					<Badge as="div" bg="light" pill>
@@ -115,9 +118,9 @@ const ResourceLibraryCard = ({
 							{subtopic}
 						</Link>
 					</p> */}
-					<h4 className={classNames(classes.title, 'mb-1')}>{title}</h4>
+					<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
 					<p className="mb-2 text-gray">by {author}</p>
-					<p className={classNames(classes.description, 'mb-0')}>{description}</p>
+					<p className={classNames(classes.description, 'text-dark mb-0')}>{description}</p>
 				</div>
 				<div className="d-flex justify-content-between align-items-end">
 					<div className="d-none d-lg-flex flex-wrap">
@@ -127,6 +130,9 @@ const ResourceLibraryCard = ({
 									key={tag.tagId}
 									to={`/resource-library/tags/${tag.urlName}`}
 									className={classes.link}
+									onClick={(event) => {
+										event.stopPropagation();
+									}}
 								>
 									<Badge
 										bg="outline-dark"
@@ -146,7 +152,7 @@ const ResourceLibraryCard = ({
 					</div>
 				</div>
 			</div>
-		</div>
+		</Link>
 	);
 };
 

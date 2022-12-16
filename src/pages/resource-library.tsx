@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { COLOR_IDS, ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
+import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
@@ -133,12 +133,10 @@ const ResourceLibrary = () => {
 											return (
 												<ResourceLibraryCard
 													key={content.contentId}
-													colorId={tagGroup.colorId}
+													contentId={content.contentId}
 													className="h-100"
 													imageUrl={content.imageUrl}
 													badgeTitle={content.newFlag ? 'New' : ''}
-													subtopic={tagGroup.name}
-													subtopicTo={`/resource-library/tag-groups/${tagGroup.urlName}`}
 													title={content.title}
 													author={content.author}
 													description={content.description}
@@ -167,28 +165,26 @@ const ResourceLibrary = () => {
 								</h3>
 							</Row>
 							<Row>
-								{contents.map((resource, resourceIndex) => {
+								{contents.map((content, resourceIndex) => {
 									return (
 										<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
 											<ResourceLibraryCard
-												colorId={COLOR_IDS.BRAND_ACCENT}
+												contentId={content.contentId}
 												className="h-100"
-												imageUrl={resource.imageUrl}
-												badgeTitle={resource.newFlag ? 'New' : ''}
-												subtopic={'[TODO: TagGroupName]'}
-												subtopicTo={`/resource-library/tag-groups/TODOTagGroupId`}
-												title={resource.title}
-												author={resource.author}
-												description={resource.description}
+												imageUrl={content.imageUrl}
+												badgeTitle={content.newFlag ? 'New' : ''}
+												title={content.title}
+												author={content.author}
+												description={content.description}
 												tags={
 													tagsByTagId
-														? resource.tagIds.map((tagId) => {
+														? content.tagIds.map((tagId) => {
 																return tagsByTagId[tagId];
 														  })
 														: []
 												}
-												contentTypeId={resource.contentTypeId}
-												duration={resource.durationInMinutesDescription}
+												contentTypeId={content.contentTypeId}
+												duration={content.durationInMinutesDescription}
 											/>
 										</Col>
 									);

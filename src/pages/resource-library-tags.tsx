@@ -193,12 +193,10 @@ const ResourceLibraryTags = () => {
 							return (
 								<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
 									<ResourceLibraryCard
-										colorId={tagGroup.colorId}
 										className="h-100"
+										contentId={resource.contentId}
 										imageUrl={resource.imageUrl}
 										badgeTitle={resource.newFlag ? 'New' : ''}
-										subtopic={tagGroup?.name ?? ''}
-										subtopicTo={`/resource-library/tag-groups/${tagGroup?.urlName}`}
 										title={resource.title}
 										author={resource.author}
 										description={resource.description}

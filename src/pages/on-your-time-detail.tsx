@@ -117,7 +117,7 @@ const OnYourTimeDetail: FC = () => {
 				]}
 			/>
 
-			<Container className="bg-white py-12">
+			<Container className="py-12">
 				<Row className="justify-content-center">
 					<Col md={10} lg={8} xl={6}>
 						<h2 className="mb-6">{item?.title}</h2>
