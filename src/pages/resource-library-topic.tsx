@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 import React, { useCallback, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
-import classNames from 'classnames';
 import Color from 'color';
 
 import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
@@ -61,6 +60,7 @@ const ResourceLibraryTopic = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchIsOpen, setSearchIsOpen] = useState(false);
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [filters, setFilters] = useState({
@@ -302,14 +302,19 @@ const ResourceLibraryTopic = () => {
 						</Col>
 					</Row>
 					<div className="pb-3">
-						<Collapse in={searchIsOpen}>
+						<Collapse
+							in={searchIsOpen}
+							onEntered={() => {
+								searchInputRef.current?.focus();
+							}}
+						>
 							<div className="overflow-hidden">
 								<div className="pb-5">
 									<Row>
 										<Col>
 											<Form onSubmit={handleSearchFormSubmit}>
 												<InputHelperSearch
-													autoFocus
+													ref={searchInputRef}
 													placeholder="Search Resources"
 													value={searchInputValue}
 													onChange={({ currentTarget }) => {
