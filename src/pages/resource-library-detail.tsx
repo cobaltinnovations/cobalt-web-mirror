@@ -16,7 +16,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import classNames from 'classnames';
 
-const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
+const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
 		height: 350,
 		[mediaQueries.lg]: {
@@ -43,11 +43,11 @@ const useOnYourTimeDetailStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const OnYourTimeDetail: FC = () => {
+const ResourceLibraryDetail: FC = () => {
 	const { contentId } = useParams<{
 		contentId: string;
 	}>();
-	const classes = useOnYourTimeDetailStyles();
+	const classes = useResourceLibraryDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
 	const [item, setItem] = useState<Content>();
@@ -107,8 +107,8 @@ const OnYourTimeDetail: FC = () => {
 						title: 'Home',
 					},
 					{
-						to: '/on-your-time',
-						title: 'On Your Time',
+						to: '/resource-library',
+						title: 'Resource Library',
 					},
 					{
 						to: '/#',
@@ -179,4 +179,4 @@ const OnYourTimeDetail: FC = () => {
 	);
 };
 
-export default OnYourTimeDetail;
+export default ResourceLibraryDetail;

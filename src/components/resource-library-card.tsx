@@ -103,7 +103,7 @@ const ResourceLibraryCard = ({
 	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
-		<Link to={`/on-your-time/${contentId}`} className={classNames(classes.resourceLibraryCard, className)}>
+		<Link to={`/resource-library/${contentId}`} className={classNames(classes.resourceLibraryCard, className)}>
 			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
 				{badgeTitle && (
 					<Badge as="div" bg="light" pill>

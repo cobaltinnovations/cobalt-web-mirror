@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, Navigate, useMatch, useSearchParams, useNavigate } from 'react-router-dom';
+import { Outlet, Navigate, useMatch, useSearchParams, useNavigate, useParams } from 'react-router-dom';
 
 import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
@@ -34,9 +34,8 @@ export const InTheStudioGroupSessionScheduled = React.lazy(
 export const InTheStudioGroupSessionByRequest = React.lazy(
 	() => import('@/pages/in-the-studio-group-session-by-request')
 );
-export const OnYourTime = React.lazy(() => import('@/pages/on-your-time'));
 export const SessionRequestThankYou = React.lazy(() => import('@/pages/session-request-thank-you'));
-export const OnYourTimeDetail = React.lazy(() => import('@/pages/on-your-time-detail'));
+
 export const Covid19Resources = React.lazy(() => import('@/pages/covid-19-resources'));
 export const WellBeingResources = React.lazy(() => import('@/pages/well-being-resources'));
 export const Privacy = React.lazy(() => import('@/pages/privacy'));
@@ -76,6 +75,7 @@ export const UserSettings = React.lazy(() => import('@/pages/user-settings'));
 export const ResourceLibrary = React.lazy(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-library-topic'));
 export const ResourceLibraryTags = React.lazy(() => import('@/pages/resource-library-tags'));
+export const ResourceLibraryDetail = React.lazy(() => import('@/pages/resource-library-detail'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -137,6 +137,16 @@ const RedirectToSupport = () => {
 	}, [account, navigate, searchString]);
 
 	return null;
+};
+
+const RedirectToResourceLibrary = () => {
+	const { contentId } = useParams<{ contentId: string }>();
+
+	if (contentId) {
+		return <Navigate to={`/resource-library/${contentId}`} replace />;
+	}
+
+	return <Navigate to="/resource-library" replace />;
 };
 
 const ButtonlessHeaderLayout = () => {
@@ -288,7 +298,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			{
 				path: '/on-your-time',
 				private: true,
-				main: OnYourTime,
+				main: RedirectToResourceLibrary,
 			},
 			{
 				path: '/on-your-time-thanks',
@@ -303,7 +313,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			{
 				path: '/on-your-time/:contentId',
 				private: true,
-				main: OnYourTimeDetail,
+				main: RedirectToResourceLibrary,
 			},
 			{
 				path: '/covid-19-resources',
@@ -561,6 +571,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/resource-library/tags/:tagId',
 				private: true,
 				main: ResourceLibraryTags,
+			},
+			{
+				path: '/resource-library/:contentId',
+				private: true,
+				main: ResourceLibraryDetail,
 			},
 			{
 				path: '*',
