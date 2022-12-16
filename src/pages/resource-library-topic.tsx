@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import Color from 'color';
 
@@ -195,12 +195,7 @@ const ResourceLibraryTopic = () => {
 					</>
 				)}
 				<Container className="pt-8">
-					<Row
-						className={classNames({
-							'mb-3': searchIsOpen,
-							'mb-6': !searchIsOpen,
-						})}
-					>
+					<Row className="mb-3">
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<div className={classes.filterButtonsOuter}>
@@ -306,22 +301,28 @@ const ResourceLibraryTopic = () => {
 							</div>
 						</Col>
 					</Row>
-					{searchIsOpen && (
-						<Row className="mb-8">
-							<Col>
-								<Form onSubmit={handleSearchFormSubmit}>
-									<InputHelperSearch
-										autoFocus
-										placeholder="Search Resources"
-										value={searchInputValue}
-										onChange={({ currentTarget }) => {
-											setSearchInputValue(currentTarget.value);
-										}}
-									/>
-								</Form>
-							</Col>
-						</Row>
-					)}
+					<div className="pb-3">
+						<Collapse in={searchIsOpen}>
+							<div className="overflow-hidden">
+								<div className="pb-5">
+									<Row>
+										<Col>
+											<Form onSubmit={handleSearchFormSubmit}>
+												<InputHelperSearch
+													autoFocus
+													placeholder="Search Resources"
+													value={searchInputValue}
+													onChange={({ currentTarget }) => {
+														setSearchInputValue(currentTarget.value);
+													}}
+												/>
+											</Form>
+										</Col>
+									</Row>
+								</div>
+							</div>
+						</Collapse>
+					</div>
 				</Container>
 			</AsyncPage>
 			<AsyncPage fetchData={fetchContent}>
