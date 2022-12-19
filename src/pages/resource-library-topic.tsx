@@ -162,13 +162,20 @@ const ResourceLibraryTopic = () => {
 		}
 
 		const { findResult } = await resourceLibraryService
-			.getResourceLibraryContentByTagGroupId(tagGroupId, { searchQuery, pageNumber: 0, pageSize: 100 })
+			.getResourceLibraryContentByTagGroupId(tagGroupId, {
+				pageNumber: 0,
+				pageSize: 100,
+				searchQuery,
+				tagId: tagIdQuery,
+				contentTypeId: contentTypeIdQuery,
+				contentDurationId: contentDurationIdQuery,
+			})
 			.fetch();
 
 		setFindResultTotalCount(findResult.totalCount);
 		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContents(findResult.contents);
-	}, [searchQuery, tagGroupId]);
+	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
