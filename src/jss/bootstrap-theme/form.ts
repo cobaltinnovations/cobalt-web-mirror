@@ -84,6 +84,7 @@ export const form = (theme: CobaltTheme) => {
 					appearance: 'none',
 					width: 20,
 					height: 20,
+					flexShrink: 0,
 					color: theme.colors.p500,
 					backgroundColor: theme.colors.n0,
 					border: `2px solid ${theme.colors.border}`,
