@@ -172,7 +172,7 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					<div className={classes.informationContainer}>
 						<BackgroundImageContainer size={82} imageUrl={groupSession.imageUrl ?? placeholderImage} />
 						<div className={classes.informationCopyContainer}>
-							<small className="text-uppercase text-muted">{groupSession.description}</small>
+							<div dangerouslySetInnerHTML={{ __html: groupSession.description }} />
 							<h6 className="mb-0">{groupSession.title}</h6>
 							<p className="mb-0">with {groupSession.facilitatorName}</p>
 							<p className="mb-0">{groupSession.startDateTimeDescription}</p>
