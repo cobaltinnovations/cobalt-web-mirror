@@ -8,15 +8,27 @@ export function encodeQueryData(data: any): string {
 	return queries.join('&');
 }
 
-export function buildQueryParamUrl(url: string, queryParams: any): string {
+export function buildQueryParamUrl(url: string, queryParams?: Record<string, any>): string {
 	let queryString;
 
 	if (queryParams) {
-		queryString = new URLSearchParams(queryParams as Record<string, string>);
+		const urlSearchParams = new URLSearchParams();
+
+		Object.entries(queryParams).forEach(([key, value]) => {
+			if (Array.isArray(value)) {
+				value.forEach((innerValue) => {
+					urlSearchParams.append(key, innerValue);
+				});
+			} else {
+				urlSearchParams.append(key, value);
+			}
+		});
+
+		queryString = urlSearchParams.toString();
 	}
 
 	if (queryString) {
-		url = url.concat(`?${queryString}`);
+		url = url.concat(`?${queryString.toString()}`);
 	}
 
 	return url;

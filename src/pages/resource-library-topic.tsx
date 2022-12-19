@@ -67,6 +67,14 @@ const ResourceLibraryTopic = () => {
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
+	const hasQueryParams = useMemo(
+		() =>
+			searchQuery.length > 0 ||
+			tagIdQuery.length > 0 ||
+			contentTypeIdQuery.length > 0 ||
+			contentDurationIdQuery.length > 0,
+		[contentDurationIdQuery.length, contentTypeIdQuery.length, searchQuery.length, tagIdQuery.length]
+	);
 
 	const classes = useResourceLibraryTopicStyles();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -373,7 +381,7 @@ const ResourceLibraryTopic = () => {
 			</AsyncPage>
 			<AsyncPage fetchData={fetchContent}>
 				<Container className="pb-24">
-					{searchQuery && (
+					{hasQueryParams && (
 						<Row className="mb-10">
 							<h3 className="mb-0">
 								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}

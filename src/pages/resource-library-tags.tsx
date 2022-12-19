@@ -28,14 +28,20 @@ const ResourceLibraryTags = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
+	const hasQueryParams = useMemo(
+		() => contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
+		[contentDurationIdQuery.length, contentTypeIdQuery.length]
+	);
 
 	const [filtersResponse, setFiltersResponse] = useState<{
 		contentTypes: ContentTypeFilterModel[];
 		contentDurations: ContentDurationFilterModel[];
 	}>();
 	const [filters, setFilters] = useState<Record<FILTER_IDS, SimpleFilterModel<FILTER_IDS>>>();
-	const [tag, setTag] = useState<TagModel>();
+	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
+	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
 	const [tagGroup, setTagGroup] = useState<TagGroupModel>();
+	const [tag, setTag] = useState<TagModel>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
 
@@ -100,7 +106,7 @@ const ResourceLibraryTags = () => {
 			throw new Error('tagId is undefined.');
 		}
 
-		const response = await resourceLibraryService
+		const { findResult } = await resourceLibraryService
 			.getResourceLibraryContentByTagId(tagId, {
 				pageNumber: 0,
 				pageSize: 100,
@@ -109,7 +115,9 @@ const ResourceLibraryTags = () => {
 			})
 			.fetch();
 
-		setContent(response.findResult.contents);
+		setFindResultTotalCount(findResult.totalCount);
+		setFindResultTotalCountDescription(findResult.totalCountDescription);
+		setContent(findResult.contents);
 	}, [contentDurationIdQuery, contentTypeIdQuery, tagId]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
@@ -238,6 +246,13 @@ const ResourceLibraryTags = () => {
 			</AsyncPage>
 			<AsyncPage fetchData={fetchContent}>
 				<Container className="pb-24">
+					{hasQueryParams && (
+						<Row className="mb-10">
+							<h3 className="mb-0">
+								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
+							</h3>
+						</Row>
+					)}
 					<Row>
 						{content.map((content) => {
 							return (
