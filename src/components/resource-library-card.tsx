@@ -15,6 +15,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 8,
 		overflow: 'hidden',
 		flexDirection: 'column',
+		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
 		transition: '0.2s all',
@@ -40,9 +41,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 	informationOuter: {
 		flex: 1,
 		display: 'flex',
-		padding: '16px 20px',
+		padding: '16px 20px 0',
 		flexDirection: 'column',
 		justifyContent: 'space-between',
+	},
+	tagsOuter: {
+		padding: '0 20px 16px',
 	},
 	link: {
 		textDecoration: 'none',
@@ -103,25 +107,29 @@ const ResourceLibraryCard = ({
 	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
-		<Link to={`/resource-library/${contentId}`} className={classNames(classes.resourceLibraryCard, className)}>
-			<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
-				{badgeTitle && (
-					<Badge as="div" bg="light" pill>
-						{badgeTitle}
-					</Badge>
-				)}
-			</div>
-			<div className={classes.informationOuter}>
-				<div className="mb-2">
-					{/* <p className="mb-2 fw-bold">
+		<div className={classNames(classes.resourceLibraryCard, className)}>
+			<Link to={`/resource-library/${contentId}`} className="text-decoration-none">
+				<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
+					{badgeTitle && (
+						<Badge as="div" bg="light" pill>
+							{badgeTitle}
+						</Badge>
+					)}
+				</div>
+				<div className={classes.informationOuter}>
+					<div className="mb-2">
+						{/* <p className="mb-2 fw-bold">
 						<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
 							{subtopic}
 						</Link>
 					</p> */}
-					<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
-					<p className="mb-2 text-gray">by {author}</p>
-					<p className={classNames(classes.description, 'text-dark mb-0')}>{description}</p>
+						<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
+						<p className="mb-2 text-gray">by {author}</p>
+						<p className={classNames(classes.description, 'text-dark mb-0')}>{description}</p>
+					</div>
 				</div>
+			</Link>
+			<div className={classes.tagsOuter}>
 				<div className="d-flex justify-content-between align-items-end">
 					<div className="d-none d-lg-flex flex-wrap">
 						{tags.map((tag) => {
@@ -152,7 +160,7 @@ const ResourceLibraryCard = ({
 					</div>
 				</div>
 			</div>
-		</Link>
+		</div>
 	);
 };
 
