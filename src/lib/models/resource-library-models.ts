@@ -1,4 +1,4 @@
-import { COLOR_IDS, Content } from '@/lib/models';
+import { COLOR_IDS, Content, ContentTypeId } from '@/lib/models';
 
 export type ResourceLibraryContentModel = {
 	tagIds: string[];
@@ -21,4 +21,14 @@ export interface TagModel {
 	tagGroupId: string;
 	tagId: string;
 	urlName: string;
+}
+
+export interface ContentTypeFilterModel {
+	contentTypeId: ContentTypeId;
+	description: string;
+}
+
+export interface ContentDurationFilterModel {
+	contentDurationId: string;
+	description: string;
 }

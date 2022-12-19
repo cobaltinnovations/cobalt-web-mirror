@@ -1,16 +1,22 @@
 import { cloneDeep } from 'lodash';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import Color from 'color';
 
-import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
+import {
+	ContentDurationFilterModel,
+	ContentTypeFilterModel,
+	ResourceLibraryContentModel,
+	TagGroupModel,
+	TagModel,
+} from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import { resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
-import SimpleFilter from '@/components/simple-filter';
+import SimpleFilter, { SimpleFilterModel } from '@/components/simple-filter';
 import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard from '@/components/resource-library-card';
 
@@ -19,9 +25,9 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 enum FILTER_IDS {
-	SUBTOPIC = 'SUBTOPIC',
-	TYPE = 'TYPE',
-	LENGTH = 'LENGTH',
+	TAGS = 'TAGS',
+	CONTENT_TYPES = 'CONTENT_TYPES',
+	CONTENT_DURATIONS = 'CONTENT_DURATIONS',
 }
 
 const useResourceLibraryTopicStyles = createUseThemedStyles((theme) => ({
@@ -55,61 +61,30 @@ const useResourceLibraryTopicStyles = createUseThemedStyles((theme) => ({
 }));
 
 const ResourceLibraryTopic = () => {
-	const classes = useResourceLibraryTopicStyles();
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const searchQuery = searchParams.get('searchQuery') ?? '';
+	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
+	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
+	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
+	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
 
+	const classes = useResourceLibraryTopicStyles();
 	const searchInputRef = useRef<HTMLInputElement>(null);
+
+	const [filtersResponse, setFiltersResponse] = useState<{
+		contentTypes: ContentTypeFilterModel[];
+		contentDurations: ContentDurationFilterModel[];
+		tags: TagModel[];
+	}>();
+	const [filters, setFilters] = useState<Record<FILTER_IDS, SimpleFilterModel<FILTER_IDS>>>();
 	const [searchIsOpen, setSearchIsOpen] = useState(false);
 	const [searchInputValue, setSearchInputValue] = useState('');
-	const [filters, setFilters] = useState({
-		[FILTER_IDS.SUBTOPIC]: {
-			id: FILTER_IDS.SUBTOPIC,
-			title: 'Subtopic',
-			searchParam: 'subtopicId',
-			value: searchParams.getAll('subtopicId'),
-			options: [
-				{ title: 'Mood', value: 'MOOD' },
-				{ title: 'Anxiety', value: 'ANXIETY' },
-				{ title: 'Sleep/Fatigue', value: 'SLEEP_FATIGUE' },
-				{ title: 'Substance Use', value: 'SUBSTANCE_USE' },
-			],
-			isShowing: false,
-		},
-		[FILTER_IDS.TYPE]: {
-			id: FILTER_IDS.TYPE,
-			title: 'Type',
-			searchParam: 'typeId',
-			value: searchParams.getAll('typeId'),
-			options: [
-				{ title: 'Video', value: 'VIDEO' },
-				{ title: 'Podcast', value: 'PODCAST' },
-				{ title: 'Article', value: 'ARTICLE' },
-				{ title: 'Website', value: 'WEBSITE' },
-				{ title: 'App', value: 'APP' },
-			],
-			isShowing: false,
-		},
-		[FILTER_IDS.LENGTH]: {
-			id: FILTER_IDS.LENGTH,
-			title: 'Length',
-			searchParam: 'lengthId',
-			value: searchParams.getAll('lengthId'),
-			options: [
-				{ title: '<5 Minutes', value: 'LESS_THAN_FIVE_MINUTES' },
-				{ title: '5-10 Minutes', value: 'FIVE_TO_TEN_MINUTES' },
-				{ title: '10-30 Minutes', value: 'TEN_TO_THIRTY_MINUTES' },
-				{ title: '>30 Minutes', value: 'GREATER_THAN_THIRTY_MINUTES' },
-			],
-			isShowing: false,
-		},
-	});
+
 	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
-	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
 	const [tagGroup, setTagGroup] = useState<TagGroupModel>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
+	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
 
 	const fetchTagGroup = useCallback(async () => {
 		if (!tagGroupId) {
@@ -123,6 +98,59 @@ const ResourceLibraryTopic = () => {
 		setTagGroup(response.tagGroup);
 		setTagsByTagId(response.tagsByTagId);
 	}, [tagGroupId]);
+
+	const fetchFilters = useCallback(async () => {
+		if (!tagGroupId) {
+			throw new Error('tagGroupId is undefined.');
+		}
+
+		const response = await resourceLibraryService.getResourceLibraryFiltersByTagGroupId(tagGroupId).fetch();
+		setFiltersResponse(response);
+	}, [tagGroupId]);
+
+	useEffect(() => {
+		if (!filtersResponse) {
+			return;
+		}
+
+		const formattedFilters = {
+			[FILTER_IDS.TAGS]: {
+				id: FILTER_IDS.TAGS,
+				title: 'Subtopic',
+				searchParam: 'tagId',
+				value: tagIdQuery,
+				options: filtersResponse.tags.map((tag) => ({
+					title: tag.name,
+					value: tag.tagId,
+				})),
+				isShowing: false,
+			},
+			[FILTER_IDS.CONTENT_TYPES]: {
+				id: FILTER_IDS.CONTENT_TYPES,
+				title: 'Type',
+				searchParam: 'contentTypeId',
+				value: contentTypeIdQuery,
+				options: filtersResponse.contentTypes.map((ct) => ({
+					title: ct.description,
+					value: ct.contentTypeId,
+				})),
+				isShowing: false,
+			},
+			[FILTER_IDS.CONTENT_DURATIONS]: {
+				id: FILTER_IDS.CONTENT_DURATIONS,
+				title: 'Length',
+				searchParam: 'contentDurationId',
+				value: contentDurationIdQuery,
+				options: filtersResponse.contentDurations.map((cd) => ({
+					title: cd.description,
+					value: cd.contentDurationId,
+				})),
+				isShowing: false,
+			},
+		};
+
+		setFilters(formattedFilters);
+	}, [contentDurationIdQuery, contentTypeIdQuery, filtersResponse, tagIdQuery]);
 
 	const fetchContent = useCallback(async () => {
 		if (searchQuery) {
@@ -194,86 +222,92 @@ const ResourceLibraryTopic = () => {
 						</HeroContainer>
 					</>
 				)}
+			</AsyncPage>
+			<AsyncPage fetchData={fetchFilters}>
 				<Container className="pt-8">
 					<Row className="mb-3">
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<div className={classes.filterButtonsOuter}>
-									{Object.values(filters).map((filter) => {
-										return (
-											<SimpleFilter
-												key={filter.id}
-												className="me-2"
-												title={filter.title}
-												show={filter.isShowing}
-												activeLength={searchParams.getAll(filter.searchParam).length}
-												onClick={() => {
-													const filtersClone = cloneDeep(filters);
-													filtersClone[filter.id].isShowing = true;
-													setFilters(filtersClone);
-												}}
-												onHide={() => {
-													const filtersClone = cloneDeep(filters);
-													filtersClone[filter.id].value = searchParams.getAll(
-														filtersClone[filter.id].searchParam
-													);
-													filtersClone[filter.id].isShowing = false;
-													setFilters(filtersClone);
-												}}
-												onClear={() => {
-													const filtersClone = cloneDeep(filters);
-													filtersClone[filter.id].value = [];
-													filtersClone[filter.id].isShowing = false;
-													setFilters(filtersClone);
+									{filters &&
+										Object.values(filters).map((filter) => {
+											return (
+												<SimpleFilter
+													key={filter.id}
+													className="me-2"
+													title={filter.title}
+													show={filter.isShowing}
+													activeLength={searchParams.getAll(filter.searchParam).length}
+													onClick={() => {
+														const filtersClone = cloneDeep(filters);
+														filtersClone[filter.id].isShowing = true;
+														setFilters(filtersClone);
+													}}
+													onHide={() => {
+														const filtersClone = cloneDeep(filters);
+														filtersClone[filter.id].value = searchParams.getAll(
+															filtersClone[filter.id].searchParam
+														);
+														filtersClone[filter.id].isShowing = false;
+														setFilters(filtersClone);
+													}}
+													onClear={() => {
+														const filtersClone = cloneDeep(filters);
+														filtersClone[filter.id].value = [];
+														filtersClone[filter.id].isShowing = false;
+														setFilters(filtersClone);
 
-													applyValuesToSearchParam([], filtersClone[filter.id].searchParam);
-												}}
-												onApply={() => {
-													const filtersClone = cloneDeep(filters);
-													filtersClone[filter.id].isShowing = false;
-													setFilters(filtersClone);
+														applyValuesToSearchParam(
+															[],
+															filtersClone[filter.id].searchParam
+														);
+													}}
+													onApply={() => {
+														const filtersClone = cloneDeep(filters);
+														filtersClone[filter.id].isShowing = false;
+														setFilters(filtersClone);
 
-													applyValuesToSearchParam(
-														filtersClone[filter.id].value,
-														filtersClone[filter.id].searchParam
-													);
-												}}
-											>
-												{filter.options.map((option) => {
-													return (
-														<Form.Check
-															key={option.value}
-															type="checkbox"
-															name={filter.id}
-															id={`${filter.id}--${option.value}`}
-															label={option.title}
-															value={option.value}
-															checked={filter.value.includes(option.value)}
-															onChange={({ currentTarget }) => {
-																const filtersClone = cloneDeep(filters);
-																const indexToRemove = filtersClone[
-																	filter.id
-																].value.findIndex((v) => v === currentTarget.value);
+														applyValuesToSearchParam(
+															filtersClone[filter.id].value,
+															filtersClone[filter.id].searchParam
+														);
+													}}
+												>
+													{filter.options.map((option) => {
+														return (
+															<Form.Check
+																key={option.value}
+																type="checkbox"
+																name={filter.id}
+																id={`${filter.id}--${option.value}`}
+																label={option.title}
+																value={option.value}
+																checked={filter.value.includes(option.value)}
+																onChange={({ currentTarget }) => {
+																	const filtersClone = cloneDeep(filters);
+																	const indexToRemove = filtersClone[
+																		filter.id
+																	].value.findIndex((v) => v === currentTarget.value);
 
-																if (indexToRemove > -1) {
-																	filtersClone[filter.id].value.splice(
-																		indexToRemove,
-																		1
-																	);
-																} else {
-																	filtersClone[filter.id].value.push(
-																		currentTarget.value
-																	);
-																}
+																	if (indexToRemove > -1) {
+																		filtersClone[filter.id].value.splice(
+																			indexToRemove,
+																			1
+																		);
+																	} else {
+																		filtersClone[filter.id].value.push(
+																			currentTarget.value
+																		);
+																	}
 
-																setFilters(filtersClone);
-															}}
-														/>
-													);
-												})}
-											</SimpleFilter>
-										);
-									})}
+																	setFilters(filtersClone);
+																}}
+															/>
+														);
+													})}
+												</SimpleFilter>
+											);
+										})}
 								</div>
 								<div className={classes.searchButtonOuter}>
 									<Button

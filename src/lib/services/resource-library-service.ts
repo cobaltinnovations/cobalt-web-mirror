@@ -1,5 +1,11 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
+import {
+	ContentDurationFilterModel,
+	ContentTypeFilterModel,
+	ResourceLibraryContentModel,
+	TagGroupModel,
+	TagModel,
+} from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
 export const resourceLibraryService = {
@@ -67,6 +73,25 @@ export const resourceLibraryService = {
 		}>({
 			method: 'GET',
 			url: buildQueryParamUrl(`/resource-library/tags/${tagId}`, queryParameters),
+		});
+	},
+	getResourceLibraryFiltersByTagGroupId(tagGroupId: string) {
+		return httpSingleton.orchestrateRequest<{
+			contentTypes: ContentTypeFilterModel[];
+			contentDurations: ContentDurationFilterModel[];
+			tags: TagModel[];
+		}>({
+			method: 'GET',
+			url: `/resource-library/tag-group-filters/${tagGroupId}`,
+		});
+	},
+	getResourceLibraryFiltersByTagId(tagId: string) {
+		return httpSingleton.orchestrateRequest<{
+			contentTypes: ContentTypeFilterModel[];
+			contentDurations: ContentDurationFilterModel[];
+		}>({
+			method: 'GET',
+			url: `/resource-library/tag-filters/${tagId}`,
 		});
 	},
 };

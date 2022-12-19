@@ -117,4 +117,16 @@ const SimpleFilter = ({
 	);
 };
 
+export interface SimpleFilterModel<T> {
+	id: T;
+	title: string;
+	searchParam: string;
+	value: string[];
+	options: {
+		title: string;
+		value: string;
+	}[];
+	isShowing: boolean;
+}
+
 export default SimpleFilter;
