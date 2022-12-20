@@ -1,14 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
 import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
+import { resourceLibraryService } from '@/lib/services';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
-import { resourceLibraryService } from '@/lib/services';
-import { useSearchParams } from 'react-router-dom';
 import InputHelperSearch from '@/components/input-helper-search';
 
 const carouselConfig = {
@@ -43,6 +44,9 @@ const ResourceLibrary = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 
+	const { hasTouchScreen } = useTouchScreenCheck();
+	const searchInputRef = useRef<HTMLInputElement>(null);
+
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
 	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
@@ -50,6 +54,12 @@ const ResourceLibrary = () => {
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
+
+	useEffect(() => {
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
+		}
+	}, [hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
 		if (searchQuery) {
@@ -101,6 +111,7 @@ const ResourceLibrary = () => {
 				</p>
 				<Form onSubmit={handleSearchFormSubmit}>
 					<InputHelperSearch
+						ref={searchInputRef}
 						placeholder="Search Resources"
 						value={searchInputValue}
 						onChange={({ currentTarget }) => {
