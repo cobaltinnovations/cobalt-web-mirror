@@ -572,7 +572,7 @@ const ConnectWithSupport: FC = () => {
 								>
 									Provider Type
 								</FilterPill>
-								<FilterPill
+								{/* <FilterPill
 									active={activeFilters[BookingFilters.Availability]}
 									onClick={() => {
 										trackEvent(ProviderSearchAnalyticsEvent.clickFilterPill('Availability'));
@@ -580,7 +580,7 @@ const ConnectWithSupport: FC = () => {
 									}}
 								>
 									Availability
-								</FilterPill>
+								</FilterPill> */}
 								{/* <FilterPill
 									disabled={!isSpecialtiesFilterEnabled}
 									active={activeFilters[BookingFilters.Specialty]}
