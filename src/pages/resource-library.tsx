@@ -101,6 +101,32 @@ const ResourceLibrary = () => {
 		setSearchParams(searchParams, { replace: true });
 	};
 
+	const handleKeydown = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key !== 'Escape') {
+				return;
+			}
+
+			setSearchInputValue('');
+
+			searchParams.delete('searchQuery');
+			setSearchParams(searchParams, { replace: true });
+
+			if (!hasTouchScreen) {
+				searchInputRef.current?.focus();
+			}
+		},
+		[hasTouchScreen, searchParams, setSearchParams]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleKeydown, false);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeydown, false);
+		};
+	}, [handleKeydown]);
+
 	return (
 		<>
 			<HeroContainer className="bg-n75">
