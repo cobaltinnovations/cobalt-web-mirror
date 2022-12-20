@@ -16,8 +16,8 @@ const firstColLinks = [
 		to: '/in-the-studio',
 	},
 	{
-		label: 'On Your Time',
-		to: '/on-your-time',
+		label: 'Resource Library',
+		to: '/resource-library',
 	},
 ];
 
