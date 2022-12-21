@@ -234,15 +234,6 @@ const AdditionalNavigationItemIcon = ({ iconName }: { iconName: string }) => {
 
 const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	{
-		items: () => [
-			{
-				label: 'Stats Dashboard',
-				icon: <AdminIcon />,
-				to: () => '/stats-dashboard',
-			},
-		],
-	},
-	{
 		title: 'Content Management',
 		items: () => [
 			{
