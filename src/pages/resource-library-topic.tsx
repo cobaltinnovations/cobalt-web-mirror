@@ -18,11 +18,12 @@ import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
 import SimpleFilter, { SimpleFilterModel } from '@/components/simple-filter';
 import InputHelperSearch from '@/components/input-helper-search';
-import ResourceLibraryCard from '@/components/resource-library-card';
+import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import { SkeletonText } from '@/components/skeleton-loaders';
 
 enum FILTER_IDS {
 	TAGS = 'TAGS',
@@ -209,7 +210,32 @@ const ResourceLibraryTopic = () => {
 
 	return (
 		<>
-			<AsyncPage fetchData={fetchTagGroup}>
+			<AsyncPage
+				fetchData={fetchTagGroup}
+				loadingComponent={
+					<>
+						<Breadcrumb
+							xs={{ span: 12 }}
+							lg={{ span: 12 }}
+							xl={{ span: 12 }}
+							breadcrumbs={[
+								{
+									to: '/',
+									title: 'Home',
+								},
+								{
+									to: '/resource-library',
+									title: 'Resource Library',
+								},
+							]}
+						/>
+						<HeroContainer>
+							<SkeletonText type="h1" className="mb-4 text-center" width="50%" />
+							<SkeletonText type="p" className="mb-0 text-center fs-large" numberOfLines={3} />
+						</HeroContainer>
+					</>
+				}
+			>
 				{tagGroup && (
 					<>
 						<Breadcrumb
@@ -379,7 +405,33 @@ const ResourceLibraryTopic = () => {
 					</div>
 				</Container>
 			</AsyncPage>
-			<AsyncPage fetchData={fetchContent}>
+			<AsyncPage
+				fetchData={fetchContent}
+				loadingComponent={
+					<Container className="pb-24">
+						<Row>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+							<Col xs={6} lg={4} className="mb-8">
+								<SkeletonResourceLibraryCard />
+							</Col>
+						</Row>
+					</Container>
+				}
+			>
 				<Container className="pb-24">
 					{hasQueryParams && (
 						<Row className="mb-10">

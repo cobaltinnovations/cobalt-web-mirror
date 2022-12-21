@@ -8,6 +8,7 @@ import { ContentTypeId, TagModel } from '@/lib/models';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
+import { SkeletonBadge, SkeletonImage, SkeletonText } from './skeleton-loaders';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibraryCard: {
@@ -37,6 +38,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 			right: 8,
 			position: 'absolute',
 		},
+	},
+	imageOuterSkeleton: {
+		paddingBottom: '56.25%',
 	},
 	informationOuter: {
 		flex: 1,
@@ -157,6 +161,40 @@ const ResourceLibraryCard = ({
 					<div className="d-flex align-items-center flex-shrink-0">
 						<ContentTypeIcon contentTypeId={contentTypeId} width={16} height={16} className="text-gray" />
 						{duration && <span className="ms-1 fs-ui-small fw-bold text-gray">{duration}</span>}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+interface SkeletonResourceLibraryCardProps {
+	className?: string;
+}
+
+export const SkeletonResourceLibraryCard = ({ className }: SkeletonResourceLibraryCardProps) => {
+	const classes = useStyles();
+
+	return (
+		<div className={classNames(classes.resourceLibraryCard, className)}>
+			<div>
+				<SkeletonImage className={classes.imageOuterSkeleton} />
+				<div className={classes.informationOuter}>
+					<div className="mb-2">
+						<SkeletonText type="h4" className={classNames(classes.title, 'mb-1')} width="75%" />
+						<SkeletonText type="p" className="mb-2" width="50%" />
+						<SkeletonText type="p" numberOfLines={3} className={classNames(classes.description, 'mb-0')} />
+					</div>
+				</div>
+			</div>
+			<div className={classes.tagsOuter}>
+				<div className="d-flex justify-content-between align-items-end">
+					<div className="d-none d-lg-flex flex-wrap">
+						<SkeletonBadge className="me-1 mt-1 fs-ui-small" />
+						<SkeletonBadge className="me-1 mt-1 fs-ui-small" />
+					</div>
+					<div className="d-flex align-items-center flex-shrink-0">
+						<SkeletonText type="p" width="60px" className="m-0 ms-1 fs-ui-small" />
 					</div>
 				</div>
 			</div>

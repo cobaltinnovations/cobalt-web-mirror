@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback, useContext, PropsWithChildren } from 'react';
+import React, { FC, useState, useEffect, useCallback, useContext, PropsWithChildren, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Loader from '@/components/loader';
@@ -13,19 +13,21 @@ enum DISPLAY_STATES {
 	ERROR = 'ERROR',
 }
 
-interface AsyncPageProps extends PropsWithChildren {
+interface AsyncWrapperProps extends PropsWithChildren {
 	fetchData(): void;
 	abortFetch?(): void;
 	showBackButton?: boolean;
 	showRetryButton?: boolean;
+	loadingComponent?: ReactNode;
 }
 
-const AsyncPage: FC<AsyncPageProps> = ({
+const AsyncWrapper: FC<AsyncWrapperProps> = ({
 	children,
 	fetchData,
 	abortFetch,
 	showBackButton = true,
 	showRetryButton = true,
+	loadingComponent,
 }) => {
 	const navigate = useNavigate();
 	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
@@ -78,6 +80,10 @@ const AsyncPage: FC<AsyncPageProps> = ({
 	function getDisplayState() {
 		switch (displayState) {
 			case DISPLAY_STATES.LOADING:
+				if (loadingComponent) {
+					return loadingComponent;
+				}
+
 				return <Loader />;
 			case DISPLAY_STATES.SUCCESS:
 				return children;
@@ -98,4 +104,4 @@ const AsyncPage: FC<AsyncPageProps> = ({
 	return <>{getDisplayState()}</>;
 };
 
-export default AsyncPage;
+export default AsyncWrapper;
