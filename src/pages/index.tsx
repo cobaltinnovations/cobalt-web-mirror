@@ -166,7 +166,7 @@ const Index: FC = () => {
 					<Container className="pt-20">
 						<Row>
 							<Col>
-								<h3 className="mb-2">On Your Time</h3>
+								<h3 className="mb-2">Resource Library</h3>
 							</Col>
 						</Row>
 					</Container>
@@ -229,16 +229,7 @@ const Index: FC = () => {
 					<Container className="pb-20">
 						<Row>
 							<Col>
-								<div className="d-flex justify-content-center mb-4">
-									<Button
-										variant="light"
-										onClick={() => {
-											navigate('/on-your-time', { state: { personalize: true } });
-										}}
-									>
-										Personalize Recommendations
-									</Button>
-								</div>
+								<div className="d-flex justify-content-center mb-4"></div>
 							</Col>
 						</Row>
 					</Container>

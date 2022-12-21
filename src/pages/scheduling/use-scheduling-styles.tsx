@@ -35,7 +35,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 		height: 'calc(100vh - 60px)', // subtracting header + footer height
 	},
 	sideBar: {
-		width: 440,
+		width: 355,
 		flexShrink: 0,
 		backgroundColor: theme.colors.n0,
 		overflowX: 'scroll',
@@ -60,7 +60,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 					display: 'flex',
 					alignItems: 'center',
 					'& .fc-toolbar-title': {
-						...theme.fonts.large,
+						...theme.fonts.default,
 					},
 					'& button.fc-prev-button, & button.fc-next-button': {
 						margin: 0,
@@ -80,12 +80,26 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 						marginLeft: 8,
 					},
 					'& button.fc-today-button': {
-						...theme.fonts.default,
+						border: 0,
 						borderRadius: 500,
-						padding: '4px 12px',
+						padding: '6px 16px',
+						position: 'relative',
+						...theme.fonts.default,
+						...theme.fonts.bodyBold,
 						color: theme.colors.p500,
+						textTransform: 'capitalize',
 						backgroundColor: 'transparent',
-						border: `1px solid ${theme.colors.border}`,
+						'&:after': {
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							content: '""',
+							borderRadius: 500,
+							position: 'absolute',
+							pointerEvents: 'none',
+							border: `2px solid ${theme.colors.p500}`,
+						},
 					},
 				},
 			},
@@ -94,8 +108,8 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 			},
 			'& .fc-daygrid-day': {
 				'& .fc-daygrid-day-frame': {
-					width: 45,
-					height: 45,
+					width: 36,
+					height: 36,
 					display: 'flex',
 					borderRadius: '50%',
 					alignItems: 'center',

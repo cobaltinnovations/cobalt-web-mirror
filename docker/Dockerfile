@@ -10,7 +10,7 @@
 #
 # docker stop $(docker ps -q --filter ancestor=cobalt-web)
 
-FROM node:16.13.2-alpine
+FROM node:18.12.1-alpine
 
 EXPOSE 3000
 

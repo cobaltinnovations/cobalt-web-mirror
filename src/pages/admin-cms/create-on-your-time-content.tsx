@@ -11,14 +11,15 @@ import SessionCropModal from '@/components/session-crop-modal';
 import InputHelper from '@/components/input-helper';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
-import { adminService, ContentTypeLabel, imageUploader, InstitutionFilters } from '@/lib/services';
+import { adminService, imageUploader, InstitutionFilters, resourceLibraryService } from '@/lib/services';
 import {
 	Content,
+	ContentTypeFilterModel,
 	ContentTypeId,
 	ContentVisibilityTypeId,
-	PersonalizationChoice,
-	PersonalizationQuestion,
 	ROLE_ID,
+	TagGroupModel,
+	TagModel,
 } from '@/lib/models';
 
 import { useCobaltTheme } from '@/jss/theme';
@@ -27,20 +28,20 @@ import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
 import useAccount from '@/hooks/use-account';
-import { PersonalizationCheckbox } from '@/components/personalize-recommendations-modal';
 import OnYourTimePreview from '@/components/admin-cms/on-your-time-preview';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import Breadcrumb from '@/components/breadcrumb';
 import useHandleError from '@/hooks/use-handle-error';
+import { cloneDeep } from 'lodash';
+import classNames from 'classnames';
 
 const onYourTimeContentSchema = yup
 	.object()
 	.required()
 	.shape({
 		contentTypeId: yup.string().required().default(''),
-		contentTypeLabel: yup.string().required().default(''),
 		title: yup.string().required().default(''),
 		author: yup.string().required().default(''),
 		created: yup.string().default(undefined),
@@ -55,6 +56,7 @@ const onYourTimeContentSchema = yup
 		visibilityPrivate: yup.boolean().default(false),
 		visibilityNetwork: yup.boolean().default(false),
 		visibilityPublic: yup.boolean().default(true),
+		tagIds: yup.array().of(yup.string().required().default('')).required().default([]),
 	});
 
 export type onYourTimeFormData = yup.InferType<typeof onYourTimeContentSchema>;
@@ -79,10 +81,11 @@ const CreateOnYourTimeContent: FC = () => {
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isAdding, setIsAdding] = useState(false);
-	const [shouldDisabledInputs, setShouldDisabledInputs] = useState(false);
-	const [tagQuestions, setTagQuestions] = useState<PersonalizationQuestion[] | undefined>([]);
-	const [choices, setChoices] = useState<Record<string, PersonalizationChoice['selectedAnswers']>>({});
-	const [contentTypeLabelOptions, setContentTypeLabelOptions] = useState<ContentTypeLabel[]>([]);
+	const [shouldDisabledInputs] = useState(false);
+
+	const [contentTypes, setContentTypes] = useState<ContentTypeFilterModel[]>([]);
+	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
+	const [tags, setTags] = useState<TagModel[]>([]);
 
 	const [contentCropModalImageSource, setContentCropModalImageSource] = useState('');
 	const [contentCropModalIsOpen, setContentCropModalIsOpen] = useState<boolean>(false);
@@ -94,12 +97,16 @@ const CreateOnYourTimeContent: FC = () => {
 		setIsEditing(!!editing && editing.toLowerCase() === 'true');
 		setIsAdding(!!adding && adding.toLowerCase() === 'true');
 
-		const { contentTags } = await adminService.fetchContentTags().fetch();
-		const { institutions } = await adminService.fetchInstitutions().fetch();
-		const { contentTypeLabels } = await adminService.fetchContentTypeLabels().fetch();
-		setTagQuestions(contentTags?.assessmentQuestions);
-		setContentInstitutions(institutions);
-		setContentTypeLabelOptions(contentTypeLabels);
+		const [contentTypesResponse, contentTagsResponse, institutionsResponse] = await Promise.all([
+			resourceLibraryService.getResourceLibraryContentTypes().fetch(),
+			adminService.fetchContentTags().fetch(),
+			adminService.fetchInstitutions().fetch(),
+		]);
+
+		setContentTypes(contentTypesResponse.contentTypes);
+		setTagGroups(contentTagsResponse.tagGroups ?? []);
+		setTags(contentTagsResponse.tags ?? []);
+		setContentInstitutions(institutionsResponse.institutions);
 
 		if (!contentId) {
 			return;
@@ -126,33 +133,6 @@ const CreateOnYourTimeContent: FC = () => {
 						})
 					);
 				}
-
-				if (!!content?.contentTagIds && content.contentTagIds.length > 0) {
-					let choicesToSet = {};
-					const buildChoices = (question: PersonalizationQuestion) => {
-						const selectedAnswers: { answerId: string }[] = [];
-						question.answers.forEach((answer) => {
-							if (content.contentTagIds?.includes(answer.answerId)) {
-								selectedAnswers.push({ answerId: answer.answerId });
-							}
-							if (answer?.question) {
-								buildChoices(answer.question);
-							}
-						});
-
-						if (selectedAnswers.length > 0) {
-							choicesToSet = { ...choicesToSet, [question.questionId]: selectedAnswers };
-						}
-					};
-
-					if (!!contentTags?.assessmentQuestions && contentTags.assessmentQuestions.length > 0) {
-						contentTags.assessmentQuestions.forEach((question) => {
-							buildChoices(question);
-						});
-					}
-
-					setChoices(choicesToSet);
-				}
 			}
 
 			if (adding) {
@@ -164,7 +144,6 @@ const CreateOnYourTimeContent: FC = () => {
 				setImagePreview(contentToSet.imageUrl);
 				setInitialValues({
 					contentTypeId: contentToSet.contentTypeId,
-					contentTypeLabel: contentToSet.contentTypeLabelId,
 					title: contentToSet.title,
 					author: contentToSet.author,
 					url: contentToSet.url,
@@ -175,6 +154,7 @@ const CreateOnYourTimeContent: FC = () => {
 					visibilityPrivate: !content?.visibleToOtherInstitutions || false,
 					visibilityPublic: content?.visibilityId === ContentVisibilityTypeId.Public,
 					visibilityNetwork: content?.visibilityId === ContentVisibilityTypeId.Network,
+					tagIds: contentToSet.tagIds ?? [],
 				} as onYourTimeFormData);
 			}
 		}
@@ -193,10 +173,9 @@ const CreateOnYourTimeContent: FC = () => {
 
 			const submissionValues = {
 				contentTypeId: values.contentTypeId,
-				contentTypeLabelId: values.contentTypeLabel,
 				title: values.title,
 				author: values.author,
-				...(values.url ? { url: values.url } : {}),
+				...(values.url && { url: values.url }),
 				imageUrl: values.imageUrl,
 				description: values.description,
 				durationInMinutes: values.duration,
@@ -204,14 +183,7 @@ const CreateOnYourTimeContent: FC = () => {
 				addToInstitution: isAdding,
 				visibilityId,
 				institutionIdList: selectedInstitutions,
-				contentTags: {
-					choices: Object.keys(choices).map((key) => {
-						return {
-							questionId: key,
-							selectedAnswers: choices[key],
-						};
-					}),
-				},
+				tagIds: values.tagIds,
 			};
 
 			if (isEditing || isAdding) {
@@ -387,95 +359,16 @@ const CreateOnYourTimeContent: FC = () => {
 																		<option value="" disabled>
 																			Select...
 																		</option>
-																		<option
-																			key={'External Blog'}
-																			value={ContentTypeId.ExternalBlog}
-																		>
-																			External Blog
-																		</option>
-																		<option
-																			key={'Internal Blog'}
-																			value={ContentTypeId.InternalBlog}
-																		>
-																			Internal Blog
-																		</option>
-																		<option
-																			key={'Article'}
-																			value={ContentTypeId.Article}
-																		>
-																			Article
-																		</option>
-																		<option
-																			key={'Audio'}
-																			value={ContentTypeId.Audio}
-																		>
-																			Audio
-																		</option>
-																		<option
-																			key={'Video'}
-																			value={ContentTypeId.Video}
-																		>
-																			Video
-																		</option>
-																		<option
-																			key={'Podcast'}
-																			value={ContentTypeId.Podcast}
-																		>
-																			Podcast
-																		</option>
-																		<option
-																			key={'Worksheet'}
-																			value={ContentTypeId.Worksheet}
-																		>
-																			Worksheet
-																		</option>
-																		<option key={'App'} value={ContentTypeId.App}>
-																			App
-																		</option>
-																	</InputHelper>
-																</div>
-															</Col>
-														</Row>
-														<Row className="mb-5">
-															<Col>
-																<div className="ps-13">
-																	<InputHelper
-																		className="flex-fill"
-																		label="Content Type Label"
-																		value={values.contentTypeLabel || ''}
-																		as="select"
-																		onChange={(event) => {
-																			setFieldValue(
-																				'contentTypeLabel',
-																				event.target.value
+																		{contentTypes.map((contentType) => {
+																			return (
+																				<option
+																					key={contentType.contentTypeId}
+																					value={contentType.contentTypeId}
+																				>
+																					{contentType.description}
+																				</option>
 																			);
-																		}}
-																		required={requiredFields.contentTypeLabel}
-																		error={
-																			touched.contentTypeLabel &&
-																			errors.contentTypeLabel
-																				? errors.contentTypeLabel
-																				: ''
-																		}
-																		disabled={shouldDisabledInputs}
-																	>
-																		<option value="" disabled>
-																			Select...
-																		</option>
-																		{contentTypeLabelOptions.map(
-																			(option, index) => {
-																				return (
-																					<option
-																						key={index}
-																						value={
-																							option.contentTypeLabelId
-																						}
-																					>
-																						{option.description}
-																					</option>
-																				);
-																			}
-																		)}
+																		})}
 																	</InputHelper>
 																</div>
 															</Col>
@@ -637,7 +530,7 @@ const CreateOnYourTimeContent: FC = () => {
 																	<CircleIndicator>6</CircleIndicator>
 																	{values.contentTypeId ===
 																	ContentTypeId.InternalBlog ? (
-																		<div className="ms-6 flex-fill">
+																		<div className="d-flex flex-column ms-6 flex-fill">
 																			<Form.Label
 																				className="mb-2"
 																				style={{ ...theme.fonts.default }}
@@ -937,39 +830,84 @@ const CreateOnYourTimeContent: FC = () => {
 																	first to a patient depending on how they answered
 																	the initial assessment questions. If no categories
 																	are selected, then the resource will be
-																	de-prioritized an appear lower in a patient’s list
+																	de-prioritized an appear lower in a patient's list
 																	of resources.
 																</p>
 															</div>
-															{tagQuestions?.map((question, index) => {
-																return (
-																	<div
-																		key={index}
-																		className={index > 0 ? 'pt-5' : 'p-5'}
-																		style={
-																			index !== tagQuestions.length - 1
-																				? {
-																						borderBottom: `1px solid ${theme.colors.border}`,
-																				  }
-																				: {}
-																		}
-																	>
-																		<PersonalizationCheckbox
-																			key={question.questionId}
-																			question={question}
-																			choices={choices}
-																			onChange={(questionId, answers) => {
-																				setChoices({
-																					...choices,
-																					[questionId]: answers,
-																				});
-																			}}
-																			bottomBordered={false}
-																			fullWidth={index > 0}
-																		/>
-																	</div>
-																);
-															})}
+
+															<div className="py-6">
+																{tagGroups.map((tagGroup, tagGroupIndex) => {
+																	const isLast =
+																		tagGroupIndex === tagGroups.length - 1;
+
+																	return (
+																		<div
+																			key={tagGroup.tagGroupId}
+																			className={classNames('px-6', {
+																				'mb-6': !isLast,
+																			})}
+																		>
+																			<p>
+																				<strong>{tagGroup.name}</strong>
+																			</p>
+
+																			{tags.map((tag) => {
+																				if (
+																					tag.tagGroupId ===
+																					tagGroup.tagGroupId
+																				) {
+																					return (
+																						<Form.Check
+																							inline
+																							bsPrefix="cobalt-form__check--pill"
+																							key={tag.tagId}
+																							id={tag.tagId}
+																							label={tag.name}
+																							value={tag.tagId}
+																							checked={values.tagIds.includes(
+																								tag.tagId
+																							)}
+																							onChange={({
+																								currentTarget,
+																							}) => {
+																								const tagIdsClone =
+																									cloneDeep(
+																										values.tagIds
+																									);
+
+																								const targetIndex =
+																									tagIdsClone.findIndex(
+																										(tid) =>
+																											tid ===
+																											currentTarget.value
+																									);
+
+																								if (targetIndex > -1) {
+																									tagIdsClone.splice(
+																										targetIndex,
+																										1
+																									);
+																								} else {
+																									tagIdsClone.push(
+																										currentTarget.value
+																									);
+																								}
+
+																								setFieldValue(
+																									'tagIds',
+																									tagIdsClone
+																								);
+																							}}
+																						/>
+																					);
+																				}
+
+																				return null;
+																			})}
+																		</div>
+																	);
+																})}
+															</div>
 														</Card>
 													)}
 												</Col>
@@ -977,10 +915,8 @@ const CreateOnYourTimeContent: FC = () => {
 													<OnYourTimePreview
 														description={values.description}
 														contentTypeLabel={
-															contentTypeLabelOptions.find(
-																(option) =>
-																	option.contentTypeLabelId ===
-																	values.contentTypeLabel
+															contentTypes.find(
+																(cT) => cT.contentTypeId === values.contentTypeId
 															)?.description
 														}
 														imageUrl={imagePreview}

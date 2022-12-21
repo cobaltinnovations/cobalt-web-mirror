@@ -2,8 +2,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Environment Versions
 
-[Node.js](https://nodejs.org/en/) `v16.13.2`<br/>
-[NPM](https://www.npmjs.com/) `v8.1.2`
+[Node.js](https://nodejs.org/en/) `v18.12.1`<br/>
+[NPM](https://www.npmjs.com/) `v8.19.2`
 
 ## Available Scripts
 

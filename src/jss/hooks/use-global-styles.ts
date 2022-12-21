@@ -301,8 +301,22 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				color: '#6c7978',
 			},
 		},
-		'.ql-editor': {
-			minHeight: 400,
+		'.ql-container': {
+			'& .ql-editor': {
+				minHeight: 400,
+				'& a': {
+					...theme.fonts.bodyNormal,
+					color: theme.colors.p500,
+				},
+			},
+			'& .ql-tooltip': {
+				'& a': {
+					color: theme.colors.p500,
+					'&:not([href]):hover': {
+						color: theme.colors.p700,
+					},
+				},
+			},
 		},
 	},
 }));

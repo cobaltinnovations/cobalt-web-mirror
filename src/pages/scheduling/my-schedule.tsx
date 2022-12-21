@@ -77,21 +77,38 @@ export const MySchedule: FC = () => {
 	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
-		const start = (leftCalendarMoment || moment()).clone().startOf('week').weekday(0);
-		const end = start.clone().weekday(7);
+		let currentMoment = leftCalendarMoment || moment();
+		let start;
+		let end;
+
+		switch (currentMainCalendarView) {
+			case MainCalendarView.Day:
+				start = currentMoment.clone().startOf('day');
+				end = currentMoment.clone().endOf('day');
+				break;
+			case MainCalendarView.Month:
+				start = currentMoment.clone().startOf('month');
+				end = currentMoment.clone().endOf('month').add(1, 'day');
+				break;
+			case MainCalendarView.Week:
+			default:
+				start = currentMoment.clone().weekday(0);
+				end = currentMoment.clone().weekday(7);
+				break;
+		}
 
 		return [
 			...leftCalendarEvents,
 			{
-				id: 'current-week',
-				start: start.toDate(),
-				end: end.toDate(),
+				id: 'current-view-select',
 				display: 'background',
 				allDay: true,
 				backgroundColor: theme.colors.a500,
+				start: start.toDate(),
+				end: end.toDate(),
 			},
 		];
-	}, [leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
+	}, [currentMainCalendarView, leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -175,8 +192,8 @@ export const MySchedule: FC = () => {
 						initialView={MainCalendarView.Month}
 						events={renderedLeftCalendarEvents}
 						headerToolbar={{
-							left: 'title prev next',
-							right: 'today',
+							left: 'title',
+							right: 'today prev next',
 						}}
 						dateClick={(clickInfo) => {
 							const mainCalendarApi = mainCalendarRef.current?.getApi();

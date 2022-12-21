@@ -234,15 +234,6 @@ const AdditionalNavigationItemIcon = ({ iconName }: { iconName: string }) => {
 
 const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	{
-		items: () => [
-			{
-				label: 'Stats Dashboard',
-				icon: <AdminIcon />,
-				to: () => '/stats-dashboard',
-			},
-		],
-	},
-	{
 		title: 'Content Management',
 		items: () => [
 			{
@@ -340,9 +331,9 @@ const MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Explore',
 		items: (context) => [
 			{
-				label: 'On Your Time',
+				label: 'Resource Library',
 				icon: <OnYourTimeIcon />,
-				to: () => '/on-your-time',
+				to: () => '/resource-library',
 			},
 			...(context?.institution
 				? context.institution.additionalNavigationItems.map((additionalNavigationItem) => {

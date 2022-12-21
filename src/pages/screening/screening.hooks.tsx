@@ -32,7 +32,7 @@ export function useScreeningNavigation() {
 				case ScreeningSessionDestinationId.CONTENT_LIST:
 					navigate(
 						{
-							pathname: '/on-your-time',
+							pathname: '/resource-library',
 							search: new URLSearchParams(params).toString(),
 						},
 						{

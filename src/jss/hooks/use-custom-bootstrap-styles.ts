@@ -75,24 +75,48 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.bg-primary': {
 			backgroundColor: `${theme.colors.p500} !important`,
 		},
+		'.bg-p50': {
+			backgroundColor: `${theme.colors.p50} !important`,
+		},
 		'.bg-p700': {
 			backgroundColor: `${theme.colors.p700} !important`,
 		},
+
 		'.bg-secondary': {
 			backgroundColor: `${theme.colors.a500} !important`,
 		},
+		'.bg-a50': {
+			backgroundColor: `${theme.colors.a50} !important`,
+		},
+
 		'.bg-success': {
 			backgroundColor: `${theme.colors.s500} !important`,
 		},
+		'.bg-s50': {
+			backgroundColor: `${theme.colors.s50} !important`,
+		},
+
 		'.bg-danger': {
 			backgroundColor: `${theme.colors.d500} !important`,
 		},
+		'.bg-d50': {
+			backgroundColor: `${theme.colors.d50} !important`,
+		},
+
 		'.bg-warning': {
 			backgroundColor: `${theme.colors.w500} !important`,
 		},
+		'.bg-w50': {
+			backgroundColor: `${theme.colors.w50} !important`,
+		},
+
 		'.bg-info': {
 			backgroundColor: `${theme.colors.i500} !important`,
 		},
+		'.bg-i50': {
+			backgroundColor: `${theme.colors.i50} !important`,
+		},
+
 		'.bg-light': {
 			backgroundColor: `${theme.colors.n0} !important`,
 		},

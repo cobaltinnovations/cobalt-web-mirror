@@ -111,6 +111,7 @@ export type Content = {
 	url: string;
 	selectedNetworkInstitutions?: InstitutionFilters[];
 	contentTagIds?: string[];
+	tagIds: string[];
 	visibilityId: ContentVisibilityTypeId;
 	visibleToOtherInstitutions?: boolean;
 } & (InternalBlog | Article | Video | Podcast);
