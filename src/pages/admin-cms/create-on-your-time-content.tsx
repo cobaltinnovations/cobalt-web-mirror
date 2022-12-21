@@ -11,8 +11,16 @@ import SessionCropModal from '@/components/session-crop-modal';
 import InputHelper from '@/components/input-helper';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
-import { adminService, ContentTypeLabel, imageUploader, InstitutionFilters } from '@/lib/services';
-import { Content, ContentTypeId, ContentVisibilityTypeId, ROLE_ID, TagGroupModel, TagModel } from '@/lib/models';
+import { adminService, imageUploader, InstitutionFilters, resourceLibraryService } from '@/lib/services';
+import {
+	Content,
+	ContentTypeFilterModel,
+	ContentTypeId,
+	ContentVisibilityTypeId,
+	ROLE_ID,
+	TagGroupModel,
+	TagModel,
+} from '@/lib/models';
 
 import { useCobaltTheme } from '@/jss/theme';
 
@@ -34,7 +42,6 @@ const onYourTimeContentSchema = yup
 	.required()
 	.shape({
 		contentTypeId: yup.string().required().default(''),
-		contentTypeLabel: yup.string().required().default(''),
 		title: yup.string().required().default(''),
 		author: yup.string().required().default(''),
 		created: yup.string().default(undefined),
@@ -76,9 +83,9 @@ const CreateOnYourTimeContent: FC = () => {
 	const [isAdding, setIsAdding] = useState(false);
 	const [shouldDisabledInputs] = useState(false);
 
+	const [contentTypes, setContentTypes] = useState<ContentTypeFilterModel[]>([]);
 	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
 	const [tags, setTags] = useState<TagModel[]>([]);
-	const [contentTypeLabelOptions, setContentTypeLabelOptions] = useState<ContentTypeLabel[]>([]);
 
 	const [contentCropModalImageSource, setContentCropModalImageSource] = useState('');
 	const [contentCropModalIsOpen, setContentCropModalIsOpen] = useState<boolean>(false);
@@ -90,16 +97,16 @@ const CreateOnYourTimeContent: FC = () => {
 		setIsEditing(!!editing && editing.toLowerCase() === 'true');
 		setIsAdding(!!adding && adding.toLowerCase() === 'true');
 
-		const [contentTagsResponse, institutionsResponse, contentTypeLabelsResponse] = await Promise.all([
+		const [contentTypesResponse, contentTagsResponse, institutionsResponse] = await Promise.all([
+			resourceLibraryService.getResourceLibraryContentTypes().fetch(),
 			adminService.fetchContentTags().fetch(),
 			adminService.fetchInstitutions().fetch(),
-			adminService.fetchContentTypeLabels().fetch(),
 		]);
 
+		setContentTypes(contentTypesResponse.contentTypes);
 		setTagGroups(contentTagsResponse.tagGroups ?? []);
 		setTags(contentTagsResponse.tags ?? []);
 		setContentInstitutions(institutionsResponse.institutions);
-		setContentTypeLabelOptions(contentTypeLabelsResponse.contentTypeLabels);
 
 		if (!contentId) {
 			return;
@@ -137,7 +144,6 @@ const CreateOnYourTimeContent: FC = () => {
 				setImagePreview(contentToSet.imageUrl);
 				setInitialValues({
 					contentTypeId: contentToSet.contentTypeId,
-					contentTypeLabel: contentToSet.contentTypeLabelId,
 					title: contentToSet.title,
 					author: contentToSet.author,
 					url: contentToSet.url,
@@ -167,7 +173,6 @@ const CreateOnYourTimeContent: FC = () => {
 
 			const submissionValues = {
 				contentTypeId: values.contentTypeId,
-				contentTypeLabelId: values.contentTypeLabel,
 				title: values.title,
 				author: values.author,
 				...(values.url && { url: values.url }),
@@ -354,95 +359,16 @@ const CreateOnYourTimeContent: FC = () => {
 																		<option value="" disabled>
 																			Select...
 																		</option>
-																		<option
-																			key={'External Blog'}
-																			value={ContentTypeId.ExternalBlog}
-																		>
-																			External Blog
-																		</option>
-																		<option
-																			key={'Internal Blog'}
-																			value={ContentTypeId.InternalBlog}
-																		>
-																			Internal Blog
-																		</option>
-																		<option
-																			key={'Article'}
-																			value={ContentTypeId.Article}
-																		>
-																			Article
-																		</option>
-																		<option
-																			key={'Audio'}
-																			value={ContentTypeId.Audio}
-																		>
-																			Audio
-																		</option>
-																		<option
-																			key={'Video'}
-																			value={ContentTypeId.Video}
-																		>
-																			Video
-																		</option>
-																		<option
-																			key={'Podcast'}
-																			value={ContentTypeId.Podcast}
-																		>
-																			Podcast
-																		</option>
-																		<option
-																			key={'Worksheet'}
-																			value={ContentTypeId.Worksheet}
-																		>
-																			Worksheet
-																		</option>
-																		<option key={'App'} value={ContentTypeId.App}>
-																			App
-																		</option>
-																	</InputHelper>
-																</div>
-															</Col>
-														</Row>
-														<Row className="mb-5">
-															<Col>
-																<div className="ps-13">
-																	<InputHelper
-																		className="flex-fill"
-																		label="Content Type Label"
-																		value={values.contentTypeLabel || ''}
-																		as="select"
-																		onChange={(event) => {
-																			setFieldValue(
-																				'contentTypeLabel',
-																				event.target.value
+																		{contentTypes.map((contentType) => {
+																			return (
+																				<option
+																					key={contentType.contentTypeId}
+																					value={contentType.contentTypeId}
+																				>
+																					{contentType.description}
+																				</option>
 																			);
-																		}}
-																		required={requiredFields.contentTypeLabel}
-																		error={
-																			touched.contentTypeLabel &&
-																			errors.contentTypeLabel
-																				? errors.contentTypeLabel
-																				: ''
-																		}
-																		disabled={shouldDisabledInputs}
-																	>
-																		<option value="" disabled>
-																			Select...
-																		</option>
-																		{contentTypeLabelOptions.map(
-																			(option, index) => {
-																				return (
-																					<option
-																						key={index}
-																						value={
-																							option.contentTypeLabelId
-																						}
-																					>
-																						{option.description}
-																					</option>
-																				);
-																			}
-																		)}
+																		})}
 																	</InputHelper>
 																</div>
 															</Col>
@@ -989,10 +915,8 @@ const CreateOnYourTimeContent: FC = () => {
 													<OnYourTimePreview
 														description={values.description}
 														contentTypeLabel={
-															contentTypeLabelOptions.find(
-																(option) =>
-																	option.contentTypeLabelId ===
-																	values.contentTypeLabel
+															contentTypes.find(
+																(cT) => cT.contentTypeId === values.contentTypeId
 															)?.description
 														}
 														imageUrl={imagePreview}

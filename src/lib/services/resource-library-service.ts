@@ -99,4 +99,12 @@ export const resourceLibraryService = {
 			url: `/resource-library/tag-filters/${tagId}`,
 		});
 	},
+	getResourceLibraryContentTypes() {
+		return httpSingleton.orchestrateRequest<{
+			contentTypes: ContentTypeFilterModel[];
+		}>({
+			method: 'GET',
+			url: `/resource-library/content-types`,
+		});
+	},
 };
