@@ -1,11 +1,8 @@
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const FooterContent = () => {
-	const { openInCrisisModal } = useInCrisisModal();
-
 	return (
 		<Row className="d-none d-md-block">
 			<Col>
@@ -18,17 +15,8 @@ const FooterContent = () => {
 				<p>
 					<strong>
 						Cobalt is also committed to your safety. If you are in crisis, call 911, 988 or text 741 741.
-						Click{' '}
-						<Link
-							to="#"
-							onClick={() => {
-								openInCrisisModal();
-								return false;
-							}}
-						>
-							here
-						</Link>{' '}
-						for more resources, or go to your nearest emergency department or crisis center.
+						Click <Link to="/in-crisis">here</Link> for more resources, or go to your nearest emergency
+						department or crisis center.
 					</strong>
 				</p>
 			</Col>
