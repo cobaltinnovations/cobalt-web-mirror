@@ -1,4 +1,4 @@
-import { Content, GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
+import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel } from '@/lib/models';
 
 export interface TopicCenterModel {
 	name: string;
@@ -8,7 +8,7 @@ export interface TopicCenterModel {
 }
 
 export interface TopicCenterRowModel {
-	contents: Content[];
+	contents: ResourceLibraryContentModel[];
 	description: string;
 	groupSessionRequests: GroupSessionRequestModel[];
 	groupSessions: GroupSessionModel[];

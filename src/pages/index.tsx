@@ -9,21 +9,21 @@ import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent from '@/components/studio-event';
-import OnYourTimeItem from '@/components/on-your-time-item';
 import CallToAction from '@/components/call-to-action';
 
 import { recommendationsService, groupSessionsService, accountService, callToActionService } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
-	Content,
 	GroupSessionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	CallToActionModel,
+	ResourceLibraryContentModel,
 } from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
+import ResourceLibraryCard from '@/components/resource-library-card';
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
@@ -31,7 +31,7 @@ const Index: FC = () => {
 	const navigate = useNavigate();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
-	const [onYourTimeContent, setOnYourTimeContent] = useState<Content[]>([]);
+	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 
 	const fetchData = useCallback(async () => {
@@ -40,7 +40,7 @@ const Index: FC = () => {
 		const response = await recommendationsService.getRecommendations(account?.accountId).fetch();
 
 		setInTheStudioEvents([...response.groupSessionRequests, ...response.groupSessions]);
-		setOnYourTimeContent(response.contents);
+		setContent(response.contents);
 
 		const roleId = Cookies.get('roleId');
 		if (roleId) {
@@ -161,7 +161,7 @@ const Index: FC = () => {
 				</>
 			)}
 
-			{onYourTimeContent.length > 0 && (
+			{content.length > 0 && (
 				<>
 					<Container className="pt-20">
 						<Row>
@@ -200,25 +200,30 @@ const Index: FC = () => {
 									// description="Explainer text goes here. What is on your time?"
 									calloutTitle="Explore all"
 									calloutOnClick={() => {
-										navigate('/on-your-time');
+										navigate('/resource-library');
 									}}
 								>
-									{onYourTimeContent.map((onYourOwnTimeItem) => {
+									{content.map((content) => {
 										return (
-											<Link
-												key={onYourOwnTimeItem.contentId}
-												to={`/on-your-time/${onYourOwnTimeItem.contentId}`}
-												className="d-block mb-2 text-decoration-none"
-											>
-												<OnYourTimeItem
-													imageUrl={onYourOwnTimeItem.imageUrl}
-													tag={onYourOwnTimeItem.newFlag ? 'NEW' : ''}
-													title={onYourOwnTimeItem.title}
-													type={onYourOwnTimeItem.contentTypeLabel}
-													author={onYourOwnTimeItem.author}
-													duration={onYourOwnTimeItem.duration}
-												/>
-											</Link>
+											<ResourceLibraryCard
+												key={content.contentId}
+												contentId={content.contentId}
+												className="h-100"
+												imageUrl={content.imageUrl}
+												badgeTitle={content.newFlag ? 'New' : ''}
+												title={content.title}
+												author={content.author}
+												description={content.description}
+												tags={
+													// tagsByTagId
+													// 	? content.tagIds.map((tagId) => {
+													// 			return tagsByTagId[tagId];
+													// 	  }) : []
+													[]
+												}
+												contentTypeId={content.contentTypeId}
+												duration={content.durationInMinutesDescription}
+											/>
 										);
 									})}
 								</Carousel>

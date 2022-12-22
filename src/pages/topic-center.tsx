@@ -14,6 +14,7 @@ import OnYourTimeItem from '@/components/on-your-time-item';
 import classNames from 'classnames';
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
+import ResourceLibraryCard from '@/components/resource-library-card';
 
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -247,10 +248,25 @@ const TopicCenter = () => {
 											const contentUrl = `/on-your-time/${content.contentId}`;
 											return (
 												<Col xs={6} md={4} lg={3} key={content.contentId}>
-													<Link
-														to={contentUrl}
-														className="d-block mb-8 text-decoration-none"
-														onClick={() => {
+													<ResourceLibraryCard
+														key={content.contentId}
+														contentId={content.contentId}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={
+															// tagsByTagId
+															// 	? content.tagIds.map((tagId) => {
+															// 			return tagsByTagId[tagId];
+															// 	  }) : []
+															[]
+														}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+														trackEvent={() => {
 															const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${content.title}, url:${contentUrl}`;
 															trackEvent(
 																TopicCenterAnalyticsEvent.clickOnYourTimeContent(
@@ -266,16 +282,7 @@ const TopicCenter = () => {
 																'Content Title': content.title,
 															});
 														}}
-													>
-														<OnYourTimeItem
-															imageUrl={content.imageUrl}
-															tag={content.newFlag ? 'NEW' : ''}
-															title={content.title}
-															author={content.author}
-															type={content.contentTypeLabel}
-															duration={content.duration}
-														/>
-													</Link>
+													/>
 												</Col>
 											);
 										})}
