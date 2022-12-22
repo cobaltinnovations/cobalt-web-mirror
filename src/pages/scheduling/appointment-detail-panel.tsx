@@ -114,29 +114,47 @@ export const AppointmentDetailPanel = ({
 	useScrollCalendar(setCalendarDate, focusDateOnLoad, appointment);
 
 	useEffect(() => {
-		if (!accountId || !appointmentId) {
+		if (!appointmentId) {
 			return;
 		}
 
-		const request = accountService.getAppointmentDetailsForAccount(accountId, appointmentId);
+		function fetchDetails(patientAccountId: string) {
+			const request = accountService.getAppointmentDetailsForAccount(patientAccountId, appointmentId!);
 
-		request
-			.fetch()
-			.then((response) => {
-				setPatient(response.account);
-				setAppointment(response.appointment);
-				setAssessment(response.assessment);
-				setAllAppointments(response.appointments);
-			})
-			.catch((e) => {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
+			request
+				.fetch()
+				.then((response) => {
+					setPatient(response.account);
+					setAppointment(response.appointment);
+					setAssessment(response.assessment);
+					setAllAppointments(response.appointments);
+				})
+				.catch((e) => {
+					if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+						handleError(e);
+					}
+				});
+
+			return request;
+		}
+
+		if (accountId) {
+			const request = fetchDetails(accountId);
+
+			return () => {
+				request.abort();
+			};
+		} else {
+			let request = appointmentService.getAppointment(appointmentId);
+
+			request.fetch().then((response) => {
+				request = fetchDetails(response.appointment.accountId);
 			});
 
-		return () => {
-			request.abort();
-		};
+			return () => {
+				request.abort();
+			};
+		}
 	}, [accountId, appointmentId, handleError]);
 
 	useEffect(() => {
