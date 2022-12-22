@@ -1,10 +1,11 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel } from '@/lib/models';
+import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel, TagModel } from '@/lib/models';
 
 interface getRecommendationsResponse {
 	groupSessions: GroupSessionModel[];
 	groupSessionRequests: GroupSessionRequestModel[];
 	contents: ResourceLibraryContentModel[];
+	tagsByTagId: Record<string, TagModel>;
 }
 
 export const recommendationsService = {

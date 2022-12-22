@@ -18,6 +18,7 @@ import {
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	CallToActionModel,
 	ResourceLibraryContentModel,
+	TagModel,
 } from '@/lib/models';
 
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
@@ -32,6 +33,7 @@ const Index: FC = () => {
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
 	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 
 	const fetchData = useCallback(async () => {
@@ -41,6 +43,7 @@ const Index: FC = () => {
 
 		setInTheStudioEvents([...response.groupSessionRequests, ...response.groupSessions]);
 		setContent(response.contents);
+		setTagsByTagId(response.tagsByTagId);
 
 		const roleId = Cookies.get('roleId');
 		if (roleId) {
@@ -215,11 +218,11 @@ const Index: FC = () => {
 												author={content.author}
 												description={content.description}
 												tags={
-													// tagsByTagId
-													// 	? content.tagIds.map((tagId) => {
-													// 			return tagsByTagId[tagId];
-													// 	  }) : []
-													[]
+													tagsByTagId
+														? content.tagIds.map((tagId) => {
+																return tagsByTagId[tagId];
+														  })
+														: []
 												}
 												contentTypeId={content.contentTypeId}
 												duration={content.durationInMinutesDescription}

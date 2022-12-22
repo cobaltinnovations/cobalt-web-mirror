@@ -246,7 +246,14 @@ const TopicCenter = () => {
 									<Row>
 										{topicCenterRow.contents.map((content) => {
 											return (
-												<Col xs={6} md={4} key={content.contentId} className="mb-8">
+												<Col
+													xs={6}
+													sm={6}
+													md={6}
+													lg={4}
+													key={content.contentId}
+													className="mb-8"
+												>
 													<ResourceLibraryCard
 														key={content.contentId}
 														contentId={content.contentId}
