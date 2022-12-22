@@ -25,6 +25,8 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonText } from '@/components/skeleton-loaders';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+// import useAnalytics from '@/hooks/use-analytics';
+// import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 
 enum FILTER_IDS {
 	TAGS = 'TAGS',
@@ -67,6 +69,7 @@ const ResourceLibraryTopic = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const { hasTouchScreen } = useTouchScreenCheck();
+	// const { trackEvent } = useAnalytics();
 
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
@@ -298,6 +301,7 @@ const ResourceLibraryTopic = () => {
 														const filtersClone = cloneDeep(filters);
 														filtersClone[filter.id].isShowing = true;
 														setFilters(filtersClone);
+														// trackEvent(ContentAnalyticsEvent.clickFilterPill(filter.title));
 													}}
 													onHide={() => {
 														const filtersClone = cloneDeep(filters);

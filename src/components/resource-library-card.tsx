@@ -90,6 +90,7 @@ interface Props {
 	imageUrl?: string;
 	duration?: string;
 	className?: string;
+	trackEvent?(): void;
 }
 
 const ResourceLibraryCard = ({
@@ -106,13 +107,14 @@ const ResourceLibraryCard = ({
 	imageUrl,
 	duration,
 	className,
+	trackEvent,
 }: Props) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
-			<Link to={`/resource-library/${contentId}`} className="text-decoration-none">
+			<Link to={`/resource-library/${contentId}`} className="text-decoration-none" onClick={trackEvent}>
 				<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
 					{badgeTitle && (
 						<Badge as="div" bg="light" pill>
@@ -123,10 +125,10 @@ const ResourceLibraryCard = ({
 				<div className={classes.informationOuter}>
 					<div className="mb-2">
 						{/* <p className="mb-2 fw-bold">
-						<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
-							{subtopic}
-						</Link>
-					</p> */}
+							<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
+								{subtopic}
+							</Link>
+						</p> */}
 						<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
 						<p className="mb-2 text-gray">by {author}</p>
 						<p className={classNames(classes.description, 'text-dark mb-0')}>{description}</p>
