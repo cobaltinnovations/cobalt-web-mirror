@@ -26,8 +26,6 @@ export const SignIn = React.lazy(() => import('@/pages/sign-in'));
 export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
 export const Index = React.lazy(() => import('@/pages'));
 export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
-export const InTheStudioDetail = React.lazy(() => import('@/pages/in-the-studio-detail'));
-export const InTheStudioExternalDetail = React.lazy(() => import('@/pages/in-the-studio-external-detail'));
 export const InTheStudioGroupSessionScheduled = React.lazy(
 	() => import('@/pages/in-the-studio-group-session-scheduled')
 );
@@ -274,16 +272,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/in-the-studio-thanks',
 				private: true,
 				main: InTheStudioThanks,
-			},
-			{
-				path: '/in-the-studio/:groupEventId',
-				private: true,
-				main: InTheStudioDetail,
-			},
-			{
-				path: '/in-the-studio/external/:externalGroupEventTypeId',
-				private: true,
-				main: InTheStudioExternalDetail,
 			},
 			{
 				path: '/in-the-studio/group-session-scheduled/:groupSessionId',

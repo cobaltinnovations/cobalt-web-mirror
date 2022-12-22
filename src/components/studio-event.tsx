@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { Badge } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { GroupEvent, ExternalGroupEventType, GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
-import { groupEventService, groupSessionsService } from '@/lib/services';
+import { GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
+import { groupSessionsService } from '@/lib/services';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import BackgroundImageContainer from '@/components/background-image-container';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -34,121 +34,73 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export type StudioEventViewModel = (
-	| GroupEvent
-	| ExternalGroupEventType
-	| GroupSessionModel
-	| GroupSessionRequestModel
-) & {
+export type StudioEventViewModel = (GroupSessionModel | GroupSessionRequestModel) & {
 	urlName?: string;
 	isGrouped?: boolean;
 };
 
 interface StudioEventProps {
-	groupEvent: StudioEventViewModel;
+	studioEvent: StudioEventViewModel;
 	className?: string;
 }
 
-const StudioEvent: FC<StudioEventProps> = ({ groupEvent, className }) => {
+const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 	const classes = useStudioEventStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
-	if (groupEventService.isEventExternal(groupEvent)) {
+	if (groupSessionsService.isGroupSession(studioEvent)) {
 		return (
 			<div className={classNames(classes.studioEvent, className)}>
 				<BackgroundImageContainer
 					className={classes.imageContainer}
-					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
-				/>
-				<div className={classes.informationContainer}>
-					<h4 className="mb-0">{groupEvent.name}</h4>
-				</div>
-			</div>
-		);
-	}
-
-	if (groupSessionsService.isGroupSession(groupEvent)) {
-		return (
-			<div className={classNames(classes.studioEvent, className)}>
-				<BackgroundImageContainer
-					className={classes.imageContainer}
-					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
 				>
-					{!groupEvent.isGrouped && (
+					{!studioEvent.isGrouped && (
 						<div className={classes.imageContent}>
-							{groupEvent.seatsAvailable && groupEvent.seatsAvailable <= 20 ? (
+							{studioEvent.seatsAvailable && studioEvent.seatsAvailable <= 20 ? (
 								<Badge as="div" bg="outline-secondary" pill>
-									{groupEvent.seatsAvailableDescription}
+									{studioEvent.seatsAvailableDescription}
 								</Badge>
 							) : null}
 						</div>
 					)}
 				</BackgroundImageContainer>
 				<div className={classes.informationContainer}>
-					<h4 className="mb-0">{groupEvent.title}</h4>
-					{!groupEvent.isGrouped && (
+					<h4 className="mb-0">{studioEvent.title}</h4>
+					{!studioEvent.isGrouped && (
 						<p className="mb-0 text-muted fw-bold text-uppercase">
-							{groupEvent.appointmentTimeDescription}
+							{studioEvent.appointmentTimeDescription}
 						</p>
 					)}
-					{groupEvent.facilitatorName && (
+					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
-							<>with {groupEvent.facilitatorName}</>
+							<>with {studioEvent.facilitatorName}</>
 						</p>
 					)}
 				</div>
 			</div>
 		);
-	}
-
-	if (groupSessionsService.isGroupSessionByRequest(groupEvent)) {
+	} else if (groupSessionsService.isGroupSessionByRequest(studioEvent)) {
 		return (
 			<div className={classNames(classes.studioEvent, className)}>
 				<BackgroundImageContainer
 					className={classes.imageContainer}
-					imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
+					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
 				/>
 				<div className={classes.informationContainer}>
-					<h4 className="mb-0">{groupEvent.title}</h4>
-					{groupEvent.facilitatorName && (
+					<h4 className="mb-0">{studioEvent.title}</h4>
+					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
-							<>with {groupEvent.facilitatorName}</>
+							<>with {studioEvent.facilitatorName}</>
 						</p>
 					)}
 				</div>
 			</div>
 		);
+	} else {
+		console.warn('attempting to render an unknown studio event');
+		return null;
 	}
-
-	return (
-		<div className={classNames(classes.studioEvent, className)}>
-			<BackgroundImageContainer
-				className={classes.imageContainer}
-				imageUrl={groupEvent.imageUrl ? groupEvent.imageUrl : placeholderImage}
-			>
-				{!groupEvent.isGrouped && (
-					<div className={classes.imageContent}>
-						{groupEvent.seatsAvailable && groupEvent.seatsAvailable <= 20 ? (
-							<Badge as="div" bg="outline-secondary" pill>
-								{groupEvent.seatsAvailableDescription}
-							</Badge>
-						) : null}
-					</div>
-				)}
-			</BackgroundImageContainer>
-			<div className={classes.informationContainer}>
-				<h4 className="mb-0">{groupEvent.name}</h4>
-				{!groupEvent.isGrouped && (
-					<p className="mb-0 text-muted fw-bold text-uppercase">{groupEvent.timeDescription}</p>
-				)}
-				{groupEvent.provider && (
-					<p className="mb-0 text-muted">
-						<>with {groupEvent.provider}</>
-					</p>
-				)}
-			</div>
-		</div>
-	);
 };
 
 export default StudioEvent;
