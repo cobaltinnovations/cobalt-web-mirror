@@ -79,6 +79,9 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 		flexDirection: 'column',
 		padding: '16px 20px 0',
 	},
+	subNavHeader: {
+		padding: '16px 20px',
+	},
 	menuContent: {
 		flex: 1,
 		overflowY: 'scroll',
@@ -442,7 +445,11 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 
 	return (
 		<div className={classes.menuWrapper}>
-			<div className={classes.menuHeader}>
+			<div
+				className={classNames(classes.menuHeader, {
+					[classes.subNavHeader]: isSubNav,
+				})}
+			>
 				{isSubNav ? (
 					<LeftChevron
 						tabIndex={0}
