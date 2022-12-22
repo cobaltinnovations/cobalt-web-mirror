@@ -29,6 +29,7 @@ const Footer: FC = () => {
 
 			const footerHeight = footer.current.clientHeight;
 			document.body.style.paddingBottom = `${footerHeight}px`;
+			document.body.style.minBlockSize = `calc(100% + ${footerHeight + 1}px)`;
 		}
 
 		handleResize();
