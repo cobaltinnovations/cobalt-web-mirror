@@ -10,18 +10,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibrarySubtopicCard: {
 		display: 'flex',
 		borderRadius: 8,
+		transition: '0.2s all',
+		textDecoration: 'none',
 		flexDirection: 'column',
+		color: theme.colors.n900,
 		padding: '32px 24px 24px 24px',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
-	},
-	exploreAllLink: {
-		textDecoration: 'none',
-		color: theme.colors.n900,
+		boxShadow: theme.elevation.e200,
 		'&:hover': {
-			color: theme.colors.n900,
-			textDecoration: 'underline',
+			color: 'inherit',
+			transform: 'translateY(-16px)',
+			boxShadow: theme.elevation.e400,
 		},
 	},
 }));
@@ -38,7 +38,8 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 	const classes = useStyles();
 
 	return (
-		<div
+		<Link
+			to={to}
 			className={classNames(
 				classes.resourceLibrarySubtopicCard,
 				getBackgroundClassForColorId(colorId),
@@ -50,13 +51,9 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 				<p className="mb-0">{description}</p>
 			</div>
 			<div>
-				<p className="mb-0">
-					<Link to={to} className={classNames(classes.exploreAllLink, 'fw-normal')}>
-						Explore all {title.toLowerCase()} content
-					</Link>
-				</p>
+				<p className="mb-0">Explore all {title.toLowerCase()} content</p>
 			</div>
-		</div>
+		</Link>
 	);
 };
 
