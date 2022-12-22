@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
@@ -42,17 +42,18 @@ const Footer: FC = () => {
 
 	return (
 		<footer ref={footer} className={classNames(classes.footer, 'py-10 py-md-12')}>
-			<Row>
-				<Col className="px-10 px-md-19" xs={12} md={6}>
-					<FooterLogo />
+			<Container fluid className="px-10 px-md-19">
+				<Row>
+					<Col xs={12} md={6}>
+						<FooterLogo />
 
-					<FooterContent />
-				</Col>
-
-				<Col className="px-10 px-md-19" xs={12} md={6}>
-					<FooterNav />
-				</Col>
-			</Row>
+						<FooterContent />
+					</Col>
+					<Col xs={12} md={6}>
+						<FooterNav />
+					</Col>
+				</Row>
+			</Container>
 		</footer>
 	);
 };
