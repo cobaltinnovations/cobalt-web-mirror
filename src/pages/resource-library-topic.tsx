@@ -24,6 +24,7 @@ import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonText } from '@/components/skeleton-loaders';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 
 enum FILTER_IDS {
 	TAGS = 'TAGS',
@@ -64,6 +65,9 @@ const useResourceLibraryTopicStyles = createUseThemedStyles((theme) => ({
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
+
+	const { hasTouchScreen } = useTouchScreenCheck();
+
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
@@ -207,6 +211,17 @@ const ResourceLibraryTopic = () => {
 
 		setSearchParams(searchParams, { replace: true });
 	};
+
+	const clearSearch = useCallback(() => {
+		setSearchInputValue('');
+
+		searchParams.delete('searchQuery');
+		setSearchParams(searchParams, { replace: true });
+
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
+		}
+	}, [hasTouchScreen, searchParams, setSearchParams]);
 
 	return (
 		<>
@@ -356,11 +371,8 @@ const ResourceLibraryTopic = () => {
 										className="p-2"
 										onClick={() => {
 											if (searchIsOpen) {
-												setSearchInputValue('');
+												clearSearch();
 												setSearchIsOpen(false);
-
-												searchParams.delete('searchQuery');
-												setSearchParams(searchParams, { replace: true });
 											} else {
 												setSearchIsOpen(true);
 											}
@@ -395,6 +407,7 @@ const ResourceLibraryTopic = () => {
 													onChange={({ currentTarget }) => {
 														setSearchInputValue(currentTarget.value);
 													}}
+													onClear={clearSearch}
 												/>
 											</Form>
 										</Col>
