@@ -9,7 +9,8 @@ const headingFontFamily: CobaltFontFamily = {
 };
 
 const bodyFontFamily: CobaltFontFamily = {
-	fontFamily: '"Clarika Pro Grotesque", sans-serif',
+	fontFamily:
+		'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 	weights: {
 		regular: 400,
 		bold: 700,
@@ -172,11 +173,11 @@ const theme: CobaltTheme = {
 			},
 		},
 		default: {
-			fontSize: '1.5rem',
+			fontSize: '1.4rem',
 			lineHeight: '2rem',
 		},
 		large: {
-			fontSize: '1.8rem',
+			fontSize: '1.6rem',
 			lineHeight: '2.2rem',
 		},
 		small: {
