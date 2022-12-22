@@ -1,26 +1,12 @@
 import React from 'react';
-import { Form, FormControlProps } from 'react-bootstrap';
+import { Button, Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import iconXCircle from '@/assets/icons/icon-x-circle.svg';
+import { ReactComponent as XCircleIcon } from '@/assets/icons/icon-x-circle.svg';
 
 const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
-	'@global': {
-		'::-webkit-search-cancel-button': {
-			width: 16,
-			height: 16,
-			cursor: 'pointer',
-			appearance: 'none',
-			borderRadius: '50%',
-			maskSize: '24px 24px',
-			maskPosition: 'center',
-			maskRepeat: 'no-repeat',
-			maskImage: `url(${iconXCircle})`,
-			backgroundColor: theme.colors.n300,
-		},
-	},
 	inputHelper: {
 		width: '100%',
 		position: 'relative',
@@ -60,15 +46,31 @@ const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 		fill: theme.colors.n300,
 		transform: 'translateY(-50%)',
 	},
+	clearButton: {
+		right: 10,
+		zIndex: 1,
+		top: '50%',
+		padding: 0,
+		position: 'absolute',
+		color: theme.colors.n300,
+		transform: 'translateY(-50%)',
+		'&:hover': {
+			color: theme.colors.n500,
+		},
+		'&:active': {
+			color: theme.colors.n900,
+		},
+	},
 }));
 
 interface InputHelperSearchProps extends FormControlProps {
 	className?: string;
 	autoFocus?: boolean;
+	onClear(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchProps>(
-	({ className, autoFocus, ...props }, ref) => {
+	({ className, autoFocus, onClear, ...props }, ref) => {
 		const classes = useInputHelperSearchStyles();
 
 		return (
@@ -83,6 +85,11 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 						autoFocus={autoFocus}
 						{...props}
 					/>
+					{props.value && (
+						<Button variant="link" className={classes.clearButton} onClick={onClear}>
+							<XCircleIcon width={24} height={24} />
+						</Button>
+					)}
 				</Form.Group>
 			</div>
 		);

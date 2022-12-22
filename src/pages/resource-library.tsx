@@ -101,22 +101,26 @@ const ResourceLibrary = () => {
 		setSearchParams(searchParams, { replace: true });
 	};
 
+	const clearSearch = useCallback(() => {
+		setSearchInputValue('');
+
+		searchParams.delete('searchQuery');
+		setSearchParams(searchParams, { replace: true });
+
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
+		}
+	}, [hasTouchScreen, searchParams, setSearchParams]);
+
 	const handleKeydown = useCallback(
 		(event: KeyboardEvent) => {
 			if (event.key !== 'Escape') {
 				return;
 			}
 
-			setSearchInputValue('');
-
-			searchParams.delete('searchQuery');
-			setSearchParams(searchParams, { replace: true });
-
-			if (!hasTouchScreen) {
-				searchInputRef.current?.focus();
-			}
+			clearSearch();
 		},
-		[hasTouchScreen, searchParams, setSearchParams]
+		[clearSearch]
 	);
 
 	useEffect(() => {
@@ -143,6 +147,7 @@ const ResourceLibrary = () => {
 						onChange={({ currentTarget }) => {
 							setSearchInputValue(currentTarget.value);
 						}}
+						onClear={clearSearch}
 					/>
 				</Form>
 			</HeroContainer>
