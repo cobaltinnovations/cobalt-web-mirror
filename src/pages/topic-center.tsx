@@ -245,9 +245,8 @@ const TopicCenter = () => {
 									</Row>
 									<Row>
 										{topicCenterRow.contents.map((content) => {
-											const contentUrl = `/on-your-time/${content.contentId}`;
 											return (
-												<Col xs={6} md={4} lg={3} key={content.contentId}>
+												<Col xs={6} md={4} key={content.contentId} className="mb-8">
 													<ResourceLibraryCard
 														key={content.contentId}
 														contentId={content.contentId}
@@ -258,15 +257,16 @@ const TopicCenter = () => {
 														author={content.author}
 														description={content.description}
 														tags={
-															// tagsByTagId
-															// 	? content.tagIds.map((tagId) => {
-															// 			return tagsByTagId[tagId];
-															// 	  }) : []
-															[]
+															topicCenter.tagsByTagId
+																? content.tagIds.map((tagId) => {
+																		return topicCenter.tagsByTagId[tagId];
+																  })
+																: []
 														}
 														contentTypeId={content.contentTypeId}
 														duration={content.durationInMinutesDescription}
 														trackEvent={() => {
+															const contentUrl = `/resource-library/${content.contentId}`;
 															const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${content.title}, url:${contentUrl}`;
 															trackEvent(
 																TopicCenterAnalyticsEvent.clickOnYourTimeContent(

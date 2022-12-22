@@ -1,10 +1,11 @@
-import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel } from '@/lib/models';
+import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel, TagModel } from '@/lib/models';
 
 export interface TopicCenterModel {
 	name: string;
 	topicCenterId: string;
 	topicCenterRows: TopicCenterRowModel[];
 	urlName: string;
+	tagsByTagId: Record<string, TagModel>;
 }
 
 export interface TopicCenterRowModel {
