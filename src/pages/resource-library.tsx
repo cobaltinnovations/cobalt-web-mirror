@@ -136,8 +136,8 @@ const ResourceLibrary = () => {
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-4 text-center">Resource Library</h1>
 				<p className="mb-6 text-center fs-large">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Magna aliquam lacus, mattis sem volutpat
-					rhoncus massa.
+					A variety of self-directed digital resources, including articles, podcasts, apps, videos, worksheets
+					and more, that help support general wellness and mental health education.
 				</p>
 				<Form onSubmit={handleSearchFormSubmit}>
 					<InputHelperSearch
