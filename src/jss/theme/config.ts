@@ -177,7 +177,7 @@ const theme: CobaltTheme = {
 			lineHeight: '2rem',
 		},
 		large: {
-			fontSize: '1.8rem',
+			fontSize: '1.6rem',
 			lineHeight: '2.2rem',
 		},
 		small: {
