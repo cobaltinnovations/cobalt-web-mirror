@@ -1,11 +1,11 @@
 import React, { FC, PropsWithChildren, useRef, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import moment from 'moment';
 
 import Select from '@/components/select';
 import DatePicker from '@/components/date-picker';
 
 import { AssessmentQuestion, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
+import { formatISO, parseISO } from 'date-fns';
 
 interface SurveyQuestionProps extends PropsWithChildren {
 	question: AssessmentQuestion;
@@ -178,14 +178,14 @@ const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children 
 							key={answer.answerId}
 							selected={
 								answersTextValues[answer.answerId]
-									? moment(answersTextValues[answer.answerId]).toDate()
+									? parseISO(answersTextValues[answer.answerId])
 									: undefined
 							}
 							onChange={(date) => {
 								handleAnswerTextChange(
 									question.questionId,
 									answer.answerId,
-									date ? moment(date).format('YYYY-MM-DD') : ''
+									date ? formatISO(date, { representation: 'date' }) : ''
 								);
 							}}
 						/>

@@ -1,19 +1,19 @@
-import moment from 'moment';
 import { LogicalAvailability } from '@/lib/models';
+import { format, parse, parseISO } from 'date-fns';
 
 export const AvailabilityFormDataFromLogicalAvailability = (logicalAvailability: LogicalAvailability) => {
-	const startMoment = moment(logicalAvailability.startDateTime, 'YYYY-MM-DDTHH:mm');
-	const endDayMoment = moment(logicalAvailability.endDate, 'YYYY-MM-DD');
-	const endTimeMoment = moment(logicalAvailability.endTime, 'HH:mm');
+	const startDate = parseISO(logicalAvailability.startDateTime);
+	const endDate = logicalAvailability.endDate ? parseISO(logicalAvailability.endDate) : undefined;
+	const endTime = logicalAvailability.endTime && parse(logicalAvailability.endTime, 'HH:mm', new Date());
 
 	return {
 		appointmentTypes: logicalAvailability.appointmentTypes.map((at) => at.appointmentTypeId),
-		startDate: startMoment.format('MMM DD, yyyy'),
-		startTime: startMoment.format('hh:mm'),
-		startTimeMeridian: startMoment.format('a'),
-		endDate: endDayMoment.isValid() ? endDayMoment.format('MMM DD, yyyy') : '',
-		endTime: endTimeMoment.format('hh:mm'),
-		endTimeMeridian: endTimeMoment.format('a'),
+		startDate,
+		startTime: format(startDate, 'hh:mm'),
+		startTimeMeridian: format(startDate, 'aaa'),
+		endDate,
+		endTime: endTime && format(endTime, 'hh:mm'),
+		endTimeMeridian: endTime && format(endTime, 'aaa'),
 		typesAccepted: logicalAvailability.appointmentTypes.length > 0 ? ('limited' as const) : ('all' as const),
 		recurring: logicalAvailability.recurrenceTypeId === 'DAILY' ? true : false,
 		occurance: {

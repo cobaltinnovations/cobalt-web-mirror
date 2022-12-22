@@ -1,7 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, ModalProps, Form, Row, Col } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
-import moment, { Moment } from 'moment';
 
 import DatePicker from '@/components/date-picker';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -9,6 +8,7 @@ import { FILTER_DAYS } from '@/contexts/booking-context';
 import useAnalytics from '@/hooks/use-analytics';
 import { ProviderSearchAnalyticsEvent } from '@/contexts/analytics-context';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import { formatISO, isAfter, parseISO } from 'date-fns';
 
 const useFilterDaysModalStyles = createUseStyles({
 	filterDaysModal: {
@@ -40,8 +40,8 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const location = useLocation();
-	const [fromDate, setFromDate] = useState<Moment>(moment());
-	const [toDate, setToDate] = useState<Moment>(moment());
+	const [fromDate, setFromDate] = useState<Date>(new Date());
+	const [toDate, setToDate] = useState<Date>(new Date());
 	const [filterDays, setFilterDays] = useState<FilterDays>(
 		FILTER_DAYS.reduce((acc, day) => {
 			acc[day.key] = true;
@@ -58,8 +58,8 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 		const endDate = searchParams.get('endDate');
 		const daysOfWeek = searchParams.getAll('dayOfWeek');
 
-		setFromDate(startDate ? moment(startDate) : defaultFrom ? moment(defaultFrom) : moment());
-		setToDate(endDate ? moment(endDate) : defaultTo ? moment(defaultTo) : moment());
+		setFromDate(startDate ? parseISO(startDate) : defaultFrom ? parseISO(defaultFrom) : new Date());
+		setToDate(endDate ? parseISO(endDate) : defaultTo ? parseISO(defaultTo) : new Date());
 		setFilterDays(
 			FILTER_DAYS.reduce((acc, day) => {
 				acc[day.key] = daysOfWeek.length === 0 || daysOfWeek.includes(day.key);
@@ -77,15 +77,14 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 			<Modal.Body>
 				<p className="my-1 fw-bold">Date Range</p>
 				<DatePicker
-					minDate={moment().toDate()}
-					selected={fromDate.toDate()}
-					onChange={(date) => {
-						if (date !== null) {
-							const dateMoment = moment(date);
-							setFromDate(dateMoment);
+					minDate={new Date()}
+					selected={fromDate}
+					onChange={(newFrom) => {
+						if (newFrom !== null) {
+							setFromDate(newFrom);
 
-							if (dateMoment.isAfter(toDate)) {
-								setToDate(dateMoment);
+							if (isAfter(newFrom, toDate)) {
+								setToDate(newFrom);
 							}
 						}
 					}}
@@ -93,11 +92,11 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 
 				<p className="my-1 fw-bold">to</p>
 				<DatePicker
-					minDate={fromDate.toDate()}
-					selected={toDate.toDate()}
-					onChange={(date) => {
-						if (date !== null) {
-							setToDate(moment(date));
+					minDate={fromDate}
+					selected={toDate}
+					onChange={(newTo) => {
+						if (newTo !== null) {
+							setToDate(newTo);
 						}
 					}}
 				/>
@@ -135,8 +134,8 @@ const FilterDaysModal: FC<FilterDaysModalProps> = ({ defaultFrom, defaultTo, ...
 						onClick={() => {
 							trackEvent(ProviderSearchAnalyticsEvent.applyFilter('Days'));
 
-							searchParams.set('startDate', fromDate.format('YYYY-MM-DD'));
-							searchParams.set('endDate', toDate.format('YYYY-MM-DD'));
+							searchParams.set('startDate', formatISO(fromDate, { representation: 'date' }));
+							searchParams.set('endDate', formatISO(toDate, { representation: 'date' }));
 
 							searchParams.delete('dayOfWeek');
 

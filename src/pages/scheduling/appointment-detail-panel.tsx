@@ -206,7 +206,7 @@ export const AppointmentDetailPanel = ({
 						as="a"
 						variant="primary"
 						size="sm"
-						className="py-2 me-1 text-decoration-none"
+						className="py-2 me-1 text-white text-decoration-none"
 						href={appointment?.videoconferenceUrl}
 						target="_blank"
 					>

@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { ManageAvailabilityPanel } from './manage-availability-panel';
@@ -12,6 +11,19 @@ import { EditAvailabilityPanel } from './edit-availability-panel';
 
 import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
+import {
+	addDays,
+	endOfDay,
+	endOfMonth,
+	endOfWeek,
+	format,
+	formatISO,
+	getDay,
+	getWeek,
+	startOfDay,
+	startOfMonth,
+	startOfWeek,
+} from 'date-fns';
 import { AppointmentDetailPanel } from './appointment-detail-panel';
 import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
@@ -43,7 +55,7 @@ export const MySchedule: FC = () => {
 	const [leftStartDate, setLeftStartDate] = useState<string>();
 	const [leftEndDate, setLeftEndDate] = useState<string>();
 
-	const [leftCalendarMoment, setLeftCalendarMoment] = useState<Moment>();
+	const [leftCalendarDate, setLeftCalendarDate] = useState<Date>();
 	const leftCalendarRef = useRef<FullCalendar>(null);
 	const mainCalendarRef = useRef<FullCalendar>(null);
 
@@ -53,7 +65,7 @@ export const MySchedule: FC = () => {
 		startDate: mainStartDate,
 		endDate: mainEndDate,
 	});
-	const { fetchData: fetchLeftData, calendarEvents: leftCalendarEvents } = useProviderCalendar({
+	const { calendarEvents: leftCalendarEvents } = useProviderCalendar({
 		providerId,
 		startDate: leftStartDate,
 		endDate: leftEndDate,
@@ -77,23 +89,23 @@ export const MySchedule: FC = () => {
 	}, [mainCalendarEvents, classes.blockedTimeslot]);
 
 	const renderedLeftCalendarEvents = useMemo(() => {
-		let currentMoment = leftCalendarMoment || moment();
+		let currentDate = leftCalendarDate || new Date();
 		let start;
 		let end;
 
 		switch (currentMainCalendarView) {
 			case MainCalendarView.Day:
-				start = currentMoment.clone().startOf('day');
-				end = currentMoment.clone().endOf('day');
+				start = startOfDay(currentDate);
+				end = endOfDay(currentDate);
 				break;
 			case MainCalendarView.Month:
-				start = currentMoment.clone().startOf('month');
-				end = currentMoment.clone().endOf('month').add(1, 'day');
+				start = startOfMonth(currentDate);
+				end = addDays(endOfMonth(currentDate), 1);
 				break;
 			case MainCalendarView.Week:
 			default:
-				start = currentMoment.clone().weekday(0);
-				end = currentMoment.clone().weekday(7);
+				start = startOfWeek(currentDate);
+				end = addDays(endOfWeek(currentDate), 1);
 				break;
 		}
 
@@ -104,11 +116,11 @@ export const MySchedule: FC = () => {
 				display: 'background',
 				allDay: true,
 				backgroundColor: theme.colors.a500,
-				start: start.toDate(),
-				end: end.toDate(),
+				start,
+				end,
 			},
 		];
-	}, [currentMainCalendarView, leftCalendarEvents, leftCalendarMoment, theme.colors.a500]);
+	}, [currentMainCalendarView, leftCalendarEvents, leftCalendarDate, theme.colors.a500]);
 
 	useEffect(() => {
 		if (!mainCalendarRef.current) {
@@ -123,11 +135,9 @@ export const MySchedule: FC = () => {
 	}, [currentMainCalendarView]);
 
 	const setCalendarDate = useCallback((date: Date, scrollTime?: string) => {
-		const nextMoment = moment(date);
-
 		mainCalendarRef.current?.getApi().gotoDate(date);
 		leftCalendarRef.current?.getApi().gotoDate(date);
-		setLeftCalendarMoment(nextMoment);
+		setLeftCalendarDate(date);
 
 		if (scrollTime) {
 			setTimeout(() => {
@@ -149,14 +159,11 @@ export const MySchedule: FC = () => {
 						} else {
 							navigate(``);
 						}
-
-						fetchMainData();
-						fetchLeftData();
 					}}
 				/>
 			</div>
 		);
-	}, [classes.sideBar, fetchLeftData, fetchMainData, focusDateOnLoad, navigate, setCalendarDate]);
+	}, [classes.sideBar, focusDateOnLoad, navigate, setCalendarDate]);
 
 	const renderedAvailabilityPanel = useMemo(() => {
 		return (
@@ -170,14 +177,11 @@ export const MySchedule: FC = () => {
 						} else {
 							navigate(``);
 						}
-
-						fetchMainData();
-						fetchLeftData();
 					}}
 				/>
 			</div>
 		);
-	}, []);
+	}, [classes.sideBar, managingAvailabilties, navigate]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -196,22 +200,25 @@ export const MySchedule: FC = () => {
 							right: 'today prev next',
 						}}
 						dateClick={(clickInfo) => {
-							const mainCalendarApi = mainCalendarRef.current?.getApi();
-							const mainMoment = moment(mainCalendarApi?.getDate());
+							if (!mainCalendarRef.current) {
+								return;
+							}
+
+							const mainCalendarApi = mainCalendarRef.current.getApi();
+							const mainCalendarDate = mainCalendarApi?.getDate();
 							const clickedDate = clickInfo.date;
-							const clickedMoment = moment(clickedDate);
 
 							setCalendarDate(clickedDate);
 
 							if (currentMainCalendarView === MainCalendarView.Week) {
-								clickedMoment.week() === mainMoment.week() && fetchMainData();
+								getWeek(mainCalendarDate) === getWeek(clickedDate) && fetchMainData();
 							} else if (currentMainCalendarView === MainCalendarView.Day) {
-								clickedMoment.day() === mainMoment.day() && fetchMainData();
+								getDay(mainCalendarDate) === getDay(clickedDate) && fetchMainData();
 							}
 						}}
 						datesSet={({ start, end }) => {
-							setLeftStartDate(moment(start).format('YYYY-MM-DD'));
-							setLeftEndDate(moment(end).format('YYYY-MM-DD'));
+							setLeftStartDate(formatISO(start, { representation: 'date' }));
+							setLeftEndDate(formatISO(end, { representation: 'date' }));
 						}}
 					/>
 				</div>
@@ -279,14 +286,6 @@ export const MySchedule: FC = () => {
 					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
 					headerToolbar={false}
 					initialView={currentMainCalendarView}
-					// editable={true}
-					// selectable={true}
-					// selectMirror={true}
-					// dayMaxEvents={true}
-					// weekends={weekendsVisible}
-					// allDayContent={(...args) => {
-					// 	console.log({args})
-					// }}
 					nowIndicator
 					events={renderedMainCalendarEvents}
 					eventContent={(evtInfo) => {
@@ -294,7 +293,9 @@ export const MySchedule: FC = () => {
 							return;
 						}
 
-						const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
+						const startTime = evtInfo.event.allDay
+							? null
+							: evtInfo.event.start && format(evtInfo.event.start, 'h:mmaaa');
 
 						return (
 							<div>
@@ -323,8 +324,8 @@ export const MySchedule: FC = () => {
 						}
 					}}
 					datesSet={({ start, end }) => {
-						setMainStartDate(moment(start).format('YYYY-MM-DD'));
-						setMainEndDate(moment(end).format('YYYY-MM-DD'));
+						setMainStartDate(formatISO(start, { representation: 'date' }));
+						setMainEndDate(formatISO(end, { representation: 'date' }));
 					}}
 				/>
 			</div>

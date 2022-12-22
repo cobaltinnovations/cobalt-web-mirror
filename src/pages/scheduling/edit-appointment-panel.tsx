@@ -1,16 +1,16 @@
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { AppointmentModel } from '@/lib/models';
-import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
-import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { AppointmentForm } from './appointment-form';
 import { useScrollCalendar } from './use-scroll-calendar';
+import { format, formatISO, parseISO } from 'date-fns';
 
 interface EditAppointmentPanelProps {
 	setCalendarDate: (date: Date, time?: string) => void;
@@ -32,12 +32,12 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 	const isCreate = location.pathname.endsWith('new-appointment');
 
 	const initialValues = useMemo(() => {
-		const appointmentMoment = appointment?.startTime ? moment(appointment?.startTime) : null;
+		const appointmentDate = appointment?.startTime && parseISO(appointment?.startTime);
 
 		return {
-			date: appointmentMoment?.format('YYYY-MM-DD') ?? '',
-			startTime: appointmentMoment?.format('hh:mm') ?? '',
-			startTimeMeridian: appointmentMoment?.format('a') ?? '',
+			date: appointmentDate ? formatISO(appointmentDate, { representation: 'date' }) : '',
+			startTime: appointmentDate ? format(appointmentDate, 'hh:mm') : '',
+			startTimeMeridian: appointmentDate ? format(appointmentDate, 'aaa') : '',
 			appointmentTypeId: appointment?.appointmentTypeId ?? '',
 		};
 	}, [appointment?.appointmentTypeId, appointment?.startTime]);

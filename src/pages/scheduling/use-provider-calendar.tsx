@@ -4,7 +4,7 @@ import { ProviderCalendar } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import { AxiosError } from 'axios';
 import Color from 'color';
-import moment from 'moment';
+import { parseISO } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface FetchProviderCalendarConfig {
@@ -101,8 +101,8 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 		return {
 			id: `appointment${index}`,
 			title: appointment.account?.displayName || 'Anonymous',
-			start: moment(appointment.startTime).toDate(),
-			end: moment(appointment.endTime).toDate(),
+			start: parseISO(appointment.startTime),
+			end: parseISO(appointment.endTime),
 			backgroundColor: Color(appointment.appointmentType.hexColor).lighten(0.7).hex(),
 			borderColor: appointment.appointmentType.hexColor,
 			textColor: '#21312A',
@@ -119,7 +119,7 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 			id: `followups${index}`,
 			allDay: true,
 			title: 'X followups',
-			start: moment().toDate(),
+			start: new Date(),
 			extendedProps: {
 				patients: [
 					{

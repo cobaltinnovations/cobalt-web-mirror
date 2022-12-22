@@ -1,7 +1,6 @@
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import { AppointmentType, AvailabilityTimeSlot, Provider } from '@/lib/models';
-import moment from 'moment';
 import React, { useCallback, useContext, useState, useImperativeHandle, forwardRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import ConfirmAppointmentTypeModal from './confirm-appointment-type-modal';
@@ -112,7 +111,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				}
 
 				if (date) {
-					params.set('date', moment(date).format('YYYY-MM-DD'));
+					params.set('date', date);
 				}
 
 				if (timeSlot?.time) {

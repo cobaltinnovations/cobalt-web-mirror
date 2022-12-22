@@ -33,9 +33,9 @@ const IntakeAssessment: FC = () => {
 
 	const {
 		selectedAppointmentTypeId,
+		selectedDate,
 		selectedProvider,
 		selectedTimeSlot,
-		formattedAvailabilityDate,
 		setIsEligible,
 		getExitBookingLocation,
 	} = useContext(BookingContext);
@@ -133,7 +133,7 @@ const IntakeAssessment: FC = () => {
 
 							params.set('providerId', selectedProvider?.providerId ?? '');
 							params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
-							params.set('date', formattedAvailabilityDate);
+							params.set('date', selectedDate ?? '');
 							params.set('time', selectedTimeSlot?.time ?? '');
 							params.set('intakeAssessmentId', assessment?.assessmentId);
 

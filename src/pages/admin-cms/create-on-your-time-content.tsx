@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Col, Container, Form, Row } from 'react-bootstrap';
@@ -36,6 +35,7 @@ import Breadcrumb from '@/components/breadcrumb';
 import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
 import classNames from 'classnames';
+import { formatISO, parseISO } from 'date-fns';
 
 const onYourTimeContentSchema = yup
 	.object()
@@ -148,7 +148,9 @@ const CreateOnYourTimeContent: FC = () => {
 					author: contentToSet.author,
 					url: contentToSet.url,
 					duration: contentToSet.duration,
-					created: contentToSet.created ? moment(contentToSet.created).format('YYYY-MM-DD') : undefined,
+					created: contentToSet.created
+						? formatISO(parseISO(contentToSet.created), { representation: 'date' })
+						: undefined,
 					imageUrl: contentToSet.imageUrl,
 					description: contentToSet.description,
 					visibilityPrivate: !content?.visibleToOtherInstitutions || false,
@@ -453,7 +455,7 @@ const CreateOnYourTimeContent: FC = () => {
 																			labelText="Submitted Date"
 																			selected={
 																				values.created
-																					? moment(values.created).toDate()
+																					? parseISO(values.created)
 																					: undefined
 																			}
 																			onChange={(date) => {
@@ -461,9 +463,9 @@ const CreateOnYourTimeContent: FC = () => {
 																				setFieldValue(
 																					'created',
 																					date
-																						? moment(date).format(
-																								'YYYY-MM-DD'
-																						  )
+																						? formatISO(date, {
+																								representation: 'date',
+																						  })
 																						: ''
 																				);
 																			}}

@@ -1,6 +1,5 @@
 import { isNumber } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
@@ -39,6 +38,7 @@ import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { addMinutes, format, formatISO, parse, parseISO, startOfDay } from 'date-fns';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -52,12 +52,14 @@ const useStyles = createUseStyles({
 });
 
 const timeSlots: string[] = [];
-const totalSlotsInDay = moment.duration(1, 'day').as('minutes');
-const timeSlot = moment('00:00', 'hh:mm');
+// totla minutes in a day
+const totalSlotsInDay = 1 * 24 * 60;
+let timeSlot = startOfDay(new Date());
 
 for (let i = 0; i < totalSlotsInDay; i += 15) {
-	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
-	timeSlots.push(timeSlot.format('hh:mm A'));
+	timeSlot = addMinutes(timeSlot, i === 0 ? 0 : 15);
+
+	timeSlots.push(format(timeSlot, 'hh:mm aaa'));
 }
 
 const groupSessionSchema = yup
@@ -65,7 +67,7 @@ const groupSessionSchema = yup
 	.required()
 	.shape({
 		isCobaltScheduling: yup.boolean().required().default(true),
-		date: yup.string().default(moment().format('YYYY-MM-DD')),
+		date: yup.string().default(formatISO(new Date(), { representation: 'date' })),
 		startTime: yup.string().required().default(''),
 		endTime: yup.string().required().default(''),
 		schedulingUrl: yup
@@ -213,6 +215,8 @@ const GroupSessionsCreate: FC = () => {
 				capacity = (groupSessionToSet.seatsAvailable || 0) + (groupSessionToSet.seatsReserved || 0);
 			}
 
+			const startDate = parseISO(groupSessionToSet.startDateTime);
+
 			setSession(groupSessionToSet);
 			setImagePreview(groupSessionToSet.imageUrl);
 			setInitialValues({
@@ -220,9 +224,9 @@ const GroupSessionsCreate: FC = () => {
 					groupSessionToSet.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT
 						? true
 						: false,
-				date: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('YYYY-MM-DD'),
-				startTime: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('hh:mm A'),
-				endTime: isCopy ? '' : moment(groupSessionToSet.endDateTime).format('hh:mm A'),
+				date: isCopy ? '' : formatISO(startDate, { representation: 'date' }),
+				startTime: isCopy ? '' : format(startDate, 'hh:mm aaa'),
+				endTime: isCopy ? '' : format(parseISO(groupSessionToSet.endDateTime), 'hh:mm aaa'),
 				schedulingUrl: groupSessionToSet.scheduleUrl,
 				isModerator: groupSessionToSet.facilitatorAccountId === accountId,
 				facilitatorsName: groupSessionToSet.facilitatorName,
@@ -269,12 +273,9 @@ const GroupSessionsCreate: FC = () => {
 
 	async function handleSubmit(values: GroupSessionFormData) {
 		try {
-			const startDateTime = moment(`${values.date} ${values.startTime}`, 'YYYY-MM-DD HH:mm A').format(
-				'YYYY-MM-DD[T]HH:mm'
-			);
-			const endDateTime = moment(`${values.date} ${values.endTime}`, 'YYYY-MM-DD HH:mm A').format(
-				'YYYY-MM-DD[T]HH:mm'
-			);
+			const date = parseISO(values.date);
+			const startDateTime = parse(values.startTime, 'hh:mm aaa', date);
+			const endDateTime = parse(values.endTime, 'hh:mm aaa', date);
 
 			const submissionValues: CreateGroupSessionRequestBody = {
 				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
@@ -283,8 +284,11 @@ const GroupSessionsCreate: FC = () => {
 				title: values.title,
 				description: values.description,
 				urlName: values.slug,
-				startDateTime,
-				endDateTime,
+				startDateTime: `${formatISO(startDateTime, { representation: 'date' })}T${format(
+					startDateTime,
+					'HH:mm'
+				)}`,
+				endDateTime: `${formatISO(endDateTime, { representation: 'date' })}T${format(endDateTime, 'HH:mm')}`,
 				imageUrl: values.imageUrl,
 				screeningQuestionsV2: values.isRestricted ? values.screeningQuestions : [],
 				confirmationEmailContent: values.confirmationEmailTemplate,
@@ -534,14 +538,12 @@ const GroupSessionsCreate: FC = () => {
 														showYearDropdown
 														showMonthDropdown
 														dropdownMode="select"
-														selected={
-															values.date ? moment(values.date).toDate() : undefined
-														}
+														selected={values.date ? parseISO(values.date) : undefined}
 														onChange={(date) => {
 															setFieldTouched('date', true);
 															setFieldValue(
 																'date',
-																date ? moment(date).format('YYYY-MM-DD') : ''
+																date ? formatISO(date, { representation: 'date' }) : ''
 															);
 														}}
 														disabled={hasReservations || isViewMode}

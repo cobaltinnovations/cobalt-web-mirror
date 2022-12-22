@@ -6,8 +6,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
 import { ReferenceDataResponse } from '@/lib/models';
 import { accountService, PatientAccountFormData } from '@/lib/services';
+import { formatISO, parseISO } from 'date-fns';
 import { Formik } from 'formik';
-import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -161,9 +161,9 @@ const PatientAccountForm = ({ referenceData, initialValues, onSuccess }: Patient
 								showMonthDropdown
 								dropdownMode="select"
 								labelText="Birthdate"
-								selected={values.birthdate ? moment(values.birthdate).toDate() : undefined}
+								selected={values.birthdate ? parseISO(values.birthdate) : undefined}
 								onChange={(date) => {
-									setFieldValue('birthdate', date ? moment(date).format('YYYY-MM-DD') : '');
+									setFieldValue('birthdate', date ? formatISO(date, { representation: 'date' }) : '');
 								}}
 							/>
 						</Form.Group>

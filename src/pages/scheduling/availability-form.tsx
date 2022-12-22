@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { Formik } from 'formik';
@@ -13,13 +12,14 @@ import DatePicker from '@/components/date-picker';
 import { AppointmentTypeItem } from './appointment-type-item';
 import { cloneDeep } from 'lodash';
 import { useCobaltTheme } from '@/jss/theme';
+import { formatISO, parse, startOfDay, setHours, setMinutes } from 'date-fns';
 
 export interface AvailabilityFormSchema {
 	appointmentTypes: string[];
-	startDate: string;
+	startDate?: Date;
 	startTime: string;
 	startTimeMeridian: string;
-	endDate: string;
+	endDate?: Date;
 	endTime: string;
 	endTimeMeridian: string;
 	typesAccepted: 'all' | 'limited';
@@ -77,24 +77,25 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				throw new Error('account.providerId is undefined');
 			}
 
-			const startDay = moment(values.startDate).startOf('day');
-			const startTimeMoment = moment(`${values.startTime} ${values.startTimeMeridian}`, 'hh:mm a');
-			const startDateTime = startDay.clone().set({
-				hours: startTimeMoment.hours(),
-				minutes: startTimeMoment.minutes(),
-				seconds: startTimeMoment.seconds(),
-			});
+			const startTime = parse(`${values.startTime} ${values.startTimeMeridian}`, 'hh:mm aaa', new Date());
+			const startDateTime =
+				values.startDate &&
+				setMinutes(setHours(values.startDate, startTime.getHours()), startTime.getMinutes());
 
 			const endDay = values.recurring
-				? moment(values.endDate).startOf('day')
-				: moment(values.startDate).startOf('day');
-			const endTimeMoment = moment(`${values.endTime} ${values.endTimeMeridian}`, 'hh:mm a');
+				? values.endDate && startOfDay(values.endDate)
+				: values.startDate && startOfDay(values.startDate);
+			const endTime = parse(`${values.endTime}:00 ${values.endTimeMeridian}`, 'hh:mm:00 aaa', new Date());
 
 			const requestBody = {
 				providerId: account.providerId,
-				...(startDateTime.isValid() && { startDateTime: startDateTime.format('YYYY-MM-DDTHH:mm:ss') }),
-				...(endDay.isValid() && { endDate: endDay.format('YYYY-MM-DD') }),
-				endTime: endTimeMoment.format('HH:mm:ss'),
+				...(startDateTime && {
+					startDateTime: `${formatISO(startDateTime, { representation: 'date' })}T${
+						formatISO(startDateTime, { representation: 'time' }).split('-')[0]
+					}`,
+				}),
+				...(endDay && { endDate: formatISO(endDay, { representation: 'date' }) }),
+				endTime: formatISO(endTime, { representation: 'time' }).split('-')[0],
 				logicalAvailabilityTypeId,
 				recurrenceTypeId: values.recurring ? ('DAILY' as const) : ('NONE' as const),
 				recurSunday: values.occurance.S,
@@ -135,10 +136,8 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 				initialValues={
 					initialValues || {
 						appointmentTypes: [],
-						startDate: '',
 						startTime: '',
 						startTimeMeridian: '',
-						endDate: '',
 						endTime: '',
 						endTimeMeridian: '',
 						typesAccepted: 'all',
@@ -174,9 +173,9 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 									showMonthDropdown
 									dropdownMode="select"
 									labelText={'Start Date'}
-									selected={values.startDate ? moment(values.startDate).toDate() : undefined}
+									selected={values.startDate}
 									onChange={(date) => {
-										setFieldValue('startDate', date ? moment(date).format('YYYY-MM-DD') : '');
+										setFieldValue('startDate', date || undefined);
 									}}
 								/>
 							</Form.Group>
@@ -258,9 +257,9 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 											showMonthDropdown
 											dropdownMode="select"
 											labelText="End Date"
-											selected={values.endDate ? moment(values.endDate).toDate() : undefined}
+											selected={values.endDate}
 											onChange={(date) => {
-												setFieldValue('endDate', date ? moment(date).format('YYYY-MM-DD') : '');
+												setFieldValue('endDate', date || undefined);
 											}}
 										/>
 									</Form.Group>

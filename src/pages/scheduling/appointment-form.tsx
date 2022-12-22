@@ -2,13 +2,13 @@ import DatePicker from '@/components/date-picker';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { Formik } from 'formik';
-import moment from 'moment';
 import React from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import TimeInput from '@/components/time-input';
 import { appointmentService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import { AppointmentTypeDropdown } from './appointment-type-dropdown';
+import { format, formatISO, parse, parseISO, startOfDay } from 'date-fns';
 
 interface AppointmentFormSchema {
 	date: string;
@@ -44,20 +44,18 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 					return;
 				}
 
-				const dateTime = moment(values.date).startOf('day');
+				const dateTime = startOfDay(parseISO(values.date));
 
-				const startTimeMoment = moment(`${values.startTime} ${values.startTimeMeridian}`, 'hh:mm a');
-
-				const startDateTime = dateTime.clone().set({
-					hours: startTimeMoment.hours(),
-					minutes: startTimeMoment.minutes(),
-					seconds: startTimeMoment.seconds(),
-				});
+				const startDateTime = parse(
+					`${values.startTime}:00 ${values.startTimeMeridian}`,
+					'hh:mm:ss aaa',
+					dateTime
+				);
 
 				const request = appointmentService.rescheduleAppointment(appointmentId, {
 					providerId: account.providerId,
-					date: startDateTime.format('YYYY-MM-DD'),
-					time: startDateTime.format('HH:mm'),
+					date: formatISO(startDateTime, { representation: 'date' }),
+					time: format(startDateTime, 'HH:mm'),
 					appointmentTypeId: values.appointmentTypeId,
 				});
 
@@ -85,9 +83,9 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 								showMonthDropdown
 								dropdownMode="select"
 								labelText={'Date'}
-								selected={values.date ? moment(values.date).toDate() : undefined}
+								selected={values.date ? parseISO(values.date) : undefined}
 								onChange={(date) => {
-									setFieldValue('date', date ? moment(date).format('YYYY-MM-DD') : '');
+									setFieldValue('date', date ? formatISO(date, { representation: 'date' }) : '');
 								}}
 							/>
 						</Form.Group>

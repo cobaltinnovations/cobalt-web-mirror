@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, { FC, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
@@ -17,6 +16,7 @@ import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { formatISO, parseISO } from 'date-fns';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -239,14 +239,14 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 															showYearDropdown
 															showMonthDropdown
 															dropdownMode="select"
-															selected={
-																values.date ? moment(values.date).toDate() : undefined
-															}
+															selected={values.date ? parseISO(values.date) : undefined}
 															onChange={(date) => {
 																setFieldTouched('date', true);
 																setFieldValue(
 																	'date',
-																	date ? moment(date).format('YYYY-MM-DD') : ''
+																	date
+																		? formatISO(date, { representation: 'date' })
+																		: ''
 																);
 															}}
 														/>

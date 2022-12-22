@@ -1,11 +1,9 @@
-import moment from 'moment';
 import React, {
 	Dispatch,
 	SetStateAction,
 	createContext,
 	FC,
 	useState,
-	useMemo,
 	useCallback,
 	useEffect,
 	PropsWithChildren,
@@ -112,7 +110,6 @@ interface BookingState {
 	setSelectedProvider: Dispatch<SetStateAction<Provider | undefined>>;
 	selectedTimeSlot?: AvailabilityTimeSlot;
 	setSelectedTimeSlot: Dispatch<SetStateAction<AvailabilityTimeSlot | undefined>>;
-	formattedAvailabilityDate: string;
 
 	setBookingSource: Dispatch<SetStateAction<BookingSource>>;
 	bookingSource: BookingSource;
@@ -142,8 +139,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [isEligible, setIsEligible] = useState(true);
 	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
 	const [previousProviderId, setPreviousProviderId] = useState<string>();
-
-	const formattedAvailabilityDate = useMemo(() => moment(selectedDate).format('YYYY-MM-DD'), [selectedDate]);
 
 	const getActiveFiltersState = useCallback(
 		(findOptions?: FindOptionsResponse) => {
@@ -258,8 +253,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 
 				preservedFilterQueryString,
 				setPreservedFilterQueryString,
-
-				formattedAvailabilityDate,
 
 				selectedAppointmentTypeId,
 				setSelectedAppointmentTypeId,

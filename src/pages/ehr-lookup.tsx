@@ -8,7 +8,6 @@ import { pick } from 'lodash';
 
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
-import moment from 'moment';
 import {
 	EpicPatientData,
 	googlePlacesService,
@@ -29,6 +28,7 @@ import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { format, formatISO, parseISO } from 'date-fns';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -87,12 +87,12 @@ const EhrLookup: FC = () => {
 	const [initialValues, setInitialValues] = useState<EpicPatientData>(getClearForm(account));
 	const {
 		selectedAppointmentTypeId,
+		selectedDate,
 		setSelectedDate,
 		selectedProvider,
 		setSelectedProvider,
 		selectedTimeSlot,
 		setSelectedTimeSlot,
-		formattedAvailabilityDate,
 
 		setIsEligible,
 		getExitBookingLocation,
@@ -147,7 +147,13 @@ const EhrLookup: FC = () => {
 	);
 
 	const finishBooking = async (data: Partial<EpicPatientData>) => {
-		if (isBooking || !selectedProvider || !selectedTimeSlot || !selectedTimeSlot.epicDepartmentId) {
+		if (
+			isBooking ||
+			!selectedProvider ||
+			!selectedDate ||
+			!selectedTimeSlot ||
+			!selectedTimeSlot.epicDepartmentId
+		) {
 			return;
 		}
 
@@ -165,7 +171,7 @@ const EhrLookup: FC = () => {
 			const appointmentData: CreateAppointmentData = {
 				providerId: selectedProvider.providerId,
 				appointmentTypeId: selectedAppointmentTypeId,
-				date: formattedAvailabilityDate,
+				date: selectedDate,
 				time: selectedTimeSlot.time,
 			};
 
@@ -435,9 +441,9 @@ function FirstStep({ values, handleChange, setFieldValue, onNext, isSearching }:
 					showYearDropdown
 					showMonthDropdown
 					dropdownMode="select"
-					selected={values.dateOfBirth ? moment(values.dateOfBirth).toDate() : undefined}
+					selected={values.dateOfBirth ? parseISO(values.dateOfBirth) : undefined}
 					onChange={(date) => {
-						setFieldValue('dateOfBirth', date ? moment(date).format('YYYY-MM-DD') : '');
+						setFieldValue('dateOfBirth', date ? formatISO(date, { representation: 'date' }) : '');
 					}}
 				/>
 			</Form.Group>
@@ -799,7 +805,7 @@ function RecordCard({
 
 			<div className="d-flex flex-column flex-grow-1">
 				<h4>{fullName}</h4>
-				<p>born {moment(data.dateOfBirth).format('M/D/YY')}</p>
+				<p>born {format(parseISO(data.dateOfBirth), 'M/D/YY')}</p>
 				{fullInfo && (
 					<>
 						<p>legal sex: {data.gender === 'MALE' ? 'male' : 'female'}</p>
