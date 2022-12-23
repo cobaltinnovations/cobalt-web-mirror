@@ -218,9 +218,6 @@ const CreateOnYourTimeContent: FC = () => {
 		<AsyncPage fetchData={fetchData}>
 			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
 				<Breadcrumb
-					md={{ span: 12 }}
-					lg={{ span: 10 }}
-					xl={{ span: 8 }}
 					breadcrumbs={[
 						{
 							to: isAdding ? '/cms/available-content' : '/cms/on-your-time',

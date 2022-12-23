@@ -138,9 +138,6 @@ const ResourceLibraryTags = () => {
 				loadingComponent={
 					<>
 						<Breadcrumb
-							xs={{ span: 12 }}
-							lg={{ span: 12 }}
-							xl={{ span: 12 }}
 							breadcrumbs={[
 								{
 									to: '/',
@@ -162,9 +159,6 @@ const ResourceLibraryTags = () => {
 				{tagGroup && tag && (
 					<>
 						<Breadcrumb
-							xs={{ span: 12 }}
-							lg={{ span: 12 }}
-							xl={{ span: 12 }}
 							breadcrumbs={[
 								{
 									to: '/',
