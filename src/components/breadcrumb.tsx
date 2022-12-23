@@ -40,15 +40,8 @@ type BreadCrumbModel = {
 	title: string;
 };
 
-type ColSpec = { span?: number; offset?: number };
-
 interface BreadcrumbProps extends PropsWithChildren {
 	breadcrumbs: BreadCrumbModel[];
-	xs?: ColSpec;
-	sm?: ColSpec;
-	md?: ColSpec;
-	lg?: ColSpec;
-	xl?: ColSpec;
 }
 
 const Breadcrumb: FC<BreadcrumbProps> = (props) => {
@@ -58,11 +51,7 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 		<Container fluid className={classes.breadcrumb}>
 			<Container className="py-3">
 				<Row>
-					<Col
-						md={props.md || { span: 10, offset: 1 }}
-						lg={props.lg || { span: 8, offset: 2 }}
-						xl={props.xl || { span: 6, offset: 3 }}
-					>
+					<Col>
 						<div className="d-flex align-items-center">
 							<p className={classNames(classes.p, 'mb-0 fs-ui-small')}>
 								{props.breadcrumbs.map((breadcrumb, index) => {

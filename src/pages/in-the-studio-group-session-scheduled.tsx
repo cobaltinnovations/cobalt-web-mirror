@@ -190,9 +190,6 @@ const InTheStudioGroupSessionScheduled = () => {
 			/>
 
 			<Breadcrumb
-				xs={{ span: 12 }}
-				lg={{ span: 12 }}
-				xl={{ span: 12 }}
 				breadcrumbs={[
 					{
 						to: '/',
