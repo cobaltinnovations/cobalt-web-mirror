@@ -10,7 +10,6 @@ const FooterLogo = () => {
 				<p className="text-primary text-center text-md-start">
 					<LogoSmallText />
 				</p>
-
 				<p className="text-primary text-center text-md-start">Powered by Cobalt Innovations, Inc.</p>
 			</Col>
 		</Row>
