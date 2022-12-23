@@ -226,6 +226,25 @@ const ResourceLibraryTopic = () => {
 		}
 	}, [hasTouchScreen, searchParams, setSearchParams]);
 
+	const handleKeydown = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key !== 'Escape') {
+				return;
+			}
+
+			clearSearch();
+		},
+		[clearSearch]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleKeydown, false);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeydown, false);
+		};
+	}, [handleKeydown]);
+
 	return (
 		<>
 			<AsyncPage
