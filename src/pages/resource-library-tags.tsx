@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import {
@@ -130,6 +130,13 @@ const ResourceLibraryTags = () => {
 
 		setSearchParams(searchParams, { replace: true });
 	};
+
+	const handleClearButtonClick = useCallback(() => {
+		searchParams.delete('contentTypeId');
+		searchParams.delete('contentDurationId');
+
+		setSearchParams(searchParams, { replace: true });
+	}, [searchParams, setSearchParams]);
 
 	return (
 		<>
@@ -260,6 +267,11 @@ const ResourceLibraryTags = () => {
 										</SimpleFilter>
 									);
 								})}
+							{hasQueryParams && (
+								<Button variant="link" className="p-0 mx-3" onClick={handleClearButtonClick}>
+									Clear
+								</Button>
+							)}
 						</Col>
 					</Row>
 				</Container>

@@ -75,13 +75,13 @@ const ResourceLibraryTopic = () => {
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
+	const hasFilterQueryParms = useMemo(
+		() => tagIdQuery.length > 0 || contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
+		[contentDurationIdQuery.length, contentTypeIdQuery.length, tagIdQuery.length]
+	);
 	const hasQueryParams = useMemo(
-		() =>
-			searchQuery.length > 0 ||
-			tagIdQuery.length > 0 ||
-			contentTypeIdQuery.length > 0 ||
-			contentDurationIdQuery.length > 0,
-		[contentDurationIdQuery.length, contentTypeIdQuery.length, searchQuery.length, tagIdQuery.length]
+		() => searchQuery.length > 0 || hasFilterQueryParms,
+		[hasFilterQueryParms, searchQuery.length]
 	);
 
 	const classes = useResourceLibraryTopicStyles();
@@ -245,6 +245,14 @@ const ResourceLibraryTopic = () => {
 		};
 	}, [handleKeydown]);
 
+	const handleClearButtonClick = useCallback(() => {
+		searchParams.delete('tagId');
+		searchParams.delete('contentTypeId');
+		searchParams.delete('contentDurationId');
+
+		setSearchParams(searchParams, { replace: true });
+	}, [searchParams, setSearchParams]);
+
 	return (
 		<>
 			<AsyncPage
@@ -381,6 +389,11 @@ const ResourceLibraryTopic = () => {
 												</SimpleFilter>
 											);
 										})}
+									{hasFilterQueryParms && (
+										<Button variant="link" className="p-0 mx-3" onClick={handleClearButtonClick}>
+											Clear
+										</Button>
+									)}
 								</div>
 								<div className={classes.searchButtonOuter}>
 									<Button
