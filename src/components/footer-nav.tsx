@@ -1,8 +1,20 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { createUseStyles } from 'react-jss';
+import classNames from 'classnames';
 
-const firstColLinks = [
+import mediaQueries from '@/jss/media-queries';
+
+const useStyles = createUseStyles(() => ({
+	links: {
+		textAlign: 'left',
+		[mediaQueries.md]: {
+			textAlign: 'center',
+		},
+	},
+}));
+
+const links = [
 	{
 		label: 'Home',
 		to: '/',
@@ -19,9 +31,6 @@ const firstColLinks = [
 		label: 'Resource Library',
 		to: '/resource-library',
 	},
-];
-
-const seconColLinks = [
 	{
 		label: 'Contact Us',
 		to: '/feedback',
@@ -33,24 +42,20 @@ const seconColLinks = [
 ];
 
 const FooterNav = () => {
-	return (
-		<Row>
-			<Col className="text-center text-md-start" xs={12} md={6}>
-				{firstColLinks.map((link) => (
-					<Link key={link.label} className="d-block fw-normal text-decoration-none mb-3" to={link.to}>
-						{link.label}
-					</Link>
-				))}
-			</Col>
+	const classes = useStyles();
 
-			<Col className="text-center text-md-start" xs={12} md={6}>
-				{seconColLinks.map((link) => (
-					<Link key={link.label} className="d-block fw-normal text-decoration-none mb-3" to={link.to}>
-						{link.label}
-					</Link>
-				))}
-			</Col>
-		</Row>
+	return (
+		<>
+			{links.map((link) => (
+				<Link
+					key={link.label}
+					className={classNames('d-block fw-normal text-decoration-none mb-3', classes.links)}
+					to={link.to}
+				>
+					{link.label}
+				</Link>
+			))}
+		</>
 	);
 };
 

@@ -42,14 +42,13 @@ const Footer: FC = () => {
 
 	return (
 		<footer ref={footer} className={classNames(classes.footer, 'py-10 py-md-12')}>
-			<Container fluid className="px-10 px-md-19">
+			<Container>
 				<Row>
-					<Col xs={12} md={6}>
+					<Col xs={12} md={8}>
 						<FooterLogo />
-
 						<FooterContent />
 					</Col>
-					<Col xs={12} md={6}>
+					<Col xs={12} sm={12} md={4} lg={{ span: 3, offset: 1 }}>
 						<FooterNav />
 					</Col>
 				</Row>

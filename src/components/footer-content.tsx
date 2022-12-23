@@ -11,7 +11,6 @@ const FooterContent = () => {
 					and your personal information will only be shared in support of providing services or when legally
 					required. Your personal information is also protected under HIPAA and/or State law.
 				</p>
-
 				<p>
 					<strong>
 						Cobalt is also committed to your safety. If you are in crisis, call 911, 988 or text 741 741.
