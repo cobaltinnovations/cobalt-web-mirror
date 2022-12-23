@@ -157,7 +157,7 @@ const ResourceLibraryDetail: FC = () => {
 							<div className="mt-10 text-center">
 								<Button
 									as="a"
-									className="d-inline-block text-decoration-none"
+									className="d-inline-block text-decoration-none text-white"
 									variant="primary"
 									href={item.url}
 									target="_blank"
