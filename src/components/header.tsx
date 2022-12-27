@@ -124,7 +124,12 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 			<header ref={header} className={classes.header}>
 				<div className="d-flex align-items-center">
 					{showHeaderButtons && (
-						<div tabIndex={0} className={classes.menuButton} onClick={handleMenuButtonClick}>
+						<div
+							data-testid="headerNavMenuButton"
+							tabIndex={0}
+							className={classes.menuButton}
+							onClick={handleMenuButtonClick}
+						>
 							<MenuIcon className={classes.menuIcon} />
 						</div>
 					)}

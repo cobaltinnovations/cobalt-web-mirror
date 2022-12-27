@@ -10,7 +10,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import Select from '@/components/select';
 import { useCobaltTheme } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 
@@ -22,6 +21,7 @@ enum QUESTION_CONTENT_HINT_IDS {
 }
 
 interface PatientIntakeCheckbox {
+	testId: string;
 	label: string;
 	question: string;
 	fontSizeId: 'DEFAULT';
@@ -31,6 +31,7 @@ interface PatientIntakeCheckbox {
 
 const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCheckbox> = {
 	[QUESTION_CONTENT_HINT_IDS.FIRST_NAME]: {
+		testId: 'appointmentTypeFormCollectFirstNameCheckbox',
 		label: 'First name',
 		question: 'What is your first name?',
 		fontSizeId: 'DEFAULT',
@@ -38,6 +39,7 @@ const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCh
 		disabled: false,
 	},
 	[QUESTION_CONTENT_HINT_IDS.LAST_NAME]: {
+		testId: 'appointmentTypeFormCollectLastNameCheckbox',
 		label: 'Last name',
 		question: 'What is your last name?',
 		fontSizeId: 'DEFAULT',
@@ -45,6 +47,7 @@ const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCh
 		disabled: false,
 	},
 	// [QUESTION_CONTENT_HINT_IDS.EMAIL_ADDRESS]: {
+	//  testId: 'appointmentTypeFormCollectEmailCheckbox',
 	// 	label: 'Email (Required by Cobalt)',
 	// 	question: 'What is your email address?',
 	// 	fontSizeId: 'DEFAULT',
@@ -52,6 +55,7 @@ const PatientIntakeCheckboxes: Record<QUESTION_CONTENT_HINT_IDS, PatientIntakeCh
 	// 	disabled: true,
 	// },
 	[QUESTION_CONTENT_HINT_IDS.PHONE_NUMBER]: {
+		testId: 'appointmentTypeFormCollectPhoneNumberCheckbox',
 		label: 'Phone number',
 		question: 'What is your phone number?',
 		fontSizeId: 'DEFAULT',
@@ -222,6 +226,7 @@ export const AppointmentTypeFormModal = ({
 				<h3 className="mb-4">Setup</h3>
 
 				<InputHelper
+					data-testid="appointmentTypeFormTitleInput"
 					className="mb-4"
 					type="text"
 					label="Title (how this appears to clients)"
@@ -237,6 +242,7 @@ export const AppointmentTypeFormModal = ({
 						Color:
 					</Form.Label>
 					<input
+						data-testid="appointmentTypeFormColorInput"
 						type="color"
 						value={color}
 						onChange={({ currentTarget }) => {
@@ -248,6 +254,7 @@ export const AppointmentTypeFormModal = ({
 				<Form.Group className="mb-5">
 					<Form.Label style={{ ...theme.fonts.default }}>Visit Type:</Form.Label>
 					<InputHelper
+						data-testid="appointmentTypeFormVisitTypeSelect"
 						label="Visit Type"
 						value={visitTypeId}
 						as="select"
@@ -271,6 +278,7 @@ export const AppointmentTypeFormModal = ({
 					</Form.Label>
 					<div className="d-flex align-items-center">
 						<Form.Check
+							data-testid="appointmentTypeForm30mDurationOption"
 							className="me-6"
 							id="duration-30"
 							type="radio"
@@ -282,6 +290,7 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
+							data-testid="appointmentTypeForm45mDurationOption"
 							className="me-6"
 							id="duration-45"
 							type="radio"
@@ -293,6 +302,7 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
+							data-testid="appointmentTypeForm60mDurationOption"
 							className="me-6"
 							id="duration-60"
 							type="radio"
@@ -304,12 +314,14 @@ export const AppointmentTypeFormModal = ({
 							}}
 						/>
 						<Form.Check
+							data-testid="appointmentTypeFormOtherDurationOption"
 							className="me-6"
 							id="duration-other"
 							type="radio"
 							name="duration"
 							label={
 								<InputHelper
+									data-testid="appointmentTypeFormOtherDurationInput"
 									type="number"
 									label="other (minutes)"
 									value={durationInMinutes}
@@ -332,7 +344,7 @@ export const AppointmentTypeFormModal = ({
 					<Form.Label style={{ ...theme.fonts.default }}>Collect:</Form.Label>
 					<div className="d-flex align-items-center">
 						{Object.values(PatientIntakeCheckboxes).map(
-							({ label, question, fontSizeId, questionContentHintId, disabled }) => {
+							({ label, question, fontSizeId, questionContentHintId, disabled, testId }) => {
 								const isChecked = !!(patientIntakeQuestions || []).find(
 									(patientIntakeQuestion) =>
 										patientIntakeQuestion.questionContentHintId === questionContentHintId
@@ -340,6 +352,7 @@ export const AppointmentTypeFormModal = ({
 
 								return (
 									<Form.Check
+										data-testid={testId}
 										id={`collect-${questionContentHintId}`}
 										key={questionContentHintId}
 										type="checkbox"
@@ -381,6 +394,7 @@ export const AppointmentTypeFormModal = ({
 					return (
 						<div key={index} className="position-relative">
 							<Button
+								data-testid="appointmentTypeFormRemoveScreeningQuestionButton"
 								size="sm"
 								className={classes.removeButton}
 								variant="danger"
@@ -394,6 +408,7 @@ export const AppointmentTypeFormModal = ({
 								<CloseIcon height={24} width={24} />
 							</Button>
 							<InputHelper
+								data-testid="appointmentTypeFormScreeningQuestionInput"
 								className="mb-3"
 								label={`Screening Question #${index + 1}`}
 								name="screeningQuestion"
@@ -409,6 +424,7 @@ export const AppointmentTypeFormModal = ({
 							/>
 							<div className="mb-5">
 								<Form.Check
+									data-testid="appointmentTypeFormScreeningQuestionSizeCheckbox"
 									id={`screening-question-toggle--${index}`}
 									label="Reduce text size"
 									value="SMALL"
@@ -431,6 +447,7 @@ export const AppointmentTypeFormModal = ({
 				})}
 				<div className="text-end">
 					<Button
+						data-testid="appointmentTypeFormAddScreeningQuestionButton"
 						size="sm"
 						onClick={() => {
 							const screeningQuestionsClone = cloneDeep(screeningQuestions || []);
@@ -451,13 +468,19 @@ export const AppointmentTypeFormModal = ({
 				<div className="d-flex align-items-center justify-content-between">
 					<div>
 						{appointmentTypeId && (
-							<Button variant="link" className="text-danger" onClick={handleDeleteButtonClick}>
+							<Button
+								data-testid="appointmentTypeFormDeleteButton"
+								variant="link"
+								className="text-danger"
+								onClick={handleDeleteButtonClick}
+							>
 								Delete
 							</Button>
 						)}
 					</div>
 					<div>
 						<Button
+							data-testid="appointmentTypeFormCancelButton"
 							variant="outline-primary"
 							onClick={() => {
 								if (modalProps?.onHide) {
@@ -467,7 +490,12 @@ export const AppointmentTypeFormModal = ({
 						>
 							Cancel
 						</Button>
-						<Button className="ms-2" variant="outline" onClick={handleSaveButtonClick}>
+						<Button
+							data-testid="appointmentTypeFormSaveButton"
+							className="ms-2"
+							variant="outline"
+							onClick={handleSaveButtonClick}
+						>
 							Save
 						</Button>
 					</div>

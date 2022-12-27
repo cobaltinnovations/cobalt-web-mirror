@@ -70,7 +70,13 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 					<h4 className="mb-0">{isBlockedTime ? 'Blocked Time' : 'Open Availability'}</h4>
 				)}
 
-				<Button variant="link" size="sm" className="ms-auto p-0" onClick={() => onClose()}>
+				<Button
+					data-testid="viewAvailabilityCloseButton"
+					variant="link"
+					size="sm"
+					className="ms-auto p-0"
+					onClick={() => onClose()}
+				>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -88,7 +94,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 					</div>
 
 					<Link to={`edit`}>
-						<Button variant="link" size="sm" className="p-0">
+						<Button data-testid="viewAvailabilityEditButton" variant="link" size="sm" className="p-0">
 							<EditIcon />
 						</Button>
 					</Link>

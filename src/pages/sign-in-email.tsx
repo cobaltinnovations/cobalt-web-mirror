@@ -122,6 +122,7 @@ const SignInEmail = () => {
 
 								<Form className="mb-6" onSubmit={handleSignInFormSubmit}>
 									<InputHelper
+										data-testid="signInEmailAddressInput"
 										className="mb-2"
 										label="Email address"
 										type="email"
@@ -135,6 +136,7 @@ const SignInEmail = () => {
 										required
 									/>
 									<InputHelper
+										data-testid="signInPasswordInput"
 										className="mb-4"
 										label="Password"
 										type="password"
@@ -149,6 +151,7 @@ const SignInEmail = () => {
 									/>
 									<div className="mb-6 text-right">
 										<Button
+											data-testid="signInForgotPasswordButton"
 											className="p-0"
 											variant="link"
 											onClick={() => {
@@ -158,7 +161,12 @@ const SignInEmail = () => {
 											Forgot Password?
 										</Button>
 									</div>
-									<Button type="submit" className="w-100 d-block" variant="primary">
+									<Button
+										data-testid="signInSubmitButton"
+										type="submit"
+										className="w-100 d-block"
+										variant="primary"
+									>
 										Sign In
 									</Button>
 								</Form>

@@ -32,7 +32,7 @@ export const AppointmentTypeItem = ({ appointmentType, onEdit, invertedColor }: 
 		  };
 
 	return (
-		<div className="d-flex align-items-center justify-content-between py-1">
+		<div data-testid="appointmentTypeItem" className="d-flex align-items-center justify-content-between py-1">
 			<div className="d-flex align-items-center">
 				<div className={schedulingClasses.appointmentTypeColorCircle} style={colorStyle} />
 
@@ -40,7 +40,13 @@ export const AppointmentTypeItem = ({ appointmentType, onEdit, invertedColor }: 
 			</div>
 
 			{onEdit && (
-				<Button variant="link" size="sm" className="p-0" onClick={() => onEdit()}>
+				<Button
+					data-testid="editAppointmentTypeButton"
+					variant="link"
+					size="sm"
+					className="p-0"
+					onClick={() => onEdit()}
+				>
 					<EditIcon />
 				</Button>
 			)}

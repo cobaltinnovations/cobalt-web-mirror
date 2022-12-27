@@ -37,16 +37,18 @@ const useMeridianSwitchStyles = createUseThemedStyles((theme) => ({
 type MeridianValue = string | 'am' | 'pm';
 
 interface MeridianSwitchProps {
+	testId?: string;
 	selected: MeridianValue;
 	onChange: (newSelected: MeridianValue) => void;
 }
 
-const MeridianSwitch: FC<MeridianSwitchProps> = ({ selected, onChange }) => {
+const MeridianSwitch: FC<MeridianSwitchProps> = ({ testId, selected, onChange }) => {
 	const classes = useMeridianSwitchStyles();
 
 	return (
 		<div className={classes.meridianToggleWrapper}>
 			<button
+				data-testid={`${testId}AMButton`}
 				type="button"
 				className={classNames(classes.meridianButton, classes.meridianButtonLeft, {
 					[classes.meridianSelectedButton]: selected === 'am',
@@ -60,6 +62,7 @@ const MeridianSwitch: FC<MeridianSwitchProps> = ({ selected, onChange }) => {
 				AM
 			</button>
 			<button
+				data-testid={`${testId}PMButton`}
 				type="button"
 				className={classNames(classes.meridianButton, classes.meridianButtonRight, {
 					[classes.meridianSelectedButton]: selected === 'pm',
@@ -77,6 +80,7 @@ const MeridianSwitch: FC<MeridianSwitchProps> = ({ selected, onChange }) => {
 };
 
 interface TimeInputProps {
+	testId?: string;
 	time: string;
 	onTimeChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
 	meridian: MeridianValue;
@@ -98,22 +102,32 @@ const useTimeInputStyles = createUseThemedStyles({
 	},
 });
 
-export const TimeInput = ({ time, onTimeChange, meridian, onMeridianChange, ...props }: TimeInputProps) => {
+export const TimeInput = ({
+	time,
+	onTimeChange,
+	meridian,
+	onMeridianChange,
+	name,
+	testId = name,
+	...props
+}: TimeInputProps) => {
 	const classes = useTimeInputStyles();
 
 	return (
 		<div className="d-flex">
 			<InputHelper
+				data-testid={`${testId}Input`}
 				className={classes.timeInput}
 				as={InputMask}
 				//@ts-expect-error InputHelper `as` type forwarding
 				mask="99:99"
 				maskChar="_"
 				value={time}
+				name={name}
 				onChange={onTimeChange}
 				{...props}
 			/>
-			<MeridianSwitch selected={meridian} onChange={onMeridianChange} />
+			<MeridianSwitch testId={testId} selected={meridian} onChange={onMeridianChange} />
 		</div>
 	);
 };

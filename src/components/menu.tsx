@@ -18,8 +18,6 @@ import { ReactComponent as OnYourTimeIcon } from '@/assets/icons/icon-on-your-ti
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
-import { ReactComponent as Covid19Icon } from '@/assets/icons/icon-covid-19.svg';
-import { ReactComponent as WellBeingIcon } from '@/assets/icons/icon-well-being.svg';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
@@ -28,6 +26,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { isEqual } from 'lodash';
 import { AnalyticsEvent, CrisisAnalyticsEvent, MainNavAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
+import { exploreLinks } from '@/menu-links';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
@@ -240,12 +239,14 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Content Management',
 		items: () => [
 			{
+				testId: 'menuLinkAdminMyContent',
 				label: 'My Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminMyContent ? '/cms/on-your-time' : null,
 			},
 			{
+				testId: 'menuLinkAdminAvailableContent',
 				label: 'Available Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
@@ -257,12 +258,14 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Group Session Management',
 		items: () => [
 			{
+				testId: 'menuLinkAdminScheduledGroupSessions',
 				label: 'Scheduled',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminGroupSession ? '/group-sessions/scheduled' : null,
 			},
 			{
+				testId: 'menuLinkAdminByRequestGroupSessions',
 				label: 'By Request',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
@@ -276,27 +279,32 @@ const MENU_SECTIONS: MenuNavSection[] = [
 	{
 		items: () => [
 			{
+				testId: 'menuLinkHome',
 				label: 'Home',
 				icon: <HomeIcon />,
 				to: () => '/',
 			},
 			// {
+			// 	testId: 'menuLinkProviderProfile',
 			// 	label: 'Provider Profile',
 			// 	icon: <></>,
 			// 	to: ({ account }) => config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true' && account?.providerId ?`/providers/${account?.providerId}/profile` : null
 			// },
 			{
+				testId: 'menuLinkScheduling',
 				label: 'Patient Scheduling',
 				icon: <EditCalendarIcon />,
 				to: ({ account }) => (account?.providerId ? '/scheduling' : null),
 			},
 
 			{
+				testId: 'menuLinkEvents',
 				label: 'My Events',
 				icon: <EventIcon />,
 				to: () => '/my-calendar',
 			},
 			{
+				testId: 'menuLinkAdmin',
 				label: 'Admin',
 				icon: <AdminIcon />,
 				subNavSections: ({ institutionCapabilities }) =>
@@ -313,16 +321,19 @@ const MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Connect',
 		items: () => [
 			{
+				testId: 'menuLinkConnectWithSupport',
 				label: 'Connect with Support',
 				icon: <ConnectWithSupportIcon />,
 				to: ({ institution }) => (institution?.supportEnabled ? '/connect-with-support' : null),
 			},
 			{
+				testId: 'menuLinkGroupSessions',
 				label: 'Group Sessions',
 				icon: <GroupSessionsIcon />,
 				to: () => '/in-the-studio',
 			},
 			{
+				testId: 'menuLinkCrisisResources',
 				label: 'Crisis Resources',
 				icon: <PhoneIcon />,
 				analyticsEvent: () => CrisisAnalyticsEvent.clickCrisisMenu(),
@@ -332,32 +343,29 @@ const MENU_SECTIONS: MenuNavSection[] = [
 	},
 	{
 		title: 'Explore',
-		items: (context) => [
-			{
-				label: 'Resource Library',
-				icon: <OnYourTimeIcon />,
-				to: () => '/resource-library',
-			},
-			...(context?.institution
-				? context.institution.additionalNavigationItems.map((additionalNavigationItem) => {
-						return {
-							label: additionalNavigationItem.name,
-							icon: <AdditionalNavigationItemIcon iconName={additionalNavigationItem.iconName} />,
-							to: () => additionalNavigationItem.url,
-						};
-				  })
-				: []),
-			{
-				label: 'COVID-19 Resources',
-				icon: <Covid19Icon />,
-				to: () => '/covid-19-resources',
-			},
-			{
-				label: 'Well-Being Resources',
-				icon: <WellBeingIcon />,
-				to: () => '/well-being-resources',
-			},
-		],
+		items: (context) => {
+			const additionalLinks = (context?.institution?.additionalNavigationItems ?? []).map(
+				(additionalNavigationItem, index) => {
+					return {
+						testId: `menuLink-additionalItem${index}`,
+						label: additionalNavigationItem.name,
+						icon: <AdditionalNavigationItemIcon iconName={additionalNavigationItem.iconName} />,
+						to: () => additionalNavigationItem.url,
+					};
+				}
+			);
+
+			return [
+				{
+					testId: 'menuLinkResourceLibrary',
+					label: 'Resource Library',
+					icon: <OnYourTimeIcon />,
+					to: () => '/resource-library',
+				},
+				...additionalLinks,
+				...exploreLinks,
+			];
+		},
 	},
 ];
 
@@ -465,7 +473,9 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 				{!isSubNav && (
 					<>
 						<div className="my-4">
-							<h5 className="mb-0">{account?.displayName ?? 'Anonymous'}</h5>
+							<h5 data-testid="menuAccountDisplayNameText" className="mb-0">
+								{account?.displayName ?? 'Anonymous'}
+							</h5>
 
 							{institution?.requireConsentForm && (
 								<Link

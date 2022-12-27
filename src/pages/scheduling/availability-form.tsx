@@ -170,6 +170,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 						<Form onSubmit={handleSubmit}>
 							<Form.Group controlId="date" className="mb-5">
 								<DatePicker
+									testId="availabilityFormStartDate"
 									showYearDropdown
 									showMonthDropdown
 									dropdownMode="select"
@@ -185,6 +186,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 								<Row>
 									<Col>
 										<TimeInput
+											testId="availabilityFormStartTime"
 											name="startTime"
 											label="Start Time"
 											time={values.startTime}
@@ -202,6 +204,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 								<Row>
 									<Col>
 										<TimeInput
+											testId="availabilityFormEndTime"
 											name="endTime"
 											label="End Time"
 											time={values.endTime}
@@ -217,6 +220,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 							<Form.Group controlId="recurring" className="mb-5">
 								<Form.Check
+									data-testid="availabilityFormRecurringCheckbox"
 									id="recurring"
 									checked={values.recurring}
 									className="ms-auto"
@@ -231,11 +235,14 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 										<Form.Label style={{ ...fonts.default }}>Occurs on...</Form.Label>
 										<div className="d-flex align-items-center flex-wrap">
 											{(['S', 'M', 'T', 'W', 'Th', 'F', 'Sa'] as const).map((dayOfWeek, idx) => {
+												const occuranceId = `availabilityFormOccurance${dayOfWeek}`;
+
 												return (
 													<Form.Check
 														className="me-4"
 														key={idx}
-														id={`occurance.${dayOfWeek}`}
+														data-testid={occuranceId}
+														id={occuranceId}
 														type="checkbox"
 														label={dayOfWeek}
 														checked={values.occurance[dayOfWeek]}
@@ -253,6 +260,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 									<Form.Group controlId="endDate" className="mb-5">
 										<DatePicker
+											testId="availabilityFormEndDate"
 											isClearable
 											showYearDropdown
 											showMonthDropdown
@@ -275,6 +283,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 										</Form.Label>
 										<div className="d-flex">
 											<Form.Check
+												data-testid="availabilityFormAllTypesAcceptedCheckbox"
 												name="typesAccepted"
 												id="all"
 												className="me-4"
@@ -285,6 +294,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 												onChange={handleChange}
 											/>
 											<Form.Check
+												data-testid="availabilityFormlimitedTypesAcceptedCheckbox"
 												name="typesAccepted"
 												id="limited"
 												type="radio"
@@ -302,6 +312,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 												return (
 													<Form.Check
 														key={idx}
+														data-testid="availabilityFormLimitedAppointmentTypeCheckbox"
 														id={`appointment-type--${appointmentType.appointmentTypeId}`}
 														type="checkbox"
 														name="appointmentTypes"
@@ -338,6 +349,7 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 
 							<div className="mt-4 d-flex flex-row justify-content-between">
 								<Button
+									data-testid="availabilityFormCancelButton"
 									variant="outline-primary"
 									size="sm"
 									onClick={() => {
@@ -346,7 +358,13 @@ export const AvailabilityForm: FC<AvailabilityFormProps> = ({
 								>
 									Cancel
 								</Button>
-								<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
+								<Button
+									data-testid="availabilityFormSaveButton"
+									variant="primary"
+									size="sm"
+									type="submit"
+									disabled={!isValid}
+								>
 									Save
 								</Button>
 							</div>

@@ -9,11 +9,12 @@ import { Dropdown } from 'react-bootstrap';
 import { AppointmentTypeItem } from './appointment-type-item';
 
 interface AppointmentTypeDropdownProps {
+	testId?: string;
 	initialId?: string;
 	onChange?: (apptType?: SchedulingAppointmentType) => void;
 }
 
-export const AppointmentTypeDropdown = ({ initialId, onChange }: AppointmentTypeDropdownProps) => {
+export const AppointmentTypeDropdown = ({ testId = '', initialId, onChange }: AppointmentTypeDropdownProps) => {
 	const { account } = useAccount();
 	const handleError = useHandleError();
 	const [appointmentTypes, setAppointmentTypes] = useState<SchedulingAppointmentType[]>([]);
@@ -48,11 +49,17 @@ export const AppointmentTypeDropdown = ({ initialId, onChange }: AppointmentType
 
 	return (
 		<Dropdown drop="down">
-			<Dropdown.Toggle as={AppointmentTypeDropdownToggle} id="reasons" selectedAppointmentType={selectedType} />
+			<Dropdown.Toggle
+				data-testid={`${testId}AppointmentTypeDropdownToggle`}
+				as={AppointmentTypeDropdownToggle}
+				id="reasons"
+				selectedAppointmentType={selectedType}
+			/>
 			<Dropdown.Menu className="w-100">
 				{appointmentTypes.map((apptType, index) => {
 					return (
 						<Dropdown.Item
+							data-testid={`${testId}AppointmentTypeDropdownOption`}
 							key={index}
 							onClick={() => {
 								setSelectedType(apptType);
