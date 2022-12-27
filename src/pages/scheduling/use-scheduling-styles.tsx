@@ -32,7 +32,8 @@ export const useSchedulingStyles = createUseThemedStyles((theme) => ({
 export const useContainerStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		display: 'flex',
-		height: 'calc(100vh - 60px)', // subtracting header + footer height
+		height: 'calc(100vh - 53px)', // subtracing header height
+		paddingBottom: 6, // footer border
 	},
 	sideBar: {
 		width: 355,
