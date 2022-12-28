@@ -3,30 +3,30 @@ import React, { FC, useCallback, useEffect } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-const useConfirmGroupEventBookingModalStyles = createUseStyles({
-	confirmGroupEventBookingModal: {
+const useConfirmGroupSessionBookingModalStyles = createUseStyles({
+	confirmGroupSessionBookingModal: {
 		width: '90%',
 		maxWidth: 295,
 		margin: '0 auto',
 	},
 });
 
-interface ConfirmGroupEventBookingModalProps extends ModalProps {
+interface ConfirmGroupSessionBookingModalProps extends ModalProps {
 	onConfirm(): void;
-	groupEventName: string;
+	groupSessionName: string;
 	dateTime: string;
 	externalUrl?: string;
 }
 
-const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
+const ConfirmGroupSessionBookingModal: FC<ConfirmGroupSessionBookingModalProps> = ({
 	onConfirm,
-	groupEventName,
+	groupSessionName,
 	dateTime,
 	externalUrl,
 	...modalProps
 }) => {
-	useTrackModalView('ConfirmGroupEventBookingModal', modalProps.show);
-	const classes = useConfirmGroupEventBookingModalStyles();
+	useTrackModalView('ConfirmGroupSessionBookingModal', modalProps.show);
+	const classes = useConfirmGroupSessionBookingModalStyles();
 
 	const navigateToExternalUrl = useCallback(() => {
 		if (!externalUrl) {
@@ -51,7 +51,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 	}, [modalProps.show, navigateToExternalUrl]);
 
 	return (
-		<Modal {...modalProps} dialogClassName={classes.confirmGroupEventBookingModal} centered>
+		<Modal {...modalProps} dialogClassName={classes.confirmGroupSessionBookingModal} centered>
 			<Modal.Header closeButton>
 				<Modal.Title>Confirm Reservation</Modal.Title>
 			</Modal.Header>
@@ -64,7 +64,7 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 				) : (
 					<>
 						<p className="mb-0 fw-bold">Group Session</p>
-						<p className="mb-2">{groupEventName}</p>
+						<p className="mb-2">{groupSessionName}</p>
 
 						<p className="mb-0 fw-bold">Scheduled for</p>
 						<p className="mb-0">{dateTime}</p>
@@ -95,4 +95,4 @@ const ConfirmGroupEventBookingModal: FC<ConfirmGroupEventBookingModalProps> = ({
 	);
 };
 
-export default ConfirmGroupEventBookingModal;
+export default ConfirmGroupSessionBookingModal;

@@ -156,6 +156,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					provider,
 					appointmentType: confirmedApptType,
 					timeSlot,
+					date,
 				});
 			} else {
 				setShowConfirmAppointmentTypeModal(true);

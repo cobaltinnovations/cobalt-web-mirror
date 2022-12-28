@@ -3,8 +3,6 @@ import {
 	PresignedUploadModel,
 	GroupSessionModel,
 	GroupSessionRequestModel,
-	GroupEvent,
-	ExternalGroupEventType,
 	GroupSessionReservationModel,
 	GROUP_SESSION_STATUS_ID,
 	GROUP_SESSION_SORT_ORDER,
@@ -204,9 +202,7 @@ export const groupSessionsService = {
 			data: { groupSessionStatusId },
 		});
 	},
-	isGroupSession(
-		event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel
-	): event is GroupSessionModel {
+	isGroupSession(event: GroupSessionModel | GroupSessionRequestModel): event is GroupSessionModel {
 		return typeof (event as GroupSessionModel).groupSessionId !== 'undefined';
 	},
 	reserveGroupSession(groupSessionId: string, emailAddress: string) {
@@ -301,9 +297,7 @@ export const groupSessionsService = {
 			data: { groupSessionRequestStatusId },
 		});
 	},
-	isGroupSessionByRequest(
-		event: GroupEvent | ExternalGroupEventType | GroupSessionModel | GroupSessionRequestModel
-	): event is GroupSessionRequestModel {
+	isGroupSessionByRequest(event: GroupSessionModel | GroupSessionRequestModel): event is GroupSessionRequestModel {
 		return typeof (event as GroupSessionRequestModel).groupSessionRequestId !== 'undefined';
 	},
 	signUpForGroupSessionRequest(data: SignUpForGroupSessionRequestRequestBody) {

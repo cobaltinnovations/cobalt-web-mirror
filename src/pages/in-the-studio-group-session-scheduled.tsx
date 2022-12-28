@@ -14,7 +14,7 @@ import useAlert from '@/hooks/use-alert';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import CollectEmailModal from '@/components/collect-email-modal';
-import ConfirmGroupEventBookingModal from '@/components/confirm-group-event-booking-modal';
+import ConfirmGroupSessionBookingModal from '@/components/confirm-group-session-booking-modal';
 import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
 import BackgroundImageContainer from '@/components/background-image-container';
 
@@ -123,13 +123,13 @@ const InTheStudioGroupSessionScheduled = () => {
 			/>
 
 			{session && (
-				<ConfirmGroupEventBookingModal
+				<ConfirmGroupSessionBookingModal
 					externalUrl={session.scheduleUrl}
 					show={showConfirmReservationModal}
 					onHide={() => {
 						setShowConfirmReservationModal(false);
 					}}
-					groupEventName={session.title}
+					groupSessionName={session.title}
 					dateTime={session.startDateTimeDescription}
 					onConfirm={async () => {
 						if (isBooking) {

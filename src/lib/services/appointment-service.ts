@@ -8,8 +8,6 @@ export interface CreateAppointmentData {
 	time: string;
 	emailAddress?: string;
 	phoneNumber?: string;
-	groupEventId?: string;
-	groupEventTypeId?: string;
 	appointmentTypeId?: string;
 	appointmentReasonId?: string;
 	intakeAssessmentId?: string;

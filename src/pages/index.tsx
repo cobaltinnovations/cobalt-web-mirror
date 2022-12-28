@@ -140,7 +140,7 @@ const Index: FC = () => {
 													className="d-block text-decoration-none h-100"
 													to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
 												>
-													<StudioEvent className="h-100" groupEvent={inTheStudioEvent} />
+													<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
 												</Link>
 											);
 										} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
@@ -150,7 +150,7 @@ const Index: FC = () => {
 													className="d-block text-decoration-none h-100"
 													to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
 												>
-													<StudioEvent className="h-100" groupEvent={inTheStudioEvent} />
+													<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
 												</Link>
 											);
 										} else {

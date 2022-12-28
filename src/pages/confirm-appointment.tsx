@@ -17,7 +17,7 @@ const ConfirmAppointment = () => {
 	const appointmentTypeId = searchParams.get('appointmentTypeId') ?? '';
 	const date = searchParams.get('date') ?? '';
 	const time = searchParams.get('time') ?? '';
-	const intakeAssessmentId = searchParams.get('intakeAssessmentId') ?? '';
+	const intakeAssessmentId = searchParams.get('intakeAssessmentId') || undefined;
 
 	const { showAlert } = useAlert();
 	const { account } = useAccount();
