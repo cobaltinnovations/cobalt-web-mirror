@@ -88,6 +88,7 @@ const SignIn: FC = () => {
 												'mb-4': !isLast,
 											})}
 											variant={variant}
+											data-testid={`signIn-${accountSource.accountSourceId}`}
 											onClick={() => {
 												if (accountSource.accountSourceId === AccountSourceId.ANONYMOUS) {
 													handleEnterAnonymouslyButtonClick();

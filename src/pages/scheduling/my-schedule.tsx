@@ -177,7 +177,7 @@ export const MySchedule: FC = () => {
 				/>
 			</div>
 		);
-	}, []);
+	}, [classes.sideBar, fetchLeftData, fetchMainData, managingAvailabilties, navigate]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -252,13 +252,19 @@ export const MySchedule: FC = () => {
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
 					<Link to={`appointments/new-appointment`}>
-						<Button variant="link" size="sm" className="p-0 mb-5 fs-default">
+						<Button
+							data-testid="schedulingNewAppointmentButton"
+							variant="link"
+							size="sm"
+							className="p-0 mb-5 fs-default"
+						>
 							New Appointment
 						</Button>
 					</Link>
 
 					<Link to={`availabilities`}>
 						<Button
+							data-testid="schedulingManageAvailabilityButton"
 							variant="link"
 							size="sm"
 							className="p-0 mb-5 fs-default"

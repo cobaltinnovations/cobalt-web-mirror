@@ -196,13 +196,20 @@ export const AppointmentDetailPanel = ({
 						)}
 					</div>
 
-					<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+					<Button
+						data-testid="appointmentDetailClodeButton"
+						variant="link"
+						size="sm"
+						className="p-0"
+						onClick={() => onClose()}
+					>
 						<CloseIcon />
 					</Button>
 				</div>
 
 				<div className="mb-4">
 					<Button
+						data-testid="appointmentDetailJoinButton"
 						as="a"
 						variant="primary"
 						size="sm"
@@ -213,14 +220,30 @@ export const AppointmentDetailPanel = ({
 						Join Now
 					</Button>
 
-					<Button variant="danger" size="sm" className="me-1" onClick={handleCancelAppointmentButtonClick}>
+					<Button
+						data-testid="apppointmentDetailCancelButton"
+						variant="danger"
+						size="sm"
+						className="me-1"
+						onClick={handleCancelAppointmentButtonClick}
+					>
 						Cancel Appointment
 					</Button>
 
-					<CopyToClipboardButton className="me-1" text={appointment?.videoconferenceUrl} iconSize={18} />
+					<CopyToClipboardButton
+						data-testid="appointmentDetailCopyVideoUrlButton"
+						className="me-1"
+						text={appointment?.videoconferenceUrl}
+						iconSize={18}
+					/>
 
 					<Link to={'edit'}>
-						<Button variant="primary" size="sm" className="px-2">
+						<Button
+							data-testid="appointmentDetailDeleteButton"
+							variant="primary"
+							size="sm"
+							className="px-2"
+						>
 							<EditIcon width={18} height={18} />
 						</Button>
 					</Link>
@@ -297,6 +320,7 @@ export const AppointmentDetailPanel = ({
 						</p>
 
 						<button
+							data-testid="appointmentDetailAddNewButton"
 							className={schedulingClasses.roundBtn}
 							onClick={() => {
 								onAddAppointment();

@@ -80,11 +80,23 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose(logicalAvailabilityId)}>
+				<Button
+					data-testid="editAvailabilityBackButton"
+					variant="link"
+					size="sm"
+					className="p-0"
+					onClick={() => onClose(logicalAvailabilityId)}
+				>
 					<ChevronLeftIcon fill={theme.colors.p500} className="me-1" />
 					Back
 				</Button>
-				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+				<Button
+					data-testid="editAvailabilityCloseButton"
+					variant="link"
+					size="sm"
+					className="p-0"
+					onClick={() => onClose()}
+				>
 					<CloseIcon />
 				</Button>
 			</div>
@@ -96,7 +108,13 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 						{isBlockedSlot ? 'unavailable time block' : 'availability'}
 					</h5>
 					{logicalAvailabilityId && (
-						<Button variant="link" size="sm" className="text-danger p-0" onClick={onDelete}>
+						<Button
+							data-testid="editAvailabilityDeleteButton"
+							variant="link"
+							size="sm"
+							className="text-danger p-0"
+							onClick={onDelete}
+						>
 							Delete
 						</Button>
 					)}

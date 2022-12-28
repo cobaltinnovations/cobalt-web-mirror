@@ -81,6 +81,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 					<Form onSubmit={handleSubmit}>
 						<Form.Group controlId="date" className="mb-5">
 							<DatePicker
+								testId="appointmentFormDate"
 								showYearDropdown
 								showMonthDropdown
 								dropdownMode="select"
@@ -96,6 +97,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 							<Row>
 								<Col>
 									<TimeInput
+										testId="appointmentFormStartTime"
 										name="startTime"
 										label="Start Time"
 										time={values.startTime}
@@ -110,6 +112,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 						</Form.Group>
 
 						<AppointmentTypeDropdown
+							testId="appointmentForm"
 							initialId={initialValues?.appointmentTypeId ?? ''}
 							onChange={(apptType) => {
 								setFieldValue('appointmentTypeId', apptType?.appointmentTypeId);
@@ -118,6 +121,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 
 						<div className="mt-4 d-flex flex-row justify-content-between">
 							<Button
+								data-testid="appointmentFormCancelButton"
 								variant="outline-primary"
 								size="sm"
 								onClick={() => {
@@ -126,7 +130,13 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 							>
 								Cancel
 							</Button>
-							<Button variant="primary" size="sm" type="submit" disabled={!isValid}>
+							<Button
+								data-testid="appointmentFormSaveButton"
+								variant="primary"
+								size="sm"
+								type="submit"
+								disabled={!isValid}
+							>
 								Save
 							</Button>
 						</div>

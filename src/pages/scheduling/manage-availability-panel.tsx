@@ -67,7 +67,14 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 			<div className="py-4">
 				<div className="mb-7 d-flex align-items-center justify-content-between">
 					<h4>Manage availability</h4>
-					<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
+
+					<Button
+						data-testid="manageAvailabilityCloseButton"
+						variant="link"
+						size="sm"
+						className="p-0"
+						onClick={() => onClose()}
+					>
 						<CloseIcon />
 					</Button>
 				</div>
@@ -76,6 +83,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>appointment types</h5>
 						<Button
+							data-testid="manageAvailabilityAddAppointmentTypeButton"
 							variant="link"
 							className={classes.roundBtn}
 							onClick={() => setAppointmentTypeModalOpen(true)}
@@ -102,7 +110,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>regular hours</h5>
 						<Link to={'new-availability'}>
-							<Button variant="link" className={classes.roundBtn}>
+							<Button
+								data-testid="manageAvailabilityAddButton"
+								variant="link"
+								className={classes.roundBtn}
+							>
 								<PlusIcon />
 							</Button>
 						</Link>
@@ -122,7 +134,11 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 					<div className="mb-1 d-flex align-items-center justify-content-between">
 						<h5>unavailable time block</h5>
 						<Link to={'new-blocked-time'}>
-							<Button variant="link" className={classes.roundBtn}>
+							<Button
+								data-testid="manageAvailabilitBlockTimeButton"
+								variant="link"
+								className={classes.roundBtn}
+							>
 								<PlusIcon />
 							</Button>
 						</Link>
@@ -150,7 +166,11 @@ interface LogicalAvailabilityItemProps {
 
 const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityItemProps) => {
 	return (
-		<div key={logicalAvailability.logicalAvailabilityId} className="mb-2 border py-2 px-3">
+		<div
+			data-testid="availabilityItem"
+			key={logicalAvailability.logicalAvailabilityId}
+			className="mb-2 border py-2 px-3"
+		>
 			<div className="d-flex align-items-center justify-content-between">
 				<div>
 					{logicalAvailability.descriptionComponents?.map((description, index) => {
@@ -162,7 +182,7 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 					})}
 				</div>
 				<Link to={`${logicalAvailability.logicalAvailabilityId}/edit`}>
-					<Button variant="link" size="sm" className="p-0">
+					<Button data-testid="availabilityItemEditButton" variant="link" size="sm" className="p-0">
 						<EditIcon height={24} width={24} />
 					</Button>
 				</Link>
