@@ -8,6 +8,7 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 
 const gutterWidth = 30;
 
@@ -226,6 +227,7 @@ const Carousel = ({
 	floatingButtonGroup,
 	...rest
 }: PropsWithChildren<CarouselProps>) => {
+	const { hasTouchScreen } = useTouchScreenCheck();
 	const [customButtonGroupHeight, setCustomButtonGroupHeight] = useState(0);
 	const classes = useCarouselStyles({
 		customButtonGroupHeight,
@@ -237,6 +239,8 @@ const Carousel = ({
 		<div className={classes.carouselOuter}>
 			<MultiCarousel
 				partialVisible={true}
+				// disable swipe/touch until fix with page overscrolling
+				swipeable={!hasTouchScreen}
 				draggable={false}
 				arrows={false}
 				customButtonGroup={
