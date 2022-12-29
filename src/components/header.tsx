@@ -56,6 +56,11 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 	phoneIcon: {
 		marginRight: 4,
 	},
+	'@global': {
+		'.header-menu-open': {
+			overflow: 'hidden',
+		},
+	},
 }));
 
 interface HeaderProps {
@@ -100,6 +105,10 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	useEffect(() => {
 		setBodyPadding();
 	}, [account]);
+
+	useEffect(() => {
+		document.body.classList.toggle('header-menu-open', !!menuOpen);
+	}, [menuOpen]);
 
 	/* ----------------------------------------------------------- */
 	/* Button handlers */
