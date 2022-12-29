@@ -383,6 +383,7 @@ const ScreeningQuestionsPage = () => {
 										screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
 										<Button
 											disabled={isSubmitting}
+											className="me-2"
 											type="button"
 											onClick={() => {
 												if (

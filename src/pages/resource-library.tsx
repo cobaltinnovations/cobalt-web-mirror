@@ -11,6 +11,9 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import InputHelperSearch from '@/components/input-helper-search';
+import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from './screening/screening.hooks';
+import Loader from '@/components/loader';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -41,6 +44,10 @@ const carouselConfig = {
 };
 
 const ResourceLibrary = () => {
+	const { institution } = useAccount();
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
+		institution?.contentScreeningFlowId
+	);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 
@@ -56,12 +63,20 @@ const ResourceLibrary = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
 	useEffect(() => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		if (!hasTouchScreen) {
 			searchInputRef.current?.focus();
 		}
-	}, [hasTouchScreen]);
+	}, [didCheckScreeningSessions, hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		if (searchQuery) {
 			setSearchInputValue(searchQuery);
 
@@ -87,7 +102,7 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
-	}, [searchQuery]);
+	}, [didCheckScreeningSessions, searchQuery]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -130,6 +145,15 @@ const ResourceLibrary = () => {
 			document.removeEventListener('keydown', handleKeydown, false);
 		};
 	}, [handleKeydown]);
+
+	if (!didCheckScreeningSessions) {
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
+	}
 
 	return (
 		<>
