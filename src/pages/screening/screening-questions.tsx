@@ -167,6 +167,8 @@ const ScreeningQuestionsPage = () => {
 									<ToggleButton
 										id={optionId}
 										key={optionId}
+										type="radio"
+										name="screeningAnswerOptionId"
 										value={optionId}
 										className="mb-2"
 										variant={isChecked ? 'primary' : 'light'}
@@ -228,7 +230,8 @@ const ScreeningQuestionsPage = () => {
 								<React.Fragment key={optionId}>
 									<ToggleButton
 										id={optionId}
-										name={optionId}
+										type="checkbox"
+										name="screeningAnswerOptionId"
 										key={optionId}
 										value={optionId}
 										className="d-flex align-items-center mb-2"
@@ -383,6 +386,7 @@ const ScreeningQuestionsPage = () => {
 										screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
 										<Button
 											disabled={isSubmitting}
+											className="me-2"
 											type="button"
 											onClick={() => {
 												if (

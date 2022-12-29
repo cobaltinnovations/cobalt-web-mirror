@@ -42,7 +42,7 @@ const UserSettings: FC = () => {
 					<ProfileSection
 						title="User Agreement"
 						actions={
-							<div>
+							<div className="d-flex flex-wrap align-items-center justify-content-end">
 								<Button
 									size="sm"
 									variant="danger"

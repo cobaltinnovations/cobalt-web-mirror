@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { COLOR_IDS } from '@/lib/models';
@@ -19,6 +19,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		boxShadow: theme.elevation.e200,
 		'&:hover': {
+			cursor: 'pointer',
 			color: 'inherit',
 			transform: 'translateY(-16px)',
 			boxShadow: theme.elevation.e400,
@@ -36,10 +37,13 @@ interface Props {
 
 const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, className }: Props) => {
 	const classes = useStyles();
+	const navigate = useNavigate();
 
 	return (
-		<Link
-			to={to}
+		<div
+			onClick={() => {
+				navigate(to);
+			}}
 			className={classNames(
 				classes.resourceLibrarySubtopicCard,
 				getBackgroundClassForColorId(colorId),
@@ -50,10 +54,11 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 				<h2 className="mb-4">{title}</h2>
 				<p className="mb-0">{description}</p>
 			</div>
-			<div>
-				<p className="mb-0">Explore all {title.toLowerCase()} content</p>
-			</div>
-		</Link>
+
+			<Link to={to} className="mb-0 text-decoration-none">
+				Explore all {title.toLowerCase()} content
+			</Link>
+		</div>
 	);
 };
 

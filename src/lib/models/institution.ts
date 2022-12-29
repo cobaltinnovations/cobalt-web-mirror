@@ -9,6 +9,9 @@ export interface Institution {
 	ga4MeasurementId?: string;
 	groupSessionsScreeningFlowId?: string;
 	immediateAccessEnabled: boolean;
+	userSubmittedContentEnabled: boolean;
+	userSubmittedGroupSessionEnabled: boolean;
+	userSubmittedGroupSessionRequestEnabled: boolean;
 	institutionId: string;
 	integratedCareEnabled: boolean;
 	integratedCareScreeningFlowId?: string;

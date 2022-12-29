@@ -61,7 +61,7 @@ export const MySchedule: FC = () => {
 
 	const renderedMainCalendarEvents = useMemo(() => {
 		const formatted = mainCalendarEvents.map((e) => {
-			const classNames = [];
+			const classNames = [...e.classNames];
 
 			if (e.extendedProps?.isBlockedTime) {
 				classNames.push(classes.blockedTimeslot);
@@ -184,7 +184,7 @@ export const MySchedule: FC = () => {
 			<div className={classNames('h-100 px-5', classes.sideBar)}>
 				<h4 className="my-6">My Calendar</h4>
 
-				<div className={classNames('mb-9', classes.leftCalendar)}>
+				<div data-testid="schedulingLeftCalendar" className={classNames('mb-9', classes.leftCalendar)}>
 					<FullCalendar
 						ref={leftCalendarRef}
 						height="auto"
@@ -278,7 +278,7 @@ export const MySchedule: FC = () => {
 				</div>
 			</div>
 
-			<div className={classes.mainCalendar}>
+			<div data-testid="schedulingMainCalendar" className={classes.mainCalendar}>
 				<FullCalendar
 					ref={mainCalendarRef}
 					height="100%"
@@ -294,7 +294,7 @@ export const MySchedule: FC = () => {
 					// 	console.log({args})
 					// }}
 					nowIndicator
-					events={renderedMainCalendarEvents}
+					events={[...renderedMainCalendarEvents]}
 					eventContent={(evtInfo) => {
 						if (evtInfo.event.display === 'background') {
 							return;

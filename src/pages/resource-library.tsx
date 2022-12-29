@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
 import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
@@ -11,6 +11,11 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import InputHelperSearch from '@/components/input-helper-search';
+import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from './screening/screening.hooks';
+import Loader from '@/components/loader';
+import ActionSheet from '@/components/action-sheet';
+import useAnalytics from '@/hooks/use-analytics';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -41,6 +46,13 @@ const carouselConfig = {
 };
 
 const ResourceLibrary = () => {
+	const { mixpanel } = useAnalytics();
+	const { institution } = useAccount();
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
+		institution?.contentScreeningFlowId
+	);
+
+	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 
@@ -56,12 +68,20 @@ const ResourceLibrary = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
 	useEffect(() => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		if (!hasTouchScreen) {
 			searchInputRef.current?.focus();
 		}
-	}, [hasTouchScreen]);
+	}, [didCheckScreeningSessions, hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
+		if (!didCheckScreeningSessions) {
+			return;
+		}
+
 		if (searchQuery) {
 			setSearchInputValue(searchQuery);
 
@@ -87,7 +107,7 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
-	}, [searchQuery]);
+	}, [didCheckScreeningSessions, searchQuery]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -131,6 +151,15 @@ const ResourceLibrary = () => {
 		};
 	}, [handleKeydown]);
 
+	if (!didCheckScreeningSessions) {
+		return (
+			<>
+				{renderedCollectPhoneModal}
+				<Loader />
+			</>
+		);
+	}
+
 	return (
 		<>
 			<HeroContainer className="bg-n75">
@@ -152,6 +181,19 @@ const ResourceLibrary = () => {
 				</Form>
 			</HeroContainer>
 			<AsyncPage fetchData={fetchData}>
+				{institution?.userSubmittedContentEnabled && (
+					<ActionSheet
+						show={false}
+						onShow={() => {
+							mixpanel.track('Patient-Sourced Add Content Click', {});
+							navigate('/cms/on-your-time/create');
+						}}
+						onHide={() => {
+							return;
+						}}
+					/>
+				)}
+
 				<Container className="pt-16 pb-32">
 					{tagGroups.map((tagGroup) => {
 						return (

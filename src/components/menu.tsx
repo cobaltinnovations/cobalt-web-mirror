@@ -452,7 +452,7 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 	}
 
 	return (
-		<div className={classes.menuWrapper}>
+		<div className={classNames(classes.menuWrapper, 'pb-6')}>
 			<div
 				className={classNames(classes.menuHeader, {
 					[classes.subNavHeader]: isSubNav,

@@ -2,7 +2,7 @@ import React, { FC, PropsWithChildren } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const transitionDuration = 200;
@@ -15,11 +15,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 		border: 0,
 		appearance: 'none',
-		width: 54,
-		height: 54,
+		width: 48,
+		height: 48,
 		borderRadius: 27,
 		color: theme.colors.n0,
-		backgroundColor: theme.colors.n900,
+		backgroundColor: theme.colors.p500,
 		transition: `${transitionDuration}ms transform`,
 		'&:focus': {
 			outline: 'none',
@@ -29,7 +29,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		transform: 'rotate(135deg)',
 	},
 	addIcon: {
-		'& polygon': {
+		'& path': {
 			fill: 'white',
 		},
 	},
@@ -136,7 +136,7 @@ const ActionSheet: FC<ActionSheetProps> = ({ show, onShow, onHide, children }) =
 				})}
 				onClick={handleAddSessionButtonClick}
 			>
-				<AddIcon width={25} height={25} className={classes.addIcon} />
+				<PlusIcon width={24} height={24} className={classes.addIcon} />
 			</button>
 		</>
 	);

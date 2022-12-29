@@ -15,6 +15,7 @@ const useStyles = createUseStyles({
 	modal: {
 		width: '90%',
 		maxWidth: 400,
+		margin: '0 auto',
 	},
 	clearHeader: {
 		border: 0,
