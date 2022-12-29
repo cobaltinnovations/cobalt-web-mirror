@@ -72,12 +72,15 @@ export const useProviderCalendar = ({
 
 function mapCalendarEvents(calendar: ProviderCalendar) {
 	const formattedAvailabilities = calendar.availabilities.map((availability, index) => {
+		const testId = `open-availability-${index}`;
 		return {
-			id: `availability${index}`,
+			id: availability.logicalAvailabilityId,
+			classNames: [testId],
 			start: availability.startDateTime,
 			end: availability.endDateTime,
 			display: 'background',
 			extendedProps: {
+				testId,
 				logicalAvailabilityId: availability.logicalAvailabilityId,
 				isAvailability: true,
 			},
@@ -85,12 +88,16 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 	});
 
 	const formattedBlockedTimes = calendar.blocks.map((availability, index) => {
+		const testId = `blocked-availability-${index}`;
+
 		return {
-			id: `blockedTime${index}`,
+			id: availability.logicalAvailabilityId,
+			classNames: [testId],
 			start: availability.startDateTime,
 			end: availability.endDateTime,
 			display: 'background',
 			extendedProps: {
+				testId,
 				logicalAvailabilityId: availability.logicalAvailabilityId,
 				isBlockedTime: true,
 			},
@@ -98,8 +105,10 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 	});
 
 	const formattedAppointments = calendar.appointments.map((appointment, index) => {
+		const testId = `appointment-${index}`;
 		return {
-			id: `appointment${index}`,
+			id: appointment.appointmentTypeId,
+			classNames: [testId],
 			title: appointment.account?.displayName || 'Anonymous',
 			start: moment(appointment.startTime).toDate(),
 			end: moment(appointment.endTime).toDate(),
@@ -107,6 +116,7 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 			borderColor: appointment.appointmentType.hexColor,
 			textColor: '#21312A',
 			extendedProps: {
+				testId,
 				accountId: appointment.accountId,
 				appointmentId: appointment.appointmentId,
 			},
