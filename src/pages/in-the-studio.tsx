@@ -14,8 +14,10 @@ import HeroContainer from '@/components/hero-container';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from './screening/screening.hooks';
 import Loader from '@/components/loader';
+import useAnalytics from '@/hooks/use-analytics';
 
 const InTheStudio: FC = () => {
+	const { mixpanel } = useAnalytics();
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
@@ -102,36 +104,47 @@ const InTheStudio: FC = () => {
 		);
 	}
 
+	const actionSheetEnabled =
+		institution?.userSubmittedGroupSessionEnabled || institution?.userSubmittedGroupSessionRequestEnabled;
+
 	return (
 		<>
-			<ActionSheet
-				show={actionSheetIsOpen}
-				onShow={() => {
-					setActionSheetIsOpen(true);
-				}}
-				onHide={() => {
-					setActionSheetIsOpen(false);
-				}}
-			>
-				<Button
-					variant="secondary"
-					className="d-block w-100 mb-2"
-					onClick={() => {
-						navigate('/group-sessions/scheduled/create');
+			{actionSheetEnabled && (
+				<ActionSheet
+					show={actionSheetIsOpen}
+					onShow={() => {
+						setActionSheetIsOpen(true);
+					}}
+					onHide={() => {
+						setActionSheetIsOpen(false);
 					}}
 				>
-					Offer Session at a Set Time
-				</Button>
-				<Button
-					variant="primary"
-					className="d-block w-100"
-					onClick={() => {
-						navigate('/group-sessions/by-request/create');
-					}}
-				>
-					Make Session Available by Request
-				</Button>
-			</ActionSheet>
+					{institution?.userSubmittedGroupSessionEnabled && (
+						<Button
+							variant="secondary"
+							className="d-block w-100 mb-2"
+							onClick={() => {
+								mixpanel.track('Patient-Sourced Add Group Session Click', {});
+								navigate('/group-sessions/scheduled/create');
+							}}
+						>
+							Offer Session at a Set Time
+						</Button>
+					)}
+					{institution?.userSubmittedGroupSessionRequestEnabled && (
+						<Button
+							variant="primary"
+							className="d-block w-100"
+							onClick={() => {
+								mixpanel.track('Patient-Sourced Add Group Session Request Click', {});
+								navigate('/group-sessions/by-request/create');
+							}}
+						>
+							Make Session Available by Request
+						</Button>
+					)}
+				</ActionSheet>
+			)}
 
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Group Sessions</h2>

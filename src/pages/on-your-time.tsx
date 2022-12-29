@@ -32,7 +32,7 @@ import useDebouncedState from '@/hooks/use-debounced-state';
 const OnYourTime: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { trackEvent } = useAnalytics();
+	const { trackEvent, mixpanel } = useAnalytics();
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
 		institution?.contentScreeningFlowId
@@ -125,15 +125,18 @@ const OnYourTime: FC = () => {
 
 	return (
 		<>
-			<ActionSheet
-				show={false}
-				onShow={() => {
-					navigate('/cms/on-your-time/create');
-				}}
-				onHide={() => {
-					return;
-				}}
-			/>
+			{institution?.userSubmittedContentEnabled && (
+				<ActionSheet
+					show={false}
+					onShow={() => {
+						mixpanel.track('Patient-Sourced Add Content Click', {});
+						navigate('/cms/on-your-time/create');
+					}}
+					onHide={() => {
+						return;
+					}}
+				/>
+			)}
 
 			<AsyncPage fetchData={fetchPersonalizationDetails}>
 				<PersonalizeRecommendationsModal

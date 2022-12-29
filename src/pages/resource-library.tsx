@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
 import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
@@ -14,6 +14,8 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from './screening/screening.hooks';
 import Loader from '@/components/loader';
+import ActionSheet from '@/components/action-sheet';
+import useAnalytics from '@/hooks/use-analytics';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -44,10 +46,13 @@ const carouselConfig = {
 };
 
 const ResourceLibrary = () => {
+	const { mixpanel } = useAnalytics();
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
 		institution?.contentScreeningFlowId
 	);
+
+	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 
@@ -176,6 +181,19 @@ const ResourceLibrary = () => {
 				</Form>
 			</HeroContainer>
 			<AsyncPage fetchData={fetchData}>
+				{institution?.userSubmittedContentEnabled && (
+					<ActionSheet
+						show={false}
+						onShow={() => {
+							mixpanel.track('Patient-Sourced Add Content Click', {});
+							navigate('/cms/on-your-time/create');
+						}}
+						onHide={() => {
+							return;
+						}}
+					/>
+				)}
+
 				<Container className="pt-16 pb-32">
 					{tagGroups.map((tagGroup) => {
 						return (
