@@ -51,9 +51,19 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 				<BackgroundImageContainer
 					className={classes.imageContainer}
 					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
-				></BackgroundImageContainer>
+				>
+					<div className={classes.imageContent}>
+						{studioEvent.seatsAvailable && studioEvent.seatsAvailable <= 20 ? (
+							<Badge as="div" bg="outline-secondary" pill>
+								{studioEvent.seatsAvailableDescription}
+							</Badge>
+						) : null}
+					</div>
+				</BackgroundImageContainer>
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
+
+					<p className="mb-0 text-muted fw-bold text-uppercase">{studioEvent.appointmentTimeDescription}</p>
 
 					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
