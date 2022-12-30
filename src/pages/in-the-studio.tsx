@@ -46,32 +46,6 @@ const InTheStudio: FC = () => {
 	}, [debouncedSearchValue, didCheckScreeningSessions, searchParams, setSearchParams]);
 
 	const fetchData = useCallback(async () => {
-		function groupByUrlName(data: StudioEventViewModel[]): StudioEventViewModel[] {
-			if (groupSessionUrlName) {
-				return data;
-			}
-
-			const addedUrlNames: Record<string, boolean> = {};
-
-			return data.reduce((acc, i) => {
-				if (i.urlName) {
-					if (!addedUrlNames[i.urlName]) {
-						addedUrlNames[i.urlName] = true;
-
-						const count = data.filter((ii) => ii.urlName === i.urlName).length;
-
-						if (count > 1) {
-							i.isGrouped = true;
-						}
-
-						acc.push(i);
-					}
-				}
-
-				return acc;
-			}, [] as typeof data);
-		}
-
 		const [{ groupSessions }, { groupSessionRequests }] = await Promise.all([
 			groupSessionsService
 				.getGroupSessions({
@@ -92,7 +66,7 @@ const InTheStudio: FC = () => {
 				.fetch(),
 		]);
 
-		setEventList([...groupByUrlName(groupSessionRequests), ...groupByUrlName(groupSessions)]);
+		setEventList([...groupSessionRequests, ...groupSessions]);
 	}, [groupSessionUrlName, debouncedSearchValue]);
 
 	if (!didCheckScreeningSessions) {
@@ -177,25 +151,23 @@ const InTheStudio: FC = () => {
 						{eventList.length > 0 ? (
 							eventList.map((studioEvent) => {
 								if (groupSessionsService.isGroupSession(studioEvent)) {
-									const link = studioEvent.isGrouped
-										? `/in-the-studio?class=${encodeURIComponent(studioEvent.urlName)}`
-										: `/in-the-studio/group-session-scheduled/${studioEvent.groupSessionId}`;
-
 									return (
 										<Col md={6} lg={4} key={studioEvent.groupSessionId} className="mb-8">
-											<Link className="d-block text-decoration-none h-100" to={link}>
+											<Link
+												className="d-block text-decoration-none h-100"
+												to={`/in-the-studio/group-session-scheduled/${studioEvent.groupSessionId}`}
+											>
 												<StudioEvent className="h-100" studioEvent={studioEvent} />
 											</Link>
 										</Col>
 									);
 								} else if (groupSessionsService.isGroupSessionByRequest(studioEvent)) {
-									const link = studioEvent.isGrouped
-										? `/in-the-studio?class=${encodeURIComponent(studioEvent.urlName)}`
-										: `/in-the-studio/group-session-by-request/${studioEvent.groupSessionRequestId}`;
-
 									return (
 										<Col md={6} lg={4} key={studioEvent.groupSessionRequestId} className="mb-8">
-											<Link className="d-block text-decoration-none h-100" to={link}>
+											<Link
+												className="d-block text-decoration-none h-100"
+												to={`/in-the-studio/group-session-by-request/${studioEvent.groupSessionRequestId}`}
+											>
 												<StudioEvent className="h-100" studioEvent={studioEvent} />
 											</Link>
 										</Col>
