@@ -34,10 +34,7 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export type StudioEventViewModel = (GroupSessionModel | GroupSessionRequestModel) & {
-	urlName?: string;
-	isGrouped?: boolean;
-};
+export type StudioEventViewModel = GroupSessionModel | GroupSessionRequestModel;
 
 interface StudioEventProps {
 	studioEvent: StudioEventViewModel;
@@ -54,24 +51,10 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 				<BackgroundImageContainer
 					className={classes.imageContainer}
 					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
-				>
-					{!studioEvent.isGrouped && (
-						<div className={classes.imageContent}>
-							{studioEvent.seatsAvailable && studioEvent.seatsAvailable <= 20 ? (
-								<Badge as="div" bg="outline-secondary" pill>
-									{studioEvent.seatsAvailableDescription}
-								</Badge>
-							) : null}
-						</div>
-					)}
-				</BackgroundImageContainer>
+				></BackgroundImageContainer>
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
-					{!studioEvent.isGrouped && (
-						<p className="mb-0 text-muted fw-bold text-uppercase">
-							{studioEvent.appointmentTimeDescription}
-						</p>
-					)}
+
 					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
 							<>with {studioEvent.facilitatorName}</>
