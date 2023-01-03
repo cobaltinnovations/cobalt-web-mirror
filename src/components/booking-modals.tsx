@@ -45,6 +45,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		appointmentTypes,
 		epicDepartments,
 		setSelectedAppointmentTypeId,
+		selectedDate,
 		setSelectedDate,
 		selectedProvider,
 		setSelectedProvider,
@@ -219,6 +220,8 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					continueBookingProcess({
 						provider: selectedProvider,
 						appointmentType: confirmedApptType,
+						timeSlot: selectedTimeSlot,
+						date: selectedDate,
 					});
 				}}
 			/>
