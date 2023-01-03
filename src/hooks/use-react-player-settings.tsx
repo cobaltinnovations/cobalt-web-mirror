@@ -14,12 +14,12 @@ function useReactPlayerSettings(contentUrl?: string) {
 	}, [contentUrl]);
 
 	const embedUrl = useMemo(() => {
-		if (!contentUrl) {
+		if (!contentUrl || !canEmbed) {
 			return;
 		}
 
 		return new URL(contentUrl);
-	}, [contentUrl]);
+	}, [canEmbed, contentUrl]);
 
 	const playerConfig: Config = useMemo(() => {
 		return {
