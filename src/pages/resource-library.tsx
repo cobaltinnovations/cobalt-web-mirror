@@ -2,20 +2,28 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { ResourceLibraryContentModel, TagGroupModel, TagModel } from '@/lib/models';
-import { resourceLibraryService } from '@/lib/services';
+import {
+	ACTION_LINK_TYPE_ID,
+	CallToActionModel,
+	CALL_TO_ACTION_DISPLAY_AREA_ID,
+	ResourceLibraryContentModel,
+	TagGroupModel,
+	TagModel,
+} from '@/lib/models';
+import { callToActionService, resourceLibraryService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
+import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import { useScreeningFlow } from './screening/screening.hooks';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import InputHelperSearch from '@/components/input-helper-search';
-import useAccount from '@/hooks/use-account';
-import { useScreeningFlow } from './screening/screening.hooks';
 import Loader from '@/components/loader';
 import ActionSheet from '@/components/action-sheet';
-import useAnalytics from '@/hooks/use-analytics';
+import CallToAction from '@/components/call-to-action';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -59,6 +67,7 @@ const ResourceLibrary = () => {
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
+	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
 	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
@@ -76,6 +85,14 @@ const ResourceLibrary = () => {
 			searchInputRef.current?.focus();
 		}
 	}, [didCheckScreeningSessions, hasTouchScreen]);
+
+	const fetchCallsToAction = useCallback(async () => {
+		const response = await callToActionService
+			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.CONTENT_LIST })
+			.fetch();
+
+		setCallsToAction(response.callsToAction);
+	}, []);
 
 	const fetchData = useCallback(async () => {
 		if (!didCheckScreeningSessions) {
@@ -180,6 +197,28 @@ const ResourceLibrary = () => {
 					/>
 				</Form>
 			</HeroContainer>
+
+			<AsyncPage fetchData={fetchCallsToAction}>
+				{callsToAction.length > 0 && (
+					<Container className="pt-16">
+						<Row>
+							<Col>
+								{callsToAction.map((cta, index) => {
+									const isLast = callsToAction.length - 1 === index;
+									return (
+										<CallToAction
+											key={`cta-${index}`}
+											className={!isLast ? 'mb-4' : ''}
+											callToAction={cta}
+										/>
+									);
+								})}
+							</Col>
+						</Row>
+					</Container>
+				)}
+			</AsyncPage>
+
 			<AsyncPage fetchData={fetchData}>
 				{institution?.userSubmittedContentEnabled && (
 					<ActionSheet
