@@ -24,7 +24,31 @@ import {
 import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
-import ResourceLibraryCard from '@/components/resource-library-card';
+import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
+
+const resourceLibraryCarouselConfig = {
+	externalMonitor: {
+		...responsiveDefaults.externalMonitor,
+		items: 4,
+	},
+	desktopExtraLarge: {
+		...responsiveDefaults.desktopExtraLarge,
+		items: 4,
+	},
+	desktop: {
+		...responsiveDefaults.desktop,
+		items: 3,
+	},
+	tablet: {
+		...responsiveDefaults.tablet,
+		items: 2,
+	},
+	mobile: {
+		...responsiveDefaults.mobile,
+		items: 2,
+		partialVisibilityGutter: 16,
+	},
+};
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
@@ -75,7 +99,7 @@ const Index: FC = () => {
 	}, [institution?.integratedCareEnabled, navigate]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			{institution?.supportEnabled && (
 				<HeroContainer className="text-center">
 					<h1 className="mb-3">Recommended for you</h1>
@@ -112,140 +136,156 @@ const Index: FC = () => {
 				)}
 			</AsyncPage>
 
-			{inTheStudioEvents.length > 0 && (
-				<>
-					<Container className="pt-20">
-						<Row>
-							<Col>
-								<h3 className="mb-2">Group Sessions</h3>
-							</Col>
-						</Row>
-					</Container>
-					<Container>
-						<Row>
-							<Col>
-								<Carousel
-									responsive={responsiveDefaults}
-									// description="Explainer text goes here. What is in the studio?"
-									calloutTitle="Explore all"
-									calloutOnClick={() => {
-										navigate('/in-the-studio');
-									}}
-								>
-									{inTheStudioEvents.map((inTheStudioEvent) => {
-										if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
+			<AsyncPage
+				fetchData={fetchData}
+				loadingComponent={
+					<>
+						<Container className="pt-20">
+							<Row className="mb-12">
+								<Col>
+									<h3 className="mb-2">Group Sessions</h3>
+								</Col>
+							</Row>
+							<Row>
+								<Col md={6} lg={4}>
+									<SkeletonResourceLibraryCard />
+								</Col>
+								<Col md={6} lg={4}>
+									<SkeletonResourceLibraryCard />
+								</Col>
+							</Row>
+						</Container>
+						<Container className="pt-20">
+							<Row className="mb-12">
+								<Col>
+									<h3 className="mb-2">Resource Library</h3>
+								</Col>
+							</Row>
+							<Row>
+								<Col sm={6} md={4} lg={3}>
+									<SkeletonResourceLibraryCard />
+								</Col>
+								<Col sm={6} md={4} lg={3}>
+									<SkeletonResourceLibraryCard />
+								</Col>
+							</Row>
+						</Container>
+					</>
+				}
+			>
+				{inTheStudioEvents.length > 0 && (
+					<>
+						<Container className="pt-20">
+							<Row>
+								<Col>
+									<h3 className="mb-2">Group Sessions</h3>
+								</Col>
+							</Row>
+						</Container>
+						<Container>
+							<Row>
+								<Col>
+									<Carousel
+										responsive={responsiveDefaults}
+										// description="Explainer text goes here. What is in the studio?"
+										calloutTitle="Explore all"
+										calloutOnClick={() => {
+											navigate('/in-the-studio');
+										}}
+									>
+										{inTheStudioEvents.map((inTheStudioEvent) => {
+											if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
+												return (
+													<Link
+														key={inTheStudioEvent.groupSessionId}
+														className="d-block text-decoration-none h-100"
+														to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
+													>
+														<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
+													</Link>
+												);
+											} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
+												return (
+													<Link
+														key={inTheStudioEvent.groupSessionRequestId}
+														className="d-block text-decoration-none h-100"
+														to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
+													>
+														<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
+													</Link>
+												);
+											} else {
+												throw new Error('Unrecognized group session type');
+											}
+										})}
+									</Carousel>
+								</Col>
+							</Row>
+						</Container>
+					</>
+				)}
+
+				{content.length > 0 && (
+					<>
+						<Container className="pt-20">
+							<Row>
+								<Col>
+									<h3 className="mb-2">Resource Library</h3>
+								</Col>
+							</Row>
+						</Container>
+						<Container>
+							<Row>
+								<Col>
+									<Carousel
+										responsive={resourceLibraryCarouselConfig}
+										// description="Explainer text goes here. What is on your time?"
+										calloutTitle="Explore all"
+										calloutOnClick={() => {
+											navigate('/resource-library');
+										}}
+									>
+										{content.map((content) => {
 											return (
-												<Link
-													key={inTheStudioEvent.groupSessionId}
-													className="d-block text-decoration-none h-100"
-													to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
-												>
-													<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
-												</Link>
+												<ResourceLibraryCard
+													key={content.contentId}
+													contentId={content.contentId}
+													className="h-100"
+													imageUrl={content.imageUrl}
+													badgeTitle={content.newFlag ? 'New' : ''}
+													title={content.title}
+													author={content.author}
+													description={content.description}
+													tags={
+														tagsByTagId
+															? content.tagIds.map((tagId) => {
+																	return tagsByTagId[tagId];
+															  })
+															: []
+													}
+													contentTypeId={content.contentTypeId}
+													duration={content.durationInMinutesDescription}
+												/>
 											);
-										} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
-											return (
-												<Link
-													key={inTheStudioEvent.groupSessionRequestId}
-													className="d-block text-decoration-none h-100"
-													to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
-												>
-													<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
-												</Link>
-											);
-										} else {
-											throw new Error('Unrecognized group session type');
-										}
-									})}
-								</Carousel>
-							</Col>
-						</Row>
-					</Container>
-				</>
-			)}
+										})}
+									</Carousel>
+								</Col>
+							</Row>
+						</Container>
 
-			{content.length > 0 && (
-				<>
-					<Container className="pt-20">
-						<Row>
-							<Col>
-								<h3 className="mb-2">Resource Library</h3>
-							</Col>
-						</Row>
-					</Container>
-					<Container>
-						<Row>
-							<Col>
-								<Carousel
-									responsive={{
-										externalMonitor: {
-											...responsiveDefaults.externalMonitor,
-											items: 4,
-										},
-										desktopExtraLarge: {
-											...responsiveDefaults.desktopExtraLarge,
-											items: 4,
-										},
-										desktop: {
-											...responsiveDefaults.desktop,
-											items: 3,
-										},
-										tablet: {
-											...responsiveDefaults.tablet,
-											items: 2,
-										},
-										mobile: {
-											...responsiveDefaults.mobile,
-											items: 2,
-											partialVisibilityGutter: 16,
-										},
-									}}
-									// description="Explainer text goes here. What is on your time?"
-									calloutTitle="Explore all"
-									calloutOnClick={() => {
-										navigate('/resource-library');
-									}}
-								>
-									{content.map((content) => {
-										return (
-											<ResourceLibraryCard
-												key={content.contentId}
-												contentId={content.contentId}
-												className="h-100"
-												imageUrl={content.imageUrl}
-												badgeTitle={content.newFlag ? 'New' : ''}
-												title={content.title}
-												author={content.author}
-												description={content.description}
-												tags={
-													tagsByTagId
-														? content.tagIds.map((tagId) => {
-																return tagsByTagId[tagId];
-														  })
-														: []
-												}
-												contentTypeId={content.contentTypeId}
-												duration={content.durationInMinutesDescription}
-											/>
-										);
-									})}
-								</Carousel>
-							</Col>
-						</Row>
-					</Container>
+						<Container className="pb-20">
+							<Row>
+								<Col>
+									<div className="d-flex justify-content-center mb-4"></div>
+								</Col>
+							</Row>
+						</Container>
+					</>
+				)}
 
-					<Container className="pb-20">
-						<Row>
-							<Col>
-								<div className="d-flex justify-content-center mb-4"></div>
-							</Col>
-						</Row>
-					</Container>
-				</>
-			)}
-
-			{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
-		</AsyncPage>
+				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
+			</AsyncPage>
+		</>
 	);
 };
 
