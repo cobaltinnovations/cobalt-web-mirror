@@ -3,32 +3,40 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Badge, Button } from 'react-bootstrap';
 
+interface useStylesProps {
+	bgColor?: string;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
-	skeleton: {
+	skeleton: ({ bgColor }: useStylesProps) => ({
 		backgroundPosition: '0 0',
 		backgroundSize: '50px 100%',
 		backgroundRepeat: 'repeat-y',
 		animation: '$skeleton-loading 1s linear infinite',
-		background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${theme.colors.n50}`,
-	},
+		background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
+			bgColor ?? theme.colors.n50
+		}`,
+	}),
 	skeletonText: {
 		borderRadius: 4,
 		display: 'inline-block',
 	},
-	skeletonImage: {
-		backgroundColor: `${theme.colors.n50} !important`,
-	},
-	skeletonBadge: {
+	skeletonImage: ({ bgColor }: useStylesProps) => ({
+		backgroundColor: `${bgColor ?? theme.colors.n50} !important`,
+	}),
+	skeletonBadge: ({ bgColor }: useStylesProps) => ({
 		width: 85,
-		backgroundColor: `${theme.colors.n50} !important`,
-	},
-	skeletonButton: {
+		backgroundColor: `${bgColor ?? theme.colors.n50} !important`,
+	}),
+	skeletonButton: ({ bgColor }: useStylesProps) => ({
 		cursor: 'default',
 		display: 'inline-block',
 		'&:hover, &:active': {
-			background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${theme.colors.n50}`,
+			background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
+				bgColor ?? theme.colors.n50
+			}`,
 		},
-	},
+	}),
 	'@keyframes skeleton-loading': {
 		'0%': {
 			backgroundPosition: '-50px 0',
@@ -39,15 +47,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface SkeletonTextProps {
+interface SkeletonProps {
+	bgColor?: string;
+}
+
+interface SkeletonTextProps extends SkeletonProps {
 	type: string;
 	width?: number | string;
 	className?: string;
 	numberOfLines?: number;
 }
 
-export const SkeletonText = ({ type, width, className, numberOfLines }: SkeletonTextProps) => {
-	const classes = useStyles();
+export const SkeletonText = ({ type, width, className, numberOfLines, bgColor }: SkeletonTextProps) => {
+	const classes = useStyles({ bgColor });
 	const numberOfLinesIterator = Array.apply(null, Array(numberOfLines ?? 1)).map((_value, index) => index);
 
 	return React.createElement(type, {
@@ -73,14 +85,14 @@ export const SkeletonText = ({ type, width, className, numberOfLines }: Skeleton
 	});
 };
 
-interface SkeletonImageProps {
+interface SkeletonImageProps extends SkeletonProps {
 	width?: number | string;
 	height?: number | string;
 	className?: string;
 }
 
-export const SkeletonImage = ({ width, height, className }: SkeletonImageProps) => {
-	const classes = useStyles();
+export const SkeletonImage = ({ width, height, className, bgColor }: SkeletonImageProps) => {
+	const classes = useStyles({ bgColor });
 
 	return (
 		<div
@@ -90,12 +102,12 @@ export const SkeletonImage = ({ width, height, className }: SkeletonImageProps) 
 	);
 };
 
-interface SkeletonBadgeProps {
+interface SkeletonBadgeProps extends SkeletonProps {
 	className?: string;
 }
 
-export const SkeletonBadge = ({ className }: SkeletonBadgeProps) => {
-	const classes = useStyles();
+export const SkeletonBadge = ({ className, bgColor }: SkeletonBadgeProps) => {
+	const classes = useStyles({ bgColor });
 
 	return (
 		<Badge pill as="div" className={classNames(classes.skeleton, classes.skeletonBadge, className)}>
@@ -104,13 +116,13 @@ export const SkeletonBadge = ({ className }: SkeletonBadgeProps) => {
 	);
 };
 
-interface SkeletonButtonProps {
+interface SkeletonButtonProps extends SkeletonProps {
 	width?: number | string;
 	className?: string;
 }
 
-export const SkeletonButton = ({ width, className }: SkeletonButtonProps) => {
-	const classes = useStyles();
+export const SkeletonButton = ({ width, className, bgColor }: SkeletonButtonProps) => {
+	const classes = useStyles({ bgColor });
 
 	return (
 		<Button

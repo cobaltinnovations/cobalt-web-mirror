@@ -12,9 +12,10 @@ import BackgroundImageContainer from '@/components/background-image-container';
 
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
-import { createUseThemedStyles } from '@/jss/theme';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import classNames from 'classnames';
+import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 
 const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -50,8 +51,8 @@ const ResourceLibraryDetail: FC = () => {
 	const classes = useResourceLibraryDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
+	const theme = useCobaltTheme();
 	const [item, setItem] = useState<Content>();
-
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(item?.url);
 
 	const fetchData = useCallback(async () => {
@@ -96,7 +97,7 @@ const ResourceLibraryDetail: FC = () => {
 	}, [item, canEmbed, trackActivity]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<>
 			<Breadcrumb
 				breadcrumbs={[
 					{
@@ -114,65 +115,93 @@ const ResourceLibraryDetail: FC = () => {
 				]}
 			/>
 
-			<Container className="py-12">
-				<Row className="justify-content-center">
-					<Col md={10} lg={8} xl={6}>
-						<h2 className="mb-6">{item?.title}</h2>
-
-						{canEmbed ? (
-							<div className={classes.reactPlayerOuter}>
-								<ReactPlayer
-									width="100%"
-									height="100%"
-									controls
-									url={embedUrl}
-									config={playerConfig}
-									onPlay={() => {
-										trackActivity();
-									}}
+			<AsyncPage
+				fetchData={fetchData}
+				loadingComponent={
+					<Container className="py-12">
+						<Row className="justify-content-center">
+							<Col md={10} lg={8} xl={6}>
+								<SkeletonText type="h2" width="75%" className="mb-6" bgColor={theme.colors.p50} />
+								<SkeletonImage
+									height={350}
+									className={classNames(classes.mediaContainer, 'mb-6')}
+									bgColor={theme.colors.p50}
 								/>
-							</div>
-						) : (
-							<BackgroundImageContainer
-								className={classNames(classes.mediaContainer, 'mb-6')}
-								imageUrl={item?.imageUrl || placeholderImage}
-							/>
-						)}
+								<SkeletonText type="p" width="25%" className="mb-1" bgColor={theme.colors.p50} />
+								<SkeletonText type="p" width="50%" className="mb-6" bgColor={theme.colors.p50} />
+								<hr className="mb-6 " />
+								<SkeletonText type="p" numberOfLines={3} className="mb-10" bgColor={theme.colors.p50} />
+								<div className="text-center">
+									<SkeletonButton bgColor={theme.colors.p50} />
+								</div>
+							</Col>
+						</Row>
+						<Row className="justify-content-center">
+							<Col md={10} lg={8} xl={6}></Col>
+						</Row>
+					</Container>
+				}
+			>
+				<Container className="py-12">
+					<Row className="justify-content-center">
+						<Col md={10} lg={8} xl={6}>
+							<h2 className="mb-6">{item?.title}</h2>
 
-						<p className="text-muted fw-bold mb-0">
-							{item?.contentTypeLabel} {item?.duration && <>&bull; {item?.duration}</>}
-						</p>
+							{canEmbed ? (
+								<div className={classes.reactPlayerOuter}>
+									<ReactPlayer
+										width="100%"
+										height="100%"
+										controls
+										url={embedUrl}
+										config={playerConfig}
+										onPlay={() => {
+											trackActivity();
+										}}
+									/>
+								</div>
+							) : (
+								<BackgroundImageContainer
+									className={classNames(classes.mediaContainer, 'mb-6')}
+									imageUrl={item?.imageUrl || placeholderImage}
+								/>
+							)}
 
-						{item?.author && <p className="text-muted mb-6">By {item?.author}</p>}
+							<p className="text-muted fw-bold mb-0">
+								{item?.contentTypeLabel} {item?.duration && <>&bull; {item?.duration}</>}
+							</p>
 
-						<hr className="mb-6" />
-					</Col>
-				</Row>
+							{item?.author && <p className="text-muted mb-6">By {item?.author}</p>}
 
-				<Row className="justify-content-center">
-					<Col md={10} lg={8} xl={6}>
-						<div className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
+							<hr className="mb-6" />
+						</Col>
+					</Row>
 
-						{!canEmbed && item?.url && (
-							<div className="mt-10 text-center">
-								<Button
-									as="a"
-									className="d-inline-block text-decoration-none text-white"
-									variant="primary"
-									href={item.url}
-									target="_blank"
-									onClick={() => {
-										trackActivity();
-									}}
-								>
-									{item.callToAction}
-								</Button>
-							</div>
-						)}
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+					<Row className="justify-content-center">
+						<Col md={10} lg={8} xl={6}>
+							<div className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
+
+							{!canEmbed && item?.url && (
+								<div className="mt-10 text-center">
+									<Button
+										as="a"
+										className="d-inline-block text-decoration-none text-white"
+										variant="primary"
+										href={item.url}
+										target="_blank"
+										onClick={() => {
+											trackActivity();
+										}}
+									>
+										{item.callToAction}
+									</Button>
+								</div>
+							)}
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 
