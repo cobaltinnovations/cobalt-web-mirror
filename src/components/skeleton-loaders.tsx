@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { Badge } from 'react-bootstrap';
+import { Badge, Button } from 'react-bootstrap';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	skeleton: {
@@ -21,6 +21,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 	skeletonBadge: {
 		width: 85,
 		backgroundColor: `${theme.colors.n50} !important`,
+	},
+	skeletonButton: {
+		cursor: 'default',
+		display: 'inline-block',
+		'&:hover, &:active': {
+			background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${theme.colors.n50}`,
+		},
 	},
 	'@keyframes skeleton-loading': {
 		'0%': {
@@ -94,5 +101,24 @@ export const SkeletonBadge = ({ className }: SkeletonBadgeProps) => {
 		<Badge pill as="div" className={classNames(classes.skeleton, classes.skeletonBadge, className)}>
 			&nbsp;
 		</Badge>
+	);
+};
+
+interface SkeletonButtonProps {
+	width?: number | string;
+	className?: string;
+}
+
+export const SkeletonButton = ({ width, className }: SkeletonButtonProps) => {
+	const classes = useStyles();
+
+	return (
+		<Button
+			as="div"
+			className={classNames(classes.skeleton, classes.skeletonButton, className)}
+			style={{ width: width ?? '150px' }}
+		>
+			&nbsp;
+		</Button>
 	);
 };
