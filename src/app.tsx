@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useEffect, useMemo } from 'react';
+import React, { FC, Suspense, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter as Router, Route, useLocation } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
@@ -40,6 +40,7 @@ import 'react-multi-carousel/lib/styles.css';
 import './scss/main.scss';
 import ErrorDisplay from './components/error-display';
 import HeaderUnauthenticated from './components/header-unauthenticated';
+import { addMaximumScaleToViewportMetaTag, isIos } from '@/lib/utils/device-utils';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
@@ -165,6 +166,21 @@ const ThemedApp: FC = () => {
 };
 
 const App: FC = () => {
+	const appInitialied = useRef(false);
+
+	// One time startup code here.
+	useEffect(() => {
+		if (appInitialied.current) {
+			return;
+		}
+
+		if (isIos()) {
+			addMaximumScaleToViewportMetaTag();
+		}
+
+		appInitialied.current = true;
+	}, []);
+
 	return (
 		<Router>
 			<CobaltThemeProvider>
