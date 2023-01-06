@@ -233,7 +233,7 @@ const ResourceLibrary = () => {
 					/>
 				)}
 
-				<Container className="pt-16 pb-32">
+				<Container className="pt-5 pt-lg-16 pb-6 pb-lg-32">
 					{tagGroups.map((tagGroup) => {
 						return (
 							<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
