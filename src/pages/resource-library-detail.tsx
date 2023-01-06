@@ -12,7 +12,7 @@ import BackgroundImageContainer from '@/components/background-image-container';
 
 import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
-import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
+import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import classNames from 'classnames';
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
@@ -51,7 +51,6 @@ const ResourceLibraryDetail: FC = () => {
 	const classes = useResourceLibraryDetailStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
-	const theme = useCobaltTheme();
 	const [item, setItem] = useState<Content>();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(item?.url);
 
@@ -121,18 +120,14 @@ const ResourceLibraryDetail: FC = () => {
 					<Container className="py-12">
 						<Row className="justify-content-center">
 							<Col md={10} lg={8} xl={6}>
-								<SkeletonText type="h2" width="75%" className="mb-6" bgColor={theme.colors.p50} />
-								<SkeletonImage
-									height={350}
-									className={classNames(classes.mediaContainer, 'mb-6')}
-									bgColor={theme.colors.p50}
-								/>
-								<SkeletonText type="p" width="25%" className="mb-1" bgColor={theme.colors.p50} />
-								<SkeletonText type="p" width="50%" className="mb-6" bgColor={theme.colors.p50} />
+								<SkeletonText type="h2" width="75%" className="mb-6" />
+								<SkeletonImage height={350} className={classNames(classes.mediaContainer, 'mb-6')} />
+								<SkeletonText type="p" width="25%" className="mb-1" />
+								<SkeletonText type="p" width="50%" className="mb-6" />
 								<hr className="mb-6 " />
-								<SkeletonText type="p" numberOfLines={3} className="mb-10" bgColor={theme.colors.p50} />
+								<SkeletonText type="p" numberOfLines={3} className="mb-10" />
 								<div className="text-center">
-									<SkeletonButton bgColor={theme.colors.p50} />
+									<SkeletonButton />
 								</div>
 							</Col>
 						</Row>

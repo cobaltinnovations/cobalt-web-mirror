@@ -6,6 +6,7 @@ import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
+import { SkeletonBadge, SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
@@ -149,6 +150,38 @@ export const TopicCenterGroupSession = ({
 					<Button size="sm" onClick={onClick}>
 						{buttonTitle}
 					</Button>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+interface SkeletonTopicCenterGroupSessionProps {
+	className?: string;
+}
+
+export const SkeletonTopicCenterGroupSession = ({ className }: SkeletonTopicCenterGroupSessionProps) => {
+	const classes = useStyles();
+
+	return (
+		<div className={classNames(classes.topicCenterGroupSession, className)}>
+			<SkeletonImage className={classes.imageOuter}>
+				<SkeletonBadge className="d-lg-none" />
+			</SkeletonImage>
+			<div className={classes.informationOuter}>
+				<div>
+					<div className="mb-lg-4">
+						<SkeletonText type="h4" className="mb-1" />
+						<SkeletonText type="p" className="mb-1" />
+						<SkeletonText type="p" className="mb-0" />
+					</div>
+					<SkeletonText type="p" className="d-none d-lg-block mb-4" numberOfLines={2} />
+				</div>
+				<div className="d-none d-lg-flex justify-content-between align-items-end">
+					<div>
+						<SkeletonBadge className="d-lg-none" />
+					</div>
+					<SkeletonButton />
 				</div>
 			</div>
 		</div>

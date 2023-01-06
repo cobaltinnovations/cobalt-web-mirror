@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Badge, Button } from 'react-bootstrap';
@@ -7,6 +7,8 @@ interface useStylesProps {
 	bgColor?: string;
 }
 
+const defaultBg = 'rgba(0, 0, 0, 0.05)';
+
 const useStyles = createUseThemedStyles((theme) => ({
 	skeleton: ({ bgColor }: useStylesProps) => ({
 		backgroundPosition: '0 0',
@@ -14,7 +16,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundRepeat: 'repeat-y',
 		animation: '$skeleton-loading 1s linear infinite',
 		background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
-			bgColor ?? theme.colors.n50
+			bgColor ?? defaultBg
 		}`,
 	}),
 	skeletonText: {
@@ -22,18 +24,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'inline-block',
 	},
 	skeletonImage: ({ bgColor }: useStylesProps) => ({
-		backgroundColor: `${bgColor ?? theme.colors.n50} !important`,
+		backgroundColor: `${bgColor ?? defaultBg} !important`,
 	}),
 	skeletonBadge: ({ bgColor }: useStylesProps) => ({
 		width: 85,
-		backgroundColor: `${bgColor ?? theme.colors.n50} !important`,
+		backgroundColor: `${bgColor ?? defaultBg} !important`,
 	}),
 	skeletonButton: ({ bgColor }: useStylesProps) => ({
 		cursor: 'default',
 		display: 'inline-block',
 		'&:hover, &:active': {
 			background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
-				bgColor ?? theme.colors.n50
+				bgColor ?? defaultBg
 			}`,
 		},
 	}),
@@ -91,14 +93,25 @@ interface SkeletonImageProps extends SkeletonProps {
 	className?: string;
 }
 
-export const SkeletonImage = ({ width, height, className, bgColor }: SkeletonImageProps) => {
+export const SkeletonImage = ({
+	width,
+	height,
+	className,
+	bgColor,
+	children,
+}: PropsWithChildren<SkeletonImageProps>) => {
 	const classes = useStyles({ bgColor });
 
 	return (
 		<div
 			className={classNames(classes.skeleton, classes.skeletonImage, className)}
-			style={{ width: width ?? 'auto', height: height ?? 'auto' }}
-		/>
+			style={{
+				...(width && { width }),
+				...(height && { height }),
+			}}
+		>
+			{children}
+		</div>
 	);
 };
 
