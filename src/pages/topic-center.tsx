@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import { TopicCenterModel } from '@/lib/models';
@@ -7,14 +7,14 @@ import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
-import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
+import { SkeletonTopicCenterGroupSession, TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
-import OnYourTimeItem from '@/components/on-your-time-item';
 import classNames from 'classnames';
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
-import ResourceLibraryCard from '@/components/resource-library-card';
+import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
+import { SkeletonText } from '@/components/skeleton-loaders';
 
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -36,7 +36,87 @@ const TopicCenter = () => {
 	}, [mixpanel, topicCenterId]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<AsyncPage
+			fetchData={fetchData}
+			loadingComponent={
+				<>
+					<HeroContainer className="bg-p700">
+						<SkeletonText type="h1" numberOfLines={2} className="mb-0 text-center" />
+					</HeroContainer>
+					<Container fluid className="bg-n50">
+						<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
+									<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+								</Col>
+							</Row>
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 10, offset: 1 }}
+									xl={{ span: 8, offset: 2 }}
+								>
+									<SkeletonTopicCenterGroupSession />
+								</Col>
+							</Row>
+						</Container>
+					</Container>
+					<Container fluid className="bg-n75">
+						<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
+									<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+								</Col>
+							</Row>
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 10, offset: 1 }}
+									xl={{ span: 8, offset: 2 }}
+								>
+									<SkeletonTopicCenterGroupSession />
+								</Col>
+							</Row>
+						</Container>
+					</Container>
+					<Container fluid className="bg-n50">
+						<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
+									<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+								</Col>
+							</Row>
+							<Row>
+								<Col xs={6} sm={6} md={6} lg={4} className="mb-8">
+									<SkeletonResourceLibraryCard />
+								</Col>
+								<Col xs={6} sm={6} md={6} lg={4} className="mb-8">
+									<SkeletonResourceLibraryCard />
+								</Col>
+								<Col xs={6} sm={6} md={6} lg={4} className="mb-8">
+									<SkeletonResourceLibraryCard />
+								</Col>
+							</Row>
+						</Container>
+					</Container>
+				</>
+			}
+		>
 			<HeroContainer className="bg-p700">
 				<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
 			</HeroContainer>
