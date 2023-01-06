@@ -48,7 +48,7 @@ const carouselConfig = {
 	},
 	mobile: {
 		breakpoint: { max: 575, min: 0 },
-		items: 2,
+		items: 1,
 		partialVisibilityGutter: 0,
 	},
 };
