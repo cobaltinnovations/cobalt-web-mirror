@@ -487,7 +487,7 @@ const ResourceLibraryTopic = () => {
 						<Row>
 							{contents.map((content) => {
 								return (
-									<Col key={content.contentId} xs={6} lg={4} className="mb-8">
+									<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
 										<ResourceLibraryCard
 											className="h-100"
 											contentId={content.contentId}
