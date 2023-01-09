@@ -56,7 +56,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 			</div>
 
 			<Link to={to} className="mb-0 text-decoration-none">
-				Explore all {title.toLowerCase()} content
+				Explore all {title} resources
 			</Link>
 		</div>
 	);
