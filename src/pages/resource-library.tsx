@@ -136,6 +136,7 @@ const ResourceLibrary = () => {
 		}
 
 		setSearchParams(searchParams, { replace: true });
+		searchInputRef.current?.blur();
 	};
 
 	const clearSearch = useCallback(() => {
@@ -290,7 +291,7 @@ const ResourceLibrary = () => {
 							<Row>
 								{contents.map((content, resourceIndex) => {
 									return (
-										<Col key={resourceIndex} xs={6} lg={4} className="mb-8">
+										<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
 											<ResourceLibraryCard
 												contentId={content.contentId}
 												className="h-100"
