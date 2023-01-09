@@ -213,6 +213,7 @@ const ResourceLibraryTopic = () => {
 		}
 
 		setSearchParams(searchParams, { replace: true });
+		searchInputRef.current?.blur();
 	};
 
 	const clearSearch = useCallback(() => {
