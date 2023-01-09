@@ -46,7 +46,6 @@ const resourceLibraryCarouselConfig = {
 	mobile: {
 		...responsiveDefaults.mobile,
 		items: 1,
-		partialVisibilityGutter: 16,
 	},
 };
 
