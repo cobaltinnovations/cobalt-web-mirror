@@ -7,7 +7,7 @@ import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models'
 import useDebouncedState from '@/hooks/use-debounced-state';
 
 import AsyncPage from '@/components/async-page';
-import StudioEvent, { StudioEventViewModel } from '@/components/studio-event';
+import StudioEvent, { StudioEventSkeleton, StudioEventViewModel } from '@/components/studio-event';
 import ActionSheet from '@/components/action-sheet';
 import InputHelper from '@/components/input-helper';
 import HeroContainer from '@/components/hero-container';
@@ -145,7 +145,34 @@ const InTheStudio: FC = () => {
 					</Col>
 				</Row>
 			</Container>
-			<AsyncPage fetchData={fetchData}>
+
+			<AsyncPage
+				fetchData={fetchData}
+				loadingComponent={
+					<Container>
+						<Row>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+							<Col md={6} lg={4} className="mb-8">
+								<StudioEventSkeleton />
+							</Col>
+						</Row>
+					</Container>
+				}
+			>
 				<Container>
 					<Row>
 						{eventList.length > 0 ? (
