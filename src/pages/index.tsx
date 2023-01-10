@@ -8,7 +8,7 @@ import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
-import StudioEvent from '@/components/studio-event';
+import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import CallToAction from '@/components/call-to-action';
 
 import { recommendationsService, groupSessionsService, accountService, callToActionService } from '@/lib/services';
@@ -147,10 +147,10 @@ const Index: FC = () => {
 							</Row>
 							<Row>
 								<Col md={6} lg={4}>
-									<SkeletonResourceLibraryCard />
+									<StudioEventSkeleton />
 								</Col>
 								<Col md={6} lg={4}>
-									<SkeletonResourceLibraryCard />
+									<StudioEventSkeleton />
 								</Col>
 							</Row>
 						</Container>

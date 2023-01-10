@@ -6,6 +6,7 @@ import { GroupSessionModel, GroupSessionRequestModel } from '@/lib/models';
 import { groupSessionsService } from '@/lib/services';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import BackgroundImageContainer from '@/components/background-image-container';
+import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStudioEventStyles = createUseThemedStyles((theme) => ({
@@ -15,6 +16,12 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		flexDirection: 'column',
 		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
+	},
+	studioEventSkeleton: {
+		display: 'flex',
+		borderRadius: 5,
+		overflow: 'hidden',
+		flexDirection: 'column',
 	},
 	imageContainer: {
 		flexShrink: 0,
@@ -97,3 +104,22 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 };
 
 export default StudioEvent;
+
+interface StudioEventSkeletonProps {
+	className?: string;
+}
+
+export const StudioEventSkeleton = ({ className }: StudioEventSkeletonProps) => {
+	const classes = useStudioEventStyles();
+
+	return (
+		<div className={classNames(classes.studioEventSkeleton, className)}>
+			<SkeletonImage className={classes.imageContainer} />
+			<div className={classes.informationContainer}>
+				<SkeletonText type="h4" className="mb-1" width="75%" />
+				<SkeletonText type="p" className="mb-1" />
+				<SkeletonText type="p" className="mb-0" width="50%" />
+			</div>
+		</div>
+	);
+};
