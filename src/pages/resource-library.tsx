@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
-	ACTION_LINK_TYPE_ID,
 	CallToActionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	ResourceLibraryContentModel,

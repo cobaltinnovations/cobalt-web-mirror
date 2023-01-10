@@ -1,30 +1,32 @@
-import React, { FC, useState, useCallback, useEffect } from 'react';
+import React, { FC, useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-
+import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import { groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
-import useDebouncedState from '@/hooks/use-debounced-state';
-
-import AsyncPage from '@/components/async-page';
-import StudioEvent, { StudioEventSkeleton, StudioEventViewModel } from '@/components/studio-event';
-import ActionSheet from '@/components/action-sheet';
-import InputHelper from '@/components/input-helper';
-import HeroContainer from '@/components/hero-container';
 import useAccount from '@/hooks/use-account';
-import { useScreeningFlow } from './screening/screening.hooks';
-import Loader from '@/components/loader';
 import useAnalytics from '@/hooks/use-analytics';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import { useScreeningFlow } from './screening/screening.hooks';
+import AsyncPage from '@/components/async-page';
+import Loader from '@/components/loader';
+import ActionSheet from '@/components/action-sheet';
+import HeroContainer from '@/components/hero-container';
+import InputHelperSearch from '@/components/input-helper-search';
+import StudioEvent, { StudioEventSkeleton, StudioEventViewModel } from '@/components/studio-event';
 
 const InTheStudio: FC = () => {
 	const { mixpanel } = useAnalytics();
 	const navigate = useNavigate();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
-	const groupSessionSearchQuery = searchParams.get('q') ?? '';
-	const [searchTerm, setSearchTerm] = useState(groupSessionSearchQuery);
-	const [debouncedSearchValue, setDebouncedSearchValue] = useDebouncedState(searchTerm);
-	const [eventList, setEventList] = useState<StudioEventViewModel[]>([]);
+	const groupSessionSearchQuery = searchParams.get('searchQuery') ?? '';
+
+	const { hasTouchScreen } = useTouchScreenCheck();
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const [searchInputValue, setSearchInputValue] = useState(groupSessionSearchQuery);
+
+	const [groupSessions, setGroupSessions] = useState<StudioEventViewModel[]>([]);
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
@@ -36,14 +38,10 @@ const InTheStudio: FC = () => {
 			return;
 		}
 
-		if (debouncedSearchValue) {
-			searchParams.set('q', debouncedSearchValue);
-		} else {
-			searchParams.delete('q');
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
 		}
-
-		setSearchParams(searchParams, { replace: true });
-	}, [debouncedSearchValue, didCheckScreeningSessions, searchParams, setSearchParams]);
+	}, [didCheckScreeningSessions, hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
 		const [{ groupSessions }, { groupSessionRequests }] = await Promise.all([
@@ -53,7 +51,7 @@ const InTheStudio: FC = () => {
 					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
 					urlName: groupSessionUrlName,
-					searchQuery: debouncedSearchValue,
+					searchQuery: groupSessionSearchQuery,
 				})
 				.fetch(),
 			groupSessionsService
@@ -61,13 +59,37 @@ const InTheStudio: FC = () => {
 					viewType: 'PATIENT',
 					groupSessionRequestStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 					urlName: groupSessionUrlName,
-					searchQuery: debouncedSearchValue,
+					searchQuery: groupSessionSearchQuery,
 				})
 				.fetch(),
 		]);
 
-		setEventList([...groupSessionRequests, ...groupSessions]);
-	}, [groupSessionUrlName, debouncedSearchValue]);
+		setGroupSessions([...groupSessionRequests, ...groupSessions]);
+	}, [groupSessionUrlName, groupSessionSearchQuery]);
+
+	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (searchInputValue) {
+			searchParams.set('searchQuery', searchInputValue);
+		} else {
+			searchParams.delete('searchQuery');
+		}
+
+		setSearchParams(searchParams, { replace: true });
+		searchInputRef.current?.blur();
+	};
+
+	const handleClearSearch = useCallback(() => {
+		setSearchInputValue('');
+
+		searchParams.delete('searchQuery');
+		setSearchParams(searchParams, { replace: true });
+
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
+		}
+	}, [hasTouchScreen, searchParams, setSearchParams]);
 
 	if (!didCheckScreeningSessions) {
 		return (
@@ -120,31 +142,20 @@ const InTheStudio: FC = () => {
 				</ActionSheet>
 			)}
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">Group Sessions</h2>
+			<HeroContainer className="mb-8">
+				<h2 className="mb-6 text-center">Group Sessions</h2>
+				<Form onSubmit={handleSearchFormSubmit}>
+					<InputHelperSearch
+						ref={searchInputRef}
+						placeholder="Find a Group Session"
+						value={searchInputValue}
+						onChange={({ currentTarget }) => {
+							setSearchInputValue(currentTarget.value);
+						}}
+						onClear={handleClearSearch}
+					/>
+				</Form>
 			</HeroContainer>
-
-			<Container className="pt-5">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<InputHelper
-							type="search"
-							label="Find a Group Session"
-							className="mb-5"
-							value={searchTerm}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								const value = event.currentTarget.value;
-								// immediately clear
-								if (!value) {
-									setDebouncedSearchValue('');
-								}
-
-								setSearchTerm(value);
-							}}
-						/>
-					</Col>
-				</Row>
-			</Container>
 
 			<AsyncPage
 				fetchData={fetchData}
@@ -175,39 +186,34 @@ const InTheStudio: FC = () => {
 			>
 				<Container>
 					<Row>
-						{eventList.length > 0 ? (
-							eventList.map((studioEvent) => {
-								if (groupSessionsService.isGroupSession(studioEvent)) {
-									return (
-										<Col md={6} lg={4} key={studioEvent.groupSessionId} className="mb-8">
-											<Link
-												className="d-block text-decoration-none h-100"
-												to={`/in-the-studio/group-session-scheduled/${studioEvent.groupSessionId}`}
-											>
-												<StudioEvent className="h-100" studioEvent={studioEvent} />
-											</Link>
-										</Col>
-									);
-								} else if (groupSessionsService.isGroupSessionByRequest(studioEvent)) {
-									return (
-										<Col md={6} lg={4} key={studioEvent.groupSessionRequestId} className="mb-8">
-											<Link
-												className="d-block text-decoration-none h-100"
-												to={`/in-the-studio/group-session-by-request/${studioEvent.groupSessionRequestId}`}
-											>
-												<StudioEvent className="h-100" studioEvent={studioEvent} />
-											</Link>
-										</Col>
-									);
+						{groupSessions.length > 0 ? (
+							groupSessions.map((groupSession) => {
+								let renderKey = '';
+								let detailUrl = '';
+
+								if (groupSessionsService.isGroupSession(groupSession)) {
+									renderKey = groupSession.groupSessionId;
+									detailUrl = `/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`;
+								} else if (groupSessionsService.isGroupSessionByRequest(groupSession)) {
+									renderKey = groupSession.groupSessionRequestId;
+									detailUrl = `/in-the-studio/group-session-by-request/${groupSession.groupSessionRequestId}`;
 								} else {
 									console.warn('attempting to render an unknown studio event');
 									return null;
 								}
+
+								return (
+									<Col md={6} lg={4} key={renderKey} className="mb-8">
+										<Link className="d-block text-decoration-none h-100" to={detailUrl}>
+											<StudioEvent className="h-100" studioEvent={groupSession} />
+										</Link>
+									</Col>
+								);
 							})
 						) : (
 							<>
 								<p className="text-center mb-0">
-									{searchTerm ? (
+									{groupSessionSearchQuery ? (
 										'There are no matching results.'
 									) : groupSessionUrlName ? (
 										<>
