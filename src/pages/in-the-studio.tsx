@@ -164,8 +164,8 @@ const InTheStudio: FC = () => {
 				</ActionSheet>
 			)}
 
-			<HeroContainer className="mb-8">
-				<h2 className="mb-6 text-center">Group Sessions</h2>
+			<HeroContainer className="mb-8 bg-n75">
+				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<Form onSubmit={handleSearchFormSubmit}>
 					<InputHelperSearch
 						ref={searchInputRef}

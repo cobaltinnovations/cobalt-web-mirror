@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import classNames from 'classnames';
 
 import { groupSessionsService } from '@/lib/services';
 import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
@@ -22,6 +23,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -108,7 +110,44 @@ const InTheStudioGroupSessionScheduled = () => {
 	}
 
 	return (
-		<AsyncPage fetchData={fetchData}>
+		<AsyncPage
+			fetchData={fetchData}
+			loadingComponent={
+				<>
+					<Breadcrumb
+						breadcrumbs={[
+							{
+								to: '/',
+								title: 'Home',
+							},
+							{
+								to: '/in-the-studio',
+								title: 'Group Sessions',
+							},
+							{
+								to: `/#`,
+								title: 'Loading...',
+							},
+						]}
+					/>
+					<Container className="pb-12">
+						<Row className="justify-content-center">
+							<Col md={10} lg={8} xl={6}>
+								<SkeletonImage height={350} className={classNames(classes.mediaContainer, 'mb-6')} />
+								<SkeletonText type="p" width="35%" className="mb-1" />
+								<SkeletonText type="p" width="50%" className="mb-1" />
+								<SkeletonText type="p" width="25%" className="mb-6" />
+								<hr className="mb-6 " />
+								<SkeletonText type="p" numberOfLines={3} className="mb-10" />
+								<div className="text-center">
+									<SkeletonButton />
+								</div>
+							</Col>
+						</Row>
+					</Container>
+				</>
+			}
+		>
 			<CollectEmailModal
 				show={showCollectEmailModal}
 				collectedEmail={collectedEmail}
@@ -259,7 +298,7 @@ const InTheStudioGroupSessionScheduled = () => {
 				</Row>
 			</Container>
 
-			<Container className="pb-10">
+			<Container className="pb-12">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h4 className="mb-0 mb-lg-1">{session?.title}</h4>

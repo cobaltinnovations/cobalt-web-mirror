@@ -12,16 +12,22 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStudioEventStyles = createUseThemedStyles((theme) => ({
 	studioEvent: {
 		display: 'flex',
-		borderRadius: 5,
+		borderRadius: 8,
 		overflow: 'hidden',
+		transition: '0.2s all',
 		flexDirection: 'column',
-		filter: 'drop-shadow(0px 3px 5px rgba(41, 40, 39, 0.2)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
+		border: `1px solid ${theme.colors.n100}`,
+		'&:hover': {
+			transform: 'translateY(-16px)',
+			boxShadow: theme.elevation.e400,
+		},
 	},
 	studioEventSkeleton: {
 		display: 'flex',
-		borderRadius: 5,
+		borderRadius: 8,
 		overflow: 'hidden',
 		flexDirection: 'column',
+		border: `1px solid ${theme.colors.n100}`,
 	},
 	imageContainer: {
 		flexShrink: 0,
