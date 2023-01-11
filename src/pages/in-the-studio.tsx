@@ -77,10 +77,13 @@ const InTheStudio: FC = () => {
 		}
 
 		setSearchParams(searchParams, { replace: true });
-		searchInputRef.current?.blur();
+
+		if (hasTouchScreen) {
+			searchInputRef.current?.blur();
+		}
 	};
 
-	const handleClearSearch = useCallback(() => {
+	const clearSearch = useCallback(() => {
 		setSearchInputValue('');
 
 		searchParams.delete('searchQuery');
@@ -90,6 +93,25 @@ const InTheStudio: FC = () => {
 			searchInputRef.current?.focus();
 		}
 	}, [hasTouchScreen, searchParams, setSearchParams]);
+
+	const handleKeydown = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key !== 'Escape') {
+				return;
+			}
+
+			clearSearch();
+		},
+		[clearSearch]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleKeydown, false);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeydown, false);
+		};
+	}, [handleKeydown]);
 
 	if (!didCheckScreeningSessions) {
 		return (
@@ -152,7 +174,7 @@ const InTheStudio: FC = () => {
 						onChange={({ currentTarget }) => {
 							setSearchInputValue(currentTarget.value);
 						}}
-						onClear={handleClearSearch}
+						onClear={clearSearch}
 					/>
 				</Form>
 			</HeroContainer>
