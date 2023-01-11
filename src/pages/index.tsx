@@ -192,30 +192,30 @@ const Index: FC = () => {
 											navigate('/in-the-studio');
 										}}
 									>
-										{inTheStudioEvents.map((inTheStudioEvent) => {
-											if (groupSessionsService.isGroupSession(inTheStudioEvent)) {
-												return (
-													<Link
-														key={inTheStudioEvent.groupSessionId}
-														className="d-block text-decoration-none h-100"
-														to={`/in-the-studio/group-session-scheduled/${inTheStudioEvent.groupSessionId}`}
-													>
-														<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
-													</Link>
-												);
-											} else if (groupSessionsService.isGroupSessionByRequest(inTheStudioEvent)) {
-												return (
-													<Link
-														key={inTheStudioEvent.groupSessionRequestId}
-														className="d-block text-decoration-none h-100"
-														to={`/in-the-studio/group-session-by-request/${inTheStudioEvent.groupSessionRequestId}`}
-													>
-														<StudioEvent className="h-100" studioEvent={inTheStudioEvent} />
-													</Link>
-												);
+										{inTheStudioEvents.map((groupSession) => {
+											let renderKey = '';
+											let detailUrl = '';
+
+											if (groupSessionsService.isGroupSession(groupSession)) {
+												renderKey = groupSession.groupSessionId;
+												detailUrl = `/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`;
+											} else if (groupSessionsService.isGroupSessionByRequest(groupSession)) {
+												renderKey = groupSession.groupSessionRequestId;
+												detailUrl = `/in-the-studio/group-session-by-request/${groupSession.groupSessionRequestId}`;
 											} else {
-												throw new Error('Unrecognized group session type');
+												console.warn('attempting to render an unknown studio event');
+												return null;
 											}
+
+											return (
+												<Link
+													key={renderKey}
+													className="d-block text-decoration-none h-100"
+													to={detailUrl}
+												>
+													<StudioEvent className="h-100" studioEvent={groupSession} />
+												</Link>
+											);
 										})}
 									</Carousel>
 								</Col>
@@ -233,7 +233,7 @@ const Index: FC = () => {
 								</Col>
 							</Row>
 						</Container>
-						<Container>
+						<Container className="pb-20">
 							<Row>
 								<Col>
 									<Carousel
@@ -268,14 +268,6 @@ const Index: FC = () => {
 											);
 										})}
 									</Carousel>
-								</Col>
-							</Row>
-						</Container>
-
-						<Container className="pb-20">
-							<Row>
-								<Col>
-									<div className="d-flex justify-content-center mb-4"></div>
 								</Col>
 							</Row>
 						</Container>

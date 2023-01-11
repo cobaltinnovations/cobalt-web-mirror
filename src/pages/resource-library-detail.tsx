@@ -32,7 +32,7 @@ const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
 	reactPlayerOuter: {
 		paddingBottom: 400,
 		position: 'relative',
-		backgroundColor: theme.colors.n500,
+		backgroundColor: '#000',
 		[mediaQueries.lg]: {
 			paddingBottom: 210,
 		},
@@ -131,9 +131,6 @@ const ResourceLibraryDetail: FC = () => {
 								</div>
 							</Col>
 						</Row>
-						<Row className="justify-content-center">
-							<Col md={10} lg={8} xl={6}></Col>
-						</Row>
 					</Container>
 				}
 			>
@@ -143,7 +140,7 @@ const ResourceLibraryDetail: FC = () => {
 							<h2 className="mb-6">{item?.title}</h2>
 
 							{canEmbed ? (
-								<div className={classes.reactPlayerOuter}>
+								<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
 									<ReactPlayer
 										width="100%"
 										height="100%"

@@ -135,7 +135,10 @@ const ResourceLibrary = () => {
 		}
 
 		setSearchParams(searchParams, { replace: true });
-		searchInputRef.current?.blur();
+
+		if (hasTouchScreen) {
+			searchInputRef.current?.blur();
+		}
 	};
 
 	const clearSearch = useCallback(() => {
