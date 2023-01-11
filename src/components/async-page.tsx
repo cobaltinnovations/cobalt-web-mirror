@@ -6,6 +6,28 @@ import ErrorDisplay from '@/components/error-display';
 import { ERROR_CODES } from '@/lib/http-client';
 import { isErrorConfig } from '@/lib/utils/error-utils';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
+import { SwitchTransition, CSSTransition } from 'react-transition-group';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles({
+	'@global': {
+		'.page-enter': {
+			opacity: 0,
+		},
+		'.page-enter-active': {
+			opacity: 1,
+		},
+		'.page-exit': {
+			opacity: 1,
+		},
+		'.page-exit-active': {
+			opacity: 0,
+		},
+		'.page-enter-active, .page-exit-active': {
+			transition: `opacity 200ms`,
+		},
+	},
+});
 
 enum DISPLAY_STATES {
 	LOADING = 'LOADING',
@@ -29,10 +51,21 @@ const AsyncWrapper: FC<AsyncWrapperProps> = ({
 	showRetryButton = true,
 	loadingComponent,
 }) => {
+	useStyles();
 	const navigate = useNavigate();
 	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
+
+	const loadingRef = React.useRef<HTMLDivElement>(null);
+	const successRef = React.useRef<HTMLDivElement>(null);
+	const errorRef = React.useRef<HTMLDivElement>(null);
+	const nodeRef =
+		displayState === DISPLAY_STATES.LOADING
+			? loadingRef
+			: displayState === DISPLAY_STATES.SUCCESS
+			? successRef
+			: errorRef;
 
 	const fetchPageData = useCallback(async () => {
 		setDisplayState(DISPLAY_STATES.LOADING);
@@ -77,31 +110,33 @@ const AsyncWrapper: FC<AsyncWrapperProps> = ({
 		};
 	}, [fetchPageData, abortFetch]);
 
-	function getDisplayState() {
-		switch (displayState) {
-			case DISPLAY_STATES.LOADING:
-				if (loadingComponent) {
-					return loadingComponent;
-				}
-
-				return <Loader />;
-			case DISPLAY_STATES.SUCCESS:
-				return children;
-			case DISPLAY_STATES.ERROR:
-				return (
-					<ErrorDisplay
-						error={fetchPageDataError}
-						showBackButton={showBackButton}
-						showRetryButton={showRetryButton}
-						onRetryButtonClick={fetchPageData}
-					/>
-				);
-			default:
-				return <></>;
-		}
-	}
-
-	return <>{getDisplayState()}</>;
+	return (
+		<SwitchTransition mode="out-in">
+			<CSSTransition
+				key={displayState}
+				nodeRef={nodeRef}
+				addEndListener={(done) => {
+					nodeRef.current?.addEventListener('transitionend', done, false);
+				}}
+				classNames="page"
+			>
+				<div ref={nodeRef}>
+					{displayState === DISPLAY_STATES.LOADING && (
+						<>{loadingComponent ? <>{loadingComponent}</> : <Loader />}</>
+					)}
+					{displayState === DISPLAY_STATES.SUCCESS && <>{children}</>}
+					{displayState === DISPLAY_STATES.ERROR && (
+						<ErrorDisplay
+							error={fetchPageDataError}
+							showBackButton={showBackButton}
+							showRetryButton={showRetryButton}
+							onRetryButtonClick={fetchPageData}
+						/>
+					)}
+				</div>
+			</CSSTransition>
+		</SwitchTransition>
+	);
 };
 
 export default AsyncWrapper;
