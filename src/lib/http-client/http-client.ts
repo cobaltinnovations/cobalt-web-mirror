@@ -47,6 +47,8 @@ export class HttpClient {
 						headers[httpConfig.tokenHeaderKey] = accessToken;
 					}
 
+					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
+
 					return data;
 				},
 			],
