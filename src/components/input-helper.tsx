@@ -38,6 +38,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		right: 'initial',
 		position: 'absolute',
 		pointerEvents: 'none',
+		...theme.fonts.headingBold,
 		transformOrigin: 'left top',
 		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
@@ -153,7 +154,7 @@ const InputHelper: FC<InputHelperProps> = ({
 				onMouseOut={handleMouseOut}
 			>
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
-					{label} {required && '*'}
+					{label} {required && <span className="text-danger">*</span>}
 				</Form.Label>
 				{/* @ts-expect-error Bootstrap 5 vs bootstrap 4 onChange type */}
 				<FormControlComponent
