@@ -63,6 +63,16 @@ const GroupSessionsRequest = () => {
 	]);
 	const [expandedInterestIds, setExpandedInterestIds] = useState<string[]>([]);
 
+	const [formValues, setFormValues] = useState({
+		name: '',
+		emailAddress: '',
+		topicIds: [] as string[],
+		otherTopics: '',
+		preferredDates: '',
+		capacity: '',
+		otherDetails: '',
+	});
+
 	return (
 		<Container className="py-14">
 			<Row className="mb-8">
@@ -87,19 +97,25 @@ const GroupSessionsRequest = () => {
 								className="mb-4"
 								required
 								type="text"
-								value={''}
+								value={formValues.name}
 								label="Name"
 								onChange={({ currentTarget }) => {
-									console.log(currentTarget);
+									setFormValues((previousValue) => ({
+										...previousValue,
+										name: currentTarget.value,
+									}));
 								}}
 							/>
 							<InputHelper
 								required
 								type="email"
-								value={''}
+								value={formValues.emailAddress}
 								label="Email Address"
 								onChange={({ currentTarget }) => {
-									console.log(currentTarget);
+									setFormValues((previousValue) => ({
+										...previousValue,
+										emailAddress: currentTarget.value,
+									}));
 								}}
 							/>
 						</div>
@@ -126,6 +142,24 @@ const GroupSessionsRequest = () => {
 													value={interest.id}
 													type="checkbox"
 													label={interest.title}
+													checked={formValues.topicIds.includes(interest.id)}
+													onChange={({ currentTarget }) => {
+														const topicIdsClone = cloneDeep(formValues.topicIds);
+														const indexToRemove = topicIdsClone.findIndex(
+															(i) => i === currentTarget.value
+														);
+
+														if (indexToRemove > -1) {
+															topicIdsClone.splice(indexToRemove, 1);
+														} else {
+															topicIdsClone.push(currentTarget.value);
+														}
+
+														setFormValues((previousValue) => ({
+															...previousValue,
+															topicIds: topicIdsClone,
+														}));
+													}}
 												/>
 												{interest.description && (
 													<Button
@@ -162,6 +196,26 @@ const GroupSessionsRequest = () => {
 													</div>
 												</Collapse>
 											)}
+											{interest.id === 'OTHER' && (
+												<Collapse in={formValues.topicIds.includes('OTHER')}>
+													<div>
+														<div className="ps-12 pe-6 pb-6">
+															<InputHelper
+																required={formValues.topicIds.includes('OTHER')}
+																type="text"
+																value={formValues.otherTopics}
+																label="Other Topics"
+																onChange={({ currentTarget }) => {
+																	setFormValues((previousValue) => ({
+																		...previousValue,
+																		otherTopics: currentTarget.value,
+																	}));
+																}}
+															/>
+														</div>
+													</div>
+												</Collapse>
+											)}
 										</div>
 									);
 								})}
@@ -176,9 +230,12 @@ const GroupSessionsRequest = () => {
 							<InputHelper
 								as="textarea"
 								label="Enter preferred date(s):"
-								value={''}
+								value={formValues.preferredDates}
 								onChange={({ currentTarget }) => {
-									console.log(currentTarget);
+									setFormValues((previousValue) => ({
+										...previousValue,
+										preferredDates: currentTarget.value,
+									}));
 								}}
 							/>
 						</div>
@@ -225,10 +282,13 @@ const GroupSessionsRequest = () => {
 							<h6 className="mb-4">Other Details</h6>
 							<InputHelper
 								as="textarea"
-								label="Is there anything specific about your group you’d like us to know?"
-								value={''}
+								label="Is there anything specific about your group you'd like us to know?"
+								value={formValues.otherDetails}
 								onChange={({ currentTarget }) => {
-									console.log(currentTarget);
+									setFormValues((previousValue) => ({
+										...previousValue,
+										otherDetails: currentTarget.value,
+									}));
 								}}
 							/>
 						</div>
