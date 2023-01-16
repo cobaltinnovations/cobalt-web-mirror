@@ -45,6 +45,8 @@ export const MyCalendar = React.lazy(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = React.lazy(() => import('@/pages/appointment-details'));
 export const Feedback = React.lazy(() => import('@/pages/feedback'));
 export const AccountSessionDetails = React.lazy(() => import('@/pages/account-session-details'));
+export const GroupSessions = React.lazy(() => import('@/pages/group-sessions'));
+export const GroupSessionsRequest = React.lazy(() => import('@/pages/group-sessions-request'));
 export const GroupSessionsScheduled = React.lazy(() => import('@/pages/group-sessions-scheduled'));
 export const GroupSessionsScheduledCreate = React.lazy(() => import('@/pages/group-sessions-scheduled-create'));
 export const GroupSessionsByRequest = React.lazy(() => import('@/pages/group-sessions-by-request'));
@@ -395,6 +397,16 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/account-sessions/:accountSessionId/text',
 				private: true,
 				main: AccountSessionDetails,
+			},
+			{
+				path: '/group-sessions',
+				private: true,
+				main: GroupSessions,
+			},
+			{
+				path: '/group-sessions/request',
+				private: true,
+				main: GroupSessionsRequest,
 			},
 			{
 				path: '/group-sessions/scheduled',
