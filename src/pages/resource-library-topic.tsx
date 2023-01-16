@@ -226,7 +226,7 @@ const ResourceLibraryTopic = () => {
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
-			searchInputRef.current?.focus();
+			searchInputRef.current?.focus({ preventScroll: true });
 		}
 	}, [hasTouchScreen, searchParams, setSearchParams]);
 
@@ -426,7 +426,7 @@ const ResourceLibraryTopic = () => {
 						<Collapse
 							in={searchIsOpen}
 							onEntered={() => {
-								searchInputRef.current?.focus();
+								searchInputRef.current?.focus({ preventScroll: true });
 							}}
 						>
 							<div className="overflow-hidden">
