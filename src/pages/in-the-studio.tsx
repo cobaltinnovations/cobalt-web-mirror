@@ -39,7 +39,7 @@ const InTheStudio: FC = () => {
 		}
 
 		if (!hasTouchScreen) {
-			searchInputRef.current?.focus();
+			searchInputRef.current?.focus({ preventScroll: true });
 		}
 	}, [didCheckScreeningSessions, hasTouchScreen]);
 
@@ -90,7 +90,7 @@ const InTheStudio: FC = () => {
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
-			searchInputRef.current?.focus();
+			searchInputRef.current?.focus({ preventScroll: true });
 		}
 	}, [hasTouchScreen, searchParams, setSearchParams]);
 

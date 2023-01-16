@@ -81,7 +81,7 @@ const ResourceLibrary = () => {
 		}
 
 		if (!hasTouchScreen) {
-			searchInputRef.current?.focus();
+			searchInputRef.current?.focus({ preventScroll: true });
 		}
 	}, [didCheckScreeningSessions, hasTouchScreen]);
 
@@ -148,7 +148,7 @@ const ResourceLibrary = () => {
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
-			searchInputRef.current?.focus();
+			searchInputRef.current?.focus({ preventScroll: true });
 		}
 	}, [hasTouchScreen, searchParams, setSearchParams]);
 
