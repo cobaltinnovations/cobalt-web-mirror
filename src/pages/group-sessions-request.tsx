@@ -1,77 +1,106 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import InputHelper from '@/components/input-helper';
 import { cloneDeep } from 'lodash';
 
 const GroupSessionsRequest = () => {
-	const [interests] = useState([
+	const [topics] = useState([
 		{
 			id: 'MINDFULNESS',
 			title: 'Mindfulness',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'MANAGING_STRESS_AND_ANXIETY',
 			title: 'Managing Stress and Anxiety',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'ENERGY_MANAGEMENT',
 			title: 'Energy Management',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'FITTING_IN_FITNESS',
 			title: 'Fitting in Fitness',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'HEALTHY_EATING',
 			title: 'Healthy Eating',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'TOXIC_POSITIVITY',
 			title: `Toxic Positivity: Don't "Just" Get Over It`,
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'SHOWING_UP_FOR_YOURSELF',
 			title: 'Showing Up for Yourself',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'TEAM_RELATIONSHIPS',
 			title: 'Team Relationships',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'SCHEDULING_TOOLS',
 			title: 'Scheduling Tools',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'HOLISTIC_WELL_BEING',
 			title: 'Holistic Well-Being',
-			description: 'Description of interest goes here.',
+			description: 'Description of topic goes here.',
 		},
 		{
 			id: 'OTHER',
 			title: 'Other',
 		},
 	]);
-	const [expandedInterestIds, setExpandedInterestIds] = useState<string[]>([]);
-
+	const [expandedTopicIds, setExpandedTopicIds] = useState<string[]>([]);
+	const [capacities] = useState([
+		{
+			id: 'FIVE_TO_TEN',
+			title: '5-10',
+		},
+		{
+			id: 'TEN_TO_FIFTEEN',
+			title: '10-15',
+		},
+		{
+			id: 'FIFTEEN_TO_TWENTY',
+			title: '15-20',
+		},
+		{
+			id: 'TWENTY_TO_TWENTY_FIVE',
+			title: '20-25',
+		},
+		{
+			id: 'MORE_THAN_TWENTY_FIVE',
+			title: 'More than 25',
+		},
+	]);
 	const [formValues, setFormValues] = useState({
 		name: '',
 		emailAddress: '',
 		topicIds: [] as string[],
 		otherTopics: '',
 		preferredDates: '',
-		capacity: '',
+		capacity: 'FIVE_TO_TEN',
 		otherDetails: '',
 	});
+
+	const handleFormSubmit = useCallback(
+		(event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+			console.log(formValues);
+		},
+		[formValues]
+	);
 
 	return (
 		<Container className="py-14">
@@ -89,7 +118,7 @@ const GroupSessionsRequest = () => {
 			</Row>
 			<Row>
 				<Col lg={{ span: 8, offset: 2 }}>
-					<Form className="p-8 pb-10 bg-white border rounded">
+					<Form className="p-8 pb-10 bg-white border rounded" onSubmit={handleFormSubmit}>
 						<h4 className="mb-8">Session Request Form</h4>
 						<div className="mb-8">
 							<h6 className="mb-4">Your Contact Information</h6>
@@ -125,12 +154,12 @@ const GroupSessionsRequest = () => {
 							</h6>
 							<p className="mb-2">Select all that apply.</p>
 							<Form.Group className="border rounded">
-								{interests.map((interest, index) => {
-									const isLast = interests.length - 1 === index;
+								{topics.map((topic, index) => {
+									const isLast = topics.length - 1 === index;
 
 									return (
 										<div
-											key={interest.id}
+											key={topic.id}
 											className={classNames({
 												'border-bottom': !isLast,
 											})}
@@ -138,11 +167,11 @@ const GroupSessionsRequest = () => {
 											<div className="p-4 d-flex align-items-center justify-content-between ">
 												<Form.Check
 													name="interests"
-													id={`interests__${interest.id}`}
-													value={interest.id}
+													id={`interests__${topic.id}`}
+													value={topic.id}
 													type="checkbox"
-													label={interest.title}
-													checked={formValues.topicIds.includes(interest.id)}
+													label={topic.title}
+													checked={formValues.topicIds.includes(topic.id)}
 													onChange={({ currentTarget }) => {
 														const topicIdsClone = cloneDeep(formValues.topicIds);
 														const indexToRemove = topicIdsClone.findIndex(
@@ -161,42 +190,41 @@ const GroupSessionsRequest = () => {
 														}));
 													}}
 												/>
-												{interest.description && (
+												{topic.description && (
 													<Button
 														variant="link"
 														className="p-0 fs-ui-small fw-normal text-decoration-none"
 														onClick={() => {
-															const expandedInterestIdsClone =
-																cloneDeep(expandedInterestIds);
-															const indexToRemove = expandedInterestIdsClone.findIndex(
-																(i) => i === interest.id
+															const expandedTopicIdsClone = cloneDeep(expandedTopicIds);
+															const indexToRemove = expandedTopicIdsClone.findIndex(
+																(i) => i === topic.id
 															);
 
 															if (indexToRemove > -1) {
-																expandedInterestIdsClone.splice(indexToRemove, 1);
+																expandedTopicIdsClone.splice(indexToRemove, 1);
 															} else {
-																expandedInterestIdsClone.push(interest.id);
+																expandedTopicIdsClone.push(topic.id);
 															}
 
-															setExpandedInterestIds(expandedInterestIdsClone);
+															setExpandedTopicIds(expandedTopicIdsClone);
 														}}
 													>
-														{expandedInterestIds.includes(interest.id)
+														{expandedTopicIds.includes(topic.id)
 															? '- Hide Details'
 															: '+ View Details'}
 													</Button>
 												)}
 											</div>
-											{interest.description && (
-												<Collapse in={expandedInterestIds.includes(interest.id)}>
+											{topic.description && (
+												<Collapse in={expandedTopicIds.includes(topic.id)}>
 													<div>
-														<div className="px-12 pb-6">
-															<p className="mb-0">{interest.description}</p>
+														<div className="ps-12 pe-6 pb-6">
+															<p className="mb-0">{topic.description}</p>
 														</div>
 													</div>
 												</Collapse>
 											)}
-											{interest.id === 'OTHER' && (
+											{topic.id === 'OTHER' && (
 												<Collapse in={formValues.topicIds.includes('OTHER')}>
 													<div>
 														<div className="ps-12 pe-6 pb-6">
@@ -246,36 +274,25 @@ const GroupSessionsRequest = () => {
 							</h6>
 							<p className="mb-2">We require a minimum of five attendees to schedule group sessions.</p>
 							<Form.Group>
-								<Form.Check
-									name="session-capacity"
-									id="session-capacity__five-to-ten"
-									type="radio"
-									label="5-10"
-								/>
-								<Form.Check
-									name="session-capacity"
-									id="session-capacity__ten-to-fifteen"
-									type="radio"
-									label="10-15"
-								/>
-								<Form.Check
-									name="session-capacity"
-									id="session-capacity__fifteen-to-twenty"
-									type="radio"
-									label="15-20"
-								/>
-								<Form.Check
-									name="session-capacity"
-									id="session-capacity__twenty-to-twenty-five"
-									type="radio"
-									label="20-25"
-								/>
-								<Form.Check
-									name="session-capacity"
-									id="session-capacity__more-than-twenty-five"
-									type="radio"
-									label="More than 25"
-								/>
+								{capacities.map((capacity) => {
+									return (
+										<Form.Check
+											key={capacity.id}
+											type="radio"
+											name="capacity"
+											id={`capacity__${capacity.id}`}
+											value={capacity.id}
+											label={capacity.title}
+											checked={formValues.capacity === capacity.id}
+											onChange={({ currentTarget }) => {
+												setFormValues((previousValue) => ({
+													...previousValue,
+													capacity: currentTarget.value,
+												}));
+											}}
+										/>
+									);
+								})}
 							</Form.Group>
 						</div>
 						<div className="mb-10">
