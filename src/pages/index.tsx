@@ -1,12 +1,12 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
-import HeroContainer from '@/components/hero-container';
+import HomeHero from '@/components/home-hero';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import CallToAction from '@/components/call-to-action';
@@ -21,7 +21,6 @@ import {
 	TagModel,
 } from '@/lib/models';
 
-import { ReactComponent as ConnectWithSupportIcon } from '@/assets/icons/icon-connect-with-support.svg';
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
@@ -87,10 +86,6 @@ const Index: FC = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
-	function handleConnectWithSupportButtonClick() {
-		navigate('/connect-with-support');
-	}
-
 	useEffect(() => {
 		if (institution?.integratedCareEnabled) {
 			navigate('/ic');
@@ -99,20 +94,7 @@ const Index: FC = () => {
 
 	return (
 		<>
-			{institution?.supportEnabled && (
-				<HeroContainer className="text-center">
-					<h1 className="mb-3">Recommended for you</h1>
-					<p className="mb-5">
-						Peers, Coping First Aid Coaches, Therapists, Psychiatrists, and more are here to help
-					</p>
-					<div className="d-flex justify-content-center">
-						<Button className="d-flex align-items-center" onClick={handleConnectWithSupportButtonClick}>
-							<ConnectWithSupportIcon className="me-2" />
-							Connect with support
-						</Button>
-					</div>
-				</HeroContainer>
-			)}
+			<HomeHero />
 
 			<AsyncPage fetchData={fetchCallsToAction}>
 				{callsToAction.length > 0 && (
