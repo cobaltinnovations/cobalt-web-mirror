@@ -24,6 +24,7 @@ import {
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
+import HomeFooterCta from '@/components/home-footer-cta';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -257,6 +258,8 @@ const Index: FC = () => {
 				)}
 
 				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
+
+				<HomeFooterCta />
 			</AsyncPage>
 		</>
 	);
