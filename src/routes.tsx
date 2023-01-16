@@ -149,6 +149,10 @@ const RedirectToResourceLibrary = () => {
 	return <Navigate to="/resource-library" replace />;
 };
 
+const RedirectToGroupSessions = () => {
+	return <Navigate to="/group-sessions" replace />;
+};
+
 const ButtonlessHeaderLayout = () => {
 	const { account } = useAccount();
 	const navigate = useNavigate();
@@ -268,7 +272,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 			{
 				path: '/in-the-studio',
 				private: true,
-				main: InTheStudio,
+				main: RedirectToGroupSessions,
 			},
 			{
 				path: '/in-the-studio-thanks',
