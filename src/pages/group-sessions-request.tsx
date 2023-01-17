@@ -382,7 +382,7 @@ const GroupSessionsRequest = () => {
 							</div>
 							<div className="mb-8">
 								<h6 className="mb-1">What time of day do you prefer for your session(s)?</h6>
-								<p className="mb-4">Enter “No Preference” if there is no preferred date.</p>
+								<p className="mb-4">Enter “No Preference” if there is no preferred time.</p>
 								<InputHelper
 									as="textarea"
 									label="Enter preferred times(s):"
