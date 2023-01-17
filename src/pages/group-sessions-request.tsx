@@ -365,10 +365,7 @@ const GroupSessionsRequest = () => {
 								</Form.Group>
 							</div>
 							<div className="mb-8">
-								<h6 className="mb-1">
-									Which (if any) dates do you prefer for your session(s)?{' '}
-									<span className="text-danger">*</span>
-								</h6>
+								<h6 className="mb-1">Which (if any) dates do you prefer for your session(s)?</h6>
 								<p className="mb-4">Enter “No Preference” if there is no preferred date.</p>
 								<InputHelper
 									as="textarea"
@@ -378,6 +375,22 @@ const GroupSessionsRequest = () => {
 										setFormValues((previousValue) => ({
 											...previousValue,
 											preferredDateDescription: currentTarget.value,
+										}));
+									}}
+									disabled={formIsSubmitting}
+								/>
+							</div>
+							<div className="mb-8">
+								<h6 className="mb-1">What time of day do you prefer for your session(s)?</h6>
+								<p className="mb-4">Enter “No Preference” if there is no preferred date.</p>
+								<InputHelper
+									as="textarea"
+									label="Enter preferred times(s):"
+									value={formValues.preferredTimeDescription}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											preferredTimeDescription: currentTarget.value,
 										}));
 									}}
 									disabled={formIsSubmitting}
