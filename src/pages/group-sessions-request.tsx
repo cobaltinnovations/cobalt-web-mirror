@@ -6,6 +6,7 @@ import { GroupTopic } from '@/lib/models';
 import { groupSessionsService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import useHandleError from '@/hooks/use-handle-error';
+import { Link } from 'react-router-dom';
 
 enum ATTENDEE_COUNTS {
 	FIVE_TO_TEN = 'FIVE_TO_TEN',
@@ -65,6 +66,7 @@ const GroupSessionsRequest = () => {
 		maximumAttendeeCount: 0,
 		additionalDescription: '',
 	});
+	const [formIsSubmitting, setFormIsSubmitting] = useState(false);
 	const [formSubmittedSuccessfully, setFormSubmittedSuccessfully] = useState(false);
 
 	const fetchData = useCallback(async () => {
@@ -143,6 +145,8 @@ const GroupSessionsRequest = () => {
 			} = formValues;
 
 			try {
+				setFormIsSubmitting(true);
+
 				await groupSessionsService
 					.postGroupRequest({
 						requestorName,
@@ -161,10 +165,40 @@ const GroupSessionsRequest = () => {
 			} catch (error) {
 				handleError(error);
 				setFormSubmittedSuccessfully(false);
+			} finally {
+				setFormIsSubmitting(false);
 			}
 		},
 		[formValues, handleError]
 	);
+
+	if (formSubmittedSuccessfully) {
+		return (
+			<Container className="py-20">
+				<Row>
+					<Col lg={{ span: 6, offset: 3 }}>
+						<div className="p-14 bg-white border rounded">
+							<h3 className="mb-7 text-center">Thank you for your interest!</h3>
+							<p className="mb-7 fs-large text-center">
+								Your request has been submitted, and a session coordinator will contact you within 1-2
+								business days.
+							</p>
+							<p className="mb-7 fs-large text-center">
+								<Link to="/group-sessions" className="fw-normal">
+									Explore more Group Sessions
+								</Link>
+							</p>
+							<p className="mb-0 fs-large text-center">
+								<Link to="/" className="fw-normal">
+									Back to Home
+								</Link>
+							</p>
+						</div>
+					</Col>
+				</Row>
+			</Container>
+		);
+	}
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -200,6 +234,7 @@ const GroupSessionsRequest = () => {
 											requestorName: currentTarget.value,
 										}));
 									}}
+									disabled={formIsSubmitting}
 								/>
 								<InputHelper
 									required
@@ -212,6 +247,7 @@ const GroupSessionsRequest = () => {
 											requestorEmailAddress: currentTarget.value,
 										}));
 									}}
+									disabled={formIsSubmitting}
 								/>
 							</div>
 							<div className="mb-8">
@@ -248,6 +284,7 @@ const GroupSessionsRequest = () => {
 																groupTopicIds: topicIdsClone,
 															}));
 														}}
+														disabled={formIsSubmitting}
 													/>
 													{topic.description && (
 														<Button
@@ -302,6 +339,7 @@ const GroupSessionsRequest = () => {
 														otherGroupTopicChecked: currentTarget.checked,
 													}));
 												}}
+												disabled={formIsSubmitting}
 											/>
 										</div>
 										<Collapse in={formValues.otherGroupTopicChecked}>
@@ -318,6 +356,7 @@ const GroupSessionsRequest = () => {
 																otherGroupTopicsDescription: currentTarget.value,
 															}));
 														}}
+														disabled={formIsSubmitting}
 													/>
 												</div>
 											</div>
@@ -341,6 +380,7 @@ const GroupSessionsRequest = () => {
 											preferredDateDescription: currentTarget.value,
 										}));
 									}}
+									disabled={formIsSubmitting}
 								/>
 							</div>
 							<div className="mb-8">
@@ -376,6 +416,7 @@ const GroupSessionsRequest = () => {
 														maximumAttendeeCount,
 													}));
 												}}
+												disabled={formIsSubmitting}
 											/>
 										);
 									})}
@@ -393,10 +434,13 @@ const GroupSessionsRequest = () => {
 											additionalDescription: currentTarget.value,
 										}));
 									}}
+									disabled={formIsSubmitting}
 								/>
 							</div>
 							<div className="text-right">
-								<Button type="submit">Submit Request</Button>
+								<Button type="submit" disabled={formIsSubmitting}>
+									Submit Request
+								</Button>
 							</div>
 						</Form>
 					</Col>
