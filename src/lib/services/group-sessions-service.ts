@@ -9,6 +9,7 @@ import {
 	GroupSessionCountModel,
 	GroupSessionResponseModel,
 	AccountModel,
+	GroupTopic,
 } from '@/lib/models';
 
 // Scheduled
@@ -304,6 +305,29 @@ export const groupSessionsService = {
 		return httpSingleton.orchestrateRequest<SignUpForGroupSessionRequestResponseBody>({
 			method: 'post',
 			url: `/group-session-responses`,
+			data,
+		});
+	},
+	getGroupTopics() {
+		return httpSingleton.orchestrateRequest<{ groupTopics: GroupTopic[] }>({
+			method: 'GET',
+			url: '/group-topics',
+		});
+	},
+	postGroupRequest(data: {
+		requestorName: string;
+		requestorEmailAddress: string;
+		preferredDateDescription?: string;
+		preferredTimeDescription?: string;
+		minimumAttendeeCount: number;
+		maximumAttendeeCount?: number;
+		additionalDescription?: string;
+		otherGroupTopicsDescription?: string;
+		groupTopicIds: string[];
+	}) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'POST',
+			url: '/group-requests',
 			data,
 		});
 	},
