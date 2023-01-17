@@ -281,22 +281,22 @@ const ResourceLibraryTags = () => {
 				loadingComponent={
 					<Container className="pb-24">
 						<Row>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
 						</Row>
@@ -314,7 +314,7 @@ const ResourceLibraryTags = () => {
 					<Row>
 						{content.map((content) => {
 							return (
-								<Col key={content.contentId} xs={6} lg={4} className="mb-8">
+								<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
 									<ResourceLibraryCard
 										className="h-100"
 										contentId={content.contentId}
