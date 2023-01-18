@@ -23,6 +23,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import Loader from '@/components/loader';
 import ActionSheet from '@/components/action-sheet';
 import CallToAction from '@/components/call-to-action';
+import TabBar from '@/components/tab-bar';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -222,6 +223,29 @@ const ResourceLibrary = () => {
 				)}
 			</AsyncPage>
 
+			<Container className="pt-0 pt-lg-6">
+				<Row>
+					<Col>
+						<TabBar
+							value={searchParams.get('recommended') === 'true' ? 'FOR_YOU' : 'ALL'}
+							tabs={[
+								{ value: 'ALL', title: 'All' },
+								{ value: 'FOR_YOU', title: 'For You' },
+							]}
+							onTabClick={(value) => {
+								if (value === 'ALL') {
+									searchParams.delete('recommended');
+								} else {
+									searchParams.set('recommended', 'true');
+								}
+
+								setSearchParams(searchParams, { replace: true });
+							}}
+						/>
+					</Col>
+				</Row>
+			</Container>
+
 			<AsyncPage fetchData={fetchData}>
 				{institution?.userSubmittedContentEnabled && (
 					<ActionSheet
@@ -236,7 +260,7 @@ const ResourceLibrary = () => {
 					/>
 				)}
 
-				<Container className="pt-5 pt-lg-16 pb-6 pb-lg-32">
+				<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
 					{tagGroups.map((tagGroup) => {
 						return (
 							<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
