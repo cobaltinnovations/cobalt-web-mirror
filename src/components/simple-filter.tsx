@@ -5,18 +5,26 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 
+interface UseStyleProps {
+	dialogWidth: number;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
-	modal: {
+	modal: ({ dialogWidth }: UseStyleProps) => ({
 		width: '90%',
-		maxWidth: 220,
+		height: '100%',
+		maxWidth: dialogWidth,
 		margin: '0 auto',
+		'& .modal-content': {
+			maxHeight: '90vh',
+		},
 		'& .cobalt-modal__body': {
 			padding: 24,
 		},
 		'& .cobalt-modal__footer': {
 			padding: '12px 16px',
 		},
-	},
+	}),
 	button: {
 		minHeight: 40,
 		borderRadius: 500,
@@ -63,6 +71,7 @@ interface Props {
 	onClear(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onApply(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	activeLength?: number;
+	dialogWidth?: number;
 	className?: string;
 }
 
@@ -74,10 +83,11 @@ const SimpleFilter = ({
 	onClear,
 	onApply,
 	activeLength,
+	dialogWidth = 220,
 	className,
 	children,
 }: PropsWithChildren<Props>) => {
-	const classes = useStyles();
+	const classes = useStyles({ dialogWidth });
 
 	return (
 		<>

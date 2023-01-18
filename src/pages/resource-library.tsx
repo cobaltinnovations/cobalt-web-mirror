@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import {
 	CallToActionModel,
@@ -24,6 +25,7 @@ import Loader from '@/components/loader';
 import ActionSheet from '@/components/action-sheet';
 import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
+import SimpleFilter from '@/components/simple-filter';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -77,6 +79,10 @@ const ResourceLibrary = () => {
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
+	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroupModel[]>([]);
+	const [tagFilters, setTagFilters] = useState<Record<string, TagModel[]>>();
+	const [topicFilterIsShowing, setTopicFilterIsShowing] = useState(false);
+
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
 			return;
@@ -95,6 +101,24 @@ const ResourceLibrary = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
+	const fetchRecommendedFilters = useCallback(async () => {
+		const response = await resourceLibraryService
+			.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 0 })
+			.fetch();
+
+		const tagsByTagGroupId: Record<string, TagModel[]> = {};
+		Object.values(response.tagsByTagId).forEach((tag) => {
+			if (tagsByTagGroupId[tag.tagGroupId]) {
+				tagsByTagGroupId[tag.tagGroupId].push(tag);
+			} else {
+				tagsByTagGroupId[tag.tagGroupId] = [tag];
+			}
+		});
+
+		setTagGroupFilters(response.tagGroups);
+		setTagFilters(tagsByTagGroupId);
+	}, []);
+
 	const fetchData = useCallback(async () => {
 		if (!didCheckScreeningSessions) {
 			return;
@@ -107,7 +131,6 @@ const ResourceLibrary = () => {
 				.searchResourceLibrary({ searchQuery, pageNumber: 0, pageSize: 100 })
 				.fetch();
 
-			// set "search state"
 			setContents(searchResponse.findResult.contents);
 			setFindResultTotalCount(searchResponse.findResult.totalCount);
 			setFindResultTotalCountDescription(searchResponse.findResult.totalCountDescription);
@@ -253,7 +276,7 @@ const ResourceLibrary = () => {
 			)}
 
 			{/* ---------------------------------------------------- */}
-			{/* Header for "All" and "For You" */}
+			{/* Tags for "All" and "For You" */}
 			{/* Only show if the current institution has a non-null contentScreeningFlowId */}
 			{/* ---------------------------------------------------- */}
 			{!searchQuery && institution?.contentScreeningFlowId && (
@@ -268,6 +291,9 @@ const ResourceLibrary = () => {
 								]}
 								onTabClick={(value) => {
 									searchParams.delete('searchQuery');
+									searchParams.delete('tagGroupId');
+									searchParams.delete('contentTypeId');
+									searchParams.delete('contentDurationId');
 
 									if (value === 'ALL') {
 										searchParams.delete('recommended');
@@ -285,6 +311,72 @@ const ResourceLibrary = () => {
 
 			<AsyncPage fetchData={fetchData}>
 				<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
+					{/* ---------------------------------------------------- */}
+					{/* Filters for "For You" */}
+					{/* ---------------------------------------------------- */}
+					{recommendedContent && (
+						<AsyncPage fetchData={fetchRecommendedFilters}>
+							<Row className="mb-6">
+								<Col>
+									<SimpleFilter
+										title="Topic"
+										dialogWidth={628}
+										show={topicFilterIsShowing}
+										onHide={() => {
+											setTopicFilterIsShowing(false);
+										}}
+										onClick={() => {
+											setTopicFilterIsShowing(true);
+										}}
+										onClear={() => {
+											return;
+										}}
+										onApply={() => {
+											return;
+										}}
+									>
+										{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
+											const isLastTagGroup = tagGroupFilters.length - 1 === tagGroupIndex;
+
+											return (
+												<div
+													key={tagGroup.tagGroupId}
+													className={classNames({ 'mb-5 border-bottom': !isLastTagGroup })}
+												>
+													<h5 className="mb-4">{tagGroup.name}</h5>
+													{tagFilters?.[tagGroup.tagGroupId].map((tag, tagIndex) => {
+														const isLastTag =
+															tagFilters[tagGroup.tagGroupId].length - 1 === tagIndex;
+
+														return (
+															<Form.Check
+																key={tag.tagId}
+																className={classNames({
+																	'mb-0': isLastTagGroup && isLastTag,
+																	'mb-5': !isLastTagGroup && isLastTag,
+																	'mb-1': !isLastTag,
+																})}
+																type="checkbox"
+																name={`tag-group--${tag.tagGroupId}`}
+																id={`tag--${tag.tagId}`}
+																label={tag.name}
+																value={tag.tagId}
+																checked={false}
+																onChange={({ currentTarget }) => {
+																	console.log(currentTarget.value);
+																}}
+															/>
+														);
+													})}
+												</div>
+											);
+										})}
+									</SimpleFilter>
+								</Col>
+							</Row>
+						</AsyncPage>
+					)}
+
 					{/* ---------------------------------------------------- */}
 					{/* Header for "Search" */}
 					{/* ---------------------------------------------------- */}

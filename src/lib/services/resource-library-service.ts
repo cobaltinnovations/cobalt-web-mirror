@@ -118,6 +118,7 @@ export const resourceLibraryService = {
 			tagsByTagId: Record<string, TagModel>;
 			contentDurations: ContentDurationFilterModel[];
 			contentTypes: ContentTypeFilterModel[];
+			tagGroups: TagGroupModel[];
 			findResult: {
 				contents: ResourceLibraryContentModel[];
 				totalCount: number;
