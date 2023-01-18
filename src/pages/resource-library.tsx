@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import {
 	CallToActionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
+	ContentDurationFilterModel,
+	ContentTypeFilterModel,
 	ResourceLibraryContentModel,
 	TagGroupModel,
 	TagModel,
@@ -79,9 +81,18 @@ const ResourceLibrary = () => {
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 
+	// Topic Filter
 	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroupModel[]>([]);
 	const [tagFilters, setTagFilters] = useState<Record<string, TagModel[]>>();
 	const [topicFilterIsShowing, setTopicFilterIsShowing] = useState(false);
+
+	// Content Type Filter
+	const [contentTypeFilters, setContentTypeFilters] = useState<ContentTypeFilterModel[]>([]);
+	const [contentTypeFilterIsShowing, setContentTypeFilterIsShowing] = useState(false);
+
+	// Content Duration Filter
+	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDurationFilterModel[]>([]);
+	const [contentDurationFilterIsShowing, setContentDurationFilterIsShowing] = useState(false);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -117,6 +128,8 @@ const ResourceLibrary = () => {
 
 		setTagGroupFilters(response.tagGroups);
 		setTagFilters(tagsByTagGroupId);
+		setContentTypeFilters(response.contentTypes);
+		setContentDurationFilters(response.contentDurations);
 	}, []);
 
 	const fetchData = useCallback(async () => {
@@ -320,6 +333,7 @@ const ResourceLibrary = () => {
 								<Col>
 									<SimpleFilter
 										title="Topic"
+										className="me-2"
 										dialogWidth={628}
 										show={topicFilterIsShowing}
 										onHide={() => {
@@ -329,10 +343,10 @@ const ResourceLibrary = () => {
 											setTopicFilterIsShowing(true);
 										}}
 										onClear={() => {
-											return;
+											setTopicFilterIsShowing(false);
 										}}
 										onApply={() => {
-											return;
+											setTopicFilterIsShowing(false);
 										}}
 									>
 										{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
@@ -369,6 +383,73 @@ const ResourceLibrary = () => {
 														);
 													})}
 												</div>
+											);
+										})}
+									</SimpleFilter>
+									<SimpleFilter
+										title="Type"
+										className="me-2"
+										show={contentTypeFilterIsShowing}
+										onHide={() => {
+											setContentTypeFilterIsShowing(false);
+										}}
+										onClick={() => {
+											setContentTypeFilterIsShowing(true);
+										}}
+										onClear={() => {
+											setContentTypeFilterIsShowing(false);
+										}}
+										onApply={() => {
+											setContentTypeFilterIsShowing(false);
+										}}
+									>
+										{contentTypeFilters.map((contentType) => {
+											return (
+												<Form.Check
+													key={contentType.contentTypeId}
+													type="checkbox"
+													name="CONTENT_TYPES"
+													id={contentType.contentTypeId}
+													label={contentType.description}
+													value={contentType.contentTypeId}
+													checked={false}
+													onChange={({ currentTarget }) => {
+														console.log(currentTarget.value);
+													}}
+												/>
+											);
+										})}
+									</SimpleFilter>
+									<SimpleFilter
+										title="Length"
+										show={contentDurationFilterIsShowing}
+										onHide={() => {
+											setContentDurationFilterIsShowing(false);
+										}}
+										onClick={() => {
+											setContentDurationFilterIsShowing(true);
+										}}
+										onClear={() => {
+											setContentDurationFilterIsShowing(false);
+										}}
+										onApply={() => {
+											setContentDurationFilterIsShowing(false);
+										}}
+									>
+										{contentDurationFilters.map((contentDuration) => {
+											return (
+												<Form.Check
+													key={contentDuration.contentDurationId}
+													type="checkbox"
+													name="CONTENT_TYPES"
+													id={contentDuration.contentDurationId}
+													label={contentDuration.description}
+													value={contentDuration.contentDurationId}
+													checked={false}
+													onChange={({ currentTarget }) => {
+														console.log(currentTarget.value);
+													}}
+												/>
 											);
 										})}
 									</SimpleFilter>
