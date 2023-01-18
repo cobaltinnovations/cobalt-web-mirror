@@ -33,7 +33,7 @@ export function useScreeningNavigation() {
 					navigate(
 						{
 							pathname: '/resource-library',
-							search: new URLSearchParams(params).toString(),
+							search: new URLSearchParams({ recommended: 'true', ...params }).toString(),
 						},
 						{
 							replace,
@@ -94,7 +94,7 @@ export function useScreeningNavigation() {
 	};
 }
 
-export function useScreeningFlow(screeningFlowId?: string) {
+export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: boolean = true) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
 	const isSkipped = searchParams.get('skipped') === 'true';
@@ -171,6 +171,10 @@ export function useScreeningFlow(screeningFlowId?: string) {
 	}, [handleError, isImmediateSession, isSkipped, screeningFlowId]);
 
 	useEffect(() => {
+		if (!instantiateOnLoad) {
+			return;
+		}
+
 		if (!activeFlowVersion) {
 			return;
 		}
@@ -182,7 +186,7 @@ export function useScreeningFlow(screeningFlowId?: string) {
 		} else {
 			setDidCheckScreeningSessions(true);
 		}
-	}, [activeFlowVersion, hasCompletedScreening, startScreeningFlow]);
+	}, [activeFlowVersion, hasCompletedScreening, instantiateOnLoad, startScreeningFlow]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
@@ -227,5 +231,6 @@ export function useScreeningFlow(screeningFlowId?: string) {
 		didCheckScreeningSessions,
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
+		startScreeningFlow,
 	};
 }

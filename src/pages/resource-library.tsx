@@ -23,7 +23,6 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import InputHelperSearch from '@/components/input-helper-search';
-import Loader from '@/components/loader';
 import ActionSheet from '@/components/action-sheet';
 import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
@@ -61,8 +60,9 @@ const carouselConfig = {
 const ResourceLibrary = () => {
 	const { mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		institution?.contentScreeningFlowId
+	const { didCheckScreeningSessions, startScreeningFlow } = useScreeningFlow(
+		institution?.contentScreeningFlowId,
+		false
 	);
 
 	const navigate = useNavigate();
@@ -103,14 +103,10 @@ const ResourceLibrary = () => {
 	);
 
 	useEffect(() => {
-		if (!didCheckScreeningSessions) {
-			return;
-		}
-
 		if (!hasTouchScreen) {
 			searchInputRef.current?.focus({ preventScroll: true });
 		}
-	}, [didCheckScreeningSessions, hasTouchScreen]);
+	}, [hasTouchScreen]);
 
 	const fetchCallsToAction = useCallback(async () => {
 		const response = await callToActionService
@@ -153,10 +149,6 @@ const ResourceLibrary = () => {
 	}, [contentDurationIdQuery]);
 
 	const fetchData = useCallback(async () => {
-		if (!didCheckScreeningSessions) {
-			return;
-		}
-
 		if (searchQuery) {
 			setSearchInputValue(searchQuery);
 
@@ -184,7 +176,8 @@ const ResourceLibrary = () => {
 				})
 				.fetch();
 
-			setContents(recommendedResponse.findResult.contents);
+			setContents([]);
+			// setContents(recommendedResponse.findResult.contents);
 			setFindResultTotalCount(0);
 			setFindResultTotalCountDescription('');
 			setTagGroups([]);
@@ -201,14 +194,7 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
-	}, [
-		contentDurationIdQuery,
-		contentTypeIdQuery,
-		didCheckScreeningSessions,
-		recommendedContent,
-		searchQuery,
-		tagIdQuery,
-	]);
+	}, [contentDurationIdQuery, contentTypeIdQuery, recommendedContent, searchQuery, tagIdQuery]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
@@ -277,15 +263,6 @@ const ResourceLibrary = () => {
 			document.removeEventListener('keydown', handleKeydown, false);
 		};
 	}, [handleKeydown]);
-
-	if (!didCheckScreeningSessions) {
-		return (
-			<>
-				{renderedCollectPhoneModal}
-				<Loader />
-			</>
-		);
-	}
 
 	return (
 		<>
@@ -603,7 +580,7 @@ const ResourceLibrary = () => {
 							</Col>
 						</Row>
 					)}
-					{recommendedContent && !hasFilterQueryParms && contents.length <= 0 && (
+					{recommendedContent && !hasFilterQueryParms && didCheckScreeningSessions && contents.length <= 0 && (
 						<Row>
 							<Col>
 								<div className="bg-n75 rounded p-12">
@@ -625,6 +602,33 @@ const ResourceLibrary = () => {
 												and{' '}
 												<Link to="/resource-library/tag-groups/world-events">World Events</Link>
 											</p>
+										</Col>
+									</Row>
+								</div>
+							</Col>
+						</Row>
+					)}
+					{recommendedContent && !didCheckScreeningSessions && contents.length <= 0 && (
+						<Row>
+							<Col>
+								<div className="bg-n75 rounded p-12">
+									<Row>
+										<Col lg={{ span: 6, offset: 3 }}>
+											<h2 className="mb-6 text-center">Get Personalized Recommendations</h2>
+											<p className="mb-6 fs-large text-center">
+												Complete a wellness assessment to get personalized recommendations
+											</p>
+											<div className="text-center">
+												<Button
+													size="lg"
+													variant="outline-primary"
+													onClick={() => {
+														startScreeningFlow();
+													}}
+												>
+													Take the assessment
+												</Button>
+											</div>
 										</Col>
 									</Row>
 								</div>
