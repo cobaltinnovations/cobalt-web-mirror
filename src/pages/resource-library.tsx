@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
@@ -28,6 +29,7 @@ import ActionSheet from '@/components/action-sheet';
 import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
 import SimpleFilter from '@/components/simple-filter';
+import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -80,19 +82,19 @@ const ResourceLibrary = () => {
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
-
 	// Topic Filter
 	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroupModel[]>([]);
 	const [tagFilters, setTagFilters] = useState<Record<string, TagModel[]>>();
-	const [topicFilterIsShowing, setTopicFilterIsShowing] = useState(false);
-
+	const [tagFilterIsShowing, setTagFilterIsShowing] = useState(false);
+	const [tagFilterValue, setTagFilterValue] = useState<string[]>([]);
 	// Content Type Filter
 	const [contentTypeFilters, setContentTypeFilters] = useState<ContentTypeFilterModel[]>([]);
 	const [contentTypeFilterIsShowing, setContentTypeFilterIsShowing] = useState(false);
-
+	const [contentTypeFilterValue, setContentTypeFilterValue] = useState<string[]>([]);
 	// Content Duration Filter
 	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDurationFilterModel[]>([]);
 	const [contentDurationFilterIsShowing, setContentDurationFilterIsShowing] = useState(false);
+	const [contentDurationFilterValue, setContentDurationFilterValue] = useState<string[]>([]);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -335,18 +337,18 @@ const ResourceLibrary = () => {
 										title="Topic"
 										className="me-2"
 										dialogWidth={628}
-										show={topicFilterIsShowing}
+										show={tagFilterIsShowing}
 										onHide={() => {
-											setTopicFilterIsShowing(false);
+											setTagFilterIsShowing(false);
 										}}
 										onClick={() => {
-											setTopicFilterIsShowing(true);
+											setTagFilterIsShowing(true);
 										}}
 										onClear={() => {
-											setTopicFilterIsShowing(false);
+											setTagFilterIsShowing(false);
 										}}
 										onApply={() => {
-											setTopicFilterIsShowing(false);
+											setTagFilterIsShowing(false);
 										}}
 									>
 										{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
@@ -375,9 +377,14 @@ const ResourceLibrary = () => {
 																id={`tag--${tag.tagId}`}
 																label={tag.name}
 																value={tag.tagId}
-																checked={false}
+																checked={tagFilterValue.includes(tag.tagId)}
 																onChange={({ currentTarget }) => {
-																	console.log(currentTarget.value);
+																	const updatedArray = AddOrRemoveValueFromArray(
+																		currentTarget.value,
+																		tagFilterValue
+																	);
+
+																	setTagFilterValue(updatedArray);
 																}}
 															/>
 														);
@@ -412,9 +419,14 @@ const ResourceLibrary = () => {
 													id={contentType.contentTypeId}
 													label={contentType.description}
 													value={contentType.contentTypeId}
-													checked={false}
+													checked={contentTypeFilterValue.includes(contentType.contentTypeId)}
 													onChange={({ currentTarget }) => {
-														console.log(currentTarget.value);
+														const updatedArray = AddOrRemoveValueFromArray(
+															currentTarget.value,
+															contentTypeFilterValue
+														);
+
+														setContentTypeFilterValue(updatedArray);
 													}}
 												/>
 											);
@@ -445,9 +457,16 @@ const ResourceLibrary = () => {
 													id={contentDuration.contentDurationId}
 													label={contentDuration.description}
 													value={contentDuration.contentDurationId}
-													checked={false}
+													checked={contentDurationFilterValue.includes(
+														contentDuration.contentDurationId
+													)}
 													onChange={({ currentTarget }) => {
-														console.log(currentTarget.value);
+														const updatedArray = AddOrRemoveValueFromArray(
+															currentTarget.value,
+															contentDurationFilterValue
+														);
+
+														setContentDurationFilterValue(updatedArray);
 													}}
 												/>
 											);

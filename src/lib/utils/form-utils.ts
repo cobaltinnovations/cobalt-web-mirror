@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import { LogicalAvailability } from '@/lib/models';
 
@@ -26,4 +27,17 @@ export const AvailabilityFormDataFromLogicalAvailability = (logicalAvailability:
 			Sa: logicalAvailability.recurSaturday,
 		},
 	};
+};
+
+export const AddOrRemoveValueFromArray = (value: string, array: string[]) => {
+	const arrayClone = cloneDeep(array);
+	const indexToRemove = arrayClone.findIndex((v) => v === value);
+
+	if (indexToRemove > -1) {
+		arrayClone.splice(indexToRemove, 1);
+	} else {
+		arrayClone.push(value);
+	}
+
+	return arrayClone;
 };
