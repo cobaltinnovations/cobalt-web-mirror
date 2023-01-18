@@ -176,8 +176,7 @@ const ResourceLibrary = () => {
 				})
 				.fetch();
 
-			setContents([]);
-			// setContents(recommendedResponse.findResult.contents);
+			setContents(recommendedResponse.findResult.contents);
 			setFindResultTotalCount(0);
 			setFindResultTotalCountDescription('');
 			setTagGroups([]);
