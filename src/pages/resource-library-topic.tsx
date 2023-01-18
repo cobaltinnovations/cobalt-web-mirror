@@ -457,22 +457,22 @@ const ResourceLibraryTopic = () => {
 				loadingComponent={
 					<Container className="pb-24">
 						<Row>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
-							<Col xs={6} lg={4} className="mb-8">
+							<Col xs={12} md={6} lg={4} className="mb-8">
 								<SkeletonResourceLibraryCard />
 							</Col>
 						</Row>
