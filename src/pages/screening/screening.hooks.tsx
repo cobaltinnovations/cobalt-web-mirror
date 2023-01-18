@@ -170,11 +170,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		};
 	}, [handleError, isImmediateSession, isSkipped, screeningFlowId]);
 
-	useEffect(() => {
-		if (!instantiateOnLoad) {
-			return;
-		}
-
+	const checkAndStartScreeningFlow = useCallback(() => {
 		if (!activeFlowVersion) {
 			return;
 		}
@@ -186,7 +182,15 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		} else {
 			setDidCheckScreeningSessions(true);
 		}
-	}, [activeFlowVersion, hasCompletedScreening, instantiateOnLoad, startScreeningFlow]);
+	}, [activeFlowVersion, hasCompletedScreening, startScreeningFlow]);
+
+	useEffect(() => {
+		if (!instantiateOnLoad) {
+			return;
+		}
+
+		checkAndStartScreeningFlow();
+	}, [instantiateOnLoad, checkAndStartScreeningFlow]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
@@ -231,6 +235,6 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		didCheckScreeningSessions,
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
-		startScreeningFlow,
+		checkAndStartScreeningFlow,
 	};
 }

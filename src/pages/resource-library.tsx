@@ -60,7 +60,7 @@ const carouselConfig = {
 const ResourceLibrary = () => {
 	const { mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { didCheckScreeningSessions, startScreeningFlow } = useScreeningFlow(
+	const { didCheckScreeningSessions, checkAndStartScreeningFlow } = useScreeningFlow(
 		institution?.contentScreeningFlowId,
 		false
 	);
@@ -547,7 +547,7 @@ const ResourceLibrary = () => {
 													size="lg"
 													variant="outline-primary"
 													onClick={() => {
-														startScreeningFlow();
+														checkAndStartScreeningFlow();
 													}}
 												>
 													Take the assessment
