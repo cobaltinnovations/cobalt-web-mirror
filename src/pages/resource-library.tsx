@@ -532,36 +532,31 @@ const ResourceLibrary = () => {
 						</Row>
 					)}
 
-					{/* ---------------------------------------------------- */}
-					{/* List view for both "Search" and "For You" */}
-					{/* Note: "Search" does not have filters, "For You" does */}
-					{/* ---------------------------------------------------- */}
-					{contents.length > 0 && (
+					{recommendedContent && !didCheckScreeningSessions && (
 						<Row>
-							{contents.map((content, resourceIndex) => {
-								return (
-									<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-										<ResourceLibraryCard
-											contentId={content.contentId}
-											className="h-100"
-											imageUrl={content.imageUrl}
-											badgeTitle={content.newFlag ? 'New' : ''}
-											title={content.title}
-											author={content.author}
-											description={content.description}
-											tags={
-												tagsByTagId
-													? content.tagIds.map((tagId) => {
-															return tagsByTagId[tagId];
-													  })
-													: []
-											}
-											contentTypeId={content.contentTypeId}
-											duration={content.durationInMinutesDescription}
-										/>
-									</Col>
-								);
-							})}
+							<Col>
+								<div className="bg-n75 rounded p-12">
+									<Row>
+										<Col lg={{ span: 6, offset: 3 }}>
+											<h2 className="mb-6 text-center">Get Personalized Recommendations</h2>
+											<p className="mb-6 fs-large text-center">
+												Complete a wellness assessment to get personalized recommendations
+											</p>
+											<div className="text-center">
+												<Button
+													size="lg"
+													variant="outline-primary"
+													onClick={() => {
+														startScreeningFlow();
+													}}
+												>
+													Take the assessment
+												</Button>
+											</div>
+										</Col>
+									</Row>
+								</div>
+							</Col>
 						</Row>
 					)}
 					{recommendedContent && hasFilterQueryParms && contents.length <= 0 && (
@@ -607,31 +602,36 @@ const ResourceLibrary = () => {
 							</Col>
 						</Row>
 					)}
-					{recommendedContent && !didCheckScreeningSessions && contents.length <= 0 && (
+					{/* ---------------------------------------------------- */}
+					{/* List view for both "Search" and "For You" */}
+					{/* Note: "Search" does not have filters, "For You" does */}
+					{/* ---------------------------------------------------- */}
+					{contents.length > 0 && (
 						<Row>
-							<Col>
-								<div className="bg-n75 rounded p-12">
-									<Row>
-										<Col lg={{ span: 6, offset: 3 }}>
-											<h2 className="mb-6 text-center">Get Personalized Recommendations</h2>
-											<p className="mb-6 fs-large text-center">
-												Complete a wellness assessment to get personalized recommendations
-											</p>
-											<div className="text-center">
-												<Button
-													size="lg"
-													variant="outline-primary"
-													onClick={() => {
-														startScreeningFlow();
-													}}
-												>
-													Take the assessment
-												</Button>
-											</div>
-										</Col>
-									</Row>
-								</div>
-							</Col>
+							{contents.map((content, resourceIndex) => {
+								return (
+									<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+										<ResourceLibraryCard
+											contentId={content.contentId}
+											className="h-100"
+											imageUrl={content.imageUrl}
+											badgeTitle={content.newFlag ? 'New' : ''}
+											title={content.title}
+											author={content.author}
+											description={content.description}
+											tags={
+												tagsByTagId
+													? content.tagIds.map((tagId) => {
+															return tagsByTagId[tagId];
+													  })
+													: []
+											}
+											contentTypeId={content.contentTypeId}
+											duration={content.durationInMinutesDescription}
+										/>
+									</Col>
+								);
+							})}
 						</Row>
 					)}
 
