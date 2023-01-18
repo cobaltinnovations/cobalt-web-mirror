@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
@@ -98,6 +98,10 @@ const ResourceLibrary = () => {
 	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDurationFilterModel[]>([]);
 	const [contentDurationFilterIsShowing, setContentDurationFilterIsShowing] = useState(false);
 	const [contentDurationFilterValue, setContentDurationFilterValue] = useState<string[]>([]);
+	const hasFilterQueryParms = useMemo(
+		() => tagIdQuery.length > 0 || contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
+		[contentDurationIdQuery.length, contentTypeIdQuery.length, tagIdQuery.length]
+	);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -136,6 +140,18 @@ const ResourceLibrary = () => {
 		setContentTypeFilters(response.contentTypes);
 		setContentDurationFilters(response.contentDurations);
 	}, []);
+
+	useEffect(() => {
+		setTagFilterValue(tagIdQuery);
+	}, [tagIdQuery]);
+
+	useEffect(() => {
+		setContentTypeFilterValue(contentTypeIdQuery);
+	}, [contentTypeIdQuery]);
+
+	useEffect(() => {
+		setContentDurationFilterValue(contentDurationIdQuery);
+	}, [contentDurationIdQuery]);
 
 	const fetchData = useCallback(async () => {
 		if (!didCheckScreeningSessions) {
@@ -204,6 +220,14 @@ const ResourceLibrary = () => {
 
 		setSearchParams(searchParams, { replace: true });
 	};
+
+	const handleClearFiltersButtonClick = useCallback(() => {
+		searchParams.delete('tagId');
+		searchParams.delete('contentTypeId');
+		searchParams.delete('contentDurationId');
+
+		setSearchParams(searchParams, { replace: true });
+	}, [searchParams, setSearchParams]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -353,168 +377,175 @@ const ResourceLibrary = () => {
 				</Container>
 			)}
 
+			{/* ---------------------------------------------------- */}
+			{/* Filters for "For You" */}
+			{/* ---------------------------------------------------- */}
+			{recommendedContent && (
+				<AsyncPage fetchData={fetchRecommendedFilters}>
+					<Container className="pt-6">
+						<Row>
+							<Col>
+								<SimpleFilter
+									title="Topic"
+									className="me-2"
+									dialogWidth={628}
+									show={tagFilterIsShowing}
+									activeLength={searchParams.getAll('tagId').length}
+									onHide={() => {
+										setTagFilterIsShowing(false);
+									}}
+									onClick={() => {
+										setTagFilterIsShowing(true);
+									}}
+									onClear={() => {
+										setTagFilterIsShowing(false);
+										applyValuesToSearchParam([], 'tagId');
+									}}
+									onApply={() => {
+										setTagFilterIsShowing(false);
+										applyValuesToSearchParam(tagFilterValue, 'tagId');
+									}}
+								>
+									{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
+										const isLastTagGroup = tagGroupFilters.length - 1 === tagGroupIndex;
+
+										return (
+											<div
+												key={tagGroup.tagGroupId}
+												className={classNames({ 'mb-5 border-bottom': !isLastTagGroup })}
+											>
+												<h5 className="mb-4">{tagGroup.name}</h5>
+												{tagFilters?.[tagGroup.tagGroupId].map((tag, tagIndex) => {
+													const isLastTag =
+														tagFilters[tagGroup.tagGroupId].length - 1 === tagIndex;
+
+													return (
+														<Form.Check
+															key={tag.tagId}
+															className={classNames({
+																'mb-0': isLastTagGroup && isLastTag,
+																'mb-5': !isLastTagGroup && isLastTag,
+																'mb-1': !isLastTag,
+															})}
+															type="checkbox"
+															name={`tag-group--${tag.tagGroupId}`}
+															id={`tag--${tag.tagId}`}
+															label={tag.name}
+															value={tag.tagId}
+															checked={tagFilterValue.includes(tag.tagId)}
+															onChange={({ currentTarget }) => {
+																const updatedArray = AddOrRemoveValueFromArray(
+																	currentTarget.value,
+																	tagFilterValue
+																);
+
+																setTagFilterValue(updatedArray);
+															}}
+														/>
+													);
+												})}
+											</div>
+										);
+									})}
+								</SimpleFilter>
+								<SimpleFilter
+									title="Type"
+									className="me-2"
+									show={contentTypeFilterIsShowing}
+									activeLength={searchParams.getAll('contentTypeId').length}
+									onHide={() => {
+										setContentTypeFilterIsShowing(false);
+									}}
+									onClick={() => {
+										setContentTypeFilterIsShowing(true);
+									}}
+									onClear={() => {
+										setContentTypeFilterIsShowing(false);
+										applyValuesToSearchParam([], 'contentTypeId');
+									}}
+									onApply={() => {
+										setContentTypeFilterIsShowing(false);
+										applyValuesToSearchParam(contentTypeFilterValue, 'contentTypeId');
+									}}
+								>
+									{contentTypeFilters.map((contentType) => {
+										return (
+											<Form.Check
+												key={contentType.contentTypeId}
+												type="checkbox"
+												name="CONTENT_TYPES"
+												id={contentType.contentTypeId}
+												label={contentType.description}
+												value={contentType.contentTypeId}
+												checked={contentTypeFilterValue.includes(contentType.contentTypeId)}
+												onChange={({ currentTarget }) => {
+													const updatedArray = AddOrRemoveValueFromArray(
+														currentTarget.value,
+														contentTypeFilterValue
+													);
+
+													setContentTypeFilterValue(updatedArray);
+												}}
+											/>
+										);
+									})}
+								</SimpleFilter>
+								<SimpleFilter
+									title="Length"
+									show={contentDurationFilterIsShowing}
+									activeLength={searchParams.getAll('contentDurationId').length}
+									onHide={() => {
+										setContentDurationFilterIsShowing(false);
+									}}
+									onClick={() => {
+										setContentDurationFilterIsShowing(true);
+									}}
+									onClear={() => {
+										setContentDurationFilterIsShowing(false);
+										applyValuesToSearchParam([], 'contentDurationId');
+									}}
+									onApply={() => {
+										setContentDurationFilterIsShowing(false);
+										applyValuesToSearchParam(contentDurationFilterValue, 'contentDurationId');
+									}}
+								>
+									{contentDurationFilters.map((contentDuration) => {
+										return (
+											<Form.Check
+												key={contentDuration.contentDurationId}
+												type="checkbox"
+												name="CONTENT_TYPES"
+												id={contentDuration.contentDurationId}
+												label={contentDuration.description}
+												value={contentDuration.contentDurationId}
+												checked={contentDurationFilterValue.includes(
+													contentDuration.contentDurationId
+												)}
+												onChange={({ currentTarget }) => {
+													const updatedArray = AddOrRemoveValueFromArray(
+														currentTarget.value,
+														contentDurationFilterValue
+													);
+
+													setContentDurationFilterValue(updatedArray);
+												}}
+											/>
+										);
+									})}
+								</SimpleFilter>
+								{hasFilterQueryParms && (
+									<Button variant="link" className="p-0 mx-3" onClick={handleClearFiltersButtonClick}>
+										Clear
+									</Button>
+								)}
+							</Col>
+						</Row>
+					</Container>
+				</AsyncPage>
+			)}
+
 			<AsyncPage fetchData={fetchData}>
 				<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
-					{/* ---------------------------------------------------- */}
-					{/* Filters for "For You" */}
-					{/* ---------------------------------------------------- */}
-					{recommendedContent && (
-						<AsyncPage fetchData={fetchRecommendedFilters}>
-							<Row className="mb-6">
-								<Col>
-									<SimpleFilter
-										title="Topic"
-										className="me-2"
-										dialogWidth={628}
-										show={tagFilterIsShowing}
-										activeLength={searchParams.getAll('tagId').length}
-										onHide={() => {
-											setTagFilterIsShowing(false);
-										}}
-										onClick={() => {
-											setTagFilterIsShowing(true);
-										}}
-										onClear={() => {
-											setTagFilterIsShowing(false);
-											applyValuesToSearchParam([], 'tagId');
-										}}
-										onApply={() => {
-											setTagFilterIsShowing(false);
-											applyValuesToSearchParam(tagFilterValue, 'tagId');
-										}}
-									>
-										{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
-											const isLastTagGroup = tagGroupFilters.length - 1 === tagGroupIndex;
-
-											return (
-												<div
-													key={tagGroup.tagGroupId}
-													className={classNames({ 'mb-5 border-bottom': !isLastTagGroup })}
-												>
-													<h5 className="mb-4">{tagGroup.name}</h5>
-													{tagFilters?.[tagGroup.tagGroupId].map((tag, tagIndex) => {
-														const isLastTag =
-															tagFilters[tagGroup.tagGroupId].length - 1 === tagIndex;
-
-														return (
-															<Form.Check
-																key={tag.tagId}
-																className={classNames({
-																	'mb-0': isLastTagGroup && isLastTag,
-																	'mb-5': !isLastTagGroup && isLastTag,
-																	'mb-1': !isLastTag,
-																})}
-																type="checkbox"
-																name={`tag-group--${tag.tagGroupId}`}
-																id={`tag--${tag.tagId}`}
-																label={tag.name}
-																value={tag.tagId}
-																checked={tagFilterValue.includes(tag.tagId)}
-																onChange={({ currentTarget }) => {
-																	const updatedArray = AddOrRemoveValueFromArray(
-																		currentTarget.value,
-																		tagFilterValue
-																	);
-
-																	setTagFilterValue(updatedArray);
-																}}
-															/>
-														);
-													})}
-												</div>
-											);
-										})}
-									</SimpleFilter>
-									<SimpleFilter
-										title="Type"
-										className="me-2"
-										show={contentTypeFilterIsShowing}
-										activeLength={searchParams.getAll('contentTypeId').length}
-										onHide={() => {
-											setContentTypeFilterIsShowing(false);
-										}}
-										onClick={() => {
-											setContentTypeFilterIsShowing(true);
-										}}
-										onClear={() => {
-											setContentTypeFilterIsShowing(false);
-											applyValuesToSearchParam([], 'contentTypeId');
-										}}
-										onApply={() => {
-											setContentTypeFilterIsShowing(false);
-											applyValuesToSearchParam(contentTypeFilterValue, 'contentTypeId');
-										}}
-									>
-										{contentTypeFilters.map((contentType) => {
-											return (
-												<Form.Check
-													key={contentType.contentTypeId}
-													type="checkbox"
-													name="CONTENT_TYPES"
-													id={contentType.contentTypeId}
-													label={contentType.description}
-													value={contentType.contentTypeId}
-													checked={contentTypeFilterValue.includes(contentType.contentTypeId)}
-													onChange={({ currentTarget }) => {
-														const updatedArray = AddOrRemoveValueFromArray(
-															currentTarget.value,
-															contentTypeFilterValue
-														);
-
-														setContentTypeFilterValue(updatedArray);
-													}}
-												/>
-											);
-										})}
-									</SimpleFilter>
-									<SimpleFilter
-										title="Length"
-										show={contentDurationFilterIsShowing}
-										activeLength={searchParams.getAll('contentDurationId').length}
-										onHide={() => {
-											setContentDurationFilterIsShowing(false);
-										}}
-										onClick={() => {
-											setContentDurationFilterIsShowing(true);
-										}}
-										onClear={() => {
-											setContentDurationFilterIsShowing(false);
-											applyValuesToSearchParam([], 'contentDurationId');
-										}}
-										onApply={() => {
-											setContentDurationFilterIsShowing(false);
-											applyValuesToSearchParam(contentDurationFilterValue, 'contentDurationId');
-										}}
-									>
-										{contentDurationFilters.map((contentDuration) => {
-											return (
-												<Form.Check
-													key={contentDuration.contentDurationId}
-													type="checkbox"
-													name="CONTENT_TYPES"
-													id={contentDuration.contentDurationId}
-													label={contentDuration.description}
-													value={contentDuration.contentDurationId}
-													checked={contentDurationFilterValue.includes(
-														contentDuration.contentDurationId
-													)}
-													onChange={({ currentTarget }) => {
-														const updatedArray = AddOrRemoveValueFromArray(
-															currentTarget.value,
-															contentDurationFilterValue
-														);
-
-														setContentDurationFilterValue(updatedArray);
-													}}
-												/>
-											);
-										})}
-									</SimpleFilter>
-								</Col>
-							</Row>
-						</AsyncPage>
-					)}
-
 					{/* ---------------------------------------------------- */}
 					{/* Header for "Search" */}
 					{/* ---------------------------------------------------- */}
