@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -586,6 +586,49 @@ const ResourceLibrary = () => {
 									</Col>
 								);
 							})}
+						</Row>
+					)}
+					{recommendedContent && hasFilterQueryParms && contents.length <= 0 && (
+						<Row className="py-4">
+							<Col>
+								<h2 className="mb-6 text-muted text-center">No Results</h2>
+								<p className="mb-6 fs-large text-muted text-center">
+									Try adjusting your filters to see available content
+								</p>
+								<div className="text-center">
+									<Button size="lg" variant="outline-primary" onClick={handleClearFiltersButtonClick}>
+										Clear Filters
+									</Button>
+								</div>
+							</Col>
+						</Row>
+					)}
+					{recommendedContent && !hasFilterQueryParms && contents.length <= 0 && (
+						<Row>
+							<Col>
+								<div className="bg-n75 rounded p-12">
+									<Row>
+										<Col lg={{ span: 6, offset: 3 }}>
+											<h2 className="mb-6 text-muted text-center">
+												No recommendations at this time
+											</h2>
+											<p className="mb-0 fs-large text-muted text-center">
+												We are continually adding more resources to the library. In the
+												meantime, you can browse resources related to{' '}
+												<Link to="/resource-library/tag-groups/symptoms">Symptoms</Link>,{' '}
+												<Link to="/resource-library/tag-groups/work-life">Work Life</Link>,{' '}
+												<Link to="/resource-library/tag-groups/personal-life">
+													Personal Life
+												</Link>
+												, <Link to="/resource-library/tag-groups/identity">Identity</Link>,{' '}
+												<Link to="/resource-library/tag-groups/caretaking">Caretaking</Link>,{' '}
+												and{' '}
+												<Link to="/resource-library/tag-groups/world-events">World Events</Link>
+											</p>
+										</Col>
+									</Row>
+								</div>
+							</Col>
 						</Row>
 					)}
 
