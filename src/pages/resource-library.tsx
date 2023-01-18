@@ -254,8 +254,9 @@ const ResourceLibrary = () => {
 
 			{/* ---------------------------------------------------- */}
 			{/* Header for "All" and "For You" */}
+			{/* Only show if the current institution has a non-null contentScreeningFlowId */}
 			{/* ---------------------------------------------------- */}
-			{!searchQuery && (
+			{!searchQuery && institution?.contentScreeningFlowId && (
 				<Container className="pt-6">
 					<Row>
 						<Col>
