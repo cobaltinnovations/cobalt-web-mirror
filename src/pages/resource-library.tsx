@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
@@ -63,6 +63,7 @@ const ResourceLibrary = () => {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
+	const recommendedContent = useMemo(() => searchParams.get('recommended') === 'true', [searchParams]);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -106,13 +107,27 @@ const ResourceLibrary = () => {
 				.searchResourceLibrary({ searchQuery, pageNumber: 0, pageSize: 100 })
 				.fetch();
 
+			// set "search state"
 			setContents(searchResponse.findResult.contents);
 			setFindResultTotalCount(searchResponse.findResult.totalCount);
 			setFindResultTotalCountDescription(searchResponse.findResult.totalCountDescription);
 			setTagGroups([]);
 			setContentsByTagGroupId(undefined);
 			setTagsByTagId(searchResponse.tagsByTagId);
+			return;
+		}
 
+		if (recommendedContent) {
+			const recommendedResponse = await resourceLibraryService
+				.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 100 })
+				.fetch();
+
+			setContents(recommendedResponse.findResult.contents);
+			setFindResultTotalCount(0);
+			setFindResultTotalCountDescription('');
+			setTagGroups([]);
+			setContentsByTagGroupId(undefined);
+			setTagsByTagId(recommendedResponse.tagsByTagId);
 			return;
 		}
 
@@ -124,12 +139,13 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
-	}, [didCheckScreeningSessions, searchQuery]);
+	}, [didCheckScreeningSessions, recommendedContent, searchQuery]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		if (searchInputValue) {
+			searchParams.delete('recommended');
 			searchParams.set('searchQuery', searchInputValue);
 		} else {
 			searchParams.delete('searchQuery');
@@ -223,44 +239,98 @@ const ResourceLibrary = () => {
 				)}
 			</AsyncPage>
 
-			<Container className="pt-0 pt-lg-6">
-				<Row>
-					<Col>
-						<TabBar
-							value={searchParams.get('recommended') === 'true' ? 'FOR_YOU' : 'ALL'}
-							tabs={[
-								{ value: 'ALL', title: 'All' },
-								{ value: 'FOR_YOU', title: 'For You' },
-							]}
-							onTabClick={(value) => {
-								if (value === 'ALL') {
-									searchParams.delete('recommended');
-								} else {
-									searchParams.set('recommended', 'true');
-								}
+			{institution?.userSubmittedContentEnabled && (
+				<ActionSheet
+					show={false}
+					onShow={() => {
+						mixpanel.track('Patient-Sourced Add Content Click', {});
+						navigate('/cms/on-your-time/create');
+					}}
+					onHide={() => {
+						return;
+					}}
+				/>
+			)}
 
-								setSearchParams(searchParams, { replace: true });
-							}}
-						/>
-					</Col>
-				</Row>
-			</Container>
+			{/* ---------------------------------------------------- */}
+			{/* Header for "All" and "For You" */}
+			{/* ---------------------------------------------------- */}
+			{!searchQuery && (
+				<Container className="pt-6">
+					<Row>
+						<Col>
+							<TabBar
+								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
+								tabs={[
+									{ value: 'ALL', title: 'All' },
+									{ value: 'FOR_YOU', title: 'For You' },
+								]}
+								onTabClick={(value) => {
+									searchParams.delete('searchQuery');
+
+									if (value === 'ALL') {
+										searchParams.delete('recommended');
+									} else {
+										searchParams.set('recommended', 'true');
+									}
+
+									setSearchParams(searchParams, { replace: true });
+								}}
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
 
 			<AsyncPage fetchData={fetchData}>
-				{institution?.userSubmittedContentEnabled && (
-					<ActionSheet
-						show={false}
-						onShow={() => {
-							mixpanel.track('Patient-Sourced Add Content Click', {});
-							navigate('/cms/on-your-time/create');
-						}}
-						onHide={() => {
-							return;
-						}}
-					/>
-				)}
-
 				<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
+					{/* ---------------------------------------------------- */}
+					{/* Header for "Search" */}
+					{/* ---------------------------------------------------- */}
+					{searchQuery && (
+						<Row className="pt-4 mb-10">
+							<h3 className="mb-0">
+								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
+							</h3>
+						</Row>
+					)}
+
+					{/* ---------------------------------------------------- */}
+					{/* List view for both "Search" and "For You" */}
+					{/* Note: "Search" does not have filters, "For You" does */}
+					{/* ---------------------------------------------------- */}
+					{contents.length > 0 && (
+						<Row>
+							{contents.map((content, resourceIndex) => {
+								return (
+									<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+										<ResourceLibraryCard
+											contentId={content.contentId}
+											className="h-100"
+											imageUrl={content.imageUrl}
+											badgeTitle={content.newFlag ? 'New' : ''}
+											title={content.title}
+											author={content.author}
+											description={content.description}
+											tags={
+												tagsByTagId
+													? content.tagIds.map((tagId) => {
+															return tagsByTagId[tagId];
+													  })
+													: []
+											}
+											contentTypeId={content.contentTypeId}
+											duration={content.durationInMinutesDescription}
+										/>
+									</Col>
+								);
+							})}
+						</Row>
+					)}
+
+					{/* ---------------------------------------------------- */}
+					{/* View for "All" */}
+					{/* ---------------------------------------------------- */}
 					{tagGroups.map((tagGroup) => {
 						return (
 							<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
@@ -307,41 +377,6 @@ const ResourceLibrary = () => {
 							</Row>
 						);
 					})}
-					{searchQuery && (
-						<>
-							<Row className="mb-10">
-								<h3 className="mb-0">
-									{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
-								</h3>
-							</Row>
-							<Row>
-								{contents.map((content, resourceIndex) => {
-									return (
-										<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-											<ResourceLibraryCard
-												contentId={content.contentId}
-												className="h-100"
-												imageUrl={content.imageUrl}
-												badgeTitle={content.newFlag ? 'New' : ''}
-												title={content.title}
-												author={content.author}
-												description={content.description}
-												tags={
-													tagsByTagId
-														? content.tagIds.map((tagId) => {
-																return tagsByTagId[tagId];
-														  })
-														: []
-												}
-												contentTypeId={content.contentTypeId}
-												duration={content.durationInMinutesDescription}
-											/>
-										</Col>
-									);
-								})}
-							</Row>
-						</>
-					)}
 				</Container>
 			</AsyncPage>
 		</>
