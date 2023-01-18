@@ -108,9 +108,9 @@ export const resourceLibraryService = {
 		});
 	},
 	getResourceLibraryRecommendedContent(queryParameters?: {
-		tagId?: string;
-		contentTypeId?: string;
-		contentDurationId?: string;
+		tagId?: string[];
+		contentTypeId?: string[];
+		contentDurationId?: string[];
 		pageNumber?: number;
 		pageSize?: number;
 	}) {

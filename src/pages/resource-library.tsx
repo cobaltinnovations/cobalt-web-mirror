@@ -70,6 +70,9 @@ const ResourceLibrary = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
 	const recommendedContent = useMemo(() => searchParams.get('recommended') === 'true', [searchParams]);
+	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
+	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
+	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -157,7 +160,13 @@ const ResourceLibrary = () => {
 
 		if (recommendedContent) {
 			const recommendedResponse = await resourceLibraryService
-				.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 100 })
+				.getResourceLibraryRecommendedContent({
+					pageNumber: 0,
+					pageSize: 100,
+					tagId: tagIdQuery,
+					contentTypeId: contentTypeIdQuery,
+					contentDurationId: contentDurationIdQuery,
+				})
 				.fetch();
 
 			setContents(recommendedResponse.findResult.contents);
@@ -177,13 +186,33 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
-	}, [didCheckScreeningSessions, recommendedContent, searchQuery]);
+	}, [
+		contentDurationIdQuery,
+		contentTypeIdQuery,
+		didCheckScreeningSessions,
+		recommendedContent,
+		searchQuery,
+		tagIdQuery,
+	]);
+
+	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
+		searchParams.delete(searchParam);
+
+		for (const value of values) {
+			searchParams.append(searchParam, value);
+		}
+
+		setSearchParams(searchParams, { replace: true });
+	};
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		if (searchInputValue) {
 			searchParams.delete('recommended');
+			searchParams.delete('tagId');
+			searchParams.delete('contentTypeId');
+			searchParams.delete('contentDurationId');
 			searchParams.set('searchQuery', searchInputValue);
 		} else {
 			searchParams.delete('searchQuery');
@@ -306,7 +335,7 @@ const ResourceLibrary = () => {
 								]}
 								onTabClick={(value) => {
 									searchParams.delete('searchQuery');
-									searchParams.delete('tagGroupId');
+									searchParams.delete('tagId');
 									searchParams.delete('contentTypeId');
 									searchParams.delete('contentDurationId');
 
@@ -338,6 +367,7 @@ const ResourceLibrary = () => {
 										className="me-2"
 										dialogWidth={628}
 										show={tagFilterIsShowing}
+										activeLength={searchParams.getAll('tagId').length}
 										onHide={() => {
 											setTagFilterIsShowing(false);
 										}}
@@ -346,9 +376,11 @@ const ResourceLibrary = () => {
 										}}
 										onClear={() => {
 											setTagFilterIsShowing(false);
+											applyValuesToSearchParam([], 'tagId');
 										}}
 										onApply={() => {
 											setTagFilterIsShowing(false);
+											applyValuesToSearchParam(tagFilterValue, 'tagId');
 										}}
 									>
 										{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
@@ -397,6 +429,7 @@ const ResourceLibrary = () => {
 										title="Type"
 										className="me-2"
 										show={contentTypeFilterIsShowing}
+										activeLength={searchParams.getAll('contentTypeId').length}
 										onHide={() => {
 											setContentTypeFilterIsShowing(false);
 										}}
@@ -405,9 +438,11 @@ const ResourceLibrary = () => {
 										}}
 										onClear={() => {
 											setContentTypeFilterIsShowing(false);
+											applyValuesToSearchParam([], 'contentTypeId');
 										}}
 										onApply={() => {
 											setContentTypeFilterIsShowing(false);
+											applyValuesToSearchParam(contentTypeFilterValue, 'contentTypeId');
 										}}
 									>
 										{contentTypeFilters.map((contentType) => {
@@ -435,6 +470,7 @@ const ResourceLibrary = () => {
 									<SimpleFilter
 										title="Length"
 										show={contentDurationFilterIsShowing}
+										activeLength={searchParams.getAll('contentDurationId').length}
 										onHide={() => {
 											setContentDurationFilterIsShowing(false);
 										}}
@@ -443,9 +479,11 @@ const ResourceLibrary = () => {
 										}}
 										onClear={() => {
 											setContentDurationFilterIsShowing(false);
+											applyValuesToSearchParam([], 'contentDurationId');
 										}}
 										onApply={() => {
 											setContentDurationFilterIsShowing(false);
+											applyValuesToSearchParam(contentDurationFilterValue, 'contentDurationId');
 										}}
 									>
 										{contentDurationFilters.map((contentDuration) => {
