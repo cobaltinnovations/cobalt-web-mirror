@@ -20,12 +20,15 @@ const GroupSessions = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
 	const groupSessionSearchQuery = searchParams.get('searchQuery') ?? '';
+	const pageSize = useRef(6);
+	const pageNumber = useRef(0);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState(groupSessionSearchQuery);
 
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
+	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
 		institution?.groupSessionsScreeningFlowId
@@ -42,18 +45,33 @@ const GroupSessions = () => {
 	}, [didCheckScreeningSessions, hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
-		const { groupSessions } = await groupSessionsService
+		console.log(pageNumber.current);
+
+		const { groupSessions, totalCount } = await groupSessionsService
 			.getGroupSessions({
 				viewType: 'PATIENT',
 				groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 				orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
 				urlName: groupSessionUrlName,
 				searchQuery: groupSessionSearchQuery,
+				pageSize: pageSize.current,
+				pageNumber: pageNumber.current,
 			})
 			.fetch();
 
 		setGroupSessions(groupSessions);
+		setGroupSessionsTotalCount(totalCount);
 	}, [groupSessionUrlName, groupSessionSearchQuery]);
+
+	const disableViewMore = groupSessionsTotalCount <= pageNumber.current + 1 * pageSize.current;
+	const handleViewMoreButtonClick = useCallback(() => {
+		if (disableViewMore) {
+			return;
+		}
+
+		pageNumber.current++;
+		fetchData();
+	}, [disableViewMore, fetchData]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -208,9 +226,11 @@ const GroupSessions = () => {
 					<Row>
 						<Col></Col>
 						<Col>
-							<div className="text-center">
-								<Button>View More</Button>
-							</div>
+							{!disableViewMore && (
+								<div className="text-center">
+									<Button onClick={handleViewMoreButtonClick}>View More</Button>
+								</div>
+							)}
 						</Col>
 						<Col>
 							<div className="text-right">
