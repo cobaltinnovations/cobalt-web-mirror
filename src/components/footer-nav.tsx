@@ -5,14 +5,14 @@ import classNames from 'classnames';
 
 import mediaQueries from '@/jss/media-queries';
 
-const useStyles = createUseStyles(() => ({
+const useStyles = createUseStyles({
 	links: {
 		textAlign: 'left',
 		[mediaQueries.md]: {
 			textAlign: 'center',
 		},
 	},
-}));
+});
 
 const links = [
 	{
