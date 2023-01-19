@@ -259,10 +259,15 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		//@ts-expect-error
 		window.dataLayer = window.dataLayer || [];
 
+		// GTM URL is slightly different from GA4
+		const scriptSrc = initialMeasurementId.startsWith('GTM-')
+			? `https://www.googletagmanager.com/gtm.js?id=${initialMeasurementId}`
+			: `https://www.googletagmanager.com/gtag/js?id=${initialMeasurementId}`;
+
 		const script = document.createElement('script');
 		script.async = true;
 		script.type = 'text/javascript';
-		script.src = `https://www.googletagmanager.com/gtag/js?id=${initialMeasurementId}`;
+		script.src = scriptSrc;
 
 		document.head.insertBefore(script, document.head.firstChild);
 

@@ -128,3 +128,9 @@ export interface GroupSessionResponseModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 }
+
+export interface GroupTopic {
+	groupTopicId: string;
+	name: string;
+	description: string;
+}
