@@ -67,7 +67,7 @@ const ResourceLibrary = () => {
 
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const searchQuery = searchParams.get('searchQuery') ?? '';
+	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 	const recommendedContent = useMemo(() => searchParams.get('recommended') === 'true', [searchParams]);
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
@@ -195,7 +195,7 @@ const ResourceLibrary = () => {
 		setTagsByTagId(response.tagsByTagId);
 	}, [contentDurationIdQuery, contentTypeIdQuery, recommendedContent, searchQuery, tagIdQuery]);
 
-	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
+	const applyRecommendedFilterValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
 
 		for (const value of values) {
@@ -205,7 +205,8 @@ const ResourceLibrary = () => {
 		setSearchParams(searchParams, { replace: true });
 	};
 
-	const handleClearFiltersButtonClick = useCallback(() => {
+	const handleClearRecommendedFiltersButtonClick = useCallback(() => {
+		searchParams.delete('searchQuery');
 		searchParams.delete('tagId');
 		searchParams.delete('contentTypeId');
 		searchParams.delete('contentDurationId');
@@ -216,11 +217,12 @@ const ResourceLibrary = () => {
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		searchParams.delete('recommended');
+		searchParams.delete('tagId');
+		searchParams.delete('contentTypeId');
+		searchParams.delete('contentDurationId');
+
 		if (searchInputValue) {
-			searchParams.delete('recommended');
-			searchParams.delete('tagId');
-			searchParams.delete('contentTypeId');
-			searchParams.delete('contentDurationId');
 			searchParams.set('searchQuery', searchInputValue);
 		} else {
 			searchParams.delete('searchQuery');
@@ -237,6 +239,9 @@ const ResourceLibrary = () => {
 		setSearchInputValue('');
 
 		searchParams.delete('searchQuery');
+		searchParams.delete('tagId');
+		searchParams.delete('contentTypeId');
+		searchParams.delete('contentDurationId');
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
@@ -431,11 +436,14 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setTagFilterIsShowing(false);
-														applyValuesToSearchParam([], 'tagId');
+														applyRecommendedFilterValuesToSearchParam([], 'tagId');
 													}}
 													onApply={() => {
 														setTagFilterIsShowing(false);
-														applyValuesToSearchParam(tagFilterValue, 'tagId');
+														applyRecommendedFilterValuesToSearchParam(
+															tagFilterValue,
+															'tagId'
+														);
 													}}
 												>
 													{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
@@ -504,11 +512,11 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setContentTypeFilterIsShowing(false);
-														applyValuesToSearchParam([], 'contentTypeId');
+														applyRecommendedFilterValuesToSearchParam([], 'contentTypeId');
 													}}
 													onApply={() => {
 														setContentTypeFilterIsShowing(false);
-														applyValuesToSearchParam(
+														applyRecommendedFilterValuesToSearchParam(
 															contentTypeFilterValue,
 															'contentTypeId'
 														);
@@ -550,11 +558,14 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setContentDurationFilterIsShowing(false);
-														applyValuesToSearchParam([], 'contentDurationId');
+														applyRecommendedFilterValuesToSearchParam(
+															[],
+															'contentDurationId'
+														);
 													}}
 													onApply={() => {
 														setContentDurationFilterIsShowing(false);
-														applyValuesToSearchParam(
+														applyRecommendedFilterValuesToSearchParam(
 															contentDurationFilterValue,
 															'contentDurationId'
 														);
@@ -588,7 +599,7 @@ const ResourceLibrary = () => {
 													<Button
 														variant="link"
 														className="p-0 mx-3"
-														onClick={handleClearFiltersButtonClick}
+														onClick={handleClearRecommendedFiltersButtonClick}
 													>
 														Clear
 													</Button>
@@ -596,72 +607,72 @@ const ResourceLibrary = () => {
 											</Col>
 										</Row>
 									</AsyncPage>
-									{contents.length <= 0 ? (
-										<>
-											{hasFilterQueryParms ? (
-												<Row className="pt-12 pb-24">
-													<Col>
-														<h2 className="mb-6 text-muted text-center">No Results</h2>
-														<p className="mb-6 fs-large text-muted text-center">
-															Try adjusting your filters to see available content
-														</p>
-														<div className="text-center">
-															<Button
-																size="lg"
-																variant="outline-primary"
-																onClick={handleClearFiltersButtonClick}
-															>
-																Clear Filters
-															</Button>
-														</div>
-													</Col>
-												</Row>
-											) : (
-												<Row className="mb-24">
-													<Col>
-														<div className="bg-n75 rounded p-12">
-															<Row>
-																<Col lg={{ span: 6, offset: 3 }}>
-																	<h2 className="mb-6 text-muted text-center">
-																		No recommendations at this time
-																	</h2>
-																	<p className="mb-0 fs-large text-muted text-center">
-																		We are continually adding more resources to the
-																		library. In the meantime, you can browse
-																		resources related to{' '}
-																		<Link to="/resource-library/tag-groups/symptoms">
-																			Symptoms
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/work-life">
-																			Work Life
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/personal-life">
-																			Personal Life
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/identity">
-																			Identity
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/caretaking">
-																			Caretaking
-																		</Link>
-																		, and{' '}
-																		<Link to="/resource-library/tag-groups/world-events">
-																			World Events
-																		</Link>
-																	</p>
-																</Col>
-															</Row>
-														</div>
-													</Col>
-												</Row>
-											)}
-										</>
-									) : (
-										<AsyncPage fetchData={fetchData}>
+									<AsyncPage fetchData={fetchData}>
+										{contents.length <= 0 ? (
+											<>
+												{hasFilterQueryParms ? (
+													<Row className="pt-12 pb-24">
+														<Col>
+															<h2 className="mb-6 text-muted text-center">No Results</h2>
+															<p className="mb-6 fs-large text-muted text-center">
+																Try adjusting your filters to see available content
+															</p>
+															<div className="text-center">
+																<Button
+																	size="lg"
+																	variant="outline-primary"
+																	onClick={handleClearRecommendedFiltersButtonClick}
+																>
+																	Clear Filters
+																</Button>
+															</div>
+														</Col>
+													</Row>
+												) : (
+													<Row className="mb-24">
+														<Col>
+															<div className="bg-n75 rounded p-12">
+																<Row>
+																	<Col lg={{ span: 6, offset: 3 }}>
+																		<h2 className="mb-6 text-muted text-center">
+																			No recommendations at this time
+																		</h2>
+																		<p className="mb-0 fs-large text-muted text-center">
+																			We are continually adding more resources to
+																			the library. In the meantime, you can browse
+																			resources related to{' '}
+																			<Link to="/resource-library/tag-groups/symptoms">
+																				Symptoms
+																			</Link>
+																			,{' '}
+																			<Link to="/resource-library/tag-groups/work-life">
+																				Work Life
+																			</Link>
+																			,{' '}
+																			<Link to="/resource-library/tag-groups/personal-life">
+																				Personal Life
+																			</Link>
+																			,{' '}
+																			<Link to="/resource-library/tag-groups/identity">
+																				Identity
+																			</Link>
+																			,{' '}
+																			<Link to="/resource-library/tag-groups/caretaking">
+																				Caretaking
+																			</Link>
+																			, and{' '}
+																			<Link to="/resource-library/tag-groups/world-events">
+																				World Events
+																			</Link>
+																		</p>
+																	</Col>
+																</Row>
+															</div>
+														</Col>
+													</Row>
+												)}
+											</>
+										) : (
 											<Row>
 												{contents.map((content, resourceIndex) => {
 													return (
@@ -688,8 +699,8 @@ const ResourceLibrary = () => {
 													);
 												})}
 											</Row>
-										</AsyncPage>
-									)}
+										)}
+									</AsyncPage>
 								</>
 							)}
 						</>
