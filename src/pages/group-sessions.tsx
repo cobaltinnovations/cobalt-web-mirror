@@ -153,7 +153,12 @@ const GroupSessions = () => {
 			<AsyncPage
 				fetchData={fetchData}
 				loadingComponent={
-					<Container>
+					<Container className="py-10">
+						<Row className="mb-10">
+							<Col>
+								<h2>Upcoming Sessions</h2>
+							</Col>
+						</Row>
 						<Row>
 							<Col md={6} lg={4} className="mb-8">
 								<StudioEventSkeleton />
