@@ -59,7 +59,7 @@ const GroupSessions = () => {
 			})
 			.fetch();
 
-		setGroupSessions(groupSessions);
+		setGroupSessions((previousValue) => previousValue.concat(groupSessions));
 		setGroupSessionsTotalCount(totalCount);
 	}, [groupSessionUrlName, groupSessionSearchQuery]);
 
