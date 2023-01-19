@@ -70,62 +70,8 @@ const GroupSessionsRequest = () => {
 	const [formSubmittedSuccessfully, setFormSubmittedSuccessfully] = useState(false);
 
 	const fetchData = useCallback(async () => {
-		// TODO: Waiting on BE for this endpoint
-		// const response = await groupSessionsService.getGroupTopics().fetch();
-		// TODO: replace setState with `response.groupTopics`
-
-		setGroupTopics([
-			{
-				groupTopicId: 'MINDFULNESS',
-				name: 'Mindfulness',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'MANAGING_STRESS_AND_ANXIETY',
-				name: 'Managing Stress and Anxiety',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'ENERGY_MANAGEMENT',
-				name: 'Energy Management',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'FITTING_IN_FITNESS',
-				name: 'Fitting in Fitness',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'HEALTHY_EATING',
-				name: 'Healthy Eating',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'TOXIC_POSITIVITY',
-				name: `Toxic Positivity: Don't "Just" Get Over It`,
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'SHOWING_UP_FOR_YOURSELF',
-				name: 'Showing Up for Yourself',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'TEAM_RELATIONSHIPS',
-				name: 'Team Relationships',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'SCHEDULING_TOOLS',
-				name: 'Scheduling Tools',
-				description: 'Description of topic goes here.',
-			},
-			{
-				groupTopicId: 'HOLISTIC_WELL_BEING',
-				name: 'Holistic Well-Being',
-				description: 'Description of topic goes here.',
-			},
-		]);
+		const response = await groupSessionsService.getGroupTopics().fetch();
+		setGroupTopics(response.groupTopics);
 	}, []);
 
 	const handleFormSubmit = useCallback(
@@ -162,6 +108,7 @@ const GroupSessionsRequest = () => {
 					.fetch();
 
 				setFormSubmittedSuccessfully(true);
+				window.scrollTo(0, 0);
 			} catch (error) {
 				handleError(error);
 				setFormSubmittedSuccessfully(false);
