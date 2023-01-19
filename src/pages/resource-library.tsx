@@ -318,295 +318,14 @@ const ResourceLibrary = () => {
 				/>
 			)}
 
-			{/* ---------------------------------------------------- */}
-			{/* Tags for "All" and "For You" */}
-			{/* Only show if the current institution has a non-null contentScreeningFlowId */}
-			{/* ---------------------------------------------------- */}
-			{!searchQuery && institution?.contentScreeningFlowId && (
-				<Container className="pt-6">
-					<Row>
-						<Col>
-							<TabBar
-								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
-								tabs={[
-									{ value: 'ALL', title: 'All' },
-									{ value: 'FOR_YOU', title: 'For You' },
-								]}
-								onTabClick={(value) => {
-									searchParams.delete('searchQuery');
-									searchParams.delete('tagId');
-									searchParams.delete('contentTypeId');
-									searchParams.delete('contentDurationId');
-
-									if (value === 'ALL') {
-										searchParams.delete('recommended');
-									} else {
-										searchParams.set('recommended', 'true');
-									}
-
-									setSearchParams(searchParams, { replace: true });
-								}}
-							/>
-						</Col>
-					</Row>
-				</Container>
-			)}
-
-			{/* ---------------------------------------------------- */}
-			{/* Filters for "For You" */}
-			{/* ---------------------------------------------------- */}
-			{recommendedContent && (
-				<AsyncPage fetchData={fetchRecommendedFilters}>
-					<Container className="pt-6">
-						<Row>
-							<Col>
-								<SimpleFilter
-									title="Topic"
-									className="me-2"
-									dialogWidth={628}
-									show={tagFilterIsShowing}
-									activeLength={searchParams.getAll('tagId').length}
-									onHide={() => {
-										setTagFilterIsShowing(false);
-									}}
-									onClick={() => {
-										setTagFilterIsShowing(true);
-									}}
-									onClear={() => {
-										setTagFilterIsShowing(false);
-										applyValuesToSearchParam([], 'tagId');
-									}}
-									onApply={() => {
-										setTagFilterIsShowing(false);
-										applyValuesToSearchParam(tagFilterValue, 'tagId');
-									}}
-								>
-									{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
-										const isLastTagGroup = tagGroupFilters.length - 1 === tagGroupIndex;
-
-										return (
-											<div
-												key={tagGroup.tagGroupId}
-												className={classNames({ 'mb-5 border-bottom': !isLastTagGroup })}
-											>
-												<h5 className="mb-4">{tagGroup.name}</h5>
-												{tagFilters?.[tagGroup.tagGroupId].map((tag, tagIndex) => {
-													const isLastTag =
-														tagFilters[tagGroup.tagGroupId].length - 1 === tagIndex;
-
-													return (
-														<Form.Check
-															key={tag.tagId}
-															className={classNames({
-																'mb-0': isLastTagGroup && isLastTag,
-																'mb-5': !isLastTagGroup && isLastTag,
-																'mb-1': !isLastTag,
-															})}
-															type="checkbox"
-															name={`tag-group--${tag.tagGroupId}`}
-															id={`tag--${tag.tagId}`}
-															label={tag.name}
-															value={tag.tagId}
-															checked={tagFilterValue.includes(tag.tagId)}
-															onChange={({ currentTarget }) => {
-																const updatedArray = AddOrRemoveValueFromArray(
-																	currentTarget.value,
-																	tagFilterValue
-																);
-
-																setTagFilterValue(updatedArray);
-															}}
-														/>
-													);
-												})}
-											</div>
-										);
-									})}
-								</SimpleFilter>
-								<SimpleFilter
-									title="Type"
-									className="me-2"
-									show={contentTypeFilterIsShowing}
-									activeLength={searchParams.getAll('contentTypeId').length}
-									onHide={() => {
-										setContentTypeFilterIsShowing(false);
-									}}
-									onClick={() => {
-										setContentTypeFilterIsShowing(true);
-									}}
-									onClear={() => {
-										setContentTypeFilterIsShowing(false);
-										applyValuesToSearchParam([], 'contentTypeId');
-									}}
-									onApply={() => {
-										setContentTypeFilterIsShowing(false);
-										applyValuesToSearchParam(contentTypeFilterValue, 'contentTypeId');
-									}}
-								>
-									{contentTypeFilters.map((contentType) => {
-										return (
-											<Form.Check
-												key={contentType.contentTypeId}
-												type="checkbox"
-												name="CONTENT_TYPES"
-												id={contentType.contentTypeId}
-												label={contentType.description}
-												value={contentType.contentTypeId}
-												checked={contentTypeFilterValue.includes(contentType.contentTypeId)}
-												onChange={({ currentTarget }) => {
-													const updatedArray = AddOrRemoveValueFromArray(
-														currentTarget.value,
-														contentTypeFilterValue
-													);
-
-													setContentTypeFilterValue(updatedArray);
-												}}
-											/>
-										);
-									})}
-								</SimpleFilter>
-								<SimpleFilter
-									title="Length"
-									show={contentDurationFilterIsShowing}
-									activeLength={searchParams.getAll('contentDurationId').length}
-									onHide={() => {
-										setContentDurationFilterIsShowing(false);
-									}}
-									onClick={() => {
-										setContentDurationFilterIsShowing(true);
-									}}
-									onClear={() => {
-										setContentDurationFilterIsShowing(false);
-										applyValuesToSearchParam([], 'contentDurationId');
-									}}
-									onApply={() => {
-										setContentDurationFilterIsShowing(false);
-										applyValuesToSearchParam(contentDurationFilterValue, 'contentDurationId');
-									}}
-								>
-									{contentDurationFilters.map((contentDuration) => {
-										return (
-											<Form.Check
-												key={contentDuration.contentDurationId}
-												type="checkbox"
-												name="CONTENT_TYPES"
-												id={contentDuration.contentDurationId}
-												label={contentDuration.description}
-												value={contentDuration.contentDurationId}
-												checked={contentDurationFilterValue.includes(
-													contentDuration.contentDurationId
-												)}
-												onChange={({ currentTarget }) => {
-													const updatedArray = AddOrRemoveValueFromArray(
-														currentTarget.value,
-														contentDurationFilterValue
-													);
-
-													setContentDurationFilterValue(updatedArray);
-												}}
-											/>
-										);
-									})}
-								</SimpleFilter>
-								{hasFilterQueryParms && (
-									<Button variant="link" className="p-0 mx-3" onClick={handleClearFiltersButtonClick}>
-										Clear
-									</Button>
-								)}
-							</Col>
-						</Row>
-					</Container>
-				</AsyncPage>
-			)}
-
-			<AsyncPage fetchData={fetchData}>
-				<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
-					{/* ---------------------------------------------------- */}
-					{/* Header for "Search" */}
-					{/* ---------------------------------------------------- */}
-					{searchQuery && (
+			{searchQuery ? (
+				<AsyncPage fetchData={fetchData}>
+					<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
 						<Row className="pt-4 mb-10">
 							<h3 className="mb-0">
 								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
 							</h3>
 						</Row>
-					)}
-
-					{recommendedContent && !didCheckScreeningSessions && (
-						<Row>
-							<Col>
-								<div className="bg-n75 rounded p-12">
-									<Row>
-										<Col lg={{ span: 6, offset: 3 }}>
-											<h2 className="mb-6 text-center">Get Personalized Recommendations</h2>
-											<p className="mb-6 fs-large text-center">
-												Complete a wellness assessment to get personalized recommendations
-											</p>
-											<div className="text-center">
-												<Button
-													size="lg"
-													variant="outline-primary"
-													onClick={() => {
-														checkAndStartScreeningFlow();
-													}}
-												>
-													Take the assessment
-												</Button>
-											</div>
-										</Col>
-									</Row>
-								</div>
-							</Col>
-						</Row>
-					)}
-					{recommendedContent && hasFilterQueryParms && contents.length <= 0 && (
-						<Row className="py-4">
-							<Col>
-								<h2 className="mb-6 text-muted text-center">No Results</h2>
-								<p className="mb-6 fs-large text-muted text-center">
-									Try adjusting your filters to see available content
-								</p>
-								<div className="text-center">
-									<Button size="lg" variant="outline-primary" onClick={handleClearFiltersButtonClick}>
-										Clear Filters
-									</Button>
-								</div>
-							</Col>
-						</Row>
-					)}
-					{recommendedContent && !hasFilterQueryParms && didCheckScreeningSessions && contents.length <= 0 && (
-						<Row>
-							<Col>
-								<div className="bg-n75 rounded p-12">
-									<Row>
-										<Col lg={{ span: 6, offset: 3 }}>
-											<h2 className="mb-6 text-muted text-center">
-												No recommendations at this time
-											</h2>
-											<p className="mb-0 fs-large text-muted text-center">
-												We are continually adding more resources to the library. In the
-												meantime, you can browse resources related to{' '}
-												<Link to="/resource-library/tag-groups/symptoms">Symptoms</Link>,{' '}
-												<Link to="/resource-library/tag-groups/work-life">Work Life</Link>,{' '}
-												<Link to="/resource-library/tag-groups/personal-life">
-													Personal Life
-												</Link>
-												, <Link to="/resource-library/tag-groups/identity">Identity</Link>,{' '}
-												<Link to="/resource-library/tag-groups/caretaking">Caretaking</Link>,{' '}
-												and{' '}
-												<Link to="/resource-library/tag-groups/world-events">World Events</Link>
-											</p>
-										</Col>
-									</Row>
-								</div>
-							</Col>
-						</Row>
-					)}
-					{/* ---------------------------------------------------- */}
-					{/* List view for both "Search" and "For You" */}
-					{/* Note: "Search" does not have filters, "For You" does */}
-					{/* ---------------------------------------------------- */}
-					{contents.length > 0 && (
 						<Row>
 							{contents.map((content, resourceIndex) => {
 								return (
@@ -633,59 +352,399 @@ const ResourceLibrary = () => {
 								);
 							})}
 						</Row>
-					)}
+					</Container>
+				</AsyncPage>
+			) : (
+				<Container className="pt-6">
+					<Row className="mb-6">
+						<Col>
+							<TabBar
+								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
+								tabs={[
+									{ value: 'ALL', title: 'All' },
+									{ value: 'FOR_YOU', title: 'For You' },
+								]}
+								onTabClick={(value) => {
+									searchParams.delete('searchQuery');
+									searchParams.delete('tagId');
+									searchParams.delete('contentTypeId');
+									searchParams.delete('contentDurationId');
 
-					{/* ---------------------------------------------------- */}
-					{/* View for "All" */}
-					{/* ---------------------------------------------------- */}
-					{tagGroups.map((tagGroup) => {
-						return (
-							<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
-								<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-									<ResourceLibrarySubtopicCard
-										className="h-100"
-										colorId={tagGroup.colorId}
-										title={tagGroup.name}
-										description={tagGroup.description}
-										to={`/resource-library/tag-groups/${tagGroup.urlName}`}
-									/>
-								</Col>
-								<Col lg={9}>
-									<Carousel
-										responsive={carouselConfig}
-										trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-										floatingButtonGroup
-									>
-										{contentsByTagGroupId?.[tagGroup.tagGroupId]?.map((content) => {
-											return (
-												<ResourceLibraryCard
-													key={content.contentId}
-													contentId={content.contentId}
-													className="h-100"
-													imageUrl={content.imageUrl}
-													badgeTitle={content.newFlag ? 'New' : ''}
-													title={content.title}
-													author={content.author}
-													description={content.description}
-													tags={
-														tagsByTagId
-															? content.tagIds.map((tagId) => {
-																	return tagsByTagId[tagId];
-															  })
-															: []
-													}
-													contentTypeId={content.contentTypeId}
-													duration={content.durationInMinutesDescription}
-												/>
-											);
-										})}
-									</Carousel>
-								</Col>
-							</Row>
-						);
-					})}
+									if (value === 'ALL') {
+										searchParams.delete('recommended');
+									} else {
+										searchParams.set('recommended', 'true');
+									}
+
+									setSearchParams(searchParams, { replace: true });
+								}}
+							/>
+						</Col>
+					</Row>
+					{recommendedContent ? (
+						<>
+							{!didCheckScreeningSessions ? (
+								<Row>
+									<Col>
+										<div className="bg-n75 rounded p-12">
+											<Row>
+												<Col lg={{ span: 6, offset: 3 }}>
+													<h2 className="mb-6 text-center">
+														Get Personalized Recommendations
+													</h2>
+													<p className="mb-6 fs-large text-center">
+														Complete a wellness assessment to get personalized
+														recommendations
+													</p>
+													<div className="text-center">
+														<Button
+															size="lg"
+															variant="outline-primary"
+															onClick={() => {
+																checkAndStartScreeningFlow();
+															}}
+														>
+															Take the assessment
+														</Button>
+													</div>
+												</Col>
+											</Row>
+										</div>
+									</Col>
+								</Row>
+							) : (
+								<>
+									<AsyncPage fetchData={fetchRecommendedFilters}>
+										<Row className="pb-6">
+											<Col>
+												<SimpleFilter
+													title="Topic"
+													className="me-2"
+													dialogWidth={628}
+													show={tagFilterIsShowing}
+													activeLength={searchParams.getAll('tagId').length}
+													onHide={() => {
+														setTagFilterIsShowing(false);
+													}}
+													onClick={() => {
+														setTagFilterIsShowing(true);
+													}}
+													onClear={() => {
+														setTagFilterIsShowing(false);
+														applyValuesToSearchParam([], 'tagId');
+													}}
+													onApply={() => {
+														setTagFilterIsShowing(false);
+														applyValuesToSearchParam(tagFilterValue, 'tagId');
+													}}
+												>
+													{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
+														const isLastTagGroup =
+															tagGroupFilters.length - 1 === tagGroupIndex;
+
+														return (
+															<div
+																key={tagGroup.tagGroupId}
+																className={classNames({
+																	'mb-5 border-bottom': !isLastTagGroup,
+																})}
+															>
+																<h5 className="mb-4">{tagGroup.name}</h5>
+																{tagFilters?.[tagGroup.tagGroupId].map(
+																	(tag, tagIndex) => {
+																		const isLastTag =
+																			tagFilters[tagGroup.tagGroupId].length -
+																				1 ===
+																			tagIndex;
+
+																		return (
+																			<Form.Check
+																				key={tag.tagId}
+																				className={classNames({
+																					'mb-0': isLastTagGroup && isLastTag,
+																					'mb-5':
+																						!isLastTagGroup && isLastTag,
+																					'mb-1': !isLastTag,
+																				})}
+																				type="checkbox"
+																				name={`tag-group--${tag.tagGroupId}`}
+																				id={`tag--${tag.tagId}`}
+																				label={tag.name}
+																				value={tag.tagId}
+																				checked={tagFilterValue.includes(
+																					tag.tagId
+																				)}
+																				onChange={({ currentTarget }) => {
+																					const updatedArray =
+																						AddOrRemoveValueFromArray(
+																							currentTarget.value,
+																							tagFilterValue
+																						);
+
+																					setTagFilterValue(updatedArray);
+																				}}
+																			/>
+																		);
+																	}
+																)}
+															</div>
+														);
+													})}
+												</SimpleFilter>
+												<SimpleFilter
+													title="Type"
+													className="me-2"
+													show={contentTypeFilterIsShowing}
+													activeLength={searchParams.getAll('contentTypeId').length}
+													onHide={() => {
+														setContentTypeFilterIsShowing(false);
+													}}
+													onClick={() => {
+														setContentTypeFilterIsShowing(true);
+													}}
+													onClear={() => {
+														setContentTypeFilterIsShowing(false);
+														applyValuesToSearchParam([], 'contentTypeId');
+													}}
+													onApply={() => {
+														setContentTypeFilterIsShowing(false);
+														applyValuesToSearchParam(
+															contentTypeFilterValue,
+															'contentTypeId'
+														);
+													}}
+												>
+													{contentTypeFilters.map((contentType) => {
+														return (
+															<Form.Check
+																key={contentType.contentTypeId}
+																type="checkbox"
+																name="CONTENT_TYPES"
+																id={contentType.contentTypeId}
+																label={contentType.description}
+																value={contentType.contentTypeId}
+																checked={contentTypeFilterValue.includes(
+																	contentType.contentTypeId
+																)}
+																onChange={({ currentTarget }) => {
+																	const updatedArray = AddOrRemoveValueFromArray(
+																		currentTarget.value,
+																		contentTypeFilterValue
+																	);
+
+																	setContentTypeFilterValue(updatedArray);
+																}}
+															/>
+														);
+													})}
+												</SimpleFilter>
+												<SimpleFilter
+													title="Length"
+													show={contentDurationFilterIsShowing}
+													activeLength={searchParams.getAll('contentDurationId').length}
+													onHide={() => {
+														setContentDurationFilterIsShowing(false);
+													}}
+													onClick={() => {
+														setContentDurationFilterIsShowing(true);
+													}}
+													onClear={() => {
+														setContentDurationFilterIsShowing(false);
+														applyValuesToSearchParam([], 'contentDurationId');
+													}}
+													onApply={() => {
+														setContentDurationFilterIsShowing(false);
+														applyValuesToSearchParam(
+															contentDurationFilterValue,
+															'contentDurationId'
+														);
+													}}
+												>
+													{contentDurationFilters.map((contentDuration) => {
+														return (
+															<Form.Check
+																key={contentDuration.contentDurationId}
+																type="checkbox"
+																name="CONTENT_TYPES"
+																id={contentDuration.contentDurationId}
+																label={contentDuration.description}
+																value={contentDuration.contentDurationId}
+																checked={contentDurationFilterValue.includes(
+																	contentDuration.contentDurationId
+																)}
+																onChange={({ currentTarget }) => {
+																	const updatedArray = AddOrRemoveValueFromArray(
+																		currentTarget.value,
+																		contentDurationFilterValue
+																	);
+
+																	setContentDurationFilterValue(updatedArray);
+																}}
+															/>
+														);
+													})}
+												</SimpleFilter>
+												{hasFilterQueryParms && (
+													<Button
+														variant="link"
+														className="p-0 mx-3"
+														onClick={handleClearFiltersButtonClick}
+													>
+														Clear
+													</Button>
+												)}
+											</Col>
+										</Row>
+									</AsyncPage>
+									{contents.length <= 0 ? (
+										<>
+											{hasFilterQueryParms ? (
+												<Row className="pt-12 pb-24">
+													<Col>
+														<h2 className="mb-6 text-muted text-center">No Results</h2>
+														<p className="mb-6 fs-large text-muted text-center">
+															Try adjusting your filters to see available content
+														</p>
+														<div className="text-center">
+															<Button
+																size="lg"
+																variant="outline-primary"
+																onClick={handleClearFiltersButtonClick}
+															>
+																Clear Filters
+															</Button>
+														</div>
+													</Col>
+												</Row>
+											) : (
+												<Row className="mb-24">
+													<Col>
+														<div className="bg-n75 rounded p-12">
+															<Row>
+																<Col lg={{ span: 6, offset: 3 }}>
+																	<h2 className="mb-6 text-muted text-center">
+																		No recommendations at this time
+																	</h2>
+																	<p className="mb-0 fs-large text-muted text-center">
+																		We are continually adding more resources to the
+																		library. In the meantime, you can browse
+																		resources related to{' '}
+																		<Link to="/resource-library/tag-groups/symptoms">
+																			Symptoms
+																		</Link>
+																		,{' '}
+																		<Link to="/resource-library/tag-groups/work-life">
+																			Work Life
+																		</Link>
+																		,{' '}
+																		<Link to="/resource-library/tag-groups/personal-life">
+																			Personal Life
+																		</Link>
+																		,{' '}
+																		<Link to="/resource-library/tag-groups/identity">
+																			Identity
+																		</Link>
+																		,{' '}
+																		<Link to="/resource-library/tag-groups/caretaking">
+																			Caretaking
+																		</Link>
+																		, and{' '}
+																		<Link to="/resource-library/tag-groups/world-events">
+																			World Events
+																		</Link>
+																	</p>
+																</Col>
+															</Row>
+														</div>
+													</Col>
+												</Row>
+											)}
+										</>
+									) : (
+										<AsyncPage fetchData={fetchData}>
+											<Row>
+												{contents.map((content, resourceIndex) => {
+													return (
+														<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+															<ResourceLibraryCard
+																contentId={content.contentId}
+																className="h-100"
+																imageUrl={content.imageUrl}
+																badgeTitle={content.newFlag ? 'New' : ''}
+																title={content.title}
+																author={content.author}
+																description={content.description}
+																tags={
+																	tagsByTagId
+																		? content.tagIds.map((tagId) => {
+																				return tagsByTagId[tagId];
+																		  })
+																		: []
+																}
+																contentTypeId={content.contentTypeId}
+																duration={content.durationInMinutesDescription}
+															/>
+														</Col>
+													);
+												})}
+											</Row>
+										</AsyncPage>
+									)}
+								</>
+							)}
+						</>
+					) : (
+						<AsyncPage fetchData={fetchData}>
+							{tagGroups.map((tagGroup) => {
+								return (
+									<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
+										<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+											<ResourceLibrarySubtopicCard
+												className="h-100"
+												colorId={tagGroup.colorId}
+												title={tagGroup.name}
+												description={tagGroup.description}
+												to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+											/>
+										</Col>
+										<Col lg={9}>
+											<Carousel
+												responsive={carouselConfig}
+												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+												floatingButtonGroup
+											>
+												{contentsByTagGroupId?.[tagGroup.tagGroupId]?.map((content) => {
+													return (
+														<ResourceLibraryCard
+															key={content.contentId}
+															contentId={content.contentId}
+															className="h-100"
+															imageUrl={content.imageUrl}
+															badgeTitle={content.newFlag ? 'New' : ''}
+															title={content.title}
+															author={content.author}
+															description={content.description}
+															tags={
+																tagsByTagId
+																	? content.tagIds.map((tagId) => {
+																			return tagsByTagId[tagId];
+																	  })
+																	: []
+															}
+															contentTypeId={content.contentTypeId}
+															duration={content.durationInMinutesDescription}
+														/>
+													);
+												})}
+											</Carousel>
+										</Col>
+									</Row>
+								);
+							})}
+						</AsyncPage>
+					)}
 				</Container>
-			</AsyncPage>
+			)}
 		</>
 	);
 };
