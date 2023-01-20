@@ -88,4 +88,13 @@ export const screeningService = {
 			},
 		});
 	},
+
+	getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId: string) {
+		return httpSingleton.orchestrateRequest<{
+			sessionFullyCompleted: boolean;
+		}>({
+			method: 'GET',
+			url: `/screening-flows/${screeningFlowId}/session-fully-completed`,
+		});
+	},
 };
