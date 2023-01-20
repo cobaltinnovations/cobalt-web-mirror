@@ -97,6 +97,7 @@ export function useScreeningNavigation() {
 export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: boolean = true) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
+	// For now - if not in "on load" mode, ignore the concept of "skipped"
 	const isSkipped = instantiateOnLoad ? searchParams.get('skipped') === 'true' : false;
 	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(!screeningFlowId || isSkipped);
 	const [screeningSessions, setScreeningSessions] = useState<ScreeningSession[]>([]);
