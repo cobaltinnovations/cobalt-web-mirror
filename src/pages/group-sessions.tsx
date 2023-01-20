@@ -7,7 +7,6 @@ import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
-import AsyncPage from '@/components/async-page';
 import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';

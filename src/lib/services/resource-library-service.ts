@@ -107,4 +107,26 @@ export const resourceLibraryService = {
 			url: `/resource-library/content-types`,
 		});
 	},
+	getResourceLibraryRecommendedContent(queryParameters?: {
+		tagId?: string[];
+		contentTypeId?: string[];
+		contentDurationId?: string[];
+		pageNumber?: number;
+		pageSize?: number;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			tagsByTagId: Record<string, TagModel>;
+			contentDurations: ContentDurationFilterModel[];
+			contentTypes: ContentTypeFilterModel[];
+			tagGroups: TagGroupModel[];
+			findResult: {
+				contents: ResourceLibraryContentModel[];
+				totalCount: number;
+				totalCountDescription: string;
+			};
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/resource-library/recommended', queryParameters),
+		});
+	},
 };

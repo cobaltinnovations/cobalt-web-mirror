@@ -160,7 +160,7 @@ const GroupSessionsRequest = () => {
 							please allow 1-2 business days to hear back from the session coordinator. Sessions are held
 							virtually.
 						</p>
-						<p className="mb-0 text-danger">Requred *</p>
+						<p className="mb-0 text-danger">Required *</p>
 					</Col>
 				</Row>
 				<Row>
