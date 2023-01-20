@@ -169,7 +169,7 @@ const Index: FC = () => {
 								<Col>
 									<Carousel
 										responsive={responsiveDefaults}
-										// description="Explainer text goes here. What is in the studio?"
+										description="Sign up for group resiliency sessions, mindfulness workshops and other in-person and virtual offerings"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/in-the-studio');
@@ -221,7 +221,7 @@ const Index: FC = () => {
 								<Col>
 									<Carousel
 										responsive={resourceLibraryCarouselConfig}
-										// description="Explainer text goes here. What is on your time?"
+										description="Browse evidence-based content including articles, videos, apps, podcasts, and more"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/resource-library');
