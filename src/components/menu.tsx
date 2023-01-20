@@ -264,13 +264,13 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminGroupSession ? '/group-sessions/scheduled' : null,
 			},
-			{
-				testId: 'menuLinkAdminByRequestGroupSessions',
-				label: 'By Request',
-				icon: <AdminIcon />,
-				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminGroupSessionRequest ? '/group-sessions/by-request' : null,
-			},
+			// {
+			// 	testId: 'menuLinkAdminByRequestGroupSessions',
+			// 	label: 'By Request',
+			// 	icon: <AdminIcon />,
+			// 	to: ({ institutionCapabilities }) =>
+			// 		institutionCapabilities?.viewNavAdminGroupSessionRequest ? '/group-sessions/by-request' : null,
+			// },
 		],
 	},
 ];
