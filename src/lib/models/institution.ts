@@ -20,6 +20,7 @@ export interface Institution {
 	requireConsentForm: boolean;
 	supportEmailAddress: string;
 	supportEnabled: boolean;
+	recommendedContentEnabled: boolean;
 }
 
 export interface AdditionalNavigationItem {
