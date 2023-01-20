@@ -55,7 +55,7 @@ const useCustomButtonGroupStyles = createUseStyles({
 		position: 'absolute',
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
-		...(floatingButtonGroup && { transform: 'translateY(-50%)' }),
+		...(floatingButtonGroup && { transform: 'translateY(calc(-50% + 16px))' }),
 	}),
 	customButtonGroup: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
 		display: 'flex',

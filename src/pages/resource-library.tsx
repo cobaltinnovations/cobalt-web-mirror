@@ -371,32 +371,39 @@ const ResourceLibrary = () => {
 					</Container>
 				</AsyncPage>
 			) : (
-				<Container className="pt-6">
-					<Row className="mb-6">
-						<Col>
-							<TabBar
-								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
-								tabs={[
-									{ value: 'ALL', title: 'All' },
-									{ value: 'FOR_YOU', title: 'For You' },
-								]}
-								onTabClick={(value) => {
-									searchParams.delete('searchQuery');
-									searchParams.delete('tagId');
-									searchParams.delete('contentTypeId');
-									searchParams.delete('contentDurationId');
+				<Container
+					className={classNames({
+						'pt-6': institution?.recommendedContentEnabled,
+						'pt-12': !institution?.recommendedContentEnabled,
+					})}
+				>
+					{institution?.recommendedContentEnabled && (
+						<Row className="mb-6">
+							<Col>
+								<TabBar
+									value={recommendedContent ? 'FOR_YOU' : 'ALL'}
+									tabs={[
+										{ value: 'ALL', title: 'All' },
+										{ value: 'FOR_YOU', title: 'For You' },
+									]}
+									onTabClick={(value) => {
+										searchParams.delete('searchQuery');
+										searchParams.delete('tagId');
+										searchParams.delete('contentTypeId');
+										searchParams.delete('contentDurationId');
 
-									if (value === 'ALL') {
-										searchParams.delete('recommended');
-									} else {
-										searchParams.set('recommended', 'true');
-									}
+										if (value === 'ALL') {
+											searchParams.delete('recommended');
+										} else {
+											searchParams.set('recommended', 'true');
+										}
 
-									setSearchParams(searchParams, { replace: true });
-								}}
-							/>
-						</Col>
-					</Row>
+										setSearchParams(searchParams, { replace: true });
+									}}
+								/>
+							</Col>
+						</Row>
+					)}
 					{recommendedContent ? (
 						<AsyncPage fetchData={fetchScreeningFlowStatus}>
 							{!screeningFlowComplete ? (

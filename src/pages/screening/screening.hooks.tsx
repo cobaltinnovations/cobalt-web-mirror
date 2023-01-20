@@ -97,7 +97,7 @@ export function useScreeningNavigation() {
 export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: boolean = true) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
-	const isSkipped = searchParams.get('skipped') === 'true';
+	const isSkipped = instantiateOnLoad ? searchParams.get('skipped') === 'true' : false;
 	const [didCheckScreeningSessions, setDidCheckScreeningSessions] = useState(!screeningFlowId || isSkipped);
 	const [screeningSessions, setScreeningSessions] = useState<ScreeningSession[]>([]);
 	const [showPhoneModal, setShowPhoneModal] = useState(false);
