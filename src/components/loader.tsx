@@ -5,7 +5,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useLoaderStyles = createUseThemedStyles((theme) => ({
 	loader: ({ size }: { size: number }) => ({
 		zIndex: 0,
-		top: '50%',
+		top: '50vh',
 		left: '50%',
 		position: 'absolute',
 		width: size || 56,
