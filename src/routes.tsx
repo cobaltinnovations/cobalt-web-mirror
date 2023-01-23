@@ -63,6 +63,7 @@ export const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
 export const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
 export const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
 export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
+export const Reports = React.lazy(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
 export const IntegratedCare = React.lazy(() => import('@/pages/ic/landing'));
 export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
@@ -486,6 +487,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/stats-dashboard',
 				private: true,
 				main: StatsDashboard,
+			},
+			{
+				path: '/cms/reports',
+				private: true,
+				main: Reports,
 			},
 			{
 				path: '/providers/:providerId',
