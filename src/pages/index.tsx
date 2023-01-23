@@ -11,7 +11,13 @@ import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import CallToAction from '@/components/call-to-action';
 
-import { recommendationsService, groupSessionsService, accountService, callToActionService } from '@/lib/services';
+import {
+	recommendationsService,
+	groupSessionsService,
+	accountService,
+	callToActionService,
+	screeningService,
+} from '@/lib/services';
 import {
 	GroupSessionRequestModel,
 	GroupSessionModel,
@@ -25,6 +31,7 @@ import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import HomeFooterCta from '@/components/home-footer-cta';
+import ScreeningFlowCta from '@/components/screening-flow-cta';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -58,6 +65,27 @@ const Index: FC = () => {
 	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
+	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
+
+	const checkScreenFlowStatus = useCallback(async () => {
+		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
+			return;
+		}
+
+		try {
+			const { sessionFullyCompleted } = await screeningService
+				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
+				.fetch();
+
+			if (sessionFullyCompleted) {
+				setShowScreeningFlowCta(false);
+			} else {
+				setShowScreeningFlowCta(true);
+			}
+		} catch (error) {
+			// dont throw
+		}
+	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled]);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) return;
@@ -96,6 +124,18 @@ const Index: FC = () => {
 	return (
 		<>
 			<HomeHero />
+
+			<AsyncPage fetchData={checkScreenFlowStatus}>
+				{showScreeningFlowCta && (
+					<Container className="pt-12">
+						<Row>
+							<Col>
+								<ScreeningFlowCta />
+							</Col>
+						</Row>
+					</Container>
+				)}
+			</AsyncPage>
 
 			<AsyncPage fetchData={fetchCallsToAction}>
 				{callsToAction.length > 0 && (

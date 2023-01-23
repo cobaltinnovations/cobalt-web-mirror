@@ -28,6 +28,8 @@ import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
 import SimpleFilter from '@/components/simple-filter';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
+import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
+import ScreeningFlowCta from '@/components/screening-flow-cta';
 
 const carouselConfig = {
 	externalMonitor: {
@@ -398,30 +400,7 @@ const ResourceLibrary = () => {
 							{!hasCompletedScreening ? (
 								<Row>
 									<Col>
-										<div className="bg-n75 rounded p-12">
-											<Row>
-												<Col lg={{ span: 6, offset: 3 }}>
-													<h2 className="mb-6 text-center">
-														Get Personalized Recommendations
-													</h2>
-													<p className="mb-6 fs-large text-center">
-														Complete a wellness assessment to get personalized
-														recommendations
-													</p>
-													<div className="text-center">
-														<Button
-															size="lg"
-															variant="outline-primary"
-															onClick={() => {
-																checkAndStartScreeningFlow();
-															}}
-														>
-															Take the assessment
-														</Button>
-													</div>
-												</Col>
-											</Row>
-										</div>
+										<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
 									</Col>
 								</Row>
 							) : (
