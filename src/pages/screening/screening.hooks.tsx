@@ -112,6 +112,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		return screeningSessions.filter((session) => !session.completed);
 	}, [screeningSessions]);
 
+	// TODO: Replace this with 'getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)'
 	const hasCompletedScreening = useMemo(() => {
 		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
