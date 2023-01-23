@@ -60,7 +60,10 @@ const carouselConfig = {
 const ResourceLibrary = () => {
 	const { mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.contentScreeningFlowId, false);
+	const { checkAndStartScreeningFlow, hasCompletedScreening } = useScreeningFlow(
+		institution?.contentScreeningFlowId,
+		false
+	);
 
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -98,8 +101,6 @@ const ResourceLibrary = () => {
 		() => tagIdQuery.length > 0 || contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
 		[contentDurationIdQuery.length, contentTypeIdQuery.length, tagIdQuery.length]
 	);
-	// Screening Flow Check
-	const [screeningFlowComplete, setScreeningFlowComplete] = useState(false);
 
 	useEffect(() => {
 		if (!hasTouchScreen) {
@@ -146,18 +147,6 @@ const ResourceLibrary = () => {
 	useEffect(() => {
 		setContentDurationFilterValue(contentDurationIdQuery);
 	}, [contentDurationIdQuery]);
-
-	const fetchScreeningFlowStatus = useCallback(async () => {
-		if (!institution?.contentScreeningFlowId) {
-			return;
-		}
-
-		const { sessionFullyCompleted } = await screeningService
-			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
-			.fetch();
-
-		setScreeningFlowComplete(sessionFullyCompleted);
-	}, [institution?.contentScreeningFlowId]);
 
 	const fetchData = useCallback(async () => {
 		if (searchQuery) {
@@ -405,8 +394,8 @@ const ResourceLibrary = () => {
 						</Row>
 					)}
 					{recommendedContent ? (
-						<AsyncPage fetchData={fetchScreeningFlowStatus}>
-							{!screeningFlowComplete ? (
+						<>
+							{!hasCompletedScreening ? (
 								<Row>
 									<Col>
 										<div className="bg-n75 rounded p-12">
@@ -721,7 +710,7 @@ const ResourceLibrary = () => {
 									</AsyncPage>
 								</>
 							)}
-						</AsyncPage>
+						</>
 					) : (
 						<AsyncPage fetchData={fetchData}>
 							{tagGroups.map((tagGroup) => {
