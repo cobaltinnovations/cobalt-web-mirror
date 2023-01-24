@@ -35,10 +35,10 @@ const Reports = () => {
 				reportTypeId: formValues.reportTypeId,
 				reportFormatId: 'CSV',
 				startDateTime: `${formValues.startDate}T00:00:00`,
-				endDateTime: '2023-01-31T23:59:59',
+				endDateTime: `${formValues.endDate}T23:59:59`,
 			});
 		},
-		[formValues.reportTypeId, formValues.startDate]
+		[formValues.endDate, formValues.reportTypeId, formValues.startDate]
 	);
 
 	useEffect(() => {
