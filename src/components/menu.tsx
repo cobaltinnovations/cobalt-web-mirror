@@ -220,6 +220,7 @@ interface MenuNavSection {
 interface MenuNavItem {
 	label: string;
 	icon: ReactNode;
+	testId?: string;
 	analyticsEvent?: () => AnalyticsEvent;
 	to?: (ctx: MenuNavContext) => To | null;
 	subNavSections?: (ctx: MenuNavContext) => MenuNavSection[] | null;
@@ -237,7 +238,7 @@ const AdditionalNavigationItemIcon = ({ iconName }: { iconName: string }) => {
 const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	{
 		title: 'Content Management',
-		items: () => [
+		items: (context) => [
 			{
 				testId: 'menuLinkAdminMyContent',
 				label: 'My Content',
@@ -252,6 +253,16 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminAvailableContent ? '/cms/available-content' : null,
 			},
+			...(context?.institutionCapabilities?.viewNavAdminReports
+				? [
+						{
+							testId: 'menuLinkAdminReports',
+							label: 'Available Content',
+							icon: <AdminIcon />,
+							to: () => '/admin/reports',
+						},
+				  ]
+				: []),
 		],
 	},
 	{

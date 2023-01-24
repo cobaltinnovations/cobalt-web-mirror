@@ -59,6 +59,7 @@ export interface AccountInstitutionCapabilities {
 	viewNavAdminGroupSession: boolean;
 	viewNavAdminGroupSessionRequest: boolean;
 	viewNavAdminMyContent: boolean;
+	viewNavAdminReports: boolean;
 }
 
 export interface AccountQuestionModel {
