@@ -489,7 +489,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: StatsDashboard,
 			},
 			{
-				path: '/cms/reports',
+				path: '/admin/reports',
 				private: true,
 				main: Reports,
 			},

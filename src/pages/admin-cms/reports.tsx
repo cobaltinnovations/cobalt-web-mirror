@@ -3,14 +3,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import { reportingSerive, ReportType } from '@/lib/services';
-import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import Select from '@/components/select';
 import DatePicker from '@/components/date-picker';
+import { buildQueryParamUrl } from '@/lib/utils';
 
 const Reports = () => {
-	const handleError = useHandleError();
 	const [reportingTypes, setReportingTypes] = useState<ReportType[]>([]);
 	const [formValues, setFormValues] = useState({
 		reportTypeId: '',
@@ -32,20 +31,14 @@ const Reports = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			try {
-				await reportingSerive
-					.runReport({
-						reportTypeId: formValues.reportTypeId,
-						reportFormatId: 'CSV',
-						startDateTime: `${formValues.startDate}T00:00:00`,
-						endDateTime: '2023-01-31T23:59:59',
-					})
-					.fetch();
-			} catch (error) {
-				handleError(error);
-			}
+			window.location.href = buildQueryParamUrl('/reporting/run-report', {
+				reportTypeId: formValues.reportTypeId,
+				reportFormatId: 'CSV',
+				startDateTime: `${formValues.startDate}T00:00:00`,
+				endDateTime: '2023-01-31T23:59:59',
+			});
 		},
-		[formValues.reportTypeId, formValues.startDate, handleError]
+		[formValues.reportTypeId, formValues.startDate]
 	);
 
 	useEffect(() => {
@@ -127,7 +120,11 @@ const Reports = () => {
 								/>
 							</Form.Group>
 							<div className="text-right">
-								<Button type="submit" size="lg">
+								<Button
+									type="submit"
+									size="lg"
+									disabled={!formValues.reportTypeId || !formValues.startDate || !formValues.endDate}
+								>
 									Download Report
 								</Button>
 							</div>

@@ -48,16 +48,4 @@ export const reportingSerive = {
 			url: '/reporting/report-types',
 		});
 	},
-	runReport(query?: {
-		reportTypeId?: string;
-		reportFormatId?: string;
-		startDateTime?: string;
-		endDateTime?: string;
-	}) {
-		return httpSingleton.orchestrateRequest({
-			baseURL: '/',
-			method: 'GET',
-			url: buildQueryParamUrl('/reporting/run-report', query),
-		});
-	},
 };
