@@ -26,22 +26,27 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	imageOuter: {
 		width: 240,
-		minHeight: 170,
 		flexShrink: 0,
-		borderRadius: 5,
 		position: 'relative',
-		backgroundSize: 'cover',
-		backgroundPosition: 'center',
-		backgroundRepeat: 'no-repeat',
-		backgroundColor: theme.colors.n300,
 		'& .cobalt-badge': {
 			right: 8,
 			bottom: 8,
 			position: 'absolute',
 		},
 		[mediaQueries.lg]: {
-			height: 210,
 			width: '100%',
+		},
+	},
+	image: {
+		width: '100%',
+		borderRadius: 5,
+		overflow: 'hidden',
+		paddingBottom: '56.25%',
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		backgroundRepeat: 'no-repeat',
+		backgroundColor: theme.colors.n300,
+		[mediaQueries.lg]: {
 			borderRadius: 0,
 		},
 	},
@@ -109,15 +114,16 @@ export const TopicCenterGroupSession = ({
 			className={classNames(classes.topicCenterGroupSession, className)}
 			onClick={isMobile ? onClick : undefined}
 		>
-			<div
-				className={classes.imageOuter}
-				style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
-			>
+			<div className={classes.imageOuter}>
 				{badgeTitle && (
 					<Badge className="d-lg-none" as="div" bg="outline-secondary" pill>
 						{badgeTitle}
 					</Badge>
 				)}
+				<div
+					className={classes.image}
+					style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
+				/>
 			</div>
 			<div className={classes.informationOuter}>
 				<div>
