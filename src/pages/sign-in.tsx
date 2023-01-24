@@ -12,6 +12,7 @@ import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-small.svg';
 import { AccountSourceId, AccountSourceDisplayStyleId } from '@/lib/models';
 import config from '@/lib/config';
+import Blurb from '@/components/blurb';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -59,7 +60,7 @@ const SignIn: FC = () => {
 	return (
 		<Container fluid className={classes.signInOuter}>
 			<Container className={classes.signIn}>
-				<Row>
+				<Row className="mb-2">
 					<Col>
 						<div className={classes.signInInner}>
 							<div className="mb-6 text-center">
@@ -113,6 +114,11 @@ const SignIn: FC = () => {
 								})}
 							</div>
 						</div>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<Blurb />
 					</Col>
 				</Row>
 			</Container>
