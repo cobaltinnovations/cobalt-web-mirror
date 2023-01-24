@@ -141,8 +141,7 @@ if (settings.sentry.dsn) {
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing
 app.get('/reporting/run-report', (req, res, next) => {
-	// TODO: use real base URL
-	const baseUrl = 'http://localhost:8080';
+	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
 	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
 	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
 

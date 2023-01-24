@@ -55,8 +55,9 @@ export const reportingSerive = {
 		endDateTime?: string;
 	}) {
 		return httpSingleton.orchestrateRequest({
+			baseURL: '/',
 			method: 'GET',
-			url: buildQueryParamUrl('/reporting/csv', query),
+			url: buildQueryParamUrl('/reporting/run-report', query),
 		});
 	},
 };
