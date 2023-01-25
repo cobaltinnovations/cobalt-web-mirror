@@ -35,27 +35,3 @@ export interface InteractionOptionAction {
 	created: string;
 	createdDescription: string;
 }
-
-export enum INSTITUTION_BLURB_TYPE_ID {
-	INTRO = 'INTRO',
-	TEAM = 'TEAM',
-	ABOUT = 'ABOUT',
-}
-
-export interface InstitutionBlurb {
-	institutionBlurbId: string;
-	institutionId: string;
-	institutionBlurbTypeId: INSTITUTION_BLURB_TYPE_ID;
-	title: string;
-	description: string;
-	shortDescription: string;
-	institutionTeamMembers: InstitutionTeamMember[];
-}
-
-export interface InstitutionTeamMember {
-	institutionTeamMemberId: string;
-	institutionId: string;
-	title: string;
-	name: string;
-	imageUrl: string;
-}
