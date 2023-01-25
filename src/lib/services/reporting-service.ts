@@ -20,6 +20,11 @@ export enum REPORTING_WINDOW_ID {
 	WEEKLY_12_WEEKS = 'WEEKLY_12_WEEKS',
 }
 
+export interface ReportType {
+	reportTypeId: string;
+	description: string;
+}
+
 export const reportingSerive = {
 	getCharts(query?: { reportingWindowId?: REPORTING_WINDOW_ID }): OrchestratedRequest<GetChartsResponse> {
 		return httpSingleton.orchestrateRequest({
@@ -35,6 +40,12 @@ export const reportingSerive = {
 			url: buildQueryParamUrl('/reporting/csv', {
 				...(query?.reportingWindowId ? { reportingWindowId: query.reportingWindowId } : {}),
 			}),
+		});
+	},
+	getReportTypes() {
+		return httpSingleton.orchestrateRequest<{ reportTypes: ReportType[] }>({
+			method: 'GET',
+			url: '/reporting/report-types',
 		});
 	},
 };

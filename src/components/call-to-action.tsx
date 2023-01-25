@@ -77,7 +77,7 @@ const CallToAction = ({ callToAction, className }: Props) => {
 		<div className={classNames(classes.callToAction, className)}>
 			<div className="d-flex align-items-center">
 				<InfoIcon width={20} height={20} className={classes.infoIcon} />
-				<div dangerouslySetInnerHTML={{ __html: callToAction.messageAsHtml }} />
+				<div className="wysiwyg-display" dangerouslySetInnerHTML={{ __html: callToAction.messageAsHtml }} />
 			</div>
 			<div className={classes.actionLinksOuter}>
 				{callToAction.actionLinks.map((actionLink, index) => {

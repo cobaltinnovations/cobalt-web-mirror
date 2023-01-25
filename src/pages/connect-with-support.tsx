@@ -418,7 +418,10 @@ const ConnectWithSupport: FC = () => {
 			<HeroContainer>
 				<h2 className="mb-2 text-center">Connect with Support</h2>
 				<div className="d-flex justify-content-center align-items-center">
-					<p className="mb-0 text-center" dangerouslySetInnerHTML={{ __html: recommendationHtml }} />
+					<div
+						className="wysiwyg-display text-center"
+						dangerouslySetInnerHTML={{ __html: recommendationHtml }}
+					/>
 					<Link to="/one-on-one-resources">
 						<InfoIcon className={classes.infoIcon} />
 					</Link>

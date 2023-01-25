@@ -15,6 +15,7 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 			borderRadius: 0,
 			cursor: 'pointer',
 			appearance: 'none',
+			backgroundImage: 'none',
 			color: theme.colors.n900,
 			...theme.fonts.bodyNormal,
 			padding: '0 40px 0 15px',

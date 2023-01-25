@@ -126,7 +126,7 @@ export class HttpClient {
 			orchestratedRequest.source = source;
 			orchestratedRequest.config = {
 				...requestConfig,
-				baseURL: this._baseUrl,
+				baseURL: requestConfig.baseURL ?? this._baseUrl,
 				headers: {
 					...this._headers,
 					...requestConfig.headers,

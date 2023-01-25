@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
 const yn = require('yn');
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
+const proxy = require('express-http-proxy');
 
 const configNamespace = process.env.COBALT_WEB_NAMESPACE;
 const configEnv = process.env.COBALT_WEB_ENV;
@@ -104,6 +105,23 @@ function configureReactApp() {
 	}
 }
 
+function extractCookieValueFromRequest(_req, cookieName) {
+	const {
+		headers: { cookie },
+	} = _req;
+
+	if (cookie) {
+		const values = cookie.split(';').reduce((res, item) => {
+			const data = item.trim().split('=');
+			return { ...res, [data[0]]: data[1] };
+		}, {});
+
+		return values[cookieName];
+	}
+
+	return undefined;
+}
+
 configureReactApp();
 
 const app = express();
@@ -118,6 +136,19 @@ if (settings.sentry.dsn) {
 	app.use(Sentry.Handlers.requestHandler());
 	app.use(Sentry.Handlers.tracingHandler());
 }
+
+// Reporting CSV downloads can proxy through to backend and tack on access token.
+// This way FE does not have access token embedded in URL, preventing
+// unintentional "copy-paste" sharing
+app.get('/reporting/run-report', (req, res, next) => {
+	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
+	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
+
+	req.url = proxyUrl;
+
+	return proxy(proxyUrl)(req, res, next);
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
