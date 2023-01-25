@@ -375,7 +375,7 @@ const ScreeningQuestionsPage = () => {
 								)}
 
 								<div
-									className="my-6"
+									className="my-6 wysiwyg-display"
 									dangerouslySetInnerHTML={{
 										__html: questionPrompt.text,
 									}}
@@ -433,6 +433,7 @@ const ScreeningQuestionsPage = () => {
 
 								<h3 className="mb-5">
 									<div
+										className="wysiwyg-display"
 										dangerouslySetInnerHTML={{
 											__html: screeningQuestionContextResponse?.screeningQuestion.questionText!,
 										}}
@@ -453,7 +454,7 @@ const ScreeningQuestionsPage = () => {
 
 									{screeningQuestionContextResponse?.screeningQuestion.footerText && (
 										<div
-											className="mt-3 mb-5"
+											className="mt-3 mb-5 wysiwyg-display"
 											dangerouslySetInnerHTML={{
 												__html: screeningQuestionContextResponse?.screeningQuestion.footerText,
 											}}

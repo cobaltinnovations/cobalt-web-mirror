@@ -184,8 +184,8 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									<CircleIndicator size={16} className={classes.circleSix}>
 										6
 									</CircleIndicator>
-									<p
-										className="mb-0"
+									<div
+										className="wysiwyg-display"
 										style={{ ...fonts.small }}
 										dangerouslySetInnerHTML={{ __html: props.description || '' }}
 									/>

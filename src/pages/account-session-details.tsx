@@ -23,7 +23,13 @@ const AccountSessionDetails = () => {
 		};
 	}, [accountSessionId]);
 
-	return <p className="m-6" style={{ whiteSpace: 'pre-line' }} dangerouslySetInnerHTML={{ __html: text }} />;
+	return (
+		<div
+			className="m-6 wysiwyg-display"
+			style={{ whiteSpace: 'pre-line' }}
+			dangerouslySetInnerHTML={{ __html: text }}
+		/>
+	);
 };
 
 export default AccountSessionDetails;

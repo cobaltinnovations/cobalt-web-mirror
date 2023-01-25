@@ -309,7 +309,10 @@ const InTheStudioGroupSessionScheduled = () => {
 							<p className="mb-3 mb-lg-5 text-muted">with {session?.facilitatorName}</p>
 						)}
 						<hr className="mb-2 mb-lg-4" />
-						<p className="mb-0" dangerouslySetInnerHTML={{ __html: session?.description || '' }} />
+						<div
+							className="wysiwyg-display"
+							dangerouslySetInnerHTML={{ __html: session?.description || '' }}
+						/>
 						<div className="mt-10 text-center">
 							{reservation ? (
 								<Button

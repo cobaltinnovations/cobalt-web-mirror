@@ -64,6 +64,7 @@ const InteractionInstances: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h3 className="mb-4 text-center">Interaction Data</h3>
 						<div
+							className="wysiwyg-display"
 							dangerouslySetInnerHTML={{
 								__html: interactionInstance?.metadata.endUserHtmlRepresentation || '',
 							}}
@@ -79,6 +80,7 @@ const InteractionInstances: FC = () => {
 									return (
 										<li key={interactionOptionAction.interactionOptionActionId}>
 											<div
+												className="wysiwyg-display"
 												dangerouslySetInnerHTML={{
 													__html: interactionOptionAction.descriptionAsHtml,
 												}}

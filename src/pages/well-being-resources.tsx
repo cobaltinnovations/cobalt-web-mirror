@@ -24,7 +24,10 @@ const WellBeingResources: FC = () => {
 											{resource.title}
 										</a>
 									</h4>
-									<div dangerouslySetInnerHTML={{ __html: resource.description }} />
+									<div
+										className="wysiwyg-display"
+										dangerouslySetInnerHTML={{ __html: resource.description }}
+									/>
 									{!isLast && <hr className="my-8" />}
 								</React.Fragment>
 							);
