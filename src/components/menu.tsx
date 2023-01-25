@@ -257,7 +257,7 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				? [
 						{
 							testId: 'menuLinkAdminReports',
-							label: 'Available Content',
+							label: 'Reports',
 							icon: <AdminIcon />,
 							to: () => '/admin/reports',
 						},
