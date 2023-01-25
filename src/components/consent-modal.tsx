@@ -8,7 +8,6 @@ import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
 import { Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
-import { Link } from 'react-router-dom';
 import LoadingButton from './loading-button';
 
 const useStyles = createUseStyles({

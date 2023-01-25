@@ -1,6 +1,7 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { AccountSource, Institution } from '@/lib/models/institution';
 import { encodeQueryData } from '@/lib/utils/url-utils';
+import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
 
 interface GetAccountSourcesResponse {
 	accountSources: AccountSource[];
@@ -41,6 +42,14 @@ export const institutionService = {
 		return httpSingleton.orchestrateRequest<GetInstitutionResponse>({
 			method: 'get',
 			url,
+		});
+	},
+	getInstitutionBlurbs() {
+		return httpSingleton.orchestrateRequest<{
+			institutionBlurbsByInstitutionBlurbTypeId: Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>;
+		}>({
+			method: 'GET',
+			url: '/institution-blurbs',
 		});
 	},
 };

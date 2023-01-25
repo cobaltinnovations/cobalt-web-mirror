@@ -17,6 +17,7 @@ import {
 	accountService,
 	callToActionService,
 	screeningService,
+	institutionService,
 } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
@@ -25,13 +26,15 @@ import {
 	CallToActionModel,
 	ResourceLibraryContentModel,
 	TagModel,
+	INSTITUTION_BLURB_TYPE_ID,
+	InstitutionBlurb,
 } from '@/lib/models';
 
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import HomeFooterCta from '@/components/home-footer-cta';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
+import Team from '@/components/team';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -66,6 +69,7 @@ const Index: FC = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
+	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
@@ -90,11 +94,18 @@ const Index: FC = () => {
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) return;
 
-		const response = await recommendationsService.getRecommendations(account?.accountId).fetch();
+		const [recommendationsResponse, blurbsResponse] = await Promise.all([
+			recommendationsService.getRecommendations(account?.accountId).fetch(),
+			institutionService.getInstitutionBlurbs().fetch(),
+		]);
 
-		setInTheStudioEvents([...response.groupSessionRequests, ...response.groupSessions]);
-		setContent(response.contents);
-		setTagsByTagId(response.tagsByTagId);
+		setInTheStudioEvents([
+			...recommendationsResponse.groupSessionRequests,
+			...recommendationsResponse.groupSessions,
+		]);
+		setContent(recommendationsResponse.contents);
+		setTagsByTagId(recommendationsResponse.tagsByTagId);
+		setInstitutionBlurbs(blurbsResponse.institutionBlurbsByInstitutionBlurbTypeId);
 
 		const roleId = Cookies.get('roleId');
 		if (roleId) {
@@ -299,7 +310,34 @@ const Index: FC = () => {
 
 				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
 
-				<HomeFooterCta />
+				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
+					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />
+				)}
+				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.ABOUT] && (
+					<>
+						<Container>
+							<Row>
+								<Col>
+									<hr />
+								</Col>
+							</Row>
+						</Container>
+						<Container className="pt-18 pb-24">
+							<Row>
+								<Col lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+									<h2 className="mb-6 text-center">
+										{institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.ABOUT].title}
+									</h2>
+									<div
+										dangerouslySetInnerHTML={{
+											__html: institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.ABOUT].description,
+										}}
+									/>
+								</Col>
+							</Row>
+						</Container>
+					</>
+				)}
 			</AsyncPage>
 		</>
 	);
