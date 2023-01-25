@@ -1,18 +1,24 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { accountService } from '@/lib/services';
+import { accountService, institutionService } from '@/lib/services';
 import useSubdomain from '@/hooks/use-subdomain';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-small.svg';
-import { AccountSourceId, AccountSourceDisplayStyleId } from '@/lib/models';
+import {
+	AccountSourceId,
+	AccountSourceDisplayStyleId,
+	INSTITUTION_BLURB_TYPE_ID,
+	InstitutionBlurb,
+} from '@/lib/models';
 import config from '@/lib/config';
 import Blurb from '@/components/blurb';
+import AsyncWrapper from '@/components/async-page';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -42,6 +48,19 @@ const SignIn: FC = () => {
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
+	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
+
+	const fetchData = useCallback(async () => {
+		try {
+			const { institutionBlurbsByInstitutionBlurbTypeId } = await institutionService
+				.getInstitutionBlurbs()
+				.fetch();
+
+			setInstitutionBlurbs(institutionBlurbsByInstitutionBlurbTypeId);
+		} catch (error) {
+			// don't throw
+		}
+	}, []);
 
 	const handleEnterAnonymouslyButtonClick = async () => {
 		try {
@@ -116,11 +135,28 @@ const SignIn: FC = () => {
 						</div>
 					</Col>
 				</Row>
-				<Row>
-					<Col>
-						<Blurb />
-					</Col>
-				</Row>
+				<AsyncWrapper fetchData={fetchData}>
+					{institutionBlurbs && institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.INTRO] && (
+						<Row>
+							<Col>
+								<Blurb
+									modalTitle={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.INTRO].title ?? ''}
+									modalDestription={
+										institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.INTRO].description ?? ''
+									}
+									speechBubbleTitle={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.INTRO].title ?? ''}
+									speechBubbleDestription={
+										institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.INTRO].shortDescription ?? ''
+									}
+									teamMemberImageUrl={
+										institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.INTRO].institutionTeamMembers?.[0]
+											.imageUrl ?? ''
+									}
+								/>
+							</Col>
+						</Row>
+					)}
+				</AsyncWrapper>
 			</Container>
 		</Container>
 	);

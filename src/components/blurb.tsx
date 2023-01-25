@@ -66,14 +66,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const Blurb = () => {
+interface BlurbProps {
+	modalTitle: string;
+	modalDestription: string;
+	speechBubbleTitle: string;
+	speechBubbleDestription: string;
+	teamMemberImageUrl: string;
+}
+
+const Blurb = ({
+	modalTitle,
+	modalDestription,
+	speechBubbleTitle,
+	speechBubbleDestription,
+	teamMemberImageUrl,
+}: BlurbProps) => {
 	const classes = useStyles();
 	const [showModal, setShowModal] = useState(false);
 
-	return null;
-
-	// Institution specific
-	// eslint-disable-next-line no-unreachable
 	return (
 		<>
 			<Modal
@@ -88,15 +98,15 @@ const Blurb = () => {
 					<Modal.Title>&nbsp;</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<h3 className="mb-6">modal title</h3>
-					<p className="mb-6 fs-large">modal description</p>
+					<h3 className="mb-6">{modalTitle}</h3>
+					<div dangerouslySetInnerHTML={{ __html: modalDestription }} />
 				</Modal.Body>
 			</Modal>
 
 			<div className={classes.blurb}>
 				<div className={classes.speechBubble}>
-					<h6 className="mb-4">speech bubble title</h6>
-					<p className="mb-4">speech bubble description</p>
+					<h6 className="mb-4">{speechBubbleTitle}</h6>
+					<p className="mb-4">{speechBubbleDestription}</p>
 					<Button
 						variant="link"
 						size="sm"
@@ -108,7 +118,7 @@ const Blurb = () => {
 						Read More
 					</Button>
 				</div>
-				<div className={classes.headshot} style={{ backgroundImage: `url(${null}` }} />
+				<div className={classes.headshot} style={{ backgroundImage: `url(${teamMemberImageUrl}` }} />
 			</div>
 		</>
 	);
