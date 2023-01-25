@@ -130,7 +130,10 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 							<img src={session?.imageUrl} alt="" />
 						</div>
 						<Card className="mb-5 border-0 p-6">
-							<div dangerouslySetInnerHTML={{ __html: session?.description || '' }}></div>
+							<div
+								className="wysiwyg-display"
+								dangerouslySetInnerHTML={{ __html: session?.description || '' }}
+							></div>
 							<p className="mb-0 text-danger">required*</p>
 						</Card>
 						<Formik<RequestSessionFormData>

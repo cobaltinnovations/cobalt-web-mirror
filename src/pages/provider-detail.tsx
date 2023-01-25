@@ -253,10 +253,11 @@ const ProviderDetail = () => {
 											<div id="about" className={classes.sectionAnchor} />
 											<h4>About</h4>
 											<div
+												className="wysiwyg-display"
 												dangerouslySetInnerHTML={{
 													__html: selectedProvider?.bio ?? '<p>Not available.</p>',
 												}}
-											></div>
+											/>
 										</div>
 
 										<div ref={sectionRefs[2]}>

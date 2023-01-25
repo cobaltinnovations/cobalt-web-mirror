@@ -171,7 +171,10 @@ const ResourceLibraryDetail: FC = () => {
 
 					<Row className="justify-content-center">
 						<Col md={10} lg={8} xl={6}>
-							<div className="mb-0" dangerouslySetInnerHTML={{ __html: item?.description || '' }} />
+							<div
+								className="wysiwyg-display"
+								dangerouslySetInnerHTML={{ __html: item?.description || '' }}
+							/>
 
 							{!canEmbed && item?.url && (
 								<div className="mt-10 text-center">
