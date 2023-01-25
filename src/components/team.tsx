@@ -62,7 +62,7 @@ const Team = ({ teamMembers }: TeamProps) => {
 						<div className={classes.teamMembers}>
 							{teamMembers.map((tm) => {
 								return (
-									<div className={classes.teamMember}>
+									<div key={tm.institutionTeamMemberId} className={classes.teamMember}>
 										<div
 											className={classes.headshot}
 											style={{ backgroundImage: `url(${tm.imageUrl})` }}

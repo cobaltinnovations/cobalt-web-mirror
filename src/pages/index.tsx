@@ -33,7 +33,6 @@ import {
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import HomeFooterCta from '@/components/home-footer-cta';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
 
@@ -314,7 +313,31 @@ const Index: FC = () => {
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
 					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />
 				)}
-				<HomeFooterCta />
+				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.ABOUT] && (
+					<>
+						<Container>
+							<Row>
+								<Col>
+									<hr />
+								</Col>
+							</Row>
+						</Container>
+						<Container className="pt-18 pb-24">
+							<Row>
+								<Col lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+									<h2 className="mb-6 text-center">
+										{institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.ABOUT].title}
+									</h2>
+									<div
+										dangerouslySetInnerHTML={{
+											__html: institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.ABOUT].description,
+										}}
+									/>
+								</Col>
+							</Row>
+						</Container>
+					</>
+				)}
 			</AsyncPage>
 		</>
 	);
