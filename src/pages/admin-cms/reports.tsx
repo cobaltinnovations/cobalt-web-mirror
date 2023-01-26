@@ -41,14 +41,10 @@ const Reports = () => {
 		[formValues.endDate, formValues.reportTypeId, formValues.startDate]
 	);
 
-	useEffect(() => {
-		console.log(formValues);
-	}, [formValues]);
-
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<HeroContainer>
-				<h2 className="mb-0 text-center">Reports</h2>
+				<h2 className="mb-0 text-center">Provider Reports</h2>
 			</HeroContainer>
 			<Container className="py-14">
 				<Row>
