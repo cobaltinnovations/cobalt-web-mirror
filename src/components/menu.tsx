@@ -276,17 +276,14 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 	},
 	{
 		title: 'Reporting',
-		items: (context) => [
-			...(context?.institutionCapabilities?.viewNavAdminReports
-				? [
-						{
-							testId: 'menuLinkAdminReports',
-							label: 'Provider Reports',
-							icon: <AdminIcon />,
-							to: () => '/admin/reports',
-						},
-				  ]
-				: []),
+		items: () => [
+			{
+				testId: 'menuLinkAdminReports',
+				label: 'Provider Reports',
+				icon: <AdminIcon />,
+				to: ({ institutionCapabilities }) =>
+					institutionCapabilities?.viewNavAdminReports ? '/admin/reports' : null,
+			},
 		],
 	},
 ];
