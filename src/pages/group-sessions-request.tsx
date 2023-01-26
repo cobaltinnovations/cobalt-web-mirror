@@ -61,9 +61,9 @@ const GroupSessionsRequest = () => {
 		otherGroupTopicsDescription: '',
 		preferredDateDescription: '',
 		preferredTimeDescription: '',
-		attendeeCountId: ATTENDEE_COUNTS.FIVE_TO_TEN,
-		minimumAttendeeCount: 0,
-		maximumAttendeeCount: 0,
+		attendeeCountId: attendeeCounts[ATTENDEE_COUNTS.FIVE_TO_TEN].attendeeCountId,
+		minimumAttendeeCount: attendeeCounts[ATTENDEE_COUNTS.FIVE_TO_TEN].minimumAttendeeCount,
+		maximumAttendeeCount: attendeeCounts[ATTENDEE_COUNTS.FIVE_TO_TEN].maximumAttendeeCount,
 		additionalDescription: '',
 	});
 	const [formIsSubmitting, setFormIsSubmitting] = useState(false);

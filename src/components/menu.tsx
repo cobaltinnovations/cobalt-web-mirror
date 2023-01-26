@@ -253,16 +253,6 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				to: ({ institutionCapabilities }) =>
 					institutionCapabilities?.viewNavAdminAvailableContent ? '/cms/available-content' : null,
 			},
-			...(context?.institutionCapabilities?.viewNavAdminReports
-				? [
-						{
-							testId: 'menuLinkAdminReports',
-							label: 'Reports',
-							icon: <AdminIcon />,
-							to: () => '/admin/reports',
-						},
-				  ]
-				: []),
 		],
 	},
 	{
@@ -282,6 +272,21 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 			// 	to: ({ institutionCapabilities }) =>
 			// 		institutionCapabilities?.viewNavAdminGroupSessionRequest ? '/group-sessions/by-request' : null,
 			// },
+		],
+	},
+	{
+		title: 'Reporting',
+		items: (context) => [
+			...(context?.institutionCapabilities?.viewNavAdminReports
+				? [
+						{
+							testId: 'menuLinkAdminReports',
+							label: 'Provider Reports',
+							icon: <AdminIcon />,
+							to: () => '/admin/reports',
+						},
+				  ]
+				: []),
 		],
 	},
 ];
