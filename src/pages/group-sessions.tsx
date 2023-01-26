@@ -12,8 +12,17 @@ import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import useHandleError from '@/hooks/use-handle-error';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles({
+	requestSessionCta: {
+		maxWidth: 382,
+		margin: '0 auto',
+	},
+});
 
 const GroupSessions = () => {
+	const classes = useStyles();
 	const handleError = useHandleError();
 	const { mixpanel } = useAnalytics();
 	const navigate = useNavigate();
@@ -282,23 +291,27 @@ const GroupSessions = () => {
 					</Col>
 				</Row>
 			</Container>
-			<HeroContainer className="bg-n75">
-				<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-				<p className="mb-6 fs-large text-center">
-					Request a session and we'll work with you to find a dedicated time for a wellness-focused group
-					session for your team.
-				</p>
-				<div className="text-center">
-					<Button
-						variant="outline-primary"
-						onClick={() => {
-							navigate('/group-sessions/request');
-						}}
-					>
-						Request a Session
-					</Button>
-				</div>
-			</HeroContainer>
+			<Container fluid className="bg-n75">
+				<Container className="py-10 py-lg-20">
+					<div className={classes.requestSessionCta}>
+						<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
+						<p className="mb-6 fs-large text-center">
+							Request a session and we'll work with you to find a dedicated time for a wellness-focused
+							group session for your team.
+						</p>
+						<div className="text-center">
+							<Button
+								variant="outline-primary"
+								onClick={() => {
+									navigate('/group-sessions/request');
+								}}
+							>
+								Request a Session
+							</Button>
+						</div>
+					</div>
+				</Container>
+			</Container>
 		</>
 	);
 };
