@@ -327,7 +327,8 @@ const MENU_SECTIONS: MenuNavSection[] = [
 					institutionCapabilities?.viewNavAdminMyContent ||
 					institutionCapabilities?.viewNavAdminAvailableContent ||
 					institutionCapabilities?.viewNavAdminGroupSession ||
-					institutionCapabilities?.viewNavAdminGroupSessionRequest
+					institutionCapabilities?.viewNavAdminGroupSessionRequest ||
+					institutionCapabilities?.viewNavAdminReports
 						? ADMIN_MENU_SECTIONS
 						: null,
 			},
