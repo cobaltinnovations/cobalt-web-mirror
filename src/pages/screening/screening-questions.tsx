@@ -175,6 +175,10 @@ const ScreeningQuestionsPage = () => {
 										disabled={isSubmitting}
 										checked={isChecked}
 										onClick={() => {
+											if (isSubmitting) {
+												return;
+											}
+
 											const selection = [optionId];
 											setSelectedAnswers(selection);
 
@@ -197,7 +201,12 @@ const ScreeningQuestionsPage = () => {
 											className="mb-4"
 											value={supplementText[optionId] ?? ''}
 											label={option.freeformSupplementText ?? ''}
+											disabled={isSubmitting}
 											onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+												if (isSubmitting) {
+													return;
+												}
+
 												setSupplementText((curr) => {
 													return {
 														...curr,
@@ -238,6 +247,10 @@ const ScreeningQuestionsPage = () => {
 										variant={isChecked ? 'primary' : 'light'}
 										disabled={isSubmitting}
 										onClick={() => {
+											if (isSubmitting) {
+												return;
+											}
+
 											setSelectedAnswers((curr) => {
 												if (isChecked) {
 													return curr.filter((v) => v !== optionId);
@@ -292,6 +305,10 @@ const ScreeningQuestionsPage = () => {
 						name={option.screeningAnswerOptionId}
 						value={answerText[option.screeningAnswerOptionId]}
 						onChange={(e) => {
+							if (isSubmitting) {
+								return;
+							}
+
 							setAnswerText((current) => {
 								return {
 									...current,
