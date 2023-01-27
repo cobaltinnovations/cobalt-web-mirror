@@ -527,8 +527,9 @@ const ScreeningQuestionsPage = () => {
 											variant="link"
 											className="mx-auto"
 											type="button"
+											disabled={isSubmitting}
 											onClick={() => {
-												if (!screeningQuestionContextId) {
+												if (isSubmitting || !screeningQuestionContextId) {
 													return;
 												}
 
