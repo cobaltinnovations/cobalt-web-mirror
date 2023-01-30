@@ -220,7 +220,7 @@ const Index: FC = () => {
 								<Col>
 									<Carousel
 										responsive={responsiveDefaults}
-										description="Sign up for group resiliency sessions, mindfulness workshops and other in-person and virtual offerings"
+										description="Register for virtual group sessions led by experts covering a range of topics, from managing anxiety to healthy living and more."
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/in-the-studio');
@@ -272,7 +272,7 @@ const Index: FC = () => {
 								<Col>
 									<Carousel
 										responsive={resourceLibraryCarouselConfig}
-										description="Browse evidence-based content including articles, videos, apps, podcasts, and more"
+										description="Browse a variety of digital resources to support your general wellness, including articles, podcasts, apps and more."
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/resource-library');
