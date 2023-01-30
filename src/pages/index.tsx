@@ -28,6 +28,7 @@ import {
 	TagModel,
 	INSTITUTION_BLURB_TYPE_ID,
 	InstitutionBlurb,
+	ACTION_LINK_TYPE_ID,
 } from '@/lib/models';
 
 import config from '@/lib/config';
@@ -123,7 +124,27 @@ const Index: FC = () => {
 			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.HOME })
 			.fetch();
 
-		setCallsToAction(response.callsToAction);
+		// setCallsToAction(response.callsToAction);
+
+		setCallsToAction([
+			{
+				message: 'hey',
+				messageAsHtml:
+					'<h2 class="mb-6">Based on your assessment results, we recommend the following:</h2><ul class="mb-0 fs-large"><li class="mb-1">Connect with the <a href="/#">Corporate Counseling Services (CCA) Team</a> (<a href="/#">Learn more about CCA</a>)</li><li class="mb-1">Review our <a href="/resource-library">On Your Time Content</a> for self-guided support</li><li>View <a href="/in-crisis">Crisis Resources</a> for immediate help</li></ul>',
+				actionLinks: [
+					{
+						actionLinkTypeId: ACTION_LINK_TYPE_ID.INTERNAL,
+						link: 'https://google.com',
+						description: 'Connect with CCA',
+					},
+					{
+						actionLinkTypeId: ACTION_LINK_TYPE_ID.CRISIS,
+						link: '/#',
+						description: 'View Crisis Resources',
+					},
+				],
+			},
+		]);
 	}, []);
 
 	useEffect(() => {
