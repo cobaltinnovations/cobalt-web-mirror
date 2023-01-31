@@ -33,7 +33,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	actionLinksOuter: {
-		marginBottom: 32,
+		marginBottom: 28,
 		display: 'flex',
 		flexWrap: 'wrap',
 		'& button': {
@@ -132,15 +132,21 @@ const CallToAction = ({ callToAction, className }: Props) => {
 					className="mb-8 wysiwyg-display"
 					dangerouslySetInnerHTML={{ __html: callToAction.messageAsHtml }}
 				/>
-				<div className={classes.actionLinksOuter}>
-					{callToAction.actionLinks.map((actionLink, index) => {
-						return (
-							<Button key={`action-link-${index}`} onClick={() => handleActionLinkClick(actionLink)}>
-								{actionLink.description}
-							</Button>
-						);
-					})}
-				</div>
+				{callToAction.actionLinks.length > 0 && (
+					<div className={classes.actionLinksOuter}>
+						{callToAction.actionLinks.map((actionLink, index) => {
+							return (
+								<Button
+									key={`action-link-${index}`}
+									className="mb-1"
+									onClick={() => handleActionLinkClick(actionLink)}
+								>
+									{actionLink.description}
+								</Button>
+							);
+						})}
+					</div>
+				)}
 				{callToAction.modalButtonText && (
 					<Button
 						variant="link"
