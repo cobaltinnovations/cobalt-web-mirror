@@ -63,6 +63,7 @@ export interface InstitutionTeamMember {
 	institutionTeamMemberId: string;
 	institutionId: string;
 	title: string;
+	subtitle?: string;
 	name: string;
 	imageUrl: string;
 }

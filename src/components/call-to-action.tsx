@@ -112,7 +112,7 @@ const CallToAction = ({ callToAction, className }: Props) => {
 					<div
 						className="mb-6"
 						dangerouslySetInnerHTML={{
-							__html: callToAction.modalMessageHtml ?? '',
+							__html: callToAction.modalMessageAsHtml ?? '',
 						}}
 					/>
 					<div className="text-right">

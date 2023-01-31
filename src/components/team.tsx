@@ -69,6 +69,7 @@ const Team = ({ teamMembers }: TeamProps) => {
 										/>
 										<h4 className="mb-2">{tm.name}</h4>
 										<p className="m-0 fs-small text-center">{tm.title}</p>
+										{tm.subtitle && <p className="m-0 fs-small text-center">{tm.subtitle}</p>}
 									</div>
 								);
 							})}
