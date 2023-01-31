@@ -124,31 +124,7 @@ const Index: FC = () => {
 			.getCallsToAction({ callToActionDisplayAreaId: CALL_TO_ACTION_DISPLAY_AREA_ID.HOME })
 			.fetch();
 
-		// setCallsToAction(response.callsToAction);
-
-		setCallsToAction([
-			{
-				message: 'hey',
-				messageAsHtml:
-					'<h2 class="mb-6">Based on your assessment results, we recommend the following:</h2><ul class="mb-0 fs-large"><li class="mb-1">Connect with the <a href="/#">Corporate Counseling Services (CCA) Team</a> (<a href="/#">Learn more about CCA</a>)</li><li class="mb-1">Review our <a href="/resource-library">On Your Time Content</a> for self-guided support</li><li>View <a href="/in-crisis">Crisis Resources</a> for immediate help</li></ul>',
-				modalButtonText: 'Why were these options recommended to me?',
-				modalMessage: 'hey again',
-				modalMessageHtml:
-					'<h3 class="mb-6">Your results indicated:</h3><ul class="mb-6 fs-large"><li class="mb-1">Higher than average symptoms of anxiety</li><li class="mb-1">Moderate symptoms of depression</li><li>Higher than average symptoms of burnout</li></ul><p class="mb-0 text-muted fs-small">You may retake the assessment in x days.</p>',
-				actionLinks: [
-					{
-						actionLinkTypeId: ACTION_LINK_TYPE_ID.INTERNAL,
-						link: 'https://google.com',
-						description: 'Connect with CCA',
-					},
-					{
-						actionLinkTypeId: ACTION_LINK_TYPE_ID.CRISIS,
-						link: '/#',
-						description: 'View Crisis Resources',
-					},
-				],
-			},
-		]);
+		setCallsToAction(response.callsToAction);
 	}, []);
 
 	useEffect(() => {
