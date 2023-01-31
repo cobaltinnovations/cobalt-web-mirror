@@ -109,11 +109,10 @@ const CallToAction = ({ callToAction, className }: Props) => {
 					<Modal.Title>&nbsp;</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<h3 className="mb-6">Your results indicated:</h3>
 					<div
 						className="mb-6"
 						dangerouslySetInnerHTML={{
-							__html: '<ul class="mb-6 fs-large"><li class="mb-1">Higher than average symptoms of anxiety</li><li class="mb-1">Moderate symptoms of depression</li><li>Higher than average symptoms of burnout</li></ul><p class="text-muted fs-small">You may retake the assessment in x days.</p>',
+							__html: callToAction.modalMessageHtml ?? '',
 						}}
 					/>
 					<div className="text-right">
@@ -142,16 +141,18 @@ const CallToAction = ({ callToAction, className }: Props) => {
 						);
 					})}
 				</div>
-				<Button
-					variant="link"
-					className="fw-normal d-inline-flex align-items-center p-0 text-decoration-none"
-					onClick={() => {
-						setShowModal(true);
-					}}
-				>
-					<InfoIcon className="me-2" />
-					Why were these options recommended to me?
-				</Button>
+				{callToAction.modalButtonText && (
+					<Button
+						variant="link"
+						className="fw-normal d-inline-flex align-items-center p-0 text-decoration-none"
+						onClick={() => {
+							setShowModal(true);
+						}}
+					>
+						<InfoIcon className="me-2" />
+						{callToAction.modalButtonText}
+					</Button>
+				)}
 			</div>
 		</>
 	);

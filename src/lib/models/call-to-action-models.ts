@@ -22,4 +22,7 @@ export interface CallToActionModel {
 	message: string;
 	messageAsHtml: string;
 	actionLinks: ActionLinkModel[];
+	modalButtonText?: string;
+	modalMessage?: string;
+	modalMessageHtml?: string;
 }
