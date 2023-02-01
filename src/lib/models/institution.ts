@@ -21,6 +21,7 @@ export interface Institution {
 	supportEmailAddress: string;
 	supportEnabled: boolean;
 	recommendedContentEnabled: boolean;
+	groupSessionRequestsEnabled: boolean;
 }
 
 export interface AdditionalNavigationItem {
