@@ -291,27 +291,29 @@ const GroupSessions = () => {
 					</Col>
 				</Row>
 			</Container>
-			<Container fluid className="bg-n75">
-				<Container className="py-10 py-lg-20">
-					<div className={classes.requestSessionCta}>
-						<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-						<p className="mb-6 fs-large text-center">
-							Request a session and we'll work with you to find a dedicated time for a wellness-focused
-							group session for your team.
-						</p>
-						<div className="text-center">
-							<Button
-								variant="outline-primary"
-								onClick={() => {
-									navigate('/group-sessions/request');
-								}}
-							>
-								Request a Session
-							</Button>
+			{institution?.groupSessionRequestsEnabled && (
+				<Container fluid className="bg-n75">
+					<Container className="py-10 py-lg-20">
+						<div className={classes.requestSessionCta}>
+							<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
+							<p className="mb-6 fs-large text-center">
+								Request a session and we'll work with you to find a dedicated time for a
+								wellness-focused group session for your team.
+							</p>
+							<div className="text-center">
+								<Button
+									variant="outline-primary"
+									onClick={() => {
+										navigate('/group-sessions/request');
+									}}
+								>
+									Request a Session
+								</Button>
+							</div>
 						</div>
-					</div>
+					</Container>
 				</Container>
-			</Container>
+			)}
 		</>
 	);
 };
