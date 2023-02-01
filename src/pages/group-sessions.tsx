@@ -72,7 +72,13 @@ const GroupSessions = () => {
 				})
 				.fetch();
 
-			setGroupSessions((previousValue) => previousValue.concat(groupSessions));
+			setGroupSessions((previousValue) => {
+				if (pageNumber.current === 0) {
+					return groupSessions;
+				}
+
+				return previousValue.concat(groupSessions);
+			});
 			setGroupSessionsTotalCount(totalCount);
 		} catch (error) {
 			handleError(error);
@@ -105,6 +111,7 @@ const GroupSessions = () => {
 			searchParams.delete('searchQuery');
 		}
 
+		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (hasTouchScreen) {
@@ -116,6 +123,8 @@ const GroupSessions = () => {
 		setSearchInputValue('');
 
 		searchParams.delete('searchQuery');
+
+		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
