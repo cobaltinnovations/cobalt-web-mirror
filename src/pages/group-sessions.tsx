@@ -231,46 +231,44 @@ const GroupSessions = () => {
 						})}
 					</Row>
 				)}
-				{isLoading && (
+				{isLoading && isFirstLoad && (
 					<Row className="mb-10">
-						{isFirstLoad ? (
-							<>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-								<Col md={6} lg={4} className="mb-8">
-									<StudioEventSkeleton />
-								</Col>
-							</>
-						) : (
-							<Col>
-								<Loader className="position-relative" />
-							</Col>
-						)}
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
 					</Row>
 				)}
 				<Row>
 					<Col></Col>
 					<Col>
-						{!disableViewMore && (
-							<div className="text-center">
-								<Button onClick={handleViewMoreButtonClick} disabled={isLoading}>
-									View More
-								</Button>
-							</div>
-						)}
+						<div className="text-center">
+							{isLoading ? (
+								<Loader className="position-static d-inline-flex" />
+							) : (
+								<>
+									{!disableViewMore && (
+										<Button onClick={handleViewMoreButtonClick} disabled={isLoading}>
+											View More
+										</Button>
+									)}
+								</>
+							)}
+						</div>
 					</Col>
 					<Col>
 						<div className="text-right">
