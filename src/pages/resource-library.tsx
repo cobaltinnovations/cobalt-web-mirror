@@ -16,7 +16,6 @@ import { callToActionService, resourceLibraryService, screeningService } from '@
 import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
-import { useScreeningFlow } from './screening/screening.hooks';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
@@ -28,7 +27,6 @@ import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
 import SimpleFilter from '@/components/simple-filter';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
-import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 
 const carouselConfig = {
@@ -62,10 +60,6 @@ const carouselConfig = {
 const ResourceLibrary = () => {
 	const { mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow, hasCompletedScreening } = useScreeningFlow(
-		institution?.contentScreeningFlowId,
-		false
-	);
 
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -78,6 +72,7 @@ const ResourceLibrary = () => {
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
@@ -149,6 +144,26 @@ const ResourceLibrary = () => {
 	useEffect(() => {
 		setContentDurationFilterValue(contentDurationIdQuery);
 	}, [contentDurationIdQuery]);
+
+	const checkScreenFlowStatus = useCallback(async () => {
+		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
+			return;
+		}
+
+		try {
+			const { sessionFullyCompleted } = await screeningService
+				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
+				.fetch();
+
+			if (sessionFullyCompleted) {
+				setHasCompletedScreening(true);
+			} else {
+				setHasCompletedScreening(false);
+			}
+		} catch (error) {
+			// dont throw
+		}
+	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled]);
 
 	const fetchData = useCallback(async () => {
 		if (searchQuery) {
@@ -396,7 +411,7 @@ const ResourceLibrary = () => {
 						</Row>
 					)}
 					{recommendedContent ? (
-						<>
+						<AsyncPage fetchData={checkScreenFlowStatus}>
 							{!hasCompletedScreening ? (
 								<Row>
 									<Col>
@@ -689,7 +704,7 @@ const ResourceLibrary = () => {
 									</AsyncPage>
 								</>
 							)}
-						</>
+						</AsyncPage>
 					) : (
 						<AsyncPage fetchData={fetchData}>
 							{tagGroups.map((tagGroup) => {
