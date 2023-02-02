@@ -150,18 +150,14 @@ const ResourceLibrary = () => {
 			return;
 		}
 
-		try {
-			const { sessionFullyCompleted } = await screeningService
-				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
-				.fetch();
+		const { sessionFullyCompleted } = await screeningService
+			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
+			.fetch();
 
-			if (sessionFullyCompleted) {
-				setHasCompletedScreening(true);
-			} else {
-				setHasCompletedScreening(false);
-			}
-		} catch (error) {
-			// dont throw
+		if (sessionFullyCompleted) {
+			setHasCompletedScreening(true);
+		} else {
+			setHasCompletedScreening(false);
 		}
 	}, [institution?.contentScreeningFlowId]);
 
