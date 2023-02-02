@@ -146,7 +146,7 @@ const ResourceLibrary = () => {
 	}, [contentDurationIdQuery]);
 
 	const checkScreenFlowStatus = useCallback(async () => {
-		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
+		if (!institution?.contentScreeningFlowId) {
 			return;
 		}
 
@@ -163,7 +163,7 @@ const ResourceLibrary = () => {
 		} catch (error) {
 			// dont throw
 		}
-	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled]);
+	}, [institution?.contentScreeningFlowId]);
 
 	const fetchData = useCallback(async () => {
 		if (searchQuery) {
