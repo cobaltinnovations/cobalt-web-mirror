@@ -92,7 +92,7 @@ const GroupSessions = () => {
 		fetchData();
 	}, [fetchData]);
 
-	const disableViewMore = groupSessionsTotalCount <= pageNumber.current + 1 * pageSize.current;
+	const disableViewMore = groupSessionsTotalCount <= (pageNumber.current + 1) * pageSize.current;
 	const handleViewMoreButtonClick = useCallback(() => {
 		if (disableViewMore) {
 			return;
