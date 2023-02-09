@@ -317,20 +317,21 @@ const Index: FC = () => {
 						<Row>
 							<Col>
 								<Button
+									variant="primary"
 									onClick={() => {
 										addFlag({
-											title: 'Whoa a new flag!',
-											description:
-												'Fruitcake topping wafer pie candy dragée sesame snaps cake. Cake cake cheesecake. Pie tiramisu carrot cake tart tart dessert cookie. Lemon drops cookie tootsie roll marzipan liquorice cotton candy brownie halvah.',
+											variant: 'primary',
+											title: 'Good news, everyone',
+											description: 'Nothing to worry about, everything is going great!',
 											actions: [
 												{
-													title: 'Nice One!',
+													title: 'Understood',
 													onClick: () => {
 														return;
 													},
 												},
 												{
-													title: 'Not right now thanks',
+													title: 'No thanks',
 													onClick: () => {
 														return;
 													},
@@ -339,7 +340,85 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									alert!
+									Primary flag
+								</Button>
+								<Button
+									variant="success"
+									onClick={() => {
+										addFlag({
+											variant: 'success',
+											title: 'Good news, everyone',
+											description: 'Nothing to worry about, everything is going great!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Success flag
+								</Button>
+								<Button
+									variant="warning"
+									onClick={() => {
+										addFlag({
+											variant: 'warning',
+											title: 'Good news, everyone',
+											description: 'Nothing to worry about, everything is going great!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Warning flag
+								</Button>
+								<Button
+									variant="danger"
+									onClick={() => {
+										addFlag({
+											variant: 'danger',
+											title: 'Good news, everyone',
+											description: 'Nothing to worry about, everything is going great!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Danger flag
 								</Button>
 							</Col>
 						</Row>

@@ -3,7 +3,6 @@ import { FlagsContext } from '@/contexts/flags-context';
 
 const useFlags = () => {
 	const flagsContext = useContext(FlagsContext);
-
 	return flagsContext;
 };
 
