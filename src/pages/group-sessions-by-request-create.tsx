@@ -103,26 +103,38 @@ const GroupSessionsByRequestCreate: FC = () => {
 					throw new Error('groupSessionId not found.');
 				}
 
-				await groupSessionsService.updateGroupSessionRequest(groupSessionId, submissionValues).fetch();
+				const updateResponse = await groupSessionsService
+					.updateGroupSessionRequest(groupSessionId, submissionValues)
+					.fetch();
 
 				addFlag({
 					variant: 'success',
 					title: 'Your group session was updated!',
+					description: 'This session is now available on Cobalt',
 					actions: [
 						{
-							title: 'OK',
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-sessions-by-request/${updateResponse.groupSession.groupSessionId}`
+								),
 						},
 					],
 				});
 			} else {
-				await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
+				const createResoonse = await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
 
 				addFlag({
 					variant: 'success',
-					title: 'Your group session was added!',
+					title: 'Your group session was updated!',
+					description: 'This session is now available on Cobalt',
 					actions: [
 						{
-							title: 'OK',
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-sessions-by-request/${createResoonse.groupSession.groupSessionId}`
+								),
 						},
 					],
 				});

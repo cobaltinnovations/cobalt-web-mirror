@@ -81,16 +81,12 @@ const InTheStudioGroupSessionScheduled = () => {
 		if (groupSessionReservation) {
 			addFlag({
 				variant: 'success',
-				title: "You've reserved a place for this session",
-				description: `Join us ${groupSession?.startDateTimeDescription}`,
+				title: 'Your seat is reserved',
+				description: 'This session was added to your events list',
 				actions: [
 					{
-						title: 'View Calendar',
+						title: 'View My Events',
 						onClick: () => navigate('/my-calendar'),
-					},
-					{
-						title: 'Join Now',
-						onClick: () => window.open(groupSession?.videoconferenceUrl, '_blank', 'noopener, noreferrer'),
 					},
 				],
 			});
@@ -230,6 +226,7 @@ const InTheStudioGroupSessionScheduled = () => {
 							.cancelGroupSessionReservation(reservation.groupSessionReservationId)
 							.fetch();
 						await fetchData();
+
 						navigate(location.pathname, {
 							replace: true,
 							state: {
@@ -238,6 +235,17 @@ const InTheStudioGroupSessionScheduled = () => {
 						});
 
 						setShowConfirmCancelModal(false);
+						addFlag({
+							variant: 'success',
+							title: 'Your reservation has been canceled',
+							description: 'This session was removed from your events list',
+							actions: [
+								{
+									title: 'View My Events',
+									onClick: () => navigate('/my-calendar'),
+								},
+							],
+						});
 					} catch (error) {
 						handleError(error);
 					}
@@ -354,7 +362,8 @@ const InTheStudioGroupSessionScheduled = () => {
 								onCopy={() => {
 									addFlag({
 										variant: 'success',
-										title: 'The link was copied to your clipboard',
+										title: 'Copied!',
+										description: 'The URL for this session was copied to your clipboard',
 										actions: [],
 									});
 								}}

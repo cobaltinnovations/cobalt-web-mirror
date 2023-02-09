@@ -74,6 +74,12 @@ const ConfirmAppointment = () => {
 
 			setConfirmationCodeRequested(true);
 			setSubmitting(false);
+			addFlag({
+				variant: 'success',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 			setSubmitting(false);
@@ -142,6 +148,13 @@ const ConfirmAppointment = () => {
 					emailAddress: response.account.emailAddress,
 				},
 			});
+
+			addFlag({
+				variant: 'success',
+				title: 'Your appointment is reserved',
+				description: `We'll see you ${response.appointment.startTimeDescription}`,
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 			setSubmitting(false);
@@ -171,7 +184,8 @@ const ConfirmAppointment = () => {
 
 			addFlag({
 				variant: 'success',
-				title: 'Verification code sent',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
 				actions: [],
 			});
 		} catch (error) {

@@ -307,25 +307,37 @@ const GroupSessionsCreate: FC = () => {
 
 			if (isEdit) {
 				if (session) {
-					await groupSessionsService.updateGroupsession(session.groupSessionId, submissionValues).fetch();
+					const updateResponse = await groupSessionsService
+						.updateGroupsession(session.groupSessionId, submissionValues)
+						.fetch();
 					addFlag({
 						variant: 'success',
 						title: 'Your group session was updated!',
+						description: 'This session is now available on Cobalt',
 						actions: [
 							{
-								title: 'OK',
+								title: 'View Session',
+								onClick: () =>
+									navigate(
+										`/in-the-studio/group-session-scheduled/${updateResponse.groupSession.groupSessionId}`
+									),
 							},
 						],
 					});
 				}
 			} else {
-				await groupSessionsService.createGroupSession(submissionValues).fetch();
+				const createResponse = await groupSessionsService.createGroupSession(submissionValues).fetch();
 				addFlag({
 					variant: 'success',
 					title: 'Your group session was added!',
+					description: 'This session is now available on Cobalt',
 					actions: [
 						{
-							title: 'OK',
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-session-scheduled/${createResponse.groupSession.groupSessionId}`
+								),
 						},
 					],
 				});
@@ -404,7 +416,8 @@ const GroupSessionsCreate: FC = () => {
 										onCopy={() => {
 											addFlag({
 												variant: 'success',
-												title: 'The link was copied to your clipboard',
+												title: 'Copied!',
+												description: 'The URL for this session was copied to your clipboard',
 												actions: [],
 											});
 										}}
