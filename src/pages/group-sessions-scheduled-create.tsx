@@ -39,6 +39,7 @@ import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -140,6 +141,7 @@ const GroupSessionsCreate: FC = () => {
 	});
 
 	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const [searchParams] = useSearchParams();
 	const groupSessionIdToCopy = searchParams.get('groupSessionIdToCopy');
@@ -308,16 +310,26 @@ const GroupSessionsCreate: FC = () => {
 			if (isEdit) {
 				if (session) {
 					await groupSessionsService.updateGroupsession(session.groupSessionId, submissionValues).fetch();
-					showAlert({
+					addFlag({
 						variant: 'success',
-						text: 'Session updated.',
+						title: 'Your group session was updated!',
+						actions: [
+							{
+								title: 'OK',
+							},
+						],
 					});
 				}
 			} else {
 				await groupSessionsService.createGroupSession(submissionValues).fetch();
-				showAlert({
+				addFlag({
 					variant: 'success',
-					text: 'Your group session was added!',
+					title: 'Your group session was added!',
+					actions: [
+						{
+							title: 'OK',
+						},
+					],
 				});
 			}
 
