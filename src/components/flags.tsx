@@ -56,6 +56,21 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'flex-start',
 		padding: '16px 20px 16px',
+		'& .flag-button': {
+			border: 0,
+			marginRight: 8,
+			borderRadius: 3,
+			padding: '2px 8px',
+			appearance: 'none',
+			color: theme.colors.p500,
+			backgroundColor: 'rgba(0, 0, 0, 0.08)',
+			'&:hover': {
+				backgroundColor: 'rgba(0, 0, 0, 0.04)',
+			},
+			'&:active': {
+				backgroundColor: 'rgba(0, 0, 0, 0.12)',
+			},
+		},
 	},
 	iconOuter: {
 		width: 24,
@@ -126,9 +141,11 @@ const Flags = () => {
 												return (
 													<Button
 														key={actionIndex}
-														variant="light"
-														size="sm"
-														onClick={action.onClick}
+														bsPrefix="flag-button"
+														onClick={(event) => {
+															action.onClick(event);
+															removeFlagByFlagId(flag.flagId);
+														}}
 													>
 														{action.title}
 													</Button>
