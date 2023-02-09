@@ -16,7 +16,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	flagsOuter: {
 		left: 48,
 		bottom: 48,
-		zIndex: 1,
+		zIndex: 2,
 		width: 400,
 		position: 'fixed',
 	},

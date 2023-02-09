@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
 
@@ -35,7 +35,6 @@ import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
-import useFlags from '@/hooks/use-flags';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -62,8 +61,6 @@ const resourceLibraryCarouselConfig = {
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
-	const { addFlag } = useFlags();
-
 	const navigate = useNavigate();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
@@ -311,119 +308,6 @@ const Index: FC = () => {
 				)}
 
 				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
-
-				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-					<Container className="mb-20">
-						<Row>
-							<Col>
-								<Button
-									variant="primary"
-									onClick={() => {
-										addFlag({
-											variant: 'primary',
-											title: 'Good news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Primary flag
-								</Button>
-								<Button
-									variant="success"
-									onClick={() => {
-										addFlag({
-											variant: 'success',
-											title: 'Good news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Success flag
-								</Button>
-								<Button
-									variant="warning"
-									onClick={() => {
-										addFlag({
-											variant: 'warning',
-											title: 'Good news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Warning flag
-								</Button>
-								<Button
-									variant="danger"
-									onClick={() => {
-										addFlag({
-											variant: 'danger',
-											title: 'Good news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Danger flag
-								</Button>
-							</Col>
-						</Row>
-					</Container>
-				)}
 
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
 					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />
