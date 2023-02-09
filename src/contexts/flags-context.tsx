@@ -29,31 +29,34 @@ const FlagsContext = createContext({} as ErrorModalContextConfig);
 const FlagsProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [flags, setFlags] = useState<FlagModel[]>([]);
 
-	const addFlag = useCallback(
-		(flag: AddFlagConfig) => {
-			const flagId = uuidv4();
-			const nodeRef = createRef<HTMLDivElement>();
-			const flagsClone = cloneDeep(flags);
+	const addFlag = useCallback((flag: AddFlagConfig) => {
+		const flagId = uuidv4();
+		const nodeRef = createRef<HTMLDivElement>();
 
-			flagsClone.unshift({ flagId, nodeRef, ...flag });
-			setFlags(flagsClone);
-		},
-		[flags]
-	);
+		setFlags((previousValue) => {
+			return [
+				{
+					flagId,
+					nodeRef,
+					...flag,
+				},
+				...previousValue,
+			];
+		});
+	}, []);
 
-	const removeFlagByFlagId = useCallback(
-		(flagId: string) => {
-			const flagsClone = cloneDeep(flags);
+	const removeFlagByFlagId = useCallback((flagId: string) => {
+		setFlags((previousValue) => {
+			const flagsClone = cloneDeep(previousValue);
 			const indexToRemove = flagsClone.findIndex((f) => f.flagId === flagId);
 
 			if (indexToRemove > -1) {
 				flagsClone.splice(indexToRemove, 1);
 			}
 
-			setFlags(flagsClone);
-		},
-		[flags]
-	);
+			return flagsClone;
+		});
+	}, []);
 
 	const value = {
 		flags,

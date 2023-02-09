@@ -136,7 +136,7 @@ const Flags = () => {
 									</div>
 									<div className="px-4 flex-grow-1">
 										<h6 className="mb-2">{flag.title}</h6>
-										{flag.description && <p className="mb-2">{flag.description}</p>}
+										{flag.description && <p className="mb-3">{flag.description}</p>}
 										<div>
 											{flag.actions.map((action, actionIndex) => {
 												return (

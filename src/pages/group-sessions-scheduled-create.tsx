@@ -31,7 +31,6 @@ import { GroupSessionModel, GroupSessionReservationModel, ROLE_ID, ScreeningQues
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
-import useAlert from '@/hooks/use-alert';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
@@ -140,7 +139,6 @@ const GroupSessionsCreate: FC = () => {
 		end: true,
 	});
 
-	const { showAlert } = useAlert();
 	const { addFlag } = useFlags();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const [searchParams] = useSearchParams();
@@ -404,9 +402,10 @@ const GroupSessionsCreate: FC = () => {
 
 									<CopyToClipboard
 										onCopy={() => {
-											showAlert({
+											addFlag({
 												variant: 'success',
-												text: 'the link was copied to your clipboard',
+												title: 'The link was copied to your clipboard',
+												actions: [],
 											});
 										}}
 										text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${groupSessionId}?immediateAccess=true`}

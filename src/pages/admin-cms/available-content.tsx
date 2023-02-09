@@ -8,13 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 import { adminService, ContentFiltersResponse } from '@/lib/services';
 import AvailableContentRow from '@/components/admin-cms/available-content-row';
 import { AlertLocationState } from '@/pages/admin-cms/on-your-time';
-import useAlert from '@/hooks/use-alert';
 import { debounce } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import mediaQueries from '@/jss/media-queries';
 import SearchInput from '@/components/admin-cms/search-input';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -40,7 +40,7 @@ const CmsAvailableContent: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const [tableIsUpdating, setTableIsUpdating] = useState(false);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
 	const [content, setContent] = useState<AdminContentRow[]>([]);
@@ -92,24 +92,26 @@ const CmsAvailableContent: FC = () => {
 
 			const locationState = (location.state as AlertLocationState) || {};
 			if (locationState?.showSuccess) {
-				showAlert({
-					text: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
+				addFlag({
 					variant: 'success',
+					title: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
+					actions: [],
 				});
+
 				navigate('', { replace: true, state: {} });
 			}
 		}
 
 		getTablePage();
 	}, [
+		addFlag,
 		currentPageIndex,
-		statusFilterValue,
-		typeFilterValue,
-		showAlert,
-		navigate,
-		searchInputValueDebounced,
 		handleError,
 		location.state,
+		navigate,
+		searchInputValueDebounced,
+		statusFilterValue,
+		typeFilterValue,
 	]);
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
@@ -144,9 +146,10 @@ const CmsAvailableContent: FC = () => {
 				}
 			});
 		});
-		showAlert({
-			text: `Your content was removed!`,
+		addFlag({
 			variant: 'success',
+			title: 'Your content was removed',
+			actions: [],
 		});
 	}
 

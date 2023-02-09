@@ -10,7 +10,6 @@ import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import useAlert from '@/hooks/use-alert';
 
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
@@ -24,6 +23,7 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -49,7 +49,7 @@ const InTheStudioGroupSessionScheduled = () => {
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { setAccount } = useAccount();
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isBooking, setIsBooking] = useState(false);
@@ -78,6 +78,24 @@ const InTheStudioGroupSessionScheduled = () => {
 		setSession(groupSession);
 		setReservation(groupSessionReservation);
 
+		if (groupSessionReservation) {
+			addFlag({
+				variant: 'success',
+				title: "You've reserved a place for this session",
+				description: `Join us ${groupSession?.startDateTimeDescription}`,
+				actions: [
+					{
+						title: 'View Calendar',
+						onClick: () => navigate('/my-calendar'),
+					},
+					{
+						title: 'Join Now',
+						onClick: () => window.open(groupSession?.videoconferenceUrl, '_blank', 'noopener, noreferrer'),
+					},
+				],
+			});
+		}
+
 		/* --------------------------------------------------------- */
 		/* This fires after you complete the sessions assessment */
 		/* --------------------------------------------------------- */
@@ -99,7 +117,7 @@ const InTheStudioGroupSessionScheduled = () => {
 				'Based on your answer(s), this session does not seem like a good match. Please join us in another.'
 			);
 		}
-	}, [groupSessionId, location.state, location.pathname, navigate]);
+	}, [addFlag, groupSessionId, location.pathname, location.state, navigate]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
@@ -334,9 +352,10 @@ const InTheStudioGroupSessionScheduled = () => {
 							)}
 							<CopyToClipboard
 								onCopy={() => {
-									showAlert({
+									addFlag({
 										variant: 'success',
-										text: 'The link was copied to your clipboard',
+										title: 'The link was copied to your clipboard',
+										actions: [],
 									});
 								}}
 								text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
