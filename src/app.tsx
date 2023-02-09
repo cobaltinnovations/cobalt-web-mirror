@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, useLocation } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import config from '@/lib/config';
+import { addMaximumScaleToViewportMetaTag, isIos } from '@/lib/utils/device-utils';
 
 import Alert from '@/components/alert';
 import ErrorModal from '@/components/error-modal';
@@ -15,6 +16,8 @@ import Loader from '@/components/loader';
 import PrivateRoute from '@/components/private-route';
 import ReauthModal from '@/components/reauth-modal';
 import ConsentModal from '@/components/consent-modal';
+import ErrorDisplay from '@/components/error-display';
+import HeaderUnauthenticated from '@/components/header-unauthenticated';
 
 import { AppRoutes, RouteConfig, NoMatch } from '@/routes';
 
@@ -28,6 +31,7 @@ import { BookingProvider } from '@/contexts/booking-context';
 import { ErrorModalProvider } from '@/contexts/error-modal-context';
 import { InCrisisModalProvider } from '@/contexts/in-crisis-modal-context';
 import { ReauthModalProvider } from '@/contexts/reauth-modal-context';
+import { FlagsProvider } from '@/contexts/flags-context';
 
 import DownForMaintenance from '@/pages/down-for-maintenance';
 
@@ -38,9 +42,7 @@ import { CobaltThemeProvider } from './jss/theme';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-multi-carousel/lib/styles.css';
 import './scss/main.scss';
-import ErrorDisplay from './components/error-display';
-import HeaderUnauthenticated from './components/header-unauthenticated';
-import { addMaximumScaleToViewportMetaTag, isIos } from '@/lib/utils/device-utils';
+import Flags from './components/flags';
 
 const AppWithProviders: FC = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
@@ -80,6 +82,7 @@ const AppWithProviders: FC = () => {
 			<ReauthModal />
 
 			<Alert />
+			<Flags />
 
 			<SentryRoutes>
 				{AppRoutes.map((config, groupIndex) => {
@@ -154,7 +157,9 @@ const ThemedApp: FC = () => {
 						<BookingProvider>
 							<InCrisisModalProvider>
 								<AnalyticsProvider>
-									<AppWithProviders />
+									<FlagsProvider>
+										<AppWithProviders />
+									</FlagsProvider>
 								</AnalyticsProvider>
 							</InCrisisModalProvider>
 						</BookingProvider>

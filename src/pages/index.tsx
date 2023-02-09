@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
 
@@ -35,6 +35,7 @@ import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
+import useFlags from '@/hooks/use-flags';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -61,6 +62,7 @@ const resourceLibraryCarouselConfig = {
 
 const Index: FC = () => {
 	const { account, institution } = useAccount();
+	const { addFlag } = useFlags();
 
 	const navigate = useNavigate();
 
@@ -309,6 +311,40 @@ const Index: FC = () => {
 				)}
 
 				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
+
+				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+					<Container className="mb-20">
+						<Row>
+							<Col>
+								<Button
+									onClick={() => {
+										addFlag({
+											title: 'Whoa a new flag!',
+											description:
+												'Fruitcake topping wafer pie candy dragée sesame snaps cake. Cake cake cheesecake. Pie tiramisu carrot cake tart tart dessert cookie. Lemon drops cookie tootsie roll marzipan liquorice cotton candy brownie halvah.',
+											actions: [
+												{
+													title: 'Nice One!',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'Not right now thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									alert!
+								</Button>
+							</Col>
+						</Row>
+					</Container>
+				)}
 
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
 					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />
