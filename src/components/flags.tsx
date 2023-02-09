@@ -22,6 +22,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	flag: {
 		bottom: 0,
+		width: '100%',
 		borderRadius: 3,
 		overflow: 'hidden',
 		position: 'absolute',
@@ -133,9 +134,9 @@ const Flags = () => {
 										{flag.variant === 'warning' && <FlagWarning />}
 										{flag.variant === 'danger' && <FlagDanger />}
 									</div>
-									<div className="px-4">
+									<div className="px-4 flex-grow-1">
 										<h6 className="mb-2">{flag.title}</h6>
-										<p className="mb-2">{flag.description}</p>
+										{flag.description && <p className="mb-2">{flag.description}</p>}
 										<div>
 											{flag.actions.map((action, actionIndex) => {
 												return (
@@ -143,7 +144,10 @@ const Flags = () => {
 														key={actionIndex}
 														bsPrefix="flag-button"
 														onClick={(event) => {
-															action.onClick(event);
+															if (action.onClick) {
+																action.onClick(event);
+															}
+
 															removeFlagByFlagId(flag.flagId);
 														}}
 													>

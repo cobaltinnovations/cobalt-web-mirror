@@ -6,7 +6,7 @@ interface FlagModel {
 	flagId: string;
 	variant: 'primary' | 'success' | 'warning' | 'danger';
 	title: string;
-	description: string;
+	description?: string;
 	actions: FlagAction[];
 	nodeRef: React.RefObject<HTMLDivElement>;
 }
@@ -15,7 +15,7 @@ type AddFlagConfig = Omit<FlagModel, 'flagId' | 'nodeRef'>;
 
 interface FlagAction {
 	title: string;
-	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 type ErrorModalContextConfig = {
