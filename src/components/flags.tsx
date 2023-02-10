@@ -269,27 +269,45 @@ const Flags = () => {
 										)}
 									</div>
 									<div className="px-4 flex-grow-1">
-										<h6 className="mb-2">{flag.title}</h6>
-										{flag.description && <p className="mb-3">{flag.description}</p>}
-										<div>
-											{flag.actions.map((action, actionIndex) => {
-												return (
-													<Button
-														key={actionIndex}
-														bsPrefix="flag-button"
-														onClick={(event) => {
-															if (action.onClick) {
-																action.onClick(event);
-															}
-
-															removeFlagByFlagId(flag.flagId);
-														}}
-													>
-														{action.title}
-													</Button>
-												);
+										<h6
+											className={classNames({
+												'mb-2': flag.description,
+												'mb-4': !flag.description,
 											})}
-										</div>
+										>
+											{flag.title}
+										</h6>
+										{flag.description && (
+											<p
+												className={classNames({
+													'mb-3': flag.actions.length > 0,
+													'mb-2': flag.actions.length <= 0,
+												})}
+											>
+												{flag.description}
+											</p>
+										)}
+										{flag.actions.length > 0 && (
+											<div>
+												{flag.actions.map((action, actionIndex) => {
+													return (
+														<Button
+															key={actionIndex}
+															bsPrefix="flag-button"
+															onClick={(event) => {
+																if (action.onClick) {
+																	action.onClick(event);
+																}
+
+																removeFlagByFlagId(flag.flagId);
+															}}
+														>
+															{action.title}
+														</Button>
+													);
+												})}
+											</div>
+										)}
 									</div>
 									<div className="close-button-outer">
 										{flagIndex === 0 && (

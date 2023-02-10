@@ -338,7 +338,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Primary flag
+									Primary Flag
 								</Button>
 								<Button
 									variant="outline-success"
@@ -365,7 +365,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Success flag
+									Success Flag
 								</Button>
 								<Button
 									variant="outline-warning"
@@ -393,7 +393,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Warning flag
+									Warning Flag
 								</Button>
 								<Button
 									variant="outline-danger"
@@ -419,7 +419,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Danger flag
+									Danger Flag
 								</Button>
 							</Col>
 						</Row>
@@ -431,8 +431,9 @@ const Index: FC = () => {
 									onClick={() => {
 										addFlag({
 											variant: 'bold-primary',
-											title: 'Regular news, everyone',
-											description: 'Nothing to worry about, everything is pretty normal!',
+											title: 'Hey, did you know...',
+											description:
+												'This alert needs your attention, but its not super important.',
 											actions: [
 												{
 													title: 'Understood',
@@ -441,7 +442,7 @@ const Index: FC = () => {
 													},
 												},
 												{
-													title: 'No thanks',
+													title: 'No way!',
 													onClick: () => {
 														return;
 													},
@@ -450,7 +451,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Bold Primary flag
+									Bold Primary Flag
 								</Button>
 								<Button
 									variant="success"
@@ -458,7 +459,7 @@ const Index: FC = () => {
 									onClick={() => {
 										addFlag({
 											variant: 'bold-success',
-											title: 'Good news, everyone',
+											title: 'You action was successful!',
 											description: 'Nothing to worry about, everything is going great!',
 											actions: [
 												{
@@ -468,7 +469,7 @@ const Index: FC = () => {
 													},
 												},
 												{
-													title: 'No thanks',
+													title: 'No way!',
 													onClick: () => {
 														return;
 													},
@@ -477,7 +478,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Bold Success flag
+									Bold Success Flag
 								</Button>
 								<Button
 									variant="warning"
@@ -485,9 +486,8 @@ const Index: FC = () => {
 									onClick={() => {
 										addFlag({
 											variant: 'bold-warning',
-											title: 'Cautionary news, everyone',
-											description:
-												'Maybe something worry about, everything is sort of falling apart!',
+											title: 'Uh oh!',
+											description: 'Pay attention to me, things are not going according to plan.',
 											actions: [
 												{
 													title: 'Understood',
@@ -496,7 +496,7 @@ const Index: FC = () => {
 													},
 												},
 												{
-													title: 'No thanks',
+													title: 'No way!',
 													onClick: () => {
 														return;
 													},
@@ -505,15 +505,15 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Bold Warning flag
+									Bold Warning Flag
 								</Button>
 								<Button
 									variant="danger"
 									onClick={() => {
 										addFlag({
 											variant: 'bold-danger',
-											title: 'Bad news, everyone',
-											description: 'Definitely should worry, everthing is broken!',
+											title: "Can't connect",
+											description: 'You need to take action, something has gone terribly wrong!',
 											actions: [
 												{
 													title: 'Understood',
@@ -522,7 +522,7 @@ const Index: FC = () => {
 													},
 												},
 												{
-													title: 'No thanks',
+													title: 'No way!',
 													onClick: () => {
 														return;
 													},
@@ -531,7 +531,7 @@ const Index: FC = () => {
 										});
 									}}
 								>
-									Bold Danger flag
+									Bold Danger Flag
 								</Button>
 							</Col>
 						</Row>
