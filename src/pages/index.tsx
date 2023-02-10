@@ -311,15 +311,16 @@ const Index: FC = () => {
 
 				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
 					<Container className="mb-20">
-						<Row>
+						<Row className="mb-2">
 							<Col>
 								<Button
-									variant="primary"
+									variant="outline-primary"
+									className="me-2"
 									onClick={() => {
 										addFlag({
 											variant: 'primary',
 											title: 'Regular news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
+											description: 'Nothing to worry about, everything is pretty normal!',
 											actions: [
 												{
 													title: 'Understood',
@@ -340,7 +341,8 @@ const Index: FC = () => {
 									Primary flag
 								</Button>
 								<Button
-									variant="success"
+									variant="outline-success"
+									className="me-2"
 									onClick={() => {
 										addFlag({
 											variant: 'success',
@@ -366,12 +368,14 @@ const Index: FC = () => {
 									Success flag
 								</Button>
 								<Button
-									variant="warning"
+									variant="outline-warning"
+									className="me-2"
 									onClick={() => {
 										addFlag({
 											variant: 'warning',
 											title: 'Cautionary news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
+											description:
+												'Maybe something worry about, everything is sort of falling apart!',
 											actions: [
 												{
 													title: 'Understood',
@@ -392,12 +396,12 @@ const Index: FC = () => {
 									Warning flag
 								</Button>
 								<Button
-									variant="danger"
+									variant="outline-danger"
 									onClick={() => {
 										addFlag({
 											variant: 'danger',
 											title: 'Bad news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
+											description: 'Definitely should worry, everthing is broken!',
 											actions: [
 												{
 													title: 'Understood',
@@ -416,6 +420,118 @@ const Index: FC = () => {
 									}}
 								>
 									Danger flag
+								</Button>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<Button
+									variant="primary"
+									className="me-2"
+									onClick={() => {
+										addFlag({
+											variant: 'bold-primary',
+											title: 'Regular news, everyone',
+											description: 'Nothing to worry about, everything is pretty normal!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Bold Primary flag
+								</Button>
+								<Button
+									variant="success"
+									className="me-2"
+									onClick={() => {
+										addFlag({
+											variant: 'bold-success',
+											title: 'Good news, everyone',
+											description: 'Nothing to worry about, everything is going great!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Bold Success flag
+								</Button>
+								<Button
+									variant="warning"
+									className="me-2"
+									onClick={() => {
+										addFlag({
+											variant: 'bold-warning',
+											title: 'Cautionary news, everyone',
+											description:
+												'Maybe something worry about, everything is sort of falling apart!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Bold Warning flag
+								</Button>
+								<Button
+									variant="danger"
+									onClick={() => {
+										addFlag({
+											variant: 'bold-danger',
+											title: 'Bad news, everyone',
+											description: 'Definitely should worry, everthing is broken!',
+											actions: [
+												{
+													title: 'Understood',
+													onClick: () => {
+														return;
+													},
+												},
+												{
+													title: 'No thanks',
+													onClick: () => {
+														return;
+													},
+												},
+											],
+										});
+									}}
+								>
+									Bold Danger flag
 								</Button>
 							</Col>
 						</Row>

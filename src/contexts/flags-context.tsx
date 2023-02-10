@@ -13,7 +13,15 @@ import React, {
 
 interface FlagModel {
 	flagId: string;
-	variant: 'primary' | 'success' | 'warning' | 'danger';
+	variant:
+		| 'primary'
+		| 'success'
+		| 'warning'
+		| 'danger'
+		| 'bold-primary'
+		| 'bold-success'
+		| 'bold-warning'
+		| 'bold-danger';
 	title: string;
 	description?: string;
 	actions: FlagAction[];

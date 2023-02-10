@@ -23,93 +23,177 @@ const useStyles = createUseThemedStyles((theme) => ({
 		zIndex: 2,
 		width: 400,
 		position: 'fixed',
-	},
-	flag: {
-		bottom: 0,
-		width: '100%',
-		borderRadius: 3,
-		overflow: 'hidden',
-		position: 'absolute',
-		boxShadow: theme.elevation.e400,
-		backgroundColor: theme.colors.n0,
-		transition: 'opacity 200ms, transform 200ms',
-		'&:nth-of-type(n+2)': {
-			transform: 'translate(0, calc(100% + 16px))',
-		},
-		'&:nth-of-type(n+3)': {
-			visibility: 'hidden',
-			transform: 'translate(0, calc(200% + 32px))',
-		},
-		'&:first-of-type .flag-border': {
-			animation: ({ removalDurationInMs }: UseStylesProps) =>
-				`$flag-border-width ${removalDurationInMs}ms linear 0ms normal forwards`,
+		'& .flag': {
+			bottom: 0,
+			width: '100%',
+			borderRadius: 3,
+			overflow: 'hidden',
+			position: 'absolute',
+			boxShadow: theme.elevation.e400,
+			backgroundColor: theme.colors.n0,
+			transition: 'opacity 200ms, transform 200ms',
+			'&:nth-of-type(n+2)': {
+				transform: 'translate(0, calc(100% + 16px))',
+			},
+			'&:nth-of-type(n+3)': {
+				visibility: 'hidden',
+				transform: 'translate(0, calc(200% + 32px))',
+			},
+			'&:first-of-type .flag-border': {
+				animation: ({ removalDurationInMs }: UseStylesProps) =>
+					`$flag-border-width ${removalDurationInMs}ms linear 0ms normal forwards`,
+			},
+			'&--primary': {
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.p100,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.p500,
+				},
+				'& .icon-outer': {
+					color: theme.colors.p500,
+				},
+				'& .close-button-outer button': {
+					color: theme.colors.n500,
+				},
+			},
+			'&--success': {
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.s100,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.s500,
+				},
+				'& .icon-outer': {
+					color: theme.colors.s500,
+				},
+				'& .close-button-outer button': {
+					color: theme.colors.n500,
+				},
+			},
+			'&--warning': {
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.w100,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.w500,
+				},
+				'& .icon-outer': {
+					color: theme.colors.w500,
+				},
+				'& .close-button-outer button': {
+					color: theme.colors.n500,
+				},
+			},
+			'&--danger': {
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.d100,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.d500,
+				},
+				'& .icon-outer': {
+					color: theme.colors.d500,
+				},
+				'& .close-button-outer button': {
+					color: theme.colors.n500,
+				},
+			},
+			'&--bold-primary': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.p500,
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.p300,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.p500,
+				},
+				'& .flag-button, & .close-button-outer button': {
+					color: theme.colors.n0,
+				},
+			},
+			'&--bold-success': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.s500,
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.s300,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.s500,
+				},
+				'& .flag-button, & .close-button-outer button': {
+					color: theme.colors.n0,
+				},
+			},
+			'&--bold-warning': {
+				color: theme.colors.n900,
+				backgroundColor: theme.colors.w500,
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.w300,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.w500,
+				},
+				'& .flag-button, & .close-button-outer button': {
+					color: theme.colors.n900,
+				},
+			},
+			'&--bold-danger': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.d500,
+				'& .flag-border-outer': {
+					backgroundColor: theme.colors.d300,
+				},
+				'& .flag-border': {
+					backgroundColor: theme.colors.d500,
+				},
+				'& .flag-button, & .close-button-outer button': {
+					color: theme.colors.n0,
+				},
+			},
 		},
 		'& .flag-border-outer': {
 			height: 8,
 			width: '100%',
 			backgroundColor: theme.colors.n100,
-			'&--primary': {
-				backgroundColor: theme.colors.p100,
-			},
-			'&--success': {
-				backgroundColor: theme.colors.s100,
-			},
-			'&--warning': {
-				backgroundColor: theme.colors.w100,
-			},
-			'&--danger': {
-				backgroundColor: theme.colors.d100,
-			},
 		},
 		'& .flag-border': {
 			width: '100%',
 			height: '100%',
 			backgroundColor: theme.colors.n500,
-			'&--primary': {
-				backgroundColor: theme.colors.p500,
+		},
+		'& .flag-inner': {
+			display: 'flex',
+			alignItems: 'flex-start',
+			padding: '20px 20px 16px',
+			'& .icon-outer': {
+				width: 24,
+				flexShrink: 0,
+				'& > svg': {
+					top: -4,
+					position: 'relative',
+				},
 			},
-			'&--success': {
-				backgroundColor: theme.colors.s500,
+			'& .flag-button': {
+				border: 0,
+				marginRight: 8,
+				borderRadius: 3,
+				padding: '2px 8px',
+				appearance: 'none',
+				color: theme.colors.p500,
+				backgroundColor: 'rgba(0, 0, 0, 0.08)',
+				'&:hover': {
+					backgroundColor: 'rgba(0, 0, 0, 0.04)',
+				},
+				'&:active': {
+					backgroundColor: 'rgba(0, 0, 0, 0.12)',
+				},
 			},
-			'&--warning': {
-				backgroundColor: theme.colors.w500,
-			},
-			'&--danger': {
-				backgroundColor: theme.colors.d500,
+			'& .close-button-outer': {
+				width: 20,
+				flexShrink: 0,
 			},
 		},
-	},
-	flagInner: {
-		display: 'flex',
-		alignItems: 'flex-start',
-		padding: '16px 20px 16px',
-		'& .flag-button': {
-			border: 0,
-			marginRight: 8,
-			borderRadius: 3,
-			padding: '2px 8px',
-			appearance: 'none',
-			color: theme.colors.p500,
-			backgroundColor: 'rgba(0, 0, 0, 0.08)',
-			'&:hover': {
-				backgroundColor: 'rgba(0, 0, 0, 0.04)',
-			},
-			'&:active': {
-				backgroundColor: 'rgba(0, 0, 0, 0.12)',
-			},
-		},
-	},
-	iconOuter: {
-		width: 24,
-		flexShrink: 0,
-		'& > svg': {
-			top: -4,
-			position: 'relative',
-		},
-	},
-	closeButtonOuter: {
-		width: 20,
-		flexShrink: 0,
 	},
 	'@global': {
 		'.flag-transition-enter': {
@@ -145,7 +229,7 @@ const Flags = () => {
 
 	return (
 		<div className={classes.flagsOuter}>
-			<TransitionGroup component={null} className="flag-transition-list">
+			<TransitionGroup component={null} className="flag-outer-transition">
 				{flags.map((flag, flagIndex) => {
 					return (
 						<CSSTransition
@@ -159,16 +243,30 @@ const Flags = () => {
 							mountOnEnter
 							unmountOnExit
 						>
-							<div key={flag.flagId} ref={flag.nodeRef} className={classes.flag}>
-								<div className={classNames('flag-border-outer', `flag-border-outer--${flag.variant}`)}>
-									<div className={classNames('flag-border', `flag-border--${flag.variant}`)} />
-								</div>
-								<div className={classes.flagInner}>
-									<div className={classes.iconOuter}>
-										{flag.variant === 'primary' && <FlagPrimary />}
-										{flag.variant === 'success' && <FlagSuccess />}
-										{flag.variant === 'warning' && <FlagWarning />}
-										{flag.variant === 'danger' && <FlagDanger />}
+							<div
+								key={flag.flagId}
+								ref={flag.nodeRef}
+								className={classNames('flag', `flag--${flag.variant}`)}
+							>
+								{!flag.variant.includes('bold') && (
+									<div className="flag-border-outer">
+										<div className="flag-border" />
+									</div>
+								)}
+								<div className="flag-inner">
+									<div className="icon-outer">
+										{(flag.variant === 'primary' || flag.variant === 'bold-primary') && (
+											<FlagPrimary />
+										)}
+										{(flag.variant === 'success' || flag.variant === 'bold-success') && (
+											<FlagSuccess />
+										)}
+										{(flag.variant === 'warning' || flag.variant === 'bold-warning') && (
+											<FlagWarning />
+										)}
+										{(flag.variant === 'danger' || flag.variant === 'bold-danger') && (
+											<FlagDanger />
+										)}
 									</div>
 									<div className="px-4 flex-grow-1">
 										<h6 className="mb-2">{flag.title}</h6>
@@ -193,9 +291,9 @@ const Flags = () => {
 											})}
 										</div>
 									</div>
-									<div className={classes.closeButtonOuter}>
+									<div className="close-button-outer">
 										{flagIndex === 0 && (
-											<Button variant="link" className="p-0 text-gray">
+											<Button variant="link" className="p-0">
 												<CloseIcon
 													width={20}
 													height={20}
