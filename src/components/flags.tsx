@@ -12,6 +12,10 @@ import { ReactComponent as FlagWarning } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
+interface UseStylesProps {
+	removalDurationInMs: number;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	flagsOuter: {
 		left: 48,
@@ -36,21 +40,43 @@ const useStyles = createUseThemedStyles((theme) => ({
 			visibility: 'hidden',
 			transform: 'translate(0, calc(200% + 32px))',
 		},
-	},
-	flagBorder: {
-		height: 8,
-		backgroundColor: theme.colors.p500,
-		'&.flag-border--primary': {
-			backgroundColor: theme.colors.p500,
+		'&:first-of-type .flag-border': {
+			animation: ({ removalDurationInMs }: UseStylesProps) =>
+				`$flag-border-width ${removalDurationInMs}ms linear 0ms normal forwards`,
 		},
-		'&.flag-border--success': {
-			backgroundColor: theme.colors.s500,
+		'& .flag-border-outer': {
+			height: 8,
+			width: '100%',
+			backgroundColor: theme.colors.n100,
+			'&--primary': {
+				backgroundColor: theme.colors.p100,
+			},
+			'&--success': {
+				backgroundColor: theme.colors.s100,
+			},
+			'&--warning': {
+				backgroundColor: theme.colors.w100,
+			},
+			'&--danger': {
+				backgroundColor: theme.colors.d100,
+			},
 		},
-		'&.flag-border--warning': {
-			backgroundColor: theme.colors.w500,
-		},
-		'&.flag-border--danger': {
-			backgroundColor: theme.colors.d500,
+		'& .flag-border': {
+			width: '100%',
+			height: '100%',
+			backgroundColor: theme.colors.n500,
+			'&--primary': {
+				backgroundColor: theme.colors.p500,
+			},
+			'&--success': {
+				backgroundColor: theme.colors.s500,
+			},
+			'&--warning': {
+				backgroundColor: theme.colors.w500,
+			},
+			'&--danger': {
+				backgroundColor: theme.colors.d500,
+			},
 		},
 	},
 	flagInner: {
@@ -103,11 +129,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 			transform: 'translateX(-100%)',
 		},
 	},
+	'@keyframes flag-border-width': {
+		'0%': {
+			width: '100%',
+		},
+		'100%': {
+			width: '0%',
+		},
+	},
 }));
 
 const Flags = () => {
-	const classes = useStyles();
-	const { flags, removeFlagByFlagId } = useFlags();
+	const { flags, removeFlagByFlagId, removalDurationInMs } = useFlags();
+	const classes = useStyles({ removalDurationInMs });
 
 	return (
 		<div className={classes.flagsOuter}>
@@ -126,7 +160,9 @@ const Flags = () => {
 							unmountOnExit
 						>
 							<div key={flag.flagId} ref={flag.nodeRef} className={classes.flag}>
-								<div className={classNames(classes.flagBorder, `flag-border--${flag.variant}`)} />
+								<div className={classNames('flag-border-outer', `flag-border-outer--${flag.variant}`)}>
+									<div className={classNames('flag-border', `flag-border--${flag.variant}`)} />
+								</div>
 								<div className={classes.flagInner}>
 									<div className={classes.iconOuter}>
 										{flag.variant === 'primary' && <FlagPrimary />}
