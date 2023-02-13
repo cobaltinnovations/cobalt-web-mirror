@@ -11,7 +11,7 @@ import React, {
 	useEffect,
 } from 'react';
 
-interface FlagModel {
+export interface FlagModel {
 	flagId: string;
 	variant:
 		| 'primary'

@@ -459,7 +459,7 @@ const Index: FC = () => {
 									onClick={() => {
 										addFlag({
 											variant: 'bold-success',
-											title: 'You action was successful!',
+											title: 'Your action was successful!',
 											description: 'Nothing to worry about, everything is going great!',
 											actions: [
 												{

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from 'react-bootstrap';
+import React, { useMemo, useState } from 'react';
+import { Button, Collapse } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 
@@ -11,6 +11,8 @@ import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as FlagWarning } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { FlagModel } from '@/contexts/flags-context';
 
 interface UseStylesProps {
 	removalDurationInMs: number;
@@ -170,7 +172,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				width: 24,
 				flexShrink: 0,
 				'& > svg': {
-					top: -4,
+					top: -2,
 					position: 'relative',
 				},
 			},
@@ -192,6 +194,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 			'& .close-button-outer': {
 				width: 20,
 				flexShrink: 0,
+				'& > button': {
+					top: -2,
+					position: 'relative',
+					'& svg': {
+						transition: 'transform 200ms',
+						'&.expanded': {
+							transform: 'rotate(180deg)',
+						},
+					},
+				},
 			},
 		},
 	},
@@ -243,91 +255,122 @@ const Flags = () => {
 							mountOnEnter
 							unmountOnExit
 						>
-							<div
-								key={flag.flagId}
-								ref={flag.nodeRef}
-								className={classNames('flag', `flag--${flag.variant}`)}
-							>
-								{!flag.variant.includes('bold') && (
-									<div className="flag-border-outer">
-										<div className="flag-border" />
-									</div>
-								)}
-								<div className="flag-inner">
-									<div className="icon-outer">
-										{(flag.variant === 'primary' || flag.variant === 'bold-primary') && (
-											<FlagPrimary />
-										)}
-										{(flag.variant === 'success' || flag.variant === 'bold-success') && (
-											<FlagSuccess />
-										)}
-										{(flag.variant === 'warning' || flag.variant === 'bold-warning') && (
-											<FlagWarning />
-										)}
-										{(flag.variant === 'danger' || flag.variant === 'bold-danger') && (
-											<FlagDanger />
-										)}
-									</div>
-									<div className="px-4 flex-grow-1">
-										<h6
-											className={classNames({
-												'mb-2': flag.description,
-												'mb-4': !flag.description,
-											})}
-										>
-											{flag.title}
-										</h6>
-										{flag.description && (
-											<p
-												className={classNames({
-													'mb-3': flag.actions.length > 0,
-													'mb-2': flag.actions.length <= 0,
-												})}
-											>
-												{flag.description}
-											</p>
-										)}
-										{flag.actions.length > 0 && (
-											<div>
-												{flag.actions.map((action, actionIndex) => {
-													return (
-														<Button
-															key={actionIndex}
-															bsPrefix="flag-button"
-															onClick={(event) => {
-																if (action.onClick) {
-																	action.onClick(event);
-																}
-
-																removeFlagByFlagId(flag.flagId);
-															}}
-														>
-															{action.title}
-														</Button>
-													);
-												})}
-											</div>
-										)}
-									</div>
-									<div className="close-button-outer">
-										{flagIndex === 0 && (
-											<Button variant="link" className="p-0">
-												<CloseIcon
-													width={20}
-													height={20}
-													onClick={() => {
-														removeFlagByFlagId(flag.flagId);
-													}}
-												/>
-											</Button>
-										)}
-									</div>
-								</div>
-							</div>
+							<Flag flag={flag} flagIndex={flagIndex} onRemove={removeFlagByFlagId} />
 						</CSSTransition>
 					);
 				})}
 			</TransitionGroup>
+		</div>
+	);
+};
+
+const Flag = ({
+	flag,
+	flagIndex,
+	onRemove,
+}: {
+	flag: FlagModel;
+	flagIndex: number;
+	onRemove(flagId: string): void;
+}) => {
+	const isBold = useMemo(() => flag.variant.includes('bold'), [flag.variant]);
+	const isPrimary = useMemo(() => flag.variant.includes('primary'), [flag.variant]);
+	const isSuccess = useMemo(() => flag.variant.includes('success'), [flag.variant]);
+	const isWarning = useMemo(() => flag.variant.includes('warning'), [flag.variant]);
+	const isDanger = useMemo(() => flag.variant.includes('danger'), [flag.variant]);
+	const [isExpanded, setIsExpanded] = useState(isBold ? false : true);
+
+	return (
+		<div key={flag.flagId} ref={flag.nodeRef} className={classNames('flag', `flag--${flag.variant}`)}>
+			{!isBold && (
+				<div className="flag-border-outer">
+					<div className="flag-border" />
+				</div>
+			)}
+			<div className="flag-inner">
+				<div className="icon-outer">
+					{isPrimary && <FlagPrimary />}
+					{isSuccess && <FlagSuccess />}
+					{isWarning && <FlagWarning />}
+					{isDanger && <FlagDanger />}
+				</div>
+				<div className="px-4 flex-grow-1">
+					<h6
+						className={classNames({
+							'mb-2': flag.description,
+							'mb-4': !flag.description,
+						})}
+					>
+						{flag.title}
+					</h6>
+					<Collapse in={isExpanded}>
+						<div>
+							{flag.description && (
+								<p
+									className={classNames({
+										'mb-3': flag.actions.length > 0,
+										'mb-2': flag.actions.length <= 0,
+									})}
+								>
+									{flag.description}
+								</p>
+							)}
+							{flag.actions.length > 0 && (
+								<div>
+									{flag.actions.map((action, actionIndex) => {
+										return (
+											<Button
+												key={actionIndex}
+												bsPrefix="flag-button"
+												onClick={(event) => {
+													if (action.onClick) {
+														action.onClick(event);
+													}
+
+													onRemove(flag.flagId);
+												}}
+											>
+												{action.title}
+											</Button>
+										);
+									})}
+								</div>
+							)}
+						</div>
+					</Collapse>
+				</div>
+				<div className="close-button-outer">
+					{flagIndex === 0 && (
+						<>
+							{isBold ? (
+								<Button
+									variant="link"
+									className="p-0"
+									onClick={() => {
+										setIsExpanded(!isExpanded);
+									}}
+								>
+									<DownChevron
+										className={classNames({
+											expanded: isExpanded,
+										})}
+									/>
+								</Button>
+							) : (
+								<Button
+									variant="link"
+									className="p-0"
+									onClick={() => {
+										onRemove(flag.flagId);
+									}}
+								>
+									<CloseIcon width={20} height={20} />
+								</Button>
+							)}
+						</>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 };
