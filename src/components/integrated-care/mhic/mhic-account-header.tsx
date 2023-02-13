@@ -6,7 +6,10 @@ import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
+		display: 'flex',
 		padding: '26px 64px',
+		alignItems: 'center',
+		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
@@ -30,6 +33,13 @@ export const MhicAccountHeader = () => {
 					<SwapIcon />
 				</Button>
 			</div>
+			<Button
+				onClick={() => {
+					window.alert('[TODO]: Import (CSV?)');
+				}}
+			>
+				Import Patients
+			</Button>
 		</header>
 	);
 };
