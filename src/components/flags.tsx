@@ -3,6 +3,7 @@ import { Button, Collapse } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 
+import { FlagModel } from '@/contexts/flags-context';
 import useFlags from '@/hooks/use-flags';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -12,7 +13,6 @@ import { ReactComponent as FlagWarning } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
-import { FlagModel } from '@/contexts/flags-context';
 
 interface UseStylesProps {
 	removalDurationInMs: number;
