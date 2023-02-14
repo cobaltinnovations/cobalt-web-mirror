@@ -13,11 +13,16 @@ const useTableRowStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface TableRowProps extends PropsWithChildren {
+	onClick?(event: React.MouseEvent<HTMLTableRowElement, MouseEvent>): void;
 	className?: string;
 }
 
-export const TableRow: FC<TableRowProps> = React.memo(({ className, children }) => {
+export const TableRow: FC<TableRowProps> = React.memo(({ onClick, className, children }) => {
 	const classes = useTableRowStyles();
 
-	return <tr className={classNames(classes.tableRow, className)}>{children}</tr>;
+	return (
+		<tr className={classNames(classes.tableRow, className)} onClick={onClick}>
+			{children}
+		</tr>
+	);
 });

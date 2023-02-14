@@ -12,6 +12,7 @@ import {
 	MhicAccountHeader,
 	MhicFilterDropdown,
 	MhicNavigation,
+	MhicPatientOrderShelf,
 	MhicSortDropdown,
 	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
@@ -45,6 +46,7 @@ const MhicPanel = () => {
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
+	const [clickedPatientOrderId, setClickedPatientOrderId] = useState('');
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -150,6 +152,13 @@ const MhicPanel = () => {
 				/>
 			)}
 
+			<MhicPatientOrderShelf
+				open={!!clickedPatientOrderId}
+				onHide={() => {
+					setClickedPatientOrderId('');
+				}}
+			/>
+
 			<MhicAccountHeader
 				onSwitchButtonClick={() => {
 					setShowSwitchAccountModal(true);
@@ -190,7 +199,12 @@ const MhicPanel = () => {
 					<TableBody>
 						{patientOrders.map((po) => {
 							return (
-								<TableRow key={po.patientOrderId}>
+								<TableRow
+									key={po.patientOrderId}
+									onClick={() => {
+										setClickedPatientOrderId(po.patientOrderId);
+									}}
+								>
 									<TableCell width={280} sticky className="py-2">
 										<span className="d-block fw-bold">Lastname, Firstname</span>
 										<span className="d-block text-gray">1A2B3C4D5E</span>
