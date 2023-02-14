@@ -16,6 +16,7 @@ import {
 	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	row: {
@@ -26,6 +27,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 const MhicPanel = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
@@ -88,6 +90,13 @@ const MhicPanel = () => {
 					}
 
 					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
+
+					addFlag({
+						variant: 'success',
+						title: 'Your patients were imported!',
+						description: 'These patients are now available to view.',
+						actions: [],
+					});
 				} catch (error) {
 					handleError(error);
 				}
