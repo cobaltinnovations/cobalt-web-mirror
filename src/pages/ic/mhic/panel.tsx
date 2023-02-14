@@ -102,9 +102,9 @@ const MhicPanel = () => {
 				}
 			});
 
-			fileReader.readAsDataURL(file);
+			fileReader.readAsText(file);
 		},
-		[handleError]
+		[addFlag, handleError]
 	);
 
 	return (
