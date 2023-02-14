@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
+import FileInputButton from '@/components/file-input-button';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
@@ -17,9 +18,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface MhicAccountHeaderProps {
 	onSwitchButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onImportPatientsInputChange(file: File): void;
 }
 
-export const MhicAccountHeader = ({ onSwitchButtonClick }: MhicAccountHeaderProps) => {
+export const MhicAccountHeader = ({ onSwitchButtonClick, onImportPatientsInputChange }: MhicAccountHeaderProps) => {
 	const classes = useStyles();
 
 	return (
@@ -31,13 +33,9 @@ export const MhicAccountHeader = ({ onSwitchButtonClick }: MhicAccountHeaderProp
 					<SwapIcon />
 				</Button>
 			</div>
-			<Button
-				onClick={() => {
-					window.alert('[TODO]: Import (CSV?)');
-				}}
-			>
+			<FileInputButton accept="*.csv" onChange={onImportPatientsInputChange}>
 				Import Patients
-			</Button>
+			</FileInputButton>
 		</header>
 	);
 };

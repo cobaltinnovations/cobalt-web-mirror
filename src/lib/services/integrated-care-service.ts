@@ -3,6 +3,13 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import { AccountModel, PatientOrderCountModel } from '@/lib/models';
 
 export const integratedCareService = {
+	importPatientOrders(data: { csvContent: string }) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'POST',
+			url: '/patient-order-imports',
+			data,
+		});
+	},
 	getPatientOrders(queryParameters?: {
 		patientOrderPanelTypeId?: string;
 		panelAccountId?: string;
@@ -26,7 +33,7 @@ export const integratedCareService = {
 			activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
 			panelAccounts: AccountModel[];
 		}>({
-			method: 'get',
+			method: 'GET',
 			url: '/integrated-care/panel-accounts',
 		});
 	},

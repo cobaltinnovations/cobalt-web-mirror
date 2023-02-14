@@ -16,7 +16,6 @@ import {
 	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
-import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	row: {
@@ -27,7 +26,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 const MhicPanel = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const { account } = useAccount();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
@@ -77,6 +75,29 @@ const MhicPanel = () => {
 		fetchPanelAccounts();
 	}, [fetchPanelAccounts]);
 
+	const handleImportPatientsInputChange = useCallback(
+		(file: File) => {
+			const fileReader = new FileReader();
+
+			fileReader.addEventListener('load', async () => {
+				const fileContent = fileReader.result;
+
+				try {
+					if (typeof fileContent !== 'string') {
+						throw new Error('Could not read file.');
+					}
+
+					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
+				} catch (error) {
+					handleError(error);
+				}
+			});
+
+			fileReader.readAsDataURL(file);
+		},
+		[handleError]
+	);
+
 	return (
 		<>
 			{activePatientOrderCountsByPanelAccountId && (
@@ -101,6 +122,7 @@ const MhicPanel = () => {
 				onSwitchButtonClick={() => {
 					setShowSwitchAccountModal(true);
 				}}
+				onImportPatientsInputChange={handleImportPatientsInputChange}
 			/>
 			<MhicNavigation />
 			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
