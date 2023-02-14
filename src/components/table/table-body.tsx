@@ -1,5 +1,13 @@
 import React, { FC, PropsWithChildren } from 'react';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const useTableBodyStyles = createUseThemedStyles((theme) => ({
+	tableBody: {
+		backgroundColor: 'inherit',
+	},
+}));
 
 export const TableBody: FC<PropsWithChildren> = React.memo(({ children }) => {
-	return <tbody>{children}</tbody>;
+	const classes = useTableBodyStyles();
+	return <tbody className={classes.tableBody}>{children}</tbody>;
 });

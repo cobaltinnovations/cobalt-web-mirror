@@ -4,8 +4,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useTableRowStyles = createUseThemedStyles((theme) => ({
 	tableRow: {
-		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.border}`,
+		backgroundColor: 'inherit',
+		borderBottom: `1px solid ${theme.colors.n100}`,
+		'&:last-child': {
+			borderBottom: 0,
+		},
 	},
 }));
 

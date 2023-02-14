@@ -5,11 +5,15 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useTableStyles = createUseThemedStyles((theme) => ({
 	tableOuter: {
 		width: '100%',
+		borderRadius: 4,
 		overflowX: 'auto',
 		backgroundColor: theme.colors.n0,
+		border: `1px solid ${theme.colors.n100}`,
 	},
 	table: {
 		width: '100%',
+		borderSpacing: 0,
+		backgroundColor: 'inherit',
 	},
 }));
 

@@ -34,10 +34,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	centerText: {
 		textAlign: 'center',
 	},
-	row: {
-		borderLeft: `1px solid ${theme.colors.border}`,
-		borderRight: `1px solid ${theme.colors.border}`,
-	},
 	noWrap: {
 		whiteSpace: 'nowrap',
 	},
@@ -223,7 +219,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 		}
 
 		return (
-			<TableRow className={classes.row}>
+			<TableRow>
 				<TableCell>
 					<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 				</TableCell>
@@ -248,16 +244,20 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 					<span className="d-block fs-default fw-normal">{content.views}</span>
 				</TableCell>
 				<TableCell>
-					{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ms-2 fs-small fw-normal">
-						{content.ownerInstitutionApprovalStatus.description}
-					</span>
+					<div>
+						{getStatusIcon(content.ownerInstitutionApprovalStatus.approvalStatusId)}
+						<span className="ms-2 fs-small fw-normal">
+							{content.ownerInstitutionApprovalStatus.description}
+						</span>
+					</div>
 				</TableCell>
 				<TableCell>
-					{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
-					<span className="ms-2 fs-small fw-normal">
-						{content.otherInstitutionApprovalStatus.description}
-					</span>
+					<div>
+						{getStatusIcon(content.otherInstitutionApprovalStatus.approvalStatusId)}
+						<span className="ms-2 fs-small fw-normal">
+							{content.otherInstitutionApprovalStatus.description}
+						</span>
+					</div>
 				</TableCell>
 				<TableCell>
 					<SessionDropdown
