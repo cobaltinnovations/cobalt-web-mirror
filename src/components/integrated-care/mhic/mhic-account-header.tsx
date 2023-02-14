@@ -15,7 +15,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicAccountHeader = () => {
+interface MhicAccountHeaderProps {
+	onSwitchButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+}
+
+export const MhicAccountHeader = ({ onSwitchButtonClick }: MhicAccountHeaderProps) => {
 	const classes = useStyles();
 
 	return (
@@ -23,13 +27,7 @@ export const MhicAccountHeader = () => {
 			<div className="d-flex align-items-center justift-content-between">
 				<h3 className="mb-0 me-2">Ava Williams, MHIC</h3>
 				<p className="m-0 fs-large text-muted">(76 Patients)</p>
-				<Button
-					variant="link"
-					className="p-2"
-					onClick={() => {
-						window.alert('[TODO]: Open modal to switch accounts');
-					}}
-				>
+				<Button variant="link" className="p-2" onClick={onSwitchButtonClick}>
 					<SwapIcon />
 				</Button>
 			</div>

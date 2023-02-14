@@ -9,6 +9,7 @@ export * from './color-ids';
 export * from './content';
 export * from './group-session-models';
 export * from './institution';
+export * from './integrated-care-models';
 export * from './interaction-models';
 export * from './provider';
 export * from './reference-data';

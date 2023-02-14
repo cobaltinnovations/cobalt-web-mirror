@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { AccountModel } from '@/lib/models';
+import { AccountModel, PatientOrderCountModel } from '@/lib/models';
 
 export const integratedCareService = {
 	getPatientOrders(queryParameters?: {
@@ -23,13 +23,7 @@ export const integratedCareService = {
 	},
 	getPanelAccounts() {
 		return httpSingleton.orchestrateRequest<{
-			activePatientOrderCountsByPanelAccountId: Record<
-				string,
-				{
-					activePatientOrderCount: number;
-					activePatientOrderCountDescription: string;
-				}
-			>;
+			activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
 			panelAccounts: AccountModel[];
 		}>({
 			method: 'get',

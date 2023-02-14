@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { AccountModel, PatientOrderCountModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -12,8 +13,10 @@ import {
 	MhicFilterDropdown,
 	MhicNavigation,
 	MhicSortDropdown,
+	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	row: {
@@ -24,12 +27,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 const MhicPanel = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { account } = useAccount();
 
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
 	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
 	const searchQuery = useMemo(() => searchParams.get('searchQuery'), [searchParams]);
 	const pageNumber = useMemo(() => searchParams.get('pageNumber'), [searchParams]);
+
+	const [showSwitchAccountModal, setShowSwitchAccountModal] = useState(false);
+	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
+	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
+		useState<Record<string, PatientOrderCountModel>>();
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
@@ -51,7 +60,10 @@ const MhicPanel = () => {
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
 			const response = await integratedCareService.getPanelAccounts().fetch();
+
 			console.log(response);
+			setPanelAccounts(response.panelAccounts);
+			setActivePatientOrderCountsByPanelAccountId(response.activePatientOrderCountsByPanelAccountId);
 		} catch (error) {
 			handleError(error);
 		}
@@ -67,7 +79,29 @@ const MhicPanel = () => {
 
 	return (
 		<>
-			<MhicAccountHeader />
+			{activePatientOrderCountsByPanelAccountId && (
+				<MhicSwitchAccountModal
+					currentPanelAccountId={panelAccountId ?? ''}
+					panelAccounts={panelAccounts}
+					activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId}
+					show={showSwitchAccountModal}
+					onSwitchButtonClick={(paid) => {
+						searchParams.set('panelAccountId', paid);
+
+						setSearchParams(searchParams);
+						setShowSwitchAccountModal(false);
+					}}
+					onHide={() => {
+						setShowSwitchAccountModal(false);
+					}}
+				/>
+			)}
+
+			<MhicAccountHeader
+				onSwitchButtonClick={() => {
+					setShowSwitchAccountModal(true);
+				}}
+			/>
 			<MhicNavigation />
 			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
 				<div className="d-flex">
