@@ -10,7 +10,6 @@ import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import useAlert from '@/hooks/use-alert';
 
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
@@ -24,6 +23,7 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -49,7 +49,7 @@ const InTheStudioGroupSessionScheduled = () => {
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { setAccount } = useAccount();
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isBooking, setIsBooking] = useState(false);
@@ -78,6 +78,20 @@ const InTheStudioGroupSessionScheduled = () => {
 		setSession(groupSession);
 		setReservation(groupSessionReservation);
 
+		if (groupSessionReservation) {
+			addFlag({
+				variant: 'success',
+				title: 'Your seat is reserved',
+				description: 'This session was added to your events list',
+				actions: [
+					{
+						title: 'View My Events',
+						onClick: () => navigate('/my-calendar'),
+					},
+				],
+			});
+		}
+
 		/* --------------------------------------------------------- */
 		/* This fires after you complete the sessions assessment */
 		/* --------------------------------------------------------- */
@@ -99,7 +113,7 @@ const InTheStudioGroupSessionScheduled = () => {
 				'Based on your answer(s), this session does not seem like a good match. Please join us in another.'
 			);
 		}
-	}, [groupSessionId, location.state, location.pathname, navigate]);
+	}, [addFlag, groupSessionId, location.pathname, location.state, navigate]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
@@ -212,6 +226,7 @@ const InTheStudioGroupSessionScheduled = () => {
 							.cancelGroupSessionReservation(reservation.groupSessionReservationId)
 							.fetch();
 						await fetchData();
+
 						navigate(location.pathname, {
 							replace: true,
 							state: {
@@ -220,6 +235,17 @@ const InTheStudioGroupSessionScheduled = () => {
 						});
 
 						setShowConfirmCancelModal(false);
+						addFlag({
+							variant: 'success',
+							title: 'Your reservation has been canceled',
+							description: 'This session was removed from your events list',
+							actions: [
+								{
+									title: 'View My Events',
+									onClick: () => navigate('/my-calendar'),
+								},
+							],
+						});
 					} catch (error) {
 						handleError(error);
 					}
@@ -334,9 +360,11 @@ const InTheStudioGroupSessionScheduled = () => {
 							)}
 							<CopyToClipboard
 								onCopy={() => {
-									showAlert({
+									addFlag({
 										variant: 'success',
-										text: 'The link was copied to your clipboard',
+										title: 'Copied!',
+										description: 'The URL for this session was copied to your clipboard',
+										actions: [],
 									});
 								}}
 								text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${session?.groupSessionId}?immediateAccess=true`}
