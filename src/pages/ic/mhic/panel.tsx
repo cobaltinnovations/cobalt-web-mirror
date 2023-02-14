@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
@@ -221,16 +221,28 @@ const MhicPanel = () => {
 				</Table>
 			</div>
 			<div className={classNames(classes.row, 'pb-20')}>
-				<p className="mb-0 fs-large fw-bold text-gray">
-					Showing <span className="text-dark">{pageSize.current}</span> of{' '}
-					<span className="text-dark">{totalCountDescription}</span> Patients
-				</p>
-				<TablePagination
-					total={totalCount}
-					page={parseInt(pageNumber, 10)}
-					size={pageSize.current}
-					onClick={handlePaginationClick}
-				/>
+				<Container fluid>
+					<Row>
+						<Col xs={4}>
+							<div className="d-flex align-items-center">
+								<p className="mb-0 fs-large fw-bold text-gray">
+									Showing <span className="text-dark">{pageSize.current}</span> of{' '}
+									<span className="text-dark">{totalCountDescription}</span> Patients
+								</p>
+							</div>
+						</Col>
+						<Col xs={4}>
+							<div className="d-flex justify-content-center align-items-center">
+								<TablePagination
+									total={totalCount}
+									page={parseInt(pageNumber, 10)}
+									size={pageSize.current}
+									onClick={handlePaginationClick}
+								/>
+							</div>
+						</Col>
+					</Row>
+				</Container>
 			</div>
 		</>
 	);
