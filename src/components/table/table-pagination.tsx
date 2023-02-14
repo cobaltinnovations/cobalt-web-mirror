@@ -1,11 +1,38 @@
-import React, { FC } from 'react';
+import { range } from 'lodash';
+import React, { FC, useCallback, useMemo } from 'react';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
+import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+
 const useTablePaginationStyles = createUseThemedStyles((theme) => ({
+	paginationButton: {
+		width: 32,
+		height: 32,
+		padding: 0,
+		borderRadius: 4,
+		textDecoration: 'none',
+		...theme.fonts.bodyNormal,
+		'&:hover': {
+			textDecoration: 'none',
+		},
+		'&:disabled': {
+			color: theme.colors.n300,
+			backgroundColor: 'transparent',
+			'&:hover': {
+				color: theme.colors.n300,
+				backgroundColor: 'transparent',
+			},
+		},
+	},
 	active: {
-		color: `${theme.colors.n900} !important`,
+		backgroundColor: theme.colors.p500,
+		color: `${theme.colors.n0} !important`,
+		'&:hover': {
+			backgroundColor: theme.colors.p300,
+		},
 	},
 }));
 
@@ -18,52 +45,50 @@ interface TablePaginationProps {
 
 export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, size, total, onClick }) => {
 	const classes = useTablePaginationStyles();
-	const buttonIndices: number[] = Array.from(Array(Math.ceil(total / size)).keys());
 
-	function getPageButtonsToShow() {
-		let pageArray = [];
+	const totalPages = Math.ceil(total / size);
+	const lastPage = totalPages > 0 ? totalPages - 1 : 0;
 
-		if (page > 0 && page < buttonIndices.length - 1) {
-			pageArray = [page];
+	const getPageButtonConfig = useCallback(
+		(index: number) => {
+			return {
+				index,
+				title: String(index + 1),
+				isActive: index === page,
+			};
+		},
+		[page]
+	);
 
-			if (buttonIndices[page + 1] !== undefined) {
-				pageArray.push(page + 1);
-			}
-			if (buttonIndices[page - 1] !== undefined) {
-				pageArray.unshift(page - 1);
-			}
+	const pageButtons = useMemo(() => {
+		const blockSize = 5;
+		const blockBuffer = 2;
+		const firstPage = 0;
 
-			return pageArray;
+		if (totalPages <= blockSize) {
+			return range(firstPage, lastPage + 1).map((index) => {
+				return getPageButtonConfig(index);
+			});
 		}
 
-		if (page === 0) {
-			pageArray = [page];
+		const currentBlock = range(page - blockBuffer, page + 1 + blockBuffer);
 
-			if (buttonIndices[page + 1] !== undefined) {
-				pageArray.push(page + 1);
-			}
-			if (buttonIndices[page + 2] !== undefined) {
-				pageArray.push(page + 2);
-			}
-
-			return pageArray;
+		if (currentBlock[0] <= firstPage) {
+			return range(firstPage, blockSize + firstPage).map((index) => {
+				return getPageButtonConfig(index);
+			});
 		}
 
-		if (page === buttonIndices.length - 1) {
-			pageArray = [page];
-
-			if (buttonIndices[page - 1] !== undefined) {
-				pageArray.unshift(page - 1);
-			}
-			if (buttonIndices[page - 2] !== undefined) {
-				pageArray.unshift(page - 2);
-			}
-
-			return pageArray;
+		if (currentBlock[currentBlock.length - 1] >= lastPage) {
+			return range(lastPage + 1 - blockSize, lastPage + 1).map((index) => {
+				return getPageButtonConfig(index);
+			});
 		}
 
-		return [];
-	}
+		return currentBlock.map((index) => {
+			return getPageButtonConfig(index);
+		});
+	}, [getPageButtonConfig, lastPage, page, totalPages]);
 
 	function handlePreviousButtonClick() {
 		const previousPage = page - 1;
@@ -86,45 +111,51 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 	function handleNextButtonClick() {
 		const nextPage = page + 1;
 
-		if (nextPage > buttonIndices.length - 1) {
+		if (nextPage > lastPage) {
 			return;
 		}
 
 		onClick(nextPage);
 	}
 
-	const pageButtonsToShow = getPageButtonsToShow();
-
 	return (
 		<ButtonGroup aria-label="Pagination">
-			{page !== 0 && (
-				<Button variant="link" size="sm" onClick={handlePreviousButtonClick}>
-					Previous
-				</Button>
-			)}
-			{pageButtonsToShow.length > 1 &&
-				pageButtonsToShow.map((buttonIndex) => {
+			<Button
+				variant="link"
+				size="sm"
+				className={classes.paginationButton}
+				onClick={handlePreviousButtonClick}
+				disabled={page === 0}
+			>
+				<LeftChevron width={24} height={24} />
+			</Button>
+			{pageButtons.length > 1 &&
+				pageButtons.map((button) => {
 					return (
 						<Button
-							key={buttonIndex}
+							key={button.index}
 							variant="link"
 							size="sm"
-							className={classNames({
-								[classes.active]: buttonIndex === page,
+							className={classNames(classes.paginationButton, {
+								[classes.active]: button.isActive,
 							})}
 							onClick={() => {
-								handlePaginationButtonClick(buttonIndex);
+								handlePaginationButtonClick(button.index);
 							}}
 						>
-							{buttonIndex + 1}
+							{button.title}
 						</Button>
 					);
 				})}
-			{page !== buttonIndices.length - 1 && (
-				<Button variant="link" size="sm" onClick={handleNextButtonClick}>
-					Next
-				</Button>
-			)}
+			<Button
+				variant="link"
+				size="sm"
+				className={classes.paginationButton}
+				onClick={handleNextButtonClick}
+				disabled={page === lastPage}
+			>
+				<RightChevron width={24} height={24} />
+			</Button>
 		</ButtonGroup>
 	);
 });
