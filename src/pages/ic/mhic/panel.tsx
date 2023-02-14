@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { AccountModel, PatientOrderCountModel } from '@/lib/models';
+import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -34,11 +34,26 @@ const MhicPanel = () => {
 	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
 	const searchQuery = useMemo(() => searchParams.get('searchQuery'), [searchParams]);
 	const pageNumber = useMemo(() => searchParams.get('pageNumber'), [searchParams]);
+	const pageSize = useRef(15);
 
 	const [showSwitchAccountModal, setShowSwitchAccountModal] = useState(false);
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
+	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const [totalCountDescription, setTotalCountDescription] = useState('0');
+
+	const fetchPanelAccounts = useCallback(async () => {
+		try {
+			const response = await integratedCareService.getPanelAccounts().fetch();
+
+			setPanelAccounts(response.panelAccounts);
+			setActivePatientOrderCountsByPanelAccountId(response.activePatientOrderCountsByPanelAccountId);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError]);
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
@@ -48,34 +63,17 @@ const MhicPanel = () => {
 					...(panelAccountId && { panelAccountId }),
 					...(searchQuery && { searchQuery }),
 					...(pageNumber && { pageNumber }),
-					pageSize: '15',
+					pageSize: String(pageSize.current),
 				})
 				.fetch();
-			console.log(response);
+
+			setPatientOrders(response.findResult.patientOrders);
+			setTotalCount(response.findResult.totalCount);
+			setTotalCountDescription(response.findResult.totalCountDescription);
 		} catch (error) {
 			handleError(error);
 		}
 	}, [handleError, pageNumber, panelAccountId, patientOrderPanelTypeId, searchQuery]);
-
-	const fetchPanelAccounts = useCallback(async () => {
-		try {
-			const response = await integratedCareService.getPanelAccounts().fetch();
-
-			console.log(response);
-			setPanelAccounts(response.panelAccounts);
-			setActivePatientOrderCountsByPanelAccountId(response.activePatientOrderCountsByPanelAccountId);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [handleError]);
-
-	useEffect(() => {
-		fetchPatientOrders();
-	}, [fetchPatientOrders]);
-
-	useEffect(() => {
-		fetchPanelAccounts();
-	}, [fetchPanelAccounts]);
 
 	const handleImportPatientsInputChange = useCallback(
 		(file: File) => {
@@ -90,6 +88,7 @@ const MhicPanel = () => {
 					}
 
 					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
+					await Promise.all([fetchPanelAccounts(), fetchPatientOrders()]);
 
 					addFlag({
 						variant: 'success',
@@ -104,8 +103,16 @@ const MhicPanel = () => {
 
 			fileReader.readAsText(file);
 		},
-		[addFlag, handleError]
+		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
 	);
+
+	useEffect(() => {
+		fetchPatientOrders();
+	}, [fetchPatientOrders]);
+
+	useEffect(() => {
+		fetchPanelAccounts();
+	}, [fetchPanelAccounts]);
 
 	return (
 		<>
@@ -148,7 +155,7 @@ const MhicPanel = () => {
 					Customize View
 				</Button>
 			</div>
-			<div className={classNames(classes.row)}>
+			<div className={classNames(classes.row, 'mb-8')}>
 				<Table>
 					<TableHead>
 						<TableRow>
@@ -165,96 +172,49 @@ const MhicPanel = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						<TableRow>
-							<TableCell width={280} sticky className="py-2">
-								<span className="d-block fw-bold">Lastname, Firstname</span>
-								<span className="d-block text-gray">1A2B3C4D5E</span>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">Jan 30, 2023</span>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">[Practice Name]</span>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">[Reason]</span>
-							</TableCell>
-							<TableCell>
-								<div>
-									<Badge pill bg="outline-primary">
-										NEW
-									</Badge>
-								</div>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">0</span>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">&#8212;</span>
-							</TableCell>
-							<TableCell>
-								<span className="fw-bold">1 Day</span>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell width={280} sticky className="py-2">
-								<span className="d-block">Lastname, Firstname</span>
-								<span className="d-block text-gray">1A2B3C4D5E</span>
-							</TableCell>
-							<TableCell>Jan 30, 2023</TableCell>
-							<TableCell>[Practice Name]</TableCell>
-							<TableCell>[Reason]</TableCell>
-							<TableCell>
-								<div>
-									<Badge pill bg="outline-dark">
-										INSURANCE
-									</Badge>
-								</div>
-							</TableCell>
-							<TableCell>0</TableCell>
-							<TableCell>&#8212;</TableCell>
-							<TableCell>1 Day</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell width={280} sticky className="py-2">
-								<span className="d-block">Lastname, Firstname</span>
-								<span className="d-block text-gray">1A2B3C4D5E</span>
-							</TableCell>
-							<TableCell>Jan 30, 2023</TableCell>
-							<TableCell>[Practice Name]</TableCell>
-							<TableCell>[Reason]</TableCell>
-							<TableCell>
-								<div>
-									<Badge pill bg="outline-success">
-										SCHEDULED
-									</Badge>
-								</div>
-							</TableCell>
-							<TableCell>0</TableCell>
-							<TableCell>&#8212;</TableCell>
-							<TableCell>1 Day</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell width={280} sticky className="py-2">
-								<span className="d-block">Lastname, Firstname</span>
-								<span className="d-block text-gray">1A2B3C4D5E</span>
-							</TableCell>
-							<TableCell>Jan 30, 2023</TableCell>
-							<TableCell>[Practice Name]</TableCell>
-							<TableCell>[Reason]</TableCell>
-							<TableCell>
-								<div>
-									<Badge pill bg="outline-warning">
-										FINAL
-									</Badge>
-								</div>
-							</TableCell>
-							<TableCell>0</TableCell>
-							<TableCell>&#8212;</TableCell>
-							<TableCell>1 Day</TableCell>
-						</TableRow>
+						{patientOrders.map((po) => {
+							return (
+								<TableRow key={po.patientOrderId}>
+									<TableCell width={280} sticky className="py-2">
+										<span className="d-block fw-bold">Lastname, Firstname</span>
+										<span className="d-block text-gray">1A2B3C4D5E</span>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">Jan 30, 2023</span>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">[Practice Name]</span>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">[Reason]</span>
+									</TableCell>
+									<TableCell>
+										<div>
+											<Badge pill bg="outline-primary">
+												NEW
+											</Badge>
+										</div>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">0</span>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">&#8212;</span>
+									</TableCell>
+									<TableCell>
+										<span className="fw-bold">1 Day</span>
+									</TableCell>
+								</TableRow>
+							);
+						})}
 					</TableBody>
 				</Table>
+			</div>
+			<div className={classNames(classes.row, 'pb-20')}>
+				<p className="mb-0 fs-large fw-bold text-gray">
+					Showing <span className="text-dark">{pageSize.current}</span> of{' '}
+					<span className="text-dark">{totalCountDescription}</span> Patients
+				</p>
 			</div>
 		</>
 	);

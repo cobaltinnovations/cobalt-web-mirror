@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { AccountModel, PatientOrderCountModel } from '@/lib/models';
+import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
 
 export const integratedCareService = {
 	importPatientOrders(data: { csvContent: string }) {
@@ -19,7 +19,7 @@ export const integratedCareService = {
 	}) {
 		return httpSingleton.orchestrateRequest<{
 			findResult: {
-				patientOrders: [];
+				patientOrders: PatientOrderModel[];
 				totalCount: number;
 				totalCountDescription: string;
 			};
