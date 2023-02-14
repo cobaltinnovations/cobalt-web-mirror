@@ -1,9 +1,15 @@
 import React from 'react';
+import { Badge, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { MhicAccountHeader, MhicNavigation } from '@/components/integrated-care/mhic';
+import {
+	MhicAccountHeader,
+	MhicFilterDropdown,
+	MhicNavigation,
+	MhicSortDropdown,
+} from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
-import { Badge, Button } from 'react-bootstrap';
+
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -20,14 +26,10 @@ const MhicPanel = () => {
 			<MhicAccountHeader />
 			<MhicNavigation />
 			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
-				<Button
-					variant="light"
-					onClick={() => {
-						window.alert('[TODO]: Open filter modal');
-					}}
-				>
-					Filter
-				</Button>
+				<div className="d-flex">
+					<MhicFilterDropdown />
+					<MhicSortDropdown />
+				</div>
 				<Button
 					variant="light"
 					onClick={() => {
