@@ -7,7 +7,7 @@ import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/m
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
 	MhicAccountHeader,
 	MhicFilterDropdown,
@@ -33,7 +33,7 @@ const MhicPanel = () => {
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
 	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
 	const searchQuery = useMemo(() => searchParams.get('searchQuery'), [searchParams]);
-	const pageNumber = useMemo(() => searchParams.get('pageNumber'), [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const pageSize = useRef(15);
 
 	const [showSwitchAccountModal, setShowSwitchAccountModal] = useState(false);
@@ -104,6 +104,16 @@ const MhicPanel = () => {
 			fileReader.readAsText(file);
 		},
 		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
+	);
+
+	const handlePaginationClick = useCallback(
+		(pageIndex: number) => {
+			searchParams.set('pageNumber', String(pageIndex));
+
+			setSearchParams(searchParams);
+			setShowSwitchAccountModal(false);
+		},
+		[searchParams, setSearchParams]
 	);
 
 	useEffect(() => {
@@ -215,6 +225,12 @@ const MhicPanel = () => {
 					Showing <span className="text-dark">{pageSize.current}</span> of{' '}
 					<span className="text-dark">{totalCountDescription}</span> Patients
 				</p>
+				<TablePagination
+					total={totalCount}
+					page={parseInt(pageNumber, 10)}
+					size={pageSize.current}
+					onClick={handlePaginationClick}
+				/>
 			</div>
 		</>
 	);
