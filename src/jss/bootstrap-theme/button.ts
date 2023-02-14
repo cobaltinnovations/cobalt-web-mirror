@@ -75,6 +75,7 @@ export const button = (theme: CobaltTheme) => {
 			/* Success variant */
 			/* ----------------------------------------------------------- */
 			'&-success': {
+				color: theme.colors.n0,
 				backgroundColor: theme.colors.s500,
 				'&:hover': {
 					backgroundColor: theme.colors.s300,

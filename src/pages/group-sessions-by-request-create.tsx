@@ -12,7 +12,6 @@ import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
 
 import { imageUploader, groupSessionsService, CreateGroupSessionRequestRequestBody } from '@/lib/services';
 import ImageUpload from '@/components/image-upload';
-import useAlert from '@/hooks/use-alert';
 import useAccount from '@/hooks/use-account';
 import { ROLE_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
@@ -21,6 +20,7 @@ import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import AsyncPage from '@/components/async-page';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import useFlags from '@/hooks/use-flags';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -46,9 +46,9 @@ const requiredFields = getRequiredYupFields<GroupSessionByRequestFormData>(group
 const GroupSessionsByRequestCreate: FC = () => {
 	const handleError = useHandleError();
 	const { fonts } = useCobaltTheme();
-	const { showAlert } = useAlert();
 	const { account } = useAccount();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
+	const { addFlag } = useFlags();
 
 	const navigate = useNavigate();
 	const [sessionCropModalIsOpen, setSessionCropModalIsOpen] = useState(false);
@@ -103,18 +103,40 @@ const GroupSessionsByRequestCreate: FC = () => {
 					throw new Error('groupSessionId not found.');
 				}
 
-				await groupSessionsService.updateGroupSessionRequest(groupSessionId, submissionValues).fetch();
+				const updateResponse = await groupSessionsService
+					.updateGroupSessionRequest(groupSessionId, submissionValues)
+					.fetch();
 
-				showAlert({
+				addFlag({
 					variant: 'success',
-					text: 'Your group session was updated!',
+					title: 'Your group session was updated!',
+					description: 'This session is now available on Cobalt',
+					actions: [
+						{
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-sessions-by-request/${updateResponse.groupSession.groupSessionId}`
+								),
+						},
+					],
 				});
 			} else {
-				await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
+				const createResoonse = await groupSessionsService.createGroupSessionRequest(submissionValues).fetch();
 
-				showAlert({
+				addFlag({
 					variant: 'success',
-					text: 'Your group session was added!',
+					title: 'Your group session was updated!',
+					description: 'This session is now available on Cobalt',
+					actions: [
+						{
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-sessions-by-request/${createResoonse.groupSession.groupSessionId}`
+								),
+						},
+					],
 				});
 			}
 

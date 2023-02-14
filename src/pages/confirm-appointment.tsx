@@ -4,7 +4,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import { accountService, appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import useAlert from '@/hooks/use-alert';
+import useFlags from '@/hooks/use-flags';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
@@ -19,7 +19,7 @@ const ConfirmAppointment = () => {
 	const time = searchParams.get('time') ?? '';
 	const intakeAssessmentId = searchParams.get('intakeAssessmentId') || undefined;
 
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const { account } = useAccount();
 	const handleError = useHandleError();
 
@@ -74,6 +74,12 @@ const ConfirmAppointment = () => {
 
 			setConfirmationCodeRequested(true);
 			setSubmitting(false);
+			addFlag({
+				variant: 'success',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 			setSubmitting(false);
@@ -142,6 +148,13 @@ const ConfirmAppointment = () => {
 					emailAddress: response.account.emailAddress,
 				},
 			});
+
+			addFlag({
+				variant: 'success',
+				title: 'Your appointment is reserved',
+				description: `We'll see you ${response.appointment.startTimeDescription}`,
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 			setSubmitting(false);
@@ -169,9 +182,11 @@ const ConfirmAppointment = () => {
 				return;
 			}
 
-			showAlert({
+			addFlag({
 				variant: 'success',
-				text: 'Verification code sent.',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
+				actions: [],
 			});
 		} catch (error) {
 			handleError(error);

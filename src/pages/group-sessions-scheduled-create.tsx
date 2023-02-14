@@ -31,7 +31,6 @@ import { GroupSessionModel, GroupSessionReservationModel, ROLE_ID, ScreeningQues
 import { getRequiredYupFields } from '@/lib/utils';
 import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
-import useAlert from '@/hooks/use-alert';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { cloneDeep } from 'lodash';
@@ -39,6 +38,7 @@ import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseStyles({
 	removeButton: {
@@ -139,7 +139,7 @@ const GroupSessionsCreate: FC = () => {
 		end: true,
 	});
 
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const [searchParams] = useSearchParams();
 	const groupSessionIdToCopy = searchParams.get('groupSessionIdToCopy');
@@ -307,17 +307,39 @@ const GroupSessionsCreate: FC = () => {
 
 			if (isEdit) {
 				if (session) {
-					await groupSessionsService.updateGroupsession(session.groupSessionId, submissionValues).fetch();
-					showAlert({
+					const updateResponse = await groupSessionsService
+						.updateGroupsession(session.groupSessionId, submissionValues)
+						.fetch();
+					addFlag({
 						variant: 'success',
-						text: 'Session updated.',
+						title: 'Your group session was updated!',
+						description: 'This session is now available on Cobalt',
+						actions: [
+							{
+								title: 'View Session',
+								onClick: () =>
+									navigate(
+										`/in-the-studio/group-session-scheduled/${updateResponse.groupSession.groupSessionId}`
+									),
+							},
+						],
 					});
 				}
 			} else {
-				await groupSessionsService.createGroupSession(submissionValues).fetch();
-				showAlert({
+				const createResponse = await groupSessionsService.createGroupSession(submissionValues).fetch();
+				addFlag({
 					variant: 'success',
-					text: 'Your group session was added!',
+					title: 'Your group session was added!',
+					description: 'This session is now available on Cobalt',
+					actions: [
+						{
+							title: 'View Session',
+							onClick: () =>
+								navigate(
+									`/in-the-studio/group-session-scheduled/${createResponse.groupSession.groupSessionId}`
+								),
+						},
+					],
 				});
 			}
 
@@ -392,9 +414,11 @@ const GroupSessionsCreate: FC = () => {
 
 									<CopyToClipboard
 										onCopy={() => {
-											showAlert({
+											addFlag({
 												variant: 'success',
-												text: 'the link was copied to your clipboard',
+												title: 'Copied!',
+												description: 'The URL for this session was copied to your clipboard',
+												actions: [],
 											});
 										}}
 										text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${groupSessionId}?immediateAccess=true`}

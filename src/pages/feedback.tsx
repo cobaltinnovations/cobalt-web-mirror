@@ -1,48 +1,44 @@
 import React, { FC, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import { feedbackService } from '@/lib/services/feedback-service';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+import useAnalytics from '@/hooks/use-analytics';
+import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
-import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const Feedback: FC = () => {
 	const handleError = useHandleError();
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
+	const { addFlag } = useFlags();
+	const navigate = useNavigate();
 
 	const [feedbackEmailValue, setFeedbackEmailValue] = useState('');
 	const [feedbackTextareaValue, setFeedbackTextareaValue] = useState<string>('');
-	const [feedbackSubmitted, setFeedbackSubmitted] = useState<boolean>(false);
 
 	async function handleSubmitFeedbackButtonClick() {
 		try {
 			await feedbackService.submitFeedback(feedbackEmailValue, feedbackTextareaValue).fetch();
 			setFeedbackEmailValue('');
 			setFeedbackTextareaValue('');
-			setFeedbackSubmitted(true);
+			addFlag({
+				variant: 'success',
+				title: 'Your message has been sent',
+				description: '',
+				actions: [{ title: 'Back to Home', onClick: () => navigate('/') }],
+			});
 		} catch (error) {
 			handleError(error);
-			setFeedbackSubmitted(false);
 		}
 	}
 
 	return (
 		<>
-			{feedbackSubmitted && (
-				<Container fluid className="bg-success p-0">
-					<Container className="pt-3 pb-1">
-						<Row>
-							<Col>
-								<h6 className="mb-0 text-center text-white mb-2">your feedback has been sent</h6>
-							</Col>
-						</Row>
-					</Container>
-				</Container>
-			)}
 			<Container className="pt-4">
 				<Row className="mb-4">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>

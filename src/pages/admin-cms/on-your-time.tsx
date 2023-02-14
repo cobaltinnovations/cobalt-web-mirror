@@ -1,20 +1,20 @@
+import { debounce } from 'lodash';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
 
 import { AdminContentRow, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
+import { adminService, ContentFiltersResponse } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { adminService, ContentFiltersResponse } from '@/lib/services';
 import OnYourTimeContentRow from '@/components/admin-cms/on-your-time-row';
-import useAccount from '@/hooks/use-account';
-import useAlert from '@/hooks/use-alert';
-import { debounce } from 'lodash';
-import { createUseStyles } from 'react-jss';
-import mediaQueries from '@/jss/media-queries';
 import SearchInput from '@/components/admin-cms/search-input';
-import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
+import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -55,7 +55,7 @@ const CmsOnYourTime: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { account } = useAccount();
-	const { showAlert } = useAlert();
+	const { addFlag } = useFlags();
 	const isSuperAdmin = account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR;
 	const [tableIsUpdating, setTableIsUpdating] = useState(false);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -92,9 +92,10 @@ const CmsOnYourTime: FC = () => {
 			try {
 				const locationState = (location.state as AlertLocationState) || {};
 				if (locationState?.showSuccess) {
-					showAlert({
-						text: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
+					addFlag({
 						variant: 'success',
+						title: `Your content was ${locationState.isEditing ? 'updated' : 'added'}!`,
+						actions: [],
 					});
 					navigate('', { replace: true, state: {} });
 				}
@@ -130,11 +131,11 @@ const CmsOnYourTime: FC = () => {
 		typeFilterValue,
 		ownerFilterValue,
 		otherStatusFilterValue,
-		showAlert,
 		navigate,
 		searchInputValueDebounced,
 		handleError,
 		location.state,
+		addFlag,
 	]);
 
 	function handleAddContentButtonClick(): void {
@@ -171,7 +172,11 @@ const CmsOnYourTime: FC = () => {
 				.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Approved)
 				.fetch();
 			updateContentItem(content as AdminContentRow);
-			showAlert({ variant: 'success', text: `Your content was approved!` });
+			addFlag({
+				variant: 'success',
+				title: 'Your content was approved!',
+				actions: [],
+			});
 		} catch (e) {
 			handleError(e);
 		}
@@ -180,7 +185,11 @@ const CmsOnYourTime: FC = () => {
 		try {
 			let { content } = await adminService.updateArchiveFlag(contentId, archivedFlag).fetch();
 			updateContentItem(content as AdminContentRow);
-			showAlert({ variant: 'success', text: `Your content was ${archivedFlag ? 'archived' : 'unarchived'}!` });
+			addFlag({
+				variant: 'success',
+				title: `Your content was ${archivedFlag ? 'archived' : 'unarchived'}!`,
+				actions: [],
+			});
 		} catch (e) {
 			handleError(e);
 		}
@@ -192,7 +201,11 @@ const CmsOnYourTime: FC = () => {
 			setContent((adminContent) => {
 				return adminContent.filter((ac) => ac.contentId !== response.contentId);
 			});
-			showAlert({ variant: 'danger', text: `Your content was deleted!` });
+			addFlag({
+				variant: 'danger',
+				title: 'Your content was deleted!',
+				actions: [],
+			});
 		} catch (e) {
 			handleError(e);
 		}
@@ -208,7 +221,11 @@ const CmsOnYourTime: FC = () => {
 				.updateContentApprovalStatus(contentId, ContentApprovalStatusId.Rejected)
 				.fetch();
 			updateContentItem(content as AdminContentRow);
-			showAlert({ variant: 'danger', text: `Your content was rejected!` });
+			addFlag({
+				variant: 'danger',
+				title: 'Your content was rejected!',
+				actions: [],
+			});
 		} catch (e) {
 			handleError(e);
 		}
