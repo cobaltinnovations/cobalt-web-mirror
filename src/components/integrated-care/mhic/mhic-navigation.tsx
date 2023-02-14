@@ -105,7 +105,7 @@ export const MhicNavigation = () => {
 					count: 4,
 				},
 				{
-					id: 'BEHAVIORAL_HEALTH_PROVIDER',
+					id: 'BHP',
 					title: 'Behavioral Health Provider',
 					count: 0,
 				},
