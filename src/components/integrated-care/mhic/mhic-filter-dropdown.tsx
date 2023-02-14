@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
@@ -25,9 +25,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export const MhicFilterDropdown = () => {
 	const classes = useStyles();
+	const [show, setShow] = useState(false);
 
 	return (
-		<Dropdown>
+		<Dropdown autoClose="outside" show={show} onToggle={setShow}>
 			<Dropdown.Toggle className="me-2" variant="light" id="mhic-filter-toggle">
 				Filter
 			</Dropdown.Toggle>
@@ -61,7 +62,13 @@ export const MhicFilterDropdown = () => {
 					/>
 				</div>
 				<div className="text-right">
-					<Button>Apply</Button>
+					<Button
+						onClick={() => {
+							setShow(false);
+						}}
+					>
+						Apply
+					</Button>
 				</div>
 			</Dropdown.Menu>
 		</Dropdown>

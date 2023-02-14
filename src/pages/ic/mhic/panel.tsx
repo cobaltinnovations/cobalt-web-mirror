@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Badge, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { integratedCareService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAccountHeader,
 	MhicFilterDropdown,
@@ -9,8 +14,6 @@ import {
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
-
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	row: {
@@ -20,6 +23,47 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const MhicPanel = () => {
 	const classes = useStyles();
+	const handleError = useHandleError();
+
+	const [searchParams] = useSearchParams();
+	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
+	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
+	const searchQuery = useMemo(() => searchParams.get('searchQuery'), [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber'), [searchParams]);
+
+	const fetchPatientOrders = useCallback(async () => {
+		try {
+			const response = await integratedCareService
+				.getPatientOrders({
+					...(patientOrderPanelTypeId && { patientOrderPanelTypeId }),
+					...(panelAccountId && { panelAccountId }),
+					...(searchQuery && { searchQuery }),
+					...(pageNumber && { pageNumber }),
+					pageSize: '15',
+				})
+				.fetch();
+			console.log(response);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, pageNumber, panelAccountId, patientOrderPanelTypeId, searchQuery]);
+
+	const fetchPanelAccounts = useCallback(async () => {
+		try {
+			const response = await integratedCareService.getPanelAccounts().fetch();
+			console.log(response);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError]);
+
+	useEffect(() => {
+		fetchPatientOrders();
+	}, [fetchPatientOrders]);
+
+	useEffect(() => {
+		fetchPanelAccounts();
+	}, [fetchPanelAccounts]);
 
 	return (
 		<>

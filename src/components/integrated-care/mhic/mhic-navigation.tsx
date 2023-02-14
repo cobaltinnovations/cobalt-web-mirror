@@ -80,7 +80,7 @@ export const MhicNavigation = () => {
 	const classes = useStyles();
 	const { pathname } = useLocation();
 	const [searchParams] = useSearchParams();
-	const statusParam = useMemo(() => searchParams.get('status'), [searchParams]);
+	const statusParam = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
 
 	const linkSections = useRef([
 		{
@@ -137,7 +137,7 @@ export const MhicNavigation = () => {
 							return (
 								<Link
 									key={linkIndex}
-									to={buildQueryParamUrl(pathname, { status: link.id })}
+									to={buildQueryParamUrl(pathname, { patientOrderPanelTypeId: link.id })}
 									className={classNames({
 										'first-link-of-section': isFirstLink && !isFirstSection,
 										'last-link-of-section': isLastLink && !isLastSection,

@@ -11,6 +11,7 @@ export * from './google-places-service';
 export * from './group-sessions-service';
 export * from './image-upload-service';
 export * from './institution-service';
+export * from './integrated-care-service';
 export * from './interaction-service';
 export * from './provider-service';
 export * from './recommendations-service';
