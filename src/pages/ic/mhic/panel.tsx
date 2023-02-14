@@ -40,6 +40,8 @@ const MhicPanel = () => {
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
+
+	const [tableIsLoading, setTableIsLoading] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
@@ -57,6 +59,8 @@ const MhicPanel = () => {
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
+			setTableIsLoading(true);
+
 			const response = await integratedCareService
 				.getPatientOrders({
 					...(patientOrderPanelTypeId && { patientOrderPanelTypeId }),
@@ -72,6 +76,8 @@ const MhicPanel = () => {
 			setTotalCountDescription(response.findResult.totalCountDescription);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setTableIsLoading(false);
 		}
 	}, [handleError, pageNumber, panelAccountId, patientOrderPanelTypeId, searchQuery]);
 
@@ -166,7 +172,7 @@ const MhicPanel = () => {
 				</Button>
 			</div>
 			<div className={classNames(classes.row, 'mb-8')}>
-				<Table>
+				<Table isLoading={tableIsLoading}>
 					<TableHead>
 						<TableRow>
 							<TableCell header width={280} sticky>
@@ -226,7 +232,7 @@ const MhicPanel = () => {
 						<Col xs={4}>
 							<div className="d-flex align-items-center">
 								<p className="mb-0 fs-large fw-bold text-gray">
-									Showing <span className="text-dark">{pageSize.current}</span> of{' '}
+									Showing <span className="text-dark">{patientOrders.length}</span> of{' '}
 									<span className="text-dark">{totalCountDescription}</span> Patients
 								</p>
 							</div>
