@@ -1,10 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>icons/edit</title>
-    <g id="icons/edit" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="edit-24px">
-            <polygon id="Path" points="0 0 24 0 24 24 0 24"></polygon>
-            <path d="M14.06,9.02 L14.98,9.94 L5.92,19 L5,19 L5,18.08 L14.06,9.02 M17.66,3 C17.41,3 17.15,3.1 16.96,3.29 L15.13,5.12 L18.88,8.87 L20.71,7.04 C21.1,6.65 21.1,6.02 20.71,5.63 L18.37,3.29 C18.17,3.09 17.92,3 17.66,3 Z M14.06,6.19 L3,17.25 L3,21 L6.75,21 L17.81,9.94 L14.06,6.19 Z" id="Shape" fill="#EE8C4E"></path>
-        </g>
-    </g>
+<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.7167 7.51667L12.4833 8.28333L4.93333 15.8333H4.16667V15.0667L11.7167 7.51667ZM14.7167 2.5C14.5083 2.5 14.2917 2.58333 14.1333 2.74167L12.6083 4.26667L15.7333 7.39167L17.2583 5.86667C17.5833 5.54167 17.5833 5.01667 17.2583 4.69167L15.3083 2.74167C15.1417 2.575 14.9333 2.5 14.7167 2.5ZM11.7167 5.15833L2.5 14.375V17.5H5.625L14.8417 8.28333L11.7167 5.15833Z" />
 </svg>

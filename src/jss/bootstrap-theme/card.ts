@@ -32,10 +32,19 @@ export const card = (theme: CobaltTheme) => {
 			'& .cobalt-card': {
 				'&__header': {
 					padding: '14px 16px',
+					position: 'relative',
 					borderTopLeftRadius: 4,
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n75,
 					borderBottom: `1px solid ${theme.colors.n100}`,
+					'& .button-container': {
+						right: 16,
+						top: '50%',
+						display: 'flex',
+						position: 'absolute',
+						alignItems: 'center',
+						transform: 'translateY(-50%)',
+					},
 				},
 				'&__title.h5': {
 					margin: 0,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 
 export const MhicPatientDetails = () => {
 	return (
@@ -43,6 +44,11 @@ export const MhicPatientDetails = () => {
 							<Card bsPrefix="ic-card">
 								<Card.Header>
 									<Card.Title>Demographics</Card.Title>
+									<div className="button-container">
+										<Button variant="light" className="p-2">
+											<EditIcon className="d-flex" />
+										</Button>
+									</div>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
@@ -106,6 +112,11 @@ export const MhicPatientDetails = () => {
 							<Card bsPrefix="ic-card">
 								<Card.Header>
 									<Card.Title>Insurance</Card.Title>
+									<div className="button-container">
+										<Button variant="light" className="p-2">
+											<EditIcon className="d-flex" />
+										</Button>
+									</div>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
@@ -143,6 +154,11 @@ export const MhicPatientDetails = () => {
 							<Card bsPrefix="ic-card">
 								<Card.Header>
 									<Card.Title>Patient</Card.Title>
+									<div className="button-container">
+										<Button variant="light" className="p-2">
+											<EditIcon className="d-flex" />
+										</Button>
+									</div>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
@@ -185,6 +201,11 @@ export const MhicPatientDetails = () => {
 							<Card bsPrefix="ic-card">
 								<Card.Header>
 									<Card.Title>Patient's Father</Card.Title>
+									<div className="button-container">
+										<Button variant="light" className="p-2">
+											<EditIcon className="d-flex" />
+										</Button>
+									</div>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
