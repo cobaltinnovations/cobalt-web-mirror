@@ -33,7 +33,7 @@ export const MhicAccountHeader = ({ onSwitchButtonClick, onImportPatientsInputCh
 					<SwapIcon />
 				</Button>
 			</div>
-			<FileInputButton accept="*.csv" onChange={onImportPatientsInputChange}>
+			<FileInputButton accept=".csv" onChange={onImportPatientsInputChange}>
 				Import Patients
 			</FileInputButton>
 		</header>
