@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { MhicDemographicsModal } from '@/components/integrated-care/mhic';
 
 export const MhicPatientDetails = () => {
+	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
+
 	return (
 		<>
+			<MhicDemographicsModal
+				show={showDemographicsModal}
+				onHide={() => {
+					setShowDemographicsModal(false);
+				}}
+				onSave={() => {
+					setShowDemographicsModal(false);
+				}}
+			/>
+
 			<section>
 				<Container fluid>
 					<Row className="mb-6">
@@ -45,7 +58,13 @@ export const MhicPatientDetails = () => {
 								<Card.Header>
 									<Card.Title>Demographics</Card.Title>
 									<div className="button-container">
-										<Button variant="light" className="p-2">
+										<Button
+											variant="light"
+											className="p-2"
+											onClick={() => {
+												setShowDemographicsModal(true);
+											}}
+										>
 											<EditIcon className="d-flex" />
 										</Button>
 									</div>

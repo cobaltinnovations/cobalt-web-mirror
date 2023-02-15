@@ -5,9 +5,7 @@ import { createUseStyles } from 'react-jss';
 
 const useSessionCancelModalStyles = createUseStyles({
 	sessionCancelModal: {
-		width: '90%',
 		maxWidth: 600,
-		margin: '0 auto',
 	},
 });
 

@@ -9,9 +9,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useHealthRecordsModal = createUseThemedStyles((theme) => ({
 	healthRecordsModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 	pageIndicator: {
 		width: 8,

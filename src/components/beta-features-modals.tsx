@@ -8,9 +8,7 @@ import { createUseStyles } from 'react-jss';
 
 const useBetaFeaturesModalStyles = createUseStyles({
 	betaFeatureModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

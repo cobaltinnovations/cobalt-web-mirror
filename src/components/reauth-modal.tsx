@@ -9,9 +9,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const usStyles = createUseStyles({
 	modal: {
-		width: '90%',
 		maxWidth: 400,
-		margin: '0 auto',
 	},
 });
 

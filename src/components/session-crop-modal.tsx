@@ -51,9 +51,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 
 const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	sessionCropModal: {
-		width: '90%',
 		maxWidth: 600,
-		margin: '0 auto',
 	},
 	infoIcon: {
 		width: 20,

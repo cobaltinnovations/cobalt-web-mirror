@@ -2,8 +2,14 @@ import { CobaltTheme } from '@/jss/theme';
 
 export const modal = (theme: CobaltTheme) => {
 	return {
+		'.modal-dialog': {
+			width: '90%',
+			height: '100%',
+			margin: '0 auto',
+		},
 		'.modal-content': {
 			borderRadius: 5,
+			maxHeight: '90vh',
 			border: `1px solid ${theme.colors.n100}`,
 			filter: 'drop-shadow(0px 10px 18px rgba(41, 40, 39, 0.15)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
 		},

@@ -6,9 +6,7 @@ import { AccountModel, PatientOrderCountModel } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
-		width: '90%',
 		maxWidth: 480,
-		margin: '0 auto',
 	},
 });
 

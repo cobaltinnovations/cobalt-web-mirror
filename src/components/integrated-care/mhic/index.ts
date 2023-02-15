@@ -1,4 +1,5 @@
 export * from './mhic-account-header';
+export * from './mhic-demographics-modal';
 export * from './mhic-filter-dropdown';
 export * from './mhic-header';
 export * from './mhic-navigation';

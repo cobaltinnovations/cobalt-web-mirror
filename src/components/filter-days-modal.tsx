@@ -12,9 +12,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterDaysModalStyles = createUseStyles({
 	filterDaysModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 
