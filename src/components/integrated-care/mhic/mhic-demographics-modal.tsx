@@ -1,7 +1,7 @@
-import InputHelper from '@/components/input-helper';
 import React, { FC, useCallback } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import InputHelper from '@/components/input-helper';
 
 const useStyles = createUseStyles({
 	modal: {

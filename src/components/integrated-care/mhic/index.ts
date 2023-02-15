@@ -1,6 +1,7 @@
 export * from './mhic-account-header';
 export * from './mhic-close-episode-modal';
 export * from './mhic-contact-information-modal';
+export * from './mhic-customize-table-modal';
 export * from './mhic-demographics-modal';
 export * from './mhic-filter-dropdown';
 export * from './mhic-header';

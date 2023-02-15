@@ -10,6 +10,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
 	MhicAccountHeader,
+	MhicCustomizeTableModal,
 	MhicFilterDropdown,
 	MhicNavigation,
 	MhicPatientOrderShelf,
@@ -41,6 +42,8 @@ const MhicPanel = () => {
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
+
+	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 
 	const [tableIsLoading, setTableIsLoading] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
@@ -152,6 +155,16 @@ const MhicPanel = () => {
 				/>
 			)}
 
+			<MhicCustomizeTableModal
+				show={showCustomizeTableModal}
+				onHide={() => {
+					setShowCustomizeTableModal(false);
+				}}
+				onSave={() => {
+					setShowCustomizeTableModal(false);
+				}}
+			/>
+
 			<MhicPatientOrderShelf
 				open={!!clickedPatientOrderId}
 				onHide={() => {
@@ -174,7 +187,7 @@ const MhicPanel = () => {
 				<Button
 					variant="light"
 					onClick={() => {
-						window.alert('[TODO]: Open customization modal');
+						setShowCustomizeTableModal(true);
 					}}
 				>
 					Customize View
