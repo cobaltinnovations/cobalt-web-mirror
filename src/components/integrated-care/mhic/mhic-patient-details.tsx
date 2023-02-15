@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
+
+import useFlags from '@/hooks/use-flags';
+import { MhicCloseEpisodeModal, MhicDemographicsModal, MhicInsuranceModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { MhicDemographicsModal, MhicInsuranceModal } from '@/components/integrated-care/mhic';
 
 export const MhicPatientDetails = () => {
+	const { addFlag } = useFlags();
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
+	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 
 	return (
 		<>
@@ -26,6 +30,22 @@ export const MhicPatientDetails = () => {
 				}}
 				onSave={() => {
 					setShowInsuranceModal(false);
+				}}
+			/>
+
+			<MhicCloseEpisodeModal
+				show={showCloseEpisodeModal}
+				onHide={() => {
+					setShowCloseEpisodeModal(false);
+				}}
+				onSave={() => {
+					setShowCloseEpisodeModal(false);
+					addFlag({
+						variant: 'success',
+						title: 'Episode Closed',
+						description: '{Message}',
+						actions: [],
+					});
 				}}
 			/>
 
@@ -286,7 +306,14 @@ export const MhicPatientDetails = () => {
 													<p className="m-0 fw-bold">Nov 12, 2022 (Episode: 6 days)</p>
 													<div className="d-flex align-items-center">
 														<p className="m-0 fw-bold text-success">Active</p>
-														<Button variant="primary" size="sm" className="ms-4">
+														<Button
+															variant="primary"
+															size="sm"
+															className="ms-4"
+															onClick={() => {
+																setShowCloseEpisodeModal(true);
+															}}
+														>
 															Close Episode
 														</Button>
 													</div>

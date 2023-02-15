@@ -37,7 +37,7 @@ export const MhicSwitchAccountModal: FC<Props> = ({
 				<Modal.Title>Switch Panel View</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<Form.Label>Select View</Form.Label>
+				<Form.Label className="mb-1">Select View</Form.Label>
 				{panelAccounts.map((panelAccount) => {
 					return (
 						<Form.Check
