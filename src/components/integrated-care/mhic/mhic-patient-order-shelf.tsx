@@ -1,8 +1,9 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import React from 'react';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import classNames from 'classnames';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
@@ -20,6 +21,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		boxShadow: theme.elevation.e400,
 		backgroundColor: theme.colors.n50,
+		'& section': {
+			padding: 32,
+			borderBottom: `1px solid ${theme.colors.n100}`,
+		},
 	},
 	overlay: {
 		top: 0,
@@ -32,7 +37,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
 	header: {
-		padding: '28px 32px',
+		padding: '28px 32px 0',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
@@ -40,8 +45,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	shelfCloseButton: {
 		top: 20,
 		right: 24,
-		padding: 8,
-		position: 'absolute',
 	},
 	'@global': {
 		'.patient-order-shelf-enter': {
@@ -93,7 +96,11 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 			<CSSTransition in={open} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
 				<div className={classes.patientOrderShelf}>
 					<div className={classes.header}>
-						<Button variant="link" className={classes.shelfCloseButton} onClick={onHide}>
+						<Button
+							variant="link"
+							className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
+							onClick={onHide}
+						>
 							<CloseIcon />
 						</Button>
 						<div className="mb-2 d-flex align-items-center">
@@ -111,7 +118,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 									addFlag({
 										variant: 'success',
 										title: 'Copied!',
-										description: 'The MRN for this patient was copied to your clipboard',
+										description: 'The MRN was copied to your clipboard',
 										actions: [],
 									});
 								}}
@@ -122,7 +129,97 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 								</Button>
 							</CopyToClipboard>
 						</div>
+						<div>[TODO]: nav goes here</div>
 					</div>
+					<section>
+						<Container fluid>
+							<Row>
+								<Col>
+									<Card>
+										<Card.Header>
+											<Card.Title>Basic Info</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row>
+												<Col>
+													<p className="m-0">Firstname Lastname</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Date of birth</p>
+												</Col>
+												<Col>
+													<p className="m-0">3/22/1953</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Pref. Language</p>
+												</Col>
+												<Col>
+													<p className="m-0">English</p>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
+								<Col>Demographics</Col>
+							</Row>
+							<Row>
+								<Col>Address</Col>
+								<Col>Insurance</Col>
+							</Row>
+						</Container>
+					</section>
+					<section>
+						<Container fluid>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Contact</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>Patient</Col>
+							</Row>
+							<Row>
+								<Col>Patient's Father</Col>
+							</Row>
+						</Container>
+					</section>
+					<section>
+						<Container fluid>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Referrals</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>Most Recent</Col>
+							</Row>
+							<Row>
+								<Col>Past</Col>
+							</Row>
+						</Container>
+					</section>
+					<section>
+						<Container fluid>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Clinical</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>Diagnoses</Col>
+							</Row>
+							<Row>
+								<Col>Medications</Col>
+							</Row>
+							<Row>
+								<Col>Care Team</Col>
+							</Row>
+						</Container>
+					</section>
 				</div>
 			</CSSTransition>
 			<CSSTransition
