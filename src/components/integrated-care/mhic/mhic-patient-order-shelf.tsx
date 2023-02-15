@@ -1,5 +1,5 @@
 import { createUseThemedStyles } from '@/jss/theme';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -97,6 +97,15 @@ interface MhicPatientOrderShelfProps {
 export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
+
+	useEffect(() => {
+		if (open) {
+			document.body.style.overflow = 'hidden';
+			return;
+		}
+
+		document.body.style.overflow = 'visible';
+	}, [open]);
 
 	return (
 		<>
