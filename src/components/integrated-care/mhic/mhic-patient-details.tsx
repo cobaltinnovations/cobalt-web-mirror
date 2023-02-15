@@ -26,6 +26,12 @@ export const MhicPatientDetails = () => {
 				}}
 				onSave={() => {
 					setShowDemographicsModal(false);
+					addFlag({
+						variant: 'success',
+						title: 'Demographic Information Saved',
+						description: '{Message}',
+						actions: [],
+					});
 				}}
 			/>
 
@@ -36,6 +42,12 @@ export const MhicPatientDetails = () => {
 				}}
 				onSave={() => {
 					setShowInsuranceModal(false);
+					addFlag({
+						variant: 'success',
+						title: 'Insurance Information Saved',
+						description: '{Message}',
+						actions: [],
+					});
 				}}
 			/>
 
@@ -46,6 +58,12 @@ export const MhicPatientDetails = () => {
 				}}
 				onSave={() => {
 					setShowContactInformationModal(false);
+					addFlag({
+						variant: 'success',
+						title: 'Patient Contact Information Saved',
+						description: '{Message}',
+						actions: [],
+					});
 				}}
 			/>
 
