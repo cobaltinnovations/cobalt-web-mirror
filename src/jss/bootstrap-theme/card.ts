@@ -26,5 +26,30 @@ export const card = (theme: CobaltTheme) => {
 				padding: '15px 30px',
 			},
 		},
+		'.ic-card': {
+			borderRadius: 4,
+			border: `1px solid ${theme.colors.n100}`,
+			'& .cobalt-card': {
+				'&__header': {
+					padding: '14px 16px',
+					borderTopLeftRadius: 4,
+					borderTopRightRadius: 4,
+					backgroundColor: theme.colors.n75,
+					borderBottom: `1px solid ${theme.colors.n100}`,
+				},
+				'&__title.h5': {
+					margin: 0,
+					...theme.fonts.default,
+					...theme.fonts.bodyBold,
+					textTransform: 'none',
+				},
+				'&__body': {
+					padding: '20px 16px',
+					borderBottomLeftRadius: 4,
+					borderBottomRightRadius: 4,
+					backgroundColor: theme.colors.n0,
+				},
+			},
+		},
 	};
 };

@@ -133,21 +133,21 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 					</div>
 					<section>
 						<Container fluid>
-							<Row>
+							<Row className="mb-6">
 								<Col>
-									<Card>
+									<Card bsPrefix="ic-card">
 										<Card.Header>
 											<Card.Title>Basic Info</Card.Title>
 										</Card.Header>
 										<Card.Body>
-											<Row>
+											<Row className="mb-4">
 												<Col>
 													<p className="m-0">Firstname Lastname</p>
 												</Col>
 											</Row>
-											<Row>
+											<Row className="mb-4">
 												<Col>
-													<p className="m-0">Date of birth</p>
+													<p className="m-0 text-gray">Date of birth</p>
 												</Col>
 												<Col>
 													<p className="m-0">3/22/1953</p>
@@ -155,7 +155,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 											</Row>
 											<Row>
 												<Col>
-													<p className="m-0">Pref. Language</p>
+													<p className="m-0 text-gray">Pref. Language</p>
 												</Col>
 												<Col>
 													<p className="m-0">English</p>
@@ -164,11 +164,89 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 										</Card.Body>
 									</Card>
 								</Col>
-								<Col>Demographics</Col>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Demographics</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row className="mb-4">
+												<Col>
+													<p className="m-0 text-gray">Race</p>
+												</Col>
+												<Col>
+													<p className="m-0">Black</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col>
+													<p className="m-0 text-gray">Ethnicity</p>
+												</Col>
+												<Col>
+													<p className="m-0">Hispanic</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0 text-gray">Gender Identity</p>
+												</Col>
+												<Col>
+													<p className="m-0">Male</p>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
 							</Row>
 							<Row>
-								<Col>Address</Col>
-								<Col>Insurance</Col>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Address</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row>
+												<Col>
+													<p className="m-0">123 Main Street</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Apt 21</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Philadelphia, PA 19238</p>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Insurance</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row>
+												<Col>
+													<p className="m-0">Medicare</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Plan: [PLAN_NAME]</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">Coverage Until: Mar 23, 2023</p>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
 							</Row>
 						</Container>
 					</section>
@@ -179,11 +257,69 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 									<h4 className="mb-0">Contact</h4>
 								</Col>
 							</Row>
-							<Row>
-								<Col>Patient</Col>
+							<Row className="mb-6">
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Patient</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Home Phone</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">(000) 000-0000</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Mobile Phone</p>
+												</Col>
+												<Col xs={9}>
+													<div className="d-flex align-items-center">
+														<p className="m-0">(000) 000-0000</p>
+														<Badge bg="outline-dark" pill className="ms-2">
+															Preferred
+														</Badge>
+													</div>
+												</Col>
+											</Row>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Email</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">frankasanzez@email.com</p>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
 							</Row>
 							<Row>
-								<Col>Patient's Father</Col>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Patient's Father</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Mobile Phone</p>
+												</Col>
+												<Col xs={9}>
+													<div className="d-flex align-items-center">
+														<p className="m-0 text-gray">(000) 000-0000</p>
+														<Badge bg="outline-dark" pill className="ms-2">
+															Preferred
+														</Badge>
+													</div>
+												</Col>
+											</Row>
+										</Card.Body>
+									</Card>
+								</Col>
 							</Row>
 						</Container>
 					</section>
