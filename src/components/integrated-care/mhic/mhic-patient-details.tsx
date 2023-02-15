@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import useFlags from '@/hooks/use-flags';
-import { MhicCloseEpisodeModal, MhicDemographicsModal, MhicInsuranceModal } from '@/components/integrated-care/mhic';
+import {
+	MhicCloseEpisodeModal,
+	MhicContactInformationModal,
+	MhicDemographicsModal,
+	MhicInsuranceModal,
+} from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 
 export const MhicPatientDetails = () => {
 	const { addFlag } = useFlags();
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
+	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 
 	return (
@@ -30,6 +36,16 @@ export const MhicPatientDetails = () => {
 				}}
 				onSave={() => {
 					setShowInsuranceModal(false);
+				}}
+			/>
+
+			<MhicContactInformationModal
+				show={showContactInformationModal}
+				onHide={() => {
+					setShowContactInformationModal(false);
+				}}
+				onSave={() => {
+					setShowContactInformationModal(false);
 				}}
 			/>
 
@@ -211,7 +227,13 @@ export const MhicPatientDetails = () => {
 								<Card.Header>
 									<Card.Title>Patient</Card.Title>
 									<div className="button-container">
-										<Button variant="light" className="p-2">
+										<Button
+											variant="light"
+											className="p-2"
+											onClick={() => {
+												setShowContactInformationModal(true);
+											}}
+										>
 											<EditIcon className="d-flex" />
 										</Button>
 									</div>
