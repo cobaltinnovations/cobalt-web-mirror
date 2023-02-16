@@ -1,12 +1,12 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { useEffect } from 'react';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge, Button, Nav, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import useFlags from '@/hooks/use-flags';
-import { MhicPatientDetails } from '@/components/integrated-care/mhic';
+import { MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
@@ -94,6 +94,12 @@ interface MhicPatientOrderShelfProps {
 	onHide(): void;
 }
 
+enum TAB_KEYS {
+	PATIENT_DETAILS = 'PATIENT_DETAILS',
+	OUTREACH_AND_ASSESSMENT = 'OUTREACH_AND_ASSESSMENT',
+	COMMENTS = 'COMMENTS',
+}
+
 export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
@@ -111,45 +117,71 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 		<>
 			<CSSTransition in={open} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
 				<div className={classes.patientOrderShelf}>
-					<div className={classes.header}>
-						<Button
-							variant="link"
-							className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
-							onClick={onHide}
-						>
-							<CloseIcon />
-						</Button>
-						<div className="mb-2 d-flex align-items-center">
-							<h4 className="mb-0 me-2">Lastname, FirstName</h4>
-							<Badge pill bg="outline-primary">
-								NEW
-							</Badge>
-						</div>
-						<div className="d-flex align-items-center">
-							<p className="mb-0">
-								MRN: <span className="fw-bold">1A2B3C4D5E</span>
-							</p>
-							<CopyToClipboard
-								onCopy={() => {
-									addFlag({
-										variant: 'success',
-										title: 'Copied!',
-										description: 'The MRN was copied to your clipboard',
-										actions: [],
-									});
-								}}
-								text="1A2B3C4D5E"
+					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS}>
+						<div className={classes.header}>
+							<Button
+								variant="link"
+								className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
+								onClick={onHide}
 							>
-								<Button variant="link" className="p-2">
-									<CopyIcon width={20} height={20} />
-								</Button>
-							</CopyToClipboard>
+								<CloseIcon />
+							</Button>
+							<div className="mb-2 d-flex align-items-center">
+								<h4 className="mb-0 me-2">Lastname, FirstName</h4>
+								<Badge pill bg="outline-primary">
+									NEW
+								</Badge>
+							</div>
+							<div className="d-flex align-items-center">
+								<p className="mb-0">
+									MRN: <span className="fw-bold">1A2B3C4D5E</span>
+								</p>
+								<CopyToClipboard
+									onCopy={() => {
+										addFlag({
+											variant: 'success',
+											title: 'Copied!',
+											description: 'The MRN was copied to your clipboard',
+											actions: [],
+										});
+									}}
+									text="1A2B3C4D5E"
+								>
+									<Button variant="link" className="p-2">
+										<CopyIcon width={20} height={20} />
+									</Button>
+								</CopyToClipboard>
+							</div>
+							<div>
+								<Nav>
+									<Nav.Item>
+										<Nav.Link eventKey={TAB_KEYS.PATIENT_DETAILS}>Patient Details</Nav.Link>
+									</Nav.Item>
+									<Nav.Item>
+										<Nav.Link eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT}>
+											Outreach and Assessment
+										</Nav.Link>
+									</Nav.Item>
+									<Nav.Item>
+										<Nav.Link eventKey={TAB_KEYS.COMMENTS}>Comments</Nav.Link>
+									</Nav.Item>
+								</Nav>
+							</div>
 						</div>
-						<div>[TODO]: nav goes here</div>
-					</div>
-					<div className={classes.body}>
-						<MhicPatientDetails />
-					</div>
+						<div className={classes.body}>
+							<Tab.Content>
+								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS}>
+									<MhicPatientDetails />
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT}>
+									<MhicOutreachAndAssesment />
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.COMMENTS}>
+									<p>Comments</p>
+								</Tab.Pane>
+							</Tab.Content>
+						</div>
+					</Tab.Container>
 				</div>
 			</CSSTransition>
 			<CSSTransition

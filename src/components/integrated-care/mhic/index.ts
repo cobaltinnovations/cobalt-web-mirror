@@ -7,6 +7,7 @@ export * from './mhic-filter-dropdown';
 export * from './mhic-header';
 export * from './mhic-insurance-modal';
 export * from './mhic-navigation';
+export * from './mhic-outreach-and-assessment';
 export * from './mhic-patient-details';
 export * from './mhic-patient-order-shelf';
 export * from './mhic-sort-dropdown';

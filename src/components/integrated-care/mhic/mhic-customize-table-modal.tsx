@@ -24,6 +24,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: 16,
 		display: 'flex',
 		borderRadius: 4,
+		marginBottom: 12,
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
@@ -112,18 +113,18 @@ export const MhicCustomizeTableModal: FC<Props> = ({ onSave, ...props }) => {
 									return (
 										<Draggable key={column.id} draggableId={column.id} index={columnIndex}>
 											{(provided, snapshot) => (
-												<PortalAwareItem provided={provided} snapshot={snapshot}>
-													<div
-														className={classNames(classes.draggable, {
-															'is-dragging': snapshot.isDragging,
-														})}
-													>
-														<div>
-															<p className="mb-0">{column.title}</p>
-														</div>
-														<div {...provided.dragHandleProps}>
-															<DragHandleIcon />
-														</div>
+												<PortalAwareItem
+													provided={provided}
+													snapshot={snapshot}
+													className={classNames(classes.draggable, {
+														'is-dragging': snapshot.isDragging,
+													})}
+												>
+													<div>
+														<p className="mb-0">{column.title}</p>
+													</div>
+													<div {...provided.dragHandleProps}>
+														<DragHandleIcon />
 													</div>
 												</PortalAwareItem>
 											)}
@@ -157,14 +158,16 @@ document.body.appendChild(portal);
 const PortalAwareItem = ({
 	provided,
 	snapshot,
+	className,
 	children,
 }: PropsWithChildren<{
 	provided: DraggableProvided;
 	snapshot: DraggableStateSnapshot;
+	className?: string;
 }>) => {
 	const usePortal = snapshot.isDragging;
 	const child = (
-		<div ref={provided.innerRef} className="mb-3" {...provided.draggableProps}>
+		<div ref={provided.innerRef} className={className} {...provided.draggableProps}>
 			{children}
 		</div>
 	);
