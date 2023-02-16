@@ -29,6 +29,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.fw-normal': {
 			...theme.fonts.bodyNormal,
 		},
+		'.fw-semibold': {
+			fontWeight: `500 !important`,
+		},
 		'.fw-bold': {
 			...theme.fonts.bodyBold,
 		},

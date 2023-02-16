@@ -63,10 +63,11 @@ interface TableCellProps extends PropsWithChildren {
 	className?: string;
 	sortDirection?: SORT_DIRECTION | null;
 	onSort?(sortDirection: SORT_DIRECTION): void;
+	colSpan?: number;
 }
 
 export const TableCell: FC<TableCellProps> = React.memo(
-	({ header, width, sticky, stickyOffset, sortable, className, sortDirection, onSort, children }) => {
+	({ header, width, sticky, stickyOffset, sortable, className, sortDirection, onSort, colSpan, children }) => {
 		const classes = useTableCellStyles({
 			header,
 			width,
@@ -88,7 +89,7 @@ export const TableCell: FC<TableCellProps> = React.memo(
 		}
 
 		return (
-			<td className={classes.tableCell}>
+			<td className={classes.tableCell} colSpan={colSpan}>
 				<div className={classNames(classes.tableCellContent, className)}>
 					{children}
 					{header && sortable && (
