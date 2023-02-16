@@ -9,6 +9,7 @@ export * from './mhic-insurance-modal';
 export * from './mhic-navigation';
 export * from './mhic-outreach-and-assessment';
 export * from './mhic-outreach-attempt';
+export * from './mhic-outreach-modal';
 export * from './mhic-patient-details';
 export * from './mhic-patient-order-shelf';
 export * from './mhic-sort-dropdown';

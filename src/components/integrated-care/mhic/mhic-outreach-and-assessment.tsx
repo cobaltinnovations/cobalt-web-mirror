@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicOutreachAttempt } from '@/components/integrated-care/mhic';
+import { MhicOutreachAttempt, MhicOutreachModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 
 export const MhicOutreachAndAssesment = () => {
+	const [showOutreachModal, setShowOutreachModal] = useState(false);
+
 	return (
 		<>
+			<MhicOutreachModal
+				show={showOutreachModal}
+				onHide={() => {
+					setShowOutreachModal(false);
+				}}
+				onSave={() => {
+					setShowOutreachModal(false);
+				}}
+			/>
+
 			<section>
 				<Container fluid className="overflow-visible">
 					<Row className="mb-6">
@@ -16,7 +28,13 @@ export const MhicOutreachAndAssesment = () => {
 								<h4 className="mb-0">
 									Outreach Attempts <span className="text-gray">(0)</span>
 								</h4>
-								<Button>Add Outreach Attempt</Button>
+								<Button
+									onClick={() => {
+										setShowOutreachModal(true);
+									}}
+								>
+									Add Outreach Attempt
+								</Button>
 							</div>
 						</Col>
 					</Row>
@@ -27,11 +45,17 @@ export const MhicOutreachAndAssesment = () => {
 								name="Ava Williams"
 								date="Nov 07, 2023 at 10:00AM"
 								message="Called and scheduled the assessment for November 12."
+								onMoreClick={() => {
+									setShowOutreachModal(true);
+								}}
 							/>
 							<MhicOutreachAttempt
 								name="Ava Williams"
 								date="Sep 30, 2023 at 2:51PM"
 								message="Called to do assessment, patient was unavailable, left a voicemail."
+								onMoreClick={() => {
+									setShowOutreachModal(true);
+								}}
 							/>
 						</Col>
 					</Row>

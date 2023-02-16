@@ -18,10 +18,11 @@ interface Props {
 	name: string;
 	date: string;
 	message: string;
+	onMoreClick(): void;
 	className?: string;
 }
 
-export const MhicOutreachAttempt = ({ name, date, message, className }: Props) => {
+export const MhicOutreachAttempt = ({ name, date, message, onMoreClick, className }: Props) => {
 	const classes = useStyles();
 
 	return (
@@ -31,7 +32,7 @@ export const MhicOutreachAttempt = ({ name, date, message, className }: Props) =
 					{name}
 					<span className="ms-2 fw-normal text-gray">{date}</span>
 				</p>
-				<Button variant="link" className="p-2">
+				<Button variant="link" className="p-2" onClick={onMoreClick}>
 					<MoreIcon className="d-flex" />
 				</Button>
 			</div>
