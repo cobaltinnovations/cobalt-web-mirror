@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicOutreachAttempt, MhicOutreachModal } from '@/components/integrated-care/mhic';
+import { MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 
 export const MhicOutreachAndAssesment = () => {
@@ -40,7 +40,7 @@ export const MhicOutreachAndAssesment = () => {
 					</Row>
 					<Row>
 						<Col>
-							<MhicOutreachAttempt
+							<MhicComment
 								className="mb-4"
 								name="Ava Williams"
 								date="Nov 07, 2023 at 10:00AM"
@@ -52,7 +52,7 @@ export const MhicOutreachAndAssesment = () => {
 									window.confirm('Are you sure?');
 								}}
 							/>
-							<MhicOutreachAttempt
+							<MhicComment
 								name="Ava Williams"
 								date="Sep 30, 2023 at 2:51PM"
 								message="Called to do assessment, patient was unavailable, left a voicemail."

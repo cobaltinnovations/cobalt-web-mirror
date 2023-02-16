@@ -6,7 +6,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import useFlags from '@/hooks/use-flags';
-import { MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
+import { MhicComments, MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
@@ -177,7 +177,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 									<MhicOutreachAndAssesment />
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.COMMENTS}>
-									<p>Comments</p>
+									<MhicComments />
 								</Tab.Pane>
 							</Tab.Content>
 						</div>

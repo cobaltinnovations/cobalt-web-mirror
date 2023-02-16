@@ -19,13 +19,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface Props {
 	name: string;
 	date: string;
+	tag?: string;
 	message: string;
 	onEdit(): void;
 	onDelete(): void;
 	className?: string;
 }
 
-export const MhicOutreachAttempt = ({ name, date, message, onEdit, onDelete, className }: Props) => {
+export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, className }: Props) => {
 	const classes = useStyles();
 	const uuid = useRef(uuidv4());
 
@@ -36,23 +37,29 @@ export const MhicOutreachAttempt = ({ name, date, message, onEdit, onDelete, cla
 					{name}
 					<span className="ms-2 fw-normal text-gray">{date}</span>
 				</p>
-				<Dropdown>
-					<Dropdown.Toggle as={DropdownToggle} id={`mhic-outreach-attempt__dropdown-menu--${uuid.current}`}>
-						<MoreIcon className="d-flex" />
-					</Dropdown.Toggle>
-					<Dropdown.Menu
-						as={DropdownMenu}
-						align="end"
-						flip={false}
-						popperConfig={{ strategy: 'fixed' }}
-						renderOnMount
-					>
-						<Dropdown.Item onClick={onEdit}>Edit</Dropdown.Item>
-						<Dropdown.Item onClick={onDelete}>
-							<span className="text-danger">Delete</span>
-						</Dropdown.Item>
-					</Dropdown.Menu>
-				</Dropdown>
+				<div className="d-flex align-items-center">
+					{tag && <p className="mb-0 me-2 text-gray">{tag}</p>}
+					<Dropdown>
+						<Dropdown.Toggle
+							as={DropdownToggle}
+							id={`mhic-outreach-attempt__dropdown-menu--${uuid.current}`}
+						>
+							<MoreIcon className="d-flex" />
+						</Dropdown.Toggle>
+						<Dropdown.Menu
+							as={DropdownMenu}
+							align="end"
+							flip={false}
+							popperConfig={{ strategy: 'fixed' }}
+							renderOnMount
+						>
+							<Dropdown.Item onClick={onEdit}>Edit</Dropdown.Item>
+							<Dropdown.Item onClick={onDelete}>
+								<span className="text-danger">Delete</span>
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				</div>
 			</div>
 			<p className="m-0">{message}</p>
 		</div>
