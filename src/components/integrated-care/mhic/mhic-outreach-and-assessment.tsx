@@ -45,16 +45,22 @@ export const MhicOutreachAndAssesment = () => {
 								name="Ava Williams"
 								date="Nov 07, 2023 at 10:00AM"
 								message="Called and scheduled the assessment for November 12."
-								onMoreClick={() => {
+								onEdit={() => {
 									setShowOutreachModal(true);
+								}}
+								onDelete={() => {
+									window.confirm('Are you sure?');
 								}}
 							/>
 							<MhicOutreachAttempt
 								name="Ava Williams"
 								date="Sep 30, 2023 at 2:51PM"
 								message="Called to do assessment, patient was unavailable, left a voicemail."
-								onMoreClick={() => {
+								onEdit={() => {
 									setShowOutreachModal(true);
+								}}
+								onDelete={() => {
+									window.confirm('Are you sure?');
 								}}
 							/>
 						</Col>
