@@ -4,6 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import { MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
+import NoData from '@/components/no-data';
 
 export const MhicOutreachAndAssesment = () => {
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
@@ -69,12 +70,51 @@ export const MhicOutreachAndAssesment = () => {
 			</section>
 			<section>
 				<Container fluid>
-					<Row>
+					<Row className="mb-6">
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">Latest Assessment</h4>
 								<Button>Start Assessment</Button>
 							</div>
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							<NoData
+								className="mb-6"
+								title="No Assessment"
+								description="There is no assessment for the patient's most recent referral order"
+								actions={[
+									{
+										variant: 'outline-primary',
+										title: 'Schedule Assessment',
+										onClick: () => {
+											return;
+										},
+									},
+								]}
+							/>
+							<NoData
+								className="bg-white"
+								title="Assessment is Scheduled"
+								description="Nov 12, 2023 at 2:30 PM"
+								actions={[
+									{
+										variant: 'primary',
+										title: 'View Appointment',
+										onClick: () => {
+											return;
+										},
+									},
+									{
+										variant: 'outline-primary',
+										title: 'Edit Appointment Date',
+										onClick: () => {
+											return;
+										},
+									},
+								]}
+							/>
 						</Col>
 					</Row>
 				</Container>

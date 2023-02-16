@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
+import { MhicComment } from '@/components/integrated-care/mhic';
 
 export const MhicComments = () => {
-	const [showOutreachModal, setShowOutreachModal] = useState(false);
-
 	return (
 		<>
 			<section className="border-0">
@@ -18,7 +16,7 @@ export const MhicComments = () => {
 								tag="Outreach"
 								message="Called and scheduled the assessment for November 12."
 								onEdit={() => {
-									setShowOutreachModal(true);
+									window.alert('[TODO]: Edit Comment');
 								}}
 								onDelete={() => {
 									window.confirm('Are you sure?');
@@ -31,7 +29,7 @@ export const MhicComments = () => {
 								tag="General"
 								message="Lorem ipsum dolor sit amet consectetur. Rutrum at sit semper tincidunt purus leo pellentesque adipiscing. Faucibus scelerisque eu viverra sed id enim feugiat morbi viverra. At venenatis eget et aliquet fermentum ornare. Fringilla condimentum sed cursus tincidunt vel interdum. Gravida augue vulputate platea blandit feugiat amet et donec."
 								onEdit={() => {
-									setShowOutreachModal(true);
+									window.alert('[TODO]: Edit Comment');
 								}}
 								onDelete={() => {
 									window.confirm('Are you sure?');
@@ -43,7 +41,7 @@ export const MhicComments = () => {
 								tag="Outreach"
 								message="Called to do assessment, patient was unavailable, left a voicemail."
 								onEdit={() => {
-									setShowOutreachModal(true);
+									window.alert('[TODO]: Edit Comment');
 								}}
 								onDelete={() => {
 									window.confirm('Are you sure?');
