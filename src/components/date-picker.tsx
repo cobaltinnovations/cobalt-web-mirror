@@ -1,29 +1,59 @@
 import React, { FC, forwardRef } from 'react';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 
-import unfoldIcon from '@/assets/icons/icon-unfold.svg';
+import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import moment from 'moment';
+
+interface useStyleProps {
+	value: boolean;
+}
 
 const useDatePickerStyles = createUseThemedStyles((theme) => ({
 	datePickerWrapper: {
 		width: '100%',
 	},
 	datePicker: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
+		height: 54,
 		width: '100%',
-		height: 56,
-		lineHeight: '4.2rem',
-		textIndent: 0,
-		paddingLeft: 15,
-		paddingRight: 15,
-		border: `1px solid ${theme.colors.border}`,
-		backgroundColor: theme.colors.n0,
 		textAlign: 'left',
+		textIndent: 0,
+		borderRadius: 5,
+		position: 'relative',
+		padding: '20px 16px 6px',
+		backgroundColor: theme.colors.n0,
+		border: `1px solid ${theme.colors.n100}`,
+		'&:hover': {
+			borderColor: theme.colors.n300,
+		},
 		'&:disabled': {
 			backgroundColor: theme.colors.background,
+		},
+		'& .date-picker-label': {
+			top: 16,
+			left: 16,
+			margin: 0,
+			zIndex: 1,
+			right: 'initial',
+			position: 'absolute',
+			color: theme.colors.n500,
+			...theme.fonts.headingBold,
+			transformOrigin: 'left top',
+			transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+			transform: ({ value }: useStyleProps) => (value ? 'translateY(-50%) scale(0.75)' : ''),
+		},
+		'& .date-picker-value': {
+			...theme.fonts.default,
+			color: theme.colors.n900,
+		},
+		'& .date-picker-icon': {
+			zIndex: 1,
+			right: 16,
+			top: '50%',
+			position: 'absolute',
+			pointerEvents: 'none',
+			color: theme.colors.n300,
+			transform: 'translateY(-50%)',
 		},
 	},
 }));
@@ -37,14 +67,24 @@ interface DatePickerProps extends ReactDatePickerProps {
 	labelText?: string;
 }
 
-const CustomDateInput = forwardRef(({ value, onClick, disabled, className, label, ...props }: any, ref: any) => {
-	return (
-		<button {...props} type="button" ref={ref} className={className} onClick={onClick} disabled={disabled}>
-			{value || label || 'Select Date'}
-			<img className="ms-auto" src={unfoldIcon} alt="Unfold Date Picker" />
-		</button>
-	);
-});
+const CustomDateInput = forwardRef(
+	(
+		{ value, onClick, disabled, className, label, ...props }: any,
+		ref: React.LegacyRef<HTMLButtonElement> | undefined
+	) => {
+		return (
+			<button {...props} type="button" ref={ref} className={className} onClick={onClick} disabled={disabled}>
+				{label ? (
+					<span className="date-picker-label">{label}</span>
+				) : (
+					<span className="date-picker-label">Select Date</span>
+				)}
+				<span className="date-picker-value">{value}</span>
+				<CalendarIcon className="date-picker-icon" />
+			</button>
+		);
+	}
+);
 
 const DatePicker: FC<DatePickerProps> = ({
 	testId,
@@ -54,7 +94,9 @@ const DatePicker: FC<DatePickerProps> = ({
 	labelText,
 	...reactDatePickerProps
 }) => {
-	const classes = useDatePickerStyles();
+	const classes = useDatePickerStyles({
+		value: !!selected,
+	});
 
 	return (
 		<ReactDatePicker

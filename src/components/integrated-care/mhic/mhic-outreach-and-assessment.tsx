@@ -54,7 +54,7 @@ export const MhicOutreachAndAssesment = () => {
 					<Row className="mb-5">
 						<Col>
 							<h4 className="mb-0">
-								Past Assessments <span className="text-gray">(0)</span>
+								Past Assessments <span className="text-gray">(1)</span>
 							</h4>
 						</Col>
 					</Row>

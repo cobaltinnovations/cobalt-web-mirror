@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -17,9 +17,10 @@ interface Props extends ModalProps {
 
 export const MhicInsuranceModal: FC<Props> = ({ onSave, ...props }) => {
 	const classes = useStyles();
+	const [coverageEnds, setCoverageEnds] = useState<Date | undefined>(undefined);
 
 	const handleOnEnter = useCallback(() => {
-		//TODO: Set <select/> values to Patient's values
+		setCoverageEnds(undefined);
 	}, []);
 
 	return (
@@ -47,13 +48,14 @@ export const MhicInsuranceModal: FC<Props> = ({ onSave, ...props }) => {
 					}}
 				/>
 				<DatePicker
-					selected={undefined}
+					labelText="Coverage Ends"
+					selected={coverageEnds}
 					onChange={(date) => {
 						if (!date) {
 							return;
 						}
 
-						// set date
+						setCoverageEnds(date);
 					}}
 				/>
 			</Modal.Body>
