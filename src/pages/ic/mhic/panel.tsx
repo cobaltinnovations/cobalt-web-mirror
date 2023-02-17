@@ -219,17 +219,17 @@ const MhicPanel = () => {
 									}}
 								>
 									<TableCell width={280} sticky className="py-2">
-										<span className="d-block fw-bold">Lastname, Firstname</span>
-										<span className="d-block text-gray">1A2B3C4D5E</span>
+										<span className="d-block fw-bold">{po.patientDisplayName}</span>
+										<span className="d-block text-gray">{po.patientMrn}</span>
 									</TableCell>
 									<TableCell>
-										<span className="fw-bold">Jan 30, 2023</span>
+										<span className="fw-bold">{po.orderDateDescription}</span>
 									</TableCell>
 									<TableCell>
-										<span className="fw-bold">[Practice Name]</span>
+										<span className="fw-bold">{po.referringPracticeName}</span>
 									</TableCell>
 									<TableCell>
-										<span className="fw-bold">[Reason]</span>
+										<span className="fw-bold">{po.reasonForReferral}</span>
 									</TableCell>
 									<TableCell>
 										<div>
@@ -245,7 +245,7 @@ const MhicPanel = () => {
 										<span className="fw-bold">&#8212;</span>
 									</TableCell>
 									<TableCell>
-										<span className="fw-bold">1 Day</span>
+										<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
 									</TableCell>
 								</TableRow>
 							);
