@@ -302,7 +302,7 @@ export const accountService = {
 	getReferenceData() {
 		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
 			method: 'GET',
-			url: `/accounts/reference-data`,
+			url: `/patient-orders/reference-data`,
 		});
 	},
 	patchPatientAccount(accountId: string, data: PatientAccountFormData) {
