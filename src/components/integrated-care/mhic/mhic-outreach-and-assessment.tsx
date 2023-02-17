@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
+import { MhicAssessmentModal, MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import NoData from '@/components/no-data';
 
 export const MhicOutreachAndAssesment = () => {
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
+	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
 	return (
 		<>
@@ -18,6 +19,13 @@ export const MhicOutreachAndAssesment = () => {
 				}}
 				onSave={() => {
 					setShowOutreachModal(false);
+				}}
+			/>
+
+			<MhicAssessmentModal
+				show={showAssessmentModal}
+				onHide={() => {
+					setShowAssessmentModal(false);
 				}}
 			/>
 
@@ -159,6 +167,9 @@ export const MhicOutreachAndAssesment = () => {
 												variant="link"
 												size="sm"
 												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
 											>
 												View
 											</Button>
@@ -180,6 +191,9 @@ export const MhicOutreachAndAssesment = () => {
 												variant="link"
 												size="sm"
 												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
 											>
 												View
 											</Button>
@@ -203,6 +217,9 @@ export const MhicOutreachAndAssesment = () => {
 												variant="link"
 												size="sm"
 												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
 											>
 												View
 											</Button>
