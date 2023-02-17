@@ -49,9 +49,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 		top: 20,
 		right: 24,
 	},
-	body: {
+	tabContent: {
 		flex: 1,
+		overflow: 'hidden',
+	},
+	tabPane: {
+		height: '100%',
 		overflowY: 'auto',
+	},
+	commentsPane: {
+		height: '100%',
 	},
 	'@global': {
 		'.patient-order-shelf-enter': {
@@ -168,19 +175,17 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 								</Nav>
 							</div>
 						</div>
-						<div className={classes.body}>
-							<Tab.Content>
-								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS}>
-									<MhicPatientDetails />
-								</Tab.Pane>
-								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT}>
-									<MhicOutreachAndAssesment />
-								</Tab.Pane>
-								<Tab.Pane eventKey={TAB_KEYS.COMMENTS}>
-									<MhicComments />
-								</Tab.Pane>
-							</Tab.Content>
-						</div>
+						<Tab.Content className={classes.tabContent}>
+							<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
+								<MhicPatientDetails />
+							</Tab.Pane>
+							<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
+								<MhicOutreachAndAssesment />
+							</Tab.Pane>
+							<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
+								<MhicComments />
+							</Tab.Pane>
+						</Tab.Content>
 					</Tab.Container>
 				</div>
 			</CSSTransition>

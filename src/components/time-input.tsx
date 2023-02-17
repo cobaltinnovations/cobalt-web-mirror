@@ -93,6 +93,7 @@ interface TimeInputProps {
 	helperText?: string;
 	error?: string;
 	required?: boolean;
+	className?: string;
 }
 
 const useTimeInputStyles = createUseThemedStyles({
@@ -109,12 +110,13 @@ export const TimeInput = ({
 	onMeridianChange,
 	name,
 	testId = name,
+	className,
 	...props
 }: TimeInputProps) => {
 	const classes = useTimeInputStyles();
 
 	return (
-		<div className="d-flex">
+		<div className={classNames('d-flex', className)}>
 			<InputHelper
 				data-testid={`${testId}Input`}
 				className={classes.timeInput}

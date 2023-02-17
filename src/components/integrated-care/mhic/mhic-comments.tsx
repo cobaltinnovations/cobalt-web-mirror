@@ -1,11 +1,33 @@
 import React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { MhicComment } from '@/components/integrated-care/mhic';
+import InputHelper from '@/components/input-helper';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	comments: {
+		height: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+	},
+	commentList: {
+		flex: 1,
+		padding: 32,
+		overflowY: 'auto',
+	},
+	inputOuter: {
+		padding: 32,
+		boxShadow: '0px -4px 8px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
+		backgroundColor: theme.colors.n0,
+	},
+}));
 
 export const MhicComments = () => {
+	const classes = useStyles();
+
 	return (
-		<>
-			<section className="border-0">
+		<div className={classes.comments}>
+			<div className={classes.commentList}>
 				<Container fluid className="overflow-visible">
 					<Row>
 						<Col>
@@ -50,7 +72,15 @@ export const MhicComments = () => {
 						</Col>
 					</Row>
 				</Container>
-			</section>
-		</>
+			</div>
+			<div className={classes.inputOuter}>
+				<Form>
+					<InputHelper className="mb-4" as="textarea" label="comment" />
+					<div className="text-right">
+						<Button type="submit">Add Comment</Button>
+					</div>
+				</Form>
+			</div>
+		</div>
 	);
 };
