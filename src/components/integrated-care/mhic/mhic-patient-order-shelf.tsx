@@ -129,11 +129,11 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
 						<div className={classes.header}>
 							<Button
-								variant="link"
+								variant="light"
 								className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
 								onClick={onHide}
 							>
-								<CloseIcon />
+								<CloseIcon className="d-block" />
 							</Button>
 							<div className="mb-2 d-flex align-items-center">
 								<h4 className="mb-0 me-2">Lastname, FirstName</h4>
