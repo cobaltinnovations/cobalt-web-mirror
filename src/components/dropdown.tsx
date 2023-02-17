@@ -21,11 +21,11 @@ export const DropdownToggle = React.forwardRef(
 const useDropdownMenuStyles = createUseThemedStyles(
 	(theme) => ({
 		dropdownMenu: {
+			border: 0,
 			minWidth: 176,
 			padding: '8px 0',
-			// boxShadow: theme.elevation.e400,
+			boxShadow: theme.elevation.e200,
 			backgroundColor: theme.colors.n0,
-			border: `1px solid ${theme.colors.n100}`,
 			'& .dropdown-item': {
 				padding: '10px 20px',
 				...theme.fonts.default,

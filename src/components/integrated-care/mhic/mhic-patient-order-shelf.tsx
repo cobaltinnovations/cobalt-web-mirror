@@ -1,6 +1,5 @@
-import { createUseThemedStyles } from '@/jss/theme';
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Nav, Tab } from 'react-bootstrap';
+import { Badge, Button, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -8,6 +7,7 @@ import classNames from 'classnames';
 import useFlags from '@/hooks/use-flags';
 import TabBar from '@/components/tab-bar';
 import { MhicComments, MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
+import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
