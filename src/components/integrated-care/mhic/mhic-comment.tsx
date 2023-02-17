@@ -43,6 +43,7 @@ export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, classN
 						<Dropdown.Toggle
 							as={DropdownToggle}
 							id={`mhic-outreach-attempt__dropdown-menu--${uuid.current}`}
+							className="p-2"
 						>
 							<MoreIcon className="d-flex" />
 						</Dropdown.Toggle>

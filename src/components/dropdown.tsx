@@ -1,17 +1,25 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-import React, { RefObject } from 'react';
+import React, { RefObject, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { DropdownMenuProps } from 'react-bootstrap/esm/DropdownMenu';
 import { DropdownToggleProps } from 'react-bootstrap/esm/DropdownToggle';
 
 export const DropdownToggle = React.forwardRef(
 	(
-		{ children, style, onClick }: DropdownToggleProps,
+		{ className, children, style, onClick }: DropdownToggleProps,
 		ref: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
 	) => {
+		const classNameProp = useMemo(() => (className ?? '').replace('dropdown-toggle', ''), [className]);
+
 		return (
-			<Button ref={ref} variant="light" style={style} className="p-2" onClick={onClick}>
+			<Button
+				ref={ref}
+				variant="light"
+				style={style}
+				className={classNames('p-0', classNameProp)}
+				onClick={onClick}
+			>
 				{children}
 			</Button>
 		);
