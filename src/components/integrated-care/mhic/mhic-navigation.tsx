@@ -12,13 +12,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 		'& a': {
+			fontWeight: 500,
 			padding: '18px 10px',
 			position: 'relative',
 			alignItems: 'center',
 			display: 'inline-flex',
 			textDecoration: 'none',
 			color: theme.colors.n500,
-			...theme.fonts.bodyNormal,
 			'&:after': {
 				left: 10,
 				right: 10,
@@ -27,10 +27,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 				content: '""',
 				display: 'none',
 				position: 'absolute',
-				backgroundColor: theme.colors.p500,
+				backgroundColor: theme.colors.p700,
 			},
 			'&:hover': {
-				color: theme.colors.p500,
+				color: theme.colors.p700,
 			},
 			'&:first-of-type': {
 				paddingLeft: 0,
@@ -58,7 +58,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&.active': {
-				color: theme.colors.p500,
+				color: theme.colors.p700,
 				'&:after': {
 					display: 'block',
 				},

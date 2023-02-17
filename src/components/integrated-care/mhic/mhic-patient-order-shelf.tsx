@@ -1,11 +1,12 @@
 import { createUseThemedStyles } from '@/jss/theme';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Button, Nav, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import useFlags from '@/hooks/use-flags';
+import TabBar from '@/components/tab-bar';
 import { MhicComments, MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
@@ -110,6 +111,7 @@ enum TAB_KEYS {
 export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
+	const [tabKey, setTabKey] = useState(TAB_KEYS.PATIENT_DETAILS);
 
 	useEffect(() => {
 		if (open) {
@@ -124,7 +126,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 		<>
 			<CSSTransition in={open} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
 				<div className={classes.patientOrderShelf}>
-					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS}>
+					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
 						<div className={classes.header}>
 							<Button
 								variant="link"
@@ -160,19 +162,18 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 								</CopyToClipboard>
 							</div>
 							<div>
-								<Nav>
-									<Nav.Item>
-										<Nav.Link eventKey={TAB_KEYS.PATIENT_DETAILS}>Patient Details</Nav.Link>
-									</Nav.Item>
-									<Nav.Item>
-										<Nav.Link eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT}>
-											Outreach &amp; Assessment
-										</Nav.Link>
-									</Nav.Item>
-									<Nav.Item>
-										<Nav.Link eventKey={TAB_KEYS.COMMENTS}>Comments</Nav.Link>
-									</Nav.Item>
-								</Nav>
+								<TabBar
+									hideBorder
+									value={tabKey}
+									tabs={[
+										{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
+										{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
+										{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
+									]}
+									onTabClick={(value) => {
+										setTabKey(value as TAB_KEYS);
+									}}
+								/>
 							</div>
 						</div>
 						<Tab.Content className={classes.tabContent}>
