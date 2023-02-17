@@ -11,7 +11,7 @@ export const DropdownToggle = React.forwardRef(
 		ref: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
 	) => {
 		return (
-			<Button ref={ref} variant="link" style={style} className={'p-2'} onClick={onClick}>
+			<Button ref={ref} variant="light" style={style} className={'p-2'} onClick={onClick}>
 				{children}
 			</Button>
 		);

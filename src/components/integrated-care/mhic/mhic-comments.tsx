@@ -75,7 +75,7 @@ export const MhicComments = () => {
 			</div>
 			<div className={classes.inputOuter}>
 				<Form>
-					<InputHelper className="mb-4" as="textarea" label="comment" />
+					<InputHelper className="mb-4" as="textarea" label="Comment" />
 					<div className="text-right">
 						<Button type="submit">Add Comment</Button>
 					</div>

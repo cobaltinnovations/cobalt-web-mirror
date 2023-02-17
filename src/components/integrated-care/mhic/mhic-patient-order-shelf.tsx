@@ -166,7 +166,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 									</Nav.Item>
 									<Nav.Item>
 										<Nav.Link eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT}>
-											Outreach and Assessment
+											Outreach &amp; Assessment
 										</Nav.Link>
 									</Nav.Item>
 									<Nav.Item>
