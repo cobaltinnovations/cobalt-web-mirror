@@ -5,7 +5,7 @@ export interface PatientOrderCountModel {
 
 export interface PatientOrderModel {
 	patientOrderId: string;
-	PatientOrderStatusId?: string;
+	patientOrderStatusId?: PatientOrderStatusId;
 	patientAccountId?: string;
 	patientAddressId?: string;
 	panelAccountId?: string;
@@ -65,6 +65,21 @@ export interface PatientOrderModel {
 	patientAddress?: PatientAddressModel;
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
+}
+
+export enum PatientOrderStatusId {
+	NEW = 'NEW',
+	AWAITING_SCREENING = 'AWAITING_SCREENING',
+	SCREENING_IN_PROGRESS = 'SCREENING_IN_PROGRESS',
+	AWAITING_MHIC_SCHEDULING = 'AWAITING_MHIC_SCHEDULING',
+	AWAITING_PROVIDER_SCHEDULING = 'AWAITING_PROVIDER_SCHEDULING',
+	AWAITING_SAFETY_PLANNING = 'AWAITING_SAFETY_PLANNING',
+	SCHEDULED_WITH_MHIC = 'SCHEDULED_WITH_MHIC',
+	SCHEDULED_WITH_PROVIDER = 'SCHEDULED_WITH_PROVIDER',
+	NEEDS_FURTHER_ASSESSMENT = 'NEEDS_FURTHER_ASSESSMENT',
+	CONNECTED_TO_CARE = 'CONNECTED_TO_CARE',
+	LOST_CONTACT = 'LOST_CONTACT',
+	CLOSED = 'CLOSED',
 }
 
 export interface PatientAddressModel {

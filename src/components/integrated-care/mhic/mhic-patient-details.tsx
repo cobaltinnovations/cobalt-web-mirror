@@ -9,8 +9,13 @@ import {
 	MhicInsuranceModal,
 } from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { PatientOrderModel } from '@/lib/models';
 
-export const MhicPatientDetails = () => {
+interface Props {
+	patientOrder: PatientOrderModel;
+}
+
+export const MhicPatientDetails = ({ patientOrder }: Props) => {
 	const { addFlag } = useFlags();
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
@@ -95,7 +100,7 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row className="mb-4">
 											<Col>
-												<p className="m-0">Firstname Lastname</p>
+												<p className="m-0">{patientOrder.patientDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -103,7 +108,7 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Date of birth</p>
 											</Col>
 											<Col>
-												<p className="m-0">3/22/1953</p>
+												<p className="m-0">{patientOrder.patientBirthdateDescription}</p>
 											</Col>
 										</Row>
 										<Row>
@@ -111,7 +116,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Pref. Language</p>
 											</Col>
 											<Col>
-												<p className="m-0">English</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -141,7 +148,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Race</p>
 											</Col>
 											<Col>
-												<p className="m-0">Black</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -149,7 +158,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Ethnicity</p>
 											</Col>
 											<Col>
-												<p className="m-0">Hispanic</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -157,7 +168,12 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Gender Identity</p>
 											</Col>
 											<Col>
-												<p className="m-0">Male</p>
+												<p className="m-0">
+													{patientOrder.patientBirthSexId}{' '}
+													<span className="text-danger">
+														[TODO]: Description instead of Id
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -175,17 +191,26 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">123 Main Street</p>
+												<p className="m-0">{patientOrder?.patientAddress?.streetAddress1}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Apt 21</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]: Street Address 2</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Philadelphia, PA 19238</p>
+												<p className="m-0">
+													{patientOrder?.patientAddress?.locality},{' '}
+													{patientOrder?.patientAddress?.region}{' '}
+													{patientOrder?.patientAddress?.postalCode}{' '}
+													<span className="text-danger">
+														[TODO]: Should probably a string from the BE
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -212,17 +237,22 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">Medicare</p>
+												<p className="m-0">{patientOrder.primaryPayorName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Plan: [PLAN_NAME]</p>
+												<p className="m-0">Plan: {patientOrder.primaryPlanName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Coverage Until: Mar 23, 2023</p>
+												<p className="m-0">
+													Coverage Until:{' '}
+													<span className="text-danger">
+														[TODO]: Primary plan expiration date
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
