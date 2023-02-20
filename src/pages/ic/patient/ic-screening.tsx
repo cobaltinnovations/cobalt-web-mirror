@@ -2,7 +2,7 @@ import Loader from '@/components/loader';
 import useAccount from '@/hooks/use-account';
 import React from 'react';
 
-import { useScreeningFlow } from '../screening/screening.hooks';
+import { useScreeningFlow } from '../../screening/screening.hooks';
 
 const IntegratedCareScreeningPage = () => {
 	const { institution } = useAccount();
