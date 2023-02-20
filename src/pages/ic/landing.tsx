@@ -32,15 +32,7 @@ const IntegratedCareLandingPage = () => {
 					<Route path="panel" element={<MhicPanel />} />
 				</Route>
 
-				<Route
-					path="patient"
-					element={
-						<>
-							<Header />
-							<Outlet />
-						</>
-					}
-				>
+				<Route path="patient" element={<Outlet />}>
 					<Route index element={<Navigate to="landing" replace />} />
 
 					<Route path="landing" element={<IntegratedCarePatientLandingPage />} />
