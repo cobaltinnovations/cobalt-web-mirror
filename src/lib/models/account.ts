@@ -6,6 +6,12 @@ export enum AccountSourceId {
 	MYCHART = 'MYCHART',
 }
 
+export enum LoginDestinationId {
+	COBALT_PATIENT = 'COBALT_PATIENT',
+	IC_PATIENT = 'IC_PATIENT',
+	IC_PANEL = 'IC_PANEL',
+}
+
 export interface AccountModel {
 	accountId: string;
 	accountSourceId?: AccountSourceId;
@@ -45,6 +51,7 @@ export interface AccountModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	locale: string;
+	loginDestinationId: LoginDestinationId;
 	phoneNumber?: string;
 	phoneNumberDescription?: string;
 	providerId?: string;

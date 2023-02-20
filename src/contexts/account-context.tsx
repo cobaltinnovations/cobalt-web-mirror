@@ -3,7 +3,7 @@ import { useNavigate, useLocation, useSearchParams, useMatch } from 'react-route
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 
-import { AccountInstitutionCapabilities, AccountModel, AccountSourceId } from '@/lib/models';
+import { AccountInstitutionCapabilities, AccountModel, AccountSourceId, LoginDestinationId } from '@/lib/models';
 import { accountService, institutionService } from '@/lib/services';
 
 import { AccountSource, Institution } from '@/lib/models/institution';
@@ -35,6 +35,12 @@ type AccountContextConfig = {
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
+
+export const LoginDestinationIdRouteMap = {
+	[LoginDestinationId.COBALT_PATIENT]: '/',
+	[LoginDestinationId.IC_PANEL]: '/ic/mhic/panel',
+	[LoginDestinationId.IC_PATIENT]: '/ic/patient',
+} as const;
 
 const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const match = useMatch('*');
@@ -131,6 +137,11 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					setAccessToken(token);
 					Cookies.remove('ssoRedirectUrl');
 					Cookies.remove('authRedirectUrl');
+
+					if (authRedirectUrl === '/') {
+						authRedirectUrl =
+							LoginDestinationIdRouteMap[response.account.loginDestinationId] || authRedirectUrl;
+					}
 
 					navigate(authRedirectUrl, { replace: true });
 				} catch (error) {
