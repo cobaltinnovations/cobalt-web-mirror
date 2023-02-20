@@ -30,15 +30,21 @@ export const integratedCareService = {
 	},
 	getPanelAccounts() {
 		return httpSingleton.orchestrateRequest<{
-			activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
 			panelAccounts: AccountModel[];
+			activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
+			overallActivePatientOrderCount: number;
+			overallActivePatientOrderCountDescription: string;
 		}>({
 			method: 'GET',
 			url: '/integrated-care/panel-accounts',
 		});
 	},
 	getPatientOverview(patientMrn: string) {
-		return httpSingleton.orchestrateRequest<any>({
+		return httpSingleton.orchestrateRequest<{
+			currentPatientOrder: PatientOrderModel;
+			pastPatientOrders: PatientOrderModel[];
+			patientAccount?: any;
+		}>({
 			method: 'GET',
 			url: `/patients/${patientMrn}/overview`,
 		});

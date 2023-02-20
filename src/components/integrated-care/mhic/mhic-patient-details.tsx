@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 
+import { PatientOrderModel } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 import {
 	MhicCloseEpisodeModal,
@@ -10,7 +12,12 @@ import {
 } from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 
-export const MhicPatientDetails = () => {
+interface Props {
+	patientOrder: PatientOrderModel;
+	pastPatientOrders: PatientOrderModel[];
+}
+
+export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) => {
 	const { addFlag } = useFlags();
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
@@ -95,7 +102,7 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row className="mb-4">
 											<Col>
-												<p className="m-0">Firstname Lastname</p>
+												<p className="m-0">{patientOrder.patientDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -103,7 +110,7 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Date of birth</p>
 											</Col>
 											<Col>
-												<p className="m-0">3/22/1953</p>
+												<p className="m-0">{patientOrder.patientBirthdateDescription}</p>
 											</Col>
 										</Row>
 										<Row>
@@ -111,7 +118,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Pref. Language</p>
 											</Col>
 											<Col>
-												<p className="m-0">English</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -141,7 +150,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Race</p>
 											</Col>
 											<Col>
-												<p className="m-0">Black</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -149,7 +160,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Ethnicity</p>
 											</Col>
 											<Col>
-												<p className="m-0">Hispanic</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -157,7 +170,12 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Gender Identity</p>
 											</Col>
 											<Col>
-												<p className="m-0">Male</p>
+												<p className="m-0">
+													{patientOrder.patientBirthSexId}{' '}
+													<span className="text-danger">
+														[TODO]: Description instead of Id
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -175,17 +193,26 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">123 Main Street</p>
+												<p className="m-0">{patientOrder.patientAddress?.streetAddress1}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Apt 21</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]: Street Address 2</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Philadelphia, PA 19238</p>
+												<p className="m-0">
+													{patientOrder.patientAddress?.locality},{' '}
+													{patientOrder.patientAddress?.region}{' '}
+													{patientOrder.patientAddress?.postalCode}{' '}
+													<span className="text-danger">
+														[TODO]: Should probably a string from the BE
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -212,17 +239,22 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">Medicare</p>
+												<p className="m-0">{patientOrder.primaryPayorName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Plan: [PLAN_NAME]</p>
+												<p className="m-0">Plan: {patientOrder.primaryPlanName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Coverage Until: Mar 23, 2023</p>
+												<p className="m-0">
+													Coverage Until:{' '}
+													<span className="text-danger">
+														[TODO]: Primary plan expiration date
+													</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -260,23 +292,10 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row className="mb-4">
 											<Col xs={3}>
-												<p className="m-0 text-gray">Home Phone</p>
+												<p className="m-0 text-gray">Callback Number</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">(000) 000-0000</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Mobile Phone</p>
-											</Col>
-											<Col xs={9}>
-												<div className="d-flex align-items-center">
-													<p className="m-0">(000) 000-0000</p>
-													<Badge bg="outline-dark" pill className="ms-2">
-														Preferred
-													</Badge>
-												</div>
+												<p className="m-0">{patientOrder.callbackPhoneNumberDescription}</p>
 											</Col>
 										</Row>
 										<Row>
@@ -284,7 +303,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Email</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">frankasanzez@email.com</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]: Patient Email Address</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -296,7 +317,9 @@ export const MhicPatientDetails = () => {
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
-									<Card.Title>Patient's Father</Card.Title>
+									<Card.Title>
+										Patient's Father <span className="text-danger">[TODO]: Emergency Contact?</span>
+									</Card.Title>
 									<div className="button-container">
 										<Button variant="light" className="p-2">
 											<EditIcon className="d-flex" />
@@ -343,9 +366,14 @@ export const MhicPatientDetails = () => {
 										<Row>
 											<Col>
 												<div className="mb-1 d-flex align-items-center justify-content-between">
-													<p className="m-0 fw-bold">Nov 12, 2022 (Episode: 6 days)</p>
+													<p className="m-0 fw-bold">
+														{patientOrder.orderDateDescription} (Episode:{' '}
+														{patientOrder.episodeDurationInDaysDescription})
+													</p>
 													<div className="d-flex align-items-center">
-														<p className="m-0 fw-bold text-success">Active</p>
+														<p className="m-0 fw-bold text-danger">
+															[TODO]: Episode Status Description
+														</p>
 														<Button
 															variant="primary"
 															size="sm"
@@ -358,10 +386,10 @@ export const MhicPatientDetails = () => {
 														</Button>
 													</div>
 												</div>
-												<p className="mb-1 text-gray">Referred by: [PRACTICE_NAME]</p>
-												<p className="m-0 text-gray">
-													High PHQ-4 score, patient reported panic attacks
+												<p className="mb-1 text-gray">
+													Referred by: {patientOrder.referringPracticeName}
 												</p>
+												<p className="m-0 text-gray">{patientOrder.reasonForReferral}</p>
 											</Col>
 										</Row>
 									</Container>
@@ -377,40 +405,44 @@ export const MhicPatientDetails = () => {
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
-										<Row className="mb-4 pb-6 border-bottom">
-											<Col>
-												<div className="mb-1 d-flex align-items-center justify-content-between">
-													<p className="m-0 fw-bold">Nov 12, 2022 (Episode: 6 days)</p>
-													<div className="d-flex align-items-center">
-														<p className="m-0 fw-bold text-gray">Closed</p>
-														<Button variant="primary" size="sm" className="ms-4" disabled>
-															Reopen
-														</Button>
-													</div>
-												</div>
-												<p className="mb-1 text-gray">Referred by: [PRACTICE_NAME]</p>
-												<p className="m-0 text-gray">
-													High PHQ-4 score, patient reported panic attacks
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<div className="mb-1 d-flex align-items-center justify-content-between">
-													<p className="m-0 fw-bold">Nov 12, 2022 (Episode: 6 days)</p>
-													<div className="d-flex align-items-center">
-														<p className="m-0 fw-bold text-gray">Closed</p>
-														<Button variant="primary" size="sm" className="ms-4" disabled>
-															Reopen
-														</Button>
-													</div>
-												</div>
-												<p className="mb-1 text-gray">Referred by: [PRACTICE_NAME]</p>
-												<p className="m-0 text-gray">
-													High PHQ-4 score, patient reported panic attacks
-												</p>
-											</Col>
-										</Row>
+										{pastPatientOrders.map((pastPatientOrder, pastPatientOrderIndex) => {
+											const isLast = pastPatientOrderIndex === pastPatientOrders.length - 1;
+
+											return (
+												<Row className={classNames({ 'mb-4 pb-6 border-bottom': !isLast })}>
+													<Col>
+														<div className="mb-1 d-flex align-items-center justify-content-between">
+															<p className="m-0 fw-bold">
+																{pastPatientOrder.orderDateDescription} (Episode:{' '}
+																{pastPatientOrder.episodeDurationInDaysDescription})
+															</p>
+															<div className="d-flex align-items-center">
+																<p className="m-0 fw-bold text-danger">
+																	[TODO]: Episode Status Description
+																</p>
+																<Button
+																	variant="primary"
+																	size="sm"
+																	className="ms-4"
+																	onClick={() => {
+																		setShowCloseEpisodeModal(true);
+																	}}
+																	disabled
+																>
+																	Reopen
+																</Button>
+															</div>
+														</div>
+														<p className="mb-1 text-gray">
+															Referred by: {pastPatientOrder.referringPracticeName}
+														</p>
+														<p className="m-0 text-gray">
+															{pastPatientOrder.reasonForReferral}
+														</p>
+													</Col>
+												</Row>
+											);
+										})}
 									</Container>
 								</Card.Body>
 							</Card>
@@ -435,7 +467,7 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">[VALUE_WITH_F_CODE]</p>
+												<p className="m-0">{patientOrder.associatedDiagnosis}</p>
 											</Col>
 										</Row>
 									</Container>
@@ -453,7 +485,11 @@ export const MhicPatientDetails = () => {
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">Psychotherapeutic Med Lst 2 Weeks</p>
+												{patientOrder.patientOrderMedications?.map((patientOrderMedication) => {
+													return (
+														<p className="m-0">{patientOrderMedication.medicationName}</p>
+													);
+												})}
 											</Col>
 										</Row>
 									</Container>
@@ -474,7 +510,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Practice</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Practice Name</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -482,7 +520,7 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Ordering Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Theresa V Rollins, MD</p>
+												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -490,7 +528,7 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Billing Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">James L Wong, MD</p>
+												<p className="m-0">{patientOrder.billingProviderDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -498,7 +536,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">PC Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">James L Wong, MD</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -506,7 +546,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">MHIC</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Ava Williams</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -514,7 +556,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">BHP</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Sally Benson</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -522,7 +566,9 @@ export const MhicPatientDetails = () => {
 												<p className="m-0 text-gray">Psychiatrist</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Ursula Forrester</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 									</Container>

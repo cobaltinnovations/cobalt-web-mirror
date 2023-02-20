@@ -144,7 +144,11 @@ const MhicPanel = () => {
 					activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId}
 					show={showSwitchAccountModal}
 					onSwitchButtonClick={(paid) => {
-						searchParams.set('panelAccountId', paid);
+						if (paid) {
+							searchParams.set('panelAccountId', paid);
+						} else {
+							searchParams.delete('panelAccountId');
+						}
 
 						setSearchParams(searchParams);
 						setShowSwitchAccountModal(false);
@@ -215,6 +219,10 @@ const MhicPanel = () => {
 								<TableRow
 									key={po.patientOrderId}
 									onClick={() => {
+										if (!po.patientMrn) {
+											return;
+										}
+
 										setClickedPatientMrn(po.patientMrn);
 									}}
 								>

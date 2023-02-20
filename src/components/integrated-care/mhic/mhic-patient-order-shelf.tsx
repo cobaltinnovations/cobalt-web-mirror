@@ -4,7 +4,11 @@ import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
+import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
+import { accountService, integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
+
+import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
 import {
 	MhicComments,
@@ -15,8 +19,6 @@ import {
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import { integratedCareService } from '@/lib/services';
-import AsyncWrapper from '@/components/async-page';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	patientOrderShelf: {
@@ -119,7 +121,26 @@ enum TAB_KEYS {
 export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
+
 	const [tabKey, setTabKey] = useState(TAB_KEYS.PATIENT_DETAILS);
+	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
+	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+
+	const fetchPatientOverview = useCallback(async () => {
+		if (!patientMrn) {
+			return;
+		}
+
+		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
+			integratedCareService.getPatientOverview(patientMrn).fetch(),
+			accountService.getReferenceData().fetch(),
+		]);
+
+		setCurrentPatientOrder(patientOverviewResponse.currentPatientOrder);
+		setPastPatientOrders(patientOverviewResponse.pastPatientOrders);
+		setReferenceData(referenceDataResponse);
+	}, [patientMrn]);
 
 	useEffect(() => {
 		if (patientMrn) {
@@ -128,14 +149,6 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 		}
 
 		document.body.style.overflow = 'visible';
-	}, [patientMrn]);
-
-	const fetchPatientOverview = useCallback(async () => {
-		if (!patientMrn) {
-			return;
-		}
-
-		await integratedCareService.getPatientOverview(patientMrn).fetch();
 	}, [patientMrn]);
 
 	return (
@@ -153,14 +166,16 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 									<CloseIcon className="d-block" />
 								</Button>
 								<div className="mb-2 d-flex align-items-center">
-									<h4 className="mb-0 me-2">Lastname, FirstName</h4>
-									<Badge pill bg="outline-primary">
-										NEW
-									</Badge>
+									<h4 className="mb-0 me-2">{currentPatientOrder?.patientDisplayName}</h4>
+									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.NEW && (
+										<Badge pill bg="outline-primary">
+											New
+										</Badge>
+									)}
 								</div>
 								<div className="d-flex align-items-center">
 									<p className="mb-0">
-										MRN: <span className="fw-bold">1A2B3C4D5E</span>
+										MRN: <span className="fw-bold">{currentPatientOrder?.patientMrn}</span>
 									</p>
 									<CopyToClipboard
 										onCopy={() => {
@@ -196,7 +211,12 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 							</div>
 							<Tab.Content className={classes.tabContent}>
 								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
-									<MhicPatientDetails />
+									{currentPatientOrder && (
+										<MhicPatientDetails
+											patientOrder={currentPatientOrder}
+											pastPatientOrders={pastPatientOrders}
+										/>
+									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
 									<MhicOutreachAndAssesment />
