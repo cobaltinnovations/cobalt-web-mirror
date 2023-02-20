@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -15,6 +15,8 @@ import {
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { integratedCareService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	patientOrderShelf: {
@@ -103,7 +105,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicPatientOrderShelfProps {
-	open: boolean;
+	patientMrn: string;
 	onHide(): void;
 }
 
@@ -114,94 +116,104 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const [tabKey, setTabKey] = useState(TAB_KEYS.PATIENT_DETAILS);
 
 	useEffect(() => {
-		if (open) {
+		if (patientMrn) {
 			document.body.style.overflow = 'hidden';
 			return;
 		}
 
 		document.body.style.overflow = 'visible';
-	}, [open]);
+	}, [patientMrn]);
+
+	const fetchPatientOverview = useCallback(async () => {
+		if (!patientMrn) {
+			return;
+		}
+
+		await integratedCareService.getPatientOverview(patientMrn).fetch();
+	}, [patientMrn]);
 
 	return (
 		<>
-			<CSSTransition in={open} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
+			<CSSTransition in={!!patientMrn} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
 				<div className={classes.patientOrderShelf}>
-					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
-						<div className={classes.header}>
-							<Button
-								variant="light"
-								className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
-								onClick={onHide}
-							>
-								<CloseIcon className="d-block" />
-							</Button>
-							<div className="mb-2 d-flex align-items-center">
-								<h4 className="mb-0 me-2">Lastname, FirstName</h4>
-								<Badge pill bg="outline-primary">
-									NEW
-								</Badge>
-							</div>
-							<div className="d-flex align-items-center">
-								<p className="mb-0">
-									MRN: <span className="fw-bold">1A2B3C4D5E</span>
-								</p>
-								<CopyToClipboard
-									onCopy={() => {
-										addFlag({
-											variant: 'success',
-											title: 'Copied!',
-											description: 'The MRN was copied to your clipboard',
-											actions: [],
-										});
-									}}
-									text="1A2B3C4D5E"
+					<AsyncWrapper fetchData={fetchPatientOverview}>
+						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
+							<div className={classes.header}>
+								<Button
+									variant="light"
+									className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
+									onClick={onHide}
 								>
-									<Button variant="link" className="p-2">
-										<CopyIcon width={20} height={20} />
-									</Button>
-								</CopyToClipboard>
+									<CloseIcon className="d-block" />
+								</Button>
+								<div className="mb-2 d-flex align-items-center">
+									<h4 className="mb-0 me-2">Lastname, FirstName</h4>
+									<Badge pill bg="outline-primary">
+										NEW
+									</Badge>
+								</div>
+								<div className="d-flex align-items-center">
+									<p className="mb-0">
+										MRN: <span className="fw-bold">1A2B3C4D5E</span>
+									</p>
+									<CopyToClipboard
+										onCopy={() => {
+											addFlag({
+												variant: 'success',
+												title: 'Copied!',
+												description: 'The MRN was copied to your clipboard',
+												actions: [],
+											});
+										}}
+										text="1A2B3C4D5E"
+									>
+										<Button variant="link" className="p-2">
+											<CopyIcon width={20} height={20} />
+										</Button>
+									</CopyToClipboard>
+								</div>
+								<div>
+									<TabBar
+										hideBorder
+										value={tabKey}
+										tabs={[
+											{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
+											{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
+											{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
+											{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
+										]}
+										onTabClick={(value) => {
+											setTabKey(value as TAB_KEYS);
+										}}
+									/>
+								</div>
 							</div>
-							<div>
-								<TabBar
-									hideBorder
-									value={tabKey}
-									tabs={[
-										{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
-										{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
-										{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
-										{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
-									]}
-									onTabClick={(value) => {
-										setTabKey(value as TAB_KEYS);
-									}}
-								/>
-							</div>
-						</div>
-						<Tab.Content className={classes.tabContent}>
-							<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
-								<MhicPatientDetails />
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
-								<MhicOutreachAndAssesment />
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UP} className={classes.tabPane}>
-								<MhicFollowUp />
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
-								<MhicComments />
-							</Tab.Pane>
-						</Tab.Content>
-					</Tab.Container>
+							<Tab.Content className={classes.tabContent}>
+								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
+									<MhicPatientDetails />
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
+									<MhicOutreachAndAssesment />
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UP} className={classes.tabPane}>
+									<MhicFollowUp />
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
+									<MhicComments />
+								</Tab.Pane>
+							</Tab.Content>
+						</Tab.Container>
+					</AsyncWrapper>
 				</div>
 			</CSSTransition>
 			<CSSTransition
-				in={open}
+				in={!!patientMrn}
 				timeout={300}
 				classNames="patient-order-shelf-overlay"
 				onClick={onHide}

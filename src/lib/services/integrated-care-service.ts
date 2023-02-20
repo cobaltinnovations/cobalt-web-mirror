@@ -37,4 +37,10 @@ export const integratedCareService = {
 			url: '/integrated-care/panel-accounts',
 		});
 	},
+	getPatientOverview(patientMrn: string) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'GET',
+			url: `/patients/${patientMrn}/overview`,
+		});
+	},
 };
