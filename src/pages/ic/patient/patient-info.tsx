@@ -82,7 +82,7 @@ const IntegratedCarePatientInfoPage = () => {
 							referenceData={referenceData!}
 							initialValues={initialFormValues}
 							onSuccess={() => {
-								navigate('/ic/screening');
+								navigate('/ic/patient/screening');
 							}}
 						/>
 					</Col>

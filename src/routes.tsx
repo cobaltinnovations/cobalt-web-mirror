@@ -6,7 +6,6 @@ import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
-import { MhicHeader } from '@/components/integrated-care/mhic';
 import {
 	ProviderManagementBasics,
 	ProviderManagementBluejeansConnection,
@@ -67,7 +66,6 @@ export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard')
 export const Reports = React.lazy(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
 export const IntegratedCare = React.lazy(() => import('@/pages/ic/landing'));
-export const MhicPanel = React.lazy(() => import('@/pages/ic/mhic/panel'));
 export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
 export const Interaction = React.lazy(() => import('@/pages/interaction'));
 export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
@@ -201,23 +199,6 @@ const DefaultLayout = () => {
 	);
 };
 
-const IntegratedCareMhicLayout = () => {
-	return (
-		<>
-			<MhicHeader />
-			<Outlet />
-		</>
-	);
-};
-
-const IntegratedCarePatientLayout = () => {
-	return (
-		<>
-			<Outlet />
-		</>
-	);
-};
-
 export const AppRoutes: AppRoutesConfig[] = [
 	{
 		layout: ButtonlessHeaderLayout,
@@ -276,6 +257,17 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/sign-in/email',
 				private: false,
 				main: SignInEmail,
+			},
+		],
+	},
+	{
+		layout: () => <Outlet />,
+		routes: [
+			{
+				path: '/ic/*',
+				private: true,
+				routeGuard: isIntegratedCareRouteGuard,
+				main: IntegratedCare,
 			},
 		],
 	},
@@ -387,12 +379,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isProviderRouteGuard,
 				main: MySchedule,
-			},
-			{
-				path: '/ic/*',
-				private: true,
-				routeGuard: isIntegratedCareRouteGuard,
-				main: IntegratedCare,
 			},
 			{
 				path: '/screening-questions/:screeningQuestionContextId',
@@ -608,26 +594,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '*',
 				private: false,
 				main: NoMatch,
-			},
-		],
-	},
-	{
-		layout: IntegratedCareMhicLayout,
-		routes: [
-			{
-				path: '/ic/mhic/panel',
-				private: true,
-				main: MhicPanel,
-			},
-		],
-	},
-	{
-		layout: IntegratedCarePatientLayout,
-		routes: [
-			{
-				path: '/ic/patient',
-				private: true,
-				main: () => null,
 			},
 		],
 	},
