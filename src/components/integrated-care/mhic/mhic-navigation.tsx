@@ -1,9 +1,10 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 
 import { buildQueryParamUrl } from '@/lib/utils';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
+import { ActivePatientOrderCountModel, PatientOrderStatusId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	navigation: {
@@ -76,51 +77,62 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicNavigation = () => {
+interface Props {
+	orderCountsByStatusId?: Record<PatientOrderStatusId, ActivePatientOrderCountModel>;
+}
+
+export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 	const classes = useStyles();
 	const { pathname } = useLocation();
 	const [searchParams] = useSearchParams();
 	const statusParam = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
 
-	const linkSections = useRef([
-		{
-			links: [
-				{
-					id: 'NEED_ASSESSMENT',
-					title: 'Need Assessment',
-					count: 4,
-				},
-			],
-		},
-		{
-			links: [
-				{
-					id: 'SAFETY_PLANNING',
-					title: 'Safety Planning',
-					count: 2,
-				},
-				{
-					id: 'SPECIALTY_CARE',
-					title: 'Specialty Care',
-					count: 4,
-				},
-				{
-					id: 'BHP',
-					title: 'Behavioral Health Provider',
-					count: 0,
-				},
-			],
-		},
-		{
-			links: [
-				{
-					id: 'CLOSED',
-					title: 'Closed',
-					count: 0,
-				},
-			],
-		},
-	]).current;
+	const linkSections = useMemo(
+		() => [
+			{
+				links: [
+					{
+						id: 'NEED_ASSESSMENT',
+						title: 'Need Assessment',
+						count:
+							orderCountsByStatusId?.[PatientOrderStatusId.NEEDS_FURTHER_ASSESSMENT].countDescription ??
+							'0',
+					},
+				],
+			},
+			{
+				links: [
+					{
+						id: 'SAFETY_PLANNING',
+						title: 'Safety Planning',
+						count:
+							orderCountsByStatusId?.[PatientOrderStatusId.AWAITING_SAFETY_PLANNING].countDescription ??
+							'0',
+					},
+					{
+						id: 'SPECIALTY_CARE',
+						title: 'Specialty Care',
+						count: '0',
+					},
+					{
+						id: 'BHP',
+						title: 'Behavioral Health Provider',
+						count: '0',
+					},
+				],
+			},
+			{
+				links: [
+					{
+						id: 'CLOSED',
+						title: 'Closed',
+						count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
+					},
+				],
+			},
+		],
+		[orderCountsByStatusId]
+	);
 
 	return (
 		<nav className={classes.navigation}>
@@ -145,7 +157,9 @@ export const MhicNavigation = () => {
 									})}
 								>
 									<span>{link.title}</span>
-									{link.count > 0 && <span className={classes.countBubble}>{link.count}</span>}
+									{link.count && parseInt(link.count, 10) > 0 && (
+										<span className={classes.countBubble}>{link.count}</span>
+									)}
 								</Link>
 							);
 						})}

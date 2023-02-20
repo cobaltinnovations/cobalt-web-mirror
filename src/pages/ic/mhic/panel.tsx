@@ -3,7 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
+import {
+	AccountModel,
+	ActivePatientOrderCountModel,
+	PatientOrderCountModel,
+	PatientOrderModel,
+	PatientOrderStatusId,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -42,13 +48,16 @@ const MhicPanel = () => {
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
-
-	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
+	const [overallActivePatientOrdersCountDescription, setOverallActivePatientOrdersCountDescription] = useState('0');
 
 	const [tableIsLoading, setTableIsLoading] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
+	const [activePatientOrderCountsByPatientOrderStatusId, setActivePatientOrderCountsByPatientOrderStatusId] =
+		useState<Record<PatientOrderStatusId, ActivePatientOrderCountModel>>();
+
+	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const [clickedPatientMrn, setClickedPatientMrn] = useState('');
 
 	const fetchPanelAccounts = useCallback(async () => {
@@ -57,6 +66,7 @@ const MhicPanel = () => {
 
 			setPanelAccounts(response.panelAccounts);
 			setActivePatientOrderCountsByPanelAccountId(response.activePatientOrderCountsByPanelAccountId);
+			setOverallActivePatientOrdersCountDescription(response.overallActivePatientOrderCountDescription);
 		} catch (error) {
 			handleError(error);
 		}
@@ -79,6 +89,7 @@ const MhicPanel = () => {
 			setPatientOrders(response.findResult.patientOrders);
 			setTotalCount(response.findResult.totalCount);
 			setTotalCountDescription(response.findResult.totalCountDescription);
+			setActivePatientOrderCountsByPatientOrderStatusId(response.activePatientOrderCountsByPatientOrderStatusId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -142,6 +153,7 @@ const MhicPanel = () => {
 					currentPanelAccountId={panelAccountId ?? ''}
 					panelAccounts={panelAccounts}
 					activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId}
+					overallActivePatientOrdersCountDescription={overallActivePatientOrdersCountDescription}
 					show={showSwitchAccountModal}
 					onSwitchButtonClick={(paid) => {
 						if (paid) {
@@ -182,7 +194,7 @@ const MhicPanel = () => {
 				}}
 				onImportPatientsInputChange={handleImportPatientsInputChange}
 			/>
-			<MhicNavigation />
+			<MhicNavigation orderCountsByStatusId={activePatientOrderCountsByPatientOrderStatusId} />
 			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
 				<div className="d-flex">
 					<MhicFilterDropdown />
@@ -241,9 +253,11 @@ const MhicPanel = () => {
 									</TableCell>
 									<TableCell>
 										<div>
-											<Badge pill bg="outline-primary">
-												NEW
-											</Badge>
+											{po.patientOrderStatusId === PatientOrderStatusId.NEW && (
+												<Badge pill bg="outline-primary">
+													New
+												</Badge>
+											)}
 										</div>
 									</TableCell>
 									<TableCell>

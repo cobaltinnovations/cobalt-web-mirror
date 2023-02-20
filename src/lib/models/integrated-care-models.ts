@@ -3,6 +3,11 @@ export interface PatientOrderCountModel {
 	activePatientOrderCountDescription: string;
 }
 
+export interface ActivePatientOrderCountModel {
+	count: number;
+	countDescription: string;
+}
+
 export interface PatientOrderModel {
 	patientOrderId: string;
 	patientOrderStatusId?: PatientOrderStatusId;

@@ -14,6 +14,7 @@ interface Props extends ModalProps {
 	currentPanelAccountId: string;
 	panelAccounts: AccountModel[];
 	activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
+	overallActivePatientOrdersCountDescription: string;
 	onSwitchButtonClick(accountId: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
@@ -21,6 +22,7 @@ export const MhicSwitchAccountModal: FC<Props> = ({
 	currentPanelAccountId,
 	panelAccounts,
 	activePatientOrderCountsByPanelAccountId,
+	overallActivePatientOrdersCountDescription,
 	onSwitchButtonClick,
 	...props
 }) => {
@@ -42,7 +44,7 @@ export const MhicSwitchAccountModal: FC<Props> = ({
 					type="radio"
 					name="select-view"
 					id={`select-view__ALL`}
-					label={`All (${1000})`}
+					label={`All (${overallActivePatientOrdersCountDescription})`}
 					value="ALL"
 					checked={!selectedPanelAccountId}
 					onChange={() => {
