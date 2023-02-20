@@ -38,6 +38,17 @@ export const MhicSwitchAccountModal: FC<Props> = ({
 			</Modal.Header>
 			<Modal.Body>
 				<Form.Label className="mb-1">Select View</Form.Label>
+				<Form.Check
+					type="radio"
+					name="select-view"
+					id={`select-view__ALL`}
+					label={`All (${1000})`}
+					value="ALL"
+					checked={!selectedPanelAccountId}
+					onChange={() => {
+						setSelectedPanelAccountId('');
+					}}
+				/>
 				{panelAccounts.map((panelAccount) => {
 					return (
 						<Form.Check
