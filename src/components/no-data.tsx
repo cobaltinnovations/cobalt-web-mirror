@@ -30,7 +30,14 @@ const NoData = ({ title, description, actions, className }: Props) => {
 	return (
 		<div className={classNames(classes.noData, className)}>
 			<h4 className="mb-3 text-center">{title}</h4>
-			<p className="mb-6 text-center">{description}</p>
+			<p
+				className={classNames('text-center', {
+					'mb-0': actions.length <= 0,
+					'mb-6': actions.length > 0,
+				})}
+			>
+				{description}
+			</p>
 			<div className="text-center">
 				{actions.map((action, actionIndex) => (
 					<Button key={actionIndex} variant={action.variant} className="mx-1" onClick={action.onClick}>

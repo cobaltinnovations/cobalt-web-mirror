@@ -6,6 +6,7 @@ export * from './mhic-contact-information-modal';
 export * from './mhic-customize-table-modal';
 export * from './mhic-demographics-modal';
 export * from './mhic-filter-dropdown';
+export * from './mhic-follow-up';
 export * from './mhic-header';
 export * from './mhic-insurance-modal';
 export * from './mhic-navigation';

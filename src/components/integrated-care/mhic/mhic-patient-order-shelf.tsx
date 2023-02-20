@@ -6,7 +6,12 @@ import classNames from 'classnames';
 
 import useFlags from '@/hooks/use-flags';
 import TabBar from '@/components/tab-bar';
-import { MhicComments, MhicOutreachAndAssesment, MhicPatientDetails } from '@/components/integrated-care/mhic';
+import {
+	MhicComments,
+	MhicFollowUp,
+	MhicOutreachAndAssesment,
+	MhicPatientDetails,
+} from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
@@ -105,6 +110,7 @@ interface MhicPatientOrderShelfProps {
 enum TAB_KEYS {
 	PATIENT_DETAILS = 'PATIENT_DETAILS',
 	OUTREACH_AND_ASSESSMENT = 'OUTREACH_AND_ASSESSMENT',
+	FOLLOW_UP = 'FOLLOW_UP',
 	COMMENTS = 'COMMENTS',
 }
 
@@ -168,6 +174,7 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 									tabs={[
 										{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
 										{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
+										{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
 										{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
 									]}
 									onTabClick={(value) => {
@@ -182,6 +189,9 @@ export const MhicPatientOrderShelf = ({ open, onHide }: MhicPatientOrderShelfPro
 							</Tab.Pane>
 							<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
 								<MhicOutreachAndAssesment />
+							</Tab.Pane>
+							<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UP} className={classes.tabPane}>
+								<MhicFollowUp />
 							</Tab.Pane>
 							<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
 								<MhicComments />
