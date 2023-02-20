@@ -14,5 +14,6 @@ export * from './mhic-comment';
 export * from './mhic-outreach-modal';
 export * from './mhic-patient-details';
 export * from './mhic-patient-order-shelf';
+export * from './mhic-schedule-assessment-modal';
 export * from './mhic-sort-dropdown';
 export * from './mhic-switch-account-modal';

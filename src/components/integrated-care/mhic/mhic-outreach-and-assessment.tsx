@@ -2,12 +2,19 @@ import React, { useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicAssessmentModal, MhicComment, MhicOutreachModal } from '@/components/integrated-care/mhic';
+import {
+	MhicAssessmentModal,
+	MhicComment,
+	MhicOutreachModal,
+	MhicScheduleAssessmentModal,
+} from '@/components/integrated-care/mhic';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import NoData from '@/components/no-data';
 
 export const MhicOutreachAndAssesment = () => {
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
+	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
+	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
 	return (
@@ -19,6 +26,17 @@ export const MhicOutreachAndAssesment = () => {
 				}}
 				onSave={() => {
 					setShowOutreachModal(false);
+				}}
+			/>
+
+			<MhicScheduleAssessmentModal
+				assessmentId={assessmentIdToEdit}
+				show={showScheduleAssessmentModal}
+				onHide={() => {
+					setShowScheduleAssessmentModal(false);
+				}}
+				onSave={() => {
+					setShowScheduleAssessmentModal(false);
 				}}
 			/>
 
@@ -82,7 +100,13 @@ export const MhicOutreachAndAssesment = () => {
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">Latest Assessment</h4>
-								<Button>Start Assessment</Button>
+								<Button
+									onClick={() => {
+										window.alert('[TODO]: Link to start assessment?');
+									}}
+								>
+									Start Assessment
+								</Button>
 							</div>
 						</Col>
 					</Row>
@@ -97,7 +121,8 @@ export const MhicOutreachAndAssesment = () => {
 										variant: 'outline-primary',
 										title: 'Schedule Assessment',
 										onClick: () => {
-											return;
+											setAssessmentIdToEdit('');
+											setShowScheduleAssessmentModal(true);
 										},
 									},
 								]}
@@ -111,14 +136,15 @@ export const MhicOutreachAndAssesment = () => {
 										variant: 'primary',
 										title: 'View Appointment',
 										onClick: () => {
-											return;
+											window.alert('[TODO]: Link to appointment details?');
 										},
 									},
 									{
 										variant: 'outline-primary',
 										title: 'Edit Appointment Date',
 										onClick: () => {
-											return;
+											setAssessmentIdToEdit('xxx');
+											setShowScheduleAssessmentModal(true);
 										},
 									},
 								]}
