@@ -215,6 +215,10 @@ const MhicPanel = () => {
 								<TableRow
 									key={po.patientOrderId}
 									onClick={() => {
+										if (!po.patientMrn) {
+											return;
+										}
+
 										setClickedPatientMrn(po.patientMrn);
 									}}
 								>

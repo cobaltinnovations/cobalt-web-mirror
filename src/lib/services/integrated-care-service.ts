@@ -38,7 +38,11 @@ export const integratedCareService = {
 		});
 	},
 	getPatientOverview(patientMrn: string) {
-		return httpSingleton.orchestrateRequest<any>({
+		return httpSingleton.orchestrateRequest<{
+			currentPatientOrder: PatientOrderModel;
+			pastPatientOrders: PatientOrderModel[];
+			patientAccount?: any;
+		}>({
 			method: 'GET',
 			url: `/patients/${patientMrn}/overview`,
 		});
