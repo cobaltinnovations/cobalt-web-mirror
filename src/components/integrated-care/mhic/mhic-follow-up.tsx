@@ -119,6 +119,52 @@ export const MhicFollowUp = () => {
 							</Card>
 						</Col>
 					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header className="bg-success">
+									<Card.Title className="text-white">Message Sent</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Date Sent</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Dec 12, 2023</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Contact Method</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Text (SMS), Email</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Patient Response</Card.Title>
+								</Card.Header>
+								<Card.Body className="p-0 bg-n75">
+									<NoData
+										className="border-0"
+										title="Awaiting Response"
+										description="The patient has not responded"
+										actions={[]}
+									/>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
 				</Container>
 			</section>
 		</>
