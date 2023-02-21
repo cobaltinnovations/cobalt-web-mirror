@@ -1,12 +1,17 @@
-import React, { useCallback } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import NoData from '@/components/no-data';
+import React, { useCallback, useState } from 'react';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+
 import useFlags from '@/hooks/use-flags';
+import NoData from '@/components/no-data';
+import { MhicFollowUpMessageModal } from '@/components/integrated-care/mhic';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 
 export const MhicFollowUp = () => {
 	const { addFlag } = useFlags();
+	const [showFollowUpMessageModal, setShowFollowUpMessageModal] = useState(false);
 
-	const handleMarkAsSentButtonClick = useCallback(() => {
+	const handleFollowUpMessageSave = useCallback(() => {
+		setShowFollowUpMessageModal(false);
 		addFlag({
 			variant: 'success',
 			title: 'Resources Sent',
@@ -17,6 +22,14 @@ export const MhicFollowUp = () => {
 
 	return (
 		<>
+			<MhicFollowUpMessageModal
+				show={showFollowUpMessageModal}
+				onHide={() => {
+					setShowFollowUpMessageModal(false);
+				}}
+				onSave={handleFollowUpMessageSave}
+			/>
+
 			<section>
 				<Container fluid>
 					<Row>
@@ -28,7 +41,9 @@ export const MhicFollowUp = () => {
 									<Button
 										className="ms-2"
 										variant="outline-primary"
-										onClick={handleMarkAsSentButtonClick}
+										onClick={() => {
+											setShowFollowUpMessageModal(true);
+										}}
 									>
 										Mark as Sent
 									</Button>
@@ -45,13 +60,63 @@ export const MhicFollowUp = () => {
 							<h4 className="mb-0">Follow Up</h4>
 						</Col>
 					</Row>
-					<Row>
+					<Row className="mb-6">
 						<Col>
 							<NoData
 								title="No Follow Up Scheduled"
 								description="A follow up email and text will be scheduled after resources are sent to the patient"
 								actions={[]}
 							/>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Message Scheduled</Card.Title>
+									<div className="button-container">
+										<Button
+											variant="danger"
+											size="sm"
+											className="py-2 me-2"
+											onClick={() => {
+												window.alert('[TODO]: Cancel the message.');
+											}}
+										>
+											Cancel
+										</Button>
+										<Button
+											variant="light"
+											className="p-2"
+											onClick={() => {
+												setShowFollowUpMessageModal(true);
+											}}
+										>
+											<EditIcon className="d-flex" />
+										</Button>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Scheduled Date</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Dec 12, 2023</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Contact Method</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Text (SMS), Email</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
 						</Col>
 					</Row>
 				</Container>
