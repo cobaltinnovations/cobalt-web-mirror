@@ -470,7 +470,29 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">{patientOrder.associatedDiagnosis}</p>
+												<p
+													className={classNames({
+														'mb-0': (patientOrder.patientOrderDiagnoses ?? []).length <= 0,
+														'mb-2': (patientOrder.patientOrderDiagnoses ?? []).length > 0,
+													})}
+												>
+													{patientOrder.associatedDiagnosis}
+												</p>
+												<ul className="mb-0">
+													{patientOrder.patientOrderDiagnoses?.map(
+														(patientOrderDiagnoses) => {
+															return (
+																<li
+																	key={patientOrderDiagnoses.patientOrderDiagnosisId}
+																	className="m-0"
+																>
+																	{patientOrderDiagnoses.diagnosisName} (
+																	{patientOrderDiagnoses.diagnosisId})
+																</li>
+															);
+														}
+													)}
+												</ul>
 											</Col>
 										</Row>
 									</Container>
@@ -490,7 +512,10 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 											<Col>
 												{patientOrder.patientOrderMedications?.map((patientOrderMedication) => {
 													return (
-														<p key={patientOrderMedication.medicationId} className="m-0">
+														<p
+															key={patientOrderMedication.patientOrderMedicationId}
+															className="m-0"
+														>
 															{patientOrderMedication.medicationName}
 														</p>
 													);
