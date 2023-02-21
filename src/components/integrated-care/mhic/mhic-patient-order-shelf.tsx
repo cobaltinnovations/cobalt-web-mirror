@@ -225,7 +225,12 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 									<MhicFollowUp />
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
-									{currentPatientOrder && <MhicComments patientOrder={currentPatientOrder} />}
+									{currentPatientOrder && (
+										<MhicComments
+											patientOrder={currentPatientOrder}
+											onPatientOrderChange={setCurrentPatientOrder}
+										/>
+									)}
 								</Tab.Pane>
 							</Tab.Content>
 						</Tab.Container>

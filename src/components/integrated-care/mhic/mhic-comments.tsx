@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -30,9 +31,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface Props {
 	patientOrder: PatientOrderModel;
+	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicComments = ({ patientOrder }: Props) => {
+export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const classes = useStyles();
@@ -43,13 +45,21 @@ export const MhicComments = ({ patientOrder }: Props) => {
 			event.preventDefault();
 
 			try {
-				const response = await integratedCareService
+				if (!patientOrder.patientMrn) {
+					throw new Error('patientOrder.patientMrn is undefined.');
+				}
+
+				await integratedCareService
 					.postNote({
 						patientOrderId: patientOrder.patientOrderId,
 						note: commentInputValue,
 					})
 					.fetch();
+				const patientOverviewResponse = await integratedCareService
+					.getPatientOverview(patientOrder.patientMrn)
+					.fetch();
 
+				onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
 				setCommentInputValue('');
 				addFlag({
 					variant: 'success',
@@ -61,7 +71,7 @@ export const MhicComments = ({ patientOrder }: Props) => {
 				handleError(error);
 			}
 		},
-		[addFlag, commentInputValue, handleError, patientOrder.patientOrderId]
+		[addFlag, commentInputValue, handleError, onPatientOrderChange, patientOrder]
 	);
 
 	return (
