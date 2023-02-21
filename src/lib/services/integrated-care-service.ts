@@ -72,7 +72,7 @@ export const integratedCareService = {
 		return httpSingleton.orchestrateRequest<{
 			patientOrderNote: PatientOrderNoteModel;
 		}>({
-			method: 'POST',
+			method: 'PUT',
 			url: `/patient-order-notes/${patientOrderNoteId}`,
 			data,
 		});

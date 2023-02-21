@@ -5,6 +5,7 @@ export * from './mhic-comments';
 export * from './mhic-contact-information-modal';
 export * from './mhic-customize-table-modal';
 export * from './mhic-demographics-modal';
+export * from './mhic-edit-comment-modal';
 export * from './mhic-filter-dropdown';
 export * from './mhic-follow-up-message-modal';
 export * from './mhic-follow-up';

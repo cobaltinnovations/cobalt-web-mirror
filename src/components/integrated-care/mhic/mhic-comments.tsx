@@ -2,11 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, PatientOrderNoteModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
-import { MhicComment } from '@/components/integrated-care/mhic';
+import { MhicComment, MhicEditCommentModal } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import useFlags from '@/hooks/use-flags';
 
@@ -38,6 +38,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const [commentInputValue, setCommentInputValue] = useState('');
+	const [commentToEdit, setCommentToEdit] = useState<PatientOrderNoteModel>();
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -73,53 +74,87 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 		[addFlag, commentInputValue, handleError, onPatientOrderChange, patientOrder]
 	);
 
+	const handleEditCommentSave = useCallback(async () => {
+		try {
+			if (!patientOrder.patientMrn) {
+				throw new Error('patientOrder.patientMrn is undefined.');
+			}
+
+			const patientOverviewResponse = await integratedCareService
+				.getPatientOverview(patientOrder.patientMrn)
+				.fetch();
+
+			setCommentToEdit(undefined);
+			onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
+			addFlag({
+				variant: 'success',
+				title: 'Comment updated',
+				description: '{Message}',
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientMrn]);
+
 	return (
-		<div className={classes.comments}>
-			<div className={classes.commentList}>
-				<Container fluid className="overflow-visible">
-					<Row>
-						<Col>
-							{(patientOrder.patientOrderNotes ?? []).map((note, noteIndex) => {
-								const isLast = noteIndex === (patientOrder.patientOrderNotes ?? []).length - 1;
-								return (
-									<MhicComment
-										key={note.patientOrderNoteId}
-										className={classNames({ 'mb-4': !isLast })}
-										name={note.account.displayName ?? ''}
-										date={note.createdDescription}
-										tag="Outreach"
-										message={note.note}
-										onEdit={() => {
-											window.alert('[TODO]: Edit comment.');
-										}}
-										onDelete={() => {
-											window.confirm('[TODO]: Delete comment.');
-										}}
-									/>
-								);
-							})}
-						</Col>
-					</Row>
-				</Container>
+		<>
+			<MhicEditCommentModal
+				patientOrderNote={commentToEdit}
+				show={!!commentToEdit}
+				onHide={() => {
+					setCommentToEdit(undefined);
+				}}
+				onSave={handleEditCommentSave}
+			/>
+
+			<div className={classes.comments}>
+				<div className={classes.commentList}>
+					<Container fluid className="overflow-visible">
+						<Row>
+							<Col>
+								{(patientOrder.patientOrderNotes ?? []).map((note, noteIndex) => {
+									const isLast = noteIndex === (patientOrder.patientOrderNotes ?? []).length - 1;
+									return (
+										<MhicComment
+											key={note.patientOrderNoteId}
+											className={classNames({ 'mb-4': !isLast })}
+											name={note.account.displayName ?? ''}
+											date={note.createdDescription}
+											tag="Outreach"
+											message={note.note}
+											onEdit={() => {
+												setCommentToEdit(note);
+											}}
+											onDelete={() => {
+												window.confirm('[TODO]: Delete comment.');
+											}}
+										/>
+									);
+								})}
+							</Col>
+						</Row>
+					</Container>
+				</div>
+				<div className={classes.inputOuter}>
+					<Form onSubmit={handleFormSubmit}>
+						<InputHelper
+							className="mb-4"
+							as="textarea"
+							label="Comment"
+							value={commentInputValue}
+							onChange={({ currentTarget }) => {
+								setCommentInputValue(currentTarget.value);
+							}}
+						/>
+						<div className="text-right">
+							<Button type="submit" disabled={!commentInputValue}>
+								Add Comment
+							</Button>
+						</div>
+					</Form>
+				</div>
 			</div>
-			<div className={classes.inputOuter}>
-				<Form onSubmit={handleFormSubmit}>
-					<InputHelper
-						className="mb-4"
-						as="textarea"
-						label="Comment"
-						value={commentInputValue}
-						onChange={({ currentTarget }) => {
-							setCommentInputValue(currentTarget.value);
-						}}
-					/>
-					<div className="text-right">
-						<Button type="submit" disabled={!commentInputValue}>
-							Add Comment
-						</Button>
-					</div>
-				</Form>
-			</div>
-		</div>
+		</>
 	);
 };
