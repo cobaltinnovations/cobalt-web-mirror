@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { MhicComment } from '@/components/integrated-care/mhic';
+import classNames from 'classnames';
+
+import { PatientOrderModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
+import { MhicComment } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	comments: {
@@ -22,8 +28,41 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicComments = () => {
+interface Props {
+	patientOrder: PatientOrderModel;
+}
+
+export const MhicComments = ({ patientOrder }: Props) => {
+	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const classes = useStyles();
+	const [commentInputValue, setCommentInputValue] = useState('');
+
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			try {
+				const response = await integratedCareService
+					.postNote({
+						patientOrderId: patientOrder.patientOrderId,
+						note: commentInputValue,
+					})
+					.fetch();
+
+				setCommentInputValue('');
+				addFlag({
+					variant: 'success',
+					title: 'Comment added',
+					description: '{Message}',
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, commentInputValue, handleError, patientOrder.patientOrderId]
+	);
 
 	return (
 		<div className={classes.comments}>
@@ -31,53 +70,44 @@ export const MhicComments = () => {
 				<Container fluid className="overflow-visible">
 					<Row>
 						<Col>
-							<MhicComment
-								className="mb-4"
-								name="Ava Williams"
-								date="Nov 07, 2023 at 10:00AM"
-								tag="Outreach"
-								message="Called and scheduled the assessment for November 12."
-								onEdit={() => {
-									window.alert('[TODO]: Edit Comment');
-								}}
-								onDelete={() => {
-									window.confirm('Are you sure?');
-								}}
-							/>
-							<MhicComment
-								className="mb-4"
-								name="Thisisalongeruser Theyhavealongname"
-								date="Nov 01, 2023 at 10:00AM"
-								tag="General"
-								message="Lorem ipsum dolor sit amet consectetur. Rutrum at sit semper tincidunt purus leo pellentesque adipiscing. Faucibus scelerisque eu viverra sed id enim feugiat morbi viverra. At venenatis eget et aliquet fermentum ornare. Fringilla condimentum sed cursus tincidunt vel interdum. Gravida augue vulputate platea blandit feugiat amet et donec."
-								onEdit={() => {
-									window.alert('[TODO]: Edit Comment');
-								}}
-								onDelete={() => {
-									window.confirm('Are you sure?');
-								}}
-							/>
-							<MhicComment
-								name="Ava Williams"
-								date="Sep 30, 2023 at 2:51PM"
-								tag="Outreach"
-								message="Called to do assessment, patient was unavailable, left a voicemail."
-								onEdit={() => {
-									window.alert('[TODO]: Edit Comment');
-								}}
-								onDelete={() => {
-									window.confirm('Are you sure?');
-								}}
-							/>
+							{(patientOrder.patientOrderNotes ?? []).map((note, noteIndex) => {
+								const isLast = noteIndex === (patientOrder.patientOrderNotes ?? []).length - 1;
+								return (
+									<MhicComment
+										key={note.patientOrderNoteId}
+										className={classNames({ 'mb-4': !isLast })}
+										name={note.account.displayName ?? ''}
+										date={note.createdDescription}
+										tag="Outreach"
+										message={note.note}
+										onEdit={() => {
+											window.alert('[TODO]: Edit comment.');
+										}}
+										onDelete={() => {
+											window.confirm('[TODO]: Delete comment.');
+										}}
+									/>
+								);
+							})}
 						</Col>
 					</Row>
 				</Container>
 			</div>
 			<div className={classes.inputOuter}>
-				<Form>
-					<InputHelper className="mb-4" as="textarea" label="Comment" />
+				<Form onSubmit={handleFormSubmit}>
+					<InputHelper
+						className="mb-4"
+						as="textarea"
+						label="Comment"
+						value={commentInputValue}
+						onChange={({ currentTarget }) => {
+							setCommentInputValue(currentTarget.value);
+						}}
+					/>
 					<div className="text-right">
-						<Button type="submit">Add Comment</Button>
+						<Button type="submit" disabled={!commentInputValue}>
+							Add Comment
+						</Button>
 					</div>
 				</Form>
 			</div>

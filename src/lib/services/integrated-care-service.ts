@@ -5,6 +5,7 @@ import {
 	ActivePatientOrderCountModel,
 	PatientOrderCountModel,
 	PatientOrderModel,
+	PatientOrderNoteModel,
 	PatientOrderStatusId,
 } from '@/lib/models';
 
@@ -56,6 +57,32 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: `/patients/${patientMrn}/overview`,
+		});
+	},
+	postNote(data: { patientOrderId: string; note: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderNote: PatientOrderNoteModel;
+		}>({
+			method: 'POST',
+			url: '/patient-order-notes',
+			data,
+		});
+	},
+	updateNote(patientOrderNoteId: string, data: { note: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderNote: PatientOrderNoteModel;
+		}>({
+			method: 'POST',
+			url: `/patient-order-notes/${patientOrderNoteId}`,
+			data,
+		});
+	},
+	deleteNote(patientOrderNoteId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderNote: PatientOrderNoteModel;
+		}>({
+			method: 'DELETE',
+			url: `/patient-order-notes/${patientOrderNoteId}`,
 		});
 	},
 };

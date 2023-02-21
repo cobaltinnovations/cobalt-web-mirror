@@ -1,3 +1,5 @@
+import { AccountModel } from './account';
+
 export interface PatientOrderCountModel {
 	activePatientOrderCount: number;
 	activePatientOrderCountDescription: string;
@@ -70,6 +72,7 @@ export interface PatientOrderModel {
 	patientAddress?: PatientAddressModel;
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
+	patientOrderNotes?: PatientOrderNoteModel[];
 }
 
 export enum PatientOrderStatusId {
@@ -111,4 +114,16 @@ export interface PatientOrderMedicationModel {
 	medicationId: string;
 	medicationIdType: string;
 	medicationName: string;
+}
+
+export interface PatientOrderNoteModel {
+	account: AccountModel;
+	accountId: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	note: string;
+	patientOrderId: string;
+	patientOrderNoteId: string;
 }
