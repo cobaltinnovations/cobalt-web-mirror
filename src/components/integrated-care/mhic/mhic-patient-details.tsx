@@ -409,7 +409,10 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 											const isLast = pastPatientOrderIndex === pastPatientOrders.length - 1;
 
 											return (
-												<Row className={classNames({ 'mb-4 pb-6 border-bottom': !isLast })}>
+												<Row
+													key={pastPatientOrder.orderId}
+													className={classNames({ 'mb-4 pb-6 border-bottom': !isLast })}
+												>
 													<Col>
 														<div className="mb-1 d-flex align-items-center justify-content-between">
 															<p className="m-0 fw-bold">
@@ -487,7 +490,9 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 											<Col>
 												{patientOrder.patientOrderMedications?.map((patientOrderMedication) => {
 													return (
-														<p className="m-0">{patientOrderMedication.medicationName}</p>
+														<p key={patientOrderMedication.medicationId} className="m-0">
+															{patientOrderMedication.medicationName}
+														</p>
 													);
 												})}
 											</Col>

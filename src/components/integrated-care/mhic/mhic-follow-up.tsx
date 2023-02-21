@@ -165,6 +165,56 @@ export const MhicFollowUp = () => {
 							</Card>
 						</Col>
 					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Response Received</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Date Recieved</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Dec 12, 2023 at 2:21 AM</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Response</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Did Not Attend</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Reason</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">[Reason]</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Comment</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">
+													Lorem ipsum dolor sit amet consectetur. Dignissim sit nunc turpis
+													mattis quis elementum sed a dolor. Et enim vel faucibus in mauris
+													erat libero est. Duis faucibus in vulputate aliquam donec integer
+													leo non. Convallis a phasellus senectus ac est commodo.
+												</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
 				</Container>
 			</section>
 		</>
