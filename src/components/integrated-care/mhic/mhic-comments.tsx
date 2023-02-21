@@ -23,8 +23,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	inputOuter: {
 		padding: 32,
-		boxShadow: '0px -4px 8px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 		backgroundColor: theme.colors.n0,
+		boxShadow: '0px -4px 8px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 	},
 }));
 
@@ -97,6 +97,36 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 		}
 	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientMrn]);
 
+	const handleDeleteComment = useCallback(
+		async (patientOrderNoteId: string) => {
+			if (!window.confirm('Are you sure?')) {
+				return;
+			}
+
+			try {
+				if (!patientOrder.patientMrn) {
+					throw new Error('patientOrder.patientMrn is undefined.');
+				}
+
+				await integratedCareService.deleteNote(patientOrderNoteId).fetch();
+				const patientOverviewResponse = await integratedCareService
+					.getPatientOverview(patientOrder.patientMrn)
+					.fetch();
+
+				onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
+				addFlag({
+					variant: 'success',
+					title: 'Comment deleted',
+					description: '{Message}',
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, handleError, onPatientOrderChange, patientOrder.patientMrn]
+	);
+
 	return (
 		<>
 			<MhicEditCommentModal
@@ -121,13 +151,12 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 											className={classNames({ 'mb-4': !isLast })}
 											name={note.account.displayName ?? ''}
 											date={note.createdDescription}
-											tag="Outreach"
 											message={note.note}
 											onEdit={() => {
 												setCommentToEdit(note);
 											}}
 											onDelete={() => {
-												window.confirm('[TODO]: Delete comment.');
+												handleDeleteComment(note.patientOrderNoteId);
 											}}
 										/>
 									);
