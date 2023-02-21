@@ -355,7 +355,7 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 							<h4 className="mb-0">Referrals</h4>
 						</Col>
 					</Row>
-					<Row className="mb-6">
+					<Row className={classNames({ 'mb-6': pastPatientOrders.length > 0 })}>
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
@@ -397,60 +397,62 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 							</Card>
 						</Col>
 					</Row>
-					<Row>
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Past</Card.Title>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										{pastPatientOrders.map((pastPatientOrder, pastPatientOrderIndex) => {
-											const isLast = pastPatientOrderIndex === pastPatientOrders.length - 1;
+					{pastPatientOrders.length > 0 && (
+						<Row>
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Past</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											{pastPatientOrders.map((pastPatientOrder, pastPatientOrderIndex) => {
+												const isLast = pastPatientOrderIndex === pastPatientOrders.length - 1;
 
-											return (
-												<Row
-													key={pastPatientOrder.orderId}
-													className={classNames({ 'mb-4 pb-6 border-bottom': !isLast })}
-												>
-													<Col>
-														<div className="mb-1 d-flex align-items-center justify-content-between">
-															<p className="m-0 fw-bold">
-																{pastPatientOrder.orderDateDescription} (Episode:{' '}
-																{pastPatientOrder.episodeDurationInDaysDescription})
-															</p>
-															<div className="d-flex align-items-center">
-																<p className="m-0 fw-bold text-danger">
-																	[TODO]: Episode Status Description
+												return (
+													<Row
+														key={pastPatientOrder.orderId}
+														className={classNames({ 'mb-4 pb-6 border-bottom': !isLast })}
+													>
+														<Col>
+															<div className="mb-1 d-flex align-items-center justify-content-between">
+																<p className="m-0 fw-bold">
+																	{pastPatientOrder.orderDateDescription} (Episode:{' '}
+																	{pastPatientOrder.episodeDurationInDaysDescription})
 																</p>
-																<Button
-																	variant="primary"
-																	size="sm"
-																	className="ms-4"
-																	onClick={() => {
-																		setShowCloseEpisodeModal(true);
-																	}}
-																	disabled
-																>
-																	Reopen
-																</Button>
+																<div className="d-flex align-items-center">
+																	<p className="m-0 fw-bold text-danger">
+																		[TODO]: Episode Status Description
+																	</p>
+																	<Button
+																		variant="primary"
+																		size="sm"
+																		className="ms-4"
+																		onClick={() => {
+																			setShowCloseEpisodeModal(true);
+																		}}
+																		disabled
+																	>
+																		Reopen
+																	</Button>
+																</div>
 															</div>
-														</div>
-														<p className="mb-1 text-gray">
-															Referred by: {pastPatientOrder.referringPracticeName}
-														</p>
-														<p className="m-0 text-gray">
-															{pastPatientOrder.reasonForReferral}
-														</p>
-													</Col>
-												</Row>
-											);
-										})}
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
+															<p className="mb-1 text-gray">
+																Referred by: {pastPatientOrder.referringPracticeName}
+															</p>
+															<p className="m-0 text-gray">
+																{pastPatientOrder.reasonForReferral}
+															</p>
+														</Col>
+													</Row>
+												);
+											})}
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+					)}
 				</Container>
 			</section>
 			<section>
@@ -478,55 +480,67 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 												>
 													{patientOrder.associatedDiagnosis}
 												</p>
-												<ul className="mb-0">
-													{patientOrder.patientOrderDiagnoses?.map(
-														(patientOrderDiagnoses) => {
+												{(patientOrder.patientOrderDiagnoses ?? []).length > 0 && (
+													<ul className="mb-0">
+														{patientOrder.patientOrderDiagnoses?.map(
+															(patientOrderDiagnoses) => {
+																return (
+																	<li
+																		key={
+																			patientOrderDiagnoses.patientOrderDiagnosisId
+																		}
+																		className="m-0"
+																	>
+																		<strong>
+																			{patientOrderDiagnoses.diagnosisId}
+																		</strong>{' '}
+																		{patientOrderDiagnoses.diagnosisName}
+																	</li>
+																);
+															}
+														)}
+													</ul>
+												)}
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					{(patientOrder.patientOrderMedications ?? []).length > 0 && (
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Medications</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row>
+												<Col>
+													{patientOrder.patientOrderMedications?.map(
+														(patientOrderMedication) => {
 															return (
-																<li
-																	key={patientOrderDiagnoses.patientOrderDiagnosisId}
+																<p
+																	key={
+																		patientOrderMedication.patientOrderMedicationId
+																	}
 																	className="m-0"
 																>
-																	{patientOrderDiagnoses.diagnosisName} (
-																	{patientOrderDiagnoses.diagnosisId})
-																</li>
+																	{patientOrderMedication.medicationName}
+																</p>
 															);
 														}
 													)}
-												</ul>
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-					<Row className="mb-6">
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Medications</Card.Title>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row>
-											<Col>
-												{patientOrder.patientOrderMedications?.map((patientOrderMedication) => {
-													return (
-														<p
-															key={patientOrderMedication.patientOrderMedicationId}
-															className="m-0"
-														>
-															{patientOrderMedication.medicationName}
-														</p>
-													);
-												})}
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+					)}
 					<Row>
 						<Col>
 							<Card bsPrefix="ic-card">
