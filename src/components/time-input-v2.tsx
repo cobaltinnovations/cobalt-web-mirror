@@ -124,7 +124,7 @@ for (let i = 0; i < totalSlotsInDay; i += 15) {
 	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
 
 	const title = timeSlot.format('h:mm A');
-	const value = timeSlot.format('HH:mm:ss');
+	const value = timeSlot.format('HH:mm');
 
 	timeSlots.push({
 		title,
