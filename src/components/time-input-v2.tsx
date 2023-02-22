@@ -116,15 +116,16 @@ const TimeInputV2 = ({ id, label, value, onChange, disabled, className }: Props)
 	);
 };
 
+const timeFormat = 'h:mm A';
 const timeSlots: TimeInputV2Option[] = [];
 const totalSlotsInDay = moment.duration(1, 'day').as('minutes');
-const timeSlot = moment(new Date(), 'hh:mm').startOf('hour');
+const timeSlot = moment(new Date(), timeFormat).startOf('hour');
 
 for (let i = 0; i < totalSlotsInDay; i += 15) {
 	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
 
-	const title = timeSlot.format('h:mm A');
-	const value = timeSlot.format('h:mm A');
+	const title = timeSlot.format(timeFormat);
+	const value = timeSlot.format(timeFormat);
 
 	timeSlots.push({
 		title,
