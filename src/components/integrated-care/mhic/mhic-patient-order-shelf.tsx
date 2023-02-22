@@ -133,7 +133,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 		}
 
 		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
-			integratedCareService.getPatientOverview(patientOrderId).fetch(),
+			integratedCareService.getPatientOrder(patientOrderId).fetch(),
 			accountService.getReferenceData().fetch(),
 		]);
 

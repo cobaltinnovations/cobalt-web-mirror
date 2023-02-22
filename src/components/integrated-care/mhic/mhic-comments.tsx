@@ -56,7 +56,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 					})
 					.fetch();
 				const patientOverviewResponse = await integratedCareService
-					.getPatientOverview(patientOrder.patientOrderId)
+					.getPatientOrder(patientOrder.patientOrderId)
 					.fetch();
 
 				onPatientOrderChange(patientOverviewResponse.patientOrder);
@@ -81,7 +81,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 			}
 
 			const patientOverviewResponse = await integratedCareService
-				.getPatientOverview(patientOrder.patientOrderId)
+				.getPatientOrder(patientOrder.patientOrderId)
 				.fetch();
 
 			setCommentToEdit(undefined);
@@ -110,7 +110,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 
 				await integratedCareService.deleteNote(patientOrderNoteId).fetch();
 				const patientOverviewResponse = await integratedCareService
-					.getPatientOverview(patientOrder.patientOrderId)
+					.getPatientOrder(patientOrder.patientOrderId)
 					.fetch();
 
 				onPatientOrderChange(patientOverviewResponse.patientOrder);
