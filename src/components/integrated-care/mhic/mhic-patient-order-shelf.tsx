@@ -167,7 +167,7 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 								</Button>
 								<div className="mb-2 d-flex align-items-center">
 									<h4 className="mb-0 me-2">{currentPatientOrder?.patientDisplayName}</h4>
-									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.NEW && (
+									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.OPEN && (
 										<Badge pill bg="outline-primary">
 											New
 										</Badge>

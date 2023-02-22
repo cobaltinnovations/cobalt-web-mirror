@@ -94,9 +94,7 @@ export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 					{
 						id: 'NEED_ASSESSMENT',
 						title: 'Need Assessment',
-						count:
-							orderCountsByStatusId?.[PatientOrderStatusId.NEEDS_FURTHER_ASSESSMENT].countDescription ??
-							'0',
+						count: '0',
 					},
 				],
 			},
@@ -105,9 +103,7 @@ export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 					{
 						id: 'SAFETY_PLANNING',
 						title: 'Safety Planning',
-						count:
-							orderCountsByStatusId?.[PatientOrderStatusId.AWAITING_SAFETY_PLANNING].countDescription ??
-							'0',
+						count: '0',
 					},
 					{
 						id: 'SPECIALTY_CARE',

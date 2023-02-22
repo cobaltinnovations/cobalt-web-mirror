@@ -253,7 +253,7 @@ const MhicPanel = () => {
 									</TableCell>
 									<TableCell>
 										<div>
-											{po.patientOrderStatusId === PatientOrderStatusId.NEW && (
+											{po.patientOrderStatusId === PatientOrderStatusId.OPEN && (
 												<Badge pill bg="outline-primary">
 													New
 												</Badge>

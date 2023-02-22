@@ -73,21 +73,21 @@ export interface PatientOrderModel {
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
+	PatientOrderScreeningStatusId: PatientOrderScreeningStatusId;
 }
 
 export enum PatientOrderStatusId {
-	NEW = 'NEW',
-	AWAITING_SCREENING = 'AWAITING_SCREENING',
-	SCREENING_IN_PROGRESS = 'SCREENING_IN_PROGRESS',
-	AWAITING_MHIC_SCHEDULING = 'AWAITING_MHIC_SCHEDULING',
-	AWAITING_PROVIDER_SCHEDULING = 'AWAITING_PROVIDER_SCHEDULING',
-	AWAITING_SAFETY_PLANNING = 'AWAITING_SAFETY_PLANNING',
-	SCHEDULED_WITH_MHIC = 'SCHEDULED_WITH_MHIC',
-	SCHEDULED_WITH_PROVIDER = 'SCHEDULED_WITH_PROVIDER',
-	NEEDS_FURTHER_ASSESSMENT = 'NEEDS_FURTHER_ASSESSMENT',
-	CONNECTED_TO_CARE = 'CONNECTED_TO_CARE',
-	LOST_CONTACT = 'LOST_CONTACT',
+	OPEN = 'OPEN',
 	CLOSED = 'CLOSED',
+	ARCHIVED = 'ARCHIVED',
+	DELETED = 'DELETED',
+}
+
+export enum PatientOrderScreeningStatusId {
+	NOT_SCREENED = 'NOT_SCREENED',
+	IN_PROGRESS = 'IN_PROGRESS',
+	SCHEDULED = 'SCHEDULED',
+	COMPLETE = 'COMPLETE',
 }
 
 export interface PatientAddressModel {
