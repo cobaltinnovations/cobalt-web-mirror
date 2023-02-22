@@ -58,6 +58,36 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
 	);
 
+	const handleDeleteOutreach = useCallback(
+		async (patientOrderOutreachId: string) => {
+			if (!window.confirm('Are you sure?')) {
+				return;
+			}
+
+			try {
+				if (!patientOrder.patientOrderId) {
+					throw new Error('patientOrder.patientOrderId is undefined.');
+				}
+
+				await integratedCareService.deletePatientOrderOutreach(patientOrderOutreachId).fetch();
+				const patientOverviewResponse = await integratedCareService
+					.getPatientOrder(patientOrder.patientOrderId)
+					.fetch();
+
+				onPatientOrderChange(patientOverviewResponse.patientOrder);
+				addFlag({
+					variant: 'success',
+					title: 'Outreach deleted',
+					description: '{Message}',
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
+	);
+
 	return (
 		<>
 			<MhicOutreachModal
@@ -90,7 +120,7 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 
 			<section>
 				<Container fluid className="overflow-visible">
-					<Row className="mb-6">
+					<Row className={classNames({ 'mb-6': (patientOrder.patientOrderOutreaches ?? []).length > 0 })}>
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">
@@ -126,7 +156,7 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 											setShowOutreachModal(true);
 										}}
 										onDelete={() => {
-											// handleDeleteComment(note.patientOrderNoteId);
+											handleDeleteOutreach(outreach.patientOrderOutreachId);
 										}}
 									/>
 								);

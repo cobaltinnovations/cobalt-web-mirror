@@ -116,4 +116,12 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	deletePatientOrderOutreach(patientOrderOutreachId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderOutreach: PatientOrderOutreachModel;
+		}>({
+			method: 'DELETE',
+			url: `/patient-order-outreaches/${patientOrderOutreachId}`,
+		});
+	},
 };
