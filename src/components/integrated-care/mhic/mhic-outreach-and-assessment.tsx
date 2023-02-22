@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, PatientOrderOutreachModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
@@ -11,9 +15,6 @@ import {
 } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { integratedCareService } from '@/lib/services';
-import useHandleError from '@/hooks/use-handle-error';
-import useFlags from '@/hooks/use-flags';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -24,37 +25,44 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
+	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
-	const handleOutreachModalSave = useCallback(async () => {
-		try {
-			if (!patientOrder.patientOrderId) {
-				throw new Error('patientOrder.patientOrderId is undefined.');
+	const handleOutreachModalSave = useCallback(
+		async (_patientOrderOutreach: PatientOrderOutreachModel, isEdit: boolean) => {
+			try {
+				if (!patientOrder.patientOrderId) {
+					throw new Error('patientOrder.patientOrderId is undefined.');
+				}
+
+				const patientOverviewResponse = await integratedCareService
+					.getPatientOrder(patientOrder.patientOrderId)
+					.fetch();
+
+				onPatientOrderChange(patientOverviewResponse.patientOrder);
+				addFlag({
+					variant: 'success',
+					title: isEdit ? 'Outreach updated' : 'Outreach added',
+					description: '{Message}',
+					actions: [],
+				});
+
+				setOutreachToEdit(undefined);
+				setShowOutreachModal(false);
+			} catch (error) {
+				handleError(error);
 			}
-
-			const patientOverviewResponse = await integratedCareService
-				.getPatientOrder(patientOrder.patientOrderId)
-				.fetch();
-
-			onPatientOrderChange(patientOverviewResponse.patientOrder);
-			setShowOutreachModal(false);
-			addFlag({
-				variant: 'success',
-				title: 'Outreach added',
-				description: '{Message}',
-				actions: [],
-			});
-		} catch (error) {
-			handleError(error);
-		}
-	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+		},
+		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
+	);
 
 	return (
 		<>
 			<MhicOutreachModal
 				patientOrderId={patientOrder.patientOrderId}
+				outreachToEdit={outreachToEdit}
 				show={showOutreachModal}
 				onHide={() => {
 					setShowOutreachModal(false);
@@ -86,10 +94,14 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">
-									Outreach Attempts <span className="text-gray">(0)</span>
+									Outreach Attempts{' '}
+									<span className="text-gray">
+										({(patientOrder.patientOrderOutreaches ?? []).length})
+									</span>
 								</h4>
 								<Button
 									onClick={() => {
+										setOutreachToEdit(undefined);
 										setShowOutreachModal(true);
 									}}
 								>
@@ -100,29 +112,25 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 					</Row>
 					<Row>
 						<Col>
-							<MhicComment
-								className="mb-4"
-								name="Ava Williams"
-								date="Nov 07, 2023 at 10:00AM"
-								message="Called and scheduled the assessment for November 12."
-								onEdit={() => {
-									setShowOutreachModal(true);
-								}}
-								onDelete={() => {
-									window.confirm('Are you sure?');
-								}}
-							/>
-							<MhicComment
-								name="Ava Williams"
-								date="Sep 30, 2023 at 2:51PM"
-								message="Called to do assessment, patient was unavailable, left a voicemail."
-								onEdit={() => {
-									setShowOutreachModal(true);
-								}}
-								onDelete={() => {
-									window.confirm('Are you sure?');
-								}}
-							/>
+							{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
+								const isLast = outreachIndex === (patientOrder.patientOrderOutreaches ?? []).length - 1;
+								return (
+									<MhicComment
+										key={outreach.patientOrderOutreachId}
+										className={classNames({ 'mb-4': !isLast })}
+										name={outreach.account.displayName ?? ''}
+										date={outreach.outreachDateTimeDescription}
+										message={outreach.note}
+										onEdit={() => {
+											setOutreachToEdit(outreach);
+											setShowOutreachModal(true);
+										}}
+										onDelete={() => {
+											// handleDeleteComment(note.patientOrderNoteId);
+										}}
+									/>
+								);
+							})}
 						</Col>
 					</Row>
 				</Container>

@@ -6,6 +6,7 @@ import {
 	PatientOrderCountModel,
 	PatientOrderModel,
 	PatientOrderNoteModel,
+	PatientOrderOutreachModel,
 	PatientOrderStatusId,
 } from '@/lib/models';
 
@@ -92,10 +93,26 @@ export const integratedCareService = {
 		note: string;
 	}) {
 		return httpSingleton.orchestrateRequest<{
-			patientOrderNote: PatientOrderNoteModel;
+			patientOrderOutreach: PatientOrderOutreachModel;
 		}>({
 			method: 'POST',
 			url: '/patient-order-outreaches',
+			data,
+		});
+	},
+	updatePatientOrderOutreach(
+		patientOrderOutreachId: string,
+		data: {
+			outreachDate: string;
+			outreachTime: string;
+			note: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderOutreach: PatientOrderOutreachModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-outreaches/${patientOrderOutreachId}`,
 			data,
 		});
 	},

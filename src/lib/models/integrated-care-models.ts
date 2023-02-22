@@ -72,6 +72,7 @@ export interface PatientOrderModel {
 	patientAddress?: PatientAddressModel;
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
+	patientOrderOutreaches?: PatientOrderOutreachModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
 	PatientOrderScreeningStatusId: PatientOrderScreeningStatusId;
 }
@@ -126,4 +127,22 @@ export interface PatientOrderNoteModel {
 	note: string;
 	patientOrderId: string;
 	patientOrderNoteId: string;
+}
+
+export interface PatientOrderOutreachModel {
+	account: AccountModel;
+	accountId: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	note: string;
+	outreachDate: string;
+	outreachDateDescription: string;
+	outreachDateTime: string;
+	outreachDateTimeDescription: string;
+	outreachTime: string;
+	outreachTimeDescription: string;
+	patientOrderId: string;
+	patientOrderOutreachId: string;
 }
