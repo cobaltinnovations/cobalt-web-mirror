@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
+import { PatientOrderModel } from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
@@ -8,25 +9,57 @@ import {
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import NoData from '@/components/no-data';
+import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
+import { integratedCareService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 
-export const MhicOutreachAndAssesment = () => {
+interface Props {
+	patientOrder: PatientOrderModel;
+	onPatientOrderChange(patientOrder: PatientOrderModel): void;
+}
+
+export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }: Props) => {
+	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
+	const handleOutreachModalSave = useCallback(async () => {
+		try {
+			if (!patientOrder.patientOrderId) {
+				throw new Error('patientOrder.patientOrderId is undefined.');
+			}
+
+			const patientOverviewResponse = await integratedCareService
+				.getPatientOrder(patientOrder.patientOrderId)
+				.fetch();
+
+			onPatientOrderChange(patientOverviewResponse.patientOrder);
+			setShowOutreachModal(false);
+			addFlag({
+				variant: 'success',
+				title: 'Outreach added',
+				description: '{Message}',
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+
 	return (
 		<>
 			<MhicOutreachModal
+				patientOrderId={patientOrder.patientOrderId}
 				show={showOutreachModal}
 				onHide={() => {
 					setShowOutreachModal(false);
 				}}
-				onSave={() => {
-					setShowOutreachModal(false);
-				}}
+				onSave={handleOutreachModalSave}
 			/>
 
 			<MhicScheduleAssessmentModal

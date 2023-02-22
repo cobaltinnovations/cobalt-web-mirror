@@ -225,7 +225,12 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
-									<MhicOutreachAndAssesment />
+									{currentPatientOrder && (
+										<MhicOutreachAndAssesment
+											patientOrder={currentPatientOrder}
+											onPatientOrderChange={setCurrentPatientOrder}
+										/>
+									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UP} className={classes.tabPane}>
 									<MhicFollowUp />

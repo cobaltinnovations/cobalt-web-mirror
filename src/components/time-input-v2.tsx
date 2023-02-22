@@ -50,10 +50,11 @@ interface Props {
 	label: string;
 	value: string;
 	onChange(value: string): void;
+	disabled?: boolean;
 	className?: string;
 }
 
-const TimeInputV2 = ({ id, label, value, onChange, className }: Props) => {
+const TimeInputV2 = ({ id, label, value, onChange, disabled, className }: Props) => {
 	const classes = useStyles();
 	const selectedValue = useMemo(() => {
 		const timeSlot = timeSlots.find((ts) => ts.value === value);
@@ -83,6 +84,7 @@ const TimeInputV2 = ({ id, label, value, onChange, className }: Props) => {
 				onChange((selected as TimeInputV2Option).value);
 			}}
 			onInputChange={onChange}
+			disabled={disabled}
 			renderInput={({ inputRef, referenceElementRef, value, ...inputProps }) => {
 				return (
 					<InputHelper

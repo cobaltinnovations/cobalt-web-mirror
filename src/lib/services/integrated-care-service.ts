@@ -85,4 +85,18 @@ export const integratedCareService = {
 			url: `/patient-order-notes/${patientOrderNoteId}`,
 		});
 	},
+	postPatientOrderOutreach(data: {
+		patientOrderId: string;
+		outreachDate: string;
+		outreachTime: string;
+		note: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderNote: PatientOrderNoteModel;
+		}>({
+			method: 'POST',
+			url: '/patient-order-outreaches',
+			data,
+		});
+	},
 };
