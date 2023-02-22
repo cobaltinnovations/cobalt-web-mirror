@@ -58,7 +58,7 @@ const MhicPanel = () => {
 		useState<Record<PatientOrderStatusId, ActivePatientOrderCountModel>>();
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
-	const [clickedPatientMrn, setClickedPatientMrn] = useState('');
+	const [clickedPatientOrderId, setClickedPatientOrderId] = useState('');
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -182,9 +182,9 @@ const MhicPanel = () => {
 			/>
 
 			<MhicPatientOrderShelf
-				patientMrn={clickedPatientMrn}
+				patientOrderId={clickedPatientOrderId}
 				onHide={() => {
-					setClickedPatientMrn('');
+					setClickedPatientOrderId('');
 				}}
 			/>
 
@@ -231,11 +231,11 @@ const MhicPanel = () => {
 								<TableRow
 									key={po.patientOrderId}
 									onClick={() => {
-										if (!po.patientMrn) {
+										if (!po.patientOrderId) {
 											return;
 										}
 
-										setClickedPatientMrn(po.patientMrn);
+										setClickedPatientOrderId(po.patientOrderId);
 									}}
 								>
 									<TableCell width={280} sticky className="py-2">

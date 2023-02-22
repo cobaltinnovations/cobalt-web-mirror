@@ -45,8 +45,8 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 			event.preventDefault();
 
 			try {
-				if (!patientOrder.patientMrn) {
-					throw new Error('patientOrder.patientMrn is undefined.');
+				if (!patientOrder.patientOrderId) {
+					throw new Error('patientOrder.patientOrderId is undefined.');
 				}
 
 				await integratedCareService
@@ -56,10 +56,10 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 					})
 					.fetch();
 				const patientOverviewResponse = await integratedCareService
-					.getPatientOverview(patientOrder.patientMrn)
+					.getPatientOverview(patientOrder.patientOrderId)
 					.fetch();
 
-				onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
+				onPatientOrderChange(patientOverviewResponse.patientOrder);
 				setCommentInputValue('');
 				addFlag({
 					variant: 'success',
@@ -76,16 +76,16 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 
 	const handleEditCommentSave = useCallback(async () => {
 		try {
-			if (!patientOrder.patientMrn) {
-				throw new Error('patientOrder.patientMrn is undefined.');
+			if (!patientOrder.patientOrderId) {
+				throw new Error('patientOrder.patientOrderId is undefined.');
 			}
 
 			const patientOverviewResponse = await integratedCareService
-				.getPatientOverview(patientOrder.patientMrn)
+				.getPatientOverview(patientOrder.patientOrderId)
 				.fetch();
 
 			setCommentToEdit(undefined);
-			onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
+			onPatientOrderChange(patientOverviewResponse.patientOrder);
 			addFlag({
 				variant: 'success',
 				title: 'Comment updated',
@@ -95,7 +95,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientMrn]);
+	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
 
 	const handleDeleteComment = useCallback(
 		async (patientOrderNoteId: string) => {
@@ -104,16 +104,16 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 			}
 
 			try {
-				if (!patientOrder.patientMrn) {
-					throw new Error('patientOrder.patientMrn is undefined.');
+				if (!patientOrder.patientOrderId) {
+					throw new Error('patientOrder.patientOrderId is undefined.');
 				}
 
 				await integratedCareService.deleteNote(patientOrderNoteId).fetch();
 				const patientOverviewResponse = await integratedCareService
-					.getPatientOverview(patientOrder.patientMrn)
+					.getPatientOverview(patientOrder.patientOrderId)
 					.fetch();
 
-				onPatientOrderChange(patientOverviewResponse.currentPatientOrder);
+				onPatientOrderChange(patientOverviewResponse.patientOrder);
 				addFlag({
 					variant: 'success',
 					title: 'Comment deleted',
@@ -124,7 +124,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				handleError(error);
 			}
 		},
-		[addFlag, handleError, onPatientOrderChange, patientOrder.patientMrn]
+		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
 	);
 
 	return (

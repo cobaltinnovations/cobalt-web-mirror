@@ -107,7 +107,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicPatientOrderShelfProps {
-	patientMrn: string;
+	patientOrderId: string;
 	onHide(): void;
 }
 
@@ -118,7 +118,7 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 
@@ -128,32 +128,38 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
 
 	const fetchPatientOverview = useCallback(async () => {
-		if (!patientMrn) {
+		if (!patientOrderId) {
 			return;
 		}
 
 		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
-			integratedCareService.getPatientOverview(patientMrn).fetch(),
+			integratedCareService.getPatientOverview(patientOrderId).fetch(),
 			accountService.getReferenceData().fetch(),
 		]);
 
-		setCurrentPatientOrder(patientOverviewResponse.currentPatientOrder);
-		setPastPatientOrders(patientOverviewResponse.pastPatientOrders);
+		setCurrentPatientOrder(patientOverviewResponse.patientOrder);
+		setPastPatientOrders(patientOverviewResponse.associatedPatientOrders);
 		setReferenceData(referenceDataResponse);
-	}, [patientMrn]);
+	}, [patientOrderId]);
 
 	useEffect(() => {
-		if (patientMrn) {
+		if (patientOrderId) {
 			document.body.style.overflow = 'hidden';
 			return;
 		}
 
 		document.body.style.overflow = 'visible';
-	}, [patientMrn]);
+	}, [patientOrderId]);
 
 	return (
 		<>
-			<CSSTransition in={!!patientMrn} timeout={300} classNames="patient-order-shelf" mountOnEnter unmountOnExit>
+			<CSSTransition
+				in={!!patientOrderId}
+				timeout={300}
+				classNames="patient-order-shelf"
+				mountOnEnter
+				unmountOnExit
+			>
 				<div className={classes.patientOrderShelf}>
 					<AsyncWrapper fetchData={fetchPatientOverview}>
 						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
@@ -238,7 +244,7 @@ export const MhicPatientOrderShelf = ({ patientMrn, onHide }: MhicPatientOrderSh
 				</div>
 			</CSSTransition>
 			<CSSTransition
-				in={!!patientMrn}
+				in={!!patientOrderId}
 				timeout={300}
 				classNames="patient-order-shelf-overlay"
 				onClick={onHide}

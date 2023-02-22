@@ -49,14 +49,14 @@ export const integratedCareService = {
 			url: '/integrated-care/panel-accounts',
 		});
 	},
-	getPatientOverview(patientMrn: string) {
+	getPatientOverview(patientOrderId: string) {
 		return httpSingleton.orchestrateRequest<{
-			currentPatientOrder: PatientOrderModel;
-			pastPatientOrders: PatientOrderModel[];
+			patientOrder: PatientOrderModel;
+			associatedPatientOrders: PatientOrderModel[];
 			patientAccount?: any;
 		}>({
 			method: 'GET',
-			url: `/patients/${patientMrn}/overview`,
+			url: `/patient-orders/${patientOrderId}`,
 		});
 	},
 	postNote(data: { patientOrderId: string; note: string }) {
