@@ -1,9 +1,11 @@
-import React, { FC, useCallback } from 'react';
+import moment from 'moment';
+import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
+import TimeInputV2 from '@/components/time-input-v2';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -18,9 +20,18 @@ interface Props extends ModalProps {
 
 export const MhicOutreachModal: FC<Props> = ({ isEdit, onSave, ...props }) => {
 	const classes = useStyles();
+	const [formValues, setFormValues] = useState({
+		date: undefined as Date | undefined,
+		time: '',
+		comment: '',
+	});
 
 	const handleOnEnter = useCallback(() => {
-		// reset state
+		setFormValues({
+			date: new Date(),
+			time: moment().format('h:mm A'),
+			comment: '',
+		});
 	}, []);
 
 	return (
@@ -32,30 +43,35 @@ export const MhicOutreachModal: FC<Props> = ({ isEdit, onSave, ...props }) => {
 				<DatePicker
 					className="mb-4"
 					labelText="Date"
-					selected={undefined}
+					selected={formValues.date}
 					onChange={(date) => {
-						if (!date) {
-							return;
-						}
-
-						//set date
+						setFormValues((previousValues) => ({
+							...previousValues,
+							date: date ?? undefined,
+						}));
 					}}
 				/>
-				<InputHelper
-					as="select"
+				<TimeInputV2
+					id="outreact-modal__time-input"
 					className="mb-4"
 					label="Time"
-					value=""
-					onChange={() => {
-						return;
+					value={formValues.time}
+					onChange={(time) => {
+						setFormValues((previousValues) => ({
+							...previousValues,
+							time,
+						}));
 					}}
 				/>
 				<InputHelper
 					as="textarea"
 					label="Comment"
 					value=""
-					onChange={() => {
-						return;
+					onChange={({ currentTarget }) => {
+						setFormValues((previousValues) => ({
+							...previousValues,
+							comment: currentTarget.value,
+						}));
 					}}
 				/>
 			</Modal.Body>
