@@ -9,6 +9,7 @@ export * from './mhic-edit-comment-modal';
 export * from './mhic-filter-dropdown';
 export * from './mhic-follow-up-message-modal';
 export * from './mhic-follow-up';
+export * from './mhic-generate-orders-modal';
 export * from './mhic-header';
 export * from './mhic-insurance-modal';
 export * from './mhic-navigation';

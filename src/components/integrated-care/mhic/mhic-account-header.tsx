@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 
+import config from '@/lib/config';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
 import FileInputButton from '@/components/file-input-button';
+import { MhicGenerateOrdersModal } from './mhic-generate-orders-modal';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
@@ -23,19 +25,45 @@ interface MhicAccountHeaderProps {
 
 export const MhicAccountHeader = ({ onSwitchButtonClick, onImportPatientsInputChange }: MhicAccountHeaderProps) => {
 	const classes = useStyles();
+	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
 	return (
-		<header className={classes.accountHeader}>
-			<div className="d-flex align-items-center justift-content-between">
-				<h3 className="mb-0 me-2">Ava Williams, MHIC</h3>
-				<p className="m-0 fs-large text-muted">(76 Patients)</p>
-				<Button variant="link" className="p-2" onClick={onSwitchButtonClick}>
-					<SwapIcon />
-				</Button>
-			</div>
-			<FileInputButton accept=".csv" onChange={onImportPatientsInputChange}>
-				Import Patients
-			</FileInputButton>
-		</header>
+		<>
+			<MhicGenerateOrdersModal
+				show={showGenerateOrdersModal}
+				onHide={() => {
+					setShowGenerateOrdersModal(false);
+				}}
+				onSave={() => {
+					setShowGenerateOrdersModal(false);
+				}}
+			/>
+
+			<header className={classes.accountHeader}>
+				<div className="d-flex align-items-center justift-content-between">
+					<h3 className="mb-0 me-2">Ava Williams, MHIC</h3>
+					<p className="m-0 fs-large text-muted">(76 Patients)</p>
+					<Button variant="link" className="p-2" onClick={onSwitchButtonClick}>
+						<SwapIcon />
+					</Button>
+				</div>
+				<div className="d-flex align-items-center">
+					{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+						<Button
+							className="me-2"
+							variant="outline-primary"
+							onClick={() => {
+								setShowGenerateOrdersModal(true);
+							}}
+						>
+							Generate Patient Orders
+						</Button>
+					)}
+					<FileInputButton accept=".csv" onChange={onImportPatientsInputChange}>
+						Import Patients
+					</FileInputButton>
+				</div>
+			</header>
+		</>
 	);
 };
