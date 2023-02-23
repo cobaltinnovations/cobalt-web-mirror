@@ -217,10 +217,11 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 							</div>
 							<Tab.Content className={classes.tabContent}>
 								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
-									{currentPatientOrder && (
+									{currentPatientOrder && referenceData && (
 										<MhicPatientDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
+											referenceData={referenceData}
 										/>
 									)}
 								</Tab.Pane>

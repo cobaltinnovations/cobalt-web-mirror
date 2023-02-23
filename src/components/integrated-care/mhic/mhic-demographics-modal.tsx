@@ -1,6 +1,8 @@
 import React, { FC, useCallback } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+
+import { Ethnicity, GenderIdentity, Race } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 
 const useStyles = createUseStyles({
@@ -10,10 +12,19 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
+	raceOptions: Race[];
+	ethnicityOptions: Ethnicity[];
+	genderIdentityOptions: GenderIdentity[];
 	onSave(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
-export const MhicDemographicsModal: FC<Props> = ({ onSave, ...props }) => {
+export const MhicDemographicsModal: FC<Props> = ({
+	raceOptions,
+	ethnicityOptions,
+	genderIdentityOptions,
+	onSave,
+	...props
+}) => {
 	const classes = useStyles();
 
 	const handleOnEnter = useCallback(() => {
@@ -31,27 +42,45 @@ export const MhicDemographicsModal: FC<Props> = ({ onSave, ...props }) => {
 					className="mb-4"
 					label="Race"
 					value=""
-					onChange={() => {
-						return;
+					onChange={({ currentTarget }) => {
+						window.alert(`Set race: ${currentTarget.value}`);
 					}}
-				/>
+				>
+					{raceOptions.map((option) => (
+						<option key={option.raceId} value={option.raceId}>
+							{option.description}
+						</option>
+					))}
+				</InputHelper>
 				<InputHelper
 					as="select"
 					className="mb-4"
 					label="Ethnicity"
 					value=""
-					onChange={() => {
-						return;
+					onChange={({ currentTarget }) => {
+						window.alert(`Set race: ${currentTarget.value}`);
 					}}
-				/>
+				>
+					{ethnicityOptions.map((option) => (
+						<option key={option.ethnicityId} value={option.ethnicityId}>
+							{option.description}
+						</option>
+					))}
+				</InputHelper>
 				<InputHelper
 					as="select"
 					label="Gender Identity"
 					value=""
-					onChange={() => {
-						return;
+					onChange={({ currentTarget }) => {
+						window.alert(`Set race: ${currentTarget.value}`);
 					}}
-				/>
+				>
+					{genderIdentityOptions.map((option) => (
+						<option key={option.genderIdentityId} value={option.genderIdentityId}>
+							{option.description}
+						</option>
+					))}
+				</InputHelper>
 			</Modal.Body>
 			<Modal.Footer className="text-right">
 				<Button variant="outline-primary" className="me-2" onClick={props.onHide}>

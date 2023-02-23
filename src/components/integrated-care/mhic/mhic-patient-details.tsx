@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 import {
 	MhicCloseEpisodeModal,
@@ -15,9 +15,10 @@ import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 interface Props {
 	patientOrder: PatientOrderModel;
 	pastPatientOrders: PatientOrderModel[];
+	referenceData: ReferenceDataResponse;
 }
 
-export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) => {
+export const MhicPatientDetails = ({ patientOrder, pastPatientOrders, referenceData }: Props) => {
 	const { addFlag } = useFlags();
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
@@ -27,6 +28,9 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 	return (
 		<>
 			<MhicDemographicsModal
+				raceOptions={referenceData.races}
+				ethnicityOptions={referenceData.ethnicities}
+				genderIdentityOptions={referenceData.genderIdentities}
 				show={showDemographicsModal}
 				onHide={() => {
 					setShowDemographicsModal(false);
@@ -554,9 +558,7 @@ export const MhicPatientDetails = ({ patientOrder, pastPatientOrders }: Props) =
 												<p className="m-0 text-gray">Practice</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.referringPracticeName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
