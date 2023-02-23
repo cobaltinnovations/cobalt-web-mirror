@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -19,14 +19,15 @@ interface Props extends ModalProps {
 
 export const MhicGenerateOrdersModal: FC<Props> = ({ onSave, ...props }) => {
 	const classes = useStyles();
-	const [formValues, setFormValues] = useState({
-		count: '',
-	});
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [formValues, setFormValues] = useState({ count: '' });
 
 	const handleOnEnter = useCallback(() => {
-		setFormValues({
-			count: '',
-		});
+		setFormValues({ count: '' });
+	}, []);
+
+	const handleOnEntered = useCallback(() => {
+		inputRef.current?.focus();
 	}, []);
 
 	const handleFormSubmit = useCallback(
@@ -53,13 +54,20 @@ export const MhicGenerateOrdersModal: FC<Props> = ({ onSave, ...props }) => {
 	);
 
 	return (
-		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
+		<Modal
+			{...props}
+			dialogClassName={classes.modal}
+			centered
+			onEntering={handleOnEnter}
+			onEntered={handleOnEntered}
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>Generate Orders</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
 					<InputHelper
+						ref={inputRef}
 						type="number"
 						label="Count"
 						value={formValues.count}

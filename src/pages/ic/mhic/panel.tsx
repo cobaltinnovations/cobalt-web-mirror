@@ -131,9 +131,7 @@ const MhicPanel = () => {
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
-
 			setSearchParams(searchParams);
-			setShowSwitchAccountModal(false);
 		},
 		[searchParams, setSearchParams]
 	);
