@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import config from '@/lib/config';
-import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
+import { AccountModel, PatientOrderCountModel } from '@/lib/models';
 import FileInputButton from '@/components/file-input-button';
-import { MhicGenerateOrdersModal } from './mhic-generate-orders-modal';
+import { MhicGenerateOrdersModal } from '@/components/integrated-care/mhic';
+import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
@@ -19,13 +20,37 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicAccountHeaderProps {
+	currentPanelAccountId: string;
+	panelAccounts: AccountModel[];
+	activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
+	overallActivePatientOrdersCountDescription: string;
 	onSwitchButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onImportPatientsInputChange(file: File): void;
 }
 
-export const MhicAccountHeader = ({ onSwitchButtonClick, onImportPatientsInputChange }: MhicAccountHeaderProps) => {
+export const MhicAccountHeader = ({
+	currentPanelAccountId,
+	panelAccounts,
+	activePatientOrderCountsByPanelAccountId,
+	overallActivePatientOrdersCountDescription,
+	onSwitchButtonClick,
+	onImportPatientsInputChange,
+}: MhicAccountHeaderProps) => {
 	const classes = useStyles();
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
+
+	const currentAccountName = useMemo(
+		() => panelAccounts.find((pa) => pa.accountId === currentPanelAccountId)?.displayName ?? 'All',
+		[currentPanelAccountId, panelAccounts]
+	);
+
+	const currentCount = useMemo(
+		() =>
+			currentPanelAccountId
+				? activePatientOrderCountsByPanelAccountId[currentPanelAccountId]?.activePatientOrderCountDescription
+				: overallActivePatientOrdersCountDescription,
+		[activePatientOrderCountsByPanelAccountId, currentPanelAccountId, overallActivePatientOrdersCountDescription]
+	);
 
 	return (
 		<>
@@ -41,8 +66,8 @@ export const MhicAccountHeader = ({ onSwitchButtonClick, onImportPatientsInputCh
 
 			<header className={classes.accountHeader}>
 				<div className="d-flex align-items-center justift-content-between">
-					<h3 className="mb-0 me-2">Ava Williams, MHIC</h3>
-					<p className="m-0 fs-large text-muted">(76 Patients)</p>
+					<h3 className="mb-0 me-2">{currentAccountName}</h3>
+					<p className="m-0 fs-large text-muted">({currentCount} Patients)</p>
 					<Button variant="link" className="p-2" onClick={onSwitchButtonClick}>
 						<SwapIcon />
 					</Button>

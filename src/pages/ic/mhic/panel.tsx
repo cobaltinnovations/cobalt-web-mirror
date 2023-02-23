@@ -189,6 +189,10 @@ const MhicPanel = () => {
 			/>
 
 			<MhicAccountHeader
+				currentPanelAccountId={panelAccountId ?? ''}
+				panelAccounts={panelAccounts}
+				activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId ?? {}}
+				overallActivePatientOrdersCountDescription={overallActivePatientOrdersCountDescription}
 				onSwitchButtonClick={() => {
 					setShowSwitchAccountModal(true);
 				}}
