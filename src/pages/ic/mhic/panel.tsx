@@ -161,6 +161,7 @@ const MhicPanel = () => {
 						} else {
 							searchParams.delete('panelAccountId');
 						}
+						searchParams.set('pageNumber', '0');
 
 						setSearchParams(searchParams);
 						setShowSwitchAccountModal(false);
@@ -198,7 +199,15 @@ const MhicPanel = () => {
 				}}
 				onImportPatientsInputChange={handleImportPatientsInputChange}
 			/>
-			<MhicNavigation orderCountsByStatusId={activePatientOrderCountsByPatientOrderStatusId} />
+			<MhicNavigation
+				patientOrderPanelTypeId={patientOrderPanelTypeId ?? ''}
+				orderCountsByStatusId={activePatientOrderCountsByPatientOrderStatusId}
+				onClick={(patientOrderPanelTypeId) => {
+					searchParams.set('patientOrderPanelTypeId', patientOrderPanelTypeId);
+					searchParams.set('pageNumber', '0');
+					setSearchParams(searchParams);
+				}}
+			/>
 			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
 				<div className="d-flex">
 					<MhicFilterDropdown />

@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
 
-import { buildQueryParamUrl } from '@/lib/utils';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import { ActivePatientOrderCountModel, PatientOrderStatusId } from '@/lib/models';
@@ -12,14 +10,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '0 64px',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
-		'& a': {
+		'& button': {
+			border: 0,
 			fontWeight: 500,
+			appearance: 'none',
 			padding: '18px 10px',
 			position: 'relative',
 			alignItems: 'center',
 			display: 'inline-flex',
 			textDecoration: 'none',
 			color: theme.colors.n500,
+			backgroundColor: 'transparent',
 			'&:after': {
 				left: 10,
 				right: 10,
@@ -78,21 +79,20 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
+	patientOrderPanelTypeId: string;
 	orderCountsByStatusId?: Record<PatientOrderStatusId, ActivePatientOrderCountModel>;
+	onClick(patientOrderPanelTypeId: string): void;
 }
 
-export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
+export const MhicNavigation = ({ patientOrderPanelTypeId, orderCountsByStatusId, onClick }: Props) => {
 	const classes = useStyles();
-	const { pathname } = useLocation();
-	const [searchParams] = useSearchParams();
-	const statusParam = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
 
 	const linkSections = useMemo(
 		() => [
 			{
 				links: [
 					{
-						id: 'NEED_ASSESSMENT',
+						patientOrderPanelTypeId: 'NEED_ASSESSMENT',
 						title: 'Need Assessment',
 						count: '0',
 					},
@@ -101,17 +101,17 @@ export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 			{
 				links: [
 					{
-						id: 'SAFETY_PLANNING',
+						patientOrderPanelTypeId: 'SAFETY_PLANNING',
 						title: 'Safety Planning',
 						count: '0',
 					},
 					{
-						id: 'SPECIALTY_CARE',
+						patientOrderPanelTypeId: 'SPECIALTY_CARE',
 						title: 'Specialty Care',
 						count: '0',
 					},
 					{
-						id: 'BHP',
+						patientOrderPanelTypeId: 'BHP',
 						title: 'Behavioral Health Provider',
 						count: '0',
 					},
@@ -120,7 +120,7 @@ export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 			{
 				links: [
 					{
-						id: 'CLOSED',
+						patientOrderPanelTypeId: 'CLOSED',
 						title: 'Closed',
 						count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
 					},
@@ -143,20 +143,22 @@ export const MhicNavigation = ({ orderCountsByStatusId }: Props) => {
 							const isLastLink = linkIndex === section.links.length - 1;
 
 							return (
-								<Link
+								<button
 									key={linkIndex}
-									to={buildQueryParamUrl(pathname, { patientOrderPanelTypeId: link.id })}
+									onClick={() => {
+										onClick(link.patientOrderPanelTypeId);
+									}}
 									className={classNames({
 										'first-link-of-section': isFirstLink && !isFirstSection,
 										'last-link-of-section': isLastLink && !isLastSection,
-										active: statusParam === link.id,
+										active: patientOrderPanelTypeId === link.patientOrderPanelTypeId,
 									})}
 								>
 									<span>{link.title}</span>
 									{link.count && parseInt(link.count, 10) > 0 && (
 										<span className={classes.countBubble}>{link.count}</span>
 									)}
-								</Link>
+								</button>
 							);
 						})}
 					</React.Fragment>
