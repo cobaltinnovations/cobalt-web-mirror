@@ -17,9 +17,9 @@ const DemographicsPart1 = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
-			<Container>
-				<Row>
-					<Col>
+			<Container className="py-20">
+				<Row className="mb-8">
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h2 className="mb-2">Let's begin with who you are</h2>
 						<p className="mb-0">
 							Your primary care team gave us a head start filling out this information. Please make sure
@@ -29,7 +29,7 @@ const DemographicsPart1 = () => {
 					</Col>
 				</Row>
 				<Row>
-					<Col>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Form>
 							<InputHelper className="mb-2" type="text" name="first-name" label="First Name" />
 							<InputHelper className="mb-2" type="text" name="last-name" label="Last Name" />
