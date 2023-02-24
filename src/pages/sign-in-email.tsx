@@ -46,7 +46,7 @@ const SignInEmail = () => {
 
 		try {
 			const { accessToken, destinationUrl } = await accountService
-				.getAccessToken({
+				.getEmailPasswordAccessToken({
 					emailAddress: signInForm.emailAddress,
 					password: signInForm.password,
 				})

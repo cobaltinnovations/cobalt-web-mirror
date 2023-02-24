@@ -154,10 +154,10 @@ export const accountService = {
 			url: `/account-sessions/${accountSessionId}/text`,
 		});
 	},
-	getAccessToken(data: RequestAccessTokenData) {
+	getEmailPasswordAccessToken(data: RequestAccessTokenData) {
 		return httpSingleton.orchestrateRequest<AccountWithTokenResponse>({
 			method: 'post',
-			url: 'accounts/access-token',
+			url: 'accounts/email-password-access-token',
 			data,
 		});
 	},
