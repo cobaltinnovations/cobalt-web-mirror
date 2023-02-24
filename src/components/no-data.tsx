@@ -1,6 +1,6 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Button } from 'react-bootstrap';
 import { ButtonVariant } from 'react-bootstrap/esm/types';
 
@@ -14,6 +14,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
+	illustration?: ReactElement;
 	title: string;
 	description: string;
 	actions: {
@@ -24,11 +25,12 @@ interface Props {
 	className?: string;
 }
 
-const NoData = ({ title, description, actions, className }: Props) => {
+const NoData = ({ illustration, title, description, actions, className }: Props) => {
 	const classes = useStyles();
 
 	return (
 		<div className={classNames(classes.noData, className)}>
+			{illustration && <div className="mb-6 text-center">{illustration}</div>}
 			<h4 className="mb-3 text-center">{title}</h4>
 			<p
 				className={classNames('text-center', {

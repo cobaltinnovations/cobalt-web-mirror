@@ -1,4 +1,3 @@
-import Header from '@/components/header';
 import { MhicHeader } from '@/components/integrated-care/mhic';
 import SentryRoutes from '@/components/sentry-routes';
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';

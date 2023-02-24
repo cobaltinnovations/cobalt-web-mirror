@@ -78,6 +78,9 @@ export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-li
 export const ResourceLibraryTags = React.lazy(() => import('@/pages/resource-library-tags'));
 export const ResourceLibraryDetail = React.lazy(() => import('@/pages/resource-library-detail'));
 
+// TODO: delete and move to pages/landing once BE is setup for it
+export const MhicPatientHomescreen = React.lazy(() => import('@/pages/ic/patient/homescreen'));
+
 interface RouteGuardProps {
 	account?: AccountModel;
 	institution?: Institution;
@@ -589,6 +592,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/resource-library/:contentId',
 				private: true,
 				main: ResourceLibraryDetail,
+			},
+			// TODO: delete and move to pages/landing once BE is setup for it
+			{
+				path: '/ic/patient',
+				private: true,
+				main: MhicPatientHomescreen,
 			},
 			{
 				path: '*',
