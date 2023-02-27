@@ -305,7 +305,7 @@ export const accountService = {
 			url: `/accounts/reference-data`,
 		});
 	},
-	patchPatientAccount(accountId: string, data: PatientAccountFormData) {
+	patchPatientAccount(accountId: string, data: Partial<PatientAccountFormData>) {
 		return httpSingleton.orchestrateRequest<AccountResponse>({
 			method: 'PATCH',
 			url: `/accounts/${accountId}`,
