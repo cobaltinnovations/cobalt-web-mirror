@@ -6,6 +6,7 @@ import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/
 import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
 import CallToAction from '@/components/call-to-action';
 import HeroContainer from '@/components/hero-container';
+import { useNavigate } from 'react-router-dom';
 
 enum HOMESCREEN_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -34,6 +35,7 @@ const homescreenStates = [
 ];
 
 const Homescreen = () => {
+	const navigate = useNavigate();
 	const [homescreenState, setHomescreenState] = useState(HOMESCREEN_STATES.AWAITING_PATIENT_ORDER);
 
 	return (
@@ -105,7 +107,7 @@ const Homescreen = () => {
 										variant: 'primary',
 										title: 'Take the Assessment',
 										onClick: () => {
-											window.alert('[TODO]');
+											navigate('/ic/patient/demographics-introduction');
 										},
 									},
 								]}

@@ -80,6 +80,9 @@ export const ResourceLibraryDetail = React.lazy(() => import('@/pages/resource-l
 
 // TODO: delete and move to pages/landing once BE is setup for it
 export const MhicPatientHomescreen = React.lazy(() => import('@/pages/ic/patient/homescreen'));
+export const MhicPatientDemographicsIntroduction = React.lazy(
+	() => import('@/pages/ic/patient/demographics-introduction')
+);
 export const MhicPatientDemographicsPart1 = React.lazy(() => import('@/pages/ic/patient/demographics-part-1'));
 export const MhicPatientDemographicsPart2 = React.lazy(() => import('@/pages/ic/patient/demographics-part-2'));
 export const MhicPatientDemographicsPart3 = React.lazy(() => import('@/pages/ic/patient/demographics-part-3'));
@@ -602,6 +605,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/ic/patient',
 				private: true,
 				main: MhicPatientHomescreen,
+			},
+			{
+				path: '/ic/patient/demographics-introduction',
+				private: true,
+				main: MhicPatientDemographicsIntroduction,
 			},
 			{
 				path: '/ic/patient/demographics-part-1',
