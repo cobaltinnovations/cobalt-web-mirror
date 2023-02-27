@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
@@ -11,18 +10,18 @@ import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
-import DatePicker from '@/components/date-picker';
 
 export interface FormData {
-	firstName: string;
-	lastName: string;
-	birthdate: string;
-	phoneNumber: string;
-	emailAddress: string;
-	insuranceId: string;
+	address: {
+		streetAddress1: string;
+		streetAddress2: string;
+		locality: string;
+		region: string;
+		postalCode: string;
+	};
 }
 
-const DemographicsPart1 = () => {
+const DemographicsPart2 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
@@ -30,20 +29,20 @@ const DemographicsPart1 = () => {
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			firstName: account?.firstName ?? '',
-			lastName: account?.lastName ?? '',
-			birthdate: account?.birthdate ?? '',
-			phoneNumber: account?.phoneNumber ?? '',
-			emailAddress: account?.emailAddress ?? '',
-			insuranceId: account?.insuranceId ?? '',
+			address: {
+				streetAddress1: account?.address?.streetAddress1 ?? '',
+				streetAddress2: account?.address?.streetAddress2 ?? '',
+				locality: account?.address?.locality ?? '',
+				region: account?.address?.region ?? '',
+				postalCode: account?.address?.postalCode ?? '',
+			},
 		};
 	}, [
-		account?.birthdate,
-		account?.emailAddress,
-		account?.firstName,
-		account?.insuranceId,
-		account?.lastName,
-		account?.phoneNumber,
+		account?.address?.locality,
+		account?.address?.postalCode,
+		account?.address?.region,
+		account?.address?.streetAddress1,
+		account?.address?.streetAddress2,
 	]);
 
 	const fetchData = useCallback(async () => {
@@ -59,7 +58,7 @@ const DemographicsPart1 = () => {
 
 			try {
 				await accountService.patchPatientAccount(account.accountId, values).fetch();
-				navigate('/ic/patient/demographics-part-2');
+				navigate('/ic/patient/demographics-part-3');
 			} catch (error) {
 				if ((error as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(error);
@@ -74,11 +73,10 @@ const DemographicsPart1 = () => {
 			<Container className="py-20">
 				<Row className="mb-8">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h3 className="mb-2">Let's begin with who you are</h3>
+						<h3 className="mb-2">Where do you live?</h3>
 						<p className="mb-0">
 							Your primary care team gave us a head start filling out this information. Please make sure
-							your preferred cell phone number and email address are correct, or enter these if they have
-							not been provided.
+							the information entered is correct, and complete any required fields that are blank.
 						</p>
 					</Col>
 				</Row>
@@ -89,86 +87,96 @@ const DemographicsPart1 = () => {
 							enableReinitialize
 							onSubmit={handleFormSubmit}
 						>
-							{({ values, touched, errors, setFieldValue, handleChange, handleBlur, handleSubmit }) => (
+							{({ values, touched, errors, handleChange, handleBlur, handleSubmit }) => (
 								<Form onSubmit={handleSubmit}>
 									<InputHelper
 										className="mb-2"
-										label="First Name"
+										label="Street Address 1"
 										type="text"
-										name="firstName"
-										value={values.firstName}
+										name="address.streetAddress1"
+										value={values.address.streetAddress1}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.firstName && errors.firstName ? errors.firstName : ''}
+										error={
+											touched.address?.streetAddress1 && errors.address?.streetAddress1
+												? errors.address?.streetAddress1
+												: ''
+										}
 									/>
 									<InputHelper
 										className="mb-2"
-										label="Last Name"
+										label="Street Address 2"
 										type="text"
-										name="lastName"
-										value={values.lastName}
+										name="address.streetAddress2"
+										value={values.address.streetAddress2}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.lastName && errors.lastName ? errors.lastName : ''}
-										required
-									/>
-									<Form.Group controlId="birthdate" className="mb-2">
-										<DatePicker
-											showYearDropdown
-											showMonthDropdown
-											dropdownMode="select"
-											labelText="Date of Birth"
-											selected={values.birthdate ? moment(values.birthdate).toDate() : undefined}
-											onChange={(date) => {
-												setFieldValue(
-													'birthdate',
-													date ? moment(date).format('YYYY-MM-DD') : ''
-												);
-											}}
-										/>
-									</Form.Group>
-									<InputHelper
-										className="mb-2"
-										label="Phone Number"
-										type="text"
-										name="phoneNumber"
-										value={values.phoneNumber}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''}
-										required
+										error={
+											touched.address?.streetAddress2 && errors.address?.streetAddress2
+												? errors.address?.streetAddress2
+												: ''
+										}
 									/>
 									<InputHelper
 										className="mb-2"
-										label="Email Address"
-										type="email"
-										name="emailAddress"
-										value={values.emailAddress}
+										label="City"
+										type="text"
+										name="address.city"
+										value={values.address.locality}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
-										required
+										error={
+											touched.address?.locality && errors.address?.locality
+												? errors.address?.locality
+												: ''
+										}
 									/>
 									<InputHelper
-										className="mb-6"
-										label="Insurance"
-										name="insuranceId"
-										value={values.insuranceId}
+										className="mb-2"
+										label="State"
+										name="address.region"
+										value={values.address.region}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.insuranceId && errors.insuranceId ? errors.insuranceId : ''}
+										error={
+											touched.address?.region && errors.address?.region
+												? errors.address?.region
+												: ''
+										}
 									>
 										<option value="">Select...</option>
-										{referenceData?.insurances.map((insurance) => {
+										{referenceData?.regionsByCountryCode['US'].map((region) => {
 											return (
-												<option key={insurance.insuranceId} value={insurance.insuranceId}>
-													{insurance.description}
+												<option key={region.abbreviation} value={region.abbreviation}>
+													{region.name}
 												</option>
 											);
 										})}
 									</InputHelper>
-									<div className="text-right">
+									<InputHelper
+										className="mb-6"
+										label="ZIP Code"
+										type="text"
+										name="address.postalCode"
+										value={values.address.postalCode}
+										onBlur={handleBlur}
+										onChange={handleChange}
+										error={
+											touched.address?.postalCode && errors.address?.postalCode
+												? errors.address?.postalCode
+												: ''
+										}
+									/>
+									<div className="d-flex align-items-center justify-content-between">
+										<Button
+											variant="outline-primary"
+											onClick={() => {
+												navigate('/ic/patient/demographics-part-1');
+											}}
+										>
+											Back
+										</Button>
 										<Button variant="primary" type="submit">
 											Next
 										</Button>
@@ -183,4 +191,4 @@ const DemographicsPart1 = () => {
 	);
 };
 
-export default DemographicsPart1;
+export default DemographicsPart2;
