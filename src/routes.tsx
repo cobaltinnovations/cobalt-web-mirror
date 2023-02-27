@@ -83,6 +83,7 @@ export const MhicPatientHomescreen = React.lazy(() => import('@/pages/ic/patient
 export const MhicPatientDemographicsPart1 = React.lazy(() => import('@/pages/ic/patient/demographics-part-1'));
 export const MhicPatientDemographicsPart2 = React.lazy(() => import('@/pages/ic/patient/demographics-part-2'));
 export const MhicPatientDemographicsPart3 = React.lazy(() => import('@/pages/ic/patient/demographics-part-3'));
+export const MhicPatientDemographicsThanks = React.lazy(() => import('@/pages/ic/patient/demographics-thanks'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
@@ -616,6 +617,11 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/ic/patient/demographics-part-3',
 				private: true,
 				main: MhicPatientDemographicsPart3,
+			},
+			{
+				path: '/ic/patient/demographics-thanks',
+				private: true,
+				main: MhicPatientDemographicsThanks,
 			},
 			{
 				path: '*',
