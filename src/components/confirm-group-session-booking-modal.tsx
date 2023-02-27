@@ -5,9 +5,7 @@ import { createUseStyles } from 'react-jss';
 
 const useConfirmGroupSessionBookingModalStyles = createUseStyles({
 	confirmGroupSessionBookingModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

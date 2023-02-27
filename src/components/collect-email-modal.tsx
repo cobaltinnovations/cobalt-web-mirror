@@ -6,9 +6,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCollectEmailModalStyles = createUseStyles({
 	collectEmailModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

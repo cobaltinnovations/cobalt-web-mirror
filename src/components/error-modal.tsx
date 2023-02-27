@@ -11,9 +11,7 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
 const useStyles = createUseStyles({
 	errorModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

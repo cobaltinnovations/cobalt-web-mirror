@@ -24,10 +24,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	centerText: {
 		textAlign: 'center',
 	},
-	row: {
-		borderLeft: `1px solid ${theme.colors.border}`,
-		borderRight: `1px solid ${theme.colors.border}`,
-	},
 	rowButton: {
 		height: 44,
 	},
@@ -138,7 +134,7 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 	}
 
 	return (
-		<TableRow className={classes.row}>
+		<TableRow>
 			<TableCell>
 				<span className="d-block fs-default fw-normal">{content.dateCreatedDescription}</span>
 			</TableCell>

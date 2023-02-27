@@ -78,6 +78,10 @@ export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-li
 export const ResourceLibraryTags = React.lazy(() => import('@/pages/resource-library-tags'));
 export const ResourceLibraryDetail = React.lazy(() => import('@/pages/resource-library-detail'));
 
+// TODO: delete and move to pages/landing once BE is setup for it
+export const MhicPatientHomescreen = React.lazy(() => import('@/pages/ic/patient/homescreen'));
+export const MhicPatientDemographicsPart1 = React.lazy(() => import('@/pages/ic/patient/demographics-part-1'));
+
 interface RouteGuardProps {
 	account?: AccountModel;
 	institution?: Institution;
@@ -240,7 +244,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 			},
 		],
 	},
-
 	{
 		layout: UnauthenticatedHeaderLayout,
 		routes: [
@@ -261,7 +264,17 @@ export const AppRoutes: AppRoutesConfig[] = [
 			},
 		],
 	},
-
+	{
+		layout: () => <Outlet />,
+		routes: [
+			{
+				path: '/ic/*',
+				private: true,
+				routeGuard: isIntegratedCareRouteGuard,
+				main: IntegratedCare,
+			},
+		],
+	},
 	{
 		layout: DefaultLayout,
 		routes: [
@@ -370,12 +383,6 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isProviderRouteGuard,
 				main: MySchedule,
-			},
-			{
-				path: '/ic/*',
-				private: true,
-				routeGuard: isIntegratedCareRouteGuard,
-				main: IntegratedCare,
 			},
 			{
 				path: '/screening-questions/:screeningQuestionContextId',
@@ -586,6 +593,17 @@ export const AppRoutes: AppRoutesConfig[] = [
 				path: '/resource-library/:contentId',
 				private: true,
 				main: ResourceLibraryDetail,
+			},
+			// TODO: delete and move to pages/landing once BE is setup for it
+			{
+				path: '/ic/patient',
+				private: true,
+				main: MhicPatientHomescreen,
+			},
+			{
+				path: '/ic/patient/demographics-part-1',
+				private: true,
+				main: MhicPatientDemographicsPart1,
 			},
 			{
 				path: '*',

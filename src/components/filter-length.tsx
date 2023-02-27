@@ -7,9 +7,7 @@ import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
 	modal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

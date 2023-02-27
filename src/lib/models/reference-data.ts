@@ -8,12 +8,12 @@ interface Country {
 	description: string;
 }
 
-interface Ethnicity {
+export interface Ethnicity {
 	ethnicityId: string;
 	description: string;
 }
 
-interface GenderIdentity {
+export interface GenderIdentity {
 	genderIdentityId: string;
 	description: string;
 }
@@ -29,7 +29,7 @@ interface Language {
 	description: string;
 }
 
-interface Race {
+export interface Race {
 	raceId: string;
 	description: string;
 }

@@ -12,12 +12,8 @@ import LoadingButton from './loading-button';
 
 const useStyles = createUseStyles({
 	modal: {
-		width: '90%',
-		height: '100%',
 		maxWidth: 408,
-		margin: '0 auto',
 		'& .modal-content': {
-			height: '90vh',
 			maxHeight: '544px',
 		},
 	},

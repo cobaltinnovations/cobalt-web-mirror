@@ -8,9 +8,7 @@ import InCrisisTemplate from '@/components/in-crisis-template';
 const useInCrisisModalStyles = createUseStyles(
 	{
 		inCrisisModal: {
-			width: '90%',
 			maxWidth: 408,
-			margin: '0 auto',
 		},
 		header: {
 			border: 0,

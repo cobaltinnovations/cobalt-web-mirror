@@ -11,9 +11,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useFilterTimesModalStyles = createUseStyles({
 	filterTimesModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 });
 

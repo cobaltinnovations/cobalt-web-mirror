@@ -47,13 +47,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	modal: {
-		width: '90%',
-		height: '100%',
 		maxWidth: 408,
-		margin: '0 auto',
-		'& .modal-content': {
-			maxHeight: '90vh',
-		},
 		'& .cobalt-modal__body': {
 			paddingTop: 0,
 		},
@@ -129,7 +123,9 @@ const CallToAction = ({ callToAction, className }: Props) => {
 
 			<div className={classNames(classes.callToAction, className)}>
 				<div
-					className="mb-8 wysiwyg-display"
+					className={classNames('wysiwyg-display', {
+						'mb-8': callToAction.actionLinks.length > 0 || callToAction.modalButtonText,
+					})}
 					dangerouslySetInnerHTML={{ __html: callToAction.messageAsHtml }}
 				/>
 				{callToAction.actionLinks.length > 0 && (

@@ -127,12 +127,6 @@ const Index: FC = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
-	useEffect(() => {
-		if (institution?.integratedCareEnabled) {
-			navigate('/ic');
-		}
-	}, [institution?.integratedCareEnabled, navigate]);
-
 	return (
 		<>
 			<HomeHero />

@@ -9,9 +9,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useConfirmAppointmentTypeModalStyles = createUseThemedStyles((theme) => ({
 	confirmAppointmentTypeModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 	},
 	unavaiableSlot: {
 		...theme.fonts.small,

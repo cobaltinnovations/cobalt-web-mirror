@@ -5,39 +5,39 @@ import classNames from 'classnames';
 import { SORT_DIRECTION } from '.';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface useStylesProps {
+	header?: boolean;
+	width?: string | number;
+	sticky?: boolean;
+	stickyOffset?: string | number;
+	sortable?: boolean;
+}
+
 const useTableCellStyles = createUseThemedStyles((theme) => ({
-	tableCell: (props: any) => ({
+	tableCell: ({ width, sticky, stickyOffset }: useStylesProps) => ({
+		height: 1, // Don't worry, this is ignored by the browser. It's a hack to allow a 100% height inner <div/>
 		padding: 0,
+		width: width ?? 'auto',
 		backgroundColor: 'inherit',
-		width: props.width ? props.width : 'auto',
-		'&.fixed-column': {
+		...(sticky && {
 			position: 'sticky',
-			left: props.fixedOffset ? props.fixedOffset : 0,
-		},
+			left: stickyOffset ?? 0,
+		}),
 	}),
-	tableCellContent: (props: any) => ({
-		...theme.fonts.large,
-		padding: '16px 16px',
-		width: typeof props.width === 'string' ? 'auto' : props.width,
-		...(props.header
-			? {
-					...theme.fonts.small,
-					display: 'flex',
-					...theme.fonts.bodyBold,
-					alignItems: 'center',
-					whiteSpace: 'nowrap',
-					color: theme.colors.n500,
-					textTransform: 'uppercase',
-					justifyContent: 'space-between',
-					...(props.sortable
-						? {
-								paddingTop: 0,
-								paddingRight: 0,
-								paddingBottom: 0,
-						  }
-						: {}),
-			  }
-			: {}),
+	tableCellContent: ({ width, sticky, header }: useStylesProps) => ({
+		height: '100%',
+		padding: '14px 20px',
+		width: width ?? '100%',
+		display: 'inline-flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		...(sticky && {
+			borderRight: `1px solid ${theme.colors.n100}`,
+		}),
+		...(header && {
+			fontWeight: 500,
+			whiteSpace: 'nowrap',
+		}),
 	}),
 	sortableButton: {
 		width: 44,
@@ -57,51 +57,50 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 interface TableCellProps extends PropsWithChildren {
 	header?: boolean;
 	width?: number | string;
-	fixed?: boolean;
-	fixedOffset?: number;
+	sticky?: boolean;
+	stickyOffset?: number;
 	sortable?: boolean;
 	className?: string;
 	sortDirection?: SORT_DIRECTION | null;
 	onSort?(sortDirection: SORT_DIRECTION): void;
+	colSpan?: number;
 }
 
-export const TableCell: FC<TableCellProps> = React.memo((props) => {
-	const classes = useTableCellStyles({
-		header: props.header,
-		width: props.width,
-		fixedOffset: props.fixedOffset,
-		sortable: props.sortable,
-	});
+export const TableCell: FC<TableCellProps> = React.memo(
+	({ header, width, sticky, stickyOffset, sortable, className, sortDirection, onSort, colSpan, children }) => {
+		const classes = useTableCellStyles({
+			header,
+			width,
+			sticky,
+			stickyOffset,
+			sortable,
+		});
 
-	function handleSortButtonClick() {
-		if (!props.onSort) {
-			return;
+		function handleSortButtonClick() {
+			if (!onSort) {
+				return;
+			}
+
+			if (sortDirection === SORT_DIRECTION.ASC) {
+				onSort(SORT_DIRECTION.DESC);
+			} else {
+				onSort(SORT_DIRECTION.ASC);
+			}
 		}
 
-		if (props.sortDirection === SORT_DIRECTION.ASC) {
-			props.onSort(SORT_DIRECTION.DESC);
-		} else {
-			props.onSort(SORT_DIRECTION.ASC);
-		}
+		return (
+			<td className={classes.tableCell} colSpan={colSpan}>
+				<div className={classNames(classes.tableCellContent, className)}>
+					{children}
+					{header && sortable && (
+						<Button variant="link" className={classes.sortableButton} onClick={handleSortButtonClick}>
+							{!sortDirection && <>Not Sorting</>}
+							{sortDirection === SORT_DIRECTION.ASC && <>Sorting ASC</>}
+							{sortDirection === SORT_DIRECTION.DESC && <>Sorting DESC</>}
+						</Button>
+					)}
+				</div>
+			</td>
+		);
 	}
-
-	return (
-		<td
-			className={classNames({
-				[classes.tableCell]: true,
-				'fixed-column': props.fixed,
-			})}
-		>
-			<div className={classNames(classes.tableCellContent, props.className)}>
-				{props.children}
-				{props.header && props.sortable && (
-					<Button variant="link" className={classes.sortableButton} onClick={handleSortButtonClick}>
-						{!props.sortDirection && <>Not Sorting</>}
-						{props.sortDirection === SORT_DIRECTION.ASC && <>Sorting ASC</>}
-						{props.sortDirection === SORT_DIRECTION.DESC && <>Sorting DESC</>}
-					</Button>
-				)}
-			</div>
-		</td>
-	);
-});
+);

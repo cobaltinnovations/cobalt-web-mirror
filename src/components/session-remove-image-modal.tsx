@@ -5,9 +5,7 @@ import { createUseStyles } from 'react-jss';
 
 const useSessionCropModalStyles = createUseStyles({
 	sessionRemoveImageModal: {
-		width: '90%',
 		maxWidth: 600,
-		margin: '0 auto',
 	},
 	imagePreview: {
 		maxWidth: '100%',

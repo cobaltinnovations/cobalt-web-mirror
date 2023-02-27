@@ -7,15 +7,13 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 	covidCopayModal: {
-		width: '90%',
 		maxWidth: 295,
-		margin: '0 auto',
 		'& .modal-content': {
-			display: 'flex',
-			justifyContent: 'center',
-			height: 295,
 			width: 295,
+			height: 295,
+			display: 'flex',
 			borderRadius: '50%',
+			justifyContent: 'center',
 			backgroundColor: theme.colors.s500,
 		},
 	},

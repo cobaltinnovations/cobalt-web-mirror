@@ -1,4 +1,4 @@
-import React, { ElementType, FC, PropsWithChildren, useState } from 'react';
+import React, { ElementType, PropsWithChildren, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -95,98 +95,91 @@ interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	autoFocus?: boolean;
 }
 
-const InputHelper: FC<InputHelperProps> = ({
-	label,
-	children,
-	className,
-	helperText,
-	characterCounter,
-	required,
-	error,
-	autoFocus,
-	...props
-}) => {
-	const [isHovered, setIsHovered] = useState(false);
-	const [isFocused, setIsFocused] = useState(false);
-	const classes = useInputHelperStyles({
-		isHovered,
-		isFocused,
-		as: props.as,
-		value: props.value,
-		hasError: !!error,
-	});
+const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
+	({ label, children, className, helperText, characterCounter, required, error, autoFocus, ...props }, ref) => {
+		const [isHovered, setIsHovered] = useState(false);
+		const [isFocused, setIsFocused] = useState(false);
+		const classes = useInputHelperStyles({
+			isHovered,
+			isFocused,
+			as: props.as,
+			value: props.value,
+			hasError: !!error,
+		});
 
-	function handleMouseOver() {
-		if (props.disabled) {
-			return;
+		function handleMouseOver() {
+			if (props.disabled) {
+				return;
+			}
+
+			setIsHovered(true);
 		}
 
-		setIsHovered(true);
-	}
-
-	function handleMouseOut() {
-		setIsHovered(false);
-	}
-
-	function handleFocus(event: React.FocusEvent) {
-		setIsFocused(true);
-
-		if (props.onFocus) {
-			props.onFocus(event);
+		function handleMouseOut() {
+			setIsHovered(false);
 		}
-	}
 
-	function handleBlur(event: React.FocusEvent) {
-		setIsFocused(false);
+		function handleFocus(event: React.FocusEvent) {
+			setIsFocused(true);
 
-		if (props.onBlur) {
-			props.onBlur(event);
+			if (props.onFocus) {
+				props.onFocus(event);
+			}
 		}
-	}
 
-	const FormControlComponent = props.as === 'select' ? Form.Select : Form.Control;
+		function handleBlur(event: React.FocusEvent) {
+			setIsFocused(false);
 
-	return (
-		<div className={className}>
-			<Form.Group
-				className={classNames(classes.inputHelper)}
-				onMouseOver={handleMouseOver}
-				onMouseOut={handleMouseOut}
-			>
-				<Form.Label className={classes.label} bsPrefix="input-helper__label">
-					{label} {required && <span className="text-danger">*</span>}
-				</Form.Label>
-				{/* @ts-expect-error Bootstrap 5 vs bootstrap 4 onChange type */}
-				<FormControlComponent
-					className={classes.input}
-					bsPrefix="input-helper__input"
-					{...props}
-					onFocus={handleFocus}
-					onBlur={handleBlur}
-					autoFocus={autoFocus}
-					required={required}
+			if (props.onBlur) {
+				props.onBlur(event);
+			}
+		}
+
+		const FormControlComponent = props.as === 'select' ? Form.Select : Form.Control;
+
+		return (
+			<div className={className}>
+				<Form.Group
+					className={classNames(classes.inputHelper)}
+					onMouseOver={handleMouseOver}
+					onMouseOut={handleMouseOut}
 				>
-					{children}
-				</FormControlComponent>
-				{props.as === 'select' && <SelectIcon className={classes.downChevron} />}
-			</Form.Group>
-			{(helperText || characterCounter) && (
-				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
-					{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
-					{characterCounter && (
-						<p className="mb-0 ms-auto me-0 text-muted fs-small">
-							{props.value ? (props.value as string | string[]).length : 0} / {characterCounter}
-						</p>
-					)}
-				</div>
-			)}
-			{error && (
-				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
-					<p className="mb-0 ms-0 me-auto text-danger fs-small">{error}</p>
-				</div>
-			)}
-		</div>
-	);
-};
+					<Form.Label className={classes.label} bsPrefix="input-helper__label">
+						{label} {required && <span className="text-danger">*</span>}
+					</Form.Label>
+					{/* @ts-expect-error Bootstrap 5 vs bootstrap 4 onChange type */}
+					<FormControlComponent
+						className={classes.input}
+						bsPrefix="input-helper__input"
+						{...props}
+						onFocus={handleFocus}
+						onBlur={handleBlur}
+						autoFocus={autoFocus}
+						required={required}
+						ref={ref}
+					>
+						{children}
+					</FormControlComponent>
+					{props.as === 'select' && <SelectIcon className={classes.downChevron} />}
+				</Form.Group>
+				{(helperText || characterCounter) && (
+					<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+						{helperText && <p className="mb-0 ms-0 me-auto text-muted fs-small">{helperText}</p>}
+						{characterCounter && (
+							<p className="mb-0 ms-auto me-0 text-muted fs-small">
+								{props.value ? (props.value as string | string[]).length : 0} / {characterCounter}
+							</p>
+						)}
+					</div>
+				)}
+				{error && (
+					<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
+						<p className="mb-0 ms-0 me-auto text-danger fs-small">{error}</p>
+					</div>
+				)}
+			</div>
+		);
+	}
+);
 
 export default InputHelper;

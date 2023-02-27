@@ -49,13 +49,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	modal: {
-		width: '90%',
-		height: '100%',
 		maxWidth: 628,
-		margin: '0 auto',
-		'& .modal-content': {
-			maxHeight: '90vh',
-		},
 		'& .cobalt-modal__body': {
 			paddingTop: 0,
 		},

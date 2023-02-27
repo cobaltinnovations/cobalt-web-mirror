@@ -3,10 +3,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useTableHeadStyles = createUseThemedStyles((theme) => ({
 	tableHead: {
-		border: `1px solid ${theme.colors.border}`,
-		'& tr': {
-			backgroundColor: theme.colors.n0,
-		},
+		backgroundColor: theme.colors.n75,
+		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
 }));
 
