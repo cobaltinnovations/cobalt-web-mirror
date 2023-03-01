@@ -50,11 +50,19 @@ export const integratedCareService = {
 			url: '/integrated-care/panel-accounts',
 		});
 	},
+	getOpenOrderForCurrentPatient() {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'GET',
+			url: `/patient-orders/open`,
+		});
+	},
 	getPatientOrder(patientOrderId: string) {
 		return httpSingleton.orchestrateRequest<{
 			patientOrder: PatientOrderModel;
 			associatedPatientOrders: PatientOrderModel[];
-			patientAccount?: any;
+			patientAccount?: AccountModel;
 		}>({
 			method: 'GET',
 			url: `/patient-orders/${patientOrderId}`,

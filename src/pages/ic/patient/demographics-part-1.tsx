@@ -22,7 +22,7 @@ export interface FormData {
 	insuranceId: string;
 }
 
-const DemographicsPart1 = () => {
+const PatientDemographicsPart1 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
@@ -183,4 +183,4 @@ const DemographicsPart1 = () => {
 	);
 };
 
-export default DemographicsPart1;
+export default PatientDemographicsPart1;

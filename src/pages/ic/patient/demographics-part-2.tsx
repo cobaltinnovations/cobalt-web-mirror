@@ -21,7 +21,7 @@ export interface FormData {
 	};
 }
 
-const DemographicsPart2 = () => {
+const PatientDemographicsPart2 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
@@ -191,4 +191,4 @@ const DemographicsPart2 = () => {
 	);
 };
 
-export default DemographicsPart2;
+export default PatientDemographicsPart2;

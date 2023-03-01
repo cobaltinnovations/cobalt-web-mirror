@@ -18,7 +18,7 @@ export interface FormData {
 	languageCode: string;
 }
 
-const DemographicsPart3 = () => {
+const PatientDemographicsPart3 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
@@ -183,4 +183,4 @@ const DemographicsPart3 = () => {
 	);
 };
 
-export default DemographicsPart3;
+export default PatientDemographicsPart3;

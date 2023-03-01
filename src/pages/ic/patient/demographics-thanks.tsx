@@ -11,7 +11,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const DemographicsThanks = () => {
+const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 
@@ -44,4 +44,4 @@ const DemographicsThanks = () => {
 	);
 };
 
-export default DemographicsThanks;
+export default PatientDemographicsThanks;

@@ -5,11 +5,16 @@ import useAccount from '@/hooks/use-account';
 import React, { useEffect } from 'react';
 import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
 
-import NoMatch from '../no-match';
 import MhicPanel from './mhic/panel';
-import IntegratedCareScreeningPage from './patient/ic-screening';
-import IntegratedCarePatientInfoPage from './patient/patient-info';
 import IntegratedCarePatientLandingPage from './patient/patient-landing';
+import PatientDemographicsIntroduction from './patient/demographics-introduction';
+import PatientDemographicsPart1 from './patient/demographics-part-1';
+import PatientDemographicsPart2 from './patient/demographics-part-2';
+import PatientDemographicsPart3 from './patient/demographics-part-3';
+import PatientDemographicsThanks from './patient/demographics-thanks';
+// import IntegratedCareScreeningPage from './patient/ic-screening';
+// import IntegratedCarePatientInfoPage from './patient/patient-info';
+import NoMatch from '../no-match';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -27,19 +32,19 @@ const IntegratedCareLandingPage = () => {
 					}
 				>
 					<Route index element={<Navigate to="panel" replace />} />
-
 					<Route path="panel" element={<MhicPanel />} />
 				</Route>
 
 				<Route path="patient" element={<Outlet />}>
 					<Route index element={<Navigate to="landing" replace />} />
-
 					<Route path="landing" element={<IntegratedCarePatientLandingPage />} />
-
-					<Route path="info" element={<IntegratedCarePatientInfoPage />} />
-
-					<Route path="screening" element={<IntegratedCareScreeningPage />} />
-
+					<Route path="demographics-introduction" element={<PatientDemographicsIntroduction />} />
+					<Route path="demographics-part-1" element={<PatientDemographicsPart1 />} />
+					<Route path="demographics-part-2" element={<PatientDemographicsPart2 />} />
+					<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
+					<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
+					{/* <Route path="info" element={<IntegratedCarePatientInfoPage />} />
+					<Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 			</Route>
