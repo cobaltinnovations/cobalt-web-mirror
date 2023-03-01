@@ -2,48 +2,72 @@ import NoData from '@/components/no-data';
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { integratedCareService } from '@/lib/services';
+import { integratedCareService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
 import CallToAction from '@/components/call-to-action';
 import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/man-at-desk.svg';
 import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
+import { PatientOrderModel } from '@/lib/models';
 
-enum HOMESCREEN_STATES {
+enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
 	ASSESSMENT_READY = 'ASSESSMENT_READY',
 	ASSESSMENT_IN_PROGRESS = 'ASSESSMENT_IN_PROGRESS',
 	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
 }
 
-const homescreenStates = [
+const pageStates = [
 	{
-		homescreenStateId: HOMESCREEN_STATES.AWAITING_PATIENT_ORDER,
+		homescreenStateId: PAGE_STATES.AWAITING_PATIENT_ORDER,
 		title: 'Awaiting Patient Order',
 	},
 	{
-		homescreenStateId: HOMESCREEN_STATES.ASSESSMENT_READY,
+		homescreenStateId: PAGE_STATES.ASSESSMENT_READY,
 		title: 'Assessment Ready',
 	},
 	{
-		homescreenStateId: HOMESCREEN_STATES.ASSESSMENT_IN_PROGRESS,
+		homescreenStateId: PAGE_STATES.ASSESSMENT_IN_PROGRESS,
 		title: 'Assessment In Progress',
 	},
 	{
-		homescreenStateId: HOMESCREEN_STATES.ASSESSMENT_COMPLETE,
+		homescreenStateId: PAGE_STATES.ASSESSMENT_COMPLETE,
 		title: 'Assessment Complete',
 	},
 ];
 
-const Homescreen = () => {
+const PatientLanding = () => {
 	const { institution } = useAccount();
-	const [homescreenState, setHomescreenState] = useState(HOMESCREEN_STATES.AWAITING_PATIENT_ORDER);
+	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
-		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
-		console.log(response);
-	}, []);
+		try {
+			const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			setPatientOrder(response.patientOrder);
+
+			if (!institution?.integratedCareScreeningFlowId) {
+				return;
+			}
+
+			const { sessionFullyCompleted } = await screeningService
+				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.integratedCareScreeningFlowId)
+				.fetch();
+
+			// TODO: how to detect ASSESSMENT_IN_PROGRESS?
+			if (sessionFullyCompleted) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
+			} else {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+			}
+		} catch (_error) {
+			// Do not throw error, backend will 404  if there is no order, but that is ok.
+			// Instead, just set the page state to PAGE_STATES.AWAITING_PATIENT_ORDER
+
+			setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+		}
+	}, [institution?.integratedCareScreeningFlowId]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -57,7 +81,7 @@ const Homescreen = () => {
 						<Form>
 							<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
 							<Form.Group>
-								{homescreenStates.map((hs) => (
+								{pageStates.map((hs) => (
 									<Form.Check
 										inline
 										key={hs.homescreenStateId}
@@ -68,7 +92,7 @@ const Homescreen = () => {
 										label={hs.title}
 										checked={homescreenState === hs.homescreenStateId}
 										onChange={({ currentTarget }) => {
-											setHomescreenState(currentTarget.value as HOMESCREEN_STATES);
+											setHomescreenState(currentTarget.value as PAGE_STATES);
 										}}
 									/>
 								))}
@@ -78,7 +102,7 @@ const Homescreen = () => {
 				</Row>
 			</Container>
 
-			{homescreenState === HOMESCREEN_STATES.AWAITING_PATIENT_ORDER && (
+			{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
 				<Container className="py-14">
 					<Row>
 						<Col>
@@ -100,7 +124,7 @@ const Homescreen = () => {
 				</Container>
 			)}
 
-			{homescreenState === HOMESCREEN_STATES.ASSESSMENT_READY && (
+			{homescreenState === PAGE_STATES.ASSESSMENT_READY && (
 				<Container className="py-10">
 					<Row>
 						<Col>
@@ -124,7 +148,7 @@ const Homescreen = () => {
 				</Container>
 			)}
 
-			{homescreenState === HOMESCREEN_STATES.ASSESSMENT_IN_PROGRESS && (
+			{homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS && (
 				<Container className="py-10">
 					<Row>
 						<Col>
@@ -155,7 +179,7 @@ const Homescreen = () => {
 				</Container>
 			)}
 
-			{homescreenState === HOMESCREEN_STATES.ASSESSMENT_COMPLETE && (
+			{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
 				<Container className="py-10">
 					<Row>
 						<Col>
@@ -193,4 +217,4 @@ const Homescreen = () => {
 	);
 };
 
-export default Homescreen;
+export default PatientLanding;
