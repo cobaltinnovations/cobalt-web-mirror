@@ -278,7 +278,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				},
 				'&--disabled': {
 					color: theme.colors.n500,
-					backgroundColor: `${theme.colors.n100} !important`,
+					textDecoration: 'line-through',
 					'&:hover': {
 						color: `${theme.colors.n500} !important`,
 						backgroundColor: `${theme.colors.n100} !important`,
