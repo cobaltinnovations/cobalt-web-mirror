@@ -15,7 +15,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.contentScreeningFlowId, false);
+	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.integratedCareScreeningFlowId, false);
 
 	return (
 		<Container fluid className={classes.gradient}>
