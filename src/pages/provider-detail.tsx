@@ -3,6 +3,7 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import Breadcrumb from '@/components/breadcrumb';
 import DayContainer from '@/components/day-container';
 import { ProviderInfoCard } from '@/components/provider-info-card';
+import TabBar from '@/components/tab-bar';
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -11,7 +12,7 @@ import { Scrollspy } from '@makotot/ghostui';
 import classNames from 'classnames';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 	horizontalScroller: {
@@ -74,7 +75,7 @@ const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 	},
 	sectionAnchor: {
 		position: 'relative',
-		top: -100,
+		top: -122,
 		visibility: 'hidden',
 	},
 	activeNav: {
@@ -90,6 +91,7 @@ const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 
 const ProviderDetail = () => {
 	const classes = useProviderDetailStyles();
+	const { pathname } = useLocation();
 	const { providerId } = useParams<{ providerId: string }>();
 	const {
 		setAppointmentTypes,
@@ -117,12 +119,8 @@ const ProviderDetail = () => {
 
 	useEffect(() => {
 		const handleScroll = () => {
-			if (!navRef.current) {
-				return;
-			}
-
-			// 54 is the height of the header
-			setScrolled(navRef.current.getBoundingClientRect().top - 54 <= 0);
+			// 54 is the height of the default Cobalt header
+			setScrolled((navRef.current?.getBoundingClientRect().top ?? 0) - 54 <= 0);
 		};
 
 		window.addEventListener('scroll', handleScroll);
@@ -214,29 +212,26 @@ const ProviderDetail = () => {
 												lg={{ span: 8, offset: 2 }}
 												xl={{ span: 6, offset: 3 }}
 											>
-												<ul className={classes.navbar}>
-													<li
-														className={classNames('py-2', classes.navItem, {
-															[classes.activeNav]: currentElementIndexInViewport === 0,
-														})}
-													>
-														<a href="#about">About</a>
-													</li>
-													<li
-														className={classNames('ms-2 py-2', classes.navItem, {
-															[classes.activeNav]: currentElementIndexInViewport === 2,
-														})}
-													>
-														<a href="#payment">Payment</a>
-													</li>
-													<li
-														className={classNames('ms-2 py-2', classes.navItem, {
-															[classes.activeNav]: currentElementIndexInViewport === 3,
-														})}
-													>
-														<a href="#availability">Availability</a>
-													</li>
-												</ul>
+												<TabBar
+													hideBorder
+													value={
+														currentElementIndexInViewport === 0
+															? '#about'
+															: currentElementIndexInViewport === 2
+															? '#payment'
+															: currentElementIndexInViewport === 3
+															? '#availability'
+															: ''
+													}
+													tabs={[
+														{ value: '#about', title: 'About' },
+														{ value: '#payment', title: 'Payment' },
+														{ value: '#availability', title: 'Availability' },
+													]}
+													onTabClick={(value) => {
+														window.location.href = `${pathname}${value}`;
+													}}
+												/>
 											</Col>
 										</Row>
 									</Container>
@@ -249,7 +244,7 @@ const ProviderDetail = () => {
 										lg={{ span: 8, offset: 2 }}
 										xl={{ span: 6, offset: 3 }}
 									>
-										<div className="mb-8" ref={sectionRefs[0]}>
+										<div ref={sectionRefs[0]}>
 											<div id="about" className={classes.sectionAnchor} />
 											<h4>About</h4>
 											<div
@@ -259,7 +254,14 @@ const ProviderDetail = () => {
 												}}
 											/>
 										</div>
-
+									</Col>
+								</Row>
+								<Row className="mb-8">
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
 										<div ref={sectionRefs[2]}>
 											<div id="payment" className={classes.sectionAnchor} />
 											<h4>Payment</h4>
