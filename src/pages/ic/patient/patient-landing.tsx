@@ -1,15 +1,15 @@
-import NoData from '@/components/no-data';
 import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
 import { integratedCareService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
+import NoData from '@/components/no-data';
 import CallToAction from '@/components/call-to-action';
 import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/man-at-desk.svg';
 import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
-import { PatientOrderModel } from '@/lib/models';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -38,28 +38,29 @@ const pageStates = [
 ];
 
 const PatientLanding = () => {
+	const navigate = useNavigate();
 	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
-	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
 		try {
-			const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
-			setPatientOrder(response.patientOrder);
+			await integratedCareService.getOpenOrderForCurrentPatient().fetch();
 
 			if (!institution?.integratedCareScreeningFlowId) {
 				return;
 			}
 
-			const { sessionFullyCompleted } = await screeningService
-				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.integratedCareScreeningFlowId)
+			const { screeningSessions } = await screeningService
+				.getScreeningSessionsByFlowId({ screeningFlowId: institution.integratedCareScreeningFlowId })
 				.fetch();
+			const assessmentIsComplete = screeningSessions.some((session) => session.completed);
 
-			// TODO: how to detect ASSESSMENT_IN_PROGRESS?
-			if (sessionFullyCompleted) {
+			if (screeningSessions.length <= 0) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+			} else if (assessmentIsComplete) {
 				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
 			} else {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
 			}
 		} catch (_error) {
 			// Do not throw error, backend will 404  if there is no order, but that is ok.
@@ -138,7 +139,7 @@ const PatientLanding = () => {
 										variant: 'primary',
 										title: 'Take the Assessment',
 										onClick: () => {
-											window.alert('[TODO]');
+											navigate('/ic/patient/demographics-introduction');
 										},
 									},
 								]}
