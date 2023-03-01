@@ -14,7 +14,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const PatientDemographicsThanks = () => {
 	const classes = useStyles();
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.integratedCareScreeningFlowId, false);
 
 	return (
@@ -25,7 +25,7 @@ const PatientDemographicsThanks = () => {
 						<div className="mb-10 text-center">
 							<WomanWithCatIllustration />
 						</div>
-						<h1 className="mb-6 text-center">Thank you, [firstName].</h1>
+						<h1 className="mb-6 text-center">Thank you, {account?.firstName ?? 'Patient'}.</h1>
 						<p className="mb-6 text-center fs-large">That information really helps.</p>
 						<p className="mb-6 text-center fs-large">
 							Next, we'd like to know about the condition or symptoms you're looking for help with

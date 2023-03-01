@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
+import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
 
@@ -14,6 +15,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 const PatientDemographicsIntroduction = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const { account } = useAccount();
 
 	return (
 		<Container fluid className={classes.gradient}>
@@ -23,7 +25,7 @@ const PatientDemographicsIntroduction = () => {
 						<div className="mb-10 text-center">
 							<WomanAtDeskIllustration width={408} height={218} />
 						</div>
-						<h1 className="mb-6 text-center">Welcome, [firstName].</h1>
+						<h1 className="mb-6 text-center">Welcome, {account?.firstName ?? 'Patient'}.</h1>
 						<p className="mb-6 text-center fs-large">
 							This assessment takes about 15 minutes to complete, and only you and your care team wll have
 							access to your answers.

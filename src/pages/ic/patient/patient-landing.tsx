@@ -39,7 +39,7 @@ const pageStates = [
 
 const PatientLanding = () => {
 	const navigate = useNavigate();
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 
 	const fetchData = useCallback(async () => {
@@ -73,7 +73,7 @@ const PatientLanding = () => {
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<HeroContainer>
-				<h1 className="text-center">Welcome back, [firstName]</h1>
+				<h1 className="text-center">Welcome back, {account?.firstName ?? 'Patient'}</h1>
 			</HeroContainer>
 
 			<Container className="pt-10">
