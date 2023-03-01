@@ -1,9 +1,11 @@
-import { MhicHeader } from '@/components/integrated-care/mhic';
 import SentryRoutes from '@/components/sentry-routes';
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import React, { useEffect } from 'react';
 import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
+
+import { MhicHeader } from '@/components/integrated-care/mhic';
+import { PatientHeader } from '@/components/integrated-care/patient';
 
 import MhicPanel from './mhic/panel';
 import PatientLanding from './patient/patient-landing';
@@ -34,7 +36,15 @@ const IntegratedCareLandingPage = () => {
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 
-				<Route path="patient" element={<Outlet />}>
+				<Route
+					path="patient"
+					element={
+						<>
+							<PatientHeader />
+							<Outlet />
+						</>
+					}
+				>
 					<Route index element={<PatientLanding />} />
 					<Route path="demographics-introduction" element={<PatientDemographicsIntroduction />} />
 					<Route path="demographics-part-1" element={<PatientDemographicsPart1 />} />
