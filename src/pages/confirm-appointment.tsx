@@ -209,8 +209,9 @@ const ConfirmAppointment = () => {
 								</h2>
 
 								<p className="mb-6">
-									We need your contact information to send appointment details. Please make sure it is
-									entered correctly.
+									We need your contact information to send appointment details and will also share
+									your name and email address with your appointment provider. Please make sure that
+									your email address is entered correctly.
 								</p>
 
 								<Form onSubmit={handleContactInformationFormSubmit}>
