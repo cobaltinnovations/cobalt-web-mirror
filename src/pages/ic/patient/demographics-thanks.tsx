@@ -1,7 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
+import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as WomanWithCatIllustration } from '@/assets/illustrations/woman-with-cat.svg';
 
@@ -13,7 +14,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const PatientDemographicsThanks = () => {
 	const classes = useStyles();
-	const navigate = useNavigate();
+	const { institution } = useAccount();
+	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.contentScreeningFlowId, false);
 
 	return (
 		<Container fluid className={classes.gradient}>
@@ -31,7 +33,7 @@ const PatientDemographicsThanks = () => {
 						<div className="text-center">
 							<Button
 								onClick={() => {
-									navigate('/ic/patient/screening');
+									checkAndStartScreeningFlow();
 								}}
 							>
 								Continue

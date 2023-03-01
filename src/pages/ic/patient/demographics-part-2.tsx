@@ -18,6 +18,8 @@ export interface FormData {
 		locality: string;
 		region: string;
 		postalCode: string;
+		postalName: string;
+		countryCode: string;
 	};
 }
 
@@ -35,6 +37,8 @@ const PatientDemographicsPart2 = () => {
 				locality: account?.address?.locality ?? '',
 				region: account?.address?.region ?? '',
 				postalCode: account?.address?.postalCode ?? '',
+				postalName: `${account?.firstName} ${account?.lastName}`,
+				countryCode: 'US',
 			},
 		};
 	}, [
@@ -43,6 +47,8 @@ const PatientDemographicsPart2 = () => {
 		account?.address?.region,
 		account?.address?.streetAddress1,
 		account?.address?.streetAddress2,
+		account?.firstName,
+		account?.lastName,
 	]);
 
 	const fetchData = useCallback(async () => {
@@ -121,7 +127,7 @@ const PatientDemographicsPart2 = () => {
 										className="mb-2"
 										label="City"
 										type="text"
-										name="address.city"
+										name="address.locality"
 										value={values.address.locality}
 										onBlur={handleBlur}
 										onChange={handleChange}

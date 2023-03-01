@@ -46,6 +46,8 @@ const IntegratedCarePatientInfoPage = () => {
 				locality: account?.address?.locality ?? '',
 				region: account?.address?.region ?? '',
 				postalCode: account?.address?.postalCode ?? '',
+				postalName: `${account?.firstName} ${account?.lastName}`,
+				countryCode: 'US',
 			},
 		};
 	}, [

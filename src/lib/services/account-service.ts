@@ -32,6 +32,8 @@ export interface PatientAccountFormData {
 		locality: string;
 		region: string;
 		postalCode: string;
+		postalName: string;
+		countryCode: string;
 	};
 }
 
