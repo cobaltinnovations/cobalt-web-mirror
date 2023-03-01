@@ -179,43 +179,76 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 		'.react-datepicker': {
 			border: 0,
+			borderRadius: 5,
+			overflow: 'hidden',
 			...theme.fonts.default,
-			borderRadius: 0,
 			...theme.fonts.bodyNormal,
 			boxShadow: theme.elevation.e400,
 			'&__triangle': {
-				borderBottomColor: `${theme.colors.p500} !important`,
-				'&:before': {
-					borderColor: `transparent !important`,
-				},
+				display: 'none',
 			},
 			'&__header': {
 				border: 0,
-				borderRadius: 0,
+				padding: 0,
+				borderRadius: '0 !important',
 				backgroundColor: theme.colors.p500,
 			},
 			'&__current-month': {
+				display: 'flex',
+				height: '4rem',
+				alignItems: 'center',
 				...theme.fonts.default,
 				color: theme.colors.n0,
+				justifyContent: 'center',
+			},
+			'&__day-names': {
+				margin: 1,
 			},
 			'&__day-name': {
-				margin: 0,
-				width: '3.5rem',
+				margin: 1,
+				width: '4rem',
+				lineHeight: '4rem',
 				color: theme.colors.n0,
-				lineHeight: '3.5rem',
 			},
 			'&__month': {
-				margin: 0,
+				margin: 1,
 				borderLeft: theme.colors.border,
 				borderRight: theme.colors.border,
 				borderBottom: theme.colors.border,
 			},
 			'&__navigation': {
+				top: 2,
+				width: '4rem',
+				height: '4rem',
+				borderRadius: '50%',
 				'&--previous': {
+					left: 2,
 					borderRightColor: theme.colors.n0,
+					'& .react-datepicker__navigation-icon:before': {
+						top: '50%',
+						left: '50%',
+						borderWidth: '2px 2px 0 0',
+						transform: 'translate(-50%, -50%) rotate(225deg)',
+					},
 				},
 				'&--next': {
+					right: 2,
 					borderLeftColor: theme.colors.n0,
+					'& .react-datepicker__navigation-icon:before': {
+						top: '50%',
+						left: '50%',
+						borderWidth: '2px 2px 0 0',
+						transform: 'translate(-50%, -50%) rotate(45deg)',
+					},
+				},
+				'&:hover': {
+					backgroundColor: theme.colors.p300,
+					'& *::before': {
+						borderColor: theme.colors.n0,
+					},
+				},
+				'&:active': {
+					backgroundColor: theme.colors.p700,
 				},
 			},
 			'&__navigation-icon': {
@@ -224,11 +257,11 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&__day': {
+				margin: 1,
+				width: '4rem',
+				lineHeight: '4rem',
 				color: theme.colors.n900,
-				margin: 0,
-				borderRadius: '0 !important',
-				width: '3.5rem',
-				lineHeight: '3.5rem',
+				borderRadius: '50% !important',
 				'&--today': {
 					...theme.fonts.bodyBold,
 				},
@@ -241,15 +274,14 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					backgroundColor: theme.colors.p700,
 				},
 				'&--outside-month': {
-					color: theme.colors.n500,
-					backgroundColor: theme.colors.n75,
+					color: theme.colors.n100,
 				},
 				'&--disabled': {
 					color: theme.colors.n500,
-					backgroundColor: `${theme.colors.n300} !important`,
+					backgroundColor: `${theme.colors.n100} !important`,
 					'&:hover': {
 						color: `${theme.colors.n500} !important`,
-						backgroundColor: `${theme.colors.n300} !important`,
+						backgroundColor: `${theme.colors.n100} !important`,
 						cursor: 'not-allowed',
 					},
 				},
