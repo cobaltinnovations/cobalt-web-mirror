@@ -11,7 +11,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
 		display: 'flex',
-		padding: '26px 64px',
+		padding: '19px 64px',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,

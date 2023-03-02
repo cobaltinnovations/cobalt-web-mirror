@@ -1,80 +1,69 @@
-import React, { useMemo } from 'react';
-
-import { createUseThemedStyles } from '@/jss/theme';
+import React, { PropsWithChildren, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
+
 import { ActivePatientOrderCountModel, PatientOrderStatusId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+
+const headerHeight = 56;
+const sideNavWidth = 280;
 
 const useStyles = createUseThemedStyles((theme) => ({
-	navigation: {
-		display: 'flex',
-		padding: '0 64px',
+	sideNav: {
+		left: 0,
+		bottom: 0,
+		padding: 16,
+		position: 'fixed',
+		overflowY: 'auto',
+		top: headerHeight,
+		width: sideNavWidth,
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
-		'& button': {
+		borderRight: `1px solid ${theme.colors.n100}`,
+	},
+	collapseList: {
+		margin: 0,
+		padding: 0,
+		listStyle: 'none',
+		'& li button': {
 			border: 0,
-			fontWeight: 500,
-			appearance: 'none',
-			padding: '18px 10px',
-			position: 'relative',
+			padding: 8,
+			width: '100%',
+			borderRadius: 4,
+			display: 'flex',
 			alignItems: 'center',
-			display: 'inline-flex',
 			textDecoration: 'none',
-			color: theme.colors.n500,
+			color: theme.colors.n900,
+			...theme.fonts.bodyNormal,
 			backgroundColor: 'transparent',
-			'&:after': {
-				left: 10,
-				right: 10,
-				bottom: 0,
-				height: 2,
-				content: '""',
-				display: 'none',
-				position: 'absolute',
-				backgroundColor: theme.colors.p700,
-			},
-			'&:hover': {
-				color: theme.colors.p700,
-			},
-			'&:first-of-type': {
-				paddingLeft: 0,
-				'&:after': {
-					left: 0,
-				},
-			},
-			'&:last-of-type': {
-				paddingRight: 0,
-				'&:after': {
-					right: 0,
-				},
-			},
-			'&.first-link-of-section': {
-				paddingLeft: 20,
-				'&:after': {
-					left: 20,
-				},
-			},
-			'&.last-link-of-section': {
-				paddingRight: 20,
-				borderRight: `1px solid ${theme.colors.n100}`,
-				'&:after': {
-					right: 20,
-				},
-			},
+			justifyContent: 'space-between',
 			'&.active': {
-				color: theme.colors.p700,
-				'&:after': {
-					display: 'block',
-				},
+				backgroundColor: theme.colors.n50,
 			},
 		},
 	},
-	countBubble: {
-		marginLeft: 4,
-		padding: '0 8px',
-		borderRadius: 32,
-		...theme.fonts.default,
-		color: theme.colors.p500,
-		...theme.fonts.headingBold,
-		backgroundColor: theme.colors.p50,
+	dotOuter: {
+		width: 24,
+		height: 24,
+		marginRight: 8,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	dot: {
+		width: 8,
+		height: 8,
+		borderRadius: '50%',
+	},
+	body: {
+		right: 0,
+		bottom: 0,
+		position: 'fixed',
+		overflowY: 'auto',
+		top: headerHeight,
+		left: sideNavWidth,
 	},
 }));
 
@@ -84,86 +73,110 @@ interface Props {
 	onClick(patientOrderPanelTypeId: string): void;
 }
 
-export const MhicNavigation = ({ patientOrderPanelTypeId, orderCountsByStatusId, onClick }: Props) => {
+export const MhicNavigation = ({
+	patientOrderPanelTypeId,
+	orderCountsByStatusId,
+	onClick,
+	children,
+}: PropsWithChildren<Props>) => {
 	const classes = useStyles();
+	const { account } = useAccount();
 
-	const linkSections = useMemo(
+	const assignedOrders = useMemo(
 		() => [
 			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'NEED_ASSESSMENT',
-						title: 'Need Assessment',
-						count: '0',
-					},
-				],
+				patientOrderPanelTypeId: '',
+				title: 'All',
+				count: '[TODO] 76',
+				backgroundClassName: 'bg-n300',
 			},
 			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'SAFETY_PLANNING',
-						title: 'Safety Planning',
-						count: '0',
-					},
-					{
-						patientOrderPanelTypeId: 'SPECIALTY_CARE',
-						title: 'Specialty Care',
-						count: '0',
-					},
-					{
-						patientOrderPanelTypeId: 'BHP',
-						title: 'Behavioral Health Provider',
-						count: '0',
-					},
-				],
+				patientOrderPanelTypeId: 'NEED_ASSESSMENT',
+				title: 'Need Assessment',
+				count: '[TODO] 15',
+				backgroundClassName: 'bg-w500',
 			},
 			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'CLOSED',
-						title: 'Closed',
-						count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
-					},
-				],
+				patientOrderPanelTypeId: 'SAFETY_PLANNING',
+				title: 'Safety Planning',
+				count: '[TODO] 2',
+				backgroundClassName: 'bg-d500',
+			},
+			{
+				patientOrderPanelTypeId: 'SPECIALTY_CARE',
+				title: 'Specialty Care',
+				count: '[TODO] 15',
+				backgroundClassName: 'bg-primary',
+			},
+			{
+				patientOrderPanelTypeId: 'BHP',
+				title: 'BHP',
+				count: '[TODO] 15',
+				backgroundClassName: 'bg-s500',
+			},
+			{
+				patientOrderPanelTypeId: 'CLOSED',
+				title: 'Closed',
+				count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
+				backgroundClassName: 'bg-n500',
 			},
 		],
 		[orderCountsByStatusId]
 	);
 
 	return (
-		<nav className={classes.navigation}>
-			{linkSections.map((section, sectionIndex) => {
-				const isFirstSection = sectionIndex === 0;
-				const isLastSection = sectionIndex === linkSections.length - 1;
-
-				return (
-					<React.Fragment key={sectionIndex}>
-						{section.links.map((link, linkIndex) => {
-							const isFirstLink = linkIndex === 0;
-							const isLastLink = linkIndex === section.links.length - 1;
-
-							return (
-								<button
-									key={linkIndex}
-									onClick={() => {
-										onClick(link.patientOrderPanelTypeId);
-									}}
-									className={classNames({
-										'first-link-of-section': isFirstLink && !isFirstSection,
-										'last-link-of-section': isLastLink && !isLastSection,
-										active: patientOrderPanelTypeId === link.patientOrderPanelTypeId,
-									})}
-								>
-									<span>{link.title}</span>
-									{link.count && parseInt(link.count, 10) > 0 && (
-										<span className={classes.countBubble}>{link.count}</span>
-									)}
-								</button>
-							);
-						})}
-					</React.Fragment>
-				);
-			})}
-		</nav>
+		<>
+			<div className={classes.sideNav}>
+				<div className="pt-1 pb-5 d-flex align-items-center border-bottom">
+					<AvatarIcon className="me-3" />
+					<div>
+						<span className="d-block">{account?.displayName}</span>
+						<span className="d-block text-gray">MHIC</span>
+					</div>
+				</div>
+				<nav>
+					<ul className="list-unstyled">
+						<li>
+							<Link to="/#">my tasks</Link>
+						</li>
+						<li>
+							<Link to="/#">Assigned Orders</Link>
+							<Collapse in={true}>
+								<ul className={classes.collapseList}>
+									{assignedOrders.map((assignedOrder) => (
+										<li>
+											<button
+												onClick={() => {
+													onClick(assignedOrder.patientOrderPanelTypeId);
+												}}
+												className={classNames({
+													active:
+														patientOrderPanelTypeId ===
+														assignedOrder.patientOrderPanelTypeId,
+												})}
+											>
+												<div className="d-flex align-items-center">
+													<div className={classes.dotOuter}>
+														<div
+															className={classNames(
+																classes.dot,
+																assignedOrder.backgroundClassName
+															)}
+														/>
+													</div>
+													<span className="d-block">{assignedOrder.title}</span>
+												</div>
+												<span className="d-block text-gray">{assignedOrder.count}</span>
+											</button>
+										</li>
+									))}
+								</ul>
+							</Collapse>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<div className={classes.body}>{children}</div>
+		</>
 	);
 };
