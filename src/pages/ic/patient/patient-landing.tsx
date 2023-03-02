@@ -1,129 +1,221 @@
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as ScreeningToDo } from '@/assets/screening-images/screening-to-do.svg';
-import { ReactComponent as Welcome } from '@/assets/screening-images/welcome.svg';
-import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
-import useAccount from '@/hooks/use-account';
-import useAnalytics from '@/hooks/use-analytics';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import React, { useState } from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 
-const IntegratedCarePatientLandingPage = () => {
-	const { account } = useAccount();
-	const { openInCrisisModal } = useInCrisisModal();
+import { integratedCareService, screeningService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
+import AsyncWrapper from '@/components/async-page';
+import HeroContainer from '@/components/hero-container';
+import NoData from '@/components/no-data';
+import CallToAction from '@/components/call-to-action';
+import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/man-at-desk.svg';
+import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
+
+enum PAGE_STATES {
+	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
+	ASSESSMENT_READY = 'ASSESSMENT_READY',
+	ASSESSMENT_IN_PROGRESS = 'ASSESSMENT_IN_PROGRESS',
+	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
+}
+
+const pageStates = [
+	{
+		homescreenStateId: PAGE_STATES.AWAITING_PATIENT_ORDER,
+		title: 'Awaiting Patient Order',
+	},
+	{
+		homescreenStateId: PAGE_STATES.ASSESSMENT_READY,
+		title: 'Assessment Ready',
+	},
+	{
+		homescreenStateId: PAGE_STATES.ASSESSMENT_IN_PROGRESS,
+		title: 'Assessment In Progress',
+	},
+	{
+		homescreenStateId: PAGE_STATES.ASSESSMENT_COMPLETE,
+		title: 'Assessment Complete',
+	},
+];
+
+const PatientLanding = () => {
 	const navigate = useNavigate();
-	const { trackEvent } = useAnalytics();
+	const { account, institution } = useAccount();
+	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 
-	const [currentStep, setCurrentStep] = useState(0);
-	const [acknowledged, setAcknowledged] = useState(false);
+	const fetchData = useCallback(async () => {
+		try {
+			await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+
+			if (!institution?.integratedCareScreeningFlowId) {
+				return;
+			}
+
+			const { screeningSessions } = await screeningService
+				.getScreeningSessionsByFlowId({ screeningFlowId: institution.integratedCareScreeningFlowId })
+				.fetch();
+			const assessmentIsComplete = screeningSessions.some((session) => session.completed);
+
+			if (screeningSessions.length <= 0) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+			} else if (assessmentIsComplete) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
+			} else {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+			}
+		} catch (_error) {
+			// Do not throw error, backend will 404  if there is no order, but that is ok.
+			// Instead, just set the page state to PAGE_STATES.AWAITING_PATIENT_ORDER
+
+			setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+		}
+	}, [institution?.integratedCareScreeningFlowId]);
 
 	return (
-		<Container className="py-8">
-			<Row className="mb-6">
-				{currentStep === 0 && (
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h2 className="mb-6">Welcome to Cobalt Integrated Care, {account?.displayName}</h2>
+		<AsyncWrapper fetchData={fetchData}>
+			<HeroContainer>
+				<h1 className="text-center">Welcome back, {account?.firstName ?? 'Patient'}</h1>
+			</HeroContainer>
 
-						<Welcome className="mb-6" style={{ width: '100%', height: 'auto' }} />
-
-						<p className="mb-6">
-							Your primary care provider suggested that you are interested in receiving support for your
-							mental health through the Cobalt Integrated Care program. Please take our assessment so we
-							can determine what type of care is best for you. This tool is not for emergencies - if you
-							need immediate help at any time during the assessment, please click the "In Crisis" button
-							in the top right corner. Everything you share is confidential - COBALT is a simple, secure
-							way to manage your Cobalt Medicine mental health care from your computer or mobile device.
-						</p>
-
-						<div className="d-flex">
-							<Button
-								variant="primary"
-								className="flex-grow-1"
-								onClick={() => {
-									setCurrentStep(1);
-								}}
-							>
-								<EditIcon /> Take the assessment
-							</Button>
-						</div>
+			<Container className="pt-10">
+				<Row>
+					<Col>
+						<Form>
+							<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
+							<Form.Group>
+								{pageStates.map((hs) => (
+									<Form.Check
+										inline
+										key={hs.homescreenStateId}
+										type="radio"
+										name="homescreen-state"
+										id={`homescreen-state--${hs.homescreenStateId}`}
+										value={hs.homescreenStateId}
+										label={hs.title}
+										checked={homescreenState === hs.homescreenStateId}
+										onChange={({ currentTarget }) => {
+											setHomescreenState(currentTarget.value as PAGE_STATES);
+										}}
+									/>
+								))}
+							</Form.Group>
+						</Form>
 					</Col>
-				)}
+				</Row>
+			</Container>
 
-				{currentStep === 1 && (
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<ScreeningToDo className="mb-6" style={{ width: '100%', height: 'auto' }} />
+			{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
+				<Container className="py-14">
+					<Row>
+						<Col>
+							<NoData
+								title="Awaiting Patient Order"
+								description="We are waiting on your patient order to come through. You will be sent an email when we are ready for you to take the assessment. In the meantime, you can check out our self-help resources for articles, podcasts, videos and more."
+								actions={[
+									{
+										variant: 'primary',
+										title: 'Browse self-help resources',
+										onClick: () => {
+											window.alert('[TODO]');
+										},
+									},
+								]}
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
 
-						<h2 className="mb-6">Take the assessment</h2>
+			{homescreenState === PAGE_STATES.ASSESSMENT_READY && (
+				<Container className="py-10">
+					<Row>
+						<Col>
+							<NoData
+								illustration={<ManAtDeskIllustration />}
+								className="bg-white"
+								title="Get Personalized Recommendations"
+								description="Dr. James Wong suggested you are interested in receiving support for your mental health. Please take our assessment so we can determine what type of care is best for you."
+								actions={[
+									{
+										variant: 'primary',
+										title: 'Take the Assessment',
+										onClick: () => {
+											navigate('/ic/patient/demographics-introduction');
+										},
+									},
+								]}
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
 
-						<p className="mb-6">
-							To match you with the right support, we'dlike to learn about you and how you're feeling.
-							Before we start. please make sure you are in a comfortable place. This assessment takes
-							about 10-15 minutes to complete. Only you and your care team will have access to your
-							answers. You can take a break at any time - we'll save your progress.
-						</p>
+			{homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS && (
+				<Container className="py-10">
+					<Row>
+						<Col>
+							<NoData
+								illustration={<WomanAtDeskIllustration />}
+								className="bg-white"
+								title="Continue with Assessment"
+								description="You previously made progress on the assessment. We'll pick up where you left off. Before we start, please make sure you are in a comfortable place. Is now a good time?"
+								actions={[
+									{
+										variant: 'primary',
+										title: 'Continue Assessment',
+										onClick: () => {
+											window.alert('[TODO]');
+										},
+									},
+									{
+										variant: 'outline-primary',
+										title: 'Restart from Beginning',
+										onClick: () => {
+											window.alert('[TODO]');
+										},
+									},
+								]}
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
 
-						<div className="d-flex">
-							<Button
-								variant="primary"
-								className="flex-grow-1"
-								onClick={() => {
-									setCurrentStep(2);
+			{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
+				<Container className="py-10">
+					<Row>
+						<Col>
+							<CallToAction
+								callToAction={{
+									message:
+										'Cobalt Recommendations. Based on your assessment results, we think the following would be beneficial to you: 1) Talk to a therapist. 2) View Crisis Resources for immediate help.',
+									messageAsHtml: `<h4 class="mb-2">Cobalt Recommendations</h4>
+                                        <p class="mb-2 fs-large">
+                                            Based on your assessment results, we think the following would be beneficial to you:
+                                        </p>
+                                        <ul class="mb-0">
+                                            <li class="mb-2">
+                                                <p class="mb-0 fs-large">
+                                                    Talk to a therapist <a class="fw-normal" href="/#">Learn more</a>
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p class="mb-0 fs-large">
+                                                    View <a class="fw-normal" href="/#">Crisis Resources</a> for immediate help
+                                                </p>
+                                            </li>
+                                        </ul>`,
+									actionLinks: [],
+									modalButtonText: '',
+									modalMessage: '',
+									modalMessageAsHtml: '',
 								}}
-							>
-								Let's Continue
-							</Button>
-						</div>
-					</Col>
-				)}
-
-				{currentStep === 2 && (
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<p className="mb-6">
-							If you need immediate help, call 911 or click{' '}
-							<span
-								className="text-primary text-decoration-underline cursor-pointer"
-								tabIndex={0}
-								onClick={() => {
-									trackEvent(CrisisAnalyticsEvent.clickCrisisICAssessment());
-									openInCrisisModal();
-								}}
-							>
-								HERE
-							</span>{' '}
-							for a list of resources. The resources above can be accessed at any time by clicking the In
-							Crisis button on the top right.
-						</p>
-
-						<Form.Check
-							className="mb-6"
-							type="checkbox"
-							id="acknowledgement"
-							name="visit-type"
-							label="I acknowledge that this assessment is not a way to communicate urgent information to my care team."
-							checked={acknowledged}
-							onChange={(event) => {
-								setAcknowledged(event.currentTarget.checked);
-							}}
-						/>
-
-						<div className="d-flex">
-							<Button
-								variant="primary"
-								className="flex-grow-1"
-								disabled={!acknowledged}
-								onClick={() => {
-									navigate('/ic/patient/info');
-								}}
-							>
-								Continue
-							</Button>
-						</div>
-					</Col>
-				)}
-			</Row>
-		</Container>
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
+		</AsyncWrapper>
 	);
 };
 
-export default IntegratedCarePatientLandingPage;
+export default PatientLanding;
