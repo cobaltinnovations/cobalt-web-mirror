@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -62,6 +62,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		bottom: 0,
 		position: 'fixed',
 		overflowY: 'auto',
+		padding: '0 40px',
 		top: headerHeight,
 		left: sideNavWidth,
 	},
@@ -81,37 +82,36 @@ export const MhicNavigation = ({
 }: PropsWithChildren<Props>) => {
 	const classes = useStyles();
 	const { account } = useAccount();
-
 	const assignedOrders = useMemo(
 		() => [
 			{
 				patientOrderPanelTypeId: '',
 				title: 'All',
-				count: '[TODO] 76',
+				count: '[TODO]',
 				backgroundClassName: 'bg-n300',
 			},
 			{
 				patientOrderPanelTypeId: 'NEED_ASSESSMENT',
 				title: 'Need Assessment',
-				count: '[TODO] 15',
+				count: '[TODO]',
 				backgroundClassName: 'bg-w500',
 			},
 			{
 				patientOrderPanelTypeId: 'SAFETY_PLANNING',
 				title: 'Safety Planning',
-				count: '[TODO] 2',
+				count: '[TODO]',
 				backgroundClassName: 'bg-d500',
 			},
 			{
 				patientOrderPanelTypeId: 'SPECIALTY_CARE',
 				title: 'Specialty Care',
-				count: '[TODO] 15',
+				count: '[TODO]',
 				backgroundClassName: 'bg-primary',
 			},
 			{
 				patientOrderPanelTypeId: 'BHP',
 				title: 'BHP',
-				count: '[TODO] 15',
+				count: '[TODO]',
 				backgroundClassName: 'bg-s500',
 			},
 			{
@@ -123,6 +123,7 @@ export const MhicNavigation = ({
 		],
 		[orderCountsByStatusId]
 	);
+	const [assignedOrdersIsExpanded, setAssignedOrdersIsExpanded] = useState(true);
 
 	return (
 		<>
@@ -140,8 +141,14 @@ export const MhicNavigation = ({
 							<Link to="/#">my tasks</Link>
 						</li>
 						<li>
-							<Link to="/#">Assigned Orders</Link>
-							<Collapse in={true}>
+							<button
+								onClick={() => {
+									setAssignedOrdersIsExpanded((previousValue) => !previousValue);
+								}}
+							>
+								Assigned Orders
+							</button>
+							<Collapse in={assignedOrdersIsExpanded}>
 								<ul className={classes.collapseList}>
 									{assignedOrders.map((assignedOrder) => (
 										<li>

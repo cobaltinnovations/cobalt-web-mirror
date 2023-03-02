@@ -11,10 +11,9 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	accountHeader: {
 		display: 'flex',
-		padding: '19px 64px',
+		padding: '19px 0',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
 }));

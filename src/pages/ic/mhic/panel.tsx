@@ -23,17 +23,9 @@ import {
 	MhicSortDropdown,
 	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
-import { createUseThemedStyles } from '@/jss/theme';
 import useFlags from '@/hooks/use-flags';
 
-const useStyles = createUseThemedStyles((theme) => ({
-	row: {
-		padding: '0 64px',
-	},
-}));
-
 const MhicPanel = () => {
-	const classes = useStyles();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 
@@ -210,7 +202,7 @@ const MhicPanel = () => {
 					}}
 					onImportPatientsInputChange={handleImportPatientsInputChange}
 				/>
-				<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
+				<div className="py-6 d-flex align-items-center justify-content-between">
 					<div className="d-flex">
 						<MhicFilterDropdown />
 						<MhicSortDropdown />
@@ -224,7 +216,7 @@ const MhicPanel = () => {
 						Customize View
 					</Button>
 				</div>
-				<div className={classNames(classes.row, 'mb-8')}>
+				<div className="mb-8">
 					<Table isLoading={tableIsLoading}>
 						<TableHead>
 							<TableRow>
@@ -290,7 +282,7 @@ const MhicPanel = () => {
 						</TableBody>
 					</Table>
 				</div>
-				<div className={classNames(classes.row, 'pb-20')}>
+				<div className="pb-20">
 					<Container fluid>
 						<Row>
 							<Col xs={4}>
