@@ -7,9 +7,10 @@ import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import classNames from 'classnames';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
+// import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import { SESSION_STATUS } from '@/components/session-status';
@@ -33,23 +34,23 @@ import ImageUpload from '@/components/image-upload';
 import SessionRemoveImageModal from '@/components/session-remove-image-modal';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { cloneDeep } from 'lodash';
-import { createUseStyles } from 'react-jss';
+// import { cloneDeep } from 'lodash';
+// import { createUseStyles } from 'react-jss';
 import Wysiwyg from '@/components/admin-cms/wysiwyg';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
 import useFlags from '@/hooks/use-flags';
 
-const useStyles = createUseStyles({
-	removeButton: {
-		top: 0,
-		right: 0,
-		zIndex: 1,
-		position: 'absolute',
-		padding: '8px !important',
-		transform: 'translate(40%, -40%)',
-	},
-});
+// const useStyles = createUseStyles({
+// 	removeButton: {
+// 		top: 0,
+// 		right: 0,
+// 		zIndex: 1,
+// 		position: 'absolute',
+// 		padding: '8px !important',
+// 		transform: 'translate(40%, -40%)',
+// 	},
+// });
 
 const timeSlots: string[] = [];
 const totalSlotsInDay = moment.duration(1, 'day').as('minutes');
@@ -72,9 +73,18 @@ const groupSessionSchema = yup
 			.string()
 			.default('')
 			.when('isCobaltScheduling', { is: false, then: (s) => s.required() }),
-		isModerator: yup.boolean().required().default(false),
-		facilitatorsName: yup.string().required().default(''),
-		facilitatorsEmail: yup.string().email().required().default(''),
+		yourName: yup.string().required().default(''),
+		yourEmail: yup.string().required().default(''),
+		isModerator: yup.boolean().required().default(true),
+		facilitatorsName: yup
+			.string()
+			.default('')
+			.when('isModerator', { is: false, then: (s) => s.required() }),
+		facilitatorsEmail: yup
+			.string()
+			.email()
+			.default('')
+			.when('isModerator', { is: false, then: (s) => s.required() }),
 		title: yup.string().required().default(''),
 		description: yup.string().required().default(''),
 		imageUrl: yup.string().default(''),
@@ -132,7 +142,7 @@ const GroupSessionsCreate: FC = () => {
 	const navigate = useNavigate();
 	const { account } = useAccount();
 	const handleError = useHandleError();
-	const classes = useStyles();
+	// const classes = useStyles();
 	const { fonts } = useCobaltTheme();
 	const isViewMode = !!useMatch({
 		path: '/group-sessions/scheduled/:groupSessionId/view',
@@ -194,18 +204,18 @@ const GroupSessionsCreate: FC = () => {
 			setIsCopy(true);
 		}
 
-		let screeningQuestionsToSet: ScreeningQuestionV2[] = [];
-		if (!!groupSessionToSet?.screeningQuestionsV2.length) {
-			screeningQuestionsToSet = groupSessionToSet.screeningQuestionsV2;
-		} else if (!!groupSessionToSet?.screeningQuestions.length) {
-			screeningQuestionsToSet = groupSessionToSet.screeningQuestions.map((question) => {
-				return {
-					questionId: uuidv4(),
-					fontSizeId: 'DEFAULT',
-					question,
-				};
-			});
-		}
+		// let screeningQuestionsToSet: ScreeningQuestionV2[] = [];
+		// if (!!groupSessionToSet?.screeningQuestionsV2.length) {
+		// 	screeningQuestionsToSet = groupSessionToSet.screeningQuestionsV2;
+		// } else if (!!groupSessionToSet?.screeningQuestions.length) {
+		// 	screeningQuestionsToSet = groupSessionToSet.screeningQuestions.map((question) => {
+		// 		return {
+		// 			questionId: uuidv4(),
+		// 			fontSizeId: 'DEFAULT',
+		// 			question,
+		// 		};
+		// 	});
+		// }
 
 		if (groupSessionToSet) {
 			let capacity = undefined;
@@ -224,6 +234,8 @@ const GroupSessionsCreate: FC = () => {
 				startTime: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('hh:mm A'),
 				endTime: isCopy ? '' : moment(groupSessionToSet.endDateTime).format('hh:mm A'),
 				schedulingUrl: groupSessionToSet.scheduleUrl,
+				yourName: '', // TODO: Must set after BE updates
+				yourEmail: '', // TODO: Must set after BE updates
 				isModerator: groupSessionToSet.facilitatorAccountId === accountId,
 				facilitatorsName: groupSessionToSet.facilitatorName,
 				facilitatorsEmail: groupSessionToSet.facilitatorEmailAddress,
@@ -233,8 +245,11 @@ const GroupSessionsCreate: FC = () => {
 				meetingUrl: groupSessionToSet.videoconferenceUrl,
 				capacity,
 				slug: groupSessionToSet.urlName,
-				isRestricted: !!groupSessionToSet.screeningQuestions.length ? true : false,
-				screeningQuestions: screeningQuestionsToSet,
+				// Comment out for now, hardcode to false and empty
+				// isRestricted: !!groupSessionToSet.screeningQuestions.length ? true : false,
+				// screeningQuestions: screeningQuestionsToSet,
+				isRestricted: false,
+				screeningQuestions: [] as ScreeningQuestionV2[],
 				confirmationEmailTemplate: groupSessionToSet.confirmationEmailContent,
 				followUpEmail: groupSessionToSet.sendFollowupEmail,
 				...(groupSessionToSet.followupEmailContent
@@ -276,6 +291,7 @@ const GroupSessionsCreate: FC = () => {
 				'YYYY-MM-DD[T]HH:mm'
 			);
 
+			// TODO: set "Your Name" and "Your Email" after BE is updated
 			const submissionValues: CreateGroupSessionRequestBody = {
 				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
 				facilitatorName: values.facilitatorsName,
@@ -390,22 +406,18 @@ const GroupSessionsCreate: FC = () => {
 				/>
 			)}
 
-			<Container className="pt-5 pb-32">
-				<Row className="mb-5">
+			<Container className="py-14">
+				<Row className="mb-8">
 					<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
-						<div className="d-flex align-items-center">
-							<div>
-								<h1 className="mb-2 fs-h3">
-									{initialValues?.title || 'Create Group Session'}
-									{isCopy ? ' (Copy)' : ''}
-								</h1>
-								<p className="mb-0 text-danger">Required*</p>
-							</div>
+						<div className="mb-6 d-flex align-items-center">
+							<h1 className="mb-0">
+								{initialValues?.title || 'Create Group Session'}
+								{isCopy ? ' (Copy)' : ''}
+							</h1>
 							{!isViewMode && groupSessionId && (
 								<>
 									<Button
 										className="ms-auto me-2"
-										size="sm"
 										variant="danger"
 										onClick={handleCancelSessionButtonClick}
 									>
@@ -430,6 +442,14 @@ const GroupSessionsCreate: FC = () => {
 								</>
 							)}
 						</div>
+
+						<p className="mb-4">
+							Please fill out this form to submit your event or session for approval on Cobalt. Approved
+							submissions will appear in the “Group Session” section of the website. Events/sessions must
+							be virtual and have a meeting link already created. Please allow 1-2 business days for your
+							submission to be approved.
+						</p>
+						<p className="mb-0 text-danger">Required *</p>
 					</Col>
 				</Row>
 
@@ -656,9 +676,37 @@ const GroupSessionsCreate: FC = () => {
 											</Card>
 
 											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Facilitator</h5>
+												<h5 className="mb-5">Your Information</h5>
+												<InputHelper
+													className="mb-5"
+													label="Your Name"
+													type="text"
+													name="yourName"
+													value={values.yourName}
+													as="input"
+													onBlur={handleBlur}
+													onChange={handleChange}
+													required={requiredFields.yourName}
+													error={touched.yourName && errors.yourName ? errors.yourName : ''}
+													disabled={isViewMode}
+												/>
+												<InputHelper
+													className="mb-5"
+													label="Your Email"
+													type="email"
+													name="yourEmail"
+													value={values.yourEmail}
+													as="input"
+													onBlur={handleBlur}
+													onChange={handleChange}
+													required={requiredFields.yourEmail}
+													error={
+														touched.yourEmail && errors.yourEmail ? errors.yourEmail : ''
+													}
+													disabled={isViewMode}
+												/>
 
-												<Form.Group className="mb-5">
+												<Form.Group className={classNames({ 'mb-5': !values.isModerator })}>
 													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Are you the facilitator of this session?
 													</Form.Label>
@@ -688,40 +736,43 @@ const GroupSessionsCreate: FC = () => {
 													/>
 												</Form.Group>
 
-												<InputHelper
-													className="mb-5"
-													label="Facilitator's Name"
-													type="text"
-													name="facilitatorsName"
-													value={values.facilitatorsName}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.facilitatorsName}
-													error={
-														touched.facilitatorsName && errors.facilitatorsName
-															? errors.facilitatorsName
-															: ''
-													}
-													disabled={isViewMode}
-												/>
-
-												<InputHelper
-													label="Facilitator's Email"
-													type="email"
-													name="facilitatorsEmail"
-													value={values.facilitatorsEmail}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.facilitatorsEmail}
-													error={
-														touched.facilitatorsEmail && errors.facilitatorsEmail
-															? errors.facilitatorsEmail
-															: ''
-													}
-													disabled={isViewMode}
-												/>
+												{!values.isModerator && (
+													<>
+														<InputHelper
+															className="mb-5"
+															label="Facilitator's Name"
+															type="text"
+															name="facilitatorsName"
+															value={values.facilitatorsName}
+															as="input"
+															onBlur={handleBlur}
+															onChange={handleChange}
+															required={requiredFields.facilitatorsName}
+															error={
+																touched.facilitatorsName && errors.facilitatorsName
+																	? errors.facilitatorsName
+																	: ''
+															}
+															disabled={isViewMode}
+														/>
+														<InputHelper
+															label="Facilitator's Email"
+															type="email"
+															name="facilitatorsEmail"
+															value={values.facilitatorsEmail}
+															as="input"
+															onBlur={handleBlur}
+															onChange={handleChange}
+															required={requiredFields.facilitatorsEmail}
+															error={
+																touched.facilitatorsEmail && errors.facilitatorsEmail
+																	? errors.facilitatorsEmail
+																	: ''
+															}
+															disabled={isViewMode}
+														/>
+													</>
+												)}
 											</Card>
 
 											<Card className="mb-5 border-0 p-6">
@@ -838,7 +889,7 @@ const GroupSessionsCreate: FC = () => {
 												/>
 											</Card>
 
-											<Card className="mb-5 border-0 p-6">
+											{/* <Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Attendee Information</h5>
 
 												<Form.Group className="mb-5">
@@ -997,7 +1048,7 @@ const GroupSessionsCreate: FC = () => {
 														Add Question
 													</Button>
 												</div>
-											</Card>
+											</Card> */}
 
 											{values.isCobaltScheduling && (
 												<Card className="mb-5 border-0 p-6">
@@ -1032,8 +1083,8 @@ const GroupSessionsCreate: FC = () => {
 														<span className="text-danger">*</span>
 													</Form.Label>
 													<p className="mb-2 ms-0 me-auto text-muted fs-small">
-														This email will be sent to attendees immediately after the
-														session.
+														This email will be sent to attendees at 11:30am the day
+														following the session.
 													</p>
 													<Form.Check
 														type="radio"
