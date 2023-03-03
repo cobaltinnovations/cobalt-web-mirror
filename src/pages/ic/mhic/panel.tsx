@@ -181,6 +181,7 @@ const MhicPanel = () => {
 			/>
 
 			<MhicNavigation
+				onImportPatientsInputChange={handleImportPatientsInputChange}
 				navigationItems={[
 					{
 						title: 'My Tasks',
@@ -267,7 +268,6 @@ const MhicPanel = () => {
 					onSwitchButtonClick={() => {
 						setShowSwitchAccountModal(true);
 					}}
-					onImportPatientsInputChange={handleImportPatientsInputChange}
 				/>
 				<div className="py-6 d-flex align-items-center justify-content-between">
 					<div className="d-flex">

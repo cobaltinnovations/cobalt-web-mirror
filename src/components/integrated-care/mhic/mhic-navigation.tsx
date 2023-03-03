@@ -1,12 +1,15 @@
 import React, { PropsWithChildren, useState } from 'react';
-import { Collapse } from 'react-bootstrap';
+import { Button, Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import config from '@/lib/config';
 import useAccount from '@/hooks/use-account';
+import { MhicGenerateOrdersModal } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import FileInputButton from '@/components/file-input-button';
 
 const headerHeight = 56;
 const sideNavWidth = 280;
@@ -82,14 +85,30 @@ interface MhicNavigationItemModel {
 
 interface MhicNavigationProps {
 	navigationItems: MhicNavigationItemModel[];
+	onImportPatientsInputChange(file: File): void;
 }
 
-export const MhicNavigation = ({ navigationItems, children }: PropsWithChildren<MhicNavigationProps>) => {
+export const MhicNavigation = ({
+	navigationItems,
+	onImportPatientsInputChange,
+	children,
+}: PropsWithChildren<MhicNavigationProps>) => {
 	const classes = useStyles();
 	const { account } = useAccount();
+	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
 	return (
 		<>
+			<MhicGenerateOrdersModal
+				show={showGenerateOrdersModal}
+				onHide={() => {
+					setShowGenerateOrdersModal(false);
+				}}
+				onSave={() => {
+					setShowGenerateOrdersModal(false);
+				}}
+			/>
+
 			<div className={classes.sideNav}>
 				<div className="mb-3 px-2 pt-1 pb-5 d-flex align-items-center border-bottom">
 					<AvatarIcon className="me-3" />
@@ -103,7 +122,25 @@ export const MhicNavigation = ({ navigationItems, children }: PropsWithChildren<
 						<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
 					))}
 				</nav>
-				<hr className="mt-3" />
+				<hr className="mt-3 mb-6" />
+				<FileInputButton
+					className="d-flex justify-content-center w-100"
+					accept=".csv"
+					onChange={onImportPatientsInputChange}
+				>
+					Import Patients
+				</FileInputButton>
+				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+					<Button
+						className="mt-2 w-100"
+						variant="outline-primary"
+						onClick={() => {
+							setShowGenerateOrdersModal(true);
+						}}
+					>
+						Generate Patient Orders
+					</Button>
+				)}
 			</div>
 			<div className={classes.body}>{children}</div>
 		</>
