@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
+import { Link, useLocation, matchPath } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
 import InputHelperSearch from '@/components/input-helper-search';
@@ -8,8 +10,6 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { Link, useLocation } from 'react-router-dom';
-import classNames from 'classnames';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -103,22 +103,29 @@ export const MhicHeader = () => {
 	const classes = useStyles();
 	const { pathname } = useLocation();
 	const { signOutAndClearContext } = useAccount();
+
+	const isMyView = matchPath('/ic/mhic/my-view/*', pathname);
+	const isOrders = matchPath('/ic/mhic/orders', pathname);
+	const isReports = matchPath('/ic/mhic/reports', pathname);
 	const navigationLinks = useMemo(
 		() => [
 			{
 				to: '/ic/mhic/my-view',
 				title: 'My View',
+				active: isMyView,
 			},
 			{
 				to: '/ic/mhic/orders',
 				title: 'Orders',
+				active: isOrders,
 			},
 			{
 				to: '/ic/mhic/reports',
 				title: 'Reports',
+				active: isReports,
 			},
 		],
-		[]
+		[isMyView, isOrders, isReports]
 	);
 
 	return (
@@ -134,7 +141,7 @@ export const MhicHeader = () => {
 							<li
 								key={index}
 								className={classNames('h-100', {
-									active: pathname === link.to,
+									active: link.active,
 								})}
 							>
 								<Link to={link.to}>{link.title}</Link>

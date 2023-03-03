@@ -15,6 +15,9 @@ import PatientDemographicsPart2 from './patient/demographics-part-2';
 import PatientDemographicsPart3 from './patient/demographics-part-3';
 import PatientDemographicsThanks from './patient/demographics-thanks';
 import NoMatch from '../no-match';
+import MhicAssignedOrders from './mhic/assigned-orders';
+import MhicOrders from './mhic/orders';
+import MhicOverview from './mhic/overview';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -32,7 +35,12 @@ const IntegratedCareLandingPage = () => {
 					}
 				>
 					<Route index element={<Navigate to="my-view" replace />} />
-					<Route path="my-view" element={<MhicMyView />} />
+					<Route path="my-view" element={<MhicMyView />}>
+						<Route index element={<Navigate to="overview" replace />} />
+						<Route path="overview" element={<MhicOverview />} />
+						<Route path="assigned-orders" element={<MhicAssignedOrders />} />
+					</Route>
+					<Route path="orders" element={<MhicOrders />} />
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 
