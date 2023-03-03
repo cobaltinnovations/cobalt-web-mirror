@@ -31,8 +31,8 @@ const IntegratedCareLandingPage = () => {
 						</>
 					}
 				>
-					<Route index element={<Navigate to="panel" replace />} />
-					<Route path="panel" element={<MhicPanel />} />
+					<Route index element={<Navigate to="my-view" replace />} />
+					<Route path="my-view" element={<MhicPanel />} />
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 
