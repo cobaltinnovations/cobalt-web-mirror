@@ -91,6 +91,17 @@ export enum PatientOrderScreeningStatusId {
 	COMPLETE = 'COMPLETE',
 }
 
+export enum PatientOrderPanelTypeId {
+	ALL = 'ALL',
+	NEW = 'NEW',
+	NEED_ASSESSMENT = 'NEED_ASSESSMENT',
+	SCHEDULED = 'SCHEDULED',
+	SAFETY_PLANNING = 'SAFETY_PLANNING',
+	SPECIALTY_CARE = 'SPECIALTY_CARE',
+	BHP = 'BHP',
+	CLOSED = 'CLOSED',
+}
+
 export interface PatientAddressModel {
 	addressId: string;
 	countryCode: string;

@@ -7,6 +7,7 @@ import {
 	ActivePatientOrderCountModel,
 	PatientOrderCountModel,
 	PatientOrderModel,
+	PatientOrderPanelTypeId,
 	PatientOrderStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -209,7 +210,10 @@ const MhicPanel = () => {
 								description: '[TODO]',
 								icon: () => <DotIcon className="text-warning" />,
 								onClick: () => {
-									searchParams.set('patientOrderPanelTypeId', 'NEED_ASSESSMENT');
+									searchParams.set(
+										'patientOrderPanelTypeId',
+										PatientOrderPanelTypeId.NEED_ASSESSMENT
+									);
 									searchParams.delete('pageNumber');
 									setSearchParams(searchParams);
 								},
@@ -219,7 +223,10 @@ const MhicPanel = () => {
 								description: '[TODO]',
 								icon: () => <DotIcon className="text-danger" />,
 								onClick: () => {
-									searchParams.set('patientOrderPanelTypeId', 'SAFETY_PLANNING');
+									searchParams.set(
+										'patientOrderPanelTypeId',
+										PatientOrderPanelTypeId.SAFETY_PLANNING
+									);
 									searchParams.delete('pageNumber');
 									setSearchParams(searchParams);
 								},
@@ -229,7 +236,7 @@ const MhicPanel = () => {
 								description: '[TODO]',
 								icon: () => <DotIcon className="text-primary" />,
 								onClick: () => {
-									searchParams.set('patientOrderPanelTypeId', 'SPECIALTY_CARE');
+									searchParams.set('patientOrderPanelTypeId', PatientOrderPanelTypeId.SPECIALTY_CARE);
 									searchParams.delete('pageNumber');
 									setSearchParams(searchParams);
 								},
@@ -239,7 +246,7 @@ const MhicPanel = () => {
 								description: '[TODO]',
 								icon: () => <DotIcon className="text-success" />,
 								onClick: () => {
-									searchParams.set('patientOrderPanelTypeId', 'BHP');
+									searchParams.set('patientOrderPanelTypeId', PatientOrderPanelTypeId.BHP);
 									searchParams.delete('pageNumber');
 									setSearchParams(searchParams);
 								},
