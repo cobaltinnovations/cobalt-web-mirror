@@ -27,7 +27,7 @@ import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
-const MhicPanel = () => {
+const MhicMyView = () => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 
@@ -385,4 +385,4 @@ const MhicPanel = () => {
 	);
 };
 
-export default MhicPanel;
+export default MhicMyView;

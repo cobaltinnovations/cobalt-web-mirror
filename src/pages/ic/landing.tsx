@@ -7,7 +7,7 @@ import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
 import { MhicHeader } from '@/components/integrated-care/mhic';
 import { PatientHeader } from '@/components/integrated-care/patient';
 
-import MhicPanel from './mhic/panel';
+import MhicMyView from './mhic/my-view';
 import PatientLanding from './patient/patient-landing';
 import PatientDemographicsIntroduction from './patient/demographics-introduction';
 import PatientDemographicsPart1 from './patient/demographics-part-1';
@@ -32,7 +32,7 @@ const IntegratedCareLandingPage = () => {
 					}
 				>
 					<Route index element={<Navigate to="my-view" replace />} />
-					<Route path="my-view" element={<MhicPanel />} />
+					<Route path="my-view" element={<MhicMyView />} />
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 
