@@ -11,7 +11,7 @@ import {
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-
+import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
 	MhicAccountHeader,
@@ -22,7 +22,9 @@ import {
 	MhicSortDropdown,
 	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
-import useFlags from '@/hooks/use-flags';
+import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
+import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
+import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
 const MhicPanel = () => {
 	const handleError = useHandleError();
@@ -179,17 +181,83 @@ const MhicPanel = () => {
 			/>
 
 			<MhicNavigation
-				patientOrderPanelTypeId={patientOrderPanelTypeId ?? ''}
-				orderCountsByStatusId={activePatientOrderCountsByPatientOrderStatusId}
-				onClick={(patientOrderPanelTypeId) => {
-					if (patientOrderPanelTypeId) {
-						searchParams.set('patientOrderPanelTypeId', patientOrderPanelTypeId);
-					} else {
-						searchParams.delete('patientOrderPanelTypeId');
-					}
-					searchParams.set('pageNumber', '0');
-					setSearchParams(searchParams);
-				}}
+				navigationItems={[
+					{
+						title: 'My Tasks',
+						icon: () => <FlagSuccess width={20} height={20} className="text-p300" />,
+						onClick: () => {
+							window.alert('[TODO]: What does this do?');
+						},
+					},
+					{
+						title: 'Assigned Orders',
+						icon: () => <AssessmentIcon width={20} height={20} className="text-p300" />,
+						navigationItems: [
+							{
+								title: 'All',
+								description: '[TODO]',
+								icon: () => <DotIcon className="text-n300" />,
+								onClick: () => {
+									searchParams.delete('patientOrderPanelTypeId');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+							{
+								title: 'Need Assessment',
+								description: '[TODO]',
+								icon: () => <DotIcon className="text-warning" />,
+								onClick: () => {
+									searchParams.set('patientOrderPanelTypeId', 'NEED_ASSESSMENT');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+							{
+								title: 'Safety Planning',
+								description: '[TODO]',
+								icon: () => <DotIcon className="text-danger" />,
+								onClick: () => {
+									searchParams.set('patientOrderPanelTypeId', 'SAFETY_PLANNING');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+							{
+								title: 'Specialty Care',
+								description: '[TODO]',
+								icon: () => <DotIcon className="text-primary" />,
+								onClick: () => {
+									searchParams.set('patientOrderPanelTypeId', 'SPECIALTY_CARE');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+							{
+								title: 'BHP',
+								description: '[TODO]',
+								icon: () => <DotIcon className="text-success" />,
+								onClick: () => {
+									searchParams.set('patientOrderPanelTypeId', 'BHP');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+							{
+								title: 'Closed',
+								description:
+									activePatientOrderCountsByPatientOrderStatusId?.[PatientOrderStatusId.CLOSED]
+										.countDescription ?? '0',
+								icon: () => <DotIcon className="text-gray" />,
+								onClick: () => {
+									searchParams.set('patientOrderPanelTypeId', 'CLOSED');
+									searchParams.delete('pageNumber');
+									setSearchParams(searchParams);
+								},
+							},
+						],
+					},
+				]}
 			>
 				<MhicAccountHeader
 					currentPanelAccountId={panelAccountId ?? ''}
