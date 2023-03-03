@@ -1,12 +1,15 @@
 import React, { PropsWithChildren, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { ActivePatientOrderCountModel, PatientOrderStatusId } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
+
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
+import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 
 const headerHeight = 56;
 const sideNavWidth = 280;
@@ -23,11 +26,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
 	},
-	collapseList: {
-		margin: 0,
-		padding: 0,
-		listStyle: 'none',
-		'& li button': {
+	navigation: {
+		'& button': {
 			border: 0,
 			padding: 8,
 			width: '100%',
@@ -39,12 +39,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.bodyNormal,
 			backgroundColor: 'transparent',
 			justifyContent: 'space-between',
+			'&:hover': {
+				backgroundColor: theme.colors.n50,
+			},
+			'&:active': {
+				backgroundColor: theme.colors.n75,
+			},
 			'&.active': {
 				backgroundColor: theme.colors.n50,
 			},
+			'& .chevron-icon': {
+				transition: '200ms transform',
+				'&--is-expanded': {
+					transform: 'rotate(180deg)',
+				},
+			},
 		},
 	},
-	dotOuter: {
+	iconOuter: {
 		width: 24,
 		height: 24,
 		marginRight: 8,
@@ -74,6 +86,14 @@ interface Props {
 	onClick(patientOrderPanelTypeId: string): void;
 }
 
+interface MhicNavigationItemModel {
+	title: string;
+	description?: string;
+	icon(): JSX.Element;
+	onClick?(): void;
+	navigationItems?: MhicNavigationItemModel[];
+}
+
 export const MhicNavigation = ({
 	patientOrderPanelTypeId,
 	orderCountsByStatusId,
@@ -82,108 +102,139 @@ export const MhicNavigation = ({
 }: PropsWithChildren<Props>) => {
 	const classes = useStyles();
 	const { account } = useAccount();
-	const assignedOrders = useMemo(
+
+	const navigationItems: MhicNavigationItemModel[] = useMemo(
 		() => [
 			{
-				patientOrderPanelTypeId: '',
-				title: 'All',
-				count: '[TODO]',
-				backgroundClassName: 'bg-n300',
+				title: 'My Tasks',
+				icon: () => <FlagSuccess width={20} height={20} className="text-p300" />,
+				onClick: () => {
+					return;
+				},
 			},
 			{
-				patientOrderPanelTypeId: 'NEED_ASSESSMENT',
-				title: 'Need Assessment',
-				count: '[TODO]',
-				backgroundClassName: 'bg-w500',
-			},
-			{
-				patientOrderPanelTypeId: 'SAFETY_PLANNING',
-				title: 'Safety Planning',
-				count: '[TODO]',
-				backgroundClassName: 'bg-d500',
-			},
-			{
-				patientOrderPanelTypeId: 'SPECIALTY_CARE',
-				title: 'Specialty Care',
-				count: '[TODO]',
-				backgroundClassName: 'bg-primary',
-			},
-			{
-				patientOrderPanelTypeId: 'BHP',
-				title: 'BHP',
-				count: '[TODO]',
-				backgroundClassName: 'bg-s500',
-			},
-			{
-				patientOrderPanelTypeId: 'CLOSED',
-				title: 'Closed',
-				count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
-				backgroundClassName: 'bg-n500',
+				title: 'Assigned Orders',
+				icon: () => <AssessmentIcon width={20} height={20} className="text-p300" />,
+				navigationItems: [
+					{
+						title: 'All',
+						description: '[TODO]',
+						icon: () => <div className={classNames(classes.dot, 'bg-n300')} />,
+						onClick: () => {
+							return;
+						},
+					},
+					{
+						title: 'Need Assessment',
+						description: '[TODO]',
+						icon: () => <div className={classNames(classes.dot, 'bg-w500')} />,
+						onClick: () => {
+							return;
+						},
+					},
+					{
+						title: 'Safety Planning',
+						description: '[TODO]',
+						icon: () => <div className={classNames(classes.dot, 'bg-d500')} />,
+						onClick: () => {
+							return;
+						},
+					},
+					{
+						title: 'Specialty Care',
+						description: '[TODO]',
+						icon: () => <div className={classNames(classes.dot, 'bg-primary')} />,
+						onClick: () => {
+							return;
+						},
+					},
+					{
+						title: 'BHP',
+						description: '[TODO]',
+						icon: () => <div className={classNames(classes.dot, 'bg-s500')} />,
+						onClick: () => {
+							return;
+						},
+					},
+					{
+						title: 'Closed',
+						description: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
+						icon: () => <div className={classNames(classes.dot, 'bg-n500')} />,
+						onClick: () => {
+							return;
+						},
+					},
+				],
 			},
 		],
-		[orderCountsByStatusId]
+		[classes.dot, orderCountsByStatusId]
 	);
-	const [assignedOrdersIsExpanded, setAssignedOrdersIsExpanded] = useState(true);
 
 	return (
 		<>
 			<div className={classes.sideNav}>
-				<div className="pt-1 pb-5 d-flex align-items-center border-bottom">
+				<div className="mb-3 px-2 pt-1 pb-5 d-flex align-items-center border-bottom">
 					<AvatarIcon className="me-3" />
 					<div>
 						<span className="d-block">{account?.displayName}</span>
 						<span className="d-block text-gray">MHIC</span>
 					</div>
 				</div>
-				<nav>
-					<ul className="list-unstyled">
-						<li>
-							<Link to="/#">my tasks</Link>
-						</li>
-						<li>
-							<button
-								onClick={() => {
-									setAssignedOrdersIsExpanded((previousValue) => !previousValue);
-								}}
-							>
-								Assigned Orders
-							</button>
-							<Collapse in={assignedOrdersIsExpanded}>
-								<ul className={classes.collapseList}>
-									{assignedOrders.map((assignedOrder) => (
-										<li>
-											<button
-												onClick={() => {
-													onClick(assignedOrder.patientOrderPanelTypeId);
-												}}
-												className={classNames({
-													active:
-														patientOrderPanelTypeId ===
-														assignedOrder.patientOrderPanelTypeId,
-												})}
-											>
-												<div className="d-flex align-items-center">
-													<div className={classes.dotOuter}>
-														<div
-															className={classNames(
-																classes.dot,
-																assignedOrder.backgroundClassName
-															)}
-														/>
-													</div>
-													<span className="d-block">{assignedOrder.title}</span>
-												</div>
-												<span className="d-block text-gray">{assignedOrder.count}</span>
-											</button>
-										</li>
-									))}
-								</ul>
-							</Collapse>
-						</li>
-					</ul>
+				<nav className={classes.navigation}>
+					{navigationItems.map((ni, index) => (
+						<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
+					))}
 				</nav>
 			</div>
 			<div className={classes.body}>{children}</div>
+		</>
+	);
+};
+
+const MhicNavigationItem = ({ navigationItem }: { navigationItem: MhicNavigationItemModel }) => {
+	const classes = useStyles();
+	const [isExpanded, setIsExpanded] = useState(true);
+
+	return (
+		<>
+			<button
+				onClick={
+					navigationItem.navigationItems
+						? () => {
+								setIsExpanded(!isExpanded);
+						  }
+						: navigationItem.onClick
+				}
+			>
+				<div className="d-flex align-items-center">
+					<div className={classes.iconOuter}>{<navigationItem.icon />}</div>
+					<span className="d-block">{navigationItem.title}</span>
+				</div>
+				{navigationItem.navigationItems ? (
+					<div>
+						<DownChevron
+							className={classNames('text-n300 chevron-icon', {
+								'chevron-icon--is-expanded': isExpanded,
+							})}
+						/>
+					</div>
+				) : (
+					<>
+						{navigationItem.description && (
+							<span className="d-block text-gray">{navigationItem.description}</span>
+						)}
+					</>
+				)}
+			</button>
+			{navigationItem.navigationItems && (
+				<Collapse in={isExpanded}>
+					<div>
+						{navigationItem.navigationItems.map((ni, index) => (
+							<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
+						))}
+					</div>
+				</Collapse>
+			)}
 		</>
 	);
 };

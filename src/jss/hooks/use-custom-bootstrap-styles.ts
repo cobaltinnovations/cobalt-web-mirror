@@ -36,6 +36,12 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.bodyBold,
 		},
 
+		'.text-p50': {
+			color: `${theme.colors.p50} !important`,
+		},
+		'.text-p300': {
+			color: `${theme.colors.p300} !important`,
+		},
 		'.text-primary': {
 			color: `${theme.colors.p500} !important`,
 		},
@@ -59,6 +65,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		},
 		'.text-dark': {
 			color: `${theme.colors.n900} !important`,
+		},
+		'.text-n300': {
+			color: `${theme.colors.n300} !important`,
 		},
 		'.text-gray': {
 			color: `${theme.colors.n500} !important`,
