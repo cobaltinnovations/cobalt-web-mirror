@@ -38,7 +38,7 @@ const AccountContext = createContext({} as AccountContextConfig);
 
 export const LoginDestinationIdRouteMap = {
 	[LoginDestinationId.COBALT_PATIENT]: '/',
-	[LoginDestinationId.IC_PANEL]: '/ic/mhic/panel',
+	[LoginDestinationId.IC_PANEL]: '/ic/mhic/my-view',
 	[LoginDestinationId.IC_PATIENT]: '/ic/patient',
 } as const;
 

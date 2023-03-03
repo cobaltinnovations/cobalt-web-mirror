@@ -21,4 +21,3 @@ export * from './mhic-patient-order-shelf';
 export * from './mhic-schedule-assessment-modal';
 export * from './mhic-navigation';
 export * from './mhic-sort-dropdown';
-export * from './mhic-switch-account-modal';
