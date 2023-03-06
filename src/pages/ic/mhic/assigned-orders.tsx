@@ -1,41 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import classNames from 'classnames';
 
-import {
-	AccountModel,
-	ActivePatientOrderCountModel,
-	PatientOrderCountModel,
-	PatientOrderModel,
-	PatientOrderStatusId,
-} from '@/lib/models';
+import { PatientOrderModel, PatientOrderStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
-	MhicAccountHeader,
 	MhicCustomizeTableModal,
 	MhicFilterDropdown,
-	MhicNavigation,
 	MhicPatientOrderShelf,
 	MhicSortDropdown,
-	MhicSwitchAccountModal,
 } from '@/components/integrated-care/mhic';
-import { createUseThemedStyles } from '@/jss/theme';
-import useFlags from '@/hooks/use-flags';
 
-const useStyles = createUseThemedStyles((theme) => ({
-	row: {
-		padding: '0 64px',
-	},
-}));
-
-const MhicPanel = () => {
-	const classes = useStyles();
+const MhicAssignedOrders = () => {
 	const handleError = useHandleError();
-	const { addFlag } = useFlags();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
@@ -44,33 +23,13 @@ const MhicPanel = () => {
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const pageSize = useRef(15);
 
-	const [showSwitchAccountModal, setShowSwitchAccountModal] = useState(false);
-	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
-	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
-		useState<Record<string, PatientOrderCountModel>>();
-	const [overallActivePatientOrdersCountDescription, setOverallActivePatientOrdersCountDescription] = useState('0');
-
 	const [tableIsLoading, setTableIsLoading] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
-	const [activePatientOrderCountsByPatientOrderStatusId, setActivePatientOrderCountsByPatientOrderStatusId] =
-		useState<Record<PatientOrderStatusId, ActivePatientOrderCountModel>>();
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const [clickedPatientOrderId, setClickedPatientOrderId] = useState('');
-
-	const fetchPanelAccounts = useCallback(async () => {
-		try {
-			const response = await integratedCareService.getPanelAccounts().fetch();
-
-			setPanelAccounts(response.panelAccounts);
-			setActivePatientOrderCountsByPanelAccountId(response.activePatientOrderCountsByPanelAccountId);
-			setOverallActivePatientOrdersCountDescription(response.overallActivePatientOrderCountDescription);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [handleError]);
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
@@ -89,44 +48,12 @@ const MhicPanel = () => {
 			setPatientOrders(response.findResult.patientOrders);
 			setTotalCount(response.findResult.totalCount);
 			setTotalCountDescription(response.findResult.totalCountDescription);
-			setActivePatientOrderCountsByPatientOrderStatusId(response.activePatientOrderCountsByPatientOrderStatusId);
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setTableIsLoading(false);
 		}
 	}, [handleError, pageNumber, panelAccountId, patientOrderPanelTypeId, searchQuery]);
-
-	const handleImportPatientsInputChange = useCallback(
-		(file: File) => {
-			const fileReader = new FileReader();
-
-			fileReader.addEventListener('load', async () => {
-				const fileContent = fileReader.result;
-
-				try {
-					if (typeof fileContent !== 'string') {
-						throw new Error('Could not read file.');
-					}
-
-					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
-					await Promise.all([fetchPanelAccounts(), fetchPatientOrders()]);
-
-					addFlag({
-						variant: 'success',
-						title: 'Your patients were imported!',
-						description: 'These patients are now available to view.',
-						actions: [],
-					});
-				} catch (error) {
-					handleError(error);
-				}
-			});
-
-			fileReader.readAsText(file);
-		},
-		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
-	);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -140,36 +67,8 @@ const MhicPanel = () => {
 		fetchPatientOrders();
 	}, [fetchPatientOrders]);
 
-	useEffect(() => {
-		fetchPanelAccounts();
-	}, [fetchPanelAccounts]);
-
 	return (
 		<>
-			{activePatientOrderCountsByPanelAccountId && (
-				<MhicSwitchAccountModal
-					currentPanelAccountId={panelAccountId ?? ''}
-					panelAccounts={panelAccounts}
-					activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId}
-					overallActivePatientOrdersCountDescription={overallActivePatientOrdersCountDescription}
-					show={showSwitchAccountModal}
-					onSwitchButtonClick={(paid) => {
-						if (paid) {
-							searchParams.set('panelAccountId', paid);
-						} else {
-							searchParams.delete('panelAccountId');
-						}
-						searchParams.set('pageNumber', '0');
-
-						setSearchParams(searchParams);
-						setShowSwitchAccountModal(false);
-					}}
-					onHide={() => {
-						setShowSwitchAccountModal(false);
-					}}
-				/>
-			)}
-
 			<MhicCustomizeTableModal
 				show={showCustomizeTableModal}
 				onHide={() => {
@@ -187,26 +86,7 @@ const MhicPanel = () => {
 				}}
 			/>
 
-			<MhicAccountHeader
-				currentPanelAccountId={panelAccountId ?? ''}
-				panelAccounts={panelAccounts}
-				activePatientOrderCountsByPanelAccountId={activePatientOrderCountsByPanelAccountId ?? {}}
-				overallActivePatientOrdersCountDescription={overallActivePatientOrdersCountDescription}
-				onSwitchButtonClick={() => {
-					setShowSwitchAccountModal(true);
-				}}
-				onImportPatientsInputChange={handleImportPatientsInputChange}
-			/>
-			<MhicNavigation
-				patientOrderPanelTypeId={patientOrderPanelTypeId ?? ''}
-				orderCountsByStatusId={activePatientOrderCountsByPatientOrderStatusId}
-				onClick={(patientOrderPanelTypeId) => {
-					searchParams.set('patientOrderPanelTypeId', patientOrderPanelTypeId);
-					searchParams.set('pageNumber', '0');
-					setSearchParams(searchParams);
-				}}
-			/>
-			<div className={classNames(classes.row, 'py-6 d-flex align-items-center justify-content-between')}>
+			<div className="py-6 d-flex align-items-center justify-content-between">
 				<div className="d-flex">
 					<MhicFilterDropdown />
 					<MhicSortDropdown />
@@ -220,7 +100,7 @@ const MhicPanel = () => {
 					Customize View
 				</Button>
 			</div>
-			<div className={classNames(classes.row, 'mb-8')}>
+			<div className="mb-8">
 				<Table isLoading={tableIsLoading}>
 					<TableHead>
 						<TableRow>
@@ -286,7 +166,7 @@ const MhicPanel = () => {
 					</TableBody>
 				</Table>
 			</div>
-			<div className={classNames(classes.row, 'pb-20')}>
+			<div className="pb-20">
 				<Container fluid>
 					<Row>
 						<Col xs={4}>
@@ -314,4 +194,4 @@ const MhicPanel = () => {
 	);
 };
 
-export default MhicPanel;
+export default MhicAssignedOrders;

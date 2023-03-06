@@ -36,6 +36,12 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.bodyBold,
 		},
 
+		'.text-p50': {
+			color: `${theme.colors.p50} !important`,
+		},
+		'.text-p300': {
+			color: `${theme.colors.p300} !important`,
+		},
 		'.text-primary': {
 			color: `${theme.colors.p500} !important`,
 		},
@@ -59,6 +65,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		},
 		'.text-dark': {
 			color: `${theme.colors.n900} !important`,
+		},
+		'.text-n300': {
+			color: `${theme.colors.n300} !important`,
 		},
 		'.text-gray': {
 			color: `${theme.colors.n500} !important`,
@@ -98,6 +107,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.bg-s50': {
 			backgroundColor: `${theme.colors.s50} !important`,
 		},
+		'.bg-s500': {
+			backgroundColor: `${theme.colors.s500} !important`,
+		},
 
 		'.bg-danger': {
 			backgroundColor: `${theme.colors.d500} !important`,
@@ -105,12 +117,18 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.bg-d50': {
 			backgroundColor: `${theme.colors.d50} !important`,
 		},
+		'.bg-d500': {
+			backgroundColor: `${theme.colors.d500} !important`,
+		},
 
 		'.bg-warning': {
 			backgroundColor: `${theme.colors.w500} !important`,
 		},
 		'.bg-w50': {
 			backgroundColor: `${theme.colors.w50} !important`,
+		},
+		'.bg-w500': {
+			backgroundColor: `${theme.colors.w500} !important`,
 		},
 
 		'.bg-info': {
@@ -128,6 +146,12 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		},
 		'.bg-n75': {
 			backgroundColor: `${theme.colors.n75} !important`,
+		},
+		'.bg-n300': {
+			backgroundColor: `${theme.colors.n300} !important`,
+		},
+		'.bg-n500': {
+			backgroundColor: `${theme.colors.n500} !important`,
 		},
 		'.bg-dark': {
 			backgroundColor: `${theme.colors.n900} !important`,

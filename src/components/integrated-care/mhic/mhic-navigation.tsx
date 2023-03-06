@@ -1,169 +1,163 @@
-import React, { useMemo } from 'react';
-
-import { createUseThemedStyles } from '@/jss/theme';
+import React, { PropsWithChildren, useState } from 'react';
+import { Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
-import { ActivePatientOrderCountModel, PatientOrderStatusId } from '@/lib/models';
+
+import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
+
+import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+
+const headerHeight = 56;
+const sideNavWidth = 280;
 
 const useStyles = createUseThemedStyles((theme) => ({
-	navigation: {
-		display: 'flex',
-		padding: '0 64px',
+	sideNav: {
+		left: 0,
+		bottom: 0,
+		padding: 16,
+		position: 'fixed',
+		overflowY: 'auto',
+		top: headerHeight,
+		width: sideNavWidth,
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderRight: `1px solid ${theme.colors.n100}`,
+	},
+	navigation: {
 		'& button': {
 			border: 0,
-			fontWeight: 500,
-			appearance: 'none',
-			padding: '18px 10px',
-			position: 'relative',
+			padding: 8,
+			width: '100%',
+			borderRadius: 4,
+			display: 'flex',
 			alignItems: 'center',
-			display: 'inline-flex',
 			textDecoration: 'none',
-			color: theme.colors.n500,
+			color: theme.colors.n900,
+			...theme.fonts.bodyNormal,
 			backgroundColor: 'transparent',
-			'&:after': {
-				left: 10,
-				right: 10,
-				bottom: 0,
-				height: 2,
-				content: '""',
-				display: 'none',
-				position: 'absolute',
-				backgroundColor: theme.colors.p700,
-			},
+			justifyContent: 'space-between',
 			'&:hover': {
-				color: theme.colors.p700,
+				backgroundColor: theme.colors.n50,
 			},
-			'&:first-of-type': {
-				paddingLeft: 0,
-				'&:after': {
-					left: 0,
-				},
-			},
-			'&:last-of-type': {
-				paddingRight: 0,
-				'&:after': {
-					right: 0,
-				},
-			},
-			'&.first-link-of-section': {
-				paddingLeft: 20,
-				'&:after': {
-					left: 20,
-				},
-			},
-			'&.last-link-of-section': {
-				paddingRight: 20,
-				borderRight: `1px solid ${theme.colors.n100}`,
-				'&:after': {
-					right: 20,
-				},
+			'&:active': {
+				backgroundColor: theme.colors.n75,
 			},
 			'&.active': {
-				color: theme.colors.p700,
-				'&:after': {
-					display: 'block',
+				backgroundColor: theme.colors.n50,
+			},
+			'& .chevron-icon': {
+				transition: '200ms transform',
+				'&--is-expanded': {
+					transform: 'rotate(180deg)',
 				},
 			},
 		},
 	},
-	countBubble: {
-		marginLeft: 4,
-		padding: '0 8px',
-		borderRadius: 32,
-		...theme.fonts.default,
-		color: theme.colors.p500,
-		...theme.fonts.headingBold,
-		backgroundColor: theme.colors.p50,
+	iconOuter: {
+		width: 24,
+		height: 24,
+		marginRight: 8,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	body: {
+		right: 0,
+		bottom: 0,
+		position: 'fixed',
+		overflowY: 'auto',
+		padding: '0 40px',
+		top: headerHeight,
+		left: sideNavWidth,
 	},
 }));
 
-interface Props {
-	patientOrderPanelTypeId: string;
-	orderCountsByStatusId?: Record<PatientOrderStatusId, ActivePatientOrderCountModel>;
-	onClick(patientOrderPanelTypeId: string): void;
+interface MhicNavigationItemModel {
+	title: string;
+	description?: string;
+	icon(): JSX.Element;
+	onClick?(): void;
+	navigationItems?: MhicNavigationItemModel[];
 }
 
-export const MhicNavigation = ({ patientOrderPanelTypeId, orderCountsByStatusId, onClick }: Props) => {
-	const classes = useStyles();
+interface MhicNavigationProps {
+	navigationItems: MhicNavigationItemModel[];
+}
 
-	const linkSections = useMemo(
-		() => [
-			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'NEED_ASSESSMENT',
-						title: 'Need Assessment',
-						count: '0',
-					},
-				],
-			},
-			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'SAFETY_PLANNING',
-						title: 'Safety Planning',
-						count: '0',
-					},
-					{
-						patientOrderPanelTypeId: 'SPECIALTY_CARE',
-						title: 'Specialty Care',
-						count: '0',
-					},
-					{
-						patientOrderPanelTypeId: 'BHP',
-						title: 'Behavioral Health Provider',
-						count: '0',
-					},
-				],
-			},
-			{
-				links: [
-					{
-						patientOrderPanelTypeId: 'CLOSED',
-						title: 'Closed',
-						count: orderCountsByStatusId?.[PatientOrderStatusId.CLOSED].countDescription ?? '0',
-					},
-				],
-			},
-		],
-		[orderCountsByStatusId]
-	);
+export const MhicNavigation = ({ navigationItems, children }: PropsWithChildren<MhicNavigationProps>) => {
+	const classes = useStyles();
+	const { account } = useAccount();
 
 	return (
-		<nav className={classes.navigation}>
-			{linkSections.map((section, sectionIndex) => {
-				const isFirstSection = sectionIndex === 0;
-				const isLastSection = sectionIndex === linkSections.length - 1;
+		<>
+			<div className={classes.sideNav}>
+				<div className="mb-3 px-2 pt-1 pb-5 d-flex align-items-center border-bottom">
+					<AvatarIcon className="me-3" />
+					<div>
+						<span className="d-block">{account?.displayName}</span>
+						<span className="d-block text-gray">MHIC</span>
+					</div>
+				</div>
+				<nav className={classes.navigation}>
+					{navigationItems.map((ni, index) => (
+						<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
+					))}
+				</nav>
+				<hr className="mt-3" />
+			</div>
+			<div className={classes.body}>{children}</div>
+		</>
+	);
+};
 
-				return (
-					<React.Fragment key={sectionIndex}>
-						{section.links.map((link, linkIndex) => {
-							const isFirstLink = linkIndex === 0;
-							const isLastLink = linkIndex === section.links.length - 1;
+interface MhicNavigationItemProps {
+	navigationItem: MhicNavigationItemModel;
+}
 
-							return (
-								<button
-									key={linkIndex}
-									onClick={() => {
-										onClick(link.patientOrderPanelTypeId);
-									}}
-									className={classNames({
-										'first-link-of-section': isFirstLink && !isFirstSection,
-										'last-link-of-section': isLastLink && !isLastSection,
-										active: patientOrderPanelTypeId === link.patientOrderPanelTypeId,
-									})}
-								>
-									<span>{link.title}</span>
-									{link.count && parseInt(link.count, 10) > 0 && (
-										<span className={classes.countBubble}>{link.count}</span>
-									)}
-								</button>
-							);
-						})}
-					</React.Fragment>
-				);
-			})}
-		</nav>
+const MhicNavigationItem = ({ navigationItem }: MhicNavigationItemProps) => {
+	const classes = useStyles();
+	const [isExpanded, setIsExpanded] = useState(true);
+
+	return (
+		<>
+			<button
+				onClick={
+					navigationItem.navigationItems
+						? () => {
+								setIsExpanded(!isExpanded);
+						  }
+						: navigationItem.onClick
+				}
+			>
+				<div className="d-flex align-items-center">
+					<div className={classes.iconOuter}>{<navigationItem.icon />}</div>
+					<span className="d-block">{navigationItem.title}</span>
+				</div>
+				{navigationItem.navigationItems ? (
+					<div>
+						<DownChevron
+							className={classNames('text-n300 chevron-icon', {
+								'chevron-icon--is-expanded': isExpanded,
+							})}
+						/>
+					</div>
+				) : (
+					<>
+						{navigationItem.description && (
+							<span className="d-block text-gray">{navigationItem.description}</span>
+						)}
+					</>
+				)}
+			</button>
+			{navigationItem.navigationItems && (
+				<Collapse in={isExpanded}>
+					<div>
+						{navigationItem.navigationItems.map((ni, index) => (
+							<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
+						))}
+					</div>
+				</Collapse>
+			)}
+		</>
 	);
 };

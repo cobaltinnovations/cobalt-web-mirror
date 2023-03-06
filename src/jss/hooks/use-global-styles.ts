@@ -51,6 +51,8 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 		hr: {
 			margin: 0,
+			opacity: 1,
+			borderColor: theme.colors.n100,
 		},
 
 		/* ----------------------------------------------------------- */
