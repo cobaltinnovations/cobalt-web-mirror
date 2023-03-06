@@ -104,28 +104,25 @@ export const MhicHeader = () => {
 	const { pathname } = useLocation();
 	const { signOutAndClearContext } = useAccount();
 
-	const isMyView = matchPath('/ic/mhic/my-view/*', pathname);
-	const isOrders = matchPath('/ic/mhic/orders', pathname);
-	const isReports = matchPath('/ic/mhic/reports', pathname);
 	const navigationLinks = useMemo(
 		() => [
 			{
 				to: '/ic/mhic/my-view',
 				title: 'My View',
-				active: isMyView,
+				active: matchPath('/ic/mhic/my-view/*', pathname),
 			},
 			{
 				to: '/ic/mhic/orders',
 				title: 'Orders',
-				active: isOrders,
+				active: matchPath('/ic/mhic/orders', pathname),
 			},
 			{
 				to: '/ic/mhic/reports',
 				title: 'Reports',
-				active: isReports,
+				active: matchPath('/ic/mhic/reports', pathname),
 			},
 		],
-		[isMyView, isOrders, isReports]
+		[pathname]
 	);
 
 	return (

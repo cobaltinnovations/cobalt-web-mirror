@@ -78,6 +78,7 @@ interface MhicNavigationItemModel {
 	icon(): JSX.Element;
 	onClick?(): void;
 	navigationItems?: MhicNavigationItemModel[];
+	isActive?: boolean;
 }
 
 interface MhicNavigationProps {
@@ -128,6 +129,7 @@ const MhicNavigationItem = ({ navigationItem }: MhicNavigationItemProps) => {
 						  }
 						: navigationItem.onClick
 				}
+				className={classNames({ active: navigationItem.isActive })}
 			>
 				<div className="d-flex align-items-center">
 					<div className={classes.iconOuter}>{<navigationItem.icon />}</div>
