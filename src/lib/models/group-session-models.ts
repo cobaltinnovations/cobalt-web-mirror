@@ -39,6 +39,8 @@ export interface GroupSessionModel {
 	title: string;
 	description: string;
 	urlName: string;
+	submitterName: string;
+	submitterEmailAddress: string;
 	facilitatorAccountId?: string;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;
