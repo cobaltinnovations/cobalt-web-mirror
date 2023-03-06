@@ -234,8 +234,8 @@ const GroupSessionsCreate: FC = () => {
 				startTime: isCopy ? '' : moment(groupSessionToSet.startDateTime).format('hh:mm A'),
 				endTime: isCopy ? '' : moment(groupSessionToSet.endDateTime).format('hh:mm A'),
 				schedulingUrl: groupSessionToSet.scheduleUrl,
-				yourName: '', // TODO: Must set after BE updates
-				yourEmail: '', // TODO: Must set after BE updates
+				yourName: groupSessionToSet.submitterName,
+				yourEmail: groupSessionToSet.submitterEmailAddress,
 				isModerator: groupSessionToSet.facilitatorAccountId === accountId,
 				facilitatorsName: groupSessionToSet.facilitatorName,
 				facilitatorsEmail: groupSessionToSet.facilitatorEmailAddress,
@@ -291,11 +291,12 @@ const GroupSessionsCreate: FC = () => {
 				'YYYY-MM-DD[T]HH:mm'
 			);
 
-			// TODO: set "Your Name" and "Your Email" after BE is updated
 			const submissionValues: CreateGroupSessionRequestBody = {
+				submitterName: values.yourName,
+				submitterEmailAddress: values.yourEmail,
 				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
-				facilitatorName: values.facilitatorsName,
-				facilitatorEmailAddress: values.facilitatorsEmail,
+				facilitatorName: values.isModerator ? values.yourName : values.facilitatorsName,
+				facilitatorEmailAddress: values.isModerator ? values.yourEmail : values.facilitatorsEmail,
 				title: values.title,
 				description: values.description,
 				urlName: values.slug,
@@ -747,7 +748,7 @@ const GroupSessionsCreate: FC = () => {
 															as="input"
 															onBlur={handleBlur}
 															onChange={handleChange}
-															required={requiredFields.facilitatorsName}
+															required={!values.isModerator}
 															error={
 																touched.facilitatorsName && errors.facilitatorsName
 																	? errors.facilitatorsName
@@ -763,7 +764,7 @@ const GroupSessionsCreate: FC = () => {
 															as="input"
 															onBlur={handleBlur}
 															onChange={handleChange}
-															required={requiredFields.facilitatorsEmail}
+															required={!values.isModerator}
 															error={
 																touched.facilitatorsEmail && errors.facilitatorsEmail
 																	? errors.facilitatorsEmail
