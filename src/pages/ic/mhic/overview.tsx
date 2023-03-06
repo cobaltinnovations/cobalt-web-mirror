@@ -1,9 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
+import classNames from 'classnames';
+
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { createUseThemedStyles } from '@/jss/theme';
+
+import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
+import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	overviewCard: {
+		display: 'flex',
+		borderRadius: 8,
+		padding: '20px 16px',
+		boxShadow: theme.elevation.e200,
+		backgroundColor: theme.colors.n0,
+	},
+	iconOuter: {
+		width: 40,
+		flexShrink: 0,
+		marginRight: 16,
+	},
+	icon: {
+		width: 40,
+		height: 40,
+		display: 'flex',
+		borderRadius: '50%',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+}));
 
 const MhicOverview = () => {
+	const classes = useStyles();
+
 	return (
 		<Container fluid className="py-11 overflow-visible">
 			<Row className="mb-8">
@@ -13,8 +45,13 @@ const MhicOverview = () => {
 			</Row>
 			<Row className="mb-14">
 				<Col>
-					<Card>
-						<Card.Body>
+					<div className={classes.overviewCard}>
+						<div className={classes.iconOuter}>
+							<div className={classNames(classes.icon, 'bg-s50')}>
+								<CalendarIcon className="text-success" width={24} height={24} />
+							</div>
+						</div>
+						<div>
 							<h4 className="mb-0">3</h4>
 							<p className="mb-4">Assessments Scheduled</p>
 							<hr className="mb-4" />
@@ -23,12 +60,17 @@ const MhicOverview = () => {
 									View Scheduled
 								</Link>
 							</p>
-						</Card.Body>
-					</Card>
+						</div>
+					</div>
 				</Col>
 				<Col>
-					<Card>
-						<Card.Body>
+					<div className={classes.overviewCard}>
+						<div className={classes.iconOuter}>
+							<div className={classNames(classes.icon, 'bg-w50')}>
+								<PhoneIcon className="text-warning" width={24} height={24} />
+							</div>
+						</div>
+						<div>
 							<h4 className="mb-0">3</h4>
 							<p className="mb-4">Due for Outreach</p>
 							<hr className="mb-4" />
@@ -37,12 +79,17 @@ const MhicOverview = () => {
 									View Outreach
 								</Link>
 							</p>
-						</Card.Body>
-					</Card>
+						</div>
+					</div>
 				</Col>
 				<Col>
-					<Card>
-						<Card.Body>
+					<div className={classes.overviewCard}>
+						<div className={classes.iconOuter}>
+							<div className={classNames(classes.icon, 'bg-p50')}>
+								<EnvelopeIcon className="text-primary" width={24} height={24} />
+							</div>
+						</div>
+						<div>
 							<h4 className="mb-0">2</h4>
 							<p className="mb-4">Need Resources</p>
 							<hr className="mb-4" />
@@ -51,8 +98,8 @@ const MhicOverview = () => {
 									View Resources
 								</Link>
 							</p>
-						</Card.Body>
-					</Card>
+						</div>
+					</div>
 				</Col>
 			</Row>
 			<Row>
