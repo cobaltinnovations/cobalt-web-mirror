@@ -330,7 +330,7 @@ const GroupSessionsCreate: FC = () => {
 					addFlag({
 						variant: 'success',
 						title: 'Your group session was updated!',
-						description: 'This session is now available on Cobalt',
+						description: '',
 						actions: [
 							{
 								title: 'View Session',
@@ -347,7 +347,7 @@ const GroupSessionsCreate: FC = () => {
 				addFlag({
 					variant: 'success',
 					title: 'Your group session was added!',
-					description: 'This session is now available on Cobalt',
+					description: '',
 					actions: [
 						{
 							title: 'View Session',
