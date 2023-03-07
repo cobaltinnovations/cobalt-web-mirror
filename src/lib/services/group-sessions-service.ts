@@ -28,6 +28,8 @@ export enum GroupSessionSchedulingSystemId {
 }
 
 export interface CreateGroupSessionRequestBody {
+	submitterName: string;
+	submitterEmailAddress: string;
 	facilitatorAccountId: string | null;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;

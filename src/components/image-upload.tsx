@@ -50,12 +50,12 @@ const ImageUpload: FC<ImageUploadProps> = ({
 	return (
 		<Form.Group className={classNames('mb-5', className)}>
 			<Form.Label className="mb-2" style={{ ...fonts.default }}>
-				Lead Image
+				Image
 			</Form.Label>
 			{!imagePreview && (
 				<p className="mb-5">
-					If you choose not to upload an image, a random image will be assigned to your post. Images that are
-					free for use can be found at{' '}
+					If you choose not to upload an image, a generic placeholder image will be added to your post. Free
+					images can be found at{' '}
 					<a href="https://unsplash.com/" target="_blank" rel="noopener noreferrer">
 						unsplash.com
 					</a>
