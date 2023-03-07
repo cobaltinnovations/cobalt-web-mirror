@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 export const MhicAssessmentComplete = () => {
+	const navigate = useNavigate();
+
 	return (
 		<Container className="py-20">
 			<Row className="mb-8">
@@ -18,7 +21,13 @@ export const MhicAssessmentComplete = () => {
 			<Row>
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 					<div className="text-right">
-						<Button>Done</Button>
+						<Button
+							onClick={() => {
+								navigate('/ic/mhic');
+							}}
+						>
+							Done
+						</Button>
 					</div>
 				</Col>
 			</Row>

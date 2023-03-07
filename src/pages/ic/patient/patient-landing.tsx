@@ -10,6 +10,7 @@ import NoData from '@/components/no-data';
 import CallToAction from '@/components/call-to-action';
 import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/man-at-desk.svg';
 import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
+import config from '@/lib/config';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -76,32 +77,34 @@ const PatientLanding = () => {
 				<h1 className="text-center">Welcome back, {account?.firstName ?? 'Patient'}</h1>
 			</HeroContainer>
 
-			<Container className="pt-10">
-				<Row>
-					<Col>
-						<Form>
-							<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
-							<Form.Group>
-								{pageStates.map((hs) => (
-									<Form.Check
-										inline
-										key={hs.homescreenStateId}
-										type="radio"
-										name="homescreen-state"
-										id={`homescreen-state--${hs.homescreenStateId}`}
-										value={hs.homescreenStateId}
-										label={hs.title}
-										checked={homescreenState === hs.homescreenStateId}
-										onChange={({ currentTarget }) => {
-											setHomescreenState(currentTarget.value as PAGE_STATES);
-										}}
-									/>
-								))}
-							</Form.Group>
-						</Form>
-					</Col>
-				</Row>
-			</Container>
+			{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+				<Container className="pt-10">
+					<Row>
+						<Col>
+							<Form>
+								<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
+								<Form.Group>
+									{pageStates.map((hs) => (
+										<Form.Check
+											inline
+											key={hs.homescreenStateId}
+											type="radio"
+											name="homescreen-state"
+											id={`homescreen-state--${hs.homescreenStateId}`}
+											value={hs.homescreenStateId}
+											label={hs.title}
+											checked={homescreenState === hs.homescreenStateId}
+											onChange={({ currentTarget }) => {
+												setHomescreenState(currentTarget.value as PAGE_STATES);
+											}}
+										/>
+									))}
+								</Form.Group>
+							</Form>
+						</Col>
+					</Row>
+				</Container>
+			)}
 
 			{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
 				<Container className="py-14">
@@ -170,7 +173,7 @@ const PatientLanding = () => {
 										variant: 'outline-primary',
 										title: 'Restart from Beginning',
 										onClick: () => {
-											window.alert('[TODO]');
+											navigate('/ic/patient/demographics-introduction');
 										},
 									},
 								]}
