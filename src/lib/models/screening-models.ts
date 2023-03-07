@@ -114,6 +114,7 @@ export interface ScreeningQuestionContextResponse {
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
 	screeningAnswers: ScreeningAnswer[];
+	screeningFlowVersion: ScreeningFlowVersion;
 	screeningSessionDestination: ScreeningSessionDestination;
 	preQuestionScreeningConfirmationPrompt?: ScreeningQuestionPrompt;
 }

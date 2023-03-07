@@ -522,40 +522,46 @@ const ScreeningQuestionsPage = () => {
 										</div>
 									</div>
 
-									<div className="d-flex">
-										<Button
-											variant="link"
-											className="mx-auto"
-											type="button"
-											disabled={isSubmitting}
-											onClick={() => {
-												if (isSubmitting || !screeningQuestionContextId) {
-													return;
-												}
+									{screeningQuestionContextResponse?.screeningFlowVersion.skippable && (
+										<div className="d-flex">
+											<Button
+												variant="link"
+												className="mx-auto"
+												type="button"
+												disabled={isSubmitting}
+												onClick={() => {
+													if (isSubmitting || !screeningQuestionContextId) {
+														return;
+													}
 
-												if (!window.confirm('Are you sure you want to skip this assessment?')) {
-													return;
-												}
+													if (
+														!window.confirm(
+															'Are you sure you want to skip this assessment?'
+														)
+													) {
+														return;
+													}
 
-												screeningService
-													.skipScreeningQuestionContext(screeningQuestionContextId)
-													.fetch()
-													.then((response) => {
-														navigateToDestination(
-															response.screeningSession.screeningSessionDestination,
-															{ skipped: true }
-														);
-													})
-													.catch((e) => {
-														if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-															handleError(e);
-														}
-													});
-											}}
-										>
-											Skip Assessment
-										</Button>
-									</div>
+													screeningService
+														.skipScreeningQuestionContext(screeningQuestionContextId)
+														.fetch()
+														.then((response) => {
+															navigateToDestination(
+																response.screeningSession.screeningSessionDestination,
+																{ skipped: true }
+															);
+														})
+														.catch((e) => {
+															if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+																handleError(e);
+															}
+														});
+												}}
+											>
+												Skip Assessment
+											</Button>
+										</div>
+									)}
 								</Form>
 							</>
 						)}
