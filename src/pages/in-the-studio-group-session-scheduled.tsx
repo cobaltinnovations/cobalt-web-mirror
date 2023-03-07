@@ -78,20 +78,6 @@ const InTheStudioGroupSessionScheduled = () => {
 		setSession(groupSession);
 		setReservation(groupSessionReservation);
 
-		if (groupSessionReservation) {
-			addFlag({
-				variant: 'success',
-				title: 'Your seat is reserved',
-				description: 'This session was added to your events list',
-				actions: [
-					{
-						title: 'View My Events',
-						onClick: () => navigate('/my-calendar'),
-					},
-				],
-			});
-		}
-
 		/* --------------------------------------------------------- */
 		/* This fires after you complete the sessions assessment */
 		/* --------------------------------------------------------- */
@@ -113,7 +99,7 @@ const InTheStudioGroupSessionScheduled = () => {
 				'Based on your answer(s), this session does not seem like a good match. Please join us in another.'
 			);
 		}
-	}, [addFlag, groupSessionId, location.pathname, location.state, navigate]);
+	}, [groupSessionId, location.pathname, location.state, navigate]);
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
