@@ -51,6 +51,28 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
+					navigate(
+						{
+							pathname: '/ic/mhic/assessment-complete',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
+					return;
+				case ScreeningSessionDestinationId.IC_PATIENT_SCREENING_SESSION_RESULTS:
+					navigate(
+						{
+							pathname: '/ic/patient/assessment-complete',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					navigate(

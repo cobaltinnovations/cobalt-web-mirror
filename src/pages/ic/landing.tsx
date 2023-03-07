@@ -7,17 +7,19 @@ import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
 import { MhicHeader } from '@/components/integrated-care/mhic';
 import { PatientHeader } from '@/components/integrated-care/patient';
 
-import MhicMyView from './mhic/my-view';
 import PatientLanding from './patient/patient-landing';
 import PatientDemographicsIntroduction from './patient/demographics-introduction';
 import PatientDemographicsPart1 from './patient/demographics-part-1';
 import PatientDemographicsPart2 from './patient/demographics-part-2';
 import PatientDemographicsPart3 from './patient/demographics-part-3';
 import PatientDemographicsThanks from './patient/demographics-thanks';
-import NoMatch from '../no-match';
+import PatientAssessmentComplete from './patient/assessment-complete';
+import MhicMyView from './mhic/my-view';
 import MhicAssignedOrders from './mhic/assigned-orders';
 import MhicOrders from './mhic/orders';
 import MhicOverview from './mhic/overview';
+import MhicAssessmentComplete from './mhic/assessment-complete';
+import NoMatch from '../no-match';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -41,6 +43,7 @@ const IntegratedCareLandingPage = () => {
 						<Route path="assigned-orders" element={<MhicAssignedOrders />} />
 					</Route>
 					<Route path="orders" element={<MhicOrders />} />
+					<Route path="assessment-complete" element={<MhicAssessmentComplete />} />
 					<Route path="*" element={<NoMatch />} />
 				</Route>
 
@@ -59,6 +62,7 @@ const IntegratedCareLandingPage = () => {
 					<Route path="demographics-part-2" element={<PatientDemographicsPart2 />} />
 					<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
 					<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
+					<Route path="assessment-complete" element={<PatientAssessmentComplete />} />
 					{/* <Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
 					<Route path="*" element={<NoMatch />} />
 				</Route>
