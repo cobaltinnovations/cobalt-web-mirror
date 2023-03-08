@@ -797,7 +797,6 @@ const GroupSessionsCreate: FC = () => {
 																? errors.notificationEmail
 																: ''
 														}
-														disabled={hasReservations || isViewMode}
 													/>
 												</Form.Group>
 											</Card>
