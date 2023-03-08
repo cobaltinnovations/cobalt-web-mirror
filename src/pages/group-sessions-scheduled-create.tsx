@@ -390,7 +390,7 @@ const GroupSessionsCreate: FC = () => {
 
 			<HeroContainer>
 				<h2 className="mb-0 text-center">
-					{initialValues?.title ? initialValues.title : 'Create Group Session'}
+					{initialValues?.title ? initialValues.title : 'Submit Group Session'}
 					{isCopy ? ' (Copy)' : ''}
 				</h2>
 			</HeroContainer>
@@ -403,7 +403,7 @@ const GroupSessionsCreate: FC = () => {
 						},
 						{
 							to: '/group-sessions/scheduled/create',
-							title: `${initialValues?.title || 'Create Group Session'}${isCopy ? ' (Copy)' : ''}`,
+							title: `${initialValues?.title || 'Submit Group Session'}${isCopy ? ' (Copy)' : ''}`,
 						},
 					]}
 				/>
@@ -414,7 +414,7 @@ const GroupSessionsCreate: FC = () => {
 					<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
 						<div className="mb-6 d-flex align-items-center">
 							<h1 className="mb-0">
-								{initialValues?.title || 'Create Group Session'}
+								{initialValues?.title || 'Submit Group Session'}
 								{isCopy ? ' (Copy)' : ''}
 							</h1>
 							{!isViewMode && groupSessionId && (
