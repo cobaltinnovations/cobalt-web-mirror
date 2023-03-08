@@ -33,6 +33,7 @@ export interface CreateGroupSessionRequestBody {
 	facilitatorAccountId: string | null;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;
+	targetEmailAddress: string;
 	title: string;
 	description: string;
 	urlName: string;

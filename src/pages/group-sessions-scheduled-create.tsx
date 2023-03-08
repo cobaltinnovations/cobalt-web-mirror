@@ -7,7 +7,6 @@ import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import classNames from 'classnames';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 // import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
@@ -85,6 +84,7 @@ const groupSessionSchema = yup
 			.email()
 			.default('')
 			.when('isModerator', { is: false, then: (s) => s.required() }),
+		notificationEmail: yup.string().email().required().default(''),
 		title: yup.string().required().default(''),
 		description: yup.string().required().default(''),
 		imageUrl: yup.string().default(''),
@@ -237,6 +237,7 @@ const GroupSessionsCreate: FC = () => {
 				yourName: groupSessionToSet.submitterName,
 				yourEmail: groupSessionToSet.submitterEmailAddress,
 				isModerator: groupSessionToSet.facilitatorAccountId === accountId,
+				notificationEmail: groupSessionToSet.targetEmailAddress,
 				facilitatorsName: groupSessionToSet.facilitatorName,
 				facilitatorsEmail: groupSessionToSet.facilitatorEmailAddress,
 				title: groupSessionToSet.title,
@@ -297,6 +298,7 @@ const GroupSessionsCreate: FC = () => {
 				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
 				facilitatorName: values.isModerator ? values.yourName : values.facilitatorsName,
 				facilitatorEmailAddress: values.isModerator ? values.yourEmail : values.facilitatorsEmail,
+				targetEmailAddress: values.notificationEmail,
 				title: values.title,
 				description: values.description,
 				urlName: values.slug,
@@ -707,7 +709,7 @@ const GroupSessionsCreate: FC = () => {
 													disabled={isViewMode}
 												/>
 
-												<Form.Group className={classNames({ 'mb-5': !values.isModerator })}>
+												<Form.Group className="mb-5">
 													<Form.Label className="mb-1" style={{ ...fonts.default }}>
 														Are you the facilitator of this session?
 													</Form.Label>
@@ -757,6 +759,7 @@ const GroupSessionsCreate: FC = () => {
 															disabled={isViewMode}
 														/>
 														<InputHelper
+															className="mb-5"
 															label="Facilitator's Email"
 															type="email"
 															name="facilitatorsEmail"
@@ -774,6 +777,29 @@ const GroupSessionsCreate: FC = () => {
 														/>
 													</>
 												)}
+
+												<Form.Group>
+													<Form.Label className="mb-3" style={{ ...fonts.default }}>
+														Which email should receive notifications when people register
+														for the event or cancel registration?
+													</Form.Label>
+													<InputHelper
+														label="Notification Email"
+														type="email"
+														name="notificationEmail"
+														value={values.notificationEmail}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.notificationEmail}
+														error={
+															touched.notificationEmail && errors.notificationEmail
+																? errors.notificationEmail
+																: ''
+														}
+														disabled={hasReservations || isViewMode}
+													/>
+												</Form.Group>
 											</Card>
 
 											<Card className="mb-5 border-0 p-6">

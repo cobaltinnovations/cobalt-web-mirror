@@ -44,6 +44,7 @@ export interface GroupSessionModel {
 	facilitatorAccountId?: string;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;
+	targetEmailAddress: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
 	endDateTime: string;
