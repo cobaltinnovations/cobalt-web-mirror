@@ -14,7 +14,7 @@ import {
 	MhicComments,
 	MhicFollowUp,
 	MhicOutreachAndAssesment,
-	MhicPatientDetails,
+	MhicOrderDetails,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -112,7 +112,7 @@ interface MhicPatientOrderShelfProps {
 }
 
 enum TAB_KEYS {
-	PATIENT_DETAILS = 'PATIENT_DETAILS',
+	ORDER_DETAILS = 'ORDER_DETAILS',
 	OUTREACH_AND_ASSESSMENT = 'OUTREACH_AND_ASSESSMENT',
 	FOLLOW_UP = 'FOLLOW_UP',
 	COMMENTS = 'COMMENTS',
@@ -122,7 +122,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 
-	const [tabKey, setTabKey] = useState(TAB_KEYS.PATIENT_DETAILS);
+	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
 	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
@@ -162,7 +162,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 			>
 				<div className={classes.patientOrderShelf}>
 					<AsyncWrapper fetchData={fetchPatientOverview}>
-						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
+						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.ORDER_DETAILS} activeKey={tabKey}>
 							<div className={classes.header}>
 								<Button
 									variant="light"
@@ -204,7 +204,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										hideBorder
 										value={tabKey}
 										tabs={[
-											{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
+											{ value: TAB_KEYS.ORDER_DETAILS, title: 'Order Details' },
 											{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
 											{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
 											{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
@@ -216,9 +216,9 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 								</div>
 							</div>
 							<Tab.Content className={classes.tabContent}>
-								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
+								<Tab.Pane eventKey={TAB_KEYS.ORDER_DETAILS} className={classes.tabPane}>
 									{currentPatientOrder && referenceData && (
-										<MhicPatientDetails
+										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
 											referenceData={referenceData}

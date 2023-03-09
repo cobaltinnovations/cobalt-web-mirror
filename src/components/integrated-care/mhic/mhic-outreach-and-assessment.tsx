@@ -13,7 +13,6 @@ import {
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
-import NoData from '@/components/no-data';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 
 interface Props {
@@ -26,7 +25,6 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 	const { addFlag } = useFlags();
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
-	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
@@ -101,7 +99,6 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 			/>
 
 			<MhicScheduleAssessmentModal
-				assessmentId={assessmentIdToEdit}
 				show={showScheduleAssessmentModal}
 				onHide={() => {
 					setShowScheduleAssessmentModal(false);
@@ -161,65 +158,6 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 									/>
 								);
 							})}
-						</Col>
-					</Row>
-				</Container>
-			</section>
-			<section>
-				<Container fluid>
-					<Row className="mb-6">
-						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<h4 className="mb-0">Latest Assessment</h4>
-								<Button
-									onClick={() => {
-										window.alert('[TODO]: Link to start assessment?');
-									}}
-								>
-									Start Assessment
-								</Button>
-							</div>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<NoData
-								className="mb-6"
-								title="No Assessment"
-								description="There is no assessment for the patient's most recent referral order"
-								actions={[
-									{
-										variant: 'outline-primary',
-										title: 'Schedule Assessment',
-										onClick: () => {
-											setAssessmentIdToEdit('');
-											setShowScheduleAssessmentModal(true);
-										},
-									},
-								]}
-							/>
-							<NoData
-								className="bg-white"
-								title="Assessment is Scheduled"
-								description="Nov 12, 2023 at 2:30 PM"
-								actions={[
-									{
-										variant: 'primary',
-										title: 'View Appointment',
-										onClick: () => {
-											window.alert('[TODO]: Link to appointment details?');
-										},
-									},
-									{
-										variant: 'outline-primary',
-										title: 'Edit Appointment Date',
-										onClick: () => {
-											setAssessmentIdToEdit('xxx');
-											setShowScheduleAssessmentModal(true);
-										},
-									},
-								]}
-							/>
 						</Col>
 					</Row>
 				</Container>
