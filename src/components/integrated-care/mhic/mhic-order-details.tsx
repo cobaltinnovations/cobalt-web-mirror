@@ -149,7 +149,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Date Referred</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Nov 12, 2022</p>
+												<p className="m-0">{patientOrder.orderDateDescription}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -157,7 +157,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Referral Reason</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">High PHQ-4 score, patient reported panic attacks</p>
+												<p className="m-0">{patientOrder.reasonForReferral}</p>
 											</Col>
 										</Row>
 										<hr className="mb-4" />
@@ -166,7 +166,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Practice</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">[Practice Name]</p>
+												<p className="m-0">{patientOrder.referringPracticeName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -174,7 +174,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Ordering Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">[Name]</p>
+												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -182,7 +182,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Authorizing Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">[Name]</p>
+												<p className="m-0">
+													<span className="text-danger">
+														[TODO]: Authorizing Provider Name
+													</span>
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -190,7 +194,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Billing Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">[Name]</p>
+												<p className="m-0">{patientOrder.billingProviderDisplayName}</p>
 											</Col>
 										</Row>
 									</Container>

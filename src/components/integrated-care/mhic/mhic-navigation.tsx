@@ -15,6 +15,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	sideNav: {
 		left: 0,
 		bottom: 0,
+		zIndex: 4,
 		padding: 16,
 		position: 'fixed',
 		overflowY: 'auto',
@@ -64,6 +65,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	body: {
 		right: 0,
 		bottom: 0,
+		zIndex: 4,
 		position: 'fixed',
 		overflowY: 'auto',
 		padding: '0 40px',
