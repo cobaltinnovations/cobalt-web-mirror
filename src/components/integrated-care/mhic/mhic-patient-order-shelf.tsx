@@ -10,12 +10,7 @@ import useFlags from '@/hooks/use-flags';
 
 import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
-import {
-	MhicComments,
-	MhicFollowUp,
-	MhicOutreachAndAssesment,
-	MhicOrderDetails,
-} from '@/components/integrated-care/mhic';
+import { MhicComments, MhicFollowUp, MhicContactHistory, MhicOrderDetails } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
@@ -113,7 +108,7 @@ interface MhicPatientOrderShelfProps {
 
 enum TAB_KEYS {
 	ORDER_DETAILS = 'ORDER_DETAILS',
-	OUTREACH_AND_ASSESSMENT = 'OUTREACH_AND_ASSESSMENT',
+	CONTACT_HISOTRY = 'CONTACT_HISOTRY',
 	FOLLOW_UP = 'FOLLOW_UP',
 	COMMENTS = 'COMMENTS',
 }
@@ -205,7 +200,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										value={tabKey}
 										tabs={[
 											{ value: TAB_KEYS.ORDER_DETAILS, title: 'Order Details' },
-											{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
+											{ value: TAB_KEYS.CONTACT_HISOTRY, title: 'Contact History' },
 											{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
 											{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
 										]}
@@ -225,9 +220,9 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										/>
 									)}
 								</Tab.Pane>
-								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
+								<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
 									{currentPatientOrder && (
-										<MhicOutreachAndAssesment
+										<MhicContactHistory
 											patientOrder={currentPatientOrder}
 											onPatientOrderChange={setCurrentPatientOrder}
 										/>

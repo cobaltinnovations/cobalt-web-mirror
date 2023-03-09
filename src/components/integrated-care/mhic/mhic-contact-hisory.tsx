@@ -6,21 +6,19 @@ import { PatientOrderModel, PatientOrderOutreachModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
 	MhicComment,
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }: Props) => {
+export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
@@ -116,6 +114,24 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 			/>
 
 			<section>
+				<Container fluid>
+					<Row>
+						<Col>
+							<div className="d-flex align-items-center justify-content-between">
+								<h4 className="mb-0">Welcome Message</h4>
+								<Button
+									onClick={() => {
+										window.alert('[TODO]: Make the modal for this.');
+									}}
+								>
+									Send Message
+								</Button>
+							</div>
+						</Col>
+					</Row>
+				</Container>
+			</section>
+			<section>
 				<Container fluid className="overflow-visible">
 					<Row className={classNames({ 'mb-6': (patientOrder.patientOrderOutreaches ?? []).length > 0 })}>
 						<Col>
@@ -158,110 +174,6 @@ export const MhicOutreachAndAssesment = ({ patientOrder, onPatientOrderChange }:
 									/>
 								);
 							})}
-						</Col>
-					</Row>
-				</Container>
-			</section>
-			<section>
-				<Container fluid>
-					<Row className="mb-5">
-						<Col>
-							<h4 className="mb-0">
-								Past Assessments <span className="text-gray">(1)</span>
-							</h4>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Table>
-								<TableHead>
-									<TableRow>
-										<TableCell header>
-											<span>Sep 21, 2022 at 12:30AM</span>
-											<span className="fw-normal">Completed By: Patient</span>
-										</TableCell>
-										<TableCell header colSpan={4} className="text-right justify-content-end">
-											<span>Triage: Specialty Care</span>
-										</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">C-SSRS</span>
-										</TableCell>
-										<TableCell width={32} className="px-0"></TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">4</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">GAD-7</span>
-										</TableCell>
-										<TableCell width={32} className="px-0"></TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">12</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">PHQ-9</span>
-										</TableCell>
-										<TableCell width={32} className="px-0">
-											<FlagDanger className="text-danger" />
-										</TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">13</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
-								</TableBody>
-							</Table>
 						</Col>
 					</Row>
 				</Container>

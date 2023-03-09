@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
 	MhicCloseEpisodeModal,
@@ -12,8 +13,10 @@ import {
 	MhicInsuranceModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import NoData from '@/components/no-data';
+
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -220,7 +223,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							</div>
 						</Col>
 					</Row>
-					<Row>
+					<Row className="mb-6">
 						<Col>
 							<NoData
 								className="mb-6"
@@ -259,6 +262,218 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 									},
 								]}
 							/>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Triage</Card.Title>
+									<div className="button-container">
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												window.alert('[TODO]: Modal for this.');
+											}}
+										>
+											Change Triage
+										</Button>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Care Type</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">[Care Type]</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Care Focus</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">[Care Focus]</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Reason</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">[Reason]</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Resources</Card.Title>
+									<div className="button-container">
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												window.alert('[TODO]: Modal for this.');
+											}}
+										>
+											Mark as Sent
+										</Button>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row>
+											<p className="mb-0">[TODO]: Some inline-alert</p>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Assessment Details</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Completed</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Nov 12, 2022 at 12:45 PM</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Completed By</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">Ava Williams, MHIC</p>
+											</Col>
+										</Row>
+										<hr className="mb-4" />
+										<Row className="mb-4">
+											<Col xs={3}>
+												<p className="m-0 text-gray">Conditions</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">
+													Yes, [Condition], [Condition], Other: [User input]
+												</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Symptoms</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">[Symptom], [Symptom]</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell header colSpan={5}>
+											<span>Assessments</span>
+										</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									<TableRow>
+										<TableCell>
+											<span className="fw-semibold">C-SSRS</span>
+										</TableCell>
+										<TableCell width={32} className="px-0"></TableCell>
+										<TableCell width={72} className="pe-0">
+											<span className="text-gray">Score:</span>
+										</TableCell>
+										<TableCell width={32} className="px-0 text-right">
+											<span className="fw-bold">4</span>
+										</TableCell>
+										<TableCell width={84} className="text-center">
+											<Button
+												variant="link"
+												size="sm"
+												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
+											>
+												View
+											</Button>
+										</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>
+											<span className="fw-semibold">GAD-7</span>
+										</TableCell>
+										<TableCell width={32} className="px-0"></TableCell>
+										<TableCell width={72} className="pe-0">
+											<span className="text-gray">Score:</span>
+										</TableCell>
+										<TableCell width={32} className="px-0 text-right">
+											<span className="fw-bold">12</span>
+										</TableCell>
+										<TableCell width={84} className="text-center">
+											<Button
+												variant="link"
+												size="sm"
+												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
+											>
+												View
+											</Button>
+										</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>
+											<span className="fw-semibold">PHQ-9</span>
+										</TableCell>
+										<TableCell width={32} className="px-0">
+											<FlagDanger className="text-danger" />
+										</TableCell>
+										<TableCell width={72} className="pe-0">
+											<span className="text-gray">Score:</span>
+										</TableCell>
+										<TableCell width={32} className="px-0 text-right">
+											<span className="fw-bold">13</span>
+										</TableCell>
+										<TableCell width={84} className="text-center">
+											<Button
+												variant="link"
+												size="sm"
+												className="p-0 text-decoration-none fw-normal"
+												onClick={() => {
+													setShowAssessmentModal(true);
+												}}
+											>
+												View
+											</Button>
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
 						</Col>
 					</Row>
 				</Container>
