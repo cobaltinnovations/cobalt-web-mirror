@@ -157,3 +157,8 @@ export interface PatientOrderOutreachModel {
 	patientOrderId: string;
 	patientOrderOutreachId: string;
 }
+
+export interface PatientOrderClosureReasonModel {
+	patientOrderClosureReasonId: string;
+	description: string;
+}

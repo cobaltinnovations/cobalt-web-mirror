@@ -3,6 +3,7 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
 	ActivePatientOrderCountModel,
+	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
 	PatientOrderModel,
 	PatientOrderNoteModel,
@@ -130,6 +131,14 @@ export const integratedCareService = {
 		}>({
 			method: 'DELETE',
 			url: `/patient-order-outreaches/${patientOrderOutreachId}`,
+		});
+	},
+	getPatientOrderClosureReasons() {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderClosureReasons: PatientOrderClosureReasonModel[];
+		}>({
+			method: 'GET',
+			url: '/patient-order-closure-reasons',
 		});
 	},
 };
