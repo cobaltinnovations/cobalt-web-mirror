@@ -13,16 +13,16 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
-	onSave(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onSave(patientOrderClosureReasonId: string): void;
 }
 
 export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const [selectedReason, setSelectedReason] = useState('');
+	const [selectedReasonId, setSelectedReasonId] = useState('');
 	const [patientOrderClosureReasons, setPatientOrderClosureReasons] = useState<PatientOrderClosureReasonModel[]>([]);
 
-	const getClosureReasones = useCallback(async () => {
+	const getClosureReasons = useCallback(async () => {
 		try {
 			const response = await integratedCareService.getPatientOrderClosureReasons().fetch();
 			setPatientOrderClosureReasons(response.patientOrderClosureReasons);
@@ -32,9 +32,9 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 	}, [handleError]);
 
 	const handleOnEnter = useCallback(() => {
-		setSelectedReason('');
-		getClosureReasones();
-	}, [getClosureReasones]);
+		setSelectedReasonId('');
+		getClosureReasons();
+	}, [getClosureReasons]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -53,9 +53,9 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 						id={`reason-for-closure__${closureReason.patientOrderClosureReasonId}`}
 						label="Ineligible due to insurance"
 						value={closureReason.patientOrderClosureReasonId}
-						checked={closureReason.patientOrderClosureReasonId === selectedReason}
+						checked={closureReason.patientOrderClosureReasonId === selectedReasonId}
 						onChange={({ currentTarget }) => {
-							setSelectedReason(currentTarget.value);
+							setSelectedReasonId(currentTarget.value);
 						}}
 					/>
 				))}
@@ -64,7 +64,13 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 				<Button variant="outline-primary" className="me-2" onClick={props.onHide}>
 					Cancel
 				</Button>
-				<Button variant="primary" onClick={onSave} disabled={!selectedReason}>
+				<Button
+					variant="primary"
+					onClick={() => {
+						onSave(selectedReasonId);
+					}}
+					disabled={!selectedReasonId}
+				>
 					Save
 				</Button>
 			</Modal.Footer>

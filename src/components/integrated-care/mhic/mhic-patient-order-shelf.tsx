@@ -217,6 +217,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
 											referenceData={referenceData}
+											onPatientOrderChange={setCurrentPatientOrder}
 										/>
 									)}
 								</Tab.Pane>

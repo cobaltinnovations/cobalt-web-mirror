@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
@@ -17,14 +18,17 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
+import { integratedCareService } from '@/lib/services';
 
 interface Props {
 	patientOrder: PatientOrderModel;
 	pastPatientOrders: PatientOrderModel[];
 	referenceData: ReferenceDataResponse;
+	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
 export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceData }: Props) => {
+	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -33,6 +37,27 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
+
+	const handleCloseEpisodeModalSave = useCallback(
+		async (patientOrderClosureReasonId: string) => {
+			try {
+				await integratedCareService
+					.closePatientOrder(patientOrder.patientOrderId, { patientOrderClosureReasonId })
+					.fetch();
+
+				setShowContactInformationModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Patient Contact Information Saved',
+					description: '{Message}',
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, handleError, patientOrder.patientOrderId]
+	);
 
 	return (
 		<>
@@ -110,15 +135,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 				onHide={() => {
 					setShowCloseEpisodeModal(false);
 				}}
-				onSave={() => {
-					setShowCloseEpisodeModal(false);
-					addFlag({
-						variant: 'success',
-						title: 'Episode Closed',
-						description: '{Message}',
-						actions: [],
-					});
-				}}
+				onSave={handleCloseEpisodeModalSave}
 			/>
 
 			<section>

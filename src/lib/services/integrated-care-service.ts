@@ -141,4 +141,13 @@ export const integratedCareService = {
 			url: '/patient-order-closure-reasons',
 		});
 	},
+	closePatientOrder(patientOrderId: string, data: { patientOrderClosureReasonId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/close`,
+			data,
+		});
+	},
 };
