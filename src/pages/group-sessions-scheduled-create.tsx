@@ -1174,13 +1174,7 @@ const GroupSessionsCreate: FC = () => {
 											<SessionFormSubmitBanner
 												disabled={isViewMode}
 												title={isEdit ? 'Update group session' : 'Add group session'}
-											>
-												{!isViewMode && isEdit && (
-													<p className="mb-0 mt-2">
-														An email with updates will be sent to all attendees
-													</p>
-												)}
-											</SessionFormSubmitBanner>
+											></SessionFormSubmitBanner>
 										</Form>
 									</>
 								);
