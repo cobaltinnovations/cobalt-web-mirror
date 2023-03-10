@@ -48,7 +48,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 				setShowCloseEpisodeModal(false);
 				addFlag({
 					variant: 'success',
-					title: 'Episode Has Been Closed',
+					title: 'Episode Closed',
 					description: '{Message}',
 					actions: [],
 				});
