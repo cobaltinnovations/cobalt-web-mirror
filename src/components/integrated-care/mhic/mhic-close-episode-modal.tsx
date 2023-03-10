@@ -51,7 +51,7 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 						type="radio"
 						name="reason-for-closure"
 						id={`reason-for-closure__${closureReason.patientOrderClosureReasonId}`}
-						label="Ineligible due to insurance"
+						label={closureReason.description}
 						value={closureReason.patientOrderClosureReasonId}
 						checked={closureReason.patientOrderClosureReasonId === selectedReasonId}
 						onChange={({ currentTarget }) => {

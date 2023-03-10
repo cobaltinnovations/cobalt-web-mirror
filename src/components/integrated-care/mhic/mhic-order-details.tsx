@@ -45,10 +45,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 					.closePatientOrder(patientOrder.patientOrderId, { patientOrderClosureReasonId })
 					.fetch();
 
-				setShowContactInformationModal(false);
+				setShowCloseEpisodeModal(false);
 				addFlag({
 					variant: 'success',
-					title: 'Patient Contact Information Saved',
+					title: 'Episode Has Been Closed',
 					description: '{Message}',
 					actions: [],
 				});
