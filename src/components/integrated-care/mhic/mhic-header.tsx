@@ -154,7 +154,7 @@ export const MhicHeader = () => {
 						}}
 					/>
 					<Dropdown className="ms-6 d-flex align-items-center">
-						<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu">
+						<Dropdown.Toggle as={DropdownToggle} className="p-0" id="mhic-header__dropdown-menu">
 							<AvatarIcon className="d-flex" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu

@@ -1,17 +1,22 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderOutreachModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
+import NoData from '@/components/no-data';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import {
 	MhicAssessmentModal,
 	MhicComment,
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
+
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -114,47 +119,85 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 			/>
 
 			<section>
-				<Container fluid>
-					<Row>
-						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<h4 className="mb-0">Welcome Message</h4>
-								<Button
-									onClick={() => {
-										window.alert('[TODO]: Make the modal for this.');
-									}}
-								>
-									Send Message
-								</Button>
-							</div>
-						</Col>
-					</Row>
-				</Container>
-			</section>
-			<section>
 				<Container fluid className="overflow-visible">
-					<Row className={classNames({ 'mb-6': (patientOrder.patientOrderOutreaches ?? []).length > 0 })}>
+					<Row className="mb-6">
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">
-									Outreach Attempts{' '}
+									Contact History{' '}
 									<span className="text-gray">
 										({(patientOrder.patientOrderOutreaches ?? []).length})
 									</span>
 								</h4>
-								<Button
-									onClick={() => {
-										setOutreachToEdit(undefined);
-										setShowOutreachModal(true);
-									}}
-								>
-									Add Outreach Attempt
-								</Button>
+								<div className="d-flex align-items-center">
+									<Dropdown>
+										<Dropdown.Toggle
+											variant="primary"
+											as={DropdownToggle}
+											className="me-2"
+											id="mhic-contact-history__dropdown-menu"
+										>
+											Log Contact Attempt
+										</Dropdown.Toggle>
+										<Dropdown.Menu
+											as={DropdownMenu}
+											align="end"
+											flip={false}
+											popperConfig={{ strategy: 'fixed' }}
+											renderOnMount
+										>
+											<Dropdown.Item
+												className="d-flex align-items-center"
+												onClick={() => {
+													setOutreachToEdit(undefined);
+													setShowOutreachModal(true);
+												}}
+											>
+												<PhoneIcon width={20} height={20} className="me-3 text-gray" />
+												<span>Call</span>
+											</Dropdown.Item>
+											<Dropdown.Item
+												className="d-flex align-items-center"
+												onClick={() => {
+													setOutreachToEdit(undefined);
+													setShowOutreachModal(true);
+												}}
+											>
+												<EnvelopeIcon width={20} height={20} className="me-3 text-gray" />
+												<span>Email</span>
+											</Dropdown.Item>
+										</Dropdown.Menu>
+									</Dropdown>
+									<Button
+										variant="outline-primary"
+										onClick={() => {
+											setOutreachToEdit(undefined);
+											setShowOutreachModal(true);
+										}}
+									>
+										Send Message
+									</Button>
+								</div>
 							</div>
 						</Col>
 					</Row>
 					<Row>
 						<Col>
+							{(patientOrder.patientOrderOutreaches ?? []).length <= 0 && (
+								<NoData
+									title="No Contact Attempts Logged"
+									actions={[
+										{
+											variant: 'primary',
+											title: 'Send Welcome Message',
+											onClick: () => {
+												setOutreachToEdit(undefined);
+												setShowOutreachModal(true);
+											},
+										},
+									]}
+								/>
+							)}
 							{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
 								const isLast = outreachIndex === (patientOrder.patientOrderOutreaches ?? []).length - 1;
 								return (

@@ -7,7 +7,7 @@ import { DropdownToggleProps } from 'react-bootstrap/esm/DropdownToggle';
 
 export const DropdownToggle = React.forwardRef(
 	(
-		{ className, children, style, onClick }: DropdownToggleProps,
+		{ variant, className, children, style, onClick }: DropdownToggleProps,
 		ref: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
 	) => {
 		const classNameProp = useMemo(() => (className ?? '').replace('dropdown-toggle', ''), [className]);
@@ -15,9 +15,9 @@ export const DropdownToggle = React.forwardRef(
 		return (
 			<Button
 				ref={ref}
-				variant="light"
+				variant={variant ?? 'light'}
+				className={classNames(classNameProp)}
 				style={style}
-				className={classNames('p-0', classNameProp)}
 				onClick={onClick}
 			>
 				{children}
