@@ -18,65 +18,72 @@ import {
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
 import useAccount from './hooks/use-account';
+import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
-export const Onboarding = React.lazy(() => import('@/pages/onboarding'));
-export const SignUp = React.lazy(() => import('@/pages/sign-up'));
-export const SignUpVerify = React.lazy(() => import('@/pages/sign-up-verify'));
-export const SignIn = React.lazy(() => import('@/pages/sign-in'));
-export const SignInEmail = React.lazy(() => import('@/pages/sign-in-email'));
-export const Index = React.lazy(() => import('@/pages'));
-export const InTheStudio = React.lazy(() => import('@/pages/in-the-studio'));
-export const InTheStudioGroupSessionScheduled = React.lazy(
+export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
+export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
+export const SignUpVerify = lazyLoadWithRefresh(() => import('@/pages/sign-up-verify'));
+export const SignIn = lazyLoadWithRefresh(() => import('@/pages/sign-in'));
+export const SignInEmail = lazyLoadWithRefresh(() => import('@/pages/sign-in-email'));
+export const Index = lazyLoadWithRefresh(() => import('@/pages'));
+export const InTheStudio = lazyLoadWithRefresh(() => import('@/pages/in-the-studio'));
+export const InTheStudioGroupSessionScheduled = lazyLoadWithRefresh(
 	() => import('@/pages/in-the-studio-group-session-scheduled')
 );
-export const InTheStudioGroupSessionByRequest = React.lazy(
+export const InTheStudioGroupSessionByRequest = lazyLoadWithRefresh(
 	() => import('@/pages/in-the-studio-group-session-by-request')
 );
-export const SessionRequestThankYou = React.lazy(() => import('@/pages/session-request-thank-you'));
+export const SessionRequestThankYou = lazyLoadWithRefresh(() => import('@/pages/session-request-thank-you'));
 
-export const Covid19Resources = React.lazy(() => import('@/pages/covid-19-resources'));
-export const WellBeingResources = React.lazy(() => import('@/pages/well-being-resources'));
-export const Privacy = React.lazy(() => import('@/pages/privacy'));
-export const IntakeAssessment = React.lazy(() => import('@/pages/intake-assessment'));
-export const OneOnOneResources = React.lazy(() => import('@/pages/one-on-one-resources'));
-export const ConnectWithSupport = React.lazy(() => import('@/pages/connect-with-support'));
-export const EhrLookup = React.lazy(() => import('@/pages/ehr-lookup'));
-export const MyCalendar = React.lazy(() => import('@/pages/my-calendar'));
-export const AppointmentDetails = React.lazy(() => import('@/pages/appointment-details'));
-export const Feedback = React.lazy(() => import('@/pages/feedback'));
-export const AccountSessionDetails = React.lazy(() => import('@/pages/account-session-details'));
-export const GroupSessions = React.lazy(() => import('@/pages/group-sessions'));
-export const GroupSessionsRequest = React.lazy(() => import('@/pages/group-sessions-request'));
-export const GroupSessionsScheduled = React.lazy(() => import('@/pages/group-sessions-scheduled'));
-export const GroupSessionsScheduledCreate = React.lazy(() => import('@/pages/group-sessions-scheduled-create'));
-export const GroupSessionsByRequest = React.lazy(() => import('@/pages/group-sessions-by-request'));
-export const GroupSessionsByRequestCreate = React.lazy(() => import('@/pages/group-sessions-by-request-create'));
-export const RedirectToBackend = React.lazy(() => import('@/pages/redirect-to-backend'));
-export const CmsOnYourTime = React.lazy(() => import('@/pages/admin-cms/on-your-time'));
-export const OnYourTimeThanks = React.lazy(() => import('@/pages/on-your-time-thanks'));
-export const InTheStudioThanks = React.lazy(() => import('@/pages/in-the-studio-thanks'));
-export const ProviderDetail = React.lazy(() => import('@/pages/provider-detail'));
-export const NoMatch = React.lazy(() => import('@/pages/no-match'));
-export const CmsAvailableContent = React.lazy(() => import('@/pages/admin-cms/available-content'));
-export const CreateOnYourTimeContent = React.lazy(() => import('@/pages/admin-cms/create-on-your-time-content'));
-export const SignUpClaim = React.lazy(() => import('@/pages/sign-up-claim'));
-export const ForgotPassword = React.lazy(() => import('@/pages/forgot-password'));
-export const PasswordReset = React.lazy(() => import('@/pages/password-reset'));
-export const StatsDashboard = React.lazy(() => import('@/pages/stats-dashboard'));
-export const Reports = React.lazy(() => import('@/pages/admin-cms/reports'));
-export const MySchedule = React.lazy(() => import('@/pages/scheduling/my-schedule'));
-export const IntegratedCare = React.lazy(() => import('@/pages/ic/landing'));
-export const ScreeningQuestions = React.lazy(() => import('@/pages/screening/screening-questions'));
-export const Interaction = React.lazy(() => import('@/pages/interaction'));
-export const InteractionInstances = React.lazy(() => import('@/pages/interaction-instances'));
-export const InCrisis = React.lazy(() => import('@/pages/in-crisis'));
-export const ConfirmAppointment = React.lazy(() => import('@/pages/confirm-appointment'));
-export const TopicCenter = React.lazy(() => import('@/pages/topic-center'));
-export const UserSettings = React.lazy(() => import('@/pages/user-settings'));
-export const ResourceLibrary = React.lazy(() => import('@/pages/resource-library'));
-export const ResourceLibraryTopic = React.lazy(() => import('@/pages/resource-library-topic'));
-export const ResourceLibraryTags = React.lazy(() => import('@/pages/resource-library-tags'));
-export const ResourceLibraryDetail = React.lazy(() => import('@/pages/resource-library-detail'));
+export const Covid19Resources = lazyLoadWithRefresh(() => import('@/pages/covid-19-resources'));
+export const WellBeingResources = lazyLoadWithRefresh(() => import('@/pages/well-being-resources'));
+export const Privacy = lazyLoadWithRefresh(() => import('@/pages/privacy'));
+export const IntakeAssessment = lazyLoadWithRefresh(() => import('@/pages/intake-assessment'));
+export const OneOnOneResources = lazyLoadWithRefresh(() => import('@/pages/one-on-one-resources'));
+export const ConnectWithSupport = lazyLoadWithRefresh(() => import('@/pages/connect-with-support'));
+export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
+export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
+export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
+export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
+export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
+export const GroupSessions = lazyLoadWithRefresh(() => import('@/pages/group-sessions'));
+export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-request'));
+export const GroupSessionsScheduled = lazyLoadWithRefresh(() => import('@/pages/group-sessions-scheduled'));
+export const GroupSessionsScheduledCreate = lazyLoadWithRefresh(
+	() => import('@/pages/group-sessions-scheduled-create')
+);
+export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
+export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
+	() => import('@/pages/group-sessions-by-request-create')
+);
+export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redirect-to-backend'));
+export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
+export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
+export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
+export const ProviderDetail = lazyLoadWithRefresh(() => import('@/pages/provider-detail'));
+export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
+export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
+export const CreateOnYourTimeContent = lazyLoadWithRefresh(
+	() => import('@/pages/admin-cms/create-on-your-time-content')
+);
+export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
+export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
+export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
+export const StatsDashboard = lazyLoadWithRefresh(() => import('@/pages/stats-dashboard'));
+export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
+export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
+export const IntegratedCare = lazyLoadWithRefresh(() => import('@/pages/ic/landing'));
+export const ScreeningQuestions = lazyLoadWithRefresh(() => import('@/pages/screening/screening-questions'));
+export const Interaction = lazyLoadWithRefresh(() => import('@/pages/interaction'));
+export const InteractionInstances = lazyLoadWithRefresh(() => import('@/pages/interaction-instances'));
+export const InCrisis = lazyLoadWithRefresh(() => import('@/pages/in-crisis'));
+export const ConfirmAppointment = lazyLoadWithRefresh(() => import('@/pages/confirm-appointment'));
+export const TopicCenter = lazyLoadWithRefresh(() => import('@/pages/topic-center'));
+export const UserSettings = lazyLoadWithRefresh(() => import('@/pages/user-settings'));
+export const ResourceLibrary = lazyLoadWithRefresh(() => import('@/pages/resource-library'));
+export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/resource-library-topic'));
+export const ResourceLibraryTags = lazyLoadWithRefresh(() => import('@/pages/resource-library-tags'));
+export const ResourceLibraryDetail = lazyLoadWithRefresh(() => import('@/pages/resource-library-detail'));
 
 interface RouteGuardProps {
 	account?: AccountModel;
