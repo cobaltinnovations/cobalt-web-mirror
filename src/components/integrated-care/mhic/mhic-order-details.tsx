@@ -8,6 +8,7 @@ import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
+	MhicChangeTriageModal,
 	MhicCloseEpisodeModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
@@ -37,6 +38,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
+	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 
 	const handleCloseEpisodeModalSave = useCallback(
 		async (patientOrderClosureReasonId: string) => {
@@ -136,6 +138,16 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 					setShowCloseEpisodeModal(false);
 				}}
 				onSave={handleCloseEpisodeModalSave}
+			/>
+
+			<MhicChangeTriageModal
+				show={showChangeTriageModal}
+				onHide={() => {
+					setShowChangeTriageModal(false);
+				}}
+				onSave={() => {
+					setShowChangeTriageModal(false);
+				}}
 			/>
 
 			<section>
@@ -291,7 +303,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 											variant="light"
 											size="sm"
 											onClick={() => {
-												window.alert('[TODO]: Modal for this.');
+												setShowChangeTriageModal(true);
 											}}
 										>
 											Change Triage
