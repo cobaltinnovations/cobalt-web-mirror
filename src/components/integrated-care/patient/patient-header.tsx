@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -13,8 +13,14 @@ import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
+		top: 0,
+		left: 0,
+		right: 0,
+		zIndex: 4,
+		height: 56,
 		display: 'flex',
-		padding: '8px 40px',
+		padding: '0 40px',
+		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
@@ -28,13 +34,41 @@ export const PatientHeader = () => {
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 
+	/* ----------------------------------------------------------- */
+	/* Body padding for fixed header */
+	/* ----------------------------------------------------------- */
+	const header = useRef<HTMLElement | null>(null);
+
+	const handleWindowResize = useCallback(() => {
+		setBodyPadding();
+	}, []);
+
+	function setBodyPadding() {
+		if (!header.current) {
+			document.body.style.paddingTop = '0px';
+			return;
+		}
+
+		const headerHeight = header.current.clientHeight;
+		document.body.style.paddingTop = `${headerHeight}px`;
+	}
+
+	useEffect(() => {
+		setBodyPadding();
+		window.addEventListener('resize', handleWindowResize);
+
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, [handleWindowResize]);
+
 	function handleInCrisisButtonClick() {
 		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
 		openInCrisisModal();
 	}
 
 	return (
-		<header className={classes.header}>
+		<header ref={header} className={classes.header}>
 			<LogoSmallText className="text-primary" />
 			<div className="d-flex align-items-center justify-content-between">
 				<Button className="py-1 d-flex align-items-center" size="sm" onClick={handleInCrisisButtonClick}>
@@ -42,7 +76,7 @@ export const PatientHeader = () => {
 					<small className="fw-bold">In Crisis?</small>
 				</Button>
 				<Dropdown className="ms-4 d-flex align-items-center">
-					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu">
+					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
 						<AvatarIcon className="d-flex" />
 					</Dropdown.Toggle>
 					<Dropdown.Menu
