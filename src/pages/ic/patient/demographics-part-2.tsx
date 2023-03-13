@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { ReferenceDataResponse } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { accountService, integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
@@ -28,32 +28,38 @@ const PatientDemographicsPart2 = () => {
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
 			address: {
-				streetAddress1: account?.address?.streetAddress1 ?? '',
-				streetAddress2: account?.address?.streetAddress2 ?? '',
-				locality: account?.address?.locality ?? '',
-				region: account?.address?.region ?? '',
-				postalCode: account?.address?.postalCode ?? '',
-				postalName: `${account?.firstName} ${account?.lastName}`,
+				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
+				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
+				locality: patientOrder?.patientAddress?.locality ?? '',
+				region: patientOrder?.patientAddress?.region ?? '',
+				postalCode: patientOrder?.patientAddress?.postalCode ?? '',
+				postalName: `${patientOrder?.patientFirstName} ${patientOrder?.patientLastName}`,
 				countryCode: 'US',
 			},
 		};
 	}, [
-		account?.address?.locality,
-		account?.address?.postalCode,
-		account?.address?.region,
-		account?.address?.streetAddress1,
-		account?.address?.streetAddress2,
-		account?.firstName,
-		account?.lastName,
+		patientOrder?.patientAddress?.locality,
+		patientOrder?.patientAddress?.postalCode,
+		patientOrder?.patientAddress?.region,
+		patientOrder?.patientAddress?.streetAddress1,
+		patientOrder?.patientAddress?.streetAddress2,
+		patientOrder?.patientFirstName,
+		patientOrder?.patientLastName,
 	]);
 
 	const fetchData = useCallback(async () => {
-		const response = await accountService.getReferenceData().fetch();
-		setReferenceData(response);
+		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
+			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
+			accountService.getReferenceData().fetch(),
+		]);
+
+		setPatientOrder(patientOrderResponse.patientOrder);
+		setReferenceData(referenceDataResponse);
 	}, []);
 
 	const handleFormSubmit = useCallback(

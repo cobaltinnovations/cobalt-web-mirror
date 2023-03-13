@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { ReferenceDataResponse } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { accountService, integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
@@ -27,28 +27,27 @@ const PatientDemographicsPart1 = () => {
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			firstName: account?.firstName ?? '',
-			lastName: account?.lastName ?? '',
-			birthdate: account?.birthdate ?? '',
-			phoneNumber: account?.phoneNumber ?? '',
-			emailAddress: account?.emailAddress ?? '',
-			insuranceId: account?.insuranceId ?? '',
+			firstName: patientOrder?.patientFirstName ?? '',
+			lastName: patientOrder?.patientLastName ?? '',
+			birthdate: patientOrder?.patientBirthdate ?? '',
+			phoneNumber: '',
+			emailAddress: '',
+			insuranceId: '',
 		};
-	}, [
-		account?.birthdate,
-		account?.emailAddress,
-		account?.firstName,
-		account?.insuranceId,
-		account?.lastName,
-		account?.phoneNumber,
-	]);
+	}, [patientOrder?.patientBirthdate, patientOrder?.patientFirstName, patientOrder?.patientLastName]);
 
 	const fetchData = useCallback(async () => {
-		const response = await accountService.getReferenceData().fetch();
-		setReferenceData(response);
+		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
+			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
+			accountService.getReferenceData().fetch(),
+		]);
+
+		setPatientOrder(patientOrderResponse.patientOrder);
+		setReferenceData(referenceDataResponse);
 	}, []);
 
 	const handleFormSubmit = useCallback(

@@ -113,6 +113,7 @@ export interface PatientAddressModel {
 	postalName: string;
 	region: string;
 	streetAddress1: string;
+	streetAddress2: string;
 }
 
 export interface PatientOrderDiagnosesModel {

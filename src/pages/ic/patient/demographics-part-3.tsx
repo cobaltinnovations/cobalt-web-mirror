@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { ReferenceDataResponse } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { accountService, integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
@@ -23,19 +23,25 @@ const PatientDemographicsPart3 = () => {
 	const handleError = useHandleError();
 	const { account } = useAccount();
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			genderIdentityId: account?.genderIdentityId ?? '',
-			raceId: account?.raceId ?? '',
-			ethnicityId: account?.ethnicityId ?? '',
-			languageCode: account?.languageCode ?? '',
+			genderIdentityId: patientOrder?.patientBirthSexId ?? '',
+			raceId: '',
+			ethnicityId: '',
+			languageCode: '',
 		};
-	}, [account?.ethnicityId, account?.genderIdentityId, account?.languageCode, account?.raceId]);
+	}, [patientOrder?.patientBirthSexId]);
 
 	const fetchData = useCallback(async () => {
-		const response = await accountService.getReferenceData().fetch();
-		setReferenceData(response);
+		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
+			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
+			accountService.getReferenceData().fetch(),
+		]);
+
+		setPatientOrder(patientOrderResponse.patientOrder);
+		setReferenceData(referenceDataResponse);
 	}, []);
 
 	const handleFormSubmit = useCallback(
