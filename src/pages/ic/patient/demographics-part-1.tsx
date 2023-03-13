@@ -8,7 +8,6 @@ import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import { accountService, integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
-import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
@@ -25,7 +24,6 @@ export interface FormData {
 const PatientDemographicsPart1 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { account } = useAccount();
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
@@ -52,12 +50,12 @@ const PatientDemographicsPart1 = () => {
 
 	const handleFormSubmit = useCallback(
 		async (values: FormData) => {
-			if (!account) {
+			if (!patientOrder) {
 				return;
 			}
 
 			try {
-				await accountService.patchPatientAccount(account.accountId, values).fetch();
+				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
 				navigate('/ic/patient/demographics-part-2');
 			} catch (error) {
 				if ((error as any).code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -65,7 +63,7 @@ const PatientDemographicsPart1 = () => {
 				}
 			}
 		},
-		[account, handleError, navigate]
+		[handleError, navigate, patientOrder]
 	);
 
 	return (

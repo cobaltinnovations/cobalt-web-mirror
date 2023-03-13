@@ -11,6 +11,29 @@ import {
 	PatientOrderStatusId,
 } from '@/lib/models';
 
+export interface PatientOrderDemographicsFormData {
+	firstName: string;
+	lastName: string;
+	birthdate: string;
+	phoneNumber: string;
+	emailAddress: string;
+	genderIdentityId: string;
+	raceId: string;
+	ethnicityId: string;
+	languageCode: string;
+	timeZone: string;
+	insuranceId: string;
+	address: {
+		streetAddress1: string;
+		streetAddress2: string;
+		locality: string;
+		region: string;
+		postalCode: string;
+		postalName: string;
+		countryCode: string;
+	};
+}
+
 export const integratedCareService = {
 	importPatientOrders(data: { csvContent: string }) {
 		return httpSingleton.orchestrateRequest<any>({
@@ -57,6 +80,15 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: `/patient-orders/open`,
+		});
+	},
+	patchPatientOrder(patientOrderId: string, data: Partial<PatientOrderDemographicsFormData>) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PATCH',
+			url: `/patient-orders/${patientOrderId}`,
+			data,
 		});
 	},
 	getPatientOrder(patientOrderId: string) {
