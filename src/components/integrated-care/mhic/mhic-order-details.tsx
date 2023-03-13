@@ -381,7 +381,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Completed</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Nov 12, 2022 at 12:45 PM</p>
+												<p className="m-0">
+													{patientOrder.screeningSession?.completedAtDescription}
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -389,7 +391,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Completed By</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">Ava Williams, MHIC</p>
+												<p className="m-0">
+													<span className="text-danger">[TODO]</span>
+												</p>
 											</Col>
 										</Row>
 										<hr className="mb-4" />
@@ -399,7 +403,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 											</Col>
 											<Col xs={9}>
 												<p className="m-0">
-													Yes, [Condition], [Condition], Other: [User input]
+													<span className="text-danger">[TODO]</span>
 												</p>
 											</Col>
 										</Row>
@@ -408,7 +412,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Symptoms</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">[Symptom], [Symptom]</p>
+												<span className="text-danger">[TODO]</span>
 											</Col>
 										</Row>
 									</Container>
@@ -427,80 +431,38 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">C-SSRS</span>
-										</TableCell>
-										<TableCell width={32} className="px-0"></TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">4</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">GAD-7</span>
-										</TableCell>
-										<TableCell width={32} className="px-0"></TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">12</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
-									<TableRow>
-										<TableCell>
-											<span className="fw-semibold">PHQ-9</span>
-										</TableCell>
-										<TableCell width={32} className="px-0">
-											<FlagDanger className="text-danger" />
-										</TableCell>
-										<TableCell width={72} className="pe-0">
-											<span className="text-gray">Score:</span>
-										</TableCell>
-										<TableCell width={32} className="px-0 text-right">
-											<span className="fw-bold">13</span>
-										</TableCell>
-										<TableCell width={84} className="text-center">
-											<Button
-												variant="link"
-												size="sm"
-												className="p-0 text-decoration-none fw-normal"
-												onClick={() => {
-													setShowAssessmentModal(true);
-												}}
-											>
-												View
-											</Button>
-										</TableCell>
-									</TableRow>
+									{patientOrder.screeningSessionResult?.screeningSessionScreeningResults?.map(
+										(screening) => (
+											<TableRow>
+												<TableCell>
+													<span className="fw-semibold">{screening.screeningName}</span>
+												</TableCell>
+												<TableCell width={32} className="px-0">
+													<FlagDanger className="text-danger" />
+												</TableCell>
+												<TableCell width={72} className="pe-0">
+													<span className="text-gray">Score:</span>
+												</TableCell>
+												<TableCell width={32} className="px-0 text-right">
+													<span className="fw-bold">
+														{screening.screeningScore?.overallScore}
+													</span>
+												</TableCell>
+												<TableCell width={84} className="text-center">
+													<Button
+														variant="link"
+														size="sm"
+														className="p-0 text-decoration-none fw-normal"
+														onClick={() => {
+															setShowAssessmentModal(true);
+														}}
+													>
+														View
+													</Button>
+												</TableCell>
+											</TableRow>
+										)
+									)}
 								</TableBody>
 							</Table>
 						</Col>
