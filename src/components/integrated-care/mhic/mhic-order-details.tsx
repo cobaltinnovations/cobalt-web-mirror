@@ -252,221 +252,235 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							</div>
 						</Col>
 					</Row>
-					<Row className="mb-6">
-						<Col>
-							<NoData
-								className="mb-6"
-								title="No Assessment"
-								description="There is no assessment for the patient's most recent referral order"
-								actions={[
-									{
-										variant: 'outline-primary',
-										title: 'Schedule Assessment',
-										onClick: () => {
-											setAssessmentIdToEdit('');
-											setShowScheduleAssessmentModal(true);
+					{!patientOrder.screeningSession && (
+						<Row>
+							<Col>
+								<NoData
+									className="mb-6"
+									title="No Assessment"
+									description="There is no assessment for the patient's most recent referral order"
+									actions={[
+										{
+											variant: 'outline-primary',
+											title: 'Schedule Assessment',
+											onClick: () => {
+												setAssessmentIdToEdit('');
+												setShowScheduleAssessmentModal(true);
+											},
 										},
-									},
-								]}
-							/>
-							<NoData
-								className="bg-white"
-								title="Assessment is Scheduled"
-								description="Nov 12, 2023 at 2:30 PM"
-								actions={[
-									{
-										variant: 'primary',
-										title: 'View Appointment',
-										onClick: () => {
-											window.alert('[TODO]: Link to appointment details?');
+									]}
+								/>
+								<NoData
+									className="bg-white"
+									title="Assessment is Scheduled"
+									description="Nov 12, 2023 at 2:30 PM"
+									actions={[
+										{
+											variant: 'primary',
+											title: 'View Appointment',
+											onClick: () => {
+												window.alert('[TODO]: Link to appointment details?');
+											},
 										},
-									},
-									{
-										variant: 'outline-primary',
-										title: 'Edit Appointment Date',
-										onClick: () => {
-											setAssessmentIdToEdit('xxx');
-											setShowScheduleAssessmentModal(true);
+										{
+											variant: 'outline-primary',
+											title: 'Edit Appointment Date',
+											onClick: () => {
+												setAssessmentIdToEdit('xxx');
+												setShowScheduleAssessmentModal(true);
+											},
 										},
-									},
-								]}
-							/>
-						</Col>
-					</Row>
-					<Row className="mb-6">
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Triage</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											size="sm"
-											onClick={() => {
-												setShowChangeTriageModal(true);
-											}}
-										>
-											Change Triage
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Care Type</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">[Care Type]</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Care Focus</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">[Care Focus]</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs={3}>
-												<p className="m-0 text-gray">Reason</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">[Reason]</p>
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-					<Row className="mb-6">
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Resources</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											size="sm"
-											onClick={() => {
-												window.alert('[TODO]: Modal for this.');
-											}}
-										>
-											Mark as Sent
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row>
-											<p className="mb-0">[TODO]: Some inline-alert</p>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-					<Row className="mb-6">
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Assessment Details</Card.Title>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Completed</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">
-													{patientOrder.screeningSession?.completedAtDescription}
-												</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Completed By</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
-											</Col>
-										</Row>
-										<hr className="mb-4" />
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Conditions</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs={3}>
-												<p className="m-0 text-gray">Symptoms</p>
-											</Col>
-											<Col xs={9}>
-												<span className="text-danger">[TODO]</span>
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Table>
-								<TableHead>
-									<TableRow>
-										<TableCell header colSpan={5}>
-											<span>Assessments</span>
-										</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{patientOrder.screeningSessionResult?.screeningSessionScreeningResults?.map(
-										(screening) => (
+									]}
+								/>
+							</Col>
+						</Row>
+					)}
+					{patientOrder.screeningSessionResult && (
+						<>
+							<Row className="mb-6">
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Triage</Card.Title>
+											<div className="button-container">
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														setShowChangeTriageModal(true);
+													}}
+												>
+													Change Triage
+												</Button>
+											</div>
+										</Card.Header>
+										<Card.Body>
+											<Container fluid>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Care Type</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															<span className="text-danger">[TODO]: Care Type</span>
+														</p>
+													</Col>
+												</Row>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Care Focus</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															<span className="text-danger">[TODO]: Care Focus</span>
+														</p>
+													</Col>
+												</Row>
+												<Row>
+													<Col xs={3}>
+														<p className="m-0 text-gray">Reason</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															<span className="text-danger">[TODO]: Reason</span>
+														</p>
+													</Col>
+												</Row>
+											</Container>
+										</Card.Body>
+									</Card>
+								</Col>
+							</Row>
+							<Row className="mb-6">
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Resources</Card.Title>
+											<div className="button-container">
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														window.alert('[TODO]: Modal for this.');
+													}}
+												>
+													Mark as Sent
+												</Button>
+											</div>
+										</Card.Header>
+										<Card.Body>
+											<Container fluid>
+												<Row>
+													<p className="mb-0">[TODO]: Some inline-alert</p>
+												</Row>
+											</Container>
+										</Card.Body>
+									</Card>
+								</Col>
+							</Row>
+							<Row className="mb-6">
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Assessment Details</Card.Title>
+										</Card.Header>
+										<Card.Body>
+											<Container fluid>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Completed</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															{patientOrder.screeningSession?.completedAtDescription}
+														</p>
+													</Col>
+												</Row>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Completed By</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															<span className="text-danger">[TODO]</span>
+														</p>
+													</Col>
+												</Row>
+												<hr className="mb-4" />
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Conditions</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															<span className="text-danger">[TODO]</span>
+														</p>
+													</Col>
+												</Row>
+												<Row>
+													<Col xs={3}>
+														<p className="m-0 text-gray">Symptoms</p>
+													</Col>
+													<Col xs={9}>
+														<span className="text-danger">[TODO]</span>
+													</Col>
+												</Row>
+											</Container>
+										</Card.Body>
+									</Card>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<Table>
+										<TableHead>
 											<TableRow>
-												<TableCell>
-													<span className="fw-semibold">{screening.screeningName}</span>
-												</TableCell>
-												<TableCell width={32} className="px-0">
-													<FlagDanger className="text-danger" />
-												</TableCell>
-												<TableCell width={72} className="pe-0">
-													<span className="text-gray">Score:</span>
-												</TableCell>
-												<TableCell width={32} className="px-0 text-right">
-													<span className="fw-bold">
-														{screening.screeningScore?.overallScore}
-													</span>
-												</TableCell>
-												<TableCell width={84} className="text-center">
-													<Button
-														variant="link"
-														size="sm"
-														className="p-0 text-decoration-none fw-normal"
-														onClick={() => {
-															setShowAssessmentModal(true);
-														}}
-													>
-														View
-													</Button>
+												<TableCell header colSpan={5}>
+													<span>Assessments</span>
 												</TableCell>
 											</TableRow>
-										)
-									)}
-								</TableBody>
-							</Table>
-						</Col>
-					</Row>
+										</TableHead>
+										<TableBody>
+											{patientOrder.screeningSessionResult?.screeningSessionScreeningResults?.map(
+												(screening) => (
+													<TableRow key={screening.screeningId}>
+														<TableCell>
+															<span className="fw-semibold">
+																{screening.screeningName}
+															</span>
+														</TableCell>
+														<TableCell width={32} className="px-0">
+															<FlagDanger className="text-danger" />
+														</TableCell>
+														<TableCell width={72} className="pe-0">
+															<span className="text-gray">Score:</span>
+														</TableCell>
+														<TableCell width={32} className="px-0 text-right">
+															<span className="fw-bold">
+																{screening.screeningScore?.overallScore}
+															</span>
+														</TableCell>
+														<TableCell width={84} className="text-center">
+															<Button
+																variant="link"
+																size="sm"
+																className="p-0 text-decoration-none fw-normal"
+																onClick={() => {
+																	setShowAssessmentModal(true);
+																}}
+															>
+																View
+															</Button>
+														</TableCell>
+													</TableRow>
+												)
+											)}
+										</TableBody>
+									</Table>
+								</Col>
+							</Row>
+						</>
+					)}
 				</Container>
 			</section>
 			<section>
