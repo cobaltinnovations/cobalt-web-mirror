@@ -1,4 +1,5 @@
 import { AccountModel } from './account';
+import { PatientOrderScreeningSession, ScreeningSessionResult } from './screening-models';
 
 export interface PatientOrderCountModel {
 	activePatientOrderCount: number;
@@ -74,7 +75,9 @@ export interface PatientOrderModel {
 	patientOrderMedications?: PatientOrderMedicationModel[];
 	patientOrderOutreaches?: PatientOrderOutreachModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
-	PatientOrderScreeningStatusId: PatientOrderScreeningStatusId;
+	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
+	screeningSession?: PatientOrderScreeningSession;
+	screeningSessionResult?: ScreeningSessionResult;
 }
 
 export enum PatientOrderStatusId {
