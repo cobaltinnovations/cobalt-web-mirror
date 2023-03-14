@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
@@ -15,6 +15,8 @@ import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 const MhicOrders = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+	const navigate = useNavigate();
+	const { pathname } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
@@ -24,9 +26,7 @@ const MhicOrders = () => {
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
 	const [overallActivePatientOrdersCountDescription, setOverallActivePatientOrdersCountDescription] = useState('0');
-
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
-
 	const [tableIsLoading, setTableIsLoading] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
@@ -138,15 +138,16 @@ const MhicOrders = () => {
 						description: overallActivePatientOrdersCountDescription,
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
-							return;
+							navigate('/ic/mhic/orders');
 						},
+						isActive: !!matchPath('/ic/mhic/orders', pathname) && panelAccountId === null,
 					},
 					{
 						title: 'Unassigned',
 						description: '[TODO]',
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
-							return;
+							window.alert('[TODO]: Unassigned query param?');
 						},
 					},
 					...panelAccounts.map((panelAccount) => {
@@ -157,18 +158,18 @@ const MhicOrders = () => {
 									.activePatientOrderCountDescription,
 							icon: () => <DotIcon className="text-n300" />,
 							onClick: () => {
-								return;
+								navigate(`/ic/mhic/orders?panelAccountId=${panelAccount.accountId}`);
 							},
+							isActive:
+								!!matchPath('/ic/mhic/orders', pathname) && panelAccountId === panelAccount.accountId,
 						};
 					}),
 				]}
 			>
 				<div className="py-6">
-					<FileInputButton className="d-inline-flex" accept=".csv" onChange={handleImportPatientsInputChange}>
-						Import Patients
-					</FileInputButton>
 					{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
 						<Button
+							className="me-4"
 							variant="outline-primary"
 							onClick={() => {
 								setShowGenerateOrdersModal(true);
@@ -177,6 +178,9 @@ const MhicOrders = () => {
 							Generate Patient Orders
 						</Button>
 					)}
+					<FileInputButton className="d-inline-flex" accept=".csv" onChange={handleImportPatientsInputChange}>
+						Import Patients
+					</FileInputButton>
 				</div>
 				<div className="mb-8">
 					<Table isLoading={tableIsLoading}>
@@ -223,7 +227,7 @@ const MhicOrders = () => {
 											<span className="fw-bold">{po.reasonForReferral}</span>
 										</TableCell>
 										<TableCell className="text-right">
-											<span className="fw-bold">0</span>
+											<span className="fw-bold text-danger">[TODO]: 0</span>
 										</TableCell>
 										<TableCell className="text-right">
 											<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
@@ -237,15 +241,7 @@ const MhicOrders = () => {
 				<div className="pb-20">
 					<Container fluid>
 						<Row>
-							<Col xs={4}>
-								<div className="d-flex align-items-center">
-									<p className="mb-0 fs-large fw-bold text-gray">
-										Showing <span className="text-dark">{patientOrders.length}</span> of{' '}
-										<span className="text-dark">{totalCountDescription}</span> Patients
-									</p>
-								</div>
-							</Col>
-							<Col xs={4}>
+							<Col xs={{ span: 4, offset: 4 }}>
 								<div className="d-flex justify-content-center align-items-center">
 									<TablePagination
 										total={totalCount}
@@ -253,6 +249,14 @@ const MhicOrders = () => {
 										size={pageSize.current}
 										onClick={handlePaginationClick}
 									/>
+								</div>
+							</Col>
+							<Col xs={4}>
+								<div className="d-flex justify-content-end align-items-center">
+									<p className="mb-0 fs-large fw-bold text-gray">
+										<span className="text-dark">{patientOrders.length}</span> of{' '}
+										<span className="text-dark">{totalCountDescription}</span> Patients
+									</p>
 								</div>
 							</Col>
 						</Row>
