@@ -144,10 +144,10 @@ export interface ScreeningSessionResult {
 	screeningFlowName?: string;
 	screeningFlowVersionId?: string;
 	screeningFlowVersionNumber?: number;
-	screeningSessionScreeningResults?: screeningSessionScreeningResult[];
+	screeningSessionScreeningResults?: ScreeningSessionScreeningResult[];
 }
 
-export interface screeningSessionScreeningResult {
+export interface ScreeningSessionScreeningResult {
 	screeningVersionId?: string;
 	screeningId?: string;
 	screeningVersionNumber?: number;
@@ -159,17 +159,17 @@ export interface screeningSessionScreeningResult {
 		depersonalizationScore?: number;
 		emotionalExhaustionScore?: number;
 	};
-	screeningQuestionResults?: screeningQuestionResult[];
+	screeningQuestionResults?: ScreeningQuestionResult[];
 }
 
-export interface screeningQuestionResult {
+export interface ScreeningQuestionResult {
 	screeningQuestionId?: string;
 	screeningQuestionIntroText?: string;
 	screeningQuestionText?: string;
-	screeningAnswerResults?: screeningAnswerResult[];
+	screeningAnswerResults?: ScreeningAnswerResult[];
 }
 
-export interface screeningAnswerResult {
+export interface ScreeningAnswerResult {
 	screeningAnswerId?: string;
 	screeningAnswerOptionId?: string;
 	answerOptionText?: string;

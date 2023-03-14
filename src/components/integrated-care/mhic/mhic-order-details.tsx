@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
@@ -33,12 +33,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 	const { addFlag } = useFlags();
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
-	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
+	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
+		useState<ScreeningSessionScreeningResult>();
 
 	const handleCloseEpisodeModalSave = useCallback(
 		async (patientOrderClosureReasonId: string) => {
@@ -75,9 +76,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 			/>
 
 			<MhicAssessmentModal
-				show={showAssessmentModal}
+				show={!!screeningSessionScreeningResult}
+				screeningSessionScreeningResult={screeningSessionScreeningResult}
 				onHide={() => {
-					setShowAssessmentModal(false);
+					setScreeningSessionScreeningResult(undefined);
 				}}
 			/>
 
@@ -466,7 +468,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 																size="sm"
 																className="p-0 text-decoration-none fw-normal"
 																onClick={() => {
-																	setShowAssessmentModal(true);
+																	setScreeningSessionScreeningResult(screening);
 																}}
 															>
 																View
