@@ -63,14 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'center',
 	},
 	body: {
-		right: 0,
-		bottom: 0,
-		zIndex: 4,
-		position: 'fixed',
-		overflowY: 'auto',
-		padding: '0 40px',
-		top: headerHeight,
-		left: sideNavWidth,
+		padding: `${headerHeight}px 40px 0 ${sideNavWidth + 40}px`,
 	},
 }));
 
