@@ -40,6 +40,7 @@ export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult
 
 								return (
 									<li
+										key={question.screeningQuestionId}
 										className={classNames('d-flex border-bottom', {
 											'mb-4': !isLastQuestion,
 										})}
@@ -48,7 +49,10 @@ export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult
 										<div className="ps-2 mb-4 flex-grow-1">
 											<p className="mb-2">{question.screeningQuestionText}</p>
 											{question.screeningAnswerResults?.map((answer) => (
-												<div className="d-flex align-items-center justify-content-between">
+												<div
+													key={answer.screeningAnswerId}
+													className="d-flex align-items-center justify-content-between"
+												>
 													<h5 className="mb-0">{answer.answerOptionText}</h5>
 													<h5 className="mb-0 text-gray flex-shrink-0">
 														Score: {answer.score}
