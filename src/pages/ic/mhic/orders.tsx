@@ -1,18 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
-import { AccountModel, PatientOrderCountModel } from '@/lib/models';
+import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import FileInputButton from '@/components/file-input-button';
 import { MhicGenerateOrdersModal, MhicNavigation } from '@/components/integrated-care/mhic';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
 const MhicOrders = () => {
-	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const handleError = useHandleError();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const pageSize = useRef(15);
 
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
@@ -20,6 +26,11 @@ const MhicOrders = () => {
 	const [overallActivePatientOrdersCountDescription, setOverallActivePatientOrdersCountDescription] = useState('0');
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
+
+	const [tableIsLoading, setTableIsLoading] = useState(false);
+	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const [totalCountDescription, setTotalCountDescription] = useState('0');
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -35,12 +46,25 @@ const MhicOrders = () => {
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
-			const response = await integratedCareService.getPatientOrders({}).fetch();
-			console.log(response);
+			setTableIsLoading(true);
+
+			const response = await integratedCareService
+				.getPatientOrders({
+					...(panelAccountId && { panelAccountId }),
+					...(pageNumber && { pageNumber }),
+					pageSize: String(pageSize.current),
+				})
+				.fetch();
+
+			setPatientOrders(response.findResult.patientOrders);
+			setTotalCount(response.findResult.totalCount);
+			setTotalCountDescription(response.findResult.totalCountDescription);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setTableIsLoading(false);
 		}
-	}, [handleError]);
+	}, [handleError, pageNumber, panelAccountId]);
 
 	const handleImportPatientsInputChange = useCallback(
 		(file: File) => {
@@ -80,6 +104,14 @@ const MhicOrders = () => {
 	useEffect(() => {
 		fetchPanelAccounts();
 	}, [fetchPanelAccounts]);
+
+	const handlePaginationClick = useCallback(
+		(pageIndex: number) => {
+			searchParams.set('pageNumber', String(pageIndex));
+			setSearchParams(searchParams);
+		},
+		[searchParams, setSearchParams]
+	);
 
 	return (
 		<>
@@ -145,6 +177,86 @@ const MhicOrders = () => {
 							Generate Patient Orders
 						</Button>
 					)}
+				</div>
+				<div className="mb-8">
+					<Table isLoading={tableIsLoading}>
+						<TableHead>
+							<TableRow>
+								<TableCell header width={280} sticky>
+									Patient
+								</TableCell>
+								<TableCell header>Referral Date</TableCell>
+								<TableCell header>Practice</TableCell>
+								<TableCell header>Referral Reason</TableCell>
+								<TableCell header className="text-right">
+									Outreach #
+								</TableCell>
+								<TableCell header className="text-right">
+									Episode
+								</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{patientOrders.map((po) => {
+								return (
+									<TableRow
+										key={po.patientOrderId}
+										onClick={() => {
+											if (!po.patientOrderId) {
+												return;
+											}
+
+											// setClickedPatientOrderId(po.patientOrderId);
+										}}
+									>
+										<TableCell width={280} sticky className="py-2">
+											<span className="d-block fw-bold">{po.patientDisplayName}</span>
+											<span className="d-block text-gray">{po.patientMrn}</span>
+										</TableCell>
+										<TableCell>
+											<span className="fw-bold">{po.orderDateDescription}</span>
+										</TableCell>
+										<TableCell>
+											<span className="fw-bold">{po.referringPracticeName}</span>
+										</TableCell>
+										<TableCell>
+											<span className="fw-bold">{po.reasonForReferral}</span>
+										</TableCell>
+										<TableCell className="text-right">
+											<span className="fw-bold">0</span>
+										</TableCell>
+										<TableCell className="text-right">
+											<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
+										</TableCell>
+									</TableRow>
+								);
+							})}
+						</TableBody>
+					</Table>
+				</div>
+				<div className="pb-20">
+					<Container fluid>
+						<Row>
+							<Col xs={4}>
+								<div className="d-flex align-items-center">
+									<p className="mb-0 fs-large fw-bold text-gray">
+										Showing <span className="text-dark">{patientOrders.length}</span> of{' '}
+										<span className="text-dark">{totalCountDescription}</span> Patients
+									</p>
+								</div>
+							</Col>
+							<Col xs={4}>
+								<div className="d-flex justify-content-center align-items-center">
+									<TablePagination
+										total={totalCount}
+										page={parseInt(pageNumber, 10)}
+										size={pageSize.current}
+										onClick={handlePaginationClick}
+									/>
+								</div>
+							</Col>
+						</Row>
+					</Container>
 				</div>
 			</MhicNavigation>
 		</>

@@ -18,8 +18,6 @@ const MhicAssignedOrders = () => {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const patientOrderPanelTypeId = useMemo(() => searchParams.get('patientOrderPanelTypeId'), [searchParams]);
-	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
-	const searchQuery = useMemo(() => searchParams.get('searchQuery'), [searchParams]);
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const pageSize = useRef(15);
 
@@ -38,8 +36,6 @@ const MhicAssignedOrders = () => {
 			const response = await integratedCareService
 				.getPatientOrders({
 					...(patientOrderPanelTypeId && { patientOrderPanelTypeId }),
-					...(panelAccountId && { panelAccountId }),
-					...(searchQuery && { searchQuery }),
 					...(pageNumber && { pageNumber }),
 					pageSize: String(pageSize.current),
 				})
@@ -53,7 +49,7 @@ const MhicAssignedOrders = () => {
 		} finally {
 			setTableIsLoading(false);
 		}
-	}, [handleError, pageNumber, panelAccountId, patientOrderPanelTypeId, searchQuery]);
+	}, [handleError, pageNumber, patientOrderPanelTypeId]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
