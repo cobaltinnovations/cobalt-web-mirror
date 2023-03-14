@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
 import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 import FileInputButton from '@/components/file-input-button';
 import { MhicGenerateOrdersModal, MhicNavigation } from '@/components/integrated-care/mhic';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
+import { cloneDeep } from 'lodash';
 
 const MhicOrders = () => {
 	const { addFlag } = useFlags();
@@ -31,6 +32,8 @@ const MhicOrders = () => {
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
+
+	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -186,7 +189,21 @@ const MhicOrders = () => {
 					<Table isLoading={tableIsLoading}>
 						<TableHead>
 							<TableRow>
-								<TableCell header width={280} sticky>
+								<TableCell header width={64} sticky className="align-items-center">
+									<Form.Check
+										className="no-label"
+										type="checkbox"
+										name="orders"
+										id="orders--select-all"
+										label=""
+										value="SELECT_ALL"
+										checked={false}
+										onChange={() => {
+											window.alert('[TODO]: Select All');
+										}}
+									/>
+								</TableCell>
+								<TableCell header width={280} sticky stickyOffset={64}>
 									Patient
 								</TableCell>
 								<TableCell header>Referral Date</TableCell>
@@ -203,17 +220,35 @@ const MhicOrders = () => {
 						<TableBody>
 							{patientOrders.map((po) => {
 								return (
-									<TableRow
-										key={po.patientOrderId}
-										onClick={() => {
-											if (!po.patientOrderId) {
-												return;
-											}
+									<TableRow key={po.patientOrderId}>
+										<TableCell header width={64} sticky className="align-items-center">
+											<Form.Check
+												className="no-label"
+												type="checkbox"
+												name="orders"
+												id={`orders--${po.patientOrderId}`}
+												label=""
+												value={po.patientOrderId}
+												checked={selectedPatientOrderIds.includes(po.patientOrderId)}
+												onChange={({ currentTarget }) => {
+													const selectedPatientOrderIdsClone =
+														cloneDeep(selectedPatientOrderIds);
 
-											// setClickedPatientOrderId(po.patientOrderId);
-										}}
-									>
-										<TableCell width={280} sticky className="py-2">
+													const targetIndex = selectedPatientOrderIdsClone.findIndex(
+														(poId) => poId === currentTarget.value
+													);
+
+													if (targetIndex > -1) {
+														selectedPatientOrderIdsClone.splice(targetIndex, 1);
+													} else {
+														selectedPatientOrderIdsClone.push(currentTarget.value);
+													}
+
+													setSelectedPatientOrderIds(selectedPatientOrderIdsClone);
+												}}
+											/>
+										</TableCell>
+										<TableCell width={280} sticky stickyOffset={64} className="py-2">
 											<span className="d-block fw-bold">{po.patientDisplayName}</span>
 											<span className="d-block text-gray">{po.patientMrn}</span>
 										</TableCell>
