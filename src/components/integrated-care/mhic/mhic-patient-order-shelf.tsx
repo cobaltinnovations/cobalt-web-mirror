@@ -5,7 +5,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
-import { accountService, integratedCareService } from '@/lib/services';
+import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
 import AsyncWrapper from '@/components/async-page';
@@ -129,7 +129,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 
 		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
 			integratedCareService.getPatientOrder(patientOrderId).fetch(),
-			accountService.getReferenceData().fetch(),
+			integratedCareService.getReferenceData().fetch(),
 		]);
 
 		setCurrentPatientOrder(patientOverviewResponse.patientOrder);

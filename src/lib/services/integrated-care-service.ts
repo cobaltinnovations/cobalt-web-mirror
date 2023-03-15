@@ -9,6 +9,7 @@ import {
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
 	PatientOrderStatusId,
+	ReferenceDataResponse,
 } from '@/lib/models';
 
 export interface PatientOrderDemographicsFormData {
@@ -179,6 +180,12 @@ export const integratedCareService = {
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/close`,
 			data,
+		});
+	},
+	getReferenceData() {
+		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
+			method: 'GET',
+			url: `/patient-orders/reference-data`,
 		});
 	},
 };

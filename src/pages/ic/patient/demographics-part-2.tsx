@@ -4,7 +4,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
 import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
-import { accountService, integratedCareService } from '@/lib/services';
+import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
@@ -53,7 +53,7 @@ const PatientDemographicsPart2 = () => {
 	const fetchData = useCallback(async () => {
 		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
 			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
-			accountService.getReferenceData().fetch(),
+			integratedCareService.getReferenceData().fetch(),
 		]);
 
 		setPatientOrder(patientOrderResponse.patientOrder);

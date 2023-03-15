@@ -56,8 +56,8 @@ export interface PatientOrderModel {
 	routing?: string;
 	reasonForReferral?: string;
 	associatedDiagnosis?: string;
-	callbackPhoneNumber?: string;
-	callbackPhoneNumberDescription?: string;
+	patientPhoneNumber?: string;
+	patientPhoneNumberDescription?: string;
 	preferredContactHours?: string;
 	comments?: string;
 	ccRecipients?: string;
@@ -68,6 +68,11 @@ export interface PatientOrderModel {
 	episodeEndedAtDescription?: string;
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
+	patientEthnicityId: string;
+	patientRaceId: string;
+	patientGenderIdentityId: string;
+	patientLanguageCode: string;
+	patientEmailAddress: string;
 
 	// MHIC specific
 	patientAddress?: PatientAddressModel;

@@ -516,7 +516,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Callback Number</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.callbackPhoneNumberDescription}</p>
+												<p className="m-0">{patientOrder.patientPhoneNumberDescription}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">

@@ -7,7 +7,6 @@ import {
 	BetaStatusId,
 	PersonalizationDetails,
 	Institution,
-	ReferenceDataResponse,
 } from '@/lib/models';
 
 export interface AccountResponse {
@@ -299,12 +298,6 @@ export const accountService = {
 		return httpSingleton.orchestrateRequest<AccountResponse>({
 			method: 'PUT',
 			url: `/accounts/${accountId}/consent-form-rejected`,
-		});
-	},
-	getReferenceData() {
-		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
-			method: 'GET',
-			url: `/accounts/reference-data`,
 		});
 	},
 	patchPatientAccount(accountId: string, data: Partial<PatientAccountFormData>) {
