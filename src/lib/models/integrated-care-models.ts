@@ -73,12 +73,14 @@ export interface PatientOrderModel {
 	patientGenderIdentityId: string;
 	patientLanguageCode: string;
 	patientEmailAddress: string;
+	patientAccount?: AccountModel;
 
 	// MHIC specific
 	patientAddress?: PatientAddressModel;
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
 	patientOrderOutreaches?: PatientOrderOutreachModel[];
+	patientOrderTriageGroups?: PateintOrderTriageGroupModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
 	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
 	screeningSession?: PatientOrderScreeningSession;
@@ -165,6 +167,14 @@ export interface PatientOrderOutreachModel {
 	outreachTimeDescription: string;
 	patientOrderId: string;
 	patientOrderOutreachId: string;
+}
+
+export interface PateintOrderTriageGroupModel {
+	patientOrderFocusTypeId: string;
+	patientOrderFocusTypeDescription: string;
+	patientOrderCareTypeId: string;
+	patientOrderCareTypeDescription: string;
+	reasons: string[];
 }
 
 export interface PatientOrderClosureReasonModel {
