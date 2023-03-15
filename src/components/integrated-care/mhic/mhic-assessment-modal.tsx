@@ -41,24 +41,33 @@ export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult
 								return (
 									<li
 										key={question.screeningQuestionId}
-										className={classNames('d-flex border-bottom', {
+										className={classNames('d-flex', {
+											'border-bottom': !isLastQuestion,
 											'mb-4': !isLastQuestion,
 										})}
 									>
 										<div>{questionIndex + 1})</div>
 										<div className="ps-2 mb-4 flex-grow-1">
 											<p className="mb-2">{question.screeningQuestionText}</p>
-											{question.screeningAnswerResults?.map((answer) => (
-												<div
-													key={answer.screeningAnswerId}
-													className="d-flex align-items-center justify-content-between"
-												>
-													<h5 className="mb-0">{answer.answerOptionText}</h5>
-													<h5 className="mb-0 text-gray flex-shrink-0">
-														Score: {answer.score}
-													</h5>
-												</div>
-											))}
+											{question.screeningAnswerResults?.map((answer, answerIndex) => {
+												const isLastAnswer =
+													(question.screeningAnswerResults ?? []).length - 1 === answerIndex;
+
+												return (
+													<div className={classNames({ 'mb-1': !isLastAnswer })}>
+														<div
+															key={answer.screeningAnswerId}
+															className="d-flex align-items-center justify-content-between"
+														>
+															<h5 className="mb-0">{answer.answerOptionText}</h5>
+															<h5 className="mb-0 text-gray flex-shrink-0">
+																Score: {answer.score}
+															</h5>
+														</div>
+														{answer.text && <p className="mb-0">{answer.text}</p>}
+													</div>
+												);
+											})}
 										</div>
 									</li>
 								);
