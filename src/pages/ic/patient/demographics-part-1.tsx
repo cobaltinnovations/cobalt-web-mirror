@@ -116,7 +116,7 @@ const PatientDemographicsPart1 = () => {
 										}
 										required
 									/>
-									<Form.Group controlId="birthdate" className="mb-2">
+									<Form.Group controlId="patientBirthdate" className="mb-2">
 										<DatePicker
 											showYearDropdown
 											showMonthDropdown
@@ -129,7 +129,7 @@ const PatientDemographicsPart1 = () => {
 											}
 											onChange={(date) => {
 												setFieldValue(
-													'birthdate',
+													'patientBirthdate',
 													date ? moment(date).format('YYYY-MM-DD') : ''
 												);
 											}}
