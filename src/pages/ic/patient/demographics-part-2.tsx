@@ -11,7 +11,7 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 
 export interface FormData {
-	address: {
+	patientAddress: {
 		streetAddress1: string;
 		streetAddress2: string;
 		locality: string;
@@ -30,7 +30,7 @@ const PatientDemographicsPart2 = () => {
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			address: {
+			patientAddress: {
 				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
 				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
 				locality: patientOrder?.patientAddress?.locality ?? '',
@@ -103,13 +103,14 @@ const PatientDemographicsPart2 = () => {
 										className="mb-2"
 										label="Street Address 1"
 										type="text"
-										name="address.streetAddress1"
-										value={values.address.streetAddress1}
+										name="patientAddress.streetAddress1"
+										value={values.patientAddress.streetAddress1}
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.address?.streetAddress1 && errors.address?.streetAddress1
-												? errors.address?.streetAddress1
+											touched.patientAddress?.streetAddress1 &&
+											errors.patientAddress?.streetAddress1
+												? errors.patientAddress?.streetAddress1
 												: ''
 										}
 									/>
@@ -117,13 +118,14 @@ const PatientDemographicsPart2 = () => {
 										className="mb-2"
 										label="Street Address 2"
 										type="text"
-										name="address.streetAddress2"
-										value={values.address.streetAddress2}
+										name="patientAddress.streetAddress2"
+										value={values.patientAddress.streetAddress2}
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.address?.streetAddress2 && errors.address?.streetAddress2
-												? errors.address?.streetAddress2
+											touched.patientAddress?.streetAddress2 &&
+											errors.patientAddress?.streetAddress2
+												? errors.patientAddress?.streetAddress2
 												: ''
 										}
 									/>
@@ -131,27 +133,27 @@ const PatientDemographicsPart2 = () => {
 										className="mb-2"
 										label="City"
 										type="text"
-										name="address.locality"
-										value={values.address.locality}
+										name="patientAddress.locality"
+										value={values.patientAddress.locality}
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.address?.locality && errors.address?.locality
-												? errors.address?.locality
+											touched.patientAddress?.locality && errors.patientAddress?.locality
+												? errors.patientAddress?.locality
 												: ''
 										}
 									/>
 									<InputHelper
 										className="mb-2"
 										label="State"
-										name="address.region"
-										value={values.address.region}
+										name="patientAddress.region"
+										value={values.patientAddress.region}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.address?.region && errors.address?.region
-												? errors.address?.region
+											touched.patientAddress?.region && errors.patientAddress?.region
+												? errors.patientAddress?.region
 												: ''
 										}
 									>
@@ -168,13 +170,13 @@ const PatientDemographicsPart2 = () => {
 										className="mb-6"
 										label="ZIP Code"
 										type="text"
-										name="address.postalCode"
-										value={values.address.postalCode}
+										name="patientAddress.postalCode"
+										value={values.patientAddress.postalCode}
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.address?.postalCode && errors.address?.postalCode
-												? errors.address?.postalCode
+											touched.patientAddress?.postalCode && errors.patientAddress?.postalCode
+												? errors.patientAddress?.postalCode
 												: ''
 										}
 									/>

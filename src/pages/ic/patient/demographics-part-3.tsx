@@ -11,10 +11,11 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 
 export interface FormData {
-	genderIdentityId: string;
-	raceId: string;
-	ethnicityId: string;
-	languageCode: string;
+	patientBirthSexId: string;
+	patientGenderIdentityId: string;
+	patientRaceId: string;
+	patientEthnicityId: string;
+	patientLanguageCode: string;
 }
 
 const PatientDemographicsPart3 = () => {
@@ -25,10 +26,11 @@ const PatientDemographicsPart3 = () => {
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			genderIdentityId: patientOrder?.patientBirthSexId ?? '',
-			raceId: '',
-			ethnicityId: '',
-			languageCode: '',
+			patientBirthSexId: patientOrder?.patientBirthSexId ?? '',
+			patientGenderIdentityId: '',
+			patientRaceId: '',
+			patientEthnicityId: '',
+			patientLanguageCode: '',
 		};
 	}, [patientOrder?.patientBirthSexId]);
 
@@ -83,15 +85,38 @@ const PatientDemographicsPart3 = () => {
 								<Form onSubmit={handleSubmit}>
 									<InputHelper
 										className="mb-2"
-										label="Gender Identity"
-										name="genderIdentityId"
-										value={values.genderIdentityId}
+										label="Birth Sex"
+										name="patientBirthSexId"
+										value={values.patientBirthSexId}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
 										error={
-											touched.genderIdentityId && errors.genderIdentityId
-												? errors.genderIdentityId
+											touched.patientBirthSexId && errors.patientBirthSexId
+												? errors.patientBirthSexId
+												: ''
+										}
+									>
+										<option value="">Select...</option>
+										{referenceData?.birthSexes.map((birthSex) => {
+											return (
+												<option key={birthSex.birthSexId} value={birthSex.birthSexId}>
+													{birthSex.description}
+												</option>
+											);
+										})}
+									</InputHelper>
+									<InputHelper
+										className="mb-2"
+										label="Gender Identity"
+										name="patientGenderIdentityId"
+										value={values.patientGenderIdentityId}
+										as="select"
+										onBlur={handleBlur}
+										onChange={handleChange}
+										error={
+											touched.patientGenderIdentityId && errors.patientGenderIdentityId
+												? errors.patientGenderIdentityId
 												: ''
 										}
 									>
@@ -110,12 +135,14 @@ const PatientDemographicsPart3 = () => {
 									<InputHelper
 										className="mb-2"
 										label="Race"
-										name="raceId"
-										value={values.raceId}
+										name="patientRaceId"
+										value={values.patientRaceId}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.raceId && errors.raceId ? errors.raceId : ''}
+										error={
+											touched.patientRaceId && errors.patientRaceId ? errors.patientRaceId : ''
+										}
 									>
 										<option value="">Select...</option>
 										{referenceData?.races.map((race) => {
@@ -129,12 +156,16 @@ const PatientDemographicsPart3 = () => {
 									<InputHelper
 										className="mb-2"
 										label="Ethnicity"
-										name="ethnicityId"
-										value={values.ethnicityId}
+										name="patientEthnicityId"
+										value={values.patientEthnicityId}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.ethnicityId && errors.ethnicityId ? errors.ethnicityId : ''}
+										error={
+											touched.patientEthnicityId && errors.patientEthnicityId
+												? errors.patientEthnicityId
+												: ''
+										}
 									>
 										<option value="">Select...</option>
 										{referenceData?.ethnicities.map((ethnicity) => {
@@ -149,11 +180,15 @@ const PatientDemographicsPart3 = () => {
 										className="mb-6"
 										label="Preferred Language"
 										name="languageCode"
-										value={values.languageCode}
+										value={values.patientLanguageCode}
 										as="select"
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.languageCode && errors.languageCode ? errors.languageCode : ''}
+										error={
+											touched.patientLanguageCode && errors.patientLanguageCode
+												? errors.patientLanguageCode
+												: ''
+										}
 									>
 										<option value="">Select...</option>
 										{referenceData?.languages.map((language) => {

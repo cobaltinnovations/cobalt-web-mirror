@@ -13,11 +13,11 @@ import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
 export interface FormData {
-	firstName: string;
-	lastName: string;
-	birthdate: string;
-	phoneNumber: string;
-	emailAddress: string;
+	patientFirstName: string;
+	patientLastName: string;
+	patientBirthdate: string;
+	patientPhoneNumber: string;
+	patientEmailAddress: string;
 	insuranceId: string;
 }
 
@@ -29,11 +29,11 @@ const PatientDemographicsPart1 = () => {
 
 	const initialFormValues: FormData = useMemo(() => {
 		return {
-			firstName: patientOrder?.patientFirstName ?? '',
-			lastName: patientOrder?.patientLastName ?? '',
-			birthdate: patientOrder?.patientBirthdate ?? '',
-			phoneNumber: '',
-			emailAddress: '',
+			patientFirstName: patientOrder?.patientFirstName ?? '',
+			patientLastName: patientOrder?.patientLastName ?? '',
+			patientBirthdate: patientOrder?.patientBirthdate ?? '',
+			patientPhoneNumber: '',
+			patientEmailAddress: '',
 			insuranceId: '',
 		};
 	}, [patientOrder?.patientBirthdate, patientOrder?.patientFirstName, patientOrder?.patientLastName]);
@@ -92,21 +92,29 @@ const PatientDemographicsPart1 = () => {
 										className="mb-2"
 										label="First Name"
 										type="text"
-										name="firstName"
-										value={values.firstName}
+										name="patientFirstName"
+										value={values.patientFirstName}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.firstName && errors.firstName ? errors.firstName : ''}
+										error={
+											touched.patientFirstName && errors.patientFirstName
+												? errors.patientFirstName
+												: ''
+										}
 									/>
 									<InputHelper
 										className="mb-2"
 										label="Last Name"
 										type="text"
-										name="lastName"
-										value={values.lastName}
+										name="patientLastName"
+										value={values.patientLastName}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.lastName && errors.lastName ? errors.lastName : ''}
+										error={
+											touched.patientLastName && errors.patientLastName
+												? errors.patientLastName
+												: ''
+										}
 										required
 									/>
 									<Form.Group controlId="birthdate" className="mb-2">
@@ -115,7 +123,11 @@ const PatientDemographicsPart1 = () => {
 											showMonthDropdown
 											dropdownMode="select"
 											labelText="Date of Birth"
-											selected={values.birthdate ? moment(values.birthdate).toDate() : undefined}
+											selected={
+												values.patientBirthdate
+													? moment(values.patientBirthdate).toDate()
+													: undefined
+											}
 											onChange={(date) => {
 												setFieldValue(
 													'birthdate',
@@ -128,22 +140,30 @@ const PatientDemographicsPart1 = () => {
 										className="mb-2"
 										label="Phone Number"
 										type="text"
-										name="phoneNumber"
-										value={values.phoneNumber}
+										name="patientPhoneNumber"
+										value={values.patientPhoneNumber}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''}
+										error={
+											touched.patientPhoneNumber && errors.patientPhoneNumber
+												? errors.patientPhoneNumber
+												: ''
+										}
 										required
 									/>
 									<InputHelper
 										className="mb-2"
 										label="Email Address"
 										type="email"
-										name="emailAddress"
-										value={values.emailAddress}
+										name="patientEmailAddress"
+										value={values.patientEmailAddress}
 										onBlur={handleBlur}
 										onChange={handleChange}
-										error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
+										error={
+											touched.patientEmailAddress && errors.patientEmailAddress
+												? errors.patientEmailAddress
+												: ''
+										}
 										required
 									/>
 									<InputHelper

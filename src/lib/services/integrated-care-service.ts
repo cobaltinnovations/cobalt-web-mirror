@@ -12,24 +12,23 @@ import {
 } from '@/lib/models';
 
 export interface PatientOrderDemographicsFormData {
-	firstName: string;
-	lastName: string;
-	birthdate: string;
-	phoneNumber: string;
-	emailAddress: string;
-	genderIdentityId: string;
-	raceId: string;
-	ethnicityId: string;
-	languageCode: string;
-	timeZone: string;
-	insuranceId: string;
-	address: {
+	patientLastName: string;
+	patientFirstName: string;
+	patientEmailAddress: string;
+	patientPhoneNumber: string;
+	patientBirthSexId: string;
+	patientBirthdate: string;
+	patientEthnicityId: string;
+	patientRaceId: string;
+	patientGenderIdentityId: string;
+	patientLanguageCode: string;
+	patientAddress: {
+		postalName: string;
 		streetAddress1: string;
 		streetAddress2: string;
 		locality: string;
 		region: string;
 		postalCode: string;
-		postalName: string;
 		countryCode: string;
 	};
 }
