@@ -299,60 +299,64 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 					)}
 					{patientOrder.screeningSessionResult && (
 						<>
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Triage</Card.Title>
-											<div className="button-container">
-												<Button
-													variant="light"
-													size="sm"
-													onClick={() => {
-														setShowChangeTriageModal(true);
-													}}
-												>
-													Change Triage
-												</Button>
-											</div>
-										</Card.Header>
-										<Card.Body>
-											<Container fluid>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Care Type</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															<span className="text-danger">[TODO]: Care Type</span>
-														</p>
-													</Col>
-												</Row>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Care Focus</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															<span className="text-danger">[TODO]: Care Focus</span>
-														</p>
-													</Col>
-												</Row>
-												<Row>
-													<Col xs={3}>
-														<p className="m-0 text-gray">Reason</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															<span className="text-danger">[TODO]: Reason</span>
-														</p>
-													</Col>
-												</Row>
-											</Container>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
+							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
+								<Row key={triageGroupIndex} className="mb-6">
+									<Col>
+										<Card bsPrefix="ic-card">
+											<Card.Header>
+												<Card.Title>Triage</Card.Title>
+												<div className="button-container">
+													<Button
+														variant="light"
+														size="sm"
+														onClick={() => {
+															setShowChangeTriageModal(true);
+														}}
+													>
+														Change Triage
+													</Button>
+												</div>
+											</Card.Header>
+											<Card.Body>
+												<Container fluid>
+													<Row className="mb-4">
+														<Col xs={3}>
+															<p className="m-0 text-gray">Care Type</p>
+														</Col>
+														<Col xs={9}>
+															<p className="m-0">
+																{triageGroup.patientOrderCareTypeDescription}
+															</p>
+														</Col>
+													</Row>
+													<Row className="mb-4">
+														<Col xs={3}>
+															<p className="m-0 text-gray">Care Focus</p>
+														</Col>
+														<Col xs={9}>
+															<p className="m-0">
+																{triageGroup.patientOrderFocusTypeDescription}
+															</p>
+														</Col>
+													</Row>
+													<Row>
+														<Col xs={3}>
+															<p className="m-0 text-gray">Reason</p>
+														</Col>
+														<Col xs={9}>
+															{triageGroup.reasons.map((reason, reasonIndex) => (
+																<p key={reasonIndex} className="m-0">
+																	{reason}
+																</p>
+															))}
+														</Col>
+													</Row>
+												</Container>
+											</Card.Body>
+										</Card>
+									</Col>
+								</Row>
+							))}
 							<Row className="mb-6">
 								<Col>
 									<Card bsPrefix="ic-card">
@@ -373,7 +377,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 										<Card.Body>
 											<Container fluid>
 												<Row>
-													<p className="mb-0">[TODO]: Some inline-alert</p>
+													<p className="mb-0">
+														<span className="text-danger">[TODO]: Some inline-alert</span>
+													</p>
 												</Row>
 											</Container>
 										</Card.Body>
