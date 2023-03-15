@@ -36,7 +36,7 @@ const PatientDemographicsThanks = () => {
 								<WomanWithCatIllustration />
 							</div>
 							<h1 className="mb-6 text-center">
-								Thank you, {patientOrder?.patientDisplayName ?? 'Patient'}.
+								Thank you, {patientOrder?.patientFirstName ?? 'Patient'}.
 							</h1>
 							<p className="mb-6 text-center fs-large">That information really helps.</p>
 							<p className="mb-6 text-center fs-large">

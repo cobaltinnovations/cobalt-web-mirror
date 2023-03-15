@@ -34,7 +34,7 @@ const PatientDemographicsIntroduction = () => {
 								<WomanAtDeskIllustration width={408} height={218} />
 							</div>
 							<h1 className="mb-6 text-center">
-								Welcome, {patientOrder?.patientDisplayName ?? 'Patient'}.
+								Welcome, {patientOrder?.patientFirstName ?? 'Patient'}.
 							</h1>
 							<p className="mb-6 text-center fs-large">
 								This assessment takes about 15 minutes to complete, and only you and your care team wll
