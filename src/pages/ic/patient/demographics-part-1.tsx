@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
@@ -18,13 +18,11 @@ export interface FormData {
 	patientBirthdate: string;
 	patientPhoneNumber: string;
 	patientEmailAddress: string;
-	insuranceId: string;
 }
 
 const PatientDemographicsPart1 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const initialFormValues: FormData = useMemo(() => {
@@ -34,7 +32,6 @@ const PatientDemographicsPart1 = () => {
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumber ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? '',
-			insuranceId: '',
 		};
 	}, [
 		patientOrder?.patientBirthdate,
@@ -45,13 +42,8 @@ const PatientDemographicsPart1 = () => {
 	]);
 
 	const fetchData = useCallback(async () => {
-		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
-			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
-			integratedCareService.getReferenceData().fetch(),
-		]);
-
-		setPatientOrder(patientOrderResponse.patientOrder);
-		setReferenceData(referenceDataResponse);
+		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+		setPatientOrder(response.patientOrder);
 	}, []);
 
 	const handleFormSubmit = useCallback(
@@ -158,7 +150,7 @@ const PatientDemographicsPart1 = () => {
 										required
 									/>
 									<InputHelper
-										className="mb-2"
+										className="mb-6"
 										label="Email Address"
 										type="email"
 										name="patientEmailAddress"
@@ -172,25 +164,6 @@ const PatientDemographicsPart1 = () => {
 										}
 										required
 									/>
-									<InputHelper
-										className="mb-6"
-										label="Insurance"
-										name="insuranceId"
-										value={values.insuranceId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.insuranceId && errors.insuranceId ? errors.insuranceId : ''}
-									>
-										<option value="">Select...</option>
-										{referenceData?.insurances.map((insurance) => {
-											return (
-												<option key={insurance.insuranceId} value={insurance.insuranceId}>
-													{insurance.description}
-												</option>
-											);
-										})}
-									</InputHelper>
 									<div className="text-right">
 										<Button variant="primary" type="submit">
 											Next
