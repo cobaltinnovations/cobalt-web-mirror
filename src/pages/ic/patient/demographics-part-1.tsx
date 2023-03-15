@@ -30,7 +30,7 @@ const PatientDemographicsPart1 = () => {
 			patientFirstName: patientOrder?.patientFirstName ?? '',
 			patientLastName: patientOrder?.patientLastName ?? '',
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
-			patientPhoneNumber: patientOrder?.patientPhoneNumber ?? '',
+			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
 		};
 	}, [
@@ -39,7 +39,7 @@ const PatientDemographicsPart1 = () => {
 		patientOrder?.patientEmailAddress,
 		patientOrder?.patientFirstName,
 		patientOrder?.patientLastName,
-		patientOrder?.patientPhoneNumber,
+		patientOrder?.patientPhoneNumberDescription,
 	]);
 
 	const fetchData = useCallback(async () => {
