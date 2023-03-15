@@ -33,11 +33,12 @@ const PatientDemographicsPart1 = () => {
 			patientLastName: patientOrder?.patientLastName ?? '',
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumber ?? '',
-			patientEmailAddress: '',
+			patientEmailAddress: patientOrder?.patientEmailAddress ?? '',
 			insuranceId: '',
 		};
 	}, [
 		patientOrder?.patientBirthdate,
+		patientOrder?.patientEmailAddress,
 		patientOrder?.patientFirstName,
 		patientOrder?.patientLastName,
 		patientOrder?.patientPhoneNumber,
