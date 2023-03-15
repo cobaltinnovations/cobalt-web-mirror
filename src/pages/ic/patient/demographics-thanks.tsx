@@ -40,7 +40,7 @@ const PatientDemographicsThanks = () => {
 							</h1>
 							<p className="mb-6 text-center fs-large">That information really helps.</p>
 							<p className="mb-6 text-center fs-large">
-								Next, we'd like to know about the condition or symptoms you're looking for help with
+								Next, we'd like to know about the condition or symptoms you're looking for help with.
 							</p>
 							<div className="text-center">
 								<Button
