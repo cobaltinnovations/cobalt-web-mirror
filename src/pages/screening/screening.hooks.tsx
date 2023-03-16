@@ -180,6 +180,7 @@ export function useScreeningFlow({
 
 		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
 			screeningFlowId,
+			patientOrderId,
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
 
@@ -201,7 +202,7 @@ export function useScreeningFlow({
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [handleError, isImmediateSession, isSkipped, screeningFlowId]);
+	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
 	const checkAndStartScreeningFlow = useCallback(() => {
 		if (!activeFlowVersion) {
