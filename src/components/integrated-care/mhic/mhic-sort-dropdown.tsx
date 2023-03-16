@@ -3,23 +3,22 @@ import { Button, Dropdown } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+
+import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	dropdownMenu: {
-		border: 0,
+	dropdownMenuBody: {
 		width: 576,
-		padding: 16,
-		zIndex: 1000,
-		display: 'none',
-		borderRadius: 4,
-		boxShadow: theme.elevation.e400,
-		backgroundColor: theme.colors.n0,
-		'&.show': {
-			display: 'block',
-		},
+		padding: '16px 24px',
 	},
-	freeformInput: {
-		width: 328,
+	dropdownMenuFooter: {
+		textAlign: 'right',
+		padding: '12px 16px',
+		borderBottomLeftRadius: 8,
+		borderBottomRightRadius: 8,
+		backgroundColor: theme.colors.n50,
+		borderTop: `1px solid ${theme.colors.n100}`,
 	},
 }));
 
@@ -28,18 +27,24 @@ export const MhicSortDropdown = () => {
 	const [show, setShow] = useState(false);
 
 	return (
-		<Dropdown autoClose="outside" show={show} onToggle={setShow}>
-			<Dropdown.Toggle className="me-2" variant="light" id="mhic-sort-toggle">
-				Sort
+		<Dropdown className="d-flex align-items-center" autoClose="outside" show={show} onToggle={setShow}>
+			<Dropdown.Toggle
+				as={DropdownToggle}
+				className="d-inline-flex align-items-center py-2 ps-3 pe-4"
+				id="order-filters--add-filter"
+			>
+				<SortIcon className="me-2" />
+				<span>Sort By</span>
 			</Dropdown.Toggle>
 			<Dropdown.Menu
-				className={classes.dropdownMenu}
+				as={DropdownMenu}
+				className="p-0"
+				align="start"
 				flip={false}
 				popperConfig={{ strategy: 'fixed' }}
 				renderOnMount
-				bsPrefix="mhic-sort-menu"
 			>
-				<div className="d-flex align-items-center mb-3">
+				<div className={classes.dropdownMenuBody}>
 					<InputHelper
 						className="me-2 flex-grow-1"
 						as="select"
@@ -64,8 +69,10 @@ export const MhicSortDropdown = () => {
 						<option value="">Descending</option>
 					</InputHelper>
 				</div>
-				<div className="text-right">
+				<div className={classes.dropdownMenuFooter}>
 					<Button
+						variant="primary"
+						size="sm"
 						onClick={() => {
 							setShow(false);
 						}}

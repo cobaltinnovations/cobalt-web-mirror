@@ -1,68 +1,144 @@
 import React, { useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
+import classNames from 'classnames';
 
-import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+
+import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	dropdownMenu: {
-		border: 0,
+	dropdownMenuBody: {
 		width: 576,
-		padding: 16,
-		zIndex: 1000,
-		display: 'none',
-		borderRadius: 4,
-		boxShadow: theme.elevation.e400,
-		backgroundColor: theme.colors.n0,
-		'&.show': {
-			display: 'block',
-		},
+		padding: '16px 24px',
 	},
-	freeformInput: {
-		width: 328,
+	dropdownMenuFooter: {
+		textAlign: 'right',
+		padding: '12px 16px',
+		borderBottomLeftRadius: 8,
+		borderBottomRightRadius: 8,
+		backgroundColor: theme.colors.n50,
+		borderTop: `1px solid ${theme.colors.n100}`,
 	},
 }));
 
-export const MhicFilterDropdown = () => {
+interface Props {
+	className?: string;
+}
+
+export const MhicFilterDropdown = ({ className }: Props) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
 
 	return (
-		<Dropdown autoClose="outside" show={show} onToggle={setShow}>
-			<Dropdown.Toggle className="me-2" variant="light" id="mhic-filter-toggle">
-				Filter
+		<Dropdown
+			className={classNames('d-flex align-items-center', className)}
+			autoClose="outside"
+			show={show}
+			onToggle={setShow}
+		>
+			<Dropdown.Toggle
+				as={DropdownToggle}
+				className="d-inline-flex align-items-center py-2 ps-3 pe-4"
+				id="order-filters--add-filter"
+			>
+				<FilterIcon className="me-2" />
+				<span>Add Filter</span>
 			</Dropdown.Toggle>
 			<Dropdown.Menu
-				className={classes.dropdownMenu}
+				as={DropdownMenu}
+				className="p-0"
+				align="start"
 				flip={false}
 				popperConfig={{ strategy: 'fixed' }}
 				renderOnMount
-				bsPrefix="mhic-filter-menu"
 			>
-				<div className="d-flex align-items-center mb-3">
-					<InputHelper
-						className="me-4 flex-grow-1"
-						as="select"
-						label="Filter"
-						value=""
-						onChange={() => {
-							return;
+				<div className={classes.dropdownMenuBody}>
+					<Dropdown className="d-flex align-items-center">
+						<Dropdown.Toggle
+							as={DropdownToggle}
+							id="order-filters--select-filter"
+							className="d-inline-flex align-items-center py-2 px-3"
+						>
+							<PlusIcon className="me-2" />
+							<span>Add Filter</span>
+							<ArrowDown className="ms-2" />
+						</Dropdown.Toggle>
+						<Dropdown.Menu
+							as={DropdownMenu}
+							align="start"
+							flip={false}
+							popperConfig={{ strategy: 'fixed' }}
+							renderOnMount
+						>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Flag
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Practice
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Referral Reason
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Assessment Status
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Care Focus
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Resource Status
+							</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									return;
+								}}
+							>
+								Follow Up Response
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				</div>
+				<div className={classes.dropdownMenuFooter}>
+					<Button
+						variant="outline-primary"
+						size="sm"
+						className="me-2"
+						onClick={() => {
+							setShow(false);
 						}}
 					>
-						<option value="">Practice</option>
-					</InputHelper>
-					<InputHelper
-						className={classes.freeformInput}
-						type="text"
-						label="Practice"
-						value=""
-						onChange={() => {
-							return;
-						}}
-					/>
-				</div>
-				<div className="text-right">
+						Clear All
+					</Button>
 					<Button
+						variant="primary"
+						size="sm"
 						onClick={() => {
 							setShow(false);
 						}}

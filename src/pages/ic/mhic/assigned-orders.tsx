@@ -71,7 +71,7 @@ const MhicAssignedOrders = () => {
 
 			<div className="py-6 d-flex align-items-center justify-content-between">
 				<div className="d-flex">
-					<MhicFilterDropdown />
+					<MhicFilterDropdown className="me-2" />
 					<MhicSortDropdown />
 				</div>
 				<Button

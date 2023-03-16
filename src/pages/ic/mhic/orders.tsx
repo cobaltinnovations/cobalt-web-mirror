@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Dropdown, Form, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
 import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
@@ -11,6 +11,7 @@ import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import FileInputButton from '@/components/file-input-button';
 import { MhicGenerateOrdersModal, MhicNavigation } from '@/components/integrated-care/mhic';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';

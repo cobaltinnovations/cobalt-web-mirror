@@ -31,6 +31,8 @@ const useDropdownMenuStyles = createUseThemedStyles(
 		dropdownMenu: {
 			border: 0,
 			minWidth: 176,
+			marginTop: 8,
+			borderRadius: 8,
 			padding: '8px 0',
 			boxShadow: theme.elevation.e200,
 			backgroundColor: theme.colors.n0,
