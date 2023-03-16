@@ -443,9 +443,12 @@ const ScreeningQuestionsPage = () => {
 						) : (
 							<>
 								{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
-									<p className="mb-3">
-										{screeningQuestionContextResponse.screeningQuestion.introText}
-									</p>
+									<div
+										className="mb-3"
+										dangerouslySetInnerHTML={{
+											__html: screeningQuestionContextResponse.screeningQuestion.introText,
+										}}
+									/>
 								)}
 
 								<h3 className="mb-5">
