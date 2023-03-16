@@ -116,7 +116,15 @@ export function useScreeningNavigation() {
 	};
 }
 
-export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: boolean = true) {
+export function useScreeningFlow({
+	screeningFlowId,
+	patientOrderId,
+	instantiateOnLoad = true,
+}: {
+	screeningFlowId?: string;
+	patientOrderId?: string;
+	instantiateOnLoad?: boolean;
+}) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
 	// For now - if not in "on load" mode, ignore the concept of "skipped"
@@ -144,6 +152,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 			screeningService
 				.createScreeningSession({
 					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+					patientOrderId,
 				})
 				.fetch()
 				.then((sessionResponse) => {
@@ -157,7 +166,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		} else {
 			navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
 		}
-	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext]);
+	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext, patientOrderId]);
 
 	useEffect(() => {
 		if (isImmediateSession || isSkipped) {

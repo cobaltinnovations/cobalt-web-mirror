@@ -12,6 +12,7 @@ type ScreeningFlowParams = {
 	screeningFlowId?: string;
 	targetAccountId?: string | null;
 	screeningFlowVersionId?: string;
+	patientOrderId?: string;
 };
 
 export const screeningService = {

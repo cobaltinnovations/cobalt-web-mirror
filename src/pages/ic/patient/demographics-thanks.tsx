@@ -18,7 +18,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.integratedCareScreeningFlowId, false);
+	const { checkAndStartScreeningFlow } = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		instantiateOnLoad: false,
+	});
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
