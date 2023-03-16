@@ -33,6 +33,7 @@ const MhicOrders = () => {
 	const [totalCount, setTotalCount] = useState(0);
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
 
+	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 
 	const fetchPanelAccounts = useCallback(async () => {
@@ -197,9 +198,19 @@ const MhicOrders = () => {
 										id="orders--select-all"
 										label=""
 										value="SELECT_ALL"
-										checked={false}
-										onChange={() => {
-											window.alert('[TODO]: Select All');
+										checked={selectAll}
+										onChange={({ currentTarget }) => {
+											if (currentTarget.checked) {
+												const allPatientOrderIds = cloneDeep(patientOrders).map(
+													(order) => order.patientOrderId
+												);
+
+												setSelectedPatientOrderIds(allPatientOrderIds);
+											} else {
+												setSelectedPatientOrderIds([]);
+											}
+
+											setSelectAll(currentTarget.checked);
 										}}
 									/>
 								</TableCell>
@@ -249,13 +260,23 @@ const MhicOrders = () => {
 														cloneDeep(selectedPatientOrderIds);
 
 													const targetIndex = selectedPatientOrderIdsClone.findIndex(
-														(poId) => poId === currentTarget.value
+														(orderId) => orderId === currentTarget.value
 													);
 
 													if (targetIndex > -1) {
 														selectedPatientOrderIdsClone.splice(targetIndex, 1);
 													} else {
 														selectedPatientOrderIdsClone.push(currentTarget.value);
+													}
+
+													const allAreSelected = patientOrders.every((order) =>
+														selectedPatientOrderIdsClone.includes(order.patientOrderId)
+													);
+
+													if (allAreSelected) {
+														setSelectAll(true);
+													} else {
+														setSelectAll(false);
 													}
 
 													setSelectedPatientOrderIds(selectedPatientOrderIdsClone);
