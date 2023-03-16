@@ -8,15 +8,7 @@ import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
-import InputHelper from '@/components/input-helper';
-
-export interface FormData {
-	patientBirthSexId: string;
-	patientGenderIdentityId: string;
-	patientRaceId: string;
-	patientEthnicityId: string;
-	patientLanguageCode: string;
-}
+import { PatientDemographicsFormInputs, PatientDemographicsFormData } from '@/components/integrated-care/common';
 
 const PatientDemographicsPart3 = () => {
 	const navigate = useNavigate();
@@ -24,7 +16,7 @@ const PatientDemographicsPart3 = () => {
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
-	const initialFormValues: FormData = useMemo(() => {
+	const initialFormValues: PatientDemographicsFormData = useMemo(() => {
 		return {
 			patientBirthSexId: patientOrder?.patientBirthSexId ?? '',
 			patientGenderIdentityId: patientOrder?.patientGenderIdentityId ?? '',
@@ -51,7 +43,7 @@ const PatientDemographicsPart3 = () => {
 	}, []);
 
 	const handleFormSubmit = useCallback(
-		async (values: FormData) => {
+		async (values: PatientDemographicsFormData) => {
 			if (!patientOrder) {
 				return;
 			}
@@ -82,129 +74,17 @@ const PatientDemographicsPart3 = () => {
 				</Row>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Formik<FormData>
+						<Formik<PatientDemographicsFormData>
 							initialValues={initialFormValues}
 							enableReinitialize
 							onSubmit={handleFormSubmit}
 						>
-							{({ values, touched, errors, handleChange, handleBlur, handleSubmit }) => (
-								<Form onSubmit={handleSubmit}>
-									<InputHelper
-										className="mb-2"
-										label="Birth Sex"
-										name="patientBirthSexId"
-										value={values.patientBirthSexId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientBirthSexId && errors.patientBirthSexId
-												? errors.patientBirthSexId
-												: ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.birthSexes.map((birthSex) => {
-											return (
-												<option key={birthSex.birthSexId} value={birthSex.birthSexId}>
-													{birthSex.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-2"
-										label="Gender Identity"
-										name="patientGenderIdentityId"
-										value={values.patientGenderIdentityId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientGenderIdentityId && errors.patientGenderIdentityId
-												? errors.patientGenderIdentityId
-												: ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.genderIdentities.map((genderIdentity) => {
-											return (
-												<option
-													key={genderIdentity.genderIdentityId}
-													value={genderIdentity.genderIdentityId}
-												>
-													{genderIdentity.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-2"
-										label="Race"
-										name="patientRaceId"
-										value={values.patientRaceId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientRaceId && errors.patientRaceId ? errors.patientRaceId : ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.races.map((race) => {
-											return (
-												<option key={race.raceId} value={race.raceId}>
-													{race.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-2"
-										label="Ethnicity"
-										name="patientEthnicityId"
-										value={values.patientEthnicityId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientEthnicityId && errors.patientEthnicityId
-												? errors.patientEthnicityId
-												: ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.ethnicities.map((ethnicity) => {
-											return (
-												<option key={ethnicity.ethnicityId} value={ethnicity.ethnicityId}>
-													{ethnicity.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-6"
-										label="Preferred Language"
-										name="languageCode"
-										value={values.patientLanguageCode}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientLanguageCode && errors.patientLanguageCode
-												? errors.patientLanguageCode
-												: ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.languages.map((language) => {
-											return (
-												<option key={language.languageCode} value={language.languageCode}>
-													{language.description}
-												</option>
-											);
-										})}
-									</InputHelper>
+							{(formikProps) => (
+								<Form onSubmit={formikProps.handleSubmit}>
+									<PatientDemographicsFormInputs
+										formikProps={formikProps}
+										referenceData={referenceData}
+									/>
 									<div className="d-flex align-items-center justify-content-between">
 										<Button
 											variant="outline-primary"

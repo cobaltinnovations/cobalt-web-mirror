@@ -1,4 +1,3 @@
-import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
@@ -9,23 +8,14 @@ import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
-import InputHelper from '@/components/input-helper';
-import DatePicker from '@/components/date-picker';
-
-export interface FormData {
-	patientFirstName: string;
-	patientLastName: string;
-	patientBirthdate: string;
-	patientPhoneNumber: string;
-	patientEmailAddress: string;
-}
+import { PatientDetailsFormInputs, PatientDetailsFormData } from '@/components/integrated-care/common';
 
 const PatientDemographicsPart1 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
-	const initialFormValues: FormData = useMemo(() => {
+	const initialFormValues: PatientDetailsFormData = useMemo(() => {
 		return {
 			patientFirstName: patientOrder?.patientFirstName ?? '',
 			patientLastName: patientOrder?.patientLastName ?? '',
@@ -48,7 +38,7 @@ const PatientDemographicsPart1 = () => {
 	}, []);
 
 	const handleFormSubmit = useCallback(
-		async (values: FormData) => {
+		async (values: PatientDetailsFormData) => {
 			if (!patientOrder) {
 				return;
 			}
@@ -80,91 +70,15 @@ const PatientDemographicsPart1 = () => {
 				</Row>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Formik<FormData>
+						<Formik<PatientDetailsFormData>
 							initialValues={initialFormValues}
 							enableReinitialize
 							onSubmit={handleFormSubmit}
 						>
-							{({ values, touched, errors, setFieldValue, handleChange, handleBlur, handleSubmit }) => (
-								<Form onSubmit={handleSubmit}>
-									<InputHelper
-										className="mb-2"
-										label="First Name"
-										type="text"
-										name="patientFirstName"
-										value={values.patientFirstName}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientFirstName && errors.patientFirstName
-												? errors.patientFirstName
-												: ''
-										}
-									/>
-									<InputHelper
-										className="mb-2"
-										label="Last Name"
-										type="text"
-										name="patientLastName"
-										value={values.patientLastName}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientLastName && errors.patientLastName
-												? errors.patientLastName
-												: ''
-										}
-										required
-									/>
-									<Form.Group controlId="patientBirthdate" className="mb-2">
-										<DatePicker
-											showYearDropdown
-											showMonthDropdown
-											dropdownMode="select"
-											labelText="Date of Birth"
-											selected={
-												values.patientBirthdate
-													? moment(values.patientBirthdate).toDate()
-													: undefined
-											}
-											onChange={(date) => {
-												setFieldValue(
-													'patientBirthdate',
-													date ? moment(date).format('YYYY-MM-DD') : ''
-												);
-											}}
-										/>
-									</Form.Group>
-									<InputHelper
-										className="mb-2"
-										label="Phone Number"
-										type="text"
-										name="patientPhoneNumber"
-										value={values.patientPhoneNumber}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientPhoneNumber && errors.patientPhoneNumber
-												? errors.patientPhoneNumber
-												: ''
-										}
-										required
-									/>
-									<InputHelper
-										className="mb-6"
-										label="Email Address"
-										type="email"
-										name="patientEmailAddress"
-										value={values.patientEmailAddress}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.patientEmailAddress && errors.patientEmailAddress
-												? errors.patientEmailAddress
-												: ''
-										}
-										required
-									/>
+							{(formikProps) => (
+								<Form onSubmit={formikProps.handleSubmit}>
+									<PatientDetailsFormInputs formikProps={formikProps} />
+
 									<div className="text-right">
 										<Button variant="primary" type="submit">
 											Next
