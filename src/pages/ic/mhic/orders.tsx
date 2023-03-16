@@ -109,12 +109,19 @@ const MhicOrders = () => {
 		fetchPanelAccounts();
 	}, [fetchPanelAccounts]);
 
+	const clearSelections = useCallback(() => {
+		setSelectAll(false);
+		setSelectedPatientOrderIds([]);
+	}, []);
+
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
 			setSearchParams(searchParams);
+
+			clearSelections();
 		},
-		[searchParams, setSearchParams]
+		[clearSelections, searchParams, setSearchParams]
 	);
 
 	return (
@@ -143,6 +150,7 @@ const MhicOrders = () => {
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
 							navigate('/ic/mhic/orders');
+							clearSelections();
 						},
 						isActive: !!matchPath('/ic/mhic/orders', pathname) && panelAccountId === null,
 					},
@@ -152,6 +160,7 @@ const MhicOrders = () => {
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
 							window.alert('[TODO]: Unassigned query param?');
+							clearSelections();
 						},
 					},
 					...panelAccounts.map((panelAccount) => {
@@ -163,6 +172,7 @@ const MhicOrders = () => {
 							icon: () => <DotIcon className="text-n300" />,
 							onClick: () => {
 								navigate(`/ic/mhic/orders?panelAccountId=${panelAccount.accountId}`);
+								clearSelections();
 							},
 							isActive:
 								!!matchPath('/ic/mhic/orders', pathname) && panelAccountId === panelAccount.accountId,
@@ -170,21 +180,44 @@ const MhicOrders = () => {
 					}),
 				]}
 			>
-				<div className="py-6">
-					{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-						<Button
-							className="me-4"
-							variant="outline-primary"
-							onClick={() => {
-								setShowGenerateOrdersModal(true);
-							}}
+				<div className="py-8 d-flex align-items-center justify-content-between">
+					<div className="d-flex align-items-end">
+						<h2 className="m-0">
+							Pending Orders{' '}
+							<span className="text-gray fs-large fw-normal">
+								{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
+							</span>
+						</h2>
+					</div>
+					<div>
+						{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+							<Button
+								className="me-4"
+								variant="outline-primary"
+								onClick={() => {
+									setShowGenerateOrdersModal(true);
+								}}
+							>
+								Generate
+							</Button>
+						)}
+						<FileInputButton
+							className="me-4 d-inline-flex"
+							accept=".csv"
+							onChange={handleImportPatientsInputChange}
 						>
-							Generate Patient Orders
+							Import
+						</FileInputButton>
+						<Button
+							onClick={() => {
+								window.alert('[TODO]: Assign Orders');
+							}}
+							disabled={selectedPatientOrderIds.length <= 0}
+						>
+							Assign Orders{' '}
+							{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
 						</Button>
-					)}
-					<FileInputButton className="d-inline-flex" accept=".csv" onChange={handleImportPatientsInputChange}>
-						Import Patients
-					</FileInputButton>
+					</div>
 				</div>
 				<div className="mb-8">
 					<Table isLoading={tableIsLoading}>
