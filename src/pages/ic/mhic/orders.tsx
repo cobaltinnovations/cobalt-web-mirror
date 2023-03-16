@@ -227,11 +227,10 @@ const MhicOrders = () => {
 												return;
 											}
 
-											setSearchParams({
-												...searchParams,
-												openPatientOrderId: po.patientOrderId,
-											});
+											searchParams.set('openPatientOrderId', po.patientOrderId);
+											setSearchParams(searchParams);
 										}}
+										highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
 									>
 										<TableCell header width={64} sticky className="align-items-center">
 											<Form.Check
@@ -242,6 +241,9 @@ const MhicOrders = () => {
 												label=""
 												value={po.patientOrderId}
 												checked={selectedPatientOrderIds.includes(po.patientOrderId)}
+												onClick={(event) => {
+													event.stopPropagation();
+												}}
 												onChange={({ currentTarget }) => {
 													const selectedPatientOrderIdsClone =
 														cloneDeep(selectedPatientOrderIds);
