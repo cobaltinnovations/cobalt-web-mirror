@@ -498,7 +498,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							<h4 className="mb-0">Contact</h4>
 						</Col>
 					</Row>
-					<Row className="mb-6">
+					<Row>
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
@@ -525,30 +525,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0">{patientOrder.patientPhoneNumberDescription}</p>
 											</Col>
 										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Mobile Number</p>
-											</Col>
-											<Col xs={9}>
-												<div className="d-flex align-items-center">
-													<p className="m-0">
-														<span className="text-danger">
-															[TODO]: Patient Mobile Number
-														</span>
-													</p>
-													<Badge bg="outline-primary" pill className="ms-2">
-														Preferred
-													</Badge>
-												</div>
-											</Col>
-										</Row>
 										<Row>
 											<Col xs={3}>
 												<p className="m-0 text-gray">Email</p>
 											</Col>
 											<Col xs={9}>
 												<p className="m-0">
-													<span className="text-danger">[TODO]: Patient Email Address</span>
+													{patientOrder.patientEmailAddress ?? 'Not Available'}
 												</p>
 											</Col>
 										</Row>
@@ -557,7 +540,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							</Card>
 						</Col>
 					</Row>
-					<Row>
+					{/* <Row>
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
@@ -589,7 +572,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 								</Card.Body>
 							</Card>
 						</Col>
-					</Row>
+					</Row> */}
 				</Container>
 			</section>
 			<section>
@@ -625,9 +608,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Pref. Language</p>
 											</Col>
 											<Col>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.patientLanguageCode}</p>
 											</Col>
 										</Row>
 									</Container>
@@ -657,9 +638,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Race</p>
 											</Col>
 											<Col>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.patientRaceId}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -667,9 +646,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Ethnicity</p>
 											</Col>
 											<Col>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.patientEthnicityId}</p>
 											</Col>
 										</Row>
 										<Row>
@@ -677,12 +654,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Gender Identity</p>
 											</Col>
 											<Col>
-												<p className="m-0">
-													{patientOrder.patientBirthSexId}{' '}
-													<span className="text-danger">
-														[TODO]: Description instead of Id
-													</span>
-												</p>
+												<p className="m-0">{patientOrder.patientBirthSexId}</p>
 											</Col>
 										</Row>
 									</Container>
@@ -703,22 +675,19 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0">{patientOrder.patientAddress?.streetAddress1}</p>
 											</Col>
 										</Row>
-										<Row>
-											<Col>
-												<p className="m-0">
-													<span className="text-danger">[TODO]: Street Address 2</span>
-												</p>
-											</Col>
-										</Row>
+										{patientOrder.patientAddress?.streetAddress2 && (
+											<Row>
+												<Col>
+													<p className="m-0">{patientOrder.patientAddress.streetAddress2}</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col>
 												<p className="m-0">
 													{patientOrder.patientAddress?.locality},{' '}
 													{patientOrder.patientAddress?.region}{' '}
 													{patientOrder.patientAddress?.postalCode}{' '}
-													<span className="text-danger">
-														[TODO]: Should probably a string from the BE
-													</span>
 												</p>
 											</Col>
 										</Row>
@@ -754,7 +723,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0">Plan: {patientOrder.primaryPlanName}</p>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col>
 												<p className="m-0">
 													Coverage Until:{' '}
@@ -763,7 +732,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 													</span>
 												</p>
 											</Col>
-										</Row>
+										</Row> */}
 									</Container>
 								</Card.Body>
 							</Card>
