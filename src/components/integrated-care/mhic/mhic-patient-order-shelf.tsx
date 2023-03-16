@@ -102,7 +102,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicPatientOrderShelfProps {
-	patientOrderId: string;
+	patientOrderId: string | null;
 	onHide(): void;
 }
 

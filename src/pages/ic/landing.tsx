@@ -2,9 +2,9 @@ import SentryRoutes from '@/components/sentry-routes';
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import React, { useEffect } from 'react';
-import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, Route, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { MhicHeader } from '@/components/integrated-care/mhic';
+import { MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
 import { PatientHeader } from '@/components/integrated-care/patient';
 
 import PatientLanding from './patient/patient-landing';
@@ -22,6 +22,8 @@ import MhicAssessmentComplete from './mhic/assessment-complete';
 import NoMatch from '../no-match';
 
 const IntegratedCareLandingPage = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	return (
 		<SentryRoutes>
 			<Route element={<Outlet />}>
@@ -32,7 +34,17 @@ const IntegratedCareLandingPage = () => {
 					element={
 						<>
 							<MhicHeader />
+
 							<Outlet />
+
+							<MhicPatientOrderShelf
+								patientOrderId={searchParams.get('openPatientOrderId')}
+								onHide={() => {
+									const params = new URLSearchParams(searchParams.toString());
+									params.delete('openPatientOrderId');
+									setSearchParams(params);
+								}}
+							/>
 						</>
 					}
 				>

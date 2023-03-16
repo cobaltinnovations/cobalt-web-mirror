@@ -6,12 +6,7 @@ import { PatientOrderModel, PatientOrderStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import {
-	MhicCustomizeTableModal,
-	MhicFilterDropdown,
-	MhicPatientOrderShelf,
-	MhicSortDropdown,
-} from '@/components/integrated-care/mhic';
+import { MhicCustomizeTableModal, MhicFilterDropdown, MhicSortDropdown } from '@/components/integrated-care/mhic';
 
 const MhicAssignedOrders = () => {
 	const handleError = useHandleError();
@@ -27,7 +22,6 @@ const MhicAssignedOrders = () => {
 	const [totalCountDescription, setTotalCountDescription] = useState('0');
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
-	const [clickedPatientOrderId, setClickedPatientOrderId] = useState('');
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
@@ -75,13 +69,6 @@ const MhicAssignedOrders = () => {
 				}}
 			/>
 
-			<MhicPatientOrderShelf
-				patientOrderId={clickedPatientOrderId}
-				onHide={() => {
-					setClickedPatientOrderId('');
-				}}
-			/>
-
 			<div className="py-6 d-flex align-items-center justify-content-between">
 				<div className="d-flex">
 					<MhicFilterDropdown />
@@ -122,7 +109,10 @@ const MhicAssignedOrders = () => {
 											return;
 										}
 
-										setClickedPatientOrderId(po.patientOrderId);
+										setSearchParams({
+											...searchParams,
+											openPatientOrderId: po.patientOrderId,
+										});
 									}}
 								>
 									<TableCell width={280} sticky className="py-2">
