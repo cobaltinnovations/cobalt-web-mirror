@@ -608,7 +608,15 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Pref. Language</p>
 											</Col>
 											<Col>
-												<p className="m-0">{patientOrder.patientLanguageCode}</p>
+												<p className="m-0">
+													{
+														referenceData.languages.find(
+															(language) =>
+																language.languageCode ===
+																patientOrder.patientLanguageCode
+														)?.description
+													}
+												</p>
 											</Col>
 										</Row>
 									</Container>
@@ -638,7 +646,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Race</p>
 											</Col>
 											<Col>
-												<p className="m-0">{patientOrder.patientRaceId}</p>
+												<p className="m-0">
+													{referenceData.races.find(
+														(race) => race.raceId === patientOrder.patientRaceId
+													)?.description ?? 'Not Asked'}
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -646,7 +658,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Ethnicity</p>
 											</Col>
 											<Col>
-												<p className="m-0">{patientOrder.patientEthnicityId}</p>
+												<p className="m-0">
+													{referenceData.ethnicities.find(
+														(ethnicity) =>
+															ethnicity.ethnicityId === patientOrder.patientEthnicityId
+													)?.description ?? 'Not Asked'}
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -654,7 +671,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 												<p className="m-0 text-gray">Gender Identity</p>
 											</Col>
 											<Col>
-												<p className="m-0">{patientOrder.patientBirthSexId}</p>
+												<p className="m-0">
+													{referenceData.genderIdentities.find(
+														(genderIdentity) =>
+															genderIdentity.genderIdentityId ===
+															patientOrder.patientGenderIdentityId
+													)?.description ?? 'Not Asked'}
+												</p>
 											</Col>
 										</Row>
 									</Container>
