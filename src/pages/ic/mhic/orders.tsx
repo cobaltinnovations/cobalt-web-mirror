@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
@@ -10,8 +11,9 @@ import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import FileInputButton from '@/components/file-input-button';
 import { MhicGenerateOrdersModal, MhicNavigation } from '@/components/integrated-care/mhic';
+
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
-import { cloneDeep } from 'lodash';
+import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 
 const MhicOrders = () => {
 	const { addFlag } = useFlags();
@@ -223,7 +225,7 @@ const MhicOrders = () => {
 					<Table isLoading={tableIsLoading}>
 						<TableHead>
 							<TableRow>
-								<TableCell header width={64} sticky className="align-items-center">
+								<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
 									<Form.Check
 										className="no-label"
 										type="checkbox"
@@ -247,7 +249,14 @@ const MhicOrders = () => {
 										}}
 									/>
 								</TableCell>
-								<TableCell header width={280} sticky stickyOffset={64}>
+								<TableCell
+									header
+									width={44}
+									stickyOffset={56}
+									sticky
+									className="align-items-center"
+								></TableCell>
+								<TableCell header width={320} sticky stickyOffset={100} stickyBorder>
 									Patient
 								</TableCell>
 								<TableCell header>Referral Date</TableCell>
@@ -276,7 +285,7 @@ const MhicOrders = () => {
 										}}
 										highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
 									>
-										<TableCell header width={64} sticky className="align-items-center">
+										<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
 											<Form.Check
 												className="no-label"
 												type="checkbox"
@@ -316,7 +325,18 @@ const MhicOrders = () => {
 												}}
 											/>
 										</TableCell>
-										<TableCell width={280} sticky stickyOffset={64} className="py-2">
+										<TableCell
+											width={44}
+											sticky
+											stickyOffset={56}
+											className="px-0 align-items-center"
+										>
+											<div className="w-100 d-flex align-items-center justify-content-end">
+												<span className="text-gray">0</span>
+												<FlagIcon className="text-warning" />
+											</div>
+										</TableCell>
+										<TableCell width={320} sticky stickyOffset={100} stickyBorder className="py-2">
 											<span className="d-block fw-bold">{po.patientDisplayName}</span>
 											<span className="d-block text-gray">{po.patientMrn}</span>
 										</TableCell>
@@ -332,7 +352,7 @@ const MhicOrders = () => {
 										<TableCell className="text-right">
 											<span className="fw-bold text-danger">[TODO]: 0</span>
 										</TableCell>
-										<TableCell className="text-right">
+										<TableCell className="text-right text-nowrap">
 											<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
 										</TableCell>
 									</TableRow>
