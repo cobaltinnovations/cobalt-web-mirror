@@ -399,26 +399,24 @@ const ScreeningQuestionsPage = () => {
 								/>
 
 								<div className="d-flex">
-									{(isSubmitPrompt ||
-										screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
-										<Button
-											disabled={isSubmitting}
-											className="me-2"
-											type="button"
-											onClick={() => {
-												if (
-													!isSubmitPrompt &&
-													screeningQuestionContextResponse?.previousScreeningQuestionContextId
-												) {
-													navigateToQuestion(
-														screeningQuestionContextResponse.previousScreeningQuestionContextId
-													);
-												}
-											}}
-										>
-											Previous
-										</Button>
-									)}
+									<Button
+										disabled={isSubmitting}
+										className="me-2"
+										type="button"
+										onClick={() => {
+											if (isSubmitPrompt) {
+												clearPrompt();
+											} else if (
+												screeningQuestionContextResponse?.previousScreeningQuestionContextId
+											) {
+												navigateToQuestion(
+													screeningQuestionContextResponse.previousScreeningQuestionContextId
+												);
+											}
+										}}
+									>
+										Previous
+									</Button>
 
 									<Button
 										disabled={disableNextBtn}
