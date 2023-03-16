@@ -220,7 +220,19 @@ const MhicOrders = () => {
 						<TableBody>
 							{patientOrders.map((po) => {
 								return (
-									<TableRow key={po.patientOrderId}>
+									<TableRow
+										key={po.patientOrderId}
+										onClick={() => {
+											if (!po.patientOrderId) {
+												return;
+											}
+
+											setSearchParams({
+												...searchParams,
+												openPatientOrderId: po.patientOrderId,
+											});
+										}}
+									>
 										<TableCell header width={64} sticky className="align-items-center">
 											<Form.Check
 												className="no-label"
