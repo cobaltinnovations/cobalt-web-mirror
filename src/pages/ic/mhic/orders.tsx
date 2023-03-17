@@ -230,6 +230,26 @@ const MhicOrders = () => {
 					pageNumber={parseInt(pageNumber, 10)}
 					pageSize={pageSize.current}
 					onPaginationClick={handlePaginationClick}
+					columnConfig={{
+						checkbox: true,
+						flag: true,
+						patient: true,
+						referralDate: true,
+						practice: true,
+						referralReason: true,
+						assessmentStatus: false,
+						outreachNumber: true,
+						lastOutreach: false,
+						assessmentScheduled: false,
+						assessmentCompleted: false,
+						completedBy: false,
+						triage: false,
+						resources: false,
+						checkInScheduled: false,
+						checkInResponse: false,
+						episode: true,
+						assignedMhic: false,
+					}}
 				/>
 			</MhicNavigation>
 		</>
