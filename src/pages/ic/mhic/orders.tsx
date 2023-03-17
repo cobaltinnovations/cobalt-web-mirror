@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Dropdown, Form, Row } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Dropdown, Form, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
 import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
@@ -257,18 +257,28 @@ const MhicOrders = () => {
 									sticky
 									className="align-items-center"
 								></TableCell>
-								<TableCell header width={320} sticky stickyOffset={100} stickyBorder>
+								<TableCell header width={280} sticky stickyOffset={100} stickyBorder>
 									Patient
 								</TableCell>
 								<TableCell header>Referral Date</TableCell>
 								<TableCell header>Practice</TableCell>
 								<TableCell header>Referral Reason</TableCell>
+								<TableCell header>Assessment Status</TableCell>
 								<TableCell header className="text-right">
 									Outreach #
 								</TableCell>
+								<TableCell header>Last Outreach</TableCell>
+								<TableCell header>Assess. Scheduled</TableCell>
+								<TableCell header>Assess. Completed</TableCell>
+								<TableCell header>Completed By</TableCell>
+								<TableCell header>Triage</TableCell>
+								<TableCell header>Resources?</TableCell>
+								<TableCell header>Check-In Scheduled</TableCell>
+								<TableCell header>Check-In Response</TableCell>
 								<TableCell header className="text-right">
 									Episode
 								</TableCell>
+								<TableCell header>Assigned MHIC</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -330,31 +340,76 @@ const MhicOrders = () => {
 											width={44}
 											sticky
 											stickyOffset={56}
-											className="px-0 align-items-center"
+											className="px-0 flex-row align-items-center justify-content-end"
 										>
-											<div className="w-100 d-flex align-items-center justify-content-end">
-												<span className="text-gray">0</span>
-												<FlagIcon className="text-warning" />
-											</div>
+											<span className="text-gray">0</span>
+											<FlagIcon className="text-warning" />
 										</TableCell>
-										<TableCell width={320} sticky stickyOffset={100} stickyBorder className="py-2">
-											<span className="d-block fw-bold">{po.patientDisplayName}</span>
-											<span className="d-block text-gray">{po.patientMrn}</span>
+										<TableCell width={280} sticky stickyOffset={100} stickyBorder className="py-2">
+											<span className="d-block text-nowrap">{po.patientDisplayName}</span>
+											<span className="d-block text-nowrap text-gray">{po.patientMrn}</span>
 										</TableCell>
-										<TableCell>
-											<span className="fw-bold">{po.orderDateDescription}</span>
+										<TableCell width={144}>
+											<span className="text-nowrap text-truncate">{po.orderDateDescription}</span>
 										</TableCell>
-										<TableCell>
-											<span className="fw-bold">{po.referringPracticeName}</span>
+										<TableCell width={240}>
+											<span className="text-nowrap text-truncate">
+												{po.referringPracticeName}
+											</span>
 										</TableCell>
-										<TableCell>
-											<span className="fw-bold">{po.reasonForReferral}</span>
+										<TableCell width={320}>
+											<span className="text-nowrap text-truncate">{po.reasonForReferral}</span>
 										</TableCell>
-										<TableCell className="text-right">
-											<span className="fw-bold text-danger">[TODO]: 0</span>
+										<TableCell
+											width={248}
+											className="flex-row align-items-center justify-content-start"
+										>
+											<Badge pill bg="outline-dark" className="text-nowrap">
+												Assessment Status
+											</Badge>
+											<span className="ms-4 fs-small">Insurance</span>
 										</TableCell>
-										<TableCell className="text-right text-nowrap">
-											<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
+										<TableCell width={116} className="text-right">
+											<span className="text-nowrap text-truncate">0</span>
+										</TableCell>
+										<TableCell width={170}>
+											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+										</TableCell>
+										<TableCell width={170}>
+											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+										</TableCell>
+										<TableCell width={170}>
+											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+										</TableCell>
+										<TableCell width={240}>
+											<span className="text-nowrap text-truncate">Mhic Name</span>
+										</TableCell>
+										<TableCell className="flex-row align-items-center justify-content-start">
+											<Badge pill bg="outline-danger" className="text-nowrap me-2">
+												Safety Planning
+											</Badge>
+											<Badge pill bg="outline-warning" className="text-nowrap">
+												Specialty
+											</Badge>
+										</TableCell>
+										<TableCell className="flex-row align-items-center justify-content-start">
+											<Badge pill bg="outline-danger" className="text-nowrap me-2">
+												Need
+											</Badge>
+										</TableCell>
+										<TableCell width={180}>
+											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+										</TableCell>
+										<TableCell width={172}>
+											<span className="text-nowrap text-truncate">No Response</span>
+										</TableCell>
+										<TableCell width={120} className="text-right">
+											<span className="text-nowrap text-truncate">
+												{po.episodeDurationInDaysDescription}
+											</span>
+										</TableCell>
+										<TableCell width={280}>
+											<span className="text-nowrap text-truncate">MHIC Name</span>
 										</TableCell>
 									</TableRow>
 								);
