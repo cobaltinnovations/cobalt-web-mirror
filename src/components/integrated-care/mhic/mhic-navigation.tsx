@@ -7,8 +7,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { MHIC_HEADER_HEIGHT } from './mhic-header';
 
-const headerHeight = 56;
 const sideNavWidth = 280;
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -19,7 +19,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: 16,
 		position: 'fixed',
 		overflowY: 'auto',
-		top: headerHeight,
+		top: MHIC_HEADER_HEIGHT,
 		width: sideNavWidth,
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
@@ -63,7 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'center',
 	},
 	body: {
-		padding: `${headerHeight}px 40px 0 ${sideNavWidth + 40}px`,
+		padding: `${MHIC_HEADER_HEIGHT}px 40px 0 ${sideNavWidth + 40}px`,
 	},
 }));
 

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Link, useLocation, matchPath } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
+import { Link, useLocation, matchPath, useNavigate } from 'react-router-dom';
+import { Button, Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
@@ -10,6 +10,15 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+import { AccountModel, PatientOrderModel } from '@/lib/models';
+
+interface MhicHeaderProps {
+	assessmentView?: boolean;
+	patientOrder?: PatientOrderModel;
+	patientAccount?: AccountModel;
+}
+
+export const MHIC_HEADER_HEIGHT = 56;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -17,7 +26,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		right: 0,
 		zIndex: 4,
-		height: 56,
+		height: MHIC_HEADER_HEIGHT,
 		display: 'flex',
 		position: 'fixed',
 		alignItems: 'center',
@@ -26,7 +35,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
 	brandingOuter: {
-		width: 280,
 		flexShrink: 0,
 		display: 'flex',
 		alignItems: 'center',
@@ -37,7 +45,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flex: 1,
 		height: '100%',
 		display: 'flex',
-		padding: '0 40px',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		'& nav ul': {
@@ -99,10 +106,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicHeader = () => {
+export const MhicHeader = ({ assessmentView = false, patientOrder, patientAccount }: MhicHeaderProps) => {
 	const classes = useStyles();
 	const { pathname } = useLocation();
 	const { signOutAndClearContext } = useAccount();
+	const navigate = useNavigate();
+
+	const hasAssessmentResult = !!patientOrder?.screeningSessionResult;
 
 	const navigationLinks = useMemo(
 		() => [
@@ -127,52 +137,79 @@ export const MhicHeader = () => {
 
 	return (
 		<header className={classes.header}>
-			<div className={classes.brandingOuter}>
+			<div
+				className={classes.brandingOuter}
+				style={{
+					minWidth: assessmentView ? 'auto' : 280,
+				}}
+			>
 				<LogoSmallText className="me-3 text-primary" width={105.78} height={14} />
-				<span className="d-block text-gray">Integrated Care</span>
+				{!assessmentView && <span className="d-block text-gray">Integrated Care</span>}
 			</div>
-			<div className={classes.navigationOuter}>
-				<nav className="h-100">
-					<ul>
-						{navigationLinks.map((link, index) => (
-							<li
-								key={index}
-								className={classNames('h-100', {
-									active: link.active,
-								})}
-							>
-								<Link to={link.to}>{link.title}</Link>
-							</li>
-						))}
-					</ul>
-				</nav>
+			<div className={classNames({ 'px-10': !assessmentView }, classes.navigationOuter)}>
+				{assessmentView ? (
+					<h5 className="ms-3 mb-0 text-primary">Assessment for {patientAccount?.displayName}</h5>
+				) : (
+					<nav className="h-100">
+						<ul>
+							{navigationLinks.map((link, index) => (
+								<li
+									key={index}
+									className={classNames('h-100', {
+										active: link.active,
+									})}
+								>
+									<Link to={link.to}>{link.title}</Link>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)}
 				<div className="d-flex align-items-center">
-					<InputHelperSearch
-						placeholder="Search"
-						onClear={() => {
-							return;
-						}}
-					/>
-					<Dropdown className="ms-6 d-flex align-items-center">
-						<Dropdown.Toggle as={DropdownToggle} className="p-0" id="mhic-header__dropdown-menu">
-							<AvatarIcon className="d-flex" />
-						</Dropdown.Toggle>
-						<Dropdown.Menu
-							as={DropdownMenu}
-							align="end"
-							flip={false}
-							popperConfig={{ strategy: 'fixed' }}
-							renderOnMount
+					{assessmentView ? (
+						<Button
+							variant="light"
+							className="p-0 me-10"
+							size="sm"
+							onClick={() => {
+								navigate({
+									pathname: '/ic/mhic/orders',
+									search: `?openPatientOrderId=${patientOrder?.patientOrderId}`,
+								});
+							}}
 						>
-							<Dropdown.Item
-								onClick={() => {
-									signOutAndClearContext();
+							{hasAssessmentResult ? 'Done' : 'Exit'}
+						</Button>
+					) : (
+						<>
+							<InputHelperSearch
+								placeholder="Search"
+								onClear={() => {
+									return;
 								}}
-							>
-								<span className="text-danger">Sign Out</span>
-							</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
+							/>
+							<Dropdown className="ms-6 d-flex align-items-center">
+								<Dropdown.Toggle as={DropdownToggle} className="p-0" id="mhic-header__dropdown-menu">
+									<AvatarIcon className="d-flex" />
+								</Dropdown.Toggle>
+								<Dropdown.Menu
+									as={DropdownMenu}
+									align="end"
+									flip={false}
+									popperConfig={{ strategy: 'fixed' }}
+									renderOnMount
+								>
+									<Dropdown.Item
+										onClick={() => {
+											signOutAndClearContext();
+										}}
+									>
+										<span className="text-danger">Sign Out</span>
+									</Dropdown.Item>
+								</Dropdown.Menu>
+							</Dropdown>
+						</>
+					)}
 				</div>
 			</div>
 		</header>
