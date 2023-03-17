@@ -1,4 +1,5 @@
 export * from './mhic-account-header';
+export * from './mhic-assessment-complete';
 export * from './mhic-assessment-modal';
 export * from './mhic-change-triage-modal';
 export * from './mhic-close-episode-modal';
