@@ -18,11 +18,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const { checkAndStartScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
 	});
-	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
