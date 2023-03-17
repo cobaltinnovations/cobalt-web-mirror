@@ -10,12 +10,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { AccountModel, PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 
 interface MhicHeaderProps {
 	assessmentView?: boolean;
 	patientOrder?: PatientOrderModel;
-	patientAccount?: AccountModel;
 }
 
 export const MHIC_HEADER_HEIGHT = 56;
@@ -106,7 +105,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicHeader = ({ assessmentView = false, patientOrder, patientAccount }: MhicHeaderProps) => {
+export const MhicHeader = ({ assessmentView = false, patientOrder }: MhicHeaderProps) => {
 	const classes = useStyles();
 	const { pathname } = useLocation();
 	const { signOutAndClearContext } = useAccount();
@@ -148,7 +147,7 @@ export const MhicHeader = ({ assessmentView = false, patientOrder, patientAccoun
 			</div>
 			<div className={classNames({ 'px-10': !assessmentView }, classes.navigationOuter)}>
 				{assessmentView ? (
-					<h5 className="ms-3 mb-0 text-primary">Assessment for {patientAccount?.displayName}</h5>
+					<h5 className="ms-3 mb-0 text-primary">Assessment for {patientOrder?.patientDisplayName}</h5>
 				) : (
 					<nav className="h-100">
 						<ul>

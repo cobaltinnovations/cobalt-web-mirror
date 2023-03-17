@@ -2,7 +2,7 @@ import AsyncPage from '@/components/async-page';
 import { MhicHeader, MHIC_HEADER_HEIGHT } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReferenceDataResponse, PatientOrderModel, AccountModel } from '@/lib/models';
-import { integratedCareService, PatientOrderResponseSupplement } from '@/lib/services';
+import { integratedCareService } from '@/lib/services';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useParams, Outlet } from 'react-router-dom';
 
@@ -25,7 +25,7 @@ export const MhicOrderLayout = () => {
 			throw new Error('Missing Patient Order');
 		}
 
-		return integratedCareService.getPatientOrder(patientOrderId, [PatientOrderResponseSupplement.EVERYTHING]);
+		return integratedCareService.getPatientOrder(patientOrderId);
 	}, [patientOrderId]);
 
 	const fetchOutletPatientOrder = useCallback(async () => {
@@ -45,7 +45,7 @@ export const MhicOrderLayout = () => {
 
 	return (
 		<>
-			<MhicHeader assessmentView patientOrder={patientOrder} patientAccount={patientAccount} />
+			<MhicHeader assessmentView patientOrder={patientOrder} />
 
 			<div className={classes.mhicOrderLayout}>
 				<AsyncPage fetchData={fetchData} abortFetch={patientOrderRequest.abort}>
