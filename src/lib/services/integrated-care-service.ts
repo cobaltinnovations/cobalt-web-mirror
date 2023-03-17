@@ -34,6 +34,12 @@ export interface PatientOrderDemographicsFormData {
 	};
 }
 
+export enum PatientOrderResponseSupplement {
+	MINIMAL = 'MINIMAL',
+	PANEL = 'PANEL',
+	EVERYTHING = 'EVERYTHING',
+}
+
 export const integratedCareService = {
 	importPatientOrders(data: { csvContent: string }) {
 		return httpSingleton.orchestrateRequest<any>({
@@ -91,14 +97,20 @@ export const integratedCareService = {
 			data,
 		});
 	},
-	getPatientOrder(patientOrderId: string) {
+	getPatientOrder(patientOrderId: string, supplements: PatientOrderResponseSupplement[] = []) {
+		const queryParams = new URLSearchParams();
+
+		for (const supplement of supplements) {
+			queryParams.append('responseSupplement', supplement);
+		}
+
 		return httpSingleton.orchestrateRequest<{
 			patientOrder: PatientOrderModel;
 			associatedPatientOrders: PatientOrderModel[];
 			patientAccount?: AccountModel;
 		}>({
 			method: 'GET',
-			url: `/patient-orders/${patientOrderId}`,
+			url: `/patient-orders/${patientOrderId}?${queryParams.toString()}`,
 		});
 	},
 	postNote(data: { patientOrderId: string; note: string }) {
