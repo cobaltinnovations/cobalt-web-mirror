@@ -21,24 +21,24 @@ interface MhicPatientOrderTableProps {
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
 	columnConfig: {
-		checkbox: boolean;
-		flag: boolean;
-		patient: boolean;
-		referralDate: boolean;
-		practice: boolean;
-		referralReason: boolean;
-		assessmentStatus: boolean;
-		outreachNumber: boolean;
-		lastOutreach: boolean;
-		assessmentScheduled: boolean;
-		assessmentCompleted: boolean;
-		completedBy: boolean;
-		triage: boolean;
-		resources: boolean;
-		checkInScheduled: boolean;
-		checkInResponse: boolean;
-		episode: boolean;
-		assignedMhic: boolean;
+		checkbox?: boolean;
+		flag?: boolean;
+		patient?: boolean;
+		referralDate?: boolean;
+		practice?: boolean;
+		referralReason?: boolean;
+		assessmentStatus?: boolean;
+		outreachNumber?: boolean;
+		lastOutreach?: boolean;
+		assessmentScheduled?: boolean;
+		assessmentCompleted?: boolean;
+		completedBy?: boolean;
+		triage?: boolean;
+		resources?: boolean;
+		checkInScheduled?: boolean;
+		checkInResponse?: boolean;
+		episode?: boolean;
+		assignedMhic?: boolean;
 	};
 }
 

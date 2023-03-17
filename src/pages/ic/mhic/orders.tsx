@@ -237,18 +237,8 @@ const MhicOrders = () => {
 						referralDate: true,
 						practice: true,
 						referralReason: true,
-						assessmentStatus: false,
 						outreachNumber: true,
-						lastOutreach: false,
-						assessmentScheduled: false,
-						assessmentCompleted: false,
-						completedBy: false,
-						triage: false,
-						resources: false,
-						checkInScheduled: false,
-						checkInResponse: false,
 						episode: true,
-						assignedMhic: false,
 					}}
 				/>
 			</MhicNavigation>

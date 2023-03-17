@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
-import { PatientOrderModel, PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { MhicCustomizeTableModal, MhicFilterDropdown, MhicSortDropdown } from '@/components/integrated-care/mhic';
+import {
+	MhicCustomizeTableModal,
+	MhicFilterDropdown,
+	MhicPatientOrderTable,
+	MhicSortDropdown,
+} from '@/components/integrated-care/mhic';
 
 const MhicAssignedOrders = () => {
 	const handleError = useHandleError();
@@ -83,99 +87,31 @@ const MhicAssignedOrders = () => {
 					Customize View
 				</Button>
 			</div>
-			<div className="mb-8">
-				<Table isLoading={tableIsLoading}>
-					<TableHead>
-						<TableRow>
-							<TableCell header width={280} sticky>
-								Patient
-							</TableCell>
-							<TableCell header>Referral Date</TableCell>
-							<TableCell header>Practice</TableCell>
-							<TableCell header>Referral Reason</TableCell>
-							<TableCell header>Referral Status</TableCell>
-							<TableCell header>Attempts</TableCell>
-							<TableCell header>Last Outreach</TableCell>
-							<TableCell header>Episode</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{patientOrders.map((po) => {
-							return (
-								<TableRow
-									key={po.patientOrderId}
-									onClick={() => {
-										if (!po.patientOrderId) {
-											return;
-										}
-
-										setSearchParams({
-											...searchParams,
-											openPatientOrderId: po.patientOrderId,
-										});
-									}}
-								>
-									<TableCell width={280} sticky className="py-2">
-										<span className="d-block fw-bold">{po.patientDisplayName}</span>
-										<span className="d-block text-gray">{po.patientMrn}</span>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">{po.orderDateDescription}</span>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">{po.referringPracticeName}</span>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">{po.reasonForReferral}</span>
-									</TableCell>
-									<TableCell>
-										<div>
-											{po.patientOrderStatusId === PatientOrderStatusId.OPEN && (
-												<Badge pill bg="outline-primary">
-													New
-												</Badge>
-											)}
-										</div>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">0</span>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">&#8212;</span>
-									</TableCell>
-									<TableCell>
-										<span className="fw-bold">{po.episodeDurationInDaysDescription}</span>
-									</TableCell>
-								</TableRow>
-							);
-						})}
-					</TableBody>
-				</Table>
-			</div>
-			<div className="pb-20">
-				<Container fluid>
-					<Row>
-						<Col xs={4}>
-							<div className="d-flex align-items-center">
-								<p className="mb-0 fs-large fw-bold text-gray">
-									Showing <span className="text-dark">{patientOrders.length}</span> of{' '}
-									<span className="text-dark">{totalCountDescription}</span> Patients
-								</p>
-							</div>
-						</Col>
-						<Col xs={4}>
-							<div className="d-flex justify-content-center align-items-center">
-								<TablePagination
-									total={totalCount}
-									page={parseInt(pageNumber, 10)}
-									size={pageSize.current}
-									onClick={handlePaginationClick}
-								/>
-							</div>
-						</Col>
-					</Row>
-				</Container>
-			</div>
+			<MhicPatientOrderTable
+				isLoading={tableIsLoading}
+				patientOrders={patientOrders}
+				selectAll={false}
+				onSelectAllChange={() => {
+					return;
+				}}
+				selectedPatientOrderIds={[]}
+				onSelectPatientOrderIdsChange={() => {
+					return;
+				}}
+				totalPatientOrdersCount={totalCount}
+				totalPatientOrdersDescription={totalCountDescription}
+				pageNumber={parseInt(pageNumber, 10)}
+				pageSize={pageSize.current}
+				onPaginationClick={handlePaginationClick}
+				columnConfig={{
+					flag: true,
+					patient: true,
+					referralDate: true,
+					practice: true,
+					referralReason: true,
+					assessmentStatus: true,
+				}}
+			/>
 		</>
 	);
 };
