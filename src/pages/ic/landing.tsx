@@ -18,7 +18,9 @@ import MhicMyView from './mhic/my-view';
 import MhicAssignedOrders from './mhic/assigned-orders';
 import MhicOrders from './mhic/orders';
 import MhicOverview from './mhic/overview';
-import MhicAssessmentComplete from './mhic/assessment-complete';
+import MhicOrderAssessment from './mhic/order-assessment';
+import MhicOrderLayout from './mhic/order-layout';
+import ScreeningQuestionsPage from '../screening/screening-questions';
 import NoMatch from '../no-match';
 
 const IntegratedCareLandingPage = () => {
@@ -33,8 +35,6 @@ const IntegratedCareLandingPage = () => {
 					path="mhic"
 					element={
 						<>
-							<MhicHeader />
-
 							<Outlet />
 
 							<MhicPatientOrderShelf
@@ -49,14 +49,50 @@ const IntegratedCareLandingPage = () => {
 					}
 				>
 					<Route index element={<Navigate to="my-view" replace />} />
-					<Route path="my-view" element={<MhicMyView />}>
+
+					<Route
+						path="my-view"
+						element={
+							<>
+								<MhicHeader />
+
+								<MhicMyView />
+							</>
+						}
+					>
 						<Route index element={<Navigate to="overview" replace />} />
 						<Route path="overview" element={<MhicOverview />} />
 						<Route path="assigned-orders" element={<MhicAssignedOrders />} />
 					</Route>
-					<Route path="orders" element={<MhicOrders />} />
-					<Route path="assessment-complete" element={<MhicAssessmentComplete />} />
-					<Route path="*" element={<NoMatch />} />
+
+					<Route
+						path="orders"
+						element={
+							<>
+								<MhicHeader />
+
+								<MhicOrders />
+							</>
+						}
+					/>
+
+					<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
+						<Route index element={<Navigate to="assessment" replace />} />
+
+						<Route path="assessment" element={<MhicOrderAssessment />} />
+
+						<Route path="assessment/:screeningQuestionContextId" element={<ScreeningQuestionsPage />} />
+					</Route>
+
+					<Route
+						path="*"
+						element={
+							<>
+								<MhicHeader />
+								<NoMatch />
+							</>
+						}
+					/>
 				</Route>
 
 				<Route

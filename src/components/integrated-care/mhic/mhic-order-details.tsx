@@ -20,8 +20,7 @@ import NoData from '@/components/no-data';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { integratedCareService } from '@/lib/services';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import useAccount from '@/hooks/use-account';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -33,12 +32,7 @@ interface Props {
 export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceData }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow({
-		screeningFlowId: institution?.integratedCareScreeningFlowId,
-		patientOrderId: patientOrder.patientOrderId,
-		instantiateOnLoad: false,
-	});
+	const navigate = useNavigate();
 
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -255,7 +249,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 								<h4 className="mb-0">Assessment</h4>
 								<Button
 									onClick={() => {
-										checkAndStartScreeningFlow();
+										navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 									}}
 								>
 									Start Assessment

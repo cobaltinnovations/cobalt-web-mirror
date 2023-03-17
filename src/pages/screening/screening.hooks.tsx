@@ -14,13 +14,18 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 
 export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
+
+	const mhicScreeningRouteMatch = useMatch({
+		path: '/ic/mhic/orders/:patientOrderId',
+		end: false,
+	});
 
 	const navigateToDestination = useCallback(
 		(destination?: ScreeningSessionDestination, params?: Record<string, any>, replace = false) => {
@@ -54,8 +59,7 @@ export function useScreeningNavigation() {
 				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
 					navigate(
 						{
-							pathname: '/ic/mhic/assessment-complete',
-							search: new URLSearchParams(params).toString(),
+							pathname: `/ic/mhic/orders/${destination.context.patientOrderId}/assessment`,
 						},
 						{
 							replace,
@@ -93,9 +97,14 @@ export function useScreeningNavigation() {
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
-			navigate(`/screening-questions/${contextId}`, { state: location.state });
+			navigate(
+				mhicScreeningRouteMatch
+					? `/ic/mhic/orders/${mhicScreeningRouteMatch.params.patientOrderId}/assessment/${contextId}`
+					: `/screening-questions/${contextId}`,
+				{ state: location.state }
+			);
 		},
-		[location.state, navigate]
+		[mhicScreeningRouteMatch, location.state, navigate]
 	);
 
 	const navigateToNext = useCallback(
@@ -147,26 +156,30 @@ export function useScreeningFlow({
 		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
+	const createNewScreeningFlow = useCallback(() => {
+		return screeningService
+			.createScreeningSession({
+				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+				patientOrderId,
+			})
+			.fetch()
+			.then((sessionResponse) => {
+				navigateToNext(sessionResponse.screeningSession);
+			})
+			.catch((e) => {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					handleError(e);
+				}
+			});
+	}, [activeFlowVersion?.screeningFlowVersionId, handleError, navigateToNext, patientOrderId]);
+
 	const startScreeningFlow = useCallback(() => {
 		if (incompleteSessions.length === 0) {
-			screeningService
-				.createScreeningSession({
-					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
-					patientOrderId,
-				})
-				.fetch()
-				.then((sessionResponse) => {
-					navigateToNext(sessionResponse.screeningSession);
-				})
-				.catch((e) => {
-					if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-						handleError(e);
-					}
-				});
+			return createNewScreeningFlow();
 		} else {
 			navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
 		}
-	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext, patientOrderId]);
+	}, [createNewScreeningFlow, incompleteSessions, navigateToNext]);
 
 	useEffect(() => {
 		if (isImmediateSession || isSkipped) {
@@ -204,7 +217,7 @@ export function useScreeningFlow({
 		};
 	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
-	const checkAndStartScreeningFlow = useCallback(() => {
+	const checkAndStartScreeningFlow = useCallback(async () => {
 		if (!activeFlowVersion) {
 			return;
 		}
@@ -212,7 +225,7 @@ export function useScreeningFlow({
 		if (!hasCompletedScreening && activeFlowVersion.phoneNumberRequired) {
 			setShowPhoneModal(true);
 		} else if (!hasCompletedScreening) {
-			startScreeningFlow();
+			return startScreeningFlow();
 		} else {
 			setDidCheckScreeningSessions(true);
 		}
@@ -270,5 +283,6 @@ export function useScreeningFlow({
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
 		checkAndStartScreeningFlow,
+		createNewScreeningFlow,
 	};
 }
