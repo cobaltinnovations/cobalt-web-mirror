@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
@@ -19,8 +21,9 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { integratedCareService } from '@/lib/services';
-import { useNavigate } from 'react-router-dom';
+import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
+import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
+import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -455,33 +458,46 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 											{patientOrder.screeningSessionResult?.screeningSessionScreeningResults?.map(
 												(screening) => (
 													<TableRow key={screening.screeningId}>
+														<TableCell width={44} className="pe-0">
+															{(screening.belowScoringThreshold === undefined ||
+																screening.belowScoringThreshold === null) && (
+																<NaIcon className="text-gray" />
+															)}
+															{screening.belowScoringThreshold === false && (
+																<DissatisfiedIcon className="text-danger" />
+															)}
+															{screening.belowScoringThreshold === true && (
+																<SatisfiedIcon className="text-success" />
+															)}
+														</TableCell>
 														<TableCell>
 															<span className="fw-semibold">
 																{screening.screeningName}
 															</span>
-														</TableCell>
-														<TableCell width={32} className="px-0">
-															<FlagDanger className="text-danger" />
 														</TableCell>
 														<TableCell width={72} className="pe-0">
 															<span className="text-gray">Score:</span>
 														</TableCell>
 														<TableCell width={32} className="px-0 text-right">
 															<span className="fw-bold">
-																{screening.screeningScore?.overallScore}
+																{screening.screeningScore?.overallScore ?? (
+																	<span className="text-gray">N/A</span>
+																)}
 															</span>
 														</TableCell>
 														<TableCell width={84} className="text-center">
-															<Button
-																variant="link"
-																size="sm"
-																className="p-0 text-decoration-none fw-normal"
-																onClick={() => {
-																	setScreeningSessionScreeningResult(screening);
-																}}
-															>
-																View
-															</Button>
+															{screening.screeningScore?.overallScore !== undefined && (
+																<Button
+																	variant="link"
+																	size="sm"
+																	className="p-0 text-decoration-none fw-normal"
+																	onClick={() => {
+																		setScreeningSessionScreeningResult(screening);
+																	}}
+																>
+																	View
+																</Button>
+															)}
 														</TableCell>
 													</TableRow>
 												)

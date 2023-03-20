@@ -159,6 +159,7 @@ export interface ScreeningSessionScreeningResult {
 		depersonalizationScore?: number;
 		emotionalExhaustionScore?: number;
 	};
+	belowScoringThreshold?: boolean;
 	screeningQuestionResults?: ScreeningQuestionResult[];
 }
 
