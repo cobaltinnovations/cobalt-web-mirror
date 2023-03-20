@@ -138,9 +138,16 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					Cookies.remove('ssoRedirectUrl');
 					Cookies.remove('authRedirectUrl');
 
-					if (authRedirectUrl === '/') {
-						authRedirectUrl =
-							LoginDestinationIdRouteMap[response.account.loginDestinationId] || authRedirectUrl;
+					try {
+						const parsedRedirectUrl = new URL(window.location.origin + authRedirectUrl);
+
+						if (parsedRedirectUrl.pathname === '/') {
+							authRedirectUrl =
+								LoginDestinationIdRouteMap[response.account.loginDestinationId] || authRedirectUrl;
+						}
+					} catch (e) {
+						// bad authRedirectUrl from queryParam/cookie
+						authRedirectUrl = LoginDestinationIdRouteMap[response.account.loginDestinationId];
 					}
 
 					navigate(authRedirectUrl, { replace: true });
