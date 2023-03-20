@@ -27,11 +27,11 @@ import { ReactComponent as CoachingIcon } from '@/assets/icons/icon-coaching.svg
 import { ReactComponent as SpiritualIcon } from '@/assets/icons/icon-spiritual.svg';
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
 import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group.svg';
+import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	header: {
@@ -47,6 +47,15 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
+		'& .dropdown-menu': {
+			'& svg': {
+				flexShrink: 0,
+				color: theme.colors.p300,
+			},
+			'& p': {
+				whiteSpace: 'initial',
+			},
+		},
 	},
 	desktopNav: {
 		height: '100%',
@@ -74,9 +83,15 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 				},
 				'& .dropdown': {
 					height: '100%',
+					'& .dropdown-menu': {
+						width: 344,
+					},
 				},
 			},
 		},
+	},
+	accountDropdown: {
+		width: 280,
 	},
 }));
 
@@ -160,6 +175,9 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 		setMenuOpen(false);
 	}
 
+	/* ----------------------------------------------------------- */
+	/* Desktop navigation Config */
+	/* ----------------------------------------------------------- */
 	const navigationConfig = useMemo(
 		() => [
 			{
@@ -179,7 +197,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 									title: 'Therapy',
 									description:
 										'Connect to a therapist through your Employee Assistance Program or TEAM Clinic',
-									to: '/connect-with-support&supportRoleId=CLINICIAN',
+									to: '/connect-with-support?supportRoleId=CLINICIAN',
 								},
 								{
 									icon: <MedicationIcon />,
@@ -191,14 +209,14 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 									icon: <CoachingIcon />,
 									title: 'Coaching',
 									description: 'Get 1:1 confidential emotional support from trained volunteers',
-									to: '/connect-with-support&supportRoleId=PSYCHIATRIST',
+									to: '/connect-with-support?supportRoleId=PSYCHIATRIST',
 								},
 								{
 									icon: <SpiritualIcon />,
 									title: 'Spiritual Support',
 									description:
 										'Receive confidential, non-judgmental support from multi-faith chaplains',
-									to: '/connect-with-support&supportRoleId=CHAPLAIN',
+									to: '/connect-with-support?supportRoleId=CHAPLAIN',
 								},
 						  ]
 						: []),
@@ -224,7 +242,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				items: [
 					{
 						testId: 'menuLinkResourceLibrary',
-						icon: <MedicationIcon />,
+						icon: <ResourceIcon />,
 						title: 'Resource Library',
 						description: 'Digital articles, podcasts, apps, videos, worksheets, and more',
 						to: '/resource-library',
@@ -247,6 +265,71 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 			},
 		],
 		[institution?.additionalNavigationItems, institution?.supportEnabled]
+	);
+
+	/* ----------------------------------------------------------- */
+	/* Admin navigation Config */
+	/* ----------------------------------------------------------- */
+	const adminNavigationConfig = useMemo(
+		() => [
+			...(account?.providerId
+				? [
+						{
+							testId: 'menuLinkScheduling',
+							icon: <AdminIcon />,
+							title: 'Patient Scheduling',
+							to: '/scheduling',
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminMyContent
+				? [
+						{
+							testId: 'menuLinkAdminMyContent',
+							icon: <AdminIcon />,
+							title: 'My Content',
+							to: '/cms/on-your-time',
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminAvailableContent
+				? [
+						{
+							testId: 'menuLinkAdminAvailableContent',
+							icon: <AdminIcon />,
+							title: 'Available Content',
+							to: '/cms/available-content',
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminGroupSession
+				? [
+						{
+							testId: 'menuLinkAdminScheduledGroupSessions',
+							icon: <AdminIcon />,
+							title: 'Scheduled',
+							to: '/group-sessions/scheduled',
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminReports
+				? [
+						{
+							testId: 'menuLinkAdminReports',
+							icon: <AdminIcon />,
+							title: 'Provider Reports',
+							to: '/admin/reports',
+						},
+				  ]
+				: []),
+		],
+		[
+			account?.providerId,
+			institutionCapabilities?.viewNavAdminAvailableContent,
+			institutionCapabilities?.viewNavAdminGroupSession,
+			institutionCapabilities?.viewNavAdminMyContent,
+			institutionCapabilities?.viewNavAdminReports,
+		]
 	);
 
 	return (
@@ -309,7 +392,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 						<small className="fw-bold">In Crisis?</small>
 					</Button>
 					<Dropdown className="ms-4 d-flex align-items-center">
-						<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu">
+						<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
 							<AvatarIcon className="d-flex" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu
@@ -318,27 +401,24 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 							flip={false}
 							popperConfig={{ strategy: 'fixed' }}
 							renderOnMount
+							className={classes.accountDropdown}
 						>
 							<p className="fw-bold text-gray">{account?.displayName}</p>
-							<Dropdown.Item to="/my-calendar" as={Link}>
+							<Dropdown.Item as={Link} to="/my-calendar">
 								<div className="d-flex align-items-center">
 									<EventIcon />
 									<p className="mb-0 ps-4 fw-semibold">My Events</p>
 								</div>
 							</Dropdown.Item>
 							<Dropdown.Divider />
-							{institutionCapabilities?.viewNavAdminMyContent ||
-								institutionCapabilities?.viewNavAdminAvailableContent ||
-								institutionCapabilities?.viewNavAdminGroupSession ||
-								institutionCapabilities?.viewNavAdminGroupSessionRequest ||
-								institutionCapabilities?.viewNavAdminReports}
-							<Dropdown.Item
-								onClick={() => {
-									return;
-								}}
-							>
-								<p className="mb-0 fw-semibold">Cobalt Admin</p>
-							</Dropdown.Item>
+							{adminNavigationConfig.map((adminNavItem) => (
+								<Dropdown.Item as={Link} to={adminNavItem.to}>
+									<div className="d-flex align-items-center">
+										{adminNavItem.icon}
+										<p className="mb-0 ps-4 fw-semibold">{adminNavItem.title}</p>
+									</div>
+								</Dropdown.Item>
+							))}
 							<Dropdown.Divider />
 							<Dropdown.Item onClick={signOutAndClearContext}>
 								<p className="mb-0 text-gray">Log Out</p>

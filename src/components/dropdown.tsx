@@ -48,6 +48,10 @@ const useDropdownMenuStyles = createUseThemedStyles(
 					backgroundColor: theme.colors.n75,
 				},
 			},
+			'& .dropdown-divider': {
+				margin: '16px 0',
+				borderColor: theme.colors.n100,
+			},
 		},
 	}),
 	{ index: 2 }

@@ -4,15 +4,15 @@ import { ReactComponent as WellBeingIcon } from '@/assets/icons/icon-well-being.
 
 export const exploreLinks = [
 	{
-		testId: 'menuLinkCovid19Resources',
-		label: 'COVID-19 Resources',
-		icon: <Covid19Icon />,
-		to: () => '/covid-19-resources',
-	},
-	{
 		testId: 'menuLinkWellBeingResources',
 		label: 'Well-Being Resources',
 		icon: <WellBeingIcon />,
 		to: () => '/well-being-resources',
+	},
+	{
+		testId: 'menuLinkCovid19Resources',
+		label: 'COVID-19 Resources',
+		icon: <Covid19Icon />,
+		to: () => '/covid-19-resources',
 	},
 ];
