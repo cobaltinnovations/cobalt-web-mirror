@@ -272,8 +272,8 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					backgroundColor: theme.colors.p500,
 				},
 				'&--keyboard-selected': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.p700,
+					color: theme.colors.n900,
+					backgroundColor: 'transparent',
 				},
 				'&--outside-month': {
 					color: theme.colors.n100,

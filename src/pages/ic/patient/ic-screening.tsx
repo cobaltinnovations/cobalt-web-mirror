@@ -6,9 +6,9 @@ import { useScreeningFlow } from '../../screening/screening.hooks';
 
 const IntegratedCareScreeningPage = () => {
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		institution?.integratedCareScreeningFlowId
-	);
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareScreeningFlowId,
+	});
 
 	if (!didCheckScreeningSessions) {
 		return (

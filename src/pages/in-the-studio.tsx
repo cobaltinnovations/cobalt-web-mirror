@@ -29,9 +29,9 @@ const InTheStudio: FC = () => {
 	const [groupSessions, setGroupSessions] = useState<StudioEventViewModel[]>([]);
 	const [actionSheetIsOpen, setActionSheetIsOpen] = useState(false);
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		institution?.groupSessionsScreeningFlowId
-	);
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+		screeningFlowId: institution?.groupSessionsScreeningFlowId,
+	});
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {

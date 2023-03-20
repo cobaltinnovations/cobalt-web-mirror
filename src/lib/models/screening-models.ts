@@ -118,3 +118,62 @@ export interface ScreeningQuestionContextResponse {
 	screeningSessionDestination: ScreeningSessionDestination;
 	preQuestionScreeningConfirmationPrompt?: ScreeningQuestionPrompt;
 }
+
+/* ---------------------------------------------- */
+/* Mainly used by MHIC */
+/* ---------------------------------------------- */
+export interface PatientOrderScreeningSession {
+	completed: boolean;
+	completedAt: string;
+	completedAtDescription: string;
+	created: string;
+	createdByAccountId: string;
+	createdDescription: string;
+	crisisIndicated: boolean;
+	crisisIndicatedAt: string;
+	crisisIndicatedAtDescription: string;
+	patientOrderId: string;
+	screeningFlowVersionId: string;
+	screeningSessionId: string;
+	skipped: boolean;
+	targetAccountId: string;
+}
+
+export interface ScreeningSessionResult {
+	screeningFlowId?: string;
+	screeningFlowName?: string;
+	screeningFlowVersionId?: string;
+	screeningFlowVersionNumber?: number;
+	screeningSessionScreeningResults?: ScreeningSessionScreeningResult[];
+}
+
+export interface ScreeningSessionScreeningResult {
+	screeningVersionId?: string;
+	screeningId?: string;
+	screeningVersionNumber?: number;
+	screeningTypeId?: string;
+	screeningName?: string;
+	screeningScore?: {
+		overallScore?: number;
+		personalAccomplishmentScore?: number;
+		depersonalizationScore?: number;
+		emotionalExhaustionScore?: number;
+	};
+	belowScoringThreshold?: boolean;
+	screeningQuestionResults?: ScreeningQuestionResult[];
+}
+
+export interface ScreeningQuestionResult {
+	screeningQuestionId?: string;
+	screeningQuestionIntroText?: string;
+	screeningQuestionText?: string;
+	screeningAnswerResults?: ScreeningAnswerResult[];
+}
+
+export interface ScreeningAnswerResult {
+	screeningAnswerId?: string;
+	screeningAnswerOptionId?: string;
+	answerOptionText?: string;
+	text?: string;
+	score?: number;
+}

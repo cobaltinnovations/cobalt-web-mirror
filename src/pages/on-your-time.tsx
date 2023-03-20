@@ -34,9 +34,9 @@ const OnYourTime: FC = () => {
 	const location = useLocation();
 	const { trackEvent, mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		institution?.contentScreeningFlowId
-	);
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+		screeningFlowId: institution?.contentScreeningFlowId,
+	});
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedFormatIds = searchParams.getAll('formatId');

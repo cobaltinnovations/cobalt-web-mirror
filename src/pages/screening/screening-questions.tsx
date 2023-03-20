@@ -399,26 +399,24 @@ const ScreeningQuestionsPage = () => {
 								/>
 
 								<div className="d-flex">
-									{(isSubmitPrompt ||
-										screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
-										<Button
-											disabled={isSubmitting}
-											className="me-2"
-											type="button"
-											onClick={() => {
-												if (
-													!isSubmitPrompt &&
-													screeningQuestionContextResponse?.previousScreeningQuestionContextId
-												) {
-													navigateToQuestion(
-														screeningQuestionContextResponse.previousScreeningQuestionContextId
-													);
-												}
-											}}
-										>
-											Previous
-										</Button>
-									)}
+									<Button
+										disabled={isSubmitting}
+										className="me-2"
+										type="button"
+										onClick={() => {
+											if (isSubmitPrompt) {
+												clearPrompt();
+											} else if (
+												screeningQuestionContextResponse?.previousScreeningQuestionContextId
+											) {
+												navigateToQuestion(
+													screeningQuestionContextResponse.previousScreeningQuestionContextId
+												);
+											}
+										}}
+									>
+										Previous
+									</Button>
 
 									<Button
 										disabled={disableNextBtn}
@@ -443,9 +441,12 @@ const ScreeningQuestionsPage = () => {
 						) : (
 							<>
 								{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
-									<p className="mb-3">
-										{screeningQuestionContextResponse.screeningQuestion.introText}
-									</p>
+									<div
+										className="mb-3"
+										dangerouslySetInnerHTML={{
+											__html: screeningQuestionContextResponse.screeningQuestion.introText,
+										}}
+									/>
 								)}
 
 								<h3 className="mb-5">

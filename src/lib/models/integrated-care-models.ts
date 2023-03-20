@@ -1,4 +1,5 @@
 import { AccountModel } from './account';
+import { PatientOrderScreeningSession, ScreeningSessionResult } from './screening-models';
 
 export interface PatientOrderCountModel {
 	activePatientOrderCount: number;
@@ -55,8 +56,8 @@ export interface PatientOrderModel {
 	routing?: string;
 	reasonForReferral?: string;
 	associatedDiagnosis?: string;
-	callbackPhoneNumber?: string;
-	callbackPhoneNumberDescription?: string;
+	patientPhoneNumber?: string;
+	patientPhoneNumberDescription?: string;
 	preferredContactHours?: string;
 	comments?: string;
 	ccRecipients?: string;
@@ -67,14 +68,23 @@ export interface PatientOrderModel {
 	episodeEndedAtDescription?: string;
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
+	patientEthnicityId: string;
+	patientRaceId: string;
+	patientGenderIdentityId: string;
+	patientLanguageCode: string;
+	patientEmailAddress: string;
+	patientAccount?: AccountModel;
 
 	// MHIC specific
 	patientAddress?: PatientAddressModel;
 	patientOrderDiagnoses?: PatientOrderDiagnosesModel[];
 	patientOrderMedications?: PatientOrderMedicationModel[];
 	patientOrderOutreaches?: PatientOrderOutreachModel[];
+	patientOrderTriageGroups?: PateintOrderTriageGroupModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
-	PatientOrderScreeningStatusId: PatientOrderScreeningStatusId;
+	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
+	screeningSession?: PatientOrderScreeningSession;
+	screeningSessionResult?: ScreeningSessionResult;
 }
 
 export enum PatientOrderStatusId {
@@ -110,6 +120,7 @@ export interface PatientAddressModel {
 	postalName: string;
 	region: string;
 	streetAddress1: string;
+	streetAddress2: string;
 }
 
 export interface PatientOrderDiagnosesModel {
@@ -156,4 +167,17 @@ export interface PatientOrderOutreachModel {
 	outreachTimeDescription: string;
 	patientOrderId: string;
 	patientOrderOutreachId: string;
+}
+
+export interface PateintOrderTriageGroupModel {
+	patientOrderFocusTypeId: string;
+	patientOrderFocusTypeDescription: string;
+	patientOrderCareTypeId: string;
+	patientOrderCareTypeDescription: string;
+	reasons: string[];
+}
+
+export interface PatientOrderClosureReasonModel {
+	patientOrderClosureReasonId: string;
+	description: string;
 }

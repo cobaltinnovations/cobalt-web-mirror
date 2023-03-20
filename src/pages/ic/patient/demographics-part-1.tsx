@@ -1,64 +1,50 @@
-import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { ReferenceDataResponse } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { PatientOrderModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
-import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
-import InputHelper from '@/components/input-helper';
-import DatePicker from '@/components/date-picker';
-
-export interface FormData {
-	firstName: string;
-	lastName: string;
-	birthdate: string;
-	phoneNumber: string;
-	emailAddress: string;
-	insuranceId: string;
-}
+import { PatientDetailsFormInputs, PatientDetailsFormData } from '@/components/integrated-care/common';
 
 const PatientDemographicsPart1 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { account } = useAccount();
-	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
-	const initialFormValues: FormData = useMemo(() => {
+	const initialFormValues: PatientDetailsFormData = useMemo(() => {
 		return {
-			firstName: account?.firstName ?? '',
-			lastName: account?.lastName ?? '',
-			birthdate: account?.birthdate ?? '',
-			phoneNumber: account?.phoneNumber ?? '',
-			emailAddress: account?.emailAddress ?? '',
-			insuranceId: account?.insuranceId ?? '',
+			patientFirstName: patientOrder?.patientFirstName ?? '',
+			patientLastName: patientOrder?.patientLastName ?? '',
+			patientBirthdate: patientOrder?.patientBirthdate ?? '',
+			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
+			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
 		};
 	}, [
-		account?.birthdate,
-		account?.emailAddress,
-		account?.firstName,
-		account?.insuranceId,
-		account?.lastName,
-		account?.phoneNumber,
+		patientOrder?.patientAccount?.emailAddress,
+		patientOrder?.patientBirthdate,
+		patientOrder?.patientEmailAddress,
+		patientOrder?.patientFirstName,
+		patientOrder?.patientLastName,
+		patientOrder?.patientPhoneNumberDescription,
 	]);
 
 	const fetchData = useCallback(async () => {
-		const response = await accountService.getReferenceData().fetch();
-		setReferenceData(response);
+		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+		setPatientOrder(response.patientOrder);
 	}, []);
 
 	const handleFormSubmit = useCallback(
-		async (values: FormData) => {
-			if (!account) {
+		async (values: PatientDetailsFormData) => {
+			if (!patientOrder) {
 				return;
 			}
 
 			try {
-				await accountService.patchPatientAccount(account.accountId, values).fetch();
+				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
 				navigate('/ic/patient/demographics-part-2');
 			} catch (error) {
 				if ((error as any).code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -66,7 +52,7 @@ const PatientDemographicsPart1 = () => {
 				}
 			}
 		},
-		[account, handleError, navigate]
+		[handleError, navigate, patientOrder]
 	);
 
 	return (
@@ -84,90 +70,15 @@ const PatientDemographicsPart1 = () => {
 				</Row>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Formik<FormData>
+						<Formik<PatientDetailsFormData>
 							initialValues={initialFormValues}
 							enableReinitialize
 							onSubmit={handleFormSubmit}
 						>
-							{({ values, touched, errors, setFieldValue, handleChange, handleBlur, handleSubmit }) => (
-								<Form onSubmit={handleSubmit}>
-									<InputHelper
-										className="mb-2"
-										label="First Name"
-										type="text"
-										name="firstName"
-										value={values.firstName}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.firstName && errors.firstName ? errors.firstName : ''}
-									/>
-									<InputHelper
-										className="mb-2"
-										label="Last Name"
-										type="text"
-										name="lastName"
-										value={values.lastName}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.lastName && errors.lastName ? errors.lastName : ''}
-										required
-									/>
-									<Form.Group controlId="birthdate" className="mb-2">
-										<DatePicker
-											showYearDropdown
-											showMonthDropdown
-											dropdownMode="select"
-											labelText="Date of Birth"
-											selected={values.birthdate ? moment(values.birthdate).toDate() : undefined}
-											onChange={(date) => {
-												setFieldValue(
-													'birthdate',
-													date ? moment(date).format('YYYY-MM-DD') : ''
-												);
-											}}
-										/>
-									</Form.Group>
-									<InputHelper
-										className="mb-2"
-										label="Phone Number"
-										type="text"
-										name="phoneNumber"
-										value={values.phoneNumber}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : ''}
-										required
-									/>
-									<InputHelper
-										className="mb-2"
-										label="Email Address"
-										type="email"
-										name="emailAddress"
-										value={values.emailAddress}
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.emailAddress && errors.emailAddress ? errors.emailAddress : ''}
-										required
-									/>
-									<InputHelper
-										className="mb-6"
-										label="Insurance"
-										name="insuranceId"
-										value={values.insuranceId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.insuranceId && errors.insuranceId ? errors.insuranceId : ''}
-									>
-										<option value="">Select...</option>
-										{referenceData?.insurances.map((insurance) => {
-											return (
-												<option key={insurance.insuranceId} value={insurance.insuranceId}>
-													{insurance.description}
-												</option>
-											);
-										})}
-									</InputHelper>
+							{(formikProps) => (
+								<Form onSubmit={formikProps.handleSubmit}>
+									<PatientDetailsFormInputs formikProps={formikProps} />
+
 									<div className="text-right">
 										<Button variant="primary" type="submit">
 											Next

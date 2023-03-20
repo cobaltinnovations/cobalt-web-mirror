@@ -4,11 +4,12 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 interface UseStylesProps {
 	clickable: boolean;
+	highlighted: boolean;
 }
 
 const useTableRowStyles = createUseThemedStyles((theme) => ({
 	tableRow: {
-		backgroundColor: 'inherit',
+		backgroundColor: ({ highlighted }: UseStylesProps) => (highlighted ? theme.colors.n75 : 'inherit'),
 		borderBottom: `1px solid ${theme.colors.n100}`,
 		cursor: ({ clickable }: UseStylesProps) => (clickable ? 'pointer' : 'default'),
 		'&:hover': {
@@ -23,11 +24,13 @@ const useTableRowStyles = createUseThemedStyles((theme) => ({
 interface TableRowProps extends PropsWithChildren {
 	onClick?(event: React.MouseEvent<HTMLTableRowElement, MouseEvent>): void;
 	className?: string;
+	highlighted?: boolean;
 }
 
-export const TableRow: FC<TableRowProps> = React.memo(({ onClick, className, children }) => {
+export const TableRow: FC<TableRowProps> = React.memo(({ onClick, highlighted = false, className, children }) => {
 	const classes = useTableRowStyles({
 		clickable: !!onClick,
+		highlighted: highlighted,
 	});
 
 	return (
