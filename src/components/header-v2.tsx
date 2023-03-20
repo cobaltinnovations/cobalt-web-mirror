@@ -1,5 +1,5 @@
 import React, { FC, useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, matchPath, useLocation } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -70,12 +70,12 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 				'& a:not(.dropdown-item), & .dropdown button': {
 					height: '100%',
 					display: 'flex',
+					padding: '0 12px',
 					alignItems: 'center',
 					textDecoration: 'none',
 					...theme.fonts.default,
 					color: theme.colors.n500,
 					...theme.fonts.bodyNormal,
-					padding: '0 12px !important',
 					'&:hover': {
 						color: theme.colors.p700,
 						backgroundColor: 'transparent',
@@ -85,6 +85,40 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 					height: '100%',
 					'& .dropdown-menu': {
 						width: 344,
+					},
+				},
+				'&:after': {
+					left: 12,
+					right: 12,
+					bottom: 0,
+					height: 2,
+					content: '""',
+					display: 'block',
+					position: 'absolute',
+					backgroundColor: 'transparent',
+				},
+				'&:first-child': {
+					'& a:not(.dropdown-item), & .dropdown button': {
+						paddingLeft: 0,
+					},
+					'&:after': {
+						left: 0,
+					},
+				},
+				'&:last-child': {
+					'& a:not(.dropdown-item), & .dropdown button': {
+						paddingRight: 0,
+					},
+					'&:after': {
+						right: 0,
+					},
+				},
+				'&.active': {
+					'& a:not(.dropdown-item), & .dropdown button': {
+						color: theme.colors.p700,
+					},
+					'&:after': {
+						backgroundColor: theme.colors.p500,
 					},
 				},
 			},
@@ -117,6 +151,7 @@ interface HeaderProps {
 }
 
 const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
+	const { pathname } = useLocation();
 	const classes = useHeaderV2Styles();
 	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
@@ -185,10 +220,14 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				navigationItemId: 'HOME',
 				title: 'Home',
 				to: '/',
+				active: matchPath('/', pathname),
 			},
 			{
 				navigationItemId: 'CONNECT_WITH_SUPPORT',
 				title: 'Connect with Support',
+				active: ['/connect-with-support', '/in-crisis', '/group-sessions'].some((path) =>
+					matchPath(path, pathname)
+				),
 				items: [
 					...(institution?.supportEnabled
 						? [
@@ -239,6 +278,11 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
 				title: 'Browse Resources',
+				active: [
+					'/resource-library',
+					...(institution?.additionalNavigationItems ?? []).map((i) => i.url),
+					...exploreLinks.map((i) => i.to()),
+				].some((path) => matchPath(path, pathname)),
 				items: [
 					{
 						testId: 'menuLinkResourceLibrary',
@@ -264,7 +308,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				],
 			},
 		],
-		[institution?.additionalNavigationItems, institution?.supportEnabled]
+		[institution?.additionalNavigationItems, institution?.supportEnabled, pathname]
 	);
 
 	/* ----------------------------------------------------------- */
@@ -338,12 +382,16 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 
 			<header ref={header} className={classes.header}>
 				<div className="h-100 d-flex align-items-center justify-content-between">
-					<LogoSmallText className="text-primary" />
-
+					<LogoSmallText className="text-primary me-10" />
 					<nav className={classes.desktopNav}>
 						<ul>
 							{navigationConfig.map((navigationItem) => (
-								<li key={navigationItem.navigationItemId}>
+								<li
+									key={navigationItem.navigationItemId}
+									className={classNames({
+										active: navigationItem.active,
+									})}
+								>
 									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
 									{navigationItem.items && (
 										<Dropdown>
