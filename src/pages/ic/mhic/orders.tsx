@@ -8,7 +8,12 @@ import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import FileInputButton from '@/components/file-input-button';
-import { MhicGenerateOrdersModal, MhicNavigation, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import {
+	MhicAssignOrderModal,
+	MhicGenerateOrdersModal,
+	MhicNavigation,
+	MhicPatientOrderTable,
+} from '@/components/integrated-care/mhic';
 
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
@@ -34,6 +39,7 @@ const MhicOrders = () => {
 
 	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
+	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -100,6 +106,26 @@ const MhicOrders = () => {
 		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
 	);
 
+	const handleAssignOrdersSave = useCallback(
+		async (patientOrderCount: number, panelAccountDisplayName: string) => {
+			try {
+				await Promise.all([fetchPanelAccounts(), fetchPatientOrders()]);
+
+				setSelectedPatientOrderIds([]);
+				setShowAssignOrderModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Patients assigned',
+					description: `${patientOrderCount} Patients were assigned to ${panelAccountDisplayName}`,
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
+	);
+
 	useEffect(() => {
 		fetchPatientOrders();
 	}, [fetchPatientOrders]);
@@ -139,6 +165,16 @@ const MhicOrders = () => {
 					});
 					setShowGenerateOrdersModal(false);
 				}}
+			/>
+
+			<MhicAssignOrderModal
+				patientOrderIds={selectedPatientOrderIds}
+				panelAccounts={panelAccounts}
+				show={showAssignOrderModal}
+				onHide={() => {
+					setShowAssignOrderModal(false);
+				}}
+				onSave={handleAssignOrdersSave}
 			/>
 
 			<MhicNavigation
@@ -209,7 +245,7 @@ const MhicOrders = () => {
 						</FileInputButton>
 						<Button
 							onClick={() => {
-								window.alert('[TODO]: Assign Orders');
+								setShowAssignOrderModal(true);
 							}}
 							disabled={selectedPatientOrderIds.length <= 0}
 						>

@@ -197,7 +197,14 @@ export const integratedCareService = {
 	getReferenceData() {
 		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
 			method: 'GET',
-			url: `/patient-orders/reference-data`,
+			url: '/patient-orders/reference-data',
+		});
+	},
+	assignPatientOrders(data: { panelAccountId: string; patientOrderIds: string[] }) {
+		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
+			method: 'POST',
+			url: '/patient-orders/assign',
+			data,
 		});
 	},
 };
