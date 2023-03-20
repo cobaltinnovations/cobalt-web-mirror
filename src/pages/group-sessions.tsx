@@ -42,9 +42,9 @@ const GroupSessions = () => {
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
 	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow(
-		institution?.groupSessionsScreeningFlowId
-	);
+	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+		screeningFlowId: institution?.groupSessionsScreeningFlowId,
+	});
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {

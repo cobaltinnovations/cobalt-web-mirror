@@ -2,6 +2,10 @@ import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
+import { PatientOrderClosureReasonModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+
 const useStyles = createUseStyles({
 	modal: {
 		maxWidth: 480,
@@ -9,16 +13,28 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
-	onSave(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onSave(patientOrderClosureReasonId: string): void;
 }
 
 export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 	const classes = useStyles();
-	const [selectedReason, setSelectedReason] = useState('');
+	const handleError = useHandleError();
+	const [selectedReasonId, setSelectedReasonId] = useState('');
+	const [patientOrderClosureReasons, setPatientOrderClosureReasons] = useState<PatientOrderClosureReasonModel[]>([]);
+
+	const getClosureReasons = useCallback(async () => {
+		try {
+			const response = await integratedCareService.getPatientOrderClosureReasons().fetch();
+			setPatientOrderClosureReasons(response.patientOrderClosureReasons);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError]);
 
 	const handleOnEnter = useCallback(() => {
-		setSelectedReason('');
-	}, []);
+		setSelectedReasonId('');
+		getClosureReasons();
+	}, [getClosureReasons]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -27,34 +43,34 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 			</Modal.Header>
 			<Modal.Body>
 				<Form.Label className="mb-1">Reason for Closure:</Form.Label>
-				<Form.Check
-					type="radio"
-					name="reason-for-closure"
-					id="reason-for-closure__INELIGIBLE"
-					label="Ineligible due to insurance"
-					value="INELIGIBLE"
-					checked={'INELIGIBLE' === selectedReason}
-					onChange={({ currentTarget }) => {
-						setSelectedReason(currentTarget.value);
-					}}
-				/>
-				<Form.Check
-					type="radio"
-					name="reason-for-closure"
-					id="reason-for-closure__REFUSED_CARE"
-					label="Refused Care"
-					value="REFUSED_CARE"
-					checked={'REFUSED_CARE' === selectedReason}
-					onChange={({ currentTarget }) => {
-						setSelectedReason(currentTarget.value);
-					}}
-				/>
+				{patientOrderClosureReasons.length <= 0 && (
+					<p className="mb-0 text-danger">No closure reasons found.</p>
+				)}
+				{patientOrderClosureReasons.map((closureReason) => (
+					<Form.Check
+						type="radio"
+						name="reason-for-closure"
+						id={`reason-for-closure__${closureReason.patientOrderClosureReasonId}`}
+						label={closureReason.description}
+						value={closureReason.patientOrderClosureReasonId}
+						checked={closureReason.patientOrderClosureReasonId === selectedReasonId}
+						onChange={({ currentTarget }) => {
+							setSelectedReasonId(currentTarget.value);
+						}}
+					/>
+				))}
 			</Modal.Body>
 			<Modal.Footer className="text-right">
 				<Button variant="outline-primary" className="me-2" onClick={props.onHide}>
 					Cancel
 				</Button>
-				<Button variant="primary" onClick={onSave} disabled={!selectedReason}>
+				<Button
+					variant="primary"
+					onClick={() => {
+						onSave(selectedReasonId);
+					}}
+					disabled={!selectedReasonId}
+				>
 					Save
 				</Button>
 			</Modal.Footer>

@@ -3,49 +3,53 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import { ReferenceDataResponse } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import { ERROR_CODES } from '@/lib/http-client';
 import useHandleError from '@/hooks/use-handle-error';
-import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
-import InputHelper from '@/components/input-helper';
-
-export interface FormData {
-	genderIdentityId: string;
-	raceId: string;
-	ethnicityId: string;
-	languageCode: string;
-}
+import { PatientDemographicsFormInputs, PatientDemographicsFormData } from '@/components/integrated-care/common';
 
 const PatientDemographicsPart3 = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { account } = useAccount();
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
-	const initialFormValues: FormData = useMemo(() => {
+	const initialFormValues: PatientDemographicsFormData = useMemo(() => {
 		return {
-			genderIdentityId: account?.genderIdentityId ?? '',
-			raceId: account?.raceId ?? '',
-			ethnicityId: account?.ethnicityId ?? '',
-			languageCode: account?.languageCode ?? '',
+			patientBirthSexId: patientOrder?.patientBirthSexId ?? '',
+			patientGenderIdentityId: patientOrder?.patientGenderIdentityId ?? '',
+			patientRaceId: patientOrder?.patientRaceId ?? '',
+			patientEthnicityId: patientOrder?.patientEthnicityId ?? '',
+			patientLanguageCode: patientOrder?.patientLanguageCode ?? '',
 		};
-	}, [account?.ethnicityId, account?.genderIdentityId, account?.languageCode, account?.raceId]);
+	}, [
+		patientOrder?.patientBirthSexId,
+		patientOrder?.patientEthnicityId,
+		patientOrder?.patientGenderIdentityId,
+		patientOrder?.patientLanguageCode,
+		patientOrder?.patientRaceId,
+	]);
 
 	const fetchData = useCallback(async () => {
-		const response = await accountService.getReferenceData().fetch();
-		setReferenceData(response);
+		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
+			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
+			integratedCareService.getReferenceData().fetch(),
+		]);
+
+		setPatientOrder(patientOrderResponse.patientOrder);
+		setReferenceData(referenceDataResponse);
 	}, []);
 
 	const handleFormSubmit = useCallback(
-		async (values: FormData) => {
-			if (!account) {
+		async (values: PatientDemographicsFormData) => {
+			if (!patientOrder) {
 				return;
 			}
 
 			try {
-				await accountService.patchPatientAccount(account.accountId, values).fetch();
+				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
 				navigate('/ic/patient/demographics-thanks');
 			} catch (error) {
 				if ((error as any).code !== ERROR_CODES.REQUEST_ABORTED) {
@@ -53,7 +57,7 @@ const PatientDemographicsPart3 = () => {
 				}
 			}
 		},
-		[account, handleError, navigate]
+		[handleError, navigate, patientOrder]
 	);
 
 	return (
@@ -70,96 +74,17 @@ const PatientDemographicsPart3 = () => {
 				</Row>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Formik<FormData>
+						<Formik<PatientDemographicsFormData>
 							initialValues={initialFormValues}
 							enableReinitialize
 							onSubmit={handleFormSubmit}
 						>
-							{({ values, touched, errors, handleChange, handleBlur, handleSubmit }) => (
-								<Form onSubmit={handleSubmit}>
-									<InputHelper
-										className="mb-2"
-										label="Gender Identity"
-										name="genderIdentityId"
-										value={values.genderIdentityId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={
-											touched.genderIdentityId && errors.genderIdentityId
-												? errors.genderIdentityId
-												: ''
-										}
-									>
-										<option value="">Select...</option>
-										{referenceData?.genderIdentities.map((genderIdentity) => {
-											return (
-												<option
-													key={genderIdentity.genderIdentityId}
-													value={genderIdentity.genderIdentityId}
-												>
-													{genderIdentity.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-2"
-										label="Race"
-										name="raceId"
-										value={values.raceId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.raceId && errors.raceId ? errors.raceId : ''}
-									>
-										<option value="">Select...</option>
-										{referenceData?.races.map((race) => {
-											return (
-												<option key={race.raceId} value={race.raceId}>
-													{race.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-2"
-										label="Ethnicity"
-										name="ethnicityId"
-										value={values.ethnicityId}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.ethnicityId && errors.ethnicityId ? errors.ethnicityId : ''}
-									>
-										<option value="">Select...</option>
-										{referenceData?.ethnicities.map((ethnicity) => {
-											return (
-												<option key={ethnicity.ethnicityId} value={ethnicity.ethnicityId}>
-													{ethnicity.description}
-												</option>
-											);
-										})}
-									</InputHelper>
-									<InputHelper
-										className="mb-6"
-										label="Preferred Language"
-										name="languageCode"
-										value={values.languageCode}
-										as="select"
-										onBlur={handleBlur}
-										onChange={handleChange}
-										error={touched.languageCode && errors.languageCode ? errors.languageCode : ''}
-									>
-										<option value="">Select...</option>
-										{referenceData?.languages.map((language) => {
-											return (
-												<option key={language.languageCode} value={language.languageCode}>
-													{language.description}
-												</option>
-											);
-										})}
-									</InputHelper>
+							{(formikProps) => (
+								<Form onSubmit={formikProps.handleSubmit}>
+									<PatientDemographicsFormInputs
+										formikProps={formikProps}
+										referenceData={referenceData}
+									/>
 									<div className="d-flex align-items-center justify-content-between">
 										<Button
 											variant="outline-primary"

@@ -1,6 +1,8 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import classNames from 'classnames';
+import { ScreeningSessionScreeningResult, ScreeningType } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -8,66 +10,71 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface Props extends ModalProps {}
+interface Props extends ModalProps {
+	screeningType?: ScreeningType;
+	screeningSessionScreeningResult?: ScreeningSessionScreeningResult;
+}
 
-export const MhicAssessmentModal: FC<Props> = ({ ...props }) => {
+export const MhicAssessmentModal: FC<Props> = ({ screeningType, screeningSessionScreeningResult, ...props }) => {
 	const classes = useStyles();
 
-	const handleOnEnter = useCallback(() => {
-		//TODO: Set <select/> values to Patient's values
-	}, []);
-
 	return (
-		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
+		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>PHQ-9 Score</Modal.Title>
+				<Modal.Title>{screeningSessionScreeningResult?.screeningName} Score</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<div className="mb-4 d-flex align-items-center justify-content-between">
 					<h5 className="mb-0">Questions</h5>
-					<p className="mb-0">Total Score: 12/27</p>
+					<p className="mb-0">
+						Total Score: {screeningSessionScreeningResult?.screeningScore?.overallScore}/
+						{screeningType?.overallScoreMaximum}
+					</p>
 				</div>
 				<div className="border p-4">
 					<ol className="m-0 p-0 list-unstyled">
-						<li className="mb-4 d-flex border-bottom">
-							<div>1)</div>
-							<div className="ps-2 mb-4">
-								<p className="mb-2">
-									Over the last 2 weeks, how often have you been bothered by... Feeling nervous,
-									anxious, or on edge?
-								</p>
-								<div className="d-flex align-items-center justify-content-between">
-									<h5 className="mb-0">Several days</h5>
-									<h5 className="mb-0 text-gray">Score: 1</h5>
-								</div>
-							</div>
-						</li>
-						<li className="mb-4 d-flex border-bottom">
-							<div>2)</div>
-							<div className="ps-2 mb-4">
-								<p className="mb-2">
-									Over the last 2 weeks, how often have you been bothered by... Feeling nervous,
-									anxious, or on edge?
-								</p>
-								<div className="d-flex align-items-center justify-content-between">
-									<h5 className="mb-0">Several days</h5>
-									<h5 className="mb-0 text-gray">Score: 1</h5>
-								</div>
-							</div>
-						</li>
-						<li className="d-flex border-bottom">
-							<div>3)</div>
-							<div className="ps-2 mb-4">
-								<p className="mb-2">
-									Over the last 2 weeks, how often have you been bothered by... Feeling nervous,
-									anxious, or on edge?
-								</p>
-								<div className="d-flex align-items-center justify-content-between">
-									<h5 className="mb-0">More than half the days</h5>
-									<h5 className="mb-0 text-gray">Score: 2</h5>
-								</div>
-							</div>
-						</li>
+						{(screeningSessionScreeningResult?.screeningQuestionResults ?? []).map(
+							(question, questionIndex) => {
+								const isLastQuestion =
+									(screeningSessionScreeningResult?.screeningQuestionResults ?? []).length - 1 ===
+									questionIndex;
+
+								return (
+									<li
+										key={question.screeningQuestionId}
+										className={classNames('d-flex', {
+											'border-bottom': !isLastQuestion,
+											'mb-4': !isLastQuestion,
+											'pb-4': !isLastQuestion,
+										})}
+									>
+										<div>{questionIndex + 1})</div>
+										<div className="ps-2 flex-grow-1">
+											<p className="mb-2">{question.screeningQuestionText}</p>
+											{question.screeningAnswerResults?.map((answer, answerIndex) => {
+												const isLastAnswer =
+													(question.screeningAnswerResults ?? []).length - 1 === answerIndex;
+
+												return (
+													<div className={classNames({ 'mb-1': !isLastAnswer })}>
+														<div
+															key={answer.screeningAnswerId}
+															className="d-flex align-items-center justify-content-between"
+														>
+															<h5 className="mb-0">{answer.answerOptionText}</h5>
+															<h5 className="mb-0 text-gray flex-shrink-0">
+																Score: {answer.score}
+															</h5>
+														</div>
+														{answer.text && <p className="mb-0">{answer.text}</p>}
+													</div>
+												);
+											})}
+										</div>
+									</li>
+								);
+							}
+						)}
 					</ol>
 				</div>
 			</Modal.Body>

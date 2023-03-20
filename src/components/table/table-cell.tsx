@@ -9,6 +9,7 @@ interface useStylesProps {
 	header?: boolean;
 	width?: string | number;
 	sticky?: boolean;
+	stickyBorder?: boolean;
 	stickyOffset?: string | number;
 	sortable?: boolean;
 }
@@ -24,14 +25,14 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 			left: stickyOffset ?? 0,
 		}),
 	}),
-	tableCellContent: ({ width, sticky, header }: useStylesProps) => ({
+	tableCellContent: ({ width, stickyBorder, header }: useStylesProps) => ({
 		height: '100%',
 		padding: '14px 20px',
 		width: width ?? '100%',
 		display: 'inline-flex',
 		flexDirection: 'column',
 		justifyContent: 'center',
-		...(sticky && {
+		...(stickyBorder && {
 			borderRight: `1px solid ${theme.colors.n100}`,
 		}),
 		...(header && {
@@ -58,6 +59,7 @@ interface TableCellProps extends PropsWithChildren {
 	header?: boolean;
 	width?: number | string;
 	sticky?: boolean;
+	stickyBorder?: boolean;
 	stickyOffset?: number;
 	sortable?: boolean;
 	className?: string;
@@ -67,11 +69,24 @@ interface TableCellProps extends PropsWithChildren {
 }
 
 export const TableCell: FC<TableCellProps> = React.memo(
-	({ header, width, sticky, stickyOffset, sortable, className, sortDirection, onSort, colSpan, children }) => {
+	({
+		header,
+		width,
+		sticky,
+		stickyBorder,
+		stickyOffset,
+		sortable,
+		className,
+		sortDirection,
+		onSort,
+		colSpan,
+		children,
+	}) => {
 		const classes = useTableCellStyles({
 			header,
 			width,
 			sticky,
+			stickyBorder,
 			stickyOffset,
 			sortable,
 		});

@@ -5,7 +5,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
-import { accountService, integratedCareService } from '@/lib/services';
+import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
 import AsyncWrapper from '@/components/async-page';
@@ -13,8 +13,9 @@ import TabBar from '@/components/tab-bar';
 import {
 	MhicComments,
 	MhicFollowUp,
-	MhicOutreachAndAssesment,
-	MhicPatientDetails,
+	MhicContactHistory,
+	MhicOrderDetails,
+	MhicAssessmentResults,
 } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -107,13 +108,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicPatientOrderShelfProps {
-	patientOrderId: string;
+	patientOrderId: string | null;
 	onHide(): void;
 }
 
 enum TAB_KEYS {
-	PATIENT_DETAILS = 'PATIENT_DETAILS',
-	OUTREACH_AND_ASSESSMENT = 'OUTREACH_AND_ASSESSMENT',
+	ORDER_DETAILS = 'ORDER_DETAILS',
+	ASSESSMENT_RESULTS = 'ASSESSMENT_RESULTS',
+	CONTACT_HISOTRY = 'CONTACT_HISOTRY',
 	FOLLOW_UP = 'FOLLOW_UP',
 	COMMENTS = 'COMMENTS',
 }
@@ -122,7 +124,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 
-	const [tabKey, setTabKey] = useState(TAB_KEYS.PATIENT_DETAILS);
+	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
 	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
@@ -134,7 +136,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 
 		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
 			integratedCareService.getPatientOrder(patientOrderId).fetch(),
-			accountService.getReferenceData().fetch(),
+			integratedCareService.getReferenceData().fetch(),
 		]);
 
 		setCurrentPatientOrder(patientOverviewResponse.patientOrder);
@@ -162,7 +164,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 			>
 				<div className={classes.patientOrderShelf}>
 					<AsyncWrapper fetchData={fetchPatientOverview}>
-						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.PATIENT_DETAILS} activeKey={tabKey}>
+						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.ORDER_DETAILS} activeKey={tabKey}>
 							<div className={classes.header}>
 								<Button
 									variant="light"
@@ -204,8 +206,9 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										hideBorder
 										value={tabKey}
 										tabs={[
-											{ value: TAB_KEYS.PATIENT_DETAILS, title: 'Patient Details' },
-											{ value: TAB_KEYS.OUTREACH_AND_ASSESSMENT, title: 'Outreach & Assessment' },
+											{ value: TAB_KEYS.ORDER_DETAILS, title: 'Order Details' },
+											{ value: TAB_KEYS.ASSESSMENT_RESULTS, title: 'Assessment Results' },
+											{ value: TAB_KEYS.CONTACT_HISOTRY, title: 'Contact History' },
 											{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
 											{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
 										]}
@@ -216,18 +219,28 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 								</div>
 							</div>
 							<Tab.Content className={classes.tabContent}>
-								<Tab.Pane eventKey={TAB_KEYS.PATIENT_DETAILS} className={classes.tabPane}>
+								<Tab.Pane eventKey={TAB_KEYS.ORDER_DETAILS} className={classes.tabPane}>
 									{currentPatientOrder && referenceData && (
-										<MhicPatientDetails
+										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
 											referenceData={referenceData}
+											onPatientOrderChange={setCurrentPatientOrder}
 										/>
 									)}
 								</Tab.Pane>
-								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_AND_ASSESSMENT} className={classes.tabPane}>
+								<Tab.Pane eventKey={TAB_KEYS.ASSESSMENT_RESULTS} className={classes.tabPane}>
+									{currentPatientOrder && referenceData && (
+										<MhicAssessmentResults
+											patientOrder={currentPatientOrder}
+											referenceData={referenceData}
+											onPatientOrderChange={setCurrentPatientOrder}
+										/>
+									)}
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
 									{currentPatientOrder && (
-										<MhicOutreachAndAssesment
+										<MhicContactHistory
 											patientOrder={currentPatientOrder}
 											onPatientOrderChange={setCurrentPatientOrder}
 										/>

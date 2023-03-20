@@ -266,6 +266,12 @@ export const form = (theme: CobaltTheme) => {
 						},
 					},
 				},
+				'&.no-label': {
+					padding: 0,
+					'& input': {
+						margin: 0,
+					},
+				},
 			},
 		},
 		'textarea.cobalt-form__control': {

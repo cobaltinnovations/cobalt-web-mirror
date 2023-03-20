@@ -3,12 +3,42 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
 	ActivePatientOrderCountModel,
+	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
 	PatientOrderStatusId,
+	ReferenceDataResponse,
 } from '@/lib/models';
+
+export interface PatientOrderDemographicsFormData {
+	patientLastName: string;
+	patientFirstName: string;
+	patientEmailAddress: string;
+	patientPhoneNumber: string;
+	patientBirthSexId: string;
+	patientBirthdate: string;
+	patientEthnicityId: string;
+	patientRaceId: string;
+	patientGenderIdentityId: string;
+	patientLanguageCode: string;
+	patientAddress: {
+		postalName: string;
+		streetAddress1: string;
+		streetAddress2: string;
+		locality: string;
+		region: string;
+		postalCode: string;
+		countryCode: string;
+	};
+}
+
+export enum PatientOrderResponseSupplement {
+	MINIMAL = 'MINIMAL',
+	PANEL = 'PANEL',
+	EVERYTHING = 'EVERYTHING',
+}
 
 export const integratedCareService = {
 	importPatientOrders(data: { csvContent: string }) {
@@ -58,14 +88,29 @@ export const integratedCareService = {
 			url: `/patient-orders/open`,
 		});
 	},
-	getPatientOrder(patientOrderId: string) {
+	patchPatientOrder(patientOrderId: string, data: Partial<PatientOrderDemographicsFormData>) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PATCH',
+			url: `/patient-orders/${patientOrderId}`,
+			data,
+		});
+	},
+	getPatientOrder(patientOrderId: string, supplements: PatientOrderResponseSupplement[] = []) {
+		const queryParams = new URLSearchParams();
+
+		for (const supplement of supplements) {
+			queryParams.append('responseSupplement', supplement);
+		}
+
 		return httpSingleton.orchestrateRequest<{
 			patientOrder: PatientOrderModel;
 			associatedPatientOrders: PatientOrderModel[];
 			patientAccount?: AccountModel;
 		}>({
 			method: 'GET',
-			url: `/patient-orders/${patientOrderId}`,
+			url: `/patient-orders/${patientOrderId}?${queryParams.toString()}`,
 		});
 	},
 	postNote(data: { patientOrderId: string; note: string }) {
@@ -130,6 +175,36 @@ export const integratedCareService = {
 		}>({
 			method: 'DELETE',
 			url: `/patient-order-outreaches/${patientOrderOutreachId}`,
+		});
+	},
+	getPatientOrderClosureReasons() {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderClosureReasons: PatientOrderClosureReasonModel[];
+		}>({
+			method: 'GET',
+			url: '/patient-order-closure-reasons',
+		});
+	},
+	closePatientOrder(patientOrderId: string, data: { patientOrderClosureReasonId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/close`,
+			data,
+		});
+	},
+	getReferenceData() {
+		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
+			method: 'GET',
+			url: '/patient-orders/reference-data',
+		});
+	},
+	assignPatientOrders(data: { panelAccountId: string; patientOrderIds: string[] }) {
+		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
+			method: 'POST',
+			url: '/patient-orders/assign',
+			data,
 		});
 	},
 };

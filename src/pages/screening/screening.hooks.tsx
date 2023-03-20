@@ -14,13 +14,18 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 
 export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
+
+	const mhicScreeningRouteMatch = useMatch({
+		path: '/ic/mhic/orders/:patientOrderId',
+		end: false,
+	});
 
 	const navigateToDestination = useCallback(
 		(destination?: ScreeningSessionDestination, params?: Record<string, any>, replace = false) => {
@@ -54,8 +59,7 @@ export function useScreeningNavigation() {
 				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
 					navigate(
 						{
-							pathname: '/ic/mhic/assessment-complete',
-							search: new URLSearchParams(params).toString(),
+							pathname: `/ic/mhic/orders/${destination.context.patientOrderId}/assessment`,
 						},
 						{
 							replace,
@@ -93,9 +97,14 @@ export function useScreeningNavigation() {
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
-			navigate(`/screening-questions/${contextId}`, { state: location.state });
+			navigate(
+				mhicScreeningRouteMatch
+					? `/ic/mhic/orders/${mhicScreeningRouteMatch.params.patientOrderId}/assessment/${contextId}`
+					: `/screening-questions/${contextId}`,
+				{ state: location.state }
+			);
 		},
-		[location.state, navigate]
+		[mhicScreeningRouteMatch, location.state, navigate]
 	);
 
 	const navigateToNext = useCallback(
@@ -116,7 +125,15 @@ export function useScreeningNavigation() {
 	};
 }
 
-export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: boolean = true) {
+export function useScreeningFlow({
+	screeningFlowId,
+	patientOrderId,
+	instantiateOnLoad = true,
+}: {
+	screeningFlowId?: string;
+	patientOrderId?: string;
+	instantiateOnLoad?: boolean;
+}) {
 	const { isImmediateSession } = useAccount();
 	const [searchParams] = useSearchParams();
 	// For now - if not in "on load" mode, ignore the concept of "skipped"
@@ -139,25 +156,30 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
+	const createNewScreeningFlow = useCallback(() => {
+		return screeningService
+			.createScreeningSession({
+				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+				patientOrderId,
+			})
+			.fetch()
+			.then((sessionResponse) => {
+				navigateToNext(sessionResponse.screeningSession);
+			})
+			.catch((e) => {
+				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					handleError(e);
+				}
+			});
+	}, [activeFlowVersion?.screeningFlowVersionId, handleError, navigateToNext, patientOrderId]);
+
 	const startScreeningFlow = useCallback(() => {
 		if (incompleteSessions.length === 0) {
-			screeningService
-				.createScreeningSession({
-					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
-				})
-				.fetch()
-				.then((sessionResponse) => {
-					navigateToNext(sessionResponse.screeningSession);
-				})
-				.catch((e) => {
-					if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-						handleError(e);
-					}
-				});
+			return createNewScreeningFlow();
 		} else {
 			navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
 		}
-	}, [activeFlowVersion?.screeningFlowVersionId, handleError, incompleteSessions, navigateToNext]);
+	}, [createNewScreeningFlow, incompleteSessions, navigateToNext]);
 
 	useEffect(() => {
 		if (isImmediateSession || isSkipped) {
@@ -171,6 +193,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 
 		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
 			screeningFlowId,
+			patientOrderId,
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
 
@@ -192,9 +215,9 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [handleError, isImmediateSession, isSkipped, screeningFlowId]);
+	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
-	const checkAndStartScreeningFlow = useCallback(() => {
+	const checkAndStartScreeningFlow = useCallback(async () => {
 		if (!activeFlowVersion) {
 			return;
 		}
@@ -202,7 +225,7 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		if (!hasCompletedScreening && activeFlowVersion.phoneNumberRequired) {
 			setShowPhoneModal(true);
 		} else if (!hasCompletedScreening) {
-			startScreeningFlow();
+			return startScreeningFlow();
 		} else {
 			setDidCheckScreeningSessions(true);
 		}
@@ -260,5 +283,6 @@ export function useScreeningFlow(screeningFlowId?: string, instantiateOnLoad: bo
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
 		checkAndStartScreeningFlow,
+		createNewScreeningFlow,
 	};
 }

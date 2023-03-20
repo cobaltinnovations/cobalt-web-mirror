@@ -5,8 +5,7 @@ export const badge = (theme: CobaltTheme) => {
 		'.cobalt-badge': {
 			padding: '5px 10px',
 			...theme.fonts.uiSmall,
-			...theme.fonts.bodyBold,
-			textTransform: 'uppercase',
+			...theme.fonts.bodyNormal,
 			'&.bg-primary': {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.p500,
@@ -36,7 +35,7 @@ export const badge = (theme: CobaltTheme) => {
 				backgroundColor: theme.colors.n0,
 			},
 			'&.bg-outline-primary': {
-				color: theme.colors.p500,
+				color: theme.colors.n900,
 				backgroundColor: theme.colors.p50,
 				border: `1px solid ${theme.colors.p300}`,
 			},
@@ -46,12 +45,12 @@ export const badge = (theme: CobaltTheme) => {
 				border: `1px solid ${theme.colors.a300}`,
 			},
 			'&.bg-outline-success': {
-				color: theme.colors.s500,
+				color: theme.colors.n900,
 				backgroundColor: theme.colors.s50,
 				border: `1px solid ${theme.colors.s300}`,
 			},
 			'&.bg-outline-danger': {
-				color: theme.colors.d500,
+				color: theme.colors.n900,
 				backgroundColor: theme.colors.d50,
 				border: `1px solid ${theme.colors.d300}`,
 			},

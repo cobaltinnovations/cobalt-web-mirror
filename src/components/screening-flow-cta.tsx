@@ -25,7 +25,10 @@ interface Props {
 const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 	const classes = useStyles();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow(institution?.contentScreeningFlowId, false);
+	const { checkAndStartScreeningFlow } = useScreeningFlow({
+		screeningFlowId: institution?.contentScreeningFlowId,
+		instantiateOnLoad: false,
+	});
 
 	return (
 		<div className={classNames(classes.screeningFlowCta, className)}>

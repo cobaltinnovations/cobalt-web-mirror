@@ -1,25 +1,45 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
 import config from '@/lib/config';
-import { AccountModel, PatientOrderCountModel } from '@/lib/models';
+import { AccountModel, PatientOrderCountModel, PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import FileInputButton from '@/components/file-input-button';
-import { MhicGenerateOrdersModal, MhicNavigation } from '@/components/integrated-care/mhic';
+import {
+	MhicAssignOrderModal,
+	MhicGenerateOrdersModal,
+	MhicNavigation,
+	MhicPatientOrderTable,
+} from '@/components/integrated-care/mhic';
+
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
 const MhicOrders = () => {
-	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const handleError = useHandleError();
+	const navigate = useNavigate();
+	const { pathname } = useLocation();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const panelAccountId = useMemo(() => searchParams.get('panelAccountId'), [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const pageSize = useRef(15);
 
 	const [panelAccounts, setPanelAccounts] = useState<AccountModel[]>([]);
 	const [activePatientOrderCountsByPanelAccountId, setActivePatientOrderCountsByPanelAccountId] =
 		useState<Record<string, PatientOrderCountModel>>();
 	const [overallActivePatientOrdersCountDescription, setOverallActivePatientOrdersCountDescription] = useState('0');
-
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
+	const [tableIsLoading, setTableIsLoading] = useState(false);
+	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const [totalCountDescription, setTotalCountDescription] = useState('0');
+
+	const [selectAll, setSelectAll] = useState(false);
+	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
+	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
 	const fetchPanelAccounts = useCallback(async () => {
 		try {
@@ -35,12 +55,25 @@ const MhicOrders = () => {
 
 	const fetchPatientOrders = useCallback(async () => {
 		try {
-			const response = await integratedCareService.getPatientOrders({}).fetch();
-			console.log(response);
+			setTableIsLoading(true);
+
+			const response = await integratedCareService
+				.getPatientOrders({
+					...(panelAccountId && { panelAccountId }),
+					...(pageNumber && { pageNumber }),
+					pageSize: String(pageSize.current),
+				})
+				.fetch();
+
+			setPatientOrders(response.findResult.patientOrders);
+			setTotalCount(response.findResult.totalCount);
+			setTotalCountDescription(response.findResult.totalCountDescription);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setTableIsLoading(false);
 		}
-	}, [handleError]);
+	}, [handleError, pageNumber, panelAccountId]);
 
 	const handleImportPatientsInputChange = useCallback(
 		(file: File) => {
@@ -73,6 +106,26 @@ const MhicOrders = () => {
 		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
 	);
 
+	const handleAssignOrdersSave = useCallback(
+		async (patientOrderCount: number, panelAccountDisplayName: string) => {
+			try {
+				await Promise.all([fetchPanelAccounts(), fetchPatientOrders()]);
+
+				setSelectedPatientOrderIds([]);
+				setShowAssignOrderModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Patients assigned',
+					description: `${patientOrderCount} Patients were assigned to ${panelAccountDisplayName}`,
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, fetchPanelAccounts, fetchPatientOrders, handleError]
+	);
+
 	useEffect(() => {
 		fetchPatientOrders();
 	}, [fetchPatientOrders]);
@@ -80,6 +133,21 @@ const MhicOrders = () => {
 	useEffect(() => {
 		fetchPanelAccounts();
 	}, [fetchPanelAccounts]);
+
+	const clearSelections = useCallback(() => {
+		setSelectAll(false);
+		setSelectedPatientOrderIds([]);
+	}, []);
+
+	const handlePaginationClick = useCallback(
+		(pageIndex: number) => {
+			searchParams.set('pageNumber', String(pageIndex));
+			setSearchParams(searchParams);
+
+			clearSelections();
+		},
+		[clearSelections, searchParams, setSearchParams]
+	);
 
 	return (
 		<>
@@ -99,6 +167,16 @@ const MhicOrders = () => {
 				}}
 			/>
 
+			<MhicAssignOrderModal
+				patientOrderIds={selectedPatientOrderIds}
+				panelAccounts={panelAccounts}
+				show={showAssignOrderModal}
+				onHide={() => {
+					setShowAssignOrderModal(false);
+				}}
+				onSave={handleAssignOrdersSave}
+			/>
+
 			<MhicNavigation
 				navigationItems={[
 					{
@@ -106,15 +184,18 @@ const MhicOrders = () => {
 						description: overallActivePatientOrdersCountDescription,
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
-							return;
+							navigate('/ic/mhic/orders');
+							clearSelections();
 						},
+						isActive: !!matchPath('/ic/mhic/orders', pathname) && panelAccountId === null,
 					},
 					{
 						title: 'Unassigned',
 						description: '[TODO]',
 						icon: () => <DotIcon className="text-n300" />,
 						onClick: () => {
-							return;
+							window.alert('[TODO]: Unassigned query param?');
+							clearSelections();
 						},
 					},
 					...panelAccounts.map((panelAccount) => {
@@ -125,27 +206,77 @@ const MhicOrders = () => {
 									.activePatientOrderCountDescription,
 							icon: () => <DotIcon className="text-n300" />,
 							onClick: () => {
-								return;
+								navigate(`/ic/mhic/orders?panelAccountId=${panelAccount.accountId}`);
+								clearSelections();
 							},
+							isActive:
+								!!matchPath('/ic/mhic/orders', pathname) && panelAccountId === panelAccount.accountId,
 						};
 					}),
 				]}
 			>
-				<div className="py-6">
-					<FileInputButton className="d-inline-flex" accept=".csv" onChange={handleImportPatientsInputChange}>
-						Import Patients
-					</FileInputButton>
-					{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-						<Button
-							variant="outline-primary"
-							onClick={() => {
-								setShowGenerateOrdersModal(true);
-							}}
+				<div className="py-8 d-flex align-items-center justify-content-between">
+					<div className="d-flex align-items-end">
+						<h2 className="m-0">
+							Pending Orders{' '}
+							<span className="text-gray fs-large fw-normal">
+								{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
+							</span>
+						</h2>
+					</div>
+					<div>
+						{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+							<Button
+								className="me-4"
+								variant="outline-primary"
+								onClick={() => {
+									setShowGenerateOrdersModal(true);
+								}}
+							>
+								Generate
+							</Button>
+						)}
+						<FileInputButton
+							className="me-4 d-inline-flex"
+							accept=".csv"
+							onChange={handleImportPatientsInputChange}
 						>
-							Generate Patient Orders
+							Import
+						</FileInputButton>
+						<Button
+							onClick={() => {
+								setShowAssignOrderModal(true);
+							}}
+							disabled={selectedPatientOrderIds.length <= 0}
+						>
+							Assign Orders{' '}
+							{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
 						</Button>
-					)}
+					</div>
 				</div>
+				<MhicPatientOrderTable
+					isLoading={tableIsLoading}
+					patientOrders={patientOrders}
+					selectAll={selectAll}
+					onSelectAllChange={setSelectAll}
+					selectedPatientOrderIds={selectedPatientOrderIds}
+					onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
+					totalPatientOrdersCount={totalCount}
+					totalPatientOrdersDescription={totalCountDescription}
+					pageNumber={parseInt(pageNumber, 10)}
+					pageSize={pageSize.current}
+					onPaginationClick={handlePaginationClick}
+					columnConfig={{
+						checkbox: true,
+						flag: true,
+						patient: true,
+						referralDate: true,
+						practice: true,
+						referralReason: true,
+						outreachNumber: true,
+						episode: true,
+					}}
+				/>
 			</MhicNavigation>
 		</>
 	);

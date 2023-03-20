@@ -19,7 +19,7 @@ export function buildQueryParamUrl(url: string, queryParams?: Record<string, any
 				value.forEach((innerValue) => {
 					urlSearchParams.append(key, innerValue);
 				});
-			} else {
+			} else if (value !== undefined && value !== null) {
 				urlSearchParams.append(key, value);
 			}
 		});

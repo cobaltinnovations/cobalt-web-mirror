@@ -100,9 +100,9 @@ const ConnectWithSupport: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
-	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow(
-		institution?.providerTriageScreeningFlowId
-	);
+	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow({
+		screeningFlowId: institution?.providerTriageScreeningFlowId,
+	});
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const typeAheadRef = useRef<any>(null);
