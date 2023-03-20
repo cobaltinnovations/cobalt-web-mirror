@@ -10,7 +10,13 @@ import useFlags from '@/hooks/use-flags';
 
 import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
-import { MhicComments, MhicFollowUp, MhicContactHistory, MhicOrderDetails } from '@/components/integrated-care/mhic';
+import {
+	MhicComments,
+	MhicFollowUp,
+	MhicContactHistory,
+	MhicOrderDetails,
+	MhicAssessmentResults,
+} from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
@@ -108,6 +114,7 @@ interface MhicPatientOrderShelfProps {
 
 enum TAB_KEYS {
 	ORDER_DETAILS = 'ORDER_DETAILS',
+	ASSESSMENT_RESULTS = 'ASSESSMENT_RESULTS',
 	CONTACT_HISOTRY = 'CONTACT_HISOTRY',
 	FOLLOW_UP = 'FOLLOW_UP',
 	COMMENTS = 'COMMENTS',
@@ -200,6 +207,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										value={tabKey}
 										tabs={[
 											{ value: TAB_KEYS.ORDER_DETAILS, title: 'Order Details' },
+											{ value: TAB_KEYS.ASSESSMENT_RESULTS, title: 'Assessment Results' },
 											{ value: TAB_KEYS.CONTACT_HISOTRY, title: 'Contact History' },
 											{ value: TAB_KEYS.FOLLOW_UP, title: 'Follow Up' },
 											{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
@@ -216,6 +224,15 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
+											referenceData={referenceData}
+											onPatientOrderChange={setCurrentPatientOrder}
+										/>
+									)}
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.ASSESSMENT_RESULTS} className={classes.tabPane}>
+									{currentPatientOrder && referenceData && (
+										<MhicAssessmentResults
+											patientOrder={currentPatientOrder}
 											referenceData={referenceData}
 											onPatientOrderChange={setCurrentPatientOrder}
 										/>

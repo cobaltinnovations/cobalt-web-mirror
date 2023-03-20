@@ -7,7 +7,6 @@ import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResu
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import {
 	MhicAssessmentModal,
 	MhicChangeTriageModal,
@@ -20,9 +19,6 @@ import {
 import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
-import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -162,7 +158,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 
 			<section>
 				<Container fluid>
-					<Row>
+					<Row className="mb-6">
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
@@ -186,6 +182,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
+										<Row className="mb-4">
+											<Col>
+												<span className="text-danger">[TODO]: Order Flagged Alert</span>
+											</Col>
+										</Row>
 										<Row className="mb-4">
 											<Col xs={3}>
 												<p className="m-0 text-gray">Date Referred</p>
@@ -244,24 +245,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							</Card>
 						</Col>
 					</Row>
-				</Container>
-			</section>
-			<section>
-				<Container fluid>
-					<Row className="mb-6">
-						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<h4 className="mb-0">Assessment</h4>
-								<Button
-									onClick={() => {
-										navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-									}}
-								>
-									Start Assessment
-								</Button>
-							</div>
-						</Col>
-					</Row>
 					{!patientOrder.screeningSession && (
 						<Row>
 							<Col>
@@ -270,6 +253,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 									title="No Assessment"
 									description="There is no assessment for the patient's most recent referral order"
 									actions={[
+										{
+											variant: 'primary',
+											title: 'Start Assessment',
+											onClick: () => {
+												navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+											},
+										},
 										{
 											variant: 'outline-primary',
 											title: 'Schedule Assessment',
@@ -287,9 +277,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 									actions={[
 										{
 											variant: 'primary',
-											title: 'View Appointment',
+											title: 'Start Assessment',
 											onClick: () => {
-												window.alert('[TODO]: Link to appointment details?');
+												navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 											},
 										},
 										{
@@ -306,34 +296,55 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 						</Row>
 					)}
 					{patientOrder.screeningSessionResult && (
-						<>
-							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-								<Row key={triageGroupIndex} className="mb-6">
-									<Col>
-										<Card bsPrefix="ic-card">
-											<Card.Header>
-												<Card.Title>Triage</Card.Title>
-												<div className="button-container">
-													<Button
-														variant="light"
-														size="sm"
-														onClick={() => {
-															setShowChangeTriageModal(true);
-														}}
-													>
-														Change Triage
-													</Button>
-												</div>
-											</Card.Header>
-											<Card.Body>
+						<Row>
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Assessment Results</Card.Title>
+										<div className="button-container">
+											<Button
+												variant="light"
+												size="sm"
+												onClick={() => {
+													window.alert('[TODO]: Jump to Assessment Results tab.');
+												}}
+											>
+												View Full Results
+											</Button>
+										</div>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row className="mb-4">
+												<Col>
+													<p className="mb-0">
+														Completed{' '}
+														{patientOrder.screeningSession?.completedAtDescription} by{' '}
+														<strong>Ava Williams, MHIC</strong>
+													</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col>
+													<span className="text-danger">[TODO]: Safety Planning Alert</span>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<span className="text-danger">[TODO]: Resources Needed Alert</span>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+									{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
+										<>
+											<hr />
+											<Card.Body key={triageGroupIndex}>
 												<Container fluid>
 													<Row className="mb-4">
-														<Col xs={3}>
-															<p className="m-0 text-gray">Care Type</p>
-														</Col>
-														<Col xs={9}>
-															<p className="m-0">
-																{triageGroup.patientOrderCareTypeDescription}
+														<Col>
+															<p className="mb-0 fw-bold">
+																Triage: {triageGroup.patientOrderCareTypeDescription}
 															</p>
 														</Col>
 													</Row>
@@ -361,154 +372,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 													</Row>
 												</Container>
 											</Card.Body>
-										</Card>
-									</Col>
-								</Row>
-							))}
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Resources</Card.Title>
-											<div className="button-container">
-												<Button
-													variant="light"
-													size="sm"
-													onClick={() => {
-														window.alert('[TODO]: Modal for this.');
-													}}
-												>
-													Mark as Sent
-												</Button>
-											</div>
-										</Card.Header>
-										<Card.Body>
-											<Container fluid>
-												<Row>
-													<p className="mb-0">
-														<span className="text-danger">[TODO]: Some inline-alert</span>
-													</p>
-												</Row>
-											</Container>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Assessment Details</Card.Title>
-										</Card.Header>
-										<Card.Body>
-											<Container fluid>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Completed</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															{patientOrder.screeningSession?.completedAtDescription}
-														</p>
-													</Col>
-												</Row>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Completed By</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															<span className="text-danger">[TODO]</span>
-														</p>
-													</Col>
-												</Row>
-												<hr className="mb-4" />
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Conditions</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															<span className="text-danger">[TODO]</span>
-														</p>
-													</Col>
-												</Row>
-												<Row>
-													<Col xs={3}>
-														<p className="m-0 text-gray">Symptoms</p>
-													</Col>
-													<Col xs={9}>
-														<span className="text-danger">[TODO]</span>
-													</Col>
-												</Row>
-											</Container>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-							<Row>
-								<Col>
-									<Table>
-										<TableHead>
-											<TableRow>
-												<TableCell header colSpan={5}>
-													<span>Assessments</span>
-												</TableCell>
-											</TableRow>
-										</TableHead>
-										<TableBody>
-											{patientOrder.screeningSessionResult?.screeningSessionScreeningResults?.map(
-												(screening) => (
-													<TableRow key={screening.screeningId}>
-														<TableCell width={44} className="pe-0">
-															{(screening.belowScoringThreshold === undefined ||
-																screening.belowScoringThreshold === null) && (
-																<NaIcon className="text-gray" />
-															)}
-															{screening.belowScoringThreshold === false && (
-																<DissatisfiedIcon className="text-danger" />
-															)}
-															{screening.belowScoringThreshold === true && (
-																<SatisfiedIcon className="text-success" />
-															)}
-														</TableCell>
-														<TableCell>
-															<span className="fw-semibold">
-																{screening.screeningName}
-															</span>
-														</TableCell>
-														<TableCell width={72} className="pe-0">
-															<span className="text-gray">Score:</span>
-														</TableCell>
-														<TableCell width={32} className="px-0 text-right">
-															<span className="fw-bold">
-																{screening.screeningScore?.overallScore ?? (
-																	<span className="text-gray">N/A</span>
-																)}
-															</span>
-														</TableCell>
-														<TableCell width={84} className="text-center">
-															{screening.screeningScore?.overallScore !== undefined && (
-																<Button
-																	variant="link"
-																	size="sm"
-																	className="p-0 text-decoration-none fw-normal"
-																	onClick={() => {
-																		setScreeningSessionScreeningResult(screening);
-																	}}
-																>
-																	View
-																</Button>
-															)}
-														</TableCell>
-													</TableRow>
-												)
-											)}
-										</TableBody>
-									</Table>
-								</Col>
-							</Row>
-						</>
+										</>
+									))}
+								</Card>
+							</Col>
+						</Row>
 					)}
 				</Container>
 			</section>
