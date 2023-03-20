@@ -5,6 +5,7 @@ import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
+import HeaderV2 from '@/components/header-v2';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
@@ -200,7 +201,7 @@ const UnauthenticatedHeaderLayout = () => {
 const DefaultLayout = () => {
 	return (
 		<>
-			<Header />
+			<HeaderV2 />
 			<Outlet />
 		</>
 	);
