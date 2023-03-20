@@ -44,6 +44,12 @@ interface TimeZone {
 	description: string;
 }
 
+export interface ScreeningType {
+	description: string;
+	screeningTypeId: string;
+	overallScoreMaximum: 20;
+}
+
 export interface ReferenceDataResponse {
 	birthSexes: BirthSex[];
 	countries: Country[];
@@ -54,4 +60,5 @@ export interface ReferenceDataResponse {
 	races: Race[];
 	regionsByCountryCode: Record<string, Region[]>;
 	timeZones: TimeZone[];
+	screeningTypes: ScreeningType[];
 }

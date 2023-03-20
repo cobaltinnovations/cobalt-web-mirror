@@ -20,7 +20,6 @@ import {
 import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
@@ -83,6 +82,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 
 			<MhicAssessmentModal
 				show={!!screeningSessionScreeningResult}
+				screeningType={referenceData.screeningTypes.find(
+					(st) => st.screeningTypeId === screeningSessionScreeningResult?.screeningTypeId
+				)}
 				screeningSessionScreeningResult={screeningSessionScreeningResult}
 				onHide={() => {
 					setScreeningSessionScreeningResult(undefined);

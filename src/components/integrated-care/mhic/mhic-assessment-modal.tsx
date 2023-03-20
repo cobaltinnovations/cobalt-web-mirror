@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
-import { ScreeningSessionScreeningResult } from '@/lib/models';
+import { ScreeningSessionScreeningResult, ScreeningType } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -11,10 +11,11 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
+	screeningType?: ScreeningType;
 	screeningSessionScreeningResult?: ScreeningSessionScreeningResult;
 }
 
-export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult, ...props }) => {
+export const MhicAssessmentModal: FC<Props> = ({ screeningType, screeningSessionScreeningResult, ...props }) => {
 	const classes = useStyles();
 
 	return (
@@ -27,7 +28,7 @@ export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult
 					<h5 className="mb-0">Questions</h5>
 					<p className="mb-0">
 						Total Score: {screeningSessionScreeningResult?.screeningScore?.overallScore}/
-						<span className="text-danger">[TODO]</span>
+						{screeningType?.overallScoreMaximum}
 					</p>
 				</div>
 				<div className="border p-4">
@@ -44,10 +45,11 @@ export const MhicAssessmentModal: FC<Props> = ({ screeningSessionScreeningResult
 										className={classNames('d-flex', {
 											'border-bottom': !isLastQuestion,
 											'mb-4': !isLastQuestion,
+											'pb-4': !isLastQuestion,
 										})}
 									>
 										<div>{questionIndex + 1})</div>
-										<div className="ps-2 mb-4 flex-grow-1">
+										<div className="ps-2 flex-grow-1">
 											<p className="mb-2">{question.screeningQuestionText}</p>
 											{question.screeningAnswerResults?.map((answer, answerIndex) => {
 												const isLastAnswer =
