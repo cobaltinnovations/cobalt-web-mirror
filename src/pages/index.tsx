@@ -32,6 +32,7 @@ import {
 
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
+import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
@@ -130,6 +131,8 @@ const Index: FC = () => {
 	return (
 		<>
 			<HomeHero />
+
+			<PathwaysSection />
 
 			<AsyncPage fetchData={checkScreenFlowStatus}>
 				{showScreeningFlowCta && (
