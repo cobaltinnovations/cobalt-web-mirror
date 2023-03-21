@@ -31,6 +31,7 @@ export interface InstitutionFeature {
 	urlName: string;
 	name: string;
 	description: string;
+	navDescription: string;
 	recommended: boolean;
 }
 

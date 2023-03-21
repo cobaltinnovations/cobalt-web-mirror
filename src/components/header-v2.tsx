@@ -409,18 +409,20 @@ const HeaderV2 = () => {
 							active: (institution?.features ?? [])
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName, pathname)),
-							items: (institution?.features ?? []).map(({ featureId, name, description, urlName }) => ({
-								navigationItemId: featureId,
-								icon: (
-									<FeatureNavigationItemIcon
-										featureId={featureId}
-										svgProps={{ width: 24, height: 24 }}
-									/>
-								),
-								title: name,
-								description,
-								to: urlName,
-							})),
+							items: (institution?.features ?? []).map(
+								({ featureId, name, navDescription, urlName }) => ({
+									navigationItemId: featureId,
+									icon: (
+										<FeatureNavigationItemIcon
+											featureId={featureId}
+											svgProps={{ width: 24, height: 24 }}
+										/>
+									),
+									title: name,
+									description: navDescription,
+									to: urlName,
+								})
+							),
 						},
 				  ]
 				: []),
@@ -436,7 +438,7 @@ const HeaderV2 = () => {
 					{
 						testId: 'menuLinkResourceLibrary',
 						icon: <ResourceIcon />,
-						title: 'Resource Library',
+						title: 'Self-Help Resources',
 						description: 'Digital articles, podcasts, apps, videos, worksheets, and more',
 						to: '/resource-library',
 					},
