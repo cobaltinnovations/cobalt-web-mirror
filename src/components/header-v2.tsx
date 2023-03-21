@@ -1,6 +1,6 @@
-import React, { FC, useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
-import { Button, Dropdown } from 'react-bootstrap';
+import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
@@ -40,9 +40,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		right: 0,
 		zIndex: 4,
 		height: 56,
-		position: 'fixed',
 		display: 'flex',
 		padding: '0 40px',
+		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
@@ -181,42 +181,67 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		right: 0,
 		bottom: 0,
 		zIndex: 4,
+		padding: 16,
 		position: 'fixed',
-		overflow: 'hidden',
+		overflowY: 'auto',
 		backgroundColor: theme.colors.n0,
+		'& ul': {
+			padding: 0,
+			margin: '0 auto',
+			listStyle: 'none',
+		},
+		'& a, & button': {
+			padding: 12,
+			borderRadius: 4,
+			display: 'block',
+			textDecoration: 'none',
+			...theme.fonts.default,
+			color: theme.colors.n900,
+			'&:hover, &:focus': {
+				backgroundColor: theme.colors.n50,
+			},
+			'&:active': {
+				backgroundColor: theme.colors.n75,
+			},
+			'& svg': {
+				flexShrink: 0,
+				color: theme.colors.p300,
+			},
+			'& p': {
+				whiteSpace: 'initial',
+			},
+		},
+		'& button': {
+			width: '100%',
+			textAlign: 'left',
+		},
+		'& .collapse-inner': {
+			padding: 16,
+			borderRadius: 8,
+			border: `1px solid ${theme.colors.n100}`,
+		},
+		'& hr': {
+			margin: '16px 0',
+		},
 	},
 	'@global': {
 		'.menu-animation-enter': {
 			opacity: 0,
-			transform: 'translateY(-200px)',
+			transform: 'scale(1.1)',
 		},
 		'.menu-animation-enter-active': {
 			opacity: 1,
-			transform: 'translateY(0)',
+			transform: 'scale(1)',
 			transition: 'opacity 200ms, transform 200ms',
 		},
 		'.menu-animation-exit': {
 			opacity: 1,
-			transform: 'translateY(0)',
+			transform: 'scale(1)',
 		},
 		'.menu-animation-exit-active': {
 			opacity: 0,
-			transform: 'translateY(-200px)',
+			transform: 'scale(1.1)',
 			transition: 'opacity 200ms, transform 200ms',
-		},
-		'.overlay-animation-enter': {
-			opacity: 0,
-		},
-		'.overlay-animation-enter-active': {
-			opacity: 1,
-			transition: 'opacity 200ms',
-		},
-		'.overlay-animation-exit': {
-			opacity: 1,
-		},
-		'.overlay-animation-exit-active': {
-			opacity: 0,
-			transition: 'opacity 200ms',
 		},
 	},
 }));
@@ -238,11 +263,7 @@ const AdditionalNavigationItemIcon = ({
 	}
 };
 
-interface HeaderProps {
-	showHeaderButtons?: boolean;
-}
-
-const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
+const HeaderV2 = () => {
 	const { pathname } = useLocation();
 	const classes = useHeaderV2Styles();
 	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
@@ -282,8 +303,16 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 		setBodyPadding();
 	}, [account]);
 
+	/* ----------------------------------------------------------- */
+	/* Disable scrolling when menu is open */
+	/* ----------------------------------------------------------- */
 	useEffect(() => {
-		document.body.classList.toggle('header-menu-open', !!menuOpen);
+		if (menuOpen) {
+			document.body.style.overflow = 'hidden';
+			return;
+		}
+
+		document.body.style.overflow = 'visible';
 	}, [menuOpen]);
 
 	/* ----------------------------------------------------------- */
@@ -488,7 +517,73 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	return (
 		<>
 			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
-				<div className={classes.mobileNav}></div>
+				<div className={classNames('d-lg-none', classes.mobileNav)}>
+					<ul>
+						{navigationConfig.map((navigationItem) => (
+							<li key={navigationItem.navigationItemId}>
+								{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
+								{navigationItem.items && (
+									<>
+										<Button variant="light">{navigationItem.title}</Button>
+										<Collapse in={true}>
+											<div className="collapse-inner">
+												{navigationItem.items.map((item, itemIndex) => (
+													<Link key={itemIndex} to={item.to}>
+														<div
+															className={classNames('d-flex', {
+																'align-items-center': !item.description,
+															})}
+														>
+															{item.icon}
+															<div className="ps-4">
+																<p className="mb-0 fw-semibold">{item.title}</p>
+																{item.description && (
+																	<p className="mb-0 text-gray">{item.description}</p>
+																)}
+															</div>
+														</div>
+													</Link>
+												))}
+											</div>
+										</Collapse>
+									</>
+								)}
+							</li>
+						))}
+						<li>
+							<Button variant="light">My Account</Button>
+							<Collapse in={true}>
+								<div className="collapse-inner">
+									{accountNavigationConfig.map((item, itemIndex) => (
+										<Link key={itemIndex} to={item.to}>
+											<div className="d-flex align-items-center">
+												<item.icon className="text-p300" />
+												<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
+											</div>
+										</Link>
+									))}
+									{adminNavigationConfig.length > 0 && (
+										<>
+											<hr />
+											{adminNavigationConfig.map((item, itemIndex) => (
+												<Link key={itemIndex} to={item.to}>
+													<div className="d-flex justify-content-between align-items-center">
+														<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+														<item.icon className="text-gray" />
+													</div>
+												</Link>
+											))}
+										</>
+									)}
+									<hr />
+									<Button variant="light" onClick={signOutAndClearContext}>
+										Log Out
+									</Button>
+								</div>
+							</Collapse>
+						</li>
+					</ul>
+				</div>
 			</CSSTransition>
 
 			<header ref={header} className={classes.header}>
@@ -563,8 +658,8 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 							className={classes.accountDropdown}
 						>
 							<p className="fw-bold text-gray">{account?.displayName}</p>
-							{accountNavigationConfig.map((item) => (
-								<Dropdown.Item as={Link} to={item.to}>
+							{accountNavigationConfig.map((item, itemIndex) => (
+								<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
 									<div className="d-flex align-items-center">
 										<item.icon className="text-p300" />
 										<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
@@ -574,8 +669,8 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 							{adminNavigationConfig.length > 0 && (
 								<>
 									<Dropdown.Divider />
-									{adminNavigationConfig.map((item) => (
-										<Dropdown.Item as={Link} to={item.to}>
+									{adminNavigationConfig.map((item, itemIndex) => (
+										<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
 											<div className="d-flex justify-content-between align-items-center">
 												<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
 												<item.icon className="text-gray" />
