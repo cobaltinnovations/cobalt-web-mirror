@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
@@ -19,7 +19,6 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
 import { ReactComponent as MedicationIcon } from '@/assets/icons/icon-medication.svg';
 import { ReactComponent as CoachingIcon } from '@/assets/icons/icon-coaching.svg';
@@ -218,6 +217,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		'& .collapse-inner': {
 			padding: 16,
 			borderRadius: 8,
+			margin: '12px 0',
 			border: `1px solid ${theme.colors.n100}`,
 		},
 		'& hr': {
@@ -261,6 +261,30 @@ const AdditionalNavigationItemIcon = ({
 		default:
 			return <AdminIcon {...svgProps} />;
 	}
+};
+
+const MobileAccordianItem = ({ toggleElement, children }: PropsWithChildren<{ toggleElement: JSX.Element }>) => {
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	return (
+		<>
+			<Button
+				variant="light"
+				className="d-flex justify-content-between align-items-center"
+				onClick={() => {
+					setIsExpanded(!isExpanded);
+				}}
+			>
+				{toggleElement}
+				<DownChevron className="text-n300" />
+			</Button>
+			<Collapse in={isExpanded}>
+				<div>
+					<div className="collapse-inner">{children}</div>
+				</div>
+			</Collapse>
+		</>
+	);
 };
 
 const HeaderV2 = () => {
@@ -314,6 +338,19 @@ const HeaderV2 = () => {
 
 		document.body.style.overflow = 'visible';
 	}, [menuOpen]);
+
+	/* ----------------------------------------------------------- */
+	/* Close menu if pathname changes */
+	/* ----------------------------------------------------------- */
+	useEffect(() => {
+		setMenuOpen((previousValue) => {
+			if (previousValue) {
+				return false;
+			}
+
+			return previousValue;
+		});
+	}, [pathname]);
 
 	/* ----------------------------------------------------------- */
 	/* Button handlers */
@@ -523,64 +560,67 @@ const HeaderV2 = () => {
 							<li key={navigationItem.navigationItemId}>
 								{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
 								{navigationItem.items && (
-									<>
-										<Button variant="light">{navigationItem.title}</Button>
-										<Collapse in={true}>
-											<div className="collapse-inner">
-												{navigationItem.items.map((item, itemIndex) => (
-													<Link key={itemIndex} to={item.to}>
-														<div
-															className={classNames('d-flex', {
-																'align-items-center': !item.description,
-															})}
-														>
-															{item.icon}
-															<div className="ps-4">
-																<p className="mb-0 fw-semibold">{item.title}</p>
-																{item.description && (
-																	<p className="mb-0 text-gray">{item.description}</p>
-																)}
-															</div>
-														</div>
-													</Link>
-												))}
-											</div>
-										</Collapse>
-									</>
+									<MobileAccordianItem toggleElement={<span>{navigationItem.title}</span>}>
+										{(navigationItem.items ?? []).map((item, itemIndex) => (
+											<Link key={itemIndex} to={item.to ?? '/#'}>
+												<div
+													className={classNames('d-flex', {
+														'align-items-center': !item.description,
+													})}
+												>
+													{item.icon}
+													<div className="ps-4">
+														<p className="mb-0 fw-semibold">{item.title}</p>
+														{item.description && (
+															<p className="mb-0 text-gray">{item.description}</p>
+														)}
+													</div>
+												</div>
+											</Link>
+										))}
+									</MobileAccordianItem>
 								)}
 							</li>
 						))}
 						<li>
-							<Button variant="light">My Account</Button>
-							<Collapse in={true}>
-								<div className="collapse-inner">
-									{accountNavigationConfig.map((item, itemIndex) => (
-										<Link key={itemIndex} to={item.to}>
-											<div className="d-flex align-items-center">
-												<item.icon className="text-p300" />
-												<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
-											</div>
-										</Link>
-									))}
-									{adminNavigationConfig.length > 0 && (
-										<>
-											<hr />
-											{adminNavigationConfig.map((item, itemIndex) => (
-												<Link key={itemIndex} to={item.to}>
-													<div className="d-flex justify-content-between align-items-center">
-														<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-														<item.icon className="text-gray" />
-													</div>
-												</Link>
-											))}
-										</>
-									)}
-									<hr />
-									<Button variant="light" onClick={signOutAndClearContext}>
-										Log Out
-									</Button>
-								</div>
-							</Collapse>
+							<MobileAccordianItem
+								toggleElement={
+									<div className="d-flex align-items-center">
+										<AvatarIcon width={20} height={20} />
+										<span className="ms-4">My Account</span>
+									</div>
+								}
+							>
+								{accountNavigationConfig.map((item, itemIndex) => (
+									<Link key={itemIndex} to={item.to}>
+										<div className="d-flex align-items-center">
+											<item.icon className="text-p300" />
+											<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
+										</div>
+									</Link>
+								))}
+								{adminNavigationConfig.length > 0 && (
+									<>
+										<hr />
+										{adminNavigationConfig.map((item, itemIndex) => (
+											<Link key={itemIndex} to={item.to}>
+												<div className="d-flex justify-content-between align-items-center">
+													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+													<item.icon className="text-gray" />
+												</div>
+											</Link>
+										))}
+									</>
+								)}
+								<hr />
+								<Button
+									variant="light"
+									className="fw-semibold text-gray"
+									onClick={signOutAndClearContext}
+								>
+									Log Out
+								</Button>
+							</MobileAccordianItem>
 						</li>
 					</ul>
 				</div>
