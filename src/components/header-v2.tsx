@@ -32,6 +32,7 @@ import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	header: {
@@ -312,6 +313,31 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	);
 
 	/* ----------------------------------------------------------- */
+	/* Account navigation Config */
+	/* ----------------------------------------------------------- */
+	const accountNavigationConfig = useMemo(
+		() => [
+			...(institution?.requireConsentForm
+				? [
+						{
+							testId: 'menuLinkPofile',
+							icon: AdminIcon,
+							title: 'Profile',
+							to: '/user-settings',
+						},
+				  ]
+				: []),
+			{
+				testId: 'menuLinkEvents',
+				icon: EventIcon,
+				title: 'My Events',
+				to: '/my-calendar',
+			},
+		],
+		[institution?.requireConsentForm]
+	);
+
+	/* ----------------------------------------------------------- */
 	/* Admin navigation Config */
 	/* ----------------------------------------------------------- */
 	const adminNavigationConfig = useMemo(
@@ -320,7 +346,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				? [
 						{
 							testId: 'menuLinkScheduling',
-							icon: <AdminIcon />,
+							icon: ExternalIcon,
 							title: 'Patient Scheduling',
 							to: '/scheduling',
 						},
@@ -330,7 +356,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				? [
 						{
 							testId: 'menuLinkAdminMyContent',
-							icon: <AdminIcon />,
+							icon: ExternalIcon,
 							title: 'My Content',
 							to: '/cms/on-your-time',
 						},
@@ -340,7 +366,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				? [
 						{
 							testId: 'menuLinkAdminAvailableContent',
-							icon: <AdminIcon />,
+							icon: ExternalIcon,
 							title: 'Available Content',
 							to: '/cms/available-content',
 						},
@@ -350,7 +376,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				? [
 						{
 							testId: 'menuLinkAdminScheduledGroupSessions',
-							icon: <AdminIcon />,
+							icon: ExternalIcon,
 							title: 'Scheduled',
 							to: '/group-sessions/scheduled',
 						},
@@ -360,7 +386,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 				? [
 						{
 							testId: 'menuLinkAdminReports',
-							icon: <AdminIcon />,
+							icon: ExternalIcon,
 							title: 'Provider Reports',
 							to: '/admin/reports',
 						},
@@ -452,21 +478,27 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 							className={classes.accountDropdown}
 						>
 							<p className="fw-bold text-gray">{account?.displayName}</p>
-							<Dropdown.Item as={Link} to="/my-calendar">
-								<div className="d-flex align-items-center">
-									<EventIcon />
-									<p className="mb-0 ps-4 fw-semibold">My Events</p>
-								</div>
-							</Dropdown.Item>
-							<Dropdown.Divider />
-							{adminNavigationConfig.map((adminNavItem) => (
-								<Dropdown.Item as={Link} to={adminNavItem.to}>
+							{accountNavigationConfig.map((item) => (
+								<Dropdown.Item as={Link} to={item.to}>
 									<div className="d-flex align-items-center">
-										{adminNavItem.icon}
-										<p className="mb-0 ps-4 fw-semibold">{adminNavItem.title}</p>
+										<item.icon className="text-p300" />
+										<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
 									</div>
 								</Dropdown.Item>
 							))}
+							{adminNavigationConfig.length > 0 && (
+								<>
+									<Dropdown.Divider />
+									{adminNavigationConfig.map((item) => (
+										<Dropdown.Item as={Link} to={item.to}>
+											<div className="d-flex justify-content-between align-items-center">
+												<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+												<item.icon className="text-gray" />
+											</div>
+										</Dropdown.Item>
+									))}
+								</>
+							)}
 							<Dropdown.Divider />
 							<Dropdown.Item onClick={signOutAndClearContext}>
 								<p className="mb-0 text-gray">Log Out</p>
