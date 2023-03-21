@@ -1,13 +1,13 @@
 import React, { FC, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link, matchPath, useLocation } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
+import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import Menu from '@/components/menu';
 
 import { exploreLinks } from '@/menu-links';
 
@@ -19,7 +19,6 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
 import { ReactComponent as MedicationIcon } from '@/assets/icons/icon-medication.svg';
@@ -56,6 +55,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			'& p': {
 				whiteSpace: 'initial',
 			},
+		},
+		[mediaQueries.lg]: {
+			padding: '0 20px',
 		},
 	},
 	desktopNav: {
@@ -124,9 +126,98 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 				},
 			},
 		},
+		[mediaQueries.lg]: {
+			display: 'none',
+		},
 	},
 	accountDropdown: {
 		width: 280,
+	},
+	menuButton: {
+		width: 44,
+		height: 44,
+		padding: 0,
+		alignItems: 'center',
+		justifyContent: 'center',
+		'& span': {
+			width: 15,
+			height: 2,
+			flexShrink: 0,
+			borderRadius: 1,
+			position: 'relative',
+			backgroundColor: theme.colors.p500,
+			transition: 'background-color 200ms',
+			'&:before, &:after': {
+				top: 0,
+				left: 0,
+				right: 0,
+				bottom: 0,
+				content: '""',
+				borderRadius: 1,
+				position: 'absolute',
+				transition: 'transform 200ms',
+				backgroundColor: theme.colors.p500,
+			},
+			'&:before': {
+				transform: 'translateY(-4px)',
+			},
+			'&:after': {
+				transform: 'translateY(4px)',
+			},
+		},
+		'&.active span': {
+			backgroundColor: 'transparent',
+			'&:before': {
+				transform: 'translateY(0) rotate(45deg)',
+			},
+			'&:after': {
+				transform: 'translateY(0) rotate(-45deg)',
+			},
+		},
+	},
+	mobileNav: {
+		top: 56,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 4,
+		position: 'fixed',
+		overflow: 'hidden',
+		backgroundColor: theme.colors.n0,
+	},
+	'@global': {
+		'.menu-animation-enter': {
+			opacity: 0,
+			transform: 'translateY(-200px)',
+		},
+		'.menu-animation-enter-active': {
+			opacity: 1,
+			transform: 'translateY(0)',
+			transition: 'opacity 200ms, transform 200ms',
+		},
+		'.menu-animation-exit': {
+			opacity: 1,
+			transform: 'translateY(0)',
+		},
+		'.menu-animation-exit-active': {
+			opacity: 0,
+			transform: 'translateY(-200px)',
+			transition: 'opacity 200ms, transform 200ms',
+		},
+		'.overlay-animation-enter': {
+			opacity: 0,
+		},
+		'.overlay-animation-enter-active': {
+			opacity: 1,
+			transition: 'opacity 200ms',
+		},
+		'.overlay-animation-exit': {
+			opacity: 1,
+		},
+		'.overlay-animation-exit-active': {
+			opacity: 0,
+			transition: 'opacity 200ms',
+		},
 	},
 }));
 
@@ -198,17 +289,9 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	/* ----------------------------------------------------------- */
 	/* Button handlers */
 	/* ----------------------------------------------------------- */
-	function handleMenuButtonClick() {
-		setMenuOpen(true);
-	}
-
 	function handleInCrisisButtonClick() {
 		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
 		openInCrisisModal();
-	}
-
-	function handleMenuHide() {
-		setMenuOpen(false);
 	}
 
 	/* ----------------------------------------------------------- */
@@ -404,7 +487,9 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 
 	return (
 		<>
-			<Menu open={menuOpen} onHide={handleMenuHide} />
+			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
+				<div className={classes.mobileNav}></div>
+			</CSSTransition>
 
 			<header ref={header} className={classes.header}>
 				<div className="h-100 d-flex align-items-center justify-content-between">
@@ -460,7 +545,7 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 						</ul>
 					</nav>
 				</div>
-				<div className="d-flex align-items-center justify-content-between">
+				<div className="d-none d-lg-flex align-items-center justify-content-between">
 					<Button className="py-1 d-flex align-items-center" size="sm" onClick={handleInCrisisButtonClick}>
 						<PhoneIcon className="me-1" />
 						<small className="fw-bold">In Crisis?</small>
@@ -506,6 +591,18 @@ const HeaderV2: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 						</Dropdown.Menu>
 					</Dropdown>
 				</div>
+				<Button
+					variant="light"
+					data-testid="headerNavMenuButton"
+					className={classNames('d-flex d-lg-none', classes.menuButton, {
+						active: menuOpen,
+					})}
+					onClick={() => {
+						setMenuOpen(!menuOpen);
+					}}
+				>
+					<span />
+				</Button>
 			</header>
 		</>
 	);
