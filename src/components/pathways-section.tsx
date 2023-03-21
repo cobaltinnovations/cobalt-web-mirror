@@ -4,6 +4,7 @@ import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
+import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
@@ -44,6 +45,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '32px 24px',
 		position: 'relative',
 		textDecoration: 'none',
+		transition: '0.2s transform, 0.2s box-shadow',
 		color: theme.colors.n900,
 		backgroundColor: theme.colors.n75,
 		border: `1px solid ${theme.colors.n100}`,
@@ -80,6 +82,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 		},
+		'&:hover': {
+			color: 'inherit',
+			transform: 'translateY(-16px)',
+			boxShadow: theme.elevation.e400,
+		},
 		[mediaQueries.lg]: {
 			display: 'flex',
 			padding: '16px 20px',
@@ -111,6 +118,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 			padding: 0,
 			marginRight: 20,
 			marginBottom: 0,
+		},
+	},
+	icon: {
+		width: 56,
+		height: 56,
+		top: '50%',
+		left: '50%',
+		position: 'absolute',
+		color: theme.colors.p300,
+		transform: 'translate(-50%, -50%)',
+		[mediaQueries.lg]: {
+			width: 24,
+			height: 24,
 		},
 	},
 	recommended: {
@@ -154,7 +174,9 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 										recommended: featureIndex % 2 === 0,
 									})}
 								>
-									<div className={classes.iconOuter}></div>
+									<div className={classes.iconOuter}>
+										<PathwaysIcon className={classes.icon} featureId={feature.featureId} />
+									</div>
 									<h5 className="text-center">{feature.name}</h5>
 									{featureIndex % 2 === 0 && <div className={classes.recommended}>Recommended</div>}
 								</Link>

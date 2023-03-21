@@ -8,6 +8,7 @@ import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import PathwaysIcon from '@/components/pathways-icons';
 
 import { exploreLinks } from '@/menu-links';
 
@@ -19,12 +20,6 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
-import { ReactComponent as MedicationIcon } from '@/assets/icons/icon-medication.svg';
-import { ReactComponent as CoachingIcon } from '@/assets/icons/icon-coaching.svg';
-import { ReactComponent as SpiritualIcon } from '@/assets/icons/icon-spiritual.svg';
-import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
-import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
@@ -246,35 +241,6 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const FeatureNavigationItemIcon = ({
-	featureId,
-	svgProps,
-}: {
-	featureId: string;
-	svgProps?: React.SVGProps<SVGSVGElement> & {
-		title?: string | undefined;
-	};
-}) => {
-	switch (featureId) {
-		case 'THERAPY':
-			return <TherapyIcon {...svgProps} />;
-		case 'MEDICATION_SUBSCRIBER':
-			return <MedicationIcon {...svgProps} />;
-		case 'GROUP_SESSIONS':
-			return <GroupIcon {...svgProps} />;
-		case 'COACHING':
-			return <CoachingIcon {...svgProps} />;
-		case 'SELF_HELP_RESOURCES':
-			return <ResourceIcon {...svgProps} />;
-		case 'SPIRITUAL_SUPPORT':
-			return <SpiritualIcon {...svgProps} />;
-		case 'CRISIS_SUPPORT':
-			return <CrisisIcon {...svgProps} />;
-		default:
-			return <AdminIcon {...svgProps} />;
-	}
-};
-
 const AdditionalNavigationItemIcon = ({
 	iconName,
 	svgProps,
@@ -412,12 +378,7 @@ const HeaderV2 = () => {
 							items: (institution?.features ?? []).map(
 								({ featureId, name, navDescription, urlName }) => ({
 									navigationItemId: featureId,
-									icon: (
-										<FeatureNavigationItemIcon
-											featureId={featureId}
-											svgProps={{ width: 24, height: 24 }}
-										/>
-									),
+									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
 									title: name,
 									description: navDescription,
 									to: urlName,
