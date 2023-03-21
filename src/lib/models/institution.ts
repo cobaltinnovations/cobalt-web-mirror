@@ -22,6 +22,16 @@ export interface Institution {
 	supportEnabled: boolean;
 	recommendedContentEnabled: boolean;
 	groupSessionRequestsEnabled: boolean;
+	features: InstitutionFeature[];
+	displayFeatures: boolean;
+}
+
+export interface InstitutionFeature {
+	featureId: string;
+	urlName: string;
+	name: string;
+	description: string;
+	recommended: boolean;
 }
 
 export interface AdditionalNavigationItem {

@@ -246,6 +246,35 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const FeatureNavigationItemIcon = ({
+	featureId,
+	svgProps,
+}: {
+	featureId: string;
+	svgProps?: React.SVGProps<SVGSVGElement> & {
+		title?: string | undefined;
+	};
+}) => {
+	switch (featureId) {
+		case 'THERAPY':
+			return <TherapyIcon {...svgProps} />;
+		case 'MEDICATION_SUBSCRIBER':
+			return <MedicationIcon {...svgProps} />;
+		case 'GROUP_SESSIONS':
+			return <GroupIcon {...svgProps} />;
+		case 'COACHING':
+			return <CoachingIcon {...svgProps} />;
+		case 'SELF_HELP_RESOURCES':
+			return <ResourceIcon {...svgProps} />;
+		case 'SPIRITUAL_SUPPORT':
+			return <SpiritualIcon {...svgProps} />;
+		case 'CRISIS_SUPPORT':
+			return <CrisisIcon {...svgProps} />;
+		default:
+			return <AdminIcon {...svgProps} />;
+	}
+};
+
 const AdditionalNavigationItemIcon = ({
 	iconName,
 	svgProps,
@@ -372,67 +401,37 @@ const HeaderV2 = () => {
 				to: '/',
 				active: matchPath('/', pathname),
 			},
-			{
-				navigationItemId: 'CONNECT_WITH_SUPPORT',
-				title: 'Connect with Support',
-				active: ['/connect-with-support', '/in-crisis', '/group-sessions'].some((path) =>
-					matchPath(path, pathname)
-				),
-				items: [
-					...(institution?.supportEnabled
-						? [
-								{
-									icon: <TherapyIcon />,
-									title: 'Therapy',
-									description:
-										'Connect to a therapist through your Employee Assistance Program or TEAM Clinic',
-									to: '/connect-with-support?supportRoleId=CLINICIAN',
-								},
-								{
-									icon: <MedicationIcon />,
-									title: 'Medication Prescribers',
-									description: 'Discuss medication prescription options through the TEAM Clinic',
-									to: '/connect-with-support',
-								},
-								{
-									icon: <CoachingIcon />,
-									title: 'Coaching',
-									description: 'Get 1:1 confidential emotional support from trained volunteers',
-									to: '/connect-with-support?supportRoleId=PSYCHIATRIST',
-								},
-								{
-									icon: <SpiritualIcon />,
-									title: 'Spiritual Support',
-									description:
-										'Receive confidential, non-judgmental support from multi-faith chaplains',
-									to: '/connect-with-support?supportRoleId=CHAPLAIN',
-								},
-						  ]
-						: []),
-					{
-						testId: 'menuLinkCrisisResources',
-						icon: <CrisisIcon />,
-						title: 'Crisis Support',
-						description: 'Get contact information for immediate help',
-						to: '/in-crisis',
-					},
-					{
-						testId: 'menuLinkGroupSessions',
-						icon: <GroupIcon />,
-						title: 'Group Sessions',
-						description: 'Register for topical group sessions led by experts',
-						to: '/group-sessions',
-					},
-				],
-			},
+			...(institution?.displayFeatures
+				? [
+						{
+							navigationItemId: 'CONNECT_WITH_SUPPORT',
+							title: 'Connect with Support',
+							active: (institution?.features ?? [])
+								.map(({ urlName }) => urlName)
+								.some((urlName) => matchPath(urlName, pathname)),
+							items: (institution?.features ?? []).map(({ featureId, name, description, urlName }) => ({
+								navigationItemId: featureId,
+								icon: (
+									<FeatureNavigationItemIcon
+										featureId={featureId}
+										svgProps={{ width: 24, height: 24 }}
+									/>
+								),
+								title: name,
+								description,
+								to: urlName,
+							})),
+						},
+				  ]
+				: []),
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
 				title: 'Browse Resources',
 				active: [
 					'/resource-library',
-					...(institution?.additionalNavigationItems ?? []).map((i) => i.url),
-					...exploreLinks.map((i) => i.to()),
-				].some((path) => matchPath(path, pathname)),
+					...(institution?.additionalNavigationItems ?? []).map(({ url }) => url),
+					...exploreLinks.map(({ to }) => to()),
+				].some((to) => matchPath(to, pathname)),
 				items: [
 					{
 						testId: 'menuLinkResourceLibrary',
@@ -458,7 +457,7 @@ const HeaderV2 = () => {
 				],
 			},
 		],
-		[institution?.additionalNavigationItems, institution?.supportEnabled, pathname]
+		[institution?.additionalNavigationItems, institution?.displayFeatures, institution?.features, pathname]
 	);
 
 	/* ----------------------------------------------------------- */

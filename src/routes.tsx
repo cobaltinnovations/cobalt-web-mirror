@@ -199,9 +199,11 @@ const UnauthenticatedHeaderLayout = () => {
 };
 
 const DefaultLayout = () => {
+	const { institution } = useAccount();
+
 	return (
 		<>
-			<HeaderV2 />
+			{institution?.displayFeatures ? <HeaderV2 /> : <Header />}
 			<Outlet />
 		</>
 	);
