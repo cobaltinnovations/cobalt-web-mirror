@@ -375,7 +375,7 @@ export const AppRoutes: AppRoutesConfig[] = [
 				main: ConnectWithSupport,
 			},
 			{
-				path: '/connect-with-support/:supportRoleId',
+				path: '/connect-with-support/:urlName',
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
 				main: ConnectWithSupportV2,

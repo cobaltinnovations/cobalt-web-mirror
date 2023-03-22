@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'react-bootstrap';
+
+import { providerService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
+import AsyncWrapper from '@/components/async-page';
 
 const ConnectWithSupportV2 = () => {
+	const { urlName } = useParams<{ urlName: string }>();
+	const { institution } = useAccount();
+
+	const featureDetails = useMemo(() => {
+		return (institution?.features ?? []).find((feature) => {
+			return feature.urlName.split('/')[1] === urlName;
+		});
+	}, [institution?.features, urlName]);
+
+	const fetchProviders = useCallback(async () => {
+		if (!institution) {
+			return;
+		}
+
+		const response = await providerService
+			.fetchFindOptions({
+				institutionId: institution?.institutionId,
+			})
+			.fetch();
+
+		console.log(response);
+	}, [institution]);
+
 	return (
-		<HeroContainer className="bg-n75">
-			<h1 className="mb-4 text-center">Feature Name</h1>
-			<p className="mb-0 text-center fs-large">Feature description</p>
-		</HeroContainer>
+		<>
+			<HeroContainer className="bg-n75">
+				<h1 className="mb-4 text-center">{featureDetails?.name}</h1>
+				<p className="mb-0 text-center fs-large">{featureDetails?.description}</p>
+			</HeroContainer>
+			<AsyncWrapper fetchData={fetchProviders}>
+				<Container>
+					<Row>
+						<Col>
+							<p>TODO: Provider List</p>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncWrapper>
+		</>
 	);
 };
 
