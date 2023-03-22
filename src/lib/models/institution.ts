@@ -24,6 +24,7 @@ export interface Institution {
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
 	displayFeatures: boolean;
+	takeTriageScreening: boolean;
 }
 
 export interface InstitutionFeature {

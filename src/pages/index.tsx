@@ -71,6 +71,7 @@ const Index: FC = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
+	const [showRetakeCta, setShowRetakeCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
 	const checkScreenFlowStatus = useCallback(async () => {
@@ -85,13 +86,17 @@ const Index: FC = () => {
 
 			if (sessionFullyCompleted) {
 				setShowScreeningFlowCta(false);
+
+				if (institution?.takeTriageScreening) {
+					setShowRetakeCta(true);
+				}
 			} else {
 				setShowScreeningFlowCta(true);
 			}
 		} catch (error) {
 			// dont throw
 		}
-	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled]);
+	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled, institution?.takeTriageScreening]);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) return;
@@ -140,7 +145,7 @@ const Index: FC = () => {
 							</Col>
 						</Row>
 					</Container>
-					<PathwaysSection />
+					<PathwaysSection showRetakeCta={showRetakeCta} />
 				</>
 			) : (
 				<HomeHero />

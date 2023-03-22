@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
@@ -154,13 +155,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface PathwaysSectionProps {
+	showRetakeCta: boolean;
 	className?: string;
 }
 
-const PathwaysSection = ({ className }: PathwaysSectionProps) => {
+const PathwaysSection = ({ showRetakeCta, className }: PathwaysSectionProps) => {
 	const { institution } = useAccount();
 	const classes = useStyles({
 		count: (institution?.features ?? []).length,
+	});
+
+	const { checkAndStartScreeningFlow } = useScreeningFlow({
+		screeningFlowId: institution?.contentScreeningFlowId,
+		instantiateOnLoad: false,
 	});
 
 	return (
@@ -187,20 +194,26 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 					</div>
 				</Col>
 			</Row>
-			{(institution?.features ?? []).some(
-				(feature) =>
-					feature.recommended && (
-						<Row className="pt-12">
-							<Col>
-								<div className="d-flex align-items-center justify-content-center">
-									<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-									<p className="mb-0 fs-large">
-										Recommendations are based on your recent assessment scores.
-									</p>
-								</div>
-							</Col>
-						</Row>
-					)
+			{(institution?.features ?? []).some((feature) => feature.recommended) && (
+				<Row className="pt-12">
+					<Col>
+						<div className="d-flex align-items-center justify-content-center">
+							<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+							<p className="mb-0 fs-large">
+								Recommendations are based on your recent assessment scores.
+								{showRetakeCta && (
+									<Button
+										variant="link"
+										className="ms-1 p-0 fw-normal"
+										onClick={checkAndStartScreeningFlow}
+									>
+										Retake the assessment
+									</Button>
+								)}
+							</p>
+						</div>
+					</Col>
+				</Row>
 			)}
 		</Container>
 	);
