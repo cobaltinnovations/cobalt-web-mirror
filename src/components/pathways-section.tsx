@@ -52,6 +52,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		color: theme.colors.n900,
 		backgroundColor: theme.colors.n75,
 		border: `1px solid ${theme.colors.n100}`,
+		'& h5': {
+			wordBreak: 'initial',
+		},
 		'&.recommended': {
 			'&:before': {
 				left: 0,

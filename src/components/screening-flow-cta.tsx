@@ -32,10 +32,17 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 
 	return (
 		<div className={classNames(classes.screeningFlowCta, className)}>
-			<h2 className="mb-4 text-center">Get Personalized Recommendations</h2>
-			<p className="mb-6 fs-large text-center">
-				Complete a wellness assessment to get personalized recommendations
-			</p>
+			{institution?.displayFeatures ? (
+				<h2 className="mb-6 text-center">Not sure what you need?</h2>
+			) : (
+				<>
+					<h2 className="mb-4 text-center">Get Personalized Recommendations</h2>
+					<p className="mb-6 fs-large text-center">
+						Complete a wellness assessment to get personalized recommendations
+					</p>
+				</>
+			)}
+
 			<div className="text-center">
 				<Button
 					size="lg"
