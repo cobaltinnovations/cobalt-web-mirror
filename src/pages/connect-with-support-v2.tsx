@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import { providerService } from '@/lib/services';
@@ -8,35 +8,37 @@ import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
 
 const ConnectWithSupportV2 = () => {
-	const { urlName } = useParams<{ urlName: string }>();
+	const { pathname } = useLocation();
 	const { institution } = useAccount();
 
-	const featureDetails = useMemo(() => {
-		return (institution?.features ?? []).find((feature) => {
-			return feature.urlName.split('/')[1] === urlName;
-		});
-	}, [institution?.features, urlName]);
+	const featureDetails = useMemo(
+		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
+		[institution?.features, pathname]
+	);
 
 	const fetchProviders = useCallback(async () => {
-		if (!institution) {
+		if (!institution || !featureDetails) {
 			return;
 		}
 
 		const response = await providerService
 			.fetchFindOptions({
 				institutionId: institution?.institutionId,
+				featureId: featureDetails.featureId,
 			})
 			.fetch();
 
 		console.log(response);
-	}, [institution]);
+	}, [featureDetails, institution]);
 
 	return (
 		<>
-			<HeroContainer className="bg-n75">
-				<h1 className="mb-4 text-center">{featureDetails?.name}</h1>
-				<p className="mb-0 text-center fs-large">{featureDetails?.description}</p>
-			</HeroContainer>
+			{featureDetails && (
+				<HeroContainer className="bg-n75">
+					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
+					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
+				</HeroContainer>
+			)}
 			<AsyncWrapper fetchData={fetchProviders}>
 				<Container>
 					<Row>

@@ -137,6 +137,7 @@ export const providerService = {
 		clinicIds?: string[];
 		providerId?: string;
 		institutionId: string;
+		featureId?: string;
 	}): OrchestratedRequest<FindOptionsResponse> {
 		let url = '/providers/find-options';
 		const params = new URLSearchParams();
