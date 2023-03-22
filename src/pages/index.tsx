@@ -130,9 +130,21 @@ const Index: FC = () => {
 
 	return (
 		<>
-			<HomeHero />
-
-			<PathwaysSection />
+			{institution?.displayFeatures ? (
+				<>
+					<Container className="pt-16 pt-lg-24 pb-16">
+						<Row>
+							<Col>
+								<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
+								<h1 className="mb-0 text-center">What can we help you find today?</h1>
+							</Col>
+						</Row>
+					</Container>
+					<PathwaysSection />
+				</>
+			) : (
+				<HomeHero />
+			)}
 
 			<AsyncPage fetchData={checkScreenFlowStatus}>
 				{showScreeningFlowCta && (

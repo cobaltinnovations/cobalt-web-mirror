@@ -8,6 +8,8 @@ import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+
 interface useStylesProps {
 	count: number;
 }
@@ -171,20 +173,35 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 								<Link
 									to={feature.urlName}
 									className={classNames(classes.pathway, {
-										recommended: featureIndex % 2 === 0,
+										recommended: feature.recommended,
 									})}
 								>
 									<div className={classes.iconOuter}>
 										<PathwaysIcon className={classes.icon} featureId={feature.featureId} />
 									</div>
 									<h5 className="text-center">{feature.name}</h5>
-									{featureIndex % 2 === 0 && <div className={classes.recommended}>Recommended</div>}
+									{feature.recommended && <div className={classes.recommended}>Recommended</div>}
 								</Link>
 							</div>
 						))}
 					</div>
 				</Col>
 			</Row>
+			{(institution?.features ?? []).some(
+				(feature) =>
+					feature.recommended && (
+						<Row className="pt-12">
+							<Col>
+								<div className="d-flex align-items-center justify-content-center">
+									<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+									<p className="mb-0 fs-large">
+										Recommendations are based on your recent assessment scores.
+									</p>
+								</div>
+							</Col>
+						</Row>
+					)
+			)}
 		</Container>
 	);
 };
