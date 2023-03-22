@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 
 import { FindOptionsFilter, FIND_OPTIONS_FILTER_IDS, providerService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
-import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 
@@ -132,27 +131,9 @@ const ConnectWithSupportV2 = () => {
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<ConnectWithSupportItem
-								title="University of Pennsylvania Employee Assistance Program"
-								subtitle="EAP Intake Counselor from Health Advocate"
-								descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
-								buttons={[
-									{
-										title: '2:00pm',
-										disabled: true,
-									},
-									{ title: '2:00pm' },
-									{ title: '5:00pm' },
-									{ title: '6:00pm' },
-									{ title: '7:00pm' },
-									{ title: '8:00pm' },
-									{ title: '9:00pm' },
-								]}
-							/>
-							<hr />
-							<ConnectWithSupportItem
-								title="University of Pennsylvania Employee Assistance Program"
-								subtitle="EAP Intake Counselor from Health Advocate"
-								descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
+								title="Princeton TBD"
+								subtitle="TBD"
+								descriptionHtml="<p>TBD</p>"
 								buttons={[
 									{
 										title: '2:00pm',
