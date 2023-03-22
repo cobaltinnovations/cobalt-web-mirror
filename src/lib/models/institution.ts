@@ -34,6 +34,7 @@ export interface InstitutionFeature {
 	description: string;
 	navDescription: string;
 	recommended: boolean;
+	supportRoleId: string;
 }
 
 export interface AdditionalNavigationItem {
