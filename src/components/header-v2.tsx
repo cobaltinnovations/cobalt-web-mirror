@@ -20,7 +20,6 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';

@@ -19,8 +19,33 @@ import {
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
+export enum FIND_OPTIONS_FILTER_IDS {
+	DATE = 'DATE',
+	TIME_OF_DAY = 'TIME_OF_DAY',
+	LOCATION = 'LOCATION',
+}
+
+export interface FindOptionsFilter {
+	filterId: FIND_OPTIONS_FILTER_IDS;
+	name: string;
+}
+
+export interface FindOptionsAppointmentTime {
+	appointmentTimeId: string;
+	description: string;
+	endTime: string;
+	name: string;
+	startTime: string;
+}
+
+export interface FindOptionsFeature {
+	description: string;
+	featureId: string;
+	name: string;
+}
+
 export interface FindOptionsResponse {
-	appointmentTimes: '';
+	appointmentTimes: FindOptionsAppointmentTime[];
 	availabilities: ProviderAvailability[];
 	defaultAvailability: string;
 	defdefaultClinicIds: string[];
@@ -30,8 +55,8 @@ export interface FindOptionsResponse {
 	defaultStartTime: string;
 	defaultSupportRoleIds: SupportRoleId[];
 	defaultVisitTypeIds: string[];
-	feature: '';
-	filters: [];
+	feature: FindOptionsFeature;
+	filters: FindOptionsFilter[];
 	paymentTypes: PaymentType[];
 	recommendation: string;
 	recommendationHtml: string;

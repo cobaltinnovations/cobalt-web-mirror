@@ -1,17 +1,19 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 
-import { providerService } from '@/lib/services';
+import { FindOptionsFilter, FIND_OPTIONS_FILTER_IDS, providerService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
+import FilterDropdown from '@/components/filter-dropdown';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
 	const { institution } = useAccount();
-	const [filters, setFilters] = useState([]);
+	const [filters, setFilters] = useState<FindOptionsFilter[]>([]);
 
 	const featureDetails = useMemo(
 		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
@@ -20,7 +22,7 @@ const ConnectWithSupportV2 = () => {
 
 	const fetchfindOptions = useCallback(async () => {
 		if (!institution || !featureDetails) {
-			throw new Error('The Connect with Support feature you are looking for could not be found.');
+			return;
 		}
 
 		const response = await providerService
@@ -30,7 +32,7 @@ const ConnectWithSupportV2 = () => {
 			})
 			.fetch();
 
-		console.log(response);
+		setFilters(response.filters);
 	}, [featureDetails, institution]);
 
 	return (
@@ -41,7 +43,43 @@ const ConnectWithSupportV2 = () => {
 					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
 				</HeroContainer>
 			)}
+
 			<AsyncWrapper fetchData={fetchfindOptions}>
+				<Container fluid className="bg-n75 pb-8">
+					<Container>
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<div className="d-flex justify-content-center">
+									{filters.map((filter) => {
+										return (
+											<FilterDropdown
+												className="mx-1"
+												id={`connect-with-support-filter--${filter.filterId}`}
+												title={filter.name}
+												onDismiss={() => {
+													return;
+												}}
+												onConfirm={() => {
+													return;
+												}}
+											>
+												{filter.filterId === FIND_OPTIONS_FILTER_IDS.DATE && (
+													<div>Date Filter</div>
+												)}
+												{filter.filterId === FIND_OPTIONS_FILTER_IDS.TIME_OF_DAY && (
+													<div>Time of Day Filter</div>
+												)}
+												{filter.filterId === FIND_OPTIONS_FILTER_IDS.LOCATION && (
+													<div>Location Filter</div>
+												)}
+											</FilterDropdown>
+										);
+									})}
+								</div>
+							</Col>
+						</Row>
+					</Container>
+				</Container>
 				<Container fluid className="py-3 bg-white border-top border-bottom">
 					<Container>
 						<Row>
