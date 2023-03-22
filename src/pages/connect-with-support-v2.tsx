@@ -16,14 +16,14 @@ const ConnectWithSupportV2 = () => {
 		[institution?.features, pathname]
 	);
 
-	const fetchProviders = useCallback(async () => {
+	const fetchfindOptions = useCallback(async () => {
 		if (!institution || !featureDetails) {
-			return;
+			throw new Error('The Connect with Support feature you are looking for could not be found.');
 		}
 
 		const response = await providerService
 			.fetchFindOptions({
-				institutionId: institution?.institutionId,
+				institutionId: institution.institutionId,
 				featureId: featureDetails.featureId,
 			})
 			.fetch();
@@ -39,7 +39,7 @@ const ConnectWithSupportV2 = () => {
 					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
 				</HeroContainer>
 			)}
-			<AsyncWrapper fetchData={fetchProviders}>
+			<AsyncWrapper fetchData={fetchfindOptions}>
 				<Container>
 					<Row>
 						<Col>

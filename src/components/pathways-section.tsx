@@ -11,10 +11,6 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 
-interface useStylesProps {
-	count: number;
-}
-
 const useStyles = createUseThemedStyles((theme) => ({
 	pathways: {
 		display: 'flex',
@@ -26,8 +22,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 			display: 'block',
 		},
 	},
-	pathwayOuter: ({ count }: useStylesProps) => ({
-		width: `${(1 / count) * 100}%`,
+	pathwayOuter: {
+		width: '14.2857%',
 		padding: '0 16px',
 		marginBottom: 32,
 		[mediaQueries.xl]: {
@@ -39,7 +35,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			width: '100%',
 			marginBottom: 16,
 		},
-	}),
+	},
 	pathway: {
 		zIndex: 0,
 		height: '100%',
@@ -164,9 +160,7 @@ interface PathwaysSectionProps {
 
 const PathwaysSection = ({ showRetakeCta, className }: PathwaysSectionProps) => {
 	const { institution } = useAccount();
-	const classes = useStyles({
-		count: (institution?.features ?? []).length,
-	});
+	const classes = useStyles();
 
 	const { checkAndStartScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.contentScreeningFlowId,
