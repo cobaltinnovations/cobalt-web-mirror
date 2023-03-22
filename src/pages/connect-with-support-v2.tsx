@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
@@ -11,6 +11,7 @@ import ConnectWithSupportItem from '@/components/connect-with-support-item';
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
 	const { institution } = useAccount();
+	const [filters, setFilters] = useState([]);
 
 	const featureDetails = useMemo(
 		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),

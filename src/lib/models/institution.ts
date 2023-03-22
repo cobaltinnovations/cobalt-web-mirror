@@ -28,13 +28,14 @@ export interface Institution {
 }
 
 export interface InstitutionFeature {
-	featureId: string;
-	urlName: string;
-	name: string;
 	description: string;
+	featureId: string;
+	name: string;
 	navDescription: string;
+	navigationHeaderId: string;
 	recommended: boolean;
 	supportRoleId: string;
+	urlName: string;
 }
 
 export interface AdditionalNavigationItem {

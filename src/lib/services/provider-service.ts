@@ -20,22 +20,25 @@ import {
 import { OrchestratedRequest } from '@/lib/http-client';
 
 export interface FindOptionsResponse {
+	appointmentTimes: '';
 	availabilities: ProviderAvailability[];
-	defaultVisitTypeIds: string[];
 	defaultAvailability: string;
+	defdefaultClinicIds: string[];
 	defaultEndDate: string;
 	defaultEndTime: string;
 	defaultStartDate: string;
 	defaultStartTime: string;
 	defaultSupportRoleIds: SupportRoleId[];
-	defaultClinicIds: string[];
+	defaultVisitTypeIds: string[];
+	feature: '';
+	filters: [];
 	paymentTypes: PaymentType[];
 	recommendation: string;
 	recommendationHtml: string;
 	recommendedSupportRoleIds: SupportRoleId[];
 	scores: AssessmentScore;
-	supportRoles: SupportRole[];
 	specialties: Specialty[];
+	supportRoles: SupportRole[];
 	visitTypes: ProviderVisitType[];
 }
 

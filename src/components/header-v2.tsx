@@ -373,17 +373,18 @@ const HeaderV2 = () => {
 							navigationItemId: 'CONNECT_WITH_SUPPORT',
 							title: 'Connect with Support',
 							active: (institution?.features ?? [])
+								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName, pathname)),
-							items: (institution?.features ?? []).map(
-								({ featureId, name, navDescription, urlName }) => ({
+							items: (institution?.features ?? [])
+								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
+								.map(({ featureId, name, navDescription, urlName }) => ({
 									navigationItemId: featureId,
 									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
 									title: name,
 									description: navDescription,
 									to: urlName,
-								})
-							),
+								})),
 						},
 				  ]
 				: []),
@@ -396,13 +397,15 @@ const HeaderV2 = () => {
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to, pathname)),
 				items: [
-					{
-						testId: 'menuLinkResourceLibrary',
-						icon: <ResourceIcon />,
-						title: 'Self-Help Resources',
-						description: 'Digital articles, podcasts, apps, videos, worksheets, and more',
-						to: '/resource-library',
-					},
+					...(institution?.features ?? [])
+						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
+						.map(({ featureId, name, navDescription, urlName }) => ({
+							navigationItemId: featureId,
+							icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
+							title: name,
+							description: navDescription,
+							to: urlName,
+						})),
 					...(institution?.additionalNavigationItems ?? []).map(({ iconName, name, url }, index) => ({
 						testId: `menuLink-additionalItem${index}`,
 						icon: <AdditionalNavigationItemIcon iconName={iconName} svgProps={{ width: 24, height: 24 }} />,
