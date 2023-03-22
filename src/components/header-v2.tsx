@@ -392,7 +392,9 @@ const HeaderV2 = () => {
 				navigationItemId: 'BROWSE_RESOURCES',
 				title: 'Browse Resources',
 				active: [
-					'/resource-library',
+					...(institution?.features ?? [])
+						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
+						.map(({ urlName }) => urlName),
 					...(institution?.additionalNavigationItems ?? []).map(({ url }) => url),
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to, pathname)),
