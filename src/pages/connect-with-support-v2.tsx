@@ -5,6 +5,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { InstitutionLocation } from '@/lib/models';
 import {
 	FindOptionsResponse,
 	FIND_OPTIONS_FILTER_IDS,
@@ -12,19 +13,20 @@ import {
 	ProviderSection,
 	providerService,
 } from '@/lib/services';
-import { FILTER_DAYS } from '@/contexts/booking-context';
+import { BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
-import { InstitutionLocation } from '@/lib/models';
+import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
 	const { institution } = useAccount();
 	const pageInstantiated = useRef(false);
+	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
@@ -112,6 +114,8 @@ const ConnectWithSupportV2 = () => {
 
 	return (
 		<>
+			<BookingModals ref={bookingRef} />
+
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
@@ -374,8 +378,13 @@ const ConnectWithSupportV2 = () => {
 																	title: time.timeDescription,
 																	disabled: time.status !== 'AVAILABLE',
 																	onClick: () => {
-																		console.log(time);
-																		window.alert('[TODO]: Start booking flow?');
+																		bookingRef.current?.kickoffBookingProcess({
+																			source: BookingSource.ConnectWithSupportV2,
+																			exitUrl: pathname,
+																			provider,
+																			date: section.date,
+																			timeSlot: time,
+																		});
 																	},
 															  }))
 													}

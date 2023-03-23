@@ -83,6 +83,7 @@ export interface FindFilters {
 	systemAffinityId?: string;
 	specialtyIds?: string[];
 	institutionLocationId?: string;
+	appointmentTimeIds?: string[];
 }
 
 export interface FindProvidersResponse {

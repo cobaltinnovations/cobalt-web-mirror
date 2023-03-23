@@ -21,6 +21,7 @@ import useAccount from '@/hooks/use-account';
 export enum BookingSource {
 	ProviderSearch,
 	ProviderDetail,
+	ConnectWithSupportV2,
 }
 
 export const FILTER_DAYS = [
@@ -116,6 +117,8 @@ interface BookingState {
 
 	setBookingSource: Dispatch<SetStateAction<BookingSource>>;
 	bookingSource: BookingSource;
+	exitUrl: string;
+	setExitUrl: Dispatch<SetStateAction<string>>;
 	getActiveFiltersState: (findOptions?: FindOptionsResponse) => Record<BookingFilters, boolean>;
 	isEligible: boolean;
 	setIsEligible: Dispatch<SetStateAction<boolean>>;
@@ -141,6 +144,7 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 
 	const [isEligible, setIsEligible] = useState(true);
 	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
+	const [exitUrl, setExitUrl] = useState('/');
 	const [previousProviderId, setPreviousProviderId] = useState<string>();
 
 	const formattedAvailabilityDate = useMemo(() => moment(selectedDate).format('YYYY-MM-DD'), [selectedDate]);
@@ -235,13 +239,19 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				};
 			}
 
+			if (bookingSource === BookingSource.ConnectWithSupportV2) {
+				return {
+					pathname: exitUrl,
+				};
+			}
+
 			return {
 				pathname: '/connect-with-support',
 				search: preservedFilterQueryString,
 				state,
 			};
 		},
-		[bookingSource, preservedFilterQueryString, redirectProviderId]
+		[bookingSource, exitUrl, preservedFilterQueryString, redirectProviderId]
 	);
 
 	return (
@@ -272,6 +282,8 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 
 				bookingSource,
 				setBookingSource,
+				exitUrl,
+				setExitUrl,
 				getActiveFiltersState,
 				isEligible,
 				setIsEligible,
