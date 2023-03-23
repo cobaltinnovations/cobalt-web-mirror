@@ -82,6 +82,7 @@ export interface FindFilters {
 	licenseTypes?: string[];
 	systemAffinityId?: string;
 	specialtyIds?: string[];
+	institutionLocationId?: string;
 }
 
 export interface FindProvidersResponse {

@@ -28,11 +28,11 @@ const ConnectWithSupportV2 = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
 	const timesOfDay = useMemo(() => searchParams.getAll('timeOfDay'), [searchParams]);
-	const location = useMemo(() => searchParams.get('location'), [searchParams]);
+	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId'), [searchParams]);
 
-	const [selectedDate, setSelectedDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
+	const [selectedStartDate, setSelectedStartDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
 	const [selectedTimesOfDay, setSelectedTimesOfDay] = useState(timesOfDay);
-	const [selectedLocation, setSelectedLocation] = useState(location ?? '');
+	const [selectedInstitutionLocationId, setSelectedInstitutionLocationId] = useState(institutionLocationId ?? '');
 
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
@@ -79,16 +79,14 @@ const ConnectWithSupportV2 = () => {
 				visitTypeIds: findOptions.defaultVisitTypeIds,
 				specialtyIds: [],
 				paymentTypeIds: [],
+				...(institutionLocationId && { institutionLocationId }),
 			})
 			.fetch();
 		setProviderSections(response.sections);
-	}, [featureDetails, findOptions, startDate]);
+	}, [featureDetails, findOptions, institutionLocationId, startDate]);
 
-	/* -------------------------------------------- */
-	/* watch queryParams to update filters */
-	/* -------------------------------------------- */
 	useEffect(() => {
-		setSelectedDate(startDate ? new Date(startDate) : new Date());
+		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
 	}, [startDate]);
 
 	useEffect(() => {
@@ -96,8 +94,8 @@ const ConnectWithSupportV2 = () => {
 	}, [timesOfDay]);
 
 	useEffect(() => {
-		setSelectedLocation(location ?? '');
-	}, [location]);
+		setSelectedInstitutionLocationId(institutionLocationId ?? '');
+	}, [institutionLocationId]);
 
 	return (
 		<>
@@ -138,7 +136,7 @@ const ConnectWithSupportV2 = () => {
 															onConfirm={() => {
 																searchParams.set(
 																	'startDate',
-																	moment(selectedDate).format('YYYY-MM-DD')
+																	moment(selectedStartDate).format('YYYY-MM-DD')
 																);
 																setSearchParams(searchParams);
 															}}
@@ -147,20 +145,20 @@ const ConnectWithSupportV2 = () => {
 																<p className="mb-6 fw-bold">
 																	Show providers with availability from:
 																	<br />
-																	{moment(selectedDate).format('MMMM D')} onwards
+																	{moment(selectedStartDate).format('MMMM D')} onwards
 																</p>
 																<hr className="mb-6" />
 																<div className="d-flex justify-content-center">
 																	<DatePicker
 																		inline
 																		minDate={new Date()}
-																		selected={selectedDate}
+																		selected={selectedStartDate}
 																		onChange={(date) => {
 																			if (!date) {
 																				return;
 																			}
 
-																			setSelectedDate(date);
+																			setSelectedStartDate(date);
 																		}}
 																	/>
 																</div>
@@ -194,7 +192,7 @@ const ConnectWithSupportV2 = () => {
 																</p>
 																{(findOptions?.appointmentTimes ?? []).map(
 																	(at, atIndex) => {
-																		const isLastAt =
+																		const isLast =
 																			atIndex ===
 																			(findOptions?.appointmentTimes ?? [])
 																				.length -
@@ -203,7 +201,7 @@ const ConnectWithSupportV2 = () => {
 																		return (
 																			<Form.Check
 																				className={classNames({
-																					'mb-1': !isLastAt,
+																					'mb-1': !isLast,
 																				})}
 																				type="checkbox"
 																				name="time-of-day"
@@ -248,18 +246,21 @@ const ConnectWithSupportV2 = () => {
 													{filter.filterId === FIND_OPTIONS_FILTER_IDS.LOCATION && (
 														<FilterDropdown
 															key={filter.filterId}
-															active={!!location}
+															active={!!institutionLocationId}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
 															dismissText="Clear"
 															onDismiss={() => {
-																searchParams.delete('location');
+																searchParams.delete('institutionLocationId');
 																setSearchParams(searchParams);
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
-																searchParams.set('location', selectedLocation);
+																searchParams.set(
+																	'institutionLocationId',
+																	selectedInstitutionLocationId
+																);
 																setSearchParams(searchParams);
 															}}
 														>
@@ -280,11 +281,11 @@ const ConnectWithSupportV2 = () => {
 																			label={l.name}
 																			value={l.institutionLocationId}
 																			checked={
-																				selectedLocation ===
+																				selectedInstitutionLocationId ===
 																				l.institutionLocationId
 																			}
 																			onChange={({ currentTarget }) => {
-																				setSelectedLocation(
+																				setSelectedInstitutionLocationId(
 																					currentTarget.value
 																				);
 																			}}
