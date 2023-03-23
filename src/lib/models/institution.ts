@@ -1,4 +1,5 @@
 import { AccountSourceId } from './account';
+import { SupportRoleId } from './provider';
 
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
@@ -34,7 +35,7 @@ export interface InstitutionFeature {
 	navDescription: string;
 	navigationHeaderId: string;
 	recommended: boolean;
-	supportRoleIds: string[];
+	supportRoleIds: SupportRoleId[];
 	urlName: string;
 }
 

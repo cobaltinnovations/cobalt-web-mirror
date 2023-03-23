@@ -87,18 +87,20 @@ export interface FindFilters {
 export interface FindProvidersResponse {
 	appointmentTypes: AppointmentType[];
 	epicDepartments: EpicDepartment[];
-	sections: {
-		fullyBooked: boolean;
-		date: string;
-		dateDescription: string;
-		providers: Provider[];
-	}[];
+	sections: ProviderSection[];
 	provider?: Provider;
 	clinics?: Clinic[];
 	appointments?: AppointmentModel[];
 	followups?: FollowupModel[];
 	specialties?: Specialty[];
 	showSpecialties: boolean;
+}
+
+export interface ProviderSection {
+	fullyBooked: boolean;
+	date: string;
+	dateDescription: string;
+	providers: Provider[];
 }
 
 interface ProvidersRepsonse {
