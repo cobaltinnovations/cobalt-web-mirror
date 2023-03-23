@@ -160,6 +160,7 @@ export const providerService = {
 		clinicIds,
 		providerId,
 		institutionId,
+		featureId,
 	}: {
 		supportRoleIds?: string[];
 		startDate?: string;
@@ -167,6 +168,7 @@ export const providerService = {
 		clinicIds?: string[];
 		providerId?: string;
 		institutionId: string;
+		featureId?: string;
 	}): OrchestratedRequest<FindOptionsResponse> {
 		let url = '/providers/find-options';
 		const params = new URLSearchParams();
@@ -193,6 +195,10 @@ export const providerService = {
 
 		if (providerId) {
 			params.append('providerId', providerId);
+		}
+
+		if (featureId) {
+			params.append('featureId', featureId);
 		}
 
 		params.set('institutionId', institutionId);

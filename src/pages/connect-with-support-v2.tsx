@@ -4,13 +4,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import {
-	FindOptionsAppointmentTime,
-	FindOptionsFilter,
-	FIND_OPTIONS_FILTER_IDS,
-	ProviderSection,
-	providerService,
-} from '@/lib/services';
+import { FindOptionsResponse, FIND_OPTIONS_FILTER_IDS, ProviderSection, providerService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
@@ -18,6 +12,7 @@ import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
 import { cloneDeep } from 'lodash';
+import { FILTER_DAYS } from '@/contexts/booking-context';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
@@ -27,8 +22,7 @@ const ConnectWithSupportV2 = () => {
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
 	const timesOfDay = useMemo(() => searchParams.getAll('timeOfDay'), [searchParams]);
 
-	const [filters, setFilters] = useState<FindOptionsFilter[]>([]);
-	const [appointmentTimes, setAppointmentTimes] = useState<FindOptionsAppointmentTime[]>([]);
+	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 
 	const [selectedDate, setSelectedDate] = useState<Date | null>(startDate ? new Date(startDate) : null);
 	const [selectedTimesOfDay, setSelectedTimesOfDay] = useState<string[]>(timesOfDay);
@@ -40,7 +34,7 @@ const ConnectWithSupportV2 = () => {
 		[institution?.features, pathname]
 	);
 
-	const fetchfindOptions = useCallback(async () => {
+	const fetchFilters = useCallback(async () => {
 		if (!institution || !featureDetails) {
 			return;
 		}
@@ -48,39 +42,51 @@ const ConnectWithSupportV2 = () => {
 		const response = await providerService
 			.fetchFindOptions({
 				institutionId: institution.institutionId,
-				supportRoleIds: featureDetails.supportRoleIds,
+				featureId: featureDetails.featureId,
 			})
 			.fetch();
 
-		setFilters(response.filters ?? []);
-		setAppointmentTimes(response.appointmentTimes);
+		setFindOptions(response);
 	}, [featureDetails, institution]);
 
 	const fetchProviders = useCallback(async () => {
-		if (!institution || !featureDetails) {
+		if (!findOptions || !featureDetails) {
 			return;
 		}
 
 		const response = await providerService
 			.findProviders({
-				...(startDate && { startDate }),
+				startDate: findOptions.defaultStartDate,
+				endDate: findOptions.defaultEndDate,
+				daysOfWeek: FILTER_DAYS.map((d) => d.key),
+				startTime: findOptions.defaultStartTime,
+				endTime: findOptions.defaultEndTime,
 				supportRoleIds: featureDetails.supportRoleIds,
+				availability: findOptions.defaultAvailability,
+				visitTypeIds: findOptions.defaultVisitTypeIds,
+				specialtyIds: [],
+				paymentTypeIds: [],
 			})
 			.fetch();
 		setProviderSections(response.sections);
-	}, [featureDetails, institution, startDate]);
+	}, [featureDetails, findOptions]);
 
 	return (
 		<>
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
-					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
+					<p
+						className="mb-0 text-ce
+					paymentTypeIdsnter fs-large"
+					>
+						{featureDetails.description}
+					</p>
 				</HeroContainer>
 			)}
 
-			<AsyncWrapper fetchData={fetchfindOptions}>
-				{filters.length > 0 && (
+			<AsyncWrapper fetchData={fetchFilters}>
+				{(findOptions?.filters ?? []).length > 0 && (
 					<Container fluid className="bg-n75 pb-8">
 						<Container>
 							<Row>
@@ -90,7 +96,7 @@ const ConnectWithSupportV2 = () => {
 									xl={{ span: 6, offset: 3 }}
 								>
 									<div className="d-flex justify-content-center">
-										{filters.map((filter) => {
+										{(findOptions?.filters ?? []).map((filter) => {
 											switch (filter.filterId) {
 												case FIND_OPTIONS_FILTER_IDS.DATE:
 													return (
@@ -154,50 +160,56 @@ const ConnectWithSupportV2 = () => {
 																<p className="mb-5 fw-bold">
 																	Do you have a preferred time of day?
 																</p>
-																{appointmentTimes.map((at, atIndex) => {
-																	const isLastAt =
-																		atIndex === appointmentTimes.length - 1;
+																{(findOptions?.appointmentTimes ?? []).map(
+																	(at, atIndex) => {
+																		const isLastAt =
+																			atIndex ===
+																			(findOptions?.appointmentTimes ?? [])
+																				.length -
+																				1;
 
-																	return (
-																		<Form.Check
-																			className={classNames({
-																				'mb-1': !isLastAt,
-																			})}
-																			type="checkbox"
-																			name="time-of-day"
-																			id={`time-of-day--${at.appointmentTimeId}`}
-																			label={`${at.name} • ${at.description}`}
-																			value={at.appointmentTimeId}
-																			checked={selectedTimesOfDay.includes(
-																				at.appointmentTimeId
-																			)}
-																			onChange={({ currentTarget }) => {
-																				const selectedTimesOfDayClone =
-																					cloneDeep(selectedTimesOfDay);
-																				const targetIndex =
-																					selectedTimesOfDayClone.findIndex(
-																						(tod) =>
-																							tod === currentTarget.value
-																					);
+																		return (
+																			<Form.Check
+																				className={classNames({
+																					'mb-1': !isLastAt,
+																				})}
+																				type="checkbox"
+																				name="time-of-day"
+																				id={`time-of-day--${at.appointmentTimeId}`}
+																				label={`${at.name} • ${at.description}`}
+																				value={at.appointmentTimeId}
+																				checked={selectedTimesOfDay.includes(
+																					at.appointmentTimeId
+																				)}
+																				onChange={({ currentTarget }) => {
+																					const selectedTimesOfDayClone =
+																						cloneDeep(selectedTimesOfDay);
+																					const targetIndex =
+																						selectedTimesOfDayClone.findIndex(
+																							(tod) =>
+																								tod ===
+																								currentTarget.value
+																						);
 
-																				if (targetIndex > -1) {
-																					selectedTimesOfDayClone.splice(
-																						targetIndex,
-																						1
-																					);
-																				} else {
-																					selectedTimesOfDayClone.push(
-																						currentTarget.value
-																					);
-																				}
+																					if (targetIndex > -1) {
+																						selectedTimesOfDayClone.splice(
+																							targetIndex,
+																							1
+																						);
+																					} else {
+																						selectedTimesOfDayClone.push(
+																							currentTarget.value
+																						);
+																					}
 
-																				setSelectedTimesOfDay(
-																					selectedTimesOfDayClone
-																				);
-																			}}
-																		/>
-																	);
-																})}
+																					setSelectedTimesOfDay(
+																						selectedTimesOfDayClone
+																					);
+																				}}
+																			/>
+																		);
+																	}
+																)}
 															</div>
 														</FilterDropdown>
 													);
