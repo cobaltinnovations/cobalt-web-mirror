@@ -11,10 +11,14 @@ interface UseStylesProps {
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
+	dropdownMenu: {
+		width: '90%',
+		padding: `0 !important`,
+		maxWidth: ({ width }: UseStylesProps) => width,
+	},
 	dropdownMenuBody: {
 		padding: '16px 24px',
 		...theme.fonts.default,
-		width: ({ width }: UseStylesProps) => width,
 	},
 	dropdownMenuFooter: {
 		textAlign: 'right',
@@ -69,10 +73,10 @@ const FilterDropdown = ({
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}
-				className="p-0"
 				align="start"
 				flip={false}
 				popperConfig={{ strategy: 'fixed' }}
+				className={classes.dropdownMenu}
 				renderOnMount
 			>
 				<div className={classes.dropdownMenuBody}>{children}</div>
