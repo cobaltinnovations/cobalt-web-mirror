@@ -77,11 +77,10 @@ const ConnectWithSupportV2 = () => {
 				supportRoleIds: featureDetails.supportRoleIds,
 				availability: findOptions.defaultAvailability,
 				visitTypeIds: findOptions.defaultVisitTypeIds,
-				specialtyIds: [],
-				paymentTypeIds: [],
 				...(institutionLocationId && { institutionLocationId }),
 			})
 			.fetch();
+
 		setProviderSections(response.sections);
 	}, [featureDetails, findOptions, institutionLocationId, startDate]);
 
@@ -308,7 +307,11 @@ const ConnectWithSupportV2 = () => {
 			<AsyncWrapper fetchData={fetchProviders}>
 				{providerSections.map((section) => (
 					<React.Fragment key={section.date}>
-						<Container fluid className="py-3 bg-white border-top border-bottom">
+						<Container
+							fluid
+							className="py-3 bg-white border-top border-bottom position-sticky"
+							style={{ top: 55, zIndex: 2 }}
+						>
 							<Container>
 								<Row>
 									<Col
@@ -354,11 +357,16 @@ const ConnectWithSupportV2 = () => {
 																	title: time.timeDescription,
 																	disabled: time.status !== 'AVAILABLE',
 																	onClick: () => {
+																		console.log(time);
 																		window.alert('[TODO]: Start booking flow?');
 																	},
 															  }))
 													}
 													showViewButton={!provider.displayPhoneNumberOnlyForBooking}
+													onModalTimeButtonClick={(availabilityTimeSlot) => {
+														console.log(availabilityTimeSlot);
+														window.alert('[TODO]: Start booking flow?');
+													}}
 												/>
 												{!isLast && <hr />}
 											</>

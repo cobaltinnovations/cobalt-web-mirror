@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps, Modal } from 'react-bootstrap';
 import Color from 'color';
 
-import { Provider } from '@/lib/models';
+import { AvailabilityTimeSlot, Provider } from '@/lib/models';
 import { ProviderSection, providerService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -111,6 +111,7 @@ interface ConnectWithSupportItemProps {
 	descriptionHtml: string;
 	buttons: ButtonProps[];
 	showViewButton: boolean;
+	onModalTimeButtonClick(availabilityTimeSlot: AvailabilityTimeSlot): void;
 }
 
 const ConnectWithSupportItem = ({
@@ -121,6 +122,7 @@ const ConnectWithSupportItem = ({
 	descriptionHtml,
 	buttons,
 	showViewButton,
+	onModalTimeButtonClick,
 }: ConnectWithSupportItemProps) => {
 	const handleError = useHandleError();
 	const scrollOuterRef = useRef<HTMLDivElement>(null);
@@ -226,7 +228,13 @@ const ConnectWithSupportItem = ({
 										{section.providers.map((provider, providerIndex) => (
 											<React.Fragment key={`${provider.providerId}-${providerIndex}`}>
 												{provider.times.map((time, timeIndex) => (
-													<Button key={timeIndex} className="me-1 mb-2">
+													<Button
+														key={timeIndex}
+														className="me-1 mb-2"
+														onClick={() => {
+															onModalTimeButtonClick(time);
+														}}
+													>
 														{time.timeDescription}
 													</Button>
 												))}

@@ -97,7 +97,6 @@ const FilterDropdown = ({
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}
-				align="start"
 				flip={false}
 				popperConfig={{ strategy: 'fixed' }}
 				className={classes.dropdownMenu}
