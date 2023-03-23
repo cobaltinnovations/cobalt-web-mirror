@@ -19,9 +19,9 @@ import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image'
 import useAccount from '@/hooks/use-account';
 
 export enum BookingSource {
-	ProviderSearch,
-	ProviderDetail,
-	ConnectWithSupportV2,
+	ProviderSearch = 'PROVIDER_SEARCH',
+	ProviderDetail = 'PROVIDER_DETAIL',
+	ConnectWithSupportV2 = 'CONNECT_WITH_SUPPORT_V2',
 }
 
 export const FILTER_DAYS = [

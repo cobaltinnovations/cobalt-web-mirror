@@ -390,8 +390,13 @@ const ConnectWithSupportV2 = () => {
 													}
 													showViewButton={!provider.displayPhoneNumberOnlyForBooking}
 													onModalTimeButtonClick={(availabilityTimeSlot) => {
-														console.log(availabilityTimeSlot);
-														window.alert('[TODO]: Start booking flow?');
+														bookingRef.current?.kickoffBookingProcess({
+															source: BookingSource.ConnectWithSupportV2,
+															exitUrl: pathname,
+															provider,
+															date: section.date,
+															timeSlot: availabilityTimeSlot,
+														});
 													}}
 												/>
 												{!isLast && <hr />}
