@@ -77,6 +77,17 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.HOME:
+					navigate(
+						{
+							pathname: '/',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					navigate(
