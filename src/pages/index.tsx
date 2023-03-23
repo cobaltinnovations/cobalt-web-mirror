@@ -135,7 +135,7 @@ const Index: FC = () => {
 
 	return (
 		<>
-			{institution?.displayFeatures ? (
+			{institution?.featuresEnabled ? (
 				<>
 					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>

@@ -23,7 +23,7 @@ const PathwaysIcon = ({
 	switch (featureId) {
 		case 'THERAPY':
 			return <TherapyIcon className={className} {...svgProps} />;
-		case 'MEDICATION_SUBSCRIBER':
+		case 'MEDICATION_PRESCRIBER':
 			return <MedicationIcon className={className} {...svgProps} />;
 		case 'GROUP_SESSIONS':
 			return <GroupIcon className={className} {...svgProps} />;

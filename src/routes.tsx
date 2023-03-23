@@ -204,7 +204,7 @@ const DefaultLayout = () => {
 
 	return (
 		<>
-			{institution?.displayFeatures ? <HeaderV2 /> : <Header />}
+			{institution?.featuresEnabled ? <HeaderV2 /> : <Header />}
 			<Outlet />
 		</>
 	);
