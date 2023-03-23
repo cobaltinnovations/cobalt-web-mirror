@@ -73,7 +73,6 @@ const Index: FC = () => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
-	const [showRetakeCta, setShowRetakeCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
 	const { checkAndStartScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
@@ -150,8 +149,8 @@ const Index: FC = () => {
 							</Col>
 						</Row>
 					</Container>
-					<PathwaysSection className="mb-10" showRetakeCta={institution.takeTriageScreening} />
-					{!institution.takeTriageScreening && (
+					<PathwaysSection className="mb-10" showRetakeCta={!institution.takeTriageScreening} />
+					{institution.takeTriageScreening && (
 						<Container>
 							<Row>
 								<Col>
