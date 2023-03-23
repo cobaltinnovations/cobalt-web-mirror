@@ -24,7 +24,7 @@ export interface Institution {
 	recommendedContentEnabled: boolean;
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
-	displayFeatures: boolean;
+	featuresEnabled: boolean;
 	takeTriageScreening: boolean;
 	locationPromptRequired: boolean;
 	featureScreeningFlowId?: string;

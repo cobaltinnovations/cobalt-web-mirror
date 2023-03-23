@@ -366,7 +366,7 @@ const HeaderV2 = () => {
 				to: '/',
 				active: matchPath('/', pathname),
 			},
-			...(institution?.displayFeatures
+			...(institution?.featuresEnabled
 				? [
 						{
 							navigationItemId: 'CONNECT_WITH_SUPPORT',
@@ -424,7 +424,7 @@ const HeaderV2 = () => {
 				],
 			},
 		],
-		[institution?.additionalNavigationItems, institution?.displayFeatures, institution?.features, pathname]
+		[institution?.additionalNavigationItems, institution?.featuresEnabled, institution?.features, pathname]
 	);
 
 	/* ----------------------------------------------------------- */

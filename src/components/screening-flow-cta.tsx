@@ -32,7 +32,7 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 
 	return (
 		<div className={classNames(classes.screeningFlowCta, className)}>
-			{institution?.displayFeatures ? (
+			{institution?.featuresEnabled ? (
 				<h2 className="mb-6 text-center">Not sure what you need?</h2>
 			) : (
 				<>
