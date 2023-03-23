@@ -162,57 +162,60 @@ const PathwaysSection = ({ showRetakeCta, className }: PathwaysSectionProps) => 
 	const { institution } = useAccount();
 	const classes = useStyles();
 
-	const { checkAndStartScreeningFlow } = useScreeningFlow({
-		screeningFlowId: institution?.contentScreeningFlowId,
+	const { checkAndStartScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
+		screeningFlowId: institution?.featureScreeningFlowId,
 		instantiateOnLoad: false,
 	});
 
 	return (
-		<Container className={className}>
-			<Row>
-				<Col>
-					<div className={classes.pathways}>
-						{(institution?.features ?? []).map((feature, featureIndex) => (
-							<div key={feature.featureId} className={classes.pathwayOuter}>
-								<Link
-									to={feature.urlName}
-									className={classNames(classes.pathway, {
-										recommended: feature.recommended,
-									})}
-								>
-									<div className={classes.iconOuter}>
-										<PathwaysIcon className={classes.icon} featureId={feature.featureId} />
-									</div>
-									<h5 className="text-center">{feature.name}</h5>
-									{feature.recommended && <div className={classes.recommended}>Recommended</div>}
-								</Link>
-							</div>
-						))}
-					</div>
-				</Col>
-			</Row>
-			{(institution?.features ?? []).some((feature) => feature.recommended) && (
-				<Row className="pt-12">
+		<>
+			{renderedCollectPhoneModal}
+			<Container className={className}>
+				<Row>
 					<Col>
-						<div className="d-flex align-items-center justify-content-center">
-							<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-							<p className="mb-0 fs-large">
-								Recommendations are based on your recent assessment scores.
-								{showRetakeCta && (
-									<Button
-										variant="link"
-										className="ms-1 p-0 fw-normal"
-										onClick={checkAndStartScreeningFlow}
+						<div className={classes.pathways}>
+							{(institution?.features ?? []).map((feature, featureIndex) => (
+								<div key={feature.featureId} className={classes.pathwayOuter}>
+									<Link
+										to={feature.urlName}
+										className={classNames(classes.pathway, {
+											recommended: feature.recommended,
+										})}
 									>
-										Retake the assessment
-									</Button>
-								)}
-							</p>
+										<div className={classes.iconOuter}>
+											<PathwaysIcon className={classes.icon} featureId={feature.featureId} />
+										</div>
+										<h5 className="text-center">{feature.name}</h5>
+										{feature.recommended && <div className={classes.recommended}>Recommended</div>}
+									</Link>
+								</div>
+							))}
 						</div>
 					</Col>
 				</Row>
-			)}
-		</Container>
+				{(institution?.features ?? []).some((feature) => feature.recommended) && (
+					<Row className="pt-12">
+						<Col>
+							<div className="d-flex align-items-center justify-content-center">
+								<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+								<p className="mb-0 fs-large">
+									Recommendations are based on your recent assessment scores.
+									{showRetakeCta && (
+										<Button
+											variant="link"
+											className="ms-1 p-0 fw-normal"
+											onClick={checkAndStartScreeningFlow}
+										>
+											Retake the assessment
+										</Button>
+									)}
+								</p>
+							</div>
+						</Col>
+					</Row>
+				)}
+			</Container>
+		</>
 	);
 };
 

@@ -37,6 +37,8 @@ import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/r
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
 import useFlags from '@/hooks/use-flags';
+import NoData from '@/components/no-data';
+import { useScreeningFlow } from './screening/screening.hooks';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -74,6 +76,11 @@ const Index: FC = () => {
 	const [showRetakeCta, setShowRetakeCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
+	const { checkAndStartScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
+		screeningFlowId: institution?.featureScreeningFlowId,
+		instantiateOnLoad: false,
+	});
+
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
 			return;
@@ -86,17 +93,13 @@ const Index: FC = () => {
 
 			if (sessionFullyCompleted) {
 				setShowScreeningFlowCta(false);
-
-				if (institution?.takeTriageScreening) {
-					setShowRetakeCta(true);
-				}
 			} else {
 				setShowScreeningFlowCta(true);
 			}
 		} catch (error) {
 			// dont throw
 		}
-	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled, institution?.takeTriageScreening]);
+	}, [institution?.contentScreeningFlowId, institution?.recommendedContentEnabled]);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) return;
@@ -137,6 +140,8 @@ const Index: FC = () => {
 		<>
 			{institution?.featuresEnabled ? (
 				<>
+					{renderedCollectPhoneModal}
+
 					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>
 							<Col>
@@ -145,23 +150,44 @@ const Index: FC = () => {
 							</Col>
 						</Row>
 					</Container>
-					<PathwaysSection showRetakeCta={showRetakeCta} />
+					<PathwaysSection className="mb-10" showRetakeCta={institution.takeTriageScreening} />
+					{!institution.takeTriageScreening && (
+						<Container>
+							<Row>
+								<Col>
+									<NoData
+										title="Not sure what you need?"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Take the Assessment',
+												onClick: () => {
+													checkAndStartScreeningFlow();
+												},
+											},
+										]}
+									/>
+								</Col>
+							</Row>
+						</Container>
+					)}
 				</>
 			) : (
-				<HomeHero />
+				<>
+					<HomeHero />
+					<AsyncPage fetchData={checkScreenFlowStatus}>
+						{showScreeningFlowCta && (
+							<Container className="pt-12">
+								<Row>
+									<Col>
+										<ScreeningFlowCta />
+									</Col>
+								</Row>
+							</Container>
+						)}
+					</AsyncPage>
+				</>
 			)}
-
-			<AsyncPage fetchData={checkScreenFlowStatus}>
-				{showScreeningFlowCta && (
-					<Container className="pt-12">
-						<Row>
-							<Col>
-								<ScreeningFlowCta />
-							</Col>
-						</Row>
-					</Container>
-				)}
-			</AsyncPage>
 
 			<AsyncPage fetchData={fetchCallsToAction}>
 				{callsToAction.length > 0 && (

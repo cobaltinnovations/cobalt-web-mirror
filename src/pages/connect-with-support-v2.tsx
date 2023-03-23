@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -13,7 +13,7 @@ import {
 	ProviderSection,
 	providerService,
 } from '@/lib/services';
-import { BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
+import { BookingContext, BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
@@ -21,6 +21,7 @@ import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
@@ -40,6 +41,8 @@ const ConnectWithSupportV2 = () => {
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
 	const [providerSections, setProviderSections] = useState<ProviderSection[]>([]);
+
+	const { setAppointmentTypes, setEpicDepartments, isEligible, setIsEligible } = useContext(BookingContext);
 
 	const featureDetails = useMemo(
 		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
@@ -97,8 +100,18 @@ const ConnectWithSupportV2 = () => {
 			})
 			.fetch();
 
+		setAppointmentTypes(response.appointmentTypes);
+		setEpicDepartments(response.epicDepartments);
 		setProviderSections(response.sections);
-	}, [appointmentTimeIds, featureDetails, findOptions, institutionLocationId, startDate]);
+	}, [
+		appointmentTimeIds,
+		featureDetails,
+		findOptions,
+		institutionLocationId,
+		setAppointmentTypes,
+		setEpicDepartments,
+		startDate,
+	]);
 
 	useEffect(() => {
 		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
@@ -115,6 +128,7 @@ const ConnectWithSupportV2 = () => {
 	return (
 		<>
 			<BookingModals ref={bookingRef} />
+			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />
 
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
