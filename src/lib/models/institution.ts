@@ -83,3 +83,9 @@ export interface InstitutionTeamMember {
 	name: string;
 	imageUrl: string;
 }
+
+export interface InstitutionLocation {
+	institutionId: string;
+	institutionLocationId: string;
+	name: string;
+}

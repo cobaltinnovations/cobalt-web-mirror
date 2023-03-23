@@ -5,7 +5,13 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { FindOptionsResponse, FIND_OPTIONS_FILTER_IDS, ProviderSection, providerService } from '@/lib/services';
+import {
+	FindOptionsResponse,
+	FIND_OPTIONS_FILTER_IDS,
+	institutionService,
+	ProviderSection,
+	providerService,
+} from '@/lib/services';
 import { FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
@@ -13,6 +19,7 @@ import AsyncWrapper from '@/components/async-page';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
+import { InstitutionLocation } from '@/lib/models';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
@@ -28,6 +35,7 @@ const ConnectWithSupportV2 = () => {
 	const [selectedLocation, setSelectedLocation] = useState(location ?? '');
 
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
+	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
 	const [providerSections, setProviderSections] = useState<ProviderSection[]>([]);
 
 	const featureDetails = useMemo(
@@ -40,14 +48,18 @@ const ConnectWithSupportV2 = () => {
 			return;
 		}
 
-		const response = await providerService
-			.fetchFindOptions({
-				institutionId: institution.institutionId,
-				featureId: featureDetails.featureId,
-			})
-			.fetch();
+		const [findOptionsResponse, institutionLocationsResponse] = await Promise.all([
+			providerService
+				.fetchFindOptions({
+					institutionId: institution.institutionId,
+					featureId: featureDetails.featureId,
+				})
+				.fetch(),
+			institutionService.getInstitutionLocations().fetch(),
+		]);
 
-		setFindOptions(response);
+		setFindOptions(findOptionsResponse);
+		setInstitutionLocations(institutionLocationsResponse.locations);
 	}, [featureDetails, institution]);
 
 	const fetchProviders = useCallback(async () => {
@@ -247,11 +259,39 @@ const ConnectWithSupportV2 = () => {
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
-																searchParams.set('location', '');
+																searchParams.set('location', selectedLocation);
 																setSearchParams(searchParams);
 															}}
 														>
-															<div className="py-3">{selectedLocation}</div>
+															<div className="py-3">
+																{institutionLocations.map((l, locationIndex) => {
+																	const isLast =
+																		locationIndex ===
+																		institutionLocations.length - 1;
+
+																	return (
+																		<Form.Check
+																			className={classNames({
+																				'mb-1': !isLast,
+																			})}
+																			type="radio"
+																			name="location"
+																			id={`location--${l.institutionLocationId}`}
+																			label={l.name}
+																			value={l.institutionLocationId}
+																			checked={
+																				selectedLocation ===
+																				l.institutionLocationId
+																			}
+																			onChange={({ currentTarget }) => {
+																				setSelectedLocation(
+																					currentTarget.value
+																				);
+																			}}
+																		/>
+																	);
+																})}
+															</div>
 														</FilterDropdown>
 													)}
 												</React.Fragment>
