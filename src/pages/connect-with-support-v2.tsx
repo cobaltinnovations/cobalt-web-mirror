@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -24,6 +24,7 @@ import { InstitutionLocation } from '@/lib/models';
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
 	const { institution } = useAccount();
+	const pageInstantiated = useRef(false);
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
@@ -42,6 +43,18 @@ const ConnectWithSupportV2 = () => {
 		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
 		[institution?.features, pathname]
 	);
+
+	useEffect(() => {
+		if (pageInstantiated.current) {
+			return;
+		}
+
+		if (institution?.locationPromptRequired !== undefined) {
+			pageInstantiated.current = true;
+		}
+
+		console.log(institution?.locationPromptRequired);
+	}, [institution]);
 
 	const fetchFilters = useCallback(async () => {
 		if (!institution || !featureDetails) {
@@ -199,6 +212,7 @@ const ConnectWithSupportV2 = () => {
 
 																		return (
 																			<Form.Check
+																				key={at.appointmentTimeId}
 																				className={classNames({
 																					'mb-1': !isLast,
 																				})}
@@ -271,6 +285,7 @@ const ConnectWithSupportV2 = () => {
 
 																	return (
 																		<Form.Check
+																			key={l.institutionLocationId}
 																			className={classNames({
 																				'mb-1': !isLast,
 																			})}
@@ -335,9 +350,8 @@ const ConnectWithSupportV2 = () => {
 										const isLast = providerIndex === section.providers.length - 1;
 
 										return (
-											<>
+											<React.Fragment key={provider.providerId}>
 												<ConnectWithSupportItem
-													key={provider.providerId}
 													providerId={provider.providerId}
 													imageUrl={provider.imageUrl}
 													title={provider.name}
@@ -369,7 +383,7 @@ const ConnectWithSupportV2 = () => {
 													}}
 												/>
 												{!isLast && <hr />}
-											</>
+											</React.Fragment>
 										);
 									})}
 								</Col>

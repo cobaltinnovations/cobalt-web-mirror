@@ -26,6 +26,7 @@ export interface Institution {
 	features: InstitutionFeature[];
 	displayFeatures: boolean;
 	takeTriageScreening: boolean;
+	locationPromptRequired: boolean;
 }
 
 export interface InstitutionFeature {
