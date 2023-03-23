@@ -1,18 +1,18 @@
+import { cloneDeep } from 'lodash';
 import moment from 'moment';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { FindOptionsResponse, FIND_OPTIONS_FILTER_IDS, ProviderSection, providerService } from '@/lib/services';
+import { FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
-import { cloneDeep } from 'lodash';
-import { FILTER_DAYS } from '@/contexts/booking-context';
 
 const ConnectWithSupportV2 = () => {
 	const { pathname } = useLocation();
@@ -21,12 +21,13 @@ const ConnectWithSupportV2 = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
 	const timesOfDay = useMemo(() => searchParams.getAll('timeOfDay'), [searchParams]);
+	const location = useMemo(() => searchParams.get('location'), [searchParams]);
+
+	const [selectedDate, setSelectedDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
+	const [selectedTimesOfDay, setSelectedTimesOfDay] = useState(timesOfDay);
+	const [selectedLocation, setSelectedLocation] = useState(location ?? '');
 
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
-
-	const [selectedDate, setSelectedDate] = useState<Date | null>(startDate ? new Date(startDate) : null);
-	const [selectedTimesOfDay, setSelectedTimesOfDay] = useState<string[]>(timesOfDay);
-
 	const [providerSections, setProviderSections] = useState<ProviderSection[]>([]);
 
 	const featureDetails = useMemo(
@@ -56,7 +57,7 @@ const ConnectWithSupportV2 = () => {
 
 		const response = await providerService
 			.findProviders({
-				startDate: findOptions.defaultStartDate,
+				startDate: startDate ?? findOptions.defaultStartDate,
 				endDate: findOptions.defaultEndDate,
 				daysOfWeek: FILTER_DAYS.map((d) => d.key),
 				startTime: findOptions.defaultStartTime,
@@ -69,19 +70,29 @@ const ConnectWithSupportV2 = () => {
 			})
 			.fetch();
 		setProviderSections(response.sections);
-	}, [featureDetails, findOptions]);
+	}, [featureDetails, findOptions, startDate]);
+
+	/* -------------------------------------------- */
+	/* watch queryParams to update filters */
+	/* -------------------------------------------- */
+	useEffect(() => {
+		setSelectedDate(startDate ? new Date(startDate) : new Date());
+	}, [startDate]);
+
+	useEffect(() => {
+		setSelectedTimesOfDay(timesOfDay);
+	}, [timesOfDay]);
+
+	useEffect(() => {
+		setSelectedLocation(location ?? '');
+	}, [location]);
 
 	return (
 		<>
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
-					<p
-						className="mb-0 text-ce
-					paymentTypeIdsnter fs-large"
-					>
-						{featureDetails.description}
-					</p>
+					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
 				</HeroContainer>
 			)}
 
@@ -96,11 +107,12 @@ const ConnectWithSupportV2 = () => {
 									xl={{ span: 6, offset: 3 }}
 								>
 									<div className="d-flex justify-content-center">
-										{(findOptions?.filters ?? []).map((filter) => {
+										{(findOptions?.filters ?? []).map((filter, filterIndex) => {
 											switch (filter.filterId) {
 												case FIND_OPTIONS_FILTER_IDS.DATE:
 													return (
 														<FilterDropdown
+															key={filter.filterId}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
@@ -127,8 +139,12 @@ const ConnectWithSupportV2 = () => {
 																<div className="d-flex justify-content-center">
 																	<DatePicker
 																		inline
-																		selected={selectedDate ?? undefined}
+																		selected={selectedDate}
 																		onChange={(date) => {
+																			if (!date) {
+																				return;
+																			}
+
 																			setSelectedDate(date);
 																		}}
 																	/>
@@ -139,6 +155,7 @@ const ConnectWithSupportV2 = () => {
 												case FIND_OPTIONS_FILTER_IDS.TIME_OF_DAY:
 													return (
 														<FilterDropdown
+															key={filter.filterId}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
@@ -214,9 +231,28 @@ const ConnectWithSupportV2 = () => {
 														</FilterDropdown>
 													);
 												case FIND_OPTIONS_FILTER_IDS.LOCATION:
-													return <></>;
+													return (
+														<FilterDropdown
+															key={filter.filterId}
+															className="mx-1"
+															id={`connect-with-support-filter--${filter.filterId}`}
+															title={filter.name}
+															dismissText="Clear"
+															onDismiss={() => {
+																searchParams.delete('location');
+																setSearchParams(searchParams);
+															}}
+															confirmText="Apply"
+															onConfirm={() => {
+																searchParams.set('location', '');
+																setSearchParams(searchParams);
+															}}
+														>
+															<div className="py-3">{selectedLocation}</div>
+														</FilterDropdown>
+													);
 												default:
-													return null;
+													return <React.Fragment key={filterIndex} />;
 											}
 										})}
 									</div>
@@ -255,13 +291,24 @@ const ConnectWithSupportV2 = () => {
 											title={provider.name}
 											subtitle={provider.title}
 											descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
-											buttons={provider.times.map((time) => ({
-												title: time.timeDescription,
-												disabled: time.status !== 'AVAILABLE',
-												onClick: () => {
-													window.alert('[TODO]: Start booking flow.');
-												},
-											}))}
+											buttons={
+												provider.displayPhoneNumberOnlyForBooking
+													? [
+															{
+																title: provider.formattedPhoneNumber,
+																onClick: () => {
+																	window.alert('[TODO]: Call this number?');
+																},
+															},
+													  ]
+													: provider.times.map((time) => ({
+															title: time.timeDescription,
+															disabled: time.status !== 'AVAILABLE',
+															onClick: () => {
+																window.alert('[TODO]: Start booking flow?');
+															},
+													  }))
+											}
 										/>
 									))}
 								</Col>
