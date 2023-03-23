@@ -19,6 +19,28 @@ const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
 		padding: '16px 24px',
 		...theme.fonts.default,
+		'& .react-datepicker': {
+			boxShadow: 'none',
+			'&__header': {
+				backgroundColor: 'transparent',
+			},
+			'&__current-month, &__day-name': {
+				color: theme.colors.n900,
+			},
+			'&__navigation': {
+				'&:hover': {
+					color: theme.colors.n900,
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					color: theme.colors.n900,
+					backgroundColor: theme.colors.n75,
+				},
+			},
+			'&__navigation-icon:before': {
+				borderColor: theme.colors.n500,
+			},
+		},
 	},
 	dropdownMenuFooter: {
 		textAlign: 'right',

@@ -132,14 +132,16 @@ const ConnectWithSupportV2 = () => {
 															}}
 														>
 															<div className="py-3">
-																<p className="mb-5 fw-bold">
+																<p className="mb-6 fw-bold">
 																	Show providers with availability from:
 																	<br />
 																	{moment(selectedDate).format('MMMM D')} onwards
 																</p>
+																<hr className="mb-6" />
 																<div className="d-flex justify-content-center">
 																	<DatePicker
 																		inline
+																		minDate={new Date()}
 																		selected={selectedDate}
 																		onChange={(date) => {
 																			if (!date) {
