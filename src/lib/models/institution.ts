@@ -34,7 +34,7 @@ export interface InstitutionFeature {
 	navDescription: string;
 	navigationHeaderId: string;
 	recommended: boolean;
-	supportRoleId: string;
+	supportRoleIds: string[];
 	urlName: string;
 }
 

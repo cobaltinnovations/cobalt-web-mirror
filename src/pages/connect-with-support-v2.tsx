@@ -47,11 +47,11 @@ const ConnectWithSupportV2 = () => {
 		const response = await providerService
 			.fetchFindOptions({
 				institutionId: institution.institutionId,
-				supportRoleIds: [featureDetails.supportRoleId],
+				supportRoleIds: featureDetails.supportRoleIds,
 			})
 			.fetch();
 
-		setFilters(response.filters);
+		setFilters(response.filters ?? []);
 		setAppointmentTimes(response.appointmentTimes);
 	}, [featureDetails, institution]);
 
