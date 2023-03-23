@@ -33,6 +33,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface FilterDropdownProps {
 	id: string;
 	title: string;
+	active?: boolean;
 	width?: number;
 	dismissText?: string;
 	confirmText?: string;
@@ -44,6 +45,7 @@ interface FilterDropdownProps {
 const FilterDropdown = ({
 	id,
 	title,
+	active = false,
 	width = 400,
 	dismissText = 'Cancel',
 	confirmText = 'Apply',
@@ -63,7 +65,7 @@ const FilterDropdown = ({
 			onToggle={setShow}
 		>
 			<Dropdown.Toggle
-				variant="outline-primary"
+				variant={active ? 'primary' : 'outline-primary'}
 				as={DropdownToggle}
 				className="d-inline-flex align-items-center pe-3"
 				id={id}

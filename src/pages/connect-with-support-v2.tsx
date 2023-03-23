@@ -107,12 +107,13 @@ const ConnectWithSupportV2 = () => {
 									xl={{ span: 6, offset: 3 }}
 								>
 									<div className="d-flex justify-content-center">
-										{(findOptions?.filters ?? []).map((filter, filterIndex) => {
-											switch (filter.filterId) {
-												case FIND_OPTIONS_FILTER_IDS.DATE:
-													return (
+										{(findOptions?.filters ?? []).map((filter) => {
+											return (
+												<React.Fragment key={filter.filterId}>
+													{filter.filterId === FIND_OPTIONS_FILTER_IDS.DATE && (
 														<FilterDropdown
 															key={filter.filterId}
+															active={!!startDate}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
@@ -151,11 +152,11 @@ const ConnectWithSupportV2 = () => {
 																</div>
 															</div>
 														</FilterDropdown>
-													);
-												case FIND_OPTIONS_FILTER_IDS.TIME_OF_DAY:
-													return (
+													)}
+													{filter.filterId === FIND_OPTIONS_FILTER_IDS.TIME_OF_DAY && (
 														<FilterDropdown
 															key={filter.filterId}
+															active={timesOfDay.length > 0}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
@@ -229,11 +230,11 @@ const ConnectWithSupportV2 = () => {
 																)}
 															</div>
 														</FilterDropdown>
-													);
-												case FIND_OPTIONS_FILTER_IDS.LOCATION:
-													return (
+													)}
+													{filter.filterId === FIND_OPTIONS_FILTER_IDS.LOCATION && (
 														<FilterDropdown
 															key={filter.filterId}
+															active={!!location}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
@@ -250,10 +251,9 @@ const ConnectWithSupportV2 = () => {
 														>
 															<div className="py-3">{selectedLocation}</div>
 														</FilterDropdown>
-													);
-												default:
-													return <React.Fragment key={filterIndex} />;
-											}
+													)}
+												</React.Fragment>
+											);
 										})}
 									</div>
 								</Col>
@@ -285,32 +285,42 @@ const ConnectWithSupportV2 = () => {
 									lg={{ span: 8, offset: 2 }}
 									xl={{ span: 6, offset: 3 }}
 								>
-									{section.providers.map((provider) => (
-										<ConnectWithSupportItem
-											key={provider.providerId}
-											title={provider.name}
-											subtitle={provider.title}
-											descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
-											buttons={
-												provider.displayPhoneNumberOnlyForBooking
-													? [
-															{
-																title: provider.formattedPhoneNumber,
-																onClick: () => {
-																	window.alert('[TODO]: Call this number?');
-																},
-															},
-													  ]
-													: provider.times.map((time) => ({
-															title: time.timeDescription,
-															disabled: time.status !== 'AVAILABLE',
-															onClick: () => {
-																window.alert('[TODO]: Start booking flow?');
-															},
-													  }))
-											}
-										/>
-									))}
+									{section.providers.map((provider, providerIndex) => {
+										const isLast = providerIndex === section.providers.length - 1;
+
+										return (
+											<>
+												<ConnectWithSupportItem
+													key={provider.providerId}
+													providerId={provider.providerId}
+													imageUrl={provider.imageUrl}
+													title={provider.name}
+													subtitle={provider.title}
+													descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
+													buttons={
+														provider.displayPhoneNumberOnlyForBooking
+															? [
+																	{
+																		as: 'a',
+																		className: 'text-decoration-none',
+																		href: `tel:${provider.phoneNumber}`,
+																		title: provider.formattedPhoneNumber,
+																	},
+															  ]
+															: provider.times.map((time) => ({
+																	title: time.timeDescription,
+																	disabled: time.status !== 'AVAILABLE',
+																	onClick: () => {
+																		window.alert('[TODO]: Start booking flow?');
+																	},
+															  }))
+													}
+													showViewButton={!provider.displayPhoneNumberOnlyForBooking}
+												/>
+												{!isLast && <hr />}
+											</>
+										);
+									})}
 								</Col>
 							</Row>
 						</Container>
