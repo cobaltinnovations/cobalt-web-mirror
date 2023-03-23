@@ -28,11 +28,11 @@ const ConnectWithSupportV2 = () => {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
-	const timesOfDay = useMemo(() => searchParams.getAll('timeOfDay'), [searchParams]);
+	const appointmentTimeIds = useMemo(() => searchParams.getAll('appointmentTimeIds'), [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId'), [searchParams]);
 
 	const [selectedStartDate, setSelectedStartDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
-	const [selectedTimesOfDay, setSelectedTimesOfDay] = useState(timesOfDay);
+	const [selectedAppointmentTimeIds, setSelectedAppointmentTimeIds] = useState(appointmentTimeIds);
 	const [selectedInstitutionLocationId, setSelectedInstitutionLocationId] = useState(institutionLocationId ?? '');
 
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
@@ -91,19 +91,20 @@ const ConnectWithSupportV2 = () => {
 				availability: findOptions.defaultAvailability,
 				visitTypeIds: findOptions.defaultVisitTypeIds,
 				...(institutionLocationId && { institutionLocationId }),
+				...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
 			})
 			.fetch();
 
 		setProviderSections(response.sections);
-	}, [featureDetails, findOptions, institutionLocationId, startDate]);
+	}, [appointmentTimeIds, featureDetails, findOptions, institutionLocationId, startDate]);
 
 	useEffect(() => {
 		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
 	}, [startDate]);
 
 	useEffect(() => {
-		setSelectedTimesOfDay(timesOfDay);
-	}, [timesOfDay]);
+		setSelectedAppointmentTimeIds(appointmentTimeIds);
+	}, [appointmentTimeIds]);
 
 	useEffect(() => {
 		setSelectedInstitutionLocationId(institutionLocationId ?? '');
@@ -180,20 +181,20 @@ const ConnectWithSupportV2 = () => {
 													{filter.filterId === FIND_OPTIONS_FILTER_IDS.TIME_OF_DAY && (
 														<FilterDropdown
 															key={filter.filterId}
-															active={timesOfDay.length > 0}
+															active={appointmentTimeIds.length > 0}
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
 															dismissText="Clear"
 															onDismiss={() => {
-																searchParams.delete('timeOfDay');
+																searchParams.delete('appointmentTimeIds');
 																setSearchParams(searchParams);
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
-																searchParams.delete('timeOfDay');
-																selectedTimesOfDay.forEach((tod) => {
-																	searchParams.append('timeOfDay', tod);
+																searchParams.delete('appointmentTimeIds');
+																selectedAppointmentTimeIds.forEach((tod) => {
+																	searchParams.append('appointmentTimeIds', tod);
 																});
 																setSearchParams(searchParams);
 															}}
@@ -217,36 +218,38 @@ const ConnectWithSupportV2 = () => {
 																					'mb-1': !isLast,
 																				})}
 																				type="checkbox"
-																				name="time-of-day"
-																				id={`time-of-day--${at.appointmentTimeId}`}
+																				name="appointment-time"
+																				id={`appointment-time--${at.appointmentTimeId}`}
 																				label={`${at.name} • ${at.description}`}
 																				value={at.appointmentTimeId}
-																				checked={selectedTimesOfDay.includes(
+																				checked={selectedAppointmentTimeIds.includes(
 																					at.appointmentTimeId
 																				)}
 																				onChange={({ currentTarget }) => {
-																					const selectedTimesOfDayClone =
-																						cloneDeep(selectedTimesOfDay);
+																					const selectedAppointmentTimeIdsClone =
+																						cloneDeep(
+																							selectedAppointmentTimeIds
+																						);
 																					const targetIndex =
-																						selectedTimesOfDayClone.findIndex(
+																						selectedAppointmentTimeIdsClone.findIndex(
 																							(tod) =>
 																								tod ===
 																								currentTarget.value
 																						);
 
 																					if (targetIndex > -1) {
-																						selectedTimesOfDayClone.splice(
+																						selectedAppointmentTimeIdsClone.splice(
 																							targetIndex,
 																							1
 																						);
 																					} else {
-																						selectedTimesOfDayClone.push(
+																						selectedAppointmentTimeIdsClone.push(
 																							currentTarget.value
 																						);
 																					}
 
-																					setSelectedTimesOfDay(
-																						selectedTimesOfDayClone
+																					setSelectedAppointmentTimeIds(
+																						selectedAppointmentTimeIdsClone
 																					);
 																				}}
 																			/>
