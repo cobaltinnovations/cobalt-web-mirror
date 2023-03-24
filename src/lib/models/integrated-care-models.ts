@@ -1,19 +1,22 @@
 import { AccountModel } from './account';
-import { PatientOrderScreeningSession, ScreeningSessionResult } from './screening-models';
+import { ScreeningSession, ScreeningSessionResult } from './screening-models';
 
 export interface PatientOrderCountModel {
 	activePatientOrderCount: number;
 	activePatientOrderCountDescription: string;
 }
 
-export interface ActivePatientOrderCountModel {
-	count: number;
-	countDescription: string;
+export interface OpenPatientOrderCountModel {
+	openPatientOrderCount: number;
+	openPatientOrderCountDescription: string;
 }
 
 export interface PatientOrderModel {
 	patientOrderId: string;
-	patientOrderStatusId?: PatientOrderStatusId;
+	patientOrderStatusId: PatientOrderStatusId;
+	patientOrderStatusDescription: string;
+	patientOrderDispositionId: PatientOrderDispositionId;
+	patientOrderDispositionDescription: PatientOrderDisposition;
 	patientAccountId?: string;
 	patientAddressId?: string;
 	panelAccountId?: string;
@@ -64,8 +67,9 @@ export interface PatientOrderModel {
 	lastActiveMedicationOrderSummary?: string;
 	medications?: string;
 	recentPsychotherapeuticMedications?: string;
-	episodeEndedAt?: string;
-	episodeEndedAtDescription?: string;
+	episodeClosedAt?: string;
+	episodeClosedAtDescription?: string;
+	episodeClosedByAccountId?: string;
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
 	patientEthnicityId: string;
@@ -83,15 +87,46 @@ export interface PatientOrderModel {
 	patientOrderTriageGroups?: PateintOrderTriageGroupModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
 	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
-	screeningSession?: PatientOrderScreeningSession;
+	patientOrderScreeningStatusDescription?: string;
+	screeningSession?: ScreeningSession;
 	screeningSessionResult?: ScreeningSessionResult;
+	patientOrderClosureReasonId?: PatientOrderClosureReasonId;
+	patientOrderClosureReasonDescription?: string;
+	patientOrderScheduledScreeningId?: string;
+	patientOrderScheduledScreeningScheduledDateTime?: string;
+	patientOrderScheduledScreeningScheduledDateTimeDescription?: string;
+	patientOrderScheduledScreeningCalendarUrl?: string;
+	crisisIndicated?: boolean;
+	crisisIndicatedAt?: string;
+	crisisIndicatedAtDescription?: string;
+	patientBelowAgeThreshold?: boolean;
+	mostRecentEpisodeClosedAt: string;
+	mostRecentEpisodeClosedAtDescription: string;
+	mostRecentEpisodeClosedWithinDateThreshold: boolean;
+}
+
+enum PatientOrderClosureReasonId {
+	NOT_CLOSED = 'NOT_CLOSED',
+	INELIGIBLE_DUE_TO_INSURANCE = 'INELIGIBLE_DUE_TO_INSURANCE',
+	REFUSED_CARE = 'REFUSED_CARE',
+	TRANSFERRED_TO_SAFETY_PLANNING = 'TRANSFERRED_TO_SAFETY_PLANNING',
+	SCHEDULED_WITH_SPECIALTY_CARE = 'SCHEDULED_WITH_SPECIALTY_CARE',
+	SCHEDULED_WITH_BHP = 'SCHEDULED_WITH_BHP',
 }
 
 export enum PatientOrderStatusId {
-	OPEN = 'OPEN',
-	CLOSED = 'CLOSED',
-	ARCHIVED = 'ARCHIVED',
-	DELETED = 'DELETED',
+	'PENDING' = 'PENDING',
+	'NEEDS_ASSESSMENT' = 'NEEDS_ASSESSMENT',
+	SCHEDULED = 'SCHEDULED',
+	SAFETY_PLANNING = 'SAFETY_PLANNING',
+	SPECIALTY_CARE = 'SPECIALTY_CARE',
+	SUBCLINICAL = 'SUBCLINICAL',
+	BHP = 'BHP',
+}
+
+export interface PatientOrderStatus {
+	patientOrderStatusId: PatientOrderStatusId;
+	description: string;
 }
 
 export enum PatientOrderScreeningStatusId {
@@ -101,15 +136,15 @@ export enum PatientOrderScreeningStatusId {
 	COMPLETE = 'COMPLETE',
 }
 
-export enum PatientOrderPanelTypeId {
-	ALL = 'ALL',
-	NEW = 'NEW',
-	NEED_ASSESSMENT = 'NEED_ASSESSMENT',
-	SCHEDULED = 'SCHEDULED',
-	SAFETY_PLANNING = 'SAFETY_PLANNING',
-	SPECIALTY_CARE = 'SPECIALTY_CARE',
-	BHP = 'BHP',
+export enum PatientOrderDispositionId {
+	OPEN = 'OPEN',
 	CLOSED = 'CLOSED',
+	ARCHIVED = 'ARCHIVED',
+}
+
+export interface PatientOrderDisposition {
+	patientOrderDispositionId: PatientOrderDispositionId;
+	description: string;
 }
 
 export interface PatientAddressModel {
@@ -180,4 +215,16 @@ export interface PateintOrderTriageGroupModel {
 export interface PatientOrderClosureReasonModel {
 	patientOrderClosureReasonId: string;
 	description: string;
+}
+
+export interface PatientOrderAutocompleteResult {
+	patientMrn: string;
+	patientId: string;
+	patientIdType: string;
+	patientFirstName: string;
+	patientLastName: string;
+	patientDisplayName: string;
+	patientDisplayNameWithLastFirst: string;
+	patientPhoneNumber: string;
+	patientPhoneNumberDescription: string;
 }

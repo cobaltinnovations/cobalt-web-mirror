@@ -1,11 +1,18 @@
 export interface ScreeningSession {
 	screeningSessionId: string;
 	screeningFlowVersionId: string;
-	targetAccountId: string;
 	createdByAccountId: string;
+	targetAccountId: string;
+	patientOrderId: string;
 	completed: boolean;
+	completedAt: string;
+	completedAtDescription: string;
 	skipped: boolean;
+	skippedAt: string;
+	skippedAtDescription: string;
 	crisisIndicated: boolean;
+	crisisIndicatedAt: string;
+	crisisIndicatedAtDescription: string;
 	created: string;
 	createdDescription: string;
 	nextScreeningQuestionContextId?: string;
@@ -101,7 +108,7 @@ export enum ScreeningImageId {
 	Welcome = 'WELCOME',
 }
 
-export interface ScreeningQuestionPrompt {
+export interface ScreeningConfirmationPrompt {
 	screeningConfirmationPromptId: string;
 	screeningImageId?: ScreeningImageId;
 	text: string;
@@ -110,33 +117,14 @@ export interface ScreeningQuestionPrompt {
 
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
-	previouslyAnswered: boolean;
+	screeningSession: ScreeningSession;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
 	screeningAnswers: ScreeningAnswer[];
-	screeningFlowVersion: ScreeningFlowVersion;
 	screeningSessionDestination: ScreeningSessionDestination;
-	preQuestionScreeningConfirmationPrompt?: ScreeningQuestionPrompt;
-}
-
-/* ---------------------------------------------- */
-/* Mainly used by MHIC */
-/* ---------------------------------------------- */
-export interface PatientOrderScreeningSession {
-	completed: boolean;
-	completedAt: string;
-	completedAtDescription: string;
-	created: string;
-	createdByAccountId: string;
-	createdDescription: string;
-	crisisIndicated: boolean;
-	crisisIndicatedAt: string;
-	crisisIndicatedAtDescription: string;
-	patientOrderId: string;
-	screeningFlowVersionId: string;
-	screeningSessionId: string;
-	skipped: boolean;
-	targetAccountId: string;
+	screeningFlowVersion: ScreeningFlowVersion;
+	preQuestionScreeningConfirmationPrompt?: ScreeningConfirmationPrompt;
+	previouslyAnswered: boolean;
 }
 
 export interface ScreeningSessionResult {
@@ -147,18 +135,20 @@ export interface ScreeningSessionResult {
 	screeningSessionScreeningResults?: ScreeningSessionScreeningResult[];
 }
 
+export interface ScreeningScore {
+	overallScore?: number;
+	personalAccomplishmentScore?: number;
+	depersonalizationScore?: number;
+	emotionalExhaustionScore?: number;
+}
+
 export interface ScreeningSessionScreeningResult {
 	screeningVersionId?: string;
 	screeningId?: string;
 	screeningVersionNumber?: number;
 	screeningTypeId?: string;
 	screeningName?: string;
-	screeningScore?: {
-		overallScore?: number;
-		personalAccomplishmentScore?: number;
-		depersonalizationScore?: number;
-		emotionalExhaustionScore?: number;
-	};
+	screeningScore?: ScreeningScore;
 	belowScoringThreshold?: boolean;
 	screeningQuestionResults?: ScreeningQuestionResult[];
 }

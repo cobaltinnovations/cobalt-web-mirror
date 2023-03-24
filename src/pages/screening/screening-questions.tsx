@@ -7,7 +7,7 @@ import {
 	ScreeningAnswerFormatId,
 	ScreeningAnswerSelection,
 	ScreeningQuestionContextResponse,
-	ScreeningQuestionPrompt,
+	ScreeningConfirmationPrompt,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -30,11 +30,11 @@ const ScreeningQuestionsPage = () => {
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 	const [supplementText, setSupplementText] = useState({} as Record<string, string>);
 
-	const [questionPrompt, setQuestionPrompt] = useState<ScreeningQuestionPrompt | null>(null);
+	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt | null>(null);
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 
 	const clearPrompt = useCallback(() => {
-		setQuestionPrompt(null);
+		setConfirmationPrompt(null);
 		setIsSubmitPrompt(false);
 	}, []);
 
@@ -45,7 +45,7 @@ const ScreeningQuestionsPage = () => {
 		setScreeningQuestionContextResponse(response);
 
 		if (response.preQuestionScreeningConfirmationPrompt) {
-			setQuestionPrompt(response.preQuestionScreeningConfirmationPrompt);
+			setConfirmationPrompt(response.preQuestionScreeningConfirmationPrompt);
 		} else {
 			clearPrompt();
 		}
@@ -98,10 +98,10 @@ const ScreeningQuestionsPage = () => {
 				})
 				.catch((e) => {
 					if (e?.apiError?.metadata?.screeningConfirmationPrompt) {
-						const newConfirmationPrompt: ScreeningQuestionPrompt =
+						const newConfirmationPrompt: ScreeningConfirmationPrompt =
 							e?.apiError?.metadata?.screeningConfirmationPrompt;
 						setIsSubmitPrompt(true);
-						setQuestionPrompt(newConfirmationPrompt);
+						setConfirmationPrompt(newConfirmationPrompt);
 					} else if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 						handleError(e);
 					}
@@ -365,7 +365,7 @@ const ScreeningQuestionsPage = () => {
 		} else if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
 			return (
 				isSubmitting ||
-				(!questionPrompt &&
+				(!confirmationPrompt &&
 					selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount)
 			);
 		}
@@ -374,19 +374,19 @@ const ScreeningQuestionsPage = () => {
 			selectedAnswers.length < screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount ||
 			selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount;
 
-		return isSubmitting || (!questionPrompt && answerCountMismatch);
-	}, [isSubmitting, questionPrompt, screeningQuestionContextResponse, selectedAnswers.length]);
+		return isSubmitting || (!confirmationPrompt && answerCountMismatch);
+	}, [isSubmitting, confirmationPrompt, screeningQuestionContextResponse, selectedAnswers.length]);
 
 	return (
 		<AsyncPage fetchData={fetchData}>
 			<Container className="py-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{questionPrompt ? (
+						{confirmationPrompt ? (
 							<>
-								{questionPrompt.screeningImageId && (
+								{confirmationPrompt.screeningImageId && (
 									<ScreeningPromptImage
-										screeningImageId={questionPrompt.screeningImageId}
+										screeningImageId={confirmationPrompt.screeningImageId}
 										className="mt-6 mx-auto d-block"
 									/>
 								)}
@@ -394,7 +394,7 @@ const ScreeningQuestionsPage = () => {
 								<div
 									className="my-6 wysiwyg-display"
 									dangerouslySetInnerHTML={{
-										__html: questionPrompt.text,
+										__html: confirmationPrompt.text,
 									}}
 								/>
 
@@ -434,7 +434,7 @@ const ScreeningQuestionsPage = () => {
 											}
 										}}
 									>
-										{questionPrompt.actionText}
+										{confirmationPrompt.actionText}
 									</Button>
 								</div>
 							</>

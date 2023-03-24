@@ -1,3 +1,5 @@
+import { PatientOrderDisposition, PatientOrderStatus } from './integrated-care-models';
+
 interface BirthSex {
 	birthSexId: string;
 	description: string;
@@ -57,6 +59,8 @@ export interface ReferenceDataResponse {
 	genderIdentities: GenderIdentity[];
 	insurances: Insurance[];
 	languages: Language[];
+	patientOrderDispositions: PatientOrderDisposition[];
+	patientOrderStatuses: PatientOrderStatus[];
 	races: Race[];
 	regionsByCountryCode: Record<string, Region[]>;
 	timeZones: TimeZone[];
