@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { ErrorConfig } from '@/lib/http-client';
@@ -11,6 +11,7 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 	const navigate = useNavigate();
 	const { setShow, setError } = useContext(ErrorModalContext);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
+	const [redirectToSignIn, setRedirectToSignIn] = useState(false);
 
 	const handleError = useCallback(
 		(error: ErrorConfig | unknown) => {
@@ -25,7 +26,7 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 						return;
 					}
 
-					navigate('/sign-in', { replace: true });
+					setRedirectToSignIn(true);
 					return;
 				} else {
 					setShow(true);
@@ -33,8 +34,14 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 				}
 			}
 		},
-		[navigate, setSignOnUrl, setShowReauthModal, setShow, setError]
+		[setSignOnUrl, setShowReauthModal, setShow, setError]
 	);
+
+	useEffect(() => {
+		if (redirectToSignIn) {
+			navigate('/sign-in', { replace: true });
+		}
+	}, [navigate, redirectToSignIn]);
 
 	return handleError;
 }
