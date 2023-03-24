@@ -154,11 +154,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface PathwaysSectionProps {
-	showRetakeCta: boolean;
 	className?: string;
 }
 
-const PathwaysSection = ({ showRetakeCta, className }: PathwaysSectionProps) => {
+const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 	const { institution } = useAccount();
 	const classes = useStyles();
 
@@ -200,7 +199,7 @@ const PathwaysSection = ({ showRetakeCta, className }: PathwaysSectionProps) => 
 								<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
 								<p className="mb-0 fs-large">
 									Recommendations are based on your recent assessment scores.
-									{showRetakeCta && (
+									{institution?.takeFeatureScreening && institution?.hasTakenFeatureScreening && (
 										<Button
 											variant="link"
 											className="ms-1 p-0 fw-normal"

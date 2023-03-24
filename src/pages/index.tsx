@@ -149,8 +149,8 @@ const Index: FC = () => {
 							</Col>
 						</Row>
 					</Container>
-					<PathwaysSection className="mb-10" showRetakeCta={!institution.takeTriageScreening} />
-					{institution.takeTriageScreening && (
+					<PathwaysSection className="mb-10" />
+					{!institution.hasTakenFeatureScreening && (
 						<Container>
 							<Row>
 								<Col>

@@ -25,9 +25,10 @@ export interface Institution {
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
-	takeTriageScreening: boolean;
 	locationPromptRequired: boolean;
 	featureScreeningFlowId?: string;
+	hasTakenFeatureScreening: boolean;
+	takeFeatureScreening: boolean;
 }
 
 export interface InstitutionFeature {
