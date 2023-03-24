@@ -25,6 +25,12 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 
+enum SEARCH_PARAMS {
+	START_DATE = 'startDate',
+	APPOINTMENT_TIME_IDS = 'appointmentTimeIds',
+	INSTITUTION_LOCATION_ID = 'institutionLocationId',
+}
+
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname } = useLocation();
@@ -33,9 +39,12 @@ const ConnectWithSupportV2 = () => {
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const startDate = useMemo(() => searchParams.get('startDate'), [searchParams]);
-	const appointmentTimeIds = useMemo(() => searchParams.getAll('appointmentTimeIds'), [searchParams]);
-	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId'), [searchParams]);
+	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
+	const appointmentTimeIds = useMemo(() => searchParams.getAll(SEARCH_PARAMS.APPOINTMENT_TIME_IDS), [searchParams]);
+	const institutionLocationId = useMemo(
+		() => searchParams.get(SEARCH_PARAMS.INSTITUTION_LOCATION_ID),
+		[searchParams]
+	);
 
 	const [selectedStartDate, setSelectedStartDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
 	const [selectedAppointmentTimeIds, setSelectedAppointmentTimeIds] = useState(appointmentTimeIds);
@@ -67,7 +76,7 @@ const ConnectWithSupportV2 = () => {
 		if (featureDetails?.locationPromptRequired) {
 			setShowEmployerModal(true);
 		} else if (account?.institutionLocationId) {
-			searchParams.set('institutionLocationId', account.institutionLocationId);
+			searchParams.set(SEARCH_PARAMS.INSTITUTION_LOCATION_ID, account.institutionLocationId);
 			setSearchParams(searchParams);
 		}
 	}, [account?.institutionLocationId, featureDetails?.locationPromptRequired, searchParams, setSearchParams]);
@@ -235,13 +244,13 @@ const ConnectWithSupportV2 = () => {
 															title={filter.name}
 															dismissText="Cancel"
 															onDismiss={() => {
-																searchParams.delete('startDate');
+																searchParams.delete(SEARCH_PARAMS.START_DATE);
 																setSearchParams(searchParams);
 															}}
 															confirmText="Done"
 															onConfirm={() => {
 																searchParams.set(
-																	'startDate',
+																	SEARCH_PARAMS.START_DATE,
 																	moment(selectedStartDate).format('YYYY-MM-DD')
 																);
 																setSearchParams(searchParams);
@@ -280,14 +289,17 @@ const ConnectWithSupportV2 = () => {
 															title={filter.name}
 															dismissText="Clear"
 															onDismiss={() => {
-																searchParams.delete('appointmentTimeIds');
+																searchParams.delete(SEARCH_PARAMS.APPOINTMENT_TIME_IDS);
 																setSearchParams(searchParams);
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
-																searchParams.delete('appointmentTimeIds');
+																searchParams.delete(SEARCH_PARAMS.APPOINTMENT_TIME_IDS);
 																selectedAppointmentTimeIds.forEach((tod) => {
-																	searchParams.append('appointmentTimeIds', tod);
+																	searchParams.append(
+																		SEARCH_PARAMS.APPOINTMENT_TIME_IDS,
+																		tod
+																	);
 																});
 																setSearchParams(searchParams);
 															}}
@@ -361,13 +373,15 @@ const ConnectWithSupportV2 = () => {
 															title={filter.name}
 															dismissText="Clear"
 															onDismiss={() => {
-																searchParams.delete('institutionLocationId');
+																searchParams.delete(
+																	SEARCH_PARAMS.INSTITUTION_LOCATION_ID
+																);
 																setSearchParams(searchParams);
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
 																searchParams.set(
-																	'institutionLocationId',
+																	SEARCH_PARAMS.INSTITUTION_LOCATION_ID,
 																	selectedInstitutionLocationId
 																);
 																setSearchParams(searchParams);
