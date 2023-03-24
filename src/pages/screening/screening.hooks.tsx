@@ -32,7 +32,15 @@ export function useScreeningNavigation() {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
-					openInCrisisModal(true);
+					navigate(
+						{
+							pathname: '/in-crisis',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
 					return;
 				case ScreeningSessionDestinationId.CONTENT_LIST:
 					navigate(
