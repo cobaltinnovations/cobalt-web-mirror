@@ -2,11 +2,12 @@ import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { InstitutionLocation } from '@/lib/models';
 import {
+	accountService,
 	FindOptionsResponse,
 	FIND_OPTIONS_FILTER_IDS,
 	institutionService,
@@ -22,10 +23,12 @@ import FilterDropdown from '@/components/filter-dropdown';
 import DatePicker from '@/components/date-picker';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import useHandleError from '@/hooks/use-handle-error';
 
 const ConnectWithSupportV2 = () => {
+	const handleError = useHandleError();
 	const { pathname } = useLocation();
-	const { institution } = useAccount();
+	const { account, setAccount, institution } = useAccount();
 	const pageInstantiated = useRef(false);
 	const bookingRef = useRef<BookingRefHandle>(null);
 
@@ -41,6 +44,9 @@ const ConnectWithSupportV2 = () => {
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
 	const [providerSections, setProviderSections] = useState<ProviderSection[]>([]);
+
+	const [showEmployerModal, setShowEmployerModal] = useState(false);
+	const [selectedEmployerId, setSelectedEmployerId] = useState(account?.institutionLocationId ?? '');
 
 	const { setAppointmentTypes, setEpicDepartments, isEligible, setIsEligible } = useContext(BookingContext);
 
@@ -58,7 +64,7 @@ const ConnectWithSupportV2 = () => {
 			pageInstantiated.current = true;
 		}
 
-		console.log(featureDetails?.locationPromptRequired);
+		setShowEmployerModal(featureDetails?.locationPromptRequired ?? false);
 	}, [featureDetails?.locationPromptRequired]);
 
 	const fetchFilters = useCallback(async () => {
@@ -113,6 +119,26 @@ const ConnectWithSupportV2 = () => {
 		startDate,
 	]);
 
+	const handleEmployerModalContinueButton = useCallback(async () => {
+		if (!account) {
+			return;
+		}
+
+		try {
+			const response = await accountService
+				.setAccountLocation(account.accountId, {
+					accountId: account.accountId,
+					institutionLocationId: selectedEmployerId !== 'NA' ? selectedEmployerId : '',
+				})
+				.fetch();
+
+			setAccount(response.account);
+			setShowEmployerModal(false);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [account, handleError, selectedEmployerId, setAccount]);
+
 	useEffect(() => {
 		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
 	}, [startDate]);
@@ -127,6 +153,50 @@ const ConnectWithSupportV2 = () => {
 
 	return (
 		<>
+			<Modal centered show={showEmployerModal}>
+				<Modal.Header>
+					<Modal.Title>Select Employer</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p className="mb-4 fw-bold">
+						Select your employer so we can display the providers available to you.
+					</p>
+					{institutionLocations.map((l) => {
+						return (
+							<Form.Check
+								key={l.institutionLocationId}
+								className="mb-1"
+								type="radio"
+								name="employer"
+								id={`employer--${l.institutionLocationId}`}
+								label={l.name}
+								value={l.institutionLocationId}
+								checked={selectedEmployerId === l.institutionLocationId}
+								onChange={({ currentTarget }) => {
+									setSelectedEmployerId(currentTarget.value);
+								}}
+							/>
+						);
+					})}
+					<Form.Check
+						type="radio"
+						name="employer"
+						id="employer--NA"
+						label="I'm not sure / I'd rather not say"
+						value={'NA'}
+						checked={selectedEmployerId === 'NA'}
+						onChange={({ currentTarget }) => {
+							setSelectedEmployerId(currentTarget.value);
+						}}
+					/>
+				</Modal.Body>
+				<Modal.Footer className="text-right">
+					<Button disabled={!selectedEmployerId} onClick={handleEmployerModalContinueButton}>
+						Continue
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
 			<BookingModals ref={bookingRef} />
 			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />
 

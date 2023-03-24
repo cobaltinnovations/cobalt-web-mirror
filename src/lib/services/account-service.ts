@@ -307,4 +307,11 @@ export const accountService = {
 			data,
 		});
 	},
+	setAccountLocation(accountId: string, data: { accountId: string; institutionLocationId: string }) {
+		return httpSingleton.orchestrateRequest<AccountResponse>({
+			method: 'PUT',
+			url: `/accounts/${accountId}/location`,
+			data,
+		});
+	},
 };
