@@ -12,11 +12,11 @@ interface MhicPatientOrderTableProps {
 	isLoading: boolean;
 	patientOrders: PatientOrderModel[];
 	selectAll: boolean;
-	onSelectAllChange(value: boolean): void;
-	selectedPatientOrderIds: string[];
-	onSelectPatientOrderIdsChange(selectedPatientOrderIds: string[]): void;
-	totalPatientOrdersCount: number;
-	totalPatientOrdersDescription: string;
+	onSelectAllChange?(value: boolean): void;
+	selectedPatientOrderIds?: string[];
+	onSelectPatientOrderIdsChange?(selectedPatientOrderIds: string[]): void;
+	totalPatientOrdersCount?: number;
+	totalPatientOrdersDescription?: string;
 	pageNumber: number;
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
@@ -47,7 +47,7 @@ export const MhicPatientOrderTable = ({
 	patientOrders,
 	selectAll,
 	onSelectAllChange,
-	selectedPatientOrderIds,
+	selectedPatientOrderIds = [],
 	onSelectPatientOrderIdsChange,
 	totalPatientOrdersCount,
 	totalPatientOrdersDescription,
@@ -92,12 +92,12 @@ export const MhicPatientOrderTable = ({
 													(order) => order.patientOrderId
 												);
 
-												onSelectPatientOrderIdsChange(allPatientOrderIds);
+												onSelectPatientOrderIdsChange?.(allPatientOrderIds);
 											} else {
-												onSelectPatientOrderIdsChange([]);
+												onSelectPatientOrderIdsChange?.([]);
 											}
 
-											onSelectAllChange(currentTarget.checked);
+											onSelectAllChange?.(currentTarget.checked);
 										}}
 									/>
 								</TableCell>
@@ -188,12 +188,12 @@ export const MhicPatientOrderTable = ({
 													);
 
 													if (allAreSelected) {
-														onSelectAllChange(true);
+														onSelectAllChange?.(true);
 													} else {
-														onSelectAllChange(false);
+														onSelectAllChange?.(false);
 													}
 
-													onSelectPatientOrderIdsChange(selectedPatientOrderIdsClone);
+													onSelectPatientOrderIdsChange?.(selectedPatientOrderIdsClone);
 												}}
 											/>
 										</TableCell>
@@ -325,7 +325,7 @@ export const MhicPatientOrderTable = ({
 						<Col xs={{ span: 4, offset: 4 }}>
 							<div className="d-flex justify-content-center align-items-center">
 								<TablePagination
-									total={totalPatientOrdersCount}
+									total={totalPatientOrdersCount ?? 0}
 									page={pageNumber}
 									size={pageSize}
 									onClick={onPaginationClick}

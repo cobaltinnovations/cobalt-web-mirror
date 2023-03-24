@@ -261,7 +261,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		/* ----------------------------------------------------------- */
 		/* React Bootstrap Typeahead (RBT) */
 		/* ----------------------------------------------------------- */
-		'.rbt': {
+		':not(.header-rbt).rbt': {
 			flex: 1,
 			'&.has-aux': {
 				display: 'flex',

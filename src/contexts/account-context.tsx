@@ -38,7 +38,7 @@ const AccountContext = createContext({} as AccountContextConfig);
 
 export const LoginDestinationIdRouteMap = {
 	[LoginDestinationId.COBALT_PATIENT]: '/',
-	[LoginDestinationId.IC_PANEL]: '/ic/mhic/my-view',
+	[LoginDestinationId.IC_PANEL]: '/ic/mhic',
 	[LoginDestinationId.IC_PATIENT]: '/ic/patient',
 } as const;
 
@@ -88,6 +88,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('x-mhic-cobalt-token');
 		Cookies.remove('piccobalt_patientcontext');
 		Cookies.remove('trackActivity');
+		window.localStorage.clear();
 		setRedirectTo('/');
 		setIsTrackedSession(false);
 

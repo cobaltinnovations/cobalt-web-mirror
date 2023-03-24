@@ -1,19 +1,21 @@
-import React, { useMemo } from 'react';
-import { Link, useLocation, matchPath, useNavigate } from 'react-router-dom';
-import { Button, Dropdown } from 'react-bootstrap';
-import classNames from 'classnames';
-
-import useAccount from '@/hooks/use-account';
-import InputHelperSearch from '@/components/input-helper-search';
-import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { createUseThemedStyles } from '@/jss/theme';
-
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { PatientOrderModel } from '@/lib/models';
-
+import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import useAccount from '@/hooks/use-account';
+import { createUseThemedStyles } from '@/jss/theme';
+import {
+	PatientOrderAutocompleteResult,
+	PatientOrderDispositionId,
+	PatientOrderModel,
+	PatientOrderStatusId,
+} from '@/lib/models';
+import classNames from 'classnames';
+import React, { useMemo } from 'react';
+import { Button, Dropdown } from 'react-bootstrap';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
+import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 interface MhicHeaderProps {
-	assessmentView?: boolean;
+	recentOrders?: PatientOrderAutocompleteResult[];
 	patientOrder?: PatientOrderModel;
 }
 
@@ -105,33 +107,71 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicHeader = ({ assessmentView = false, patientOrder }: MhicHeaderProps) => {
+export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps) => {
 	const classes = useStyles();
-	const { pathname } = useLocation();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
+
+	const panelRoot = useMatch({
+		path: '/ic/mhic',
+		end: true,
+	});
+	const patientsRoot = useMatch({
+		path: '/ic/mhic/my-patients',
+		end: true,
+	});
+	const ordersPath = useMatch({
+		path: '/ic/mhic/orders',
+	});
+	const reportsPath = useMatch({
+		path: '/ic/mhic/reports',
+	});
+	const assessmentPath = useMatch({
+		path: '/ic/mhic/orders/:patientOrderId/assessment',
+	});
+
+	const isInAssessmentView = !!assessmentPath;
 
 	const hasAssessmentResult = !!patientOrder?.screeningSessionResult;
 
 	const navigationLinks = useMemo(
 		() => [
 			{
-				to: '/ic/mhic/my-view',
-				title: 'My View',
-				active: matchPath('/ic/mhic/my-view/*', pathname),
+				to: '/ic/mhic',
+				title: 'My Panel',
+				active: !!panelRoot || !!patientsRoot,
 			},
 			{
-				to: '/ic/mhic/orders',
-				title: 'Orders',
-				active: matchPath('/ic/mhic/orders', pathname),
+				to: {
+					pathname: '/ic/mhic/orders',
+					search: `?patientOrderStatusId=${PatientOrderStatusId.PENDING}`,
+				},
+				title: 'Pending Orders',
+				active: !!ordersPath,
+			},
+			{
+				to: {
+					pathname: '/ic/mhic/orders',
+					search: `?patientOrderStatusId=${PatientOrderStatusId.NEEDS_ASSESSMENT}&patientOrderStatusId=${PatientOrderStatusId.SCHEDULED}&patientOrderStatusId=${PatientOrderStatusId.SAFETY_PLANNING}&patientOrderStatusId=${PatientOrderStatusId.SPECIALTY_CARE}&patientOrderStatusId=${PatientOrderStatusId.SUBCLINICAL}&patientOrderStatusId=${PatientOrderStatusId.BHP}`,
+				},
+				title: 'Assigned Orders',
+				active: !!ordersPath,
+			},
+			{
+				to: {
+					pathname: '/ic/mhic/orders',
+					search: `?patientOrderDispositionId=${PatientOrderDispositionId.CLOSED}`,
+				},
+				title: 'Closed Orders',
+				active: !!ordersPath,
 			},
 			{
 				to: '/ic/mhic/reports',
 				title: 'Reports',
-				active: matchPath('/ic/mhic/reports', pathname),
+				active: !!reportsPath,
 			},
 		],
-		[pathname]
+		[ordersPath, panelRoot, patientsRoot, reportsPath]
 	);
 
 	return (
@@ -139,14 +179,14 @@ export const MhicHeader = ({ assessmentView = false, patientOrder }: MhicHeaderP
 			<div
 				className={classes.brandingOuter}
 				style={{
-					minWidth: assessmentView ? 'auto' : 280,
+					minWidth: isInAssessmentView ? 'auto' : 280,
 				}}
 			>
 				<LogoSmallText className="me-3 text-primary" width={105.78} height={14} />
-				{!assessmentView && <span className="d-block text-gray">Integrated Care</span>}
+				{!isInAssessmentView && <span className="d-block text-gray">Integrated Care</span>}
 			</div>
-			<div className={classNames({ 'px-10': !assessmentView }, classes.navigationOuter)}>
-				{assessmentView ? (
+			<div className={classNames({ 'px-10': !isInAssessmentView }, classes.navigationOuter)}>
+				{isInAssessmentView ? (
 					<h5 className="ms-3 mb-0 text-primary">Assessment for {patientOrder?.patientDisplayName}</h5>
 				) : (
 					<nav className="h-100">
@@ -165,7 +205,7 @@ export const MhicHeader = ({ assessmentView = false, patientOrder }: MhicHeaderP
 					</nav>
 				)}
 				<div className="d-flex align-items-center">
-					{assessmentView ? (
+					{isInAssessmentView ? (
 						<Button
 							variant="light"
 							className="p-0 me-10"
@@ -181,12 +221,8 @@ export const MhicHeader = ({ assessmentView = false, patientOrder }: MhicHeaderP
 						</Button>
 					) : (
 						<>
-							<InputHelperSearch
-								placeholder="Search"
-								onClear={() => {
-									return;
-								}}
-							/>
+							<MhicHeaderAutoComplete recentOrders={recentOrders} />
+
 							<Dropdown className="ms-6 d-flex align-items-center">
 								<Dropdown.Toggle as={DropdownToggle} className="p-0" id="mhic-header__dropdown-menu">
 									<AvatarIcon className="d-flex" />

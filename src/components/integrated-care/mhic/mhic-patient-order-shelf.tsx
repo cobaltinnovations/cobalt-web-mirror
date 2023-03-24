@@ -110,6 +110,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface MhicPatientOrderShelfProps {
 	patientOrderId: string | null;
 	onHide(): void;
+	onShelfLoad(result: PatientOrderModel): void;
 }
 
 enum TAB_KEYS {
@@ -120,7 +121,7 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 
@@ -142,7 +143,8 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 		setCurrentPatientOrder(patientOverviewResponse.patientOrder);
 		setPastPatientOrders(patientOverviewResponse.associatedPatientOrders);
 		setReferenceData(referenceDataResponse);
-	}, [patientOrderId]);
+		onShelfLoad(patientOverviewResponse.patientOrder);
+	}, [onShelfLoad, patientOrderId]);
 
 	useEffect(() => {
 		if (patientOrderId) {
@@ -175,7 +177,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide }: MhicPatientOrd
 								</Button>
 								<div className="mb-2 d-flex align-items-center">
 									<h4 className="mb-0 me-2">{currentPatientOrder?.patientDisplayName}</h4>
-									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.OPEN && (
+									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.PENDING && (
 										<Badge pill bg="outline-primary">
 											New
 										</Badge>

@@ -2,9 +2,8 @@ import SentryRoutes from '@/components/sentry-routes';
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import React, { useEffect } from 'react';
-import { Navigate, Outlet, Route, useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
 
-import { MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
 import { PatientHeader } from '@/components/integrated-care/patient';
 
 import PatientLanding from './patient/patient-landing';
@@ -14,106 +13,60 @@ import PatientDemographicsPart2 from './patient/demographics-part-2';
 import PatientDemographicsPart3 from './patient/demographics-part-3';
 import PatientDemographicsThanks from './patient/demographics-thanks';
 import PatientAssessmentComplete from './patient/assessment-complete';
-import MhicMyView from './mhic/my-view';
-import MhicAssignedOrders from './mhic/assigned-orders';
+import MhicMyPanel from './mhic/my-panel';
+import MhicMyPatients from './mhic/my-patients';
 import MhicOrders from './mhic/orders';
 import MhicOverview from './mhic/overview';
 import MhicOrderAssessment from './mhic/order-assessment';
 import MhicOrderLayout from './mhic/order-layout';
 import ScreeningQuestionsPage from '../screening/screening-questions';
 import NoMatch from '../no-match';
+import MhicSearchResults from './mhic/search-results';
+import MhicLayout from './mhic/mhic-layout';
 
 const IntegratedCareLandingPage = () => {
-	const [searchParams, setSearchParams] = useSearchParams();
-
 	return (
 		<SentryRoutes>
-			<Route element={<Outlet />}>
-				<Route index element={<IntegratedCareRedirectToRole />} />
+			<Route index element={<IntegratedCareRedirectToRole />} />
 
-				<Route
-					path="mhic"
-					element={
-						<>
-							<Outlet />
-
-							<MhicPatientOrderShelf
-								patientOrderId={searchParams.get('openPatientOrderId')}
-								onHide={() => {
-									const params = new URLSearchParams(searchParams.toString());
-									params.delete('openPatientOrderId');
-									setSearchParams(params);
-								}}
-							/>
-						</>
-					}
-				>
-					<Route index element={<Navigate to="my-view" replace />} />
-
-					<Route
-						path="my-view"
-						element={
-							<>
-								<MhicHeader />
-
-								<MhicMyView />
-							</>
-						}
-					>
-						<Route index element={<Navigate to="overview" replace />} />
-						<Route path="overview" element={<MhicOverview />} />
-						<Route path="assigned-orders" element={<MhicAssignedOrders />} />
-					</Route>
-
-					<Route
-						path="orders"
-						element={
-							<>
-								<MhicHeader />
-
-								<MhicOrders />
-							</>
-						}
-					/>
-
-					<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
-						<Route index element={<Navigate to="assessment" replace />} />
-
-						<Route path="assessment" element={<MhicOrderAssessment />} />
-
-						<Route path="assessment/:screeningQuestionContextId" element={<ScreeningQuestionsPage />} />
-					</Route>
-
-					<Route
-						path="*"
-						element={
-							<>
-								<MhicHeader />
-								<NoMatch />
-							</>
-						}
-					/>
+			<Route path="mhic" element={<MhicLayout />}>
+				<Route element={<MhicMyPanel />}>
+					<Route index element={<MhicOverview />} />
+					<Route path="my-patients" element={<MhicMyPatients />} />
 				</Route>
 
-				<Route
-					path="patient"
-					element={
-						<>
-							<PatientHeader />
-							<Outlet />
-						</>
-					}
-				>
-					<Route index element={<PatientLanding />} />
-					<Route path="demographics-introduction" element={<PatientDemographicsIntroduction />} />
-					<Route path="demographics-part-1" element={<PatientDemographicsPart1 />} />
-					<Route path="demographics-part-2" element={<PatientDemographicsPart2 />} />
-					<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
-					<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
-					<Route path="assessment-complete" element={<PatientAssessmentComplete />} />
-					{/* <Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
-					<Route path="*" element={<NoMatch />} />
+				<Route path="orders" element={<MhicOrders />} />
+				<Route path="orders/search" element={<MhicSearchResults />} />
+
+				<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
+					<Route index element={<Navigate to="assessment" replace />} />
+
+					<Route path="assessment" element={<MhicOrderAssessment />} />
+
+					<Route path="assessment/:screeningQuestionContextId" element={<ScreeningQuestionsPage />} />
 				</Route>
+
+				<Route path="*" element={<NoMatch />} />
+			</Route>
+
+			<Route
+				path="patient"
+				element={
+					<>
+						<PatientHeader />
+						<Outlet />
+					</>
+				}
+			>
+				<Route index element={<PatientLanding />} />
+				<Route path="demographics-introduction" element={<PatientDemographicsIntroduction />} />
+				<Route path="demographics-part-1" element={<PatientDemographicsPart1 />} />
+				<Route path="demographics-part-2" element={<PatientDemographicsPart2 />} />
+				<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
+				<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
+				<Route path="assessment-complete" element={<PatientAssessmentComplete />} />
+				{/* <Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
+				<Route path="*" element={<NoMatch />} />
 			</Route>
 		</SentryRoutes>
 	);
