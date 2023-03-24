@@ -64,8 +64,13 @@ const ConnectWithSupportV2 = () => {
 			pageInstantiated.current = true;
 		}
 
-		setShowEmployerModal(featureDetails?.locationPromptRequired ?? false);
-	}, [featureDetails?.locationPromptRequired]);
+		if (featureDetails?.locationPromptRequired) {
+			setShowEmployerModal(true);
+		} else if (account?.institutionLocationId) {
+			searchParams.set('institutionLocationId', account.institutionLocationId);
+			setSearchParams(searchParams);
+		}
+	}, [account?.institutionLocationId, featureDetails?.locationPromptRequired, searchParams, setSearchParams]);
 
 	const fetchFilters = useCallback(async () => {
 		if (!institution || !featureDetails) {
