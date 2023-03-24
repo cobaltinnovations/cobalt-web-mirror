@@ -34,8 +34,8 @@ enum SEARCH_PARAMS {
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname } = useLocation();
-	const { account, setAccount, institution } = useAccount();
-	const pageInstantiated = useRef(false);
+	const { account, institution } = useAccount();
+	const [pageInstantiated, setPageInstantiated] = useState(false);
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -64,23 +64,50 @@ const ConnectWithSupportV2 = () => {
 		[institution?.features, pathname]
 	);
 
+	/* --------------------------------------------------- */
+	/* Employer modal check  */
+	/* --------------------------------------------------- */
 	useEffect(() => {
-		if (pageInstantiated.current) {
+		if (featureDetails?.locationPromptRequired) {
+			setShowEmployerModal(true);
+		}
+	}, [featureDetails?.locationPromptRequired]);
+
+	/* --------------------------------------------------- */
+	/* Set institutionLocationId searchParam on page load  */
+	/* --------------------------------------------------- */
+	useEffect(() => {
+		if (pageInstantiated || !findOptions?.filters) {
 			return;
 		}
 
-		if (featureDetails?.locationPromptRequired !== undefined) {
-			pageInstantiated.current = true;
+		const hasLocationFilter = !!findOptions.filters.find(
+			(filter) => filter.filterId === FIND_OPTIONS_FILTER_IDS.LOCATION
+		);
+
+		if (!hasLocationFilter) {
+			setPageInstantiated(true);
+			return;
 		}
 
-		if (featureDetails?.locationPromptRequired) {
-			setShowEmployerModal(true);
-		} else if (account?.institutionLocationId) {
+		if (account?.institutionLocationId) {
 			searchParams.set(SEARCH_PARAMS.INSTITUTION_LOCATION_ID, account.institutionLocationId);
 			setSearchParams(searchParams);
 		}
-	}, [account?.institutionLocationId, featureDetails?.locationPromptRequired, searchParams, setSearchParams]);
 
+		setPageInstantiated(true);
+	}, [
+		account?.institutionLocationId,
+		findOptions?.filters,
+		pageInstantiated,
+		searchParams,
+		setPageInstantiated,
+		setSearchParams,
+	]);
+
+	/* --------------------------------------------------- */
+	/* Get available filters for feature  */
+	/* --------------------------------------------------- */
 	const fetchFilters = useCallback(async () => {
 		if (!institution || !featureDetails) {
 			return;
@@ -100,8 +127,11 @@ const ConnectWithSupportV2 = () => {
 		setInstitutionLocations(institutionLocationsResponse.locations);
 	}, [featureDetails, institution]);
 
+	/* --------------------------------------------------- */
+	/* Get providers based on searchParams  */
+	/* --------------------------------------------------- */
 	const fetchProviders = useCallback(async () => {
-		if (!findOptions || !featureDetails) {
+		if (!pageInstantiated || !findOptions || !featureDetails) {
 			return;
 		}
 
@@ -128,31 +158,37 @@ const ConnectWithSupportV2 = () => {
 		featureDetails,
 		findOptions,
 		institutionLocationId,
+		pageInstantiated,
 		setAppointmentTypes,
 		setEpicDepartments,
 		startDate,
 	]);
 
+	/* --------------------------------------------------- */
+	/* Employer submission (reload page for simplicity) */
+	/* --------------------------------------------------- */
 	const handleEmployerModalContinueButton = useCallback(async () => {
 		if (!account) {
 			return;
 		}
 
 		try {
-			const response = await accountService
+			await accountService
 				.setAccountLocation(account.accountId, {
 					accountId: account.accountId,
 					institutionLocationId: selectedEmployerId !== 'NA' ? selectedEmployerId : '',
 				})
 				.fetch();
 
-			setAccount(response.account);
-			setShowEmployerModal(false);
+			window.location.reload();
 		} catch (error) {
 			handleError(error);
 		}
-	}, [account, handleError, selectedEmployerId, setAccount]);
+	}, [account, handleError, selectedEmployerId]);
 
+	/* --------------------------------------------------- */
+	/* If searchParams change, set filter states  */
+	/* --------------------------------------------------- */
 	useEffect(() => {
 		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
 	}, [startDate]);
