@@ -265,6 +265,7 @@ export function useScreeningFlow({
 					.skipScreeningFlowVersion(activeFlowVersion?.screeningFlowVersionId)
 					.fetch()
 					.then((response) => {
+						setShowPhoneModal(false);
 						navigateToDestination(
 							response.screeningSession.screeningSessionDestination,
 							{ skipped: true },

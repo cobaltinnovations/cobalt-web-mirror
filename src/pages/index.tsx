@@ -155,9 +155,11 @@ const Index: FC = () => {
 							<Row>
 								<Col>
 									<NoData
+										className="bg-p50"
 										title="Not sure what you need?"
 										actions={[
 											{
+												size: 'lg',
 												variant: 'primary',
 												title: 'Take the Assessment',
 												onClick: () => {
