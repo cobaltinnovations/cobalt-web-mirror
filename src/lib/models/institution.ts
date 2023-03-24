@@ -25,7 +25,6 @@ export interface Institution {
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
-	locationPromptRequired: boolean;
 	featureScreeningFlowId?: string;
 	hasTakenFeatureScreening: boolean;
 	takeFeatureScreening: boolean;
@@ -40,6 +39,7 @@ export interface InstitutionFeature {
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
+	locationPromptRequired: boolean;
 }
 
 export interface AdditionalNavigationItem {

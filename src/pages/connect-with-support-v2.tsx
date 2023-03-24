@@ -54,12 +54,12 @@ const ConnectWithSupportV2 = () => {
 			return;
 		}
 
-		if (institution?.locationPromptRequired !== undefined) {
+		if (featureDetails?.locationPromptRequired !== undefined) {
 			pageInstantiated.current = true;
 		}
 
-		console.log(institution?.locationPromptRequired);
-	}, [institution]);
+		console.log(featureDetails?.locationPromptRequired);
+	}, [featureDetails?.locationPromptRequired]);
 
 	const fetchFilters = useCallback(async () => {
 		if (!institution || !featureDetails) {

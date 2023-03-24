@@ -192,13 +192,16 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 						</div>
 					</Col>
 				</Row>
-				{(institution?.features ?? []).some((feature) => feature.recommended) && (
+
+				{institution?.hasTakenFeatureScreening && (
 					<Row className="pt-12">
 						<Col>
 							<div className="d-flex align-items-center justify-content-center">
 								<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-								<p className="mb-0 fs-large">
-									Recommendations are based on your recent assessment scores.
+								<p>
+									{(institution?.features ?? []).some((feature) => feature.recommended)
+										? 'Recommendations are based on your recent assessment scores.'
+										: 'There are no recommendations are based on your recent assessment scores.'}
 									{institution?.takeFeatureScreening && institution?.hasTakenFeatureScreening && (
 										<Button
 											variant="link"
