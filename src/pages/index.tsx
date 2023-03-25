@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { FC, useState, useCallback, useEffect } from 'react';
+import React, { FC, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
@@ -32,10 +32,13 @@ import {
 
 import config from '@/lib/config';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
+import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
 import useFlags from '@/hooks/use-flags';
+import NoData from '@/components/no-data';
+import { useScreeningFlow } from './screening/screening.hooks';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -71,6 +74,11 @@ const Index: FC = () => {
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
+
+	const { checkAndStartScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
+		screeningFlowId: institution?.featureScreeningFlowId,
+		instantiateOnLoad: false,
+	});
 
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
@@ -129,19 +137,58 @@ const Index: FC = () => {
 
 	return (
 		<>
-			<HomeHero />
+			{institution?.featuresEnabled ? (
+				<>
+					{renderedCollectPhoneModal}
 
-			<AsyncPage fetchData={checkScreenFlowStatus}>
-				{showScreeningFlowCta && (
-					<Container className="pt-12">
+					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>
 							<Col>
-								<ScreeningFlowCta />
+								<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
+								<h1 className="mb-0 text-center">What can we help you find today?</h1>
 							</Col>
 						</Row>
 					</Container>
-				)}
-			</AsyncPage>
+					<PathwaysSection className="mb-10" />
+					{!institution.hasTakenFeatureScreening && (
+						<Container>
+							<Row>
+								<Col>
+									<NoData
+										className="bg-p50"
+										title="Not sure what you need?"
+										actions={[
+											{
+												size: 'lg',
+												variant: 'primary',
+												title: 'Take the Assessment',
+												onClick: () => {
+													checkAndStartScreeningFlow();
+												},
+											},
+										]}
+									/>
+								</Col>
+							</Row>
+						</Container>
+					)}
+				</>
+			) : (
+				<>
+					<HomeHero />
+					<AsyncPage fetchData={checkScreenFlowStatus}>
+						{showScreeningFlowCta && (
+							<Container className="pt-12">
+								<Row>
+									<Col>
+										<ScreeningFlowCta />
+									</Col>
+								</Row>
+							</Container>
+						)}
+					</AsyncPage>
+				</>
+			)}
 
 			<AsyncPage fetchData={fetchCallsToAction}>
 				{callsToAction.length > 0 && (

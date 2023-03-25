@@ -5,6 +5,7 @@ import config from '@/lib/config';
 import { Institution } from '@/lib/models/institution';
 import { AccountModel } from '@/lib/models';
 import Header from '@/components/header';
+import HeaderV2 from '@/components/header-v2';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import {
 	ProviderManagementBasics,
@@ -41,6 +42,7 @@ export const Privacy = lazyLoadWithRefresh(() => import('@/pages/privacy'));
 export const IntakeAssessment = lazyLoadWithRefresh(() => import('@/pages/intake-assessment'));
 export const OneOnOneResources = lazyLoadWithRefresh(() => import('@/pages/one-on-one-resources'));
 export const ConnectWithSupport = lazyLoadWithRefresh(() => import('@/pages/connect-with-support'));
+export const ConnectWithSupportV2 = lazyLoadWithRefresh(() => import('@/pages/connect-with-support-v2'));
 export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
 export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
@@ -198,9 +200,11 @@ const UnauthenticatedHeaderLayout = () => {
 };
 
 const DefaultLayout = () => {
+	const { institution } = useAccount();
+
 	return (
 		<>
-			<Header />
+			{institution?.featuresEnabled ? <HeaderV2 /> : <Header />}
 			<Outlet />
 		</>
 	);
@@ -369,6 +373,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
 				main: ConnectWithSupport,
+			},
+			{
+				path: '/connect-with-support/:urlName',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: ConnectWithSupportV2,
 			},
 			{
 				path: '/ehr-lookup',

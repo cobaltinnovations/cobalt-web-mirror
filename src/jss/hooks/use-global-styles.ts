@@ -265,7 +265,19 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				color: theme.colors.n900,
 				borderRadius: '50% !important',
 				'&--today': {
-					...theme.fonts.bodyBold,
+					position: 'relative',
+					...theme.fonts.bodyNormal,
+					'&:after': {
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						content: '""',
+						borderRadius: 500,
+						position: 'absolute',
+						pointerEvents: 'none',
+						border: `2px solid ${theme.colors.p300}`,
+					},
 				},
 				'&--selected': {
 					color: theme.colors.n0,
@@ -279,11 +291,11 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					color: theme.colors.n100,
 				},
 				'&--disabled': {
-					color: theme.colors.n500,
-					backgroundColor: `${theme.colors.n100} !important`,
+					color: theme.colors.n300,
+					textDecoration: 'line-through',
 					'&:hover': {
-						color: `${theme.colors.n500} !important`,
-						backgroundColor: `${theme.colors.n100} !important`,
+						color: `${theme.colors.n300} !important`,
+						backgroundColor: `transparent !important`,
 						cursor: 'not-allowed',
 					},
 				},

@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AccountSource, Institution } from '@/lib/models/institution';
+import { AccountSource, Institution, InstitutionLocation } from '@/lib/models/institution';
 import { encodeQueryData } from '@/lib/utils/url-utils';
 import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
 
@@ -50,6 +50,14 @@ export const institutionService = {
 		}>({
 			method: 'GET',
 			url: '/institution-blurbs',
+		});
+	},
+	getInstitutionLocations() {
+		return httpSingleton.orchestrateRequest<{
+			locations: InstitutionLocation[];
+		}>({
+			method: 'GET',
+			url: '/institution/locations',
 		});
 	},
 };

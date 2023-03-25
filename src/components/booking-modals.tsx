@@ -9,6 +9,7 @@ import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
 
 export type KickoffBookingOptions = {
 	source: BookingSource;
+	exitUrl?: string;
 	provider: Provider;
 	date: string;
 	timeSlot: AvailabilityTimeSlot;
@@ -54,6 +55,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 		bookingSource,
 		setBookingSource,
+		setExitUrl,
 		setPreservedFilterQueryString,
 	} = useContext(BookingContext);
 
@@ -131,8 +133,11 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const kickoffBookingProcess = useCallback(
-		({ source, provider, date, timeSlot }: KickoffBookingOptions) => {
+		({ source, exitUrl, provider, date, timeSlot }: KickoffBookingOptions) => {
 			setBookingSource(source);
+			if (exitUrl) {
+				setExitUrl(exitUrl);
+			}
 			setSelectedProvider(provider);
 			setSelectedDate(date);
 			setSelectedTimeSlot(timeSlot);
@@ -167,6 +172,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 			appointmentTypes,
 			continueBookingProcess,
 			setBookingSource,
+			setExitUrl,
 			setSelectedAppointmentTypeId,
 			setSelectedDate,
 			setSelectedProvider,

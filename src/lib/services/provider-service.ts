@@ -19,23 +19,51 @@ import {
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
+export enum FIND_OPTIONS_FILTER_IDS {
+	DATE = 'DATE',
+	TIME_OF_DAY = 'TIME_OF_DAY',
+	LOCATION = 'LOCATION',
+}
+
+export interface FindOptionsFilter {
+	filterId: FIND_OPTIONS_FILTER_IDS;
+	name: string;
+}
+
+export interface FindOptionsAppointmentTime {
+	appointmentTimeId: string;
+	description: string;
+	endTime: string;
+	name: string;
+	startTime: string;
+}
+
+export interface FindOptionsFeature {
+	description: string;
+	featureId: string;
+	name: string;
+}
+
 export interface FindOptionsResponse {
+	appointmentTimes: FindOptionsAppointmentTime[];
 	availabilities: ProviderAvailability[];
-	defaultVisitTypeIds: string[];
 	defaultAvailability: string;
+	defaultClinicIds: string[];
 	defaultEndDate: string;
 	defaultEndTime: string;
 	defaultStartDate: string;
 	defaultStartTime: string;
 	defaultSupportRoleIds: SupportRoleId[];
-	defaultClinicIds: string[];
+	defaultVisitTypeIds: string[];
+	feature?: FindOptionsFeature;
+	filters?: FindOptionsFilter[];
 	paymentTypes: PaymentType[];
 	recommendation: string;
 	recommendationHtml: string;
 	recommendedSupportRoleIds: SupportRoleId[];
-	scores: AssessmentScore;
-	supportRoles: SupportRole[];
+	scores?: AssessmentScore;
 	specialties: Specialty[];
+	supportRoles: SupportRole[];
 	visitTypes: ProviderVisitType[];
 }
 
@@ -54,23 +82,27 @@ export interface FindFilters {
 	licenseTypes?: string[];
 	systemAffinityId?: string;
 	specialtyIds?: string[];
+	institutionLocationId?: string;
+	appointmentTimeIds?: string[];
 }
 
 export interface FindProvidersResponse {
 	appointmentTypes: AppointmentType[];
 	epicDepartments: EpicDepartment[];
-	sections: {
-		fullyBooked: boolean;
-		date: string;
-		dateDescription: string;
-		providers: Provider[];
-	}[];
+	sections: ProviderSection[];
 	provider?: Provider;
 	clinics?: Clinic[];
 	appointments?: AppointmentModel[];
 	followups?: FollowupModel[];
 	specialties?: Specialty[];
 	showSpecialties: boolean;
+}
+
+export interface ProviderSection {
+	fullyBooked: boolean;
+	date: string;
+	dateDescription: string;
+	providers: Provider[];
 }
 
 interface ProvidersRepsonse {
@@ -130,6 +162,7 @@ export const providerService = {
 		clinicIds,
 		providerId,
 		institutionId,
+		featureId,
 	}: {
 		supportRoleIds?: string[];
 		startDate?: string;
@@ -137,6 +170,7 @@ export const providerService = {
 		clinicIds?: string[];
 		providerId?: string;
 		institutionId: string;
+		featureId?: string;
 	}): OrchestratedRequest<FindOptionsResponse> {
 		let url = '/providers/find-options';
 		const params = new URLSearchParams();
@@ -163,6 +197,10 @@ export const providerService = {
 
 		if (providerId) {
 			params.append('providerId', providerId);
+		}
+
+		if (featureId) {
+			params.append('featureId', featureId);
 		}
 
 		params.set('institutionId', institutionId);

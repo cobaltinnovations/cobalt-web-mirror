@@ -90,6 +90,8 @@ export interface Provider {
 	supportRoles: SupportRole[];
 	appointmentTypeIds: string[];
 	supportRolesDescription: string;
+	phoneNumber?: string;
+	formattedPhoneNumber?: string;
 	phoneNumberRequiredForAppointment?: boolean;
 	paymentFundingDescriptions?: string[];
 	intakeAssessmentIneligible?: boolean;
@@ -99,6 +101,7 @@ export interface Provider {
 	emailAddress?: string;
 	bio?: string;
 	bioUrl?: string;
+	displayPhoneNumberOnlyForBooking: boolean;
 }
 
 export interface Specialty {

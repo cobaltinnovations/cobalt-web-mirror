@@ -45,6 +45,7 @@ export interface AccountModel {
 	firstName?: string;
 	genderIdentityId?: string;
 	institutionId: string;
+	institutionLocationId: string;
 	insuranceId?: string;
 	languageCode?: string;
 	lastName?: string;

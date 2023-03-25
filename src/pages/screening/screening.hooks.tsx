@@ -32,7 +32,15 @@ export function useScreeningNavigation() {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
-					openInCrisisModal(true);
+					navigate(
+						{
+							pathname: '/in-crisis',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
 					return;
 				case ScreeningSessionDestinationId.CONTENT_LIST:
 					navigate(
@@ -70,6 +78,17 @@ export function useScreeningNavigation() {
 					navigate(
 						{
 							pathname: '/ic/patient/assessment-complete',
+							search: new URLSearchParams(params).toString(),
+						},
+						{
+							replace,
+						}
+					);
+					return;
+				case ScreeningSessionDestinationId.HOME:
+					navigate(
+						{
+							pathname: '/',
 							search: new URLSearchParams(params).toString(),
 						},
 						{
@@ -254,6 +273,7 @@ export function useScreeningFlow({
 					.skipScreeningFlowVersion(activeFlowVersion?.screeningFlowVersionId)
 					.fetch()
 					.then((response) => {
+						setShowPhoneModal(false);
 						navigateToDestination(
 							response.screeningSession.screeningSessionDestination,
 							{ skipped: true },

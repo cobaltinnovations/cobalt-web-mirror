@@ -30,14 +30,15 @@ const useDropdownMenuStyles = createUseThemedStyles(
 	(theme) => ({
 		dropdownMenu: {
 			border: 0,
+			padding: 16,
 			minWidth: 176,
 			marginTop: 8,
 			borderRadius: 8,
-			padding: '8px 0',
 			boxShadow: theme.elevation.e200,
 			backgroundColor: theme.colors.n0,
 			'& .dropdown-item': {
-				padding: '10px 20px',
+				padding: 12,
+				borderRadius: 4,
 				...theme.fonts.default,
 				color: theme.colors.n900,
 				'&:hover, &:focus': {
@@ -46,6 +47,10 @@ const useDropdownMenuStyles = createUseThemedStyles(
 				'&:active': {
 					backgroundColor: theme.colors.n75,
 				},
+			},
+			'& .dropdown-divider': {
+				margin: '16px 0',
+				borderColor: theme.colors.n100,
 			},
 		},
 	}),

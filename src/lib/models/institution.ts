@@ -1,4 +1,5 @@
 import { AccountSourceId } from './account';
+import { SupportRoleId } from './provider';
 
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
@@ -22,6 +23,23 @@ export interface Institution {
 	supportEnabled: boolean;
 	recommendedContentEnabled: boolean;
 	groupSessionRequestsEnabled: boolean;
+	features: InstitutionFeature[];
+	featuresEnabled: boolean;
+	featureScreeningFlowId?: string;
+	hasTakenFeatureScreening: boolean;
+	takeFeatureScreening: boolean;
+}
+
+export interface InstitutionFeature {
+	description: string;
+	featureId: string;
+	name: string;
+	navDescription: string;
+	navigationHeaderId: string;
+	recommended: boolean;
+	supportRoleIds: SupportRoleId[];
+	urlName: string;
+	locationPromptRequired: boolean;
 }
 
 export interface AdditionalNavigationItem {
@@ -67,4 +85,10 @@ export interface InstitutionTeamMember {
 	subtitle?: string;
 	name: string;
 	imageUrl: string;
+}
+
+export interface InstitutionLocation {
+	institutionId: string;
+	institutionLocationId: string;
+	name: string;
 }

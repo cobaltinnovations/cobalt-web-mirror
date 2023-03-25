@@ -18,6 +18,7 @@ interface Props {
 	title: string;
 	description?: string;
 	actions: {
+		size?: 'sm' | 'lg';
 		variant: ButtonVariant;
 		title: string;
 		onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -53,7 +54,13 @@ const NoData = ({ illustration, title, description, actions, className }: Props)
 			{actions.length > 0 && (
 				<div className="text-center">
 					{actions.map((action, actionIndex) => (
-						<Button key={actionIndex} variant={action.variant} className="mx-1" onClick={action.onClick}>
+						<Button
+							key={actionIndex}
+							size={action.size}
+							variant={action.variant}
+							className="mx-1"
+							onClick={action.onClick}
+						>
 							{action.title}
 						</Button>
 					))}
