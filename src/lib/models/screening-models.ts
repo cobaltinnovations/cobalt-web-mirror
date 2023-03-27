@@ -12,11 +12,17 @@ export interface ScreeningSession {
 	screeningSessionDestination?: ScreeningSessionDestination;
 }
 
+export enum ScreeningFlowSkipTypeId {
+	SKIP = 'SKIP',
+	EXIT = 'EXIT',
+}
+
 export interface ScreeningFlowVersion {
-	screeningFlowVersionId: string;
-	screeningFlowId: string;
 	initialScreeningId: string;
 	phoneNumberRequired: boolean;
+	screeningFlowId: string;
+	screeningFlowSkipTypeId: ScreeningFlowSkipTypeId;
+	screeningFlowVersionId: string;
 	skippable: boolean;
 	versionNumber: number;
 }
