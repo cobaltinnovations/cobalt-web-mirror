@@ -209,9 +209,10 @@ const ConnectWithSupportV2 = () => {
 					<Modal.Title>Select Employer</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<p className="mb-4 fw-bold">
+					<p className="mb-2 fw-bold">
 						Select your employer so we can display the providers available to you.
 					</p>
+					<p className="mb-4 fs-small">Your employment information will not be shared.</p>
 					{institutionLocations.map((l) => {
 						return (
 							<Form.Check
@@ -234,7 +235,7 @@ const ConnectWithSupportV2 = () => {
 						name="employer"
 						id="employer--NA"
 						label="I'm not sure / I'd rather not say"
-						value={'NA'}
+						value="NA"
 						checked={selectedEmployerId === 'NA'}
 						onChange={({ currentTarget }) => {
 							setSelectedEmployerId(currentTarget.value);
