@@ -149,9 +149,13 @@ const ConnectWithSupportV2 = () => {
 				})
 				.fetch();
 
-			window.location.replace(
-				`${pathname}?${SEARCH_PARAMS.INSTITUTION_LOCATION_ID}=${response.account.institutionLocationId}`
-			);
+			if (response.account.institutionLocationId) {
+				window.location.replace(
+					`${pathname}?${SEARCH_PARAMS.INSTITUTION_LOCATION_ID}=${response.account.institutionLocationId}`
+				);
+			} else {
+				window.location.replace(pathname);
+			}
 		} catch (error) {
 			handleError(error);
 		}
