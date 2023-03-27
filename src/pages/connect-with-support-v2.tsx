@@ -502,7 +502,7 @@ const ConnectWithSupportV2 = () => {
 													imageUrl={provider.imageUrl}
 													title={provider.name}
 													subtitle={provider.title}
-													descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
+													descriptionHtml={provider.treatmentDescription ?? ''}
 													buttons={
 														provider.displayPhoneNumberOnlyForBooking
 															? [

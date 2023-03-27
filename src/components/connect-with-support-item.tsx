@@ -107,7 +107,7 @@ interface ConnectWithSupportItemProps {
 	providerId: string;
 	imageUrl: string;
 	title: string;
-	subtitle: string;
+	subtitle?: string;
 	descriptionHtml: string;
 	buttons: ButtonProps[];
 	showViewButton: boolean;
@@ -253,7 +253,7 @@ const ConnectWithSupportItem = ({
 					<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl})` }} />
 					<div className={classes.information}>
 						<h5>{title}</h5>
-						<p>{subtitle}</p>
+						{subtitle && <p>{subtitle}</p>}
 					</div>
 				</div>
 				<div className={classes.descriptionOuter}>
