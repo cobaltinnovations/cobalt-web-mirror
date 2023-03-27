@@ -36,7 +36,6 @@ const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname } = useLocation();
 	const { account, institution } = useAccount();
-	const [pageInstantiated, setPageInstantiated] = useState(false);
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -75,38 +74,6 @@ const ConnectWithSupportV2 = () => {
 	}, [featureDetails?.locationPromptRequired]);
 
 	/* --------------------------------------------------- */
-	/* Set institutionLocationId searchParam on page load  */
-	/* --------------------------------------------------- */
-	useEffect(() => {
-		if (pageInstantiated || !findOptions?.filters) {
-			return;
-		}
-
-		const hasLocationFilter = !!findOptions.filters.find(
-			(filter) => filter.filterId === FIND_OPTIONS_FILTER_IDS.LOCATION
-		);
-
-		if (!hasLocationFilter) {
-			setPageInstantiated(true);
-			return;
-		}
-
-		if (account?.institutionLocationId) {
-			searchParams.set(SEARCH_PARAMS.INSTITUTION_LOCATION_ID, account.institutionLocationId);
-			setSearchParams(searchParams);
-		}
-
-		setPageInstantiated(true);
-	}, [
-		account?.institutionLocationId,
-		findOptions?.filters,
-		pageInstantiated,
-		searchParams,
-		setPageInstantiated,
-		setSearchParams,
-	]);
-
-	/* --------------------------------------------------- */
 	/* Get available filters for feature  */
 	/* --------------------------------------------------- */
 	const fetchFilters = useCallback(async () => {
@@ -132,7 +99,7 @@ const ConnectWithSupportV2 = () => {
 	/* Get providers based on searchParams  */
 	/* --------------------------------------------------- */
 	const fetchProviders = useCallback(async () => {
-		if (!pageInstantiated || !findOptions || !featureDetails) {
+		if (!findOptions || !featureDetails) {
 			return;
 		}
 
@@ -159,7 +126,6 @@ const ConnectWithSupportV2 = () => {
 		featureDetails,
 		findOptions,
 		institutionLocationId,
-		pageInstantiated,
 		setAppointmentTypes,
 		setEpicDepartments,
 		startDate,
@@ -174,18 +140,20 @@ const ConnectWithSupportV2 = () => {
 		}
 
 		try {
-			await accountService
+			const response = await accountService
 				.setAccountLocation(account.accountId, {
 					accountId: account.accountId,
 					institutionLocationId: selectedEmployerId !== 'NA' ? selectedEmployerId : '',
 				})
 				.fetch();
 
-			window.location.reload();
+			window.location.replace(
+				`${pathname}?${SEARCH_PARAMS.INSTITUTION_LOCATION_ID}=${response.account.institutionLocationId}`
+			);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [account, handleError, selectedEmployerId]);
+	}, [account, handleError, pathname, selectedEmployerId]);
 
 	/* --------------------------------------------------- */
 	/* If searchParams change, set filter states  */

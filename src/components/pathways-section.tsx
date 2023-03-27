@@ -158,7 +158,7 @@ interface PathwaysSectionProps {
 }
 
 const PathwaysSection = ({ className }: PathwaysSectionProps) => {
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 	const classes = useStyles();
 
 	const { checkAndStartScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
@@ -173,22 +173,28 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 				<Row>
 					<Col>
 						<div className={classes.pathways}>
-							{(institution?.features ?? []).map((feature, featureIndex) => (
-								<div key={feature.featureId} className={classes.pathwayOuter}>
-									<Link
-										to={feature.urlName}
-										className={classNames(classes.pathway, {
-											recommended: feature.recommended,
-										})}
-									>
-										<div className={classes.iconOuter}>
-											<PathwaysIcon className={classes.icon} featureId={feature.featureId} />
-										</div>
-										<h5 className="text-center">{feature.name}</h5>
-										{feature.recommended && <div className={classes.recommended}>Recommended</div>}
-									</Link>
-								</div>
-							))}
+							{(institution?.features ?? []).map(
+								({ featureId, urlName, name, recommended }, featureIndex) => (
+									<div key={featureId} className={classes.pathwayOuter}>
+										<Link
+											to={
+												featureId === 'THERAPY' && account?.institutionLocationId
+													? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+													: urlName
+											}
+											className={classNames(classes.pathway, {
+												recommended: recommended,
+											})}
+										>
+											<div className={classes.iconOuter}>
+												<PathwaysIcon className={classes.icon} featureId={featureId} />
+											</div>
+											<h5 className="text-center">{name}</h5>
+											{recommended && <div className={classes.recommended}>Recommended</div>}
+										</Link>
+									</div>
+								)
+							)}
 						</div>
 					</Col>
 				</Row>

@@ -25,7 +25,7 @@ const useFooterStyles = createUseThemedStyles((theme) => ({
 const Footer: FC = () => {
 	const classes = useFooterStyles();
 	const footer = useRef<HTMLElement | null>(null);
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 
 	useEffect(() => {
 		function handleResize() {
@@ -60,7 +60,14 @@ const Footer: FC = () => {
 									.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 									.map(({ featureId, name, urlName }) => (
 										<li key={featureId} className="mb-3">
-											<Link className="fw-normal text-decoration-none" to={urlName}>
+											<Link
+												className="fw-normal text-decoration-none"
+												to={
+													featureId === 'THERAPY' && account?.institutionLocationId
+														? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+														: urlName
+												}
+											>
 												{name}
 											</Link>
 										</li>
