@@ -24,6 +24,7 @@ import DatePicker from '@/components/date-picker';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import NoData from '@/components/no-data';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -208,9 +209,10 @@ const ConnectWithSupportV2 = () => {
 					<Modal.Title>Select Employer</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<p className="mb-4 fw-bold">
+					<p className="mb-2 fw-bold">
 						Select your employer so we can display the providers available to you.
 					</p>
+					<p className="mb-4 fs-small">Your employment information will not be shared.</p>
 					{institutionLocations.map((l) => {
 						return (
 							<Form.Check
@@ -233,7 +235,7 @@ const ConnectWithSupportV2 = () => {
 						name="employer"
 						id="employer--NA"
 						label="I'm not sure / I'd rather not say"
-						value={'NA'}
+						value="NA"
 						checked={selectedEmployerId === 'NA'}
 						onChange={({ currentTarget }) => {
 							setSelectedEmployerId(currentTarget.value);
@@ -278,12 +280,12 @@ const ConnectWithSupportV2 = () => {
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
-															dismissText="Cancel"
+															dismissText="Clear"
 															onDismiss={() => {
 																searchParams.delete(SEARCH_PARAMS.START_DATE);
 																setSearchParams(searchParams);
 															}}
-															confirmText="Done"
+															confirmText="Apply"
 															onConfirm={() => {
 																searchParams.set(
 																	SEARCH_PARAMS.START_DATE,
@@ -492,6 +494,15 @@ const ConnectWithSupportV2 = () => {
 									lg={{ span: 8, offset: 2 }}
 									xl={{ span: 6, offset: 3 }}
 								>
+									{section.providers.length <= 0 && (
+										<div className="py-8">
+											<NoData
+												title="No Available Providers"
+												description="All providers are booked for this date"
+												actions={[]}
+											/>
+										</div>
+									)}
 									{section.providers.map((provider, providerIndex) => {
 										const isLast = providerIndex === section.providers.length - 1;
 
@@ -502,7 +513,7 @@ const ConnectWithSupportV2 = () => {
 													imageUrl={provider.imageUrl}
 													title={provider.name}
 													subtitle={provider.title}
-													descriptionHtml="<p>During your first session, an intake coordinator will collect your information and ask you about the issue/s you're experiencing, spanning issues with self, family, work or substance use. Next they'll help you schedule your next session with a provider appropriate to your needs and goals, which may not be the intake coordinator. The EAP program does not prescribe or recommend medications.</p>"
+													descriptionHtml={provider.treatmentDescription ?? ''}
 													buttons={
 														provider.displayPhoneNumberOnlyForBooking
 															? [

@@ -198,7 +198,7 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 						<Col>
 							<div className="d-flex align-items-center justify-content-center">
 								<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-								<p>
+								<p className="mb-0">
 									{(institution?.features ?? []).some((feature) => feature.recommended)
 										? 'Recommendations are based on your recent assessment scores.'
 										: 'There are no recommendations are based on your recent assessment scores.'}

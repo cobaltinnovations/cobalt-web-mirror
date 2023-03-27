@@ -43,6 +43,9 @@ export const IntakeAssessment = lazyLoadWithRefresh(() => import('@/pages/intake
 export const OneOnOneResources = lazyLoadWithRefresh(() => import('@/pages/one-on-one-resources'));
 export const ConnectWithSupport = lazyLoadWithRefresh(() => import('@/pages/connect-with-support'));
 export const ConnectWithSupportV2 = lazyLoadWithRefresh(() => import('@/pages/connect-with-support-v2'));
+export const ConnectWithSupportMedicationPrescriber = lazyLoadWithRefresh(
+	() => import('@/pages/connect-with-support-medication-prescriber')
+);
 export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
 export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
@@ -373,6 +376,12 @@ export const AppRoutes: AppRoutesConfig[] = [
 				private: true,
 				routeGuard: isInstitutionSupportEnabledRouteGuard,
 				main: ConnectWithSupport,
+			},
+			{
+				path: '/connect-with-support/medication-prescriber',
+				private: true,
+				routeGuard: isInstitutionSupportEnabledRouteGuard,
+				main: ConnectWithSupportMedicationPrescriber,
 			},
 			{
 				path: '/connect-with-support/:urlName',
