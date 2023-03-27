@@ -6,6 +6,7 @@ import { ERROR_CODES } from '@/lib/http-client';
 import {
 	ScreeningAnswerFormatId,
 	ScreeningAnswerSelection,
+	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningQuestionPrompt,
 } from '@/lib/models';
@@ -559,7 +560,10 @@ const ScreeningQuestionsPage = () => {
 														});
 												}}
 											>
-												Skip Assessment
+												{screeningQuestionContextResponse?.screeningFlowVersion
+													.screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
+													? 'Exit Assessment'
+													: 'Skip Assessment'}
 											</Button>
 										</div>
 									)}
