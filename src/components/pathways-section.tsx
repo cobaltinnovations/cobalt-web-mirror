@@ -201,7 +201,7 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 								<p className="mb-0">
 									{(institution?.features ?? []).some((feature) => feature.recommended)
 										? 'Recommendations are based on your recent assessment scores.'
-										: 'There are no recommendations are based on your recent assessment scores.'}
+										: 'There are no recommendations based on your recent assessment scores.'}
 									{institution?.takeFeatureScreening && institution?.hasTakenFeatureScreening && (
 										<Button
 											variant="link"
