@@ -139,7 +139,7 @@ const ConnectWithSupport: FC = () => {
 	const [paymentDisclaimerOpen, setPaymentDisclaimerOpen] = useState(!Cookies.get('paymentDisclaimerSeen'));
 	// const [showCopayModal, setShowCopayModal] = useState(!Cookies.get('seenWaivedCopay'));
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
-	const [isSpecialtiesFilterEnabled, setIsSpecialtiesFilterEnabled] = useState(true);
+	// const [isSpecialtiesFilterEnabled, setIsSpecialtiesFilterEnabled] = useState(true);
 	const providerRefs = useMemo(
 		() =>
 			availableSections.reduce((acc, section) => {
@@ -261,7 +261,7 @@ const ConnectWithSupport: FC = () => {
 		findRequest
 			.fetch()
 			.then(({ appointmentTypes, epicDepartments, sections, provider, clinics, showSpecialties }) => {
-				setIsSpecialtiesFilterEnabled(showSpecialties);
+				// setIsSpecialtiesFilterEnabled(showSpecialties);
 				setIsLoading(false);
 				setAppointmentTypes(appointmentTypes);
 				setEpicDepartments(epicDepartments);
