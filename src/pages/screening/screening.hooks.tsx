@@ -251,6 +251,7 @@ export function useScreeningFlow({
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
 			show={showPhoneModal}
+			screeningFlowSkipTypeId={activeFlowVersion?.screeningFlowSkipTypeId}
 			skippable={activeFlowVersion?.skippable}
 			onSkip={() => {
 				trackEvent(ScreeningAnalyticsEvent.skipPhoneNumberPrompt());

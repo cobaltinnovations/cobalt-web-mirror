@@ -1,41 +1,40 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
-import InputHelper from '@/components/input-helper';
+
+import { ScreeningFlowSkipTypeId } from '@/lib/models';
+import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { accountService } from '@/lib/services';
 import useTrackModalView from '@/hooks/use-track-modal-view';
-
-const useCollectPhoneModalStyles = createUseStyles({
-	collectPhoneNumberModal: {
-		maxWidth: 295,
-	},
-});
+import InputHelper from '@/components/input-helper';
 
 interface CollectPhoneModalProps extends ModalProps {
 	skippable?: boolean;
+	screeningFlowSkipTypeId?: ScreeningFlowSkipTypeId;
 	onSkip(): void;
 	onSuccess(): void;
 }
 
-const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ skippable, onSkip, onSuccess, ...props }) => {
+const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
+	skippable,
+	screeningFlowSkipTypeId,
+	onSkip,
+	onSuccess,
+	...props
+}) => {
 	useTrackModalView('CollectPhoneModal', props.show);
 	const handleError = useHandleError();
-	const classes = useCollectPhoneModalStyles();
 	const { account, setAccount } = useAccount();
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>('');
 
 	return (
-		<Modal
-			{...props}
-			backdrop="static"
-			dialogClassName={classes.collectPhoneNumberModal}
-			centered
-			onHide={() => onSkip()}
-		>
+		<Modal {...props} backdrop="static" centered onHide={() => onSkip()}>
 			<Modal.Header closeButton={skippable}>
-				<Modal.Title>Take Our Assessment</Modal.Title>
+				<Modal.Title>
+					{screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
+						? 'Take the Assessment'
+						: 'Take Our Assessment'}
+				</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={async (e) => {
@@ -60,43 +59,53 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({ skippable, onSkip, onSu
 				}}
 			>
 				<Modal.Body>
-					<p className="mb-3">
-						To take the Cobalt assessment we'd like a way to reach you if there is a need. Please enter your
-						phone number to continue.
-					</p>
+					{screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT ? (
+						<>
+							<p className="fw-bold">Please enter you phone number to continue</p>
+							<p className="mb-3">
+								We respect your privacy and will only use your phone number to contact you if there is a
+								need.
+							</p>
+						</>
+					) : (
+						<p className="mb-3">
+							To take the Cobalt assessment we'd like a way to reach you if there is a need. Please enter
+							your phone number to continue.
+						</p>
+					)}
+
 					<InputHelper
 						required
 						type="tel"
 						value={phoneNumberInputValue}
 						autoFocus
-						label="Your Phone Number"
+						label={
+							screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
+								? 'Phone Number'
+								: 'Your Phone Number'
+						}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 							setPhoneNumberInputValue(e.target.value);
 						}}
 					/>
 				</Modal.Body>
-				<Modal.Footer>
-					<div className="text-center">
-						{skippable && (
-							<Button
-								className="mb-2"
-								type="button"
-								variant="outline-primary"
-								size="sm"
-								onClick={() => {
-									onSkip();
-								}}
-							>
-								Skip for Now
-							</Button>
-						)}
-
-						<div className="d-grid">
-							<Button type="submit" variant="primary" size="sm">
-								Continue Assessment
-							</Button>
-						</div>
-					</div>
+				<Modal.Footer className="text-right">
+					{skippable && (
+						<Button
+							className="me-2"
+							type="button"
+							variant="outline-primary"
+							size="sm"
+							onClick={() => {
+								onSkip();
+							}}
+						>
+							{screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT ? 'Cancel' : 'Skip for Now'}
+						</Button>
+					)}
+					<Button type="submit" variant="primary" size="sm">
+						Continue
+					</Button>
 				</Modal.Footer>
 			</Form>
 		</Modal>
