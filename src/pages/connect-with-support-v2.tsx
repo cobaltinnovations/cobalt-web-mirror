@@ -24,6 +24,7 @@ import DatePicker from '@/components/date-picker';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import NoData from '@/components/no-data';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -492,6 +493,15 @@ const ConnectWithSupportV2 = () => {
 									lg={{ span: 8, offset: 2 }}
 									xl={{ span: 6, offset: 3 }}
 								>
+									{section.providers.length <= 0 && (
+										<div className="py-8">
+											<NoData
+												title="No Available Providers"
+												description="All providers are booked for this date"
+												actions={[]}
+											/>
+										</div>
+									)}
 									{section.providers.map((provider, providerIndex) => {
 										const isLast = providerIndex === section.providers.length - 1;
 

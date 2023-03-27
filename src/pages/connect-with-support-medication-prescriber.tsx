@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
@@ -7,12 +6,11 @@ import HeroContainer from '@/components/hero-container';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 
 const ConnectWithSupportMedicationPrescriber = () => {
-	const { pathname } = useLocation();
 	const { institution } = useAccount();
 
 	const featureDetails = useMemo(
-		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
-		[institution?.features, pathname]
+		() => (institution?.features ?? []).find((feature) => feature.featureId === 'MEDICATION_PRESCRIBER'),
+		[institution?.features]
 	);
 
 	return (
