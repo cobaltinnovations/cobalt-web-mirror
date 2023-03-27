@@ -34,7 +34,7 @@ enum SEARCH_PARAMS {
 
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
-	const { pathname } = useLocation();
+	const { pathname, search } = useLocation();
 	const { account, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
 
@@ -500,7 +500,7 @@ const ConnectWithSupportV2 = () => {
 																	onClick: () => {
 																		bookingRef.current?.kickoffBookingProcess({
 																			source: BookingSource.ConnectWithSupportV2,
-																			exitUrl: pathname,
+																			exitUrl: `${pathname}${search}`,
 																			provider,
 																			date: section.date,
 																			timeSlot: time,
@@ -512,7 +512,7 @@ const ConnectWithSupportV2 = () => {
 													onModalTimeButtonClick={(availabilityTimeSlot) => {
 														bookingRef.current?.kickoffBookingProcess({
 															source: BookingSource.ConnectWithSupportV2,
-															exitUrl: pathname,
+															exitUrl: `${pathname}${search}`,
 															provider,
 															date: section.date,
 															timeSlot: availabilityTimeSlot,
