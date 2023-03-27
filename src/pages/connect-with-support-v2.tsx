@@ -278,12 +278,12 @@ const ConnectWithSupportV2 = () => {
 															className="mx-1"
 															id={`connect-with-support-filter--${filter.filterId}`}
 															title={filter.name}
-															dismissText="Cancel"
+															dismissText="Clear"
 															onDismiss={() => {
 																searchParams.delete(SEARCH_PARAMS.START_DATE);
 																setSearchParams(searchParams);
 															}}
-															confirmText="Done"
+															confirmText="Apply"
 															onConfirm={() => {
 																searchParams.set(
 																	SEARCH_PARAMS.START_DATE,
