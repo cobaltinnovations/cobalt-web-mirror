@@ -382,7 +382,10 @@ const HeaderV2 = () => {
 									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
 									title: name,
 									description: navDescription,
-									to: urlName,
+									to:
+										featureId === 'THERAPY' && account?.institutionLocationId
+											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+											: urlName,
 								})),
 						},
 				  ]
