@@ -3,7 +3,6 @@ import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analyt
 import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { ERROR_CODES } from '@/lib/http-client';
 import {
 	ScreeningFlowVersion,
@@ -19,7 +18,6 @@ import { useLocation, useMatch, useNavigate, useSearchParams } from 'react-route
 export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 
 	const mhicScreeningRouteMatch = useMatch({
@@ -86,15 +84,7 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.HOME:
-					navigate(
-						{
-							pathname: '/',
-							search: new URLSearchParams(params).toString(),
-						},
-						{
-							replace,
-						}
-					);
+					window.location.href = '/';
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
@@ -111,7 +101,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[navigate, openInCrisisModal, trackEvent]
+		[navigate, trackEvent]
 	);
 
 	const navigateToQuestion = useCallback(
