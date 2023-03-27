@@ -594,7 +594,9 @@ const HeaderV2 = () => {
 
 			<header ref={header} className={classes.header}>
 				<div className="h-100 d-flex align-items-center justify-content-between">
-					<LogoSmallText className="text-primary me-10" />
+					<Link to="/" className="d-block me-10">
+						<LogoSmallText className="text-primary" />
+					</Link>
 					<nav className={classes.desktopNav}>
 						<ul>
 							{navigationConfig.map((navigationItem) => (
