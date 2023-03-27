@@ -427,7 +427,13 @@ const HeaderV2 = () => {
 				],
 			},
 		],
-		[institution?.additionalNavigationItems, institution?.featuresEnabled, institution?.features, pathname]
+		[
+			pathname,
+			institution?.featuresEnabled,
+			institution?.features,
+			institution?.additionalNavigationItems,
+			account?.institutionLocationId,
+		]
 	);
 
 	/* ----------------------------------------------------------- */

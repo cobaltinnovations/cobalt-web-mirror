@@ -46,7 +46,9 @@ const ConnectWithSupportV2 = () => {
 		[searchParams]
 	);
 
-	const [selectedStartDate, setSelectedStartDate] = useState<Date>(startDate ? new Date(startDate) : new Date());
+	const [selectedStartDate, setSelectedStartDate] = useState<Date>(
+		startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date()
+	);
 	const [selectedAppointmentTimeIds, setSelectedAppointmentTimeIds] = useState(appointmentTimeIds);
 	const [selectedInstitutionLocationId, setSelectedInstitutionLocationId] = useState(institutionLocationId ?? '');
 
@@ -159,7 +161,7 @@ const ConnectWithSupportV2 = () => {
 	/* If searchParams change, set filter states  */
 	/* --------------------------------------------------- */
 	useEffect(() => {
-		setSelectedStartDate(startDate ? new Date(startDate) : new Date());
+		setSelectedStartDate(startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date());
 	}, [startDate]);
 
 	useEffect(() => {
