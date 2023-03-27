@@ -61,7 +61,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
 				<Modal.Body>
 					{screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT ? (
 						<>
-							<p className="fw-bold">Please enter you phone number to continue</p>
+							<p className="fw-bold">Please enter your phone number to continue</p>
 							<p className="mb-3">
 								We respect your privacy and will only use your phone number to contact you if there is a
 								need.
