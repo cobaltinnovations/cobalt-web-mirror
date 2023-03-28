@@ -178,7 +178,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 			.catch((e) => {
 				setFailedToInit(true);
 			});
-	}, [sessionAccountSourceId, subdomain]);
+	}, [sessionAccountSourceId, subdomain, account?.accountId]);
 
 	useEffect(() => {
 		// Get patient account if landing with a chart token
