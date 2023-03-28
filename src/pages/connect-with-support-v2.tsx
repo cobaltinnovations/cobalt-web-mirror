@@ -35,7 +35,7 @@ enum SEARCH_PARAMS {
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname, search } = useLocation();
-	const { account, institution } = useAccount();
+	const { account, setAccount, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -175,6 +175,38 @@ const ConnectWithSupportV2 = () => {
 	useEffect(() => {
 		setSelectedInstitutionLocationId(institutionLocationId ?? '');
 	}, [institutionLocationId]);
+
+	const handleLocationFilterApply = useCallback(
+		async (desiredInstitutionLocationId?: string) => {
+			if (desiredInstitutionLocationId) {
+				searchParams.set(SEARCH_PARAMS.INSTITUTION_LOCATION_ID, selectedInstitutionLocationId);
+			} else {
+				searchParams.delete(SEARCH_PARAMS.INSTITUTION_LOCATION_ID);
+			}
+
+			setSearchParams(searchParams);
+
+			// Persist the selectedInstitutionLocationId in the account
+			// Don't throw if it fails though, fire-and-forget
+			if (!account) {
+				return;
+			}
+
+			try {
+				const response = await accountService
+					.setAccountLocation(account.accountId, {
+						accountId: account.accountId,
+						institutionLocationId: desiredInstitutionLocationId ?? '',
+					})
+					.fetch();
+
+				setAccount(response.account);
+			} catch (error) {
+				// Don't throw
+			}
+		},
+		[account, searchParams, selectedInstitutionLocationId, setAccount, setSearchParams]
+	);
 
 	return (
 		<>
@@ -385,18 +417,13 @@ const ConnectWithSupportV2 = () => {
 															title={filter.name}
 															dismissText="Clear"
 															onDismiss={() => {
-																searchParams.delete(
-																	SEARCH_PARAMS.INSTITUTION_LOCATION_ID
-																);
-																setSearchParams(searchParams);
+																handleLocationFilterApply();
 															}}
 															confirmText="Apply"
 															onConfirm={() => {
-																searchParams.set(
-																	SEARCH_PARAMS.INSTITUTION_LOCATION_ID,
+																handleLocationFilterApply(
 																	selectedInstitutionLocationId
 																);
-																setSearchParams(searchParams);
 															}}
 														>
 															<div className="py-3">
