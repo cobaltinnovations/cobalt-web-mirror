@@ -13,7 +13,7 @@ import { EditAvailabilityPanel } from './edit-availability-panel';
 import { useContainerStyles } from './use-scheduling-styles';
 import { EditAppointmentPanel } from './edit-appointment-panel';
 import { AppointmentDetailPanel } from './appointment-detail-panel';
-import { FollowUpsListPanel } from './follow-ups-list-panel';
+// import { FollowUpsListPanel } from './follow-ups-list-panel';
 import { SelectedAvailabilityPanel } from './selected-availability-panel';
 import { useProviderCalendar } from './use-provider-calendar';
 import { Link, Outlet, Route, useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ export const MySchedule: FC = () => {
 	const { account } = useAccount();
 	const navigate = useNavigate();
 
-	const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
+	// const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
 
 	const [currentMainCalendarView, setCurrentMainCalendarView] = useState<MainCalendarView>(MainCalendarView.Week);
 	const [focusDateOnLoad, setFocusDateOnLoad] = useState(true);
@@ -251,7 +251,7 @@ export const MySchedule: FC = () => {
 
 				<h5 className=" mb-5">actions</h5>
 				<div className="d-flex flex-column align-items-start">
-					<Link to={`appointments/new-appointment`}>
+					{/* <Link to={`appointments/new-appointment`}>
 						<Button
 							data-testid="schedulingNewAppointmentButton"
 							variant="link"
@@ -260,7 +260,7 @@ export const MySchedule: FC = () => {
 						>
 							New Appointment
 						</Button>
-					</Link>
+					</Link> */}
 
 					<Link to={`availabilities`}>
 						<Button
@@ -313,7 +313,7 @@ export const MySchedule: FC = () => {
 					}}
 					eventClick={(clickInfo) => {
 						if (clickInfo.event.allDay) {
-							setFollowupPatientList(clickInfo.event.extendedProps.patients);
+							// setFollowupPatientList(clickInfo.event.extendedProps.patients);
 							return;
 						} else if (
 							clickInfo.event.extendedProps.isAvailability ||
