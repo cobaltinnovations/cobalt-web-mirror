@@ -128,7 +128,7 @@ const MhicNavigationItem = ({ navigationItem }: MhicNavigationItemProps) => {
 			>
 				<div className="d-flex align-items-center">
 					<div className={classes.iconOuter}>{<navigationItem.icon />}</div>
-					<span className="d-block">{navigationItem.title}</span>
+					<span className="d-block fw-semibold">{navigationItem.title}</span>
 				</div>
 				{navigationItem.navigationItems ? (
 					<div>

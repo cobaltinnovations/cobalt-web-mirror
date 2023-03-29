@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Outlet, useMatch, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 
+import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
@@ -44,7 +45,7 @@ const MhicMyPanel = () => {
 	const navigationItems = useMemo(
 		() => [
 			{
-				title: 'Overview',
+				title: 'Today',
 				icon: () => <FlagSuccess width={20} height={20} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic');
@@ -53,7 +54,7 @@ const MhicMyPanel = () => {
 			},
 			{
 				title: 'My Patients',
-				icon: () => <FlagSuccess width={20} height={20} className="text-p300" />,
+				icon: () => <ClipboardIcon width={20} height={20} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic/my-patients');
 				},

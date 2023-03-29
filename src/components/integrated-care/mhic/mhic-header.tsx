@@ -58,6 +58,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			listStyle: 'none',
 		},
 		'& nav ul li': {
+			height: '100%',
 			position: 'relative',
 			'& a:not(.dropdown-item), & .dropdown button': {
 				height: '100%',
@@ -156,7 +157,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			{
 				testId: '',
 				navigationItemId: 'ORDERS',
-				title: 'Pending Orders',
+				title: 'Orders',
 				active: !!ordersPath,
 				items: [
 					{
@@ -217,12 +218,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 					<nav className="h-100">
 						<ul>
 							{navigationLinks.map((link, index) => (
-								<li
-									key={index}
-									className={classNames('h-100', {
-										active: link.active,
-									})}
-								>
+								<li key={index} className={classNames({ active: link.active })}>
 									{link.to && <Link to={link.to}>{link.title}</Link>}
 									{link.items && (
 										<Dropdown>
@@ -242,9 +238,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 											>
 												{link.items.map((item, itemIndex) => (
 													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
-														<div className="d-flex align-items-center">
-															<p className="mb-0 fw-semibold">{item.title}</p>
-														</div>
+														<span className="fw-semibold">{item.title}</span>
 													</Dropdown.Item>
 												))}
 											</Dropdown.Menu>

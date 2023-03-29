@@ -1,33 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import useFetchPatientOrders from '@/pages/ic/hooks/use-fetch-patient-orders';
+import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
-import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
+import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	overviewCard: {
+		padding: 16,
 		display: 'flex',
 		borderRadius: 8,
-		padding: '20px 16px',
 		boxShadow: theme.elevation.e200,
 		backgroundColor: theme.colors.n0,
 	},
 	iconOuter: {
-		width: 40,
+		width: 48,
 		flexShrink: 0,
 		marginRight: 16,
 	},
 	icon: {
-		width: 40,
-		height: 40,
+		width: 48,
+		height: 48,
 		display: 'flex',
-		borderRadius: '50%',
+		borderRadius: 4,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -35,6 +38,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const MhicOverview = () => {
 	const classes = useStyles();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const { isLoadingOrders, patientOrders = [], totalCount, totalCountDescription } = useFetchPatientOrders();
+	const pageNumber = searchParams.get('pageNumber') ?? '0';
+
+	const handlePaginationClick = useCallback(
+		(pageIndex: number) => {
+			searchParams.set('pageNumber', String(pageIndex));
+			setSearchParams(searchParams);
+		},
+		[searchParams, setSearchParams]
+	);
 
 	return (
 		<Container fluid className="py-11 overflow-visible">
@@ -47,19 +61,13 @@ const MhicOverview = () => {
 				<Col>
 					<div className={classes.overviewCard}>
 						<div className={classes.iconOuter}>
-							<div className={classNames(classes.icon, 'bg-s50')}>
-								<CalendarIcon className="text-success" width={24} height={24} />
+							<div className={classNames(classes.icon, 'bg-a50')}>
+								<ClipboardIcon className="text-secondary" width={24} height={24} />
 							</div>
 						</div>
 						<div>
+							<p className="mb-0">New Patients</p>
 							<h4 className="mb-0">3</h4>
-							<p className="mb-4">Assessments Scheduled</p>
-							<hr className="mb-4" />
-							<p className="mb-0">
-								<Link to="/#" className="fw-normal">
-									View Scheduled
-								</Link>
-							</p>
 						</div>
 					</div>
 				</Col>
@@ -67,18 +75,12 @@ const MhicOverview = () => {
 					<div className={classes.overviewCard}>
 						<div className={classes.iconOuter}>
 							<div className={classNames(classes.icon, 'bg-w50')}>
-								<PhoneIcon className="text-warning" width={24} height={24} />
+								<TherapyIcon className="text-warning" width={24} height={24} />
 							</div>
 						</div>
 						<div>
+							<p className="mb-0">Voicemail Tasks</p>
 							<h4 className="mb-0">3</h4>
-							<p className="mb-4">Due for Outreach</p>
-							<hr className="mb-4" />
-							<p className="mb-0">
-								<Link to="/#" className="fw-normal">
-									View Outreach
-								</Link>
-							</p>
 						</div>
 					</div>
 				</Col>
@@ -86,102 +88,50 @@ const MhicOverview = () => {
 					<div className={classes.overviewCard}>
 						<div className={classes.iconOuter}>
 							<div className={classNames(classes.icon, 'bg-p50')}>
-								<EnvelopeIcon className="text-primary" width={24} height={24} />
+								<PhoneIcon className="text-primary" width={24} height={24} />
 							</div>
 						</div>
 						<div>
+							<p className="mb-0">Follow Ups</p>
 							<h4 className="mb-0">2</h4>
-							<p className="mb-4">Need Resources</p>
-							<hr className="mb-4" />
-							<p className="mb-0">
-								<Link to="/#" className="fw-normal">
-									View Resources
-								</Link>
-							</p>
+						</div>
+					</div>
+				</Col>
+				<Col>
+					<div className={classes.overviewCard}>
+						<div className={classes.iconOuter}>
+							<div className={classNames(classes.icon, 'bg-s50')}>
+								<EventIcon className="text-success" width={24} height={24} />
+							</div>
+						</div>
+						<div>
+							<p className="mb-0">Scheduled Assessments</p>
+							<h4 className="mb-0">2</h4>
 						</div>
 					</div>
 				</Col>
 			</Row>
 			<Row>
 				<Col>
-					<h3 className="mb-6">
-						Follow Up <span className="text-gray">(6)</span>
-					</h3>
-					<Table isLoading={false}>
-						<TableHead>
-							<TableRow>
-								<TableCell header width={280} sticky>
-									Patient
-								</TableCell>
-								<TableCell header>Referral Date</TableCell>
-								<TableCell header className="text-right">
-									Outreach #
-								</TableCell>
-								<TableCell header>Last Outreach</TableCell>
-								<TableCell header className="text-right">
-									Episode
-								</TableCell>
-								<TableCell />
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							<TableRow>
-								<TableCell width={280} sticky className="py-2">
-									<span className="d-block">Lastname, Firstname</span>
-									<span className="d-block text-gray">1A2B3C4D5E</span>
-								</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1 day</TableCell>
-								<TableCell>button</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell width={280} sticky className="py-2">
-									<span className="d-block">Lastname, Firstname</span>
-									<span className="d-block text-gray">1A2B3C4D5E</span>
-								</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1 day</TableCell>
-								<TableCell>button</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell width={280} sticky className="py-2">
-									<span className="d-block">Lastname, Firstname</span>
-									<span className="d-block text-gray">1A2B3C4D5E</span>
-								</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1 day</TableCell>
-								<TableCell>button</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell width={280} sticky className="py-2">
-									<span className="d-block">Lastname, Firstname</span>
-									<span className="d-block text-gray">1A2B3C4D5E</span>
-								</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1 day</TableCell>
-								<TableCell>button</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell width={280} sticky className="py-2">
-									<span className="d-block">Lastname, Firstname</span>
-									<span className="d-block text-gray">1A2B3C4D5E</span>
-								</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">1</TableCell>
-								<TableCell>Jan 30, 2023</TableCell>
-								<TableCell className="text-right">4 days</TableCell>
-								<TableCell>button</TableCell>
-							</TableRow>
-						</TableBody>
-					</Table>
+					<h4 className="mb-6">My Prioirities</h4>
+					<MhicPatientOrderTable
+						isLoading={isLoadingOrders}
+						patientOrders={patientOrders}
+						selectAll={false}
+						totalPatientOrdersCount={totalCount}
+						totalPatientOrdersDescription={totalCountDescription}
+						pageNumber={parseInt(pageNumber, 10)}
+						pageSize={15}
+						onPaginationClick={handlePaginationClick}
+						columnConfig={{
+							flag: true,
+							patient: true,
+							referralDate: true,
+							outreachNumber: true,
+							lastOutreach: true,
+							episode: true,
+						}}
+					/>
 				</Col>
 			</Row>
 		</Container>
