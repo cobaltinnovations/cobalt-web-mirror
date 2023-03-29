@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { Outlet, useMatch, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 
-import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
-import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
-import { MhicNavigation } from '@/components/integrated-care/mhic';
 import { PatientOrderStatusId } from '@/lib/models';
+import { MhicNavigation } from '@/components/integrated-care/mhic';
+
+import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
+import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
+import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 
 const MhicMyPanel = () => {
 	const [searchParams] = useSearchParams();
@@ -46,7 +46,7 @@ const MhicMyPanel = () => {
 		() => [
 			{
 				title: 'Today',
-				icon: () => <FlagSuccess width={20} height={20} className="text-p300" />,
+				icon: () => <DashboardIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic');
 				},
@@ -54,20 +54,19 @@ const MhicMyPanel = () => {
 			},
 			{
 				title: 'My Patients',
-				icon: () => <ClipboardIcon width={20} height={20} className="text-p300" />,
+				icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic/my-patients');
 				},
 				isActive: !!myPatientsMatch && !patientOrderStatusId,
 			},
 			{
-				title: 'Assigned Orders',
-				icon: () => <AssessmentIcon width={20} height={20} className="text-p300" />,
+				title: 'My Patient Views',
 				navigationItems: [
 					{
 						title: 'Need Assessment',
 						description: '[TODO]',
-						icon: () => <DotIcon className="text-warning" />,
+						icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.NEEDS_ASSESSMENT);
 						},
@@ -76,7 +75,7 @@ const MhicMyPanel = () => {
 					{
 						title: 'Safety Planning',
 						description: '[TODO]',
-						icon: () => <DotIcon className="text-danger" />,
+						icon: () => <DotIcon width={24} height={24} className="text-danger" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SAFETY_PLANNING);
 						},
@@ -86,7 +85,7 @@ const MhicMyPanel = () => {
 					{
 						title: 'BHP',
 						description: '[TODO]',
-						icon: () => <DotIcon className="text-success" />,
+						icon: () => <DotIcon width={24} height={24} className="text-success" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.BHP);
 						},
@@ -95,7 +94,7 @@ const MhicMyPanel = () => {
 					{
 						title: 'Specialty Care',
 						description: '[TODO]',
-						icon: () => <DotIcon className="text-primary" />,
+						icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SPECIALTY_CARE);
 						},
