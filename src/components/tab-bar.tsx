@@ -20,7 +20,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				'& button': {
 					border: 0,
 					fontWeight: 500,
-					padding: '18px 10px',
+					padding: '18px 12px',
 					appearance: 'none',
 					whiteSpace: 'nowrap',
 					color: theme.colors.n500,
@@ -45,18 +45,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 				},
 				'&:first-child': {
 					'& button': {
-						paddingLeft: ({ hideBorder }: UseStylesProps) => (hideBorder ? 0 : 10),
+						paddingLeft: 0,
 					},
 					'&.active:after': {
-						left: ({ hideBorder }: UseStylesProps) => (hideBorder ? 0 : 10),
+						left: 0,
 					},
 				},
 				'&:last-child': {
 					'& button': {
-						paddingRight: ({ hideBorder }: UseStylesProps) => (hideBorder ? 0 : 10),
+						paddingRight: 0,
 					},
 					'&.active:after': {
-						right: ({ hideBorder }: UseStylesProps) => (hideBorder ? 0 : 10),
+						right: 0,
 					},
 				},
 			},
@@ -69,15 +69,16 @@ interface TabBarProps {
 	tabs: { value: string; title: string }[];
 	onTabClick(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	hideBorder?: boolean;
+	className?: string;
 }
 
-const TabBar = ({ value, tabs, onTabClick, hideBorder }: TabBarProps) => {
+const TabBar = ({ value, tabs, onTabClick, hideBorder, className }: TabBarProps) => {
 	const classes = useStyles({
 		hideBorder: !!hideBorder,
 	});
 
 	return (
-		<div className={classes.tabBar}>
+		<div className={classNames(classes.tabBar, className)}>
 			<ul>
 				{tabs.map((tab) => {
 					return (
