@@ -15,3 +15,7 @@ export enum ENV_VARS {
 }
 
 export const AUTH_REDIRECT_URLS = ['/auth', '/mychart/authenticate'];
+
+export const STORAGE_KEYS = {
+	MHIC_RECENT_ORDERS_STORAGE_KEY: 'mhic-recent-orders',
+} as const;

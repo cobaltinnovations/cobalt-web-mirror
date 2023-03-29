@@ -2,7 +2,8 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
-	ActivePatientOrderCountModel,
+	OpenPatientOrderCountModel,
+	PatientOrderAutocompleteResult,
 	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
 	PatientOrderModel,
@@ -11,6 +12,24 @@ import {
 	PatientOrderStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
+
+export interface PatientOrderResponse {
+	findResult: {
+		patientOrders: PatientOrderModel[];
+		totalCount: number;
+		totalCountDescription: string;
+	};
+	activePatientOrdersCount: number;
+	activePatientOrdersCountDescription: string;
+	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderStatusId, PatientOrderCountModel>;
+}
+
+export interface PanelAccountsResponse {
+	panelAccounts: AccountModel[];
+	openPatientOrderCountsByPanelAccountId: Record<string, OpenPatientOrderCountModel>;
+	overallActivePatientOrderCount: number;
+	overallActivePatientOrderCountDescription: string;
+}
 
 export interface PatientOrderDemographicsFormData {
 	patientLastName: string;
@@ -48,34 +67,28 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	autocompletePatientOrders(queryParameters: { searchQuery: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderAutocompleteResults: PatientOrderAutocompleteResult[];
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/patient-orders/autocomplete', queryParameters),
+		});
+	},
 	getPatientOrders(queryParameters?: {
-		patientOrderPanelTypeId?: string;
+		patientOrderStatusId?: string | string[];
 		panelAccountId?: string;
-		searchQuery?: string;
+		patientMrn?: string;
 		pageNumber?: string;
 		pageSize?: string;
 	}) {
-		return httpSingleton.orchestrateRequest<{
-			findResult: {
-				patientOrders: PatientOrderModel[];
-				totalCount: number;
-				totalCountDescription: string;
-			};
-			activePatientOrdersCount: number;
-			activePatientOrdersCountDescription: string;
-			activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderStatusId, ActivePatientOrderCountModel>;
-		}>({
+		return httpSingleton.orchestrateRequest<PatientOrderResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/patient-orders', queryParameters),
 		});
 	},
 	getPanelAccounts() {
-		return httpSingleton.orchestrateRequest<{
-			panelAccounts: AccountModel[];
-			activePatientOrderCountsByPanelAccountId: Record<string, PatientOrderCountModel>;
-			overallActivePatientOrderCount: number;
-			overallActivePatientOrderCountDescription: string;
-		}>({
+		return httpSingleton.orchestrateRequest<PanelAccountsResponse>({
 			method: 'GET',
 			url: '/integrated-care/panel-accounts',
 		});

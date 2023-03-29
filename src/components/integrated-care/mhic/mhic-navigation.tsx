@@ -63,7 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'center',
 	},
 	body: {
-		padding: `${MHIC_HEADER_HEIGHT}px 40px 0 ${sideNavWidth + 40}px`,
+		padding: `0 40px 0 ${sideNavWidth + 40}px`,
 	},
 }));
 
