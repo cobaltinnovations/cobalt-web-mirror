@@ -14,6 +14,8 @@ import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
 	patientOrder?: PatientOrderModel;
@@ -57,16 +59,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 		'& nav ul li': {
 			position: 'relative',
-			'& a': {
+			'& a:not(.dropdown-item), & .dropdown button': {
 				height: '100%',
 				display: 'flex',
 				padding: '0 12px',
 				alignItems: 'center',
 				textDecoration: 'none',
+				...theme.fonts.default,
 				color: theme.colors.n500,
 				...theme.fonts.bodyNormal,
 				'&:hover': {
 					color: theme.colors.p700,
+					backgroundColor: 'transparent',
+				},
+			},
+			'& .dropdown': {
+				height: '100%',
+				'& .dropdown-menu': {
+					width: 344,
 				},
 			},
 			'&:after': {
@@ -80,7 +90,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				backgroundColor: 'transparent',
 			},
 			'&:first-child': {
-				'& a': {
+				'& a:not(.dropdown-item), & .dropdown button': {
 					paddingLeft: 0,
 				},
 				'&:after': {
@@ -88,7 +98,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&:last-child': {
-				'& a': {
+				'& a:not(.dropdown-item), & .dropdown button': {
 					paddingRight: 0,
 				},
 				'&:after': {
@@ -96,7 +106,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'&.active': {
-				'& a': {
+				'& a:not(.dropdown-item), & .dropdown button': {
 					color: theme.colors.p700,
 				},
 				'&:after': {
@@ -137,35 +147,50 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const navigationLinks = useMemo(
 		() => [
 			{
+				testId: '',
+				navigationItemId: 'MY_PANEL',
 				to: '/ic/mhic',
 				title: 'My Panel',
 				active: !!panelRoot || !!patientsRoot,
 			},
 			{
-				to: {
-					pathname: '/ic/mhic/orders',
-					search: `?patientOrderStatusId=${PatientOrderStatusId.PENDING}`,
-				},
+				testId: '',
+				navigationItemId: 'ORDERS',
 				title: 'Pending Orders',
 				active: !!ordersPath,
+				items: [
+					{
+						testId: '',
+						navigationItemId: 'ORDERS_PENDING',
+						title: 'Pending',
+						to: {
+							pathname: '/ic/mhic/orders',
+							search: `?patientOrderStatusId=${PatientOrderStatusId.PENDING}`,
+						},
+					},
+					{
+						testId: '',
+						navigationItemId: 'ORDERS_ASSIGNED',
+						title: 'Assigned',
+						to: {
+							pathname: '/ic/mhic/orders',
+							search: `?patientOrderStatusId=${PatientOrderStatusId.NEEDS_ASSESSMENT}&patientOrderStatusId=${PatientOrderStatusId.SCHEDULED}&patientOrderStatusId=${PatientOrderStatusId.SAFETY_PLANNING}&patientOrderStatusId=${PatientOrderStatusId.SPECIALTY_CARE}&patientOrderStatusId=${PatientOrderStatusId.SUBCLINICAL}&patientOrderStatusId=${PatientOrderStatusId.BHP}`,
+						},
+					},
+					{
+						testId: '',
+						navigationItemId: 'ORDERS_CLOSED',
+						title: 'Closed',
+						to: {
+							pathname: '/ic/mhic/orders',
+							search: `?patientOrderDispositionId=${PatientOrderDispositionId.CLOSED}`,
+						},
+					},
+				],
 			},
 			{
-				to: {
-					pathname: '/ic/mhic/orders',
-					search: `?patientOrderStatusId=${PatientOrderStatusId.NEEDS_ASSESSMENT}&patientOrderStatusId=${PatientOrderStatusId.SCHEDULED}&patientOrderStatusId=${PatientOrderStatusId.SAFETY_PLANNING}&patientOrderStatusId=${PatientOrderStatusId.SPECIALTY_CARE}&patientOrderStatusId=${PatientOrderStatusId.SUBCLINICAL}&patientOrderStatusId=${PatientOrderStatusId.BHP}`,
-				},
-				title: 'Assigned Orders',
-				active: !!ordersPath,
-			},
-			{
-				to: {
-					pathname: '/ic/mhic/orders',
-					search: `?patientOrderDispositionId=${PatientOrderDispositionId.CLOSED}`,
-				},
-				title: 'Closed Orders',
-				active: !!ordersPath,
-			},
-			{
+				testId: '',
+				navigationItemId: 'REPORTS',
 				to: '/ic/mhic/reports',
 				title: 'Reports',
 				active: !!reportsPath,
@@ -198,7 +223,33 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 										active: link.active,
 									})}
 								>
-									<Link to={link.to}>{link.title}</Link>
+									{link.to && <Link to={link.to}>{link.title}</Link>}
+									{link.items && (
+										<Dropdown>
+											<Dropdown.Toggle
+												as={DropdownToggle}
+												id={`mhic-header__${link.navigationItemId}`}
+											>
+												<span>{link.title}</span>
+												<DownChevron width={16} height={16} />
+											</Dropdown.Toggle>
+											<Dropdown.Menu
+												as={DropdownMenu}
+												align="start"
+												flip={false}
+												popperConfig={{ strategy: 'fixed' }}
+												renderOnMount
+											>
+												{link.items.map((item, itemIndex) => (
+													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
+														<div className="d-flex align-items-center">
+															<p className="mb-0 fw-semibold">{item.title}</p>
+														</div>
+													</Dropdown.Item>
+												))}
+											</Dropdown.Menu>
+										</Dropdown>
+									)}
 								</li>
 							))}
 						</ul>
