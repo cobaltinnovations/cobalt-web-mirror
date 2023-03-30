@@ -1,13 +1,8 @@
-import React, { PropsWithChildren, useState } from 'react';
-import { Collapse } from 'react-bootstrap';
+import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 
-import useAccount from '@/hooks/use-account';
+import { MHIC_HEADER_HEIGHT } from '@/components/integrated-care/mhic/mhic-header';
 import { createUseThemedStyles } from '@/jss/theme';
-
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
-import { MHIC_HEADER_HEIGHT } from './mhic-header';
 
 const sideNavWidth = 280;
 
@@ -16,9 +11,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		bottom: 0,
 		zIndex: 4,
-		padding: 16,
 		position: 'fixed',
 		overflowY: 'auto',
+		padding: '24px 12px',
 		top: MHIC_HEADER_HEIGHT,
 		width: sideNavWidth,
 		backgroundColor: theme.colors.n0,
@@ -27,7 +22,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	navigation: {
 		'& button': {
 			border: 0,
-			padding: 8,
+			padding: 12,
 			width: '100%',
 			borderRadius: 4,
 			display: 'flex',
@@ -70,7 +65,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface MhicNavigationItemModel {
 	title: string;
 	description?: string;
-	icon(): JSX.Element;
+	icon?(): JSX.Element;
 	onClick?(): void;
 	navigationItems?: MhicNavigationItemModel[];
 	isActive?: boolean;
@@ -82,24 +77,15 @@ interface MhicNavigationProps {
 
 export const MhicNavigation = ({ navigationItems, children }: PropsWithChildren<MhicNavigationProps>) => {
 	const classes = useStyles();
-	const { account } = useAccount();
 
 	return (
 		<>
 			<div className={classes.sideNav}>
-				<div className="mb-3 px-2 pt-1 pb-5 d-flex align-items-center border-bottom">
-					<AvatarIcon className="me-3" />
-					<div>
-						<span className="d-block">{account?.displayName}</span>
-						<span className="d-block text-gray">MHIC</span>
-					</div>
-				</div>
 				<nav className={classes.navigation}>
 					{navigationItems.map((ni, index) => (
 						<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
 					))}
 				</nav>
-				<hr className="mt-3" />
 			</div>
 			<div className={classes.body}>{children}</div>
 		</>
@@ -108,52 +94,45 @@ export const MhicNavigation = ({ navigationItems, children }: PropsWithChildren<
 
 interface MhicNavigationItemProps {
 	navigationItem: MhicNavigationItemModel;
+	isSubNav?: boolean;
 }
 
-const MhicNavigationItem = ({ navigationItem }: MhicNavigationItemProps) => {
+const MhicNavigationItem = ({ navigationItem, isSubNav }: MhicNavigationItemProps) => {
 	const classes = useStyles();
-	const [isExpanded, setIsExpanded] = useState(true);
 
 	return (
 		<>
-			<button
-				onClick={
-					navigationItem.navigationItems
-						? () => {
-								setIsExpanded(!isExpanded);
-						  }
-						: navigationItem.onClick
-				}
-				className={classNames({ active: navigationItem.isActive })}
-			>
-				<div className="d-flex align-items-center">
-					<div className={classes.iconOuter}>{<navigationItem.icon />}</div>
-					<span className="d-block">{navigationItem.title}</span>
-				</div>
-				{navigationItem.navigationItems ? (
-					<div>
-						<DownChevron
-							className={classNames('text-n300 chevron-icon', {
-								'chevron-icon--is-expanded': isExpanded,
-							})}
-						/>
-					</div>
-				) : (
-					<>
-						{navigationItem.description && (
-							<span className="d-block text-gray">{navigationItem.description}</span>
-						)}
-					</>
-				)}
-			</button>
-			{navigationItem.navigationItems && (
-				<Collapse in={isExpanded}>
+			{navigationItem.navigationItems ? (
+				<>
+					<hr className="my-5" />
+					<h6 className="py-4 px-3 fs-small text-uppercase text-gray">{navigationItem.title}</h6>
 					<div>
 						{navigationItem.navigationItems.map((ni, index) => (
-							<MhicNavigationItem key={`${ni.title.replace(/\s+/g, '')}-${index}`} navigationItem={ni} />
+							<MhicNavigationItem
+								isSubNav
+								key={`${ni.title.replace(/\s+/g, '')}-${index}`}
+								navigationItem={ni}
+							/>
 						))}
 					</div>
-				</Collapse>
+				</>
+			) : (
+				<button onClick={navigationItem.onClick} className={classNames({ active: navigationItem.isActive })}>
+					<div className="d-flex align-items-center">
+						{navigationItem.icon && <div className={classes.iconOuter}>{<navigationItem.icon />}</div>}
+						<span
+							className={classNames('d-block', {
+								'fw-semibold': !isSubNav,
+								'fw-normal': isSubNav,
+							})}
+						>
+							{navigationItem.title}
+						</span>
+					</div>
+					{navigationItem.description && (
+						<span className="d-block text-gray">{navigationItem.description}</span>
+					)}
+				</button>
 			)}
 		</>
 	);
