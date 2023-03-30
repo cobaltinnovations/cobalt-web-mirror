@@ -61,18 +61,27 @@ const MhicMyPatients = () => {
 			/>
 
 			<div className="py-6 d-flex align-items-center justify-content-between">
+				<h3>
+					All Assigned <span className="text-gray fs-large fw-normal">(0 Patients)</span>
+				</h3>
 				<div className="d-flex">
-					<MhicFilterDropdown className="me-2" />
-					<MhicSortDropdown />
+					<MhicFilterDropdown
+						align="end"
+						className="me-2"
+						onApply={(selectedFilters) => {
+							console.log(selectedFilters);
+						}}
+					/>
+					<MhicSortDropdown align="end" className="me-2" />
+					<Button
+						variant="light"
+						onClick={() => {
+							setShowCustomizeTableModal(true);
+						}}
+					>
+						Customize
+					</Button>
 				</div>
-				<Button
-					variant="light"
-					onClick={() => {
-						setShowCustomizeTableModal(true);
-					}}
-				>
-					Customize View
-				</Button>
 			</div>
 
 			<MhicPatientOrderTable

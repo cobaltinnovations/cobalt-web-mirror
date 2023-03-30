@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
+import { AlignType } from 'react-bootstrap/esm/types';
+import classNames from 'classnames';
 
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -22,12 +24,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const MhicSortDropdown = () => {
+interface MhicSortDropdownProps {
+	align?: AlignType;
+	className?: string;
+}
+
+export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
 
 	return (
-		<Dropdown className="d-flex align-items-center" autoClose="outside" show={show} onToggle={setShow}>
+		<Dropdown
+			className={classNames('d-flex align-items-center', className)}
+			autoClose="outside"
+			show={show}
+			onToggle={setShow}
+		>
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				className="d-inline-flex align-items-center py-2 ps-3 pe-4"
@@ -39,7 +51,7 @@ export const MhicSortDropdown = () => {
 			<Dropdown.Menu
 				as={DropdownMenu}
 				className="p-0"
-				align="start"
+				align={align ?? 'start'}
 				flip={false}
 				popperConfig={{ strategy: 'fixed' }}
 				renderOnMount

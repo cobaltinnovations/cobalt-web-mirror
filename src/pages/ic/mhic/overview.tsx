@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 

@@ -38,6 +38,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		right: 'initial',
 		position: 'absolute',
 		pointerEvents: 'none',
+		...theme.fonts.default,
 		...theme.fonts.headingBold,
 		transformOrigin: 'left top',
 		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
