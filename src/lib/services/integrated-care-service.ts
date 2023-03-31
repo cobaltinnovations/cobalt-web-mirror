@@ -155,7 +155,6 @@ export const integratedCareService = {
 	},
 	postPatientOrderOutreach(data: {
 		patientOrderId: string;
-		accountId: string;
 		patientOrderOutreachResultId: string;
 		outreachDate: string;
 		outreachTime: string;
@@ -172,6 +171,7 @@ export const integratedCareService = {
 	updatePatientOrderOutreach(
 		patientOrderOutreachId: string,
 		data: {
+			patientOrderOutreachResultId: string;
 			outreachDate: string;
 			outreachTime: string;
 			note: string;

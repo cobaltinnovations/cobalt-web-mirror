@@ -308,6 +308,13 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 										date={outreach.outreachDateTimeDescription}
 										message={outreach.note}
 										onEdit={() => {
+											setOutreachTypeId(
+												referenceData.patientOrderOutreachResults.find(
+													(result) =>
+														result.patientOrderOutreachResultId ===
+														outreach.patientOrderOutreachResultId
+												)?.patientOrderOutreachTypeId as PatientOrderOutreachTypeId
+											);
 											setOutreachToEdit(outreach);
 											setShowOutreachModal(true);
 										}}

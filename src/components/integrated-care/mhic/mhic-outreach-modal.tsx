@@ -46,6 +46,22 @@ export const MhicOutreachModal: FC<Props> = ({
 	});
 	const [isSaving, setIsSaving] = useState(false);
 
+	const modalTitleByOutreachTypeId = useMemo(
+		() => ({
+			[PatientOrderOutreachTypeId.MYCHART_MESSAGE]: 'MyPennMedicine Message',
+			[PatientOrderOutreachTypeId.PHONE_CALL]: 'Call',
+		}),
+		[]
+	);
+
+	const resultSelectLabelByOutreachTypeId = useMemo(
+		() => ({
+			[PatientOrderOutreachTypeId.MYCHART_MESSAGE]: 'Message Type',
+			[PatientOrderOutreachTypeId.PHONE_CALL]: 'Select Call Result',
+		}),
+		[]
+	);
+
 	const resultGroupsByOutreachTypeId = useMemo(() => {
 		const resultGroup: Record<
 			string,
@@ -104,7 +120,7 @@ export const MhicOutreachModal: FC<Props> = ({
 			setFormValues({
 				date: new Date(outreachToEdit.outreachDate),
 				time: moment(outreachToEdit.outreachTime, 'HH:mm').format('h:mm A'),
-				resultId: '', // TODO
+				resultId: outreachToEdit.patientOrderOutreachResultId,
 				comment: outreachToEdit.note,
 			});
 			return;
@@ -127,6 +143,7 @@ export const MhicOutreachModal: FC<Props> = ({
 				if (outreachToEdit) {
 					const response = await integratedCareService
 						.updatePatientOrderOutreach(outreachToEdit.patientOrderOutreachId, {
+							patientOrderOutreachResultId: formValues.resultId,
 							outreachDate: moment(formValues.date).format('YYYY-MM-DD'),
 							outreachTime: formValues.time,
 							note: formValues.comment,
@@ -138,8 +155,7 @@ export const MhicOutreachModal: FC<Props> = ({
 					const response = await integratedCareService
 						.postPatientOrderOutreach({
 							patientOrderId,
-							accountId: '', // TODO
-							patientOrderOutreachResultId: '', // TODO
+							patientOrderOutreachResultId: formValues.resultId,
 							outreachDate: moment(formValues.date).format('YYYY-MM-DD'),
 							outreachTime: formValues.time,
 							note: formValues.comment,
@@ -154,13 +170,24 @@ export const MhicOutreachModal: FC<Props> = ({
 				setIsSaving(false);
 			}
 		},
-		[formValues.comment, formValues.date, formValues.time, handleError, onSave, outreachToEdit, patientOrderId]
+		[
+			formValues.comment,
+			formValues.date,
+			formValues.resultId,
+			formValues.time,
+			handleError,
+			onSave,
+			outreachToEdit,
+			patientOrderId,
+		]
 	);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEntering={handleOnEnter}>
 			<Modal.Header closeButton>
-				<Modal.Title>{outreachToEdit ? 'Edit Outreach Attempt' : 'Log Outreach Attempt'}</Modal.Title>
+				<Modal.Title>
+					{outreachToEdit ? 'Edit' : 'Log'} {modalTitleByOutreachTypeId[patientOrderOutreachTypeId]}
+				</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
@@ -176,6 +203,7 @@ export const MhicOutreachModal: FC<Props> = ({
 									}));
 								}}
 								disabled={isSaving}
+								required
 							/>
 						</div>
 						<div className={classNames(classes.flex1, 'ms-2')}>
@@ -190,13 +218,14 @@ export const MhicOutreachModal: FC<Props> = ({
 									}));
 								}}
 								disabled={isSaving}
+								required
 							/>
 						</div>
 					</div>
 					<InputHelper
 						className="mb-4"
 						as="select"
-						label="Select Call Result"
+						label={resultSelectLabelByOutreachTypeId[patientOrderOutreachTypeId]}
 						value={formValues.resultId}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValues) => ({
@@ -215,8 +244,8 @@ export const MhicOutreachModal: FC<Props> = ({
 								>
 									{optGroup.options.map((option) => (
 										<option
-											key={option.patientOrderOutreachResultTypeId}
-											value={option.patientOrderOutreachResultTypeId}
+											key={option.patientOrderOutreachResultId}
+											value={option.patientOrderOutreachResultId}
 										>
 											{option.patientOrderOutreachResultTypeDescription}
 										</option>

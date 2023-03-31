@@ -203,6 +203,7 @@ export interface PatientOrderOutreachModel {
 	outreachTimeDescription: string;
 	patientOrderId: string;
 	patientOrderOutreachId: string;
+	patientOrderOutreachResultId: string;
 }
 
 export interface PateintOrderTriageGroupModel {

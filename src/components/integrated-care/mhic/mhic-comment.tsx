@@ -47,13 +47,7 @@ export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, classN
 						>
 							<MoreIcon className="d-flex" />
 						</Dropdown.Toggle>
-						<Dropdown.Menu
-							as={DropdownMenu}
-							align="end"
-							flip={false}
-							popperConfig={{ strategy: 'fixed' }}
-							renderOnMount
-						>
+						<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 							<Dropdown.Item onClick={onEdit}>Edit</Dropdown.Item>
 							<Dropdown.Item onClick={onDelete}>
 								<span className="text-danger">Delete</span>
