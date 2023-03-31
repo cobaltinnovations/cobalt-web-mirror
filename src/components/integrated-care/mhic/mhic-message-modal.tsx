@@ -23,7 +23,7 @@ const useStyles = createUseStyles({
 
 enum PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS {
 	WELCOME = 'WELCOME',
-	CHECK_IN = 'CHECK_IN',
+	RESOURCE_CHECK_IN = 'RESOURCE_CHECK_IN',
 }
 
 enum CONTACT_METHOD_IDS {
@@ -37,7 +37,7 @@ const messageTypes = [
 		title: 'Welcome',
 	},
 	{
-		patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.CHECK_IN,
+		patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.RESOURCE_CHECK_IN,
 		title: 'Check-in',
 	},
 ];

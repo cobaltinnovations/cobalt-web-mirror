@@ -218,8 +218,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 											variant: 'primary',
 											title: 'Send Welcome Message',
 											onClick: () => {
-												setOutreachToEdit(undefined);
-												setShowOutreachModal(true);
+												setShowMessageModal(true);
 											},
 										},
 									]}
