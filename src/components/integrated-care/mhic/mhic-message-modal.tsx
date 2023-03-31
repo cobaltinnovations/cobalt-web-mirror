@@ -131,27 +131,6 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
-					<InputHelper
-						className="mb-4"
-						as="select"
-						label="Message Type"
-						value={formValues.messageType}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValues) => ({
-								...previousValues,
-								messageType: currentTarget.value,
-							}));
-						}}
-					>
-						{messageTypes.map((messageType) => (
-							<option
-								key={messageType.patientOrderScheduledMessageTypeId}
-								value={messageType.patientOrderScheduledMessageTypeId}
-							>
-								{messageType.title}
-							</option>
-						))}
-					</InputHelper>
 					<div className="mb-4 d-flex align-items-start">
 						<div className={classNames(classes.flex1, 'me-2')}>
 							<DatePicker
@@ -164,6 +143,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 									}));
 								}}
 								disabled={isSaving}
+								required
 							/>
 						</div>
 						<div className={classNames(classes.flex1, 'ms-2')}>
@@ -178,9 +158,32 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 									}));
 								}}
 								disabled={isSaving}
+								required
 							/>
 						</div>
 					</div>
+					<InputHelper
+						className="mb-4"
+						as="select"
+						label="Message Type"
+						value={formValues.messageType}
+						onChange={({ currentTarget }) => {
+							setFormValues((previousValues) => ({
+								...previousValues,
+								messageType: currentTarget.value,
+							}));
+						}}
+						required
+					>
+						{messageTypes.map((messageType) => (
+							<option
+								key={messageType.patientOrderScheduledMessageTypeId}
+								value={messageType.patientOrderScheduledMessageTypeId}
+							>
+								{messageType.title}
+							</option>
+						))}
+					</InputHelper>
 					<Form.Group>
 						<Form.Label className="mb-1">Contact Method:</Form.Label>
 						{contactMethods.map((contactMethod) => (

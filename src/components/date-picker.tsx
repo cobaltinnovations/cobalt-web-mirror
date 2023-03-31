@@ -69,15 +69,19 @@ interface DatePickerProps extends ReactDatePickerProps {
 
 const CustomDateInput = forwardRef(
 	(
-		{ value, onClick, disabled, className, label, ...props }: any,
+		{ value, onClick, disabled, required, className, label, ...props }: any,
 		ref: React.LegacyRef<HTMLButtonElement> | undefined
 	) => {
 		return (
 			<button {...props} type="button" ref={ref} className={className} onClick={onClick} disabled={disabled}>
 				{label ? (
-					<span className="date-picker-label">{label}</span>
+					<span className="date-picker-label">
+						{label} {required && <span className="text-danger">*</span>}
+					</span>
 				) : (
-					<span className="date-picker-label">Select Date</span>
+					<span className="date-picker-label">
+						Select Date {required && <span className="text-danger">*</span>}
+					</span>
 				)}
 				<span className="date-picker-value">{value}</span>
 				<CalendarIcon className="date-picker-icon" />
@@ -113,6 +117,7 @@ const DatePicker: FC<DatePickerProps> = ({
 					className={classes.datePicker}
 					label={labelText}
 					disabled={reactDatePickerProps.disabled}
+					required={reactDatePickerProps.required}
 				/>
 			}
 			{...reactDatePickerProps}

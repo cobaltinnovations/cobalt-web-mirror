@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderOutreachModel } from '@/lib/models';
@@ -210,6 +210,55 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 					</Row>
 					<Row>
 						<Col>
+							{patientOrder.patientOrderScheduledMessageGroups.map((message) => {
+								return (
+									<Card className="mb-6" bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>
+												Message scheduled for {message.scheduledAtDateTimeDescription}
+											</Card.Title>
+											<div className="button-container">
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														return;
+													}}
+												>
+													Close Episode
+												</Button>
+											</div>
+										</Card.Header>
+										<Card.Body>
+											<Container fluid>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Message Type</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															{message.patientOrderScheduledMessageTypeDescription}
+														</p>
+													</Col>
+												</Row>
+												<Row>
+													<Col xs={3}>
+														<p className="m-0 text-gray">Contact Method</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															{message.patientOrderScheduledMessages
+																.map((m) => m.messageTypeDescription)
+																.join(', ')}
+														</p>
+													</Col>
+												</Row>
+											</Container>
+										</Card.Body>
+									</Card>
+								);
+							})}
+
 							{(patientOrder.patientOrderOutreaches ?? []).length <= 0 && (
 								<NoData
 									title="No Contact Attempts Logged"

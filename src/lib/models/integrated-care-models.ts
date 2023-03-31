@@ -103,6 +103,7 @@ export interface PatientOrderModel {
 	mostRecentEpisodeClosedAt: string;
 	mostRecentEpisodeClosedAtDescription: string;
 	mostRecentEpisodeClosedWithinDateThreshold: boolean;
+	patientOrderScheduledMessageGroups: PatientOrderScheduledMessageGroup[];
 }
 
 enum PatientOrderClosureReasonId {
