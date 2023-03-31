@@ -2,7 +2,13 @@ import React, { useCallback, useState } from 'react';
 import { Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderOutreachModel, PatientOrderScheduledMessageGroup } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderOutreachModel,
+	PatientOrderOutreachTypeId,
+	PatientOrderScheduledMessageGroup,
+	ReferenceDataResponse,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -22,16 +28,21 @@ import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
+	referenceData: ReferenceDataResponse;
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props) => {
+export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrderChange }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+
 	const [showMessageModal, setShowMessageModal] = useState(false);
 	const [messageToEdit, setMessageToEdit] = useState<PatientOrderScheduledMessageGroup>();
+
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
+	const [outreachTypeId, setOutreachTypeId] = useState(PatientOrderOutreachTypeId.PHONE_CALL);
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
+
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
@@ -124,6 +135,8 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 
 			<MhicOutreachModal
 				patientOrderId={patientOrder.patientOrderId}
+				patientOrderOutreachTypeId={outreachTypeId}
+				patientOrderOutreachResults={referenceData.patientOrderOutreachResults}
 				outreachToEdit={outreachToEdit}
 				show={showOutreachModal}
 				onHide={() => {
@@ -180,6 +193,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 											<Dropdown.Item
 												className="d-flex align-items-center"
 												onClick={() => {
+													setOutreachTypeId(PatientOrderOutreachTypeId.PHONE_CALL);
 													setOutreachToEdit(undefined);
 													setShowOutreachModal(true);
 												}}
@@ -190,6 +204,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 											<Dropdown.Item
 												className="d-flex align-items-center"
 												onClick={() => {
+													setOutreachTypeId(PatientOrderOutreachTypeId.MYCHART_MESSAGE);
 													setOutreachToEdit(undefined);
 													setShowOutreachModal(true);
 												}}
@@ -216,7 +231,11 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 						<Col>
 							{patientOrder.patientOrderScheduledMessageGroups.map((message) => {
 								return (
-									<Card className="mb-6" bsPrefix="ic-card">
+									<Card
+										key={message.patientOrderScheduledMessageGroupId}
+										className="mb-6"
+										bsPrefix="ic-card"
+									>
 										<Card.Header>
 											<Card.Title>
 												Message scheduled for {message.scheduledAtDateTimeDescription}

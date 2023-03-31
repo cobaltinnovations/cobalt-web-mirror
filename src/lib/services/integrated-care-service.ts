@@ -155,6 +155,8 @@ export const integratedCareService = {
 	},
 	postPatientOrderOutreach(data: {
 		patientOrderId: string;
+		accountId: string;
+		patientOrderOutreachResultId: string;
 		outreachDate: string;
 		outreachTime: string;
 		note: string;

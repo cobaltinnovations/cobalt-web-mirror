@@ -241,9 +241,10 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
-									{currentPatientOrder && (
+									{currentPatientOrder && referenceData && (
 										<MhicContactHistory
 											patientOrder={currentPatientOrder}
+											referenceData={referenceData}
 											onPatientOrderChange={setCurrentPatientOrder}
 										/>
 									)}
