@@ -632,16 +632,19 @@ const HeaderV2 = () => {
 										</Link>
 									)}
 									{navigationItem.items && (
-										<Dropdown>
-											<Dropdown.Toggle
-												as={DropdownToggle}
-												id={`employee-header__${navigationItem.navigationItemId}`}
-												onClick={() => {
+										<Dropdown
+											onToggle={(nextShow) => {
+												if (nextShow) {
 													trackEvent({
 														action: 'Top Nav',
 														link_text: navigationItem.title,
 													});
-												}}
+												}
+											}}
+										>
+											<Dropdown.Toggle
+												as={DropdownToggle}
+												id={`employee-header__${navigationItem.navigationItemId}`}
 											>
 												<span>{navigationItem.title}</span>
 												<DownChevron width={16} height={16} />

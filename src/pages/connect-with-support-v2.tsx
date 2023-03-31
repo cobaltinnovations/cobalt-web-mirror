@@ -68,8 +68,6 @@ const ConnectWithSupportV2 = () => {
 		[institution?.features, pathname]
 	);
 
-	console.log({ featureDetails, institution });
-
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
 	/* --------------------------------------------------- */
