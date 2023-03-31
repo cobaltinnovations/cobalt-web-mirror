@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderOutreachModel } from '@/lib/models';
+import { PatientOrderModel, PatientOrderOutreachModel, PatientOrderScheduledMessageGroup } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -16,6 +16,7 @@ import {
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
 
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 
@@ -28,6 +29,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [showMessageModal, setShowMessageModal] = useState(false);
+	const [messageToEdit, setMessageToEdit] = useState<PatientOrderScheduledMessageGroup>();
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -112,6 +114,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 		<>
 			<MhicMessageModal
 				patientOrder={patientOrder}
+				messageToEdit={messageToEdit}
 				show={showMessageModal}
 				onHide={() => {
 					setShowMessageModal(false);
@@ -199,6 +202,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 									<Button
 										variant="outline-primary"
 										onClick={() => {
+											setMessageToEdit(undefined);
 											setShowMessageModal(true);
 										}}
 									>
@@ -220,12 +224,13 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 											<div className="button-container">
 												<Button
 													variant="light"
-													size="sm"
+													className="p-2"
 													onClick={() => {
-														return;
+														setMessageToEdit(message);
+														setShowMessageModal(true);
 													}}
 												>
-													Close Episode
+													<EditIcon className="d-flex" />
 												</Button>
 											</div>
 										</Card.Header>
@@ -267,6 +272,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 											variant: 'primary',
 											title: 'Send Welcome Message',
 											onClick: () => {
+												setMessageToEdit(undefined);
 												setShowMessageModal(true);
 											},
 										},

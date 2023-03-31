@@ -44,10 +44,11 @@ const messageTypes = [
 
 interface Props extends ModalProps {
 	patientOrder: PatientOrderModel;
+	messageToEdit?: PatientOrderScheduledMessageGroup;
 	onSave(patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup): void;
 }
 
-export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
+export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSave, ...props }) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
@@ -76,36 +77,52 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleOnEnter = useCallback(() => {
+		if (messageToEdit) {
+			setFormValues({
+				messageType: messageToEdit.patientOrderScheduledMessageTypeId,
+				date: moment(messageToEdit.scheduledAtDate, 'YYYY-MM-DD').toDate(),
+				time: moment(messageToEdit.scheduledAtTime, 'HH:mm').format('h:mm A'),
+				contactMethods: messageToEdit.patientOrderScheduledMessages.map((m) => m.messageTypeId),
+			});
+			return;
+		}
+
 		setFormValues({
 			messageType: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME,
 			date: new Date(),
 			time: moment().format('h:mm A'),
 			contactMethods: [],
 		});
-	}, []);
+	}, [messageToEdit]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 			try {
-				const response = await integratedCareService
-					.sendMessage({
-						patientOrderId: patientOrder.patientOrderId,
-						patientOrderScheduledMessageTypeId: formValues.messageType,
-						messageTypeIds: formValues.contactMethods,
-						scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
-						scheduledAtTime: formValues.time,
-					})
-					.fetch();
+				setIsSaving(true);
 
-				addFlag({
-					variant: 'success',
-					title: `${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message scheduled`,
-					description: `A ${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message is scheduled for ${response.patientOrderScheduledMessageGroup.scheduledAtDateTimeDescription}`,
-					actions: [],
-				});
+				if (messageToEdit) {
+					window.alert('[TODO]: Save edit message');
+				} else {
+					const response = await integratedCareService
+						.sendMessage({
+							patientOrderId: patientOrder.patientOrderId,
+							patientOrderScheduledMessageTypeId: formValues.messageType,
+							messageTypeIds: formValues.contactMethods,
+							scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledAtTime: formValues.time,
+						})
+						.fetch();
 
-				onSave(response.patientOrderScheduledMessageGroup);
+					addFlag({
+						variant: 'success',
+						title: `${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message scheduled`,
+						description: `A ${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message is scheduled for ${response.patientOrderScheduledMessageGroup.scheduledAtDateTimeDescription}`,
+						actions: [],
+					});
+
+					onSave(response.patientOrderScheduledMessageGroup);
+				}
 			} catch (error) {
 				handleError(error);
 			} finally {
@@ -119,15 +136,16 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 			formValues.messageType,
 			formValues.time,
 			handleError,
+			messageToEdit,
 			onSave,
-			patientOrder,
+			patientOrder.patientOrderId,
 		]
 	);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
 			<Modal.Header closeButton>
-				<Modal.Title>Send Message</Modal.Title>
+				<Modal.Title>{messageToEdit ? 'Edit Scheduled Message' : 'Send Message'}</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
@@ -174,6 +192,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 							}));
 						}}
 						required
+						disabled={!!messageToEdit}
 					>
 						{messageTypes.map((messageType) => (
 							<option
@@ -214,23 +233,38 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 						))}
 					</Form.Group>
 				</Modal.Body>
-				<Modal.Footer className="text-right">
-					<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
-						Cancel
-					</Button>
-					<Button
-						variant="primary"
-						type="submit"
-						disabled={
-							isSaving ||
-							!formValues.messageType ||
-							!formValues.date ||
-							!formValues.time ||
-							formValues.contactMethods.length <= 0
-						}
-					>
-						Save
-					</Button>
+				<Modal.Footer className="d-flex align-items-center justify-content-between">
+					<div>
+						{messageToEdit && (
+							<Button
+								variant="danger"
+								onClick={() => {
+									window.alert('[TODO]: Delete the message');
+								}}
+								disabled={isSaving}
+							>
+								Delete
+							</Button>
+						)}
+					</div>
+					<div className="d-flex align-items-center">
+						<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
+							Cancel
+						</Button>
+						<Button
+							variant="primary"
+							type="submit"
+							disabled={
+								isSaving ||
+								!formValues.messageType ||
+								!formValues.date ||
+								!formValues.time ||
+								formValues.contactMethods.length <= 0
+							}
+						>
+							Save
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>
