@@ -36,7 +36,11 @@ const useStyles = createUseThemedStyles(
 	{ index: 1 }
 );
 
-export const InCrisisTemplate = () => {
+interface InCrisisTemplateProps {
+	isModal?: boolean;
+}
+
+export const InCrisisTemplate = ({ isModal = false }: InCrisisTemplateProps) => {
 	const classes = useStyles();
 	const { trackEvent } = useAnalytics();
 
@@ -54,6 +58,11 @@ export const InCrisisTemplate = () => {
 						})}
 						href={link.href}
 						onClick={() => {
+							trackEvent({
+								action: isModal ? 'In Crisis Pop Up' : 'In Crisis Page',
+								link_text: link.description,
+							});
+
 							if (link.href.includes('tel:')) {
 								trackEvent(CrisisAnalyticsEvent.clickCrisisTelResource(link.href));
 							}

@@ -1,5 +1,5 @@
 import useAccount from '@/hooks/use-account';
-import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef } from 'react';
+import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
@@ -171,13 +171,12 @@ export class CrisisAnalyticsEvent {
 	constructor(public action: CrisisEventActions, public label?: string) {}
 }
 
-export type AnalyticsEvent =
-	| MainNavAnalyticsEvent
-	| ScreeningAnalyticsEvent
-	| ContentAnalyticsEvent
-	| TopicCenterAnalyticsEvent
-	| ProviderSearchAnalyticsEvent
-	| CrisisAnalyticsEvent;
+export interface AnalyticsEvent extends Record<string, any> {
+	action: string;
+	category?: string;
+	label?: string;
+	nonInteractive?: boolean;
+}
 
 const AnalyticsContext = createContext<
 	| {
@@ -218,6 +217,27 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	const isGA4Enabled = enabledVersionsRef.current.ga4;
 	const configuredMeasurementIdsRef = useRef<Record<string, boolean>>({});
 
+	const accountId = account?.accountId;
+	const accountSourceId = account?.accountSourceId;
+	const jobTitle = account?.jobTitle;
+	const commonData = useMemo(() => {
+		const data: Record<string, string> = {};
+
+		if (accountId) {
+			data.user_id = accountId;
+		}
+
+		if (accountSourceId) {
+			data.login_status = accountSourceId;
+		}
+
+		if (jobTitle) {
+			data.job_type = jobTitle;
+		}
+
+		return data;
+	}, [accountId, accountSourceId, jobTitle]);
+
 	const configureMeasurementId = useCallback((measurementId: string) => {
 		if (!enabledVersionsRef.current.ga4 || configuredMeasurementIdsRef.current[measurementId]) {
 			return;
@@ -230,14 +250,19 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		configuredMeasurementIdsRef.current[measurementId] = true;
 	}, []);
 
-	const gtagPageView = useCallback((measurementId: string, page: string) => {
-		gtag('event', 'page_view', {
-			page_title: document.title,
-			page_location: document.location.href,
-			page_path: page,
-			send_to: measurementId,
-		});
-	}, []);
+	const gtagPageView = useCallback(
+		(measurementId: string, page: string) => {
+			gtag('event', 'page_view', {
+				timestamp: Date.now(),
+				...commonData,
+				page_title: document.title,
+				page_location: document.location.href,
+				page_path: page,
+				send_to: measurementId,
+			});
+		},
+		[commonData]
+	);
 
 	useEffect(() => {
 		const mixpanelId = config.COBALT_WEB_MIXPANEL_ID;
@@ -304,20 +329,19 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, []);
 
-	const accountId = account?.accountId;
 	useEffect(() => {
 		if (!initialized) {
 			return;
 		}
 
 		if (enabledVersionsRef.current.reactGa) {
-			ReactGA.set({ accountId });
+			ReactGA.set({ ...commonData });
 		}
 
 		if (enabledVersionsRef.current.ga4) {
-			gtag('set', { accountId });
+			gtag('set', { ...commonData });
 		}
-	}, [accountId, initialized]);
+	}, [commonData, initialized]);
 
 	const institutionId = institution?.institutionId;
 	useEffect(() => {
@@ -345,20 +369,20 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			return;
 		}
 
-		ReactGA.set({ page });
+		ReactGA.set({ page, ...commonData });
 		ReactGA.pageview(page);
-	}, [initialized, isReactGAEnabled, page]);
+	}, [commonData, initialized, isReactGAEnabled, page]);
 
 	useEffect(() => {
 		if (!initialized || !isGA4Enabled) {
 			return;
 		}
 
-		gtag('set', { page });
+		gtag('set', { page, ...commonData });
 		for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
 			gtagPageView(measurementId, page);
 		}
-	}, [initialized, gtagPageView, isGA4Enabled, page]);
+	}, [initialized, gtagPageView, isGA4Enabled, page, commonData]);
 
 	const trackEvent = useCallback(
 		(event: AnalyticsEvent) => {
@@ -367,21 +391,40 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			}
 
 			if (enabledVersionsRef.current.reactGa) {
-				ReactGA.event(event);
+				if (event.category) {
+					ReactGA.event({
+						...event,
+						action: event.action,
+						category: event.category,
+					});
+				}
 			}
 
 			if (enabledVersionsRef.current.ga4) {
 				for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
+					const customData: Record<string, unknown> = {};
+					if (event.category) {
+						customData.event_category = event.category;
+					}
+
+					if (event.label) {
+						customData.event_label = event.label;
+					}
+
+					if (typeof event.nonInteractive === 'boolean') {
+						customData.non_interaction = event.nonInteractive;
+					}
+
 					gtag('event', event.action, {
-						event_category: event.category,
-						event_label: event.label,
-						non_interaction: event.nonInteractive,
 						send_to: measurementId,
+						timestamp: Date.now(),
+						...commonData,
+						...customData,
 					});
 				}
 			}
 		},
-		[initialized]
+		[commonData, initialized]
 	);
 
 	const trackModalView = useCallback(

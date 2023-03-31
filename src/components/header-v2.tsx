@@ -351,6 +351,9 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	function handleInCrisisButtonClick() {
 		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
+		trackEvent({
+			action: 'In Crisis Button',
+		});
 		openInCrisisModal();
 	}
 
@@ -615,12 +618,30 @@ const HeaderV2 = () => {
 										active: navigationItem.active,
 									})}
 								>
-									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
+									{navigationItem.to && (
+										<Link
+											to={navigationItem.to}
+											onClick={() => {
+												trackEvent({
+													action: 'Top Nav',
+													link_text: navigationItem.title,
+												});
+											}}
+										>
+											{navigationItem.title}
+										</Link>
+									)}
 									{navigationItem.items && (
 										<Dropdown>
 											<Dropdown.Toggle
 												as={DropdownToggle}
 												id={`employee-header__${navigationItem.navigationItemId}`}
+												onClick={() => {
+													trackEvent({
+														action: 'Top Nav',
+														link_text: navigationItem.title,
+													});
+												}}
 											>
 												<span>{navigationItem.title}</span>
 												<DownChevron width={16} height={16} />
@@ -633,7 +654,17 @@ const HeaderV2 = () => {
 												renderOnMount
 											>
 												{navigationItem.items.map((item, itemIndex) => (
-													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
+													<Dropdown.Item
+														key={itemIndex}
+														to={item.to}
+														as={Link}
+														onClick={() => {
+															trackEvent({
+																action: 'Top Nav Dropdown',
+																link_text: item.title,
+															});
+														}}
+													>
 														<div
 															className={classNames('d-flex', {
 																'align-items-center': !item.description,

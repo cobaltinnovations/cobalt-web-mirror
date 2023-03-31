@@ -25,6 +25,7 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
+import useAnalytics from '@/hooks/use-analytics';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -37,6 +38,7 @@ const ConnectWithSupportV2 = () => {
 	const { pathname, search } = useLocation();
 	const { account, setAccount, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
+	const { trackEvent } = useAnalytics();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
@@ -65,6 +67,8 @@ const ConnectWithSupportV2 = () => {
 		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
 		[institution?.features, pathname]
 	);
+
+	console.log({ featureDetails, institution });
 
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
@@ -523,6 +527,16 @@ const ConnectWithSupportV2 = () => {
 																		className: 'text-decoration-none',
 																		href: `tel:${provider.phoneNumber}`,
 																		title: provider.formattedPhoneNumber,
+																		onClick: () => {
+																			if (
+																				featureDetails?.featureId === 'THERAPY'
+																			) {
+																				trackEvent({
+																					action: 'Therapy Phone Call',
+																					link_text: provider.name,
+																				});
+																			}
+																		},
 																	},
 															  ]
 															: provider.times.map((time) => ({
