@@ -17,6 +17,7 @@ export * from './mhic-follow-up';
 export * from './mhic-generate-orders-modal';
 export * from './mhic-header';
 export * from './mhic-insurance-modal';
+export * from './mhic-message-modal';
 export * from './mhic-navigation';
 export * from './mhic-order-details';
 export * from './mhic-comment';

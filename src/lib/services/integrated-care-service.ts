@@ -9,6 +9,7 @@ import {
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
+	PatientOrderScheduledMessageGroup,
 	PatientOrderStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
@@ -217,6 +218,21 @@ export const integratedCareService = {
 		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
 			method: 'POST',
 			url: '/patient-orders/assign',
+			data,
+		});
+	},
+	sendMessage(data: {
+		patientOrderId: string;
+		patientOrderScheduledMessageTypeId: string;
+		messageTypeIds: string[];
+		scheduledAtDate: string;
+		scheduledAtTime: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-message-groups',
 			data,
 		});
 	},

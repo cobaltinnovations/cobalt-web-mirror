@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import {
 	MhicAssessmentModal,
 	MhicComment,
+	MhicMessageModal,
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
@@ -26,6 +27,7 @@ interface Props {
 export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const [showMessageModal, setShowMessageModal] = useState(false);
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -89,8 +91,34 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
 	);
 
+	const handleMessageModalSave = useCallback(async () => {
+		try {
+			if (!patientOrder.patientOrderId) {
+				throw new Error('patientOrder.patientOrderId is undefined.');
+			}
+
+			const patientOverviewResponse = await integratedCareService
+				.getPatientOrder(patientOrder.patientOrderId)
+				.fetch();
+
+			onPatientOrderChange(patientOverviewResponse.patientOrder);
+			setShowMessageModal(false);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+
 	return (
 		<>
+			<MhicMessageModal
+				patientOrderId={patientOrder.patientOrderId}
+				show={showMessageModal}
+				onHide={() => {
+					setShowMessageModal(false);
+				}}
+				onSave={handleMessageModalSave}
+			/>
+
 			<MhicOutreachModal
 				patientOrderId={patientOrder.patientOrderId}
 				outreachToEdit={outreachToEdit}
@@ -171,8 +199,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 									<Button
 										variant="outline-primary"
 										onClick={() => {
-											setOutreachToEdit(undefined);
-											setShowOutreachModal(true);
+											setShowMessageModal(true);
 										}}
 									>
 										Send Message

@@ -7,7 +7,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	input: {
 		'& input': {
-			textIndent: 16,
+			textIndent: '16px !important',
 		},
 	},
 	menu: {
