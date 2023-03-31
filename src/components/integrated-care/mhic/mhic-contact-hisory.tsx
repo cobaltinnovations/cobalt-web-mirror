@@ -111,7 +111,7 @@ export const MhicContactHistory = ({ patientOrder, onPatientOrderChange }: Props
 	return (
 		<>
 			<MhicMessageModal
-				patientOrderId={patientOrder.patientOrderId}
+				patientOrder={patientOrder}
 				show={showMessageModal}
 				onHide={() => {
 					setShowMessageModal(false);

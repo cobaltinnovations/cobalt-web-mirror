@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -9,7 +9,7 @@ import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
 import classNames from 'classnames';
 import { integratedCareService } from '@/lib/services';
-import { PatientOrderScheduledMessageGroup } from '@/lib/models';
+import { PatientOrderModel, PatientOrderScheduledMessageGroup } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseStyles({
@@ -42,27 +42,31 @@ const messageTypes = [
 	},
 ];
 
-const contactMethods = [
-	{
-		contactMethodId: CONTACT_METHOD_IDS.EMAIL,
-		title: 'Email',
-	},
-	{
-		contactMethodId: CONTACT_METHOD_IDS.SMS,
-		title: 'Text (SMS)',
-	},
-];
-
 interface Props extends ModalProps {
-	patientOrderId: string;
+	patientOrder: PatientOrderModel;
 	onSave(patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup): void;
 }
 
-export const MhicMessageModal: FC<Props> = ({ patientOrderId, onSave, ...props }) => {
+export const MhicMessageModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 
+	const contactMethods = useMemo(
+		() => [
+			{
+				contactMethodId: CONTACT_METHOD_IDS.EMAIL,
+				title: 'Email',
+				disabled: !patientOrder.patientEmailAddress,
+			},
+			{
+				contactMethodId: CONTACT_METHOD_IDS.SMS,
+				title: 'Text (SMS)',
+				disabled: !patientOrder.patientPhoneNumber,
+			},
+		],
+		[patientOrder.patientEmailAddress, patientOrder.patientPhoneNumber]
+	);
 	const [formValues, setFormValues] = useState({
 		messageType: '',
 		date: undefined as Date | undefined,
@@ -86,7 +90,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrderId, onSave, ...props }
 			try {
 				const response = await integratedCareService
 					.sendMessage({
-						patientOrderId,
+						patientOrderId: patientOrder.patientOrderId,
 						patientOrderScheduledMessageTypeId: formValues.messageType,
 						messageTypeIds: formValues.contactMethods,
 						scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
@@ -116,7 +120,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrderId, onSave, ...props }
 			formValues.time,
 			handleError,
 			onSave,
-			patientOrderId,
+			patientOrder,
 		]
 	);
 
@@ -189,14 +193,12 @@ export const MhicMessageModal: FC<Props> = ({ patientOrderId, onSave, ...props }
 								checked={formValues.contactMethods.includes(contactMethod.contactMethodId)}
 								onChange={({ currentTarget }) => {
 									setFormValues((previousValues) => {
-										const targetIndex = previousValues.contactMethods.indexOf(
-											contactMethod.contactMethodId
-										);
+										const targetIndex = previousValues.contactMethods.indexOf(currentTarget.value);
 
 										if (targetIndex > -1) {
 											previousValues.contactMethods.splice(targetIndex, 1);
 										} else {
-											previousValues.contactMethods.push(contactMethod.contactMethodId);
+											previousValues.contactMethods.push(currentTarget.value);
 										}
 
 										return {
@@ -204,6 +206,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrderId, onSave, ...props }
 										};
 									});
 								}}
+								disabled={isSaving || contactMethod.disabled}
 							/>
 						))}
 					</Form.Group>
