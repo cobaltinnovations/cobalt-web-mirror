@@ -240,6 +240,18 @@ export function useScreeningFlow({
 		}
 	}, [activeFlowVersion, hasCompletedScreening, startScreeningFlow]);
 
+	const startScreeningFlowWithoutChecks = useCallback(async () => {
+		if (!activeFlowVersion) {
+			return;
+		}
+
+		if (activeFlowVersion.phoneNumberRequired) {
+			setShowPhoneModal(true);
+		} else {
+			startScreeningFlow();
+		}
+	}, [activeFlowVersion, startScreeningFlow]);
+
 	useEffect(() => {
 		if (!instantiateOnLoad) {
 			return;
@@ -294,6 +306,7 @@ export function useScreeningFlow({
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
 		checkAndStartScreeningFlow,
+		startScreeningFlowWithoutChecks,
 		createNewScreeningFlow,
 	};
 }
