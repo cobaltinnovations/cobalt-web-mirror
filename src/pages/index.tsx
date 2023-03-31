@@ -39,6 +39,7 @@ import Team from '@/components/team';
 import useFlags from '@/hooks/use-flags';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from './screening/screening.hooks';
+import useAnalytics from '@/hooks/use-analytics';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -67,6 +68,7 @@ const Index: FC = () => {
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
+	const { trackEvent } = useAnalytics();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
 	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
@@ -164,6 +166,9 @@ const Index: FC = () => {
 												title: 'Take the Assessment',
 												onClick: () => {
 													startScreeningFlowWithoutChecks();
+													trackEvent({
+														action: 'HP Take Assessment',
+													});
 												},
 											},
 										]}

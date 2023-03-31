@@ -43,7 +43,7 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 						listed below, which are available 24/7.
 					</p>
 				)}
-				<InCrisisTemplate />
+				<InCrisisTemplate isModal />
 			</Modal.Body>
 		</Modal>
 	);

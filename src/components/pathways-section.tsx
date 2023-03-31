@@ -10,6 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import useAnalytics from '@/hooks/use-analytics';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	pathways: {
@@ -159,6 +160,7 @@ interface PathwaysSectionProps {
 
 const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
+	const { trackEvent } = useAnalytics();
 	const classes = useStyles();
 
 	const { startScreeningFlowWithoutChecks, renderedCollectPhoneModal } = useScreeningFlow({
@@ -185,6 +187,12 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 											className={classNames(classes.pathway, {
 												recommended: recommended,
 											})}
+											onClick={() => {
+												trackEvent({
+													action: 'HP Nav',
+													link_text: name,
+												});
+											}}
 										>
 											<div className={classes.iconOuter}>
 												<PathwaysIcon className={classes.icon} featureId={featureId} />
