@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
-import RenderJson from '@/components/render-json';
+import { MHIC_HEADER_HEIGHT, MhicInlineAlert } from '@/components/integrated-care/mhic';
+import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
@@ -22,6 +23,8 @@ export const MhicAssessmentComplete = ({
 	referenceData,
 	onStartNewAssessment,
 }: MhicAssessmentCompleteProps) => {
+	const { pathname } = useLocation();
+
 	const conditionsAndSymptomsResults = useMemo(
 		() =>
 			(patientOrder?.screeningSessionResult?.screeningSessionScreeningResults ?? []).filter(
@@ -66,7 +69,9 @@ export const MhicAssessmentComplete = ({
 			{patientOrder && (
 				<Row>
 					<Col md={{ span: 7, offset: 1 }}>
-						<h3 className="mb-8">Results</h3>
+						<h3 className="mb-8" id="results">
+							Results
+						</h3>
 						<MhicInlineAlert
 							className="mb-8"
 							variant="danger"
@@ -93,7 +98,7 @@ export const MhicAssessmentComplete = ({
 											variant="light"
 											className="p-2"
 											onClick={() => {
-												// setShowChangeTriageModal(true);
+												window.alert('[TODO]: show modal.');
 											}}
 										>
 											<EditIcon className="d-flex" />
@@ -174,9 +179,15 @@ export const MhicAssessmentComplete = ({
 
 						{conditionsAndSymptomsResults.length > 0 && (
 							<>
-								<h3 className="mb-8">Conditions &amp; Symptoms</h3>
+								<h3 className="mb-8" id="conditions-and-symptoms">
+									Conditions &amp; Symptoms
+								</h3>
 								{conditionsAndSymptomsResults.map((screening) => (
-									<ScreeningResultCard screening={screening} referenceData={referenceData} />
+									<ScreeningResultCard
+										screening={screening}
+										referenceData={referenceData}
+										id={screening.screeningId}
+									/>
 								))}
 								<hr className="mb-8" />
 							</>
@@ -184,24 +195,62 @@ export const MhicAssessmentComplete = ({
 
 						{completedAssessmentsResults.length > 0 && (
 							<>
-								<h3 className="mb-8">Completed Assessments</h3>
+								<h3 className="mb-8" id="completed-assessments">
+									Completed Assessments
+								</h3>
 								{completedAssessmentsResults.map((screening) => (
-									<ScreeningResultCard screening={screening} referenceData={referenceData} />
+									<ScreeningResultCard
+										screening={screening}
+										referenceData={referenceData}
+										id={screening.screeningId}
+									/>
 								))}
 							</>
 						)}
 					</Col>
 					<Col md={{ span: 2, offset: 1 }}>
-						<hr />
+						<TabBar
+							className="position-sticky"
+							style={{ top: MHIC_HEADER_HEIGHT + 32 }}
+							orientation="vertical"
+							value="RESULTS"
+							tabs={[
+								{
+									title: 'Results',
+									value: '#results',
+								},
+								...(conditionsAndSymptomsResults.length > 0
+									? [
+											{
+												title: 'Conditions & Symptoms',
+												value: '#conditions-and-symptoms',
+											},
+									  ]
+									: []),
+								...conditionsAndSymptomsResults.map((result) => ({
+									title: result.screeningName ?? '',
+									value: `#${result.screeningId}` ?? '#',
+								})),
+								...(completedAssessmentsResults.length > 0
+									? [
+											{
+												title: 'Completed Assessments',
+												value: '#completed-assessments',
+											},
+									  ]
+									: []),
+								...completedAssessmentsResults.map((result) => ({
+									title: result.screeningName ?? '',
+									value: `#${result.screeningId}` ?? '#',
+								})),
+							]}
+							onTabClick={(value) => {
+								window.location.href = `${pathname}${value}`;
+							}}
+						/>
 					</Col>
 				</Row>
 			)}
-
-			<Row className="mb-6">
-				<Col>
-					<RenderJson json={patientOrder?.screeningSessionResult} />
-				</Col>
-			</Row>
 		</Container>
 	);
 };
@@ -209,12 +258,14 @@ export const MhicAssessmentComplete = ({
 const ScreeningResultCard = ({
 	screening,
 	referenceData,
+	id,
 }: {
 	screening: ScreeningSessionScreeningResult;
 	referenceData?: ReferenceDataResponse;
+	id?: string;
 }) => {
 	return (
-		<Card bsPrefix="ic-card" className="mb-8">
+		<Card bsPrefix="ic-card" id={id} className="mb-8">
 			<Card.Header>
 				<Card.Title>{screening.screeningName}</Card.Title>
 				<div className="button-container">
