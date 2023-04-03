@@ -3,9 +3,10 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicAssessmentModal, MhicChangeTriageModal } from '@/components/integrated-care/mhic';
+import { MhicAssessmentModal, MhicChangeTriageModal, MhicInlineAlert } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
 
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
@@ -62,15 +63,48 @@ export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOr
 						<>
 							<Row className="mb-6">
 								<Col>
-									<h4 className="mb-0">Triage</h4>
+									<div className="d-flex align-items-center justify-content-between">
+										<h4 className="mb-0">Assessment</h4>
+										<Button variant="primary" className="d-flex align-items-center">
+											Review <ExternalIcon className="ms-2" width={20} height={20} />
+										</Button>
+									</div>
+									<p className="mb-0">
+										Completed{' '}
+										<strong>{patientOrder.screeningSession?.completedAtDescription}</strong> by{' '}
+										<strong className="text-danger">[TODO]: completedBy</strong>
+									</p>
 								</Col>
 							</Row>
+							<MhicInlineAlert
+								className="mb-6"
+								variant="danger"
+								title="[TODO]: Patient needs safety planning"
+								description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
+								action={{
+									title: '[TODO]: Complete Handoff',
+									onClick: () => {
+										window.alert('[TODO]: Not sure what this does.');
+									},
+								}}
+							/>
+							<MhicInlineAlert
+								className="mb-6"
+								variant="success"
+								title="[TODO]: Patient connected to Safety Planning on [Date] at [Time]"
+								description="[TODO]: Reason for Safety Planning: [Reason]"
+							/>
 							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-								<Row key={triageGroupIndex}>
+								<Row key={triageGroupIndex} className="mb-6">
 									<Col>
 										<Card bsPrefix="ic-card">
 											<Card.Header>
-												<Card.Title>{triageGroup.patientOrderCareTypeDescription}</Card.Title>
+												<Card.Title>
+													Triage:{' '}
+													<span className="text-uppercase">
+														{triageGroup.patientOrderCareTypeDescription}
+													</span>
+												</Card.Title>
 												<div className="button-container">
 													<Button
 														variant="light"
@@ -115,9 +149,56 @@ export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOr
 							))}
 						</>
 					)}
+					<Row>
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Resources</Card.Title>
+									<div className="button-container">
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												window.alert('[TODO]: mark it');
+											}}
+										>
+											Mark as Sent
+										</Button>
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												window.alert('[TODO]: ?');
+											}}
+										>
+											Add Request
+										</Button>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<MhicInlineAlert
+										className="mb-4"
+										variant="warning"
+										title="[TODO]: Resources needed"
+										description="[TODO]: Triage indicates the patient needs external resources"
+									/>
+									<MhicInlineAlert
+										variant="success"
+										title="[TODO]: Resources sent on [Date] at [Time]"
+										action={{
+											title: '[TODO]: Review contact history for more details',
+											onClick: () => {
+												window.alert('[TODO]: ?');
+											},
+										}}
+									/>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
 				</Container>
 			</section>
-			{patientOrder.screeningSessionResult && (
+			{/* {patientOrder.screeningSessionResult && (
 				<section>
 					<Container fluid>
 						<Row className="mb-6">
@@ -187,7 +268,7 @@ export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOr
 						</Row>
 					</Container>
 				</section>
-			)}
+			)} */}
 		</>
 	);
 };
