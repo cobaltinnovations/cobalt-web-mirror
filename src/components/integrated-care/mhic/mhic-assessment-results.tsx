@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import { MhicAssessmentModal, MhicChangeTriageModal, MhicInlineAlert } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
 
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
-import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -19,6 +16,7 @@ interface Props {
 }
 
 export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOrderChange }: Props) => {
+	const navigate = useNavigate();
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -65,7 +63,13 @@ export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOr
 								<Col>
 									<div className="d-flex align-items-center justify-content-between">
 										<h4 className="mb-0">Assessment</h4>
-										<Button variant="primary" className="d-flex align-items-center">
+										<Button
+											variant="primary"
+											className="d-flex align-items-center"
+											onClick={() => {
+												navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+											}}
+										>
 											Review <ExternalIcon className="ms-2" width={20} height={20} />
 										</Button>
 									</div>
@@ -147,55 +151,55 @@ export const MhicAssessmentResults = ({ patientOrder, referenceData, onPatientOr
 									</Col>
 								</Row>
 							))}
+							<Row>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header>
+											<Card.Title>Resources</Card.Title>
+											<div className="button-container">
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														window.alert('[TODO]: mark it');
+													}}
+												>
+													Mark as Sent
+												</Button>
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														window.alert('[TODO]: ?');
+													}}
+												>
+													Add Request
+												</Button>
+											</div>
+										</Card.Header>
+										<Card.Body>
+											<MhicInlineAlert
+												className="mb-4"
+												variant="warning"
+												title="[TODO]: Resources needed"
+												description="[TODO]: Triage indicates the patient needs external resources"
+											/>
+											<MhicInlineAlert
+												variant="success"
+												title="[TODO]: Resources sent on [Date] at [Time]"
+												action={{
+													title: '[TODO]: Review contact history for more details',
+													onClick: () => {
+														window.alert('[TODO]: ?');
+													},
+												}}
+											/>
+										</Card.Body>
+									</Card>
+								</Col>
+							</Row>
 						</>
 					)}
-					<Row>
-						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>Resources</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											size="sm"
-											onClick={() => {
-												window.alert('[TODO]: mark it');
-											}}
-										>
-											Mark as Sent
-										</Button>
-										<Button
-											variant="light"
-											size="sm"
-											onClick={() => {
-												window.alert('[TODO]: ?');
-											}}
-										>
-											Add Request
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body>
-									<MhicInlineAlert
-										className="mb-4"
-										variant="warning"
-										title="[TODO]: Resources needed"
-										description="[TODO]: Triage indicates the patient needs external resources"
-									/>
-									<MhicInlineAlert
-										variant="success"
-										title="[TODO]: Resources sent on [Date] at [Time]"
-										action={{
-											title: '[TODO]: Review contact history for more details',
-											onClick: () => {
-												window.alert('[TODO]: ?');
-											},
-										}}
-									/>
-								</Card.Body>
-							</Card>
-						</Col>
-					</Row>
 				</Container>
 			</section>
 			{/* {patientOrder.screeningSessionResult && (
