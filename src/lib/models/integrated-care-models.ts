@@ -275,3 +275,11 @@ export interface PatientOrderScheduledMessageGroup {
 		messageTypeDescription: string;
 	}[];
 }
+
+export type PatientOrderCountsByPatientOrderStatusId = Record<
+	PatientOrderStatusId,
+	{
+		patientOrderCountDescription: string;
+		patientOrderCount: number;
+	}
+>;
