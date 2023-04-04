@@ -337,9 +337,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 										</Container>
 									</Card.Body>
 									{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-										<>
+										<React.Fragment key={triageGroupIndex}>
 											<hr />
-											<Card.Body key={triageGroupIndex}>
+											<Card.Body>
 												<Container fluid>
 													<Row className="mb-4">
 														<Col>
@@ -372,7 +372,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 													</Row>
 												</Container>
 											</Card.Body>
-										</>
+										</React.Fragment>
 									))}
 								</Card>
 							</Col>

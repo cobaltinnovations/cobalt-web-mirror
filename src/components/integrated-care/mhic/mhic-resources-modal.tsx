@@ -1,10 +1,13 @@
+import moment from 'moment';
 import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseStyles } from 'react-jss';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
@@ -19,12 +22,13 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
-	patientOrder?: PatientOrderModel;
-	onSave(): void;
+	patientOrder: PatientOrderModel;
+	onSave(patientOrder: PatientOrderModel): void;
 }
 
 export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
+	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [isSaving, setIsSaving] = useState(false);
 	const [formValues, setFormValues] = useState({
@@ -35,8 +39,8 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 
 	const handleOnEntering = useCallback(() => {
 		setFormValues({
-			date: undefined,
-			time: '',
+			date: new Date(),
+			time: moment().format('h:mm A'),
 			comment: '',
 		});
 	}, []);
@@ -46,19 +50,39 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 			event.preventDefault();
 
 			try {
-				if (!patientOrder) {
-					throw new Error('patientOrder is undefined.');
-				}
-
 				setIsSaving(true);
-				onSave();
+
+				const response = await integratedCareService
+					.updateResourcingStatus(patientOrder.patientOrderId, {
+						patientOrderResourcingStatusId: PatientOrderResourcingStatusId.SENT_RESOURCES,
+						resourcesSentAtDate: moment(formValues.date).format('YYYY-MM-DD'),
+						resourcesSentAtTime: formValues.time,
+						resourcesSentNote: formValues.comment,
+					})
+					.fetch();
+
+				addFlag({
+					variant: 'success',
+					title: 'Resources marked as sent',
+					actions: [],
+				});
+
+				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSaving(false);
 			}
 		},
-		[handleError, onSave, patientOrder]
+		[
+			addFlag,
+			formValues.comment,
+			formValues.date,
+			formValues.time,
+			handleError,
+			onSave,
+			patientOrder.patientOrderId,
+		]
 	);
 
 	return (

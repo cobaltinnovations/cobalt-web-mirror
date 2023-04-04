@@ -263,4 +263,21 @@ export const integratedCareService = {
 			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
 		});
 	},
+	updateResourcingStatus(
+		patientOrderId: string,
+		data: {
+			patientOrderResourcingStatusId: string;
+			resourcesSentAtDate: string;
+			resourcesSentAtTime: string;
+			resourcesSentNote: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-resourcing-status`,
+			data,
+		});
+	},
 };

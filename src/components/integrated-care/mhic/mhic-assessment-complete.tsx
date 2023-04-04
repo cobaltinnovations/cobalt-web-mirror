@@ -161,18 +161,6 @@ export const MhicAssessmentComplete = ({
 												[TODO]: Mark as Sent
 											</Button>
 										)}
-										{patientOrder.patientOrderResourcingStatusId ===
-											PatientOrderResourcingStatusId.SENT_RESOURCES && (
-											<Button
-												variant="light"
-												size="sm"
-												onClick={() => {
-													window.alert('[TODO]: Add Request');
-												}}
-											>
-												[TODO]: Add Request
-											</Button>
-										)}
 									</div>
 								</Card.Header>
 								<Card.Body>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
@@ -20,10 +20,18 @@ interface Props {
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicAssessmentResults = ({ patientOrder }: Props) => {
+export const MhicAssessmentResults = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const navigate = useNavigate();
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
+
+	const handleResourcesModalSave = useCallback(
+		(updatedPatientOrder: PatientOrderModel) => {
+			setShowResourcesModal(false);
+			onPatientOrderChange(updatedPatientOrder);
+		},
+		[onPatientOrderChange]
+	);
 
 	return (
 		<>
@@ -38,13 +46,12 @@ export const MhicAssessmentResults = ({ patientOrder }: Props) => {
 			/>
 
 			<MhicResourcesModal
+				patientOrder={patientOrder}
 				show={showResourcesModal}
 				onHide={() => {
 					setShowResourcesModal(false);
 				}}
-				onSave={() => {
-					setShowResourcesModal(false);
-				}}
+				onSave={handleResourcesModalSave}
 			/>
 
 			<section>
@@ -177,18 +184,6 @@ export const MhicAssessmentResults = ({ patientOrder }: Props) => {
 															}}
 														>
 															Mark as Sent
-														</Button>
-													)}
-													{patientOrder.patientOrderResourcingStatusId ===
-														PatientOrderResourcingStatusId.SENT_RESOURCES && (
-														<Button
-															variant="light"
-															size="sm"
-															onClick={() => {
-																window.alert('[TODO]: Add Request');
-															}}
-														>
-															[TODO]: Add Request
 														</Button>
 													)}
 												</div>
