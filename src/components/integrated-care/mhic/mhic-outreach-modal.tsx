@@ -2,14 +2,15 @@ import moment from 'moment';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import classNames from 'classnames';
 
 import { PatientOrderOutreachModel, PatientOrderOutreachResult, PatientOrderOutreachTypeId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
+import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
-import classNames from 'classnames';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -25,7 +26,7 @@ interface Props extends ModalProps {
 	patientOrderOutreachTypeId: PatientOrderOutreachTypeId;
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	outreachToEdit?: PatientOrderOutreachModel;
-	onSave(patientOrderOutreach: PatientOrderOutreachModel, isEdit: boolean): void;
+	onSave(patientOrderOutreach: PatientOrderOutreachModel): void;
 }
 
 export const MhicOutreachModal: FC<Props> = ({
@@ -38,6 +39,7 @@ export const MhicOutreachModal: FC<Props> = ({
 }) => {
 	const handleError = useHandleError();
 	const classes = useStyles();
+	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
@@ -140,8 +142,9 @@ export const MhicOutreachModal: FC<Props> = ({
 			try {
 				setIsSaving(true);
 
+				let response;
 				if (outreachToEdit) {
-					const response = await integratedCareService
+					response = await integratedCareService
 						.updatePatientOrderOutreach(outreachToEdit.patientOrderOutreachId, {
 							patientOrderOutreachResultId: formValues.resultId,
 							outreachDate: moment(formValues.date).format('YYYY-MM-DD'),
@@ -150,9 +153,14 @@ export const MhicOutreachModal: FC<Props> = ({
 						})
 						.fetch();
 
-					onSave(response.patientOrderOutreach, true);
+					addFlag({
+						variant: 'success',
+						title: 'Outreach updated',
+						description: '{Message}',
+						actions: [],
+					});
 				} else {
-					const response = await integratedCareService
+					response = await integratedCareService
 						.postPatientOrderOutreach({
 							patientOrderId,
 							patientOrderOutreachResultId: formValues.resultId,
@@ -162,8 +170,15 @@ export const MhicOutreachModal: FC<Props> = ({
 						})
 						.fetch();
 
-					onSave(response.patientOrderOutreach, false);
+					addFlag({
+						variant: 'success',
+						title: 'Outreach added',
+						description: '{Message}',
+						actions: [],
+					});
 				}
+
+				onSave(response.patientOrderOutreach);
 			} catch (error) {
 				handleError(error);
 			} finally {
@@ -171,6 +186,7 @@ export const MhicOutreachModal: FC<Props> = ({
 			}
 		},
 		[
+			addFlag,
 			formValues.comment,
 			formValues.date,
 			formValues.resultId,

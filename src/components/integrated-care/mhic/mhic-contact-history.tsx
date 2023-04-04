@@ -46,37 +46,27 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
-	const handleOutreachModalSave = useCallback(
-		async (_patientOrderOutreach: PatientOrderOutreachModel, isEdit: boolean) => {
-			try {
-				if (!patientOrder.patientOrderId) {
-					throw new Error('patientOrder.patientOrderId is undefined.');
-				}
-
-				const patientOverviewResponse = await integratedCareService
-					.getPatientOrder(patientOrder.patientOrderId)
-					.fetch();
-
-				onPatientOrderChange(patientOverviewResponse.patientOrder);
-				addFlag({
-					variant: 'success',
-					title: isEdit ? 'Outreach updated' : 'Outreach added',
-					description: '{Message}',
-					actions: [],
-				});
-
-				setOutreachToEdit(undefined);
-				setShowOutreachModal(false);
-			} catch (error) {
-				handleError(error);
+	const handleOutreachModalSave = useCallback(async () => {
+		try {
+			if (!patientOrder.patientOrderId) {
+				throw new Error('patientOrder.patientOrderId is undefined.');
 			}
-		},
-		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
-	);
+
+			const patientOverviewResponse = await integratedCareService
+				.getPatientOrder(patientOrder.patientOrderId)
+				.fetch();
+
+			onPatientOrderChange(patientOverviewResponse.patientOrder);
+			setOutreachToEdit(undefined);
+			setShowOutreachModal(false);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, onPatientOrderChange, patientOrder.patientOrderId]);
 
 	const handleDeleteOutreach = useCallback(
 		async (patientOrderOutreachId: string) => {
-			if (!window.confirm('Are you sure?')) {
+			if (!window.confirm('Are you sure you want to delete the contact attempt?')) {
 				return;
 			}
 
@@ -115,6 +105,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				.fetch();
 
 			onPatientOrderChange(patientOverviewResponse.patientOrder);
+			setMessageToEdit(undefined);
 			setShowMessageModal(false);
 		} catch (error) {
 			handleError(error);

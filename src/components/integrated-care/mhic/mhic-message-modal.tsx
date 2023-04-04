@@ -52,7 +52,6 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
-
 	const contactMethods = useMemo(
 		() => [
 			{
@@ -180,6 +179,10 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 	);
 
 	const handleDeleteButtonClick = useCallback(async () => {
+		if (!window.confirm('Are you sure you want to delete the scheduled message?')) {
+			return;
+		}
+
 		try {
 			setIsSaving(true);
 
