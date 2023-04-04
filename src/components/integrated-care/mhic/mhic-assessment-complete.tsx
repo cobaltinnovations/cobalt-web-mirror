@@ -3,7 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	ReferenceDataResponse,
+	ScreeningSessionScreeningResult,
+} from '@/lib/models';
 import { MHIC_HEADER_HEIGHT, MhicInlineAlert } from '@/components/integrated-care/mhic';
 import TabBar from '@/components/tab-bar';
 
@@ -139,50 +144,62 @@ export const MhicAssessmentComplete = ({
 								</Card.Body>
 							</Card>
 						))}
-						<Card bsPrefix="ic-card" className="mb-8">
-							<Card.Header>
-								<Card.Title>Resources</Card.Title>
-								<div className="button-container">
-									<Button
-										variant="light"
-										size="sm"
-										onClick={() => {
-											window.alert('[TODO]: mark it');
-										}}
-									>
-										Mark as Sent
-									</Button>
-									<Button
-										className="ms-2"
-										variant="light"
-										size="sm"
-										onClick={() => {
-											window.alert('[TODO]: ?');
-										}}
-									>
-										Add Request
-									</Button>
-								</div>
-							</Card.Header>
-							<Card.Body>
-								<MhicInlineAlert
-									className="mb-4"
-									variant="warning"
-									title="[TODO]: Resources needed"
-									description="[TODO]: Triage indicates the patient needs external resources"
-								/>
-								<MhicInlineAlert
-									variant="success"
-									title="[TODO]: Resources sent on [Date] at [Time]"
-									action={{
-										title: '[TODO]: Review contact history for more details',
-										onClick: () => {
-											window.alert('[TODO]: ?');
-										},
-									}}
-								/>
-							</Card.Body>
-						</Card>
+						{patientOrder.patientOrderResourcingStatusId && (
+							<Card bsPrefix="ic-card" className="mb-8">
+								<Card.Header>
+									<Card.Title>Resources</Card.Title>
+									<div className="button-container">
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+											<Button
+												variant="light"
+												size="sm"
+												onClick={() => {
+													window.alert('[TODO]: Mark as Sent');
+												}}
+											>
+												[TODO]: Mark as Sent
+											</Button>
+										)}
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.SENT_RESOURCES && (
+											<Button
+												variant="light"
+												size="sm"
+												onClick={() => {
+													window.alert('[TODO]: Add Request');
+												}}
+											>
+												[TODO]: Add Request
+											</Button>
+										)}
+									</div>
+								</Card.Header>
+								<Card.Body>
+									{patientOrder.patientOrderResourcingStatusId ===
+										PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+										<MhicInlineAlert
+											variant="warning"
+											title="Resources needed"
+											description="Triage indicates the patient needs external resources"
+										/>
+									)}
+									{patientOrder.patientOrderResourcingStatusId ===
+										PatientOrderResourcingStatusId.SENT_RESOURCES && (
+										<MhicInlineAlert
+											variant="success"
+											title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+											action={{
+												title: 'Review contact history for more details',
+												onClick: () => {
+													window.alert('[TODO]: ?');
+												},
+											}}
+										/>
+									)}
+								</Card.Body>
+							</Card>
+						)}
 						<hr className="mb-8" />
 
 						{conditionsAndSymptomsResults.length > 0 && (
