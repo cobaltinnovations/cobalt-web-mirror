@@ -238,4 +238,29 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	updateMessage(
+		patientOrderScheduledMessageGroupId: string,
+		data: {
+			patientOrderScheduledMessageTypeId: string;
+			messageTypeIds: string[];
+			scheduledAtDate: string;
+			scheduledAtTime: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
+			data,
+		});
+	},
+	deleteMessage(patientOrderScheduledMessageGroupId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'DELETE',
+			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
+		});
+	},
 };
