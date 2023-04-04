@@ -11,6 +11,14 @@ import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles(() => ({
+	scrollAnchor: {
+		position: 'relative',
+		top: -32 - MHIC_HEADER_HEIGHT,
+	},
+}));
 
 interface MhicAssessmentCompleteProps {
 	referenceData?: ReferenceDataResponse;
@@ -24,6 +32,7 @@ export const MhicAssessmentComplete = ({
 	onStartNewAssessment,
 }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
+	const classes = useStyles();
 
 	const conditionsAndSymptomsResults = useMemo(
 		() =>
@@ -69,9 +78,8 @@ export const MhicAssessmentComplete = ({
 			{patientOrder && (
 				<Row>
 					<Col md={{ span: 7, offset: 1 }}>
-						<h3 className="mb-8" id="results">
-							Results
-						</h3>
+						<div className={classes.scrollAnchor} id="results" />
+						<h3 className="mb-8">Results</h3>
 						<MhicInlineAlert
 							className="mb-8"
 							variant="danger"
@@ -179,9 +187,8 @@ export const MhicAssessmentComplete = ({
 
 						{conditionsAndSymptomsResults.length > 0 && (
 							<>
-								<h3 className="mb-8" id="conditions-and-symptoms">
-									Conditions &amp; Symptoms
-								</h3>
+								<div className={classes.scrollAnchor} id="conditions-and-symptoms" />
+								<h3 className="mb-8">Conditions &amp; Symptoms</h3>
 								{conditionsAndSymptomsResults.map((screening) => (
 									<ScreeningResultCard
 										screening={screening}
@@ -195,9 +202,8 @@ export const MhicAssessmentComplete = ({
 
 						{completedAssessmentsResults.length > 0 && (
 							<>
-								<h3 className="mb-8" id="completed-assessments">
-									Completed Assessments
-								</h3>
+								<div className={classes.scrollAnchor} id="completed-assessments" />
+								<h3 className="mb-8">Completed Assessments</h3>
 								{completedAssessmentsResults.map((screening) => (
 									<ScreeningResultCard
 										screening={screening}
@@ -264,8 +270,11 @@ const ScreeningResultCard = ({
 	referenceData?: ReferenceDataResponse;
 	id?: string;
 }) => {
+	const classes = useStyles();
+
 	return (
-		<Card bsPrefix="ic-card" id={id} className="mb-8">
+		<Card bsPrefix="ic-card" className="mb-8">
+			<div className={classes.scrollAnchor} id={id} />
 			<Card.Header>
 				<Card.Title>{screening.screeningName}</Card.Title>
 				<div className="button-container">
