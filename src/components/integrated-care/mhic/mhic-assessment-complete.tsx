@@ -299,7 +299,10 @@ const ScreeningResultCard = ({
 							>
 								<div>{questionIndex + 1})</div>
 								<div className="ps-2 flex-grow-1">
-									<p className="mb-2">{question.screeningQuestionText}</p>
+									<div
+										className="mb-2"
+										dangerouslySetInnerHTML={{ __html: question.screeningQuestionText ?? '' }}
+									/>
 									{question.screeningAnswerResults?.map((answer, answerIndex) => {
 										const isLastAnswer =
 											(question.screeningAnswerResults ?? []).length - 1 === answerIndex;
