@@ -16,7 +16,6 @@ import NoData from '@/components/no-data';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import {
 	MhicAssessmentModal,
-	MhicComment,
 	MhicMessageModal,
 	MhicOutreachModal,
 	MhicScheduleAssessmentModal,
@@ -25,6 +24,7 @@ import {
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -289,32 +289,83 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 									]}
 								/>
 							)}
-							{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
-								const isLast = outreachIndex === (patientOrder.patientOrderOutreaches ?? []).length - 1;
-								return (
-									<MhicComment
-										key={outreach.patientOrderOutreachId}
-										className={classNames({ 'mb-4': !isLast })}
-										name={outreach.account.displayName ?? ''}
-										date={outreach.outreachDateTimeDescription}
-										message={outreach.note}
-										onEdit={() => {
-											setOutreachTypeId(
-												referenceData.patientOrderOutreachResults.find(
-													(result) =>
-														result.patientOrderOutreachResultId ===
-														outreach.patientOrderOutreachResultId
-												)?.patientOrderOutreachTypeId as PatientOrderOutreachTypeId
-											);
-											setOutreachToEdit(outreach);
-											setShowOutreachModal(true);
-										}}
-										onDelete={() => {
-											handleDeleteOutreach(outreach.patientOrderOutreachId);
-										}}
-									/>
-								);
-							})}
+							{(patientOrder.patientOrderOutreaches ?? []).length > 0 && (
+								<div className="border rounded bg-white">
+									{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
+										const isLast =
+											(patientOrder.patientOrderOutreaches ?? []).length - 1 === outreachIndex;
+
+										return (
+											<div
+												key={outreach.patientOrderOutreachId}
+												className={classNames('py-3 px-4', {
+													'border-bottom': !isLast,
+												})}
+											>
+												<div className="d-flex align-items-center justify-content-between">
+													<p className="mb-0 text-gray">
+														<span className="fw-semibold">
+															{outreach.account.displayName}
+														</span>{' '}
+														{outreach.outreachDateTimeDescription}
+													</p>
+													<Dropdown>
+														<Dropdown.Toggle
+															as={DropdownToggle}
+															id={`mhic-outreach-attempt__dropdown-menu--${outreach.patientOrderOutreachId}`}
+															className="p-2"
+														>
+															<MoreIcon className="d-flex" />
+														</Dropdown.Toggle>
+														<Dropdown.Menu
+															as={DropdownMenu}
+															align="end"
+															popperConfig={{ strategy: 'fixed' }}
+															renderOnMount
+														>
+															<Dropdown.Item
+																onClick={() => {
+																	setOutreachTypeId(
+																		referenceData.patientOrderOutreachResults.find(
+																			(result) =>
+																				result.patientOrderOutreachResultId ===
+																				outreach.patientOrderOutreachResultId
+																		)
+																			?.patientOrderOutreachTypeId as PatientOrderOutreachTypeId
+																	);
+																	setOutreachToEdit(outreach);
+																	setShowOutreachModal(true);
+																}}
+															>
+																Edit
+															</Dropdown.Item>
+															<Dropdown.Item
+																onClick={() => {
+																	handleDeleteOutreach(
+																		outreach.patientOrderOutreachId
+																	);
+																}}
+															>
+																<span className="text-danger">Delete</span>
+															</Dropdown.Item>
+														</Dropdown.Menu>
+													</Dropdown>
+												</div>
+												<p className="mb-1 fw-bold">
+													{
+														referenceData.patientOrderOutreachResults.find(
+															(result) =>
+																result.patientOrderOutreachResultId ===
+																outreach.patientOrderOutreachResultId
+														)?.patientOrderOutreachResultTypeDescription
+													}
+												</p>
+												<p className="mb-0">{outreach.note}</p>
+											</div>
+										);
+									})}
+								</div>
+							)}
 						</Col>
 					</Row>
 				</Container>
