@@ -104,6 +104,13 @@ export interface PatientOrderModel {
 	mostRecentEpisodeClosedAtDescription: string;
 	mostRecentEpisodeClosedWithinDateThreshold: boolean;
 	patientOrderScheduledMessageGroups: PatientOrderScheduledMessageGroup[];
+	connectedToSafetyPlanningAt?: string;
+	connectedToSafetyPlanningAtDescription?: string;
+	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
+	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
+	resourcesSentAt?: string;
+	resourcesSentAtDescription?: string;
+	resourcesSentNote?: string;
 }
 
 enum PatientOrderClosureReasonId {
@@ -141,6 +148,18 @@ export enum PatientOrderDispositionId {
 	OPEN = 'OPEN',
 	CLOSED = 'CLOSED',
 	ARCHIVED = 'ARCHIVED',
+}
+
+export enum PatientOrderSafetyPlanningStatusId {
+	UNKNOWN = 'UNKNOWN',
+	NONE_NEEDED = 'NONE_NEEDED',
+	NEEDS_SAFETY_PLANNING = 'NEEDS_SAFETY_PLANNING',
+	CONNECTED_TO_SAFETY_PLANNING = 'CONNECTED_TO_SAFETY_PLANNING',
+}
+
+export enum PatientOrderResourcingStatusId {
+	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
+	SENT_RESOURCES = 'SENT_RESOURCES',
 }
 
 export interface PatientOrderDisposition {
@@ -256,3 +275,11 @@ export interface PatientOrderScheduledMessageGroup {
 		messageTypeDescription: string;
 	}[];
 }
+
+export type PatientOrderCountsByPatientOrderStatusId = Record<
+	PatientOrderStatusId,
+	{
+		patientOrderCountDescription: string;
+		patientOrderCount: number;
+	}
+>;

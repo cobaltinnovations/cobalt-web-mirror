@@ -6,6 +6,7 @@ import {
 	PatientOrderAutocompleteResult,
 	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
+	PatientOrderCountsByPatientOrderStatusId,
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
@@ -92,6 +93,14 @@ export const integratedCareService = {
 		return httpSingleton.orchestrateRequest<PanelAccountsResponse>({
 			method: 'GET',
 			url: '/integrated-care/panel-accounts',
+		});
+	},
+	getPanelCounts(queryParameters?: { panelAccountId?: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderCountsByPatientOrderStatusId: PatientOrderCountsByPatientOrderStatusId;
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/integrated-care/panel-counts', queryParameters),
 		});
 	},
 	getOpenOrderForCurrentPatient() {
@@ -261,6 +270,23 @@ export const integratedCareService = {
 		}>({
 			method: 'DELETE',
 			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
+		});
+	},
+	updateResourcingStatus(
+		patientOrderId: string,
+		data: {
+			patientOrderResourcingStatusId: string;
+			resourcesSentAtDate: string;
+			resourcesSentAtTime: string;
+			resourcesSentNote: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-resourcing-status`,
+			data,
 		});
 	},
 };

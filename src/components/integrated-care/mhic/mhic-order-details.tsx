@@ -3,22 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, ReferenceDataResponse, ScreeningSessionScreeningResult } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
+	ReferenceDataResponse,
+	ScreeningSessionScreeningResult,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import {
 	MhicAssessmentModal,
-	MhicChangeTriageModal,
 	MhicCloseEpisodeModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
+	MhicInlineAlert,
 	MhicInsuranceModal,
+	MhicNextStepsCard,
 	MhicScheduleAssessmentModal,
+	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -27,7 +36,7 @@ interface Props {
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceData }: Props) => {
+export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatientOrders, referenceData }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const navigate = useNavigate();
@@ -38,7 +47,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
-	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 
@@ -146,19 +154,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 				onSave={handleCloseEpisodeModalSave}
 			/>
 
-			<MhicChangeTriageModal
-				show={showChangeTriageModal}
-				onHide={() => {
-					setShowChangeTriageModal(false);
-				}}
-				onSave={() => {
-					setShowChangeTriageModal(false);
-				}}
-			/>
-
 			<section>
 				<Container fluid>
-					<Row className="mb-6">
+					<Row>
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
@@ -182,11 +180,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
-										<Row className="mb-4">
-											<Col>
-												<span className="text-danger">[TODO]: Order Flagged Alert</span>
-											</Col>
-										</Row>
+										{patientOrder.patientBelowAgeThreshold && (
+											<Row className="mb-4">
+												<Col>
+													<MhicInlineAlert
+														variant="warning"
+														title="Order Flagged"
+														description="Patient under 18"
+													/>
+												</Col>
+											</Row>
+										)}
 										<Row className="mb-4">
 											<Col xs={3}>
 												<p className="m-0 text-gray">Date Referred</p>
@@ -245,138 +249,147 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 							</Card>
 						</Col>
 					</Row>
-					{!patientOrder.screeningSession && (
-						<Row>
-							<Col>
-								<NoData
-									className="mb-6"
-									title="No Assessment"
-									description="There is no assessment for the patient's most recent referral order"
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Start Assessment',
-											onClick: () => {
-												navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-											},
-										},
-										{
-											variant: 'outline-primary',
-											title: 'Schedule Assessment',
-											onClick: () => {
-												setAssessmentIdToEdit('');
-												setShowScheduleAssessmentModal(true);
-											},
-										},
-									]}
-								/>
-								<NoData
-									className="bg-white"
-									title="Assessment is Scheduled"
-									description="Nov 12, 2023 at 2:30 PM"
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Start Assessment',
-											onClick: () => {
-												navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-											},
-										},
-										{
-											variant: 'outline-primary',
-											title: 'Edit Appointment Date',
-											onClick: () => {
-												setAssessmentIdToEdit('xxx');
-												setShowScheduleAssessmentModal(true);
-											},
-										},
-									]}
-								/>
-							</Col>
-						</Row>
-					)}
+				</Container>
+			</section>
+			<section>
+				<Container fluid>
 					{patientOrder.screeningSessionResult && (
-						<Row>
-							<Col>
-								<Card bsPrefix="ic-card">
-									<Card.Header>
-										<Card.Title>Assessment Results</Card.Title>
-										<div className="button-container">
-											<Button
-												variant="light"
-												size="sm"
-												onClick={() => {
-													window.alert('[TODO]: Jump to Assessment Results tab.');
-												}}
-											>
-												View Full Results
-											</Button>
-										</div>
-									</Card.Header>
-									<Card.Body>
-										<Container fluid>
-											<Row className="mb-4">
-												<Col>
-													<p className="mb-0">
-														Completed{' '}
-														{patientOrder.screeningSession?.completedAtDescription} by{' '}
-														<strong>Ava Williams, MHIC</strong>
-													</p>
-												</Col>
-											</Row>
-											<Row className="mb-4">
-												<Col>
-													<span className="text-danger">[TODO]: Safety Planning Alert</span>
-												</Col>
-											</Row>
-											<Row>
-												<Col>
-													<span className="text-danger">[TODO]: Resources Needed Alert</span>
-												</Col>
-											</Row>
-										</Container>
-									</Card.Body>
-									{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-										<>
-											<hr />
-											<Card.Body key={triageGroupIndex}>
-												<Container fluid>
-													<Row className="mb-4">
-														<Col>
-															<p className="mb-0 fw-bold">
-																Triage: {triageGroup.patientOrderCareTypeDescription}
-															</p>
-														</Col>
-													</Row>
-													<Row className="mb-4">
-														<Col xs={3}>
-															<p className="m-0 text-gray">Care Focus</p>
-														</Col>
-														<Col xs={9}>
-															<p className="m-0">
-																{triageGroup.patientOrderFocusTypeDescription}
-															</p>
-														</Col>
-													</Row>
-													<Row>
-														<Col xs={3}>
-															<p className="m-0 text-gray">Reason</p>
-														</Col>
-														<Col xs={9}>
-															{triageGroup.reasons.map((reason, reasonIndex) => (
-																<p key={reasonIndex} className="m-0">
-																	{reason}
-																</p>
-															))}
-														</Col>
-													</Row>
-												</Container>
-											</Card.Body>
-										</>
-									))}
-								</Card>
-							</Col>
-						</Row>
+						<>
+							<Row className="mb-6">
+								<Col>
+									<div className="d-flex align-items-center justify-content-between">
+										<h4 className="mb-0">Assessment</h4>
+										<Button
+											variant="primary"
+											className="d-flex align-items-center"
+											onClick={() => {
+												navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+											}}
+										>
+											Review <ExternalIcon className="ms-2" width={20} height={20} />
+										</Button>
+									</div>
+									<p className="mb-0">
+										Completed{' '}
+										<strong>{patientOrder.screeningSession?.completedAtDescription}</strong> by{' '}
+										<strong className="text-danger">[TODO]: completedBy</strong>
+									</p>
+								</Col>
+							</Row>
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+								<MhicInlineAlert
+									className="mb-6"
+									variant="danger"
+									title="Patient needs safety planning"
+									description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
+								/>
+							)}
+							{patientOrder.patientOrderResourcingStatusId ===
+								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+								<MhicInlineAlert
+									className="mb-6"
+									variant="warning"
+									title="Resources needed"
+									description="Triage indicates the patient needs external resources"
+								/>
+							)}
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
+								<MhicInlineAlert
+									className="mb-6"
+									variant="success"
+									title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
+									description="[TODO]: Reason for Safety Planning: [Reason]"
+								/>
+							)}
+							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
+								<MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />
+							))}
+							<MhicNextStepsCard
+								className="mb-6"
+								patientOrder={patientOrder}
+								onPatientOrderChange={onPatientOrderChange}
+							/>
+						</>
+					)}
+					{!patientOrder.screeningSession && (
+						<>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Assessment</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<NoData
+										className="mb-6"
+										title="No Assessment"
+										description="There is no assessment for the patient's most recent referral order"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Start Assessment',
+												onClick: () => {
+													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+												},
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Schedule Assessment',
+												onClick: () => {
+													setAssessmentIdToEdit('');
+													setShowScheduleAssessmentModal(true);
+												},
+											},
+										]}
+									/>
+									<NoData
+										className="mb-6 bg-white"
+										title="Assessment is Scheduled"
+										description="Nov 12, 2023 at 2:30 PM"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Start Assessment',
+												onClick: () => {
+													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+												},
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Edit Appointment Date',
+												onClick: () => {
+													setAssessmentIdToEdit('xxx');
+													setShowScheduleAssessmentModal(true);
+												},
+											},
+										]}
+									/>
+									<NoData
+										className="bg-white"
+										title="Assessment in Progress"
+										description="{Patient Name} began the assessment on {Date} at {Time}"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Continue Assessment',
+												onClick: () => {
+													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+												},
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Retake Assessment',
+												onClick: () => {
+													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+												},
+											},
+										]}
+									/>
+								</Col>
+							</Row>
+						</>
 					)}
 				</Container>
 			</section>

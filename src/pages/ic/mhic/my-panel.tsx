@@ -1,18 +1,21 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Outlet, useMatch, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 
-import { PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderCountsByPatientOrderStatusId, PatientOrderStatusId } from '@/lib/models';
 import { MhicNavigation } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
+import { integratedCareService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
 
 const MhicMyPanel = () => {
 	const [searchParams] = useSearchParams();
+	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
 	const navigate = useNavigate();
 
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
+	const [countsById, setCountsById] = useState<PatientOrderCountsByPatientOrderStatusId>();
 
 	const rootMatch = useMatch({
 		path: '/ic/mhic',
@@ -42,6 +45,11 @@ const MhicMyPanel = () => {
 		[navigate, searchParams]
 	);
 
+	const fetchData = useCallback(async () => {
+		const response = await integratedCareService.getPanelCounts().fetch();
+		setCountsById(response.patientOrderCountsByPatientOrderStatusId);
+	}, []);
+
 	const navigationItems = useMemo(
 		() => [
 			{
@@ -65,7 +73,7 @@ const MhicMyPanel = () => {
 				navigationItems: [
 					{
 						title: 'Need Assessment',
-						description: '[TODO]',
+						description: countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.NEEDS_ASSESSMENT);
@@ -74,7 +82,7 @@ const MhicMyPanel = () => {
 					},
 					{
 						title: 'Safety Planning',
-						description: '[TODO]',
+						description: countsById?.SAFETY_PLANNING.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-danger" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SAFETY_PLANNING);
@@ -84,7 +92,7 @@ const MhicMyPanel = () => {
 
 					{
 						title: 'BHP',
-						description: '[TODO]',
+						description: countsById?.BHP.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-success" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.BHP);
@@ -93,7 +101,7 @@ const MhicMyPanel = () => {
 					},
 					{
 						title: 'Specialty Care',
-						description: '[TODO]',
+						description: countsById?.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SPECIALTY_CARE);
@@ -103,13 +111,25 @@ const MhicMyPanel = () => {
 				],
 			},
 		],
-		[myPatientsMatch, navigate, patientOrderStatusId, rootMatch, updateSelectedOrderStatusId]
+		[
+			countsById?.BHP.patientOrderCountDescription,
+			countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription,
+			countsById?.SAFETY_PLANNING.patientOrderCountDescription,
+			countsById?.SPECIALTY_CARE.patientOrderCountDescription,
+			myPatientsMatch,
+			navigate,
+			patientOrderStatusId,
+			rootMatch,
+			updateSelectedOrderStatusId,
+		]
 	);
 
 	return (
-		<MhicNavigation navigationItems={navigationItems}>
-			<Outlet context={useOutletContext()} />
-		</MhicNavigation>
+		<AsyncWrapper fetchData={fetchData}>
+			<MhicNavigation navigationItems={navigationItems}>
+				<Outlet context={useOutletContext()} />
+			</MhicNavigation>
+		</AsyncWrapper>
 	);
 };
 
