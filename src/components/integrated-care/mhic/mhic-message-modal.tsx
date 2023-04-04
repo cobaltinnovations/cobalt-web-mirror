@@ -101,10 +101,18 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 			try {
 				setIsSaving(true);
 
+				let response;
 				if (messageToEdit) {
-					window.alert('[TODO]: Save edit message');
+					response = await integratedCareService
+						.updateMessage(messageToEdit.patientOrderScheduledMessageGroupId, {
+							patientOrderScheduledMessageTypeId: formValues.messageType,
+							messageTypeIds: formValues.contactMethods,
+							scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledAtTime: formValues.time,
+						})
+						.fetch();
 				} else {
-					const response = await integratedCareService
+					response = await integratedCareService
 						.sendMessage({
 							patientOrderId: patientOrder.patientOrderId,
 							patientOrderScheduledMessageTypeId: formValues.messageType,
@@ -113,16 +121,16 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 							scheduledAtTime: formValues.time,
 						})
 						.fetch();
-
-					addFlag({
-						variant: 'success',
-						title: `${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message scheduled`,
-						description: `A ${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message is scheduled for ${response.patientOrderScheduledMessageGroup.scheduledAtDateTimeDescription}`,
-						actions: [],
-					});
-
-					onSave(response.patientOrderScheduledMessageGroup);
 				}
+
+				addFlag({
+					variant: 'success',
+					title: `${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message scheduled`,
+					description: `A ${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message is scheduled for ${response.patientOrderScheduledMessageGroup.scheduledAtDateTimeDescription}`,
+					actions: [],
+				});
+
+				onSave(response.patientOrderScheduledMessageGroup);
 			} catch (error) {
 				handleError(error);
 			} finally {
@@ -141,6 +149,66 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 			patientOrder.patientOrderId,
 		]
 	);
+
+	const handleUndoButtonClick = useCallback(
+		async (patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup) => {
+			const response = await integratedCareService
+				.sendMessage({
+					patientOrderId: patientOrder.patientOrderId,
+					patientOrderScheduledMessageTypeId:
+						patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeId,
+					messageTypeIds: patientOrderScheduledMessageGroup.patientOrderScheduledMessages.map(
+						(m) => m.messageTypeId
+					),
+					scheduledAtDate: patientOrderScheduledMessageGroup.scheduledAtDate,
+					scheduledAtTime: moment(patientOrderScheduledMessageGroup.scheduledAtTime, 'HH:mm').format(
+						'h:mm A'
+					),
+				})
+				.fetch();
+
+			addFlag({
+				variant: 'success',
+				title: `${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message scheduled`,
+				description: `A ${response.patientOrderScheduledMessageGroup.patientOrderScheduledMessageTypeDescription} message is scheduled for ${response.patientOrderScheduledMessageGroup.scheduledAtDateTimeDescription}`,
+				actions: [],
+			});
+
+			onSave(response.patientOrderScheduledMessageGroup);
+		},
+		[addFlag, onSave, patientOrder.patientOrderId]
+	);
+
+	const handleDeleteButtonClick = useCallback(async () => {
+		try {
+			setIsSaving(true);
+
+			if (!messageToEdit) {
+				throw new Error('Cannot delete message.');
+			}
+
+			await integratedCareService.deleteMessage(messageToEdit.patientOrderScheduledMessageGroupId).fetch();
+
+			addFlag({
+				variant: 'success',
+				title: `${messageToEdit.patientOrderScheduledMessageTypeDescription} message deleted`,
+				actions: [
+					{
+						title: 'Undo',
+						onClick: () => {
+							handleUndoButtonClick(messageToEdit);
+						},
+					},
+				],
+			});
+
+			onSave(messageToEdit);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	}, [addFlag, handleError, handleUndoButtonClick, messageToEdit, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEntering={handleOnEnter}>
@@ -236,13 +304,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 				<Modal.Footer className="d-flex align-items-center justify-content-between">
 					<div>
 						{messageToEdit && (
-							<Button
-								variant="danger"
-								onClick={() => {
-									window.alert('[TODO]: Delete the message');
-								}}
-								disabled={isSaving}
-							>
+							<Button variant="danger" onClick={handleDeleteButtonClick} disabled={isSaving}>
 								Delete
 							</Button>
 						)}
