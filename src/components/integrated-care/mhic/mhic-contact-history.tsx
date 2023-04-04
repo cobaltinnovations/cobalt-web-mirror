@@ -14,12 +14,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import NoData from '@/components/no-data';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import {
-	MhicAssessmentModal,
-	MhicMessageModal,
-	MhicOutreachModal,
-	MhicScheduleAssessmentModal,
-} from '@/components/integrated-care/mhic';
+import { MhicMessageModal, MhicOutreachModal } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
@@ -42,9 +37,6 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 	const [showOutreachModal, setShowOutreachModal] = useState(false);
 	const [outreachTypeId, setOutreachTypeId] = useState(PatientOrderOutreachTypeId.PHONE_CALL);
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
-
-	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
-	const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
 	const handleOutreachModalSave = useCallback(async () => {
 		try {
@@ -136,23 +128,6 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				onSave={handleOutreachModalSave}
 			/>
 
-			<MhicScheduleAssessmentModal
-				show={showScheduleAssessmentModal}
-				onHide={() => {
-					setShowScheduleAssessmentModal(false);
-				}}
-				onSave={() => {
-					setShowScheduleAssessmentModal(false);
-				}}
-			/>
-
-			<MhicAssessmentModal
-				show={showAssessmentModal}
-				onHide={() => {
-					setShowAssessmentModal(false);
-				}}
-			/>
-
 			<section>
 				<Container fluid className="overflow-visible">
 					<Row className="mb-6">
@@ -220,6 +195,23 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 					</Row>
 					<Row>
 						<Col>
+							{(patientOrder.patientOrderOutreaches ?? []).length <= 0 &&
+								patientOrder.patientOrderScheduledMessageGroups.length <= 0 && (
+									<NoData
+										title="No Contact Attempts Logged"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Send Welcome Message',
+												onClick: () => {
+													setMessageToEdit(undefined);
+													setShowMessageModal(true);
+												},
+											},
+										]}
+									/>
+								)}
+
 							{patientOrder.patientOrderScheduledMessageGroups.map((message) => {
 								return (
 									<Card
@@ -274,21 +266,6 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 								);
 							})}
 
-							{(patientOrder.patientOrderOutreaches ?? []).length <= 0 && (
-								<NoData
-									title="No Contact Attempts Logged"
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Send Welcome Message',
-											onClick: () => {
-												setMessageToEdit(undefined);
-												setShowMessageModal(true);
-											},
-										},
-									]}
-								/>
-							)}
 							{(patientOrder.patientOrderOutreaches ?? []).length > 0 && (
 								<div className="border rounded bg-white">
 									{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
