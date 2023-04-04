@@ -49,7 +49,8 @@ export const card = (theme: CobaltTheme) => {
 				'&__title.h5': {
 					margin: 0,
 					...theme.fonts.default,
-					...theme.fonts.bodyBold,
+					...theme.fonts.bodyNormal,
+					fontWeight: `500 !important`,
 					textTransform: 'none',
 				},
 				'&__body': {

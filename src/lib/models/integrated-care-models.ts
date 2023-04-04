@@ -103,6 +103,7 @@ export interface PatientOrderModel {
 	mostRecentEpisodeClosedAt: string;
 	mostRecentEpisodeClosedAtDescription: string;
 	mostRecentEpisodeClosedWithinDateThreshold: boolean;
+	patientOrderScheduledMessageGroups: PatientOrderScheduledMessageGroup[];
 }
 
 enum PatientOrderClosureReasonId {
@@ -202,6 +203,7 @@ export interface PatientOrderOutreachModel {
 	outreachTimeDescription: string;
 	patientOrderId: string;
 	patientOrderOutreachId: string;
+	patientOrderOutreachResultId: string;
 }
 
 export interface PateintOrderTriageGroupModel {
@@ -227,4 +229,30 @@ export interface PatientOrderAutocompleteResult {
 	patientDisplayNameWithLastFirst: string;
 	patientPhoneNumber: string;
 	patientPhoneNumberDescription: string;
+}
+
+export interface PatientOrderScheduledMessageGroup {
+	patientOrderScheduledMessageGroupId: string;
+	patientOrderScheduledMessageTypeId: string;
+	patientOrderScheduledMessageTypeDescription: string;
+	scheduledMessageSourceId: string;
+	patientOrderId: string;
+	scheduledAtDate: string;
+	scheduledAtDateDescription: string;
+	scheduledAtTime: string;
+	scheduledAtTimeDescription: string;
+	scheduledAtDateTime: string;
+	scheduledAtDateTimeDescription: string;
+	timeZone: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	patientOrderScheduledMessages: {
+		patientOrderScheduledMessageId: string;
+		scheduledMessageId: string;
+		scheduledMessageStatusId: string;
+		messageTypeId: string;
+		messageTypeDescription: string;
+	}[];
 }

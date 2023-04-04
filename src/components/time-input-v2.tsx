@@ -7,7 +7,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useStyles = createUseThemedStyles((theme) => ({
 	input: {
 		'& input': {
-			textIndent: 16,
+			textIndent: '16px !important',
 		},
 	},
 	menu: {
@@ -51,10 +51,11 @@ interface Props {
 	value: string;
 	onChange(value: string): void;
 	disabled?: boolean;
+	required?: boolean;
 	className?: string;
 }
 
-const TimeInputV2 = ({ id, label, value, onChange, disabled, className }: Props) => {
+const TimeInputV2 = ({ id, label, value, onChange, disabled, required, className }: Props) => {
 	const classes = useStyles();
 	const selectedValue = useMemo(() => {
 		const timeSlot = timeSlots.find((ts) => ts.value === value);
@@ -96,6 +97,7 @@ const TimeInputV2 = ({ id, label, value, onChange, disabled, className }: Props)
 						className={classes.input}
 						value={value as string}
 						label={label}
+						required={required}
 					/>
 				);
 			}}

@@ -9,6 +9,7 @@ import {
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
+	PatientOrderScheduledMessageGroup,
 	PatientOrderStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
@@ -154,6 +155,7 @@ export const integratedCareService = {
 	},
 	postPatientOrderOutreach(data: {
 		patientOrderId: string;
+		patientOrderOutreachResultId: string;
 		outreachDate: string;
 		outreachTime: string;
 		note: string;
@@ -169,6 +171,7 @@ export const integratedCareService = {
 	updatePatientOrderOutreach(
 		patientOrderOutreachId: string,
 		data: {
+			patientOrderOutreachResultId: string;
 			outreachDate: string;
 			outreachTime: string;
 			note: string;
@@ -218,6 +221,46 @@ export const integratedCareService = {
 			method: 'POST',
 			url: '/patient-orders/assign',
 			data,
+		});
+	},
+	sendMessage(data: {
+		patientOrderId: string;
+		patientOrderScheduledMessageTypeId: string;
+		messageTypeIds: string[];
+		scheduledAtDate: string;
+		scheduledAtTime: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-message-groups',
+			data,
+		});
+	},
+	updateMessage(
+		patientOrderScheduledMessageGroupId: string,
+		data: {
+			patientOrderScheduledMessageTypeId: string;
+			messageTypeIds: string[];
+			scheduledAtDate: string;
+			scheduledAtTime: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
+			data,
+		});
+	},
+	deleteMessage(patientOrderScheduledMessageGroupId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledMessageGroup: PatientOrderScheduledMessageGroup;
+		}>({
+			method: 'DELETE',
+			url: `/patient-order-scheduled-message-groups/${patientOrderScheduledMessageGroupId}`,
 		});
 	},
 };

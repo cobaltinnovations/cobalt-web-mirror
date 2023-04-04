@@ -3,24 +3,29 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
 interface UseStylesProps {
+	vertical: boolean;
 	hideBorder: boolean;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	tabBar: {
-		overflowX: 'auto',
-		borderBottom: ({ hideBorder }: UseStylesProps) => (hideBorder ? '' : `1px solid ${theme.colors.n100}`),
+	tabBar: ({ vertical, hideBorder }: UseStylesProps) => ({
+		overflowX: vertical ? 'visible' : 'auto',
+		...(vertical
+			? { borderLeft: hideBorder ? '' : `1px solid ${theme.colors.n100}` }
+			: { borderBottom: hideBorder ? '' : `1px solid ${theme.colors.n100}` }),
+
 		'& ul': {
 			margin: 0,
 			padding: 0,
 			display: 'flex',
 			listStyle: 'none',
+			flexDirection: vertical ? 'column' : 'row',
 			'& li': {
 				position: 'relative',
 				'& button': {
 					border: 0,
 					fontWeight: 500,
-					padding: '18px 12px',
+					padding: vertical ? '10px 16px' : '18px 12px',
 					appearance: 'none',
 					whiteSpace: 'nowrap',
 					color: theme.colors.n500,
@@ -34,51 +39,65 @@ const useStyles = createUseThemedStyles((theme) => ({
 						color: theme.colors.p700,
 					},
 					'&:after': {
-						left: 10,
-						right: 10,
-						bottom: 0,
-						height: 2,
 						content: '""',
 						position: 'absolute',
 						backgroundColor: theme.colors.p700,
+						...(vertical
+							? {
+									top: 0,
+									left: 0,
+									bottom: 0,
+									width: 2,
+							  }
+							: {
+									left: 10,
+									right: 10,
+									bottom: 0,
+									height: 2,
+							  }),
 					},
 				},
-				'&:first-child': {
-					'& button': {
-						paddingLeft: 0,
+				...(!vertical && {
+					'&:first-child': {
+						'& button': {
+							paddingLeft: 0,
+						},
+						'&.active:after': {
+							left: 0,
+						},
 					},
-					'&.active:after': {
-						left: 0,
+					'&:last-child': {
+						'& button': {
+							paddingRight: 0,
+						},
+						'&.active:after': {
+							right: 0,
+						},
 					},
-				},
-				'&:last-child': {
-					'& button': {
-						paddingRight: 0,
-					},
-					'&.active:after': {
-						right: 0,
-					},
-				},
+				}),
 			},
 		},
-	},
+	}),
 }));
 
 interface TabBarProps {
+	orientation?: 'horizontal' | 'vertical';
 	value: string;
 	tabs: { value: string; title: string }[];
 	onTabClick(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	hideBorder?: boolean;
 	className?: string;
+	style?: React.CSSProperties;
 }
 
-const TabBar = ({ value, tabs, onTabClick, hideBorder, className }: TabBarProps) => {
+const TabBar = ({ orientation = 'horizontal', value, tabs, onTabClick, hideBorder, className, style }: TabBarProps) => {
 	const classes = useStyles({
+		vertical: orientation === 'vertical',
 		hideBorder: !!hideBorder,
 	});
 
 	return (
-		<div className={classNames(classes.tabBar, className)}>
+		<div className={classNames(classes.tabBar, className)} style={style}>
 			<ul>
 				{tabs.map((tab) => {
 					return (
