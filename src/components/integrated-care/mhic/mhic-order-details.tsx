@@ -13,6 +13,7 @@ import {
 	MhicCloseEpisodeModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
+	MhicInlineAlert,
 	MhicInsuranceModal,
 	MhicScheduleAssessmentModal,
 } from '@/components/integrated-care/mhic';
@@ -182,11 +183,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders, referenceDat
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
-										<Row className="mb-4">
-											<Col>
-												<span className="text-danger">[TODO]: Order Flagged Alert</span>
-											</Col>
-										</Row>
+										{patientOrder.patientBelowAgeThreshold && (
+											<Row className="mb-4">
+												<Col>
+													<MhicInlineAlert
+														variant="warning"
+														title="Order Flagged"
+														description="Patient under 18"
+													/>
+												</Col>
+											</Row>
+										)}
 										<Row className="mb-4">
 											<Col xs={3}>
 												<p className="m-0 text-gray">Date Referred</p>
