@@ -172,7 +172,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		},
 	},
 	mobileNav: {
-		top: 56,
+		top: 0,
 		left: 0,
 		right: 0,
 		bottom: 0,
@@ -296,9 +296,11 @@ const HeaderV2 = () => {
 	/* Body padding for fixed header */
 	/* ----------------------------------------------------------- */
 	const header = useRef<HTMLDivElement | null>(null);
+	const movileNavRef = useRef<HTMLDivElement | null>(null);
 
 	const handleWindowResize = useCallback(() => {
 		setBodyPadding();
+		setMobileNavTop();
 	}, []);
 
 	function setBodyPadding() {
@@ -311,8 +313,24 @@ const HeaderV2 = () => {
 		document.body.style.paddingTop = `${headerHeight}px`;
 	}
 
+	function setMobileNavTop() {
+		if (!movileNavRef.current) {
+			return;
+		}
+
+		if (!header.current) {
+			movileNavRef.current.style.top = '0px';
+			return;
+		}
+
+		const headerHeight = header.current.clientHeight;
+		movileNavRef.current.style.top = `${headerHeight}px`;
+	}
+
 	useEffect(() => {
 		setBodyPadding();
+		setMobileNavTop();
+
 		window.addEventListener('resize', handleWindowResize);
 
 		return () => {
@@ -328,6 +346,8 @@ const HeaderV2 = () => {
 	/* Disable scrolling when menu is open */
 	/* ----------------------------------------------------------- */
 	useEffect(() => {
+		setMobileNavTop();
+
 		if (menuOpen) {
 			document.body.style.overflow = 'hidden';
 			return;
@@ -535,7 +555,7 @@ const HeaderV2 = () => {
 	return (
 		<>
 			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
-				<div className={classNames('d-lg-none', classes.mobileNav)}>
+				<div ref={movileNavRef} className={classNames('d-lg-none', classes.mobileNav)}>
 					<ul>
 						{navigationConfig.map((navigationItem) => (
 							<li key={navigationItem.navigationItemId}>
