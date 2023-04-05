@@ -393,10 +393,11 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
 	/* ----------------------------------------------------------- */
-	const featureIdsWithLocationFilter = ['THERAPY', 'COACHING'];
 
-	const navigationConfig = useMemo(
-		() => [
+	const navigationConfig = useMemo(() => {
+		const featureIdsWithLocationFilter = ['THERAPY', 'COACHING'];
+
+		return [
 			{
 				testId: 'menuLinkHome',
 				navigationItemId: 'HOME',
@@ -465,15 +466,14 @@ const HeaderV2 = () => {
 					})),
 				],
 			},
-		],
-		[
-			pathname,
-			institution?.featuresEnabled,
-			institution?.features,
-			institution?.additionalNavigationItems,
-			account?.institutionLocationId,
-		]
-	);
+		];
+	}, [
+		pathname,
+		institution?.featuresEnabled,
+		institution?.features,
+		institution?.additionalNavigationItems,
+		account?.institutionLocationId,
+	]);
 
 	/* ----------------------------------------------------------- */
 	/* Account navigation Config */
