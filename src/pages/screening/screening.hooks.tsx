@@ -30,15 +30,7 @@ export function useScreeningNavigation() {
 			switch (destination?.screeningSessionDestinationId) {
 				case ScreeningSessionDestinationId.CRISIS:
 					trackEvent(CrisisAnalyticsEvent.presentScreeningCrisis());
-					navigate(
-						{
-							pathname: '/in-crisis',
-							search: new URLSearchParams(params).toString(),
-						},
-						{
-							replace,
-						}
-					);
+					window.location.href = '/in-crisis';
 					return;
 				case ScreeningSessionDestinationId.CONTENT_LIST:
 					navigate(
