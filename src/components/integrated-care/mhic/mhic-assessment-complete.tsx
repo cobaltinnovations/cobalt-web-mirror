@@ -172,6 +172,7 @@ export const MhicAssessmentComplete = ({
 								...conditionsAndSymptomsResults.map((result) => ({
 									title: result.screeningName ?? '',
 									value: `#${result.screeningId}` ?? '#',
+									level: 1,
 								})),
 								...(completedAssessmentsResults.length > 0
 									? [
@@ -184,6 +185,7 @@ export const MhicAssessmentComplete = ({
 								...completedAssessmentsResults.map((result) => ({
 									title: result.screeningName ?? '',
 									value: `#${result.screeningId}` ?? '#',
+									level: 1,
 								})),
 							]}
 							onTabClick={(value) => {
