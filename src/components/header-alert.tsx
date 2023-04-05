@@ -31,7 +31,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			color: theme.colors.n0,
 			backgroundColor: theme.colors.d500,
 		},
-		'& button': {
+		'& button, & a': {
 			color: 'inherit',
 			'&:hover': {
 				color: 'inherit',
@@ -57,10 +57,11 @@ interface HeaderAlertProps {
 	message: string;
 	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	dismissable?: boolean;
+	onDismiss?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	className?: string;
 }
 
-const HeaderAlert = ({ title, message, variant = 'primary', dismissable, className }: HeaderAlertProps) => {
+const HeaderAlert = ({ title, message, variant = 'primary', dismissable, onDismiss, className }: HeaderAlertProps) => {
 	const classes = useStyles();
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
@@ -89,7 +90,7 @@ const HeaderAlert = ({ title, message, variant = 'primary', dismissable, classNa
 			</div>
 			{dismissable && (
 				<div className={classes.buttonOuter}>
-					<Button variant="link">
+					<Button variant="link" onClick={onDismiss}>
 						<CloseIcon />
 					</Button>
 				</div>

@@ -3,6 +3,7 @@ import { SupportRoleId } from './provider';
 
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
+	alerts: InstitutionAlert[];
 	anonymousEnabled: boolean;
 	contactUsEnabled: boolean;
 	contentScreeningFlowId?: string;
@@ -91,4 +92,17 @@ export interface InstitutionLocation {
 	institutionId: string;
 	institutionLocationId: string;
 	name: string;
+}
+
+export enum AlertTypeId {
+	INFORMATION = 'INFORMATION',
+	WARNING = 'WARNING',
+	ERROR = 'ERROR',
+}
+
+export interface InstitutionAlert {
+	alertId: string;
+	alertTypeId: AlertTypeId;
+	title: string;
+	message: string;
 }

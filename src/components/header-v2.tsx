@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation } from 'react-router-dom';
+import { Link, matchPath, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
+import { AlertTypeId } from '@/lib/models';
+import { institutionService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
@@ -26,6 +29,7 @@ import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import useSubdomain from '@/hooks/use-subdomain';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
@@ -286,8 +290,13 @@ const MobileAccordianItem = ({ toggleElement, children }: PropsWithChildren<{ to
 
 const HeaderV2 = () => {
 	const { pathname } = useLocation();
+	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
-	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
+	const subdomain = useSubdomain();
+	const [searchParams] = useSearchParams();
+	const sessionAccountSourceId = useMemo(() => searchParams.get('accountSourceId'), [searchParams]);
+
+	const { account, institution, institutionCapabilities, setInstitution, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -552,6 +561,25 @@ const HeaderV2 = () => {
 		]
 	);
 
+	const handleAlertDismiss = useCallback(
+		async (alertId: string) => {
+			try {
+				await institutionService.dismissAlert(alertId).fetch();
+				const response = await institutionService
+					.getInstitution({
+						subdomain,
+						...(sessionAccountSourceId ? { accountSourceId: sessionAccountSourceId } : {}),
+					})
+					.fetch();
+
+				setInstitution(response.institution);
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError, sessionAccountSourceId, setInstitution, subdomain]
+	);
+
 	return (
 		<>
 			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
@@ -628,28 +656,25 @@ const HeaderV2 = () => {
 			</CSSTransition>
 
 			<div ref={header} className={classes.headerOuter}>
-				<HeaderAlert
-					variant="primary"
-					title="User Terms of Service Update"
-					message="We have updated our User Terms of Service."
-					dismissable
-				/>
-				<HeaderAlert
-					variant="success"
-					title="User Terms of Service Update"
-					message="We have updated our User Terms of Service."
-					dismissable
-				/>
-				<HeaderAlert
-					variant="warning"
-					title="User Terms of Service Update"
-					message="We have updated our User Terms of Service."
-				/>
-				<HeaderAlert
-					variant="danger"
-					title="Payment has expired"
-					message="You will not be able to use the site until your payment information has been updated."
-				/>
+				{institution?.alerts.map((alert) => {
+					const variantMap: Record<AlertTypeId, 'primary' | 'warning' | 'danger'> = {
+						[AlertTypeId.INFORMATION]: 'primary',
+						[AlertTypeId.WARNING]: 'warning',
+						[AlertTypeId.ERROR]: 'danger',
+					};
+
+					return (
+						<HeaderAlert
+							variant={variantMap[alert.alertTypeId]}
+							title={alert.title}
+							message={alert.message}
+							dismissable={alert.alertTypeId === AlertTypeId.INFORMATION}
+							onDismiss={() => {
+								handleAlertDismiss(alert.alertId);
+							}}
+						/>
+					);
+				})}
 				<header className={classes.header}>
 					<div className="h-100 d-flex align-items-center justify-content-between">
 						<Link to="/" className="d-block me-10">
