@@ -9,6 +9,7 @@ import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import PathwaysIcon from '@/components/pathways-icons';
+import HeaderAlert from '@/components/header-alert';
 
 import { exploreLinks } from '@/menu-links';
 
@@ -27,15 +28,17 @@ import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
-	header: {
+	headerOuter: {
 		top: 0,
 		left: 0,
 		right: 0,
 		zIndex: 4,
+		position: 'fixed',
+	},
+	header: {
 		height: 56,
 		display: 'flex',
 		padding: '0 40px',
-		position: 'fixed',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
@@ -292,7 +295,7 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
 	/* ----------------------------------------------------------- */
-	const header = useRef<HTMLElement | null>(null);
+	const header = useRef<HTMLDivElement | null>(null);
 
 	const handleWindowResize = useCallback(() => {
 		setBodyPadding();
@@ -604,152 +607,163 @@ const HeaderV2 = () => {
 				</div>
 			</CSSTransition>
 
-			<header ref={header} className={classes.header}>
-				<div className="h-100 d-flex align-items-center justify-content-between">
-					<Link to="/" className="d-block me-10">
-						<LogoSmallText className="text-primary" />
-					</Link>
-					<nav className={classes.desktopNav}>
-						<ul>
-							{navigationConfig.map((navigationItem) => (
-								<li
-									key={navigationItem.navigationItemId}
-									className={classNames({
-										active: navigationItem.active,
-									})}
-								>
-									{navigationItem.to && (
-										<Link
-											to={navigationItem.to}
-											onClick={() => {
-												trackEvent({
-													action: 'Top Nav',
-													link_text: navigationItem.title,
-												});
-											}}
-										>
-											{navigationItem.title}
-										</Link>
-									)}
-									{navigationItem.items && (
-										<Dropdown
-											onToggle={(nextShow) => {
-												if (nextShow) {
+			<div ref={header} className={classes.headerOuter}>
+				<HeaderAlert variant="primary" />
+				<HeaderAlert variant="warning" />
+				<HeaderAlert variant="danger" />
+				<header className={classes.header}>
+					<div className="h-100 d-flex align-items-center justify-content-between">
+						<Link to="/" className="d-block me-10">
+							<LogoSmallText className="text-primary" />
+						</Link>
+						<nav className={classes.desktopNav}>
+							<ul>
+								{navigationConfig.map((navigationItem) => (
+									<li
+										key={navigationItem.navigationItemId}
+										className={classNames({
+											active: navigationItem.active,
+										})}
+									>
+										{navigationItem.to && (
+											<Link
+												to={navigationItem.to}
+												onClick={() => {
 													trackEvent({
 														action: 'Top Nav',
 														link_text: navigationItem.title,
 													});
-												}
-											}}
-										>
-											<Dropdown.Toggle
-												as={DropdownToggle}
-												id={`employee-header__${navigationItem.navigationItemId}`}
+												}}
 											>
-												<span>{navigationItem.title}</span>
-												<DownChevron width={16} height={16} />
-											</Dropdown.Toggle>
-											<Dropdown.Menu
-												as={DropdownMenu}
-												align="start"
-												flip={false}
-												popperConfig={{ strategy: 'fixed' }}
-												renderOnMount
+												{navigationItem.title}
+											</Link>
+										)}
+										{navigationItem.items && (
+											<Dropdown
+												onToggle={(nextShow) => {
+													if (nextShow) {
+														trackEvent({
+															action: 'Top Nav',
+															link_text: navigationItem.title,
+														});
+													}
+												}}
 											>
-												{navigationItem.items.map((item, itemIndex) => (
-													<Dropdown.Item
-														key={itemIndex}
-														to={item.to}
-														as={Link}
-														onClick={() => {
-															trackEvent({
-																action: 'Top Nav Dropdown',
-																link_text: item.title,
-															});
-														}}
-													>
-														<div
-															className={classNames('d-flex', {
-																'align-items-center': !item.description,
-															})}
+												<Dropdown.Toggle
+													as={DropdownToggle}
+													id={`employee-header__${navigationItem.navigationItemId}`}
+												>
+													<span>{navigationItem.title}</span>
+													<DownChevron width={16} height={16} />
+												</Dropdown.Toggle>
+												<Dropdown.Menu
+													as={DropdownMenu}
+													align="start"
+													flip={false}
+													popperConfig={{ strategy: 'fixed' }}
+													renderOnMount
+												>
+													{navigationItem.items.map((item, itemIndex) => (
+														<Dropdown.Item
+															key={itemIndex}
+															to={item.to}
+															as={Link}
+															onClick={() => {
+																trackEvent({
+																	action: 'Top Nav Dropdown',
+																	link_text: item.title,
+																});
+															}}
 														>
-															{item.icon}
-															<div className="ps-4">
-																<p className="mb-0 fw-semibold">{item.title}</p>
-																{item.description && (
-																	<p className="mb-0 text-gray">{item.description}</p>
-																)}
+															<div
+																className={classNames('d-flex', {
+																	'align-items-center': !item.description,
+																})}
+															>
+																{item.icon}
+																<div className="ps-4">
+																	<p className="mb-0 fw-semibold">{item.title}</p>
+																	{item.description && (
+																		<p className="mb-0 text-gray">
+																			{item.description}
+																		</p>
+																	)}
+																</div>
 															</div>
-														</div>
-													</Dropdown.Item>
-												))}
-											</Dropdown.Menu>
-										</Dropdown>
-									)}
-								</li>
-							))}
-						</ul>
-					</nav>
-				</div>
-				<div className="d-none d-lg-flex align-items-center justify-content-between">
-					<Button className="py-1 d-flex align-items-center" size="sm" onClick={handleInCrisisButtonClick}>
-						<PhoneIcon className="me-1" />
-						<small className="fw-bold">In Crisis?</small>
-					</Button>
-					<Dropdown className="ms-4 d-flex align-items-center">
-						<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
-							<AvatarIcon className="d-flex" />
-						</Dropdown.Toggle>
-						<Dropdown.Menu
-							as={DropdownMenu}
-							align="end"
-							flip={false}
-							popperConfig={{ strategy: 'fixed' }}
-							renderOnMount
-							className={classes.accountDropdown}
+														</Dropdown.Item>
+													))}
+												</Dropdown.Menu>
+											</Dropdown>
+										)}
+									</li>
+								))}
+							</ul>
+						</nav>
+					</div>
+					<div className="d-none d-lg-flex align-items-center justify-content-between">
+						<Button
+							className="py-1 d-flex align-items-center"
+							size="sm"
+							onClick={handleInCrisisButtonClick}
 						>
-							<p className="fw-bold text-gray">{account?.displayName}</p>
-							{accountNavigationConfig.map((item, itemIndex) => (
-								<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
-									<div className="d-flex align-items-center">
-										<item.icon className="text-p300" />
-										<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
-									</div>
+							<PhoneIcon className="me-1" />
+							<small className="fw-bold">In Crisis?</small>
+						</Button>
+						<Dropdown className="ms-4 d-flex align-items-center">
+							<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
+								<AvatarIcon className="d-flex" />
+							</Dropdown.Toggle>
+							<Dropdown.Menu
+								as={DropdownMenu}
+								align="end"
+								flip={false}
+								popperConfig={{ strategy: 'fixed' }}
+								renderOnMount
+								className={classes.accountDropdown}
+							>
+								<p className="fw-bold text-gray">{account?.displayName}</p>
+								{accountNavigationConfig.map((item, itemIndex) => (
+									<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
+										<div className="d-flex align-items-center">
+											<item.icon className="text-p300" />
+											<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
+										</div>
+									</Dropdown.Item>
+								))}
+								{adminNavigationConfig.length > 0 && (
+									<>
+										<Dropdown.Divider />
+										{adminNavigationConfig.map((item, itemIndex) => (
+											<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
+												<div className="d-flex justify-content-between align-items-center">
+													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+													<item.icon className="text-gray" />
+												</div>
+											</Dropdown.Item>
+										))}
+									</>
+								)}
+								<Dropdown.Divider />
+								<Dropdown.Item onClick={signOutAndClearContext}>
+									<p className="mb-0 text-gray">Log Out</p>
 								</Dropdown.Item>
-							))}
-							{adminNavigationConfig.length > 0 && (
-								<>
-									<Dropdown.Divider />
-									{adminNavigationConfig.map((item, itemIndex) => (
-										<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
-											<div className="d-flex justify-content-between align-items-center">
-												<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-												<item.icon className="text-gray" />
-											</div>
-										</Dropdown.Item>
-									))}
-								</>
-							)}
-							<Dropdown.Divider />
-							<Dropdown.Item onClick={signOutAndClearContext}>
-								<p className="mb-0 text-gray">Log Out</p>
-							</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
-				</div>
-				<Button
-					variant="light"
-					data-testid="headerNavMenuButton"
-					className={classNames('d-flex d-lg-none', classes.menuButton, {
-						active: menuOpen,
-					})}
-					onClick={() => {
-						setMenuOpen(!menuOpen);
-					}}
-				>
-					<span />
-				</Button>
-			</header>
+							</Dropdown.Menu>
+						</Dropdown>
+					</div>
+					<Button
+						variant="light"
+						data-testid="headerNavMenuButton"
+						className={classNames('d-flex d-lg-none', classes.menuButton, {
+							active: menuOpen,
+						})}
+						onClick={() => {
+							setMenuOpen(!menuOpen);
+						}}
+					>
+						<span />
+					</Button>
+				</header>
+			</div>
 		</>
 	);
 };
