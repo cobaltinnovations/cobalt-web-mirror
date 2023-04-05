@@ -393,6 +393,8 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
 	/* ----------------------------------------------------------- */
+	const featureIdsWithLocationFilter = ['THERAPY', 'COACHING'];
+
 	const navigationConfig = useMemo(
 		() => [
 			{
@@ -419,7 +421,8 @@ const HeaderV2 = () => {
 									title: name,
 									description: navDescription,
 									to:
-										featureId === 'THERAPY' && account?.institutionLocationId
+										featureIdsWithLocationFilter.includes(featureId) &&
+										account?.institutionLocationId
 											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 											: urlName,
 								})),
