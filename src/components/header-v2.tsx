@@ -608,9 +608,22 @@ const HeaderV2 = () => {
 			</CSSTransition>
 
 			<div ref={header} className={classes.headerOuter}>
-				<HeaderAlert variant="primary" />
-				<HeaderAlert variant="warning" />
-				<HeaderAlert variant="danger" />
+				<HeaderAlert
+					variant="primary"
+					title="User Terms of Service Update"
+					message="We have updated our User Terms of Service."
+					dismissable
+				/>
+				<HeaderAlert
+					variant="warning"
+					title="User Terms of Service Update"
+					message="We have updated our User Terms of Service."
+				/>
+				<HeaderAlert
+					variant="danger"
+					title="Payment has expired"
+					message="You will not be able to use the site until your payment information has been updated."
+				/>
 				<header className={classes.header}>
 					<div className="h-100 d-flex align-items-center justify-content-between">
 						<Link to="/" className="d-block me-10">
