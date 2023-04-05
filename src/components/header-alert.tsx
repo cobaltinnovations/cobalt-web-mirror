@@ -58,10 +58,19 @@ interface HeaderAlertProps {
 	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	dismissable?: boolean;
 	onDismiss?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	disabled?: boolean;
 	className?: string;
 }
 
-const HeaderAlert = ({ title, message, variant = 'primary', dismissable, onDismiss, className }: HeaderAlertProps) => {
+const HeaderAlert = ({
+	title,
+	message,
+	variant = 'primary',
+	dismissable,
+	onDismiss,
+	disabled,
+	className,
+}: HeaderAlertProps) => {
 	const classes = useStyles();
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
@@ -90,7 +99,7 @@ const HeaderAlert = ({ title, message, variant = 'primary', dismissable, onDismi
 			</div>
 			{dismissable && (
 				<div className={classes.buttonOuter}>
-					<Button variant="link" onClick={onDismiss}>
+					<Button variant="link" onClick={onDismiss} disabled={disabled}>
 						<CloseIcon />
 					</Button>
 				</div>

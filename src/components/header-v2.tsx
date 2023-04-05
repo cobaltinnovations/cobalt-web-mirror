@@ -300,6 +300,7 @@ const HeaderV2 = () => {
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
+	const [alertsDisabled, setAlertsDisabled] = useState(false);
 
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
@@ -564,6 +565,8 @@ const HeaderV2 = () => {
 	const handleAlertDismiss = useCallback(
 		async (alertId: string) => {
 			try {
+				setAlertsDisabled(true);
+
 				await institutionService.dismissAlert(alertId).fetch();
 				const response = await institutionService
 					.getInstitution({
@@ -575,6 +578,8 @@ const HeaderV2 = () => {
 				setInstitution(response.institution);
 			} catch (error) {
 				handleError(error);
+			} finally {
+				setAlertsDisabled(false);
 			}
 		},
 		[handleError, sessionAccountSourceId, setInstitution, subdomain]
@@ -672,6 +677,7 @@ const HeaderV2 = () => {
 							onDismiss={() => {
 								handleAlertDismiss(alert.alertId);
 							}}
+							disabled={alertsDisabled}
 						/>
 					);
 				})}
