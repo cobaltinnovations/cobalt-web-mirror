@@ -4,6 +4,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
 import { ReactComponent as PrimaryIcon } from '@/assets/icons/flag-primary.svg';
+import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as DangerIcon } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -17,6 +18,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'&--primary': {
 			color: theme.colors.n0,
 			backgroundColor: theme.colors.p500,
+		},
+		'&--success': {
+			color: theme.colors.n0,
+			backgroundColor: theme.colors.s500,
 		},
 		'&--warning': {
 			color: theme.colors.n900,
@@ -50,7 +55,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface HeaderAlertProps {
 	title: string;
 	message: string;
-	variant?: 'primary' | 'warning' | 'danger';
+	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	dismissable?: boolean;
 	className?: string;
 }
@@ -61,6 +66,7 @@ const HeaderAlert = ({ title, message, variant = 'primary', dismissable, classNa
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
 		return {
 			primary: <PrimaryIcon width={24} height={24} />,
+			success: <SuccessIcon width={24} height={24} />,
 			warning: <WarningIcon width={24} height={24} />,
 			danger: <DangerIcon width={24} height={24} />,
 		};
@@ -78,7 +84,7 @@ const HeaderAlert = ({ title, message, variant = 'primary', dismissable, classNa
 		>
 			<div className={classes.iconOuter}>{variant && icon[variant]}</div>
 			<div className={classes.messageOuter}>
-				<div className="fw-semibold" dangerouslySetInnerHTML={{ __html: title }} />
+				<div className="fw-bold" dangerouslySetInnerHTML={{ __html: title }} />
 				<div dangerouslySetInnerHTML={{ __html: message }} />
 			</div>
 			{dismissable && (

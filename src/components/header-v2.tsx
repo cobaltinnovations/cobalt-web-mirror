@@ -635,6 +635,12 @@ const HeaderV2 = () => {
 					dismissable
 				/>
 				<HeaderAlert
+					variant="success"
+					title="User Terms of Service Update"
+					message="We have updated our User Terms of Service."
+					dismissable
+				/>
+				<HeaderAlert
 					variant="warning"
 					title="User Terms of Service Update"
 					message="We have updated our User Terms of Service."
