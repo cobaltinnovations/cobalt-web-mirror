@@ -60,4 +60,10 @@ export const institutionService = {
 			url: '/institution/locations',
 		});
 	},
+	dismissAlert(alertId: string) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'POST',
+			url: `/alerts/${alertId}/dismiss`,
+		});
+	},
 };
