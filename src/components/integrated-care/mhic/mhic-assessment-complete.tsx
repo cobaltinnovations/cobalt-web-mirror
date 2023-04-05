@@ -6,10 +6,11 @@ import classNames from 'classnames';
 import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
 	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
-import { MHIC_HEADER_HEIGHT, MhicInlineAlert } from '@/components/integrated-care/mhic';
+import { MHIC_HEADER_HEIGHT, MhicInlineAlert, MhicNextStepsCard } from '@/components/integrated-care/mhic';
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
@@ -85,18 +86,24 @@ export const MhicAssessmentComplete = ({
 					<Col md={{ span: 7, offset: 1 }}>
 						<div className={classes.scrollAnchor} id="results" />
 						<h3 className="mb-8">Results</h3>
-						<MhicInlineAlert
-							className="mb-8"
-							variant="danger"
-							title="[TODO]: Patient needs safety planning"
-							description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
-							action={{
-								title: '[TODO]: Complete Handoff',
-								onClick: () => {
-									window.alert('[TODO]: Not sure what this does.');
-								},
-							}}
-						/>
+						{patientOrder.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="danger"
+								title="Patient needs safety planning"
+								description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
+							/>
+						)}
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="warning"
+								title="Resources needed"
+								description="Triage indicates the patient needs external resources"
+							/>
+						)}
 						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
 							<Card key={triageGroupIndex} bsPrefix="ic-card" className="mb-8">
 								<Card.Header>
@@ -144,50 +151,14 @@ export const MhicAssessmentComplete = ({
 								</Card.Body>
 							</Card>
 						))}
-						{patientOrder.patientOrderResourcingStatusId && (
-							<Card bsPrefix="ic-card" className="mb-8">
-								<Card.Header>
-									<Card.Title>Resources</Card.Title>
-									<div className="button-container">
-										{patientOrder.patientOrderResourcingStatusId ===
-											PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-											<Button
-												variant="light"
-												size="sm"
-												onClick={() => {
-													window.alert('[TODO]: Mark as Sent');
-												}}
-											>
-												[TODO]: Mark as Sent
-											</Button>
-										)}
-									</div>
-								</Card.Header>
-								<Card.Body>
-									{patientOrder.patientOrderResourcingStatusId ===
-										PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-										<MhicInlineAlert
-											variant="warning"
-											title="Resources needed"
-											description="Triage indicates the patient needs external resources"
-										/>
-									)}
-									{patientOrder.patientOrderResourcingStatusId ===
-										PatientOrderResourcingStatusId.SENT_RESOURCES && (
-										<MhicInlineAlert
-											variant="success"
-											title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-											action={{
-												title: 'Review contact history for more details',
-												onClick: () => {
-													window.alert('[TODO]: ?');
-												},
-											}}
-										/>
-									)}
-								</Card.Body>
-							</Card>
-						)}
+						<MhicNextStepsCard
+							className="mb-8"
+							patientOrder={patientOrder}
+							onPatientOrderChange={(patientOrder) => {
+								window.alert('[TODO]: Refresh the order on this page');
+								console.log(patientOrder);
+							}}
+						/>
 						<hr className="mb-8" />
 
 						{conditionsAndSymptomsResults.length > 0 && (

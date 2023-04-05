@@ -234,7 +234,6 @@ export const form = (theme: CobaltTheme) => {
 						appearance: 'none',
 						'& + label': {
 							display: 'flex',
-
 							cursor: 'pointer',
 							borderRadius: 500,
 							alignItems: 'center',
@@ -270,6 +269,35 @@ export const form = (theme: CobaltTheme) => {
 					padding: 0,
 					'& input': {
 						margin: 0,
+					},
+				},
+				'&.form-switch': {
+					alignItems: 'start',
+					'& .form-check-input': {
+						width: 36,
+						border: 0,
+						height: 20,
+						marginLeft: 0,
+						cursor: 'pointer',
+						backgroundSize: 20,
+						backgroundPosition: 0,
+						backgroundColor: theme.colors.n100,
+						backgroundImage: `url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27%3e%3ccircle r=%273%27 fill=%27${encodeURIComponent(
+							theme.colors.n0
+						)}%27/%3e%3c/svg%3e")`,
+						'&:hover': {
+							backgroundColor: theme.colors.n300,
+						},
+						'&:checked': {
+							backgroundPosition: '16px 0',
+							backgroundColor: theme.colors.p500,
+							backgroundImage: `url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27%3e%3ccircle r=%273%27 fill=%27${encodeURIComponent(
+								theme.colors.n0
+							)}%27/%3e%3c/svg%3e")`,
+							'&:hover': {
+								backgroundColor: theme.colors.p300,
+							},
+						},
 					},
 				},
 			},

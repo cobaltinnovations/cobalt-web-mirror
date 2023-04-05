@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Form } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
 import { MhicResourcesModal } from '@/components/integrated-care/mhic';
@@ -38,10 +38,16 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 				</Card.Header>
 				<Card.Body>
 					<div className="mb-4 d-flex align-items-center justify-content-between">
-						<div>
-							<p className="mb-0">Safety Planning</p>
-							<p className="mb-0 text-gray">Triage indicates patient needs safety planning</p>
-						</div>
+						<Form.Check
+							type="switch"
+							id="safety-planning-switch"
+							label={
+								<div>
+									<p className="mb-0">Safety Planning</p>
+									<p className="mb-0 text-gray">Recommended</p>
+								</div>
+							}
+						/>
 						<div>
 							<Button variant="link" size="sm" className="p-0 fw-semibold text-decoration-none">
 								Mark Complete
@@ -54,10 +60,16 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 							{patientOrder.patientOrderResourcingStatusId ===
 								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
 								<div className="d-flex align-items-center justify-content-between">
-									<div>
-										<p className="mb-0">Resources</p>
-										<p className="mb-0 text-gray">Triage indicates patient needs resources</p>
-									</div>
+									<Form.Check
+										type="switch"
+										id="safety-planning-switch"
+										label={
+											<div>
+												<p className="mb-0">Resources</p>
+												<p className="mb-0 text-gray">Recommended</p>
+											</div>
+										}
+									/>
 									<div>
 										<Button
 											variant="link"
@@ -75,7 +87,16 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 							{patientOrder.patientOrderResourcingStatusId ===
 								PatientOrderResourcingStatusId.SENT_RESOURCES && (
 								<div>
-									<p className="mb-0">Resources</p>
+									<Form.Check
+										type="switch"
+										id="safety-planning-switch"
+										label={
+											<div>
+												<p className="mb-0">Resources</p>
+												<p className="mb-0 text-gray">Recommended</p>
+											</div>
+										}
+									/>
 									<p className="mb-0 text-gray">
 										Resources sent on {patientOrder.resourcesSentAtDescription ?? 'N/A'}
 									</p>
