@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import {
@@ -10,14 +11,17 @@ import {
 	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
-import { MHIC_HEADER_HEIGHT, MhicInlineAlert, MhicNextStepsCard } from '@/components/integrated-care/mhic';
 import TabBar from '@/components/tab-bar';
+import {
+	MHIC_HEADER_HEIGHT,
+	MhicInlineAlert,
+	MhicNextStepsCard,
+	MhicTriageCard,
+} from '@/components/integrated-care/mhic';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
-import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -105,51 +109,7 @@ export const MhicAssessmentComplete = ({
 							/>
 						)}
 						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-							<Card key={triageGroupIndex} bsPrefix="ic-card" className="mb-8">
-								<Card.Header>
-									<Card.Title>
-										Triage:{' '}
-										<span className="text-uppercase">
-											{triageGroup.patientOrderCareTypeDescription}
-										</span>
-									</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											className="p-2"
-											onClick={() => {
-												window.alert('[TODO]: show modal.');
-											}}
-										>
-											<EditIcon className="d-flex" />
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body key={triageGroupIndex}>
-									<Container fluid>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Care Focus</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{triageGroup.patientOrderFocusTypeDescription}</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs={3}>
-												<p className="m-0 text-gray">Reason</p>
-											</Col>
-											<Col xs={9}>
-												{triageGroup.reasons.map((reason, reasonIndex) => (
-													<p key={reasonIndex} className="m-0">
-														{reason}
-													</p>
-												))}
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
+							<MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />
 						))}
 						<MhicNextStepsCard
 							className="mb-8"

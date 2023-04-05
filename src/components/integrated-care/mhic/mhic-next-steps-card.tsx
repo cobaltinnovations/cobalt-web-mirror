@@ -54,56 +54,40 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 							</Button>
 						</div>
 					</div>
-					{patientOrder.patientOrderResourcingStatusId && (
-						<>
-							<hr className="mb-4" />
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<div className="d-flex align-items-center justify-content-between">
-									<Form.Check
-										type="switch"
-										id="safety-planning-switch"
-										label={
-											<div>
-												<p className="mb-0">Resources</p>
-												<p className="mb-0 text-gray">Recommended</p>
-											</div>
-										}
-									/>
-									<div>
-										<Button
-											variant="link"
-											size="sm"
-											className="p-0 fw-semibold text-decoration-none"
-											onClick={() => {
-												setShowResourcesModal(true);
-											}}
-										>
-											Mark Complete
-										</Button>
-									</div>
-								</div>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.SENT_RESOURCES && (
+					<hr className="mb-4" />
+					<div className="d-flex align-items-center justify-content-between">
+						<Form.Check
+							type="switch"
+							id="safety-planning-switch"
+							label={
 								<div>
-									<Form.Check
-										type="switch"
-										id="safety-planning-switch"
-										label={
-											<div>
-												<p className="mb-0">Resources</p>
-												<p className="mb-0 text-gray">Recommended</p>
-											</div>
-										}
-									/>
+									<p className="mb-0">Resources</p>
 									<p className="mb-0 text-gray">
-										Resources sent on {patientOrder.resourcesSentAtDescription ?? 'N/A'}
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.NEEDS_RESOURCES && 'Recommended'}
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.SENT_RESOURCES &&
+											`Resources sent on {patientOrder.resourcesSentAtDescription ?? 'N/A'}`}
 									</p>
 								</div>
-							)}
-						</>
-					)}
+							}
+						/>
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<div>
+								<Button
+									variant="link"
+									size="sm"
+									className="p-0 fw-semibold text-decoration-none"
+									onClick={() => {
+										setShowResourcesModal(true);
+									}}
+								>
+									Mark Complete
+								</Button>
+							</div>
+						)}
+					</div>
 				</Card.Body>
 			</Card>
 		</>
