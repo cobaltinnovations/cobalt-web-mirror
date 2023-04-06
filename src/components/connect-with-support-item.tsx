@@ -234,6 +234,7 @@ const ConnectWithSupportItem = ({
 														onClick={() => {
 															onModalTimeButtonClick(time);
 														}}
+														disabled={time.status !== 'AVAILABLE'}
 													>
 														{time.timeDescription}
 													</Button>
