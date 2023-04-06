@@ -234,6 +234,7 @@ const ConnectWithSupportItem = ({
 														onClick={() => {
 															onModalTimeButtonClick(time);
 														}}
+														disabled={time.status !== 'AVAILABLE'}
 													>
 														{time.timeDescription}
 													</Button>
@@ -256,13 +257,15 @@ const ConnectWithSupportItem = ({
 						{subtitle && <p>{subtitle}</p>}
 					</div>
 				</div>
-				<div className={classes.descriptionOuter}>
-					<div
-						dangerouslySetInnerHTML={{
-							__html: descriptionHtml,
-						}}
-					/>
-				</div>
+				{descriptionHtml && (
+					<div className={classes.descriptionOuter}>
+						<div
+							dangerouslySetInnerHTML={{
+								__html: descriptionHtml,
+							}}
+						/>
+					</div>
+				)}
 				<div className={classes.buttonsOuter}>
 					<div ref={scrollOuterRef} className={classes.scrollOuter} onScroll={handleButtonScroll}>
 						<div ref={scrollInnerRef} className={classes.scrollInner}>

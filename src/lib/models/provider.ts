@@ -102,6 +102,7 @@ export interface Provider {
 	bio?: string;
 	bioUrl?: string;
 	displayPhoneNumberOnlyForBooking: boolean;
+	description?: string;
 }
 
 export interface Specialty {
