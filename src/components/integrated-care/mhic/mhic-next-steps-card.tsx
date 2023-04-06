@@ -34,7 +34,7 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 
 			<Card bsPrefix="ic-card" className={className}>
 				<Card.Header>
-					<Card.Title>Next Steps</Card.Title>
+					<Card.Title className="text-danger">[TODO]: Next Steps</Card.Title>
 				</Card.Header>
 				<Card.Body>
 					<div className="mb-4 d-flex align-items-center justify-content-between">

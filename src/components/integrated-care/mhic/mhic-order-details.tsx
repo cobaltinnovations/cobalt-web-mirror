@@ -18,6 +18,7 @@ import {
 	MhicCloseEpisodeModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
+	MhicEpisodeCard,
 	MhicInlineAlert,
 	MhicInsuranceModal,
 	MhicNextStepsCard,
@@ -158,95 +159,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				<Container fluid>
 					<Row>
 						<Col>
-							<Card bsPrefix="ic-card">
-								<Card.Header>
-									<Card.Title>
-										Order{' '}
-										<span className="text-gray">
-											(Episode: {patientOrder.episodeDurationInDaysDescription})
-										</span>
-									</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											size="sm"
-											onClick={() => {
-												setShowCloseEpisodeModal(true);
-											}}
-										>
-											Close Episode
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										{patientOrder.patientBelowAgeThreshold && (
-											<Row className="mb-4">
-												<Col>
-													<MhicInlineAlert
-														variant="warning"
-														title="Order Flagged"
-														description="Patient under 18"
-													/>
-												</Col>
-											</Row>
-										)}
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Date Referred</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{patientOrder.orderDateDescription}</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Referral Reason</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{patientOrder.reasonForReferral}</p>
-											</Col>
-										</Row>
-										<hr className="mb-4" />
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Practice</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{patientOrder.referringPracticeName}</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Ordering Provider</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Authorizing Provider</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">
-														[TODO]: Authorizing Provider Name
-													</span>
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs={3}>
-												<p className="m-0 text-gray">Billing Provider</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{patientOrder.billingProviderDisplayName}</p>
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
+							<MhicEpisodeCard patientOrder={patientOrder} onPatientOrderChange={onPatientOrderChange} />
 						</Col>
 					</Row>
 				</Container>
