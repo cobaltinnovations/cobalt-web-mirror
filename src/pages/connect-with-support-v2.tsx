@@ -516,7 +516,7 @@ const ConnectWithSupportV2 = () => {
 													imageUrl={provider.imageUrl}
 													title={provider.name}
 													subtitle={provider.title}
-													descriptionHtml={provider.treatmentDescription ?? ''}
+													descriptionHtml={provider.description ?? ''}
 													buttons={
 														provider.displayPhoneNumberOnlyForBooking
 															? [
@@ -524,7 +524,7 @@ const ConnectWithSupportV2 = () => {
 																		as: 'a',
 																		className: 'text-decoration-none',
 																		href: `tel:${provider.phoneNumber}`,
-																		title: provider.formattedPhoneNumber,
+																		title: `Call ${provider.formattedPhoneNumber}`,
 																		onClick: () => {
 																			if (
 																				featureDetails?.featureId === 'THERAPY'
