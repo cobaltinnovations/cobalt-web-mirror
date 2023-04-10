@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
 import useFetchPatientOrders from '@/pages/ic/hooks/use-fetch-patient-orders';
 import TabBar from '@/components/tab-bar';
-import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import { MhicInlineAlert, MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
 
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -48,15 +49,31 @@ enum TAB_KEYS {
 const MhicOverview = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
+	const navigate = useNavigate();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 	const { isLoadingOrders, patientOrders = [], totalCount, totalCountDescription } = useFetchPatientOrders();
 
 	return (
-		<Container fluid className="py-11 overflow-visible">
+		<Container fluid className="py-8 overflow-visible">
 			<Row className="mb-8">
 				<Col>
-					<h3>Welcome back, {account?.firstName}</h3>
+					<MhicPageHeader title={`Welcome back, ${account?.firstName}`} />
+				</Col>
+			</Row>
+			<Row className="mb-9">
+				<Col>
+					<MhicInlineAlert
+						variant="danger"
+						title="2 orders require safety planning"
+						description="Please review these orders first"
+						action={{
+							title: 'View Safety Planning',
+							onClick: () => {
+								navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
+							},
+						}}
+					/>
 				</Col>
 			</Row>
 			<Row className="mb-10">

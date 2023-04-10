@@ -22,6 +22,7 @@ export * from './mhic-next-steps-card';
 export * from './mhic-order-details';
 export * from './mhic-comment';
 export * from './mhic-outreach-modal';
+export * from './mhic-page-header';
 export * from './mhic-patient-order-shelf';
 export * from './mhic-patient-order-table';
 export * from './mhic-resources-modal';
