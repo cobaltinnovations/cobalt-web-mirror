@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
@@ -61,7 +62,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicInlineAlertProps {
-	variant?: 'success' | 'warning' | 'danger';
+	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	title: string;
 	description?: string;
 	action?: {
@@ -71,11 +72,18 @@ interface MhicInlineAlertProps {
 	className?: string;
 }
 
-export const MhicInlineAlert = ({ title, description, action, variant, className }: MhicInlineAlertProps) => {
+export const MhicInlineAlert = ({
+	title,
+	description,
+	action,
+	variant = 'primary',
+	className,
+}: MhicInlineAlertProps) => {
 	const classes = useStyles({});
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
 		return {
+			primary: <InfoIcon width={24} height={24} />,
 			success: <SuccessIcon width={24} height={24} />,
 			warning: <WarningIcon width={24} height={24} />,
 			danger: <DangerIcon width={24} height={24} />,
