@@ -111,6 +111,8 @@ export interface PatientOrderModel {
 	resourcesSentAt?: string;
 	resourcesSentAtDescription?: string;
 	resourcesSentNote?: string;
+	outreachCount?: number;
+	outreachCountDescription?: string;
 }
 
 enum PatientOrderClosureReasonId {

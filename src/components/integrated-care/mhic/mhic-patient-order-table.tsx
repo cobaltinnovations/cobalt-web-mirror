@@ -3,7 +3,12 @@ import React, { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
-import { PatientOrderModel } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderScreeningStatusId,
+} from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
@@ -243,62 +248,91 @@ export const MhicPatientOrderTable = ({
 											width={248}
 											className="flex-row align-items-center justify-content-start"
 										>
-											<Badge pill bg="outline-dark" className="text-nowrap">
-												Assessment Status
-											</Badge>
-											<span className="ms-4 fs-small">Insurance</span>
+											{po.patientOrderScreeningStatusId ===
+												PatientOrderScreeningStatusId.NOT_SCREENED && (
+												<Badge pill bg="outline-dark" className="text-nowrap">
+													{po.patientOrderScreeningStatusDescription}
+												</Badge>
+											)}
+											{po.patientOrderScreeningStatusId ===
+												PatientOrderScreeningStatusId.SCHEDULED && (
+												<Badge pill bg="outline-success" className="text-nowrap">
+													{po.patientOrderScreeningStatusDescription}
+												</Badge>
+											)}
+											{po.patientOrderScreeningStatusId ===
+												PatientOrderScreeningStatusId.IN_PROGRESS && (
+												<Badge pill bg="outline-secondary" className="text-nowrap">
+													{po.patientOrderScreeningStatusDescription}
+												</Badge>
+											)}
+											{po.patientOrderScreeningStatusId ===
+												PatientOrderScreeningStatusId.COMPLETE && (
+												<Badge pill bg="outline-primary" className="text-nowrap">
+													{po.patientOrderScreeningStatusDescription}
+												</Badge>
+											)}
+											<span className="ms-4 fs-small">[TODO]: Insurance</span>
 										</TableCell>
 									)}
 									{columnConfig.outreachNumber && (
 										<TableCell width={116} className="text-right">
-											<span className="text-nowrap text-truncate">0</span>
+											<span className="text-nowrap text-truncate">
+												{po.outreachCountDescription}
+											</span>
 										</TableCell>
 									)}
 									{columnConfig.lastOutreach && (
 										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
 										</TableCell>
 									)}
 									{columnConfig.assessmentScheduled && (
 										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
 										</TableCell>
 									)}
 									{columnConfig.assessmentCompleted && (
 										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
 										</TableCell>
 									)}
 									{columnConfig.completedBy && (
 										<TableCell width={240}>
-											<span className="text-nowrap text-truncate">Mhic Name</span>
+											<span className="text-nowrap text-truncate">[TODO]: Mhic Name</span>
 										</TableCell>
 									)}
 									{columnConfig.triage && (
 										<TableCell className="flex-row align-items-center justify-content-start">
-											<Badge pill bg="outline-danger" className="text-nowrap me-2">
-												Safety Planning
-											</Badge>
+											{po.patientOrderSafetyPlanningStatusId ===
+												PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+												<Badge pill bg="outline-danger" className="text-nowrap me-2">
+													Safety Planning
+												</Badge>
+											)}
 											<Badge pill bg="outline-warning" className="text-nowrap">
-												Specialty
+												[TODO]: Specialty
 											</Badge>
 										</TableCell>
 									)}
 									{columnConfig.resources && (
 										<TableCell className="flex-row align-items-center justify-content-start">
-											<Badge pill bg="outline-danger" className="text-nowrap me-2">
-												Need
-											</Badge>
+											{po.patientOrderResourcingStatusId ===
+												PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+												<Badge pill bg="outline-danger" className="text-nowrap me-2">
+													Need
+												</Badge>
+											)}
 										</TableCell>
 									)}
 									{columnConfig.checkInScheduled && (
 										<TableCell width={180}>
-											<span className="text-nowrap text-truncate">Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
 										</TableCell>
 									)}
 									{columnConfig.checkInResponse && (
 										<TableCell width={172}>
-											<span className="text-nowrap text-truncate">No Response</span>
+											<span className="text-nowrap text-truncate">[TODO]: No Response</span>
 										</TableCell>
 									)}
 									{columnConfig.episode && (
@@ -310,7 +344,7 @@ export const MhicPatientOrderTable = ({
 									)}
 									{columnConfig.assignedMhic && (
 										<TableCell width={280}>
-											<span className="text-nowrap text-truncate">MHIC Name</span>
+											<span className="text-nowrap text-truncate">[TODO]: MHIC Name</span>
 										</TableCell>
 									)}
 								</TableRow>

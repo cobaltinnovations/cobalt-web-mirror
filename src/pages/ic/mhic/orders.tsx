@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Container } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
 	MhicGenerateOrdersModal,
+	MhicPageHeader,
 	MhicPatientOrderTable,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
@@ -149,70 +150,73 @@ const MhicOrders = () => {
 				onSave={handleAssignOrdersSave}
 			/>
 
-			<Container fluid className="px-8">
-				<div className="py-8 d-flex align-items-center justify-content-between">
-					<div className="d-flex align-items-end">
-						<h2 className="m-0">
-							Pending Orders{' '}
-							<span className="text-gray fs-large fw-normal">
-								{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
-							</span>
-						</h2>
-					</div>
-					<div>
-						{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-							<Button
-								className="me-4"
-								variant="outline-primary"
-								onClick={() => {
-									setShowGenerateOrdersModal(true);
-								}}
-							>
-								Generate
-							</Button>
-						)}
-						<FileInputButton
-							className="me-4 d-inline-flex"
-							accept=".csv"
-							onChange={handleImportPatientsInputChange}
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-8">
+					<Col>
+						<MhicPageHeader
+							title="Pending Orders"
+							description={`${totalCountDescription} ${totalCount === 1 ? 'Order' : 'Orders'}`}
 						>
-							Import
-						</FileInputButton>
-						<Button
-							onClick={() => {
-								fetchPanelAccounts();
-								setShowAssignOrderModal(true);
+							<div className="d-flex align-items-center">
+								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+									<Button
+										className="me-4"
+										variant="outline-primary"
+										onClick={() => {
+											setShowGenerateOrdersModal(true);
+										}}
+									>
+										Generate
+									</Button>
+								)}
+								<FileInputButton
+									className="me-4 d-inline-flex"
+									accept=".csv"
+									onChange={handleImportPatientsInputChange}
+								>
+									Import
+								</FileInputButton>
+								<Button
+									onClick={() => {
+										fetchPanelAccounts();
+										setShowAssignOrderModal(true);
+									}}
+									disabled={selectedPatientOrderIds.length <= 0}
+								>
+									Assign Orders{' '}
+									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
+								</Button>
+							</div>
+						</MhicPageHeader>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<MhicPatientOrderTable
+							isLoading={isLoadingOrders}
+							patientOrders={patientOrders}
+							selectAll={selectAll}
+							onSelectAllChange={setSelectAll}
+							selectedPatientOrderIds={selectedPatientOrderIds}
+							onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
+							totalPatientOrdersCount={totalCount}
+							totalPatientOrdersDescription={totalCountDescription}
+							pageNumber={parseInt(pageNumber, 10)}
+							pageSize={15}
+							onPaginationClick={handlePaginationClick}
+							columnConfig={{
+								checkbox: true,
+								flag: true,
+								patient: true,
+								referralDate: true,
+								practice: true,
+								referralReason: true,
+								outreachNumber: true,
+								episode: true,
 							}}
-							disabled={selectedPatientOrderIds.length <= 0}
-						>
-							Assign Orders{' '}
-							{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
-						</Button>
-					</div>
-				</div>
-				<MhicPatientOrderTable
-					isLoading={isLoadingOrders}
-					patientOrders={patientOrders}
-					selectAll={selectAll}
-					onSelectAllChange={setSelectAll}
-					selectedPatientOrderIds={selectedPatientOrderIds}
-					onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
-					totalPatientOrdersCount={totalCount}
-					totalPatientOrdersDescription={totalCountDescription}
-					pageNumber={parseInt(pageNumber, 10)}
-					pageSize={15}
-					onPaginationClick={handlePaginationClick}
-					columnConfig={{
-						checkbox: true,
-						flag: true,
-						patient: true,
-						referralDate: true,
-						practice: true,
-						referralReason: true,
-						outreachNumber: true,
-						episode: true,
-					}}
-				/>
+						/>
+					</Col>
+				</Row>
 			</Container>
 		</>
 	);
