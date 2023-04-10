@@ -13,6 +13,27 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 
+export type MhicPatientOrderTableColumnConfig = {
+	checkbox?: boolean;
+	flag?: boolean;
+	patient?: boolean;
+	referralDate?: boolean;
+	practice?: boolean;
+	referralReason?: boolean;
+	assessmentStatus?: boolean;
+	outreachNumber?: boolean;
+	lastOutreach?: boolean;
+	assessmentScheduled?: boolean;
+	assessmentCompleted?: boolean;
+	completedBy?: boolean;
+	triage?: boolean;
+	resources?: boolean;
+	checkInScheduled?: boolean;
+	checkInResponse?: boolean;
+	episode?: boolean;
+	assignedMhic?: boolean;
+};
+
 interface MhicPatientOrderTableProps {
 	isLoading: boolean;
 	patientOrders: PatientOrderModel[];
@@ -25,26 +46,7 @@ interface MhicPatientOrderTableProps {
 	pageNumber: number;
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
-	columnConfig: {
-		checkbox?: boolean;
-		flag?: boolean;
-		patient?: boolean;
-		referralDate?: boolean;
-		practice?: boolean;
-		referralReason?: boolean;
-		assessmentStatus?: boolean;
-		outreachNumber?: boolean;
-		lastOutreach?: boolean;
-		assessmentScheduled?: boolean;
-		assessmentCompleted?: boolean;
-		completedBy?: boolean;
-		triage?: boolean;
-		resources?: boolean;
-		checkInScheduled?: boolean;
-		checkInResponse?: boolean;
-		episode?: boolean;
-		assignedMhic?: boolean;
-	};
+	columnConfig: MhicPatientOrderTableColumnConfig;
 }
 
 export const MhicPatientOrderTable = ({

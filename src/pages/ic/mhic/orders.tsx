@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ import {
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
+	MhicPatientOrderTableColumnConfig,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -16,13 +17,23 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderDispositionId, PatientOrderStatusId } from '@/lib/models';
+
+enum PatientOrderViewId {
+	ASSIGNED = 'ASSIGNED',
+	CLOSED = 'CLOSED',
+	PENDING = 'PENDING',
+}
 
 const MhicOrders = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
+	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
-
 	const {
 		fetchPatientOrders,
 		isLoadingOrders,
@@ -31,17 +42,69 @@ const MhicOrders = () => {
 		totalCountDescription,
 	} = useFetchPatientOrders();
 
-	const [searchParams, setSearchParams] = useSearchParams();
-
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
 	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
-	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
-	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
+	const patientOrderViewId = useMemo(() => {
+		if (patientOrderStatusId) {
+			if (patientOrderStatusId === PatientOrderStatusId.PENDING) {
+				return PatientOrderViewId.PENDING;
+			} else {
+				return PatientOrderViewId.ASSIGNED;
+			}
+		} else if (patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
+			return PatientOrderViewId.CLOSED;
+		} else {
+			return null;
+		}
+	}, [patientOrderDispositionId, patientOrderStatusId]);
+
+	const pageTitleMap = useMemo(
+		() => ({
+			[PatientOrderViewId.ASSIGNED]: 'Assigned Orders',
+			[PatientOrderViewId.CLOSED]: 'Closed Orders',
+			[PatientOrderViewId.PENDING]: 'Pending Orders',
+		}),
+		[]
+	);
+
+	const patientOrderTableConfig: Record<PatientOrderViewId, MhicPatientOrderTableColumnConfig> = useMemo(
+		() => ({
+			[PatientOrderViewId.ASSIGNED]: {
+				checkbox: true,
+				flag: true,
+				patient: true,
+				referralDate: true,
+				practice: true,
+				referralReason: true,
+				assessmentStatus: true,
+				outreachNumber: true,
+				lastOutreach: true,
+			},
+			[PatientOrderViewId.CLOSED]: {
+				patient: true,
+				referralDate: true,
+				practice: true,
+				closureDate: true,
+				reasoneForClosure: true,
+				episode: true,
+			},
+			[PatientOrderViewId.PENDING]: {
+				checkbox: true,
+				flag: true,
+				patient: true,
+				referralDate: true,
+				practice: true,
+				referralReason: true,
+				outreachNumber: true,
+				episode: true,
+			},
+		}),
+		[]
+	);
 
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
@@ -112,7 +175,6 @@ const MhicOrders = () => {
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
 			setSearchParams(searchParams);
-
 			clearSelections();
 		},
 		[clearSelections, searchParams, setSearchParams]
@@ -154,7 +216,7 @@ const MhicOrders = () => {
 				<Row className="mb-8">
 					<Col>
 						<MhicPageHeader
-							title="Pending Orders"
+							title={patientOrderViewId ? pageTitleMap[patientOrderViewId] : 'Patient Orders'}
 							description={`${totalCountDescription} ${totalCount === 1 ? 'Order' : 'Orders'}`}
 						>
 							<div className="d-flex align-items-center">
@@ -192,29 +254,22 @@ const MhicOrders = () => {
 				</Row>
 				<Row>
 					<Col>
-						<MhicPatientOrderTable
-							isLoading={isLoadingOrders}
-							patientOrders={patientOrders}
-							selectAll={selectAll}
-							onSelectAllChange={setSelectAll}
-							selectedPatientOrderIds={selectedPatientOrderIds}
-							onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
-							totalPatientOrdersCount={totalCount}
-							totalPatientOrdersDescription={totalCountDescription}
-							pageNumber={parseInt(pageNumber, 10)}
-							pageSize={15}
-							onPaginationClick={handlePaginationClick}
-							columnConfig={{
-								checkbox: true,
-								flag: true,
-								patient: true,
-								referralDate: true,
-								practice: true,
-								referralReason: true,
-								outreachNumber: true,
-								episode: true,
-							}}
-						/>
+						{patientOrderViewId && (
+							<MhicPatientOrderTable
+								isLoading={isLoadingOrders}
+								patientOrders={patientOrders}
+								selectAll={selectAll}
+								onSelectAllChange={setSelectAll}
+								selectedPatientOrderIds={selectedPatientOrderIds}
+								onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
+								totalPatientOrdersCount={totalCount}
+								totalPatientOrdersDescription={totalCountDescription}
+								pageNumber={parseInt(pageNumber, 10)}
+								pageSize={15}
+								onPaginationClick={handlePaginationClick}
+								columnConfig={patientOrderTableConfig[patientOrderViewId]}
+							/>
+						)}
 					</Col>
 				</Row>
 			</Container>
