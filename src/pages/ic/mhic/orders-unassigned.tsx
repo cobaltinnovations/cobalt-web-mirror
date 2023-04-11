@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
@@ -8,7 +8,6 @@ import {
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
-	MhicPatientOrderTableColumnConfig,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -17,21 +16,12 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { PatientOrderDispositionId, PatientOrderStatusId } from '@/lib/models';
 
-enum PatientOrderViewId {
-	ASSIGNED = 'ASSIGNED',
-	CLOSED = 'CLOSED',
-	PENDING = 'PENDING',
-}
-
-const MhicOrders = () => {
+const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
-	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -48,72 +38,11 @@ const MhicOrders = () => {
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
-	const patientOrderViewId = useMemo(() => {
-		if (patientOrderStatusId) {
-			if (patientOrderStatusId === PatientOrderStatusId.PENDING) {
-				return PatientOrderViewId.PENDING;
-			} else {
-				return PatientOrderViewId.ASSIGNED;
-			}
-		} else if (patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
-			return PatientOrderViewId.CLOSED;
-		} else {
-			return null;
-		}
-	}, [patientOrderDispositionId, patientOrderStatusId]);
-
-	const pageTitleMap = useMemo(
-		() => ({
-			[PatientOrderViewId.ASSIGNED]: 'Assigned Orders',
-			[PatientOrderViewId.CLOSED]: 'Closed Orders',
-			[PatientOrderViewId.PENDING]: 'Pending Orders',
-		}),
-		[]
-	);
-
-	const patientOrderTableConfig: Record<PatientOrderViewId, MhicPatientOrderTableColumnConfig> = useMemo(
-		() => ({
-			[PatientOrderViewId.ASSIGNED]: {
-				checkbox: true,
-				flag: true,
-				patient: true,
-				referralDate: true,
-				practice: true,
-				referralReason: true,
-				assessmentStatus: true,
-				outreachNumber: true,
-				lastOutreach: true,
-			},
-			[PatientOrderViewId.CLOSED]: {
-				patient: true,
-				referralDate: true,
-				practice: true,
-				closureDate: true,
-				reasoneForClosure: true,
-				episode: true,
-			},
-			[PatientOrderViewId.PENDING]: {
-				checkbox: true,
-				flag: true,
-				patient: true,
-				referralDate: true,
-				practice: true,
-				referralReason: true,
-				outreachNumber: true,
-				episode: true,
-			},
-		}),
-		[]
-	);
-
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
-			...(patientOrderStatusId && { patientOrderStatusId }),
-			...(patientOrderDispositionId && { patientOrderDispositionId }),
-			...(pageNumber && { pageNumber }),
 			pageSize: '15',
 		});
-	}, [fetchPatientOrders, pageNumber, patientOrderDispositionId, patientOrderStatusId]);
+	}, [fetchPatientOrders]);
 
 	const handleImportPatientsInputChange = useCallback(
 		(file: File) => {
@@ -215,10 +144,7 @@ const MhicOrders = () => {
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader
-							title={patientOrderViewId ? pageTitleMap[patientOrderViewId] : 'Patient Orders'}
-							description={`${totalCountDescription} ${totalCount === 1 ? 'Order' : 'Orders'}`}
-						>
+						<MhicPageHeader title="Unassigned">
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
 									<Button
@@ -254,22 +180,29 @@ const MhicOrders = () => {
 				</Row>
 				<Row>
 					<Col>
-						{patientOrderViewId && (
-							<MhicPatientOrderTable
-								isLoading={isLoadingOrders}
-								patientOrders={patientOrders}
-								selectAll={selectAll}
-								onSelectAllChange={setSelectAll}
-								selectedPatientOrderIds={selectedPatientOrderIds}
-								onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
-								totalPatientOrdersCount={totalCount}
-								totalPatientOrdersDescription={totalCountDescription}
-								pageNumber={parseInt(pageNumber, 10)}
-								pageSize={15}
-								onPaginationClick={handlePaginationClick}
-								columnConfig={patientOrderTableConfig[patientOrderViewId]}
-							/>
-						)}
+						<MhicPatientOrderTable
+							isLoading={isLoadingOrders}
+							patientOrders={patientOrders}
+							selectAll={selectAll}
+							onSelectAllChange={setSelectAll}
+							selectedPatientOrderIds={selectedPatientOrderIds}
+							onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
+							totalPatientOrdersCount={totalCount}
+							totalPatientOrdersDescription={totalCountDescription}
+							pageNumber={parseInt(pageNumber, 10)}
+							pageSize={15}
+							onPaginationClick={handlePaginationClick}
+							columnConfig={{
+								checkbox: true,
+								flag: true,
+								patient: true,
+								referralDate: true,
+								practice: true,
+								referralReason: true,
+								outreachNumber: true,
+								episode: true,
+							}}
+						/>
 					</Col>
 				</Row>
 			</Container>
@@ -277,4 +210,4 @@ const MhicOrders = () => {
 	);
 };
 
-export default MhicOrders;
+export default MhicOrdersUnassigned;

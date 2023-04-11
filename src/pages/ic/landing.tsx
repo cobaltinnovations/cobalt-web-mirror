@@ -15,7 +15,6 @@ import PatientDemographicsThanks from './patient/demographics-thanks';
 import PatientAssessmentComplete from './patient/assessment-complete';
 import MhicMyPanel from './mhic/my-panel';
 import MhicMyPatients from './mhic/my-patients';
-import MhicOrders from './mhic/orders';
 import MhicOverview from './mhic/overview';
 import MhicOrderAssessment from './mhic/order-assessment';
 import MhicOrderLayout from './mhic/order-layout';
@@ -23,6 +22,9 @@ import ScreeningQuestionsPage from '../screening/screening-questions';
 import NoMatch from '../no-match';
 import MhicSearchResults from './mhic/search-results';
 import MhicLayout from './mhic/mhic-layout';
+import MhicOrdersUnassigned from './mhic/orders-unassigned';
+import MhicOrdersAssigned from './mhic/orders-assigned';
+import MhicOrdersClosed from './mhic/orders-closed';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -35,8 +37,10 @@ const IntegratedCareLandingPage = () => {
 					<Route path="my-patients" element={<MhicMyPatients />} />
 				</Route>
 
-				<Route path="orders" element={<MhicOrders />} />
 				<Route path="orders/search" element={<MhicSearchResults />} />
+				<Route path="orders/unassigned" element={<MhicOrdersUnassigned />} />
+				<Route path="orders/assigned" element={<MhicOrdersAssigned />} />
+				<Route path="orders/closed" element={<MhicOrdersClosed />} />
 
 				<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
 					<Route index element={<Navigate to="assessment" replace />} />

@@ -3,12 +3,7 @@ import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-hori
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
-import {
-	PatientOrderAutocompleteResult,
-	PatientOrderDispositionId,
-	PatientOrderModel,
-	PatientOrderStatusId,
-} from '@/lib/models';
+import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
@@ -162,11 +157,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				items: [
 					{
 						testId: '',
-						navigationItemId: 'ORDERS_PENDING',
-						title: 'Pending',
+						navigationItemId: 'ORDERS_UNASSIGNED',
+						title: 'Unassigned',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderStatusId=${PatientOrderStatusId.PENDING}`,
+							pathname: '/ic/mhic/orders/unassigned',
 						},
 					},
 					{
@@ -174,8 +168,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 						navigationItemId: 'ORDERS_ASSIGNED',
 						title: 'Assigned',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderStatusId=${PatientOrderStatusId.NEEDS_ASSESSMENT}&patientOrderStatusId=${PatientOrderStatusId.SCHEDULED}&patientOrderStatusId=${PatientOrderStatusId.SAFETY_PLANNING}&patientOrderStatusId=${PatientOrderStatusId.SPECIALTY_CARE}&patientOrderStatusId=${PatientOrderStatusId.SUBCLINICAL}&patientOrderStatusId=${PatientOrderStatusId.BHP}`,
+							pathname: '/ic/mhic/orders/assigned',
 						},
 					},
 					{
@@ -183,8 +176,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 						navigationItemId: 'ORDERS_CLOSED',
 						title: 'Closed',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderDispositionId=${PatientOrderDispositionId.CLOSED}`,
+							pathname: '/ic/mhic/orders/closed',
 						},
 					},
 				],
