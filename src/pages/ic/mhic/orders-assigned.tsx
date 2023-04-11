@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
-import { MhicAssignOrderModal, MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import {
+	MhicAssignOrderModal,
+	MhicFilterDropdown,
+	MhicPageHeader,
+	MhicPatientOrderTable,
+} from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -94,9 +99,10 @@ const MhicOrdersAssigned = () => {
 			/>
 
 			<Container fluid className="px-8 py-8">
-				<Row className="mb-8">
+				<Row className="mb-6">
 					<Col>
 						<MhicPageHeader
+							className="mb-6"
 							title="Assigned Orders"
 							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
 						>
@@ -108,11 +114,34 @@ const MhicOrdersAssigned = () => {
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}
 								>
-									Assign Orders{' '}
+									MHIC Assigned{' '}
 									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
 								</Button>
 							</div>
 						</MhicPageHeader>
+						<hr className="mb-6" />
+						<div className="d-flex justify-content-between align-items-center">
+							<div>
+								<MhicFilterDropdown
+									align="start"
+									onApply={(selectedFilters) => {
+										return;
+									}}
+								/>
+							</div>
+							<div>
+								<Button
+									onClick={() => {
+										fetchPanelAccounts();
+										setShowAssignOrderModal(true);
+									}}
+									disabled={selectedPatientOrderIds.length <= 0}
+								>
+									Assign{' '}
+									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
+								</Button>
+							</div>
+						</div>
 					</Col>
 				</Row>
 				<Row>
