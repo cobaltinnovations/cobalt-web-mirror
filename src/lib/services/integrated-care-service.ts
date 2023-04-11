@@ -79,6 +79,7 @@ export const integratedCareService = {
 	},
 	getPatientOrders(queryParameters?: {
 		patientOrderStatusId?: string | string[];
+		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
 		pageNumber?: string;

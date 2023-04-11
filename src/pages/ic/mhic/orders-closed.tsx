@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import { PatientOrderDispositionId } from '@/lib/models';
 
 const MhicOrdersClosed = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -20,6 +21,7 @@ const MhicOrdersClosed = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
+			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
 		});
 	}, [fetchPatientOrders]);
 

@@ -16,6 +16,7 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderStatusId } from '@/lib/models';
 
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
@@ -41,6 +42,7 @@ const MhicOrdersUnassigned = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
+			patientOrderStatusId: PatientOrderStatusId.PENDING,
 		});
 	}, [fetchPatientOrders]);
 

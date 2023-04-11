@@ -8,6 +8,7 @@ import useHandleError from '@/hooks/use-handle-error';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderStatusId } from '@/lib/models';
 
 const MhicOrdersAssigned = () => {
 	const { addFlag } = useFlags();
@@ -31,6 +32,14 @@ const MhicOrdersAssigned = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
+			patientOrderStatusId: [
+				PatientOrderStatusId.NEEDS_ASSESSMENT,
+				PatientOrderStatusId.SCHEDULED,
+				PatientOrderStatusId.SAFETY_PLANNING,
+				PatientOrderStatusId.SPECIALTY_CARE,
+				PatientOrderStatusId.SUBCLINICAL,
+				PatientOrderStatusId.BHP,
+			],
 		});
 	}, [fetchPatientOrders]);
 
