@@ -17,6 +17,7 @@ import { integratedCareService } from '@/lib/services';
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderStatusId } from '@/lib/models';
+import TabBar from '@/components/tab-bar';
 
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
@@ -146,11 +147,11 @@ const MhicOrdersUnassigned = () => {
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader title="Unassigned">
+						<MhicPageHeader className="mb-6" title="Unassigned">
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
 									<Button
-										className="me-4"
+										className="me-2"
 										variant="outline-primary"
 										onClick={() => {
 											setShowGenerateOrdersModal(true);
@@ -160,7 +161,7 @@ const MhicOrdersUnassigned = () => {
 									</Button>
 								)}
 								<FileInputButton
-									className="me-4 d-inline-flex"
+									className="me-2 d-inline-flex"
 									accept=".csv"
 									onChange={handleImportPatientsInputChange}
 								>
@@ -173,11 +174,36 @@ const MhicOrdersUnassigned = () => {
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}
 								>
-									Assign Orders{' '}
+									Assign{' '}
 									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
 								</Button>
 							</div>
 						</MhicPageHeader>
+						<hr />
+						<TabBar
+							value=""
+							tabs={[
+								{
+									title: 'No Outreach (New)',
+									value: 'NO_OUTREACH',
+								},
+								{
+									title: 'Waiting for Response',
+									value: 'WAITING_FOR_RESPONSE',
+								},
+								{
+									title: 'Safety Planning',
+									value: 'SAFETY_PLANNING',
+								},
+								{
+									title: 'Assessment Complete',
+									value: 'ASSESSMENT_COMPLETE',
+								},
+							]}
+							onTabClick={() => {
+								return;
+							}}
+						/>
 					</Col>
 				</Row>
 				<Row>
