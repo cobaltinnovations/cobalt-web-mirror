@@ -126,12 +126,18 @@ const MhicOrdersAssigned = () => {
 								<MhicFilterDropdown
 									align="start"
 									onApply={(selectedFilters) => {
-										return;
+										console.log(selectedFilters);
 									}}
 								/>
 							</div>
 							<div className="d-flex align-items-center">
-								<MhicSortDropdown className="me-2" align="end" />
+								<MhicSortDropdown
+									className="me-2"
+									align="end"
+									onApply={(selectedFilters) => {
+										console.log(selectedFilters);
+									}}
+								/>
 								<Button
 									onClick={() => {
 										fetchPanelAccounts();

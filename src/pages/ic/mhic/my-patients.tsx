@@ -91,7 +91,13 @@ const MhicMyPatients = () => {
 										console.log(selectedFilters);
 									}}
 								/>
-								<MhicSortDropdown align="end" className="me-2" />
+								<MhicSortDropdown
+									align="end"
+									className="me-2"
+									onApply={(selectedFilters) => {
+										console.log(selectedFilters);
+									}}
+								/>
 								{/* <Button
 									variant="light"
 									onClick={() => {

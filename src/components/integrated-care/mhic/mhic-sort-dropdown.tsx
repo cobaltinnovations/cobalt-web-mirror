@@ -12,6 +12,7 @@ import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
 		width: 576,
+		display: 'flex',
 		padding: '16px 24px',
 	},
 	dropdownMenuFooter: {
@@ -25,13 +26,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicSortDropdownProps {
+	onApply(selectedFilters: Record<string, string>): void;
 	align?: AlignType;
 	className?: string;
 }
 
-export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) => {
+export const MhicSortDropdown = ({ onApply, align, className }: MhicSortDropdownProps) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
+
+	const [sortByValue, setSortByValue] = useState('');
+	const [orderValue, setOrderValue] = useState('');
 
 	return (
 		<Dropdown
@@ -61,26 +66,26 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 						className="me-2 flex-grow-1"
 						as="select"
 						label="Sort By"
-						value=""
-						onChange={() => {
-							return;
+						value={sortByValue}
+						onChange={({ currentTarget }) => {
+							setSortByValue(currentTarget.value);
 						}}
 					>
 						<option value="" label="Select Sort By" disabled />
-						<option value="">Practice</option>
+						<option value="PRACTICE">Practice</option>
 					</InputHelper>
 					<InputHelper
 						className="ms-2 flex-grow-1"
 						as="select"
 						label="Order"
-						value=""
-						onChange={() => {
-							return;
+						value={orderValue}
+						onChange={({ currentTarget }) => {
+							setOrderValue(currentTarget.value);
 						}}
 					>
 						<option value="" label="Select Order" disabled />
-						<option value="">Ascending</option>
-						<option value="">Descending</option>
+						<option value="ASCENDING">Ascending</option>
+						<option value="DESCENDING">Descending</option>
 					</InputHelper>
 				</div>
 				<div className={classes.dropdownMenuFooter}>
@@ -89,6 +94,9 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 						size="sm"
 						onClick={() => {
 							setShow(false);
+							onApply({
+								[sortByValue]: orderValue,
+							});
 						}}
 					>
 						Apply

@@ -59,10 +59,15 @@ const MhicOrdersClosed = () => {
 							<MhicFilterDropdown
 								align="start"
 								onApply={(selectedFilters) => {
-									return;
+									console.log(selectedFilters);
 								}}
 							/>
-							<MhicSortDropdown align="end" />
+							<MhicSortDropdown
+								align="end"
+								onApply={(selectedFilters) => {
+									console.log(selectedFilters);
+								}}
+							/>
 						</div>
 					</Col>
 				</Row>
