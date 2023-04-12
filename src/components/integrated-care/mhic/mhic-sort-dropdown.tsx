@@ -60,12 +60,13 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 					<InputHelper
 						className="me-2 flex-grow-1"
 						as="select"
-						label="Sorted By"
+						label="Sort By"
 						value=""
 						onChange={() => {
 							return;
 						}}
 					>
+						<option value="" label="Select Sort By" disabled />
 						<option value="">Practice</option>
 					</InputHelper>
 					<InputHelper
@@ -77,6 +78,7 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 							return;
 						}}
 					>
+						<option value="" label="Select Order" disabled />
 						<option value="">Ascending</option>
 						<option value="">Descending</option>
 					</InputHelper>

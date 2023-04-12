@@ -3,7 +3,12 @@ import { Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import {
+	MhicFilterDropdown,
+	MhicPageHeader,
+	MhicPatientOrderTable,
+	MhicSortDropdown,
+} from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
 
 const MhicOrdersClosed = () => {
@@ -40,12 +45,25 @@ const MhicOrdersClosed = () => {
 	return (
 		<>
 			<Container fluid className="px-8 py-8">
-				<Row className="mb-8">
+				<Row className="mb-6">
 					<Col>
 						<MhicPageHeader
 							title="Closed Orders"
 							description="Closed orders will be archived after 30 days"
 						/>
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col>
+						<div className="d-flex justify-content-between align-items-center">
+							<MhicFilterDropdown
+								align="start"
+								onApply={(selectedFilters) => {
+									return;
+								}}
+							/>
+							<MhicSortDropdown align="end" />
+						</div>
 					</Col>
 				</Row>
 				<Row>
