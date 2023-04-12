@@ -26,18 +26,15 @@ export const button = (theme: CobaltTheme) => {
 					backgroundColor: theme.colors.n100,
 				},
 			},
-
 			'&-lg': {
 				fontSize: '1.8rem',
 				lineHeight: '2.4rem',
 				padding: '12px 28px',
 			},
-
 			'&-sm': {
 				fontSize: '1.4rem',
 				padding: '6px 16px',
 			},
-
 			'& svg': {
 				fill: 'currentColor',
 				'& path': {

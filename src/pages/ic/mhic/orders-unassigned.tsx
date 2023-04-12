@@ -19,6 +19,8 @@ import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderStatusId } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 
+import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
+
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
@@ -48,7 +50,7 @@ const MhicOrdersUnassigned = () => {
 		});
 	}, [fetchPatientOrders]);
 
-	const handleImportPatientsInputChange = useCallback(
+	const handleImportButtonChange = useCallback(
 		(file: File) => {
 			const fileReader = new FileReader();
 
@@ -161,12 +163,11 @@ const MhicOrdersUnassigned = () => {
 										Generate
 									</Button>
 								)}
-								<FileInputButton
-									className="me-2 d-inline-flex"
-									accept=".csv"
-									onChange={handleImportPatientsInputChange}
-								>
-									Import
+								<FileInputButton className="me-2" accept=".csv" onChange={handleImportButtonChange}>
+									<Button as="div" variant="outline-primary" className="d-flex align-items-center">
+										<UploadIcon className="me-2" />
+										Import
+									</Button>
 								</FileInputButton>
 								<Button
 									onClick={() => {
