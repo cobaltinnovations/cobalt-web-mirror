@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
@@ -23,7 +23,8 @@ const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const filterBy = useMemo(() => searchParams.get('filterBy') ?? 'NO_OUTREACH', [searchParams]);
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -181,7 +182,7 @@ const MhicOrdersUnassigned = () => {
 						</MhicPageHeader>
 						<hr />
 						<TabBar
-							value=""
+							value={filterBy}
 							tabs={[
 								{
 									title: 'No Outreach (New)',
@@ -200,8 +201,9 @@ const MhicOrdersUnassigned = () => {
 									value: 'ASSESSMENT_COMPLETE',
 								},
 							]}
-							onTabClick={() => {
-								return;
+							onTabClick={(value) => {
+								searchParams.set('filterBy', value);
+								setSearchParams(searchParams);
 							}}
 						/>
 					</Col>
