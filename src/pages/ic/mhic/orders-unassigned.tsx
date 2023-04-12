@@ -150,7 +150,11 @@ const MhicOrdersUnassigned = () => {
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader className="mb-6" title="Unassigned">
+						<MhicPageHeader
+							className="mb-6"
+							title="Unassigned"
+							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
+						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
 									<Button

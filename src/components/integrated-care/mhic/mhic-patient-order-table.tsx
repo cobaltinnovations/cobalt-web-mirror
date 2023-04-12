@@ -370,7 +370,7 @@ export const MhicPatientOrderTable = ({
 						</Col>
 						<Col xs={4}>
 							<div className="d-flex justify-content-end align-items-center">
-								<p className="mb-0 fs-large fw-bold text-gray">
+								<p className="mb-0 fw-semibold text-gray">
 									<span className="text-dark">{patientOrders.length}</span> of{' '}
 									<span className="text-dark">{totalPatientOrdersDescription}</span> Patients
 								</p>

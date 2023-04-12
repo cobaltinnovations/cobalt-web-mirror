@@ -42,7 +42,7 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 		>
 			<Dropdown.Toggle
 				as={DropdownToggle}
-				className="d-inline-flex align-items-center py-2 ps-3 pe-4"
+				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
 				<SortIcon className="me-2" />

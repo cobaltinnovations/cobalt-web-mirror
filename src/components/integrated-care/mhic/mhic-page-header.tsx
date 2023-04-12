@@ -13,7 +13,7 @@ export const MhicPageHeader = ({ title, description, className, children }: Prop
 				<h3 className="mb-0">{title}</h3>
 				{children}
 			</div>
-			{description && <p className="mb-0 text-gray">{description}</p>}
+			{description && <p className="mb-0 fs-large text-gray">{description}</p>}
 		</div>
 	);
 };

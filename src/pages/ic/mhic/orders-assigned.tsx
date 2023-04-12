@@ -7,6 +7,7 @@ import {
 	MhicFilterDropdown,
 	MhicPageHeader,
 	MhicPatientOrderTable,
+	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -129,7 +130,8 @@ const MhicOrdersAssigned = () => {
 									}}
 								/>
 							</div>
-							<div>
+							<div className="d-flex align-items-center">
+								<MhicSortDropdown className="me-2" align="end" />
 								<Button
 									onClick={() => {
 										fetchPanelAccounts();
