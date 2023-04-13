@@ -194,6 +194,15 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 											<CopyIcon width={20} height={20} />
 										</Button>
 									</CopyToClipboard>
+									<span className="text-n300 me-2">|</span>
+									<p className="mb-0">
+										Phone:{' '}
+										<span className="fw-bold">{currentPatientOrder?.patientPhoneNumber}</span>
+									</p>
+									<span className="text-n300 mx-2">|</span>
+									<p className="mb-0">
+										MHIC: <span className="fw-bold text-danger">[TODO]: Assigned MHIC</span>
+									</p>
 								</div>
 								<div>
 									<TabBar
