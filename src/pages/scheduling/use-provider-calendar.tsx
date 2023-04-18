@@ -7,7 +7,7 @@ import Color from 'color';
 import moment from 'moment';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface FetchProviderCalendarConfig {
+export interface FetchProviderCalendarConfig {
 	throwErrors?: boolean;
 }
 
