@@ -68,7 +68,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('ssoRedirectUrl');
 		Cookies.remove('immediateAccess');
 		Cookies.remove('seenWaivedCopay');
-		Cookies.remove('trackActivity');
+		Cookies.remove('track');
 		window.localStorage.clear();
 
 		try {

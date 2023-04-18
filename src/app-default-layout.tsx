@@ -17,16 +17,12 @@ const AppHeader = ({ hideHeaderButtons, unauthenticated }: AppDefaultLayoutProps
 
 	const activeHeader = useMemo(() => {
 		if (unauthenticated) {
-			console.log('unauthenticated');
 			return <HeaderUnauthenticated />;
 		} else if (hideHeaderButtons) {
-			console.log('hideHeaderButtons');
 			return <Header showHeaderButtons={false} />;
 		} else if (institution?.featuresEnabled) {
-			console.log('features');
 			return <HeaderV2 />;
 		} else {
-			console.log('default');
 			return <Header />;
 		}
 	}, [hideHeaderButtons, institution?.featuresEnabled, unauthenticated]);

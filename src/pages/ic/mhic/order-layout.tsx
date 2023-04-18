@@ -10,13 +10,11 @@ interface MhicOrderLayoutLoaderData {
 	patientAccount: AccountModel;
 }
 
-export const MhicOrderLayoutLoader: LoaderFunction = async ({ params, request, context }) => {
-	console.log({ rest2: { request, context, params } });
+export const mhicOrderLayoutLoader: LoaderFunction = async ({ params, request }) => {
 	if (!params.patientOrderId) {
 		throw new Error('Missing Patient Order ID');
 	}
 
-	console.log('loader?');
 	const dataRequest = integratedCareService.getPatientOrder(params.patientOrderId);
 	request.signal.addEventListener('abort', () => {
 		dataRequest.abort();

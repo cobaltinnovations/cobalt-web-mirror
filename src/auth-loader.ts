@@ -6,6 +6,16 @@ import { accountService } from './lib/services';
 import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import { isErrorConfig } from './lib/utils/error-utils';
 
+export function processAccessToken(accessToken: string) {
+	const decodedAccessToken = jwtDecode(accessToken) as { sub: string; exp: number };
+	const expirationDate = new Date(decodedAccessToken.exp * 1000);
+
+	Cookies.set('accessToken', accessToken, { expires: expirationDate });
+	Cookies.set('accountId', decodedAccessToken.sub, { expires: expirationDate });
+
+	return decodedAccessToken;
+}
+
 export async function authLoader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 
@@ -15,11 +25,7 @@ export async function authLoader({ request }: LoaderFunctionArgs) {
 		return redirect('/sign-in');
 	}
 
-	const decodedAccessToken = jwtDecode(accessToken) as { sub: string; exp: number };
-	const expirationDate = new Date(decodedAccessToken.exp * 1000);
-
-	Cookies.set('accessToken', accessToken, { expires: expirationDate });
-	Cookies.set('accountId', decodedAccessToken.sub, { expires: expirationDate });
+	const decodedAccessToken = processAccessToken(accessToken);
 
 	const ssoRedirectUrl = Cookies.get('ssoRedirectUrl');
 	let authRedirectUrl = ssoRedirectUrl || Cookies.get('authRedirectUrl') || '/';

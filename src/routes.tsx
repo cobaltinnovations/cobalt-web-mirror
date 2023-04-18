@@ -12,7 +12,7 @@ import {
 } from '@/pages/provider-management';
 import ScreeningQuestionsPage from '@/pages/screening/screening-questions';
 import React from 'react';
-import { Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
+import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
 
 import { AppRoot, AppRootErrorLayout, appRootLoader } from './app-root';
 
@@ -28,7 +28,7 @@ import IntegratedCareMhicLayout from './pages/ic/mhic/mhic-layout';
 import MhicMyPanel from './pages/ic/mhic/my-panel';
 import MhicMyPatients from './pages/ic/mhic/my-patients';
 import MhicOrderAssessment from './pages/ic/mhic/order-assessment';
-import MhicOrderLayout, { MhicOrderLayoutLoader } from './pages/ic/mhic/order-layout';
+import MhicOrderLayout, { mhicOrderLayoutLoader } from './pages/ic/mhic/order-layout';
 import MhicOrdersAssigned from './pages/ic/mhic/orders-assigned';
 import MhicOrdersClosed from './pages/ic/mhic/orders-closed';
 import MhicOrdersUnassigned from './pages/ic/mhic/orders-unassigned';
@@ -48,6 +48,7 @@ import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-avai
 import { RoutedManageAvailailityPanel } from './pages/scheduling/routed-managed-availabilities-panel';
 import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selected-availability-panel';
 import Cookies from 'js-cookie';
+import { routeRedirects } from './route-redirects';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -118,6 +119,54 @@ export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/re
 export const ResourceLibraryTags = lazyLoadWithRefresh(() => import('@/pages/resource-library-tags'));
 export const ResourceLibraryDetail = lazyLoadWithRefresh(() => import('@/pages/resource-library-detail'));
 
+function requireAuthLoader({ request }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
+	const accessToken = Cookies.get('accessToken');
+
+	if (!accessToken) {
+		Cookies.set('authRedirectUrl', url.pathname + url.search);
+		return redirect('/sign-in');
+	}
+
+	return null;
+}
+
+function requireUnauthLoader() {
+	const accessToken = Cookies.get('accessToken');
+
+	if (accessToken) {
+		return redirect('/');
+	}
+
+	return null;
+}
+
+function redirectCheckLoader({ request }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
+
+	const redirectConfig = routeRedirects.find((c) => {
+		if (c.caseSensitive) {
+			return c.fromPath === url.pathname;
+		}
+
+		return c.fromPath.toLowerCase() === url.pathname.toLowerCase();
+	});
+
+	if (redirectConfig) {
+		const redirctParams = new URLSearchParams({
+			...redirectConfig.searchParams,
+		});
+
+		if (Cookies.get('track') === 'true') {
+			redirctParams.set('track', 'true');
+		}
+
+		return redirect(`${redirectConfig.toPath}?${redirctParams.toString()}`);
+	}
+
+	return null;
+}
+
 const RedirectToResourceLibrary = () => {
 	const { contentId } = useParams<{ contentId: string }>();
 
@@ -172,14 +221,7 @@ export const routes: RouteObject[] = [
 
 			{
 				element: <AppDefaultLayout unauthenticated />,
-				loader: () => {
-					const accessToken = Cookies.get('accessToken');
-					if (accessToken) {
-						return redirect('/');
-					}
-
-					return null;
-				},
+				loader: requireUnauthLoader,
 				children: [
 					{
 						path: 'sign-up',
@@ -198,14 +240,7 @@ export const routes: RouteObject[] = [
 
 			{
 				element: <AppDefaultLayout hideHeaderButtons />,
-				loader: () => {
-					const accessToken = Cookies.get('accessToken');
-					if (accessToken) {
-						return redirect('/');
-					}
-
-					return null;
-				},
+				loader: requireAuthLoader,
 				children: [
 					{
 						path: 'onboarding',
@@ -241,15 +276,7 @@ export const routes: RouteObject[] = [
 			{
 				element: <AppDefaultLayout />,
 				errorElement: <AppErrorDefaultLayout />,
-				loader: () => {
-					const accessToken = Cookies.get('accessToken');
-
-					if (!accessToken) {
-						return redirect('/sign-in');
-					}
-
-					return null;
-				},
+				loader: requireAuthLoader,
 				children: [
 					{
 						index: true,
@@ -604,7 +631,7 @@ export const routes: RouteObject[] = [
 											{
 												path: 'orders/:patientOrderId',
 												element: <MhicOrderLayout />,
-												loader: MhicOrderLayoutLoader,
+												loader: mhicOrderLayoutLoader,
 												children: [
 													{
 														index: true,
@@ -667,6 +694,12 @@ export const routes: RouteObject[] = [
 								],
 							},
 						],
+					},
+
+					{
+						path: '*',
+						loader: redirectCheckLoader,
+						element: <NoMatch />,
 					},
 				],
 			},

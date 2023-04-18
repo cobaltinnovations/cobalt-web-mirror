@@ -331,7 +331,9 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 	useEffect(() => {
 		if (enabledVersionsRef.current.reactGa) {
-			ReactGA.set({ ...commonData });
+			if (Object.keys(commonData).length > 0) {
+				ReactGA.set({ ...commonData });
+			}
 		}
 
 		if (enabledVersionsRef.current.ga4) {

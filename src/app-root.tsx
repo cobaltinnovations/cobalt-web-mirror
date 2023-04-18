@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 import React, { Suspense } from 'react';
 import { Loader } from 'react-bootstrap-typeahead';
-import { LoaderFunctionArgs, Outlet, matchPath, redirect, useRouteError } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, matchPath, useRouteError } from 'react-router-dom';
 import Alert from './components/alert';
 import ConsentModal from './components/consent-modal';
 import ErrorModal from './components/error-modal';
@@ -20,9 +20,9 @@ import { getSubdomain } from './hooks/use-subdomain';
 import useUrlViewTracking from './hooks/use-url-view-tracking';
 import { AccountModel, AccountSource, Institution } from './lib/models';
 import { accountService, institutionService } from './lib/services';
-import { routeRedirects } from './route-redirects';
 import HeaderUnauthenticated from './components/header-unauthenticated';
 import ErrorDisplay from './components/error-display';
+import { processAccessToken } from './auth-loader';
 
 export interface AppRootLoaderData {
 	isTrackedSession: boolean;
@@ -34,6 +34,7 @@ export interface AppRootLoaderData {
 
 export async function appRootLoader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
+
 	let account: AccountModel | undefined = undefined;
 	let accessToken = Cookies.get('accessToken');
 
@@ -49,47 +50,28 @@ export async function appRootLoader({ request }: LoaderFunctionArgs) {
 		const response = await accountDataRequest.fetch();
 
 		accessToken = response.accessToken;
-		Cookies.set('accessToken', accessToken);
+		processAccessToken(accessToken);
 	}
 	// end -- MyChart check
 
 	// Check if session should be tracked
-	let isTrackedSession = !!url.searchParams.get('track');
+	let isTrackedSession = url.searchParams.get('track') === 'true';
 	if (isTrackedSession) {
-		Cookies.set('trackActivity', '1');
+		Cookies.set('track', 'true');
 	}
 
-	isTrackedSession = isTrackedSession || !!Cookies.get('trackActivity');
+	isTrackedSession = isTrackedSession || Cookies.get('track') === 'true';
 	// end -- track check
 
-	// Check if loaded route needs to be redirected outside of react-router
-	const redirectConfig = routeRedirects.find((c) => {
-		if (c.caseSensitive) {
-			return c.fromPath === url.pathname;
-		}
-
-		return c.fromPath.toLowerCase() === url.pathname.toLowerCase();
-	});
-
-	if (redirectConfig) {
-		const redirctParams = new URLSearchParams({
-			...redirectConfig.searchParams,
-			track: '' + isTrackedSession,
-		});
-
-		return redirect(`${redirectConfig.toPath}?${redirctParams.toString()}`);
-	}
-	// end -- redirect check
-
 	// Check if session should be immediate
-	let isImmediateSession = !!url.searchParams.get('immediateAccess');
+	let isImmediateSession = url.searchParams.get('immediateAccess') === 'true';
 	const immediateSupportPathMatch = matchPath('/immediate-support/:supportRoleId', url.pathname);
 
 	if (isImmediateSession || !!immediateSupportPathMatch) {
-		Cookies.set('immediateAccess', '1');
+		Cookies.set('immediateAccess', 'true');
 	}
 
-	isImmediateSession = isImmediateSession || !!Cookies.get('immediateAccess');
+	isImmediateSession = isImmediateSession || Cookies.get('immediateAccess') === 'true';
 	// end -- immediate check
 
 	// Get institution data
@@ -121,6 +103,9 @@ export async function appRootLoader({ request }: LoaderFunctionArgs) {
 		});
 
 		const anonymousAccountResponse = await anonymousAccountDataRequest.fetch();
+
+		processAccessToken(anonymousAccountResponse.accessToken);
+
 		account = anonymousAccountResponse.account;
 	} else if (decodedAccessToken) {
 		// load account data if logged in
