@@ -585,121 +585,123 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <IntegratedCareEnabledRoutes />,
+						path: '*',
+						loader: redirectCheckLoader,
+						element: <NoMatch />,
+					},
+				],
+			},
+
+			{
+				element: <IntegratedCareEnabledRoutes />,
+				errorElement: <AppErrorDefaultLayout />,
+				loader: requireAuthLoader,
+				children: [
+					{
+						path: 'ic',
+						element: <IntegratedCareLandingPage />,
 						children: [
 							{
-								path: 'ic',
-								element: <IntegratedCareLandingPage />,
+								index: true,
+								element: <RedirectToIntegratedCareRole />,
+							},
+							{
+								path: 'mhic',
+								element: <IntegratedCareMhicLayout />,
 								children: [
 									{
-										index: true,
-										element: <RedirectToIntegratedCareRole />,
-									},
-									{
-										path: 'mhic',
-										element: <IntegratedCareMhicLayout />,
-										children: [
-											{
-												element: <MhicMyPanel />,
-												children: [
-													{
-														index: true,
-														element: <MhicOverview />,
-													},
-													{
-														path: 'my-patients',
-														element: <MhicMyPatients />,
-													},
-												],
-											},
-											{
-												path: 'orders/search',
-												element: <MhicSearchResults />,
-											},
-											{
-												path: 'orders/unassigned',
-												element: <MhicOrdersUnassigned />,
-											},
-											{
-												path: 'orders/assigned',
-												element: <MhicOrdersAssigned />,
-											},
-											{
-												path: 'orders/closed',
-												element: <MhicOrdersClosed />,
-											},
-											{
-												path: 'orders/:patientOrderId',
-												element: <MhicOrderLayout />,
-												loader: mhicOrderLayoutLoader,
-												children: [
-													{
-														index: true,
-														element: <Navigate to="assessment" replace />,
-													},
-													{
-														path: 'assessment',
-														element: <MhicOrderAssessment />,
-													},
-													{
-														path: 'assessment/:screeningQuestionContextId',
-														element: <ScreeningQuestionsPage />,
-													},
-												],
-											},
-											{
-												path: '*',
-												element: <NoMatch />,
-											},
-										],
-									},
-									{
-										path: 'patient',
-										element: <IntegratedCarePatientLayout />,
+										element: <MhicMyPanel />,
 										children: [
 											{
 												index: true,
-												element: <PatientLanding />,
+												element: <MhicOverview />,
 											},
 											{
-												path: 'demographics-introduction',
-												element: <PatientDemographicsIntroduction />,
-											},
-											{
-												path: 'demographics-part-1',
-												element: <PatientDemographicsPart1 />,
-											},
-											{
-												path: 'demographics-part-2',
-												element: <PatientDemographicsPart2 />,
-											},
-											{
-												path: 'demographics-part-3',
-												element: <PatientDemographicsPart3 />,
-											},
-											{
-												path: 'demographics-thanks',
-												element: <PatientDemographicsThanks />,
-											},
-											{
-												path: 'assessment-complete',
-												element: <PatientAssessmentComplete />,
-											},
-											{
-												path: '*',
-												element: <NoMatch />,
+												path: 'my-patients',
+												element: <MhicMyPatients />,
 											},
 										],
+									},
+									{
+										path: 'orders/search',
+										element: <MhicSearchResults />,
+									},
+									{
+										path: 'orders/unassigned',
+										element: <MhicOrdersUnassigned />,
+									},
+									{
+										path: 'orders/assigned',
+										element: <MhicOrdersAssigned />,
+									},
+									{
+										path: 'orders/closed',
+										element: <MhicOrdersClosed />,
+									},
+									{
+										path: 'orders/:patientOrderId',
+										element: <MhicOrderLayout />,
+										loader: mhicOrderLayoutLoader,
+										children: [
+											{
+												index: true,
+												element: <Navigate to="assessment" replace />,
+											},
+											{
+												path: 'assessment',
+												element: <MhicOrderAssessment />,
+											},
+											{
+												path: 'assessment/:screeningQuestionContextId',
+												element: <ScreeningQuestionsPage />,
+											},
+										],
+									},
+									{
+										path: '*',
+										element: <NoMatch />,
+									},
+								],
+							},
+							{
+								path: 'patient',
+								element: <IntegratedCarePatientLayout />,
+								children: [
+									{
+										index: true,
+										element: <PatientLanding />,
+									},
+									{
+										path: 'demographics-introduction',
+										element: <PatientDemographicsIntroduction />,
+									},
+									{
+										path: 'demographics-part-1',
+										element: <PatientDemographicsPart1 />,
+									},
+									{
+										path: 'demographics-part-2',
+										element: <PatientDemographicsPart2 />,
+									},
+									{
+										path: 'demographics-part-3',
+										element: <PatientDemographicsPart3 />,
+									},
+									{
+										path: 'demographics-thanks',
+										element: <PatientDemographicsThanks />,
+									},
+									{
+										path: 'assessment-complete',
+										element: <PatientAssessmentComplete />,
+									},
+									{
+										path: '*',
+										element: <NoMatch />,
 									},
 								],
 							},
 						],
-					},
-
-					{
-						path: '*',
-						loader: redirectCheckLoader,
-						element: <NoMatch />,
 					},
 				],
 			},

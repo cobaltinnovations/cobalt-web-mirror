@@ -1,4 +1,4 @@
-import { MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
+import { MHIC_HEADER_HEIGHT, MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
 import Loader from '@/components/loader';
 import { STORAGE_KEYS } from '@/lib/config/constants';
 import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
@@ -51,13 +51,19 @@ export const IntegratedCareMhicLayout = () => {
 		<>
 			<MhicHeader patientOrder={openOrder} recentOrders={recentOrders} />
 
-			<Suspense fallback={<Loader />}>
-				<Outlet
-					context={{
-						setOpenOrder,
-					}}
-				/>
-			</Suspense>
+			<div
+				style={{
+					paddingTop: MHIC_HEADER_HEIGHT,
+				}}
+			>
+				<Suspense fallback={<Loader />}>
+					<Outlet
+						context={{
+							setOpenOrder,
+						}}
+					/>
+				</Suspense>
+			</div>
 
 			<MhicPatientOrderShelf
 				patientOrderId={searchParams.get('openPatientOrderId')}
