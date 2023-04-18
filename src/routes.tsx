@@ -1,12 +1,5 @@
-import React, { useEffect } from 'react';
-import { Outlet, Navigate, useMatch, useSearchParams, useNavigate, useParams } from 'react-router-dom';
-
 import config from '@/lib/config';
-import { Institution } from '@/lib/models/institution';
-import { AccountModel } from '@/lib/models';
-import Header from '@/components/header';
-import HeaderV2 from '@/components/header-v2';
-import HeaderUnauthenticated from '@/components/header-unauthenticated';
+
 import {
 	ProviderManagementBasics,
 	ProviderManagementBluejeansConnection,
@@ -17,9 +10,44 @@ import {
 	ProviderManagementPersonalDetails,
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
-import Cookies from 'js-cookie';
-import useAccount from './hooks/use-account';
+import ScreeningQuestionsPage from '@/pages/screening/screening-questions';
+import React from 'react';
+import { Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
+
+import { AppRoot, AppRootErrorLayout, appRootLoader } from './app-root';
+
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
+
+import { authLoader } from './auth-loader';
+import useAccount from './hooks/use-account';
+import { immediateSupportLoader } from './immediate-support-loader';
+
+import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
+import { IntegratedCareLandingPage, RedirectToIntegratedCareRole } from './pages/ic/landing';
+import IntegratedCareMhicLayout from './pages/ic/mhic/mhic-layout';
+import MhicMyPanel from './pages/ic/mhic/my-panel';
+import MhicMyPatients from './pages/ic/mhic/my-patients';
+import MhicOrderAssessment from './pages/ic/mhic/order-assessment';
+import MhicOrderLayout, { MhicOrderLayoutLoader } from './pages/ic/mhic/order-layout';
+import MhicOrdersAssigned from './pages/ic/mhic/orders-assigned';
+import MhicOrdersClosed from './pages/ic/mhic/orders-closed';
+import MhicOrdersUnassigned from './pages/ic/mhic/orders-unassigned';
+import MhicOverview from './pages/ic/mhic/overview';
+import MhicSearchResults from './pages/ic/mhic/search-results';
+import PatientAssessmentComplete from './pages/ic/patient/assessment-complete';
+import PatientDemographicsIntroduction from './pages/ic/patient/demographics-introduction';
+import PatientDemographicsPart1 from './pages/ic/patient/demographics-part-1';
+import PatientDemographicsPart2 from './pages/ic/patient/demographics-part-2';
+import PatientDemographicsPart3 from './pages/ic/patient/demographics-part-3';
+import PatientDemographicsThanks from './pages/ic/patient/demographics-thanks';
+import PatientLanding from './pages/ic/patient/patient-landing';
+import { IntegratedCarePatientLayout } from './pages/ic/patient/patient-layout';
+import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
+import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
+import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-availability-panel';
+import { RoutedManageAvailailityPanel } from './pages/scheduling/routed-managed-availabilities-panel';
+import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selected-availability-panel';
+import Cookies from 'js-cookie';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -77,7 +105,7 @@ export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-
 export const StatsDashboard = lazyLoadWithRefresh(() => import('@/pages/stats-dashboard'));
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
-export const IntegratedCare = lazyLoadWithRefresh(() => import('@/pages/ic/landing'));
+
 export const ScreeningQuestions = lazyLoadWithRefresh(() => import('@/pages/screening/screening-questions'));
 export const Interaction = lazyLoadWithRefresh(() => import('@/pages/interaction'));
 export const InteractionInstances = lazyLoadWithRefresh(() => import('@/pages/interaction-instances'));
@@ -90,68 +118,6 @@ export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/re
 export const ResourceLibraryTags = lazyLoadWithRefresh(() => import('@/pages/resource-library-tags'));
 export const ResourceLibraryDetail = lazyLoadWithRefresh(() => import('@/pages/resource-library-detail'));
 
-interface RouteGuardProps {
-	account?: AccountModel;
-	institution?: Institution;
-}
-
-export interface RouteConfig {
-	path: string;
-	private: boolean;
-	routeGuard?: (guardProps: RouteGuardProps) => boolean;
-	header?: React.ComponentType<any>;
-	nav?: React.ComponentType<any>;
-	main: React.ComponentType<any>;
-}
-
-export interface AppRoutesConfig {
-	layout: React.ComponentType<any>;
-	routes: RouteConfig[];
-}
-
-const isInstitutionSupportEnabledRouteGuard = ({ institution }: RouteGuardProps): boolean =>
-	!!institution?.supportEnabled;
-const isIntegratedCareRouteGuard = ({ institution, account }: RouteGuardProps) => !!institution?.integratedCareEnabled;
-const isProviderRouteGuard = ({ account }: RouteGuardProps) => !!account && account.roleId === 'PROVIDER';
-const isContactUsEnabledGuard = ({ institution }: RouteGuardProps) => !!institution?.contactUsEnabled;
-
-const RedirectToSupport = () => {
-	const match = useMatch<'supportRoleId', '/immediate-support/:supportRoleId'>('/immediate-support/:supportRoleId');
-	const [searchParams] = useSearchParams();
-	const navigate = useNavigate();
-	const { account } = useAccount();
-
-	let routedSupportRoleId = match?.params.supportRoleId ?? '';
-
-	if (routedSupportRoleId === 'therapist') {
-		routedSupportRoleId = 'clinician';
-	}
-
-	searchParams.set('supportRoleId', routedSupportRoleId.toUpperCase());
-	searchParams.set('immediateAccess', 'true');
-
-	const searchString = searchParams.toString();
-	useEffect(() => {
-		const authRedirectUrl = `/connect-with-support?${searchString}`;
-
-		if (!account) {
-			Cookies.set('authRedirectUrl', authRedirectUrl);
-		}
-
-		navigate(
-			{
-				pathname: '/connect-with-support',
-				search: searchString,
-			},
-			{
-				replace: true,
-			}
-		);
-	}, [account, navigate, searchString]);
-
-	return null;
-};
-
 const RedirectToResourceLibrary = () => {
 	const { contentId } = useParams<{ contentId: string }>();
 
@@ -162,464 +128,547 @@ const RedirectToResourceLibrary = () => {
 	return <Navigate to="/resource-library" replace />;
 };
 
-const RedirectToGroupSessions = () => {
-	return <Navigate to="/group-sessions" replace />;
-};
-
-const ButtonlessHeaderLayout = () => {
-	const { account } = useAccount();
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		if (account) {
-			navigate('/');
-		}
-	}, [account, navigate]);
-
-	return (
-		<>
-			<Header showHeaderButtons={false} />
-			<Outlet />
-		</>
-	);
-};
-
-const UnauthenticatedHeaderLayout = () => {
-	const { account } = useAccount();
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		if (account) {
-			navigate('/');
-		}
-	}, [account, navigate]);
-
-	return (
-		<>
-			<HeaderUnauthenticated />
-			<Outlet />
-		</>
-	);
-};
-
-const DefaultLayout = () => {
+const SupportEnabledRoutes = () => {
 	const { institution } = useAccount();
 
-	return (
-		<>
-			{institution?.featuresEnabled ? <HeaderV2 /> : <Header />}
-			<Outlet />
-		</>
-	);
+	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
 };
 
-export const AppRoutes: AppRoutesConfig[] = [
+const IntegratedCareEnabledRoutes = () => {
+	const { institution } = useAccount();
+
+	return institution?.integratedCareEnabled ? <Outlet /> : <NoMatch />;
+};
+
+const ProviderOnlyRoutes = () => {
+	const { account } = useAccount();
+
+	return account?.roleId === 'PROVIDER' ? <Outlet /> : <NoMatch />;
+};
+
+const ContactUsEnabledRoutes = () => {
+	const { institution } = useAccount();
+
+	return institution?.contactUsEnabled ? <Outlet /> : <NoMatch />;
+};
+
+export const routes: RouteObject[] = [
 	{
-		layout: ButtonlessHeaderLayout,
-		routes: [
-			{
-				path: '/onboarding',
-				private: false,
-				main: Onboarding,
-			},
-			{
-				path: '/sign-up-verify',
-				private: false,
-				main: SignUpVerify,
-			},
-			{
-				path: '/accounts/claim-invite/:accountInviteId',
-				private: false,
-				main: SignUpClaim,
-			},
-			{
-				path: '/sign-in-sso',
-				private: false,
-				main: () => <Navigate to="/sign-in" replace />,
-			},
-			{
-				path: '/sign-in-email',
-				private: false,
-				main: () => <Navigate to="/sign-in/email" replace />,
-			},
-			{
-				path: '/forgot-password',
-				private: false,
-				main: ForgotPassword,
-			},
-			{
-				path: '/accounts/reset-password/:passwordResetToken',
-				private: false,
-				main: PasswordReset,
-			},
-		],
-	},
-	{
-		layout: UnauthenticatedHeaderLayout,
-		routes: [
-			{
-				path: '/sign-up',
-				private: false,
-				main: SignUp,
-			},
-			{
-				path: '/sign-in',
-				private: false,
-				main: SignIn,
-			},
-			{
-				path: '/sign-in/email',
-				private: false,
-				main: SignInEmail,
-			},
-		],
-	},
-	{
-		layout: () => <Outlet />,
-		routes: [
-			{
-				path: '/ic/*',
-				private: true,
-				routeGuard: isIntegratedCareRouteGuard,
-				main: IntegratedCare,
-			},
-		],
-	},
-	{
-		layout: DefaultLayout,
-		routes: [
-			{
-				path: '/',
-				private: true,
-				main: Index,
-			},
-			{
-				path: '/in-the-studio',
-				private: true,
-				main: RedirectToGroupSessions,
-			},
-			{
-				path: '/in-the-studio-thanks',
-				private: true,
-				main: InTheStudioThanks,
-			},
-			{
-				path: '/in-the-studio/group-session-scheduled/:groupSessionId',
-				private: true,
-				main: InTheStudioGroupSessionScheduled,
-			},
-			{
-				path: '/in-the-studio/group-session-by-request/:groupSessionRequestId',
-				private: true,
-				main: InTheStudioGroupSessionByRequest,
-			},
-			{
-				path: '/on-your-time',
-				private: true,
-				main: RedirectToResourceLibrary,
-			},
-			{
-				path: '/on-your-time-thanks',
-				private: true,
-				main: OnYourTimeThanks,
-			},
-			{
-				path: '/thank-you',
-				private: true,
-				main: SessionRequestThankYou,
-			},
-			{
-				path: '/on-your-time/:contentId',
-				private: true,
-				main: RedirectToResourceLibrary,
-			},
-			{
-				path: '/covid-19-resources',
-				private: true,
-				main: Covid19Resources,
-			},
-			{
-				path: '/well-being-resources',
-				private: true,
-				main: WellBeingResources,
-			},
-			{
-				path: '/privacy',
-				private: true,
-				main: Privacy,
-			},
-			{
-				path: '/immediate-support/:supportRoleId',
-				private: false,
-				main: RedirectToSupport,
-			},
-			{
-				path: '/intake-assessment',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: IntakeAssessment,
-			},
-			{
-				path: '/confirm-appointment',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: ConfirmAppointment,
-			},
-			{
-				path: '/one-on-one-resources',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: OneOnOneResources,
-			},
-			{
-				path: '/connect-with-support',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: ConnectWithSupport,
-			},
-			{
-				path: '/connect-with-support/medication-prescriber',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: ConnectWithSupportMedicationPrescriber,
-			},
-			{
-				path: '/connect-with-support/:urlName',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: ConnectWithSupportV2,
-			},
-			{
-				path: '/ehr-lookup',
-				private: true,
-				routeGuard: isInstitutionSupportEnabledRouteGuard,
-				main: EhrLookup,
-			},
-			{
-				path: '/my-calendar',
-				private: true,
-				main: MyCalendar,
-			},
-			{
-				path: '/scheduling/*',
-				private: true,
-				routeGuard: isProviderRouteGuard,
-				main: MySchedule,
-			},
-			{
-				path: '/screening-questions/:screeningQuestionContextId',
-				private: true,
-				main: ScreeningQuestions,
-			},
-			{
-				path: '/appointments/:appointmentId',
-				private: true,
-				main: AppointmentDetails,
-			},
-			{
-				path: '/feedback',
-				private: true,
-				routeGuard: isContactUsEnabledGuard,
-				main: Feedback,
-			},
-			{
-				path: '/account-sessions/:accountSessionId/text',
-				private: true,
-				main: AccountSessionDetails,
-			},
-			{
-				path: '/account-sessions/:accountSessionId/text',
-				private: true,
-				main: AccountSessionDetails,
-			},
-			{
-				path: '/group-sessions',
-				private: true,
-				main: GroupSessions,
-			},
-			{
-				path: '/group-sessions/request',
-				private: true,
-				main: GroupSessionsRequest,
-			},
-			{
-				path: '/group-sessions/scheduled',
-				private: true,
-				main: GroupSessionsScheduled,
-			},
-			{
-				path: '/group-sessions/scheduled/create',
-				private: true,
-				main: GroupSessionsScheduledCreate,
-			},
-			{
-				path: '/group-sessions/scheduled/:groupSessionId/edit',
-				private: true,
-				main: GroupSessionsScheduledCreate,
-			},
-			{
-				path: '/group-sessions/scheduled/:groupSessionId/view',
-				private: true,
-				main: GroupSessionsScheduledCreate,
-			},
-			{
-				path: '/group-sessions/by-request',
-				private: true,
-				main: GroupSessionsByRequest,
-			},
-			{
-				path: '/group-sessions/by-request/create',
-				private: true,
-				main: GroupSessionsByRequestCreate,
-			},
-			{
-				path: '/group-sessions/by-request/:groupSessionId/edit',
-				private: true,
-				main: GroupSessionsByRequestCreate,
-			},
-			{
-				path: '/group-session-reservations/:groupSessionReservationId/ical',
-				private: true,
-				main: RedirectToBackend,
-			},
-			{
-				path: '/group-session-reservations/:groupSessionReservationId/google-calendar',
-				private: true,
-				main: RedirectToBackend,
-			},
-			{
-				path: '/appointments/:appointmentId/ical',
-				private: true,
-				main: RedirectToBackend,
-			},
-			{
-				path: '/appointments/:appointmentId/google-calendar',
-				private: true,
-				main: RedirectToBackend,
-			},
-			{
-				path: '/cms/on-your-time',
-				private: true,
-				main: CmsOnYourTime,
-			},
-			{
-				path: '/cms/on-your-time/create',
-				private: true,
-				main: CreateOnYourTimeContent,
-			},
-			{
-				path: '/cms/available-content',
-				private: true,
-				main: CmsAvailableContent,
-			},
-			{
-				path: '/stats-dashboard',
-				private: true,
-				main: StatsDashboard,
-			},
-			{
-				path: '/admin/reports',
-				private: true,
-				main: Reports,
-			},
-			{
-				path: '/providers/:providerId',
-				private: true,
-				main: ProviderDetail,
-			},
-			...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
-				? [
-						{
-							path: `/providers/:providerId/profile`,
-							private: true,
-							main: ProviderManagementProfile,
-						},
-						{
-							path: `/providers/:providerId/basics`,
-							private: true,
-							main: ProviderManagementBasics,
-						},
-						{
-							path: `/providers/:providerId/clinical-background`,
-							private: true,
-							main: ProviderManagementClinicalBackground,
-						},
-						{
-							path: `/providers/:providerId/communication`,
-							private: true,
-							main: ProviderManagementCommunication,
-						},
-						{
-							path: `/providers/:providerId/bluejeans-connection`,
-							private: true,
-							main: ProviderManagementBluejeansConnection,
-						},
-						{
-							path: `/providers/:providerId/payment-types-accepted`,
-							private: true,
-							main: ProviderManagementPaymentTypesAccepted,
-						},
-						{
-							path: `/providers/:providerId/personal-details`,
-							private: true,
-							main: ProviderManagementPersonalDetails,
-						},
-						{
-							path: `/providers/:providerId/cobalt-bio`,
-							private: true,
-							main: ProviderManagementCobaltBio,
-						},
-				  ]
-				: []),
-			{
-				path: '/interaction/:interactionInstanceId/option/:interactionOptionId',
-				private: true,
-				main: Interaction,
-			},
-			{
-				path: '/interaction-instances/:interactionId',
-				private: true,
-				main: InteractionInstances,
-			},
-			{
-				path: '/in-crisis',
-				private: false,
-				main: InCrisis,
-			},
-			{
-				path: '/topic-centers/:topicCenterId',
-				private: true,
-				main: TopicCenter,
-			},
-			{
-				path: '/user-settings',
-				private: true,
-				main: UserSettings,
-			},
-			{
-				path: '/resource-library',
-				private: true,
-				main: ResourceLibrary,
-			},
-			{
-				path: '/resource-library/tag-groups/:tagGroupId',
-				private: true,
-				main: ResourceLibraryTopic,
-			},
-			{
-				path: '/resource-library/tags/:tagId',
-				private: true,
-				main: ResourceLibraryTags,
-			},
-			{
-				path: '/resource-library/:contentId',
-				private: true,
-				main: ResourceLibraryDetail,
-			},
-			{
-				path: '*',
-				private: false,
-				main: NoMatch,
+		id: 'root',
+		path: '/',
+		element: <AppRoot />,
+		errorElement: <AppRootErrorLayout />,
+		loader: appRootLoader,
+		children: [
+			{
+				path: 'auth',
+				loader: authLoader,
+			},
+
+			{
+				path: 'immediate-support/:supportRoleId',
+				loader: immediateSupportLoader,
+			},
+
+			{
+				element: <AppDefaultLayout unauthenticated />,
+				loader: () => {
+					const accessToken = Cookies.get('accessToken');
+					if (accessToken) {
+						return redirect('/');
+					}
+
+					return null;
+				},
+				children: [
+					{
+						path: 'sign-up',
+						element: <SignUp />,
+					},
+					{
+						path: 'sign-in',
+						element: <SignIn />,
+					},
+					{
+						path: 'sign-in/email',
+						element: <SignInEmail />,
+					},
+				],
+			},
+
+			{
+				element: <AppDefaultLayout hideHeaderButtons />,
+				loader: () => {
+					const accessToken = Cookies.get('accessToken');
+					if (accessToken) {
+						return redirect('/');
+					}
+
+					return null;
+				},
+				children: [
+					{
+						path: 'onboarding',
+						element: <Onboarding />,
+					},
+					{
+						path: 'sign-up-verify',
+						element: <SignUpVerify />,
+					},
+					{
+						path: 'accounts/claim-invite/:accountInviteId',
+						element: <SignUpClaim />,
+					},
+					{
+						path: 'sign-in-sso',
+						element: <Navigate to="/sign-in" replace />,
+					},
+					{
+						path: 'sign-in-email',
+						element: <Navigate to="/sign-in/email" replace />,
+					},
+					{
+						path: 'forgot-password',
+						element: <ForgotPassword />,
+					},
+					{
+						path: 'accounts/reset-password/:passwordResetToken',
+						element: <PasswordReset />,
+					},
+				],
+			},
+
+			{
+				element: <AppDefaultLayout />,
+				errorElement: <AppErrorDefaultLayout />,
+				loader: () => {
+					const accessToken = Cookies.get('accessToken');
+
+					if (!accessToken) {
+						return redirect('/sign-in');
+					}
+
+					return null;
+				},
+				children: [
+					{
+						index: true,
+						element: <Index />,
+					},
+					{
+						path: 'in-the-studio',
+						element: <Navigate to="/group-sessions" replace />,
+					},
+					{
+						path: 'in-the-studio-thanks',
+						element: <InTheStudioThanks />,
+					},
+					{
+						path: 'in-the-studio/group-session-scheduled/:groupSessionId',
+						element: <InTheStudioGroupSessionScheduled />,
+					},
+					{
+						path: 'in-the-studio/group-session-by-request/:groupSessionRequestId',
+						element: <InTheStudioGroupSessionByRequest />,
+					},
+					{
+						path: 'on-your-time',
+						element: <RedirectToResourceLibrary />,
+					},
+					{
+						path: 'on-your-time-thanks',
+						element: <OnYourTimeThanks />,
+					},
+					{
+						path: 'thank-you',
+						element: <SessionRequestThankYou />,
+					},
+					{
+						path: 'on-your-time/:contentId',
+						element: <RedirectToResourceLibrary />,
+					},
+					{
+						path: 'covid-19-resources',
+						element: <Covid19Resources />,
+					},
+					{
+						path: 'well-being-resources',
+						element: <WellBeingResources />,
+					},
+					{
+						path: 'privacy',
+						element: <Privacy />,
+					},
+					{
+						path: 'my-calendar',
+						element: <MyCalendar />,
+					},
+
+					{
+						element: <SupportEnabledRoutes />,
+						children: [
+							{
+								path: 'intake-assessment',
+								element: <IntakeAssessment />,
+							},
+							{
+								path: 'confirm-appointment',
+								element: <ConfirmAppointment />,
+							},
+							{
+								path: 'one-on-one-resources',
+								element: <OneOnOneResources />,
+							},
+							{
+								path: 'connect-with-support',
+								element: <ConnectWithSupport />,
+							},
+							{
+								path: 'connect-with-support/medication-prescriber',
+								element: <ConnectWithSupportMedicationPrescriber />,
+							},
+							{
+								path: 'connect-with-support/:urlName',
+								element: <ConnectWithSupportV2 />,
+							},
+							{
+								path: 'ehr-lookup',
+								element: <EhrLookup />,
+							},
+						],
+					},
+
+					{
+						element: <ProviderOnlyRoutes />,
+						children: [
+							{
+								path: 'scheduling',
+								element: <MySchedule />,
+								children: [
+									{
+										path: 'appointments/new-appointment',
+										element: <RoutedEditAppointmentPanel />,
+									},
+									{
+										path: 'appointments/:appointmentId/edit',
+										element: <RoutedEditAppointmentPanel />,
+									},
+									{
+										path: 'appointments/:appointmentId',
+										element: <RoutedAppointmentDetailPanel />,
+									},
+									{
+										path: 'availabilities',
+										element: <RoutedManageAvailailityPanel />,
+									},
+									{
+										path: 'availabilities/new-availability',
+										element: <RoutedEditAvailabilityPanel />,
+									},
+									{
+										path: 'availabilities/new-blocked-time',
+										element: <RoutedEditAvailabilityPanel />,
+									},
+									{
+										path: 'availabilities/:logicalAvailabilityId/edit',
+										element: <RoutedEditAvailabilityPanel />,
+									},
+									{
+										path: 'availabilities/:logicalAvailabilityId',
+										element: <RoutedSelectedAvailabilityPanel />,
+									},
+								],
+							},
+						],
+					},
+
+					{
+						element: <ContactUsEnabledRoutes />,
+						children: [
+							{
+								path: 'feedback',
+								element: <Feedback />,
+							},
+						],
+					},
+
+					{
+						path: 'screening-questions/:screeningQuestionContextId',
+						element: <ScreeningQuestions />,
+					},
+					{
+						path: 'appointments/:appointmentId',
+						element: <AppointmentDetails />,
+					},
+					{
+						path: 'account-sessions/:accountSessionId/text',
+						element: <AccountSessionDetails />,
+					},
+					{
+						path: 'account-sessions/:accountSessionId/text',
+						element: <AccountSessionDetails />,
+					},
+					{
+						path: 'group-sessions',
+						element: <GroupSessions />,
+					},
+					{
+						path: 'group-sessions/request',
+						element: <GroupSessionsRequest />,
+					},
+					{
+						path: 'group-sessions/scheduled',
+						element: <GroupSessionsScheduled />,
+					},
+					{
+						path: 'group-sessions/scheduled/create',
+						element: <GroupSessionsScheduledCreate />,
+					},
+					{
+						path: 'group-sessions/scheduled/:groupSessionId/edit',
+						element: <GroupSessionsScheduledCreate />,
+					},
+					{
+						path: 'group-sessions/scheduled/:groupSessionId/view',
+						element: <GroupSessionsScheduledCreate />,
+					},
+					{
+						path: 'group-sessions/by-request',
+						element: <GroupSessionsByRequest />,
+					},
+					{
+						path: 'group-sessions/by-request/create',
+						element: <GroupSessionsByRequestCreate />,
+					},
+					{
+						path: 'group-sessions/by-request/:groupSessionId/edit',
+						element: <GroupSessionsByRequestCreate />,
+					},
+					{
+						path: 'group-session-reservations/:groupSessionReservationId/ical',
+						element: <RedirectToBackend />,
+					},
+					{
+						path: 'group-session-reservations/:groupSessionReservationId/google-calendar',
+						element: <RedirectToBackend />,
+					},
+					{
+						path: 'appointments/:appointmentId/ical',
+						element: <RedirectToBackend />,
+					},
+					{
+						path: 'appointments/:appointmentId/google-calendar',
+						element: <RedirectToBackend />,
+					},
+					{
+						path: 'cms/on-your-time',
+						element: <CmsOnYourTime />,
+					},
+					{
+						path: 'cms/on-your-time/create',
+						element: <CreateOnYourTimeContent />,
+					},
+					{
+						path: 'cms/available-content',
+						element: <CmsAvailableContent />,
+					},
+					{
+						path: 'stats-dashboard',
+						element: <StatsDashboard />,
+					},
+					{
+						path: 'admin/reports',
+						element: <Reports />,
+					},
+					{
+						path: 'providers/:providerId',
+						element: <ProviderDetail />,
+					},
+					...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
+						? [
+								{
+									path: 'providers/:providerId/profile',
+									element: <ProviderManagementProfile />,
+								},
+								{
+									path: 'providers/:providerId/basics',
+									element: <ProviderManagementBasics />,
+								},
+								{
+									path: 'providers/:providerId/clinical-background',
+									element: <ProviderManagementClinicalBackground />,
+								},
+								{
+									path: 'providers/:providerId/communication',
+									element: <ProviderManagementCommunication />,
+								},
+								{
+									path: 'providers/:providerId/bluejeans-connection',
+									element: <ProviderManagementBluejeansConnection />,
+								},
+								{
+									path: 'providers/:providerId/payment-types-accepted',
+									element: <ProviderManagementPaymentTypesAccepted />,
+								},
+								{
+									path: 'providers/:providerId/personal-details',
+									element: <ProviderManagementPersonalDetails />,
+								},
+								{
+									path: 'providers/:providerId/cobalt-bio',
+									element: <ProviderManagementCobaltBio />,
+								},
+						  ]
+						: []),
+					{
+						path: 'interaction/:interactionInstanceId/option/:interactionOptionId',
+						element: <Interaction />,
+					},
+					{
+						path: 'interaction-instances/:interactionId',
+						element: <InteractionInstances />,
+					},
+					{
+						path: 'in-crisis',
+						element: <InCrisis />,
+					},
+					{
+						path: 'topic-centers/:topicCenterId',
+						element: <TopicCenter />,
+					},
+					{
+						path: 'user-settings',
+						element: <UserSettings />,
+					},
+					{
+						path: 'resource-library',
+						element: <ResourceLibrary />,
+					},
+					{
+						path: 'resource-library/tag-groups/:tagGroupId',
+						element: <ResourceLibraryTopic />,
+					},
+					{
+						path: 'resource-library/tags/:tagId',
+						element: <ResourceLibraryTags />,
+					},
+					{
+						path: 'resource-library/:contentId',
+						element: <ResourceLibraryDetail />,
+					},
+
+					{
+						element: <IntegratedCareEnabledRoutes />,
+						children: [
+							{
+								path: 'ic',
+								element: <IntegratedCareLandingPage />,
+								children: [
+									{
+										index: true,
+										element: <RedirectToIntegratedCareRole />,
+									},
+									{
+										path: 'mhic',
+										element: <IntegratedCareMhicLayout />,
+										children: [
+											{
+												element: <MhicMyPanel />,
+												children: [
+													{
+														index: true,
+														element: <MhicOverview />,
+													},
+													{
+														path: 'my-patients',
+														element: <MhicMyPatients />,
+													},
+												],
+											},
+											{
+												path: 'orders/search',
+												element: <MhicSearchResults />,
+											},
+											{
+												path: 'orders/unassigned',
+												element: <MhicOrdersUnassigned />,
+											},
+											{
+												path: 'orders/assigned',
+												element: <MhicOrdersAssigned />,
+											},
+											{
+												path: 'orders/closed',
+												element: <MhicOrdersClosed />,
+											},
+											{
+												path: 'orders/:patientOrderId',
+												element: <MhicOrderLayout />,
+												loader: MhicOrderLayoutLoader,
+												children: [
+													{
+														index: true,
+														element: <Navigate to="assessment" replace />,
+													},
+													{
+														path: 'assessment',
+														element: <MhicOrderAssessment />,
+													},
+													{
+														path: 'assessment/:screeningQuestionContextId',
+														element: <ScreeningQuestionsPage />,
+													},
+												],
+											},
+											{
+												path: '*',
+												element: <NoMatch />,
+											},
+										],
+									},
+									{
+										path: 'patient',
+										element: <IntegratedCarePatientLayout />,
+										children: [
+											{
+												index: true,
+												element: <PatientLanding />,
+											},
+											{
+												path: 'demographics-introduction',
+												element: <PatientDemographicsIntroduction />,
+											},
+											{
+												path: 'demographics-part-1',
+												element: <PatientDemographicsPart1 />,
+											},
+											{
+												path: 'demographics-part-2',
+												element: <PatientDemographicsPart2 />,
+											},
+											{
+												path: 'demographics-part-3',
+												element: <PatientDemographicsPart3 />,
+											},
+											{
+												path: 'demographics-thanks',
+												element: <PatientDemographicsThanks />,
+											},
+											{
+												path: 'assessment-complete',
+												element: <PatientAssessmentComplete />,
+											},
+											{
+												path: '*',
+												element: <NoMatch />,
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				],
 			},
 		],
 	},
