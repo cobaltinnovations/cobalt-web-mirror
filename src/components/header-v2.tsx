@@ -292,11 +292,8 @@ const HeaderV2 = () => {
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
-	const subdomain = useSubdomain();
-	const [searchParams] = useSearchParams();
-	const sessionAccountSourceId = useMemo(() => searchParams.get('accountSourceId'), [searchParams]);
 
-	const { account, institution, institutionCapabilities, setInstitution, signOutAndClearContext } = useAccount();
+	const { account, institution, institutionCapabilities, refetchInstitution, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -350,6 +347,10 @@ const HeaderV2 = () => {
 
 	useEffect(() => {
 		setBodyPadding();
+
+		return () => {
+			document.body.style.paddingTop = '0px';
+		};
 	}, [account]);
 
 	/* ----------------------------------------------------------- */
@@ -364,6 +365,10 @@ const HeaderV2 = () => {
 		}
 
 		document.body.style.overflow = 'visible';
+
+		return () => {
+			document.body.style.overflow = 'visible';
+		};
 	}, [menuOpen]);
 
 	/* ----------------------------------------------------------- */
@@ -571,21 +576,14 @@ const HeaderV2 = () => {
 				setAlertsDisabled(true);
 
 				await institutionService.dismissAlert(alertId).fetch();
-				const response = await institutionService
-					.getInstitution({
-						subdomain,
-						...(sessionAccountSourceId ? { accountSourceId: sessionAccountSourceId } : {}),
-					})
-					.fetch();
-
-				setInstitution(response.institution);
+				refetchInstitution();
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setAlertsDisabled(false);
 			}
 		},
-		[handleError, sessionAccountSourceId, setInstitution, subdomain]
+		[handleError, refetchInstitution]
 	);
 
 	return (

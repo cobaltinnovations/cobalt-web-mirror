@@ -5,25 +5,30 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { ManageAvailabilityPanel } from './manage-availability-panel';
-import { EditAvailabilityPanel } from './edit-availability-panel';
 
 import { useContainerStyles } from './use-scheduling-styles';
-import { EditAppointmentPanel } from './edit-appointment-panel';
-import { AppointmentDetailPanel } from './appointment-detail-panel';
 // import { FollowUpsListPanel } from './follow-ups-list-panel';
-import { SelectedAvailabilityPanel } from './selected-availability-panel';
-import { useProviderCalendar } from './use-provider-calendar';
-import { Link, Outlet, Route, useNavigate } from 'react-router-dom';
+import { FetchProviderCalendarConfig, useProviderCalendar } from './use-provider-calendar';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
-import SentryRoutes from '@/components/sentry-routes';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
 	Week = 'timeGridWeek',
 	Month = 'dayGridMonth',
+}
+
+export interface MyScheduleOutletContext {
+	focusDateOnLoad: boolean;
+	setFocusDateOnLoad: Dispatch<SetStateAction<boolean>>;
+	managingAvailabilities: boolean;
+	setManagingAvailabilties: Dispatch<SetStateAction<boolean>>;
+	fetchMainData: (config?: FetchProviderCalendarConfig) => Promise<void>;
+	fetchLeftData: (config?: FetchProviderCalendarConfig) => Promise<void>;
+	accountIdForDetailsPanel: string;
+	setCalendarDate: (date: Date, scrollTime?: string) => void;
 }
 
 export const MySchedule: FC = () => {
@@ -135,49 +140,6 @@ export const MySchedule: FC = () => {
 			});
 		}
 	}, []);
-
-	const renderedEditAppointmentPanel = useMemo(() => {
-		return (
-			<div className={classNames('px-5 h-100', classes.sideBar)}>
-				<EditAppointmentPanel
-					focusDateOnLoad={focusDateOnLoad}
-					setCalendarDate={setCalendarDate}
-					onClose={(updatedAppointmentId) => {
-						setFocusDateOnLoad(false);
-						if (updatedAppointmentId) {
-							navigate(`appointments/${updatedAppointmentId}`);
-						} else {
-							navigate(``);
-						}
-
-						fetchMainData();
-						fetchLeftData();
-					}}
-				/>
-			</div>
-		);
-	}, [classes.sideBar, fetchLeftData, fetchMainData, focusDateOnLoad, navigate, setCalendarDate]);
-
-	const renderedAvailabilityPanel = useMemo(() => {
-		return (
-			<div className={classNames('px-5 h-100', classes.sideBar)}>
-				<EditAvailabilityPanel
-					onClose={(logicalAvailabilityId) => {
-						if (managingAvailabilties) {
-							navigate(`availabilities`);
-						} else if (logicalAvailabilityId) {
-							navigate(`availabilities/${logicalAvailabilityId}`);
-						} else {
-							navigate(``);
-						}
-
-						fetchMainData();
-						fetchLeftData();
-					}}
-				/>
-			</div>
-		);
-	}, [classes.sideBar, fetchLeftData, fetchMainData, managingAvailabilties, navigate]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -335,63 +297,18 @@ export const MySchedule: FC = () => {
 				/>
 			</div>
 
-			<SentryRoutes>
-				<Route element={<Outlet />}>
-					<Route path="appointments/new-appointment" element={renderedEditAppointmentPanel} />
-					<Route path="appointments/:appointmentId/edit" element={renderedEditAppointmentPanel} />
-
-					<Route
-						path="appointments/:appointmentId"
-						element={
-							<div className={classNames('px-5 h-100', classes.sideBar)}>
-								<AppointmentDetailPanel
-									focusDateOnLoad={focusDateOnLoad}
-									setCalendarDate={setCalendarDate}
-									onAddAppointment={() => {
-										navigate(`appointments/new-appointment`);
-									}}
-									onClose={() => {
-										setFocusDateOnLoad(true);
-										navigate(``);
-									}}
-									accountId={accountIdForDetailsPanel}
-								/>
-							</div>
-						}
-					/>
-
-					<Route
-						path={`availabilities`}
-						element={
-							<div className={classNames('px-5 h-100', classes.sideBar)}>
-								<ManageAvailabilityPanel
-									onClose={() => {
-										setManagingAvailabilties(false);
-										navigate(``);
-									}}
-								/>
-							</div>
-						}
-					/>
-
-					<Route path="availabilities/new-availability" element={renderedAvailabilityPanel} />
-					<Route path="availabilities/new-blocked-time" element={renderedAvailabilityPanel} />
-					<Route path="availabilities/:logicalAvailabilityId/edit" element={renderedAvailabilityPanel} />
-
-					<Route
-						path={`availabilities/:logicalAvailabilityId`}
-						element={
-							<div className={classNames('px-5 h-100', classes.sideBar)}>
-								<SelectedAvailabilityPanel
-									onClose={() => {
-										navigate(``);
-									}}
-								/>
-							</div>
-						}
-					/>
-				</Route>
-			</SentryRoutes>
+			<Outlet
+				context={{
+					focusDateOnLoad,
+					setFocusDateOnLoad,
+					setCalendarDate,
+					fetchMainData,
+					fetchLeftData,
+					accountIdForDetailsPanel,
+					managingAvailabilties,
+					setManagingAvailabilties,
+				}}
+			/>
 
 			{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel

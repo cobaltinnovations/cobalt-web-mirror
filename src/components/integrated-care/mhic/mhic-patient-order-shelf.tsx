@@ -145,6 +145,10 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 		}
 
 		document.body.style.overflow = 'visible';
+
+		return () => {
+			document.body.style.overflow = 'visible';
+		};
 	}, [patientOrderId]);
 
 	return (

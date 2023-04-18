@@ -1,7 +1,8 @@
-import { MhicHeader, MhicPatientOrderShelf, MHIC_HEADER_HEIGHT } from '@/components/integrated-care/mhic';
+import { MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
+import Loader from '@/components/loader';
 import { STORAGE_KEYS } from '@/lib/config/constants';
 import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
-import React, { useCallback, useState } from 'react';
+import React, { Suspense, useCallback, useState } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
 
 export interface MhicLayoutContext {
@@ -10,7 +11,7 @@ export interface MhicLayoutContext {
 	setOpenOrder: (order: PatientOrderModel) => void;
 }
 
-export const MhicLayout = () => {
+export const IntegratedCareMhicLayout = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(
@@ -50,17 +51,13 @@ export const MhicLayout = () => {
 		<>
 			<MhicHeader patientOrder={openOrder} recentOrders={recentOrders} />
 
-			<div
-				style={{
-					paddingTop: MHIC_HEADER_HEIGHT,
-				}}
-			>
+			<Suspense fallback={<Loader />}>
 				<Outlet
 					context={{
 						setOpenOrder,
 					}}
 				/>
-			</div>
+			</Suspense>
 
 			<MhicPatientOrderShelf
 				patientOrderId={searchParams.get('openPatientOrderId')}
@@ -75,4 +72,4 @@ export const MhicLayout = () => {
 	);
 };
 
-export default MhicLayout;
+export default IntegratedCareMhicLayout;
