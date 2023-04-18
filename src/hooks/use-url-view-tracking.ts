@@ -5,22 +5,20 @@ import { AcivityTypeId, ActivityActionId } from '@/lib/models';
 import { ActivityTrackingContext, activityTrackingService } from '@/lib/services';
 
 import useAccount from './use-account';
-import { useSearchParams } from 'react-router-dom';
+import { useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { AppRootLoaderData } from '@/app-root';
 
 const TRACKED_PATHS = ['/sign-in', '/connect-with-support'];
 
 export default function useUrlViewTracking(): void {
-	const { account, initialized, isTrackedSession, didCheckImmediateFlag } = useAccount();
+	const { isTrackedSession } = useRouteLoaderData('root') as AppRootLoaderData;
+	const { account } = useAccount();
 	const [searchParams] = useSearchParams();
 	const { pathname } = useLocation();
 
 	const accountId = account?.accountId;
 	useEffect(() => {
-		if (!initialized || !didCheckImmediateFlag) {
-			return;
-		}
-
-		if (TRACKED_PATHS.includes(pathname)) {
+		if (TRACKED_PATHS.some((trackedPath) => pathname.includes(trackedPath))) {
 			const queryParamsKeys = searchParams.keys();
 			const queryParamsAsObject: Record<string, string[]> = {};
 
@@ -59,5 +57,5 @@ export default function useUrlViewTracking(): void {
 				})
 				.fetch();
 		}
-	}, [accountId, didCheckImmediateFlag, initialized, isTrackedSession, pathname, searchParams]);
+	}, [accountId, isTrackedSession, pathname, searchParams]);
 }

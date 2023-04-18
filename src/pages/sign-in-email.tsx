@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
 import { accountService } from '@/lib/services';
@@ -28,8 +28,9 @@ const useSignInStyles = createUseThemedStyles((theme) => ({
 
 const SignInEmail = () => {
 	const handleError = useHandleError();
-	const { institution, processAccessToken } = useAccount();
+	const { institution } = useAccount();
 	const classes = useSignInStyles();
+	const navigate = useNavigate();
 
 	// Sign In
 	const [signInForm, setSignInForm] = useState({
@@ -57,7 +58,10 @@ const SignInEmail = () => {
 				return;
 			}
 
-			processAccessToken(accessToken);
+			navigate({
+				pathname: '/auth',
+				search: `?accessToken=${accessToken}`,
+			});
 		} catch (error) {
 			handleError(error);
 		}

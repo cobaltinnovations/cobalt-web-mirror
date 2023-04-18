@@ -44,7 +44,7 @@ const accountSourceVariantMap = {
 
 const SignIn: FC = () => {
 	const handleError = useHandleError();
-	const { institution, processAccessToken, accountSources } = useAccount();
+	const { institution, accountSources } = useAccount();
 	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
@@ -70,7 +70,10 @@ const SignIn: FC = () => {
 				})
 				.fetch();
 
-			processAccessToken(accessToken);
+			navigate({
+				pathname: '/auth',
+				search: `?accessToken=${accessToken}`,
+			});
 		} catch (error) {
 			handleError(error);
 		}
