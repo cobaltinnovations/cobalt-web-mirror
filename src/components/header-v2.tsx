@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, matchPath, useLocation } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
+import { queryClient } from '@/app-providers';
 import { AlertTypeId } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -29,7 +30,6 @@ import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import useSubdomain from '@/hooks/use-subdomain';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
@@ -293,7 +293,7 @@ const HeaderV2 = () => {
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
 
-	const { account, institution, institutionCapabilities, refetchInstitution, signOutAndClearContext } = useAccount();
+	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -576,14 +576,14 @@ const HeaderV2 = () => {
 				setAlertsDisabled(true);
 
 				await institutionService.dismissAlert(alertId).fetch();
-				refetchInstitution();
+				queryClient.invalidateQueries(['institution']);
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setAlertsDisabled(false);
 			}
 		},
-		[handleError, refetchInstitution]
+		[handleError]
 	);
 
 	return (

@@ -7,8 +7,6 @@ import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 
 import { AccountInstitutionCapabilities, AccountModel, Institution } from '@/lib/models';
-import { accountService } from '@/lib/services';
-
 import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
@@ -27,6 +25,7 @@ import { isEqual } from 'lodash';
 import { AnalyticsEvent, CrisisAnalyticsEvent, MainNavAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import { exploreLinks } from '@/menu-links';
+import { queryClient } from '@/app-providers';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
@@ -384,7 +383,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 ];
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 
@@ -396,14 +395,9 @@ const Menu: FC<MenuProps> = ({ open, onHide }) => {
 	const accountId = account?.accountId;
 	useEffect(() => {
 		if (accountId && open) {
-			accountService
-				.account(accountId)
-				.fetch()
-				.then((response) => {
-					setAccount(response.account);
-				});
+			queryClient.invalidateQueries(['account', accountId]);
 		}
-	}, [accountId, open, setAccount]);
+	}, [accountId, open]);
 
 	const isSubNav = useMemo(() => {
 		return !isEqual(menuSections, MENU_SECTIONS);

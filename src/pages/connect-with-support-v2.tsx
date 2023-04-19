@@ -26,6 +26,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
+import { queryClient } from '@/app-providers';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -36,7 +37,7 @@ enum SEARCH_PARAMS {
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname, search } = useLocation();
-	const { account, setAccount, institution } = useAccount();
+	const { account, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const { trackEvent } = useAnalytics();
 
@@ -190,24 +191,24 @@ const ConnectWithSupportV2 = () => {
 
 			// Persist the selectedInstitutionLocationId in the account
 			// Don't throw if it fails though, fire-and-forget
-			if (!account) {
+			if (!account?.accountId) {
 				return;
 			}
 
 			try {
-				const response = await accountService
+				await accountService
 					.setAccountLocation(account.accountId, {
 						accountId: account.accountId,
 						institutionLocationId: desiredInstitutionLocationId ?? '',
 					})
 					.fetch();
 
-				setAccount(response.account);
+				queryClient.invalidateQueries(['account', account.accountId]);
 			} catch (error) {
 				// Don't throw
 			}
 		},
-		[account, searchParams, selectedInstitutionLocationId, setAccount, setSearchParams]
+		[account?.accountId, searchParams, selectedInstitutionLocationId, setSearchParams]
 	);
 
 	return (

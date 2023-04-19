@@ -10,10 +10,11 @@ import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';
 
-import { assessmentService, accountService } from '@/lib/services';
+import { assessmentService } from '@/lib/services';
 import { Assessment, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
+import { queryClient } from '@/app-providers';
 
 interface HistoryLocationState {
 	from?: string;
@@ -23,7 +24,7 @@ const IntroAssessment: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 	const [searchParams] = useSearchParams();
 	const questionId = searchParams.get('questionId');
 	const sessionId = searchParams.get('sessionId');
@@ -71,10 +72,8 @@ const IntroAssessment: FC = () => {
 				state: location.state,
 			});
 		} else {
-			if (account) {
-				const response = await accountService.account(account.accountId).fetch();
-
-				setAccount(response.account);
+			if (account?.accountId) {
+				queryClient.invalidateQueries(['account', account.accountId]);
 			}
 
 			const authRedirectUrl = Cookies.get('authRedirectUrl');
@@ -84,7 +83,7 @@ const IntroAssessment: FC = () => {
 			navigate(redirectUrl);
 			Cookies.remove('authRedirectUrl');
 		}
-	}, [account, assessment, location.state, navigate, setAccount]);
+	}, [account?.accountId, assessment, location.state, navigate]);
 
 	const navigateBackwards = useCallback(() => {
 		if (!assessment) return;

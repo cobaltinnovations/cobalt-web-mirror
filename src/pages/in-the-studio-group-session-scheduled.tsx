@@ -24,6 +24,7 @@ import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import useFlags from '@/hooks/use-flags';
+import { queryClient } from '@/app-providers';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -48,7 +49,7 @@ const InTheStudioGroupSessionScheduled = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const { setAccount } = useAccount();
+	const { account } = useAccount();
 	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -178,11 +179,11 @@ const InTheStudioGroupSessionScheduled = () => {
 						try {
 							setIsBooking(true);
 
-							const response = await groupSessionsService
+							await groupSessionsService
 								.reserveGroupSession(session.groupSessionId, collectedEmail)
 								.fetch();
 
-							setAccount(response.account);
+							queryClient.invalidateQueries(['account', account?.accountId]);
 							await fetchData();
 
 							setShowConfirmReservationModal(false);

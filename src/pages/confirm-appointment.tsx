@@ -128,7 +128,7 @@ const ConfirmAppointment = () => {
 			// 	})
 			// 	.fetch();
 
-			// setAccount(accountResponse.account);
+			// queryClient.invalidateQueries(['account', account?.accountId])
 
 			const response = await appointmentService
 				.createAppointment({

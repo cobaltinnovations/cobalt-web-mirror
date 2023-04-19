@@ -7,6 +7,7 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import InputHelper from '@/components/input-helper';
+import { queryClient } from '@/app-providers';
 
 interface CollectPhoneModalProps extends ModalProps {
 	skippable?: boolean;
@@ -24,7 +25,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
 }) => {
 	useTrackModalView('CollectPhoneModal', props.show);
 	const handleError = useHandleError();
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState<string>('');
 
 	return (
@@ -45,13 +46,13 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
 					}
 
 					try {
-						const accountResponse = await accountService
+						await accountService
 							.updatePhoneNumberForAccountId(account.accountId, {
 								phoneNumber: phoneNumberInputValue,
 							})
 							.fetch();
 
-						setAccount(accountResponse.account);
+						queryClient.invalidateQueries(['account', account.accountId]);
 						onSuccess();
 					} catch (error) {
 						handleError(error);

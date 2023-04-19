@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
+import { useAppRootLoaderData } from '@/routes/root';
 import { AcivityTypeId, ActivityActionId } from '@/lib/models';
 import { ActivityTrackingContext, activityTrackingService } from '@/lib/services';
 
 import useAccount from './use-account';
-import { useRouteLoaderData, useSearchParams } from 'react-router-dom';
-import { AppRootLoaderData } from '@/app-root';
 
 const TRACKED_PATHS = ['/sign-in', '/connect-with-support'];
 
 export default function useUrlViewTracking(): void {
-	const { isTrackedSession } = useRouteLoaderData('root') as AppRootLoaderData;
+	const { isTrackedSession } = useAppRootLoaderData();
+
 	const { account } = useAccount();
 	const [searchParams] = useSearchParams();
 	const { pathname } = useLocation();

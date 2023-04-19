@@ -29,6 +29,7 @@ import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { queryClient } from '@/app-providers';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -83,7 +84,7 @@ const EhrLookup: FC = () => {
 
 	const [numMatches, setNumMatches] = useState(0);
 
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 	const [initialValues, setInitialValues] = useState<EpicPatientData>(getClearForm(account));
 	const {
 		selectedAppointmentTypeId,
@@ -159,7 +160,7 @@ const EhrLookup: FC = () => {
 
 		try {
 			const response = await request.fetch();
-			setAccount(response.account);
+			queryClient.invalidateQueries(['account', response.account.accountId]);
 
 			setIsBooking(true);
 			const appointmentData: CreateAppointmentData = {

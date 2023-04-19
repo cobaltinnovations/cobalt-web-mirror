@@ -1,3 +1,4 @@
+import { queryClient } from '@/app-providers';
 import ConsentContent from '@/components/consent-content';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
@@ -11,7 +12,7 @@ const Consent = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [searchParams] = useSearchParams();
-	const { account, setAccount, institution, signOutAndClearContext } = useAccount();
+	const { account, institution, signOutAndClearContext } = useAccount();
 
 	const destinationUrl = searchParams.get('destinationUrl') ?? '/';
 
@@ -53,8 +54,8 @@ const Consent = () => {
 											accountService
 												.acceptConsent(account.accountId)
 												.fetch()
-												.then((response) => {
-													setAccount(response.account);
+												.then(() => {
+													queryClient.invalidateQueries(['account', account.accountId]);
 													navigate(destinationUrl, { replace: true });
 												})
 												.catch((e) => {
