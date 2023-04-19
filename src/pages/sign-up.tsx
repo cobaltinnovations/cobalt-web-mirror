@@ -5,8 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
 
-import useSubdomain from '@/hooks/use-subdomain';
-
 import InputHelper from '@/components/input-helper';
 
 import { getRequiredYupFields } from '@/lib/utils';
@@ -15,6 +13,7 @@ import useHandleError from '@/hooks/use-handle-error';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import { useAppRootLoaderData } from '@/routes/root';
 
 const useSignUpStyles = createUseThemedStyles((theme) => ({
 	signUpOuter: {
@@ -39,17 +38,13 @@ type SignUpFormData = yup.InferType<typeof signUpSchema>;
 const requiredFields = getRequiredYupFields<SignUpFormData>(signUpSchema);
 
 const SignUp: FC = () => {
+	const { subdomain } = useAppRootLoaderData();
 	const handleError = useHandleError();
-	const subdomain = useSubdomain();
 	const navigate = useNavigate();
 	const classes = useSignUpStyles();
 
 	async function handleFormSubmit(values: SignUpFormData) {
 		try {
-			if (!subdomain) {
-				throw new Error('Could not extract subdomain for inviteAccount.');
-			}
-
 			const { accountInviteId } = await accountService
 				.inviteAccount({
 					subdomain,

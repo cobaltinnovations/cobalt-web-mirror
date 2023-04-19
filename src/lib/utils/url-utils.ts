@@ -1,12 +1,6 @@
-export function encodeQueryData(data: any): string {
-	const queries = [];
+import Cookies from 'js-cookie';
 
-	for (const key in data) {
-		queries.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-	}
-
-	return queries.join('&');
-}
+import config from '../config';
 
 export function buildQueryParamUrl(url: string, queryParams?: Record<string, any>): string {
 	let queryString;
@@ -32,4 +26,29 @@ export function buildQueryParamUrl(url: string, queryParams?: Record<string, any
 	}
 
 	return url;
+}
+
+export function getSubdomain(url: URL) {
+	let subdomain = 'cobalt';
+
+	const hostSplit = url.host.split('.');
+
+	if (__DEV__ && url.host.startsWith('localhost') && config.COBALT_WEB_LOCALHOST_SUBDOMAIN) {
+		subdomain = config.COBALT_WEB_LOCALHOST_SUBDOMAIN.toLowerCase();
+		// only support `subdomain.host.tld` for now
+	} else if (hostSplit.length >= 3) {
+		subdomain = hostSplit[0].toLowerCase();
+	}
+
+	return subdomain;
+}
+
+export function getCookieOrParamAsBoolean(url: URL, cookieOrParamName: string) {
+	const urlHasParam = url.searchParams.get(cookieOrParamName) === 'true';
+
+	if (urlHasParam) {
+		Cookies.set(cookieOrParamName, 'true');
+	}
+
+	return Cookies.get(cookieOrParamName) === 'true';
 }

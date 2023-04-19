@@ -4,7 +4,6 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { accountService, institutionService } from '@/lib/services';
-import useSubdomain from '@/hooks/use-subdomain';
 import useHandleError from '@/hooks/use-handle-error';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -19,6 +18,7 @@ import {
 import config from '@/lib/config';
 import Blurb from '@/components/blurb';
 import AsyncWrapper from '@/components/async-page';
+import { useAppRootLoaderData } from '@/routes/root';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -43,9 +43,10 @@ const accountSourceVariantMap = {
 };
 
 const SignIn: FC = () => {
+	const { subdomain } = useAppRootLoaderData();
+
 	const handleError = useHandleError();
 	const { institution, accountSources } = useAccount();
-	const subdomain = useSubdomain();
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
@@ -66,7 +67,7 @@ const SignIn: FC = () => {
 		try {
 			const { accessToken } = await accountService
 				.createAnonymousAccount({
-					...(subdomain && { subdomain }),
+					subdomain,
 				})
 				.fetch();
 

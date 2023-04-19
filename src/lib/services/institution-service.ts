@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { AccountSource, Institution, InstitutionLocation } from '@/lib/models/institution';
-import { encodeQueryData } from '@/lib/utils/url-utils';
+import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
 
 interface GetAccountSourcesResponse {
@@ -9,7 +9,7 @@ interface GetAccountSourcesResponse {
 
 interface GetAccountSourcesRequestBody {
 	subdomain?: string;
-	accountSourceId?: string;
+	accountSourceId: string | null;
 }
 
 interface GetInstitutionResponse {
@@ -19,16 +19,9 @@ interface GetInstitutionResponse {
 
 export const institutionService = {
 	getAccountSources(queryOptions?: GetAccountSourcesRequestBody) {
-		let url = '/institution/account-sources';
-		const queryParameterString = queryOptions ? encodeQueryData(queryOptions) : null;
-
-		if (queryParameterString) {
-			url = url.concat(`?${queryParameterString}`);
-		}
-
 		return httpSingleton.orchestrateRequest<GetAccountSourcesResponse>({
 			method: 'get',
-			url,
+			url: buildQueryParamUrl('/institution/account-sources', queryOptions),
 		});
 	},
 	getInstitution(queryOptions?: GetAccountSourcesRequestBody) {
