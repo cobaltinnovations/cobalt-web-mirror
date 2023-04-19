@@ -11,14 +11,12 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 import ScreeningQuestionsPage from '@/pages/screening/screening-questions';
+import Cookies from 'js-cookie';
 import React from 'react';
 import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
 
-import { AppRoot, AppRootErrorLayout, appRootLoader } from './app-root';
-
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
-import { authLoader } from './auth-loader';
 import useAccount from './hooks/use-account';
 import { immediateSupportLoader } from './immediate-support-loader';
 
@@ -47,7 +45,6 @@ import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appoi
 import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-availability-panel';
 import { RoutedManageAvailailityPanel } from './pages/scheduling/routed-managed-availabilities-panel';
 import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selected-availability-panel';
-import Cookies from 'js-cookie';
 import { routeRedirects } from './route-redirects';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
@@ -205,13 +202,16 @@ export const routes: RouteObject[] = [
 	{
 		id: 'root',
 		path: '/',
-		element: <AppRoot />,
-		errorElement: <AppRootErrorLayout />,
-		loader: appRootLoader,
+		lazy: () => import('@/routes/root'),
 		children: [
 			{
 				path: 'auth',
-				loader: authLoader,
+				lazy: () => import('@/routes/auth'),
+			},
+
+			{
+				path: 'mychart/authenticate',
+				lazy: () => import('@/routes/auth'),
 			},
 
 			{

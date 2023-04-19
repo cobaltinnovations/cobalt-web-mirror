@@ -1,25 +1,21 @@
-import React, { FC, createContext, useState, useCallback, useMemo, PropsWithChildren, useEffect } from 'react';
-import { useNavigate, useRouteLoaderData } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
+import React, { FC, PropsWithChildren, createContext, useCallback, useState } from 'react';
 
-import { AccountInstitutionCapabilities, AccountModel, AccountSourceId, LoginDestinationId } from '@/lib/models';
+import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId } from '@/lib/models';
 import { accountService, institutionService } from '@/lib/services';
 
 import { AccountSource, Institution } from '@/lib/models/institution';
-
-import { AppRootLoaderData } from '@/app-root';
-import { getSubdomain } from '@/hooks/use-subdomain';
+import { useAppRootLoaderData } from '@/routes/root';
+import { createQueryFn } from '@/lib/http-client';
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
-	setAccount: React.Dispatch<React.SetStateAction<AccountModel | undefined>>;
-	isAnonymous: boolean;
+	setAccountId: (accountId: string) => void;
 	institution: Institution;
-	refetchInstitution: () => void;
 	accountSources: AccountSource[];
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
 	signOutAndClearContext: () => void;
-	isImmediateSession: boolean;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
@@ -31,39 +27,27 @@ export const LoginDestinationIdRouteMap = {
 } as const;
 
 const AccountProvider: FC<PropsWithChildren> = (props) => {
-	const rootData = useRouteLoaderData('root') as AppRootLoaderData;
+	const { subdomain, accountSourceId, initialData } = useAppRootLoaderData();
 
-	const [account, setAccount] = useState<AccountModel | undefined>(rootData.account);
-	const [institution, setInstitution] = useState<Institution>(rootData.institution);
+	const [accountId, setAccountId] = useState(initialData.accountId);
 
-	const isAnonymous = account?.accountSourceId === AccountSourceId.ANONYMOUS;
+	const { data: institutionResponse } = useQuery({
+		...institutionService.getInstitution({
+			subdomain,
+			accountSourceId,
+		}),
+		initialData: initialData.institutionResponse,
+	});
 
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		setInstitution(rootData.institution);
-	}, [rootData.institution]);
-
-	const institutionCapabilities = useMemo(() => {
-		if (!account || !account.capabilities) {
-			return;
-		}
-
-		return account.capabilities[rootData.institution.institutionId];
-	}, [account, rootData.institution.institutionId]);
-
-	const refetchInstitution = useCallback(async () => {
-		const response = await institutionService
-			.getInstitution({
-				subdomain: getSubdomain(),
-			})
-			.fetch();
-
-		setInstitution(response.institution);
-	}, []);
+	const { data: accountResponse } = useQuery({
+		queryKey: ['account', accountId],
+		queryFn: createQueryFn(() => accountService.account(accountId)),
+		enabled: !!accountId,
+	});
 
 	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
+		Cookies.remove('accountId');
 		Cookies.remove('authRedirectUrl');
 		Cookies.remove('ssoRedirectUrl');
 		Cookies.remove('immediateAccess');
@@ -72,43 +56,35 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		window.localStorage.clear();
 
 		try {
-			if (!account) {
+			if (!accountId) {
 				throw new Error('account is required.');
 			}
 
-			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(account.accountId).fetch();
-
-			setAccount(undefined);
+			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(accountId).fetch();
 
 			if (federatedLogoutUrl) {
 				window.location.href = federatedLogoutUrl;
 				return;
 			}
-
-			navigate('/sign-in');
 		} catch (error) {
-			// Fail silently and just log the user normally
-
-			navigate('/sign-in');
-			setAccount(undefined);
+			// Fail silently and just log the user out normally
+		} finally {
+			const url = new URL(window.location.href);
+			url.pathname = '/sign-in';
+			window.location.href = url.toString();
 		}
-	}, [account, navigate]);
+	}, [accountId]);
 
 	const value = {
-		account,
-		setAccount,
-		isAnonymous,
-		institution: institution,
-		refetchInstitution,
-		accountSources: rootData.accountSources,
-		institutionCapabilities,
+		account: accountResponse?.account,
+		setAccountId,
+		institution: accountResponse?.institution || institutionResponse.institution,
+		accountSources: institutionResponse.accountSources,
+		institutionCapabilities: accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId],
 		signOutAndClearContext,
-		isImmediateSession: rootData.isImmediateSession,
 	};
 
 	return <AccountContext.Provider value={value}>{props.children}</AccountContext.Provider>;
 };
 
-const AccountConsumer = AccountContext.Consumer;
-
-export { AccountContext, AccountProvider, AccountConsumer };
+export { AccountContext, AccountProvider };
