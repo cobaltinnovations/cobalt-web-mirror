@@ -29,6 +29,7 @@ import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { buildQueryParamUrl } from '@/lib/utils';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -175,12 +176,10 @@ const EhrLookup: FC = () => {
 			setSelectedProvider(undefined);
 			setSelectedTimeSlot(undefined);
 
-			navigate(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
-				replace: true,
-				state: {
-					successBooking: true,
-					emailAddress: response.account.emailAddress,
-				},
+			window.location.href = buildQueryParamUrl('/my-calendar', {
+				appointmentId: appointment.appointmentId,
+				successBooking: String(true),
+				...(response.account.emailAddress && { emailAddress: response.account.emailAddress }),
 			});
 		} catch (e) {
 			handleError(e);

@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObject, useLayoutEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 
 import AsyncPage from '@/components/async-page';
@@ -19,16 +19,21 @@ interface PendingCancellationModel {
 
 const MyCalendar: FC = () => {
 	const handleError = useHandleError();
-	const location = useLocation();
+
 	const [searchParams] = useSearchParams();
-	const appointmentId = searchParams.get('appointmentId') || '';
-	const groupSessionReservationId = searchParams.get('groupSessionReservationId') || '';
-	const action = searchParams.get('action') || '';
+	const appointmentId = useMemo(() => searchParams.get('appointmentId') ?? '', [searchParams]);
+	const groupSessionReservationId = useMemo(
+		() => searchParams.get('groupSessionReservationId') ?? '',
+		[searchParams]
+	);
+	const successBooking = useMemo(() => searchParams.get('successBooking') ?? '', [searchParams]);
+	const emailAddress = useMemo(() => searchParams.get('emailAddress') ?? '', [searchParams]);
+	const action = useMemo(() => searchParams.get('action') ?? '', [searchParams]);
+
 	const [isCancelling, setIsCancelling] = useState(false);
 	const [pendingCancellation, setPendingCancellation] = useState<PendingCancellationModel | undefined>(undefined);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
 	const [calendarEventGroups, setCalendarEventGroups] = useState<CalendarEventGroupsModel[]>([]);
-	const locationState = (location.state as { successBooking?: boolean; emailAddress?: string }) || {};
 
 	const eventRefs = useMemo(
 		() =>
@@ -146,12 +151,11 @@ const MyCalendar: FC = () => {
 			</HeroContainer>
 
 			<div className="pb-8">
-				{locationState?.successBooking ? (
+				{successBooking ? (
 					<HeroContainer className="bg-success">
-						{locationState?.emailAddress ? (
+						{emailAddress ? (
 							<h5 className="text-center text-light mb-0">
-								Your session is reserved and we have sent a confirmation to{' '}
-								{locationState?.emailAddress}.
+								Your session is reserved and we have sent a confirmation to {emailAddress}.
 							</h5>
 						) : (
 							<h5 className="text-center mb-0">Your appointment was reserved.</h5>

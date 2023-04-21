@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import { accountService, appointmentService } from '@/lib/services';
@@ -8,9 +8,9 @@ import useFlags from '@/hooks/use-flags';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
+import { buildQueryParamUrl } from '@/lib/utils';
 
 const ConfirmAppointment = () => {
-	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const promptForPhoneNumber = searchParams.get('promptForPhoneNumber') === 'true';
 	const providerId = searchParams.get('providerId') ?? '';
@@ -142,18 +142,10 @@ const ConfirmAppointment = () => {
 				})
 				.fetch();
 
-			navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-				state: {
-					successBooking: true,
-					emailAddress: response.account.emailAddress,
-				},
-			});
-
-			addFlag({
-				variant: 'success',
-				title: 'Your appointment is reserved',
-				description: `We'll see you ${response.appointment.startTimeDescription}`,
-				actions: [],
+			window.location.href = buildQueryParamUrl('/my-calendar', {
+				appointmentId: response.appointment.appointmentId,
+				successBooking: String(true),
+				...(response.account.emailAddress && { emailAddress: response.account.emailAddress }),
 			});
 		} catch (error) {
 			handleError(error);
