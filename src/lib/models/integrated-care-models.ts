@@ -20,6 +20,10 @@ export interface PatientOrderModel {
 	patientAccountId?: string;
 	patientAddressId?: string;
 	panelAccountId?: string;
+	panelAccountFirstName: string;
+	panelAccountLastName: string;
+	panelAccountDisplayName: string;
+	panelAccountDisplayNameWithLastFirst: string;
 	encounterDepartmentId?: string;
 	encounterDepartmentIdType?: string;
 	encounterDepartmentName?: string;
@@ -113,6 +117,25 @@ export interface PatientOrderModel {
 	resourcesSentNote?: string;
 	outreachCount?: number;
 	outreachCountDescription?: string;
+	patientOrderCareTypeId?: PatientOrderCareTypeId;
+	patientOrderCareTypeDescription?: string;
+	mostRecentScreeningSessionId: string;
+	mostRecentScreeningSessionCreatedByAccountId: string;
+	mostRecentScreeningSessionCreatedByAccountFirstName: string;
+	mostRecentScreeningSessionCreatedByAccountLastName: string;
+	mostRecentScreeningSessionCreatedByAccountDisplayName: string;
+	mostRecentScreeningSessionCreatedByAccountDisplayNameWithLastFirst: string;
+	mostRecentScreeningSessionCompleted: boolean;
+	mostRecentScreeningSessionCompletedAt: string;
+	mostRecentScreeningSessionCompletedAtDescription: string;
+}
+
+export enum PatientOrderCareTypeId {
+	UNSPECIFIED = 'UNSPECIFIED',
+	SUBCLINICAL = 'SUBCLINICAL',
+	SPECIALTY = 'SPECIALTY',
+	COLLABORATIVE = 'COLLABORATIVE',
+	SAFETY_PLANNING = 'SAFETY_PLANNING',
 }
 
 enum PatientOrderClosureReasonId {

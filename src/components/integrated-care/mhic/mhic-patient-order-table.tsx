@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
+	PatientOrderCareTypeId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -212,8 +213,13 @@ export const MhicPatientOrderTable = ({
 											stickyOffset={columnConfig.checkbox ? 56 : 0}
 											className="px-0 flex-row align-items-center justify-content-end"
 										>
-											<span className="text-gray">0</span>
-											<FlagIcon className="text-warning" />
+											{(po.patientBelowAgeThreshold ||
+												po.mostRecentEpisodeClosedWithinDateThreshold) && (
+												<>
+													<span className="text-gray">0</span>
+													<FlagIcon className="text-warning" />
+												</>
+											)}
 										</TableCell>
 									)}
 									{columnConfig.patient && (
@@ -274,7 +280,7 @@ export const MhicPatientOrderTable = ({
 													{po.patientOrderScreeningStatusDescription}
 												</Badge>
 											)}
-											<span className="ms-4 fs-small">[TODO]: Insurance</span>
+											<span className="ms-4 fs-small text-danger">[TODO]: Insurance</span>
 										</TableCell>
 									)}
 									{columnConfig.outreachNumber && (
@@ -296,12 +302,16 @@ export const MhicPatientOrderTable = ({
 									)}
 									{columnConfig.assessmentCompleted && (
 										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">
+												{po.mostRecentScreeningSessionCompletedAtDescription}
+											</span>
 										</TableCell>
 									)}
 									{columnConfig.completedBy && (
 										<TableCell width={240}>
-											<span className="text-nowrap text-truncate">[TODO]: Mhic Name</span>
+											<span className="text-nowrap text-truncate">
+												{po.mostRecentScreeningSessionCreatedByAccountDisplayName}
+											</span>
 										</TableCell>
 									)}
 									{columnConfig.triage && (
@@ -312,9 +322,21 @@ export const MhicPatientOrderTable = ({
 													Safety Planning
 												</Badge>
 											)}
-											<Badge pill bg="outline-warning" className="text-nowrap">
-												[TODO]: Specialty
-											</Badge>
+											{po.patientOrderCareTypeId === PatientOrderCareTypeId.SUBCLINICAL && (
+												<Badge pill bg="outline-dark" className="text-nowrap">
+													{po.patientOrderCareTypeDescription}
+												</Badge>
+											)}
+											{po.patientOrderCareTypeId === PatientOrderCareTypeId.SPECIALTY && (
+												<Badge pill bg="outline-warning" className="text-nowrap">
+													{po.patientOrderCareTypeDescription}
+												</Badge>
+											)}
+											{po.patientOrderCareTypeId === PatientOrderCareTypeId.COLLABORATIVE && (
+												<Badge pill bg="outline-primary" className="text-nowrap">
+													{po.patientOrderCareTypeDescription}
+												</Badge>
+											)}
 										</TableCell>
 									)}
 									{columnConfig.resources && (
@@ -346,7 +368,9 @@ export const MhicPatientOrderTable = ({
 									)}
 									{columnConfig.assignedMhic && (
 										<TableCell width={280}>
-											<span className="text-nowrap text-truncate">[TODO]: MHIC Name</span>
+											<span className="text-nowrap text-truncate">
+												{po.panelAccountDisplayName}
+											</span>
 										</TableCell>
 									)}
 								</TableRow>
