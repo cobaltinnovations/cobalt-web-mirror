@@ -552,12 +552,12 @@ const ConnectWithSupportV2 = () => {
 															  }))
 													}
 													showViewButton={!provider.displayPhoneNumberOnlyForBooking}
-													onModalTimeButtonClick={(availabilityTimeSlot) => {
+													onModalTimeButtonClick={(sectionDate, availabilityTimeSlot) => {
 														bookingRef.current?.kickoffBookingProcess({
 															source: BookingSource.ConnectWithSupportV2,
 															exitUrl: `${pathname}${search}`,
 															provider,
-															date: section.date,
+															date: sectionDate,
 															timeSlot: availabilityTimeSlot,
 														});
 													}}

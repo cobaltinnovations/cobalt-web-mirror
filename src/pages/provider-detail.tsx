@@ -91,7 +91,7 @@ const useProviderDetailStyles = createUseThemedStyles((theme) => ({
 
 const ProviderDetail = () => {
 	const classes = useProviderDetailStyles();
-	const { pathname } = useLocation();
+	const { pathname, search } = useLocation();
 	const { providerId } = useParams<{ providerId: string }>();
 	const {
 		setAppointmentTypes,
@@ -327,6 +327,7 @@ const ProviderDetail = () => {
 																				bookingRef.current?.kickoffBookingProcess(
 																					{
 																						source: BookingSource.ProviderDetail,
+																						exitUrl: `${pathname}${search}`,
 																						timeSlot: availability,
 																						date: section.date,
 																						provider: sectionProvider,
