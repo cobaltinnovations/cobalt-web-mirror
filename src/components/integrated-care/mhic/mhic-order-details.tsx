@@ -190,7 +190,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									<p className="mb-0">
 										Completed{' '}
 										<strong>{patientOrder.screeningSession?.completedAtDescription}</strong> by{' '}
-										<strong className="text-danger">[TODO]: completedBy</strong>
+										<strong>
+											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName}
+										</strong>
 									</p>
 								</Col>
 							</Row>
@@ -739,9 +741,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0 text-gray">MHIC</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.panelAccountDisplayName}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">

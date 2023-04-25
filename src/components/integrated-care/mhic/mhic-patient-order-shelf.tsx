@@ -201,7 +201,10 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									</p>
 									<span className="text-n300 mx-2">|</span>
 									<p className="mb-0">
-										MHIC: <span className="fw-bold text-danger">[TODO]: Assigned MHIC</span>
+										MHIC:{' '}
+										<span className="fw-bold">
+											{currentPatientOrder?.panelAccountDisplayName ?? 'Unassigned'}
+										</span>
 									</p>
 								</div>
 								<div>
