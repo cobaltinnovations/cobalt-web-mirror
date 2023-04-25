@@ -17,6 +17,7 @@ import { isEqual, sortBy } from 'lodash';
 import { To, useSearchParams } from 'react-router-dom';
 import { getRandomPlaceholderImage } from '@/hooks/use-random-placeholder-image';
 import useAccount from '@/hooks/use-account';
+import Cookies from 'js-cookie';
 
 export enum BookingSource {
 	ProviderSearch = 'PROVIDER_SEARCH',
@@ -115,10 +116,6 @@ interface BookingState {
 	setSelectedTimeSlot: Dispatch<SetStateAction<AvailabilityTimeSlot | undefined>>;
 	formattedAvailabilityDate: string;
 
-	setBookingSource: Dispatch<SetStateAction<BookingSource>>;
-	bookingSource: BookingSource;
-	exitUrl: string;
-	setExitUrl: Dispatch<SetStateAction<string>>;
 	getActiveFiltersState: (findOptions?: FindOptionsResponse) => Record<BookingFilters, boolean>;
 	isEligible: boolean;
 	setIsEligible: Dispatch<SetStateAction<boolean>>;
@@ -143,8 +140,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [selectedTimeSlot, setSelectedTimeSlot] = useState<AvailabilityTimeSlot>();
 
 	const [isEligible, setIsEligible] = useState(true);
-	const [bookingSource, setBookingSource] = useState<BookingSource>(BookingSource.ProviderSearch);
-	const [exitUrl, setExitUrl] = useState('/');
 	const [previousProviderId, setPreviousProviderId] = useState<string>();
 
 	const formattedAvailabilityDate = useMemo(() => moment(selectedDate).format('YYYY-MM-DD'), [selectedDate]);
@@ -225,13 +220,17 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		setSelectedProvider(undefined);
 		setSelectedTimeSlot(undefined);
 		setIsEligible(true);
-		setBookingSource(BookingSource.ProviderSearch);
 		setPreviousProviderId(undefined);
+
+		Cookies.remove('bookingSource');
+		Cookies.remove('exitUrl');
 	}, [accountId]);
 
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
 	const getExitBookingLocation = useCallback(
 		(state?: unknown) => {
+			const bookingSource = Cookies.get('bookingSource');
+
 			if (bookingSource === BookingSource.ProviderDetail && redirectProviderId) {
 				return {
 					pathname: `/providers/${redirectProviderId}`,
@@ -239,19 +238,15 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				};
 			}
 
-			if (bookingSource === BookingSource.ConnectWithSupportV2) {
-				return {
-					pathname: exitUrl,
-				};
-			}
+			const exitUrl = Cookies.get('bookingExitUrl') ?? '/';
 
 			return {
-				pathname: '/connect-with-support',
+				pathname: exitUrl,
 				search: preservedFilterQueryString,
 				state,
 			};
 		},
-		[bookingSource, exitUrl, preservedFilterQueryString, redirectProviderId]
+		[preservedFilterQueryString, redirectProviderId]
 	);
 
 	return (
@@ -280,10 +275,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				selectedTimeSlot,
 				setSelectedTimeSlot,
 
-				bookingSource,
-				setBookingSource,
-				exitUrl,
-				setExitUrl,
 				getActiveFiltersState,
 				isEligible,
 				setIsEligible,
