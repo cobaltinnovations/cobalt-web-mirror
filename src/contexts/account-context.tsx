@@ -88,6 +88,8 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('x-mhic-cobalt-token');
 		Cookies.remove('piccobalt_patientcontext');
 		Cookies.remove('trackActivity');
+		Cookies.remove('bookingSource');
+		Cookies.remove('exitUrl');
 		window.localStorage.clear();
 		setRedirectTo('/');
 		setIsTrackedSession(false);
