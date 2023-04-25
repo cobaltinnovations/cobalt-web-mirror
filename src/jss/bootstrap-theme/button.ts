@@ -182,6 +182,9 @@ export const button = (theme: CobaltTheme) => {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.p700,
 				},
+				'&:disabled:after': {
+					border: `2px solid ${theme.colors.n500}`,
+				},
 			},
 			'&-outline-secondary': {
 				color: theme.colors.a500,

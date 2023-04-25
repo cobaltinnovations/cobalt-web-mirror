@@ -4,6 +4,7 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
+	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -178,6 +179,10 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											onClick={() => {
 												navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
 											}}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										>
 											Review <ExternalIcon className="ms-2" width={20} height={20} />
 										</Button>
@@ -217,12 +222,20 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 								/>
 							)}
 							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-								<MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />
+								<MhicTriageCard
+									key={triageGroupIndex}
+									className="mb-6"
+									triageGroup={triageGroup}
+									disabled={
+										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+									}
+								/>
 							))}
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
 								onPatientOrderChange={onPatientOrderChange}
+								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 						</>
 					)}
@@ -246,6 +259,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												onClick: () => {
 													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 											{
 												variant: 'outline-primary',
@@ -254,6 +270,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 													setAssessmentIdToEdit('');
 													setShowScheduleAssessmentModal(true);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 										]}
 									/>
@@ -268,6 +287,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												onClick: () => {
 													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 											{
 												variant: 'outline-primary',
@@ -276,6 +298,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 													setAssessmentIdToEdit('xxx');
 													setShowScheduleAssessmentModal(true);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 										]}
 									/>
@@ -290,6 +315,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												onClick: () => {
 													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 											{
 												variant: 'outline-primary',
@@ -297,6 +325,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												onClick: () => {
 													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 										]}
 									/>
@@ -325,6 +356,10 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											onClick={() => {
 												setShowContactInformationModal(true);
 											}}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										>
 											<EditIcon className="d-flex" />
 										</Button>
@@ -449,6 +484,10 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											onClick={() => {
 												setShowDemographicsModal(true);
 											}}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										>
 											<EditIcon className="d-flex" />
 										</Button>
@@ -544,6 +583,10 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											onClick={() => {
 												setShowInsuranceModal(true);
 											}}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										>
 											<EditIcon className="d-flex" />
 										</Button>

@@ -3,6 +3,7 @@ import { Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
+	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderOutreachModel,
 	PatientOrderOutreachTypeId,
@@ -146,6 +147,10 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 											as={DropdownToggle}
 											className="me-2"
 											id="mhic-contact-history__dropdown-menu"
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										>
 											Log Contact Attempt
 										</Dropdown.Toggle>
@@ -186,6 +191,9 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 											setMessageToEdit(undefined);
 											setShowMessageModal(true);
 										}}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
 									>
 										Send Message
 									</Button>
@@ -207,6 +215,9 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 													setMessageToEdit(undefined);
 													setShowMessageModal(true);
 												},
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
 											},
 										]}
 									/>
@@ -231,6 +242,10 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 														setMessageToEdit(message);
 														setShowMessageModal(true);
 													}}
+													disabled={
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED
+													}
 												>
 													<EditIcon className="d-flex" />
 												</Button>
@@ -291,6 +306,10 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 															as={DropdownToggle}
 															id={`mhic-outreach-attempt__dropdown-menu--${outreach.patientOrderOutreachId}`}
 															className="p-2"
+															disabled={
+																patientOrder.patientOrderDispositionId ===
+																PatientOrderDispositionId.CLOSED
+															}
 														>
 															<MoreIcon className="d-flex" />
 														</Dropdown.Toggle>
