@@ -744,7 +744,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0">{patientOrder.panelAccountDisplayName}</p>
 											</Col>
 										</Row>
-										<Row className="mb-4">
+										<Row>
 											<Col xs={3}>
 												<p className="m-0 text-gray">BHP</p>
 											</Col>
@@ -754,7 +754,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												</p>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col xs={3}>
 												<p className="m-0 text-gray">Psychiatrist</p>
 											</Col>
@@ -763,7 +763,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 													<span className="text-danger">[TODO]</span>
 												</p>
 											</Col>
-										</Row>
+										</Row> */}
 									</Container>
 								</Card.Body>
 							</Card>
