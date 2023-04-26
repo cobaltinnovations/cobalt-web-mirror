@@ -26,9 +26,10 @@ const MhicOrdersClosed = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
+			...(pageNumber && { pageNumber }),
 			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
 		});
-	}, [fetchPatientOrders]);
+	}, [fetchPatientOrders, pageNumber]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {

@@ -38,6 +38,7 @@ const MhicOrdersAssigned = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
+			...(pageNumber && { pageNumber }),
 			patientOrderStatusId: [
 				PatientOrderStatusId.NEEDS_ASSESSMENT,
 				PatientOrderStatusId.SCHEDULED,
@@ -47,7 +48,7 @@ const MhicOrdersAssigned = () => {
 				PatientOrderStatusId.BHP,
 			],
 		});
-	}, [fetchPatientOrders]);
+	}, [fetchPatientOrders, pageNumber]);
 
 	const handleAssignOrdersSave = useCallback(
 		async (patientOrderCount: number, panelAccountDisplayName: string) => {

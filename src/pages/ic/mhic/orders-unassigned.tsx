@@ -47,8 +47,9 @@ const MhicOrdersUnassigned = () => {
 		return fetchPatientOrders({
 			pageSize: '15',
 			patientOrderStatusId: PatientOrderStatusId.PENDING,
+			...(pageNumber && { pageNumber }),
 		});
-	}, [fetchPatientOrders]);
+	}, [fetchPatientOrders, pageNumber]);
 
 	const handleImportButtonChange = useCallback(
 		(file: File) => {
