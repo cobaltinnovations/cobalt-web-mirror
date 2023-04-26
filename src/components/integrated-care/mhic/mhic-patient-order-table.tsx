@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
@@ -77,6 +77,20 @@ export const MhicPatientOrderTable = ({
 
 		return 0;
 	}, [columnConfig.checkbox, columnConfig.flag]);
+
+	const getFlagCount = useCallback((patientOrder: PatientOrderModel) => {
+		let count = 0;
+
+		if (patientOrder.patientBelowAgeThreshold) {
+			count++;
+		}
+
+		if (patientOrder.mostRecentEpisodeClosedWithinDateThreshold) {
+			count++;
+		}
+
+		return count;
+	}, []);
 
 	return (
 		<>
@@ -213,10 +227,9 @@ export const MhicPatientOrderTable = ({
 											stickyOffset={columnConfig.checkbox ? 56 : 0}
 											className="px-0 flex-row align-items-center justify-content-end"
 										>
-											{(po.patientBelowAgeThreshold ||
-												po.mostRecentEpisodeClosedWithinDateThreshold) && (
+											{getFlagCount(po) > 0 && (
 												<>
-													<span className="text-gray">0</span>
+													<span className="text-gray">{getFlagCount(po)}</span>
 													<FlagIcon className="text-warning" />
 												</>
 											)}
