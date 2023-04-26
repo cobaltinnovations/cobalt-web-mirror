@@ -23,10 +23,11 @@ interface Props {
 	message: string;
 	onEdit(): void;
 	onDelete(): void;
+	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, className }: Props) => {
+export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, disabled, className }: Props) => {
 	const classes = useStyles();
 	const uuid = useRef(uuidv4());
 
@@ -44,6 +45,7 @@ export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, classN
 							as={DropdownToggle}
 							id={`mhic-outreach-attempt__dropdown-menu--${uuid.current}`}
 							className="p-2"
+							disabled={disabled}
 						>
 							<MoreIcon className="d-flex" />
 						</Dropdown.Toggle>

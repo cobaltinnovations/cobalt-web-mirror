@@ -3,16 +3,11 @@ import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-hori
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
-import {
-	PatientOrderAutocompleteResult,
-	PatientOrderDispositionId,
-	PatientOrderModel,
-	PatientOrderStatusId,
-} from '@/lib/models';
+import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
-import { Link, useMatch, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 
@@ -122,6 +117,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
+	const { pathname } = useLocation();
 
 	const panelRoot = useMatch({
 		path: '/ic/mhic',
@@ -131,9 +127,12 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		path: '/ic/mhic/my-patients',
 		end: true,
 	});
-	const ordersPath = useMatch({
-		path: '/ic/mhic/orders',
-	});
+	const ordersPath = [
+		'/ic/mhic/orders',
+		'/ic/mhic/orders/unassigned',
+		'/ic/mhic/orders/assigned',
+		'/ic/mhic/orders/closed',
+	].some((pattern) => matchPath(pattern, pathname));
 	const reportsPath = useMatch({
 		path: '/ic/mhic/reports',
 	});
@@ -158,15 +157,14 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				testId: '',
 				navigationItemId: 'ORDERS',
 				title: 'Orders',
-				active: !!ordersPath,
+				active: ordersPath,
 				items: [
 					{
 						testId: '',
-						navigationItemId: 'ORDERS_PENDING',
-						title: 'Pending',
+						navigationItemId: 'ORDERS_UNASSIGNED',
+						title: 'Unassigned',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderStatusId=${PatientOrderStatusId.PENDING}`,
+							pathname: '/ic/mhic/orders/unassigned',
 						},
 					},
 					{
@@ -174,8 +172,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 						navigationItemId: 'ORDERS_ASSIGNED',
 						title: 'Assigned',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderStatusId=${PatientOrderStatusId.NEEDS_ASSESSMENT}&patientOrderStatusId=${PatientOrderStatusId.SCHEDULED}&patientOrderStatusId=${PatientOrderStatusId.SAFETY_PLANNING}&patientOrderStatusId=${PatientOrderStatusId.SPECIALTY_CARE}&patientOrderStatusId=${PatientOrderStatusId.SUBCLINICAL}&patientOrderStatusId=${PatientOrderStatusId.BHP}`,
+							pathname: '/ic/mhic/orders/assigned',
 						},
 					},
 					{
@@ -183,8 +180,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 						navigationItemId: 'ORDERS_CLOSED',
 						title: 'Closed',
 						to: {
-							pathname: '/ic/mhic/orders',
-							search: `?patientOrderDispositionId=${PatientOrderDispositionId.CLOSED}`,
+							pathname: '/ic/mhic/orders/closed',
 						},
 					},
 				],
@@ -257,7 +253,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 							size="sm"
 							onClick={() => {
 								navigate({
-									pathname: '/ic/mhic/orders',
+									pathname: '/ic/mhic/my-patients',
 									search: `?openPatientOrderId=${patientOrder?.patientOrderId}`,
 								});
 							}}

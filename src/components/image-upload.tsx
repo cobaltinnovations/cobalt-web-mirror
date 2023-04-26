@@ -69,7 +69,9 @@ const ImageUpload: FC<ImageUploadProps> = ({
 					</div>
 				)}
 				<FileInputButton accept="image/*" onChange={onChange} disabled={isUploading || disabled}>
-					{isUploading ? 'uploading...' : imagePreview ? 'upload new image' : 'upload image'}
+					<Button as="div">
+						{isUploading ? 'uploading...' : imagePreview ? 'upload new image' : 'upload image'}
+					</Button>
 				</FileInputButton>
 				{imagePreview && (
 					<Button size="sm" variant="danger" className="ms-2" onClick={onRemove} disabled={disabled}>

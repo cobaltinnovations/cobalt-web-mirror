@@ -162,7 +162,7 @@ export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
 		>
 			<Dropdown.Toggle
 				as={DropdownToggle}
-				className="d-inline-flex align-items-center py-2 ps-3 pe-4"
+				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
 				<FilterIcon className="me-2" />
@@ -218,7 +218,7 @@ export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
 						<Dropdown.Toggle
 							as={DropdownToggle}
 							id="order-filters--select-filter"
-							className="d-inline-flex align-items-center py-2 px-3"
+							className="d-inline-flex align-items-center"
 						>
 							<PlusIcon className="me-2" />
 							<span>Add Filter</span>

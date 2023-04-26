@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import {
 	MhicCustomizeTableModal,
 	MhicFilterDropdown,
+	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import useAccount from '@/hooks/use-account';
+import { PatientOrderStatusId } from '@/lib/models';
 
 const MhicMyPatients = () => {
 	const { account } = useAccount();
@@ -48,6 +50,16 @@ const MhicMyPatients = () => {
 		[searchParams, setSearchParams]
 	);
 
+	const pageTitleMap: Record<PatientOrderStatusId, string> = {
+		[PatientOrderStatusId.BHP]: 'BHP',
+		[PatientOrderStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
+		[PatientOrderStatusId.PENDING]: 'Pending',
+		[PatientOrderStatusId.SAFETY_PLANNING]: 'Safety Planning',
+		[PatientOrderStatusId.SCHEDULED]: 'Scheduled',
+		[PatientOrderStatusId.SPECIALTY_CARE]: 'Specialty Care',
+		[PatientOrderStatusId.SUBCLINICAL]: 'Subclinical',
+	};
+
 	return (
 		<>
 			<MhicCustomizeTableModal
@@ -60,51 +72,70 @@ const MhicMyPatients = () => {
 				}}
 			/>
 
-			<div className="py-6 d-flex align-items-center justify-content-between">
-				<h3>
-					All Assigned <span className="text-gray fs-large fw-normal">(0 Patients)</span>
-				</h3>
-				<div className="d-flex">
-					<MhicFilterDropdown
-						align="end"
-						className="me-2"
-						onApply={(selectedFilters) => {
-							console.log(selectedFilters);
-						}}
-					/>
-					<MhicSortDropdown align="end" className="me-2" />
-					<Button
-						variant="light"
-						onClick={() => {
-							setShowCustomizeTableModal(true);
-						}}
-					>
-						Customize
-					</Button>
-				</div>
-			</div>
-
-			<MhicPatientOrderTable
-				isLoading={isLoadingOrders}
-				patientOrders={patientOrders}
-				selectAll={false}
-				onSelectPatientOrderIdsChange={() => {
-					return;
-				}}
-				totalPatientOrdersCount={totalCount}
-				totalPatientOrdersDescription={totalCountDescription}
-				pageNumber={parseInt(pageNumber, 10)}
-				pageSize={15}
-				onPaginationClick={handlePaginationClick}
-				columnConfig={{
-					flag: true,
-					patient: true,
-					referralDate: true,
-					practice: true,
-					referralReason: true,
-					assessmentStatus: true,
-				}}
-			/>
+			<Container fluid className="py-8">
+				<Row className="mb-8">
+					<Col>
+						<MhicPageHeader
+							title={
+								patientOrderStatusId
+									? pageTitleMap[patientOrderStatusId as PatientOrderStatusId]
+									: 'All Assigned'
+							}
+							description={`${totalCountDescription ?? 0} Patients`}
+						>
+							<div className="d-flex align-items-center">
+								<MhicFilterDropdown
+									align="end"
+									className="me-2"
+									onApply={(selectedFilters) => {
+										console.log(selectedFilters);
+									}}
+								/>
+								<MhicSortDropdown
+									align="end"
+									className="me-2"
+									onApply={(selectedFilters) => {
+										console.log(selectedFilters);
+									}}
+								/>
+								{/* <Button
+									variant="light"
+									onClick={() => {
+										setShowCustomizeTableModal(true);
+									}}
+								>
+									Customize
+								</Button> */}
+							</div>
+						</MhicPageHeader>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<MhicPatientOrderTable
+							isLoading={isLoadingOrders}
+							patientOrders={patientOrders}
+							selectAll={false}
+							onSelectPatientOrderIdsChange={() => {
+								return;
+							}}
+							totalPatientOrdersCount={totalCount}
+							totalPatientOrdersDescription={totalCountDescription}
+							pageNumber={parseInt(pageNumber, 10)}
+							pageSize={15}
+							onPaginationClick={handlePaginationClick}
+							columnConfig={{
+								flag: true,
+								patient: true,
+								referralDate: true,
+								practice: true,
+								referralReason: true,
+								assessmentStatus: true,
+							}}
+						/>
+					</Col>
+				</Row>
+			</Container>
 		</>
 	);
 };

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PateintOrderTriageGroupModel } from '@/lib/models';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
 
 interface Props {
 	triageGroup: PateintOrderTriageGroupModel;
+	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicTriageCard = ({ triageGroup, className }: Props) => {
+export const MhicTriageCard = ({ triageGroup, disabled, className }: Props) => {
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 
 	return (
@@ -32,30 +32,24 @@ export const MhicTriageCard = ({ triageGroup, className }: Props) => {
 						<span className="text-uppercase">{triageGroup.patientOrderCareTypeDescription}</span>
 					</Card.Title>
 					<div className="button-container">
+						<span className="me-3 text-uppercase text-gray">Enrolled</span>
 						<Button
 							variant="light"
-							className="p-2"
+							size="sm"
 							onClick={() => {
 								setShowChangeTriageModal(true);
 							}}
+							disabled={disabled}
 						>
-							<EditIcon className="d-flex" />
+							Override
 						</Button>
 					</div>
 				</Card.Header>
 				<Card.Body>
 					<Container fluid>
-						<Row className="mb-4">
-							<Col xs={3}>
-								<p className="m-0 text-gray">Care Focus</p>
-							</Col>
-							<Col xs={9}>
-								<p className="m-0">{triageGroup.patientOrderFocusTypeDescription}</p>
-							</Col>
-						</Row>
 						<Row>
 							<Col xs={3}>
-								<p className="m-0 text-gray">Reason</p>
+								<p className="m-0 text-gray">{triageGroup.patientOrderFocusTypeDescription}</p>
 							</Col>
 							<Col xs={9}>
 								{triageGroup.reasons.map((reason, reasonIndex) => (

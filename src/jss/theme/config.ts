@@ -4,7 +4,7 @@ const headingFontFamily: CobaltFontFamily = {
 	fontFamily: '"Clarika Pro Geometric", sans-serif',
 	weights: {
 		regular: 400,
-		bold: 700,
+		bold: 600,
 	},
 };
 
@@ -13,7 +13,7 @@ const bodyFontFamily: CobaltFontFamily = {
 		'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 	weights: {
 		regular: 400,
-		bold: 700,
+		bold: 600,
 	},
 };
 

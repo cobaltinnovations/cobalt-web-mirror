@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Form } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
 import { MhicResourcesModal } from '@/components/integrated-care/mhic';
@@ -7,10 +7,11 @@ import { MhicResourcesModal } from '@/components/integrated-care/mhic';
 interface Props {
 	patientOrder: PatientOrderModel;
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
+	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, className }: Props) => {
+export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled, className }: Props) => {
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 
 	const handleResourcesModalSave = useCallback(
@@ -34,55 +35,68 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 
 			<Card bsPrefix="ic-card" className={className}>
 				<Card.Header>
-					<Card.Title>Next Steps</Card.Title>
+					<Card.Title className="text-danger">[TODO]: Next Steps</Card.Title>
 				</Card.Header>
 				<Card.Body>
 					<div className="mb-4 d-flex align-items-center justify-content-between">
+						<Form.Check
+							type="switch"
+							id="safety-planning-switch"
+							label={
+								<div>
+									<p className="mb-0">Safety Planning</p>
+									<p className="mb-0 text-gray">Recommended</p>
+								</div>
+							}
+							disabled={disabled}
+						/>
 						<div>
-							<p className="mb-0">Safety Planning</p>
-							<p className="mb-0 text-gray">Triage indicates patient needs safety planning</p>
-						</div>
-						<div>
-							<Button variant="link" size="sm" className="p-0 fw-semibold text-decoration-none">
+							<Button
+								variant="link"
+								size="sm"
+								className="p-0 fw-semibold text-decoration-none"
+								disabled={disabled}
+							>
 								Mark Complete
 							</Button>
 						</div>
 					</div>
-					{patientOrder.patientOrderResourcingStatusId && (
-						<>
-							<hr className="mb-4" />
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<div className="d-flex align-items-center justify-content-between">
-									<div>
-										<p className="mb-0">Resources</p>
-										<p className="mb-0 text-gray">Triage indicates patient needs resources</p>
-									</div>
-									<div>
-										<Button
-											variant="link"
-											size="sm"
-											className="p-0 fw-semibold text-decoration-none"
-											onClick={() => {
-												setShowResourcesModal(true);
-											}}
-										>
-											Mark Complete
-										</Button>
-									</div>
-								</div>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.SENT_RESOURCES && (
+					<hr className="mb-4" />
+					<div className="d-flex align-items-center justify-content-between">
+						<Form.Check
+							type="switch"
+							id="safety-planning-switch"
+							label={
 								<div>
 									<p className="mb-0">Resources</p>
 									<p className="mb-0 text-gray">
-										Resources sent on {patientOrder.resourcesSentAtDescription ?? 'N/A'}
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.NEEDS_RESOURCES && 'Recommended'}
+										{patientOrder.patientOrderResourcingStatusId ===
+											PatientOrderResourcingStatusId.SENT_RESOURCES &&
+											`Resources sent on {patientOrder.resourcesSentAtDescription ?? 'N/A'}`}
 									</p>
 								</div>
-							)}
-						</>
-					)}
+							}
+							disabled={disabled}
+						/>
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<div>
+								<Button
+									variant="link"
+									size="sm"
+									className="p-0 fw-semibold text-decoration-none"
+									onClick={() => {
+										setShowResourcesModal(true);
+									}}
+									disabled={disabled}
+								>
+									Mark Complete
+								</Button>
+							</div>
+						)}
+					</div>
 				</Card.Body>
 			</Card>
 		</>

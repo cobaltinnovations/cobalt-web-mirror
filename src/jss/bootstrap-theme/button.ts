@@ -1,4 +1,5 @@
 import { CobaltTheme } from '@/jss/theme';
+import Color from 'color';
 
 export const button = (theme: CobaltTheme) => {
 	return {
@@ -12,8 +13,9 @@ export const button = (theme: CobaltTheme) => {
 			lineHeight: '2rem',
 			position: 'relative',
 			textTransform: 'none',
-			'&:focus': {
+			'&:focus-visible': {
 				outline: 'none',
+				boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
 			},
 			'&:disabled': {
 				color: theme.colors.n500,
@@ -24,18 +26,15 @@ export const button = (theme: CobaltTheme) => {
 					backgroundColor: theme.colors.n100,
 				},
 			},
-
 			'&-lg': {
 				fontSize: '1.8rem',
 				lineHeight: '2.4rem',
 				padding: '12px 28px',
 			},
-
 			'&-sm': {
 				fontSize: '1.4rem',
 				padding: '6px 16px',
 			},
-
 			'& svg': {
 				fill: 'currentColor',
 				'& path': {
@@ -182,6 +181,9 @@ export const button = (theme: CobaltTheme) => {
 				'&:active': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.p700,
+				},
+				'&:disabled:after': {
+					border: `2px solid ${theme.colors.n500}`,
 				},
 			},
 			'&-outline-secondary': {

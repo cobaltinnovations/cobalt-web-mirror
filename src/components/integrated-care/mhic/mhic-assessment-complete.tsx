@@ -1,22 +1,27 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
 	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
-import { MHIC_HEADER_HEIGHT, MhicInlineAlert } from '@/components/integrated-care/mhic';
 import TabBar from '@/components/tab-bar';
+import {
+	MHIC_HEADER_HEIGHT,
+	MhicInlineAlert,
+	MhicNextStepsCard,
+	MhicTriageCard,
+} from '@/components/integrated-care/mhic';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
-import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -71,7 +76,7 @@ export const MhicAssessmentComplete = ({
 					</div>
 					<p className="mb-0">
 						Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
-						<span className="text-danger">[TODO]: Who</span>
+						{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
 					</p>
 				</Col>
 			</Row>
@@ -85,109 +90,39 @@ export const MhicAssessmentComplete = ({
 					<Col md={{ span: 7, offset: 1 }}>
 						<div className={classes.scrollAnchor} id="results" />
 						<h3 className="mb-8">Results</h3>
-						<MhicInlineAlert
+						{patientOrder.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="danger"
+								title="Patient needs safety planning"
+								description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
+							/>
+						)}
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="warning"
+								title="Resources needed"
+								description="Triage indicates the patient needs external resources"
+							/>
+						)}
+						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
+							if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
+								return null;
+							}
+
+							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
+						})}
+						<MhicNextStepsCard
 							className="mb-8"
-							variant="danger"
-							title="[TODO]: Patient needs safety planning"
-							description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
-							action={{
-								title: '[TODO]: Complete Handoff',
-								onClick: () => {
-									window.alert('[TODO]: Not sure what this does.');
-								},
+							patientOrder={patientOrder}
+							onPatientOrderChange={(patientOrder) => {
+								window.alert('[TODO]: Refresh the order on this page');
+								console.log(patientOrder);
 							}}
 						/>
-						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-							<Card key={triageGroupIndex} bsPrefix="ic-card" className="mb-8">
-								<Card.Header>
-									<Card.Title>
-										Triage:{' '}
-										<span className="text-uppercase">
-											{triageGroup.patientOrderCareTypeDescription}
-										</span>
-									</Card.Title>
-									<div className="button-container">
-										<Button
-											variant="light"
-											className="p-2"
-											onClick={() => {
-												window.alert('[TODO]: show modal.');
-											}}
-										>
-											<EditIcon className="d-flex" />
-										</Button>
-									</div>
-								</Card.Header>
-								<Card.Body key={triageGroupIndex}>
-									<Container fluid>
-										<Row className="mb-4">
-											<Col xs={3}>
-												<p className="m-0 text-gray">Care Focus</p>
-											</Col>
-											<Col xs={9}>
-												<p className="m-0">{triageGroup.patientOrderFocusTypeDescription}</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col xs={3}>
-												<p className="m-0 text-gray">Reason</p>
-											</Col>
-											<Col xs={9}>
-												{triageGroup.reasons.map((reason, reasonIndex) => (
-													<p key={reasonIndex} className="m-0">
-														{reason}
-													</p>
-												))}
-											</Col>
-										</Row>
-									</Container>
-								</Card.Body>
-							</Card>
-						))}
-						{patientOrder.patientOrderResourcingStatusId && (
-							<Card bsPrefix="ic-card" className="mb-8">
-								<Card.Header>
-									<Card.Title>Resources</Card.Title>
-									<div className="button-container">
-										{patientOrder.patientOrderResourcingStatusId ===
-											PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-											<Button
-												variant="light"
-												size="sm"
-												onClick={() => {
-													window.alert('[TODO]: Mark as Sent');
-												}}
-											>
-												[TODO]: Mark as Sent
-											</Button>
-										)}
-									</div>
-								</Card.Header>
-								<Card.Body>
-									{patientOrder.patientOrderResourcingStatusId ===
-										PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-										<MhicInlineAlert
-											variant="warning"
-											title="Resources needed"
-											description="Triage indicates the patient needs external resources"
-										/>
-									)}
-									{patientOrder.patientOrderResourcingStatusId ===
-										PatientOrderResourcingStatusId.SENT_RESOURCES && (
-										<MhicInlineAlert
-											variant="success"
-											title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-											action={{
-												title: 'Review contact history for more details',
-												onClick: () => {
-													window.alert('[TODO]: ?');
-												},
-											}}
-										/>
-									)}
-								</Card.Body>
-							</Card>
-						)}
 						<hr className="mb-8" />
 
 						{conditionsAndSymptomsResults.length > 0 && (
@@ -241,6 +176,7 @@ export const MhicAssessmentComplete = ({
 								...conditionsAndSymptomsResults.map((result) => ({
 									title: result.screeningName ?? '',
 									value: `#${result.screeningId}` ?? '#',
+									level: 1,
 								})),
 								...(completedAssessmentsResults.length > 0
 									? [
@@ -253,6 +189,7 @@ export const MhicAssessmentComplete = ({
 								...completedAssessmentsResults.map((result) => ({
 									title: result.screeningName ?? '',
 									value: `#${result.screeningId}` ?? '#',
+									level: 1,
 								})),
 							]}
 							onTabClick={(value) => {

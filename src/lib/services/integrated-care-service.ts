@@ -79,6 +79,7 @@ export const integratedCareService = {
 	},
 	getPatientOrders(queryParameters?: {
 		patientOrderStatusId?: string | string[];
+		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
 		pageNumber?: string;
@@ -217,6 +218,14 @@ export const integratedCareService = {
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/close`,
 			data,
+		});
+	},
+	openPatientOrder(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/open`,
 		});
 	},
 	getReferenceData() {

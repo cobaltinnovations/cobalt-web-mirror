@@ -34,6 +34,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 						color: theme.colors.p700,
 					},
 				},
+				'&.level-1': {
+					paddingLeft: 16,
+				},
 				'&.active': {
 					'& button': {
 						color: theme.colors.p700,
@@ -83,7 +86,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface TabBarProps {
 	orientation?: 'horizontal' | 'vertical';
 	value: string;
-	tabs: { value: string; title: string }[];
+	tabs: { value: string; title: string; level?: number }[];
 	onTabClick(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	hideBorder?: boolean;
 	className?: string;
@@ -101,7 +104,13 @@ const TabBar = ({ orientation = 'horizontal', value, tabs, onTabClick, hideBorde
 			<ul>
 				{tabs.map((tab) => {
 					return (
-						<li key={tab.value} className={classNames({ active: value === tab.value })}>
+						<li
+							key={tab.value}
+							className={classNames({
+								active: value === tab.value,
+								[`level-${tab.level}`]: tab.level ?? 0,
+							})}
+						>
 							<button
 								onClick={(event) => {
 									onTabClick(tab.value, event);

@@ -19,8 +19,10 @@ const MhicSearchResults = () => {
 	const searchQuery = searchParams.get('searchQuery');
 
 	useEffect(() => {
-		fetchPatientOrders({});
-	}, [fetchPatientOrders]);
+		fetchPatientOrders({
+			...(pageNumber && { pageNumber }),
+		});
+	}, [fetchPatientOrders, pageNumber]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {

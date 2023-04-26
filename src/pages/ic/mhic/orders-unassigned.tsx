@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Container } from 'react-bootstrap';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
 	MhicGenerateOrdersModal,
+	MhicPageHeader,
 	MhicPatientOrderTable,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
@@ -15,13 +16,19 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderStatusId } from '@/lib/models';
+import TabBar from '@/components/tab-bar';
 
-const MhicOrders = () => {
+import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
+
+const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const filterBy = useMemo(() => searchParams.get('filterBy') ?? 'NO_OUTREACH', [searchParams]);
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
-
 	const {
 		fetchPatientOrders,
 		isLoadingOrders,
@@ -30,28 +37,21 @@ const MhicOrders = () => {
 		totalCountDescription,
 	} = useFetchPatientOrders();
 
-	const [searchParams, setSearchParams] = useSearchParams();
-
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
 	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
-	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
-	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
-
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
-			...(patientOrderStatusId && { patientOrderStatusId }),
-			...(patientOrderDispositionId && { patientOrderDispositionId }),
-			...(pageNumber && { pageNumber }),
 			pageSize: '15',
+			patientOrderStatusId: PatientOrderStatusId.PENDING,
+			...(pageNumber && { pageNumber }),
 		});
-	}, [fetchPatientOrders, pageNumber, patientOrderDispositionId, patientOrderStatusId]);
+	}, [fetchPatientOrders, pageNumber]);
 
-	const handleImportPatientsInputChange = useCallback(
+	const handleImportButtonChange = useCallback(
 		(file: File) => {
 			const fileReader = new FileReader();
 
@@ -111,7 +111,6 @@ const MhicOrders = () => {
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
 			setSearchParams(searchParams);
-
 			clearSelections();
 		},
 		[clearSelections, searchParams, setSearchParams]
@@ -149,73 +148,102 @@ const MhicOrders = () => {
 				onSave={handleAssignOrdersSave}
 			/>
 
-			<Container fluid className="px-8">
-				<div className="py-8 d-flex align-items-center justify-content-between">
-					<div className="d-flex align-items-end">
-						<h2 className="m-0">
-							Pending Orders{' '}
-							<span className="text-gray fs-large fw-normal">
-								{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
-							</span>
-						</h2>
-					</div>
-					<div>
-						{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-							<Button
-								className="me-4"
-								variant="outline-primary"
-								onClick={() => {
-									setShowGenerateOrdersModal(true);
-								}}
-							>
-								Generate
-							</Button>
-						)}
-						<FileInputButton
-							className="me-4 d-inline-flex"
-							accept=".csv"
-							onChange={handleImportPatientsInputChange}
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-8">
+					<Col>
+						<MhicPageHeader
+							className="mb-6"
+							title="Unassigned"
+							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
 						>
-							Import
-						</FileInputButton>
-						<Button
-							onClick={() => {
-								fetchPanelAccounts();
-								setShowAssignOrderModal(true);
+							<div className="d-flex align-items-center">
+								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+									<Button
+										className="me-2"
+										variant="outline-primary"
+										onClick={() => {
+											setShowGenerateOrdersModal(true);
+										}}
+									>
+										Generate
+									</Button>
+								)}
+								<FileInputButton className="me-2" accept=".csv" onChange={handleImportButtonChange}>
+									<Button as="div" variant="outline-primary" className="d-flex align-items-center">
+										<UploadIcon className="me-2" />
+										Import
+									</Button>
+								</FileInputButton>
+								<Button
+									onClick={() => {
+										fetchPanelAccounts();
+										setShowAssignOrderModal(true);
+									}}
+									disabled={selectedPatientOrderIds.length <= 0}
+								>
+									Assign{' '}
+									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
+								</Button>
+							</div>
+						</MhicPageHeader>
+						<hr />
+						<TabBar
+							value={filterBy}
+							tabs={[
+								{
+									title: 'No Outreach (New)',
+									value: 'NO_OUTREACH',
+								},
+								{
+									title: 'Waiting for Response',
+									value: 'WAITING_FOR_RESPONSE',
+								},
+								{
+									title: 'Safety Planning',
+									value: 'SAFETY_PLANNING',
+								},
+								{
+									title: 'Assessment Complete',
+									value: 'ASSESSMENT_COMPLETE',
+								},
+							]}
+							onTabClick={(value) => {
+								searchParams.set('filterBy', value);
+								setSearchParams(searchParams);
 							}}
-							disabled={selectedPatientOrderIds.length <= 0}
-						>
-							Assign Orders{' '}
-							{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
-						</Button>
-					</div>
-				</div>
-				<MhicPatientOrderTable
-					isLoading={isLoadingOrders}
-					patientOrders={patientOrders}
-					selectAll={selectAll}
-					onSelectAllChange={setSelectAll}
-					selectedPatientOrderIds={selectedPatientOrderIds}
-					onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
-					totalPatientOrdersCount={totalCount}
-					totalPatientOrdersDescription={totalCountDescription}
-					pageNumber={parseInt(pageNumber, 10)}
-					pageSize={15}
-					onPaginationClick={handlePaginationClick}
-					columnConfig={{
-						checkbox: true,
-						flag: true,
-						patient: true,
-						referralDate: true,
-						practice: true,
-						referralReason: true,
-						outreachNumber: true,
-						episode: true,
-					}}
-				/>
+						/>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<MhicPatientOrderTable
+							isLoading={isLoadingOrders}
+							patientOrders={patientOrders}
+							selectAll={selectAll}
+							onSelectAllChange={setSelectAll}
+							selectedPatientOrderIds={selectedPatientOrderIds}
+							onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
+							totalPatientOrdersCount={totalCount}
+							totalPatientOrdersDescription={totalCountDescription}
+							pageNumber={parseInt(pageNumber, 10)}
+							pageSize={15}
+							onPaginationClick={handlePaginationClick}
+							columnConfig={{
+								checkbox: true,
+								flag: true,
+								patient: true,
+								referralDate: true,
+								practice: true,
+								referralReason: true,
+								outreachNumber: true,
+								episode: true,
+							}}
+						/>
+					</Col>
+				</Row>
 			</Container>
 		</>
 	);
 };
 
-export default MhicOrders;
+export default MhicOrdersUnassigned;
