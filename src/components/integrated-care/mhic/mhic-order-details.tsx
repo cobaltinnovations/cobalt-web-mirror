@@ -101,18 +101,14 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				raceOptions={referenceData.races}
 				ethnicityOptions={referenceData.ethnicities}
 				genderIdentityOptions={referenceData.genderIdentities}
+				patientOrder={patientOrder}
 				show={showDemographicsModal}
 				onHide={() => {
 					setShowDemographicsModal(false);
 				}}
-				onSave={() => {
+				onSave={(updatedPatientOrder) => {
 					setShowDemographicsModal(false);
-					addFlag({
-						variant: 'success',
-						title: 'Demographic Information Saved',
-						description: '{Message}',
-						actions: [],
-					});
+					onPatientOrderChange(updatedPatientOrder);
 				}}
 			/>
 
@@ -507,7 +503,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0">
 													{referenceData.races.find(
 														(race) => race.raceId === patientOrder.patientRaceId
-													)?.description ?? 'Not Asked'}
+													)?.description ?? 'Not Specified'}
 												</p>
 											</Col>
 										</Row>
@@ -520,7 +516,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 													{referenceData.ethnicities.find(
 														(ethnicity) =>
 															ethnicity.ethnicityId === patientOrder.patientEthnicityId
-													)?.description ?? 'Not Asked'}
+													)?.description ?? 'Not Specified'}
 												</p>
 											</Col>
 										</Row>
@@ -534,7 +530,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 														(genderIdentity) =>
 															genderIdentity.genderIdentityId ===
 															patientOrder.patientGenderIdentityId
-													)?.description ?? 'Not Asked'}
+													)?.description ?? 'Not Specified'}
 												</p>
 											</Col>
 										</Row>
