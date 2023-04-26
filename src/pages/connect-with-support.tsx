@@ -663,6 +663,7 @@ const ConnectWithSupport: FC = () => {
 														onTimeSlotClick={(timeSlot) => {
 															bookingRef.current?.kickoffBookingProcess({
 																source: BookingSource.ProviderSearch,
+																exitUrl: `${location.pathname}${location.search}`,
 																provider,
 																date: section.date,
 																timeSlot,

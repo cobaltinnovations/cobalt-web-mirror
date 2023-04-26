@@ -53,6 +53,8 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('immediateAccess');
 		Cookies.remove('seenWaivedCopay');
 		Cookies.remove('track');
+		Cookies.remove('bookingSource');
+		Cookies.remove('exitUrl');
 		window.localStorage.clear();
 
 		try {

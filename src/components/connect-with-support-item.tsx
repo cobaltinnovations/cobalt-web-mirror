@@ -111,7 +111,7 @@ interface ConnectWithSupportItemProps {
 	descriptionHtml: string;
 	buttons: ButtonProps[];
 	showViewButton: boolean;
-	onModalTimeButtonClick(availabilityTimeSlot: AvailabilityTimeSlot): void;
+	onModalTimeButtonClick(sectionDate: string, availabilityTimeSlot: AvailabilityTimeSlot): void;
 }
 
 const ConnectWithSupportItem = ({
@@ -232,7 +232,7 @@ const ConnectWithSupportItem = ({
 														key={timeIndex}
 														className="me-1 mb-2"
 														onClick={() => {
-															onModalTimeButtonClick(time);
+															onModalTimeButtonClick(section.date, time);
 														}}
 														disabled={time.status !== 'AVAILABLE'}
 													>

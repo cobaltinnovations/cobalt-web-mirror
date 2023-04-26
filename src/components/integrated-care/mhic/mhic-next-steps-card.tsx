@@ -7,10 +7,11 @@ import { MhicResourcesModal } from '@/components/integrated-care/mhic';
 interface Props {
 	patientOrder: PatientOrderModel;
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
+	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, className }: Props) => {
+export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled, className }: Props) => {
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 
 	const handleResourcesModalSave = useCallback(
@@ -47,9 +48,15 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 									<p className="mb-0 text-gray">Recommended</p>
 								</div>
 							}
+							disabled={disabled}
 						/>
 						<div>
-							<Button variant="link" size="sm" className="p-0 fw-semibold text-decoration-none">
+							<Button
+								variant="link"
+								size="sm"
+								className="p-0 fw-semibold text-decoration-none"
+								disabled={disabled}
+							>
 								Mark Complete
 							</Button>
 						</div>
@@ -71,6 +78,7 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 									</p>
 								</div>
 							}
+							disabled={disabled}
 						/>
 						{patientOrder.patientOrderResourcingStatusId ===
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
@@ -82,6 +90,7 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, classNam
 									onClick={() => {
 										setShowResourcesModal(true);
 									}}
+									disabled={disabled}
 								>
 									Mark Complete
 								</Button>

@@ -220,6 +220,14 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	openPatientOrder(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/open`,
+		});
+	},
 	getReferenceData() {
 		return httpSingleton.orchestrateRequest<ReferenceDataResponse>({
 			method: 'GET',

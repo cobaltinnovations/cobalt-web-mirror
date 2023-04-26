@@ -40,6 +40,23 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
 	);
 
+	const handleReopenButtonClick = useCallback(async () => {
+		try {
+			const response = await integratedCareService.openPatientOrder(patientOrder.patientOrderId).fetch();
+
+			addFlag({
+				variant: 'success',
+				title: 'Episode Reopened',
+				description: '{Message}',
+				actions: [],
+			});
+
+			onPatientOrderChange(response.patientOrder);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+
 	return (
 		<>
 			<MhicCloseEpisodeModal
@@ -74,13 +91,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 						{patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED && (
 							<>
 								<span className="me-3 fw-bold text-gray">Closed</span>
-								<Button
-									variant="light"
-									size="sm"
-									onClick={() => {
-										window.alert('[TODO]: Reopen Patient Order');
-									}}
-								>
+								<Button variant="light" size="sm" onClick={handleReopenButtonClick}>
 									Reopen
 								</Button>
 							</>

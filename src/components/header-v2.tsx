@@ -742,7 +742,8 @@ const HeaderV2 = () => {
 															onClick={() => {
 																trackEvent({
 																	action: 'Top Nav Dropdown',
-																	link_text: item.title,
+																	link_text: navigationItem.title,
+																	link_detail: item.title,
 																});
 															}}
 														>

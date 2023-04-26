@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderNoteModel } from '@/lib/models';
+import { PatientOrderDispositionId, PatientOrderModel, PatientOrderNoteModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
@@ -158,6 +158,10 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 											onDelete={() => {
 												handleDeleteComment(note.patientOrderNoteId);
 											}}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
 										/>
 									);
 								})}
@@ -175,9 +179,16 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 							onChange={({ currentTarget }) => {
 								setCommentInputValue(currentTarget.value);
 							}}
+							disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 						/>
 						<div className="text-right">
-							<Button type="submit" disabled={!commentInputValue}>
+							<Button
+								type="submit"
+								disabled={
+									!commentInputValue ||
+									patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+								}
+							>
 								Add Comment
 							</Button>
 						</div>

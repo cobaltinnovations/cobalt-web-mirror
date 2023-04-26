@@ -76,7 +76,7 @@ export const MhicAssessmentComplete = ({
 					</div>
 					<p className="mb-0">
 						Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
-						<span className="text-danger">[TODO]: Who</span>
+						{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
 					</p>
 				</Col>
 			</Row>

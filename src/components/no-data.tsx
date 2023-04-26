@@ -22,6 +22,7 @@ interface Props {
 		variant: ButtonVariant;
 		title: string;
 		onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+		disabled?: boolean;
 	}[];
 	className?: string;
 }
@@ -60,6 +61,7 @@ const NoData = ({ illustration, title, description, actions, className }: Props)
 							variant={action.variant}
 							className="mx-1"
 							onClick={action.onClick}
+							disabled={action.disabled}
 						>
 							{action.title}
 						</Button>

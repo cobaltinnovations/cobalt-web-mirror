@@ -6,10 +6,11 @@ import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
 
 interface Props {
 	triageGroup: PateintOrderTriageGroupModel;
+	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicTriageCard = ({ triageGroup, className }: Props) => {
+export const MhicTriageCard = ({ triageGroup, disabled, className }: Props) => {
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 
 	return (
@@ -38,6 +39,7 @@ export const MhicTriageCard = ({ triageGroup, className }: Props) => {
 							onClick={() => {
 								setShowChangeTriageModal(true);
 							}}
+							disabled={disabled}
 						>
 							Override
 						</Button>

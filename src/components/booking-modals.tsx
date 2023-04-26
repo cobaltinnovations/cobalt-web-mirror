@@ -6,10 +6,11 @@ import React, { useCallback, useContext, useState, useImperativeHandle, forwardR
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import ConfirmAppointmentTypeModal from './confirm-appointment-type-modal';
 import ConfirmIntakeAssessmentModal from './confirm-intake-assessment-modal';
+import Cookies from 'js-cookie';
 
 export type KickoffBookingOptions = {
 	source: BookingSource;
-	exitUrl?: string;
+	exitUrl: string;
 	provider: Provider;
 	date: string;
 	timeSlot: AvailabilityTimeSlot;
@@ -53,15 +54,14 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		selectedTimeSlot,
 		setSelectedTimeSlot,
 
-		bookingSource,
-		setBookingSource,
-		setExitUrl,
 		setPreservedFilterQueryString,
 	} = useContext(BookingContext);
 
 	const currentSearchString = searchParams.toString();
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
 	const navigateToEhrLookup = useCallback(() => {
+		const bookingSource = Cookies.get('bookingSource');
+
 		if (bookingSource === BookingSource.ProviderSearch) {
 			setPreservedFilterQueryString(currentSearchString);
 		}
@@ -71,13 +71,15 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				skipAssessment,
 			},
 		});
-	}, [bookingSource, currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]);
+	}, [currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]);
 
 	const navigateToIntakeAssessment = useCallback(
 		(provider: Provider) => {
 			if (!provider) {
 				return;
 			}
+
+			const bookingSource = Cookies.get('bookingSource');
 
 			if (bookingSource === BookingSource.ProviderSearch) {
 				setPreservedFilterQueryString(currentSearchString);
@@ -89,7 +91,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				},
 			});
 		},
-		[bookingSource, currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]
+		[currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]
 	);
 
 	const continueBookingProcess = useCallback(
@@ -134,10 +136,9 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 	const kickoffBookingProcess = useCallback(
 		({ source, exitUrl, provider, date, timeSlot }: KickoffBookingOptions) => {
-			setBookingSource(source);
-			if (exitUrl) {
-				setExitUrl(exitUrl);
-			}
+			Cookies.set('bookingSource', source);
+			Cookies.set('bookingExitUrl', exitUrl);
+
 			setSelectedProvider(provider);
 			setSelectedDate(date);
 			setSelectedTimeSlot(timeSlot);
@@ -171,8 +172,6 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		[
 			appointmentTypes,
 			continueBookingProcess,
-			setBookingSource,
-			setExitUrl,
 			setSelectedAppointmentTypeId,
 			setSelectedDate,
 			setSelectedProvider,

@@ -396,16 +396,19 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 			if (enabledVersionsRef.current.ga4) {
 				for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
-					const customData: Record<string, unknown> = {};
-					if (event.category) {
-						customData.event_category = event.category;
+					const { category, label, nonInteractive, ...rest } = event;
+					const customData: Record<string, unknown> = {
+						...rest,
+					};
+					if (category) {
+						customData.event_category = category;
 					}
 
-					if (event.label) {
-						customData.event_label = event.label;
+					if (label) {
+						customData.event_label = label;
 					}
 
-					if (typeof event.nonInteractive === 'boolean') {
+					if (typeof nonInteractive === 'boolean') {
 						customData.non_interaction = event.nonInteractive;
 					}
 
