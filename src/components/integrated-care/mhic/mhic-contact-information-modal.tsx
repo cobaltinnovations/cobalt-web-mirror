@@ -7,6 +7,7 @@ import { createUseStyles } from 'react-jss';
 import { PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
 // import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
@@ -87,6 +88,7 @@ interface Props extends ModalProps {
 export const MhicContactInformationModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState<{
 		phoneNumber: string;
 		//phoneNumbers: PhoneNumber[];
@@ -141,12 +143,19 @@ export const MhicContactInformationModal: FC<Props> = ({ patientOrder, onSave, .
 					})
 					.fetch();
 
+				addFlag({
+					variant: 'success',
+					title: 'Patient Contact Information Saved',
+					description: '{Message}',
+					actions: [],
+				});
+
 				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
 			}
 		},
-		[formValues.emailAddress, formValues.phoneNumber, handleError, onSave, patientOrder.patientOrderId]
+		[addFlag, formValues.emailAddress, formValues.phoneNumber, handleError, onSave, patientOrder.patientOrderId]
 	);
 
 	return (

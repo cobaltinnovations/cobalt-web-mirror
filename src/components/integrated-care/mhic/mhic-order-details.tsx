@@ -140,12 +140,6 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowContactInformationModal(false);
-					addFlag({
-						variant: 'success',
-						title: 'Patient Contact Information Saved',
-						description: '{Message}',
-						actions: [],
-					});
 					onPatientOrderChange(updatedPatientOrder);
 				}}
 			/>
