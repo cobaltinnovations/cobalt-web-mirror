@@ -219,16 +219,22 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									description="[TODO]: Reason for Safety Planning: [Reason]"
 								/>
 							)}
-							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-								<MhicTriageCard
-									key={triageGroupIndex}
-									className="mb-6"
-									triageGroup={triageGroup}
-									disabled={
-										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
-									}
-								/>
-							))}
+							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
+								if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
+									return null;
+								}
+
+								return (
+									<MhicTriageCard
+										key={triageGroupIndex}
+										className="mb-6"
+										triageGroup={triageGroup}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
+								);
+							})}
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
