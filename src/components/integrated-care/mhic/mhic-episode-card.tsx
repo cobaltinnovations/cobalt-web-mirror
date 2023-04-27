@@ -170,7 +170,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 								<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 							</Col>
 						</Row>
-						<Row className="mb-4">
+						{/* <Row className="mb-4">
 							<Col xs={3}>
 								<p className="m-0 text-gray">Authorizing Provider</p>
 							</Col>
@@ -179,7 +179,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 									<span className="text-danger">[TODO]: Authorizing Provider Name</span>
 								</p>
 							</Col>
-						</Row>
+						</Row> */}
 						<Row>
 							<Col xs={3}>
 								<p className="m-0 text-gray">Billing Provider</p>
