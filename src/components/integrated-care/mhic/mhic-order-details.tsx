@@ -194,7 +194,6 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									className="mb-6"
 									variant="danger"
 									title="Patient needs safety planning"
-									description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
 								/>
 							)}
 							{patientOrder.patientOrderResourcingStatusId ===

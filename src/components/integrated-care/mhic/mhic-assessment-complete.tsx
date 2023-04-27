@@ -92,12 +92,7 @@ export const MhicAssessmentComplete = ({
 						<h3 className="mb-8">Results</h3>
 						{patientOrder.patientOrderSafetyPlanningStatusId ===
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-							<MhicInlineAlert
-								className="mb-6"
-								variant="danger"
-								title="Patient needs safety planning"
-								description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
-							/>
+							<MhicInlineAlert className="mb-6" variant="danger" title="Patient needs safety planning" />
 						)}
 						{patientOrder.patientOrderResourcingStatusId ===
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (

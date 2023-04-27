@@ -166,7 +166,14 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 				<Modal.Footer className="d-flex align-items-center justify-content-between">
 					<div>
 						{currentTriageGroup?.patientOrderTriageSourceId === PatientOrderTriageSourceId.MANUALLY_SET && (
-							<Button variant="danger">Revert to Assessment</Button>
+							<Button
+								variant="danger"
+								onClick={() => {
+									window.alert('[TODO]: Call endpoint to revert back to original triage');
+								}}
+							>
+								Revert to Assessment
+							</Button>
 						)}
 					</div>
 					<div>
