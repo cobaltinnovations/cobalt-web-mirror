@@ -108,9 +108,13 @@ export const MhicAssessmentComplete = ({
 								description="Triage indicates the patient needs external resources"
 							/>
 						)}
-						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => (
-							<MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />
-						))}
+						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
+							if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
+								return null;
+							}
+
+							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
+						})}
 						<MhicNextStepsCard
 							className="mb-8"
 							patientOrder={patientOrder}
