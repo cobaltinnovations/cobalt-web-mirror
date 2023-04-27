@@ -1,6 +1,3 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-
 import React, { useEffect } from 'react';
 
 import config from '@/lib/config';
@@ -21,8 +18,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import 'react-multi-carousel/lib/styles.css';
 import './scss/main.scss';
 
-export const queryClient = new QueryClient();
-
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
 	useGlobalStyles();
 	useCustomBootstrapStyles();
@@ -40,18 +35,14 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
 	}
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ErrorModalProvider>
-				<ReauthModalProvider>
-					<AlertProvider>
-						<InCrisisModalProvider>
-							<FlagsProvider>{children}</FlagsProvider>
-						</InCrisisModalProvider>
-					</AlertProvider>
-				</ReauthModalProvider>
-			</ErrorModalProvider>
-
-			{__DEV__ && <ReactQueryDevtools position="bottom-right" />}
-		</QueryClientProvider>
+		<ErrorModalProvider>
+			<ReauthModalProvider>
+				<AlertProvider>
+					<InCrisisModalProvider>
+						<FlagsProvider>{children}</FlagsProvider>
+					</InCrisisModalProvider>
+				</AlertProvider>
+			</ReauthModalProvider>
+		</ErrorModalProvider>
 	);
 };

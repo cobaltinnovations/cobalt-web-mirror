@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -26,7 +26,6 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
-import { queryClient } from '@/app-providers';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -40,6 +39,7 @@ const ConnectWithSupportV2 = () => {
 	const { account, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const { trackEvent } = useAnalytics();
+	const revalidator = useRevalidator();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
@@ -203,12 +203,12 @@ const ConnectWithSupportV2 = () => {
 					})
 					.fetch();
 
-				queryClient.invalidateQueries(['account', account.accountId]);
+				revalidator.revalidate();
 			} catch (error) {
 				// Don't throw
 			}
 		},
-		[account?.accountId, searchParams, selectedInstitutionLocationId, setSearchParams]
+		[account?.accountId, revalidator, searchParams, selectedInstitutionLocationId, setSearchParams]
 	);
 
 	return (

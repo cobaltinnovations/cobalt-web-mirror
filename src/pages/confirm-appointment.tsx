@@ -128,8 +128,6 @@ const ConfirmAppointment = () => {
 			// 	})
 			// 	.fetch();
 
-			// queryClient.invalidateQueries(['account', account?.accountId])
-
 			const response = await appointmentService
 				.createAppointment({
 					providerId,

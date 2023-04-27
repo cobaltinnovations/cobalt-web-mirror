@@ -2,7 +2,6 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { AccountSource, Institution, InstitutionLocation } from '@/lib/models/institution';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
-import { createQueryFn } from '../http-client';
 
 interface GetAccountSourcesResponse {
 	accountSources: AccountSource[];
@@ -26,16 +25,10 @@ export const institutionService = {
 		});
 	},
 	getInstitution(queryOptions?: GetAccountSourcesRequestBody) {
-		return {
-			queryKey: ['institution', queryOptions?.subdomain, queryOptions?.accountSourceId],
-			queryFn: createQueryFn(() =>
-				httpSingleton.orchestrateRequest<GetInstitutionResponse>({
-					method: 'get',
-					url: buildQueryParamUrl('/institution', queryOptions),
-				})
-			),
-			staleTime: 1000 * 60 * 10, // 10 minutes in milliseconds
-		};
+		return httpSingleton.orchestrateRequest<GetInstitutionResponse>({
+			method: 'get',
+			url: buildQueryParamUrl('/institution', queryOptions),
+		});
 	},
 	getInstitutionBlurbs() {
 		return httpSingleton.orchestrateRequest<{

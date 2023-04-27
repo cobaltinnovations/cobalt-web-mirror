@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation, useRevalidator } from 'react-router-dom';
 import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -24,7 +24,6 @@ import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import useFlags from '@/hooks/use-flags';
-import { queryClient } from '@/app-providers';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -55,6 +54,7 @@ const InTheStudioGroupSessionScheduled = () => {
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
+	const revalidator = useRevalidator();
 
 	const [session, setSession] = useState<GroupSessionModel>();
 	const [reservation, setReservation] = useState<GroupSessionReservationModel>();
@@ -183,7 +183,7 @@ const InTheStudioGroupSessionScheduled = () => {
 								.reserveGroupSession(session.groupSessionId, collectedEmail)
 								.fetch();
 
-							queryClient.invalidateQueries(['account', account?.accountId]);
+							revalidator.revalidate();
 							await fetchData();
 
 							setShowConfirmReservationModal(false);

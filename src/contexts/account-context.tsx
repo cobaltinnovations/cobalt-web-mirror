@@ -1,17 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
-import React, { FC, PropsWithChildren, createContext, useCallback, useState } from 'react';
+import React, { FC, PropsWithChildren, createContext, useCallback } from 'react';
 
 import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId } from '@/lib/models';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService } from '@/lib/services';
 
 import { AccountSource, Institution } from '@/lib/models/institution';
 import { useAppRootLoaderData } from '@/routes/root';
-import { createQueryFn } from '@/lib/http-client';
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
-	setAccountId: (accountId: string) => void;
 	institution: Institution;
 	accountSources: AccountSource[];
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
@@ -27,23 +24,7 @@ export const LoginDestinationIdRouteMap = {
 } as const;
 
 const AccountProvider: FC<PropsWithChildren> = (props) => {
-	const { subdomain, accountSourceId, initialData } = useAppRootLoaderData();
-
-	const [accountId, setAccountId] = useState(initialData.accountId);
-
-	const { data: institutionResponse } = useQuery({
-		...institutionService.getInstitution({
-			subdomain,
-			accountSourceId,
-		}),
-		initialData: initialData.institutionResponse,
-	});
-
-	const { data: accountResponse } = useQuery({
-		queryKey: ['account', accountId],
-		queryFn: createQueryFn(() => accountService.account(accountId)),
-		enabled: !!accountId,
-	});
+	const { accountId, institutionResponse, accountResponse } = useAppRootLoaderData();
 
 	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
@@ -79,7 +60,6 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 
 	const value = {
 		account: accountResponse?.account,
-		setAccountId,
 		institution: accountResponse?.institution || institutionResponse.institution,
 		accountSources: institutionResponse.accountSources,
 		institutionCapabilities: accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId],

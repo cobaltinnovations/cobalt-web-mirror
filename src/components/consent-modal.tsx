@@ -8,8 +8,8 @@ import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
 import { Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import { useRevalidator } from 'react-router-dom';
 import LoadingButton from './loading-button';
-import { queryClient } from '@/app-providers';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -33,6 +33,7 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const { account, signOutAndClearContext } = useAccount();
+	const revalidator = useRevalidator();
 
 	const [isAccepting, setIsAccepting] = useState(false);
 	const [isRejecting, setIsRejecting] = useState(false);
@@ -101,7 +102,7 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 										}
 									})
 									.finally(() => {
-										queryClient.invalidateQueries(['account', account.accountId]);
+										revalidator.revalidate();
 										setIsAccepting(false);
 									});
 							}}

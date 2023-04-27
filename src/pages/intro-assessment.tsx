@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
@@ -14,7 +14,6 @@ import { assessmentService } from '@/lib/services';
 import { Assessment, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
-import { queryClient } from '@/app-providers';
 
 interface HistoryLocationState {
 	from?: string;
@@ -28,6 +27,7 @@ const IntroAssessment: FC = () => {
 	const [searchParams] = useSearchParams();
 	const questionId = searchParams.get('questionId');
 	const sessionId = searchParams.get('sessionId');
+	const revalidator = useRevalidator();
 
 	const [assessment, setAssessment] = useState<Assessment | undefined>();
 	const [answerChangedByUser, setAnswerChangedByUser] = useState<boolean>(false);
@@ -73,7 +73,7 @@ const IntroAssessment: FC = () => {
 			});
 		} else {
 			if (account?.accountId) {
-				queryClient.invalidateQueries(['account', account.accountId]);
+				revalidator.revalidate();
 			}
 
 			const authRedirectUrl = Cookies.get('authRedirectUrl');
@@ -83,7 +83,7 @@ const IntroAssessment: FC = () => {
 			navigate(redirectUrl);
 			Cookies.remove('authRedirectUrl');
 		}
-	}, [account?.accountId, assessment, location.state, navigate]);
+	}, [account?.accountId, assessment, location.state, navigate, revalidator]);
 
 	const navigateBackwards = useCallback(() => {
 		if (!assessment) return;

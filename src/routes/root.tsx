@@ -1,9 +1,8 @@
 import Cookies from 'js-cookie';
 import React, { Suspense } from 'react';
-import { Loader } from 'react-bootstrap-typeahead';
+
 import { LoaderFunctionArgs, Outlet, useRouteError, useRouteLoaderData } from 'react-router-dom';
 
-import { queryClient } from '@/app-providers';
 import Alert from '@/components/alert';
 import ConsentModal from '@/components/consent-modal';
 import ErrorDisplay from '@/components/error-display';
@@ -23,6 +22,7 @@ import useUrlViewTracking from '@/hooks/use-url-view-tracking';
 import { accountService, institutionService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { updateTokenCookies } from '@/routes/auth';
+import Loader from '@/components/loader';
 
 type AppRootLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -41,12 +41,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	let accessToken = Cookies.get('accessToken');
 	let accountId = Cookies.get('accountId');
 
-	const institutionResponse = await queryClient.ensureQueryData(
-		institutionService.getInstitution({
-			subdomain,
-			accountSourceId,
-		})
-	);
+	const institutionRequest = institutionService.getInstitution({
+		subdomain,
+		accountSourceId,
+	});
+
+	let accountRequest = accountId ? accountService.account(accountId) : undefined;
+
+	let [institutionResponse, accountResponse] = await Promise.all([
+		institutionRequest.fetch(),
+		accountRequest?.fetch(),
+	]);
 
 	if (
 		institutionResponse.institution.immediateAccessEnabled &&
@@ -63,10 +68,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		const anonymousAccountResponse = await anonymousAccountDataRequest.fetch();
 
 		accessToken = anonymousAccountResponse.accessToken;
+		accountResponse = {
+			...anonymousAccountResponse,
+			institution: institutionResponse.institution,
+		};
 	}
 
 	if (accessToken) {
 		accountId = updateTokenCookies(accessToken);
+
+		if (!accountResponse) {
+			const accountRequest = accountService.account(accountId);
+			accountResponse = await accountRequest.fetch();
+		}
 	}
 
 	return {
@@ -74,10 +88,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		accountSourceId,
 		isTrackedSession,
 		isImmediateSession,
-		initialData: {
-			accountId,
-			institutionResponse,
-		},
+		accountId,
+		institutionResponse,
+		accountResponse,
 	};
 }
 
@@ -88,9 +101,7 @@ export const Component = () => {
 		<AnalyticsProvider>
 			<AccountProvider>
 				<BookingProvider>
-					<Suspense fallback={<Loader />}>
-						<Layout />
-					</Suspense>
+					<Layout />
 				</BookingProvider>
 			</AccountProvider>
 		</AnalyticsProvider>
@@ -113,7 +124,9 @@ const Layout = () => {
 			<Alert />
 			<Flags />
 
-			<Outlet />
+			<Suspense fallback={<Loader />}>
+				<Outlet />
+			</Suspense>
 
 			{account && <Footer />}
 		</>

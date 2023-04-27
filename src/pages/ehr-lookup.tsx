@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik, FormikProps } from 'formik';
 import InputMask from 'react-input-mask';
 import Lottie from 'lottie-web';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useRevalidator } from 'react-router-dom';
 import { pick } from 'lodash';
 
 import useAccount from '@/hooks/use-account';
@@ -29,7 +29,6 @@ import { ReactComponent as ProfileIcon } from '@/assets/icons/profile.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
-import { queryClient } from '@/app-providers';
 
 type StepProps = {
 	onNext: (values: Partial<EpicPatientData>) => void;
@@ -79,6 +78,7 @@ const EhrLookup: FC = () => {
 		percent: 0,
 		description: 'undetermined',
 	});
+	const revalidator = useRevalidator();
 
 	const [healthRecordsModalIsOpen, setHealthRecordsModalIsOpen] = useState(true);
 
@@ -160,7 +160,7 @@ const EhrLookup: FC = () => {
 
 		try {
 			const response = await request.fetch();
-			queryClient.invalidateQueries(['account', response.account.accountId]);
+			revalidator.revalidate();
 
 			setIsBooking(true);
 			const appointmentData: CreateAppointmentData = {

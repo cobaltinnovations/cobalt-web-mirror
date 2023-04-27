@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation } from 'react-router-dom';
+import { Link, matchPath, useLocation, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { queryClient } from '@/app-providers';
 import { AlertTypeId } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -292,6 +291,7 @@ const HeaderV2 = () => {
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
+	const revalidator = useRevalidator();
 
 	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
@@ -576,14 +576,15 @@ const HeaderV2 = () => {
 				setAlertsDisabled(true);
 
 				await institutionService.dismissAlert(alertId).fetch();
-				queryClient.invalidateQueries(['institution']);
+
+				revalidator.revalidate();
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setAlertsDisabled(false);
 			}
 		},
-		[handleError]
+		[handleError, revalidator]
 	);
 
 	return (

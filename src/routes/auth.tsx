@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
-import { LoaderFunctionArgs, Navigate, redirect, useLoaderData } from 'react-router-dom';
+import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator } from 'react-router-dom';
 
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
@@ -59,12 +59,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const { accountId, authRedirectUrl } = useLoaderData() as AuthLoaderData;
-	const { account, setAccountId } = useAccount();
+	const { account } = useAccount();
 	const [destination, setDestination] = useState<string | null>(null);
+	const revalidator = useRevalidator();
 
+	const shouldRevalidate = !!accountId && !account && revalidator.state === 'idle';
 	useEffect(() => {
-		setAccountId(accountId);
-	}, [accountId, setAccountId]);
+		if (shouldRevalidate) {
+			revalidator.revalidate();
+		}
+	}, [revalidator, shouldRevalidate]);
 
 	useEffect(() => {
 		if (!account) {

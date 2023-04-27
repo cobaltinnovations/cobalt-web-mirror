@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { Link, To } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -25,7 +25,6 @@ import { isEqual } from 'lodash';
 import { AnalyticsEvent, CrisisAnalyticsEvent, MainNavAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import { exploreLinks } from '@/menu-links';
-import { queryClient } from '@/app-providers';
 
 const useMenuStyles = createUseThemedStyles((theme) => ({
 	menu: {
@@ -383,21 +382,12 @@ const MENU_SECTIONS: MenuNavSection[] = [
 ];
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
-	const { account } = useAccount();
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 
 	function handleOverlayClick() {
 		onHide();
 	}
-
-	// fetch account on "open" to have most up-to-date "capabilities"
-	const accountId = account?.accountId;
-	useEffect(() => {
-		if (accountId && open) {
-			queryClient.invalidateQueries(['account', accountId]);
-		}
-	}, [accountId, open]);
 
 	const isSubNav = useMemo(() => {
 		return !isEqual(menuSections, MENU_SECTIONS);

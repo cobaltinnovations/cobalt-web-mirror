@@ -1,13 +1,13 @@
 import React, { FC, useState } from 'react';
-import { Modal, Button, Form, ModalProps } from 'react-bootstrap';
+import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 
-import { ScreeningFlowSkipTypeId } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useTrackModalView from '@/hooks/use-track-modal-view';
-import InputHelper from '@/components/input-helper';
-import { queryClient } from '@/app-providers';
+import { ScreeningFlowSkipTypeId } from '@/lib/models';
+import { accountService } from '@/lib/services';
+import { useRevalidator } from 'react-router-dom';
 
 interface CollectPhoneModalProps extends ModalProps {
 	skippable?: boolean;
@@ -23,6 +23,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
 	onSuccess,
 	...props
 }) => {
+	const revalidator = useRevalidator();
 	useTrackModalView('CollectPhoneModal', props.show);
 	const handleError = useHandleError();
 	const { account } = useAccount();
@@ -52,7 +53,7 @@ const CollectPhoneModal: FC<CollectPhoneModalProps> = ({
 							})
 							.fetch();
 
-						queryClient.invalidateQueries(['account', account.accountId]);
+						revalidator.revalidate();
 						onSuccess();
 					} catch (error) {
 						handleError(error);

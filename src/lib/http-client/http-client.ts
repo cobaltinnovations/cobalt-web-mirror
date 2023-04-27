@@ -1,4 +1,3 @@
-import { QueryFunctionContext } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
@@ -23,20 +22,6 @@ export type OrchestratedRequest<T = undefined> = {
 	fetch(): Promise<T>;
 	abort(): void;
 };
-
-type RequestOrchestrator<T> = (queryFnCtx: QueryFunctionContext) => OrchestratedRequest<T>;
-
-export function createQueryFn<T>(orchestrator: RequestOrchestrator<T>) {
-	return async (ctx: QueryFunctionContext) => {
-		const request = orchestrator(ctx);
-
-		ctx.signal?.addEventListener('abort', () => {
-			request.abort();
-		});
-
-		return request.fetch();
-	};
-}
 
 export class HttpClient {
 	_baseUrl: string;

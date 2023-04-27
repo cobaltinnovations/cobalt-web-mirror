@@ -1,4 +1,3 @@
-import { queryClient } from '@/app-providers';
 import ConsentContent from '@/components/consent-content';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
@@ -6,11 +5,13 @@ import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
 import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 const Consent = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
+	const revalidator = useRevalidator();
+
 	const [searchParams] = useSearchParams();
 	const { account, institution, signOutAndClearContext } = useAccount();
 
@@ -55,8 +56,8 @@ const Consent = () => {
 												.acceptConsent(account.accountId)
 												.fetch()
 												.then(() => {
-													queryClient.invalidateQueries(['account', account.accountId]);
 													navigate(destinationUrl, { replace: true });
+													revalidator.revalidate();
 												})
 												.catch((e) => {
 													if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
