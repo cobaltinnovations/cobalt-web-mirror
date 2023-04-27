@@ -127,13 +127,14 @@ export const MhicAssessmentComplete = ({
 							/>
 						)}
 
-						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
-							if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
-								return <React.Fragment key={triageGroupIndex} />;
-							}
-
-							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
-						})}
+						<MhicTriageCard
+							className="mb-6"
+							patientOrder={patientOrder}
+							onPatientOrderChange={(patientOrder) => {
+								window.alert('[TODO]: Refresh the order on this page');
+								console.log(patientOrder);
+							}}
+						/>
 						<MhicNextStepsCard
 							className="mb-8"
 							patientOrder={patientOrder}

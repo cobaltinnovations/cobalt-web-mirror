@@ -225,22 +225,12 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 								/>
 							)}
 
-							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
-								if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
-									return null;
-								}
-
-								return (
-									<MhicTriageCard
-										key={triageGroupIndex}
-										className="mb-6"
-										triageGroup={triageGroup}
-										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
-										}
-									/>
-								);
-							})}
+							<MhicTriageCard
+								className="mb-6"
+								patientOrder={patientOrder}
+								onPatientOrderChange={onPatientOrderChange}
+								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+							/>
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
