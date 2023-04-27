@@ -285,14 +285,12 @@ const ScreeningResultCard = ({
 
 										return (
 											<div
+												key={answer.screeningAnswerId}
 												className={classNames({
 													'mb-1': !isLastAnswer,
 												})}
 											>
-												<div
-													key={answer.screeningAnswerId}
-													className="d-flex align-items-center justify-content-between"
-												>
+												<div className="d-flex align-items-center justify-content-between">
 													<h5 className="mb-0">{answer.answerOptionText}</h5>
 													<h5 className="mb-0 text-gray flex-shrink-0">
 														Score: {answer.score}

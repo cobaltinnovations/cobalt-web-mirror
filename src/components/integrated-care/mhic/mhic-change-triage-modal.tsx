@@ -40,8 +40,16 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	);
 
 	const handleOnEnter = useCallback(() => {
-		//TODO: Set initial formValues
-	}, []);
+		if (!currentTriageGroup) {
+			return;
+		}
+
+		setFormValues({
+			patientOrderCareTypeId: currentTriageGroup?.patientOrderCareTypeId,
+			patientOrderFocusTypeId: currentTriageGroup?.patientOrderFocusTypeId,
+			reason: currentTriageGroup?.reasons.join(', '),
+		});
+	}, [currentTriageGroup]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -52,9 +60,13 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 
 				const response = await integratedCareService
 					.overrideTriage(patientOrder.patientOrderId, {
-						patientOrderCareTypeId: formValues.patientOrderCareTypeId,
-						patientOrderFocusTypeId: formValues.patientOrderFocusTypeId,
-						reason: formValues.reason,
+						patientOrderTriages: [
+							{
+								patientOrderCareTypeId: formValues.patientOrderCareTypeId,
+								patientOrderFocusTypeId: formValues.patientOrderFocusTypeId,
+								reason: formValues.reason,
+							},
+						],
 					})
 					.fetch();
 

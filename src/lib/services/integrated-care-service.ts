@@ -317,9 +317,11 @@ export const integratedCareService = {
 	overrideTriage(
 		patientOrderId: string,
 		data: {
-			patientOrderFocusTypeId: string;
-			patientOrderCareTypeId: string;
-			reason: string;
+			patientOrderTriages: {
+				patientOrderFocusTypeId: string;
+				patientOrderCareTypeId: string;
+				reason: string;
+			}[];
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
