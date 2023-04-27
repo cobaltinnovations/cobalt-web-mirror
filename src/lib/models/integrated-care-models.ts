@@ -183,6 +183,8 @@ export enum PatientOrderSafetyPlanningStatusId {
 }
 
 export enum PatientOrderResourcingStatusId {
+	UNKNOWN = 'UNKNOWN',
+	NONE_NEEDED = 'NONE_NEEDED',
 	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
 	SENT_RESOURCES = 'SENT_RESOURCES',
 }

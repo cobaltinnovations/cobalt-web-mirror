@@ -199,12 +199,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 							)}
 							{patientOrder.patientOrderResourcingStatusId ===
 								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="warning"
-									title="Resources needed"
-									description="Triage indicates the patient needs external resources"
-								/>
+								<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
 							)}
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
 								PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
@@ -215,6 +210,21 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									description="[TODO]: Reason for Safety Planning: [Reason]"
 								/>
 							)}
+							{patientOrder.patientOrderResourcingStatusId ===
+								PatientOrderResourcingStatusId.SENT_RESOURCES && (
+								<MhicInlineAlert
+									className="mb-6"
+									variant="success"
+									title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+									action={{
+										title: 'Review contact history for more details',
+										onClick: () => {
+											window.alert('[TODO]: where does this link to.');
+										},
+									}}
+								/>
+							)}
+
 							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
 								if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
 									return null;

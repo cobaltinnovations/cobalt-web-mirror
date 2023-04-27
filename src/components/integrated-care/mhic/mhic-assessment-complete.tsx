@@ -101,16 +101,35 @@ export const MhicAssessmentComplete = ({
 						)}
 						{patientOrder.patientOrderResourcingStatusId ===
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
+						)}
+						{patientOrder.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
 							<MhicInlineAlert
 								className="mb-6"
-								variant="warning"
-								title="Resources needed"
-								description="Triage indicates the patient needs external resources"
+								variant="success"
+								title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
+								description="[TODO]: Reason for Safety Planning: [Reason]"
 							/>
 						)}
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.SENT_RESOURCES && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="success"
+								title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+								action={{
+									title: 'Review contact history for more details',
+									onClick: () => {
+										window.alert('[TODO]: where does this link to.');
+									},
+								}}
+							/>
+						)}
+
 						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
 							if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
-								return null;
+								return <React.Fragment key={triageGroupIndex} />;
 							}
 
 							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
@@ -131,6 +150,7 @@ export const MhicAssessmentComplete = ({
 								<h3 className="mb-8">Conditions &amp; Symptoms</h3>
 								{conditionsAndSymptomsResults.map((screening) => (
 									<ScreeningResultCard
+										key={screening.screeningId}
 										screening={screening}
 										referenceData={referenceData}
 										id={screening.screeningId}
@@ -146,6 +166,7 @@ export const MhicAssessmentComplete = ({
 								<h3 className="mb-8">Completed Assessments</h3>
 								{completedAssessmentsResults.map((screening) => (
 									<ScreeningResultCard
+										key={screening.screeningId}
 										screening={screening}
 										referenceData={referenceData}
 										id={screening.screeningId}

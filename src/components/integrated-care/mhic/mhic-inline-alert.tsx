@@ -102,7 +102,14 @@ export const MhicInlineAlert = ({
 		>
 			<div className={classes.iconOuter}>{variant && icon[variant]}</div>
 			<div className={classes.informationOuter}>
-				<p className="mb-2 fs-large fw-bold">{title}</p>
+				<p
+					className={classNames('fs-large fw-bold', {
+						'mb-0': !description && !action,
+						'mb-2': description || action,
+					})}
+				>
+					{title}
+				</p>
 				{description && (
 					<p
 						className={classNames({

@@ -10,6 +10,8 @@ import {
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
 	PatientOrderStatusId,
 	ReferenceDataResponse,
@@ -284,10 +286,10 @@ export const integratedCareService = {
 	updateResourcingStatus(
 		patientOrderId: string,
 		data: {
-			patientOrderResourcingStatusId: string;
-			resourcesSentAtDate: string;
-			resourcesSentAtTime: string;
-			resourcesSentNote: string;
+			patientOrderResourcingStatusId: PatientOrderResourcingStatusId;
+			resourcesSentAtDate?: string;
+			resourcesSentAtTime?: string;
+			resourcesSentNote?: string;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -295,6 +297,20 @@ export const integratedCareService = {
 		}>({
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/patient-order-resourcing-status`,
+			data,
+		});
+	},
+	updateSafetyPlanningStatus(
+		patientOrderId: string,
+		data: {
+			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-safety-planning-status`,
 			data,
 		});
 	},
