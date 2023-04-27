@@ -15,11 +15,18 @@ interface useInputHelperStylesProps {
 
 const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+		minHeight: 54,
+		borderRadius: 5,
 		position: 'relative',
-		minHeight: 56,
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${
-			hasError ? theme.colors.d500 : isHovered || isFocused ? theme.colors.p500 : theme.colors.border
+			hasError
+				? theme.colors.d500
+				: isFocused
+				? theme.colors.p500
+				: isHovered
+				? theme.colors.n300
+				: theme.colors.n100
 		}`,
 	}),
 	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
@@ -30,6 +37,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 'initial',
 		position: 'absolute',
 		pointerEvents: 'none',
+		...theme.fonts.default,
+		...theme.fonts.headingBold,
 		transformOrigin: 'left top',
 		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',

@@ -2,11 +2,17 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { PatientOrderModel, PatientOrderTriageSourceId, ReferenceDataResponse } from '@/lib/models';
+import {
+	PatientOrderFocusType,
+	PatientOrderModel,
+	PatientOrderTriageSourceId,
+	ReferenceDataResponse,
+} from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { integratedCareService } from '@/lib/services';
+import { TypeaheadHelper } from '@/components/typeahead-helper';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -27,7 +33,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	const [isSaving, setIsSaving] = useState(false);
 	const [formValues, setFormValues] = useState({
 		patientOrderCareTypeId: '',
-		patientOrderFocusTypeId: '',
+		patientOrderFocusTypes: [] as PatientOrderFocusType[],
 		reason: '',
 	});
 
@@ -44,12 +50,16 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			return;
 		}
 
+		const patientOrderFocusTypes = referenceData.patientOrderFocusTypes.filter(
+			(ft) => ft.patientOrderFocusTypeId === currentTriageGroup?.patientOrderFocusTypeId
+		);
+
 		setFormValues({
 			patientOrderCareTypeId: currentTriageGroup?.patientOrderCareTypeId,
-			patientOrderFocusTypeId: currentTriageGroup?.patientOrderFocusTypeId,
+			patientOrderFocusTypes: patientOrderFocusTypes,
 			reason: currentTriageGroup?.reasons.join(', '),
 		});
-	}, [currentTriageGroup]);
+	}, [currentTriageGroup, referenceData.patientOrderFocusTypes]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -60,13 +70,11 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 
 				const response = await integratedCareService
 					.overrideTriage(patientOrder.patientOrderId, {
-						patientOrderTriages: [
-							{
-								patientOrderCareTypeId: formValues.patientOrderCareTypeId,
-								patientOrderFocusTypeId: formValues.patientOrderFocusTypeId,
-								reason: formValues.reason,
-							},
-						],
+						patientOrderTriages: formValues.patientOrderFocusTypes.map(({ patientOrderFocusTypeId }) => ({
+							patientOrderCareTypeId: formValues.patientOrderCareTypeId,
+							patientOrderFocusTypeId,
+							reason: formValues.reason,
+						})),
 					})
 					.fetch();
 
@@ -86,7 +94,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 		[
 			addFlag,
 			formValues.patientOrderCareTypeId,
-			formValues.patientOrderFocusTypeId,
+			formValues.patientOrderFocusTypes,
 			formValues.reason,
 			handleError,
 			onSave,
@@ -127,28 +135,21 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 							</option>
 						))}
 					</InputHelper>
-					<InputHelper
-						as="select"
+					<TypeaheadHelper
 						className="mb-4"
+						id="typeahead--care-focus"
 						label="Care Focus"
-						value={formValues.patientOrderFocusTypeId}
-						onChange={({ currentTarget }) => {
+						multiple
+						labelKey="description"
+						options={referenceData.patientOrderFocusTypes}
+						selected={formValues.patientOrderFocusTypes}
+						onChange={(selected) => {
 							setFormValues((previousValues) => ({
 								...previousValues,
-								patientOrderFocusTypeId: currentTarget.value,
+								patientOrderFocusTypes: selected as PatientOrderFocusType[],
 							}));
 						}}
-						disabled={isSaving}
-					>
-						<option value="" disabled>
-							Select Focus Type...
-						</option>
-						{referenceData.patientOrderFocusTypes.map((o) => (
-							<option key={o.patientOrderFocusTypeId} value={o.patientOrderFocusTypeId}>
-								{o.description}
-							</option>
-						))}
-					</InputHelper>
+					/>
 					<InputHelper
 						as="textarea"
 						label="Reason for Override"
