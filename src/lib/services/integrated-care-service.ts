@@ -314,4 +314,20 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	overrideTriage(
+		patientOrderId: string,
+		data: {
+			patientOrderFocusTypeId: string;
+			patientOrderCareTypeId: string;
+			reason: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-triages`,
+			data,
+		});
+	},
 };

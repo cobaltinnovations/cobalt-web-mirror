@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, PatientOrderTriageSourceId } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
+import { integratedCareService } from '@/lib/services';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -23,9 +24,22 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [isSaving, setIsSaving] = useState(false);
+	const [formValues, setFormValues] = useState({
+		patientOrderCareTypeId: '',
+		patientOrderFocusTypeId: '',
+		reason: '',
+	});
+
+	const currentTriageGroup = useMemo(
+		() =>
+			patientOrder.patientOrderTriageGroups?.find(
+				(tg) => tg.patientOrderCareTypeId === patientOrder.patientOrderCareTypeId
+			),
+		[patientOrder.patientOrderCareTypeId, patientOrder.patientOrderTriageGroups]
+	);
 
 	const handleOnEnter = useCallback(() => {
-		//TODO: Set initial values
+		//TODO: Set initial formValues
 	}, []);
 
 	const handleFormSubmit = useCallback(
@@ -35,20 +49,36 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 			try {
 				setIsSaving(true);
 
+				const response = await integratedCareService
+					.overrideTriage(patientOrder.patientOrderId, {
+						patientOrderCareTypeId: formValues.patientOrderCareTypeId,
+						patientOrderFocusTypeId: formValues.patientOrderFocusTypeId,
+						reason: formValues.reason,
+					})
+					.fetch();
+
 				addFlag({
 					variant: 'success',
 					title: 'Assessment triage overridden',
 					actions: [],
 				});
 
-				// onSave(response.patientOrder);
+				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSaving(false);
 			}
 		},
-		[addFlag, handleError]
+		[
+			addFlag,
+			formValues.patientOrderCareTypeId,
+			formValues.patientOrderFocusTypeId,
+			formValues.reason,
+			handleError,
+			onSave,
+			patientOrder.patientOrderId,
+		]
 	);
 
 	return (
@@ -66,9 +96,12 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 						as="select"
 						className="mb-4"
 						label="Care Type"
-						value=""
+						value={formValues.patientOrderCareTypeId}
 						onChange={({ currentTarget }) => {
-							window.alert(`Set care type: ${currentTarget.value}`);
+							setFormValues((previousValues) => ({
+								...previousValues,
+								patientOrderCareTypeId: currentTarget.value,
+							}));
 						}}
 						disabled={isSaving}
 					>
@@ -80,9 +113,12 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 						as="select"
 						className="mb-4"
 						label="Care Focus"
-						value=""
+						value={formValues.patientOrderFocusTypeId}
 						onChange={({ currentTarget }) => {
-							window.alert(`Set care focus: ${currentTarget.value}`);
+							setFormValues((previousValues) => ({
+								...previousValues,
+								patientOrderFocusTypeId: currentTarget.value,
+							}));
 						}}
 						disabled={isSaving}
 					>
@@ -92,21 +128,31 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 					</InputHelper>
 					<InputHelper
 						as="textarea"
-						label="Reason for Override:"
-						value={''}
+						label="Reason for Override"
+						value={formValues.reason}
 						onChange={({ currentTarget }) => {
-							window.alert(`Set comment: ${currentTarget.value}`);
+							setFormValues((previousValues) => ({
+								...previousValues,
+								reason: currentTarget.value,
+							}));
 						}}
 						disabled={isSaving}
 					/>
 				</Modal.Body>
-				<Modal.Footer className="text-right">
-					<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
-						Cancel
-					</Button>
-					<Button variant="primary" type="submit" disabled={isSaving}>
-						Save
-					</Button>
+				<Modal.Footer className="d-flex align-items-center justify-content-between">
+					<div>
+						{currentTriageGroup?.patientOrderTriageSourceId === PatientOrderTriageSourceId.MANUALLY_SET && (
+							<Button variant="danger">Revert to Assessment</Button>
+						)}
+					</div>
+					<div>
+						<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
+							Cancel
+						</Button>
+						<Button variant="primary" type="submit" disabled={isSaving}>
+							Save
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>

@@ -189,6 +189,11 @@ export enum PatientOrderResourcingStatusId {
 	SENT_RESOURCES = 'SENT_RESOURCES',
 }
 
+export enum PatientOrderTriageSourceId {
+	COBALT = 'COBALT',
+	MANUALLY_SET = 'MANUALLY_SET',
+}
+
 export interface PatientOrderDisposition {
 	patientOrderDispositionId: PatientOrderDispositionId;
 	description: string;
@@ -253,6 +258,7 @@ export interface PatientOrderOutreachModel {
 }
 
 export interface PateintOrderTriageGroupModel {
+	patientOrderTriageSourceId: PatientOrderTriageSourceId;
 	patientOrderFocusTypeId: string;
 	patientOrderFocusTypeDescription: string;
 	patientOrderCareTypeId: string;
