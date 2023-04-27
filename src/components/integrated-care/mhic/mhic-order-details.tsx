@@ -228,6 +228,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 							<MhicTriageCard
 								className="mb-6"
 								patientOrder={patientOrder}
+								referenceData={referenceData}
 								onPatientOrderChange={onPatientOrderChange}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>

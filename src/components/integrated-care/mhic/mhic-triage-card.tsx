@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
 
 interface Props {
 	patientOrder: PatientOrderModel;
 	onPatientOrderChange(patientOrder: PatientOrderModel): void;
+	referenceData: ReferenceDataResponse;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicTriageCard = ({ patientOrder, onPatientOrderChange, disabled, className }: Props) => {
+export const MhicTriageCard = ({ patientOrder, onPatientOrderChange, referenceData, disabled, className }: Props) => {
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 
 	return (
 		<>
 			<MhicChangeTriageModal
 				patientOrder={patientOrder}
+				referenceData={referenceData}
 				show={showChangeTriageModal}
 				onHide={() => {
 					setShowChangeTriageModal(false);

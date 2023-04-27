@@ -127,14 +127,17 @@ export const MhicAssessmentComplete = ({
 							/>
 						)}
 
-						<MhicTriageCard
-							className="mb-6"
-							patientOrder={patientOrder}
-							onPatientOrderChange={(patientOrder) => {
-								window.alert('[TODO]: Refresh the order on this page');
-								console.log(patientOrder);
-							}}
-						/>
+						{referenceData && (
+							<MhicTriageCard
+								className="mb-6"
+								patientOrder={patientOrder}
+								referenceData={referenceData}
+								onPatientOrderChange={(patientOrder) => {
+									window.alert('[TODO]: Refresh the order on this page');
+									console.log(patientOrder);
+								}}
+							/>
+						)}
 						<MhicNextStepsCard
 							className="mb-8"
 							patientOrder={patientOrder}

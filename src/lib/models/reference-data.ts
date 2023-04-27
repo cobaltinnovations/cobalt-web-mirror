@@ -72,6 +72,16 @@ export interface PatientOrderScheduledMessageType {
 	patientOrderScheduledMessageTypeId: string;
 }
 
+export interface PatientOrderCareType {
+	description: string;
+	patientOrderCareTypeId: string;
+}
+
+export interface PatientOrderFocusType {
+	description: string;
+	patientOrderFocusTypeId: string;
+}
+
 export interface ReferenceDataResponse {
 	birthSexes: BirthSex[];
 	countries: Country[];
@@ -79,7 +89,9 @@ export interface ReferenceDataResponse {
 	genderIdentities: GenderIdentity[];
 	insurances: Insurance[];
 	languages: Language[];
+	patientOrderCareTypes: PatientOrderCareType[];
 	patientOrderDispositions: PatientOrderDisposition[];
+	patientOrderFocusTypes: PatientOrderFocusType[];
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
 	patientOrderStatuses: PatientOrderStatus[];

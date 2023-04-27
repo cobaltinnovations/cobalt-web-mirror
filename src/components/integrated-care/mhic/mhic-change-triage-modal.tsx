@@ -2,7 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { PatientOrderModel, PatientOrderTriageSourceId } from '@/lib/models';
+import { PatientOrderModel, PatientOrderTriageSourceId, ReferenceDataResponse } from '@/lib/models';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
@@ -16,10 +16,11 @@ const useStyles = createUseStyles({
 
 interface Props extends ModalProps {
 	patientOrder: PatientOrderModel;
+	referenceData: ReferenceDataResponse;
 	onSave(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
+export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, onSave, ...props }) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
@@ -105,9 +106,14 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 						}}
 						disabled={isSaving}
 					>
-						<option key={''} value={''}>
-							Select...
+						<option value="" disabled>
+							Select Care Type...
 						</option>
+						{referenceData.patientOrderCareTypes.map((o) => (
+							<option key={o.patientOrderCareTypeId} value={o.patientOrderCareTypeId}>
+								{o.description}
+							</option>
+						))}
 					</InputHelper>
 					<InputHelper
 						as="select"
@@ -122,9 +128,14 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, onSave, ...prop
 						}}
 						disabled={isSaving}
 					>
-						<option key={''} value={''}>
-							Select...
+						<option value="" disabled>
+							Select Focus Type...
 						</option>
+						{referenceData.patientOrderFocusTypes.map((o) => (
+							<option key={o.patientOrderFocusTypeId} value={o.patientOrderFocusTypeId}>
+								{o.description}
+							</option>
+						))}
 					</InputHelper>
 					<InputHelper
 						as="textarea"
