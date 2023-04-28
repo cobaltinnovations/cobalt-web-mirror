@@ -209,32 +209,35 @@ export const MhicAssessmentComplete = ({
 								</>
 							)}
 
-							<hr className="mb-8" />
-
-							<div className={classes.scrollAnchor} id="other-assessments" />
-							<h3 className="mb-2">Other Assessments</h3>
-							<p className="mb-8">These assessments were not applicable to the patient.</p>
-							{notTakenScreeningTypes.map((screeningType) => (
-								<ScreeningResultCard
-									key={screeningType.screeningTypeId}
-									screening={{
-										screeningVersionId: '',
-										screeningId: '',
-										screeningVersionNumber: 0,
-										screeningTypeId: screeningType.screeningTypeId,
-										screeningName: screeningType.description,
-										screeningScore: {
-											overallScore: undefined,
-											personalAccomplishmentScore: 0,
-											depersonalizationScore: 0,
-											emotionalExhaustionScore: 0,
-										},
-										belowScoringThreshold: undefined,
-									}}
-									referenceData={referenceData}
-									id={screeningType.screeningTypeId}
-								/>
-							))}
+							{notTakenScreeningTypes.length > 0 && (
+								<>
+									<hr className="mb-8" />
+									<div className={classes.scrollAnchor} id="other-assessments" />
+									<h3 className="mb-2">Other Assessments</h3>
+									<p className="mb-8">These assessments were not applicable to the patient.</p>
+									{notTakenScreeningTypes.map((screeningType) => (
+										<ScreeningResultCard
+											key={screeningType.screeningTypeId}
+											screening={{
+												screeningVersionId: '',
+												screeningId: '',
+												screeningVersionNumber: 0,
+												screeningTypeId: screeningType.screeningTypeId,
+												screeningName: screeningType.description,
+												screeningScore: {
+													overallScore: undefined,
+													personalAccomplishmentScore: 0,
+													depersonalizationScore: 0,
+													emotionalExhaustionScore: 0,
+												},
+												belowScoringThreshold: undefined,
+											}}
+											referenceData={referenceData}
+											id={screeningType.screeningTypeId}
+										/>
+									))}
+								</>
+							)}
 						</Col>
 						<Col md={{ span: 2, offset: 1 }}>
 							<TabBar
@@ -271,6 +274,19 @@ export const MhicAssessmentComplete = ({
 									...completedAssessmentsResults.map((result) => ({
 										title: result.screeningName ?? '',
 										value: `#${result.screeningId}` ?? '#',
+										level: 1,
+									})),
+									...(notTakenScreeningTypes.length > 0
+										? [
+												{
+													title: 'Other Assessments',
+													value: '#other-assessments',
+												},
+										  ]
+										: []),
+									...notTakenScreeningTypes.map((result) => ({
+										title: result.description ?? '',
+										value: `#${result.screeningTypeId}` ?? '#',
 										level: 1,
 									})),
 								]}
