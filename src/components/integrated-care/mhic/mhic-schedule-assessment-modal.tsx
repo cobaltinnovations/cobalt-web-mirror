@@ -6,6 +6,7 @@ import { createUseStyles } from 'react-jss';
 import { PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
@@ -24,6 +25,7 @@ interface Props extends ModalProps {
 export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
@@ -54,15 +56,22 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 				setIsSaving(true);
 
 				if (patientOrder.patientOrderScheduledScreeningId) {
-					await integratedCareService
+					const assessmentResponse = await integratedCareService
 						.updateScheduledAssessment(patientOrder.patientOrderScheduledScreeningId, {
 							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
 							scheduledTime: formValues.time,
 							calendarUrl: formValues.link,
 						})
 						.fetch();
+
+					addFlag({
+						variant: 'success',
+						title: 'Assessment updated',
+						description: `Assessment was updated for ${patientOrder.patientDisplayName} to ${assessmentResponse.patientOrderScheduledScreening.scheduledDateTimeDescription}`,
+						actions: [],
+					});
 				} else {
-					await integratedCareService
+					const assessmentResponse = await integratedCareService
 						.scheduleAssessment({
 							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
 							scheduledTime: formValues.time,
@@ -70,6 +79,13 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 							calendarUrl: formValues.link,
 						})
 						.fetch();
+
+					addFlag({
+						variant: 'success',
+						title: 'Assessment scheduled',
+						description: `Assessment was scheduled for ${patientOrder.patientDisplayName} at ${assessmentResponse.patientOrderScheduledScreening.scheduledDateTimeDescription}`,
+						actions: [],
+					});
 				}
 
 				const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
@@ -80,7 +96,17 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 				setIsSaving(false);
 			}
 		},
-		[formValues.date, formValues.link, formValues.time, handleError, onSave, patientOrder]
+		[
+			addFlag,
+			formValues.date,
+			formValues.link,
+			formValues.time,
+			handleError,
+			onSave,
+			patientOrder.patientDisplayName,
+			patientOrder.patientOrderId,
+			patientOrder.patientOrderScheduledScreeningId,
+		]
 	);
 
 	return (
