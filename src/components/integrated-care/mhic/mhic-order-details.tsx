@@ -728,9 +728,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0 text-gray">PC Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 											</Col>
 										</Row>
 										<hr className="mb-4" />
@@ -739,7 +737,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0 text-gray">MHIC</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.panelAccountDisplayName}</p>
+												<p className="m-0">
+													{patientOrder.panelAccountDisplayName ?? 'Unassigned'}
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -747,9 +747,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 												<p className="m-0 text-gray">BHP</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.providerName ?? 'N/A'}</p>
 											</Col>
 										</Row>
 										{/* <Row>

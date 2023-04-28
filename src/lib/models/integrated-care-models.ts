@@ -128,6 +128,8 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
+
+	providerName?: string;
 }
 
 export enum PatientOrderCareTypeId {
