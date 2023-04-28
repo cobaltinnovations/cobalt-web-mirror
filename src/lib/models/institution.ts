@@ -29,6 +29,12 @@ export interface Institution {
 	featureScreeningFlowId?: string;
 	hasTakenFeatureScreening: boolean;
 	takeFeatureScreening: boolean;
+	userExperienceTypeId: UserExperienceTypeId;
+	patientUserExperienceBaseUrl: string;
+	staffUserExperienceBaseUrl: string;
+	integratedCarePhoneNumber: string;
+	integratedCarePhoneNumberDescription: string;
+	integratedCareAvailabilityDescription: string;
 }
 
 export interface InstitutionFeature {
@@ -53,6 +59,11 @@ export enum AccountSourceDisplayStyleId {
 	PRIMARY = 'PRIMARY',
 	SECONDARY = 'SECONDARY',
 	TERTIARY = 'TERTIARY',
+}
+
+export enum UserExperienceTypeId {
+	STAFF = 'STAFF',
+	PATIENT = 'PATIENT',
 }
 
 export interface AccountSource {
