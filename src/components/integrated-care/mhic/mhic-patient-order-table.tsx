@@ -293,7 +293,9 @@ export const MhicPatientOrderTable = ({
 													{po.patientOrderScreeningStatusDescription}
 												</Badge>
 											)}
-											<span className="ms-4 fs-small text-danger">[TODO]: Insurance</span>
+											<span className="ms-4 fs-small text-danger text-nowrap">
+												[TODO]: Insurance
+											</span>
 										</TableCell>
 									)}
 									{columnConfig.outreachNumber && (

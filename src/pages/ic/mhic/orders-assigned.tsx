@@ -41,7 +41,6 @@ const MhicOrdersAssigned = () => {
 			...(pageNumber && { pageNumber }),
 			patientOrderStatusId: [
 				PatientOrderStatusId.NEEDS_ASSESSMENT,
-				PatientOrderStatusId.SCHEDULED,
 				PatientOrderStatusId.SAFETY_PLANNING,
 				PatientOrderStatusId.SPECIALTY_CARE,
 				PatientOrderStatusId.SUBCLINICAL,

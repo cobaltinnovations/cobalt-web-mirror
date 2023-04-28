@@ -55,7 +55,6 @@ const MhicMyPatients = () => {
 		[PatientOrderStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
 		[PatientOrderStatusId.PENDING]: 'Pending',
 		[PatientOrderStatusId.SAFETY_PLANNING]: 'Safety Planning',
-		[PatientOrderStatusId.SCHEDULED]: 'Scheduled',
 		[PatientOrderStatusId.SPECIALTY_CARE]: 'Specialty Care',
 		[PatientOrderStatusId.SUBCLINICAL]: 'Subclinical',
 	};
