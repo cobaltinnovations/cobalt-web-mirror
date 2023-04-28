@@ -127,6 +127,8 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 
 	const handleRevertToAssessmentButtonClick = useCallback(async () => {
 		try {
+			setIsSaving(true);
+
 			const response = await integratedCareService.revertTriage(patientOrder.patientOrderId).fetch();
 
 			addFlag({
@@ -139,6 +141,8 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			onSave(response.patientOrder);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	}, [addFlag, handleError, onSave, patientOrder.patientOrderId]);
 
@@ -189,6 +193,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 								patientOrderFocusTypes: selected as PatientOrderFocusType[],
 							}));
 						}}
+						disabled={isSaving}
 					/>
 					<InputHelper
 						as="textarea"
@@ -206,7 +211,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 				<Modal.Footer className="d-flex align-items-center justify-content-between">
 					<div>
 						{currentTriageGroup?.patientOrderTriageSourceId === PatientOrderTriageSourceId.MANUALLY_SET && (
-							<Button variant="danger" onClick={handleRevertToAssessmentButtonClick}>
+							<Button variant="danger" onClick={handleRevertToAssessmentButtonClick} disabled={isSaving}>
 								Revert to Assessment
 							</Button>
 						)}
