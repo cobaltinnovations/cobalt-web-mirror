@@ -252,7 +252,6 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									{patientOrder.patientOrderScreeningStatusId ===
 										PatientOrderScreeningStatusId.NOT_SCREENED && (
 										<NoData
-											className="mb-6"
 											title="No Assessment"
 											description="There is no assessment for the patient's most recent referral order"
 											actions={[
@@ -282,7 +281,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 									{patientOrder.patientOrderScreeningStatusId ===
 										PatientOrderScreeningStatusId.SCHEDULED && (
 										<NoData
-											className="mb-6 bg-white"
+											className="bg-white"
 											title="Assessment is Scheduled"
 											description={
 												patientOrder.patientOrderScheduledScreeningScheduledDateTimeDescription

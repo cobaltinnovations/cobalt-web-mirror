@@ -355,4 +355,20 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	updateScheduledAssessment(
+		patientOrderScheduledScreeningId: string,
+		data: {
+			scheduledDate: string;
+			scheduledTime: string;
+			calendarUrl?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-screenings/${patientOrderScheduledScreeningId}`,
+			data,
+		});
+	},
 };

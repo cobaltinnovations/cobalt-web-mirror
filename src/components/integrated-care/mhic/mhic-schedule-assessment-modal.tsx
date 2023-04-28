@@ -33,11 +33,18 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 
 	const handleOnEnter = useCallback(() => {
 		setFormValues({
-			date: undefined,
-			time: '',
-			link: '',
+			date: patientOrder.patientOrderScheduledScreeningScheduledDateTime
+				? moment(patientOrder.patientOrderScheduledScreeningScheduledDateTime).toDate()
+				: undefined,
+			time: patientOrder.patientOrderScheduledScreeningScheduledDateTime
+				? moment(patientOrder.patientOrderScheduledScreeningScheduledDateTime).format('h:mm A')
+				: '',
+			link: patientOrder.patientOrderScheduledScreeningCalendarUrl ?? '',
 		});
-	}, []);
+	}, [
+		patientOrder.patientOrderScheduledScreeningCalendarUrl,
+		patientOrder.patientOrderScheduledScreeningScheduledDateTime,
+	]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -46,16 +53,26 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 			try {
 				setIsSaving(true);
 
-				await integratedCareService
-					.scheduleAssessment({
-						scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
-						scheduledTime: formValues.time,
-						patientOrderId: patientOrder.patientOrderId,
-						calendarUrl: formValues.link,
-					})
-					.fetch();
-				const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
+				if (patientOrder.patientOrderScheduledScreeningId) {
+					await integratedCareService
+						.updateScheduledAssessment(patientOrder.patientOrderScheduledScreeningId, {
+							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledTime: formValues.time,
+							calendarUrl: formValues.link,
+						})
+						.fetch();
+				} else {
+					await integratedCareService
+						.scheduleAssessment({
+							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledTime: formValues.time,
+							patientOrderId: patientOrder.patientOrderId,
+							calendarUrl: formValues.link,
+						})
+						.fetch();
+				}
 
+				const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
 				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
