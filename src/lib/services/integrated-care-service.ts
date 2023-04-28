@@ -13,6 +13,7 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
+	PatientOrderScheduledScreening,
 	PatientOrderStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
@@ -338,6 +339,20 @@ export const integratedCareService = {
 		}>({
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/reset-patient-order-triages`,
+		});
+	},
+	scheduleAssessment(data: {
+		scheduledDate: string;
+		scheduledTime: string;
+		patientOrderId: string;
+		calendarUrl?: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-screenings',
+			data,
 		});
 	},
 };

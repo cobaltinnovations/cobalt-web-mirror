@@ -315,3 +315,18 @@ export type PatientOrderCountsByPatientOrderStatusId = Record<
 		patientOrderCount: number;
 	}
 >;
+
+export interface PatientOrderScheduledScreening {
+	patientOrderScheduledScreeningId: string;
+	patientOrderId: string;
+	accountId: string;
+	scheduledDateTime: string;
+	scheduledDateTimeDescription: string;
+	canceled: boolean;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	canceledAt?: string;
+	canceledAtDescription?: string;
+}

@@ -8,6 +8,7 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
+	PatientOrderScreeningStatusId,
 	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
@@ -43,7 +44,6 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 	const { addFlag } = useFlags();
 	const navigate = useNavigate();
 
-	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
@@ -76,12 +76,13 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 	return (
 		<>
 			<MhicScheduleAssessmentModal
-				assessmentId={assessmentIdToEdit}
+				patientOrder={patientOrder}
 				show={showScheduleAssessmentModal}
 				onHide={() => {
 					setShowScheduleAssessmentModal(false);
 				}}
-				onSave={() => {
+				onSave={(updatedPatientOrder) => {
+					onPatientOrderChange(updatedPatientOrder);
 					setShowScheduleAssessmentModal(false);
 				}}
 			/>
@@ -248,89 +249,98 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 							</Row>
 							<Row>
 								<Col>
-									<NoData
-										className="mb-6"
-										title="No Assessment"
-										description="There is no assessment for the patient's most recent referral order"
-										actions={[
-											{
-												variant: 'primary',
-												title: 'Start Assessment',
-												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+									{patientOrder.patientOrderScreeningStatusId ===
+										PatientOrderScreeningStatusId.NOT_SCREENED && (
+										<NoData
+											className="mb-6"
+											title="No Assessment"
+											description="There is no assessment for the patient's most recent referral order"
+											actions={[
+												{
+													variant: 'primary',
+													title: 'Start Assessment',
+													onClick: () => {
+														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-											{
-												variant: 'outline-primary',
-												title: 'Schedule Assessment',
-												onClick: () => {
-													setAssessmentIdToEdit('');
-													setShowScheduleAssessmentModal(true);
+												{
+													variant: 'outline-primary',
+													title: 'Schedule Assessment',
+													onClick: () => {
+														setShowScheduleAssessmentModal(true);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-										]}
-									/>
-									<NoData
-										className="mb-6 bg-white"
-										title="Assessment is Scheduled"
-										description="Nov 12, 2023 at 2:30 PM"
-										actions={[
-											{
-												variant: 'primary',
-												title: 'Start Assessment',
-												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+											]}
+										/>
+									)}
+									{patientOrder.patientOrderScreeningStatusId ===
+										PatientOrderScreeningStatusId.SCHEDULED && (
+										<NoData
+											className="mb-6 bg-white"
+											title="Assessment is Scheduled"
+											description={
+												patientOrder.patientOrderScheduledScreeningScheduledDateTimeDescription
+											}
+											actions={[
+												{
+													variant: 'primary',
+													title: 'Start Assessment',
+													onClick: () => {
+														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-											{
-												variant: 'outline-primary',
-												title: 'Edit Appointment Date',
-												onClick: () => {
-													setAssessmentIdToEdit('xxx');
-													setShowScheduleAssessmentModal(true);
+												{
+													variant: 'outline-primary',
+													title: 'Edit Appointment Date',
+													onClick: () => {
+														setShowScheduleAssessmentModal(true);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-										]}
-									/>
-									<NoData
-										className="bg-white"
-										title="Assessment in Progress"
-										description="{Patient Name} began the assessment on {Date} at {Time}"
-										actions={[
-											{
-												variant: 'primary',
-												title: 'Continue Assessment',
-												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+											]}
+										/>
+									)}
+									{patientOrder.patientOrderScreeningStatusId ===
+										PatientOrderScreeningStatusId.IN_PROGRESS && (
+										<NoData
+											className="bg-white"
+											title="Assessment in Progress"
+											description="{Patient Name} began the assessment on {Date} at {Time}"
+											actions={[
+												{
+													variant: 'primary',
+													title: 'Continue Assessment',
+													onClick: () => {
+														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-											{
-												variant: 'outline-primary',
-												title: 'Retake Assessment',
-												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+												{
+													variant: 'outline-primary',
+													title: 'Retake Assessment',
+													onClick: () => {
+														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													},
+													disabled:
+														patientOrder.patientOrderDispositionId ===
+														PatientOrderDispositionId.CLOSED,
 												},
-												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
-											},
-										]}
-									/>
+											]}
+										/>
+									)}
 								</Col>
 							</Row>
 						</>
