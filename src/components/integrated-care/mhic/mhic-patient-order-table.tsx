@@ -5,6 +5,7 @@ import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
 	PatientOrderCareTypeId,
+	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -13,13 +14,45 @@ import {
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
+import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const dispositionVariantMap = {
+	[PatientOrderDispositionId.OPEN]: 'success',
+	[PatientOrderDispositionId.CLOSED]: 'light',
+	[PatientOrderDispositionId.ARCHIVED]: 'dark',
+};
+
+const useStyles = createUseThemedStyles((theme) => ({
+	[`${PatientOrderDispositionId.OPEN}-row`]: {
+		backgroundColor: theme.colors.s50,
+	},
+	[`${PatientOrderDispositionId.CLOSED}-row`]: {
+		backgroundColor: theme.colors.n50,
+	},
+	[`${PatientOrderDispositionId.ARCHIVED}-row`]: {
+		backgroundColor: theme.colors.n50,
+	},
+	[`${PatientOrderDispositionId.OPEN}-icon`]: {
+		fill: theme.colors.s500,
+	},
+	[`${PatientOrderDispositionId.CLOSED}-icon`]: {
+		fill: theme.colors.n50,
+	},
+	[`${PatientOrderDispositionId.ARCHIVED}-icon`]: {
+		fill: theme.colors.n50,
+	},
+}));
 
 export type MhicPatientOrderTableColumnConfig = {
 	checkbox?: boolean;
 	flag?: boolean;
 	patient?: boolean;
+	mrn?: boolean;
 	referralDate?: boolean;
+	preferredPhone?: boolean;
 	practice?: boolean;
+	orderState?: boolean;
 	referralReason?: boolean;
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
@@ -48,6 +81,7 @@ interface MhicPatientOrderTableProps {
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
 	columnConfig: MhicPatientOrderTableColumnConfig;
+	coloredRows?: boolean;
 }
 
 export const MhicPatientOrderTable = ({
@@ -63,7 +97,9 @@ export const MhicPatientOrderTable = ({
 	pageSize,
 	onPaginationClick,
 	columnConfig,
+	coloredRows = false,
 }: MhicPatientOrderTableProps) => {
+	const classes = useStyles();
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const patientColumnOffset = useMemo(() => {
@@ -138,9 +174,12 @@ export const MhicPatientOrderTable = ({
 									Patient
 								</TableCell>
 							)}
+							{columnConfig.mrn && <TableCell header>MRN</TableCell>}
 							{columnConfig.referralDate && <TableCell header>Referral Date</TableCell>}
+							{columnConfig.preferredPhone && <TableCell header>Pref. Phone</TableCell>}
 							{columnConfig.practice && <TableCell header>Practice</TableCell>}
 							{columnConfig.referralReason && <TableCell header>Referral Reason</TableCell>}
+							{columnConfig.orderState && <TableCell header>Order State</TableCell>}
 							{columnConfig.assessmentStatus && <TableCell header>Assessment Status</TableCell>}
 							{columnConfig.outreachNumber && (
 								<TableCell header className="text-right">
@@ -177,6 +216,7 @@ export const MhicPatientOrderTable = ({
 										setSearchParams(searchParams);
 									}}
 									highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
+									className={classes[`${po.patientOrderDispositionId}-row`]}
 								>
 									{columnConfig.checkbox && (
 										<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
@@ -247,11 +287,18 @@ export const MhicPatientOrderTable = ({
 											<span className="d-block text-nowrap text-gray">{po.patientMrn}</span>
 										</TableCell>
 									)}
+
+									{columnConfig.mrn && <TableCell header>{po.patientMrn}</TableCell>}
+
 									{columnConfig.referralDate && (
 										<TableCell width={144}>
 											<span className="text-nowrap text-truncate">{po.orderDateDescription}</span>
 										</TableCell>
 									)}
+									{columnConfig.preferredPhone && (
+										<TableCell header>{po.patientPhoneNumberDescription}</TableCell>
+									)}
+
 									{columnConfig.practice && (
 										<TableCell width={240}>
 											<span className="text-nowrap text-truncate">
@@ -262,6 +309,23 @@ export const MhicPatientOrderTable = ({
 									{columnConfig.referralReason && (
 										<TableCell width={320}>
 											<span className="text-nowrap text-truncate">{po.reasonForReferral}</span>
+										</TableCell>
+									)}
+									{columnConfig.orderState && (
+										<TableCell>
+											<div>
+												<Badge
+													pill
+													bg={
+														'outline-' + dispositionVariantMap[po.patientOrderDispositionId]
+													}
+												>
+													<FilledCircleIcon
+														className={classes[`${po.patientOrderDispositionId}-icon`]}
+													/>
+													{'  '} {po.patientOrderDispositionDescription}
+												</Badge>
+											</div>
 										</TableCell>
 									)}
 									{columnConfig.assessmentStatus && (
