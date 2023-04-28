@@ -62,6 +62,7 @@ const MhicSearchResults = () => {
 					orderState: true,
 					assignedMhic: true,
 				}}
+				coloredRows
 			/>
 		</Container>
 	);

@@ -16,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import classNames from 'classnames';
 
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
@@ -216,7 +217,9 @@ export const MhicPatientOrderTable = ({
 										setSearchParams(searchParams);
 									}}
 									highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
-									className={classes[`${po.patientOrderDispositionId}-row`]}
+									className={classNames({
+										[classes[`${po.patientOrderDispositionId}-row`]]: coloredRows,
+									})}
 								>
 									{columnConfig.checkbox && (
 										<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
