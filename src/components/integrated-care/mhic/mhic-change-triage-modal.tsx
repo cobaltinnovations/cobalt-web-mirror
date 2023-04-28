@@ -46,6 +46,25 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 		[patientOrder.patientOrderCareTypeId, patientOrder.patientOrderTriageGroups]
 	);
 
+	// Remove SAFETY_PLANNING and UNSPECIFIED as they break the UI
+	// by removing the triage from the patientOrder
+	const filteredFocusOptions = useMemo(
+		() =>
+			compact(
+				referenceData.patientOrderFocusTypes.map((option) => {
+					if (
+						option.patientOrderFocusTypeId === 'SAFETY_PLANNING' ||
+						option.patientOrderFocusTypeId === 'UNSPECIFIED'
+					) {
+						return null;
+					}
+
+					return option;
+				})
+			),
+		[referenceData.patientOrderFocusTypes]
+	);
+
 	const handleOnEnter = useCallback(() => {
 		if (!currentTriageGroup) {
 			return;
@@ -55,14 +74,12 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			patientOrderCareTypeId: currentTriageGroup.patientOrderCareTypeId,
 			patientOrderFocusTypes: compact(
 				currentTriageGroup.patientOrderFocusTypes.map((ft) =>
-					referenceData.patientOrderFocusTypes.find(
-						(rd) => rd.patientOrderFocusTypeId === ft.patientOrderFocusTypeId
-					)
+					filteredFocusOptions.find((rd) => rd.patientOrderFocusTypeId === ft.patientOrderFocusTypeId)
 				)
 			),
 			reason: currentTriageGroup.patientOrderFocusTypes.map((ft) => ft.reasons).join(', '),
 		});
-	}, [currentTriageGroup, referenceData.patientOrderFocusTypes]);
+	}, [currentTriageGroup, filteredFocusOptions]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -144,7 +161,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 						label="Care Focus"
 						multiple
 						labelKey="description"
-						options={referenceData.patientOrderFocusTypes}
+						options={filteredFocusOptions}
 						selected={formValues.patientOrderFocusTypes}
 						onChange={(selected) => {
 							setFormValues((previousValues) => ({
