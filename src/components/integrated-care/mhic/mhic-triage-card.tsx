@@ -1,67 +1,86 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
-import { PateintOrderTriageGroupModel } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { useRevalidator } from 'react-router-dom';
 
 interface Props {
-	triageGroup: PateintOrderTriageGroupModel;
+	patientOrder: PatientOrderModel;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicTriageCard = ({ triageGroup, disabled, className }: Props) => {
+export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
+	const revalidator = useRevalidator();
 
 	return (
 		<>
 			<MhicChangeTriageModal
+				patientOrder={patientOrder}
+				referenceData={referenceDataResponse}
 				show={showChangeTriageModal}
 				onHide={() => {
 					setShowChangeTriageModal(false);
 				}}
-				onSave={() => {
+				onSave={(updatedPatientOrder) => {
 					setShowChangeTriageModal(false);
+					revalidator.revalidate();
 				}}
 			/>
 
-			<Card bsPrefix="ic-card" className={className}>
-				<Card.Header>
-					<Card.Title>
-						Assessment Triage:{' '}
-						<span className="text-uppercase">{triageGroup.patientOrderCareTypeDescription}</span>
-					</Card.Title>
-					<div className="button-container">
-						<span className="me-3 text-uppercase text-gray">Enrolled</span>
-						<Button
-							variant="light"
-							size="sm"
-							onClick={() => {
-								setShowChangeTriageModal(true);
-							}}
-							disabled={disabled}
-						>
-							Override
-						</Button>
-					</div>
-				</Card.Header>
-				<Card.Body>
-					<Container fluid>
-						<Row>
-							<Col xs={3}>
-								<p className="m-0 text-gray">{triageGroup.patientOrderFocusTypeDescription}</p>
-							</Col>
-							<Col xs={9}>
-								{triageGroup.reasons.map((reason, reasonIndex) => (
-									<p key={reasonIndex} className="m-0">
-										{reason}
-									</p>
+			{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
+				if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
+					return <React.Fragment key={triageGroupIndex} />;
+				}
+
+				return (
+					<Card key={triageGroupIndex} bsPrefix="ic-card" className={className}>
+						<Card.Header>
+							<Card.Title>
+								Assessment Triage:{' '}
+								<span className="text-uppercase">{triageGroup.patientOrderCareTypeDescription}</span>
+							</Card.Title>
+							<div className="button-container">
+								<span className="me-3 text-uppercase text-gray">Enrolled</span>
+								<Button
+									variant="light"
+									size="sm"
+									onClick={() => {
+										setShowChangeTriageModal(true);
+									}}
+									disabled={disabled}
+								>
+									Override
+								</Button>
+							</div>
+						</Card.Header>
+						<Card.Body>
+							<Container fluid>
+								{triageGroup.patientOrderFocusTypes.map((focusType) => (
+									<Row key={focusType.patientOrderFocusTypeId}>
+										<Col xs={3}>
+											<p className="m-0 text-gray">
+												{focusType.patientOrderFocusTypeDescription}
+											</p>
+										</Col>
+										<Col xs={9}>
+											{focusType.reasons.map((reason, reasonIndex) => (
+												<p key={reasonIndex} className="m-0">
+													{reason}
+												</p>
+											))}
+										</Col>
+									</Row>
 								))}
-							</Col>
-						</Row>
-					</Container>
-				</Card.Body>
-			</Card>
+							</Container>
+						</Card.Body>
+					</Card>
+				);
+			})}
 		</>
 	);
 };

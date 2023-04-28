@@ -194,17 +194,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									className="mb-6"
 									variant="danger"
 									title="Patient needs safety planning"
-									description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
 								/>
 							)}
 							{patientOrder.patientOrderResourcingStatusId ===
 								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="warning"
-									title="Resources needed"
-									description="Triage indicates the patient needs external resources"
-								/>
+								<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
 							)}
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
 								PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
@@ -215,22 +209,26 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									description="[TODO]: Reason for Safety Planning: [Reason]"
 								/>
 							)}
-							{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
-								if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
-									return null;
-								}
+							{patientOrder.patientOrderResourcingStatusId ===
+								PatientOrderResourcingStatusId.SENT_RESOURCES && (
+								<MhicInlineAlert
+									className="mb-6"
+									variant="success"
+									title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+									action={{
+										title: 'Review contact history for more details',
+										onClick: () => {
+											window.alert('[TODO]: where does this link to.');
+										},
+									}}
+								/>
+							)}
 
-								return (
-									<MhicTriageCard
-										key={triageGroupIndex}
-										className="mb-6"
-										triageGroup={triageGroup}
-										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
-										}
-									/>
-								);
-							})}
+							<MhicTriageCard
+								className="mb-6"
+								patientOrder={patientOrder}
+								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+							/>
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}

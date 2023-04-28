@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Badge, Button, Tab } from 'react-bootstrap';
+import { Badge, Button, Dropdown, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderModel, PatientOrderStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
@@ -12,8 +12,10 @@ import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
 import { MhicComments, MhicContactHistory, MhicOrderDetails } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	patientOrderShelf: {
@@ -49,6 +51,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
+	},
+	shelfMoreButton: {
+		top: 20,
+		right: 64,
 	},
 	shelfCloseButton: {
 		top: 20,
@@ -116,25 +122,18 @@ enum TAB_KEYS {
 export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
-
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
 	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [referenceData, setReferenceData] = useState<ReferenceDataResponse>();
 
 	const fetchPatientOverview = useCallback(async () => {
 		if (!patientOrderId) {
 			return;
 		}
 
-		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
-			integratedCareService.getPatientOrder(patientOrderId).fetch(),
-			integratedCareService.getReferenceData().fetch(),
-		]);
-
+		const patientOverviewResponse = await integratedCareService.getPatientOrder(patientOrderId).fetch();
 		setCurrentPatientOrder(patientOverviewResponse.patientOrder);
 		setPastPatientOrders(patientOverviewResponse.associatedPatientOrders);
-		setReferenceData(referenceDataResponse);
 		onShelfLoad(patientOverviewResponse.patientOrder);
 	}, [onShelfLoad, patientOrderId]);
 
@@ -164,6 +163,59 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 					<AsyncWrapper fetchData={fetchPatientOverview}>
 						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.ORDER_DETAILS} activeKey={tabKey}>
 							<div className={classes.header}>
+								<Dropdown className={classNames(classes.shelfMoreButton, 'position-absolute')}>
+									<Dropdown.Toggle
+										as={DropdownToggle}
+										id={`mhic-shelf__dropdown-menu`}
+										className="p-2"
+									>
+										<MoreIcon className="d-flex" />
+									</Dropdown.Toggle>
+									<Dropdown.Menu
+										as={DropdownMenu}
+										align="end"
+										popperConfig={{ strategy: 'fixed' }}
+										renderOnMount
+									>
+										<Dropdown.Item
+											onClick={() => {
+												window.alert('[TODO]');
+											}}
+										>
+											Assign to MHIC
+										</Dropdown.Item>
+										<Dropdown.Item
+											onClick={() => {
+												window.alert('[TODO]');
+											}}
+										>
+											Add Voicemail Task
+										</Dropdown.Item>
+										<Dropdown.Divider />
+										<Dropdown.Item
+											onClick={() => {
+												window.alert('[TODO]');
+											}}
+										>
+											Start Assessment
+										</Dropdown.Item>
+										<Dropdown.Item
+											onClick={() => {
+												window.alert('[TODO]');
+											}}
+										>
+											Schedule Assessment
+										</Dropdown.Item>
+										<Dropdown.Divider />
+										<Dropdown.Item
+											onClick={() => {
+												window.alert('[TODO]');
+											}}
+										>
+											Close Episode
+										</Dropdown.Item>
+									</Dropdown.Menu>
+								</Dropdown>
 								<Button
 									variant="light"
 									className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
@@ -230,7 +282,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 							</div>
 							<Tab.Content className={classes.tabContent}>
 								<Tab.Pane eventKey={TAB_KEYS.ORDER_DETAILS} className={classes.tabPane}>
-									{currentPatientOrder && referenceData && (
+									{currentPatientOrder && (
 										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
@@ -238,9 +290,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
-									{currentPatientOrder && referenceData && (
-										<MhicContactHistory patientOrder={currentPatientOrder} />
-									)}
+									{currentPatientOrder && <MhicContactHistory patientOrder={currentPatientOrder} />}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
 									{currentPatientOrder && <MhicComments patientOrder={currentPatientOrder} />}

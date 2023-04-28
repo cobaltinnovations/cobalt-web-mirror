@@ -8,7 +8,6 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
-	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
@@ -22,6 +21,7 @@ import {
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -31,16 +31,11 @@ const useStyles = createUseStyles(() => ({
 }));
 
 interface MhicAssessmentCompleteProps {
-	referenceData?: ReferenceDataResponse;
 	patientOrder?: PatientOrderModel;
 	onStartNewAssessment: () => void;
 }
 
-export const MhicAssessmentComplete = ({
-	patientOrder,
-	referenceData,
-	onStartNewAssessment,
-}: MhicAssessmentCompleteProps) => {
+export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
 	const classes = useStyles();
 
@@ -92,29 +87,37 @@ export const MhicAssessmentComplete = ({
 						<h3 className="mb-8">Results</h3>
 						{patientOrder.patientOrderSafetyPlanningStatusId ===
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-							<MhicInlineAlert
-								className="mb-6"
-								variant="danger"
-								title="Patient needs safety planning"
-								description="[TODO]: Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason, Reason"
-							/>
+							<MhicInlineAlert className="mb-6" variant="danger" title="Patient needs safety planning" />
 						)}
 						{patientOrder.patientOrderResourcingStatusId ===
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
+						)}
+						{patientOrder.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
 							<MhicInlineAlert
 								className="mb-6"
-								variant="warning"
-								title="Resources needed"
-								description="Triage indicates the patient needs external resources"
+								variant="success"
+								title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
+								description="[TODO]: Reason for Safety Planning: [Reason]"
 							/>
 						)}
-						{patientOrder.patientOrderTriageGroups?.map((triageGroup, triageGroupIndex) => {
-							if (triageGroup.patientOrderCareTypeId !== patientOrder.patientOrderCareTypeId) {
-								return null;
-							}
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.SENT_RESOURCES && (
+							<MhicInlineAlert
+								className="mb-6"
+								variant="success"
+								title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+								action={{
+									title: 'Review contact history for more details',
+									onClick: () => {
+										window.alert('[TODO]: where does this link to.');
+									},
+								}}
+							/>
+						)}
 
-							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
-						})}
+						<MhicTriageCard className="mb-6" patientOrder={patientOrder} />
 						<MhicNextStepsCard className="mb-8" patientOrder={patientOrder} />
 						<hr className="mb-8" />
 
@@ -124,8 +127,8 @@ export const MhicAssessmentComplete = ({
 								<h3 className="mb-8">Conditions &amp; Symptoms</h3>
 								{conditionsAndSymptomsResults.map((screening) => (
 									<ScreeningResultCard
+										key={screening.screeningId}
 										screening={screening}
-										referenceData={referenceData}
 										id={screening.screeningId}
 									/>
 								))}
@@ -139,8 +142,8 @@ export const MhicAssessmentComplete = ({
 								<h3 className="mb-8">Completed Assessments</h3>
 								{completedAssessmentsResults.map((screening) => (
 									<ScreeningResultCard
+										key={screening.screeningId}
 										screening={screening}
-										referenceData={referenceData}
 										id={screening.screeningId}
 									/>
 								))}
@@ -196,15 +199,8 @@ export const MhicAssessmentComplete = ({
 	);
 };
 
-const ScreeningResultCard = ({
-	screening,
-	referenceData,
-	id,
-}: {
-	screening: ScreeningSessionScreeningResult;
-	referenceData?: ReferenceDataResponse;
-	id?: string;
-}) => {
+const ScreeningResultCard = ({ screening, id }: { screening: ScreeningSessionScreeningResult; id?: string }) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const classes = useStyles();
 
 	return (
@@ -216,8 +212,9 @@ const ScreeningResultCard = ({
 					<p className="mb-0 fw-semibold me-2">
 						Total Score: {screening.screeningScore?.overallScore}/
 						{
-							referenceData?.screeningTypes.find((st) => st.screeningTypeId === screening.screeningTypeId)
-								?.overallScoreMaximum
+							referenceDataResponse?.screeningTypes.find(
+								(st) => st.screeningTypeId === screening.screeningTypeId
+							)?.overallScoreMaximum
 						}
 					</p>
 					{(screening.belowScoringThreshold === undefined || screening.belowScoringThreshold === null) && (
@@ -253,14 +250,12 @@ const ScreeningResultCard = ({
 
 										return (
 											<div
+												key={answer.screeningAnswerId}
 												className={classNames({
 													'mb-1': !isLastAnswer,
 												})}
 											>
-												<div
-													key={answer.screeningAnswerId}
-													className="d-flex align-items-center justify-content-between"
-												>
+												<div className="d-flex align-items-center justify-content-between">
 													<h5 className="mb-0">{answer.answerOptionText}</h5>
 													<h5 className="mb-0 text-gray flex-shrink-0">
 														Score: {answer.score}

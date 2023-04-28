@@ -111,7 +111,6 @@ export const MhicOrderAssessment = () => {
 			{isCompleted && (
 				<MhicAssessmentComplete
 					patientOrder={patientOrder}
-					referenceData={referenceData}
 					onStartNewAssessment={() => {
 						setIsRecreate(true);
 					}}

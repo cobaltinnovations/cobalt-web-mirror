@@ -183,8 +183,15 @@ export enum PatientOrderSafetyPlanningStatusId {
 }
 
 export enum PatientOrderResourcingStatusId {
+	UNKNOWN = 'UNKNOWN',
+	NONE_NEEDED = 'NONE_NEEDED',
 	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
 	SENT_RESOURCES = 'SENT_RESOURCES',
+}
+
+export enum PatientOrderTriageSourceId {
+	COBALT = 'COBALT',
+	MANUALLY_SET = 'MANUALLY_SET',
 }
 
 export interface PatientOrderDisposition {
@@ -251,11 +258,14 @@ export interface PatientOrderOutreachModel {
 }
 
 export interface PateintOrderTriageGroupModel {
-	patientOrderFocusTypeId: string;
-	patientOrderFocusTypeDescription: string;
-	patientOrderCareTypeId: string;
+	patientOrderTriageSourceId: PatientOrderTriageSourceId;
+	patientOrderCareTypeId: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription: string;
-	reasons: string[];
+	patientOrderFocusTypes: {
+		patientOrderFocusTypeId: string;
+		patientOrderFocusTypeDescription: string;
+		reasons: string[];
+	}[];
 }
 
 export interface PatientOrderClosureReasonModel {
