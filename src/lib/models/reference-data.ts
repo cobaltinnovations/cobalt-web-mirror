@@ -48,8 +48,9 @@ interface TimeZone {
 
 export interface ScreeningType {
 	description: string;
+	overallScoreMaximum: number;
+	overallScoreMaximumDescription: string;
 	screeningTypeId: string;
-	overallScoreMaximum: 20;
 }
 
 export enum PatientOrderOutreachTypeId {
