@@ -137,6 +137,17 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 								</Col>
 							</Row>
 						)}
+						{patientOrder.mostRecentEpisodeClosedWithinDateThreshold && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Episode closed within date threshold"
+									/>
+								</Col>
+							</Row>
+						)}
 						<Row className="mb-4">
 							<Col xs={3}>
 								<p className="m-0 text-gray">Date Referred</p>
