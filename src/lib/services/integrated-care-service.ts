@@ -332,4 +332,12 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	revertTriage(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/reset-patient-order-triages`,
+		});
+	},
 };

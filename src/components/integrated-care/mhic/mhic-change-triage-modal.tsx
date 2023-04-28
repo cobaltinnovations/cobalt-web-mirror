@@ -48,13 +48,13 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 
 	// Remove SAFETY_PLANNING and UNSPECIFIED as they break the UI
 	// by removing the triage from the patientOrder
-	const filteredFocusOptions = useMemo(
+	const filteredCareOptions = useMemo(
 		() =>
 			compact(
-				referenceData.patientOrderFocusTypes.map((option) => {
+				referenceData.patientOrderCareTypes.map((option) => {
 					if (
-						option.patientOrderFocusTypeId === 'SAFETY_PLANNING' ||
-						option.patientOrderFocusTypeId === 'UNSPECIFIED'
+						option.patientOrderCareTypeId === 'SAFETY_PLANNING' ||
+						option.patientOrderCareTypeId === 'UNSPECIFIED'
 					) {
 						return null;
 					}
@@ -62,7 +62,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 					return option;
 				})
 			),
-		[referenceData.patientOrderFocusTypes]
+		[referenceData.patientOrderCareTypes]
 	);
 
 	const handleOnEnter = useCallback(() => {
@@ -74,12 +74,14 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			patientOrderCareTypeId: currentTriageGroup.patientOrderCareTypeId,
 			patientOrderFocusTypes: compact(
 				currentTriageGroup.patientOrderFocusTypes.map((ft) =>
-					filteredFocusOptions.find((rd) => rd.patientOrderFocusTypeId === ft.patientOrderFocusTypeId)
+					referenceData.patientOrderFocusTypes.find(
+						(rd) => rd.patientOrderFocusTypeId === ft.patientOrderFocusTypeId
+					)
 				)
 			),
 			reason: currentTriageGroup.patientOrderFocusTypes.map((ft) => ft.reasons).join(', '),
 		});
-	}, [currentTriageGroup, filteredFocusOptions]);
+	}, [currentTriageGroup, referenceData.patientOrderFocusTypes]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -100,7 +102,8 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 
 				addFlag({
 					variant: 'success',
-					title: 'Assessment triage overridden',
+					title: 'Triage updated',
+					description: 'Triage overridden',
 					actions: [],
 				});
 
@@ -121,6 +124,23 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			patientOrder.patientOrderId,
 		]
 	);
+
+	const handleRevertToAssessmentButtonClick = useCallback(async () => {
+		try {
+			const response = await integratedCareService.revertTriage(patientOrder.patientOrderId).fetch();
+
+			addFlag({
+				variant: 'success',
+				title: 'Triage updated',
+				description: 'Triage reverted',
+				actions: [],
+			});
+
+			onSave(response.patientOrder);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, onSave, patientOrder.patientOrderId]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -149,7 +169,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 						<option value="" disabled>
 							Select Care Type...
 						</option>
-						{referenceData.patientOrderCareTypes.map((o) => (
+						{filteredCareOptions.map((o) => (
 							<option key={o.patientOrderCareTypeId} value={o.patientOrderCareTypeId}>
 								{o.description}
 							</option>
@@ -161,7 +181,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 						label="Care Focus"
 						multiple
 						labelKey="description"
-						options={filteredFocusOptions}
+						options={referenceData.patientOrderFocusTypes}
 						selected={formValues.patientOrderFocusTypes}
 						onChange={(selected) => {
 							setFormValues((previousValues) => ({
@@ -186,12 +206,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 				<Modal.Footer className="d-flex align-items-center justify-content-between">
 					<div>
 						{currentTriageGroup?.patientOrderTriageSourceId === PatientOrderTriageSourceId.MANUALLY_SET && (
-							<Button
-								variant="danger"
-								onClick={() => {
-									window.alert('[TODO]: Call endpoint to revert back to original triage');
-								}}
-							>
+							<Button variant="danger" onClick={handleRevertToAssessmentButtonClick}>
 								Revert to Assessment
 							</Button>
 						)}
