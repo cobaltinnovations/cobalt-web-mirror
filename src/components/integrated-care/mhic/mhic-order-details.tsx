@@ -772,7 +772,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 					<Row className="mb-6">
 						<Col>
 							<h4 className="mb-0">
-								Other Episodes <span className="text-gray">({pastPatientOrders.length})</span>
+								Episodes <span className="text-gray">({pastPatientOrders.length})</span>
 							</h4>
 						</Col>
 					</Row>
@@ -796,32 +796,16 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 														<Col>
 															<div className="mb-1 d-flex align-items-center justify-content-between">
 																<p className="m-0 fw-bold">
-																	{pastPatientOrder.orderDateDescription} (Episode:{' '}
+																	{pastPatientOrder.orderDateDescription} -{' '}
+																	{patientOrder.episodeClosedAtDescription} (
 																	{pastPatientOrder.episodeDurationInDaysDescription})
 																</p>
-																<div className="d-flex align-items-center">
-																	<p className="m-0 fw-bold text-danger">
-																		[TODO]: Episode Status Description
-																	</p>
-																	<Button
-																		variant="primary"
-																		size="sm"
-																		className="ms-4"
-																		onClick={() => {
-																			setShowCloseEpisodeModal(true);
-																		}}
-																		disabled
-																	>
-																		Reopen
-																	</Button>
-																</div>
+																<p className="m-0 fw-bold text-gray">
+																	{
+																		pastPatientOrder.patientOrderDispositionDescription
+																	}
+																</p>
 															</div>
-															<p className="mb-1 text-gray">
-																Referred by: {pastPatientOrder.referringPracticeName}
-															</p>
-															<p className="m-0 text-gray">
-																{pastPatientOrder.reasonForReferral}
-															</p>
 														</Col>
 													</Row>
 												);

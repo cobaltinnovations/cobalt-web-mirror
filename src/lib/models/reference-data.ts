@@ -1,4 +1,4 @@
-import { PatientOrderDisposition, PatientOrderStatus } from './integrated-care-models';
+import { PatientOrderDispositionId, PatientOrderStatus } from './integrated-care-models';
 
 interface BirthSex {
 	birthSexId: string;
@@ -17,6 +17,11 @@ export interface Ethnicity {
 
 export interface GenderIdentity {
 	genderIdentityId: string;
+	description: string;
+}
+
+export interface PatientOrderDisposition {
+	patientOrderDispositionId: PatientOrderDispositionId;
 	description: string;
 }
 

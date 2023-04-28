@@ -16,7 +16,7 @@ export interface PatientOrderModel {
 	patientOrderStatusId: PatientOrderStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
-	patientOrderDispositionDescription: PatientOrderDisposition;
+	patientOrderDispositionDescription: string;
 	patientAccountId?: string;
 	patientAddressId?: string;
 	panelAccountId?: string;
@@ -194,11 +194,6 @@ export enum PatientOrderResourcingStatusId {
 export enum PatientOrderTriageSourceId {
 	COBALT = 'COBALT',
 	MANUALLY_SET = 'MANUALLY_SET',
-}
-
-export interface PatientOrderDisposition {
-	patientOrderDispositionId: PatientOrderDispositionId;
-	description: string;
 }
 
 export interface PatientAddressModel {
