@@ -58,18 +58,22 @@ export const MhicTriageCard = ({ patientOrder, onPatientOrderChange, referenceDa
 						</Card.Header>
 						<Card.Body>
 							<Container fluid>
-								<Row>
-									<Col xs={3}>
-										<p className="m-0 text-gray">{triageGroup.patientOrderFocusTypeDescription}</p>
-									</Col>
-									<Col xs={9}>
-										{triageGroup.reasons.map((reason, reasonIndex) => (
-											<p key={reasonIndex} className="m-0">
-												{reason}
+								{triageGroup.patientOrderFocusTypes.map((focusType) => (
+									<Row key={focusType.patientOrderFocusTypeId}>
+										<Col xs={3}>
+											<p className="m-0 text-gray">
+												{focusType.patientOrderFocusTypeDescription}
 											</p>
-										))}
-									</Col>
-								</Row>
+										</Col>
+										<Col xs={9}>
+											{focusType.reasons.map((reason, reasonIndex) => (
+												<p key={reasonIndex} className="m-0">
+													{reason}
+												</p>
+											))}
+										</Col>
+									</Row>
+								))}
 							</Container>
 						</Card.Body>
 					</Card>

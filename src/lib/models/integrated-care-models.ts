@@ -259,11 +259,13 @@ export interface PatientOrderOutreachModel {
 
 export interface PateintOrderTriageGroupModel {
 	patientOrderTriageSourceId: PatientOrderTriageSourceId;
-	patientOrderFocusTypeId: string;
-	patientOrderFocusTypeDescription: string;
-	patientOrderCareTypeId: string;
+	patientOrderCareTypeId: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription: string;
-	reasons: string[];
+	patientOrderFocusTypes: {
+		patientOrderFocusTypeId: string;
+		patientOrderFocusTypeDescription: string;
+		reasons: string[];
+	}[];
 }
 
 export interface PatientOrderClosureReasonModel {

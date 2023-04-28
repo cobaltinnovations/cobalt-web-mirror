@@ -13,6 +13,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { integratedCareService } from '@/lib/services';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import { compact } from 'lodash';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -50,14 +51,16 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			return;
 		}
 
-		const patientOrderFocusTypes = referenceData.patientOrderFocusTypes.filter(
-			(ft) => ft.patientOrderFocusTypeId === currentTriageGroup?.patientOrderFocusTypeId
-		);
-
 		setFormValues({
-			patientOrderCareTypeId: currentTriageGroup?.patientOrderCareTypeId,
-			patientOrderFocusTypes: patientOrderFocusTypes,
-			reason: currentTriageGroup?.reasons.join(', '),
+			patientOrderCareTypeId: currentTriageGroup.patientOrderCareTypeId,
+			patientOrderFocusTypes: compact(
+				currentTriageGroup.patientOrderFocusTypes.map((ft) =>
+					referenceData.patientOrderFocusTypes.find(
+						(rd) => rd.patientOrderFocusTypeId === ft.patientOrderFocusTypeId
+					)
+				)
+			),
+			reason: currentTriageGroup.patientOrderFocusTypes.map((ft) => ft.reasons).join(', '),
 		});
 	}, [currentTriageGroup, referenceData.patientOrderFocusTypes]);
 
