@@ -3,15 +3,14 @@ import Loader from '@/components/loader';
 import { STORAGE_KEYS } from '@/lib/config/constants';
 import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
 import React, { Suspense, useCallback, useState } from 'react';
-import { Outlet, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, useSearchParams } from 'react-router-dom';
 
-export interface MhicLayoutContext {
-	recentOrders: PatientOrderAutocompleteResult[];
-	setRecentOrders: (orders: PatientOrderAutocompleteResult[]) => void;
-	setOpenOrder: (order: PatientOrderModel) => void;
+export async function loader({ request }: LoaderFunctionArgs) {
+	console.log('==> mhic layout loader');
+	return null;
 }
 
-export const IntegratedCareMhicLayout = () => {
+export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(
@@ -57,11 +56,7 @@ export const IntegratedCareMhicLayout = () => {
 				}}
 			>
 				<Suspense fallback={<Loader />}>
-					<Outlet
-						context={{
-							setOpenOrder,
-						}}
-					/>
+					<Outlet />
 				</Suspense>
 			</div>
 
@@ -77,5 +72,3 @@ export const IntegratedCareMhicLayout = () => {
 		</>
 	);
 };
-
-export default IntegratedCareMhicLayout;

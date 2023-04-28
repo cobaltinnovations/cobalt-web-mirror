@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRevalidator } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -8,7 +8,6 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
-	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -30,18 +29,19 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 
 interface Props {
 	patientOrder: PatientOrderModel;
 	pastPatientOrders: PatientOrderModel[];
-	referenceData: ReferenceDataResponse;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatientOrders, referenceData }: Props) => {
+export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
 
 	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -88,7 +88,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 
 			<MhicAssessmentModal
 				show={!!screeningSessionScreeningResult}
-				screeningType={referenceData.screeningTypes.find(
+				screeningType={referenceDataResponse.screeningTypes.find(
 					(st) => st.screeningTypeId === screeningSessionScreeningResult?.screeningTypeId
 				)}
 				screeningSessionScreeningResult={screeningSessionScreeningResult}
@@ -98,9 +98,9 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 			/>
 
 			<MhicDemographicsModal
-				raceOptions={referenceData.races}
-				ethnicityOptions={referenceData.ethnicities}
-				genderIdentityOptions={referenceData.genderIdentities}
+				raceOptions={referenceDataResponse.races}
+				ethnicityOptions={referenceDataResponse.ethnicities}
+				genderIdentityOptions={referenceDataResponse.genderIdentities}
 				patientOrder={patientOrder}
 				show={showDemographicsModal}
 				onHide={() => {
@@ -108,7 +108,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowDemographicsModal(false);
-					onPatientOrderChange(updatedPatientOrder);
+					revalidator.revalidate();
 				}}
 			/>
 
@@ -136,7 +136,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowContactInformationModal(false);
-					onPatientOrderChange(updatedPatientOrder);
+					revalidator.revalidate();
 				}}
 			/>
 
@@ -152,7 +152,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 				<Container fluid>
 					<Row>
 						<Col>
-							<MhicEpisodeCard patientOrder={patientOrder} onPatientOrderChange={onPatientOrderChange} />
+							<MhicEpisodeCard patientOrder={patientOrder} />
 						</Col>
 					</Row>
 				</Container>
@@ -234,7 +234,6 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
-								onPatientOrderChange={onPatientOrderChange}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 						</>
@@ -460,7 +459,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											<Col>
 												<p className="m-0">
 													{
-														referenceData.languages.find(
+														referenceDataResponse.languages.find(
 															(language) =>
 																language.languageCode ===
 																patientOrder.patientLanguageCode
@@ -501,7 +500,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.races.find(
+													{referenceDataResponse.races.find(
 														(race) => race.raceId === patientOrder.patientRaceId
 													)?.description ?? 'Not Specified'}
 												</p>
@@ -513,7 +512,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.ethnicities.find(
+													{referenceDataResponse.ethnicities.find(
 														(ethnicity) =>
 															ethnicity.ethnicityId === patientOrder.patientEthnicityId
 													)?.description ?? 'Not Specified'}
@@ -526,7 +525,7 @@ export const MhicOrderDetails = ({ patientOrder, onPatientOrderChange, pastPatie
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.genderIdentities.find(
+													{referenceDataResponse.genderIdentities.find(
 														(genderIdentity) =>
 															genderIdentity.genderIdentityId ===
 															patientOrder.patientGenderIdentityId

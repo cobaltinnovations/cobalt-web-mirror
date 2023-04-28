@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicCustomizeTableModal,
@@ -10,11 +10,23 @@ import {
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 
-import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import useAccount from '@/hooks/use-account';
 import { PatientOrderStatusId } from '@/lib/models';
+import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 
-const MhicMyPatients = () => {
+type MhicMyPatientsLoaderData = Awaited<ReturnType<typeof loader>>;
+
+export function useMhicMyPatientsLoaderData() {
+	return useRouteLoaderData('mhic-my-patients') as MhicMyPatientsLoaderData;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	console.log('==> my-patients loader');
+
+	return null;
+}
+
+export const Component = () => {
 	const { account } = useAccount();
 	const {
 		fetchPatientOrders,
@@ -139,5 +151,3 @@ const MhicMyPatients = () => {
 		</>
 	);
 };
-
-export default MhicMyPatients;

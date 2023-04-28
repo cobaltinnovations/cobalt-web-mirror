@@ -1,21 +1,48 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Outlet, useMatch, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useMemo } from 'react';
+import {
+	LoaderFunctionArgs,
+	Outlet,
+	useMatch,
+	useNavigate,
+	useOutletContext,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
 
-import { PatientOrderCountsByPatientOrderStatusId, PatientOrderStatusId } from '@/lib/models';
 import { MhicNavigation } from '@/components/integrated-care/mhic';
+import { PatientOrderStatusId } from '@/lib/models';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 import { integratedCareService } from '@/lib/services';
-import AsyncWrapper from '@/components/async-page';
 
-const MhicMyPanel = () => {
+type MhicMyPanelLoaderData = Awaited<ReturnType<typeof loader>>;
+
+export function useMhicMyPanelLoaderData() {
+	return useRouteLoaderData('mhic-my-panel') as MhicMyPanelLoaderData;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	console.log('==> my-panel loader');
+
+	const countsByIdRequest = integratedCareService.getPanelCounts();
+
+	const countsByIdResponse = await countsByIdRequest.fetch();
+
+	return {
+		countsByIdResponse,
+	};
+}
+
+export const Component = () => {
 	const [searchParams] = useSearchParams();
 	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
 	const navigate = useNavigate();
 
-	const [countsById, setCountsById] = useState<PatientOrderCountsByPatientOrderStatusId>();
+	const { countsByIdResponse } = useMhicMyPanelLoaderData();
+
+	const countsById = countsByIdResponse.patientOrderCountsByPatientOrderStatusId;
 
 	const rootMatch = useMatch({
 		path: '/ic/mhic',
@@ -45,11 +72,6 @@ const MhicMyPanel = () => {
 		[navigate, searchParams]
 	);
 
-	const fetchData = useCallback(async () => {
-		const response = await integratedCareService.getPanelCounts().fetch();
-		setCountsById(response.patientOrderCountsByPatientOrderStatusId);
-	}, []);
-
 	const navigationItems = useMemo(
 		() => [
 			{
@@ -73,7 +95,7 @@ const MhicMyPanel = () => {
 				navigationItems: [
 					{
 						title: 'Need Assessment',
-						description: countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
+						description: countsById.NEEDS_ASSESSMENT.patientOrderCountDescription,
 						icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.NEEDS_ASSESSMENT);
@@ -82,7 +104,7 @@ const MhicMyPanel = () => {
 					},
 					{
 						title: 'Safety Planning',
-						description: countsById?.SAFETY_PLANNING.patientOrderCountDescription ?? '0',
+						description: countsById.SAFETY_PLANNING.patientOrderCountDescription,
 						icon: () => <DotIcon width={24} height={24} className="text-danger" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SAFETY_PLANNING);
@@ -92,7 +114,7 @@ const MhicMyPanel = () => {
 
 					{
 						title: 'BHP',
-						description: countsById?.BHP.patientOrderCountDescription ?? '0',
+						description: countsById.BHP.patientOrderCountDescription,
 						icon: () => <DotIcon width={24} height={24} className="text-success" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.BHP);
@@ -101,7 +123,7 @@ const MhicMyPanel = () => {
 					},
 					{
 						title: 'Specialty Care',
-						description: countsById?.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
+						description: countsById.SPECIALTY_CARE.patientOrderCountDescription,
 						icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 						onClick: () => {
 							updateSelectedOrderStatusId(PatientOrderStatusId.SPECIALTY_CARE);
@@ -112,10 +134,10 @@ const MhicMyPanel = () => {
 			},
 		],
 		[
-			countsById?.BHP.patientOrderCountDescription,
-			countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription,
-			countsById?.SAFETY_PLANNING.patientOrderCountDescription,
-			countsById?.SPECIALTY_CARE.patientOrderCountDescription,
+			countsById.BHP.patientOrderCountDescription,
+			countsById.NEEDS_ASSESSMENT.patientOrderCountDescription,
+			countsById.SAFETY_PLANNING.patientOrderCountDescription,
+			countsById.SPECIALTY_CARE.patientOrderCountDescription,
 			myPatientsMatch,
 			navigate,
 			patientOrderStatusId,
@@ -125,12 +147,8 @@ const MhicMyPanel = () => {
 	);
 
 	return (
-		<AsyncWrapper fetchData={fetchData}>
-			<MhicNavigation navigationItems={navigationItems}>
-				<Outlet context={useOutletContext()} />
-			</MhicNavigation>
-		</AsyncWrapper>
+		<MhicNavigation navigationItems={navigationItems}>
+			<Outlet context={useOutletContext()} />
+		</MhicNavigation>
 	);
 };
-
-export default MhicMyPanel;

@@ -21,31 +21,27 @@ import useAccount from './hooks/use-account';
 import { immediateSupportLoader } from './immediate-support-loader';
 
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
-import { IntegratedCareLandingPage, RedirectToIntegratedCareRole } from './pages/ic/landing';
-import IntegratedCareMhicLayout from './pages/ic/mhic/mhic-layout';
-import MhicMyPanel from './pages/ic/mhic/my-panel';
-import MhicMyPatients from './pages/ic/mhic/my-patients';
-import MhicOrderAssessment from './pages/ic/mhic/order-assessment';
-import MhicOrderLayout, { mhicOrderLayoutLoader } from './pages/ic/mhic/order-layout';
-import MhicOrdersAssigned from './pages/ic/mhic/orders-assigned';
-import MhicOrdersClosed from './pages/ic/mhic/orders-closed';
-import MhicOrdersUnassigned from './pages/ic/mhic/orders-unassigned';
-import MhicOverview from './pages/ic/mhic/overview';
-import MhicSearchResults from './pages/ic/mhic/search-results';
-import PatientAssessmentComplete from './pages/ic/patient/assessment-complete';
-import PatientDemographicsIntroduction from './pages/ic/patient/demographics-introduction';
-import PatientDemographicsPart1 from './pages/ic/patient/demographics-part-1';
-import PatientDemographicsPart2 from './pages/ic/patient/demographics-part-2';
-import PatientDemographicsPart3 from './pages/ic/patient/demographics-part-3';
-import PatientDemographicsThanks from './pages/ic/patient/demographics-thanks';
-import PatientLanding from './pages/ic/patient/patient-landing';
-import { IntegratedCarePatientLayout } from './pages/ic/patient/patient-layout';
+
+import MhicOrderAssessment from './routes/ic/mhic/order-assessment';
+import MhicOrdersAssigned from './routes/ic/mhic/orders-assigned';
+import MhicOrdersClosed from './routes/ic/mhic/orders-closed';
+import MhicOrdersUnassigned from './routes/ic/mhic/orders-unassigned';
+import MhicSearchResults from './routes/ic/mhic/search-results';
+import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
+import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
+import PatientDemographicsPart1 from './routes/ic/patient/demographics-part-1';
+import PatientDemographicsPart2 from './routes/ic/patient/demographics-part-2';
+import PatientDemographicsPart3 from './routes/ic/patient/demographics-part-3';
+import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
+import PatientLanding from './routes/ic/patient/patient-landing';
+import { IntegratedCarePatientLayout } from './routes/ic/patient/patient-layout';
 import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
 import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
 import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-availability-panel';
 import { RoutedManageAvailailityPanel } from './pages/scheduling/routed-managed-availabilities-panel';
 import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selected-availability-panel';
 import { routeRedirects } from './route-redirects';
+import { LoginDestinationIdRouteMap } from './contexts/account-context';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -163,6 +159,12 @@ function redirectCheckLoader({ request }: LoaderFunctionArgs) {
 
 	return null;
 }
+
+export const RedirectToLoginDestination = () => {
+	const { account } = useAccount();
+
+	return <Navigate to={account ? LoginDestinationIdRouteMap[account.loginDestinationId] : '/'} replace />;
+};
 
 const RedirectToResourceLibrary = () => {
 	const { contentId } = useParams<{ contentId: string }>();
@@ -598,27 +600,31 @@ export const routes: RouteObject[] = [
 				loader: requireAuthLoader,
 				children: [
 					{
+						id: 'ic',
 						path: 'ic',
-						element: <IntegratedCareLandingPage />,
+						lazy: () => import('@/routes/ic/landing'),
 						children: [
 							{
 								index: true,
-								element: <RedirectToIntegratedCareRole />,
+								element: <RedirectToLoginDestination />,
 							},
 							{
+								id: 'mhic',
 								path: 'mhic',
-								element: <IntegratedCareMhicLayout />,
+								lazy: () => import('@/routes/ic/mhic/mhic-layout'),
 								children: [
 									{
-										element: <MhicMyPanel />,
+										id: 'mhic-my-panel',
+										lazy: () => import('@/routes/ic/mhic/my-panel'),
 										children: [
 											{
 												index: true,
-												element: <MhicOverview />,
+												lazy: () => import('@/routes/ic/mhic/overview'),
 											},
 											{
+												id: 'mhic-my-patients',
 												path: 'my-patients',
-												element: <MhicMyPatients />,
+												lazy: () => import('@/routes/ic/mhic/my-patients'),
 											},
 										],
 									},
@@ -639,9 +645,9 @@ export const routes: RouteObject[] = [
 										element: <MhicOrdersClosed />,
 									},
 									{
+										id: 'mhic-patient-order',
 										path: 'orders/:patientOrderId',
-										element: <MhicOrderLayout />,
-										loader: mhicOrderLayoutLoader,
+										lazy: () => import('@/routes/ic/mhic/order-layout'),
 										children: [
 											{
 												index: true,

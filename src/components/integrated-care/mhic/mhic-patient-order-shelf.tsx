@@ -234,27 +234,16 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
-											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
 										/>
 									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
 									{currentPatientOrder && referenceData && (
-										<MhicContactHistory
-											patientOrder={currentPatientOrder}
-											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
-										/>
+										<MhicContactHistory patientOrder={currentPatientOrder} />
 									)}
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
-									{currentPatientOrder && (
-										<MhicComments
-											patientOrder={currentPatientOrder}
-											onPatientOrderChange={setCurrentPatientOrder}
-										/>
-									)}
+									{currentPatientOrder && <MhicComments patientOrder={currentPatientOrder} />}
 								</Tab.Pane>
 							</Tab.Content>
 						</Tab.Container>

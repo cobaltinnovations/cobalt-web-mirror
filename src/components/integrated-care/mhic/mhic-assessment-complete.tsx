@@ -115,14 +115,7 @@ export const MhicAssessmentComplete = ({
 
 							return <MhicTriageCard key={triageGroupIndex} className="mb-6" triageGroup={triageGroup} />;
 						})}
-						<MhicNextStepsCard
-							className="mb-8"
-							patientOrder={patientOrder}
-							onPatientOrderChange={(patientOrder) => {
-								window.alert('[TODO]: Refresh the order on this page');
-								console.log(patientOrder);
-							}}
-						/>
+						<MhicNextStepsCard className="mb-8" patientOrder={patientOrder} />
 						<hr className="mb-8" />
 
 						{conditionsAndSymptomsResults.length > 0 && (

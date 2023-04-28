@@ -3,23 +3,24 @@ import { Button, Card, Form } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
 import { MhicResourcesModal } from '@/components/integrated-care/mhic';
+import { useRevalidator } from 'react-router-dom';
 
 interface Props {
 	patientOrder: PatientOrderModel;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled, className }: Props) => {
+export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) => {
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
+	const revalidator = useRevalidator();
 
 	const handleResourcesModalSave = useCallback(
 		(updatedPatientOrder: PatientOrderModel) => {
 			setShowResourcesModal(false);
-			onPatientOrderChange(updatedPatientOrder);
+			revalidator.revalidate();
 		},
-		[onPatientOrderChange]
+		[revalidator]
 	);
 
 	return (

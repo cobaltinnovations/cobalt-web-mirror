@@ -8,7 +8,6 @@ import {
 	PatientOrderOutreachModel,
 	PatientOrderOutreachTypeId,
 	PatientOrderScheduledMessageGroup,
-	ReferenceDataResponse,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -21,16 +20,18 @@ import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { useRevalidator } from 'react-router-dom';
 
 interface Props {
 	patientOrder: PatientOrderModel;
-	referenceData: ReferenceDataResponse;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrderChange }: Props) => {
+export const MhicContactHistory = ({ patientOrder }: Props) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const revalidator = useRevalidator();
 
 	const [showMessageModal, setShowMessageModal] = useState(false);
 	const [messageToEdit, setMessageToEdit] = useState<PatientOrderScheduledMessageGroup>();
@@ -45,17 +46,14 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				throw new Error('patientOrder.patientOrderId is undefined.');
 			}
 
-			const patientOverviewResponse = await integratedCareService
-				.getPatientOrder(patientOrder.patientOrderId)
-				.fetch();
+			revalidator.revalidate();
 
-			onPatientOrderChange(patientOverviewResponse.patientOrder);
 			setOutreachToEdit(undefined);
 			setShowOutreachModal(false);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+	}, [handleError, patientOrder.patientOrderId, revalidator]);
 
 	const handleDeleteOutreach = useCallback(
 		async (patientOrderOutreachId: string) => {
@@ -69,11 +67,9 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				}
 
 				await integratedCareService.deletePatientOrderOutreach(patientOrderOutreachId).fetch();
-				const patientOverviewResponse = await integratedCareService
-					.getPatientOrder(patientOrder.patientOrderId)
-					.fetch();
 
-				onPatientOrderChange(patientOverviewResponse.patientOrder);
+				revalidator.revalidate();
+
 				addFlag({
 					variant: 'success',
 					title: 'Outreach deleted',
@@ -84,7 +80,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				handleError(error);
 			}
 		},
-		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
+		[addFlag, handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	const handleMessageModalSave = useCallback(async () => {
@@ -93,17 +89,14 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 				throw new Error('patientOrder.patientOrderId is undefined.');
 			}
 
-			const patientOverviewResponse = await integratedCareService
-				.getPatientOrder(patientOrder.patientOrderId)
-				.fetch();
+			revalidator.revalidate();
 
-			onPatientOrderChange(patientOverviewResponse.patientOrder);
 			setMessageToEdit(undefined);
 			setShowMessageModal(false);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+	}, [handleError, patientOrder.patientOrderId, revalidator]);
 
 	return (
 		<>
@@ -120,7 +113,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 			<MhicOutreachModal
 				patientOrderId={patientOrder.patientOrderId}
 				patientOrderOutreachTypeId={outreachTypeId}
-				patientOrderOutreachResults={referenceData.patientOrderOutreachResults}
+				patientOrderOutreachResults={referenceDataResponse.patientOrderOutreachResults}
 				outreachToEdit={outreachToEdit}
 				show={showOutreachModal}
 				onHide={() => {
@@ -322,7 +315,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 															<Dropdown.Item
 																onClick={() => {
 																	setOutreachTypeId(
-																		referenceData.patientOrderOutreachResults.find(
+																		referenceDataResponse.patientOrderOutreachResults.find(
 																			(result) =>
 																				result.patientOrderOutreachResultId ===
 																				outreach.patientOrderOutreachResultId
@@ -349,7 +342,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 												</div>
 												<p className="mb-1 fw-bold">
 													{
-														referenceData.patientOrderOutreachResults.find(
+														referenceDataResponse.patientOrderOutreachResults.find(
 															(result) =>
 																result.patientOrderOutreachResultId ===
 																outreach.patientOrderOutreachResultId

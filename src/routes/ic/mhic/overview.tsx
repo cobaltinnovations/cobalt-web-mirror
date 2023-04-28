@@ -4,7 +4,7 @@ import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
-import useFetchPatientOrders from '@/pages/ic/hooks/use-fetch-patient-orders';
+import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import TabBar from '@/components/tab-bar';
 import { MhicInlineAlert, MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
 
@@ -46,7 +46,7 @@ enum TAB_KEYS {
 	RESOURCES = 'RESOURCES',
 }
 
-const MhicOverview = () => {
+export const Component = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
 	const navigate = useNavigate();
@@ -279,5 +279,3 @@ const MhicOverview = () => {
 		</Container>
 	);
 };
-
-export default MhicOverview;

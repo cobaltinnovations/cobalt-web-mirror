@@ -12,7 +12,7 @@ interface GetAccountSourcesRequestBody {
 	accountSourceId: string | null;
 }
 
-interface GetInstitutionResponse {
+export interface GetInstitutionResponse {
 	accountSources: AccountSource[];
 	institution: Institution;
 }

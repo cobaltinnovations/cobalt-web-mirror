@@ -15,7 +15,7 @@ import {
 	ReferenceDataResponse,
 } from '@/lib/models';
 
-export interface PatientOrderResponse {
+export interface PatientOrdersListResponse {
 	findResult: {
 		patientOrders: PatientOrderModel[];
 		totalCount: number;
@@ -24,6 +24,12 @@ export interface PatientOrderResponse {
 	activePatientOrdersCount: number;
 	activePatientOrdersCountDescription: string;
 	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderStatusId, PatientOrderCountModel>;
+}
+
+export interface PatientOrderResponse {
+	patientOrder: PatientOrderModel;
+	associatedPatientOrders: PatientOrderModel[];
+	patientAccount?: AccountModel;
 }
 
 export interface PanelAccountsResponse {
@@ -85,7 +91,7 @@ export const integratedCareService = {
 		pageNumber?: string;
 		pageSize?: string;
 	}) {
-		return httpSingleton.orchestrateRequest<PatientOrderResponse>({
+		return httpSingleton.orchestrateRequest<PatientOrdersListResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/patient-orders', queryParameters),
 		});
@@ -128,11 +134,7 @@ export const integratedCareService = {
 			queryParams.append('responseSupplement', supplement);
 		}
 
-		return httpSingleton.orchestrateRequest<{
-			patientOrder: PatientOrderModel;
-			associatedPatientOrders: PatientOrderModel[];
-			patientAccount?: AccountModel;
-		}>({
+		return httpSingleton.orchestrateRequest<PatientOrderResponse>({
 			method: 'GET',
 			url: `/patient-orders/${patientOrderId}?${queryParams.toString()}`,
 		});
