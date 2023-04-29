@@ -85,6 +85,7 @@ export const integratedCareService = {
 		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
+		searchQuery?: string;
 		pageNumber?: string;
 		pageSize?: string;
 	}) {

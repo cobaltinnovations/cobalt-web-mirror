@@ -16,13 +16,16 @@ const MhicSearchResults = () => {
 	} = useFetchPatientOrders();
 
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const patientMrn = searchParams.get('patientMrn');
 	const searchQuery = searchParams.get('searchQuery');
 
 	useEffect(() => {
 		fetchPatientOrders({
+			...(searchQuery && { searchQuery }),
+			...(patientMrn && { patientMrn }),
 			...(pageNumber && { pageNumber }),
 		});
-	}, [fetchPatientOrders, pageNumber]);
+	}, [fetchPatientOrders, pageNumber, patientMrn, searchQuery]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -34,15 +37,12 @@ const MhicSearchResults = () => {
 
 	return (
 		<Container fluid className="px-8">
-			<div className="py-8 d-flex align-items-center justify-content-between">
-				<div className="d-flex align-items-end">
-					<h2 className="m-0">
-						Search Results for "{searchQuery}"
-						<span className="text-gray fs-large fw-normal">
-							{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
-						</span>
-					</h2>
-				</div>
+			<div className="py-8">
+				<h2>Search Results for "{patientMrn || searchQuery}" </h2>
+
+				<p className="mb-0 text-gray fs-large fw-normal">
+					{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
+				</p>
 			</div>
 
 			<MhicPatientOrderTable
@@ -55,15 +55,14 @@ const MhicSearchResults = () => {
 				pageSize={15}
 				onPaginationClick={handlePaginationClick}
 				columnConfig={{
-					checkbox: false,
-					flag: true,
 					patient: true,
-					referralDate: true,
+					mrn: true,
+					preferredPhone: true,
 					practice: true,
-					referralReason: true,
-					outreachNumber: true,
-					episode: true,
+					orderState: true,
+					assignedMhic: true,
 				}}
+				coloredRows
 			/>
 		</Container>
 	);
