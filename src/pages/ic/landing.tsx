@@ -25,6 +25,7 @@ import MhicLayout from './mhic/mhic-layout';
 import MhicOrdersUnassigned from './mhic/orders-unassigned';
 import MhicOrdersAssigned from './mhic/orders-assigned';
 import MhicOrdersClosed from './mhic/orders-closed';
+import PatientConsent from './patient/patient-consent';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -63,6 +64,7 @@ const IntegratedCareLandingPage = () => {
 				}
 			>
 				<Route index element={<PatientLanding />} />
+				<Route path="consent" element={<PatientConsent />} />
 				<Route path="demographics-introduction" element={<PatientDemographicsIntroduction />} />
 				<Route path="demographics-part-1" element={<PatientDemographicsPart1 />} />
 				<Route path="demographics-part-2" element={<PatientDemographicsPart2 />} />
