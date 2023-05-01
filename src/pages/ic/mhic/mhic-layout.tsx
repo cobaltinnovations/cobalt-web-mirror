@@ -22,6 +22,7 @@ export const MhicLayout = () => {
 		setOpenOrder(patientOrder);
 
 		const result = {
+			patientOrderId: patientOrder.patientOrderId,
 			patientMrn: patientOrder.patientMrn,
 			patientId: patientOrder.patientId,
 			patientIdType: patientOrder.patientIdType,
@@ -30,7 +31,7 @@ export const MhicLayout = () => {
 			patientDisplayName: patientOrder.patientDisplayName,
 			patientPhoneNumber: patientOrder.patientPhoneNumber,
 			patientPhoneNumberDescription: patientOrder.patientPhoneNumberDescription,
-		} as PatientOrderAutocompleteResult;
+		} as PatientOrderAutocompleteResult & { patientOrderId: string };
 
 		setRecentOrders((orders) => {
 			const newOrders = orders.slice(0, 4);
