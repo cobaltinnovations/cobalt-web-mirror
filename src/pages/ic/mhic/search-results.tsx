@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
 import { Container } from 'react-bootstrap';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderDispositionId } from '@/lib/models';
 
 const MhicSearchResults = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +25,11 @@ const MhicSearchResults = () => {
 			...(searchQuery && { searchQuery }),
 			...(patientMrn && { patientMrn }),
 			...(pageNumber && { pageNumber }),
+			patientOrderDispositionId: [
+				PatientOrderDispositionId.OPEN,
+				PatientOrderDispositionId.CLOSED,
+				PatientOrderDispositionId.ARCHIVED,
+			],
 		});
 	}, [fetchPatientOrders, pageNumber, patientMrn, searchQuery]);
 
