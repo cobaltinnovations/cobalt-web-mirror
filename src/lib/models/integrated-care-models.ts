@@ -195,6 +195,13 @@ export enum PatientOrderTriageSourceId {
 	MANUALLY_SET = 'MANUALLY_SET',
 }
 
+export enum ScheduledMessageStatusId {
+	PENDING = 'PENDING',
+	PROCESSED = 'PROCESSED',
+	CANCELED = 'CANCELED',
+	ERROR = 'ERROR',
+}
+
 export interface PatientAddressModel {
 	addressId: string;
 	countryCode: string;
@@ -301,7 +308,7 @@ export interface PatientOrderScheduledMessageGroup {
 	patientOrderScheduledMessages: {
 		patientOrderScheduledMessageId: string;
 		scheduledMessageId: string;
-		scheduledMessageStatusId: string;
+		scheduledMessageStatusId: ScheduledMessageStatusId;
 		messageTypeId: string;
 		messageTypeDescription: string;
 	}[];
