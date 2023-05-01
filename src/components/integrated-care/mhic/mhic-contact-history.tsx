@@ -137,7 +137,10 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 								<h4 className="mb-0">
 									Contact History{' '}
 									<span className="text-gray">
-										({(patientOrder.patientOrderOutreaches ?? []).length})
+										(
+										{(patientOrder.patientOrderOutreaches ?? []).length +
+											(patientOrder.patientOrderScheduledMessageGroups ?? []).length}
+										)
 									</span>
 								</h4>
 								<div className="d-flex align-items-center">
