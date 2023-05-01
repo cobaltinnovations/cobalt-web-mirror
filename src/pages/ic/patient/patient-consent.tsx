@@ -43,7 +43,7 @@ const PatientConsent = () => {
 						connect.
 					</p>
 					<p className="mb-2 fs-large">First we need to know...</p>
-					<h2 className="mb-8">Are you still interested in seeking services for mental health concerns?</h2>
+					<h1 className="mb-8">Are you still interested in seeking services for mental health concerns?</h1>
 					<Form className="mb-8" onSubmit={handleFormSubmit}>
 						<Button
 							className="mb-2 d-block w-100 text-left border"

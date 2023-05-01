@@ -1,20 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
 import { integratedCareService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
-import HeroContainer from '@/components/hero-container';
 import NoData from '@/components/no-data';
-import CallToAction from '@/components/call-to-action';
-import { ReactComponent as ManAtDeskIllustration } from '@/assets/illustrations/man-at-desk.svg';
-import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
 import config from '@/lib/config';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
 	ASSESSMENT_READY = 'ASSESSMENT_READY',
+	ASSESSMENT_REFUSED = 'ASSESSMENT_REFUSED',
 	ASSESSMENT_IN_PROGRESS = 'ASSESSMENT_IN_PROGRESS',
 	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
 }
@@ -27,6 +24,10 @@ const pageStates = [
 	{
 		homescreenStateId: PAGE_STATES.ASSESSMENT_READY,
 		title: 'Assessment Ready',
+	},
+	{
+		homescreenStateId: PAGE_STATES.ASSESSMENT_REFUSED,
+		title: 'Assessment Refused',
 	},
 	{
 		homescreenStateId: PAGE_STATES.ASSESSMENT_IN_PROGRESS,
@@ -73,14 +74,10 @@ const PatientLanding = () => {
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
-			<HeroContainer>
-				<h1 className="text-center">Welcome back, {account?.firstName ?? 'Patient'}</h1>
-			</HeroContainer>
-
-			{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-				<Container className="pt-10">
-					<Row>
-						<Col>
+			<Container className="py-10">
+				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<Form>
 								<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
 								<Form.Group>
@@ -103,120 +100,249 @@ const PatientLanding = () => {
 							</Form>
 						</Col>
 					</Row>
-				</Container>
-			)}
+				)}
 
-			{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
-				<Container className="py-14">
-					<Row>
-						<Col>
+				<Row className="mb-10">
+					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+						<h1 className="mb-6">Welcome back, {account?.firstName ?? 'patient'}</h1>
+						<hr />
+					</Col>
+				</Row>
+
+				{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+							<h4 className="mb-1">Current Episode</h4>
+							<p className="mb-6 text-gray">You do not have a current patient order</p>
 							<NoData
+								className="mb-10"
 								title="Awaiting Patient Order"
-								description="We are waiting on your patient order to come through. You will be sent an email when we are ready for you to take the assessment. In the meantime, you can check out our self-help resources for articles, podcasts, videos and more."
-								actions={[
-									{
-										variant: 'primary',
-										title: 'Browse self-help resources',
-										onClick: () => {
-											window.alert('[TODO]');
-										},
-									},
-								]}
+								description="Your patient order has not been sent yet. You will get an email when we are ready for you."
+								actions={[]}
 							/>
+							<hr />
 						</Col>
 					</Row>
-				</Container>
-			)}
+				)}
 
-			{homescreenState === PAGE_STATES.ASSESSMENT_READY && (
-				<Container className="py-10">
-					<Row>
-						<Col>
+				{homescreenState === PAGE_STATES.ASSESSMENT_READY && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+							<h4 className="mb-1">Current Episode</h4>
+							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<Card bsPrefix="ic-card" className="mb-10">
+								<Card.Header>
+									<Card.Title>Next Steps</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-5">
+											<Col>
+												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
+												<p className="mb-0">
+													In order to connect you to the correct level of care, we need you to
+													complete an assessment. There are two ways to complete the
+													assessment:
+												</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col>
+												<Card bsPrefix="ic-card">
+													<Card.Header className="bg-white">
+														<Card.Title>Online (Recommended)</Card.Title>
+													</Card.Header>
+													<Card.Body>
+														<p className="mb-5">
+															Completing the assessment online will take about 15 minutes.
+															Only you and your care team will have access to your
+															answers.
+														</p>
+														<Button
+															onClick={() => {
+																navigate('/ic/patient/demographics-introduction');
+															}}
+														>
+															Take the Assessment
+														</Button>
+													</Card.Body>
+												</Card>
+											</Col>
+											<Col>
+												<Card bsPrefix="ic-card">
+													<Card.Header className="bg-white">
+														<Card.Title>By Phone</Card.Title>
+													</Card.Header>
+													<Card.Body>
+														<p className="mb-5">
+															Call us at 215-615-4222 Monday-Friday, 9am to 4pm and a
+															Mental Health Intake Coordinator will guide you through the
+															assessment over the phone.
+														</p>
+														<Button
+															variant="outline-primary"
+															onClick={() => {
+																window.alert('[TODO]');
+															}}
+														>
+															Call Us
+														</Button>
+													</Card.Body>
+												</Card>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+							<hr />
+						</Col>
+					</Row>
+				)}
+
+				{homescreenState === PAGE_STATES.ASSESSMENT_REFUSED && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+							<h4 className="mb-1">Current Episode</h4>
+							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
 							<NoData
-								illustration={<ManAtDeskIllustration />}
-								className="bg-white"
-								title="Get Personalized Recommendations"
-								description="Dr. James Wong suggested you are interested in receiving support for your mental health. Please take our assessment so we can determine what type of care is best for you."
-								actions={[
-									{
-										variant: 'primary',
-										title: 'Take the Assessment',
-										onClick: () => {
-											navigate('/ic/patient/demographics-introduction');
-										},
-									},
-								]}
+								className="mb-10 bg-white"
+								title="No further action required"
+								description="You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at 215-615-4222 if you change your mind."
+								actions={[]}
 							/>
+							<hr />
 						</Col>
 					</Row>
-				</Container>
-			)}
+				)}
 
-			{homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS && (
-				<Container className="py-10">
-					<Row>
-						<Col>
-							<NoData
-								illustration={<WomanAtDeskIllustration />}
-								className="bg-white"
-								title="Continue with Assessment"
-								description="You previously made progress on the assessment. We'll pick up where you left off. Before we start, please make sure you are in a comfortable place. Is now a good time?"
-								actions={[
-									{
-										variant: 'primary',
-										title: 'Continue Assessment',
-										onClick: () => {
-											window.alert('[TODO]');
-										},
-									},
-									{
-										variant: 'outline-primary',
-										title: 'Restart from Beginning',
-										onClick: () => {
-											navigate('/ic/patient/demographics-introduction');
-										},
-									},
-								]}
-							/>
+				{homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+							<h4 className="mb-1">Current Episode</h4>
+							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<Card bsPrefix="ic-card" className="mb-10">
+								<Card.Header>
+									<Card.Title>Next Steps</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row className="mb-5">
+											<Col>
+												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
+												<p className="mb-0">
+													In order to connect you to the correct level of care, we need you to
+													complete an assessment. There are two ways to complete the
+													assessment:
+												</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col>
+												<NoData
+													className="bg-white"
+													title="Continue Assessment"
+													description="You previously made progress on the assessment. If now is a good time, we can restart from where you left off. Before we continue, please make sure you are in a comfortable place."
+													actions={[
+														{
+															variant: 'primary',
+															title: 'Continue Assessment',
+															onClick: () => {
+																window.alert('[TODO]');
+															},
+														},
+														{
+															variant: 'outline-primary',
+															title: 'Restart from Beginning',
+															onClick: () => {
+																navigate('/ic/patient/demographics-introduction');
+															},
+														},
+													]}
+												/>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+							<hr />
 						</Col>
 					</Row>
-				</Container>
-			)}
+				)}
 
-			{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
-				<Container className="py-10">
-					<Row>
-						<Col>
-							<CallToAction
-								callToAction={{
-									message:
-										'Cobalt Recommendations. Based on your assessment results, we think the following would be beneficial to you: 1) Talk to a therapist. 2) View Crisis Resources for immediate help.',
-									messageAsHtml: `<h4 class="mb-2">Cobalt Recommendations</h4>
-                                        <p class="mb-2 fs-large">
-                                            Based on your assessment results, we think the following would be beneficial to you:
-                                        </p>
-                                        <ul class="mb-0">
-                                            <li class="mb-2">
-                                                <p class="mb-0 fs-large">
-                                                    Talk to a therapist <a class="fw-normal" href="/#">Learn more</a>
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <p class="mb-0 fs-large">
-                                                    View <a class="fw-normal" href="/#">Crisis Resources</a> for immediate help
-                                                </p>
-                                            </li>
-                                        </ul>`,
-									actionLinks: [],
-									modalButtonText: '',
-									modalMessage: '',
-									modalMessageAsHtml: '',
-								}}
-							/>
+				{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
+					<Row className="mb-10">
+						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+							<h4 className="mb-1">Current Episode</h4>
+							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<Card bsPrefix="ic-card" className="mb-10">
+								<Card.Header>
+									<Card.Title>Next Steps</Card.Title>
+								</Card.Header>
+								<Card.Body className="p-0">
+									<div className="px-6 py-5">
+										<div className="d-flex align-items-center justify-content-between">
+											<div>
+												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
+												<p className="mb-0 text-gray">Completed Apr 6, 2023 at 1:45 PM</p>
+											</div>
+											<Button
+												className="text-nowrap"
+												variant="outline-primary"
+												onClick={() => {
+													window.alert('[TODO]');
+												}}
+											>
+												Review Results
+											</Button>
+										</div>
+									</div>
+									<hr />
+									<div className="px-6 py-5">
+										<div className="d-flex align-items-center justify-content-between">
+											<div>
+												<p className="mb-1 fs-large fw-semibold">
+													Schedule appointment with Behavioral Health Provider
+												</p>
+												<p className="mb-0 text-gray">
+													Find an appointment by browsing the list of providers and choosing
+													an available appointment time.
+												</p>
+											</div>
+											<Button
+												className="text-nowrap"
+												onClick={() => {
+													window.alert('[TODO]');
+												}}
+											>
+												Find Appointment
+											</Button>
+										</div>
+									</div>
+								</Card.Body>
+							</Card>
+							<hr />
 						</Col>
 					</Row>
-				</Container>
-			)}
+				)}
+
+				<Row className="mb-10">
+					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+						<h4 className="mb-1">Past Episodes</h4>
+						<p className="mb-6 text-gray">You 2 past episodes</p>
+						<div className="rounded border bg-white">
+							<div className="px-6 py-5">
+								<p className="mb-1 fs-large fw-semibold">Nov 12, 2023</p>
+								<p className="mb-0 text-gray">Closed: Nov 18, 2022 | Scheduled with BHP</p>
+							</div>
+							<hr />
+							<div className="px-6 py-5">
+								<p className="mb-1 fs-large fw-semibold">Apr 5, 2023</p>
+								<p className="mb-0 text-gray">Closed: Apr 7, 2022 | Scheduled with BHP</p>
+							</div>
+						</div>
+					</Col>
+				</Row>
+			</Container>
 		</AsyncWrapper>
 	);
 };
