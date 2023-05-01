@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -14,6 +14,9 @@ import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.s
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
+import { integratedCareService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
+import { PatientOrderModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	overviewCard: {
@@ -52,231 +55,259 @@ const MhicOverview = () => {
 	const navigate = useNavigate();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
-	const { isLoadingOrders, patientOrders = [], totalCount, totalCountDescription } = useFetchPatientOrders();
+
+	const [newPatientOrders, setNewPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [voicemailPatientOrders, setVoicemailPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [followUpPatientOrders, setFollowUpPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [assessmentPatientOrders, setAssessmentPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [resourcesPatientOrders, setResourcesPatientOrders] = useState<PatientOrderModel[]>([]);
+
+	const fetchData = useCallback(async () => {
+		const {
+			newPatientPatientOrders,
+			voicemailTaskPatientOrders,
+			followupPatientOrders,
+			scheduledAssessmentPatientOrders,
+			needResourcesPatientOrders,
+		} = await integratedCareService.getOverview().fetch();
+
+		setNewPatientOrders(newPatientPatientOrders);
+		setVoicemailPatientOrders(voicemailTaskPatientOrders);
+		setFollowUpPatientOrders(followupPatientOrders);
+		setAssessmentPatientOrders(scheduledAssessmentPatientOrders);
+		setResourcesPatientOrders(needResourcesPatientOrders);
+	}, []);
 
 	return (
-		<Container fluid className="py-8 overflow-visible">
-			<Row className="mb-8">
-				<Col>
-					<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
-				</Col>
-			</Row>
-			<Row className="mb-9">
-				<Col>
-					<MhicInlineAlert
-						variant="danger"
-						title="2 orders require safety planning"
-						description="Please review these orders first"
-						action={{
-							title: 'View Safety Planning',
-							onClick: () => {
-								navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
-							},
-						}}
-					/>
-				</Col>
-			</Row>
-			<Row className="mb-10">
-				<Col>
-					<div className={classes.overviewCard}>
-						<div className={classes.iconOuter}>
-							<div className={classNames(classes.icon, 'bg-a50')}>
-								<ClipboardIcon className="text-secondary" width={24} height={24} />
-							</div>
-						</div>
-						<div>
-							<p className="mb-0">New Patients</p>
-							<h4 className="mb-0">3</h4>
-						</div>
-					</div>
-				</Col>
-				<Col>
-					<div className={classes.overviewCard}>
-						<div className={classes.iconOuter}>
-							<div className={classNames(classes.icon, 'bg-w50')}>
-								<TherapyIcon className="text-warning" width={24} height={24} />
-							</div>
-						</div>
-						<div>
-							<p className="mb-0">Voicemail Tasks</p>
-							<h4 className="mb-0">3</h4>
-						</div>
-					</div>
-				</Col>
-				<Col>
-					<div className={classes.overviewCard}>
-						<div className={classes.iconOuter}>
-							<div className={classNames(classes.icon, 'bg-p50')}>
-								<PhoneIcon className="text-primary" width={24} height={24} />
-							</div>
-						</div>
-						<div>
-							<p className="mb-0">Follow Ups</p>
-							<h4 className="mb-0">2</h4>
-						</div>
-					</div>
-				</Col>
-				<Col>
-					<div className={classes.overviewCard}>
-						<div className={classes.iconOuter}>
-							<div className={classNames(classes.icon, 'bg-s50')}>
-								<EventIcon className="text-success" width={24} height={24} />
-							</div>
-						</div>
-						<div>
-							<p className="mb-0">Scheduled Assessments</p>
-							<h4 className="mb-0">2</h4>
-						</div>
-					</div>
-				</Col>
-			</Row>
-			<Row className="mb-5">
-				<Col>
-					<h4 className="mb-2">My Prioirities</h4>
-					<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.NEW_PATIENTS} activeKey={tabKey}>
-						<TabBar
-							className="mb-5"
-							value={tabKey}
-							tabs={[
-								{
-									value: TAB_KEYS.NEW_PATIENTS,
-									title: 'New Patients (8)',
+		<AsyncWrapper fetchData={fetchData}>
+			<Container fluid className="py-8 overflow-visible">
+				<Row className="mb-8">
+					<Col>
+						<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
+					</Col>
+				</Row>
+				<Row className="mb-9">
+					<Col>
+						<MhicInlineAlert
+							variant="danger"
+							title="2 orders require safety planning"
+							description="Please review these orders first"
+							action={{
+								title: 'View Safety Planning',
+								onClick: () => {
+									navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
 								},
-								{
-									value: TAB_KEYS.VOICEMAILS,
-									title: 'Voicemails (4)',
-								},
-								{
-									value: TAB_KEYS.FOLLOW_UPS,
-									title: 'Follow Up (3)',
-								},
-								{
-									value: TAB_KEYS.ASSESSMENTS,
-									title: 'Assessments (3)',
-								},
-								{
-									value: TAB_KEYS.RESOURCES,
-									title: 'Resources (4)',
-								},
-							]}
-							onTabClick={(value) => {
-								setTabKey(value as TAB_KEYS);
 							}}
 						/>
-						<Tab.Content>
-							<Tab.Pane eventKey={TAB_KEYS.NEW_PATIENTS}>
-								<MhicPatientOrderTable
-									isLoading={isLoadingOrders}
-									patientOrders={patientOrders}
-									selectAll={false}
-									totalPatientOrdersCount={totalCount}
-									totalPatientOrdersDescription={totalCountDescription}
-									pageNumber={0}
-									pageSize={15}
-									onPaginationClick={() => {
-										return;
-									}}
-									columnConfig={{
-										flag: true,
-										patient: true,
-										practice: true,
-										referralReason: true,
-										outreachNumber: true,
-										episode: true,
-									}}
-								/>
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.VOICEMAILS}>
-								<MhicPatientOrderTable
-									isLoading={isLoadingOrders}
-									patientOrders={patientOrders}
-									selectAll={false}
-									totalPatientOrdersCount={totalCount}
-									totalPatientOrdersDescription={totalCountDescription}
-									pageNumber={0}
-									pageSize={15}
-									onPaginationClick={() => {
-										return;
-									}}
-									columnConfig={{
-										flag: true,
-										patient: true,
-										referralDate: true,
-										outreachNumber: true,
-										lastOutreach: true,
-										episode: true,
-									}}
-								/>
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UPS}>
-								<MhicPatientOrderTable
-									isLoading={isLoadingOrders}
-									patientOrders={patientOrders}
-									selectAll={false}
-									totalPatientOrdersCount={totalCount}
-									totalPatientOrdersDescription={totalCountDescription}
-									pageNumber={0}
-									pageSize={15}
-									onPaginationClick={() => {
-										return;
-									}}
-									columnConfig={{
-										flag: true,
-										patient: true,
-										referralDate: true,
-										outreachNumber: true,
-										lastOutreach: true,
-										episode: true,
-									}}
-								/>
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.ASSESSMENTS}>
-								<MhicPatientOrderTable
-									isLoading={isLoadingOrders}
-									patientOrders={patientOrders}
-									selectAll={false}
-									totalPatientOrdersCount={totalCount}
-									totalPatientOrdersDescription={totalCountDescription}
-									pageNumber={0}
-									pageSize={15}
-									onPaginationClick={() => {
-										return;
-									}}
-									columnConfig={{
-										flag: true,
-										patient: true,
-										assessmentScheduled: true,
-										episode: true,
-									}}
-								/>
-							</Tab.Pane>
-							<Tab.Pane eventKey={TAB_KEYS.RESOURCES}>
-								<MhicPatientOrderTable
-									isLoading={isLoadingOrders}
-									patientOrders={patientOrders}
-									selectAll={false}
-									totalPatientOrdersCount={totalCount}
-									totalPatientOrdersDescription={totalCountDescription}
-									pageNumber={0}
-									pageSize={15}
-									onPaginationClick={() => {
-										return;
-									}}
-									columnConfig={{
-										flag: true,
-										patient: true,
-										assessmentCompleted: true,
-										completedBy: true,
-										triage: true,
-										episode: true,
-									}}
-								/>
-							</Tab.Pane>
-						</Tab.Content>
-					</Tab.Container>
-				</Col>
-			</Row>
-		</Container>
+					</Col>
+				</Row>
+				<Row className="mb-10">
+					<Col>
+						<div className={classes.overviewCard}>
+							<div className={classes.iconOuter}>
+								<div className={classNames(classes.icon, 'bg-a50')}>
+									<ClipboardIcon className="text-secondary" width={24} height={24} />
+								</div>
+							</div>
+							<div>
+								<p className="mb-0">New Patients</p>
+								<h4 className="mb-0">3</h4>
+							</div>
+						</div>
+					</Col>
+					<Col>
+						<div className={classes.overviewCard}>
+							<div className={classes.iconOuter}>
+								<div className={classNames(classes.icon, 'bg-w50')}>
+									<TherapyIcon className="text-warning" width={24} height={24} />
+								</div>
+							</div>
+							<div>
+								<p className="mb-0">Voicemail Tasks</p>
+								<h4 className="mb-0">3</h4>
+							</div>
+						</div>
+					</Col>
+					<Col>
+						<div className={classes.overviewCard}>
+							<div className={classes.iconOuter}>
+								<div className={classNames(classes.icon, 'bg-p50')}>
+									<PhoneIcon className="text-primary" width={24} height={24} />
+								</div>
+							</div>
+							<div>
+								<p className="mb-0">Follow Ups</p>
+								<h4 className="mb-0">2</h4>
+							</div>
+						</div>
+					</Col>
+					<Col>
+						<div className={classes.overviewCard}>
+							<div className={classes.iconOuter}>
+								<div className={classNames(classes.icon, 'bg-s50')}>
+									<EventIcon className="text-success" width={24} height={24} />
+								</div>
+							</div>
+							<div>
+								<p className="mb-0">Scheduled Assessments</p>
+								<h4 className="mb-0">2</h4>
+							</div>
+						</div>
+					</Col>
+				</Row>
+				<Row className="mb-5">
+					<Col>
+						<h4 className="mb-2">My Prioirities</h4>
+						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.NEW_PATIENTS} activeKey={tabKey}>
+							<TabBar
+								className="mb-5"
+								value={tabKey}
+								tabs={[
+									{
+										value: TAB_KEYS.NEW_PATIENTS,
+										title: `New Patients (${newPatientOrders.length})`,
+									},
+									{
+										value: TAB_KEYS.VOICEMAILS,
+										title: `Voicemails (${voicemailPatientOrders.length})`,
+									},
+									{
+										value: TAB_KEYS.FOLLOW_UPS,
+										title: `Follow Up (${followUpPatientOrders.length})`,
+									},
+									{
+										value: TAB_KEYS.ASSESSMENTS,
+										title: `Assessments (${assessmentPatientOrders.length})`,
+									},
+									{
+										value: TAB_KEYS.RESOURCES,
+										title: `Resources (${resourcesPatientOrders.length})`,
+									},
+								]}
+								onTabClick={(value) => {
+									setTabKey(value as TAB_KEYS);
+								}}
+							/>
+							<Tab.Content>
+								<Tab.Pane eventKey={TAB_KEYS.NEW_PATIENTS}>
+									<MhicPatientOrderTable
+										isLoading={false}
+										patientOrders={newPatientOrders}
+										selectAll={false}
+										totalPatientOrdersCount={newPatientOrders.length}
+										totalPatientOrdersDescription={String(newPatientOrders.length)}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											practice: true,
+											referralReason: true,
+											outreachNumber: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.VOICEMAILS}>
+									<MhicPatientOrderTable
+										isLoading={false}
+										patientOrders={voicemailPatientOrders}
+										selectAll={false}
+										totalPatientOrdersCount={voicemailPatientOrders.length}
+										totalPatientOrdersDescription={String(voicemailPatientOrders.length)}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											referralDate: true,
+											outreachNumber: true,
+											lastOutreach: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UPS}>
+									<MhicPatientOrderTable
+										isLoading={false}
+										patientOrders={followUpPatientOrders}
+										selectAll={false}
+										totalPatientOrdersCount={followUpPatientOrders.length}
+										totalPatientOrdersDescription={String(followUpPatientOrders.length)}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											referralDate: true,
+											outreachNumber: true,
+											lastOutreach: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.ASSESSMENTS}>
+									<MhicPatientOrderTable
+										isLoading={false}
+										patientOrders={assessmentPatientOrders}
+										selectAll={false}
+										totalPatientOrdersCount={assessmentPatientOrders.length}
+										totalPatientOrdersDescription={String(assessmentPatientOrders.length)}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											assessmentScheduled: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.RESOURCES}>
+									<MhicPatientOrderTable
+										isLoading={false}
+										patientOrders={resourcesPatientOrders}
+										selectAll={false}
+										totalPatientOrdersCount={resourcesPatientOrders.length}
+										totalPatientOrdersDescription={String(resourcesPatientOrders.length)}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											assessmentCompleted: true,
+											completedBy: true,
+											triage: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+							</Tab.Content>
+						</Tab.Container>
+					</Col>
+				</Row>
+			</Container>
+		</AsyncWrapper>
 	);
 };
 

@@ -11,6 +11,7 @@ const useTableStyles = createUseThemedStyles((theme) => ({
 		width: '100%',
 		borderRadius: 4,
 		overflowX: 'auto',
+		overflowY: 'hidden',
 		opacity: ({ isLoading }: UseStylesProps) => (isLoading ? 0.5 : 1),
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,

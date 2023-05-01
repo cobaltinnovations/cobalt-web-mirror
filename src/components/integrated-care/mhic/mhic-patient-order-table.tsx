@@ -83,6 +83,7 @@ interface MhicPatientOrderTableProps {
 	onPaginationClick(pageIndex: number): void;
 	columnConfig: MhicPatientOrderTableColumnConfig;
 	coloredRows?: boolean;
+	showPagination?: boolean;
 }
 
 export const MhicPatientOrderTable = ({
@@ -99,6 +100,7 @@ export const MhicPatientOrderTable = ({
 	onPaginationClick,
 	columnConfig,
 	coloredRows = false,
+	showPagination = true,
 }: MhicPatientOrderTableProps) => {
 	const classes = useStyles();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -461,30 +463,32 @@ export const MhicPatientOrderTable = ({
 					</TableBody>
 				</Table>
 			</div>
-			<div className="pb-20">
-				<Container fluid>
-					<Row>
-						<Col xs={{ span: 4, offset: 4 }}>
-							<div className="d-flex justify-content-center align-items-center">
-								<TablePagination
-									total={totalPatientOrdersCount ?? 0}
-									page={pageNumber}
-									size={pageSize}
-									onClick={onPaginationClick}
-								/>
-							</div>
-						</Col>
-						<Col xs={4}>
-							<div className="d-flex justify-content-end align-items-center">
-								<p className="mb-0 fw-semibold text-gray">
-									<span className="text-dark">{patientOrders.length}</span> of{' '}
-									<span className="text-dark">{totalPatientOrdersDescription}</span> Patients
-								</p>
-							</div>
-						</Col>
-					</Row>
-				</Container>
-			</div>
+			{showPagination && (
+				<div className="pb-20">
+					<Container fluid>
+						<Row>
+							<Col xs={{ span: 4, offset: 4 }}>
+								<div className="d-flex justify-content-center align-items-center">
+									<TablePagination
+										total={totalPatientOrdersCount ?? 0}
+										page={pageNumber}
+										size={pageSize}
+										onClick={onPaginationClick}
+									/>
+								</div>
+							</Col>
+							<Col xs={4}>
+								<div className="d-flex justify-content-end align-items-center">
+									<p className="mb-0 fw-semibold text-gray">
+										<span className="text-dark">{patientOrders.length}</span> of{' '}
+										<span className="text-dark">{totalPatientOrdersDescription}</span> Patients
+									</p>
+								</div>
+							</Col>
+						</Row>
+					</Container>
+				</div>
+			)}
 		</>
 	);
 };
