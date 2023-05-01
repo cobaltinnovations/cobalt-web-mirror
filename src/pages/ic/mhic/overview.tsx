@@ -3,20 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { PatientOrderModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
-import useFetchPatientOrders from '@/pages/ic/hooks/use-fetch-patient-orders';
+import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
 import { MhicInlineAlert, MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
-
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
-import { integratedCareService } from '@/lib/services';
-import AsyncWrapper from '@/components/async-page';
-import { PatientOrderModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	overviewCard: {
@@ -56,6 +54,7 @@ const MhicOverview = () => {
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
+	const [safetyPatientOrders, setSafetyPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [newPatientOrders, setNewPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [voicemailPatientOrders, setVoicemailPatientOrders] = useState<PatientOrderModel[]>([]);
 	const [followUpPatientOrders, setFollowUpPatientOrders] = useState<PatientOrderModel[]>([]);
@@ -64,6 +63,7 @@ const MhicOverview = () => {
 
 	const fetchData = useCallback(async () => {
 		const {
+			safetyPlanningPatientOrders,
 			newPatientPatientOrders,
 			voicemailTaskPatientOrders,
 			followupPatientOrders,
@@ -71,6 +71,7 @@ const MhicOverview = () => {
 			needResourcesPatientOrders,
 		} = await integratedCareService.getOverview().fetch();
 
+		setSafetyPatientOrders(safetyPlanningPatientOrders);
 		setNewPatientOrders(newPatientPatientOrders);
 		setVoicemailPatientOrders(voicemailTaskPatientOrders);
 		setFollowUpPatientOrders(followupPatientOrders);
@@ -86,21 +87,27 @@ const MhicOverview = () => {
 						<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
 					</Col>
 				</Row>
-				<Row className="mb-9">
-					<Col>
-						<MhicInlineAlert
-							variant="danger"
-							title="2 orders require safety planning"
-							description="Please review these orders first"
-							action={{
-								title: 'View Safety Planning',
-								onClick: () => {
-									navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
-								},
-							}}
-						/>
-					</Col>
-				</Row>
+				{safetyPatientOrders.length > 0 && (
+					<Row className="mb-9">
+						<Col>
+							<MhicInlineAlert
+								variant="danger"
+								title={`${safetyPatientOrders.length} order${
+									safetyPatientOrders.length === 1 ? '' : 's'
+								} require${safetyPatientOrders.length === 1 ? 's' : ''} safety planning`}
+								description={`Please review ${
+									safetyPatientOrders.length === 1 ? 'this order' : 'these orders'
+								} first`}
+								action={{
+									title: 'View Safety Planning',
+									onClick: () => {
+										navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
+									},
+								}}
+							/>
+						</Col>
+					</Row>
+				)}
 				<Row className="mb-10">
 					<Col>
 						<div className={classes.overviewCard}>
@@ -111,7 +118,7 @@ const MhicOverview = () => {
 							</div>
 							<div>
 								<p className="mb-0">New Patients</p>
-								<h4 className="mb-0">3</h4>
+								<h4 className="mb-0">{newPatientOrders.length}</h4>
 							</div>
 						</div>
 					</Col>
@@ -124,7 +131,7 @@ const MhicOverview = () => {
 							</div>
 							<div>
 								<p className="mb-0">Voicemail Tasks</p>
-								<h4 className="mb-0">3</h4>
+								<h4 className="mb-0">{voicemailPatientOrders.length}</h4>
 							</div>
 						</div>
 					</Col>
@@ -137,7 +144,7 @@ const MhicOverview = () => {
 							</div>
 							<div>
 								<p className="mb-0">Follow Ups</p>
-								<h4 className="mb-0">2</h4>
+								<h4 className="mb-0">{followUpPatientOrders.length}</h4>
 							</div>
 						</div>
 					</Col>
@@ -150,7 +157,7 @@ const MhicOverview = () => {
 							</div>
 							<div>
 								<p className="mb-0">Scheduled Assessments</p>
-								<h4 className="mb-0">2</h4>
+								<h4 className="mb-0">{assessmentPatientOrders.length}</h4>
 							</div>
 						</div>
 					</Col>
