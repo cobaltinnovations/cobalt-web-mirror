@@ -58,7 +58,7 @@ const MhicOverview = () => {
 		<Container fluid className="py-8 overflow-visible">
 			<Row className="mb-8">
 				<Col>
-					<MhicPageHeader title={`Welcome back, ${account?.firstName}`} />
+					<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
 				</Col>
 			</Row>
 			<Row className="mb-9">
