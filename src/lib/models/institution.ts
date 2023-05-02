@@ -35,6 +35,7 @@ export interface Institution {
 	integratedCarePhoneNumber: string;
 	integratedCarePhoneNumberDescription: string;
 	integratedCareAvailabilityDescription: string;
+	myChartName: string;
 }
 
 export interface InstitutionFeature {
