@@ -1,12 +1,35 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 
+import config from '@/lib/config';
+import { PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
-import config from '@/lib/config';
-import { PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
+
+import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	checkOuter: {
+		width: 48,
+		height: 48,
+		flexShrink: 0,
+		display: 'flex',
+		borderRadius: '50%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		color: theme.colors.n300,
+		border: `2px solid ${theme.colors.n300}`,
+	},
+	checkOuterGreen: {
+		color: theme.colors.s500,
+		backgroundColor: theme.colors.s50,
+		border: `2px solid ${theme.colors.s300}`,
+	},
+}));
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -40,6 +63,7 @@ const pageStates = [
 ];
 
 const PatientLanding = () => {
+	const classes = useStyles();
 	const navigate = useNavigate();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
@@ -146,12 +170,21 @@ const PatientLanding = () => {
 									<Container fluid>
 										<Row className="mb-5">
 											<Col>
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0">
-													In order to connect you to the correct level of care, we need you to
-													complete an assessment. There are two ways to complete the
-													assessment:
-												</p>
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4">
+														<p className="mb-1 fs-large fw-semibold">
+															Complete the assessment
+														</p>
+														<p className="mb-0 text-gray">
+															In order to connect you to the correct level of care, we
+															need you to complete an assessment. There are two ways to
+															complete the assessment:
+														</p>
+													</div>
+												</div>
 											</Col>
 										</Row>
 										<Row>
@@ -242,12 +275,17 @@ const PatientLanding = () => {
 									<Container fluid>
 										<Row className="mb-5">
 											<Col>
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0">
-													In order to connect you to the correct level of care, we need you to
-													complete an assessment. There are two ways to complete the
-													assessment:
-												</p>
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4">
+														<p className="mb-1 fs-large fw-semibold">
+															Complete the assessment
+														</p>
+														<p className="mb-0 text-gray">Online assessment in progress</p>
+													</div>
+												</div>
 											</Col>
 										</Row>
 										<Row>
@@ -297,29 +335,37 @@ const PatientLanding = () => {
 								</Card.Header>
 								<Card.Body className="p-0">
 									<div className="px-6 py-5">
-										<div className="d-flex align-items-center justify-content-between">
-											<div>
+										<div className="d-flex">
+											<div className={classNames(classes.checkOuter, classes.checkOuterGreen)}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
 												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
 												<p className="mb-0 text-gray">
 													Completed{' '}
 													{patientOrder?.mostRecentScreeningSessionCompletedAtDescription}
 												</p>
 											</div>
-											<Button
-												className="text-nowrap"
-												variant="outline-primary"
-												onClick={() => {
-													window.alert('[TODO]');
-												}}
-											>
-												Review Results
-											</Button>
+											<div>
+												<Button
+													className="text-nowrap"
+													variant="outline-primary"
+													onClick={() => {
+														window.alert('[TODO]');
+													}}
+												>
+													Review Results
+												</Button>
+											</div>
 										</div>
 									</div>
 									<hr />
 									<div className="px-6 py-5">
-										<div className="d-flex align-items-center justify-content-between">
-											<div>
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
 												<p className="mb-1 fs-large fw-semibold">
 													Schedule appointment with Behavioral Health Provider
 												</p>
@@ -328,14 +374,16 @@ const PatientLanding = () => {
 													an available appointment time.
 												</p>
 											</div>
-											<Button
-												className="text-nowrap"
-												onClick={() => {
-													window.alert('[TODO]');
-												}}
-											>
-												Find Appointment
-											</Button>
+											<div>
+												<Button
+													className="text-nowrap"
+													onClick={() => {
+														window.alert('[TODO]');
+													}}
+												>
+													Find Appointment
+												</Button>
+											</div>
 										</div>
 									</div>
 								</Card.Body>
