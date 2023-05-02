@@ -254,7 +254,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -282,7 +284,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -310,7 +314,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Continue Assessment',
 												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -320,7 +326,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Retake Assessment',
 												onClick: () => {
-													navigate(`orders/${patientOrder.patientOrderId}/assessment`);
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
