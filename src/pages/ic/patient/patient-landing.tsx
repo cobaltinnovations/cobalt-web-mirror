@@ -2,11 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
-import { integratedCareService, screeningService } from '@/lib/services';
-import useAccount from '@/hooks/use-account';
+import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 import config from '@/lib/config';
+import { PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -41,28 +41,33 @@ const pageStates = [
 
 const PatientLanding = () => {
 	const navigate = useNavigate();
-	const { account, institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
 		try {
-			await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			setPatientOrder(response.patientOrder);
 
-			if (!institution?.integratedCareScreeningFlowId) {
+			const { screeningSessionResult, screeningSession, patientOrderScreeningStatusId } = response.patientOrder;
+
+			if (screeningSessionResult) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
 				return;
 			}
 
-			const { screeningSessions } = await screeningService
-				.getScreeningSessionsByFlowId({ screeningFlowId: institution.integratedCareScreeningFlowId })
-				.fetch();
-			const assessmentIsComplete = screeningSessions.some((session) => session.completed);
-
-			if (screeningSessions.length <= 0) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-			} else if (assessmentIsComplete) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
-			} else {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+			if (!screeningSession) {
+				if (
+					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED ||
+					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED
+				) {
+					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+					return;
+				}
+				if (patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS) {
+					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+					return;
+				}
 			}
 		} catch (_error) {
 			// Do not throw error, backend will 404  if there is no order, but that is ok.
@@ -70,7 +75,7 @@ const PatientLanding = () => {
 
 			setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 		}
-	}, [institution?.integratedCareScreeningFlowId]);
+	}, []);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -104,7 +109,7 @@ const PatientLanding = () => {
 
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-6">Welcome back, {account?.firstName ?? 'patient'}</h1>
+						<h1 className="mb-6">Welcome back, {patientOrder?.patientFirstName ?? 'patient'}</h1>
 						<hr />
 					</Col>
 				</Row>
@@ -129,7 +134,10 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
@@ -160,7 +168,7 @@ const PatientLanding = () => {
 														</p>
 														<Button
 															onClick={() => {
-																navigate('/ic/patient/demographics-introduction');
+																navigate('/ic/patient/consent/');
 															}}
 														>
 															Take the Assessment
@@ -203,7 +211,10 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<NoData
 								className="mb-10 bg-white"
 								title="No further action required"
@@ -219,7 +230,10 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
@@ -254,7 +268,7 @@ const PatientLanding = () => {
 															variant: 'outline-primary',
 															title: 'Restart from Beginning',
 															onClick: () => {
-																navigate('/ic/patient/demographics-introduction');
+																navigate('/ic/patient/consent');
 															},
 														},
 													]}
@@ -273,7 +287,10 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
@@ -283,7 +300,10 @@ const PatientLanding = () => {
 										<div className="d-flex align-items-center justify-content-between">
 											<div>
 												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0 text-gray">Completed Apr 6, 2023 at 1:45 PM</p>
+												<p className="mb-0 text-gray">
+													Completed{' '}
+													{patientOrder?.mostRecentScreeningSessionCompletedAtDescription}
+												</p>
 											</div>
 											<Button
 												className="text-nowrap"

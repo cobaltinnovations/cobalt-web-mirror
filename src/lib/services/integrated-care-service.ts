@@ -387,4 +387,10 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	consentToCare(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/consent`,
+		});
+	},
 };

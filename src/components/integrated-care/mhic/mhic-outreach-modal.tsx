@@ -55,7 +55,7 @@ export const MhicOutreachModal: FC<Props> = ({
 			[PatientOrderOutreachTypeId.MYCHART_MESSAGE]: `${institution?.myChartName ?? 'MyChart'} Message`,
 			[PatientOrderOutreachTypeId.PHONE_CALL]: 'Call',
 		}),
-		[]
+		[institution?.myChartName]
 	);
 
 	const resultSelectLabelByOutreachTypeId = useMemo(

@@ -140,7 +140,7 @@ export enum PatientOrderCareTypeId {
 	SAFETY_PLANNING = 'SAFETY_PLANNING',
 }
 
-enum PatientOrderClosureReasonId {
+export enum PatientOrderClosureReasonId {
 	NOT_CLOSED = 'NOT_CLOSED',
 	INELIGIBLE_DUE_TO_INSURANCE = 'INELIGIBLE_DUE_TO_INSURANCE',
 	REFUSED_CARE = 'REFUSED_CARE',
