@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import classNames from 'classnames';
 
 import config from '@/lib/config';
 import { PatientOrderModel, PatientOrderScreeningStatusId, PatientOrderStatusId } from '@/lib/models';
@@ -9,28 +8,9 @@ import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 
-import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useAccount from '@/hooks/use-account';
-
-const useStyles = createUseThemedStyles((theme) => ({
-	checkOuter: {
-		width: 48,
-		height: 48,
-		flexShrink: 0,
-		display: 'flex',
-		borderRadius: '50%',
-		alignItems: 'center',
-		justifyContent: 'center',
-		color: theme.colors.n300,
-		border: `2px solid ${theme.colors.n300}`,
-	},
-	checkOuterGreen: {
-		color: theme.colors.s500,
-		backgroundColor: theme.colors.s50,
-		border: `2px solid ${theme.colors.s300}`,
-	},
-}));
+import { NextStepsItem } from '@/components/integrated-care/patient';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -64,7 +44,6 @@ const pageStates = [
 ];
 
 const PatientLanding = () => {
-	const classes = useStyles();
 	const navigate = useNavigate();
 	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
@@ -169,22 +148,10 @@ const PatientLanding = () => {
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
 								<Card.Body className="p-0">
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
-											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0 text-gray">
-													In order to connect you to the correct level of care, we need you to
-													complete an assessment. There are two ways to complete the
-													assessment:
-												</p>
-											</div>
-										</div>
-									</div>
-									<div className="px-6 pb-6">
+									<NextStepsItem
+										title="Complete the assessment"
+										description="In order to connect you to the correct level of care, we need you to complete an assessment. There are two ways to complete the assessment:"
+									>
 										<Container fluid>
 											<Row>
 												<Col>
@@ -232,7 +199,7 @@ const PatientLanding = () => {
 												</Col>
 											</Row>
 										</Container>
-									</div>
+									</NextStepsItem>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -272,18 +239,10 @@ const PatientLanding = () => {
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
 								<Card.Body className="p-0">
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
-											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0 text-gray">Online assessment in progress</p>
-											</div>
-										</div>
-									</div>
-									<div className="px-6 pb-6">
+									<NextStepsItem
+										title="Complete the assessment"
+										description="Online assessment in progress"
+									>
 										<NoData
 											className="bg-white"
 											title="Continue Assessment"
@@ -305,7 +264,7 @@ const PatientLanding = () => {
 												},
 											]}
 										/>
-									</div>
+									</NextStepsItem>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -326,115 +285,48 @@ const PatientLanding = () => {
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
 								<Card.Body className="p-0">
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classNames(classes.checkOuter, classes.checkOuterGreen)}>
-												<CheckIcon width={24} height={24} />
-											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0 text-gray">
-													Completed{' '}
-													{patientOrder?.mostRecentScreeningSessionCompletedAtDescription}
-												</p>
-											</div>
-											<div>
-												<Button
-													className="text-nowrap"
-													variant="outline-primary"
-													onClick={() => {
-														window.alert('[TODO]');
-													}}
-												>
-													Review Results
-												</Button>
-											</div>
-										</div>
-									</div>
+									<NextStepsItem
+										complete
+										title="Complete the assessment"
+										description={`Completed ${
+											patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'
+										}`}
+										button={{
+											variant: 'outline-primary',
+											title: 'Review Results',
+										}}
+									/>
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
 										<>
 											<hr />
-											<div className="px-6 py-5">
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4 flex-grow-1">
-														<p className="mb-1 fs-large fw-semibold">
-															Schedule appointment with Behavioral Health Provider
-														</p>
-														<p className="mb-0 text-gray">
-															Find an appointment by browsing the list of providers and
-															choosing an available appointment time.
-														</p>
-													</div>
-													<div>
-														<Button
-															className="text-nowrap"
-															onClick={() => {
-																window.alert('[TODO]');
-															}}
-														>
-															Find Appointment
-														</Button>
-													</div>
-												</div>
-											</div>
+											<NextStepsItem
+												title="Schedule appointment with Behavioral Health Provider"
+												description="Find an appointment by browsing the list of providers and choosing an available appointment time."
+												button={{
+													variant: 'primary',
+													title: 'Find Appointment',
+												}}
+											/>
 											<hr />
-											<div className="px-6 py-5">
-												<div className="d-flex">
-													<div
-														className={classNames(
-															classes.checkOuter,
-															classes.checkOuterGreen
-														)}
-													>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4 flex-grow-1">
-														<p className="mb-1 fs-large fw-semibold">
-															Schedule appointment with Behavioral Health Provider
-														</p>
-														<p className="mb-0 text-gray">
-															You have an appointment on [Date] at [Time] with [Provider
-															Name]
-														</p>
-													</div>
-													<div>
-														<Button
-															variant="danger"
-															className="text-nowrap"
-															onClick={() => {
-																window.alert('[TODO]');
-															}}
-														>
-															Cancel Appointment
-														</Button>
-													</div>
-												</div>
-											</div>
+											<NextStepsItem
+												title="Schedule appointment with Behavioral Health Provider"
+												description="You have an appointment on [Date] at [Time] with [Provider Name]"
+												button={{
+													variant: 'danger',
+													title: 'Cancel Appointment',
+												}}
+											/>
 										</>
 									)}
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (
 										<>
 											<hr />
-											<div className="px-6 py-5">
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4 flex-grow-1">
-														<p className="mb-1 fs-large fw-semibold">
-															Review resources &amp; schedule appointment
-														</p>
-														<p className="mb-0 text-gray">
-															Check {institution?.myChartName ?? 'MyChart'} or call us for
-															resources about available [Provider Type]s in your area.
-														</p>
-													</div>
-												</div>
-											</div>
-											<div className="px-6 pb-6">
+											<NextStepsItem
+												title="Review resources & schedule appointment"
+												description={`Check ${
+													institution?.myChartName ?? 'MyChart'
+												} or call us for resources about available [Provider Type]s in your area.`}
+											>
 												<Container fluid>
 													<Row>
 														<Col>
@@ -454,11 +346,17 @@ const PatientLanding = () => {
 																		details.
 																	</p>
 																	<Button
+																		className="d-flex align-items-center"
 																		onClick={() => {
 																			window.alert('[TODO]');
 																		}}
 																	>
 																		Visit {institution?.myChartName ?? 'MyChart'}
+																		<ExternalIcon
+																			className="ms-2"
+																			width={20}
+																			height={20}
+																		/>
 																	</Button>
 																</Card.Body>
 															</Card>
@@ -491,43 +389,23 @@ const PatientLanding = () => {
 														</Col>
 													</Row>
 												</Container>
-											</div>
+											</NextStepsItem>
 											<hr />
-											<div className="px-6 py-5">
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4 flex-grow-1">
-														<p className="mb-1 fs-large fw-semibold">Attend appointment</p>
-														<p className="mb-0 text-gray">
-															You indicated that you attended an appointment on [Date] at
-															[Time] with [Provider Name].
-														</p>
-													</div>
-												</div>
-											</div>
+											<NextStepsItem
+												title="Attend appointment"
+												description={`You indicated that you attended an appointment on [Date] at [Time] with [Provider Name].`}
+											/>
 										</>
 									)}
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SUBCLINICAL && (
 										<>
 											<hr />
-											<div className="px-6 py-5">
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4 flex-grow-1">
-														<p className="mb-1 fs-large fw-semibold">
-															Review resources &amp; schedule appointment
-														</p>
-														<p className="mb-0 text-gray">
-															Check {institution?.myChartName ?? 'MyChart'} or call us for
-															resources about available [Provider Type]s in your area.
-														</p>
-													</div>
-												</div>
-											</div>
+											<NextStepsItem
+												title="Review resources & schedule appointment"
+												description={`Check ${
+													institution?.myChartName ?? 'MyChart'
+												} or call us for resources about available [Provider Type]s in your area.`}
+											/>
 										</>
 									)}
 								</Card.Body>
