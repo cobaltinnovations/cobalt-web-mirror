@@ -39,6 +39,7 @@ export const MhicOrderAssessment = () => {
 
 			try {
 				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
+				await fetchOutletPatientOrder();
 				setShowIntro(true);
 				window.scrollTo(0, 0);
 			} catch (error) {
@@ -47,7 +48,7 @@ export const MhicOrderAssessment = () => {
 				}
 			}
 		},
-		[handleError, patientOrder]
+		[fetchOutletPatientOrder, handleError, patientOrder]
 	);
 
 	const showVerificationForm = !!patientOrder && (isRecreate || !patientOrder.screeningSession) && !showIntro;
