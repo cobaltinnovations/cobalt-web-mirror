@@ -166,73 +166,71 @@ const PatientLanding = () => {
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-5">
-											<Col>
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4">
-														<p className="mb-1 fs-large fw-semibold">
-															Complete the assessment
-														</p>
-														<p className="mb-0 text-gray">
-															In order to connect you to the correct level of care, we
-															need you to complete an assessment. There are two ways to
-															complete the assessment:
-														</p>
-													</div>
-												</div>
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<Card bsPrefix="ic-card">
-													<Card.Header className="bg-white">
-														<Card.Title>Online (Recommended)</Card.Title>
-													</Card.Header>
-													<Card.Body>
-														<p className="mb-5">
-															Completing the assessment online will take about 15 minutes.
-															Only you and your care team will have access to your
-															answers.
-														</p>
-														<Button
-															onClick={() => {
-																navigate('/ic/patient/consent/');
-															}}
-														>
-															Take the Assessment
-														</Button>
-													</Card.Body>
-												</Card>
-											</Col>
-											<Col>
-												<Card bsPrefix="ic-card">
-													<Card.Header className="bg-white">
-														<Card.Title>By Phone</Card.Title>
-													</Card.Header>
-													<Card.Body>
-														<p className="mb-5">
-															Call us at 215-615-4222 Monday-Friday, 9am to 4pm and a
-															Mental Health Intake Coordinator will guide you through the
-															assessment over the phone.
-														</p>
-														<Button
-															variant="outline-primary"
-															onClick={() => {
-																window.alert('[TODO]');
-															}}
-														>
-															Call Us
-														</Button>
-													</Card.Body>
-												</Card>
-											</Col>
-										</Row>
-									</Container>
+								<Card.Body className="p-0">
+									<div className="px-6 py-5">
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
+												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
+												<p className="mb-0 text-gray">
+													In order to connect you to the correct level of care, we need you to
+													complete an assessment. There are two ways to complete the
+													assessment:
+												</p>
+											</div>
+										</div>
+									</div>
+									<div className="px-6 pb-6">
+										<Container fluid>
+											<Row>
+												<Col>
+													<Card bsPrefix="ic-card">
+														<Card.Header className="bg-white">
+															<Card.Title>Online (Recommended)</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																Completing the assessment online will take about 15
+																minutes. Only you and your care team will have access to
+																your answers.
+															</p>
+															<Button
+																onClick={() => {
+																	navigate('/ic/patient/consent/');
+																}}
+															>
+																Take the Assessment
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+												<Col>
+													<Card bsPrefix="ic-card">
+														<Card.Header className="bg-white">
+															<Card.Title>By Phone</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																Call us at 215-615-4222 Monday-Friday, 9am to 4pm and a
+																Mental Health Intake Coordinator will guide you through
+																the assessment over the phone.
+															</p>
+															<Button
+																variant="outline-primary"
+																onClick={() => {
+																	window.alert('[TODO]');
+																}}
+															>
+																Call Us
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+											</Row>
+										</Container>
+									</div>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -271,49 +269,41 @@ const PatientLanding = () => {
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-5">
-											<Col>
-												<div className="d-flex">
-													<div className={classes.checkOuter}>
-														<CheckIcon width={24} height={24} />
-													</div>
-													<div className="ps-4">
-														<p className="mb-1 fs-large fw-semibold">
-															Complete the assessment
-														</p>
-														<p className="mb-0 text-gray">Online assessment in progress</p>
-													</div>
-												</div>
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<NoData
-													className="bg-white"
-													title="Continue Assessment"
-													description="You previously made progress on the assessment. If now is a good time, we can restart from where you left off. Before we continue, please make sure you are in a comfortable place."
-													actions={[
-														{
-															variant: 'primary',
-															title: 'Continue Assessment',
-															onClick: () => {
-																window.alert('[TODO]');
-															},
-														},
-														{
-															variant: 'outline-primary',
-															title: 'Restart from Beginning',
-															onClick: () => {
-																navigate('/ic/patient/consent');
-															},
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-									</Container>
+								<Card.Body className="p-0">
+									<div className="px-6 py-5">
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
+												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
+												<p className="mb-0 text-gray">Online assessment in progress</p>
+											</div>
+										</div>
+									</div>
+									<div className="px-6 pb-6">
+										<NoData
+											className="bg-white"
+											title="Continue Assessment"
+											description="You previously made progress on the assessment. If now is a good time, we can restart from where you left off. Before we continue, please make sure you are in a comfortable place."
+											actions={[
+												{
+													variant: 'primary',
+													title: 'Continue Assessment',
+													onClick: () => {
+														window.alert('[TODO]');
+													},
+												},
+												{
+													variant: 'outline-primary',
+													title: 'Restart from Beginning',
+													onClick: () => {
+														navigate('/ic/patient/consent');
+													},
+												},
+											]}
+										/>
+									</div>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -385,6 +375,116 @@ const PatientLanding = () => {
 												</Button>
 											</div>
 										</div>
+									</div>
+									<hr />
+									<div className="px-6 py-5">
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
+												<p className="mb-1 fs-large fw-semibold">
+													Schedule appointment with Behavioral Health Provider
+												</p>
+												<p className="mb-0 text-gray">
+													You have an appointment on [Date] at [Time] with [Provider Name]
+												</p>
+											</div>
+											<div>
+												<Button
+													variant="danger"
+													className="text-nowrap"
+													onClick={() => {
+														window.alert('[TODO]');
+													}}
+												>
+													Cancel Appointment
+												</Button>
+											</div>
+										</div>
+									</div>
+									<hr />
+									<div className="px-6 py-5">
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
+												<p className="mb-1 fs-large fw-semibold">Attend appointment</p>
+												<p className="mb-0 text-gray">
+													You indicated that you attended an appointment on [Date] at [Time]
+													with [Provider Name].
+												</p>
+											</div>
+										</div>
+									</div>
+									<hr />
+									<div className="px-6 py-5">
+										<div className="d-flex">
+											<div className={classes.checkOuter}>
+												<CheckIcon width={24} height={24} />
+											</div>
+											<div className="ps-4 flex-grow-1">
+												<p className="mb-1 fs-large fw-semibold">
+													Review resources &amp; schedule appointment
+												</p>
+												<p className="mb-0 text-gray">
+													Check MyPennMedicine or call us for resources about available
+													[Provider Type]s in your area.
+												</p>
+											</div>
+										</div>
+									</div>
+									<div className="px-6 pb-6">
+										<Container fluid>
+											<Row>
+												<Col>
+													<Card bsPrefix="ic-card">
+														<Card.Header className="bg-white">
+															<Card.Title>Check MyPennMedicine</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																A Mental Health Intake Coordinator will review your
+																results and send a list of resources that work with your
+																insurance within the next 24 hours. Please check
+																MyPennMedicine for more details.
+															</p>
+															<Button
+																onClick={() => {
+																	window.alert('[TODO]');
+																}}
+															>
+																Visit MyPennMedicine
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+												<Col>
+													<Card bsPrefix="ic-card">
+														<Card.Header className="bg-white">
+															<Card.Title>Call Us</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																Feel free to call us at 215-615-4222 if you do not
+																receive the MyPennMedicine message or if you wish to
+																speak to a Mental Health Intake Coordinator about your
+																options.
+															</p>
+															<Button
+																variant="outline-primary"
+																onClick={() => {
+																	window.alert('[TODO]');
+																}}
+															>
+																Call Us
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+											</Row>
+										</Container>
 									</div>
 								</Card.Body>
 							</Card>
