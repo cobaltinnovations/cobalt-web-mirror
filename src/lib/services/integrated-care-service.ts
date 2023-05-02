@@ -13,6 +13,7 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
+	PatientOrderScheduledScreening,
 	PatientOrderStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
@@ -90,6 +91,7 @@ export const integratedCareService = {
 		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
+		searchQuery?: string;
 		pageNumber?: string;
 		pageSize?: string;
 	}) {
@@ -331,6 +333,59 @@ export const integratedCareService = {
 		}>({
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/patient-order-triages`,
+			data,
+		});
+	},
+	revertTriage(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/reset-patient-order-triages`,
+		});
+	},
+	scheduleAssessment(data: {
+		scheduledDate: string;
+		scheduledTime: string;
+		patientOrderId: string;
+		calendarUrl?: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-screenings',
+			data,
+		});
+	},
+	updateScheduledAssessment(
+		patientOrderScheduledScreeningId: string,
+		data: {
+			scheduledDate: string;
+			scheduledTime: string;
+			calendarUrl?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-screenings/${patientOrderScheduledScreeningId}`,
+			data,
+		});
+	},
+	getOverview(data?: { panelAccountId?: string }) {
+		return httpSingleton.orchestrateRequest<{
+			scheduledAssessmentPatientOrders: PatientOrderModel[];
+			safetyPlanningPatientOrders: PatientOrderModel[];
+			newPatientPatientOrders: PatientOrderModel[];
+			outreachNeededPatientOrders: PatientOrderModel[];
+			followupPatientOrders: PatientOrderModel[];
+			needResourcesPatientOrders: PatientOrderModel[];
+			voicemailTaskPatientOrders: PatientOrderModel[];
+		}>({
+			method: 'GET',
+			url: '/integrated-care/panel-today',
 			data,
 		});
 	},

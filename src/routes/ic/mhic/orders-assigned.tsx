@@ -41,7 +41,6 @@ const MhicOrdersAssigned = () => {
 			...(pageNumber && { pageNumber }),
 			patientOrderStatusId: [
 				PatientOrderStatusId.NEEDS_ASSESSMENT,
-				PatientOrderStatusId.SCHEDULED,
 				PatientOrderStatusId.SAFETY_PLANNING,
 				PatientOrderStatusId.SPECIALTY_CARE,
 				PatientOrderStatusId.SUBCLINICAL,
@@ -106,7 +105,7 @@ const MhicOrdersAssigned = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Assigned Orders"
-							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
+							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
 						>
 							<div className="d-flex align-items-center">
 								<Button

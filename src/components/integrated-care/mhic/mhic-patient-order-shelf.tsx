@@ -161,7 +161,13 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 			>
 				<div className={classes.patientOrderShelf}>
 					<AsyncWrapper fetchData={fetchPatientOverview}>
-						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.ORDER_DETAILS} activeKey={tabKey}>
+						<Tab.Container
+							id="shelf-tabs"
+							defaultActiveKey={TAB_KEYS.ORDER_DETAILS}
+							activeKey={tabKey}
+							mountOnEnter
+							unmountOnExit
+						>
 							<div className={classes.header}>
 								<Dropdown className={classNames(classes.shelfMoreButton, 'position-absolute')}>
 									<Dropdown.Toggle

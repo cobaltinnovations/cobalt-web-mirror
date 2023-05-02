@@ -154,7 +154,7 @@ const MhicOrdersUnassigned = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Unassigned"
-							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
+							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
 						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (

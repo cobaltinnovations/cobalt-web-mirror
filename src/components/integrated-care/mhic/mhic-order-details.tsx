@@ -43,7 +43,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const navigate = useNavigate();
 	const revalidator = useRevalidator();
 
-	const [assessmentIdToEdit, setAssessmentIdToEdit] = useState('');
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
@@ -76,13 +75,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	return (
 		<>
 			<MhicScheduleAssessmentModal
-				assessmentId={assessmentIdToEdit}
+				patientOrder={patientOrder}
 				show={showScheduleAssessmentModal}
 				onHide={() => {
 					setShowScheduleAssessmentModal(false);
 				}}
-				onSave={() => {
+				onSave={(updatedPatientOrder) => {
 					setShowScheduleAssessmentModal(false);
+					revalidator.revalidate();
 				}}
 			/>
 
@@ -266,7 +266,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Schedule Assessment',
 												onClick: () => {
-													setAssessmentIdToEdit('');
 													setShowScheduleAssessmentModal(true);
 												},
 												disabled:
@@ -296,7 +295,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Edit Appointment Date',
 												onClick: () => {
-													setAssessmentIdToEdit('xxx');
 													setShowScheduleAssessmentModal(true);
 												},
 												disabled:
@@ -733,9 +731,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">PC Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 											</Col>
 										</Row>
 										<hr className="mb-4" />
@@ -744,7 +740,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">MHIC</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.panelAccountDisplayName}</p>
+												<p className="m-0">
+													{patientOrder.panelAccountDisplayName ?? 'Unassigned'}
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -752,9 +750,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">BHP</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">
-													<span className="text-danger">[TODO]</span>
-												</p>
+												<p className="m-0">{patientOrder.providerName ?? 'N/A'}</p>
 											</Col>
 										</Row>
 										{/* <Row>
@@ -779,7 +775,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					<Row className="mb-6">
 						<Col>
 							<h4 className="mb-0">
-								Other Episodes <span className="text-gray">({pastPatientOrders.length})</span>
+								Episodes <span className="text-gray">({pastPatientOrders.length})</span>
 							</h4>
 						</Col>
 					</Row>
@@ -803,32 +799,16 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 														<Col>
 															<div className="mb-1 d-flex align-items-center justify-content-between">
 																<p className="m-0 fw-bold">
-																	{pastPatientOrder.orderDateDescription} (Episode:{' '}
+																	{pastPatientOrder.orderDateDescription} -{' '}
+																	{patientOrder.episodeClosedAtDescription} (
 																	{pastPatientOrder.episodeDurationInDaysDescription})
 																</p>
-																<div className="d-flex align-items-center">
-																	<p className="m-0 fw-bold text-danger">
-																		[TODO]: Episode Status Description
-																	</p>
-																	<Button
-																		variant="primary"
-																		size="sm"
-																		className="ms-4"
-																		onClick={() => {
-																			setShowCloseEpisodeModal(true);
-																		}}
-																		disabled
-																	>
-																		Reopen
-																	</Button>
-																</div>
+																<p className="m-0 fw-bold text-gray">
+																	{
+																		pastPatientOrder.patientOrderDispositionDescription
+																	}
+																</p>
 															</div>
-															<p className="mb-1 text-gray">
-																Referred by: {pastPatientOrder.referringPracticeName}
-															</p>
-															<p className="m-0 text-gray">
-																{pastPatientOrder.reasonForReferral}
-															</p>
 														</Col>
 													</Row>
 												);

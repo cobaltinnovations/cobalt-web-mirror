@@ -34,6 +34,7 @@ import PatientDemographicsPart2 from './routes/ic/patient/demographics-part-2';
 import PatientDemographicsPart3 from './routes/ic/patient/demographics-part-3';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
 import PatientLanding from './routes/ic/patient/patient-landing';
+import PatientConsent from './routes/ic/patient/patient-consent';
 import { IntegratedCarePatientLayout } from './routes/ic/patient/patient-layout';
 import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
 import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
@@ -676,6 +677,10 @@ export const routes: RouteObject[] = [
 									{
 										index: true,
 										element: <PatientLanding />,
+									},
+									{
+										path: 'consent',
+										element: <PatientConsent />,
 									},
 									{
 										path: 'demographics-introduction',

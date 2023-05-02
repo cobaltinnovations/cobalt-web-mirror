@@ -16,7 +16,7 @@ export interface PatientOrderModel {
 	patientOrderStatusId: PatientOrderStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
-	patientOrderDispositionDescription: PatientOrderDisposition;
+	patientOrderDispositionDescription: string;
 	patientAccountId?: string;
 	patientAddressId?: string;
 	panelAccountId?: string;
@@ -128,6 +128,8 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
+
+	providerName?: string;
 }
 
 export enum PatientOrderCareTypeId {
@@ -150,7 +152,6 @@ enum PatientOrderClosureReasonId {
 export enum PatientOrderStatusId {
 	PENDING = 'PENDING',
 	NEEDS_ASSESSMENT = 'NEEDS_ASSESSMENT',
-	SCHEDULED = 'SCHEDULED',
 	SAFETY_PLANNING = 'SAFETY_PLANNING',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
@@ -194,9 +195,11 @@ export enum PatientOrderTriageSourceId {
 	MANUALLY_SET = 'MANUALLY_SET',
 }
 
-export interface PatientOrderDisposition {
-	patientOrderDispositionId: PatientOrderDispositionId;
-	description: string;
+export enum ScheduledMessageStatusId {
+	PENDING = 'PENDING',
+	PROCESSED = 'PROCESSED',
+	CANCELED = 'CANCELED',
+	ERROR = 'ERROR',
 }
 
 export interface PatientAddressModel {
@@ -305,7 +308,7 @@ export interface PatientOrderScheduledMessageGroup {
 	patientOrderScheduledMessages: {
 		patientOrderScheduledMessageId: string;
 		scheduledMessageId: string;
-		scheduledMessageStatusId: string;
+		scheduledMessageStatusId: ScheduledMessageStatusId;
 		messageTypeId: string;
 		messageTypeDescription: string;
 	}[];
@@ -318,3 +321,18 @@ export type PatientOrderCountsByPatientOrderStatusId = Record<
 		patientOrderCount: number;
 	}
 >;
+
+export interface PatientOrderScheduledScreening {
+	patientOrderScheduledScreeningId: string;
+	patientOrderId: string;
+	accountId: string;
+	scheduledDateTime: string;
+	scheduledDateTimeDescription: string;
+	canceled: boolean;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	canceledAt?: string;
+	canceledAtDescription?: string;
+}

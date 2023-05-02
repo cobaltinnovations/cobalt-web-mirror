@@ -3,7 +3,10 @@ import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
+import { PatientOrderModel } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
@@ -15,13 +18,14 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
-	assessmentId?: string;
-	onSave(): void;
+	patientOrder: PatientOrderModel;
+	onSave(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicScheduleAssessmentModal: FC<Props> = ({ assessmentId, onSave, ...props }) => {
+export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
@@ -30,8 +34,19 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ assessmentId, onSave, .
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleOnEnter = useCallback(() => {
-		// todo
-	}, []);
+		setFormValues({
+			date: patientOrder.patientOrderScheduledScreeningScheduledDateTime
+				? moment(patientOrder.patientOrderScheduledScreeningScheduledDateTime).toDate()
+				: undefined,
+			time: patientOrder.patientOrderScheduledScreeningScheduledDateTime
+				? moment(patientOrder.patientOrderScheduledScreeningScheduledDateTime).format('h:mm A')
+				: '',
+			link: patientOrder.patientOrderScheduledScreeningCalendarUrl ?? '',
+		});
+	}, [
+		patientOrder.patientOrderScheduledScreeningCalendarUrl,
+		patientOrder.patientOrderScheduledScreeningScheduledDateTime,
+	]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -40,24 +55,68 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ assessmentId, onSave, .
 			try {
 				setIsSaving(true);
 
-				console.log('formValues.date:', moment(formValues.date).format('YYYY-MM-DD'));
-				console.log('formValues.time:', formValues.time);
-				console.log('formValues.link:', formValues.link);
+				if (patientOrder.patientOrderScheduledScreeningId) {
+					const assessmentResponse = await integratedCareService
+						.updateScheduledAssessment(patientOrder.patientOrderScheduledScreeningId, {
+							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledTime: formValues.time,
+							calendarUrl: formValues.link,
+						})
+						.fetch();
 
-				onSave();
+					addFlag({
+						variant: 'success',
+						title: 'Assessment updated',
+						description: `Assessment was updated for ${patientOrder.patientDisplayName} to ${assessmentResponse.patientOrderScheduledScreening.scheduledDateTimeDescription}`,
+						actions: [],
+					});
+				} else {
+					const assessmentResponse = await integratedCareService
+						.scheduleAssessment({
+							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
+							scheduledTime: formValues.time,
+							patientOrderId: patientOrder.patientOrderId,
+							calendarUrl: formValues.link,
+						})
+						.fetch();
+
+					addFlag({
+						variant: 'success',
+						title: 'Assessment scheduled',
+						description: `Assessment was scheduled for ${patientOrder.patientDisplayName} at ${assessmentResponse.patientOrderScheduledScreening.scheduledDateTimeDescription}`,
+						actions: [],
+					});
+				}
+
+				const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
+				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSaving(false);
 			}
 		},
-		[formValues.date, formValues.link, formValues.time, handleError, onSave]
+		[
+			addFlag,
+			formValues.date,
+			formValues.link,
+			formValues.time,
+			handleError,
+			onSave,
+			patientOrder.patientDisplayName,
+			patientOrder.patientOrderId,
+			patientOrder.patientOrderScheduledScreeningId,
+		]
 	);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
 			<Modal.Header closeButton>
-				<Modal.Title>{assessmentId ? 'Edit Assessment Appointment' : 'Schedule Assessment'}</Modal.Title>
+				<Modal.Title>
+					{patientOrder.patientOrderScheduledScreeningId
+						? 'Edit Assessment Appointment'
+						: 'Schedule Assessment'}
+				</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
@@ -74,7 +133,7 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ assessmentId, onSave, .
 						disabled={isSaving}
 					/>
 					<TimeInputV2
-						id="outreact-modal__time-input"
+						id="schedule-assessment__time-input"
 						className="mb-4"
 						label="Assessment Time"
 						value={formValues.time}
@@ -100,10 +159,10 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ assessmentId, onSave, .
 					/>
 				</Modal.Body>
 				<Modal.Footer className="text-right">
-					<Button variant="outline-primary" className="me-2" onClick={props.onHide}>
+					<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
 						Cancel
 					</Button>
-					<Button variant="primary" type="submit">
+					<Button variant="primary" type="submit" disabled={isSaving}>
 						Save
 					</Button>
 				</Modal.Footer>

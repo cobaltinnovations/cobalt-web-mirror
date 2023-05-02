@@ -77,6 +77,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
 		},
+		'.text-left': {
+			textAlign: 'left',
+		},
 		'.text-right': {
 			textAlign: 'right',
 		},
