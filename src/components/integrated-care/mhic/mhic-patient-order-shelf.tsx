@@ -267,7 +267,7 @@ export const MhicPatientOrderShelf = ({
 												actions: [],
 											});
 										}}
-										text="1A2B3C4D5E"
+										text={currentPatientOrder?.patientMrn ?? ''}
 									>
 										<Button variant="link" className="p-2">
 											<CopyIcon width={20} height={20} />
