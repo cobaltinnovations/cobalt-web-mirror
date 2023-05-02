@@ -282,12 +282,14 @@ export const MySchedule: FC = () => {
 							clickInfo.event.extendedProps.isBlockedTime
 						) {
 							setManagingAvailabilties(false);
-							navigate(`availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`);
+							navigate(
+								`/scheduling/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
+							);
 							return;
 						} else if (clickInfo.event.extendedProps.appointmentId) {
 							setFocusDateOnLoad(false);
 							setAccountIdForDetailsPanel(clickInfo.event.extendedProps.accountId);
-							navigate(`appointments/${clickInfo.event.extendedProps.appointmentId}`);
+							navigate(`/scheduling/appointments/${clickInfo.event.extendedProps.appointmentId}`);
 						}
 					}}
 					datesSet={({ start, end }) => {

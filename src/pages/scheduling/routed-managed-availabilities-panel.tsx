@@ -16,7 +16,7 @@ export const RoutedManageAvailailityPanel = () => {
 			<ManageAvailabilityPanel
 				onClose={() => {
 					setManagingAvailabilties(false);
-					navigate(``);
+					navigate(`/scheduling`);
 				}}
 			/>
 		</div>

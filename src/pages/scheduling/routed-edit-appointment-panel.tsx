@@ -20,9 +20,9 @@ export const RoutedEditAppointmentPanel = () => {
 				onClose={(updatedAppointmentId) => {
 					setFocusDateOnLoad(false);
 					if (updatedAppointmentId) {
-						navigate(`appointments/${updatedAppointmentId}`);
+						navigate(`/scheduling/appointments/${updatedAppointmentId}`);
 					} else {
-						navigate(``);
+						navigate(`/scheduling`);
 					}
 
 					fetchMainData();

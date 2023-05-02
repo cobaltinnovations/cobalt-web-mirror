@@ -12,7 +12,7 @@ export const RoutedSelectedAvailabilityPanel = () => {
 		<div className={classNames('px-5 h-100', classes.sideBar)}>
 			<SelectedAvailabilityPanel
 				onClose={() => {
-					navigate(``);
+					navigate(`/scheduling`);
 				}}
 			/>
 		</div>

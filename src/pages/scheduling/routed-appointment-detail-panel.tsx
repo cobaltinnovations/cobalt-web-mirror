@@ -18,11 +18,11 @@ export const RoutedAppointmentDetailPanel = () => {
 				focusDateOnLoad={focusDateOnLoad}
 				setCalendarDate={setCalendarDate}
 				onAddAppointment={() => {
-					navigate(`appointments/new-appointment`);
+					navigate(`/scheduling/appointments/new-appointment`);
 				}}
 				onClose={() => {
 					setFocusDateOnLoad(true);
-					navigate(``);
+					navigate(`/scheduling`);
 				}}
 				accountId={accountIdForDetailsPanel}
 			/>

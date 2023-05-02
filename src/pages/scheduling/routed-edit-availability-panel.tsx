@@ -16,11 +16,11 @@ export const RoutedEditAvailabilityPanel = () => {
 			<EditAvailabilityPanel
 				onClose={(logicalAvailabilityId) => {
 					if (managingAvailabilities) {
-						navigate(`availabilities`);
+						navigate(`/scheduling/availabilities`);
 					} else if (logicalAvailabilityId) {
-						navigate(`availabilities/${logicalAvailabilityId}`);
+						navigate(`/scheduling/availabilities/${logicalAvailabilityId}`);
 					} else {
-						navigate(``);
+						navigate('/scheduling');
 					}
 
 					fetchMainData();
