@@ -4,13 +4,14 @@ import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import config from '@/lib/config';
-import { PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
+import { PatientOrderModel, PatientOrderScreeningStatusId, PatientOrderStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	checkOuter: {
@@ -65,6 +66,7 @@ const pageStates = [
 const PatientLanding = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
@@ -349,143 +351,185 @@ const PatientLanding = () => {
 											</div>
 										</div>
 									</div>
-									<hr />
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
+									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
+										<>
+											<hr />
+											<div className="px-6 py-5">
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4 flex-grow-1">
+														<p className="mb-1 fs-large fw-semibold">
+															Schedule appointment with Behavioral Health Provider
+														</p>
+														<p className="mb-0 text-gray">
+															Find an appointment by browsing the list of providers and
+															choosing an available appointment time.
+														</p>
+													</div>
+													<div>
+														<Button
+															className="text-nowrap"
+															onClick={() => {
+																window.alert('[TODO]');
+															}}
+														>
+															Find Appointment
+														</Button>
+													</div>
+												</div>
 											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">
-													Schedule appointment with Behavioral Health Provider
-												</p>
-												<p className="mb-0 text-gray">
-													Find an appointment by browsing the list of providers and choosing
-													an available appointment time.
-												</p>
+											<hr />
+											<div className="px-6 py-5">
+												<div className="d-flex">
+													<div
+														className={classNames(
+															classes.checkOuter,
+															classes.checkOuterGreen
+														)}
+													>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4 flex-grow-1">
+														<p className="mb-1 fs-large fw-semibold">
+															Schedule appointment with Behavioral Health Provider
+														</p>
+														<p className="mb-0 text-gray">
+															You have an appointment on [Date] at [Time] with [Provider
+															Name]
+														</p>
+													</div>
+													<div>
+														<Button
+															variant="danger"
+															className="text-nowrap"
+															onClick={() => {
+																window.alert('[TODO]');
+															}}
+														>
+															Cancel Appointment
+														</Button>
+													</div>
+												</div>
 											</div>
-											<div>
-												<Button
-													className="text-nowrap"
-													onClick={() => {
-														window.alert('[TODO]');
-													}}
-												>
-													Find Appointment
-												</Button>
+										</>
+									)}
+									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (
+										<>
+											<hr />
+											<div className="px-6 py-5">
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4 flex-grow-1">
+														<p className="mb-1 fs-large fw-semibold">
+															Review resources &amp; schedule appointment
+														</p>
+														<p className="mb-0 text-gray">
+															Check {institution?.myChartName ?? 'MyChart'} or call us for
+															resources about available [Provider Type]s in your area.
+														</p>
+													</div>
+												</div>
 											</div>
-										</div>
-									</div>
-									<hr />
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
+											<div className="px-6 pb-6">
+												<Container fluid>
+													<Row>
+														<Col>
+															<Card bsPrefix="ic-card">
+																<Card.Header className="bg-white">
+																	<Card.Title>
+																		Check {institution?.myChartName ?? 'MyChart'}
+																	</Card.Title>
+																</Card.Header>
+																<Card.Body>
+																	<p className="mb-5">
+																		A Mental Health Intake Coordinator will review
+																		your results and send a list of resources that
+																		work with your insurance within the next 24
+																		hours. Please check{' '}
+																		{institution?.myChartName ?? 'MyChart'} for more
+																		details.
+																	</p>
+																	<Button
+																		onClick={() => {
+																			window.alert('[TODO]');
+																		}}
+																	>
+																		Visit {institution?.myChartName ?? 'MyChart'}
+																	</Button>
+																</Card.Body>
+															</Card>
+														</Col>
+														<Col>
+															<Card bsPrefix="ic-card">
+																<Card.Header className="bg-white">
+																	<Card.Title>Call Us</Card.Title>
+																</Card.Header>
+																<Card.Body>
+																	<p className="mb-5">
+																		Feel free to call us at{' '}
+																		{institution?.integratedCarePhoneNumberDescription ??
+																			'N/A'}{' '}
+																		if you do not receive the{' '}
+																		{institution?.myChartName ?? 'MyChart'} message
+																		or if you wish to speak to a Mental Health
+																		Intake Coordinator about your options.
+																	</p>
+																	<Button
+																		variant="outline-primary"
+																		onClick={() => {
+																			window.alert('[TODO]');
+																		}}
+																	>
+																		Call Us
+																	</Button>
+																</Card.Body>
+															</Card>
+														</Col>
+													</Row>
+												</Container>
 											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">
-													Schedule appointment with Behavioral Health Provider
-												</p>
-												<p className="mb-0 text-gray">
-													You have an appointment on [Date] at [Time] with [Provider Name]
-												</p>
+											<hr />
+											<div className="px-6 py-5">
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4 flex-grow-1">
+														<p className="mb-1 fs-large fw-semibold">Attend appointment</p>
+														<p className="mb-0 text-gray">
+															You indicated that you attended an appointment on [Date] at
+															[Time] with [Provider Name].
+														</p>
+													</div>
+												</div>
 											</div>
-											<div>
-												<Button
-													variant="danger"
-													className="text-nowrap"
-													onClick={() => {
-														window.alert('[TODO]');
-													}}
-												>
-													Cancel Appointment
-												</Button>
+										</>
+									)}
+									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SUBCLINICAL && (
+										<>
+											<hr />
+											<div className="px-6 py-5">
+												<div className="d-flex">
+													<div className={classes.checkOuter}>
+														<CheckIcon width={24} height={24} />
+													</div>
+													<div className="ps-4 flex-grow-1">
+														<p className="mb-1 fs-large fw-semibold">
+															Review resources &amp; schedule appointment
+														</p>
+														<p className="mb-0 text-gray">
+															Check {institution?.myChartName ?? 'MyChart'} or call us for
+															resources about available [Provider Type]s in your area.
+														</p>
+													</div>
+												</div>
 											</div>
-										</div>
-									</div>
-									<hr />
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
-											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">Attend appointment</p>
-												<p className="mb-0 text-gray">
-													You indicated that you attended an appointment on [Date] at [Time]
-													with [Provider Name].
-												</p>
-											</div>
-										</div>
-									</div>
-									<hr />
-									<div className="px-6 py-5">
-										<div className="d-flex">
-											<div className={classes.checkOuter}>
-												<CheckIcon width={24} height={24} />
-											</div>
-											<div className="ps-4 flex-grow-1">
-												<p className="mb-1 fs-large fw-semibold">
-													Review resources &amp; schedule appointment
-												</p>
-												<p className="mb-0 text-gray">
-													Check MyPennMedicine or call us for resources about available
-													[Provider Type]s in your area.
-												</p>
-											</div>
-										</div>
-									</div>
-									<div className="px-6 pb-6">
-										<Container fluid>
-											<Row>
-												<Col>
-													<Card bsPrefix="ic-card">
-														<Card.Header className="bg-white">
-															<Card.Title>Check MyPennMedicine</Card.Title>
-														</Card.Header>
-														<Card.Body>
-															<p className="mb-5">
-																A Mental Health Intake Coordinator will review your
-																results and send a list of resources that work with your
-																insurance within the next 24 hours. Please check
-																MyPennMedicine for more details.
-															</p>
-															<Button
-																onClick={() => {
-																	window.alert('[TODO]');
-																}}
-															>
-																Visit MyPennMedicine
-															</Button>
-														</Card.Body>
-													</Card>
-												</Col>
-												<Col>
-													<Card bsPrefix="ic-card">
-														<Card.Header className="bg-white">
-															<Card.Title>Call Us</Card.Title>
-														</Card.Header>
-														<Card.Body>
-															<p className="mb-5">
-																Feel free to call us at 215-615-4222 if you do not
-																receive the MyPennMedicine message or if you wish to
-																speak to a Mental Health Intake Coordinator about your
-																options.
-															</p>
-															<Button
-																variant="outline-primary"
-																onClick={() => {
-																	window.alert('[TODO]');
-																}}
-															>
-																Call Us
-															</Button>
-														</Card.Body>
-													</Card>
-												</Col>
-											</Row>
-										</Container>
-									</div>
+										</>
+									)}
 								</Card.Body>
 							</Card>
 							<hr />
