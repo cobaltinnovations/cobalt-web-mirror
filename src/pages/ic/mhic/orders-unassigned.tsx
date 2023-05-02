@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -20,6 +20,7 @@ import { PatientOrderStatusId } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
@@ -27,6 +28,7 @@ const MhicOrdersUnassigned = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const filterBy = useMemo(() => searchParams.get('filterBy') ?? 'NO_OUTREACH', [searchParams]);
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -119,6 +121,10 @@ const MhicOrdersUnassigned = () => {
 	useEffect(() => {
 		fetchTableData();
 	}, [fetchTableData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchTableData);
+	}, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

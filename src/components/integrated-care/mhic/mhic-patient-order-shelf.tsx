@@ -109,6 +109,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface MhicPatientOrderShelfProps {
 	patientOrderId: string | null;
+	mainViewRefresher(): void;
 	onHide(): void;
 	onShelfLoad(result: PatientOrderModel): void;
 }
@@ -119,7 +120,12 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({
+	patientOrderId,
+	mainViewRefresher,
+	onHide,
+	onShelfLoad,
+}: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 
@@ -143,6 +149,14 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 		setReferenceData(referenceDataResponse);
 		onShelfLoad(patientOverviewResponse.patientOrder);
 	}, [onShelfLoad, patientOrderId]);
+
+	const handlePatientOrderChanges = useCallback(
+		(changedOrder: PatientOrderModel) => {
+			setCurrentPatientOrder(changedOrder);
+			mainViewRefresher();
+		},
+		[mainViewRefresher]
+	);
 
 	useEffect(() => {
 		if (patientOrderId) {
@@ -296,7 +310,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
 											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>
@@ -305,7 +319,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 										<MhicContactHistory
 											patientOrder={currentPatientOrder}
 											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>
@@ -313,7 +327,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									{currentPatientOrder && (
 										<MhicComments
 											patientOrder={currentPatientOrder}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>

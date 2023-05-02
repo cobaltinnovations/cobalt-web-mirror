@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicAssignOrderModal,
@@ -15,12 +15,14 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderStatusId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersAssigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -86,6 +88,10 @@ const MhicOrdersAssigned = () => {
 	useEffect(() => {
 		fetchTableData();
 	}, [fetchTableData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchTableData);
+	}, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

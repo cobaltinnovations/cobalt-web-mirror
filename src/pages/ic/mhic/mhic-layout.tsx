@@ -5,14 +5,14 @@ import React, { useCallback, useState } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
 
 export interface MhicLayoutContext {
-	recentOrders: PatientOrderAutocompleteResult[];
-	setRecentOrders: (orders: PatientOrderAutocompleteResult[]) => void;
 	setOpenOrder: (order: PatientOrderModel) => void;
+	setMainViewRefresher: React.Dispatch<React.SetStateAction<() => void>>;
 }
 
 export const MhicLayout = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
+	const [mainViewRefresher, setMainViewRefresher] = useState<() => void>(() => () => {});
 	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(
 		JSON.parse(window.localStorage.getItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY) ?? '[]')
 	);
@@ -58,6 +58,7 @@ export const MhicLayout = () => {
 			>
 				<Outlet
 					context={{
+						setMainViewRefresher,
 						setOpenOrder,
 					}}
 				/>
@@ -66,6 +67,7 @@ export const MhicLayout = () => {
 			<MhicPatientOrderShelf
 				patientOrderId={searchParams.get('openPatientOrderId')}
 				onShelfLoad={handleShelfOpen}
+				mainViewRefresher={mainViewRefresher}
 				onHide={() => {
 					const params = new URLSearchParams(searchParams.toString());
 					params.delete('openPatientOrderId');

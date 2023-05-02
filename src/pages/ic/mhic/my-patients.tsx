@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicCustomizeTableModal,
@@ -13,6 +13,7 @@ import {
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import useAccount from '@/hooks/use-account';
 import { PatientOrderStatusId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicMyPatients = () => {
 	const { account } = useAccount();
@@ -24,6 +25,7 @@ const MhicMyPatients = () => {
 		totalCountDescription,
 	} = useFetchPatientOrders();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 
@@ -32,7 +34,7 @@ const MhicMyPatients = () => {
 	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
 	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
 
-	useEffect(() => {
+	const fetchData = useCallback(() => {
 		fetchPatientOrders({
 			...(accountId && { panelAccountId: accountId }),
 			...(patientOrderStatusId && { patientOrderStatusId }),
@@ -41,6 +43,14 @@ const MhicMyPatients = () => {
 			pageSize: '15',
 		});
 	}, [accountId, fetchPatientOrders, pageNumber, patientOrderDispositionId, patientOrderStatusId]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchData);
+	}, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
