@@ -115,7 +115,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 							</Row>
 							<Row>
 								<Col xs={3}>
-									<p className="m-0">Closure Reaseon</p>
+									<p className="m-0">Closure Reason</p>
 								</Col>
 								<Col xs={9}>
 									<p className="m-0 text-gray">{patientOrder.patientOrderClosureReasonDescription}</p>
