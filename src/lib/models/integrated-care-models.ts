@@ -132,8 +132,6 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
-	totalOutreachCount: number;
-	totalOutreachCountDescription: string;
 
 	// Scheduled appointment through connect-with-support
 	appointmentId?: string;
