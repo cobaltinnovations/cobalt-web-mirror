@@ -401,4 +401,25 @@ export const integratedCareService = {
 			url: `/patient-orders/${patientOrderId}/consent`,
 		});
 	},
+	createVoicemailTask(data: { patientOrderId: string; panelAccountId: string; message: string }) {
+		return httpSingleton.orchestrateRequest({
+			method: 'POST',
+			url: '/patient-order-voicemail-tasks',
+			data,
+		});
+	},
+	updateVoicemailTask(patientOrderVoicemailTaskId: string, data: { panelAccountId: string; message: string }) {
+		return httpSingleton.orchestrateRequest({
+			method: 'PUT',
+			url: `/patient-order-voicemail-tasks/${patientOrderVoicemailTaskId}`,
+			data,
+		});
+	},
+	completeVoicemailTask(patientOrderVoicemailTaskId: string) {
+		return httpSingleton.orchestrateRequest({
+			method: 'POST',
+			url: `/patient-order-voicemail-tasks/${patientOrderVoicemailTaskId}/complete`,
+			data: {},
+		});
+	},
 };
