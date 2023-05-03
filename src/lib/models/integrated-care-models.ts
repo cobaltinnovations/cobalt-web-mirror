@@ -111,7 +111,6 @@ export interface PatientOrderModel {
 	connectedToSafetyPlanningAt?: string;
 	connectedToSafetyPlanningAtDescription?: string;
 	patientOrderAssignmentStatusId?: PatientOrderAssignmentStatusId;
-	patientOrderOutreachStatusId?: PatientOrderOutreachStatusId;
 	patientOrderResponseStatusId?: PatientOrderResponseStatusId;
 	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
@@ -131,6 +130,8 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
+	totalOutreachCount: number;
+	totalOutreachCountDescription: string;
 
 	providerName?: string;
 }
