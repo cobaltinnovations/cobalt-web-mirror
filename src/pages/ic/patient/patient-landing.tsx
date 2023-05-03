@@ -299,23 +299,34 @@ const PatientLanding = () => {
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
 										<>
 											<hr />
-											<NextStepsItem
-												title="Schedule appointment with Behavioral Health Provider"
-												description="Find an appointment by browsing the list of providers and choosing an available appointment time."
-												button={{
-													variant: 'primary',
-													title: 'Find Appointment',
-												}}
-											/>
-											<hr />
-											<NextStepsItem
-												title="Schedule appointment with Behavioral Health Provider"
-												description="You have an appointment on [Date] at [Time] with [Provider Name]"
-												button={{
-													variant: 'danger',
-													title: 'Cancel Appointment',
-												}}
-											/>
+											{!patientOrder.appointmentId ? (
+												<NextStepsItem
+													title="Schedule appointment with Behavioral Health Provider"
+													description="Find an appointment by browsing the list of providers and choosing an available appointment time."
+													button={{
+														variant: 'primary',
+														title: 'Find Appointment',
+														onClick: () => {
+															navigate(
+																`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder.patientOrderId}`
+															);
+														},
+													}}
+												/>
+											) : (
+												<NextStepsItem
+													complete
+													title="Schedule appointment with Behavioral Health Provider"
+													description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
+													button={{
+														variant: 'danger',
+														title: 'Cancel Appointment',
+														onClick: () => {
+															window.alert('[TODO]: Show cancel appointment UI.');
+														},
+													}}
+												/>
+											)}
 										</>
 									)}
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (

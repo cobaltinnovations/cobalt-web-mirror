@@ -26,6 +26,7 @@ import MhicOrdersUnassigned from './mhic/orders-unassigned';
 import MhicOrdersAssigned from './mhic/orders-assigned';
 import MhicOrdersClosed from './mhic/orders-closed';
 import PatientConsent from './patient/patient-consent';
+import ConnectWithSupportV2 from '@/pages/connect-with-support-v2';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -45,9 +46,7 @@ const IntegratedCareLandingPage = () => {
 
 				<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
 					<Route index element={<Navigate to="assessment" replace />} />
-
 					<Route path="assessment" element={<MhicOrderAssessment />} />
-
 					<Route path="assessment/:screeningQuestionContextId" element={<ScreeningQuestionsPage />} />
 				</Route>
 
@@ -71,7 +70,7 @@ const IntegratedCareLandingPage = () => {
 				<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
 				<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
 				<Route path="assessment-complete" element={<PatientAssessmentComplete />} />
-				{/* <Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
+				<Route path="connect-with-support/bhp" element={<ConnectWithSupportV2 />} />
 				<Route path="*" element={<NoMatch />} />
 			</Route>
 		</SentryRoutes>

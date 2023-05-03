@@ -129,6 +129,11 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
+	// Scheduled appointment through connect-with-support
+	appointmentId?: string;
+	appointmentStartTime?: string;
+	appointmentStartTimeDescription?: string;
+	providerId?: string;
 	providerName?: string;
 }
 
