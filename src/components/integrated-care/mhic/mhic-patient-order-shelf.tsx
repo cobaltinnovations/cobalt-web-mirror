@@ -4,7 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderAssignmentStatusId, PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
@@ -248,7 +248,8 @@ export const MhicPatientOrderShelf = ({
 								</Button>
 								<div className="mb-2 d-flex align-items-center">
 									<h4 className="mb-0 me-2">{currentPatientOrder?.patientDisplayName}</h4>
-									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.PENDING && (
+									{currentPatientOrder?.patientOrderAssignmentStatusId ===
+										PatientOrderAssignmentStatusId.UNASSIGNED && (
 										<Badge pill bg="outline-primary">
 											New
 										</Badge>

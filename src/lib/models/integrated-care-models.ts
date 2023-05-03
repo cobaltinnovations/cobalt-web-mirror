@@ -13,7 +13,7 @@ export interface OpenPatientOrderCountModel {
 
 export interface PatientOrderModel {
 	patientOrderId: string;
-	patientOrderStatusId: PatientOrderStatusId;
+	patientOrderTriageStatusId: PatientOrderTriageStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
 	patientOrderDispositionDescription: string;
@@ -110,6 +110,9 @@ export interface PatientOrderModel {
 	patientOrderScheduledMessageGroups: PatientOrderScheduledMessageGroup[];
 	connectedToSafetyPlanningAt?: string;
 	connectedToSafetyPlanningAtDescription?: string;
+	patientOrderAssignmentStatusId?: PatientOrderAssignmentStatusId;
+	patientOrderOutreachStatusId?: PatientOrderOutreachStatusId;
+	patientOrderResponseStatusId?: PatientOrderResponseStatusId;
 	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
 	resourcesSentAt?: string;
@@ -149,18 +152,26 @@ export enum PatientOrderClosureReasonId {
 	SCHEDULED_WITH_BHP = 'SCHEDULED_WITH_BHP',
 }
 
-export enum PatientOrderStatusId {
-	PENDING = 'PENDING',
+export enum PatientOrderTriageStatusId {
 	NEEDS_ASSESSMENT = 'NEEDS_ASSESSMENT',
-	SAFETY_PLANNING = 'SAFETY_PLANNING',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	BHP = 'BHP',
 }
 
-export interface PatientOrderStatus {
-	patientOrderStatusId: PatientOrderStatusId;
-	description: string;
+export enum PatientOrderAssignmentStatusId {
+	UNASSIGNED = 'UNASSIGNED',
+	ASSIGNED = 'ASSIGNED',
+}
+
+export enum PatientOrderOutreachStatusId {
+	NO_OUTREACH = 'NO_OUTREACH',
+	HAS_OUTREACH = 'HAS_OUTREACH',
+}
+
+export enum PatientOrderResponseStatusId {
+	WAITING_FOR_RESPONSE = 'WAITING_FOR_RESPONSE',
+	NOT_WAITING_FOR_RESPONSE = 'NOT_WAITING_FOR_RESPONSE',
 }
 
 export enum PatientOrderScreeningStatusId {
@@ -314,8 +325,8 @@ export interface PatientOrderScheduledMessageGroup {
 	}[];
 }
 
-export type PatientOrderCountsByPatientOrderStatusId = Record<
-	PatientOrderStatusId,
+export type PatientOrderCountsByPatientOrderTriageStatusId = Record<
+	PatientOrderTriageStatusId,
 	{
 		patientOrderCountDescription: string;
 		patientOrderCount: number;

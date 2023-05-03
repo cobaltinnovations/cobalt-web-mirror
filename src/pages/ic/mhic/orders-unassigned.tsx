@@ -16,7 +16,7 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderAssignmentStatusId } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
@@ -48,7 +48,7 @@ const MhicOrdersUnassigned = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
-			patientOrderStatusId: PatientOrderStatusId.PENDING,
+			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
 			...(pageNumber && { pageNumber }),
 		});
 	}, [fetchPatientOrders, pageNumber]);

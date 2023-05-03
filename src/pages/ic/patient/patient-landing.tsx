@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
-import { PatientOrderModel, PatientOrderScreeningStatusId, PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderModel, PatientOrderScreeningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
@@ -296,7 +296,7 @@ const PatientLanding = () => {
 											title: 'Review Results',
 										}}
 									/>
-									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
+									{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
 										<>
 											<hr />
 											<NextStepsItem
@@ -318,7 +318,8 @@ const PatientLanding = () => {
 											/>
 										</>
 									)}
-									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (
+									{patientOrder?.patientOrderTriageStatusId ===
+										PatientOrderTriageStatusId.SPECIALTY_CARE && (
 										<>
 											<hr />
 											<NextStepsItem
@@ -397,7 +398,8 @@ const PatientLanding = () => {
 											/>
 										</>
 									)}
-									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SUBCLINICAL && (
+									{patientOrder?.patientOrderTriageStatusId ===
+										PatientOrderTriageStatusId.SUBCLINICAL && (
 										<>
 											<hr />
 											<NextStepsItem
