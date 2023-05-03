@@ -117,6 +117,8 @@ export interface PatientOrderModel {
 	resourcesSentNote?: string;
 	outreachCount?: number;
 	outreachCountDescription?: string;
+	totalOutreachCount?: number;
+	totalOutreachCountDescription?: string;
 	patientOrderCareTypeId?: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription?: string;
 	mostRecentScreeningSessionId: string;
