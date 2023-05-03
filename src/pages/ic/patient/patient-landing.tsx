@@ -296,6 +296,9 @@ const PatientLanding = () => {
 										button={{
 											variant: 'outline-primary',
 											title: 'Review Results',
+											onClick: () => {
+												navigate('/ic/patient/assessment-results');
+											},
 										}}
 									/>
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
