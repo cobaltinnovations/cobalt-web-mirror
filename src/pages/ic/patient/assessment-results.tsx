@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
-import { PatientOrderModel, PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderModel, PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import useAccount from '@/hooks/use-account';
@@ -30,7 +30,7 @@ export const PatientAssessmentResults = () => {
 					>
 						<h1 className="mb-6">Assessment Results</h1>
 
-						{patientOrder?.patientOrderStatusId === PatientOrderStatusId.BHP && (
+						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
 							<>
 								<p className="mb-6 fs-large">
 									Based on the symptoms reported and your provider's request, we recommend that you
@@ -71,7 +71,7 @@ export const PatientAssessmentResults = () => {
 							</>
 						)}
 
-						{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (
+						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
 							<>
 								<p className="mb-6 fs-large">
 									Based on the symptoms reported and your provider's request, we would like to set you
@@ -104,7 +104,7 @@ export const PatientAssessmentResults = () => {
 							</>
 						)}
 
-						{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SUBCLINICAL && (
+						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
 							<>
 								{subclinicalInterested ? (
 									<>
@@ -156,7 +156,8 @@ export const PatientAssessmentResults = () => {
 							</>
 						)}
 
-						{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SAFETY_PLANNING && (
+						{patientOrder?.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
 							<>
 								<p className="mb-6 fs-large">Safety Planning Message</p>
 								<p className="mb-6 fs-large">Safety Planning Actions</p>
