@@ -154,8 +154,8 @@ const PatientLanding = () => {
 									>
 										<Container fluid>
 											<Row>
-												<Col>
-													<Card bsPrefix="ic-card">
+												<Col md={6} className="mb-6 mb-md-0">
+													<Card bsPrefix="ic-card" className="h-100">
 														<Card.Header className="bg-white">
 															<Card.Title>Online (Recommended)</Card.Title>
 														</Card.Header>
@@ -175,22 +175,24 @@ const PatientLanding = () => {
 														</Card.Body>
 													</Card>
 												</Col>
-												<Col>
-													<Card bsPrefix="ic-card">
+												<Col md={6}>
+													<Card bsPrefix="ic-card" className="h-100">
 														<Card.Header className="bg-white">
 															<Card.Title>By Phone</Card.Title>
 														</Card.Header>
 														<Card.Body>
 															<p className="mb-5">
-																Call us at 215-615-4222 Monday-Friday, 9am to 4pm and a
-																Mental Health Intake Coordinator will guide you through
-																the assessment over the phone.
+																Call us at{' '}
+																{institution?.integratedCarePhoneNumberDescription}{' '}
+																Monday-Friday, 9am to 4pm and a Mental Health Intake
+																Coordinator will guide you through the assessment over
+																the phone.
 															</p>
 															<Button
+																as="a"
+																className="d-inline-block text-decoration-none"
 																variant="outline-primary"
-																onClick={() => {
-																	window.alert('[TODO]');
-																}}
+																href={`tel:${institution?.integratedCarePhoneNumber}`}
 															>
 																Call Us
 															</Button>
@@ -218,7 +220,7 @@ const PatientLanding = () => {
 							<NoData
 								className="mb-10 bg-white"
 								title="No further action required"
-								description="You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at 215-615-4222 if you change your mind."
+								description={`You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at ${institution?.integratedCarePhoneNumberDescription} if you change your mind.`}
 								actions={[]}
 							/>
 							<hr />
@@ -332,80 +334,95 @@ const PatientLanding = () => {
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE && (
 										<>
 											<hr />
-											<NextStepsItem
-												title="Review resources & schedule appointment"
-												description={`Check ${
-													institution?.myChartName ?? 'MyChart'
-												} or call us for resources about available [Provider Type]s in your area.`}
-											>
-												<Container fluid>
-													<Row>
-														<Col>
-															<Card bsPrefix="ic-card">
-																<Card.Header className="bg-white">
-																	<Card.Title>
-																		Check {institution?.myChartName ?? 'MyChart'}
-																	</Card.Title>
-																</Card.Header>
-																<Card.Body>
-																	<p className="mb-5">
-																		A Mental Health Intake Coordinator will review
-																		your results and send a list of resources that
-																		work with your insurance within the next 24
-																		hours. Please check{' '}
-																		{institution?.myChartName ?? 'MyChart'} for more
-																		details.
-																	</p>
-																	<Button
-																		className="d-flex align-items-center"
-																		onClick={() => {
-																			window.alert('[TODO]');
-																		}}
-																	>
-																		Visit {institution?.myChartName ?? 'MyChart'}
-																		<ExternalIcon
-																			className="ms-2"
-																			width={20}
-																			height={20}
-																		/>
-																	</Button>
-																</Card.Body>
-															</Card>
-														</Col>
-														<Col>
-															<Card bsPrefix="ic-card">
-																<Card.Header className="bg-white">
-																	<Card.Title>Call Us</Card.Title>
-																</Card.Header>
-																<Card.Body>
-																	<p className="mb-5">
-																		Feel free to call us at{' '}
-																		{institution?.integratedCarePhoneNumberDescription ??
-																			'N/A'}{' '}
-																		if you do not receive the{' '}
-																		{institution?.myChartName ?? 'MyChart'} message
-																		or if you wish to speak to a Mental Health
-																		Intake Coordinator about your options.
-																	</p>
-																	<Button
-																		variant="outline-primary"
-																		onClick={() => {
-																			window.alert('[TODO]');
-																		}}
-																	>
-																		Call Us
-																	</Button>
-																</Card.Body>
-															</Card>
-														</Col>
-													</Row>
-												</Container>
-											</NextStepsItem>
-											<hr />
-											<NextStepsItem
-												title="Attend appointment"
-												description={`You indicated that you attended an appointment on [Date] at [Time] with [Provider Name].`}
-											/>
+											{!patientOrder.appointmentId ? (
+												<NextStepsItem
+													title="Review resources & schedule appointment"
+													description={`Check ${
+														institution?.myChartName ?? 'MyChart'
+													} or call us for resources about available providers in your area.`}
+												>
+													<Container fluid>
+														<Row>
+															<Col md={6} className="mb-6 mb-md-0">
+																<Card bsPrefix="ic-card" className="h-100">
+																	<Card.Header className="bg-white">
+																		<Card.Title>
+																			Check{' '}
+																			{institution?.myChartName ?? 'MyChart'}
+																		</Card.Title>
+																	</Card.Header>
+																	<Card.Body>
+																		<p className="mb-5">
+																			A Mental Health Intake Coordinator will
+																			review your results and send a list of
+																			resources that work with your insurance
+																			within the next 24 hours. Please check{' '}
+																			{institution?.myChartName ?? 'MyChart'} for
+																			more details.
+																		</p>
+																		<Button
+																			className="d-flex align-items-center"
+																			onClick={() => {
+																				window.alert(
+																					'[TODO]: Need a "MyChart" url to link to.'
+																				);
+																			}}
+																		>
+																			Visit{' '}
+																			{institution?.myChartName ?? 'MyChart'}
+																			<ExternalIcon
+																				className="ms-2"
+																				width={20}
+																				height={20}
+																			/>
+																		</Button>
+																	</Card.Body>
+																</Card>
+															</Col>
+															<Col md={6}>
+																<Card bsPrefix="ic-card" className="h-100">
+																	<Card.Header className="bg-white">
+																		<Card.Title>Call Us</Card.Title>
+																	</Card.Header>
+																	<Card.Body>
+																		<p className="mb-5">
+																			Feel free to call us at{' '}
+																			{institution?.integratedCarePhoneNumberDescription ??
+																				'N/A'}{' '}
+																			if you do not receive the{' '}
+																			{institution?.myChartName ?? 'MyChart'}{' '}
+																			message or if you wish to speak to a Mental
+																			Health Intake Coordinator about your
+																			options.
+																		</p>
+																		<Button
+																			variant="outline-primary"
+																			onClick={() => {
+																				window.alert('[TODO]');
+																			}}
+																		>
+																			Call Us
+																		</Button>
+																	</Card.Body>
+																</Card>
+															</Col>
+														</Row>
+													</Container>
+												</NextStepsItem>
+											) : (
+												<>
+													<NextStepsItem
+														complete
+														title="Review resources & schedule appointment"
+														description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}. If you need to cancel this appointment...`}
+													/>
+													<hr />
+													<NextStepsItem
+														title="Attend appointment"
+														description={`You indicated that you attended an appointment on [Date] at [Time] with [Provider Name].`}
+													/>
+												</>
+											)}
 										</>
 									)}
 									{patientOrder?.patientOrderStatusId === PatientOrderStatusId.SUBCLINICAL && (
@@ -415,7 +432,7 @@ const PatientLanding = () => {
 												title="Review resources & schedule appointment"
 												description={`Check ${
 													institution?.myChartName ?? 'MyChart'
-												} or call us for resources about available [Provider Type]s in your area.`}
+												} or call us for resources about available providers in your area.`}
 											/>
 										</>
 									)}
