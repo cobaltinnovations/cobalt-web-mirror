@@ -254,7 +254,7 @@ const PatientLanding = () => {
 										<NoData
 											className="bg-white"
 											title="Continue Assessment"
-											description="You previously made progress on the assessment. If now is a good time, we can restart from where you left off. Before we continue, please make sure you are in a comfortable place."
+											description="You previously made progress on the assessment. If now is a good time, we can start from where you left off. Before we continue, please make sure you are in a comfortable place."
 											actions={[
 												{
 													variant: 'primary',
@@ -423,7 +423,7 @@ const PatientLanding = () => {
 													<NextStepsItem
 														complete
 														title="Review resources & schedule appointment"
-														description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}. If you need to cancel this appointment...`}
+														description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}. If you need to cancel this appointment... [TODO]`}
 													/>
 													<hr />
 													<NextStepsItem
