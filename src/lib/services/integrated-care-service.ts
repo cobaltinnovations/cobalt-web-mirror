@@ -6,7 +6,7 @@ import {
 	PatientOrderAutocompleteResult,
 	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
-	PatientOrderCountsByPatientOrderStatusId,
+	PatientOrderCountsByPatientOrderTriageStatusId,
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
@@ -14,7 +14,7 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
 	PatientOrderScheduledScreening,
-	PatientOrderStatusId,
+	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
 
@@ -26,7 +26,13 @@ export interface PatientOrderResponse {
 	};
 	activePatientOrdersCount: number;
 	activePatientOrdersCountDescription: string;
-	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderStatusId, PatientOrderCountModel>;
+	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderTriageStatusId, PatientOrderCountModel>;
+}
+
+export interface PatientOrderPanelCountsResponse {
+	patientOrderCountsByPatientOrderTriageStatusId: PatientOrderCountsByPatientOrderTriageStatusId;
+	safetyPlanningPatientOrderCount: number;
+	safetyPlanningPatientOrderCountDescription: string;
 }
 
 export interface PanelAccountsResponse {
@@ -81,7 +87,11 @@ export const integratedCareService = {
 		});
 	},
 	getPatientOrders(queryParameters?: {
-		patientOrderStatusId?: string | string[];
+		patientOrderTriageStatusId?: string | string[];
+		patientOrderAssignmentStatusId?: string;
+		patientOrderOutreachStatusId?: string;
+		patientOrderResponseStatusId?: string;
+		patientOrderSafetyPlanningStatusId?: string;
 		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
@@ -101,9 +111,7 @@ export const integratedCareService = {
 		});
 	},
 	getPanelCounts(queryParameters?: { panelAccountId?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			patientOrderCountsByPatientOrderStatusId: PatientOrderCountsByPatientOrderStatusId;
-		}>({
+		return httpSingleton.orchestrateRequest<PatientOrderPanelCountsResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/integrated-care/panel-counts', queryParameters),
 		});
