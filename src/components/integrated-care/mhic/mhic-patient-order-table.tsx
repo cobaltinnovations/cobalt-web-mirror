@@ -381,7 +381,9 @@ export const MhicPatientOrderTable = ({
 									)}
 									{columnConfig.assessmentScheduled && (
 										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
+											<span className="text-nowrap text-truncate">
+												{po.patientOrderScheduledScreeningScheduledDateTimeDescription}
+											</span>
 										</TableCell>
 									)}
 									{columnConfig.assessmentCompleted && (
