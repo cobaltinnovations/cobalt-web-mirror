@@ -26,6 +26,7 @@ export * from './mhic-page-header';
 export * from './mhic-patient-order-shelf';
 export * from './mhic-patient-order-table';
 export * from './mhic-resources-modal';
+export * from './mhic-safety-planning-modal';
 export * from './mhic-schedule-assessment-modal';
 export * from './mhic-sort-dropdown';
 export * from './mhic-triage-card';

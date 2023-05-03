@@ -2,6 +2,7 @@ import { badge, button, card, form, modal, screeningButtonGroup, surveyForm } fr
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
+import closeIcon from '@/assets/icons/icon-search-close.svg';
 
 export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -75,6 +76,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
+		},
+		'.text-left': {
+			textAlign: 'left',
 		},
 		'.text-right': {
 			textAlign: 'right',
@@ -375,16 +379,17 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				...theme.fonts.headingNormal,
 			},
 			'& .rbt-token': {
-				height: 24,
+				height: 28,
 				...theme.fonts.default,
 				flexShrink: 0,
-				marginRight: 5,
-				marginBottom: 5,
+				marginRight: 2,
+				marginBottom: 2,
 				borderRadius: 500,
 				color: theme.colors.n900,
 				alignItems: 'center',
 				display: 'inline-flex',
 				padding: '0 4px 0 10px',
+				backgroundColor: theme.colors.n50,
 				border: `1px solid ${theme.colors.border}`,
 				'&:focus-visible': {
 					outline: 'none',
@@ -394,16 +399,25 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			'& .rbt-close': {
 				width: 18,
 				height: 18,
-				marginTop: -2,
+				opacity: 0.4,
+				fontSize: 0,
+				lineHeight: 0,
+				marginLeft: 4,
 				display: 'flex',
-				color: theme.colors.n900,
-				alignItems: 'center',
-				justifyContent: 'center',
-				backgroundColor: 'transparent',
+				background: 'none',
+				maskPosition: 'center',
+				maskRepeat: 'no-repeat',
+				maskImage: `url(${closeIcon})`,
+				backgroundColor: theme.colors.n900,
+			},
+			'& .rbt-close-content': {
+				display: 'none',
 			},
 			'& .rbt-menu': {
 				padding: 0,
 				marginTop: 1,
+				borderRadius: 5,
+				boxShadow: theme.elevation.e200,
 				'& .dropdown-item': {
 					...theme.fonts.default,
 					color: theme.colors.n900,

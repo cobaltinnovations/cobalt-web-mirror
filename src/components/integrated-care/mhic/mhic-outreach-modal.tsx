@@ -11,6 +11,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -37,6 +38,7 @@ export const MhicOutreachModal: FC<Props> = ({
 	onSave,
 	...props
 }) => {
+	const { institution } = useAccount();
 	const handleError = useHandleError();
 	const classes = useStyles();
 	const { addFlag } = useFlags();
@@ -50,10 +52,10 @@ export const MhicOutreachModal: FC<Props> = ({
 
 	const modalTitleByOutreachTypeId = useMemo(
 		() => ({
-			[PatientOrderOutreachTypeId.MYCHART_MESSAGE]: 'MyPennMedicine Message',
+			[PatientOrderOutreachTypeId.MYCHART_MESSAGE]: `${institution?.myChartName ?? 'MyChart'} Message`,
 			[PatientOrderOutreachTypeId.PHONE_CALL]: 'Call',
 		}),
-		[]
+		[institution?.myChartName]
 	);
 
 	const resultSelectLabelByOutreachTypeId = useMemo(

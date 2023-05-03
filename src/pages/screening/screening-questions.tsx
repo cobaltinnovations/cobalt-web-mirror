@@ -9,6 +9,8 @@ import {
 	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
+	UserExperienceTypeId,
+	ScreeningSessionDestinationId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -17,15 +19,20 @@ import { useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 import classNames from 'classnames';
+import useAccount from '@/hooks/use-account';
+import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [screeningQuestionContextResponse, setScreeningQuestionContextResponse] =
 		useState<ScreeningQuestionContextResponse>();
 
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
+	const [showCrisisModal, setShowCrisisModal] = useState(false);
+	const [navigateNext, setNavigateNext] = useState<() => void>();
 
 	const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
@@ -91,10 +98,35 @@ const ScreeningQuestionsPage = () => {
 			submit
 				.fetch()
 				.then((r) => {
-					if (r.nextScreeningQuestionContextId) {
-						navigateToQuestion(r.nextScreeningQuestionContextId);
-					} else if (r.screeningSessionDestination) {
-						navigateToDestination(r.screeningSessionDestination);
+					const goToNext = () => {
+						if (r.nextScreeningQuestionContextId) {
+							navigateToQuestion(r.nextScreeningQuestionContextId);
+						} else if (r.screeningSessionDestination) {
+							let actualDestinationId = r.screeningSessionDestination.screeningSessionDestinationId;
+
+							if (
+								institution?.integratedCareEnabled &&
+								institution?.userExperienceTypeId === UserExperienceTypeId.PATIENT
+							) {
+								actualDestinationId =
+									ScreeningSessionDestinationId.IC_PATIENT_SCREENING_SESSION_RESULTS;
+							}
+							navigateToDestination({
+								...r.screeningSessionDestination,
+								screeningSessionDestinationId: actualDestinationId,
+							});
+						}
+					};
+
+					if (
+						institution?.integratedCareEnabled &&
+						!screeningQuestionContextResponse?.screeningSession.crisisIndicated &&
+						r.screeningSession.crisisIndicated
+					) {
+						setNavigateNext(() => goToNext);
+						setShowCrisisModal(true);
+					} else {
+						goToNext();
 					}
 				})
 				.catch((e) => {
@@ -111,7 +143,15 @@ const ScreeningQuestionsPage = () => {
 					setIsSubmitting(false);
 				});
 		},
-		[handleError, navigateToDestination, navigateToQuestion, screeningQuestionContextId]
+		[
+			handleError,
+			institution?.integratedCareEnabled,
+			institution?.userExperienceTypeId,
+			navigateToDestination,
+			navigateToQuestion,
+			screeningQuestionContextId,
+			screeningQuestionContextResponse?.screeningSession.crisisIndicated,
+		]
 	);
 
 	useEffect(() => {
@@ -380,6 +420,17 @@ const ScreeningQuestionsPage = () => {
 
 	return (
 		<AsyncPage fetchData={fetchData}>
+			{institution?.integratedCareEnabled && (
+				<IcScreeningCrisisModal
+					show={showCrisisModal}
+					onHide={() => {
+						setShowCrisisModal(false);
+						navigateNext?.();
+						setNavigateNext(undefined);
+					}}
+				/>
+			)}
+
 			<Container className="py-5">
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>

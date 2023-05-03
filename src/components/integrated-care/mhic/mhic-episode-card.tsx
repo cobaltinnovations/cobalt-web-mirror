@@ -115,7 +115,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 							</Row>
 							<Row>
 								<Col xs={3}>
-									<p className="m-0">Closure Reaseon</p>
+									<p className="m-0">Closure Reason</p>
 								</Col>
 								<Col xs={9}>
 									<p className="m-0 text-gray">{patientOrder.patientOrderClosureReasonDescription}</p>
@@ -133,6 +133,17 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 										variant="warning"
 										title="Order Flagged"
 										description="Patient under 18"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.mostRecentEpisodeClosedWithinDateThreshold && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Episode closed within date threshold"
 									/>
 								</Col>
 							</Row>
@@ -170,7 +181,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 								<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
 							</Col>
 						</Row>
-						<Row className="mb-4">
+						{/* <Row className="mb-4">
 							<Col xs={3}>
 								<p className="m-0 text-gray">Authorizing Provider</p>
 							</Col>
@@ -179,7 +190,7 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 									<span className="text-danger">[TODO]: Authorizing Provider Name</span>
 								</p>
 							</Col>
-						</Row>
+						</Row> */}
 						<Row>
 							<Col xs={3}>
 								<p className="m-0 text-gray">Billing Provider</p>

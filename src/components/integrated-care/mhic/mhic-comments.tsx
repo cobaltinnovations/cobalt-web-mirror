@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -37,8 +37,13 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const classes = useStyles();
+	const textareaRef = useRef<HTMLInputElement>(null);
 	const [commentInputValue, setCommentInputValue] = useState('');
 	const [commentToEdit, setCommentToEdit] = useState<PatientOrderNoteModel>();
+
+	useEffect(() => {
+		textareaRef.current?.focus();
+	}, []);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -172,6 +177,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				<div className={classes.inputOuter}>
 					<Form onSubmit={handleFormSubmit}>
 						<InputHelper
+							ref={textareaRef}
 							className="mb-4"
 							as="textarea"
 							label="Comment"

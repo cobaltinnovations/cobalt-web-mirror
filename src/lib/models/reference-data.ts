@@ -1,4 +1,4 @@
-import { PatientOrderDisposition, PatientOrderStatus } from './integrated-care-models';
+import { PatientOrderDispositionId, PatientOrderTriageStatusId } from './integrated-care-models';
 
 interface BirthSex {
 	birthSexId: string;
@@ -17,6 +17,11 @@ export interface Ethnicity {
 
 export interface GenderIdentity {
 	genderIdentityId: string;
+	description: string;
+}
+
+export interface PatientOrderDisposition {
+	patientOrderDispositionId: PatientOrderDispositionId;
 	description: string;
 }
 
@@ -48,8 +53,9 @@ interface TimeZone {
 
 export interface ScreeningType {
 	description: string;
+	overallScoreMaximum: number;
+	overallScoreMaximumDescription: string;
 	screeningTypeId: string;
-	overallScoreMaximum: 20;
 }
 
 export enum PatientOrderOutreachTypeId {
@@ -72,6 +78,16 @@ export interface PatientOrderScheduledMessageType {
 	patientOrderScheduledMessageTypeId: string;
 }
 
+export interface PatientOrderCareType {
+	description: string;
+	patientOrderCareTypeId: string;
+}
+
+export interface PatientOrderFocusType {
+	description: string;
+	patientOrderFocusTypeId: string;
+}
+
 export interface ReferenceDataResponse {
 	birthSexes: BirthSex[];
 	countries: Country[];
@@ -79,10 +95,12 @@ export interface ReferenceDataResponse {
 	genderIdentities: GenderIdentity[];
 	insurances: Insurance[];
 	languages: Language[];
+	patientOrderCareTypes: PatientOrderCareType[];
 	patientOrderDispositions: PatientOrderDisposition[];
+	patientOrderFocusTypes: PatientOrderFocusType[];
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
-	patientOrderStatuses: PatientOrderStatus[];
+	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];
 	races: Race[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];

@@ -136,9 +136,7 @@ export const MhicContactHistory = ({ patientOrder, referenceData, onPatientOrder
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">
 									Contact History{' '}
-									<span className="text-gray">
-										({(patientOrder.patientOrderOutreaches ?? []).length})
-									</span>
+									<span className="text-gray">({patientOrder.totalOutreachCountDescription})</span>
 								</h4>
 								<div className="d-flex align-items-center">
 									<Dropdown>

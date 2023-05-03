@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicCustomizeTableModal,
@@ -12,7 +12,8 @@ import {
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import useAccount from '@/hooks/use-account';
-import { PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicMyPatients = () => {
 	const { account } = useAccount();
@@ -24,23 +25,32 @@ const MhicMyPatients = () => {
 		totalCountDescription,
 	} = useFetchPatientOrders();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 
 	const accountId = account?.accountId;
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
-	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
+	const patientOrderTriageStatusId = searchParams.get('patientOrderTriageStatusId');
+	const patientOrderSafetyPlanningStatusId = searchParams.get('patientOrderSafetyPlanningStatusId');
 
-	useEffect(() => {
+	const fetchData = useCallback(() => {
 		fetchPatientOrders({
 			...(accountId && { panelAccountId: accountId }),
-			...(patientOrderStatusId && { patientOrderStatusId }),
-			...(patientOrderDispositionId && { patientOrderDispositionId }),
+			...(patientOrderTriageStatusId && { patientOrderTriageStatusId }),
+			...(patientOrderSafetyPlanningStatusId && { patientOrderSafetyPlanningStatusId }),
 			...(pageNumber && { pageNumber }),
 			pageSize: '15',
 		});
-	}, [accountId, fetchPatientOrders, pageNumber, patientOrderDispositionId, patientOrderStatusId]);
+	}, [accountId, fetchPatientOrders, pageNumber, patientOrderSafetyPlanningStatusId, patientOrderTriageStatusId]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchData);
+	}, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -50,14 +60,12 @@ const MhicMyPatients = () => {
 		[searchParams, setSearchParams]
 	);
 
-	const pageTitleMap: Record<PatientOrderStatusId, string> = {
-		[PatientOrderStatusId.BHP]: 'BHP',
-		[PatientOrderStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
-		[PatientOrderStatusId.PENDING]: 'Pending',
-		[PatientOrderStatusId.SAFETY_PLANNING]: 'Safety Planning',
-		[PatientOrderStatusId.SCHEDULED]: 'Scheduled',
-		[PatientOrderStatusId.SPECIALTY_CARE]: 'Specialty Care',
-		[PatientOrderStatusId.SUBCLINICAL]: 'Subclinical',
+	const pageTitleMap: Record<string, string> = {
+		all: 'All Assigned',
+		[PatientOrderTriageStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
+		[PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING]: 'Safety Planning',
+		[PatientOrderTriageStatusId.BHP]: 'BHP',
+		[PatientOrderTriageStatusId.SPECIALTY_CARE]: 'Specialty Care',
 	};
 
 	return (
@@ -77,9 +85,7 @@ const MhicMyPatients = () => {
 					<Col>
 						<MhicPageHeader
 							title={
-								patientOrderStatusId
-									? pageTitleMap[patientOrderStatusId as PatientOrderStatusId]
-									: 'All Assigned'
+								pageTitleMap[patientOrderTriageStatusId ?? patientOrderSafetyPlanningStatusId ?? 'all']
 							}
 							description={`${totalCountDescription ?? 0} Patients`}
 						>

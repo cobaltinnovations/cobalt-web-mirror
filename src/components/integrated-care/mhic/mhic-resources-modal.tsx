@@ -11,6 +11,7 @@ import useFlags from '@/hooks/use-flags';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -28,6 +29,7 @@ interface Props extends ModalProps {
 
 export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [isSaving, setIsSaving] = useState(false);
@@ -92,7 +94,9 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
-					<p className="mb-4 fw-semibold">Confirm resources have been sent through MyPennMedicine</p>
+					<p className="mb-4 fw-semibold">
+						Confirm resources have been sent through {institution?.myChartName ?? 'MyChart'}
+					</p>
 					<p className="mb-4">
 						A check-in message will be scheduled automatically based on the date the resources were marked
 						as sent.

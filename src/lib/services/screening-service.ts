@@ -4,6 +4,7 @@ import {
 	ScreeningQuestionContextResponse,
 	ScreeningSession,
 	ScreeningSessionDestination,
+	ScreeningType,
 } from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
@@ -79,6 +80,7 @@ export const screeningService = {
 			screeningAnswers: ScreeningAnswer[];
 			nextScreeningQuestionContextId?: string;
 			screeningSessionDestination?: ScreeningSessionDestination;
+			screeningSession: ScreeningSession;
 		}>({
 			method: 'post',
 			url: '/screening-answers',
@@ -96,6 +98,15 @@ export const screeningService = {
 		}>({
 			method: 'GET',
 			url: `/screening-flows/${screeningFlowId}/session-fully-completed`,
+		});
+	},
+
+	getPossibleScreeningTypesForFlowVersionId(screeningFlowVersionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			screeningType: ScreeningType[];
+		}>({
+			method: 'GET',
+			url: `/screening-flow-versions/${screeningFlowVersionId}/screening-types`,
 		});
 	},
 };

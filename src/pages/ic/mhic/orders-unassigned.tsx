@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -16,17 +16,50 @@ import { integratedCareService } from '@/lib/services';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { PatientOrderStatusId } from '@/lib/models';
+import {
+	PatientOrderAssignmentStatusId,
+	PatientOrderOutreachStatusId,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderTriageStatusId,
+} from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
+import { MhicLayoutContext } from './mhic-layout';
+
+const uiTabToApiQueryMap = {
+	NO_OUTREACH: {
+		patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
+	},
+
+	WAITING_FOR_CONSENT: {
+		// TODO: WAITING_FOR_CONSENT query
+	},
+
+	NEED_ASSESSMENT: {
+		patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+	},
+
+	SAFETY_PLANNING: {
+		patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+	},
+
+	BHP: {
+		patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
+	},
+
+	SPECIALTY_CARE: {
+		patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+	},
+};
 
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
-	const filterBy = useMemo(() => searchParams.get('filterBy') ?? 'NO_OUTREACH', [searchParams]);
+	const filterBy = (searchParams.get('filterBy') ?? 'NO_OUTREACH') as keyof typeof uiTabToApiQueryMap;
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -46,10 +79,11 @@ const MhicOrdersUnassigned = () => {
 	const fetchTableData = useCallback(() => {
 		return fetchPatientOrders({
 			pageSize: '15',
-			patientOrderStatusId: PatientOrderStatusId.PENDING,
+			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
+			...uiTabToApiQueryMap[filterBy],
 			...(pageNumber && { pageNumber }),
 		});
-	}, [fetchPatientOrders, pageNumber]);
+	}, [fetchPatientOrders, filterBy, pageNumber]);
 
 	const handleImportButtonChange = useCallback(
 		(file: File) => {
@@ -120,6 +154,10 @@ const MhicOrdersUnassigned = () => {
 		fetchTableData();
 	}, [fetchTableData]);
 
+	useEffect(() => {
+		setMainViewRefresher(() => fetchTableData);
+	}, [fetchTableData, setMainViewRefresher]);
+
 	return (
 		<>
 			<MhicGenerateOrdersModal
@@ -154,7 +192,7 @@ const MhicOrdersUnassigned = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Unassigned"
-							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
+							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
 						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
@@ -195,16 +233,24 @@ const MhicOrdersUnassigned = () => {
 									value: 'NO_OUTREACH',
 								},
 								{
-									title: 'Waiting for Response',
-									value: 'WAITING_FOR_RESPONSE',
+									title: 'Waiting for Consent',
+									value: 'WAITING_FOR_CONSENT',
+								},
+								{
+									title: 'Need Assessment',
+									value: 'NEED_ASSESSMENT',
 								},
 								{
 									title: 'Safety Planning',
 									value: 'SAFETY_PLANNING',
 								},
 								{
-									title: 'Assessment Complete',
-									value: 'ASSESSMENT_COMPLETE',
+									title: 'BHP',
+									value: 'BHP',
+								},
+								{
+									title: 'Specialty Care',
+									value: 'SPECIALTY_CARE',
 								},
 							]}
 							onTabClick={(value) => {
@@ -218,7 +264,8 @@ const MhicOrdersUnassigned = () => {
 					<Col>
 						<MhicPatientOrderTable
 							isLoading={isLoadingOrders}
-							patientOrders={patientOrders}
+							// TODO: WAITING_FOR_CONSENT query
+							patientOrders={filterBy === 'WAITING_FOR_CONSENT' ? [] : patientOrders}
 							selectAll={selectAll}
 							onSelectAllChange={setSelectAll}
 							selectedPatientOrderIds={selectedPatientOrderIds}

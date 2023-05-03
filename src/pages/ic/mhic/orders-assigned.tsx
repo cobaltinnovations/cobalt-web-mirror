@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicAssignOrderModal,
@@ -14,13 +14,15 @@ import useHandleError from '@/hooks/use-handle-error';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderAssignmentStatusId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersAssigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -39,14 +41,7 @@ const MhicOrdersAssigned = () => {
 		return fetchPatientOrders({
 			pageSize: '15',
 			...(pageNumber && { pageNumber }),
-			patientOrderStatusId: [
-				PatientOrderStatusId.NEEDS_ASSESSMENT,
-				PatientOrderStatusId.SCHEDULED,
-				PatientOrderStatusId.SAFETY_PLANNING,
-				PatientOrderStatusId.SPECIALTY_CARE,
-				PatientOrderStatusId.SUBCLINICAL,
-				PatientOrderStatusId.BHP,
-			],
+			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.ASSIGNED,
 		});
 	}, [fetchPatientOrders, pageNumber]);
 
@@ -88,6 +83,10 @@ const MhicOrdersAssigned = () => {
 		fetchTableData();
 	}, [fetchTableData]);
 
+	useEffect(() => {
+		setMainViewRefresher(() => fetchTableData);
+	}, [fetchTableData, setMainViewRefresher]);
+
 	return (
 		<>
 			<MhicAssignOrderModal
@@ -106,7 +105,7 @@ const MhicOrdersAssigned = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Assigned Orders"
-							description={`${totalCountDescription} Order${totalCount === 1 ? '' : 's'}`}
+							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
 						>
 							<div className="d-flex align-items-center">
 								<Button

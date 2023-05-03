@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { AsyncTypeahead, Menu } from 'react-bootstrap-typeahead';
 import MenuItem, { MenuItemProps } from 'react-bootstrap-typeahead/types/components/MenuItem';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	searchInput: {
@@ -170,14 +170,6 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 					/>
 				);
 			}}
-			onChange={([selectedResult]) => {
-				const params = new URLSearchParams(searchParams);
-
-				// params.set('openPatientOrderId', selectedResult.patientOrderId);
-				params.set('openPatientOrderId', 'TODO');
-
-				setSearchParams(params);
-			}}
 			newSelectionPrefix={null}
 			renderMenu={(
 				_,
@@ -213,7 +205,9 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 										return null;
 									}
 
-									return <PatientSearchResult key={index} option={result} position={index} />;
+									return (
+										<PatientSearchResult openShelf key={index} option={result} position={index} />
+									);
 								})}
 							</>
 						)}
@@ -261,12 +255,31 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 };
 
 interface PatientSearchResultProps extends MenuItemProps {
-	option: PatientOrderAutocompleteResult;
+	option: PatientOrderAutocompleteResult & { patientOrderId?: string };
+	openShelf?: boolean;
 }
 
-const PatientSearchResult = ({ option, ...itemProps }: PatientSearchResultProps) => {
+const PatientSearchResult = ({ option, openShelf, ...itemProps }: PatientSearchResultProps) => {
+	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	return (
-		<MenuItem option={option} {...itemProps} className="d-flex justify-content-between">
+		<MenuItem
+			option={option}
+			{...itemProps}
+			className="d-flex justify-content-between"
+			onClick={(e) => {
+				if (openShelf && option.patientOrderId) {
+					searchParams.set('openPatientOrderId', option.patientOrderId);
+					setSearchParams(searchParams);
+				} else {
+					navigate({
+						pathname: '/ic/mhic/orders/search',
+						search: '?patientMrn=' + option.patientMrn,
+					});
+				}
+			}}
+		>
 			<div>
 				<p className="mb-0">{option.patientDisplayName}</p>
 				<p className="mb-0 text-gray">{option.patientMrn}</p>

@@ -31,6 +31,7 @@ enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
 	APPOINTMENT_TIME_IDS = 'appointmentTimeIds',
 	INSTITUTION_LOCATION_ID = 'institutionLocationId',
+	PATIENT_ORDER_ID = 'patientOrderId',
 }
 
 const ConnectWithSupportV2 = () => {
@@ -47,6 +48,7 @@ const ConnectWithSupportV2 = () => {
 		() => searchParams.get(SEARCH_PARAMS.INSTITUTION_LOCATION_ID),
 		[searchParams]
 	);
+	const patientOrderId = useMemo(() => searchParams.get(SEARCH_PARAMS.PATIENT_ORDER_ID), [searchParams]);
 
 	const [selectedStartDate, setSelectedStartDate] = useState<Date>(
 		startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date()
@@ -63,10 +65,9 @@ const ConnectWithSupportV2 = () => {
 
 	const { setAppointmentTypes, setEpicDepartments, isEligible, setIsEligible } = useContext(BookingContext);
 
-	const featureDetails = useMemo(
-		() => (institution?.features ?? []).find((feature) => pathname === feature.urlName),
-		[institution?.features, pathname]
-	);
+	const featureDetails = useMemo(() => {
+		return (institution?.features ?? []).find((feature) => pathname.includes(feature.urlName));
+	}, [institution?.features, pathname]);
 
 	/* --------------------------------------------------- */
 	/* Employer modal check  */

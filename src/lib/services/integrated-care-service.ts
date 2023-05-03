@@ -6,12 +6,15 @@ import {
 	PatientOrderAutocompleteResult,
 	PatientOrderClosureReasonModel,
 	PatientOrderCountModel,
-	PatientOrderCountsByPatientOrderStatusId,
+	PatientOrderCountsByPatientOrderTriageStatusId,
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
-	PatientOrderStatusId,
+	PatientOrderScheduledScreening,
+	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
 
@@ -23,7 +26,13 @@ export interface PatientOrderResponse {
 	};
 	activePatientOrdersCount: number;
 	activePatientOrdersCountDescription: string;
-	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderStatusId, PatientOrderCountModel>;
+	activePatientOrderCountsByPatientOrderStatusId: Record<PatientOrderTriageStatusId, PatientOrderCountModel>;
+}
+
+export interface PatientOrderPanelCountsResponse {
+	patientOrderCountsByPatientOrderTriageStatusId: PatientOrderCountsByPatientOrderTriageStatusId;
+	safetyPlanningPatientOrderCount: number;
+	safetyPlanningPatientOrderCountDescription: string;
 }
 
 export interface PanelAccountsResponse {
@@ -78,10 +87,15 @@ export const integratedCareService = {
 		});
 	},
 	getPatientOrders(queryParameters?: {
-		patientOrderStatusId?: string | string[];
+		patientOrderTriageStatusId?: string | string[];
+		patientOrderAssignmentStatusId?: string;
+		patientOrderOutreachStatusId?: string;
+		patientOrderResponseStatusId?: string;
+		patientOrderSafetyPlanningStatusId?: string;
 		patientOrderDispositionId?: string | string[];
 		panelAccountId?: string;
 		patientMrn?: string;
+		searchQuery?: string;
 		pageNumber?: string;
 		pageSize?: string;
 	}) {
@@ -97,9 +111,7 @@ export const integratedCareService = {
 		});
 	},
 	getPanelCounts(queryParameters?: { panelAccountId?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			patientOrderCountsByPatientOrderStatusId: PatientOrderCountsByPatientOrderStatusId;
-		}>({
+		return httpSingleton.orchestrateRequest<PatientOrderPanelCountsResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/integrated-care/panel-counts', queryParameters),
 		});
@@ -284,10 +296,10 @@ export const integratedCareService = {
 	updateResourcingStatus(
 		patientOrderId: string,
 		data: {
-			patientOrderResourcingStatusId: string;
-			resourcesSentAtDate: string;
-			resourcesSentAtTime: string;
-			resourcesSentNote: string;
+			patientOrderResourcingStatusId: PatientOrderResourcingStatusId;
+			resourcesSentAtDate?: string;
+			resourcesSentAtTime?: string;
+			resourcesSentNote?: string;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -296,6 +308,118 @@ export const integratedCareService = {
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/patient-order-resourcing-status`,
 			data,
+		});
+	},
+	updateSafetyPlanningStatus(
+		patientOrderId: string,
+		data: {
+			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-safety-planning-status`,
+			data,
+		});
+	},
+	overrideTriage(
+		patientOrderId: string,
+		data: {
+			patientOrderTriages: {
+				patientOrderFocusTypeId: string;
+				patientOrderCareTypeId: string;
+				reason: string;
+			}[];
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/patient-order-triages`,
+			data,
+		});
+	},
+	revertTriage(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/reset-patient-order-triages`,
+		});
+	},
+	scheduleAssessment(data: {
+		scheduledDate: string;
+		scheduledTime: string;
+		patientOrderId: string;
+		calendarUrl?: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-screenings',
+			data,
+		});
+	},
+	updateScheduledAssessment(
+		patientOrderScheduledScreeningId: string,
+		data: {
+			scheduledDate: string;
+			scheduledTime: string;
+			calendarUrl?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledScreening: PatientOrderScheduledScreening;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-screenings/${patientOrderScheduledScreeningId}`,
+			data,
+		});
+	},
+	getOverview(data?: { panelAccountId?: string }) {
+		return httpSingleton.orchestrateRequest<{
+			scheduledAssessmentPatientOrders: PatientOrderModel[];
+			safetyPlanningPatientOrders: PatientOrderModel[];
+			newPatientPatientOrders: PatientOrderModel[];
+			outreachNeededPatientOrders: PatientOrderModel[];
+			followupPatientOrders: PatientOrderModel[];
+			needResourcesPatientOrders: PatientOrderModel[];
+			voicemailTaskPatientOrders: PatientOrderModel[];
+		}>({
+			method: 'GET',
+			url: '/integrated-care/panel-today',
+			data,
+		});
+	},
+	consentToCare(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/consent`,
+		});
+	},
+	createVoicemailTask(data: { patientOrderId: string; panelAccountId: string; message: string }) {
+		return httpSingleton.orchestrateRequest({
+			method: 'POST',
+			url: '/patient-order-voicemail-tasks',
+			data,
+		});
+	},
+	updateVoicemailTask(patientOrderVoicemailTaskId: string, data: { panelAccountId: string; message: string }) {
+		return httpSingleton.orchestrateRequest({
+			method: 'PUT',
+			url: `/patient-order-voicemail-tasks/${patientOrderVoicemailTaskId}`,
+			data,
+		});
+	},
+	completeVoicemailTask(patientOrderVoicemailTaskId: string) {
+		return httpSingleton.orchestrateRequest({
+			method: 'POST',
+			url: `/patient-order-voicemail-tasks/${patientOrderVoicemailTaskId}/complete`,
+			data: {},
 		});
 	},
 };

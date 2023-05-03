@@ -4,7 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderStatusId, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
@@ -14,6 +14,8 @@ import { MhicComments, MhicContactHistory, MhicOrderDetails } from '@/components
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { MhicPatientOrderShelfActions } from './mhic-patient-order-shelf-actions';
+import useFetchPanelAccounts from '@/pages/ic/hooks/use-fetch-panel-accounts';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	patientOrderShelf: {
@@ -103,6 +105,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface MhicPatientOrderShelfProps {
 	patientOrderId: string | null;
+	mainViewRefresher(): void;
 	onHide(): void;
 	onShelfLoad(result: PatientOrderModel): void;
 }
@@ -113,9 +116,16 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({
+	patientOrderId,
+	mainViewRefresher,
+	onHide,
+	onShelfLoad,
+}: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
+
+	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
@@ -130,13 +140,22 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 		const [patientOverviewResponse, referenceDataResponse] = await Promise.all([
 			integratedCareService.getPatientOrder(patientOrderId).fetch(),
 			integratedCareService.getReferenceData().fetch(),
+			fetchPanelAccounts(),
 		]);
 
 		setCurrentPatientOrder(patientOverviewResponse.patientOrder);
 		setPastPatientOrders(patientOverviewResponse.associatedPatientOrders);
 		setReferenceData(referenceDataResponse);
 		onShelfLoad(patientOverviewResponse.patientOrder);
-	}, [onShelfLoad, patientOrderId]);
+	}, [fetchPanelAccounts, onShelfLoad, patientOrderId]);
+
+	const handlePatientOrderChanges = useCallback(
+		(changedOrder: PatientOrderModel) => {
+			setCurrentPatientOrder(changedOrder);
+			mainViewRefresher();
+		},
+		[mainViewRefresher]
+	);
 
 	useEffect(() => {
 		if (patientOrderId) {
@@ -158,8 +177,20 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 			>
 				<div className={classes.patientOrderShelf}>
 					<AsyncWrapper fetchData={fetchPatientOverview}>
-						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.ORDER_DETAILS} activeKey={tabKey}>
+						<Tab.Container
+							id="shelf-tabs"
+							defaultActiveKey={TAB_KEYS.ORDER_DETAILS}
+							activeKey={tabKey}
+							mountOnEnter
+							unmountOnExit
+						>
 							<div className={classes.header}>
+								{currentPatientOrder && (
+									<MhicPatientOrderShelfActions
+										patientOrder={currentPatientOrder}
+										onDataChange={handlePatientOrderChanges}
+									/>
+								)}
 								<Button
 									variant="light"
 									className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
@@ -169,7 +200,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 								</Button>
 								<div className="mb-2 d-flex align-items-center">
 									<h4 className="mb-0 me-2">{currentPatientOrder?.patientDisplayName}</h4>
-									{currentPatientOrder?.patientOrderStatusId === PatientOrderStatusId.PENDING && (
+									{currentPatientOrder?.totalOutreachCount === 0 && (
 										<Badge pill bg="outline-primary">
 											New
 										</Badge>
@@ -188,7 +219,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 												actions: [],
 											});
 										}}
-										text="1A2B3C4D5E"
+										text={currentPatientOrder?.patientMrn ?? ''}
 									>
 										<Button variant="link" className="p-2">
 											<CopyIcon width={20} height={20} />
@@ -197,7 +228,9 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									<span className="text-n300 me-2">|</span>
 									<p className="mb-0">
 										Phone:{' '}
-										<span className="fw-bold">{currentPatientOrder?.patientPhoneNumber}</span>
+										<span className="fw-bold">
+											{currentPatientOrder?.patientPhoneNumberDescription}
+										</span>
 									</p>
 									<span className="text-n300 mx-2">|</span>
 									<p className="mb-0">
@@ -228,8 +261,9 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 										<MhicOrderDetails
 											patientOrder={currentPatientOrder}
 											pastPatientOrders={pastPatientOrders}
+											panelAccounts={panelAccounts}
 											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>
@@ -238,7 +272,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 										<MhicContactHistory
 											patientOrder={currentPatientOrder}
 											referenceData={referenceData}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>
@@ -246,7 +280,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 									{currentPatientOrder && (
 										<MhicComments
 											patientOrder={currentPatientOrder}
-											onPatientOrderChange={setCurrentPatientOrder}
+											onPatientOrderChange={handlePatientOrderChanges}
 										/>
 									)}
 								</Tab.Pane>
