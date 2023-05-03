@@ -370,7 +370,7 @@ export const MhicPatientOrderTable = ({
 									{columnConfig.outreachNumber && (
 										<TableCell width={116} className="text-right">
 											<span className="text-nowrap text-truncate">
-												{po.outreachCountDescription}
+												{po.totalOutreachCountDescription}
 											</span>
 										</TableCell>
 									)}

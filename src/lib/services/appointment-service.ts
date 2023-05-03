@@ -12,6 +12,7 @@ export interface CreateAppointmentData {
 	appointmentReasonId?: string;
 	intakeAssessmentId?: string;
 	comment?: string;
+	patientOrderId?: string;
 }
 
 export interface CreateFollowupDate {

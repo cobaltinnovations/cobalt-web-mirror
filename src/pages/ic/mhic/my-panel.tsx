@@ -1,21 +1,23 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Outlet, useMatch, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 
-import { PatientOrderCountsByPatientOrderStatusId, PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { MhicNavigation } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
-import { integratedCareService } from '@/lib/services';
+import { PatientOrderPanelCountsResponse, integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 const MhicMyPanel = () => {
 	const [searchParams] = useSearchParams();
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
+	const patientOrderTriageStatusId = searchParams.get('patientOrderTriageStatusId');
+	const patientOrderSafetyPlanningStatusId = searchParams.get('patientOrderSafetyPlanningStatusId');
+
 	const navigate = useNavigate();
 
-	const [countsById, setCountsById] = useState<PatientOrderCountsByPatientOrderStatusId>();
+	const [countsResponse, setCountsResponse] = useState<PatientOrderPanelCountsResponse>();
 
 	const rootMatch = useMatch({
 		path: '/ic/mhic',
@@ -27,15 +29,37 @@ const MhicMyPanel = () => {
 		end: true,
 	});
 
-	const updateSelectedOrderStatusId = useCallback(
-		(statusId?: PatientOrderStatusId) => {
+	const updateSelectedOrderTriageStatusId = useCallback(
+		(statusId?: PatientOrderTriageStatusId) => {
 			const params = new URLSearchParams(searchParams);
 
 			if (statusId) {
-				params.set('patientOrderStatusId', statusId);
+				params.set('patientOrderTriageStatusId', statusId);
 			} else {
-				params.delete('patientOrderStatusId');
+				params.delete('patientOrderTriageStatusId');
 			}
+
+			params.delete('patientOrderSafetyPlanningStatusId');
+
+			navigate({
+				pathname: '/ic/mhic/my-patients',
+				search: params.toString(),
+			});
+		},
+		[navigate, searchParams]
+	);
+
+	const updateSelectedOrderSafetyPlanningStatusId = useCallback(
+		(statusId?: PatientOrderSafetyPlanningStatusId) => {
+			const params = new URLSearchParams(searchParams);
+
+			if (statusId) {
+				params.set('patientOrderSafetyPlanningStatusId', statusId);
+			} else {
+				params.delete('patientOrderSafetyPlanningStatusId');
+			}
+
+			params.delete('patientOrderTriageStatusId');
 
 			navigate({
 				pathname: '/ic/mhic/my-patients',
@@ -47,7 +71,7 @@ const MhicMyPanel = () => {
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getPanelCounts().fetch();
-		setCountsById(response.patientOrderCountsByPatientOrderStatusId);
+		setCountsResponse(response);
 	}, []);
 
 	const navigationItems = useMemo(
@@ -66,61 +90,79 @@ const MhicMyPanel = () => {
 				onClick: () => {
 					navigate('/ic/mhic/my-patients');
 				},
-				isActive: !!myPatientsMatch && !patientOrderStatusId,
+				isActive: !!myPatientsMatch && !patientOrderTriageStatusId && !patientOrderSafetyPlanningStatusId,
 			},
 			{
 				title: 'My Patient Views',
 				navigationItems: [
 					{
 						title: 'Need Assessment',
-						description: countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
+						description:
+							countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.NEEDS_ASSESSMENT
+								.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 						onClick: () => {
-							updateSelectedOrderStatusId(PatientOrderStatusId.NEEDS_ASSESSMENT);
+							updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.NEEDS_ASSESSMENT);
 						},
-						isActive: !!myPatientsMatch && patientOrderStatusId === PatientOrderStatusId.NEEDS_ASSESSMENT,
+						isActive:
+							!!myPatientsMatch &&
+							patientOrderTriageStatusId === PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
 					},
 					{
 						title: 'Safety Planning',
-						description: countsById?.SAFETY_PLANNING.patientOrderCountDescription ?? '0',
+						description: countsResponse?.safetyPlanningPatientOrderCountDescription,
 						icon: () => <DotIcon width={24} height={24} className="text-danger" />,
 						onClick: () => {
-							updateSelectedOrderStatusId(PatientOrderStatusId.SAFETY_PLANNING);
+							updateSelectedOrderSafetyPlanningStatusId(
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
+							);
 						},
-						isActive: !!myPatientsMatch && patientOrderStatusId === PatientOrderStatusId.SAFETY_PLANNING,
+						isActive:
+							!!myPatientsMatch &&
+							patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
 					},
 
 					{
 						title: 'BHP',
-						description: countsById?.BHP.patientOrderCountDescription ?? '0',
+						description:
+							countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.BHP
+								.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-success" />,
 						onClick: () => {
-							updateSelectedOrderStatusId(PatientOrderStatusId.BHP);
+							updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.BHP);
 						},
-						isActive: !!myPatientsMatch && patientOrderStatusId === PatientOrderStatusId.BHP,
+						isActive: !!myPatientsMatch && patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP,
 					},
 					{
 						title: 'Specialty Care',
-						description: countsById?.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
+						description:
+							countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.SPECIALTY_CARE
+								.patientOrderCountDescription ?? '0',
 						icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 						onClick: () => {
-							updateSelectedOrderStatusId(PatientOrderStatusId.SPECIALTY_CARE);
+							updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.SPECIALTY_CARE);
 						},
-						isActive: !!myPatientsMatch && patientOrderStatusId === PatientOrderStatusId.SPECIALTY_CARE,
+						isActive:
+							!!myPatientsMatch &&
+							patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE,
 					},
 				],
 			},
 		],
 		[
-			countsById?.BHP.patientOrderCountDescription,
-			countsById?.NEEDS_ASSESSMENT.patientOrderCountDescription,
-			countsById?.SAFETY_PLANNING.patientOrderCountDescription,
-			countsById?.SPECIALTY_CARE.patientOrderCountDescription,
+			countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.BHP.patientOrderCountDescription,
+			countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.NEEDS_ASSESSMENT
+				.patientOrderCountDescription,
+			countsResponse?.patientOrderCountsByPatientOrderTriageStatusId.SPECIALTY_CARE.patientOrderCountDescription,
+			countsResponse?.safetyPlanningPatientOrderCountDescription,
 			myPatientsMatch,
 			navigate,
-			patientOrderStatusId,
+			patientOrderSafetyPlanningStatusId,
+			patientOrderTriageStatusId,
 			rootMatch,
-			updateSelectedOrderStatusId,
+			updateSelectedOrderSafetyPlanningStatusId,
+			updateSelectedOrderTriageStatusId,
 		]
 	);
 

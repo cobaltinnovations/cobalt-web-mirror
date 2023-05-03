@@ -7,12 +7,16 @@ import { Navigate, Outlet, Route, useNavigate } from 'react-router-dom';
 import { PatientHeader } from '@/components/integrated-care/patient';
 
 import PatientLanding from './patient/patient-landing';
+import PatientConsent from './patient/patient-consent';
 import PatientDemographicsIntroduction from './patient/demographics-introduction';
 import PatientDemographicsPart1 from './patient/demographics-part-1';
 import PatientDemographicsPart2 from './patient/demographics-part-2';
 import PatientDemographicsPart3 from './patient/demographics-part-3';
 import PatientDemographicsThanks from './patient/demographics-thanks';
 import PatientAssessmentComplete from './patient/assessment-complete';
+import PatientAssessmentResults from './patient/assessment-results';
+import ConnectWithSupportV2 from '@/pages/connect-with-support-v2';
+
 import MhicMyPanel from './mhic/my-panel';
 import MhicMyPatients from './mhic/my-patients';
 import MhicOverview from './mhic/overview';
@@ -25,7 +29,6 @@ import MhicLayout from './mhic/mhic-layout';
 import MhicOrdersUnassigned from './mhic/orders-unassigned';
 import MhicOrdersAssigned from './mhic/orders-assigned';
 import MhicOrdersClosed from './mhic/orders-closed';
-import PatientConsent from './patient/patient-consent';
 
 const IntegratedCareLandingPage = () => {
 	return (
@@ -45,9 +48,7 @@ const IntegratedCareLandingPage = () => {
 
 				<Route path="orders/:patientOrderId" element={<MhicOrderLayout />}>
 					<Route index element={<Navigate to="assessment" replace />} />
-
 					<Route path="assessment" element={<MhicOrderAssessment />} />
-
 					<Route path="assessment/:screeningQuestionContextId" element={<ScreeningQuestionsPage />} />
 				</Route>
 
@@ -71,7 +72,8 @@ const IntegratedCareLandingPage = () => {
 				<Route path="demographics-part-3" element={<PatientDemographicsPart3 />} />
 				<Route path="demographics-thanks" element={<PatientDemographicsThanks />} />
 				<Route path="assessment-complete" element={<PatientAssessmentComplete />} />
-				{/* <Route path="screening" element={<IntegratedCareScreeningPage />} /> */}
+				<Route path="assessment-results" element={<PatientAssessmentResults />} />
+				<Route path="connect-with-support/bhp" element={<ConnectWithSupportV2 />} />
 				<Route path="*" element={<NoMatch />} />
 			</Route>
 		</SentryRoutes>
