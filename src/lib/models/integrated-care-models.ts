@@ -100,6 +100,7 @@ export interface PatientOrderModel {
 	patientOrderScheduledScreeningScheduledDateTime?: string;
 	patientOrderScheduledScreeningScheduledDateTimeDescription?: string;
 	patientOrderScheduledScreeningCalendarUrl?: string;
+	patientOrderVoicemailTasks: PatientOrderVoicemailTask[];
 	crisisIndicated?: boolean;
 	crisisIndicatedAt?: string;
 	crisisIndicatedAtDescription?: string;
@@ -352,4 +353,25 @@ export interface PatientOrderScheduledScreening {
 	lastUpdatedDescription: string;
 	canceledAt?: string;
 	canceledAtDescription?: string;
+}
+
+export interface PatientOrderVoicemailTask {
+	completed: boolean;
+	created: string;
+	createdByAccountId: string;
+	createdDescription: string;
+	createdByAccountFirstName: string;
+	createdByAccountLastName: string;
+	createdByAccountDisplayName: string;
+	createdByAccountDisplayNameWithLastFirst: string;
+	completedByAccountFirstName?: string;
+	completedByAccountLastName?: string;
+	completedByAccountDisplayName?: string;
+	completedByAccountDisplayNameWithLastFirst?: string;
+	deleted: boolean;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	message: string;
+	patientOrderId: string;
+	patientOrderVoicemailTaskId: string;
 }
