@@ -1,4 +1,4 @@
-import { PatientOrderDispositionId, PatientOrderStatus } from './integrated-care-models';
+import { PatientOrderDispositionId, PatientOrderTriageStatusId } from './integrated-care-models';
 
 interface BirthSex {
 	birthSexId: string;
@@ -100,7 +100,7 @@ export interface ReferenceDataResponse {
 	patientOrderFocusTypes: PatientOrderFocusType[];
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
-	patientOrderStatuses: PatientOrderStatus[];
+	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];
 	races: Race[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];

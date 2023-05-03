@@ -14,7 +14,7 @@ import useHandleError from '@/hooks/use-handle-error';
 
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
-import { PatientOrderStatusId } from '@/lib/models';
+import { PatientOrderAssignmentStatusId } from '@/lib/models';
 import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersAssigned = () => {
@@ -41,13 +41,7 @@ const MhicOrdersAssigned = () => {
 		return fetchPatientOrders({
 			pageSize: '15',
 			...(pageNumber && { pageNumber }),
-			patientOrderStatusId: [
-				PatientOrderStatusId.NEEDS_ASSESSMENT,
-				PatientOrderStatusId.SAFETY_PLANNING,
-				PatientOrderStatusId.SPECIALTY_CARE,
-				PatientOrderStatusId.SUBCLINICAL,
-				PatientOrderStatusId.BHP,
-			],
+			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.ASSIGNED,
 		});
 	}, [fetchPatientOrders, pageNumber]);
 

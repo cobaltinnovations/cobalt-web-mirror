@@ -107,7 +107,9 @@ const MhicOverview = () => {
 								action={{
 									title: 'View Safety Planning',
 									onClick: () => {
-										navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
+										navigate(
+											'/ic/mhic/my-patients?patientOrderSafetyPlanningStatusId=NEEDS_SAFETY_PLANNING'
+										);
 									},
 								}}
 							/>
