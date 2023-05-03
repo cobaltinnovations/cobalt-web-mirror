@@ -48,11 +48,17 @@ const PatientLanding = () => {
 	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
+	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
 
 	const fetchData = useCallback(async () => {
 		try {
 			const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			const { associatedPatientOrders } = await integratedCareService
+				.getPatientOrder(response.patientOrder.patientOrderId)
+				.fetch();
+
 			setPatientOrder(response.patientOrder);
+			setPastPatientOrders(associatedPatientOrders);
 
 			const { screeningSessionResult, screeningSession, patientOrderScreeningStatusId } = response.patientOrder;
 
@@ -449,18 +455,31 @@ const PatientLanding = () => {
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 						<h4 className="mb-1">Past Episodes</h4>
-						<p className="mb-6 text-gray">You 2 past episodes</p>
-						<div className="rounded border bg-white">
-							<div className="px-6 py-5">
-								<p className="mb-1 fs-large fw-semibold">Nov 12, 2023</p>
-								<p className="mb-0 text-gray">Closed: Nov 18, 2022 | Scheduled with BHP</p>
+						<p className="mb-6 text-gray">
+							Your {pastPatientOrders.length} past episode{pastPatientOrders.length === 1 ? '' : 's'}
+						</p>
+						{pastPatientOrders.length > 0 ? (
+							<div className="rounded border bg-white">
+								{pastPatientOrders.map((ppo, ppoIndex) => {
+									const isLast = ppoIndex === pastPatientOrders.length - 1;
+
+									return (
+										<React.Fragment key={ppo.patientOrderId}>
+											<div className="px-6 py-5">
+												<p className="mb-1 fs-large fw-semibold">{ppo.orderDateDescription}</p>
+												<p className="mb-0 text-gray">
+													Closed: {ppo.episodeClosedAtDescription} | [TODO]: Scheduled with
+													BHP
+												</p>
+											</div>
+											{!isLast && <hr />}
+										</React.Fragment>
+									);
+								})}
 							</div>
-							<hr />
-							<div className="px-6 py-5">
-								<p className="mb-1 fs-large fw-semibold">Apr 5, 2023</p>
-								<p className="mb-0 text-gray">Closed: Apr 7, 2022 | Scheduled with BHP</p>
-							</div>
-						</div>
+						) : (
+							<NoData title="No Past Episodes" actions={[]} />
+						)}
 					</Col>
 				</Row>
 			</Container>
