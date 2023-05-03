@@ -35,6 +35,7 @@ export interface Institution {
 	integratedCarePhoneNumber: string;
 	integratedCarePhoneNumberDescription: string;
 	integratedCareAvailabilityDescription: string;
+	integratedCareProgramName: string;
 	myChartName: string;
 }
 
