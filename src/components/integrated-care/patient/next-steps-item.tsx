@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { Button, ButtonProps } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
@@ -68,7 +68,7 @@ export const NextStepsItem = ({
 					</div>
 				</div>
 			</div>
-			{children && <div className="px-6 pb-6">{children}</div>}
+			{React.Children.toArray(children).length > 0 && <div className="px-6 pb-6">{children}</div>}
 		</>
 	);
 };
