@@ -10,12 +10,12 @@ import {
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
-import { MhicLayoutContext } from './mhic-layout';
+// import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersClosed = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const {
 		fetchPatientOrders,
@@ -45,9 +45,9 @@ const MhicOrdersClosed = () => {
 		fetchTableData();
 	}, [fetchTableData]);
 
-	useEffect(() => {
-		setMainViewRefresher(() => fetchTableData);
-	}, [fetchTableData, setMainViewRefresher]);
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchTableData);
+	// }, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

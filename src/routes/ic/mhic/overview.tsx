@@ -15,7 +15,7 @@ import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.s
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
-import { MhicLayoutContext } from './mhic-layout';
+// import { MhicLayoutContext } from './mhic-layout';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	overviewCard: {
@@ -52,7 +52,7 @@ export const Component = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
 	const navigate = useNavigate();
-	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
@@ -81,9 +81,9 @@ export const Component = () => {
 		setResourcesPatientOrders(needResourcesPatientOrders);
 	}, []);
 
-	useEffect(() => {
-		setMainViewRefresher(() => fetchData);
-	}, [fetchData, setMainViewRefresher]);
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchData);
+	// }, [fetchData, setMainViewRefresher]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>

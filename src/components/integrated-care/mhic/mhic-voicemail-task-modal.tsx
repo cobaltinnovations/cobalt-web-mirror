@@ -17,14 +17,14 @@ const useStyles = createUseStyles({
 interface Props extends ModalProps {
 	patientOrderVoicemailTask?: PatientOrderVoicemailTask;
 	patientOrder: PatientOrderModel;
-	panelAccounts: AccountModel[];
+	panelAccounts?: AccountModel[];
 	onSave(updatedPatientOrder: PatientOrderModel): void;
 }
 
 export const MhicVoicemailTaskModal: FC<Props> = ({
 	patientOrderVoicemailTask,
 	patientOrder,
-	panelAccounts,
+	panelAccounts = [],
 	onSave,
 	...props
 }) => {

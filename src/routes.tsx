@@ -43,6 +43,7 @@ import { RoutedManageAvailailityPanel } from './pages/scheduling/routed-managed-
 import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selected-availability-panel';
 import { routeRedirects } from './route-redirects';
 import { LoginDestinationIdRouteMap } from './contexts/account-context';
+import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -705,6 +706,14 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment-complete',
 										element: <PatientAssessmentComplete />,
+									},
+									{
+										path: 'assessment-results',
+										element: <PatientAssessmentResults />,
+									},
+									{
+										path: 'connect-with-support/bhp',
+										element: <ConnectWithSupportV2 />,
 									},
 									{
 										path: '*',

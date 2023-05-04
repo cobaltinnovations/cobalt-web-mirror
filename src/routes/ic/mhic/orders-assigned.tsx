@@ -15,14 +15,14 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderAssignmentStatusId } from '@/lib/models';
-import { MhicLayoutContext } from './mhic-layout';
+// import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersAssigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -83,9 +83,9 @@ const MhicOrdersAssigned = () => {
 		fetchTableData();
 	}, [fetchTableData]);
 
-	useEffect(() => {
-		setMainViewRefresher(() => fetchTableData);
-	}, [fetchTableData, setMainViewRefresher]);
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchTableData);
+	// }, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

@@ -8,7 +8,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { MhicAssignOrderModal } from './mhic-assign-order-modal';
 import useFlags from '@/hooks/use-flags';
 import { PatientOrderDispositionId, PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
-import useFetchPanelAccounts from '@/pages/ic/hooks/use-fetch-panel-accounts';
+import useFetchPanelAccounts from '@/routes/ic/hooks/use-fetch-panel-accounts';
 import { integratedCareService } from '@/lib/services';
 
 import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';

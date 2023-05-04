@@ -15,6 +15,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { MhicPatientOrderShelfActions } from './mhic-patient-order-shelf-actions';
+import { useRevalidator } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	patientOrderShelf: {
@@ -104,7 +105,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface MhicPatientOrderShelfProps {
 	patientOrderId: string | null;
-	mainViewRefresher(): void;
 	onHide(): void;
 	onShelfLoad(result: PatientOrderModel): void;
 }
@@ -115,17 +115,13 @@ enum TAB_KEYS {
 	COMMENTS = 'COMMENTS',
 }
 
-export const MhicPatientOrderShelf = ({
-	patientOrderId,
-	mainViewRefresher,
-	onHide,
-	onShelfLoad,
-}: MhicPatientOrderShelfProps) => {
+export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: MhicPatientOrderShelfProps) => {
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 	const [currentPatientOrder, setCurrentPatientOrder] = useState<PatientOrderModel>();
 	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
+	const revalidator = useRevalidator();
 
 	const fetchPatientOverview = useCallback(async () => {
 		if (!patientOrderId) {
@@ -141,9 +137,9 @@ export const MhicPatientOrderShelf = ({
 	const handlePatientOrderChanges = useCallback(
 		(changedOrder: PatientOrderModel) => {
 			setCurrentPatientOrder(changedOrder);
-			mainViewRefresher();
+			revalidator.revalidate();
 		},
-		[mainViewRefresher]
+		[revalidator]
 	);
 
 	useEffect(() => {

@@ -25,7 +25,7 @@ import {
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
-import { MhicLayoutContext } from './mhic-layout';
+// import { MhicLayoutContext } from './mhic-layout';
 
 const uiTabToApiQueryMap = {
 	NO_OUTREACH: {
@@ -59,7 +59,7 @@ const MhicOrdersUnassigned = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const filterBy = (searchParams.get('filterBy') ?? 'NO_OUTREACH') as keyof typeof uiTabToApiQueryMap;
-	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
@@ -154,9 +154,9 @@ const MhicOrdersUnassigned = () => {
 		fetchTableData();
 	}, [fetchTableData]);
 
-	useEffect(() => {
-		setMainViewRefresher(() => fetchTableData);
-	}, [fetchTableData, setMainViewRefresher]);
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchTableData);
+	// }, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

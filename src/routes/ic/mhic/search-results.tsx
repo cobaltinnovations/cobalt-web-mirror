@@ -5,11 +5,11 @@ import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
 import { Container } from 'react-bootstrap';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderDispositionId } from '@/lib/models';
-import { MhicLayoutContext } from './mhic-layout';
+// import { MhicLayoutContext } from './mhic-layout';
 
 const MhicSearchResults = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const {
 		fetchPatientOrders,
@@ -40,9 +40,9 @@ const MhicSearchResults = () => {
 		fetchData();
 	}, [fetchData]);
 
-	useEffect(() => {
-		setMainViewRefresher(() => fetchData);
-	}, [fetchData, setMainViewRefresher]);
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchData);
+	// }, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
