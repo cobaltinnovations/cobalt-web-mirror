@@ -226,6 +226,7 @@ const MhicOrdersUnassigned = () => {
 						</MhicPageHeader>
 						<hr />
 						<TabBar
+							key="mhic-orders-unassigned-tabbar"
 							value={filterBy}
 							tabs={[
 								{

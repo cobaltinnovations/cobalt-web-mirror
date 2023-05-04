@@ -217,6 +217,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 						</Col>
 						<Col md={{ span: 2, offset: 1 }}>
 							<TabBar
+								key="mhic-assessment-tabbar"
 								className="position-sticky"
 								style={{ top: MHIC_HEADER_HEIGHT + 32 }}
 								orientation="vertical"

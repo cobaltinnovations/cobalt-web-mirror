@@ -231,6 +231,7 @@ export const MhicPatientOrderShelf = ({ patientOrderId, onHide, onShelfLoad }: M
 								</div>
 								<div>
 									<TabBar
+										key="mhic-shelf-tabbar"
 										hideBorder
 										value={tabKey}
 										tabs={[
