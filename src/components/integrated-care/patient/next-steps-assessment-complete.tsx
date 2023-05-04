@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
@@ -7,6 +7,7 @@ import useAccount from '@/hooks/use-account';
 import { NextStepsItem } from './next-steps-item';
 
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { PatientInsuranceStatementModal } from './patient-insurance-statement-modal';
 
 interface NextStepsAssessmentCompleteProps {
 	patientOrder: PatientOrderModel;
@@ -15,9 +16,20 @@ interface NextStepsAssessmentCompleteProps {
 export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmentCompleteProps) => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
+	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
 
 	return (
 		<>
+			<PatientInsuranceStatementModal
+				show={showInsuranceStatementModal}
+				onHide={() => {
+					setShowInsuranceStatementModal(false);
+				}}
+				onContinue={() => {
+					navigate(`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder.patientOrderId}`);
+				}}
+			/>
+
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
 				<>
 					{patientOrder.appointmentId ? (
@@ -41,9 +53,7 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 								variant: 'primary',
 								title: 'Find Appointment',
 								onClick: () => {
-									navigate(
-										`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder.patientOrderId}`
-									);
+									setShowInsuranceStatementModal(true);
 								},
 							}}
 						/>
