@@ -422,4 +422,12 @@ export const integratedCareService = {
 			data: {},
 		});
 	},
+	getLatestPatientOrder() {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'GET',
+			url: '/patient-orders/latest',
+		});
+	},
 };

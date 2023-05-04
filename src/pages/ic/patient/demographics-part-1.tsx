@@ -33,7 +33,7 @@ const PatientDemographicsPart1 = () => {
 	]);
 
 	const fetchData = useCallback(async () => {
-		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+		const response = await integratedCareService.getLatestPatientOrder().fetch();
 		setPatientOrder(response.patientOrder);
 	}, []);
 

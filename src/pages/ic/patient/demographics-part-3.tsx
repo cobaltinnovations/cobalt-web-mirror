@@ -34,7 +34,7 @@ const PatientDemographicsPart3 = () => {
 
 	const fetchData = useCallback(async () => {
 		const [patientOrderResponse, referenceDataResponse] = await Promise.all([
-			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
+			integratedCareService.getLatestPatientOrder().fetch(),
 			integratedCareService.getReferenceData().fetch(),
 		]);
 
