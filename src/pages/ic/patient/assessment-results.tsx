@@ -7,6 +7,7 @@ import { integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import { PatientInsuranceStatementModal } from '@/components/integrated-care/patient';
+import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 
 export const PatientAssessmentResults = () => {
 	const navigate = useNavigate();
@@ -33,15 +34,15 @@ export const PatientAssessmentResults = () => {
 				}}
 			/>
 
-			<Container className="py-20">
+			<Container className="py-10">
 				<Row className="mb-6">
-					<Col
-						md={{ span: 10, offset: 1 }}
-						lg={{ span: 8, offset: 2 }}
-						xl={{ span: 6, offset: 3 }}
-						className="text-center"
-					>
-						<h1 className="mb-6">Assessment Results</h1>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<h1 className="mb-1">Assessment Results</h1>
+						<p className="mb-6 fs-large text-gray">
+							Completed at {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'} by{' '}
+							{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName ?? 'N/A'}
+						</p>
+						<hr className="mb-8" />
 
 						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
 							<>
@@ -58,7 +59,7 @@ export const PatientAssessmentResults = () => {
 									You can schedule an appointment with a Behavioral Health Provider by browsing the
 									list of providers and choosing an available appointment time.
 								</p>
-								<div className="mb-5">
+								<div className="mb-4 text-center">
 									<Button
 										size="lg"
 										onClick={() => {
@@ -68,7 +69,7 @@ export const PatientAssessmentResults = () => {
 										Find Appointment
 									</Button>
 								</div>
-								<div>
+								<div className="text-center">
 									<Button
 										variant="outline-primary"
 										size="lg"
@@ -102,7 +103,7 @@ export const PatientAssessmentResults = () => {
 									if you do not receive the {institution?.myChartName ?? 'MyChart'} message or if you
 									wish to speak to a Mental Health Intake Coordinator about your options.
 								</p>
-								<div>
+								<div className="text-center">
 									<Button
 										size="lg"
 										onClick={() => {
@@ -154,7 +155,7 @@ export const PatientAssessmentResults = () => {
 										</p>
 									</>
 								)}
-								<div>
+								<div className="text-center">
 									<Button
 										size="lg"
 										onClick={() => {
@@ -171,8 +172,7 @@ export const PatientAssessmentResults = () => {
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
 							<>
 								<p className="mb-6 fs-large">Safety Planning Message</p>
-								<p className="mb-6 fs-large">Safety Planning Actions</p>
-								<div>
+								<div className="text-center">
 									<Button
 										size="lg"
 										onClick={() => {
@@ -184,6 +184,13 @@ export const PatientAssessmentResults = () => {
 								</div>
 							</>
 						)}
+
+						<MhicInlineAlert
+							className="mt-12"
+							variant="primary"
+							title="NOTE: Your responses are not reviewed in real time"
+							description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+						/>
 					</Col>
 				</Row>
 			</Container>
