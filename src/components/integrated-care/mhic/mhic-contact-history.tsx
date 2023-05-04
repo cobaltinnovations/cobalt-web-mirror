@@ -129,12 +129,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 							<div className="d-flex align-items-center justify-content-between">
 								<h4 className="mb-0">
 									Contact History{' '}
-									<span className="text-gray">
-										(
-										{(patientOrder.patientOrderOutreaches ?? []).length +
-											(patientOrder.patientOrderScheduledMessageGroups ?? []).length}
-										)
-									</span>
+									<span className="text-gray">({patientOrder.totalOutreachCountDescription})</span>
 								</h4>
 								<div className="d-flex align-items-center">
 									<Dropdown>

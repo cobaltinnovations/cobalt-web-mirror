@@ -80,6 +80,7 @@ export const screeningService = {
 			screeningAnswers: ScreeningAnswer[];
 			nextScreeningQuestionContextId?: string;
 			screeningSessionDestination?: ScreeningSessionDestination;
+			screeningSession: ScreeningSession;
 		}>({
 			method: 'post',
 			url: '/screening-answers',

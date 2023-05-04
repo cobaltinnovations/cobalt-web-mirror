@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -15,6 +15,7 @@ import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.s
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
 import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
+import { MhicLayoutContext } from './mhic-layout';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	overviewCard: {
@@ -51,6 +52,7 @@ export const Component = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
 	const navigate = useNavigate();
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
@@ -79,6 +81,10 @@ export const Component = () => {
 		setResourcesPatientOrders(needResourcesPatientOrders);
 	}, []);
 
+	useEffect(() => {
+		setMainViewRefresher(() => fetchData);
+	}, [fetchData, setMainViewRefresher]);
+
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<Container fluid className="py-8 overflow-visible">
@@ -101,7 +107,9 @@ export const Component = () => {
 								action={{
 									title: 'View Safety Planning',
 									onClick: () => {
-										navigate('/ic/mhic/my-patients?patientOrderStatusId=SAFETY_PLANNING');
+										navigate(
+											'/ic/mhic/my-patients?patientOrderSafetyPlanningStatusId=NEEDS_SAFETY_PLANNING'
+										);
 									},
 								}}
 							/>

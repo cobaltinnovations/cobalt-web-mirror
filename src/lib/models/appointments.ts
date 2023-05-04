@@ -68,6 +68,7 @@ export interface AppointmentModel {
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
 	canceledForReschedule: boolean;
 	rescheduledAppointmentId?: string;
+	patientOrderId?: string;
 }
 
 export enum AppointmentReasonType {

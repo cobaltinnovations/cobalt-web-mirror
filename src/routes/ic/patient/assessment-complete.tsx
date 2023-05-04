@@ -10,7 +10,7 @@ export const PatientAssessmentComplete = () => {
 	useEffect(() => {
 		if (!timeoutRef.current) {
 			timeoutRef.current = setTimeout(() => {
-				navigate('/ic/patient');
+				navigate('/ic/patient/assessment-results');
 			}, 5000);
 		}
 

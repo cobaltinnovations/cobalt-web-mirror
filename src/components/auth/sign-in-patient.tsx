@@ -67,10 +67,15 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									<Logo className="text-primary" width={151.11} height={20} />
 								</div>
 								<h1 className="mb-6">Welcome to {institution?.name}</h1>
-								<h4 className="mb-6">[TODO:] Placeholder text</h4>
+								<h4 className="mb-6">
+									The {institution?.integratedCareProgramName} program connects you to the correct
+									level of mental healthcare
+								</h4>
 								<hr className="mb-6" />
 								<h3 className="mb-4">Sign in</h3>
-								<p className="mb-6">[TODO:] Placeholder text</p>
+								<p className="mb-6">
+									Click "{institution?.myChartName}" below, then enter your details to sign in.
+								</p>
 								<div className="text-center mb-8">
 									{accountSources.map((accountSource, index) => {
 										const isLast = accountSources.length - 1 === index;

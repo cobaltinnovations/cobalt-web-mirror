@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import {
@@ -10,10 +10,12 @@ import {
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersClosed = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const {
 		fetchPatientOrders,
@@ -42,6 +44,10 @@ const MhicOrdersClosed = () => {
 	useEffect(() => {
 		fetchTableData();
 	}, [fetchTableData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchTableData);
+	}, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>

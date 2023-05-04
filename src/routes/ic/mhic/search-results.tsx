@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 
 import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
 import { Container } from 'react-bootstrap';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderDispositionId } from '@/lib/models';
+import { MhicLayoutContext } from './mhic-layout';
 
 const MhicSearchResults = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+
 	const {
 		fetchPatientOrders,
 		isLoadingOrders,
@@ -19,13 +23,26 @@ const MhicSearchResults = () => {
 	const patientMrn = searchParams.get('patientMrn');
 	const searchQuery = searchParams.get('searchQuery');
 
-	useEffect(() => {
+	const fetchData = useCallback(() => {
 		fetchPatientOrders({
 			...(searchQuery && { searchQuery }),
 			...(patientMrn && { patientMrn }),
 			...(pageNumber && { pageNumber }),
+			patientOrderDispositionId: [
+				PatientOrderDispositionId.OPEN,
+				PatientOrderDispositionId.CLOSED,
+				PatientOrderDispositionId.ARCHIVED,
+			],
 		});
 	}, [fetchPatientOrders, pageNumber, patientMrn, searchQuery]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	useEffect(() => {
+		setMainViewRefresher(() => fetchData);
+	}, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {

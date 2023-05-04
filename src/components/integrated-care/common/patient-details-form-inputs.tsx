@@ -74,7 +74,6 @@ export const PatientDetailsFormInputs = ({
 				onBlur={handleBlur}
 				onChange={handleChange}
 				error={touched.patientEmailAddress && errors.patientEmailAddress ? errors.patientEmailAddress : ''}
-				required
 			/>
 		</>
 	);

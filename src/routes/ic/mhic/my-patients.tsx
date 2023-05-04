@@ -11,8 +11,8 @@ import {
 } from '@/components/integrated-care/mhic';
 
 import useAccount from '@/hooks/use-account';
-import { PatientOrderStatusId } from '@/lib/models';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
+import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 
 type MhicMyPatientsLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -36,23 +36,30 @@ export const Component = () => {
 		totalCountDescription,
 	} = useFetchPatientOrders();
 	const [searchParams, setSearchParams] = useSearchParams();
-
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 
 	const accountId = account?.accountId;
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderStatusId = searchParams.get('patientOrderStatusId');
-	const patientOrderDispositionId = searchParams.get('patientOrderDispositionId');
+	const patientOrderTriageStatusId = searchParams.get('patientOrderTriageStatusId');
+	const patientOrderSafetyPlanningStatusId = searchParams.get('patientOrderSafetyPlanningStatusId');
 
-	useEffect(() => {
+	const fetchData = useCallback(() => {
 		fetchPatientOrders({
 			...(accountId && { panelAccountId: accountId }),
-			...(patientOrderStatusId && { patientOrderStatusId }),
-			...(patientOrderDispositionId && { patientOrderDispositionId }),
+			...(patientOrderTriageStatusId && { patientOrderTriageStatusId }),
+			...(patientOrderSafetyPlanningStatusId && { patientOrderSafetyPlanningStatusId }),
 			...(pageNumber && { pageNumber }),
 			pageSize: '15',
 		});
-	}, [accountId, fetchPatientOrders, pageNumber, patientOrderDispositionId, patientOrderStatusId]);
+	}, [accountId, fetchPatientOrders, pageNumber, patientOrderSafetyPlanningStatusId, patientOrderTriageStatusId]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	// useEffect(() => {
+	// 	setMainViewRefresher(() => fetchData);
+	// }, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -62,13 +69,12 @@ export const Component = () => {
 		[searchParams, setSearchParams]
 	);
 
-	const pageTitleMap: Record<PatientOrderStatusId, string> = {
-		[PatientOrderStatusId.BHP]: 'BHP',
-		[PatientOrderStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
-		[PatientOrderStatusId.PENDING]: 'Pending',
-		[PatientOrderStatusId.SAFETY_PLANNING]: 'Safety Planning',
-		[PatientOrderStatusId.SPECIALTY_CARE]: 'Specialty Care',
-		[PatientOrderStatusId.SUBCLINICAL]: 'Subclinical',
+	const pageTitleMap: Record<string, string> = {
+		all: 'All Assigned',
+		[PatientOrderTriageStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
+		[PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING]: 'Safety Planning',
+		[PatientOrderTriageStatusId.BHP]: 'BHP',
+		[PatientOrderTriageStatusId.SPECIALTY_CARE]: 'Specialty Care',
 	};
 
 	return (
@@ -88,9 +94,7 @@ export const Component = () => {
 					<Col>
 						<MhicPageHeader
 							title={
-								patientOrderStatusId
-									? pageTitleMap[patientOrderStatusId as PatientOrderStatusId]
-									: 'All Assigned'
+								pageTitleMap[patientOrderTriageStatusId ?? patientOrderSafetyPlanningStatusId ?? 'all']
 							}
 							description={`${totalCountDescription ?? 0} Patients`}
 						>

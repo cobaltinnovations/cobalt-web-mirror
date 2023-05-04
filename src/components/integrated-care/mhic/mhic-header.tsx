@@ -137,7 +137,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		path: '/ic/mhic/reports',
 	});
 	const assessmentPath = useMatch({
-		path: '/ic/mhic/orders/:patientOrderId/assessment',
+		path: '/ic/mhic/orders/:patientOrderId/assessment/*',
 	});
 
 	const isInAssessmentView = !!assessmentPath;

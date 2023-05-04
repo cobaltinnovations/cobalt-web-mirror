@@ -13,7 +13,7 @@ export interface OpenPatientOrderCountModel {
 
 export interface PatientOrderModel {
 	patientOrderId: string;
-	patientOrderStatusId: PatientOrderStatusId;
+	patientOrderTriageStatusId: PatientOrderTriageStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
 	patientOrderDispositionDescription: string;
@@ -100,6 +100,7 @@ export interface PatientOrderModel {
 	patientOrderScheduledScreeningScheduledDateTime?: string;
 	patientOrderScheduledScreeningScheduledDateTimeDescription?: string;
 	patientOrderScheduledScreeningCalendarUrl?: string;
+	patientOrderVoicemailTasks: PatientOrderVoicemailTask[];
 	crisisIndicated?: boolean;
 	crisisIndicatedAt?: string;
 	crisisIndicatedAtDescription?: string;
@@ -110,6 +111,8 @@ export interface PatientOrderModel {
 	patientOrderScheduledMessageGroups: PatientOrderScheduledMessageGroup[];
 	connectedToSafetyPlanningAt?: string;
 	connectedToSafetyPlanningAtDescription?: string;
+	patientOrderAssignmentStatusId?: PatientOrderAssignmentStatusId;
+	patientOrderResponseStatusId?: PatientOrderResponseStatusId;
 	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
 	resourcesSentAt?: string;
@@ -117,6 +120,8 @@ export interface PatientOrderModel {
 	resourcesSentNote?: string;
 	outreachCount?: number;
 	outreachCountDescription?: string;
+	totalOutreachCount?: number;
+	totalOutreachCountDescription?: string;
 	patientOrderCareTypeId?: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription?: string;
 	mostRecentScreeningSessionId: string;
@@ -129,6 +134,11 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
+	// Scheduled appointment through connect-with-support
+	appointmentId?: string;
+	appointmentStartTime?: string;
+	appointmentStartTimeDescription?: string;
+	providerId?: string;
 	providerName?: string;
 }
 
@@ -140,7 +150,7 @@ export enum PatientOrderCareTypeId {
 	SAFETY_PLANNING = 'SAFETY_PLANNING',
 }
 
-enum PatientOrderClosureReasonId {
+export enum PatientOrderClosureReasonId {
 	NOT_CLOSED = 'NOT_CLOSED',
 	INELIGIBLE_DUE_TO_INSURANCE = 'INELIGIBLE_DUE_TO_INSURANCE',
 	REFUSED_CARE = 'REFUSED_CARE',
@@ -149,18 +159,26 @@ enum PatientOrderClosureReasonId {
 	SCHEDULED_WITH_BHP = 'SCHEDULED_WITH_BHP',
 }
 
-export enum PatientOrderStatusId {
-	PENDING = 'PENDING',
+export enum PatientOrderTriageStatusId {
 	NEEDS_ASSESSMENT = 'NEEDS_ASSESSMENT',
-	SAFETY_PLANNING = 'SAFETY_PLANNING',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	BHP = 'BHP',
 }
 
-export interface PatientOrderStatus {
-	patientOrderStatusId: PatientOrderStatusId;
-	description: string;
+export enum PatientOrderAssignmentStatusId {
+	UNASSIGNED = 'UNASSIGNED',
+	ASSIGNED = 'ASSIGNED',
+}
+
+export enum PatientOrderOutreachStatusId {
+	NO_OUTREACH = 'NO_OUTREACH',
+	HAS_OUTREACH = 'HAS_OUTREACH',
+}
+
+export enum PatientOrderResponseStatusId {
+	WAITING_FOR_RESPONSE = 'WAITING_FOR_RESPONSE',
+	NOT_WAITING_FOR_RESPONSE = 'NOT_WAITING_FOR_RESPONSE',
 }
 
 export enum PatientOrderScreeningStatusId {
@@ -314,8 +332,8 @@ export interface PatientOrderScheduledMessageGroup {
 	}[];
 }
 
-export type PatientOrderCountsByPatientOrderStatusId = Record<
-	PatientOrderStatusId,
+export type PatientOrderCountsByPatientOrderTriageStatusId = Record<
+	PatientOrderTriageStatusId,
 	{
 		patientOrderCountDescription: string;
 		patientOrderCount: number;
@@ -335,4 +353,25 @@ export interface PatientOrderScheduledScreening {
 	lastUpdatedDescription: string;
 	canceledAt?: string;
 	canceledAtDescription?: string;
+}
+
+export interface PatientOrderVoicemailTask {
+	completed: boolean;
+	created: string;
+	createdByAccountId: string;
+	createdDescription: string;
+	createdByAccountFirstName: string;
+	createdByAccountLastName: string;
+	createdByAccountDisplayName: string;
+	createdByAccountDisplayNameWithLastFirst: string;
+	completedByAccountFirstName?: string;
+	completedByAccountLastName?: string;
+	completedByAccountDisplayName?: string;
+	completedByAccountDisplayNameWithLastFirst?: string;
+	deleted: boolean;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	message: string;
+	patientOrderId: string;
+	patientOrderVoicemailTaskId: string;
 }

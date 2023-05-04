@@ -2,11 +2,15 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
-import { integratedCareService, screeningService } from '@/lib/services';
-import useAccount from '@/hooks/use-account';
+import config from '@/lib/config';
+import { PatientOrderModel, PatientOrderScreeningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
-import config from '@/lib/config';
+
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import useAccount from '@/hooks/use-account';
+import { NextStepsItem } from '@/components/integrated-care/patient';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -41,28 +45,40 @@ const pageStates = [
 
 const PatientLanding = () => {
 	const navigate = useNavigate();
-	const { account, institution } = useAccount();
+	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
+	const [pastPatientOrders, setPastPatientOrders] = useState<PatientOrderModel[]>([]);
 
 	const fetchData = useCallback(async () => {
 		try {
-			await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+			const { associatedPatientOrders } = await integratedCareService
+				.getPatientOrder(response.patientOrder.patientOrderId)
+				.fetch();
 
-			if (!institution?.integratedCareScreeningFlowId) {
+			setPatientOrder(response.patientOrder);
+			setPastPatientOrders(associatedPatientOrders);
+
+			const { screeningSessionResult, screeningSession, patientOrderScreeningStatusId } = response.patientOrder;
+
+			if (screeningSessionResult) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
 				return;
 			}
 
-			const { screeningSessions } = await screeningService
-				.getScreeningSessionsByFlowId({ screeningFlowId: institution.integratedCareScreeningFlowId })
-				.fetch();
-			const assessmentIsComplete = screeningSessions.some((session) => session.completed);
-
-			if (screeningSessions.length <= 0) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-			} else if (assessmentIsComplete) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
-			} else {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+			if (!screeningSession) {
+				if (
+					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED ||
+					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED
+				) {
+					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+					return;
+				}
+				if (patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS) {
+					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+					return;
+				}
 			}
 		} catch (_error) {
 			// Do not throw error, backend will 404  if there is no order, but that is ok.
@@ -70,7 +86,7 @@ const PatientLanding = () => {
 
 			setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 		}
-	}, [institution?.integratedCareScreeningFlowId]);
+	}, []);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -104,7 +120,7 @@ const PatientLanding = () => {
 
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-6">Welcome back, {account?.firstName ?? 'patient'}</h1>
+						<h1 className="mb-6">Welcome back, {patientOrder?.patientFirstName ?? 'patient'}</h1>
 						<hr />
 					</Col>
 				</Row>
@@ -129,69 +145,69 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-5">
-											<Col>
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0">
-													In order to connect you to the correct level of care, we need you to
-													complete an assessment. There are two ways to complete the
-													assessment:
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<Card bsPrefix="ic-card">
-													<Card.Header className="bg-white">
-														<Card.Title>Online (Recommended)</Card.Title>
-													</Card.Header>
-													<Card.Body>
-														<p className="mb-5">
-															Completing the assessment online will take about 15 minutes.
-															Only you and your care team will have access to your
-															answers.
-														</p>
-														<Button
-															onClick={() => {
-																navigate('/ic/patient/demographics-introduction');
-															}}
-														>
-															Take the Assessment
-														</Button>
-													</Card.Body>
-												</Card>
-											</Col>
-											<Col>
-												<Card bsPrefix="ic-card">
-													<Card.Header className="bg-white">
-														<Card.Title>By Phone</Card.Title>
-													</Card.Header>
-													<Card.Body>
-														<p className="mb-5">
-															Call us at 215-615-4222 Monday-Friday, 9am to 4pm and a
-															Mental Health Intake Coordinator will guide you through the
-															assessment over the phone.
-														</p>
-														<Button
-															variant="outline-primary"
-															onClick={() => {
-																window.alert('[TODO]');
-															}}
-														>
-															Call Us
-														</Button>
-													</Card.Body>
-												</Card>
-											</Col>
-										</Row>
-									</Container>
+								<Card.Body className="p-0">
+									<NextStepsItem
+										title="Complete the assessment"
+										description="In order to connect you to the correct level of care, we need you to complete an assessment. There are two ways to complete the assessment:"
+									>
+										<Container fluid>
+											<Row>
+												<Col md={6} className="mb-6 mb-md-0">
+													<Card bsPrefix="ic-card" className="h-100">
+														<Card.Header className="bg-white">
+															<Card.Title>Online (Recommended)</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																Completing the assessment online will take about 15
+																minutes. Only you and your care team will have access to
+																your answers.
+															</p>
+															<Button
+																onClick={() => {
+																	navigate('/ic/patient/consent/');
+																}}
+															>
+																Take the Assessment
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+												<Col md={6}>
+													<Card bsPrefix="ic-card" className="h-100">
+														<Card.Header className="bg-white">
+															<Card.Title>By Phone</Card.Title>
+														</Card.Header>
+														<Card.Body>
+															<p className="mb-5">
+																Call us at{' '}
+																{institution?.integratedCarePhoneNumberDescription}{' '}
+																Monday-Friday, 9am to 4pm and a Mental Health Intake
+																Coordinator will guide you through the assessment over
+																the phone.
+															</p>
+															<Button
+																as="a"
+																className="d-inline-block text-decoration-none"
+																variant="outline-primary"
+																href={`tel:${institution?.integratedCarePhoneNumber}`}
+															>
+																Call Us
+															</Button>
+														</Card.Body>
+													</Card>
+												</Col>
+											</Row>
+										</Container>
+									</NextStepsItem>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -203,11 +219,14 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<NoData
 								className="mb-10 bg-white"
 								title="No further action required"
-								description="You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at 215-615-4222 if you change your mind."
+								description={`You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at ${institution?.integratedCarePhoneNumberDescription} if you change your mind.`}
 								actions={[]}
 							/>
 							<hr />
@@ -219,49 +238,41 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
-								<Card.Body>
-									<Container fluid>
-										<Row className="mb-5">
-											<Col>
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0">
-													In order to connect you to the correct level of care, we need you to
-													complete an assessment. There are two ways to complete the
-													assessment:
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<NoData
-													className="bg-white"
-													title="Continue Assessment"
-													description="You previously made progress on the assessment. If now is a good time, we can restart from where you left off. Before we continue, please make sure you are in a comfortable place."
-													actions={[
-														{
-															variant: 'primary',
-															title: 'Continue Assessment',
-															onClick: () => {
-																window.alert('[TODO]');
-															},
-														},
-														{
-															variant: 'outline-primary',
-															title: 'Restart from Beginning',
-															onClick: () => {
-																navigate('/ic/patient/demographics-introduction');
-															},
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-									</Container>
+								<Card.Body className="p-0">
+									<NextStepsItem
+										title="Complete the assessment"
+										description="Online assessment in progress"
+									>
+										<NoData
+											className="bg-white"
+											title="Continue Assessment"
+											description="You previously made progress on the assessment. If now is a good time, we can start from where you left off. Before we continue, please make sure you are in a comfortable place."
+											actions={[
+												{
+													variant: 'primary',
+													title: 'Continue Assessment',
+													onClick: () => {
+														window.alert('[TODO]');
+													},
+												},
+												{
+													variant: 'outline-primary',
+													title: 'Restart from Beginning',
+													onClick: () => {
+														navigate('/ic/patient/consent');
+													},
+												},
+											]}
+										/>
+									</NextStepsItem>
 								</Card.Body>
 							</Card>
 							<hr />
@@ -273,51 +284,169 @@ const PatientLanding = () => {
 					<Row className="mb-10">
 						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 							<h4 className="mb-1">Current Episode</h4>
-							<p className="mb-6 text-gray">Referred Apr 5, 2023 by James L. Wong, MD</p>
+							<p className="mb-6 text-gray">
+								Referred {patientOrder?.orderDateDescription} by{' '}
+								{patientOrder?.orderingProviderDisplayName}
+							</p>
 							<Card bsPrefix="ic-card" className="mb-10">
 								<Card.Header>
 									<Card.Title>Next Steps</Card.Title>
 								</Card.Header>
 								<Card.Body className="p-0">
-									<div className="px-6 py-5">
-										<div className="d-flex align-items-center justify-content-between">
-											<div>
-												<p className="mb-1 fs-large fw-semibold">Complete the assessment</p>
-												<p className="mb-0 text-gray">Completed Apr 6, 2023 at 1:45 PM</p>
-											</div>
-											<Button
-												className="text-nowrap"
-												variant="outline-primary"
-												onClick={() => {
-													window.alert('[TODO]');
-												}}
-											>
-												Review Results
-											</Button>
-										</div>
-									</div>
-									<hr />
-									<div className="px-6 py-5">
-										<div className="d-flex align-items-center justify-content-between">
-											<div>
-												<p className="mb-1 fs-large fw-semibold">
-													Schedule appointment with Behavioral Health Provider
-												</p>
-												<p className="mb-0 text-gray">
-													Find an appointment by browsing the list of providers and choosing
-													an available appointment time.
-												</p>
-											</div>
-											<Button
-												className="text-nowrap"
-												onClick={() => {
-													window.alert('[TODO]');
-												}}
-											>
-												Find Appointment
-											</Button>
-										</div>
-									</div>
+									<NextStepsItem
+										complete
+										title="Complete the assessment"
+										description={`Completed ${
+											patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'
+										}`}
+										button={{
+											variant: 'outline-primary',
+											title: 'Review Results',
+											onClick: () => {
+												navigate('/ic/patient/assessment-results');
+											},
+										}}
+									/>
+									{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
+										<>
+											<hr />
+											{!patientOrder.appointmentId ? (
+												<NextStepsItem
+													title="Schedule appointment with Behavioral Health Provider"
+													description="Find an appointment by browsing the list of providers and choosing an available appointment time."
+													button={{
+														variant: 'primary',
+														title: 'Find Appointment',
+														onClick: () => {
+															navigate(
+																`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder.patientOrderId}`
+															);
+														},
+													}}
+												/>
+											) : (
+												<NextStepsItem
+													complete
+													title="Schedule appointment with Behavioral Health Provider"
+													description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
+													button={{
+														variant: 'danger',
+														title: 'Cancel Appointment',
+														onClick: () => {
+															window.alert('[TODO]: Show cancel appointment UI.');
+														},
+													}}
+												/>
+											)}
+										</>
+									)}
+									{patientOrder?.patientOrderTriageStatusId ===
+										PatientOrderTriageStatusId.SPECIALTY_CARE && (
+										<>
+											<hr />
+											{!patientOrder.appointmentId ? (
+												<NextStepsItem
+													title="Review resources & schedule appointment"
+													description={`Check ${
+														institution?.myChartName ?? 'MyChart'
+													} or call us for resources about available providers in your area.`}
+												>
+													<Container fluid>
+														<Row>
+															<Col md={6} className="mb-6 mb-md-0">
+																<Card bsPrefix="ic-card" className="h-100">
+																	<Card.Header className="bg-white">
+																		<Card.Title>
+																			Check{' '}
+																			{institution?.myChartName ?? 'MyChart'}
+																		</Card.Title>
+																	</Card.Header>
+																	<Card.Body>
+																		<p className="mb-5">
+																			A Mental Health Intake Coordinator will
+																			review your results and send a list of
+																			resources that work with your insurance
+																			within the next 24 hours. Please check{' '}
+																			{institution?.myChartName ?? 'MyChart'} for
+																			more details.
+																		</p>
+																		<Button
+																			className="d-flex align-items-center"
+																			onClick={() => {
+																				window.alert(
+																					'[TODO]: Need a "MyChart" url to link to.'
+																				);
+																			}}
+																		>
+																			Visit{' '}
+																			{institution?.myChartName ?? 'MyChart'}
+																			<ExternalIcon
+																				className="ms-2"
+																				width={20}
+																				height={20}
+																			/>
+																		</Button>
+																	</Card.Body>
+																</Card>
+															</Col>
+															<Col md={6}>
+																<Card bsPrefix="ic-card" className="h-100">
+																	<Card.Header className="bg-white">
+																		<Card.Title>Call Us</Card.Title>
+																	</Card.Header>
+																	<Card.Body>
+																		<p className="mb-5">
+																			Feel free to call us at{' '}
+																			{institution?.integratedCarePhoneNumberDescription ??
+																				'N/A'}{' '}
+																			if you do not receive the{' '}
+																			{institution?.myChartName ?? 'MyChart'}{' '}
+																			message or if you wish to speak to a Mental
+																			Health Intake Coordinator about your
+																			options.
+																		</p>
+																		<Button
+																			variant="outline-primary"
+																			onClick={() => {
+																				window.alert('[TODO]');
+																			}}
+																		>
+																			Call Us
+																		</Button>
+																	</Card.Body>
+																</Card>
+															</Col>
+														</Row>
+													</Container>
+												</NextStepsItem>
+											) : (
+												<>
+													<NextStepsItem
+														complete
+														title="Review resources & schedule appointment"
+														description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}. If you need to cancel this appointment... [TODO]`}
+													/>
+													<hr />
+													<NextStepsItem
+														title="Attend appointment"
+														description={`You indicated that you attended an appointment on [Date] at [Time] with [Provider Name].`}
+													/>
+												</>
+											)}
+										</>
+									)}
+									{patientOrder?.patientOrderTriageStatusId ===
+										PatientOrderTriageStatusId.SUBCLINICAL && (
+										<>
+											<hr />
+											<NextStepsItem
+												title="Review resources & schedule appointment"
+												description={`Check ${
+													institution?.myChartName ?? 'MyChart'
+												} or call us for resources about available providers in your area.`}
+											/>
+										</>
+									)}
 								</Card.Body>
 							</Card>
 							<hr />
@@ -328,18 +457,31 @@ const PatientLanding = () => {
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 						<h4 className="mb-1">Past Episodes</h4>
-						<p className="mb-6 text-gray">You 2 past episodes</p>
-						<div className="rounded border bg-white">
-							<div className="px-6 py-5">
-								<p className="mb-1 fs-large fw-semibold">Nov 12, 2023</p>
-								<p className="mb-0 text-gray">Closed: Nov 18, 2022 | Scheduled with BHP</p>
+						<p className="mb-6 text-gray">
+							Your {pastPatientOrders.length} past episode{pastPatientOrders.length === 1 ? '' : 's'}
+						</p>
+						{pastPatientOrders.length > 0 ? (
+							<div className="rounded border bg-white">
+								{pastPatientOrders.map((ppo, ppoIndex) => {
+									const isLast = ppoIndex === pastPatientOrders.length - 1;
+
+									return (
+										<React.Fragment key={ppo.patientOrderId}>
+											<div className="px-6 py-5">
+												<p className="mb-1 fs-large fw-semibold">{ppo.orderDateDescription}</p>
+												<p className="mb-0 text-gray">
+													Closed: {ppo.episodeClosedAtDescription} | [TODO]: Scheduled with
+													BHP
+												</p>
+											</div>
+											{!isLast && <hr />}
+										</React.Fragment>
+									);
+								})}
 							</div>
-							<hr />
-							<div className="px-6 py-5">
-								<p className="mb-1 fs-large fw-semibold">Apr 5, 2023</p>
-								<p className="mb-0 text-gray">Closed: Apr 7, 2022 | Scheduled with BHP</p>
-							</div>
-						</div>
+						) : (
+							<NoData title="No Past Episodes" actions={[]} />
+						)}
 					</Col>
 				</Row>
 			</Container>

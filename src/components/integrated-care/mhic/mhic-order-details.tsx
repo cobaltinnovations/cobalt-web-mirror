@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useRevalidator } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
+	AccountModel,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
@@ -30,6 +31,7 @@ import NoData from '@/components/no-data';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -48,6 +50,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
+	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 
@@ -71,6 +74,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		},
 		[addFlag, handleError, patientOrder.patientOrderId]
 	);
+
+	const incompleteVoicemailTask = useMemo(() => {
+		return patientOrder.patientOrderVoicemailTasks.find((vmt) => !vmt.completed);
+	}, [patientOrder.patientOrderVoicemailTasks]);
 
 	return (
 		<>
@@ -147,6 +154,79 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 				onSave={handleCloseEpisodeModalSave}
 			/>
+
+			<MhicVoicemailTaskModal
+				patientOrderVoicemailTask={incompleteVoicemailTask}
+				patientOrder={patientOrder}
+				show={showAddVoicemailTaskModal}
+				onHide={() => {
+					setShowAddVoicemailTaskModal(false);
+				}}
+				onSave={(updatedPatientOrder) => {
+					setShowAddVoicemailTaskModal(false);
+				}}
+			/>
+
+			{incompleteVoicemailTask && (
+				<section>
+					<Container fluid>
+						<Row>
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Voicemail Task</Card.Title>
+										<div className="button-container">
+											<Button
+												variant="light"
+												size="sm"
+												onClick={async () => {
+													await integratedCareService
+														.completeVoicemailTask(
+															incompleteVoicemailTask.patientOrderVoicemailTaskId
+														)
+														.fetch();
+
+													revalidator.revalidate();
+												}}
+											>
+												Mark Complete
+											</Button>
+											<Button
+												variant="light"
+												className="ms-2 p-2"
+												onClick={() => {
+													setShowAddVoicemailTaskModal(true);
+												}}
+											>
+												<EditIcon className="d-flex" />
+											</Button>
+										</div>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">
+														{incompleteVoicemailTask.createdByAccountDisplayName}
+													</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">{incompleteVoicemailTask.createdDescription}</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col>
+													<p className="m-0">{incompleteVoicemailTask.message}</p>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+					</Container>
+				</section>
+			)}
 
 			<section>
 				<Container fluid>
