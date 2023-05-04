@@ -4,13 +4,16 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
-import AsyncWrapper from '@/components/async-page';
 import useAccount from '@/hooks/use-account';
+import AsyncWrapper from '@/components/async-page';
+import { PatientInsuranceStatementModal } from '@/components/integrated-care/patient';
 
 export const PatientAssessmentResults = () => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
+
+	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
 	const [subclinicalInterested, setSubclinicalInterested] = useState(false);
 
 	const fetchData = useCallback(async () => {
@@ -20,6 +23,16 @@ export const PatientAssessmentResults = () => {
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
+			<PatientInsuranceStatementModal
+				show={showInsuranceStatementModal}
+				onHide={() => {
+					setShowInsuranceStatementModal(false);
+				}}
+				onContinue={() => {
+					navigate(`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder?.patientOrderId}`);
+				}}
+			/>
+
 			<Container className="py-20">
 				<Row className="mb-6">
 					<Col
@@ -49,9 +62,7 @@ export const PatientAssessmentResults = () => {
 									<Button
 										size="lg"
 										onClick={() => {
-											navigate(
-												`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder?.patientOrderId}`
-											);
+											setShowInsuranceStatementModal(true);
 										}}
 									>
 										Find Appointment
