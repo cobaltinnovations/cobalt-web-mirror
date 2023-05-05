@@ -16,7 +16,7 @@ const PatientConsent = () => {
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 
 	const fetchData = useCallback(async () => {
-		const response = await integratedCareService.getOpenOrderForCurrentPatient().fetch();
+		const response = await integratedCareService.getLatestPatientOrder().fetch();
 		setPatientOrder(response.patientOrder);
 	}, []);
 
@@ -34,6 +34,7 @@ const PatientConsent = () => {
 
 				if (value === 'YES') {
 					await integratedCareService.consentToCare(patientOrder.patientOrderId).fetch();
+
 					navigate('/ic/patient/demographics-part-1');
 					return;
 				}
@@ -44,6 +45,7 @@ const PatientConsent = () => {
 							patientOrderClosureReasonId: PatientOrderClosureReasonId.REFUSED_CARE,
 						})
 						.fetch();
+
 					navigate('/ic/patient');
 					return;
 				}

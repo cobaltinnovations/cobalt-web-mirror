@@ -134,6 +134,12 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
+	// Consent to mental health care
+	patientConsented?: boolean;
+	patientConsentedByAccountId?: string;
+	patientConsentedAt?: string;
+	patientConsentedAtDescription?: string;
+
 	// Scheduled appointment through connect-with-support
 	appointmentId?: string;
 	appointmentStartTime?: string;

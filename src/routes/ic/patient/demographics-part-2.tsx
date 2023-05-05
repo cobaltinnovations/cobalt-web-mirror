@@ -38,9 +38,7 @@ const PatientDemographicsPart2 = () => {
 	]);
 
 	const fetchData = useCallback(async () => {
-		const [patientOrderResponse] = await Promise.all([
-			integratedCareService.getOpenOrderForCurrentPatient().fetch(),
-		]);
+		const [patientOrderResponse] = await Promise.all([integratedCareService.getLatestPatientOrder().fetch()]);
 
 		setPatientOrder(patientOrderResponse.patientOrder);
 	}, []);
