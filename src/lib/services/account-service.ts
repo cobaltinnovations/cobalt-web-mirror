@@ -113,7 +113,7 @@ export interface ResetPasswordRequestBody {
 }
 
 export const accountService = {
-	account(accountId: string) {
+	account(accountId?: string) {
 		return httpSingleton.orchestrateRequest<AccountWithInstitutionResponse>({
 			method: 'get',
 			url: `/accounts/${accountId}?supplements=CAPABILITIES`,

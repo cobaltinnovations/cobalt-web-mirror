@@ -104,10 +104,18 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 
 	useEffect(() => {
 		setBodyPadding();
+
+		return () => {
+			document.body.style.paddingTop = '0px';
+		};
 	}, [account]);
 
 	useEffect(() => {
 		document.body.classList.toggle('header-menu-open', !!menuOpen);
+
+		return () => {
+			document.body.classList.remove('header-menu-open');
+		};
 	}, [menuOpen]);
 
 	/* ----------------------------------------------------------- */

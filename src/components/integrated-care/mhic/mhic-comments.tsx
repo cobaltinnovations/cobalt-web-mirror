@@ -9,6 +9,7 @@ import InputHelper from '@/components/input-helper';
 import { MhicComment, MhicEditCommentModal } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 import useFlags from '@/hooks/use-flags';
+import { useRevalidator } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	comments: {
@@ -30,16 +31,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface Props {
 	patientOrder: PatientOrderModel;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
+export const MhicComments = ({ patientOrder }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const textareaRef = useRef<HTMLInputElement>(null);
 	const [commentInputValue, setCommentInputValue] = useState('');
 	const [commentToEdit, setCommentToEdit] = useState<PatientOrderNoteModel>();
+	const revalidator = useRevalidator();
 
 	useEffect(() => {
 		textareaRef.current?.focus();
@@ -60,11 +61,9 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 						note: commentInputValue,
 					})
 					.fetch();
-				const patientOverviewResponse = await integratedCareService
-					.getPatientOrder(patientOrder.patientOrderId)
-					.fetch();
 
-				onPatientOrderChange(patientOverviewResponse.patientOrder);
+				revalidator.revalidate();
+
 				setCommentInputValue('');
 				addFlag({
 					variant: 'success',
@@ -76,7 +75,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				handleError(error);
 			}
 		},
-		[addFlag, commentInputValue, handleError, onPatientOrderChange, patientOrder]
+		[addFlag, commentInputValue, handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	const handleEditCommentSave = useCallback(async () => {
@@ -85,12 +84,8 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				throw new Error('patientOrder.patientOrderId is undefined.');
 			}
 
-			const patientOverviewResponse = await integratedCareService
-				.getPatientOrder(patientOrder.patientOrderId)
-				.fetch();
-
+			revalidator.revalidate();
 			setCommentToEdit(undefined);
-			onPatientOrderChange(patientOverviewResponse.patientOrder);
 			addFlag({
 				variant: 'success',
 				title: 'Comment updated',
@@ -100,7 +95,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+	}, [addFlag, handleError, patientOrder.patientOrderId, revalidator]);
 
 	const handleDeleteComment = useCallback(
 		async (patientOrderNoteId: string) => {
@@ -114,11 +109,9 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				}
 
 				await integratedCareService.deleteNote(patientOrderNoteId).fetch();
-				const patientOverviewResponse = await integratedCareService
-					.getPatientOrder(patientOrder.patientOrderId)
-					.fetch();
 
-				onPatientOrderChange(patientOverviewResponse.patientOrder);
+				revalidator.revalidate();
+
 				addFlag({
 					variant: 'success',
 					title: 'Comment deleted',
@@ -129,7 +122,7 @@ export const MhicComments = ({ patientOrder, onPatientOrderChange }: Props) => {
 				handleError(error);
 			}
 		},
-		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
+		[addFlag, handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	return (

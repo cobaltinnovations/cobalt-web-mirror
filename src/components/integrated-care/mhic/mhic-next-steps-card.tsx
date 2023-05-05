@@ -2,37 +2,38 @@ import React, { useCallback, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, PatientOrderSafetyPlanningStatusId } from '@/lib/models';
-import useHandleError from '@/hooks/use-handle-error';
 import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import { integratedCareService } from '@/lib/services';
+import { useRevalidator } from 'react-router-dom';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface Props {
 	patientOrder: PatientOrderModel;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled, className }: Props) => {
+export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) => {
 	const handleError = useHandleError();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
+	const revalidator = useRevalidator();
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleSafetyPlanningModalSave = useCallback(
 		(updatedPatientOrder: PatientOrderModel) => {
 			setShowSafetyPlanningModal(false);
-			onPatientOrderChange(updatedPatientOrder);
+			revalidator.revalidate();
 		},
-		[onPatientOrderChange]
+		[revalidator]
 	);
 
 	const handleResourcesModalSave = useCallback(
 		(updatedPatientOrder: PatientOrderModel) => {
 			setShowResourcesModal(false);
-			onPatientOrderChange(updatedPatientOrder);
+			revalidator.revalidate();
 		},
-		[onPatientOrderChange]
+		[revalidator]
 	);
 
 	const handleSafetyPlanningToggleChange = useCallback(
@@ -40,7 +41,7 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled
 			try {
 				setIsSaving(true);
 
-				const response = await integratedCareService
+				await integratedCareService
 					.updateSafetyPlanningStatus(patientOrder.patientOrderId, {
 						patientOrderSafetyPlanningStatusId: currentTarget.checked
 							? PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
@@ -48,14 +49,14 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled
 					})
 					.fetch();
 
-				onPatientOrderChange(response.patientOrder);
+				revalidator.revalidate();
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSaving(false);
 			}
 		},
-		[handleError, onPatientOrderChange, patientOrder.patientOrderId]
+		[handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	const handleResourcesToggleChange = useCallback(
@@ -63,7 +64,7 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled
 			try {
 				setIsSaving(true);
 
-				const response = await integratedCareService
+				await integratedCareService
 					.updateResourcingStatus(patientOrder.patientOrderId, {
 						patientOrderResourcingStatusId: currentTarget.checked
 							? PatientOrderResourcingStatusId.NEEDS_RESOURCES
@@ -71,14 +72,14 @@ export const MhicNextStepsCard = ({ patientOrder, onPatientOrderChange, disabled
 					})
 					.fetch();
 
-				onPatientOrderChange(response.patientOrder);
+				revalidator.revalidate();
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSaving(false);
 			}
 		},
-		[handleError, onPatientOrderChange, patientOrder.patientOrderId]
+		[handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	return (

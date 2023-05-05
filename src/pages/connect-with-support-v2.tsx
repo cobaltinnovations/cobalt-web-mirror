@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -37,9 +37,10 @@ enum SEARCH_PARAMS {
 const ConnectWithSupportV2 = () => {
 	const handleError = useHandleError();
 	const { pathname, search } = useLocation();
-	const { account, setAccount, institution } = useAccount();
+	const { account, institution } = useAccount();
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const { trackEvent } = useAnalytics();
+	const revalidator = useRevalidator();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
@@ -191,24 +192,24 @@ const ConnectWithSupportV2 = () => {
 
 			// Persist the selectedInstitutionLocationId in the account
 			// Don't throw if it fails though, fire-and-forget
-			if (!account) {
+			if (!account?.accountId) {
 				return;
 			}
 
 			try {
-				const response = await accountService
+				await accountService
 					.setAccountLocation(account.accountId, {
 						accountId: account.accountId,
 						institutionLocationId: desiredInstitutionLocationId ?? '',
 					})
 					.fetch();
 
-				setAccount(response.account);
+				revalidator.revalidate();
 			} catch (error) {
 				// Don't throw
 			}
 		},
-		[account, searchParams, selectedInstitutionLocationId, setAccount, setSearchParams]
+		[account?.accountId, revalidator, searchParams, selectedInstitutionLocationId, setSearchParams]
 	);
 
 	return (

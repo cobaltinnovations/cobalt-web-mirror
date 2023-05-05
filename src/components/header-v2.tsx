@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, matchPath, useLocation, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
@@ -29,7 +29,6 @@ import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import useSubdomain from '@/hooks/use-subdomain';
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
@@ -292,11 +291,9 @@ const HeaderV2 = () => {
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
-	const subdomain = useSubdomain();
-	const [searchParams] = useSearchParams();
-	const sessionAccountSourceId = useMemo(() => searchParams.get('accountSourceId'), [searchParams]);
+	const revalidator = useRevalidator();
 
-	const { account, institution, institutionCapabilities, setInstitution, signOutAndClearContext } = useAccount();
+	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -350,6 +347,10 @@ const HeaderV2 = () => {
 
 	useEffect(() => {
 		setBodyPadding();
+
+		return () => {
+			document.body.style.paddingTop = '0px';
+		};
 	}, [account]);
 
 	/* ----------------------------------------------------------- */
@@ -364,6 +365,10 @@ const HeaderV2 = () => {
 		}
 
 		document.body.style.overflow = 'visible';
+
+		return () => {
+			document.body.style.overflow = 'visible';
+		};
 	}, [menuOpen]);
 
 	/* ----------------------------------------------------------- */
@@ -571,21 +576,15 @@ const HeaderV2 = () => {
 				setAlertsDisabled(true);
 
 				await institutionService.dismissAlert(alertId).fetch();
-				const response = await institutionService
-					.getInstitution({
-						subdomain,
-						...(sessionAccountSourceId ? { accountSourceId: sessionAccountSourceId } : {}),
-					})
-					.fetch();
 
-				setInstitution(response.institution);
+				revalidator.revalidate();
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setAlertsDisabled(false);
 			}
 		},
-		[handleError, sessionAccountSourceId, setInstitution, subdomain]
+		[handleError, revalidator]
 	);
 
 	return (

@@ -1,9 +1,8 @@
 import useAccount from '@/hooks/use-account';
-import React, { FC, createContext, PropsWithChildren, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import ReactGA from 'react-ga';
-import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import config from '@/lib/config';
+import mixpanel, { Mixpanel } from 'mixpanel-browser';
+import React, { FC, PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
+import ReactGA from 'react-ga';
 
 import {
 	AnalyticsEventCategory,
@@ -14,6 +13,7 @@ import {
 	ScreeningEventActions,
 	TopicCenterEventActions,
 } from '@/lib/models/ga-events';
+import { useLocation } from 'react-router-dom';
 import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 
 /**
@@ -206,7 +206,7 @@ if (__DEV__) {
 
 const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	const location = useLocation();
-	const { institution, account, initialized } = useAccount();
+	const { institution, account } = useAccount();
 
 	const enabledVersionsRef = useRef({
 		mixpanel: false,
@@ -330,22 +330,20 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	}, []);
 
 	useEffect(() => {
-		if (!initialized) {
-			return;
-		}
-
 		if (enabledVersionsRef.current.reactGa) {
-			ReactGA.set({ ...commonData });
+			if (Object.keys(commonData).length > 0) {
+				ReactGA.set({ ...commonData });
+			}
 		}
 
 		if (enabledVersionsRef.current.ga4) {
 			gtag('set', { ...commonData });
 		}
-	}, [commonData, initialized]);
+	}, [commonData]);
 
 	const institutionId = institution?.institutionId;
 	useEffect(() => {
-		if (!initialized || !enabledVersionsRef.current.mixpanel || !institutionId) {
+		if (!enabledVersionsRef.current.mixpanel || !institutionId) {
 			return;
 		}
 
@@ -356,7 +354,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		}
 
 		mixpanel.register({ 'Institution ID': institutionId });
-	}, [accountId, initialized, institutionId]);
+	}, [accountId, institutionId]);
 
 	// track pageviews on navigation
 	// discard any search information on auth urls, as it may be sensitive (access token redirect)
@@ -365,16 +363,16 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		: location.pathname + location.search;
 
 	useEffect(() => {
-		if (!initialized || !isReactGAEnabled) {
+		if (!isReactGAEnabled) {
 			return;
 		}
 
 		ReactGA.set({ page, ...commonData });
 		ReactGA.pageview(page);
-	}, [commonData, initialized, isReactGAEnabled, page]);
+	}, [commonData, isReactGAEnabled, page]);
 
 	useEffect(() => {
-		if (!initialized || !isGA4Enabled) {
+		if (!isGA4Enabled) {
 			return;
 		}
 
@@ -382,14 +380,10 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
 			gtagPageView(measurementId, page);
 		}
-	}, [initialized, gtagPageView, isGA4Enabled, page, commonData]);
+	}, [gtagPageView, isGA4Enabled, page, commonData]);
 
 	const trackEvent = useCallback(
 		(event: AnalyticsEvent) => {
-			if (!initialized) {
-				return;
-			}
-
 			if (enabledVersionsRef.current.reactGa) {
 				if (event.category) {
 					ReactGA.event({
@@ -427,15 +421,11 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 				}
 			}
 		},
-		[commonData, initialized]
+		[commonData]
 	);
 
 	const trackModalView = useCallback(
 		(modalName: string) => {
-			if (!initialized) {
-				return;
-			}
-
 			if (enabledVersionsRef.current.reactGa) {
 				ReactGA.modalview(modalName);
 			}
@@ -446,7 +436,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 				}
 			}
 		},
-		[initialized, gtagPageView]
+		[gtagPageView]
 	);
 
 	return (

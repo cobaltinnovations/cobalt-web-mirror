@@ -1,32 +1,34 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
-import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { useRevalidator } from 'react-router-dom';
 
 interface Props {
 	patientOrder: PatientOrderModel;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
-	referenceData: ReferenceDataResponse;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicTriageCard = ({ patientOrder, onPatientOrderChange, referenceData, disabled, className }: Props) => {
+export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
+	const revalidator = useRevalidator();
 
 	return (
 		<>
 			<MhicChangeTriageModal
 				patientOrder={patientOrder}
-				referenceData={referenceData}
+				referenceData={referenceDataResponse}
 				show={showChangeTriageModal}
 				onHide={() => {
 					setShowChangeTriageModal(false);
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowChangeTriageModal(false);
-					onPatientOrderChange(updatedPatientOrder);
+					revalidator.revalidate();
 				}}
 			/>
 

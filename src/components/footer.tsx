@@ -41,6 +41,8 @@ const Footer: FC = () => {
 
 		return () => {
 			window.removeEventListener('resize', handleResize);
+			document.body.style.paddingBottom = '0';
+			document.body.style.minBlockSize = '100%';
 		};
 	}, []);
 

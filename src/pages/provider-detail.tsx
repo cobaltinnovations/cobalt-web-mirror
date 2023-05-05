@@ -213,6 +213,7 @@ const ProviderDetail = () => {
 												xl={{ span: 6, offset: 3 }}
 											>
 												<TabBar
+													key="provider-detail-tabbar"
 													hideBorder
 													value={
 														currentElementIndexInViewport === 0

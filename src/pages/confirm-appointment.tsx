@@ -128,8 +128,6 @@ const ConfirmAppointment = () => {
 			// 	})
 			// 	.fetch();
 
-			// setAccount(accountResponse.account);
-
 			const response = await appointmentService
 				.createAppointment({
 					providerId,

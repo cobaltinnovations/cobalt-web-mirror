@@ -8,6 +8,7 @@ import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
 import { Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import { useRevalidator } from 'react-router-dom';
 import LoadingButton from './loading-button';
 
 const useStyles = createUseStyles({
@@ -31,7 +32,8 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 	useTrackModalView('ConsentModal', modalProps.show);
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const { account, setAccount, signOutAndClearContext } = useAccount();
+	const { account, signOutAndClearContext } = useAccount();
+	const revalidator = useRevalidator();
 
 	const [isAccepting, setIsAccepting] = useState(false);
 	const [isRejecting, setIsRejecting] = useState(false);
@@ -94,15 +96,13 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 								accountService
 									.acceptConsent(account.accountId)
 									.fetch()
-									.then((response) => {
-										setAccount(response.account);
-									})
 									.catch((e) => {
 										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
 											handleError(e);
 										}
 									})
 									.finally(() => {
+										revalidator.revalidate();
 										setIsAccepting(false);
 									});
 							}}

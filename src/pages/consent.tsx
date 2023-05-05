@@ -5,13 +5,15 @@ import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
 import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 const Consent = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
+	const revalidator = useRevalidator();
+
 	const [searchParams] = useSearchParams();
-	const { account, setAccount, institution, signOutAndClearContext } = useAccount();
+	const { account, institution, signOutAndClearContext } = useAccount();
 
 	const destinationUrl = searchParams.get('destinationUrl') ?? '/';
 
@@ -53,9 +55,9 @@ const Consent = () => {
 											accountService
 												.acceptConsent(account.accountId)
 												.fetch()
-												.then((response) => {
-													setAccount(response.account);
+												.then(() => {
 													navigate(destinationUrl, { replace: true });
+													revalidator.revalidate();
 												})
 												.catch((e) => {
 													if (e.code !== ERROR_CODES.REQUEST_ABORTED) {

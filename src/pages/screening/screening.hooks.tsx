@@ -1,6 +1,6 @@
+import { useAppRootLoaderData } from '@/routes/root';
 import CollectPhoneModal from '@/components/collect-phone-modal';
 import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
-import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
@@ -135,7 +135,7 @@ export function useScreeningFlow({
 	patientOrderId?: string;
 	instantiateOnLoad?: boolean;
 }) {
-	const { isImmediateSession } = useAccount();
+	const { isImmediateSession } = useAppRootLoaderData();
 	const [searchParams] = useSearchParams();
 	// For now - if not in "on load" mode, ignore the concept of "skipped"
 	const isSkipped = instantiateOnLoad ? searchParams.get('skipped') === 'true' : false;

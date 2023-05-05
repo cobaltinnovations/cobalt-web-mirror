@@ -59,6 +59,7 @@ export const PatientHeader = () => {
 
 		return () => {
 			window.removeEventListener('resize', handleWindowResize);
+			document.body.style.paddingTop = '0px';
 		};
 	}, [handleWindowResize]);
 

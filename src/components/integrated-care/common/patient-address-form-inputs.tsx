@@ -1,5 +1,5 @@
 import InputHelper from '@/components/input-helper';
-import { ReferenceDataResponse } from '@/lib/models';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { FormikProps } from 'formik';
 import React from 'react';
 
@@ -17,13 +17,13 @@ export interface PatientAddressFormData {
 
 interface PatientAddressFormInputsProps {
 	formikProps: FormikProps<PatientAddressFormData>;
-	referenceData?: ReferenceDataResponse;
 }
 
 export const PatientAddressFormInputs = ({
 	formikProps: { values, handleBlur, setFieldValue, handleChange, touched, errors },
-	referenceData,
 }: PatientAddressFormInputsProps) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+
 	return (
 		<>
 			<InputHelper
@@ -81,7 +81,7 @@ export const PatientAddressFormInputs = ({
 				}
 			>
 				<option value="">Select...</option>
-				{referenceData?.regionsByCountryCode['US'].map((region) => {
+				{referenceDataResponse.regionsByCountryCode['US'].map((region) => {
 					return (
 						<option key={region.abbreviation} value={region.abbreviation}>
 							{region.name}

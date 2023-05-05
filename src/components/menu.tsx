@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { Link, To } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -7,8 +7,6 @@ import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 
 import { AccountInstitutionCapabilities, AccountModel, Institution } from '@/lib/models';
-import { accountService } from '@/lib/services';
-
 import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
@@ -384,26 +382,12 @@ const MENU_SECTIONS: MenuNavSection[] = [
 ];
 
 const Menu: FC<MenuProps> = ({ open, onHide }) => {
-	const { account, setAccount } = useAccount();
 	const classes = useMenuStyles();
 	const [menuSections, setMenuSections] = useState(MENU_SECTIONS);
 
 	function handleOverlayClick() {
 		onHide();
 	}
-
-	// fetch account on "open" to have most up-to-date "capabilities"
-	const accountId = account?.accountId;
-	useEffect(() => {
-		if (accountId && open) {
-			accountService
-				.account(accountId)
-				.fetch()
-				.then((response) => {
-					setAccount(response.account);
-				});
-		}
-	}, [accountId, open, setAccount]);
 
 	const isSubNav = useMemo(() => {
 		return !isEqual(menuSections, MENU_SECTIONS);

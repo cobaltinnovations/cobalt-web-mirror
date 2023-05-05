@@ -62,7 +62,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface MhicNavigationItemModel {
+export interface MhicNavigationItemModel {
 	title: string;
 	description?: string;
 	icon?(): JSX.Element;

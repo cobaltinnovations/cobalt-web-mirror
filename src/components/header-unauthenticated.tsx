@@ -58,6 +58,7 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 
 		return () => {
 			window.removeEventListener('resize', handleWindowResize);
+			document.body.style.paddingTop = '0px';
 		};
 	}, [handleWindowResize]);
 

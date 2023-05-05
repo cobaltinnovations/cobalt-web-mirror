@@ -383,6 +383,7 @@ const ResourceLibrary = () => {
 						<Row className="mb-6">
 							<Col>
 								<TabBar
+									key="resource-library-tabbar"
 									value={recommendedContent ? 'FOR_YOU' : 'ALL'}
 									tabs={[
 										{ value: 'ALL', title: 'All' },

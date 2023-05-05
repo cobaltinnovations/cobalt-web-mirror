@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Formik, FormikProps } from 'formik';
 import InputMask from 'react-input-mask';
 import Lottie from 'lottie-web';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useRevalidator } from 'react-router-dom';
 import { pick } from 'lodash';
 
 import useAccount from '@/hooks/use-account';
@@ -78,12 +78,13 @@ const EhrLookup: FC = () => {
 		percent: 0,
 		description: 'undetermined',
 	});
+	const revalidator = useRevalidator();
 
 	const [healthRecordsModalIsOpen, setHealthRecordsModalIsOpen] = useState(true);
 
 	const [numMatches, setNumMatches] = useState(0);
 
-	const { account, setAccount } = useAccount();
+	const { account } = useAccount();
 	const [initialValues, setInitialValues] = useState<EpicPatientData>(getClearForm(account));
 	const {
 		selectedAppointmentTypeId,
@@ -159,7 +160,7 @@ const EhrLookup: FC = () => {
 
 		try {
 			const response = await request.fetch();
-			setAccount(response.account);
+			revalidator.revalidate();
 
 			setIsBooking(true);
 			const appointmentData: CreateAppointmentData = {

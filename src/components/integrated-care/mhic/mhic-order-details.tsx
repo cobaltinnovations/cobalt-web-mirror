@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRevalidator } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -9,8 +9,6 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
-	PatientOrderScreeningStatusId,
-	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -32,26 +30,20 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 
 interface Props {
 	patientOrder: PatientOrderModel;
 	pastPatientOrders: PatientOrderModel[];
-	referenceData: ReferenceDataResponse;
-	panelAccounts: AccountModel[];
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicOrderDetails = ({
-	patientOrder,
-	onPatientOrderChange,
-	pastPatientOrders,
-	referenceData,
-	panelAccounts,
-}: Props) => {
+export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
 
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
@@ -96,14 +88,14 @@ export const MhicOrderDetails = ({
 					setShowScheduleAssessmentModal(false);
 				}}
 				onSave={(updatedPatientOrder) => {
-					onPatientOrderChange(updatedPatientOrder);
 					setShowScheduleAssessmentModal(false);
+					revalidator.revalidate();
 				}}
 			/>
 
 			<MhicAssessmentModal
 				show={!!screeningSessionScreeningResult}
-				screeningType={referenceData.screeningTypes.find(
+				screeningType={referenceDataResponse.screeningTypes.find(
 					(st) => st.screeningTypeId === screeningSessionScreeningResult?.screeningTypeId
 				)}
 				screeningSessionScreeningResult={screeningSessionScreeningResult}
@@ -113,9 +105,9 @@ export const MhicOrderDetails = ({
 			/>
 
 			<MhicDemographicsModal
-				raceOptions={referenceData.races}
-				ethnicityOptions={referenceData.ethnicities}
-				genderIdentityOptions={referenceData.genderIdentities}
+				raceOptions={referenceDataResponse.races}
+				ethnicityOptions={referenceDataResponse.ethnicities}
+				genderIdentityOptions={referenceDataResponse.genderIdentities}
 				patientOrder={patientOrder}
 				show={showDemographicsModal}
 				onHide={() => {
@@ -123,7 +115,7 @@ export const MhicOrderDetails = ({
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowDemographicsModal(false);
-					onPatientOrderChange(updatedPatientOrder);
+					revalidator.revalidate();
 				}}
 			/>
 
@@ -151,7 +143,7 @@ export const MhicOrderDetails = ({
 				}}
 				onSave={(updatedPatientOrder) => {
 					setShowContactInformationModal(false);
-					onPatientOrderChange(updatedPatientOrder);
+					revalidator.revalidate();
 				}}
 			/>
 
@@ -167,12 +159,10 @@ export const MhicOrderDetails = ({
 				patientOrderVoicemailTask={incompleteVoicemailTask}
 				patientOrder={patientOrder}
 				show={showAddVoicemailTaskModal}
-				panelAccounts={panelAccounts}
 				onHide={() => {
 					setShowAddVoicemailTaskModal(false);
 				}}
 				onSave={(updatedPatientOrder) => {
-					onPatientOrderChange(updatedPatientOrder);
 					setShowAddVoicemailTaskModal(false);
 				}}
 			/>
@@ -196,10 +186,7 @@ export const MhicOrderDetails = ({
 														)
 														.fetch();
 
-													const response = await integratedCareService
-														.getPatientOrder(patientOrder.patientOrderId)
-														.fetch();
-													onPatientOrderChange(response.patientOrder);
+													revalidator.revalidate();
 												}}
 											>
 												Mark Complete
@@ -245,7 +232,7 @@ export const MhicOrderDetails = ({
 				<Container fluid>
 					<Row>
 						<Col>
-							<MhicEpisodeCard patientOrder={patientOrder} onPatientOrderChange={onPatientOrderChange} />
+							<MhicEpisodeCard patientOrder={patientOrder} />
 						</Col>
 					</Row>
 				</Container>
@@ -320,14 +307,11 @@ export const MhicOrderDetails = ({
 							<MhicTriageCard
 								className="mb-6"
 								patientOrder={patientOrder}
-								referenceData={referenceData}
-								onPatientOrderChange={onPatientOrderChange}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
-								onPatientOrderChange={onPatientOrderChange}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 						</>
@@ -341,97 +325,95 @@ export const MhicOrderDetails = ({
 							</Row>
 							<Row>
 								<Col>
-									{patientOrder.patientOrderScreeningStatusId ===
-										PatientOrderScreeningStatusId.NOT_SCREENED && (
-										<NoData
-											title="No Assessment"
-											description="There is no assessment for the patient's most recent referral order"
-											actions={[
-												{
-													variant: 'primary',
-													title: 'Start Assessment',
-													onClick: () => {
-														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+									<NoData
+										className="mb-6"
+										title="No Assessment"
+										description="There is no assessment for the patient's most recent referral order"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Start Assessment',
+												onClick: () => {
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
-												{
-													variant: 'outline-primary',
-													title: 'Schedule Assessment',
-													onClick: () => {
-														setShowScheduleAssessmentModal(true);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Schedule Assessment',
+												onClick: () => {
+													setShowScheduleAssessmentModal(true);
 												},
-											]}
-										/>
-									)}
-									{patientOrder.patientOrderScreeningStatusId ===
-										PatientOrderScreeningStatusId.SCHEDULED && (
-										<NoData
-											className="bg-white"
-											title="Assessment is Scheduled"
-											description={
-												patientOrder.patientOrderScheduledScreeningScheduledDateTimeDescription
-											}
-											actions={[
-												{
-													variant: 'primary',
-													title: 'Start Assessment',
-													onClick: () => {
-														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+										]}
+									/>
+									<NoData
+										className="mb-6 bg-white"
+										title="Assessment is Scheduled"
+										description="Nov 12, 2023 at 2:30 PM"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Start Assessment',
+												onClick: () => {
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
-												{
-													variant: 'outline-primary',
-													title: 'Edit Appointment Date',
-													onClick: () => {
-														setShowScheduleAssessmentModal(true);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Edit Appointment Date',
+												onClick: () => {
+													setShowScheduleAssessmentModal(true);
 												},
-											]}
-										/>
-									)}
-									{patientOrder.patientOrderScreeningStatusId ===
-										PatientOrderScreeningStatusId.IN_PROGRESS && (
-										<NoData
-											className="bg-white"
-											title="Assessment in Progress"
-											description="{Patient Name} began the assessment on {Date} at {Time}"
-											actions={[
-												{
-													variant: 'primary',
-													title: 'Continue Assessment',
-													onClick: () => {
-														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+										]}
+									/>
+									<NoData
+										className="bg-white"
+										title="Assessment in Progress"
+										description="{Patient Name} began the assessment on {Date} at {Time}"
+										actions={[
+											{
+												variant: 'primary',
+												title: 'Continue Assessment',
+												onClick: () => {
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
-												{
-													variant: 'outline-primary',
-													title: 'Retake Assessment',
-													onClick: () => {
-														navigate(`orders/${patientOrder.patientOrderId}/assessment`);
-													},
-													disabled:
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED,
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Retake Assessment',
+												onClick: () => {
+													navigate(
+														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
+													);
 												},
-											]}
-										/>
-									)}
+												disabled:
+													patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED,
+											},
+										]}
+									/>
 								</Col>
 							</Row>
 						</>
@@ -561,7 +543,7 @@ export const MhicOrderDetails = ({
 											<Col>
 												<p className="m-0">
 													{
-														referenceData.languages.find(
+														referenceDataResponse.languages.find(
 															(language) =>
 																language.languageCode ===
 																patientOrder.patientLanguageCode
@@ -602,7 +584,7 @@ export const MhicOrderDetails = ({
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.races.find(
+													{referenceDataResponse.races.find(
 														(race) => race.raceId === patientOrder.patientRaceId
 													)?.description ?? 'Not Specified'}
 												</p>
@@ -614,7 +596,7 @@ export const MhicOrderDetails = ({
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.ethnicities.find(
+													{referenceDataResponse.ethnicities.find(
 														(ethnicity) =>
 															ethnicity.ethnicityId === patientOrder.patientEthnicityId
 													)?.description ?? 'Not Specified'}
@@ -627,7 +609,7 @@ export const MhicOrderDetails = ({
 											</Col>
 											<Col>
 												<p className="m-0">
-													{referenceData.genderIdentities.find(
+													{referenceDataResponse.genderIdentities.find(
 														(genderIdentity) =>
 															genderIdentity.genderIdentityId ===
 															patientOrder.patientGenderIdentityId

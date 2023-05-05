@@ -1,5 +1,5 @@
 import InputHelper from '@/components/input-helper';
-import { ReferenceDataResponse } from '@/lib/models';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { FormikProps } from 'formik';
 import React from 'react';
 
@@ -13,13 +13,13 @@ export interface PatientDemographicsFormData {
 
 interface PatientDemographicsFormInputsProps {
 	formikProps: FormikProps<PatientDemographicsFormData>;
-	referenceData?: ReferenceDataResponse;
 }
 
 export const PatientDemographicsFormInputs = ({
 	formikProps: { values, handleBlur, handleChange, touched, errors },
-	referenceData,
 }: PatientDemographicsFormInputsProps) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+
 	return (
 		<>
 			<InputHelper
@@ -33,7 +33,7 @@ export const PatientDemographicsFormInputs = ({
 				error={touched.patientBirthSexId && errors.patientBirthSexId ? errors.patientBirthSexId : ''}
 			>
 				<option value="">Select...</option>
-				{referenceData?.birthSexes.map((birthSex) => {
+				{referenceDataResponse.birthSexes.map((birthSex) => {
 					return (
 						<option key={birthSex.birthSexId} value={birthSex.birthSexId}>
 							{birthSex.description}
@@ -56,7 +56,7 @@ export const PatientDemographicsFormInputs = ({
 				}
 			>
 				<option value="">Select...</option>
-				{referenceData?.genderIdentities.map((genderIdentity) => {
+				{referenceDataResponse.genderIdentities.map((genderIdentity) => {
 					return (
 						<option key={genderIdentity.genderIdentityId} value={genderIdentity.genderIdentityId}>
 							{genderIdentity.description}
@@ -75,7 +75,7 @@ export const PatientDemographicsFormInputs = ({
 				error={touched.patientRaceId && errors.patientRaceId ? errors.patientRaceId : ''}
 			>
 				<option value="">Select...</option>
-				{referenceData?.races.map((race) => {
+				{referenceDataResponse.races.map((race) => {
 					return (
 						<option key={race.raceId} value={race.raceId}>
 							{race.description}
@@ -94,7 +94,7 @@ export const PatientDemographicsFormInputs = ({
 				error={touched.patientEthnicityId && errors.patientEthnicityId ? errors.patientEthnicityId : ''}
 			>
 				<option value="">Select...</option>
-				{referenceData?.ethnicities.map((ethnicity) => {
+				{referenceDataResponse.ethnicities.map((ethnicity) => {
 					return (
 						<option key={ethnicity.ethnicityId} value={ethnicity.ethnicityId}>
 							{ethnicity.description}
@@ -113,7 +113,7 @@ export const PatientDemographicsFormInputs = ({
 				error={touched.patientLanguageCode && errors.patientLanguageCode ? errors.patientLanguageCode : ''}
 			>
 				<option value="">Select...</option>
-				{referenceData?.languages.map((language) => {
+				{referenceDataResponse.languages.map((language) => {
 					return (
 						<option key={language.languageCode} value={language.languageCode}>
 							{language.description}

@@ -253,8 +253,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 							size="sm"
 							onClick={() => {
 								navigate({
-									pathname: '/ic/mhic/my-patients',
-									search: `?openPatientOrderId=${patientOrder?.patientOrderId}`,
+									pathname: '/ic/mhic/my-patients/' + patientOrder?.patientOrderId,
 								});
 							}}
 						>

@@ -8,7 +8,6 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
-	ReferenceDataResponse,
 	ScreeningSessionScreeningResult,
 	ScreeningType,
 } from '@/lib/models';
@@ -23,6 +22,7 @@ import {
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { compact } from 'lodash';
@@ -35,16 +35,11 @@ const useStyles = createUseStyles(() => ({
 }));
 
 interface MhicAssessmentCompleteProps {
-	referenceData?: ReferenceDataResponse;
 	patientOrder?: PatientOrderModel;
 	onStartNewAssessment: () => void;
 }
 
-export const MhicAssessmentComplete = ({
-	patientOrder,
-	referenceData,
-	onStartNewAssessment,
-}: MhicAssessmentCompleteProps) => {
+export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
 	const classes = useStyles();
 	const [notTakenScreeningTypes, setNotTakeScreeningTypes] = useState<ScreeningType[]>([]);
@@ -157,25 +152,9 @@ export const MhicAssessmentComplete = ({
 								/>
 							)}
 
-							{referenceData && (
-								<MhicTriageCard
-									className="mb-6"
-									patientOrder={patientOrder}
-									referenceData={referenceData}
-									onPatientOrderChange={(patientOrder) => {
-										window.alert('[TODO]: Refresh the order on this page');
-										console.log(patientOrder);
-									}}
-								/>
-							)}
-							<MhicNextStepsCard
-								className="mb-8"
-								patientOrder={patientOrder}
-								onPatientOrderChange={(patientOrder) => {
-									window.alert('[TODO]: Refresh the order on this page');
-									console.log(patientOrder);
-								}}
-							/>
+							<MhicTriageCard className="mb-6" patientOrder={patientOrder} />
+
+							<MhicNextStepsCard className="mb-8" patientOrder={patientOrder} />
 							<hr className="mb-8" />
 
 							{conditionsAndSymptomsResults.length > 0 && (
@@ -186,7 +165,6 @@ export const MhicAssessmentComplete = ({
 										<ScreeningResultCard
 											key={screening.screeningId}
 											screening={screening}
-											referenceData={referenceData}
 											id={screening.screeningId}
 										/>
 									))}
@@ -202,7 +180,6 @@ export const MhicAssessmentComplete = ({
 										<ScreeningResultCard
 											key={screening.screeningId}
 											screening={screening}
-											referenceData={referenceData}
 											id={screening.screeningId}
 										/>
 									))}
@@ -232,7 +209,6 @@ export const MhicAssessmentComplete = ({
 												},
 												belowScoringThreshold: undefined,
 											}}
-											referenceData={referenceData}
 											id={screeningType.screeningTypeId}
 										/>
 									))}
@@ -241,6 +217,7 @@ export const MhicAssessmentComplete = ({
 						</Col>
 						<Col md={{ span: 2, offset: 1 }}>
 							<TabBar
+								key="mhic-assessment-tabbar"
 								className="position-sticky"
 								style={{ top: MHIC_HEADER_HEIGHT + 32 }}
 								orientation="vertical"
@@ -302,15 +279,8 @@ export const MhicAssessmentComplete = ({
 	);
 };
 
-const ScreeningResultCard = ({
-	screening,
-	referenceData,
-	id,
-}: {
-	screening: ScreeningSessionScreeningResult;
-	referenceData?: ReferenceDataResponse;
-	id?: string;
-}) => {
+const ScreeningResultCard = ({ screening, id }: { screening: ScreeningSessionScreeningResult; id?: string }) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const classes = useStyles();
 
 	return (
@@ -336,7 +306,7 @@ const ScreeningResultCard = ({
 							<>
 								{screening.screeningScore?.overallScore}/
 								{
-									referenceData?.screeningTypes.find(
+									referenceDataResponse?.screeningTypes.find(
 										(st) => st.screeningTypeId === screening.screeningTypeId
 									)?.overallScoreMaximum
 								}

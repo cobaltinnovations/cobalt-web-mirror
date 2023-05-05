@@ -6,21 +6,22 @@ import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { MhicCloseEpisodeModal, MhicInlineAlert } from '@/components/integrated-care/mhic';
+import { useRevalidator } from 'react-router-dom';
 
 interface MhicEpisodeCardProps {
 	patientOrder: PatientOrderModel;
-	onPatientOrderChange(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpisodeCardProps) => {
+export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
+	const revalidator = useRevalidator();
 
 	const handleCloseEpisodeModalSave = useCallback(
 		async (patientOrderClosureReasonId: string) => {
 			try {
-				const response = await integratedCareService
+				await integratedCareService
 					.closePatientOrder(patientOrder.patientOrderId, { patientOrderClosureReasonId })
 					.fetch();
 
@@ -32,17 +33,17 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 					actions: [],
 				});
 
-				onPatientOrderChange(response.patientOrder);
+				revalidator.revalidate();
 			} catch (error) {
 				handleError(error);
 			}
 		},
-		[addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]
+		[addFlag, handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	const handleReopenButtonClick = useCallback(async () => {
 		try {
-			const response = await integratedCareService.openPatientOrder(patientOrder.patientOrderId).fetch();
+			await integratedCareService.openPatientOrder(patientOrder.patientOrderId).fetch();
 
 			addFlag({
 				variant: 'success',
@@ -51,11 +52,11 @@ export const MhicEpisodeCard = ({ patientOrder, onPatientOrderChange }: MhicEpis
 				actions: [],
 			});
 
-			onPatientOrderChange(response.patientOrder);
+			revalidator.revalidate();
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, handleError, onPatientOrderChange, patientOrder.patientOrderId]);
+	}, [addFlag, handleError, patientOrder.patientOrderId, revalidator]);
 
 	return (
 		<>

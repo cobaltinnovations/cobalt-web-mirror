@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation, useRevalidator } from 'react-router-dom';
 import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -48,12 +48,13 @@ const InTheStudioGroupSessionScheduled = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
-	const { setAccount } = useAccount();
+	const { account } = useAccount();
 	const { addFlag } = useFlags();
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const [isBooking, setIsBooking] = useState(false);
 	const [isCancelling, setIsCancelling] = useState(false);
+	const revalidator = useRevalidator();
 
 	const [session, setSession] = useState<GroupSessionModel>();
 	const [reservation, setReservation] = useState<GroupSessionReservationModel>();
@@ -178,11 +179,11 @@ const InTheStudioGroupSessionScheduled = () => {
 						try {
 							setIsBooking(true);
 
-							const response = await groupSessionsService
+							await groupSessionsService
 								.reserveGroupSession(session.groupSessionId, collectedEmail)
 								.fetch();
 
-							setAccount(response.account);
+							revalidator.revalidate();
 							await fetchData();
 
 							setShowConfirmReservationModal(false);

@@ -6,30 +6,34 @@ import { SignInPatient } from '@/components/auth/sign-in-patient';
 import { SignInStaff } from '@/components/auth/sign-in-staff';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import useSubdomain from '@/hooks/use-subdomain';
 import config from '@/lib/config';
 import { AccountSource, AccountSourceId, UserExperienceTypeId } from '@/lib/models';
 import { accountService } from '@/lib/services';
+import { useAppRootLoaderData } from '@/routes/root';
 
 const SignIn: FC = () => {
+	const { subdomain } = useAppRootLoaderData();
+
 	const handleError = useHandleError();
-	const { institution, processAccessToken } = useAccount();
-	const subdomain = useSubdomain();
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 
 	const handleEnterAnonymouslyButtonClick = useCallback(async () => {
 		try {
 			const { accessToken } = await accountService
 				.createAnonymousAccount({
-					...(subdomain && { subdomain }),
+					subdomain,
 				})
 				.fetch();
 
-			processAccessToken(accessToken);
+			navigate({
+				pathname: '/auth',
+				search: `?accessToken=${accessToken}`,
+			});
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, processAccessToken, subdomain]);
+	}, [handleError, navigate, subdomain]);
 
 	const handleAccountSourceClick = useCallback(
 		async (accountSource: AccountSource) => {
