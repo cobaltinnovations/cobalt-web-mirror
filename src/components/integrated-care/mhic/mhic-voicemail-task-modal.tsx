@@ -4,9 +4,10 @@ import { createUseStyles } from 'react-jss';
 
 import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
-import { AccountModel, PatientOrderModel, PatientOrderVoicemailTask } from '@/lib/models';
+import { PatientOrderModel, PatientOrderVoicemailTask } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
+import { useMhicLayoutLoaderData } from '@/routes/ic/mhic/mhic-layout';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -17,19 +18,13 @@ const useStyles = createUseStyles({
 interface Props extends ModalProps {
 	patientOrderVoicemailTask?: PatientOrderVoicemailTask;
 	patientOrder: PatientOrderModel;
-	panelAccounts?: AccountModel[];
 	onSave(updatedPatientOrder: PatientOrderModel): void;
 }
 
-export const MhicVoicemailTaskModal: FC<Props> = ({
-	patientOrderVoicemailTask,
-	patientOrder,
-	panelAccounts = [],
-	onSave,
-	...props
-}) => {
+export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { panelAccounts } = useMhicLayoutLoaderData();
 	const { addFlag } = useFlags();
 
 	const [panelAccountId, setPanelAccountId] = useState(patientOrder.panelAccountId ?? '');

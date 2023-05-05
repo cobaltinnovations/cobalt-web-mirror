@@ -14,7 +14,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
 import { integratedCareService } from '@/lib/services';
 
-import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import {
 	PatientOrderAssignmentStatusId,
@@ -88,7 +87,6 @@ const MhicOrdersUnassigned = () => {
 	const navigate = useNavigate();
 	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
-	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
 		fetchPatientOrders,
 		isLoadingOrders,
@@ -207,7 +205,6 @@ const MhicOrdersUnassigned = () => {
 
 			<MhicAssignOrderModal
 				patientOrderIds={selectedPatientOrderIds}
-				panelAccounts={panelAccounts}
 				show={showAssignOrderModal}
 				onHide={() => {
 					setShowAssignOrderModal(false);
@@ -243,7 +240,7 @@ const MhicOrdersUnassigned = () => {
 								</FileInputButton>
 								<Button
 									onClick={() => {
-										fetchPanelAccounts();
+										// fetchPanelAccounts();
 										setShowAssignOrderModal(true);
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}

@@ -6,6 +6,7 @@ import { LoaderFunctionArgs, Outlet, useRouteLoaderData } from 'react-router-dom
 import { useMhicOrderLayoutLoaderData } from './order-layout';
 import Loader from '@/components/loader';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { integratedCareService } from '@/lib/services';
 
 type MhicLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -16,7 +17,11 @@ export function useMhicLayoutLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	console.log('==> mhic layout loader');
 
-	return null;
+	const accounts = await integratedCareService.getPanelAccounts().fetch();
+
+	return {
+		panelAccounts: accounts.panelAccounts,
+	};
 }
 
 export const Component = () => {

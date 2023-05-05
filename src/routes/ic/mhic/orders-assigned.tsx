@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import {
 	MhicAssignOrderModal,
@@ -12,7 +12,6 @@ import {
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 
-import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderAssignmentStatusId } from '@/lib/models';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
@@ -24,7 +23,6 @@ const MhicOrdersAssigned = () => {
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
-	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
 	const {
 		fetchPatientOrders,
 		isLoadingOrders,
@@ -91,7 +89,6 @@ const MhicOrdersAssigned = () => {
 		<>
 			<MhicAssignOrderModal
 				patientOrderIds={selectedPatientOrderIds}
-				panelAccounts={panelAccounts}
 				show={showAssignOrderModal}
 				onHide={() => {
 					setShowAssignOrderModal(false);
@@ -110,7 +107,6 @@ const MhicOrdersAssigned = () => {
 							<div className="d-flex align-items-center">
 								<Button
 									onClick={() => {
-										fetchPanelAccounts();
 										setShowAssignOrderModal(true);
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}
@@ -140,7 +136,6 @@ const MhicOrdersAssigned = () => {
 								/>
 								<Button
 									onClick={() => {
-										fetchPanelAccounts();
 										setShowAssignOrderModal(true);
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}
