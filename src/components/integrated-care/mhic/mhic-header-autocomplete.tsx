@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { AsyncTypeahead, Menu } from 'react-bootstrap-typeahead';
 import MenuItem, { MenuItemProps } from 'react-bootstrap-typeahead/types/components/MenuItem';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	searchInput: {
@@ -261,7 +261,7 @@ interface PatientSearchResultProps extends MenuItemProps {
 
 const PatientSearchResult = ({ option, openShelf, ...itemProps }: PatientSearchResultProps) => {
 	const navigate = useNavigate();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const { pathname } = useLocation();
 
 	return (
 		<MenuItem
@@ -270,8 +270,9 @@ const PatientSearchResult = ({ option, openShelf, ...itemProps }: PatientSearchR
 			className="d-flex justify-content-between"
 			onClick={(e) => {
 				if (openShelf && option.patientOrderId) {
-					searchParams.set('openPatientOrderId', option.patientOrderId);
-					setSearchParams(searchParams);
+					navigate({
+						pathname: pathname + '/' + option.patientOrderId,
+					});
 				} else {
 					navigate({
 						pathname: '/ic/mhic/orders/search',

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -25,40 +25,67 @@ import {
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
-// import { MhicLayoutContext } from './mhic-layout';
+import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 
-const uiTabToApiQueryMap = {
-	NO_OUTREACH: {
-		patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
+const unassignedTabsConfig = [
+	{
+		tabTitle: 'No Outreach (New)',
+		routePath: 'new',
+		apiParameters: {
+			patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
+		},
 	},
+	{
+		tabTitle: 'Waiting for Consent',
+		routePath: 'pending-consent',
+		apiParameters: {
+			// TODO: WAITING_FOR_CONSENT query
+		},
+	},
+	{
+		tabTitle: 'Need Assessment',
+		routePath: 'need-assessment',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+		},
+	},
+	{
+		tabTitle: 'Safety Planning',
+		routePath: 'safety-planning',
+		apiParameters: {
+			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+		},
+	},
+	{
+		tabTitle: 'BHP',
+		routePath: 'bhp',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
+		},
+	},
+	{
+		tabTitle: 'Specialty',
+		routePath: 'specialty-care',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+		},
+	},
+];
 
-	WAITING_FOR_CONSENT: {
-		// TODO: WAITING_FOR_CONSENT query
-	},
-
-	NEED_ASSESSMENT: {
-		patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
-	},
-
-	SAFETY_PLANNING: {
-		patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-	},
-
-	BHP: {
-		patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
-	},
-
-	SPECIALTY_CARE: {
-		patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
-	},
-};
+const uiTabs = unassignedTabsConfig.map((tabConfig) => {
+	return {
+		title: tabConfig.tabTitle,
+		value: tabConfig.routePath,
+	};
+});
 
 const MhicOrdersUnassigned = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { activeTab = uiTabs[0].value } = useParams<{ activeTab: string }>();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
-	const filterBy = (searchParams.get('filterBy') ?? 'NO_OUTREACH') as keyof typeof uiTabToApiQueryMap;
+	const navigate = useNavigate();
 	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
@@ -77,13 +104,15 @@ const MhicOrdersUnassigned = () => {
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 
 	const fetchTableData = useCallback(() => {
+		const apiParameters = unassignedTabsConfig.find((c) => c.routePath === activeTab)?.apiParameters;
+
 		return fetchPatientOrders({
 			pageSize: '15',
 			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
-			...uiTabToApiQueryMap[filterBy],
+			...apiParameters,
 			...(pageNumber && { pageNumber }),
 		});
-	}, [fetchPatientOrders, filterBy, pageNumber]);
+	}, [fetchPatientOrders, activeTab, pageNumber]);
 
 	const handleImportButtonChange = useCallback(
 		(file: File) => {
@@ -227,36 +256,12 @@ const MhicOrdersUnassigned = () => {
 						<hr />
 						<TabBar
 							key="mhic-orders-unassigned-tabbar"
-							value={filterBy}
-							tabs={[
-								{
-									title: 'No Outreach (New)',
-									value: 'NO_OUTREACH',
-								},
-								{
-									title: 'Waiting for Consent',
-									value: 'WAITING_FOR_CONSENT',
-								},
-								{
-									title: 'Need Assessment',
-									value: 'NEED_ASSESSMENT',
-								},
-								{
-									title: 'Safety Planning',
-									value: 'SAFETY_PLANNING',
-								},
-								{
-									title: 'BHP',
-									value: 'BHP',
-								},
-								{
-									title: 'Specialty Care',
-									value: 'SPECIALTY_CARE',
-								},
-							]}
+							value={activeTab}
+							tabs={uiTabs}
 							onTabClick={(value) => {
-								searchParams.set('filterBy', value);
-								setSearchParams(searchParams);
+								navigate({
+									pathname: '/ic/mhic/orders/unassigned/' + value,
+								});
 							}}
 						/>
 					</Col>
@@ -266,7 +271,7 @@ const MhicOrdersUnassigned = () => {
 						<MhicPatientOrderTable
 							isLoading={isLoadingOrders}
 							// TODO: WAITING_FOR_CONSENT query
-							patientOrders={filterBy === 'WAITING_FOR_CONSENT' ? [] : patientOrders}
+							patientOrders={activeTab === uiTabs[1].value ? [] : patientOrders}
 							selectAll={selectAll}
 							onSelectAllChange={setSelectAll}
 							selectedPatientOrderIds={selectedPatientOrderIds}
@@ -290,6 +295,8 @@ const MhicOrdersUnassigned = () => {
 					</Col>
 				</Row>
 			</Container>
+
+			<MhicShelfOutlet />
 		</>
 	);
 };

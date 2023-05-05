@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import {
 	MhicFilterDropdown,
 	MhicPageHeader,
 	MhicPatientOrderTable,
+	MhicShelfOutlet,
 	MhicSortDropdown,
 } from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
-// import { MhicLayoutContext } from './mhic-layout';
 
 const MhicOrdersClosed = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -101,6 +101,8 @@ const MhicOrdersClosed = () => {
 					</Col>
 				</Row>
 			</Container>
+
+			<MhicShelfOutlet />
 		</>
 	);
 };

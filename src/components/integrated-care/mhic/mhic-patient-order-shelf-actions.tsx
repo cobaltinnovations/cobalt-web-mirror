@@ -17,7 +17,7 @@ import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
 import { ReactComponent as AddNotesIcon } from '@/assets/icons/icon-add-notes.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRevalidator } from 'react-router-dom';
 import { MhicScheduleAssessmentModal } from './mhic-schedule-assessment-modal';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicCloseEpisodeModal } from './mhic-close-episode-modal';
@@ -32,16 +32,16 @@ const useStyles = createUseThemedStyles(() => ({
 
 interface MhicPatientOrderShelfActionsProps {
 	patientOrder: PatientOrderModel;
-	onDataChange: (updatedOrder: PatientOrderModel) => void;
 }
 
 const NO_ACTION_DISPOSITIONS = [PatientOrderDispositionId.CLOSED, PatientOrderDispositionId.ARCHIVED];
 
-export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: MhicPatientOrderShelfActionsProps) => {
+export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderShelfActionsProps) => {
 	const handleError = useHandleError();
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
 
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
@@ -50,8 +50,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 
 	const handleAssignOrdersSave = useCallback(
 		async (patientOrderCount: number, panelAccountDisplayName: string) => {
-			const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
-			onDataChange(response.patientOrder);
+			revalidator.revalidate();
 			setShowAssignOrderModal(false);
 			addFlag({
 				variant: 'success',
@@ -60,7 +59,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 				actions: [],
 			});
 		},
-		[addFlag, onDataChange, patientOrder.patientOrderId]
+		[addFlag, revalidator]
 	);
 
 	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
@@ -96,8 +95,8 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 				onHide={() => {
 					setShowScheduleAssessmentModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
-					onDataChange(updatedPatientOrder);
+				onSave={() => {
+					revalidator.revalidate();
 					setShowScheduleAssessmentModal(false);
 				}}
 			/>
@@ -109,8 +108,8 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 				onHide={() => {
 					setShowAddVoicemailTaskModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
-					onDataChange(updatedPatientOrder);
+				onSave={() => {
+					revalidator.revalidate();
 					setShowAddVoicemailTaskModal(false);
 				}}
 			/>
@@ -122,11 +121,11 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 				}}
 				onSave={async (patientOrderClosureReasonId) => {
 					try {
-						const response = await integratedCareService
+						await integratedCareService
 							.closePatientOrder(patientOrder.patientOrderId, { patientOrderClosureReasonId })
 							.fetch();
 
-						onDataChange(response.patientOrder);
+						revalidator.revalidate();
 						setShowCloseEpisodeModal(false);
 						addFlag({
 							variant: 'success',
@@ -184,14 +183,14 @@ export const MhicPatientOrderShelfActions = ({ patientOrder, onDataChange }: Mhi
 							<Dropdown.Divider />
 							<Dropdown.Item
 								onClick={async () => {
-									const response = await integratedCareService
+									await integratedCareService
 										.updateResourcingStatus(patientOrder.patientOrderId, {
 											patientOrderResourcingStatusId:
 												PatientOrderResourcingStatusId.NEEDS_RESOURCES,
 										})
 										.fetch();
 
-									onDataChange(response.patientOrder);
+									revalidator.revalidate();
 								}}
 							>
 								<AddNotesIcon className="text-gray" /> Add Resource Request

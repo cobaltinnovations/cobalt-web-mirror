@@ -44,6 +44,7 @@ import { RoutedSelectedAvailabilityPanel } from './pages/scheduling/routed-selec
 import { routeRedirects } from './route-redirects';
 import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
+import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -627,24 +628,38 @@ export const routes: RouteObject[] = [
 												id: 'mhic-my-patients',
 												path: 'my-patients',
 												lazy: () => import('@/routes/ic/mhic/my-patients'),
+												children: [mhicShelfRouteObject],
 											},
 										],
 									},
 									{
 										path: 'orders/search',
 										element: <MhicSearchResults />,
+										children: [mhicShelfRouteObject],
 									},
 									{
 										path: 'orders/unassigned',
-										element: <MhicOrdersUnassigned />,
+										children: [
+											{
+												index: true,
+												element: <Navigate to="new" />,
+											},
+											{
+												path: ':activeTab',
+												element: <MhicOrdersUnassigned />,
+												children: [mhicShelfRouteObject],
+											},
+										],
 									},
 									{
 										path: 'orders/assigned',
 										element: <MhicOrdersAssigned />,
+										children: [mhicShelfRouteObject],
 									},
 									{
 										path: 'orders/closed',
 										element: <MhicOrdersClosed />,
+										children: [mhicShelfRouteObject],
 									},
 									{
 										id: 'mhic-patient-order',

@@ -15,7 +15,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
 import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderAssignmentStatusId } from '@/lib/models';
-// import { MhicLayoutContext } from './mhic-layout';
+import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 
 const MhicOrdersAssigned = () => {
 	const { addFlag } = useFlags();
@@ -182,6 +182,8 @@ const MhicOrdersAssigned = () => {
 					</Col>
 				</Row>
 			</Container>
+
+			<MhicShelfOutlet />
 		</>
 	);
 };

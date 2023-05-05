@@ -7,21 +7,21 @@ import {
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { ERROR_CODES } from '@/lib/http-client';
-import { PatientOrderModel, ReferenceDataResponse } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useParams, useRevalidator } from 'react-router-dom';
+import { useIntegratedCareLoaderData } from '../landing';
+import { useMhicOrderLayoutLoaderData } from './order-layout';
 
 export const MhicOrderAssessment = () => {
 	const handleError = useHandleError();
 	const { patientOrderId } = useParams<{ patientOrderId: string }>();
-	const { referenceData, patientOrder, fetchOutletPatientOrder } = useOutletContext<{
-		referenceData?: ReferenceDataResponse;
-		patientOrder?: PatientOrderModel;
-		fetchOutletPatientOrder: () => Promise<void>;
-	}>();
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+	const { patientOrderResponse } = useMhicOrderLayoutLoaderData();
+	const revalidator = useRevalidator();
+
 	const { institution } = useAccount();
 	const { checkAndStartScreeningFlow, createNewScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
@@ -33,13 +33,16 @@ export const MhicOrderAssessment = () => {
 
 	const handleFormSubmit = useCallback(
 		async (values: PatientInfoFormData) => {
-			if (!patientOrder) {
+			if (!patientOrderResponse.patientOrder) {
 				return;
 			}
 
 			try {
-				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
-				await fetchOutletPatientOrder();
+				await integratedCareService
+					.patchPatientOrder(patientOrderResponse.patientOrder.patientOrderId, values)
+					.fetch();
+				revalidator.revalidate();
+
 				setShowIntro(true);
 				window.scrollTo(0, 0);
 			} catch (error) {
@@ -48,29 +51,37 @@ export const MhicOrderAssessment = () => {
 				}
 			}
 		},
-		[fetchOutletPatientOrder, handleError, patientOrder]
+		[handleError, patientOrderResponse.patientOrder, revalidator]
 	);
 
-	const showVerificationForm = !!patientOrder && (isRecreate || !patientOrder.screeningSession) && !showIntro;
+	const showVerificationForm =
+		!!patientOrderResponse.patientOrder &&
+		(isRecreate || !patientOrderResponse.patientOrder.screeningSession) &&
+		!showIntro;
 	const showInProgress =
-		!!patientOrder?.screeningSession && !patientOrder.screeningSession.completed && !showIntro && !isRecreate;
+		!!patientOrderResponse.patientOrder?.screeningSession &&
+		!patientOrderResponse.patientOrder.screeningSession.completed &&
+		!showIntro &&
+		!isRecreate;
 	const isCompleted =
-		!!patientOrder?.screeningSession?.completed && !!patientOrder.screeningSessionResult && !isRecreate;
+		!!patientOrderResponse.patientOrder?.screeningSession?.completed &&
+		!!patientOrderResponse.patientOrder.screeningSessionResult &&
+		!isRecreate;
 
 	return (
 		<>
 			{showVerificationForm && (
 				<MhicVerifyPatientInfoForm
-					patientOrder={patientOrder}
+					patientOrder={patientOrderResponse.patientOrder}
 					onSubmit={handleFormSubmit}
-					referenceData={referenceData}
+					referenceData={referenceDataResponse}
 				/>
 			)}
 
 			{showIntro && (
 				<ScreeningIntro
 					isMhic
-					patientOrder={patientOrder}
+					patientOrder={patientOrderResponse.patientOrder}
 					onBegin={async () => {
 						if (isRecreate) {
 							await createNewScreeningFlow();
@@ -78,7 +89,7 @@ export const MhicOrderAssessment = () => {
 							await checkAndStartScreeningFlow();
 						}
 
-						fetchOutletPatientOrder();
+						revalidator.revalidate();
 					}}
 				/>
 			)}
@@ -111,7 +122,7 @@ export const MhicOrderAssessment = () => {
 
 			{isCompleted && (
 				<MhicAssessmentComplete
-					patientOrder={patientOrder}
+					patientOrder={patientOrderResponse.patientOrder}
 					onStartNewAssessment={() => {
 						setIsRecreate(true);
 					}}

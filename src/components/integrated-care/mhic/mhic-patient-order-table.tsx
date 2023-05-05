@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
@@ -103,7 +103,8 @@ export const MhicPatientOrderTable = ({
 	showPagination = true,
 }: MhicPatientOrderTableProps) => {
 	const classes = useStyles();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const { pathname } = useLocation();
+	const navigate = useNavigate();
 
 	const patientColumnOffset = useMemo(() => {
 		if (columnConfig.checkbox && columnConfig.flag) {
@@ -215,8 +216,9 @@ export const MhicPatientOrderTable = ({
 											return;
 										}
 
-										searchParams.set('openPatientOrderId', po.patientOrderId);
-										setSearchParams(searchParams);
+										navigate({
+											pathname: pathname + '/' + po.patientOrderId,
+										});
 									}}
 									highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
 									className={classNames({

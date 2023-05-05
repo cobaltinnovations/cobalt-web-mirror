@@ -8,6 +8,7 @@ import {
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
+	MhicShelfOutlet,
 } from '@/components/integrated-care/mhic';
 
 import useAccount from '@/hooks/use-account';
@@ -151,6 +152,8 @@ export const Component = () => {
 					</Col>
 				</Row>
 			</Container>
+
+			<MhicShelfOutlet />
 		</>
 	);
 };

@@ -1,55 +1,71 @@
-import { MHIC_HEADER_HEIGHT, MhicHeader, MhicPatientOrderShelf } from '@/components/integrated-care/mhic';
-import Loader from '@/components/loader';
+import { MHIC_HEADER_HEIGHT, MhicHeader } from '@/components/integrated-care/mhic';
 import { STORAGE_KEYS } from '@/lib/config/constants';
-import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models';
-import React, { Suspense, useCallback, useState } from 'react';
-import { LoaderFunctionArgs, Outlet, useSearchParams } from 'react-router-dom';
+import { PatientOrderAutocompleteResult } from '@/lib/models';
+import React, { Suspense, useEffect, useState } from 'react';
+import { LoaderFunctionArgs, Outlet, useRouteLoaderData } from 'react-router-dom';
+import { useMhicOrderLayoutLoaderData } from './order-layout';
+import Loader from '@/components/loader';
+import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+
+type MhicLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
+
+export function useMhicLayoutLoaderData() {
+	return useRouteLoaderData('mhic') as MhicLayoutLoaderData;
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	console.log('==> mhic layout loader');
+
 	return null;
 }
 
 export const Component = () => {
-	const [searchParams, setSearchParams] = useSearchParams();
+	const mhicOrderLayoutLoaderData = useMhicOrderLayoutLoaderData();
+	const shelfLoaderData = useMhicPatientOrdereShelfLoaderData();
 
 	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(
 		JSON.parse(window.localStorage.getItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY) ?? '[]')
 	);
-	const [openOrder, setOpenOrder] = useState<PatientOrderModel>();
 
-	const handleShelfOpen = useCallback((patientOrder: PatientOrderModel) => {
-		setOpenOrder(patientOrder);
+	useEffect(() => {
+		if (!shelfLoaderData?.patientOrderPromise) {
+			return;
+		}
 
-		const result = {
-			patientOrderId: patientOrder.patientOrderId,
-			patientMrn: patientOrder.patientMrn,
-			patientId: patientOrder.patientId,
-			patientIdType: patientOrder.patientIdType,
-			patientFirstName: patientOrder.patientFirstName,
-			patientLastName: patientOrder.patientLastName,
-			patientDisplayName: patientOrder.patientDisplayName,
-			patientPhoneNumber: patientOrder.patientPhoneNumber,
-			patientPhoneNumberDescription: patientOrder.patientPhoneNumberDescription,
-		} as PatientOrderAutocompleteResult & { patientOrderId: string };
+		shelfLoaderData.patientOrderPromise.then((patientOrderResponse) => {
+			const result = {
+				patientOrderId: patientOrderResponse.patientOrder.patientOrderId,
+				patientMrn: patientOrderResponse.patientOrder.patientMrn,
+				patientId: patientOrderResponse.patientOrder.patientId,
+				patientIdType: patientOrderResponse.patientOrder.patientIdType,
+				patientFirstName: patientOrderResponse.patientOrder.patientFirstName,
+				patientLastName: patientOrderResponse.patientOrder.patientLastName,
+				patientDisplayName: patientOrderResponse.patientOrder.patientDisplayName,
+				patientPhoneNumber: patientOrderResponse.patientOrder.patientPhoneNumber,
+				patientPhoneNumberDescription: patientOrderResponse.patientOrder.patientPhoneNumberDescription,
+			} as PatientOrderAutocompleteResult & { patientOrderId: string };
 
-		setRecentOrders((orders) => {
-			const newOrders = orders.slice(0, 4);
-			const index = newOrders.findIndex((o) => o.patientMrn === result.patientMrn);
+			setRecentOrders((orders) => {
+				const newOrders = orders.slice(0, 4);
+				const index = newOrders.findIndex((o) => o.patientMrn === result.patientMrn);
 
-			if (index > -1) {
+				if (index > -1) {
+					return newOrders;
+				}
+
+				newOrders.unshift(result);
+				window.localStorage.setItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY, JSON.stringify(newOrders));
 				return newOrders;
-			}
-
-			newOrders.unshift(result);
-			window.localStorage.setItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY, JSON.stringify(newOrders));
-			return newOrders;
+			});
 		});
-	}, []);
+	}, [shelfLoaderData?.patientOrderPromise]);
 
 	return (
 		<>
-			<MhicHeader patientOrder={openOrder} recentOrders={recentOrders} />
+			<MhicHeader
+				patientOrder={mhicOrderLayoutLoaderData?.patientOrderResponse.patientOrder}
+				recentOrders={recentOrders}
+			/>
 
 			<div
 				style={{
@@ -60,16 +76,6 @@ export const Component = () => {
 					<Outlet />
 				</Suspense>
 			</div>
-
-			<MhicPatientOrderShelf
-				patientOrderId={searchParams.get('openPatientOrderId')}
-				onShelfLoad={handleShelfOpen}
-				onHide={() => {
-					const params = new URLSearchParams(searchParams.toString());
-					params.delete('openPatientOrderId');
-					setSearchParams(params);
-				}}
-			/>
 		</>
 	);
 };
