@@ -18,6 +18,7 @@ const ConfirmAppointment = () => {
 	const date = searchParams.get('date') ?? '';
 	const time = searchParams.get('time') ?? '';
 	const intakeAssessmentId = searchParams.get('intakeAssessmentId') || undefined;
+	const patientOrderId = searchParams.get('patientOrderId') || undefined;
 
 	const { addFlag } = useFlags();
 	const { account } = useAccount();
@@ -137,6 +138,7 @@ const ConfirmAppointment = () => {
 					intakeAssessmentId,
 					emailAddress: emailInputValue,
 					...(promptForPhoneNumber && { phoneNumber: phoneNumberInputValue }),
+					...(patientOrderId && { patientOrderId }),
 				})
 				.fetch();
 

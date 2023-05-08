@@ -342,10 +342,6 @@ export const routes: RouteObject[] = [
 								element: <IntakeAssessment />,
 							},
 							{
-								path: 'confirm-appointment',
-								element: <ConfirmAppointment />,
-							},
-							{
 								path: 'one-on-one-resources',
 								element: <OneOnOneResources />,
 							},
@@ -366,6 +362,10 @@ export const routes: RouteObject[] = [
 								element: <EhrLookup />,
 							},
 						],
+					},
+					{
+						path: 'confirm-appointment',
+						element: <ConfirmAppointment />,
 					},
 
 					{
