@@ -13,12 +13,13 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 export function useScreeningNavigation() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
+	const revalidator = useRevalidator();
 
 	const mhicScreeningRouteMatch = useMatch({
 		path: '/ic/mhic/orders/:patientOrderId',
@@ -55,6 +56,7 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
+					revalidator.revalidate();
 					navigate(
 						{
 							pathname: `/ic/mhic/orders/${destination.context.patientOrderId}/assessment`,
@@ -65,6 +67,7 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.IC_PATIENT_SCREENING_SESSION_RESULTS:
+					revalidator.revalidate();
 					navigate(
 						{
 							pathname: '/ic/patient/assessment-complete',
@@ -93,7 +96,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[navigate, trackEvent]
+		[navigate, revalidator, trackEvent]
 	);
 
 	const navigateToQuestion = useCallback(
