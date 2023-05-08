@@ -118,25 +118,23 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
 
-	const panelRoot = useMatch({
-		path: '/ic/mhic',
-		end: true,
+	const overviewMatch = useMatch({
+		path: '/ic/mhic/overview/*',
 	});
-	const patientsRoot = useMatch({
-		path: '/ic/mhic/my-patients',
-		end: true,
+	const myPatientsMatch = useMatch({
+		path: '/ic/mhic/my-patients/*',
 	});
-	const ordersPath = useMatch({
+	const ordersMatch = useMatch({
 		path: '/ic/mhic/orders/*',
 	});
-	const reportsPath = useMatch({
+	const reportsMatch = useMatch({
 		path: '/ic/mhic/reports',
 	});
-	const assessmentPath = useMatch({
+	const assessmentMatch = useMatch({
 		path: '/ic/mhic/orders/:patientOrderId/assessment/*',
 	});
 
-	const isInAssessmentView = !!assessmentPath;
+	const isInAssessmentView = !!assessmentMatch;
 
 	const hasAssessmentResult = !!patientOrder?.screeningSessionResult;
 
@@ -147,13 +145,13 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				navigationItemId: 'MY_PANEL',
 				to: '/ic/mhic',
 				title: 'My Panel',
-				active: !!panelRoot || !!patientsRoot,
+				active: !!overviewMatch || !!myPatientsMatch,
 			},
 			{
 				testId: '',
 				navigationItemId: 'ORDERS',
 				title: 'Orders',
-				active: ordersPath,
+				active: ordersMatch,
 				items: [
 					{
 						testId: '',
@@ -186,10 +184,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				navigationItemId: 'REPORTS',
 				to: '/ic/mhic/reports',
 				title: 'Reports',
-				active: !!reportsPath,
+				active: !!reportsMatch,
 			},
 		],
-		[ordersPath, panelRoot, patientsRoot, reportsPath]
+		[myPatientsMatch, ordersMatch, overviewMatch, reportsMatch]
 	);
 
 	return (
