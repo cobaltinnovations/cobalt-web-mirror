@@ -44,20 +44,19 @@ export const PatientAssessmentResults = () => {
 						</p>
 						<hr className="mb-8" />
 
-						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
+						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 							<>
 								<p className="mb-6 fs-large">
 									Based on the symptoms reported and your provider's request, we recommend that you
-									meet with a <strong>Behavioral Health Provider</strong> in your primary care
-									practice.
+									meet with a <strong>Mental Health Provider</strong> in your primary care practice.
 								</p>
 								<p className="mb-6 fs-large">
-									The Behavioral Health Provider will discuss treatment options that will work in
+									The Mental Health Provider will discuss treatment options that will work in
 									collaboration with your primary care provider.
 								</p>
 								<p className="mb-6 fs-large">
-									You can schedule an appointment with a Behavioral Health Provider by browsing the
-									list of providers and choosing an available appointment time.
+									You can schedule an appointment with a Mental Health Provider by browsing the list
+									of providers and choosing an available appointment time.
 								</p>
 								<div className="mb-4 text-center">
 									<Button

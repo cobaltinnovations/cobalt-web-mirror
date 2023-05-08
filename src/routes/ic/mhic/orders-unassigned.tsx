@@ -63,10 +63,10 @@ const unassignedTabsConfig = [
 		},
 	},
 	{
-		tabTitle: 'BHP',
-		routePath: 'bhp',
+		tabTitle: 'MHP',
+		routePath: 'mhp',
 		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.MHP,
 		},
 	},
 	{

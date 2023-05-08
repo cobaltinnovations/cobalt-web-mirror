@@ -20,7 +20,7 @@ export enum MhicMyPatientView {
 	All = 'all',
 	NeedAssessment = 'need-assessment',
 	SafetyPlanning = 'safety-planning',
-	BHP = 'bhp',
+	MHP = 'mhp',
 	SpecialtyCare = 'specialty-care',
 }
 
@@ -41,10 +41,10 @@ const viewConfig = {
 			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
 		},
 	},
-	[MhicMyPatientView.BHP]: {
-		pageTitle: 'BHP',
+	[MhicMyPatientView.MHP]: {
+		pageTitle: 'MHP',
 		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.MHP,
 		},
 	},
 	[MhicMyPatientView.SpecialtyCare]: {
