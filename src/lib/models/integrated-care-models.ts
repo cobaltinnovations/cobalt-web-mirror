@@ -141,6 +141,15 @@ export interface PatientOrderModel {
 	patientConsentedAt?: string;
 	patientConsentedAtDescription?: string;
 
+	// Insurance
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePayorName: string;
+	patientOrderInsurancePayorTypeId: string;
+	patientOrderInsurancePlanAccepted: boolean;
+	patientOrderInsurancePlanId: string;
+	patientOrderInsurancePlanName: string;
+	patientOrderInsurancePlanTypeId: string;
+
 	// Scheduled appointment through connect-with-support
 	appointmentId?: string;
 	appointmentStartTime?: string;

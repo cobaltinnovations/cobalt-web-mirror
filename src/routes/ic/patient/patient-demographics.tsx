@@ -29,8 +29,8 @@ const PatientDemographics = () => {
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
-			patientOrderInsurancePayorId: '', // TODO
-			patientOrderInsurancePlanId: '', // TODO
+			patientOrderInsurancePayorId: patientOrder?.patientOrderInsurancePayorId ?? '',
+			patientOrderInsurancePlanId: patientOrder?.patientOrderInsurancePlanId ?? '',
 			patientAddress: {
 				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
 				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
