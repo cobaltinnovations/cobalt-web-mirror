@@ -135,6 +135,7 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
 	// Consent to mental health care
+	patientOrderConsentStatusId: PatientOrderConsentStatusId;
 	patientConsented?: boolean;
 	patientConsentedByAccountId?: string;
 	patientConsentedAt?: string;
@@ -224,6 +225,12 @@ export enum ScheduledMessageStatusId {
 	PROCESSED = 'PROCESSED',
 	CANCELED = 'CANCELED',
 	ERROR = 'ERROR',
+}
+
+export enum PatientOrderConsentStatusId {
+	UNKNOWN = 'UNKNOWN',
+	CONSENTED = 'CONSENTED',
+	REJECTED = 'REJECTED',
 }
 
 export interface PatientAddressModel {

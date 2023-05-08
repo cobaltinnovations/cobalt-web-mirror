@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
 import config from '@/lib/config';
-import { PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
+import { PatientOrderConsentStatusId, PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
@@ -60,7 +60,7 @@ const PatientLanding = () => {
 
 			console.log(response.patientOrder);
 
-			if (!response.patientOrder.patientConsented) {
+			if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 				navigate('/ic/patient/consent');
 				return;
 			}
