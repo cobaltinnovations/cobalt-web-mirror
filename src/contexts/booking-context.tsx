@@ -114,6 +114,8 @@ interface BookingState {
 	setSelectedProvider: Dispatch<SetStateAction<Provider | undefined>>;
 	selectedTimeSlot?: AvailabilityTimeSlot;
 	setSelectedTimeSlot: Dispatch<SetStateAction<AvailabilityTimeSlot | undefined>>;
+	selectedPatientOrderId?: string;
+	setSelectedPatientOrderId: Dispatch<SetStateAction<string | undefined>>;
 	formattedAvailabilityDate: string;
 
 	getActiveFiltersState: (findOptions?: FindOptionsResponse) => Record<BookingFilters, boolean>;
@@ -138,6 +140,7 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	const [selectedDate, setSelectedDate] = useState<string>();
 	const [selectedProvider, setSelectedProvider] = useState<Provider>();
 	const [selectedTimeSlot, setSelectedTimeSlot] = useState<AvailabilityTimeSlot>();
+	const [selectedPatientOrderId, setSelectedPatientOrderId] = useState<string>();
 
 	const [isEligible, setIsEligible] = useState(true);
 	const [previousProviderId, setPreviousProviderId] = useState<string>();
@@ -274,6 +277,8 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				setSelectedProvider,
 				selectedTimeSlot,
 				setSelectedTimeSlot,
+				selectedPatientOrderId,
+				setSelectedPatientOrderId,
 
 				getActiveFiltersState,
 				isEligible,

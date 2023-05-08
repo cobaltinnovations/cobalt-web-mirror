@@ -88,20 +88,38 @@ export interface PatientOrderFocusType {
 	patientOrderFocusTypeId: string;
 }
 
+export interface PatientOrderInsurancePayors {
+	institutionId: string;
+	name: string;
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePayorTypeId: string;
+}
+
+export interface PatientOrderInsurancePlans {
+	accepted: boolean;
+	name: string;
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePlanId: string;
+	patientOrderInsurancePlanTypeId: string;
+}
+
 export interface ReferenceDataResponse {
 	birthSexes: BirthSex[];
 	countries: Country[];
 	ethnicities: Ethnicity[];
 	genderIdentities: GenderIdentity[];
-	insurances: Insurance[];
 	languages: Language[];
 	patientOrderCareTypes: PatientOrderCareType[];
 	patientOrderDispositions: PatientOrderDisposition[];
 	patientOrderFocusTypes: PatientOrderFocusType[];
+	patientOrderInsurancePayors: PatientOrderInsurancePayors[];
+	patientOrderInsurancePlans: PatientOrderInsurancePlans[];
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
 	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];
 	races: Race[];
+	reasonsForReferral: string[];
+	referringPracticeNames: string[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];
 	timeZones: TimeZone[];

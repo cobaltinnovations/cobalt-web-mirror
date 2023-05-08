@@ -5,6 +5,7 @@ import {
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
 	PatientOrderClosureReasonModel,
+	PatientOrderConsentStatusId,
 	PatientOrderCountModel,
 	PatientOrderCountsByPatientOrderTriageStatusId,
 	PatientOrderModel,
@@ -68,6 +69,7 @@ export interface PatientOrderDemographicsFormData {
 		postalCode: string;
 		countryCode: string;
 	};
+	patientOrderInsurancePlanId: string;
 }
 
 export enum PatientOrderResponseSupplement {
@@ -397,10 +399,14 @@ export const integratedCareService = {
 			data,
 		});
 	},
-	consentToCare(patientOrderId: string) {
+	updatePatientOrderConsentStatus(
+		patientOrderId: string,
+		data: { patientOrderConsentStatusId: PatientOrderConsentStatusId }
+	) {
 		return httpSingleton.orchestrateRequest({
 			method: 'PUT',
-			url: `/patient-orders/${patientOrderId}/consent`,
+			url: `/patient-orders/${patientOrderId}/consent-status`,
+			data,
 		});
 	},
 	createVoicemailTask(data: { patientOrderId: string; panelAccountId: string; message: string }) {

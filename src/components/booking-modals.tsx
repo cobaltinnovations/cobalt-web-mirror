@@ -14,6 +14,7 @@ export type KickoffBookingOptions = {
 	provider: Provider;
 	date: string;
 	timeSlot: AvailabilityTimeSlot;
+	patientOrderId?: string;
 };
 
 export type ContinueBookingOptions = {
@@ -21,6 +22,7 @@ export type ContinueBookingOptions = {
 	appointmentType?: AppointmentType;
 	timeSlot?: AvailabilityTimeSlot;
 	date?: string;
+	patientOrderId?: string;
 };
 
 export type BookingRefHandle = {
@@ -53,6 +55,8 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 		setSelectedProvider,
 		selectedTimeSlot,
 		setSelectedTimeSlot,
+		selectedPatientOrderId,
+		setSelectedPatientOrderId,
 
 		setPreservedFilterQueryString,
 	} = useContext(BookingContext);
@@ -95,7 +99,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const continueBookingProcess = useCallback(
-		({ provider, appointmentType, timeSlot, date }: ContinueBookingOptions) => {
+		({ provider, appointmentType, timeSlot, date, patientOrderId }: ContinueBookingOptions) => {
 			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
 				navigateToEhrLookup();
 			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
@@ -128,6 +132,10 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					params.set('intakeAssessmentId', appointmentType?.assessmentId);
 				}
 
+				if (patientOrderId) {
+					params.set('patientOrderId', patientOrderId);
+				}
+
 				navigate(`/confirm-appointment?${params.toString()}`);
 			}
 		},
@@ -135,13 +143,14 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 	);
 
 	const kickoffBookingProcess = useCallback(
-		({ source, exitUrl, provider, date, timeSlot }: KickoffBookingOptions) => {
+		({ source, exitUrl, provider, date, timeSlot, patientOrderId }: KickoffBookingOptions) => {
 			Cookies.set('bookingSource', source);
 			Cookies.set('bookingExitUrl', exitUrl);
 
 			setSelectedProvider(provider);
 			setSelectedDate(date);
 			setSelectedTimeSlot(timeSlot);
+			setSelectedPatientOrderId(patientOrderId);
 
 			if (provider.appointmentTypeIds.length === 1) {
 				const confirmedApptType = appointmentTypes.find(
@@ -164,6 +173,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					appointmentType: confirmedApptType,
 					timeSlot,
 					date,
+					patientOrderId,
 				});
 			} else {
 				setShowConfirmAppointmentTypeModal(true);
@@ -174,6 +184,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 			continueBookingProcess,
 			setSelectedAppointmentTypeId,
 			setSelectedDate,
+			setSelectedPatientOrderId,
 			setSelectedProvider,
 			setSelectedTimeSlot,
 		]
@@ -227,6 +238,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 						appointmentType: confirmedApptType,
 						timeSlot: selectedTimeSlot,
 						date: selectedDate,
+						patientOrderId: selectedPatientOrderId,
 					});
 				}}
 			/>

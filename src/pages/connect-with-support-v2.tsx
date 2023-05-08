@@ -49,7 +49,7 @@ const ConnectWithSupportV2 = () => {
 		() => searchParams.get(SEARCH_PARAMS.INSTITUTION_LOCATION_ID),
 		[searchParams]
 	);
-	const patientOrderId = useMemo(() => searchParams.get(SEARCH_PARAMS.PATIENT_ORDER_ID), [searchParams]);
+	const patientOrderId = useMemo(() => searchParams.get(SEARCH_PARAMS.PATIENT_ORDER_ID) ?? undefined, [searchParams]);
 
 	const [selectedStartDate, setSelectedStartDate] = useState<Date>(
 		startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date()
@@ -549,6 +549,7 @@ const ConnectWithSupportV2 = () => {
 																			provider,
 																			date: section.date,
 																			timeSlot: time,
+																			patientOrderId,
 																		});
 																	},
 															  }))
@@ -561,6 +562,7 @@ const ConnectWithSupportV2 = () => {
 															provider,
 															date: sectionDate,
 															timeSlot: availabilityTimeSlot,
+															patientOrderId,
 														});
 													}}
 												/>

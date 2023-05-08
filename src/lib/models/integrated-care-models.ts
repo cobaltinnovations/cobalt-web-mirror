@@ -134,11 +134,25 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
+	patientDemographicsAccepted?: boolean;
+	patientDemographicsCompleted?: boolean;
+	patientAddressRegionAccepted?: boolean;
+
 	// Consent to mental health care
+	patientOrderConsentStatusId: PatientOrderConsentStatusId;
 	patientConsented?: boolean;
 	patientConsentedByAccountId?: string;
 	patientConsentedAt?: string;
 	patientConsentedAtDescription?: string;
+
+	// Insurance
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePayorName: string;
+	patientOrderInsurancePayorTypeId: string;
+	patientOrderInsurancePlanAccepted: boolean;
+	patientOrderInsurancePlanId: string;
+	patientOrderInsurancePlanName: string;
+	patientOrderInsurancePlanTypeId: string;
 
 	// Scheduled appointment through connect-with-support
 	appointmentId?: string;
@@ -224,6 +238,12 @@ export enum ScheduledMessageStatusId {
 	PROCESSED = 'PROCESSED',
 	CANCELED = 'CANCELED',
 	ERROR = 'ERROR',
+}
+
+export enum PatientOrderConsentStatusId {
+	UNKNOWN = 'UNKNOWN',
+	CONSENTED = 'CONSENTED',
+	REJECTED = 'REJECTED',
 }
 
 export interface PatientAddressModel {
