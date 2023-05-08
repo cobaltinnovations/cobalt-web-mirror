@@ -34,17 +34,15 @@ export const Component = () => {
 
 	const { patientOrderPanelCountsPromise } = useMhicMyPanelLoaderData();
 
-	const rootMatch = useMatch({
-		path: '/ic/mhic',
-		end: true,
+	const overviewMatch = useMatch({
+		path: '/ic/mhic/overview/*',
 	});
 
 	const myPatientsMatch = useMatch({
-		path: '/ic/mhic/my-patients/:mhicView',
-		end: true,
+		path: '/ic/mhic/my-patients/:mhicView/*',
 	});
 
-	const isTodayActive = !!rootMatch;
+	const isTodayActive = !!overviewMatch;
 	const isMyPatientsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.All;
 	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
 	const isSafetyPlanningActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SafetyPlanning;
