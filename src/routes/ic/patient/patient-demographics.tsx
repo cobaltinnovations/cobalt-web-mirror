@@ -29,8 +29,8 @@ const PatientDemographics = () => {
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
-			patientInsuranceProvider: '', // TODO
-			patientInsurancePlan: '', // TODO
+			patientOrderInsurancePayorId: '', // TODO
+			patientOrderInsurancePlanId: '', // TODO
 			patientAddress: {
 				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
 				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
@@ -117,7 +117,7 @@ const PatientDemographics = () => {
 									/>
 									<div className="d-flex align-items-center justify-content-end">
 										<Button variant="primary" type="submit" disabled={isSaving}>
-											Next
+											Continue
 										</Button>
 									</div>
 								</Form>

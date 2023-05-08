@@ -69,6 +69,7 @@ export interface PatientOrderDemographicsFormData {
 		postalCode: string;
 		countryCode: string;
 	};
+	patientOrderInsurancePlanId: string;
 }
 
 export enum PatientOrderResponseSupplement {

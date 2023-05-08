@@ -12,8 +12,8 @@ export interface PatientDetailsFormData {
 	patientBirthdate: string;
 	patientPhoneNumber: string;
 	patientEmailAddress: string;
-	patientInsuranceProvider: string;
-	patientInsurancePlan: string;
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePlanId: string;
 }
 interface PatientDetailsFormInputsProps<T = PatientDetailsFormData> {
 	formikProps: FormikProps<T>;
@@ -86,13 +86,13 @@ export const PatientDetailsFormInputs = ({
 				className="mb-2"
 				label="Insurance Provider"
 				as="select"
-				name="patientInsuranceProvider"
-				value={values.patientInsuranceProvider}
+				name="patientOrderInsurancePayorId"
+				value={values.patientOrderInsurancePayorId}
 				onBlur={handleBlur}
 				onChange={handleChange}
 				error={
-					touched.patientInsuranceProvider && errors.patientInsuranceProvider
-						? errors.patientInsuranceProvider
+					touched.patientOrderInsurancePayorId && errors.patientOrderInsurancePayorId
+						? errors.patientOrderInsurancePayorId
 						: ''
 				}
 				required
@@ -115,17 +115,21 @@ export const PatientDetailsFormInputs = ({
 				className="mb-6"
 				label="Insurance Plan"
 				as="select"
-				name="patientInsurancePlan"
-				value={values.patientInsurancePlan}
+				name="patientOrderInsurancePlanId"
+				value={values.patientOrderInsurancePlanId}
 				onBlur={handleBlur}
 				onChange={handleChange}
-				error={touched.patientInsurancePlan && errors.patientInsurancePlan ? errors.patientInsurancePlan : ''}
-				disabled={!values.patientInsuranceProvider}
+				error={
+					touched.patientOrderInsurancePlanId && errors.patientOrderInsurancePlanId
+						? errors.patientOrderInsurancePlanId
+						: ''
+				}
+				disabled={!values.patientOrderInsurancePayorId}
 				required
 			>
 				<option value="" disabled label="Select..." />
 				{referenceDataResponse.patientOrderInsurancePlans
-					.filter((plan) => plan.patientOrderInsurancePayorId === values.patientInsuranceProvider)
+					.filter((plan) => plan.patientOrderInsurancePayorId === values.patientOrderInsurancePayorId)
 					.map((insurancePlan) => {
 						return (
 							<option
