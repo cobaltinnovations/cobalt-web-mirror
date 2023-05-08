@@ -1,6 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	defer,
+	useNavigate,
+	useParams,
+	useRevalidator,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -12,10 +20,8 @@ import {
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
-import { integratedCareService } from '@/lib/services';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-import useFetchPanelAccounts from '../hooks/use-fetch-panel-accounts';
-import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import {
 	PatientOrderAssignmentStatusId,
 	PatientOrderOutreachStatusId,
@@ -79,40 +85,51 @@ const uiTabs = unassignedTabsConfig.map((tabConfig) => {
 	};
 });
 
-const MhicOrdersUnassigned = () => {
+interface MhicOrdersUnassignedLoaderData {
+	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
+}
+
+export function useMhicOrdersUnassignedLoaderData() {
+	return useRouteLoaderData('mhic-orders-unassigned') as MhicOrdersUnassignedLoaderData;
+}
+
+export async function loader({ request, params }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
+
+	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+
+	const apiParameters = unassignedTabsConfig.find((c) => c.routePath === params.activeTab)?.apiParameters;
+
+	return defer({
+		patientOrdersListPromise: integratedCareService
+			.getPatientOrders({
+				pageSize: '15',
+				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
+				...apiParameters,
+				...(pageNumber && { pageNumber }),
+			})
+			.fetch()
+			.then((r) => r.findResult),
+	});
+}
+
+export const Component = () => {
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { activeTab = uiTabs[0].value } = useParams<{ activeTab: string }>();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const navigate = useNavigate();
-	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
-
-	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
-	const {
-		fetchPatientOrders,
-		isLoadingOrders,
-		patientOrders = [],
-		totalCount,
-		totalCountDescription,
-	} = useFetchPatientOrders();
+	const [totalCount, setTotalCount] = useState(0);
+	const [totalCountDescription, setTotalCountDescription] = useState('');
+	const revalidator = useRevalidator();
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
 	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
-
-	const fetchTableData = useCallback(() => {
-		const apiParameters = unassignedTabsConfig.find((c) => c.routePath === activeTab)?.apiParameters;
-
-		return fetchPatientOrders({
-			pageSize: '15',
-			patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
-			...apiParameters,
-			...(pageNumber && { pageNumber }),
-		});
-	}, [fetchPatientOrders, activeTab, pageNumber]);
 
 	const handleImportButtonChange = useCallback(
 		(file: File) => {
@@ -127,7 +144,8 @@ const MhicOrdersUnassigned = () => {
 					}
 
 					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
-					await fetchTableData();
+
+					revalidator.revalidate();
 
 					addFlag({
 						variant: 'success',
@@ -142,27 +160,24 @@ const MhicOrdersUnassigned = () => {
 
 			fileReader.readAsText(file);
 		},
-		[addFlag, handleError, fetchTableData]
+		[addFlag, handleError, revalidator]
 	);
 
 	const handleAssignOrdersSave = useCallback(
 		async (patientOrderCount: number, panelAccountDisplayName: string) => {
-			try {
-				await fetchTableData();
+			revalidator.revalidate();
 
-				setSelectedPatientOrderIds([]);
-				setShowAssignOrderModal(false);
-				addFlag({
-					variant: 'success',
-					title: 'Patients assigned',
-					description: `${patientOrderCount} Patients were assigned to ${panelAccountDisplayName}`,
-					actions: [],
-				});
-			} catch (error) {
-				handleError(error);
-			}
+			setSelectedPatientOrderIds([]);
+			setShowAssignOrderModal(false);
+
+			addFlag({
+				variant: 'success',
+				title: 'Patients assigned',
+				description: `${patientOrderCount} Patients were assigned to ${panelAccountDisplayName}`,
+				actions: [],
+			});
 		},
-		[addFlag, handleError, fetchTableData]
+		[addFlag, revalidator]
 	);
 
 	const clearSelections = useCallback(() => {
@@ -180,12 +195,11 @@ const MhicOrdersUnassigned = () => {
 	);
 
 	useEffect(() => {
-		fetchTableData();
-	}, [fetchTableData]);
-
-	// useEffect(() => {
-	// 	setMainViewRefresher(() => fetchTableData);
-	// }, [fetchTableData, setMainViewRefresher]);
+		patientOrdersListPromise.then((result) => {
+			setTotalCount(result.totalCount);
+			setTotalCountDescription(result.totalCountDescription);
+		});
+	}, [patientOrdersListPromise]);
 
 	return (
 		<>
@@ -207,7 +221,6 @@ const MhicOrdersUnassigned = () => {
 
 			<MhicAssignOrderModal
 				patientOrderIds={selectedPatientOrderIds}
-				panelAccounts={panelAccounts}
 				show={showAssignOrderModal}
 				onHide={() => {
 					setShowAssignOrderModal(false);
@@ -243,7 +256,7 @@ const MhicOrdersUnassigned = () => {
 								</FileInputButton>
 								<Button
 									onClick={() => {
-										fetchPanelAccounts();
+										// fetchPanelAccounts();
 										setShowAssignOrderModal(true);
 									}}
 									disabled={selectedPatientOrderIds.length <= 0}
@@ -269,15 +282,11 @@ const MhicOrdersUnassigned = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
-							isLoading={isLoadingOrders}
-							// TODO: WAITING_FOR_CONSENT query
-							patientOrders={activeTab === uiTabs[1].value ? [] : patientOrders}
+							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={selectAll}
 							onSelectAllChange={setSelectAll}
 							selectedPatientOrderIds={selectedPatientOrderIds}
 							onSelectPatientOrderIdsChange={setSelectedPatientOrderIds}
-							totalPatientOrdersCount={totalCount}
-							totalPatientOrdersDescription={totalCountDescription}
 							pageNumber={parseInt(pageNumber, 10)}
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}
@@ -300,5 +309,3 @@ const MhicOrdersUnassigned = () => {
 		</>
 	);
 };
-
-export default MhicOrdersUnassigned;

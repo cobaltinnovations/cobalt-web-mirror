@@ -39,7 +39,6 @@ interface MhicPatientOrderShelfLoaderData {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	console.log('==> mhic shelf loader');
 	const patientOrderId = params.patientOrderId;
 
 	if (!patientOrderId) {

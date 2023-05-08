@@ -41,19 +41,11 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 	const [outreachToEdit, setOutreachToEdit] = useState<PatientOrderOutreachModel>();
 
 	const handleOutreachModalSave = useCallback(async () => {
-		try {
-			if (!patientOrder.patientOrderId) {
-				throw new Error('patientOrder.patientOrderId is undefined.');
-			}
+		revalidator.revalidate();
 
-			revalidator.revalidate();
-
-			setOutreachToEdit(undefined);
-			setShowOutreachModal(false);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [handleError, patientOrder.patientOrderId, revalidator]);
+		setOutreachToEdit(undefined);
+		setShowOutreachModal(false);
+	}, [revalidator]);
 
 	const handleDeleteOutreach = useCallback(
 		async (patientOrderOutreachId: string) => {
@@ -84,19 +76,11 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 	);
 
 	const handleMessageModalSave = useCallback(async () => {
-		try {
-			if (!patientOrder.patientOrderId) {
-				throw new Error('patientOrder.patientOrderId is undefined.');
-			}
+		revalidator.revalidate();
 
-			revalidator.revalidate();
-
-			setMessageToEdit(undefined);
-			setShowMessageModal(false);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [handleError, patientOrder.patientOrderId, revalidator]);
+		setMessageToEdit(undefined);
+		setShowMessageModal(false);
+	}, [revalidator]);
 
 	return (
 		<>

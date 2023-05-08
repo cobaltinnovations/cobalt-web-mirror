@@ -2,7 +2,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { useMhicPatientOrdereShelfLoaderData } from '@/routes/ic/mhic/patient-order-shelf';
 
 import React, { createRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 const shelfRef = createRef<HTMLDivElement>();
@@ -76,6 +76,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const MhicShelfOutlet = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 
 	return (
@@ -98,7 +99,10 @@ export const MhicShelfOutlet = () => {
 				timeout={300}
 				classNames="patient-order-shelf-overlay"
 				onClick={() => {
-					navigate('.');
+					navigate({
+						pathname: '.',
+						search: location.search,
+					});
 				}}
 				mountOnEnter
 				unmountOnExit

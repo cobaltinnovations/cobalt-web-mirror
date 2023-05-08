@@ -2,9 +2,9 @@ import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import { AccountModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import { useMhicLayoutLoaderData } from '@/routes/ic/mhic/mhic-layout';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -14,11 +14,11 @@ const useStyles = createUseStyles({
 
 interface Props extends ModalProps {
 	patientOrderIds: string[];
-	panelAccounts: AccountModel[];
 	onSave(patientOrderCount: number, panelAccountDisplayName: string): void;
 }
 
-export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, panelAccounts, onSave, ...props }) => {
+export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, onSave, ...props }) => {
+	const mhicLayoutLoaderData = useMhicLayoutLoaderData();
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [selectedPanelAccountId, setSelectedPanelAccountId] = useState('');
@@ -35,7 +35,8 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, panelAccounts
 
 			const patientOrderCount = patientOrderIds.length;
 			const panelAccountDisplayName =
-				panelAccounts.find((pa) => pa.accountId === selectedPanelAccountId)?.displayName ?? '';
+				mhicLayoutLoaderData.panelAccounts.find((pa) => pa.accountId === selectedPanelAccountId)?.displayName ??
+				'';
 
 			await integratedCareService
 				.assignPatientOrders({
@@ -50,7 +51,7 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, panelAccounts
 		} finally {
 			setIsSaving(false);
 		}
-	}, [handleError, onSave, panelAccounts, patientOrderIds, selectedPanelAccountId]);
+	}, [handleError, onSave, mhicLayoutLoaderData.panelAccounts, patientOrderIds, selectedPanelAccountId]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -59,8 +60,9 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, panelAccounts
 			</Modal.Header>
 			<Modal.Body>
 				<Form.Label className="mb-1">Select MHIC to Assign</Form.Label>
-				{panelAccounts.map((panelAccount) => (
+				{mhicLayoutLoaderData.panelAccounts.map((panelAccount) => (
 					<Form.Check
+						key={panelAccount.accountId}
 						type="radio"
 						name="panel-account"
 						id={`panel-account__${panelAccount.accountId}`}
