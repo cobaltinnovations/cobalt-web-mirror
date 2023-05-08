@@ -1,14 +1,17 @@
-import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { defer, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { PatientOrderModel } from '@/lib/models';
-import { integratedCareService } from '@/lib/services';
+import { MhicPanelTodayResponse, PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
-import AsyncWrapper from '@/components/async-page';
 import TabBar from '@/components/tab-bar';
-import { MhicInlineAlert, MhicPageHeader, MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import {
+	MhicInlineAlert,
+	MhicPageHeader,
+	MhicPatientOrderTable,
+	MhicShelfOutlet,
+} from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
@@ -47,61 +50,117 @@ enum TAB_KEYS {
 	RESOURCES = 'RESOURCES',
 }
 
+interface MhicOverviewLoaderData {
+	overviewResponsePromise: Promise<MhicPanelTodayResponse>;
+	newPatientResults: Promise<PatientOrdersListResponse['findResult']>;
+	voicemailResults: Promise<PatientOrdersListResponse['findResult']>;
+	followupResults: Promise<PatientOrdersListResponse['findResult']>;
+	assessmentResults: Promise<PatientOrdersListResponse['findResult']>;
+	resourcesResults: Promise<PatientOrdersListResponse['findResult']>;
+}
+
+export function useMhicOverviewLoaderData() {
+	return useRouteLoaderData('mhic-overview') as MhicOverviewLoaderData;
+}
+
+export async function loader() {
+	const overviewResponsePromise = integratedCareService.getOverview().fetch();
+	return defer({
+		overviewResponsePromise,
+		newPatientResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.newPatientPatientOrders,
+				totalCount: res.newPatientPatientOrders.length,
+				totalCountDescription: res.newPatientPatientOrders.length.toString(),
+			};
+		}),
+		voicemailResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.voicemailTaskPatientOrders,
+				totalCount: res.voicemailTaskPatientOrders.length,
+				totalCountDescription: res.voicemailTaskPatientOrders.length.toString(),
+			};
+		}),
+		followupResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.followupPatientOrders,
+				totalCount: res.followupPatientOrders.length,
+				totalCountDescription: res.followupPatientOrders.length.toString(),
+			};
+		}),
+		assessmentResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.scheduledAssessmentPatientOrders,
+				totalCount: res.scheduledAssessmentPatientOrders.length,
+				totalCountDescription: res.scheduledAssessmentPatientOrders.length.toString(),
+			};
+		}),
+		resourcesResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.needResourcesPatientOrders,
+				totalCount: res.needResourcesPatientOrders.length,
+				totalCountDescription: res.needResourcesPatientOrders.length.toString(),
+			};
+		}),
+	});
+}
+
 export const Component = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
 	const navigate = useNavigate();
-	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+	const {
+		overviewResponsePromise,
+		newPatientResults,
+		voicemailResults,
+		followupResults,
+		assessmentResults,
+		resourcesResults,
+	} = useMhicOverviewLoaderData();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
-	const [safetyPatientOrders, setSafetyPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [newPatientOrders, setNewPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [voicemailPatientOrders, setVoicemailPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [followUpPatientOrders, setFollowUpPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [assessmentPatientOrders, setAssessmentPatientOrders] = useState<PatientOrderModel[]>([]);
-	const [resourcesPatientOrders, setResourcesPatientOrders] = useState<PatientOrderModel[]>([]);
+	const [safetyPlanningOrderCount, setSafetyPlanningOrderCount] = useState(0);
+	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({
+		[TAB_KEYS.ASSESSMENTS]: 0,
+		[TAB_KEYS.FOLLOW_UPS]: 0,
+		[TAB_KEYS.NEW_PATIENTS]: 0,
+		[TAB_KEYS.RESOURCES]: 0,
+		[TAB_KEYS.VOICEMAILS]: 0,
+	});
 
-	const fetchData = useCallback(async () => {
-		const {
-			safetyPlanningPatientOrders,
-			newPatientPatientOrders,
-			voicemailTaskPatientOrders,
-			followupPatientOrders,
-			scheduledAssessmentPatientOrders,
-			needResourcesPatientOrders,
-		} = await integratedCareService.getOverview().fetch();
+	useEffect(() => {
+		overviewResponsePromise.then((res) => {
+			setSafetyPlanningOrderCount(res.safetyPlanningPatientOrders.length);
 
-		setSafetyPatientOrders(safetyPlanningPatientOrders);
-		setNewPatientOrders(newPatientPatientOrders);
-		setVoicemailPatientOrders(voicemailTaskPatientOrders);
-		setFollowUpPatientOrders(followupPatientOrders);
-		setAssessmentPatientOrders(scheduledAssessmentPatientOrders);
-		setResourcesPatientOrders(needResourcesPatientOrders);
-	}, []);
-
-	// useEffect(() => {
-	// 	setMainViewRefresher(() => fetchData);
-	// }, [fetchData, setMainViewRefresher]);
+			setCountsByStatus({
+				[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
+				[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
+				[TAB_KEYS.NEW_PATIENTS]: res.newPatientPatientOrders.length,
+				[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
+				[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
+			});
+		});
+	}, [overviewResponsePromise]);
 
 	return (
-		<AsyncWrapper fetchData={fetchData}>
+		<>
 			<Container fluid className="py-8 overflow-visible">
 				<Row className="mb-8">
 					<Col>
 						<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
 					</Col>
 				</Row>
-				{safetyPatientOrders.length > 0 && (
+				{safetyPlanningOrderCount > 0 && (
 					<Row className="mb-9">
 						<Col>
 							<MhicInlineAlert
 								variant="danger"
-								title={`${safetyPatientOrders.length} order${
-									safetyPatientOrders.length === 1 ? '' : 's'
-								} require${safetyPatientOrders.length === 1 ? 's' : ''} safety planning`}
+								title={`${safetyPlanningOrderCount} order${
+									safetyPlanningOrderCount === 1 ? '' : 's'
+								} require${safetyPlanningOrderCount === 1 ? 's' : ''} safety planning`}
 								description={`Please review ${
-									safetyPatientOrders.length === 1 ? 'this order' : 'these orders'
+									safetyPlanningOrderCount === 1 ? 'this order' : 'these orders'
 								} first`}
 								action={{
 									title: 'View Safety Planning',
@@ -125,7 +184,7 @@ export const Component = () => {
 							</div>
 							<div>
 								<p className="mb-0">New Patients</p>
-								<h4 className="mb-0">{newPatientOrders.length}</h4>
+								<h4 className="mb-0">{countsByStatus.NEW_PATIENTS}</h4>
 							</div>
 						</div>
 					</Col>
@@ -138,7 +197,7 @@ export const Component = () => {
 							</div>
 							<div>
 								<p className="mb-0">Voicemail Tasks</p>
-								<h4 className="mb-0">{voicemailPatientOrders.length}</h4>
+								<h4 className="mb-0">{countsByStatus.VOICEMAILS}</h4>
 							</div>
 						</div>
 					</Col>
@@ -151,7 +210,7 @@ export const Component = () => {
 							</div>
 							<div>
 								<p className="mb-0">Follow Ups</p>
-								<h4 className="mb-0">{followUpPatientOrders.length}</h4>
+								<h4 className="mb-0">{countsByStatus.FOLLOW_UPS}</h4>
 							</div>
 						</div>
 					</Col>
@@ -164,7 +223,7 @@ export const Component = () => {
 							</div>
 							<div>
 								<p className="mb-0">Scheduled Assessments</p>
-								<h4 className="mb-0">{assessmentPatientOrders.length}</h4>
+								<h4 className="mb-0">{countsByStatus.ASSESSMENTS}</h4>
 							</div>
 						</div>
 					</Col>
@@ -180,23 +239,23 @@ export const Component = () => {
 								tabs={[
 									{
 										value: TAB_KEYS.NEW_PATIENTS,
-										title: `New Patients (${newPatientOrders.length})`,
+										title: `New Patients (${countsByStatus.NEW_PATIENTS})`,
 									},
 									{
 										value: TAB_KEYS.VOICEMAILS,
-										title: `Voicemails (${voicemailPatientOrders.length})`,
+										title: `Voicemails (${countsByStatus.VOICEMAILS})`,
 									},
 									{
 										value: TAB_KEYS.FOLLOW_UPS,
-										title: `Follow Up (${followUpPatientOrders.length})`,
+										title: `Follow Up (${countsByStatus.FOLLOW_UPS})`,
 									},
 									{
 										value: TAB_KEYS.ASSESSMENTS,
-										title: `Assessments (${assessmentPatientOrders.length})`,
+										title: `Assessments (${countsByStatus.ASSESSMENTS})`,
 									},
 									{
 										value: TAB_KEYS.RESOURCES,
-										title: `Resources (${resourcesPatientOrders.length})`,
+										title: `Resources (${countsByStatus.RESOURCES})`,
 									},
 								]}
 								onTabClick={(value) => {
@@ -206,11 +265,8 @@ export const Component = () => {
 							<Tab.Content>
 								<Tab.Pane eventKey={TAB_KEYS.NEW_PATIENTS}>
 									<MhicPatientOrderTable
-										isLoading={false}
-										patientOrders={newPatientOrders}
+										patientOrderFindResultPromise={newPatientResults}
 										selectAll={false}
-										totalPatientOrdersCount={newPatientOrders.length}
-										totalPatientOrdersDescription={String(newPatientOrders.length)}
 										pageNumber={0}
 										pageSize={1000}
 										showPagination={false}
@@ -229,11 +285,8 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.VOICEMAILS}>
 									<MhicPatientOrderTable
-										isLoading={false}
-										patientOrders={voicemailPatientOrders}
+										patientOrderFindResultPromise={voicemailResults}
 										selectAll={false}
-										totalPatientOrdersCount={voicemailPatientOrders.length}
-										totalPatientOrdersDescription={String(voicemailPatientOrders.length)}
 										pageNumber={0}
 										pageSize={1000}
 										showPagination={false}
@@ -252,11 +305,8 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UPS}>
 									<MhicPatientOrderTable
-										isLoading={false}
-										patientOrders={followUpPatientOrders}
+										patientOrderFindResultPromise={followupResults}
 										selectAll={false}
-										totalPatientOrdersCount={followUpPatientOrders.length}
-										totalPatientOrdersDescription={String(followUpPatientOrders.length)}
 										pageNumber={0}
 										pageSize={1000}
 										showPagination={false}
@@ -275,11 +325,8 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.ASSESSMENTS}>
 									<MhicPatientOrderTable
-										isLoading={false}
-										patientOrders={assessmentPatientOrders}
+										patientOrderFindResultPromise={assessmentResults}
 										selectAll={false}
-										totalPatientOrdersCount={assessmentPatientOrders.length}
-										totalPatientOrdersDescription={String(assessmentPatientOrders.length)}
 										pageNumber={0}
 										pageSize={1000}
 										showPagination={false}
@@ -296,11 +343,8 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.RESOURCES}>
 									<MhicPatientOrderTable
-										isLoading={false}
-										patientOrders={resourcesPatientOrders}
+										patientOrderFindResultPromise={resourcesResults}
 										selectAll={false}
-										totalPatientOrdersCount={resourcesPatientOrders.length}
-										totalPatientOrdersDescription={String(resourcesPatientOrders.length)}
 										pageNumber={0}
 										pageSize={1000}
 										showPagination={false}
@@ -322,6 +366,8 @@ export const Component = () => {
 					</Col>
 				</Row>
 			</Container>
-		</AsyncWrapper>
+
+			<MhicShelfOutlet />
+		</>
 	);
 };

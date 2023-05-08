@@ -1,30 +1,28 @@
-import React, { useCallback, useEffect } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
-import { MhicPatientOrderTable } from '@/components/integrated-care/mhic';
+import { MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { Container } from 'react-bootstrap';
-import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderDispositionId } from '@/lib/models';
-// import { MhicLayoutContext } from './mhic-layout';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-const MhicSearchResults = () => {
-	const [searchParams, setSearchParams] = useSearchParams();
-	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
+interface MhicSearchResultsLoaderData {
+	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
+}
 
-	const {
-		fetchPatientOrders,
-		isLoadingOrders,
-		patientOrders = [],
-		totalCount,
-		totalCountDescription,
-	} = useFetchPatientOrders();
+export function useMhicSearchResulsLoaderData() {
+	return useRouteLoaderData('mhic-search-results') as MhicSearchResultsLoaderData;
+}
 
-	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientMrn = searchParams.get('patientMrn');
-	const searchQuery = searchParams.get('searchQuery');
+export async function loader({ request }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
 
-	const fetchData = useCallback(() => {
-		fetchPatientOrders({
+	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+	const patientMrn = url.searchParams.get('patientMrn') ?? 0;
+	const searchQuery = url.searchParams.get('searchQuery') ?? 0;
+
+	const responsePromise = integratedCareService
+		.getPatientOrders({
 			...(searchQuery && { searchQuery }),
 			...(patientMrn && { patientMrn }),
 			...(pageNumber && { pageNumber }),
@@ -33,16 +31,24 @@ const MhicSearchResults = () => {
 				PatientOrderDispositionId.CLOSED,
 				PatientOrderDispositionId.ARCHIVED,
 			],
-		});
-	}, [fetchPatientOrders, pageNumber, patientMrn, searchQuery]);
+			pageSize: '15',
+		})
+		.fetch();
 
-	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+	return defer({
+		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
+	});
+}
 
-	// useEffect(() => {
-	// 	setMainViewRefresher(() => fetchData);
-	// }, [fetchData, setMainViewRefresher]);
+export const Component = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const { patientOrdersListPromise } = useMhicSearchResulsLoaderData();
+	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const patientMrn = searchParams.get('patientMrn');
+	const searchQuery = searchParams.get('searchQuery');
+
+	const [totalCount, setTotalCount] = useState(0);
+	const [totalCountDescription, setTotalCountDescription] = useState('');
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -52,37 +58,43 @@ const MhicSearchResults = () => {
 		[searchParams, setSearchParams]
 	);
 
+	useEffect(() => {
+		patientOrdersListPromise.then((result) => {
+			setTotalCount(result.totalCount);
+			setTotalCountDescription(result.totalCountDescription);
+		});
+	}, [patientOrdersListPromise]);
+
 	return (
-		<Container fluid className="px-8">
-			<div className="py-8">
-				<h2>Search Results for "{patientMrn || searchQuery}" </h2>
+		<>
+			<Container fluid className="px-8">
+				<div className="py-8">
+					<h2>Search Results for "{patientMrn || searchQuery}" </h2>
 
-				<p className="mb-0 text-gray fs-large fw-normal">
-					{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
-				</p>
-			</div>
+					<p className="mb-0 text-gray fs-large fw-normal">
+						{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
+					</p>
+				</div>
 
-			<MhicPatientOrderTable
-				isLoading={isLoadingOrders}
-				patientOrders={patientOrders}
-				selectAll={false}
-				totalPatientOrdersCount={totalCount}
-				totalPatientOrdersDescription={totalCountDescription}
-				pageNumber={parseInt(pageNumber, 10)}
-				pageSize={15}
-				onPaginationClick={handlePaginationClick}
-				columnConfig={{
-					patient: true,
-					mrn: true,
-					preferredPhone: true,
-					practice: true,
-					orderState: true,
-					assignedMhic: true,
-				}}
-				coloredRows
-			/>
-		</Container>
+				<MhicPatientOrderTable
+					patientOrderFindResultPromise={patientOrdersListPromise}
+					selectAll={false}
+					pageNumber={parseInt(pageNumber, 10)}
+					pageSize={15}
+					onPaginationClick={handlePaginationClick}
+					columnConfig={{
+						patient: true,
+						mrn: true,
+						preferredPhone: true,
+						practice: true,
+						orderState: true,
+						assignedMhic: true,
+					}}
+					coloredRows
+				/>
+			</Container>
+
+			<MhicShelfOutlet />
+		</>
 	);
 };
-
-export default MhicSearchResults;

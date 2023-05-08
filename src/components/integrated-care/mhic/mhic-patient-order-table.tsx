@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
-import React, { useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Await, useLocation, useNavigate } from 'react-router-dom';
 import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
@@ -17,6 +17,7 @@ import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
+import { PatientOrdersListResponse } from '@/lib/services';
 
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
@@ -70,14 +71,11 @@ export type MhicPatientOrderTableColumnConfig = {
 };
 
 interface MhicPatientOrderTableProps {
-	isLoading: boolean;
-	patientOrders: PatientOrderModel[];
+	patientOrderFindResultPromise: Promise<PatientOrdersListResponse['findResult']>;
 	selectAll: boolean;
 	onSelectAllChange?(value: boolean): void;
 	selectedPatientOrderIds?: string[];
 	onSelectPatientOrderIdsChange?(selectedPatientOrderIds: string[]): void;
-	totalPatientOrdersCount?: number;
-	totalPatientOrdersDescription?: string;
 	pageNumber: number;
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
@@ -87,14 +85,11 @@ interface MhicPatientOrderTableProps {
 }
 
 export const MhicPatientOrderTable = ({
-	isLoading,
-	patientOrders,
+	patientOrderFindResultPromise,
 	selectAll,
 	onSelectAllChange,
 	selectedPatientOrderIds = [],
 	onSelectPatientOrderIdsChange,
-	totalPatientOrdersCount,
-	totalPatientOrdersDescription,
 	pageNumber,
 	pageSize,
 	onPaginationClick,
@@ -103,8 +98,14 @@ export const MhicPatientOrderTable = ({
 	showPagination = true,
 }: MhicPatientOrderTableProps) => {
 	const classes = useStyles();
-	const { pathname } = useLocation();
+	const location = useLocation();
 	const navigate = useNavigate();
+
+	const [isLoading, setIsLoading] = useState(false);
+	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
+
+	const [totalPatientOrdersCount, setTotalPatientOrdersCount] = useState(0);
+	const [totalPatientOrdersDescription, setTotalPatientOrdersDescription] = useState('0');
 
 	const patientColumnOffset = useMemo(() => {
 		if (columnConfig.checkbox && columnConfig.flag) {
@@ -132,6 +133,24 @@ export const MhicPatientOrderTable = ({
 		return count;
 	}, []);
 
+	useEffect(() => {
+		if (!patientOrderFindResultPromise) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		patientOrderFindResultPromise
+			.then((response) => {
+				setPatientOrders(response.patientOrders);
+				setTotalPatientOrdersCount(response.totalCount);
+				setTotalPatientOrdersDescription(response.totalCountDescription);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
+	}, [patientOrderFindResultPromise]);
+
 	return (
 		<>
 			<div className="mb-8">
@@ -149,17 +168,20 @@ export const MhicPatientOrderTable = ({
 										value="SELECT_ALL"
 										checked={selectAll}
 										onChange={({ currentTarget }) => {
-											if (currentTarget.checked) {
-												const allPatientOrderIds = cloneDeep(patientOrders).map(
+											onSelectAllChange?.(currentTarget.checked);
+
+											if (!currentTarget.checked) {
+												onSelectPatientOrderIdsChange?.([]);
+												return;
+											}
+
+											patientOrderFindResultPromise.then((list) => {
+												const allPatientOrderIds = list.patientOrders.map(
 													(order) => order.patientOrderId
 												);
 
 												onSelectPatientOrderIdsChange?.(allPatientOrderIds);
-											} else {
-												onSelectPatientOrderIdsChange?.([]);
-											}
-
-											onSelectAllChange?.(currentTarget.checked);
+											});
 										}}
 									/>
 								</TableCell>
@@ -207,263 +229,294 @@ export const MhicPatientOrderTable = ({
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{patientOrders.map((po) => {
-							return (
-								<TableRow
-									key={po.patientOrderId}
-									onClick={() => {
-										if (!po.patientOrderId) {
-											return;
-										}
+						<Suspense>
+							<Await resolve={patientOrderFindResultPromise}>
+								{patientOrders.map((po) => {
+									return (
+										<TableRow
+											key={po.patientOrderId}
+											onClick={() => {
+												if (!po.patientOrderId) {
+													return;
+												}
 
-										navigate({
-											pathname: pathname + '/' + po.patientOrderId,
-										});
-									}}
-									highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
-									className={classNames({
-										[classes[`${po.patientOrderDispositionId}-row`]]: coloredRows,
-									})}
-								>
-									{columnConfig.checkbox && (
-										<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
-											<Form.Check
-												className="no-label"
-												type="checkbox"
-												name="orders"
-												id={`orders--${po.patientOrderId}`}
-												label=""
-												value={po.patientOrderId}
-												checked={selectedPatientOrderIds.includes(po.patientOrderId)}
-												onClick={(event) => {
-													event.stopPropagation();
-												}}
-												onChange={({ currentTarget }) => {
-													const selectedPatientOrderIdsClone =
-														cloneDeep(selectedPatientOrderIds);
-
-													const targetIndex = selectedPatientOrderIdsClone.findIndex(
-														(orderId) => orderId === currentTarget.value
-													);
-
-													if (targetIndex > -1) {
-														selectedPatientOrderIdsClone.splice(targetIndex, 1);
-													} else {
-														selectedPatientOrderIdsClone.push(currentTarget.value);
-													}
-
-													const allAreSelected = patientOrders.every((order) =>
-														selectedPatientOrderIdsClone.includes(order.patientOrderId)
-													);
-
-													if (allAreSelected) {
-														onSelectAllChange?.(true);
-													} else {
-														onSelectAllChange?.(false);
-													}
-
-													onSelectPatientOrderIdsChange?.(selectedPatientOrderIdsClone);
-												}}
-											/>
-										</TableCell>
-									)}
-									{columnConfig.flag && (
-										<TableCell
-											width={44}
-											sticky
-											stickyOffset={columnConfig.checkbox ? 56 : 0}
-											className="px-0 flex-row align-items-center justify-content-end"
+												navigate({
+													pathname: location.pathname + '/' + po.patientOrderId,
+													search: location.search,
+												});
+											}}
+											highlighted={selectedPatientOrderIds.includes(po.patientOrderId)}
+											className={classNames({
+												[classes[`${po.patientOrderDispositionId}-row`]]: coloredRows,
+											})}
 										>
-											{getFlagCount(po) > 0 && (
-												<>
-													<span className="text-gray">{getFlagCount(po)}</span>
-													<FlagIcon className="text-warning" />
-												</>
-											)}
-										</TableCell>
-									)}
-									{columnConfig.patient && (
-										<TableCell
-											width={280}
-											sticky
-											stickyOffset={patientColumnOffset}
-											stickyBorder
-											className="py-2"
-										>
-											<span className="d-block text-nowrap">{po.patientDisplayName}</span>
-											<span className="d-block text-nowrap text-gray">{po.patientMrn}</span>
-										</TableCell>
-									)}
-
-									{columnConfig.mrn && <TableCell header>{po.patientMrn}</TableCell>}
-
-									{columnConfig.referralDate && (
-										<TableCell width={144}>
-											<span className="text-nowrap text-truncate">{po.orderDateDescription}</span>
-										</TableCell>
-									)}
-									{columnConfig.preferredPhone && (
-										<TableCell header>{po.patientPhoneNumberDescription}</TableCell>
-									)}
-
-									{columnConfig.practice && (
-										<TableCell width={240}>
-											<span className="text-nowrap text-truncate">
-												{po.referringPracticeName}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.referralReason && (
-										<TableCell width={320}>
-											<span className="text-nowrap text-truncate">{po.reasonForReferral}</span>
-										</TableCell>
-									)}
-									{columnConfig.orderState && (
-										<TableCell>
-											<div>
-												<Badge
-													pill
-													bg={
-														'outline-' + dispositionVariantMap[po.patientOrderDispositionId]
-													}
+											{columnConfig.checkbox && (
+												<TableCell
+													header
+													width={56}
+													sticky
+													className="ps-6 pe-0 align-items-start"
 												>
-													<FilledCircleIcon
-														className={classes[`${po.patientOrderDispositionId}-icon`]}
+													<Form.Check
+														className="no-label"
+														type="checkbox"
+														name="orders"
+														id={`orders--${po.patientOrderId}`}
+														label=""
+														value={po.patientOrderId}
+														checked={selectedPatientOrderIds.includes(po.patientOrderId)}
+														onClick={(event) => {
+															event.stopPropagation();
+														}}
+														onChange={({ currentTarget }) => {
+															const selectedPatientOrderIdsClone =
+																cloneDeep(selectedPatientOrderIds);
+
+															const targetIndex = selectedPatientOrderIdsClone.findIndex(
+																(orderId) => orderId === currentTarget.value
+															);
+
+															if (targetIndex > -1) {
+																selectedPatientOrderIdsClone.splice(targetIndex, 1);
+															} else {
+																selectedPatientOrderIdsClone.push(currentTarget.value);
+															}
+
+															const allAreSelected = patientOrders.every((order) =>
+																selectedPatientOrderIdsClone.includes(
+																	order.patientOrderId
+																)
+															);
+
+															if (allAreSelected) {
+																onSelectAllChange?.(true);
+															} else {
+																onSelectAllChange?.(false);
+															}
+
+															onSelectPatientOrderIdsChange?.(
+																selectedPatientOrderIdsClone
+															);
+														}}
 													/>
-													{'  '} {po.patientOrderDispositionDescription}
-												</Badge>
-											</div>
-										</TableCell>
-									)}
-									{columnConfig.assessmentStatus && (
-										<TableCell
-											width={248}
-											className="flex-row align-items-center justify-content-start"
-										>
-											{po.patientOrderScreeningStatusId ===
-												PatientOrderScreeningStatusId.NOT_SCREENED && (
-												<Badge pill bg="outline-dark" className="text-nowrap">
-													{po.patientOrderScreeningStatusDescription}
-												</Badge>
+												</TableCell>
 											)}
-											{po.patientOrderScreeningStatusId ===
-												PatientOrderScreeningStatusId.SCHEDULED && (
-												<Badge pill bg="outline-success" className="text-nowrap">
-													{po.patientOrderScreeningStatusDescription}
-												</Badge>
+											{columnConfig.flag && (
+												<TableCell
+													width={44}
+													sticky
+													stickyOffset={columnConfig.checkbox ? 56 : 0}
+													className="px-0 flex-row align-items-center justify-content-end"
+												>
+													{getFlagCount(po) > 0 && (
+														<>
+															<span className="text-gray">{getFlagCount(po)}</span>
+															<FlagIcon className="text-warning" />
+														</>
+													)}
+												</TableCell>
 											)}
-											{po.patientOrderScreeningStatusId ===
-												PatientOrderScreeningStatusId.IN_PROGRESS && (
-												<Badge pill bg="outline-secondary" className="text-nowrap">
-													{po.patientOrderScreeningStatusDescription}
-												</Badge>
+											{columnConfig.patient && (
+												<TableCell
+													width={280}
+													sticky
+													stickyOffset={patientColumnOffset}
+													stickyBorder
+													className="py-2"
+												>
+													<span className="d-block text-nowrap">{po.patientDisplayName}</span>
+													<span className="d-block text-nowrap text-gray">
+														{po.patientMrn}
+													</span>
+												</TableCell>
 											)}
-											{po.patientOrderScreeningStatusId ===
-												PatientOrderScreeningStatusId.COMPLETE && (
-												<Badge pill bg="outline-primary" className="text-nowrap">
-													{po.patientOrderScreeningStatusDescription}
-												</Badge>
+
+											{columnConfig.mrn && <TableCell header>{po.patientMrn}</TableCell>}
+
+											{columnConfig.referralDate && (
+												<TableCell width={144}>
+													<span className="text-nowrap text-truncate">
+														{po.orderDateDescription}
+													</span>
+												</TableCell>
 											)}
-											<span className="ms-4 fs-small text-danger text-nowrap">
-												[TODO]: Insurance
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.outreachNumber && (
-										<TableCell width={116} className="text-right">
-											<span className="text-nowrap text-truncate">
-												{po.totalOutreachCountDescription}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.lastOutreach && (
-										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
-										</TableCell>
-									)}
-									{columnConfig.assessmentScheduled && (
-										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">
-												{po.patientOrderScheduledScreeningScheduledDateTimeDescription}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.assessmentCompleted && (
-										<TableCell width={170}>
-											<span className="text-nowrap text-truncate">
-												{po.mostRecentScreeningSessionCompletedAtDescription}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.completedBy && (
-										<TableCell width={240}>
-											<span className="text-nowrap text-truncate">
-												{po.mostRecentScreeningSessionCreatedByAccountDisplayName}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.triage && (
-										<TableCell className="flex-row align-items-center justify-content-start">
-											{po.patientOrderSafetyPlanningStatusId ===
-												PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-												<Badge pill bg="outline-danger" className="text-nowrap me-2">
-													Safety Planning
-												</Badge>
+											{columnConfig.preferredPhone && (
+												<TableCell header>{po.patientPhoneNumberDescription}</TableCell>
 											)}
-											{po.patientOrderCareTypeId === PatientOrderCareTypeId.SUBCLINICAL && (
-												<Badge pill bg="outline-dark" className="text-nowrap">
-													{po.patientOrderCareTypeDescription}
-												</Badge>
+
+											{columnConfig.practice && (
+												<TableCell width={240}>
+													<span className="text-nowrap text-truncate">
+														{po.referringPracticeName}
+													</span>
+												</TableCell>
 											)}
-											{po.patientOrderCareTypeId === PatientOrderCareTypeId.SPECIALTY && (
-												<Badge pill bg="outline-warning" className="text-nowrap">
-													{po.patientOrderCareTypeDescription}
-												</Badge>
+											{columnConfig.referralReason && (
+												<TableCell width={320}>
+													<span className="text-nowrap text-truncate">
+														{po.reasonForReferral}
+													</span>
+												</TableCell>
 											)}
-											{po.patientOrderCareTypeId === PatientOrderCareTypeId.COLLABORATIVE && (
-												<Badge pill bg="outline-primary" className="text-nowrap">
-													{po.patientOrderCareTypeDescription}
-												</Badge>
+											{columnConfig.orderState && (
+												<TableCell>
+													<div>
+														<Badge
+															pill
+															bg={
+																'outline-' +
+																dispositionVariantMap[po.patientOrderDispositionId]
+															}
+														>
+															<FilledCircleIcon
+																className={
+																	classes[`${po.patientOrderDispositionId}-icon`]
+																}
+															/>
+															{'  '} {po.patientOrderDispositionDescription}
+														</Badge>
+													</div>
+												</TableCell>
 											)}
-										</TableCell>
-									)}
-									{columnConfig.resources && (
-										<TableCell className="flex-row align-items-center justify-content-start">
-											{po.patientOrderResourcingStatusId ===
-												PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-												<Badge pill bg="outline-danger" className="text-nowrap me-2">
-													Need
-												</Badge>
+											{columnConfig.assessmentStatus && (
+												<TableCell
+													width={248}
+													className="flex-row align-items-center justify-content-start"
+												>
+													{po.patientOrderScreeningStatusId ===
+														PatientOrderScreeningStatusId.NOT_SCREENED && (
+														<Badge pill bg="outline-dark" className="text-nowrap">
+															{po.patientOrderScreeningStatusDescription}
+														</Badge>
+													)}
+													{po.patientOrderScreeningStatusId ===
+														PatientOrderScreeningStatusId.SCHEDULED && (
+														<Badge pill bg="outline-success" className="text-nowrap">
+															{po.patientOrderScreeningStatusDescription}
+														</Badge>
+													)}
+													{po.patientOrderScreeningStatusId ===
+														PatientOrderScreeningStatusId.IN_PROGRESS && (
+														<Badge pill bg="outline-secondary" className="text-nowrap">
+															{po.patientOrderScreeningStatusDescription}
+														</Badge>
+													)}
+													{po.patientOrderScreeningStatusId ===
+														PatientOrderScreeningStatusId.COMPLETE && (
+														<Badge pill bg="outline-primary" className="text-nowrap">
+															{po.patientOrderScreeningStatusDescription}
+														</Badge>
+													)}
+													<span className="ms-4 fs-small text-danger text-nowrap">
+														[TODO]: Insurance
+													</span>
+												</TableCell>
 											)}
-										</TableCell>
-									)}
-									{columnConfig.checkInScheduled && (
-										<TableCell width={180}>
-											<span className="text-nowrap text-truncate">[TODO]: Jan 30, 2023</span>
-										</TableCell>
-									)}
-									{columnConfig.checkInResponse && (
-										<TableCell width={172}>
-											<span className="text-nowrap text-truncate">[TODO]: No Response</span>
-										</TableCell>
-									)}
-									{columnConfig.episode && (
-										<TableCell width={120} className="text-right">
-											<span className="text-nowrap text-truncate">
-												{po.episodeDurationInDaysDescription}
-											</span>
-										</TableCell>
-									)}
-									{columnConfig.assignedMhic && (
-										<TableCell width={280}>
-											<span className="text-nowrap text-truncate">
-												{po.panelAccountDisplayName}
-											</span>
-										</TableCell>
-									)}
-								</TableRow>
-							);
-						})}
+											{columnConfig.outreachNumber && (
+												<TableCell width={116} className="text-right">
+													<span className="text-nowrap text-truncate">
+														{po.totalOutreachCountDescription}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.lastOutreach && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														[TODO]: Jan 30, 2023
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.assessmentScheduled && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														{po.patientOrderScheduledScreeningScheduledDateTimeDescription}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.assessmentCompleted && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														{po.mostRecentScreeningSessionCompletedAtDescription}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.completedBy && (
+												<TableCell width={240}>
+													<span className="text-nowrap text-truncate">
+														{po.mostRecentScreeningSessionCreatedByAccountDisplayName}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.triage && (
+												<TableCell className="flex-row align-items-center justify-content-start">
+													{po.patientOrderSafetyPlanningStatusId ===
+														PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+														<Badge pill bg="outline-danger" className="text-nowrap me-2">
+															Safety Planning
+														</Badge>
+													)}
+													{po.patientOrderCareTypeId ===
+														PatientOrderCareTypeId.SUBCLINICAL && (
+														<Badge pill bg="outline-dark" className="text-nowrap">
+															{po.patientOrderCareTypeDescription}
+														</Badge>
+													)}
+													{po.patientOrderCareTypeId === PatientOrderCareTypeId.SPECIALTY && (
+														<Badge pill bg="outline-warning" className="text-nowrap">
+															{po.patientOrderCareTypeDescription}
+														</Badge>
+													)}
+													{po.patientOrderCareTypeId ===
+														PatientOrderCareTypeId.COLLABORATIVE && (
+														<Badge pill bg="outline-primary" className="text-nowrap">
+															{po.patientOrderCareTypeDescription}
+														</Badge>
+													)}
+												</TableCell>
+											)}
+											{columnConfig.resources && (
+												<TableCell className="flex-row align-items-center justify-content-start">
+													{po.patientOrderResourcingStatusId ===
+														PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+														<Badge pill bg="outline-danger" className="text-nowrap me-2">
+															Need
+														</Badge>
+													)}
+												</TableCell>
+											)}
+											{columnConfig.checkInScheduled && (
+												<TableCell width={180}>
+													<span className="text-nowrap text-truncate">
+														[TODO]: Jan 30, 2023
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.checkInResponse && (
+												<TableCell width={172}>
+													<span className="text-nowrap text-truncate">
+														[TODO]: No Response
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.episode && (
+												<TableCell width={120} className="text-right">
+													<span className="text-nowrap text-truncate">
+														{po.episodeDurationInDaysDescription}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.assignedMhic && (
+												<TableCell width={280}>
+													<span className="text-nowrap text-truncate">
+														{po.panelAccountDisplayName}
+													</span>
+												</TableCell>
+											)}
+										</TableRow>
+									);
+								})}
+							</Await>
+						</Suspense>
 					</TableBody>
 				</Table>
 			</div>

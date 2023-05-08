@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { LoaderFunctionArgs, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, defer, redirect, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import {
 	MhicCustomizeTableModal,
@@ -11,56 +11,92 @@ import {
 	MhicShelfOutlet,
 } from '@/components/integrated-care/mhic';
 
-import useAccount from '@/hooks/use-account';
-import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import Cookies from 'js-cookie';
 
-type MhicMyPatientsLoaderData = Awaited<ReturnType<typeof loader>>;
+export enum MhicMyPatientView {
+	All = 'all',
+	NeedAssessment = 'need-assessment',
+	SafetyPlanning = 'safety-planning',
+	BHP = 'bhp',
+	SpecialtyCare = 'specialty-care',
+}
+
+const viewConfig = {
+	[MhicMyPatientView.All]: {
+		pageTitle: 'All Assigned',
+		apiParameters: {},
+	},
+	[MhicMyPatientView.NeedAssessment]: {
+		pageTitle: 'Need Assessment',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+		},
+	},
+	[MhicMyPatientView.SafetyPlanning]: {
+		pageTitle: 'Safety Planning',
+		apiParameters: {
+			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+		},
+	},
+	[MhicMyPatientView.BHP]: {
+		pageTitle: 'BHP',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.BHP,
+		},
+	},
+	[MhicMyPatientView.SpecialtyCare]: {
+		pageTitle: 'Specialty Care',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+		},
+	},
+};
+
+interface MhicMyPatientsLoaderData {
+	pageTitle: string;
+	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
+}
 
 export function useMhicMyPatientsLoaderData() {
 	return useRouteLoaderData('mhic-my-patients') as MhicMyPatientsLoaderData;
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-	console.log('==> my-patients loader');
+export async function loader({ request, params }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
 
-	return null;
+	if (!Object.keys(viewConfig).includes(params.mhicView ?? '')) {
+		return redirect('/ic/mhic/my-patients/all');
+	}
+
+	const accountId = Cookies.get('accountId');
+	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+	const { pageTitle, apiParameters } = viewConfig[params.mhicView as MhicMyPatientView];
+
+	const responsePromise = integratedCareService
+		.getPatientOrders({
+			...(accountId && { panelAccountId: accountId }),
+			...apiParameters,
+			...(pageNumber && { pageNumber }),
+			pageSize: '15',
+		})
+		.fetch();
+
+	return defer({
+		pageTitle,
+		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
+	});
 }
 
 export const Component = () => {
-	const { account } = useAccount();
-	const {
-		fetchPatientOrders,
-		isLoadingOrders,
-		patientOrders = [],
-		totalCount,
-		totalCountDescription,
-	} = useFetchPatientOrders();
+	const { pageTitle, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 
-	const accountId = account?.accountId;
+	const [totalCountDescription, setTotalCountDescription] = useState('');
+
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const patientOrderTriageStatusId = searchParams.get('patientOrderTriageStatusId');
-	const patientOrderSafetyPlanningStatusId = searchParams.get('patientOrderSafetyPlanningStatusId');
-
-	const fetchData = useCallback(() => {
-		fetchPatientOrders({
-			...(accountId && { panelAccountId: accountId }),
-			...(patientOrderTriageStatusId && { patientOrderTriageStatusId }),
-			...(patientOrderSafetyPlanningStatusId && { patientOrderSafetyPlanningStatusId }),
-			...(pageNumber && { pageNumber }),
-			pageSize: '15',
-		});
-	}, [accountId, fetchPatientOrders, pageNumber, patientOrderSafetyPlanningStatusId, patientOrderTriageStatusId]);
-
-	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
-
-	// useEffect(() => {
-	// 	setMainViewRefresher(() => fetchData);
-	// }, [fetchData, setMainViewRefresher]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -70,13 +106,11 @@ export const Component = () => {
 		[searchParams, setSearchParams]
 	);
 
-	const pageTitleMap: Record<string, string> = {
-		all: 'All Assigned',
-		[PatientOrderTriageStatusId.NEEDS_ASSESSMENT]: 'Need Assessment',
-		[PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING]: 'Safety Planning',
-		[PatientOrderTriageStatusId.BHP]: 'BHP',
-		[PatientOrderTriageStatusId.SPECIALTY_CARE]: 'Specialty Care',
-	};
+	useEffect(() => {
+		patientOrdersListPromise.then((result) => {
+			setTotalCountDescription(result.totalCountDescription);
+		});
+	}, [patientOrdersListPromise]);
 
 	return (
 		<>
@@ -93,12 +127,7 @@ export const Component = () => {
 			<Container fluid className="py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader
-							title={
-								pageTitleMap[patientOrderTriageStatusId ?? patientOrderSafetyPlanningStatusId ?? 'all']
-							}
-							description={`${totalCountDescription ?? 0} Patients`}
-						>
+						<MhicPageHeader title={pageTitle} description={`${totalCountDescription ?? 0} Patients`}>
 							<div className="d-flex align-items-center">
 								<MhicFilterDropdown
 									align="end"
@@ -129,14 +158,11 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
-							isLoading={isLoadingOrders}
-							patientOrders={patientOrders}
+							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
 							onSelectPatientOrderIdsChange={() => {
 								return;
 							}}
-							totalPatientOrdersCount={totalCount}
-							totalPatientOrdersDescription={totalCountDescription}
 							pageNumber={parseInt(pageNumber, 10)}
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}

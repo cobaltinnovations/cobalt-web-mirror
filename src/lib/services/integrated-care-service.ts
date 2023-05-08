@@ -18,6 +18,16 @@ import {
 	ReferenceDataResponse,
 } from '@/lib/models';
 
+export interface MhicPanelTodayResponse {
+	scheduledAssessmentPatientOrders: PatientOrderModel[];
+	safetyPlanningPatientOrders: PatientOrderModel[];
+	newPatientPatientOrders: PatientOrderModel[];
+	outreachNeededPatientOrders: PatientOrderModel[];
+	followupPatientOrders: PatientOrderModel[];
+	needResourcesPatientOrders: PatientOrderModel[];
+	voicemailTaskPatientOrders: PatientOrderModel[];
+}
+
 export interface PatientOrdersListResponse {
 	findResult: {
 		patientOrders: PatientOrderModel[];
@@ -383,15 +393,7 @@ export const integratedCareService = {
 		});
 	},
 	getOverview(data?: { panelAccountId?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			scheduledAssessmentPatientOrders: PatientOrderModel[];
-			safetyPlanningPatientOrders: PatientOrderModel[];
-			newPatientPatientOrders: PatientOrderModel[];
-			outreachNeededPatientOrders: PatientOrderModel[];
-			followupPatientOrders: PatientOrderModel[];
-			needResourcesPatientOrders: PatientOrderModel[];
-			voicemailTaskPatientOrders: PatientOrderModel[];
-		}>({
+		return httpSingleton.orchestrateRequest<MhicPanelTodayResponse>({
 			method: 'GET',
 			url: '/integrated-care/panel-today',
 			data,
