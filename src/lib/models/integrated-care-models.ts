@@ -134,6 +134,10 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
 
+	patientDemographicsAccepted?: boolean;
+	patientDemographicsCompleted?: boolean;
+	patientAddressRegionAccepted?: boolean;
+
 	// Consent to mental health care
 	patientOrderConsentStatusId: PatientOrderConsentStatusId;
 	patientConsented?: boolean;
