@@ -58,48 +58,26 @@ const PatientLanding = () => {
 		try {
 			const response = await integratedCareService.getLatestPatientOrder().fetch();
 
-			console.log(response.patientOrder);
-
 			if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 				navigate('/ic/patient/consent');
 				return;
 			}
 
-			// if (!insuranceCheck) {
-			// 	navigate('/ic/patient/demographics-part-1');
-			// 	return;
-			// }
-
-			// if (!locationCheck) {
-			// 	navigate('/ic/patient/demographics-part-2');
-			// 	return;
-			// }
-
-			// if (!someOtherCheck) {
-			// 	navigate('/ic/patient/demographics-part-3');
-			// 	return;
-			// }
-
 			setPatientOrder(response.patientOrder);
-			const { screeningSessionResult, screeningSession, patientOrderScreeningStatusId } = response.patientOrder;
 
-			if (screeningSessionResult) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
-				return;
-			}
-
-			if (!screeningSession) {
-				if (
-					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED ||
-					patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED
-				) {
+			switch (response.patientOrder.patientOrderScreeningStatusId) {
+				case PatientOrderScreeningStatusId.COMPLETE:
+					setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
+					break;
+				case PatientOrderScreeningStatusId.NOT_SCREENED:
+				case PatientOrderScreeningStatusId.SCHEDULED:
 					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-					return;
-				}
-				if (patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS) {
+					break;
+				case PatientOrderScreeningStatusId.IN_PROGRESS:
 					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
-					return;
-				}
+					break;
+				default:
+					setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 			}
 		} catch (_error) {
 			// Do not throw error, backend will 404  if there is no order, but that is ok.
