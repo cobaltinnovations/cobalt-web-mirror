@@ -137,6 +137,9 @@ export interface PatientOrderModel {
 	patientDemographicsAccepted?: boolean;
 	patientDemographicsCompleted?: boolean;
 	patientAddressRegionAccepted?: boolean;
+	patientDemographicsConfirmedAt?: string;
+	patientDemographicsConfirmedAtDescription?: string;
+	patientDemographicsConfirmedByAccountId?: string;
 
 	// Consent to mental health care
 	patientOrderConsentStatusId: PatientOrderConsentStatusId;

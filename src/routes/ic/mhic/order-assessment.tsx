@@ -39,8 +39,12 @@ export const MhicOrderAssessment = () => {
 
 			try {
 				await integratedCareService
-					.patchPatientOrder(patientOrderResponse.patientOrder.patientOrderId, values)
+					.patchPatientOrder(patientOrderResponse.patientOrder.patientOrderId, {
+						...values,
+						patientDemographicsConfirmed: true,
+					})
 					.fetch();
+
 				revalidator.revalidate();
 
 				setShowIntro(true);

@@ -70,6 +70,7 @@ export interface PatientOrderDemographicsFormData {
 		countryCode: string;
 	};
 	patientOrderInsurancePlanId: string;
+	patientDemographicsConfirmed: boolean;
 }
 
 export enum PatientOrderResponseSupplement {
