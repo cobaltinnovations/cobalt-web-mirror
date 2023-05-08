@@ -9,6 +9,7 @@ import {
 	MhicPatientOrderTable,
 	MhicSortDropdown,
 	MhicShelfOutlet,
+	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 
 import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
@@ -72,12 +73,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	const accountId = Cookies.get('accountId');
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+	const filters = parseMhicFilterQueryParamsFromURL(url);
 	const { pageTitle, apiParameters } = viewConfig[params.mhicView as MhicMyPatientView];
 
 	const responsePromise = integratedCareService
 		.getPatientOrders({
 			...(accountId && { panelAccountId: accountId }),
 			...apiParameters,
+			...filters,
 			...(pageNumber && { pageNumber }),
 			pageSize: '15',
 		})
@@ -129,13 +132,7 @@ export const Component = () => {
 					<Col>
 						<MhicPageHeader title={pageTitle} description={`${totalCountDescription ?? 0} Patients`}>
 							<div className="d-flex align-items-center">
-								<MhicFilterDropdown
-									align="end"
-									className="me-2"
-									onApply={(selectedFilters) => {
-										console.log(selectedFilters);
-									}}
-								/>
+								<MhicFilterDropdown align="end" className="me-2" />
 								<MhicSortDropdown
 									align="end"
 									className="me-2"

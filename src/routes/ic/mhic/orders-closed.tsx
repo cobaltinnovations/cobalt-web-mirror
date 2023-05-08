@@ -8,6 +8,7 @@ import {
 	MhicPatientOrderTable,
 	MhicShelfOutlet,
 	MhicSortDropdown,
+	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
@@ -24,12 +25,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+	const filters = parseMhicFilterQueryParamsFromURL(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
 			.getPatientOrders({
 				pageSize: '15',
 				patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
+				...filters,
 				...(pageNumber && { pageNumber }),
 			})
 			.fetch()
@@ -64,12 +67,7 @@ export const Component = () => {
 				<Row className="mb-8">
 					<Col>
 						<div className="d-flex justify-content-between align-items-center">
-							<MhicFilterDropdown
-								align="start"
-								onApply={(selectedFilters) => {
-									console.log(selectedFilters);
-								}}
-							/>
+							<MhicFilterDropdown align="start" />
 							<MhicSortDropdown
 								align="end"
 								onApply={(selectedFilters) => {
