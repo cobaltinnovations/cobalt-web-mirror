@@ -9,6 +9,7 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
+	PatientOrderScreeningStatusId,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -239,7 +240,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			</section>
 			<section>
 				<Container fluid>
-					{patientOrder.screeningSessionResult && (
+					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.COMPLETE && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -303,7 +304,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									}}
 								/>
 							)}
-
 							<MhicTriageCard
 								className="mb-6"
 								patientOrder={patientOrder}
@@ -316,7 +316,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 						</>
 					)}
-					{!patientOrder.screeningSession && (
+					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -354,10 +354,25 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											},
 										]}
 									/>
+								</Col>
+							</Row>
+						</>
+					)}
+					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED && (
+						<>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Assessment</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
 									<NoData
 										className="mb-6 bg-white"
 										title="Assessment is Scheduled"
-										description="Nov 12, 2023 at 2:30 PM"
+										description={
+											patientOrder.patientOrderScheduledScreeningScheduledDateTimeDescription
+										}
 										actions={[
 											{
 												variant: 'primary',
@@ -383,10 +398,23 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											},
 										]}
 									/>
+								</Col>
+							</Row>
+						</>
+					)}
+					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS && (
+						<>
+							<Row className="mb-6">
+								<Col>
+									<h4 className="mb-0">Assessment</h4>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"
-										description="{Patient Name} began the assessment on {Date} at {Time}"
+										description={`[STARTED_BY] began the assessment on [ASSESSMENT_START_TIME]`}
 										actions={[
 											{
 												variant: 'primary',
