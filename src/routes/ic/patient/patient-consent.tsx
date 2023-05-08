@@ -5,7 +5,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 import { integratedCareService } from '@/lib/services';
-import { PatientOrderClosureReasonId, PatientOrderModel } from '@/lib/models';
+import { PatientOrderConsentStatusId, PatientOrderModel } from '@/lib/models';
 import AsyncWrapper from '@/components/async-page';
 
 const PatientConsent = () => {
@@ -32,23 +32,13 @@ const PatientConsent = () => {
 
 				setIsSaving(true);
 
-				if (value === 'YES') {
-					await integratedCareService.consentToCare(patientOrder.patientOrderId).fetch();
+				await integratedCareService
+					.updatePatientOrderConsentStatus(patientOrder.patientOrderId, {
+						patientOrderConsentStatusId: value as PatientOrderConsentStatusId,
+					})
+					.fetch();
 
-					navigate('/ic/patient/demographics-part-1');
-					return;
-				}
-
-				if (value === 'NO') {
-					await integratedCareService
-						.closePatientOrder(patientOrder.patientOrderId, {
-							patientOrderClosureReasonId: PatientOrderClosureReasonId.REFUSED_CARE,
-						})
-						.fetch();
-
-					navigate('/ic/patient');
-					return;
-				}
+				navigate('/ic/patient');
 			} catch (error) {
 				handleError(error);
 				setIsSaving(false);
@@ -79,7 +69,7 @@ const PatientConsent = () => {
 								size="lg"
 								name="consent"
 								id="consent-yes"
-								value="YES"
+								value={PatientOrderConsentStatusId.CONSENTED}
 								type="submit"
 								disabled={isSaving}
 							>
@@ -91,7 +81,7 @@ const PatientConsent = () => {
 								size="lg"
 								name="consent"
 								id="consent-no"
-								value="NO"
+								value={PatientOrderConsentStatusId.REJECTED}
 								type="submit"
 								disabled={isSaving}
 							>

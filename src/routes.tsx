@@ -25,9 +25,7 @@ import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
 import MhicOrderAssessment from './routes/ic/mhic/order-assessment';
 import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
-import PatientDemographicsPart1 from './routes/ic/patient/demographics-part-1';
-import PatientDemographicsPart2 from './routes/ic/patient/demographics-part-2';
-import PatientDemographicsPart3 from './routes/ic/patient/demographics-part-3';
+import PatientDemographics from './routes/ic/patient/patient-demographics';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
 import PatientLanding from './routes/ic/patient/patient-landing';
 import PatientConsent from './routes/ic/patient/patient-consent';
@@ -340,10 +338,6 @@ export const routes: RouteObject[] = [
 								element: <IntakeAssessment />,
 							},
 							{
-								path: 'confirm-appointment',
-								element: <ConfirmAppointment />,
-							},
-							{
 								path: 'one-on-one-resources',
 								element: <OneOnOneResources />,
 							},
@@ -364,6 +358,10 @@ export const routes: RouteObject[] = [
 								element: <EhrLookup />,
 							},
 						],
+					},
+					{
+						path: 'confirm-appointment',
+						element: <ConfirmAppointment />,
 					},
 
 					{
@@ -722,16 +720,8 @@ export const routes: RouteObject[] = [
 										element: <PatientDemographicsIntroduction />,
 									},
 									{
-										path: 'demographics-part-1',
-										element: <PatientDemographicsPart1 />,
-									},
-									{
-										path: 'demographics-part-2',
-										element: <PatientDemographicsPart2 />,
-									},
-									{
-										path: 'demographics-part-3',
-										element: <PatientDemographicsPart3 />,
+										path: 'demographics',
+										element: <PatientDemographics />,
 									},
 									{
 										path: 'demographics-thanks',

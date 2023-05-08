@@ -4,6 +4,7 @@ import { FormikProps } from 'formik';
 import { Form } from 'react-bootstrap';
 import DatePicker from '@/components/date-picker';
 import moment from 'moment';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 
 export interface PatientDetailsFormData {
 	patientFirstName: string;
@@ -11,6 +12,8 @@ export interface PatientDetailsFormData {
 	patientBirthdate: string;
 	patientPhoneNumber: string;
 	patientEmailAddress: string;
+	patientOrderInsurancePayorId: string;
+	patientOrderInsurancePlanId: string;
 }
 interface PatientDetailsFormInputsProps<T = PatientDetailsFormData> {
 	formikProps: FormikProps<T>;
@@ -19,6 +22,8 @@ interface PatientDetailsFormInputsProps<T = PatientDetailsFormData> {
 export const PatientDetailsFormInputs = ({
 	formikProps: { values, handleBlur, setFieldValue, handleChange, touched, errors },
 }: PatientDetailsFormInputsProps) => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+
 	return (
 		<>
 			<InputHelper
@@ -30,6 +35,7 @@ export const PatientDetailsFormInputs = ({
 				onBlur={handleBlur}
 				onChange={handleChange}
 				error={touched.patientFirstName && errors.patientFirstName ? errors.patientFirstName : ''}
+				required
 			/>
 			<InputHelper
 				className="mb-2"
@@ -66,7 +72,7 @@ export const PatientDetailsFormInputs = ({
 				required
 			/>
 			<InputHelper
-				className="mb-6"
+				className="mb-2"
 				label="Email Address"
 				type="email"
 				name="patientEmailAddress"
@@ -74,7 +80,67 @@ export const PatientDetailsFormInputs = ({
 				onBlur={handleBlur}
 				onChange={handleChange}
 				error={touched.patientEmailAddress && errors.patientEmailAddress ? errors.patientEmailAddress : ''}
+				required
 			/>
+			<InputHelper
+				className="mb-2"
+				label="Insurance Provider"
+				as="select"
+				name="patientOrderInsurancePayorId"
+				value={values.patientOrderInsurancePayorId}
+				onBlur={handleBlur}
+				onChange={handleChange}
+				error={
+					touched.patientOrderInsurancePayorId && errors.patientOrderInsurancePayorId
+						? errors.patientOrderInsurancePayorId
+						: ''
+				}
+				required
+			>
+				<option value="" disabled>
+					Select...
+				</option>
+				{referenceDataResponse.patientOrderInsurancePayors.map((insurancePayor) => {
+					return (
+						<option
+							key={insurancePayor.patientOrderInsurancePayorId}
+							value={insurancePayor.patientOrderInsurancePayorId}
+						>
+							{insurancePayor.name}
+						</option>
+					);
+				})}
+			</InputHelper>
+			<InputHelper
+				className="mb-6"
+				label="Insurance Plan"
+				as="select"
+				name="patientOrderInsurancePlanId"
+				value={values.patientOrderInsurancePlanId}
+				onBlur={handleBlur}
+				onChange={handleChange}
+				error={
+					touched.patientOrderInsurancePlanId && errors.patientOrderInsurancePlanId
+						? errors.patientOrderInsurancePlanId
+						: ''
+				}
+				disabled={!values.patientOrderInsurancePayorId}
+				required
+			>
+				<option value="" disabled label="Select..." />
+				{referenceDataResponse.patientOrderInsurancePlans
+					.filter((plan) => plan.patientOrderInsurancePayorId === values.patientOrderInsurancePayorId)
+					.map((insurancePlan) => {
+						return (
+							<option
+								key={insurancePlan.patientOrderInsurancePlanId}
+								value={insurancePlan.patientOrderInsurancePlanId}
+							>
+								{insurancePlan.name}
+							</option>
+						);
+					})}
+			</InputHelper>
 		</>
 	);
 };
