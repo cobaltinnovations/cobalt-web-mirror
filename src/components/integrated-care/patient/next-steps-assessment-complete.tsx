@@ -30,7 +30,7 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 				}}
 			/>
 
-			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
+			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 				<>
 					{patientOrder.appointmentId ? (
 						<NextStepsItem

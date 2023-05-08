@@ -856,7 +856,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										</Row>
 										<Row>
 											<Col xs={3}>
-												<p className="m-0 text-gray">BHP</p>
+												<p className="m-0 text-gray">MHP</p>
 											</Col>
 											<Col xs={9}>
 												<p className="m-0">{patientOrder.providerName ?? 'N/A'}</p>

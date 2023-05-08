@@ -48,7 +48,7 @@ export const Component = () => {
 	const isMyPatientsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.All;
 	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
 	const isSafetyPlanningActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SafetyPlanning;
-	const isBhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.BHP;
+	const isMhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.MHP;
 	const isSpecialtyCareActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SpecialtyCare;
 
 	useEffect(() => {
@@ -95,15 +95,15 @@ export const Component = () => {
 						},
 
 						{
-							title: 'BHP',
+							title: 'MHP',
 							description:
-								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.BHP
+								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
 									.patientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-success" />,
 							onClick: () => {
-								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.BHP);
+								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
 							},
-							isActive: isBhpActive,
+							isActive: isMhpActive,
 						},
 						{
 							title: 'Specialty Care',
@@ -121,7 +121,7 @@ export const Component = () => {
 			]);
 		});
 	}, [
-		isBhpActive,
+		isMhpActive,
 		isMyPatientsActive,
 		isNeedsAssessmentActive,
 		isSafetyPlanningActive,
