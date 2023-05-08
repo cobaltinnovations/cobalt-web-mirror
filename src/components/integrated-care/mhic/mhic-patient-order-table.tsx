@@ -129,7 +129,23 @@ export const MhicPatientOrderTable = ({
 			count++;
 		}
 
+		if (
+			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
+		) {
+			count++;
+		}
+
 		return count;
+	}, []);
+
+	const getFlagColor = useCallback((patientOrder: PatientOrderModel) => {
+		if (
+			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
+		) {
+			return 'text-danger';
+		}
+
+		return 'text-warning';
 	}, []);
 
 	return (
@@ -277,7 +293,7 @@ export const MhicPatientOrderTable = ({
 											{getFlagCount(po) > 0 && (
 												<>
 													<span className="text-gray">{getFlagCount(po)}</span>
-													<FlagIcon className="text-warning" />
+													<FlagIcon className={getFlagColor(po)} />
 												</>
 											)}
 										</TableCell>
