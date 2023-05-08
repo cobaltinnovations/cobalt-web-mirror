@@ -29,6 +29,8 @@ const PatientDemographics = () => {
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
+			patientInsuranceProvider: '', // TODO
+			patientInsurancePlan: '', // TODO
 			patientAddress: {
 				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
 				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
@@ -76,6 +78,15 @@ const PatientDemographics = () => {
 			<Container className="py-20">
 				<Row className="mb-8">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<h3 className="mb-2">Verify your information</h3>
+						<p className="mb-0">
+							Your primary care team gave us a head start filling out this information. Please make sure
+							all information is correct and complete before continuing.
+						</p>
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<Formik<PatientInfoFormData>
 							initialValues={initialFormValues}
 							enableReinitialize
@@ -87,13 +98,18 @@ const PatientDemographics = () => {
 										//@ts-expect-error
 										formikProps={formikProps}
 									/>
-									<hr />
+									<hr className="mb-6" />
+									<h5 className="mb-6">Address</h5>
 									<PatientAddressFormInputs
 										//@ts-expect-error
 										formikProps={formikProps}
 										referenceData={referenceDataResponse}
 									/>
-									<hr />
+									<hr className="mb-6" />
+									<h5 className="mb-2">About</h5>
+									<p className="mb-6">
+										This information is not required but can be helpful for your care team to know.{' '}
+									</p>
 									<PatientDemographicsFormInputs
 										//@ts-expect-error
 										formikProps={formikProps}

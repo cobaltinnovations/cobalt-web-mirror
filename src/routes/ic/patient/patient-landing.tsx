@@ -168,7 +168,7 @@ const PatientLanding = () => {
 												variant: 'outline-primary',
 												title: 'Begin Verification Process',
 												onClick: () => {
-													navigate('/ic/patient/demographics-part-1');
+													navigate('/ic/patient/demographics');
 												},
 											}}
 										/>

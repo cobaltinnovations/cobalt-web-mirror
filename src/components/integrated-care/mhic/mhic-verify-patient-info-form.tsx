@@ -27,6 +27,8 @@ export const MhicVerifyPatientInfoForm = ({ patientOrder, onSubmit, referenceDat
 			patientBirthdate: patientOrder?.patientBirthdate ?? '',
 			patientPhoneNumber: patientOrder?.patientPhoneNumberDescription ?? '',
 			patientEmailAddress: patientOrder?.patientEmailAddress ?? patientOrder?.patientAccount?.emailAddress ?? '',
+			patientInsuranceProvider: '', // TODO
+			patientInsurancePlan: '', // TODO
 			patientAddress: {
 				streetAddress1: patientOrder?.patientAddress?.streetAddress1 ?? '',
 				streetAddress2: patientOrder?.patientAddress?.streetAddress2 ?? '',
