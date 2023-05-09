@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import useAccount from '@/hooks/use-account';
@@ -136,6 +136,10 @@ const Index: FC = () => {
 
 		setCallsToAction(response.callsToAction);
 	}, []);
+
+	if (institution?.integratedCareEnabled) {
+		return <Navigate to="/ic" />;
+	}
 
 	return (
 		<>
