@@ -149,6 +149,28 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								</Col>
 							</Row>
 						)}
+						{!patientOrder.patientAddressRegionAccepted && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Address region not accepted"
+									/>
+								</Col>
+							</Row>
+						)}
+						{!patientOrder.patientOrderInsurancePlanAccepted && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Insurance plan not accepted"
+									/>
+								</Col>
+							</Row>
+						)}
 						<Row className="mb-4">
 							<Col xs={3}>
 								<p className="m-0 text-gray">Date Referred</p>

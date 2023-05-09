@@ -89,7 +89,10 @@ export const PatientDetailsFormInputs = ({
 				name="patientOrderInsurancePayorId"
 				value={values.patientOrderInsurancePayorId}
 				onBlur={handleBlur}
-				onChange={handleChange}
+				onChange={(event) => {
+					setFieldValue('patientOrderInsurancePlanId', '');
+					handleChange(event);
+				}}
 				error={
 					touched.patientOrderInsurancePayorId && errors.patientOrderInsurancePayorId
 						? errors.patientOrderInsurancePayorId

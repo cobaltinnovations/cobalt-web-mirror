@@ -168,7 +168,7 @@ const PatientLanding = () => {
 											title="Step 1: Verify your information"
 											description={
 												patientOrder?.patientDemographicsAccepted
-													? '[TODO]: Completed Apr 6, 2023 at 1:45 PM'
+													? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
 													: 'Review the information provided by your primary care provider and make sure it is correct.'
 											}
 											button={{
