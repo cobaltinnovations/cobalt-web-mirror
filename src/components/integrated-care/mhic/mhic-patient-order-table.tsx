@@ -125,14 +125,18 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.patientBelowAgeThreshold) {
 			count++;
 		}
-
 		if (patientOrder.mostRecentEpisodeClosedWithinDateThreshold) {
 			count++;
 		}
-
 		if (
 			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
 		) {
+			count++;
+		}
+		if (!patientOrder.patientAddressRegionAccepted) {
+			count++;
+		}
+		if (!patientOrder.patientOrderInsurancePlanAccepted) {
 			count++;
 		}
 

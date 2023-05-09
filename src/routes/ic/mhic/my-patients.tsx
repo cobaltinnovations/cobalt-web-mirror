@@ -12,22 +12,35 @@ import {
 	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 
-import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
+import {
+	PatientOrderConsentStatusId,
+	PatientOrderDispositionId,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderTriageStatusId,
+} from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import Cookies from 'js-cookie';
 
 export enum MhicMyPatientView {
 	All = 'all',
+	WaitingForConsent = 'waiting-for-consent',
 	NeedAssessment = 'need-assessment',
 	SafetyPlanning = 'safety-planning',
 	MHP = 'mhp',
 	SpecialtyCare = 'specialty-care',
+	Closed = 'closed',
 }
 
 const viewConfig = {
 	[MhicMyPatientView.All]: {
 		pageTitle: 'All Assigned',
 		apiParameters: {},
+	},
+	[MhicMyPatientView.WaitingForConsent]: {
+		pageTitle: 'Waiting for Consent',
+		apiParameters: {
+			patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
+		},
 	},
 	[MhicMyPatientView.NeedAssessment]: {
 		pageTitle: 'Need Assessment',
@@ -51,6 +64,12 @@ const viewConfig = {
 		pageTitle: 'Specialty Care',
 		apiParameters: {
 			patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+		},
+	},
+	[MhicMyPatientView.Closed]: {
+		pageTitle: 'Closed',
+		apiParameters: {
+			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
 		},
 	},
 };

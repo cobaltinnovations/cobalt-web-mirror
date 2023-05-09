@@ -44,10 +44,12 @@ export const Component = () => {
 
 	const isTodayActive = !!overviewMatch;
 	const isMyPatientsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.All;
+	const isWaitingForConsentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.WaitingForConsent;
 	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
 	const isSafetyPlanningActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SafetyPlanning;
 	const isMhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.MHP;
 	const isSpecialtyCareActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SpecialtyCare;
+	const isClosedActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Closed;
 
 	useEffect(() => {
 		patientOrderPanelCountsPromise.then((patientOrderPanelCountsResponse) => {
@@ -71,6 +73,16 @@ export const Component = () => {
 				{
 					title: 'My Patient Views',
 					navigationItems: [
+						{
+							title: 'Waiting for Consent',
+							description:
+								patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ?? '0',
+							icon: () => <DotIcon width={24} height={24} className="text-n300" />,
+							onClick: () => {
+								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
+							},
+							isActive: isWaitingForConsentActive,
+						},
 						{
 							title: 'Need Assessment',
 							description:
@@ -114,17 +126,28 @@ export const Component = () => {
 							},
 							isActive: isSpecialtyCareActive,
 						},
+						{
+							title: 'Closed',
+							description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
+							icon: () => <DotIcon width={24} height={24} className="text-gray" />,
+							onClick: () => {
+								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
+							},
+							isActive: isClosedActive,
+						},
 					],
 				},
 			]);
 		});
 	}, [
+		isClosedActive,
 		isMhpActive,
 		isMyPatientsActive,
 		isNeedsAssessmentActive,
 		isSafetyPlanningActive,
 		isSpecialtyCareActive,
 		isTodayActive,
+		isWaitingForConsentActive,
 		navigate,
 		patientOrderPanelCountsPromise,
 	]);
