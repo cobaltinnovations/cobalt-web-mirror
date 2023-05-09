@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useNavigate, useRevalidator } from 'react-router-dom';
 import { Button, Card, Form } from 'react-bootstrap';
 
 import {
@@ -7,10 +8,9 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
-import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import { integratedCareService } from '@/lib/services';
-import { useRevalidator } from 'react-router-dom';
 import useHandleError from '@/hooks/use-handle-error';
+import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
 }
 
 export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) => {
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
@@ -140,7 +141,9 @@ export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) 
 											variant: 'primary',
 											title: 'Schedule Appointment',
 											onClick: () => {
-												window.alert('TODO: Link to BHP/MHP connect-with-support');
+												navigate(
+													`/ic/mhic/connect-with-support/mhp?patientOrderId=${patientOrder.patientOrderId}`
+												);
 											},
 										},
 									]}
