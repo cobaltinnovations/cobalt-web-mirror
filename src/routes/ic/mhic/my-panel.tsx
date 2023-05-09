@@ -139,6 +139,7 @@ export const Component = () => {
 			]);
 		});
 	}, [
+		isClosedActive,
 		isMhpActive,
 		isMyPatientsActive,
 		isNeedsAssessmentActive,
