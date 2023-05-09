@@ -1,11 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
-import { PatientOrderModel, PatientOrderResourcingStatusId, PatientOrderSafetyPlanningStatusId } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderTriageStatusId,
+} from '@/lib/models';
 import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import { integratedCareService } from '@/lib/services';
 import { useRevalidator } from 'react-router-dom';
 import useHandleError from '@/hooks/use-handle-error';
+import NoData from '@/components/no-data';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -107,6 +113,41 @@ export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) 
 					<Card.Title>Next Steps</Card.Title>
 				</Card.Header>
 				<Card.Body>
+					{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+						<>
+							{patientOrder.appointmentId ? (
+								<NoData
+									className="mb-4 bg-white"
+									title="Appointment is Scheduled"
+									description={`${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
+									actions={[
+										{
+											variant: 'primary',
+											title: 'Cancel Appointment',
+											onClick: () => {
+												window.alert('TODO: Cancel appointment UI');
+											},
+										},
+									]}
+								/>
+							) : (
+								<NoData
+									className="mb-4"
+									title="No Appointment"
+									description="The patient's appointment information will appear here"
+									actions={[
+										{
+											variant: 'primary',
+											title: 'Schedule Appointment',
+											onClick: () => {
+												window.alert('TODO: Link to BHP/MHP connect-with-support');
+											},
+										},
+									]}
+								/>
+							)}
+						</>
+					)}
 					<div className="mb-4 d-flex align-items-center justify-content-between">
 						<Form.Check
 							type="switch"
