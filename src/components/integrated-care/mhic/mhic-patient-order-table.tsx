@@ -427,8 +427,8 @@ export const MhicPatientOrderTable = ({
 															{po.patientOrderScreeningStatusDescription}
 														</Badge>
 													)}
-													<span className="ms-4 fs-small text-danger text-nowrap">
-														[TODO]: Insurance
+													<span className="ms-4 fs-small text-nowrap">
+														{po.patientOrderInsurancePlanName}
 													</span>
 												</TableCell>
 											)}
