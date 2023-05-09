@@ -10,7 +10,6 @@ export function useMhicOrderLayoutLoaderData() {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	console.log('==> order loader');
 	if (!params.patientOrderId) {
 		throw new Error('Missing Patient Order ID');
 	}

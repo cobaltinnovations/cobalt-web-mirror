@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { Dropdown } from 'react-bootstrap';
 
@@ -8,7 +8,6 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { MhicAssignOrderModal } from './mhic-assign-order-modal';
 import useFlags from '@/hooks/use-flags';
 import { PatientOrderDispositionId, PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
-import useFetchPanelAccounts from '@/routes/ic/hooks/use-fetch-panel-accounts';
 import { integratedCareService } from '@/lib/services';
 
 import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
@@ -62,12 +61,6 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 		[addFlag, revalidator]
 	);
 
-	const { fetchPanelAccounts, panelAccounts = [] } = useFetchPanelAccounts();
-
-	useEffect(() => {
-		fetchPanelAccounts();
-	}, [fetchPanelAccounts]);
-
 	if (NO_ACTION_DISPOSITIONS.includes(patientOrder.patientOrderDispositionId)) {
 		return null;
 	}
@@ -81,7 +74,6 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 		<>
 			<MhicAssignOrderModal
 				patientOrderIds={[patientOrder.patientOrderId]}
-				panelAccounts={panelAccounts}
 				show={showAssignOrderModal}
 				onHide={() => {
 					setShowAssignOrderModal(false);
@@ -104,7 +96,6 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 			<MhicVoicemailTaskModal
 				patientOrder={patientOrder}
 				show={showAddVoicemailTaskModal}
-				panelAccounts={panelAccounts}
 				onHide={() => {
 					setShowAddVoicemailTaskModal(false);
 				}}

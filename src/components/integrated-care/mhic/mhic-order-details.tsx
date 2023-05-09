@@ -4,7 +4,6 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
-	AccountModel,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
@@ -63,6 +62,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					.fetch();
 
 				setShowCloseEpisodeModal(false);
+				revalidator.revalidate();
 				addFlag({
 					variant: 'success',
 					title: 'Episode Closed',
@@ -73,7 +73,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				handleError(error);
 			}
 		},
-		[addFlag, handleError, patientOrder.patientOrderId]
+		[addFlag, handleError, patientOrder.patientOrderId, revalidator]
 	);
 
 	const incompleteVoicemailTask = useMemo(() => {
@@ -88,7 +88,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onHide={() => {
 					setShowScheduleAssessmentModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
+				onSave={() => {
 					setShowScheduleAssessmentModal(false);
 					revalidator.revalidate();
 				}}
@@ -163,7 +163,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onHide={() => {
 					setShowAddVoicemailTaskModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
+				onSave={() => {
+					revalidator.revalidate();
 					setShowAddVoicemailTaskModal(false);
 				}}
 			/>
@@ -855,7 +856,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										</Row>
 										<Row>
 											<Col xs={3}>
-												<p className="m-0 text-gray">BHP</p>
+												<p className="m-0 text-gray">MHP</p>
 											</Col>
 											<Col xs={9}>
 												<p className="m-0">{patientOrder.providerName ?? 'N/A'}</p>

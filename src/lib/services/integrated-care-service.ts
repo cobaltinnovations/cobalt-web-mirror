@@ -8,16 +8,29 @@ import {
 	PatientOrderConsentStatusId,
 	PatientOrderCountModel,
 	PatientOrderCountsByPatientOrderTriageStatusId,
+	PatientOrderFilterFlagTypeId,
 	PatientOrderModel,
 	PatientOrderNoteModel,
 	PatientOrderOutreachModel,
+	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
 	PatientOrderScheduledScreening,
+	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
+
+export interface MhicPanelTodayResponse {
+	scheduledAssessmentPatientOrders: PatientOrderModel[];
+	safetyPlanningPatientOrders: PatientOrderModel[];
+	newPatientPatientOrders: PatientOrderModel[];
+	outreachNeededPatientOrders: PatientOrderModel[];
+	followupPatientOrders: PatientOrderModel[];
+	needResourcesPatientOrders: PatientOrderModel[];
+	voicemailTaskPatientOrders: PatientOrderModel[];
+}
 
 export interface PatientOrdersListResponse {
 	findResult: {
@@ -79,6 +92,28 @@ export enum PatientOrderResponseSupplement {
 	EVERYTHING = 'EVERYTHING',
 }
 
+export interface PatientOrderApiQueryParameters {
+	patientOrderTriageStatusId?: string | string[];
+	patientOrderAssignmentStatusId?: string;
+	patientOrderOutreachStatusId?: string;
+	patientOrderResponseStatusId?: string;
+	patientOrderSafetyPlanningStatusId?: string;
+	patientOrderDispositionId?: string | string[];
+	panelAccountId?: string;
+	patientMrn?: string;
+	searchQuery?: string;
+	pageNumber?: string;
+	pageSize?: string;
+	patientOrderFilterFlagTypeId?: PatientOrderFilterFlagTypeId;
+	referringPracticeNames?: string | string[];
+	reasonsForReferral?: string | string[];
+	patientOrderScreeningStatusId?: PatientOrderScreeningStatusId | PatientOrderScreeningStatusId[];
+	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId | PatientOrderResourcingStatusId[];
+	patientOrderResourceCheckInResponseStatusId?:
+		| PatientOrderResourceCheckInResponseStatusId
+		| PatientOrderResourceCheckInResponseStatusId[];
+}
+
 export const integratedCareService = {
 	importPatientOrders(data: { csvContent: string }) {
 		return httpSingleton.orchestrateRequest<any>({
@@ -95,19 +130,7 @@ export const integratedCareService = {
 			url: buildQueryParamUrl('/patient-orders/autocomplete', queryParameters),
 		});
 	},
-	getPatientOrders(queryParameters?: {
-		patientOrderTriageStatusId?: string | string[];
-		patientOrderAssignmentStatusId?: string;
-		patientOrderOutreachStatusId?: string;
-		patientOrderResponseStatusId?: string;
-		patientOrderSafetyPlanningStatusId?: string;
-		patientOrderDispositionId?: string | string[];
-		panelAccountId?: string;
-		patientMrn?: string;
-		searchQuery?: string;
-		pageNumber?: string;
-		pageSize?: string;
-	}) {
+	getPatientOrders(queryParameters?: PatientOrderApiQueryParameters) {
 		return httpSingleton.orchestrateRequest<PatientOrdersListResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/patient-orders', queryParameters),
@@ -386,15 +409,7 @@ export const integratedCareService = {
 		});
 	},
 	getOverview(data?: { panelAccountId?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			scheduledAssessmentPatientOrders: PatientOrderModel[];
-			safetyPlanningPatientOrders: PatientOrderModel[];
-			newPatientPatientOrders: PatientOrderModel[];
-			outreachNeededPatientOrders: PatientOrderModel[];
-			followupPatientOrders: PatientOrderModel[];
-			needResourcesPatientOrders: PatientOrderModel[];
-			voicemailTaskPatientOrders: PatientOrderModel[];
-		}>({
+		return httpSingleton.orchestrateRequest<MhicPanelTodayResponse>({
 			method: 'GET',
 			url: '/integrated-care/panel-today',
 			data,
