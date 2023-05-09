@@ -1,37 +1,49 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
-import useFetchPatientOrders from '../hooks/use-fetch-patient-orders';
 import {
 	MhicFilterDropdown,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicShelfOutlet,
 	MhicSortDropdown,
+	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import { PatientOrderDispositionId } from '@/lib/models';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-const MhicOrdersClosed = () => {
+interface MhicOrdersClosedLoaderData {
+	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
+}
+
+export function useMhicOrdersClosedLoaderData() {
+	return useRouteLoaderData('mhic-orders-closed') as MhicOrdersClosedLoaderData;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
+
+	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+	const filters = parseMhicFilterQueryParamsFromURL(url);
+
+	return defer({
+		patientOrdersListPromise: integratedCareService
+			.getPatientOrders({
+				pageSize: '15',
+				patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
+				...filters,
+				...(pageNumber && { pageNumber }),
+			})
+			.fetch()
+			.then((r) => r.findResult),
+	});
+}
+
+export const Component = () => {
+	const { patientOrdersListPromise } = useMhicOrdersClosedLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	// const { setMainViewRefresher } = useOutletContext<MhicLayoutContext>();
-
-	const {
-		fetchPatientOrders,
-		isLoadingOrders,
-		patientOrders = [],
-		totalCount,
-		totalCountDescription,
-	} = useFetchPatientOrders();
-
-	const fetchTableData = useCallback(() => {
-		return fetchPatientOrders({
-			pageSize: '15',
-			...(pageNumber && { pageNumber }),
-			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
-		});
-	}, [fetchPatientOrders, pageNumber]);
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -40,14 +52,6 @@ const MhicOrdersClosed = () => {
 		},
 		[searchParams, setSearchParams]
 	);
-
-	useEffect(() => {
-		fetchTableData();
-	}, [fetchTableData]);
-
-	// useEffect(() => {
-	// 	setMainViewRefresher(() => fetchTableData);
-	// }, [fetchTableData, setMainViewRefresher]);
 
 	return (
 		<>
@@ -63,12 +67,7 @@ const MhicOrdersClosed = () => {
 				<Row className="mb-8">
 					<Col>
 						<div className="d-flex justify-content-between align-items-center">
-							<MhicFilterDropdown
-								align="start"
-								onApply={(selectedFilters) => {
-									console.log(selectedFilters);
-								}}
-							/>
+							<MhicFilterDropdown align="start" />
 							<MhicSortDropdown
 								align="end"
 								onApply={(selectedFilters) => {
@@ -81,11 +80,8 @@ const MhicOrdersClosed = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
-							isLoading={isLoadingOrders}
-							patientOrders={patientOrders}
+							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
-							totalPatientOrdersCount={totalCount}
-							totalPatientOrdersDescription={totalCountDescription}
 							pageNumber={parseInt(pageNumber, 10)}
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}
@@ -106,5 +102,3 @@ const MhicOrdersClosed = () => {
 		</>
 	);
 };
-
-export default MhicOrdersClosed;

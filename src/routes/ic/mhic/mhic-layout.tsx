@@ -2,10 +2,11 @@ import { MHIC_HEADER_HEIGHT, MhicHeader } from '@/components/integrated-care/mhi
 import { STORAGE_KEYS } from '@/lib/config/constants';
 import { PatientOrderAutocompleteResult } from '@/lib/models';
 import React, { Suspense, useEffect, useState } from 'react';
-import { LoaderFunctionArgs, Outlet, useRouteLoaderData } from 'react-router-dom';
+import { Outlet, useRouteLoaderData } from 'react-router-dom';
 import { useMhicOrderLayoutLoaderData } from './order-layout';
 import Loader from '@/components/loader';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { integratedCareService } from '@/lib/services';
 
 type MhicLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -13,10 +14,12 @@ export function useMhicLayoutLoaderData() {
 	return useRouteLoaderData('mhic') as MhicLayoutLoaderData;
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-	console.log('==> mhic layout loader');
+export async function loader() {
+	const accounts = await integratedCareService.getPanelAccounts().fetch();
 
-	return null;
+	return {
+		panelAccounts: accounts.panelAccounts,
+	};
 }
 
 export const Component = () => {

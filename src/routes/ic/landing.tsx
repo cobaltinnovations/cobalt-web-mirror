@@ -10,7 +10,6 @@ export function useIntegratedCareLoaderData() {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	console.log('==> ic loader');
 	const referenceDataRequest = integratedCareService.getReferenceData();
 
 	request.signal.addEventListener('abort', () => {
