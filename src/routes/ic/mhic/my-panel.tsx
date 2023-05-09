@@ -75,7 +75,8 @@ export const Component = () => {
 					navigationItems: [
 						{
 							title: 'Waiting for Consent',
-							description: '0',
+							description:
+								patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-n300" />,
 							onClick: () => {
 								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
@@ -127,7 +128,7 @@ export const Component = () => {
 						},
 						{
 							title: 'Closed',
-							description: '0',
+							description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-gray" />,
 							onClick: () => {
 								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);

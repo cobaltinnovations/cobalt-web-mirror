@@ -47,6 +47,10 @@ export interface PatientOrderPanelCountsResponse {
 	patientOrderCountsByPatientOrderTriageStatusId: PatientOrderCountsByPatientOrderTriageStatusId;
 	safetyPlanningPatientOrderCount: number;
 	safetyPlanningPatientOrderCountDescription: string;
+	closedPatientOrderCount: number;
+	closedPatientOrderCountDescription: string;
+	waitingForConsentPatientOrderCount: number;
+	waitingForConsentPatientOrderCountDescription: string;
 }
 
 export interface PatientOrderResponse {
