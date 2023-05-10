@@ -22,6 +22,7 @@ import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { useRevalidator } from 'react-router-dom';
+import useAccount from '@/hooks/use-account';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -32,6 +33,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const revalidator = useRevalidator();
+	const { institution } = useAccount();
 
 	const [showMessageModal, setShowMessageModal] = useState(false);
 	const [messageToEdit, setMessageToEdit] = useState<PatientOrderScheduledMessageGroup>();
@@ -155,7 +157,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 												}}
 											>
 												<EnvelopeIcon width={20} height={20} className="me-3 text-gray" />
-												<span>Email</span>
+												<span>{institution.myChartName}</span>
 											</Dropdown.Item>
 										</Dropdown.Menu>
 									</Dropdown>
