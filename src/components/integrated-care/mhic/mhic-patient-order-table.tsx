@@ -442,7 +442,7 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.lastOutreach && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
-														[TODO]: Jan 30, 2023
+														{po.mostRecentTotalOutreachDateTimeDescription}
 													</span>
 												</TableCell>
 											)}

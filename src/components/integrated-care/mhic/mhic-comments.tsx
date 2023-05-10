@@ -68,7 +68,6 @@ export const MhicComments = ({ patientOrder }: Props) => {
 				addFlag({
 					variant: 'success',
 					title: 'Comment added',
-					description: '{Message}',
 					actions: [],
 				});
 			} catch (error) {
@@ -89,7 +88,6 @@ export const MhicComments = ({ patientOrder }: Props) => {
 			addFlag({
 				variant: 'success',
 				title: 'Comment updated',
-				description: '{Message}',
 				actions: [],
 			});
 		} catch (error) {
@@ -115,7 +113,6 @@ export const MhicComments = ({ patientOrder }: Props) => {
 				addFlag({
 					variant: 'success',
 					title: 'Comment deleted',
-					description: '{Message}',
 					actions: [],
 				});
 			} catch (error) {

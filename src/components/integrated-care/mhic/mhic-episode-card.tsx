@@ -29,7 +29,6 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 				addFlag({
 					variant: 'success',
 					title: 'Episode Closed',
-					description: '{Message}',
 					actions: [],
 				});
 
@@ -48,7 +47,6 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 			addFlag({
 				variant: 'success',
 				title: 'Episode Reopened',
-				description: '{Message}',
 				actions: [],
 			});
 

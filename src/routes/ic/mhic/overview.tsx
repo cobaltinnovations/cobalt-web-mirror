@@ -148,7 +148,7 @@ export const Component = () => {
 			<Container fluid className="py-8 overflow-visible">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader title={`Welcome back, ${account?.firstName ?? 'MHIC'}`} />
+						<MhicPageHeader title={`Welcome, ${account?.firstName ?? 'MHIC'}`} />
 					</Col>
 				</Row>
 				{safetyPlanningOrderCount > 0 && (

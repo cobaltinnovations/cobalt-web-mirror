@@ -37,6 +37,7 @@ export interface Institution {
 	integratedCareAvailabilityDescription: string;
 	integratedCareProgramName: string;
 	myChartName: string;
+	myChartDefaultUrl: string;
 }
 
 export interface InstitutionFeature {

@@ -63,7 +63,6 @@ export const MhicDemographicsModal: FC<Props> = ({
 				addFlag({
 					variant: 'success',
 					title: 'Patient Demographic Information Saved',
-					description: '{Message}',
 					actions: [],
 				});
 

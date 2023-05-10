@@ -31,7 +31,7 @@ export const MhicOrderAssessment = () => {
 
 	return (
 		<>
-			{!showInProgress && (
+			{!isCompleted && !showInProgress && (
 				<ScreeningIntro
 					isMhic
 					patientOrder={patientOrderResponse.patientOrder}
