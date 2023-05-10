@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { PatientOrderAssignmentStatusId } from '@/lib/models';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import { AwaitedString } from '@/components/awaited-string';
 
 interface MhicOrdersAssignedLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
@@ -54,8 +55,6 @@ export const Component = () => {
 	const [selectAll, setSelectAll] = useState(false);
 	const [selectedPatientOrderIds, setSelectedPatientOrderIds] = useState<string[]>([]);
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
-	const [totalCount, setTotalCount] = useState(0);
-	const [totalCountDescription, setTotalCountDescription] = useState('');
 
 	const handleAssignOrdersSave = useCallback(
 		async (patientOrderCount: number, panelAccountDisplayName: string) => {
@@ -88,14 +87,6 @@ export const Component = () => {
 		},
 		[clearSelections, searchParams, setSearchParams]
 	);
-
-	useEffect(() => {
-		patientOrdersListPromise.then((result) => {
-			setTotalCount(result.totalCount);
-			setTotalCountDescription(result.totalCountDescription);
-		});
-	}, [patientOrdersListPromise]);
-
 	return (
 		<>
 			<MhicAssignOrderModal
@@ -113,7 +104,13 @@ export const Component = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Assigned Orders"
-							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
+							description={
+								<AwaitedString
+									resolve={patientOrdersListPromise.then((r) => {
+										return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+									})}
+								/>
+							}
 						>
 							<div className="d-flex align-items-center">
 								<Button

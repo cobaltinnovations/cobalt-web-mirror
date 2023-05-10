@@ -1,8 +1,8 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 
 interface MhicPageHeaderProps {
 	title: string;
-	description?: string;
+	description?: string | ReactNode;
 	className?: string;
 }
 

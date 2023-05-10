@@ -52,93 +52,104 @@ export const Component = () => {
 	const isClosedActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Closed;
 
 	useEffect(() => {
-		patientOrderPanelCountsPromise.then((patientOrderPanelCountsResponse) => {
-			setNavigationItems([
-				{
-					title: 'Today',
-					icon: () => <DashboardIcon width={24} height={24} className="text-p300" />,
-					onClick: () => {
-						navigate('/ic/mhic');
-					},
-					isActive: isTodayActive,
+		const itemsWithoutCounts = [
+			{
+				title: 'Today',
+				icon: () => <DashboardIcon width={24} height={24} className="text-p300" />,
+				onClick: () => {
+					navigate('/ic/mhic');
 				},
-				{
-					title: 'My Patients',
-					icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
-					onClick: () => {
-						navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);
-					},
-					isActive: isMyPatientsActive,
+				isActive: isTodayActive,
+			},
+			{
+				title: 'My Patients',
+				icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
+				onClick: () => {
+					navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);
 				},
-				{
-					title: 'My Patient Views',
-					navigationItems: [
-						{
-							title: 'Waiting for Consent',
-							description:
-								patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ?? '0',
-							icon: () => <DotIcon width={24} height={24} className="text-n300" />,
-							onClick: () => {
-								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
-							},
-							isActive: isWaitingForConsentActive,
-						},
-						{
-							title: 'Need Assessment',
-							description:
-								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
-									.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
-							icon: () => <DotIcon width={24} height={24} className="text-warning" />,
-							onClick: () => {
-								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
-							},
-							isActive: isNeedsAssessmentActive,
-						},
-						{
-							title: 'Safety Planning',
-							description: patientOrderPanelCountsResponse?.safetyPlanningPatientOrderCountDescription,
-							icon: () => <DotIcon width={24} height={24} className="text-danger" />,
-							onClick: () => {
-								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SafetyPlanning);
-							},
-							isActive: isSafetyPlanningActive,
-						},
+				isActive: isMyPatientsActive,
+			},
+		];
 
-						{
-							title: 'MHP',
-							description:
-								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
-									.patientOrderCountDescription ?? '0',
-							icon: () => <DotIcon width={24} height={24} className="text-success" />,
-							onClick: () => {
-								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
+		// TODO: Perhaps better moving resolution behind <Await />
+		patientOrderPanelCountsPromise
+			.then((patientOrderPanelCountsResponse) => {
+				setNavigationItems([
+					...itemsWithoutCounts,
+					{
+						title: 'My Patient Views',
+						navigationItems: [
+							{
+								title: 'Waiting for Consent',
+								description:
+									patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ??
+									'0',
+								icon: () => <DotIcon width={24} height={24} className="text-n300" />,
+								onClick: () => {
+									navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
+								},
+								isActive: isWaitingForConsentActive,
 							},
-							isActive: isMhpActive,
-						},
-						{
-							title: 'Specialty Care',
-							description:
-								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
-									.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
-							icon: () => <DotIcon width={24} height={24} className="text-primary" />,
-							onClick: () => {
-								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SpecialtyCare);
+							{
+								title: 'Need Assessment',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
+										.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-warning" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
+								},
+								isActive: isNeedsAssessmentActive,
 							},
-							isActive: isSpecialtyCareActive,
-						},
-						{
-							title: 'Closed',
-							description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
-							icon: () => <DotIcon width={24} height={24} className="text-gray" />,
-							onClick: () => {
-								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
+							{
+								title: 'Safety Planning',
+								description:
+									patientOrderPanelCountsResponse?.safetyPlanningPatientOrderCountDescription,
+								icon: () => <DotIcon width={24} height={24} className="text-danger" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SafetyPlanning);
+								},
+								isActive: isSafetyPlanningActive,
 							},
-							isActive: isClosedActive,
-						},
-					],
-				},
-			]);
-		});
+
+							{
+								title: 'MHP',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
+										.patientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-success" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
+								},
+								isActive: isMhpActive,
+							},
+							{
+								title: 'Specialty Care',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
+										.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-primary" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SpecialtyCare);
+								},
+								isActive: isSpecialtyCareActive,
+							},
+							{
+								title: 'Closed',
+								description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-gray" />,
+								onClick: () => {
+									navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
+								},
+								isActive: isClosedActive,
+							},
+						],
+					},
+				]);
+			})
+			.catch(() => {
+				setNavigationItems(itemsWithoutCounts);
+			});
 	}, [
 		isClosedActive,
 		isMhpActive,
