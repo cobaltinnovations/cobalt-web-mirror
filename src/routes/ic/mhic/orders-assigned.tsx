@@ -175,6 +175,7 @@ export const Component = () => {
 								outreachNumber: true,
 								lastOutreach: true,
 								episode: true,
+								assignedMhic: true,
 							}}
 						/>
 					</Col>
