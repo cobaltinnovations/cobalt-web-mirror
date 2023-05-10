@@ -5,15 +5,19 @@ import { Formik } from 'formik';
 
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { PatientInfoFormData } from '@/components/integrated-care/mhic';
 import {
+	PatientAddressFormData,
 	PatientAddressFormInputs,
+	PatientDemographicsFormData,
 	PatientDemographicsFormInputs,
+	PatientDetailsFormData,
 	PatientDetailsFormInputs,
 } from '@/components/integrated-care/common';
 import { useIntegratedCareLoaderData } from '../landing';
 import { PatientOrderModel } from '@/lib/models';
 import AsyncWrapper from '@/components/async-page';
+
+type PatientInfoFormData = PatientDetailsFormData & PatientAddressFormData & PatientDemographicsFormData;
 
 const PatientDemographics = () => {
 	const { referenceDataResponse } = useIntegratedCareLoaderData();

@@ -123,9 +123,13 @@ const PatientLanding = () => {
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 						<h1 className="mb-6">Welcome back, {patientOrder?.patientFirstName ?? 'patient'}</h1>
 						<hr className="mb-8" />
-						{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER
-							? 'You do not have a current patient order'
-							: `Your primary care provider, ${patientOrder?.orderingProviderDisplayName}, has referred you to the ${institution.name} program for further assessment. Follow the steps below to connect to mental health services.`}
+						{homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
+							<p className="mb-0">
+								Your primary care provider, <strong>{patientOrder?.orderingProviderDisplayName}</strong>
+								, has referred you to the <strong>{institution.name}</strong> program for further
+								assessment. Follow the steps below to connect to mental health services.
+							</p>
+						)}
 					</Col>
 				</Row>
 
