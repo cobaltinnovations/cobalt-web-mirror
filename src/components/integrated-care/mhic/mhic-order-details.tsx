@@ -83,6 +83,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		return patientOrder.patientOrderVoicemailTasks.find((vmt) => !vmt.completed);
 	}, [patientOrder.patientOrderVoicemailTasks]);
 
+	const navigateToAssessment = useCallback(() => {
+		if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+			setShowConsentModal(true);
+		} else {
+			navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+		}
+	}, [navigate, patientOrder.patientOrderConsentStatusId, patientOrder.patientOrderId]);
+
 	return (
 		<>
 			<MhicScheduleAssessmentModal
@@ -354,7 +362,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													setShowConsentModal(true);
+													navigateToAssessment();
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -396,7 +404,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													setShowConsentModal(true);
+													navigateToAssessment();
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -436,9 +444,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Continue Assessment',
 												onClick: () => {
-													navigate(
-														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
-													);
+													navigateToAssessment();
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -448,9 +454,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Retake Assessment',
 												onClick: () => {
-													navigate(
-														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
-													);
+													navigateToAssessment();
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
