@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderTriageStatusId } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import { NextStepsItem } from './next-steps-item';
 
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { PatientInsuranceStatementModal } from './patient-insurance-statement-modal';
 
 interface NextStepsAssessmentCompleteProps {

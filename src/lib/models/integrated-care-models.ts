@@ -133,6 +133,7 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;
+	mostRecentScreeningSessionCreatedAtDescription: string;
 
 	patientDemographicsAccepted?: boolean;
 	patientDemographicsCompleted?: boolean;

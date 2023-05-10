@@ -433,7 +433,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"
-										description={`[STARTED_BY] began the assessment on [ASSESSMENT_START_TIME]`}
+										description={`${patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName} began the assessment on ${patientOrder.mostRecentScreeningSessionCreatedAtDescription}`}
 										actions={[
 											{
 												variant: 'primary',
