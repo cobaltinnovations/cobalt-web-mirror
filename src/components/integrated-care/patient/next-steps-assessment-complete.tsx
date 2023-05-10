@@ -84,7 +84,7 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 									variant: 'outline-primary',
 									title: `Check ${institution?.myChartName ?? 'MyChart'}`,
 									onClick: () => {
-										window.alert('[TODO]: Link to MyChart');
+										window.open(institution.myChartDefaultUrl, '_blank');
 									},
 								}}
 							/>
@@ -136,7 +136,7 @@ const RecieveResourcesInformation = () => {
 							<Button
 								className="d-flex align-items-center"
 								onClick={() => {
-									window.alert('[TODO]: Need a "MyChart" url to link to.');
+									window.open(institution.myChartDefaultUrl, '_blank');
 								}}
 							>
 								Visit {institution?.myChartName ?? 'MyChart'}
