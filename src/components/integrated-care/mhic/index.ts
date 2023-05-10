@@ -5,6 +5,7 @@ export * from './mhic-assign-order-modal';
 export * from './mhic-change-triage-modal';
 export * from './mhic-close-episode-modal';
 export * from './mhic-comments';
+export * from './mhic-consent-modal';
 export * from './mhic-contact-history';
 export * from './mhic-contact-information-modal';
 export * from './mhic-customize-table-modal';
