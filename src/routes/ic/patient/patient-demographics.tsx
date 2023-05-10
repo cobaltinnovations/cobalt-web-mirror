@@ -62,7 +62,12 @@ const PatientDemographics = () => {
 			try {
 				setIsSaving(true);
 
-				await integratedCareService.patchPatientOrder(patientOrder.patientOrderId, values).fetch();
+				await integratedCareService
+					.patchPatientOrder(patientOrder.patientOrderId, {
+						...values,
+						patientDemographicsConfirmed: true,
+					})
+					.fetch();
 
 				navigate('/ic/patient');
 			} catch (error) {

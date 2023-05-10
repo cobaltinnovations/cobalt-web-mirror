@@ -1,7 +1,14 @@
 import Cookies from 'js-cookie';
 import React, { Suspense } from 'react';
 
-import { LoaderFunctionArgs, Outlet, useRouteError, useRouteLoaderData } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	Outlet,
+	ScrollRestoration,
+	redirect,
+	useRouteError,
+	useRouteLoaderData,
+} from 'react-router-dom';
 
 import Alert from '@/components/alert';
 import ConsentModal from '@/components/consent-modal';
@@ -21,10 +28,10 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useUrlViewTracking from '@/hooks/use-url-view-tracking';
 import { accountService, institutionService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
-import { updateTokenCookies } from '@/routes/auth';
+import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
 
-type AppRootLoaderData = Awaited<ReturnType<typeof loader>>;
+type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
 export function useAppRootLoaderData() {
 	return useRouteLoaderData('root') as AppRootLoaderData;
@@ -50,8 +57,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	let [institutionResponse, accountResponse] = await Promise.all([
 		institutionRequest.fetch(),
-		accountRequest?.fetch(),
+		accountRequest?.fetch().catch(() => {
+			clearTokenCookies();
+
+			return new Error();
+		}),
 	]);
+
+	if (accountResponse instanceof Error) {
+		Cookies.set('authRedirectUrl', url.pathname + url.search);
+
+		return redirect('/sign-in');
+	}
 
 	if (
 		institutionResponse.institution.immediateAccessEnabled &&
@@ -74,13 +91,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		};
 	}
 
-	if (accessToken) {
+	if (accessToken && accountResponse) {
 		accountId = updateTokenCookies(accessToken);
-
-		if (!accountResponse) {
-			const accountRequest = accountService.account(accountId);
-			accountResponse = await accountRequest.fetch();
-		}
 	}
 
 	return {
@@ -127,6 +139,8 @@ const Layout = () => {
 			<Suspense fallback={<Loader />}>
 				<Outlet />
 			</Suspense>
+
+			<ScrollRestoration />
 
 			{account && <Footer />}
 		</>

@@ -23,10 +23,6 @@ import { immediateSupportLoader } from './immediate-support-loader';
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
 
 import MhicOrderAssessment from './routes/ic/mhic/order-assessment';
-import MhicOrdersAssigned from './routes/ic/mhic/orders-assigned';
-import MhicOrdersClosed from './routes/ic/mhic/orders-closed';
-import MhicOrdersUnassigned from './routes/ic/mhic/orders-unassigned';
-import MhicSearchResults from './routes/ic/mhic/search-results';
 import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
 import PatientDemographics from './routes/ic/patient/patient-demographics';
@@ -620,19 +616,35 @@ export const routes: RouteObject[] = [
 										children: [
 											{
 												index: true,
-												lazy: () => import('@/routes/ic/mhic/overview'),
+												element: <Navigate to="overview" />,
 											},
 											{
-												id: 'mhic-my-patients',
-												path: 'my-patients',
-												lazy: () => import('@/routes/ic/mhic/my-patients'),
+												path: 'overview',
+												id: 'mhic-overview',
+												lazy: () => import('@/routes/ic/mhic/overview'),
 												children: [mhicShelfRouteObject],
+											},
+											{
+												path: 'my-patients',
+												children: [
+													{
+														index: true,
+														element: <Navigate to="all" />,
+													},
+													{
+														id: 'mhic-my-patients',
+														path: ':mhicView',
+														lazy: () => import('@/routes/ic/mhic/my-patients'),
+														children: [mhicShelfRouteObject],
+													},
+												],
 											},
 										],
 									},
 									{
+										id: 'mhic-search-results',
 										path: 'orders/search',
-										element: <MhicSearchResults />,
+										lazy: () => import('@/routes/ic/mhic/search-results'),
 										children: [mhicShelfRouteObject],
 									},
 									{
@@ -643,20 +655,23 @@ export const routes: RouteObject[] = [
 												element: <Navigate to="new" />,
 											},
 											{
+												id: 'mhic-orders-unassigned',
 												path: ':activeTab',
-												element: <MhicOrdersUnassigned />,
+												lazy: () => import('@/routes/ic/mhic/orders-unassigned'),
 												children: [mhicShelfRouteObject],
 											},
 										],
 									},
 									{
+										id: 'mhic-orders-assigned',
 										path: 'orders/assigned',
-										element: <MhicOrdersAssigned />,
+										lazy: () => import('@/routes/ic/mhic/orders-assigned'),
 										children: [mhicShelfRouteObject],
 									},
 									{
+										id: 'mhic-orders-closed',
 										path: 'orders/closed',
-										element: <MhicOrdersClosed />,
+										lazy: () => import('@/routes/ic/mhic/orders-closed'),
 										children: [mhicShelfRouteObject],
 									},
 									{
@@ -677,6 +692,10 @@ export const routes: RouteObject[] = [
 												element: <ScreeningQuestionsPage />,
 											},
 										],
+									},
+									{
+										path: 'reports',
+										element: <NoMatch />,
 									},
 									{
 										path: '*',

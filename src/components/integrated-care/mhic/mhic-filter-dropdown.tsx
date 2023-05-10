@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
 import classNames from 'classnames';
@@ -11,6 +11,14 @@ import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import {
+	PatientOrderFilterFlagTypeId,
+	PatientOrderResourceCheckInResponseStatusId,
+	PatientOrderResourcingStatusId,
+	PatientOrderScreeningStatusId,
+} from '@/lib/models';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { useSearchParams } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
@@ -28,7 +36,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface Props {
-	onApply(selectedFilters: Record<string, string>): void;
 	align?: AlignType;
 	className?: string;
 }
@@ -42,96 +49,143 @@ interface Filter {
 	}[];
 }
 
-export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
+const MHIC_FITER_QUERY_PARAMS = [
+	'patientOrderFilterFlagTypeId',
+	'referringPracticeNames',
+	'reasonsForReferral',
+	'patientOrderScreeningStatusId',
+	'patientOrderResourcingStatusId',
+	'patientOrderResourceCheckInResponseStatusId',
+];
+
+export function parseMhicFilterQueryParamsFromURL(url: URL) {
+	const parsed: Record<string, string[]> = {};
+
+	for (const param of MHIC_FITER_QUERY_PARAMS) {
+		parsed[param] = url.searchParams.getAll(param);
+	}
+
+	return parsed;
+}
+
+export const MhicFilterDropdown = ({ align, className }: Props) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
 
-	const [availableFilters] = useState<Filter[]>([
-		{
-			filterId: 'FLAG',
-			title: 'Flag',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'FLAG_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'FLAG_OPTION_2',
-				},
-			],
-		},
-		{
-			filterId: 'PRACTICE',
-			title: 'Practice',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'PRACTICE_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'PRACTICE_OPTION_2',
-				},
-			],
-		},
-		{
-			filterId: 'REFERRAL_REASON',
-			title: 'Referral Reason',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'REFERRAL_REASON_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'REFERRAL_REASON_OPTION_2',
-				},
-			],
-		},
-		{
-			filterId: 'ASSESSMENT_STATUS',
-			title: 'Assessment Status',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'ASSESSMENT_STATUS_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'ASSESSMENT_STATUS_OPTION_2',
-				},
-			],
-		},
-		{
-			filterId: 'RESOURCE_STATUS',
-			title: 'Resource Status',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'RESOURCE_STATUS_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'RESOURCE_STATUS_OPTION_2',
-				},
-			],
-		},
-		{
-			filterId: 'RESOURCE_CHECK_IN_RESPONSE',
-			title: 'Resource Check-In Response',
-			options: [
-				{
-					title: 'Option 1',
-					value: 'RESOURCE_CHECK_IN_RESPONSE_OPTION_1',
-				},
-				{
-					title: 'Option 2',
-					value: 'RESOURCE_CHECK_IN_RESPONSE_OPTION_2',
-				},
-			],
-		},
-	]);
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+	const availableFilters = useMemo<Filter[]>(() => {
+		return [
+			{
+				filterId: 'patientOrderFilterFlagTypeId',
+				title: 'Flag',
+				options: [
+					{
+						title: 'None',
+						value: PatientOrderFilterFlagTypeId.NONE,
+					},
+					{
+						title: 'Patient below age threshold',
+						value: PatientOrderFilterFlagTypeId.PATIENT_BELOW_AGE_THRESHOLD,
+					},
+					{
+						title: 'Most recent episode closed within date threshold',
+						value: PatientOrderFilterFlagTypeId.MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD,
+					},
+				],
+			},
+			{
+				filterId: 'referringPracticeNames',
+				title: 'Practice',
+				options: referenceDataResponse.referringPracticeNames.map((p) => {
+					return {
+						title: p,
+						value: p,
+					};
+				}),
+			},
+			{
+				filterId: 'reasonsForReferral',
+				title: 'Referral Reason',
+				options: referenceDataResponse.reasonsForReferral.map((r) => {
+					return {
+						title: r,
+						value: r,
+					};
+				}),
+			},
+			{
+				filterId: 'patientOrderScreeningStatusId',
+				title: 'Assessment Status',
+				options: [
+					{
+						title: 'Not screened',
+						value: PatientOrderScreeningStatusId.NOT_SCREENED,
+					},
+					{
+						title: 'In progress',
+						value: PatientOrderScreeningStatusId.IN_PROGRESS,
+					},
+					{
+						title: 'Scheduled',
+						value: PatientOrderScreeningStatusId.SCHEDULED,
+					},
+					{
+						title: 'Compelte',
+						value: PatientOrderScreeningStatusId.COMPLETE,
+					},
+				],
+			},
+			{
+				filterId: 'patientOrderResourcingStatusId',
+				title: 'Resource Status',
+				options: [
+					{
+						title: 'None needed',
+						value: PatientOrderResourcingStatusId.NONE_NEEDED,
+					},
+					{
+						title: 'Needs resources',
+						value: PatientOrderResourcingStatusId.NEEDS_RESOURCES,
+					},
+					{
+						title: 'Sent resources',
+						value: PatientOrderResourcingStatusId.SENT_RESOURCES,
+					},
+					{
+						title: 'Unknown',
+						value: PatientOrderResourcingStatusId.UNKNOWN,
+					},
+				],
+			},
+			{
+				filterId: 'patientOrderResourceCheckInResponseStatusId',
+				title: 'Resource Check-In Response',
+				options: [
+					{
+						title: 'None',
+						value: PatientOrderResourceCheckInResponseStatusId.NONE,
+					},
+					{
+						title: 'No longer need care',
+						value: PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE,
+					},
+					{
+						title: 'Need followup',
+						value: PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP,
+					},
+					{
+						title: 'Appointment scheduled',
+						value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED,
+					},
+					{
+						title: 'Appointment attended',
+						value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_ATTENDED,
+					},
+				],
+			},
+		];
+	}, [referenceDataResponse.reasonsForReferral, referenceDataResponse.referringPracticeNames]);
 
 	const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({});
 
@@ -152,6 +206,22 @@ export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
 			return { ...previousValue };
 		});
 	}, []);
+
+	useEffect(() => {
+		if (show) {
+			const active: typeof selectedFilters = {};
+
+			for (const filter of availableFilters) {
+				const value = searchParams.get(filter.filterId);
+
+				if (value) {
+					active[filter.filterId] = value;
+				}
+			}
+
+			setSelectedFilters(active);
+		}
+	}, [availableFilters, searchParams, show]);
 
 	return (
 		<Dropdown
@@ -258,6 +328,12 @@ export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
 						onClick={() => {
 							setSelectedFilters({});
 							setShow(false);
+
+							for (const filter of availableFilters) {
+								searchParams.delete(filter.filterId);
+							}
+
+							setSearchParams(searchParams);
 						}}
 					>
 						Clear All
@@ -267,7 +343,19 @@ export const MhicFilterDropdown = ({ onApply, align, className }: Props) => {
 						size="sm"
 						onClick={() => {
 							setShow(false);
-							onApply(selectedFilters);
+
+							const filters = Object.entries(selectedFilters).reduce(
+								(params, [filterId, filterValue]) => {
+									if (filterValue) {
+										params.set(filterId, filterValue);
+									}
+
+									return params;
+								},
+								searchParams
+							);
+
+							setSearchParams(filters);
 						}}
 					>
 						Apply

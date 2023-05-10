@@ -7,7 +7,7 @@ import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models'
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
-import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 
@@ -117,30 +117,24 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
-	const { pathname } = useLocation();
 
-	const panelRoot = useMatch({
-		path: '/ic/mhic',
-		end: true,
+	const overviewMatch = useMatch({
+		path: '/ic/mhic/overview/*',
 	});
-	const patientsRoot = useMatch({
-		path: '/ic/mhic/my-patients',
-		end: true,
+	const myPatientsMatch = useMatch({
+		path: '/ic/mhic/my-patients/*',
 	});
-	const ordersPath = [
-		'/ic/mhic/orders',
-		'/ic/mhic/orders/unassigned',
-		'/ic/mhic/orders/assigned',
-		'/ic/mhic/orders/closed',
-	].some((pattern) => matchPath(pattern, pathname));
-	const reportsPath = useMatch({
+	const ordersMatch = useMatch({
+		path: '/ic/mhic/orders/*',
+	});
+	const reportsMatch = useMatch({
 		path: '/ic/mhic/reports',
 	});
-	const assessmentPath = useMatch({
+	const assessmentMatch = useMatch({
 		path: '/ic/mhic/orders/:patientOrderId/assessment/*',
 	});
 
-	const isInAssessmentView = !!assessmentPath;
+	const isInAssessmentView = !!assessmentMatch;
 
 	const hasAssessmentResult = !!patientOrder?.screeningSessionResult;
 
@@ -151,13 +145,13 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				navigationItemId: 'MY_PANEL',
 				to: '/ic/mhic',
 				title: 'My Panel',
-				active: !!panelRoot || !!patientsRoot,
+				active: !!overviewMatch || !!myPatientsMatch,
 			},
 			{
 				testId: '',
 				navigationItemId: 'ORDERS',
 				title: 'Orders',
-				active: ordersPath,
+				active: ordersMatch,
 				items: [
 					{
 						testId: '',
@@ -190,10 +184,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				navigationItemId: 'REPORTS',
 				to: '/ic/mhic/reports',
 				title: 'Reports',
-				active: !!reportsPath,
+				active: !!reportsMatch,
 			},
 		],
-		[ordersPath, panelRoot, patientsRoot, reportsPath]
+		[myPatientsMatch, ordersMatch, overviewMatch, reportsMatch]
 	);
 
 	return (

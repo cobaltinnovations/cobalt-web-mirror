@@ -39,25 +39,23 @@ export const PatientAssessmentResults = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h1 className="mb-1">Assessment Results</h1>
 						<p className="mb-6 fs-large text-gray">
-							Completed at {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'} by{' '}
-							{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName ?? 'N/A'}
+							Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'}
 						</p>
 						<hr className="mb-8" />
 
-						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP && (
+						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 							<>
 								<p className="mb-6 fs-large">
 									Based on the symptoms reported and your provider's request, we recommend that you
-									meet with a <strong>Behavioral Health Provider</strong> in your primary care
-									practice.
+									meet with a <strong>Mental Health Provider</strong> in your primary care practice.
 								</p>
 								<p className="mb-6 fs-large">
-									The Behavioral Health Provider will discuss treatment options that will work in
+									The Mental Health Provider will discuss treatment options that will work in
 									collaboration with your primary care provider.
 								</p>
 								<p className="mb-6 fs-large">
-									You can schedule an appointment with a Behavioral Health Provider by browsing the
-									list of providers and choosing an available appointment time.
+									You can schedule an appointment with a Mental Health Provider by browsing the list
+									of providers and choosing an available appointment time.
 								</p>
 								<div className="mb-4 text-center">
 									<Button
@@ -87,13 +85,12 @@ export const PatientAssessmentResults = () => {
 							<>
 								<p className="mb-6 fs-large">
 									Based on the symptoms reported and your provider's request, we would like to set you
-									up with a [Provider Type] in your area.
+									up with a healthcare provider in your area.
 								</p>
 								<p className="mb-6 fs-large">
-									A Mental Health Intake Coordinater will review your results and send you a list of
-									resources that work with your insurance within the next [24 hours]. Please check
-									your
-									{institution?.myChartName ?? 'MyChart'} messages for more details.
+									A Mental Health Intake Coordinator will review your results and send you a list of
+									resources that work with your insurance within the next business day. Please check
+									your {institution?.myChartName ?? 'MyChart'} messages for more details.
 								</p>
 								<p className="mb-6 fs-large">
 									You can also call us at{' '}

@@ -111,7 +111,11 @@ async function buildInstitutionTarget(institution) {
 		}
 
 		// generate separate bundles per supported institution
-		exec(`${buildEnvArgs.join(' ')} npx react-app-rewired build`);
+		const buildOutput = exec(`${buildEnvArgs.join(' ')} npx react-app-rewired build`);
+
+		if (buildOutput.code !== 0) {
+			throw new Error('react-app build failed for ' + institution);
+		}
 
 		const publicOverridesDir = path.join(__dirname, 'institution-overrides', institution, 'public');
 

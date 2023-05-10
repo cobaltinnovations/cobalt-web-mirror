@@ -63,35 +63,28 @@ export const Component = () => {
 	const [destination, setDestination] = useState<string | null>(null);
 	const revalidator = useRevalidator();
 
-	const shouldRevalidate = !!accountId && !account && revalidator.state === 'idle';
+	useEffect(() => {
+		setDestination(authRedirectUrl);
+
+		return () => {
+			Cookies.remove('ssoRedirectUrl');
+			Cookies.remove('authRedirectUrl');
+		};
+	}, [authRedirectUrl]);
+
+	const shouldRevalidate = !!destination && !!accountId && !account && revalidator.state === 'idle';
+
 	useEffect(() => {
 		if (shouldRevalidate) {
 			revalidator.revalidate();
 		}
 	}, [revalidator, shouldRevalidate]);
 
-	useEffect(() => {
-		if (!account) {
-			return;
-		}
-
-		let redirectTo = authRedirectUrl;
-
-		if (redirectTo === '/') {
-			redirectTo = LoginDestinationIdRouteMap[account?.loginDestinationId] || authRedirectUrl;
-		}
-
-		Cookies.remove('ssoRedirectUrl');
-		Cookies.remove('authRedirectUrl');
-
-		setDestination(redirectTo);
-	}, [account, authRedirectUrl]);
-
-	if (!destination) {
+	if (!destination || !account) {
 		return <Loader />;
 	}
 
-	return <Navigate to={destination} />;
+	return <Navigate to={destination === '/' ? LoginDestinationIdRouteMap[account.loginDestinationId] : destination} />;
 };
 
 export function updateTokenCookies(accessToken: string) {
@@ -107,4 +100,9 @@ export function updateTokenCookies(accessToken: string) {
 	Cookies.set('accountId', accountId, cookieOptions);
 
 	return accountId;
+}
+
+export function clearTokenCookies() {
+	Cookies.remove('accessToken');
+	Cookies.remove('accountId');
 }

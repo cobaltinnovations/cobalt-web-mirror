@@ -1,21 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-	LoaderFunctionArgs,
-	Outlet,
-	defer,
-	useMatch,
-	useNavigate,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, defer, useMatch, useNavigate, useRouteLoaderData } from 'react-router-dom';
 
-import { PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { MhicNavigation, MhicNavigationItemModel } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
 import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 import { PatientOrderPanelCountsResponse, integratedCareService } from '@/lib/services';
+import { MhicMyPatientView } from './my-patients';
 
 interface MhicMyPanelLoaderData {
 	patientOrderPanelCountsPromise: Promise<PatientOrderPanelCountsResponse>;
@@ -25,9 +17,7 @@ export function useMhicMyPanelLoaderData() {
 	return useRouteLoaderData('mhic-my-panel') as MhicMyPanelLoaderData;
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-	console.log('==> my-panel loader');
-
+export async function loader() {
 	const countsRequest = integratedCareService.getPanelCounts();
 
 	const patientOrderPanelCountsPromise = countsRequest.fetch();
@@ -38,75 +28,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
-	const [searchParams] = useSearchParams();
-	const patientOrderTriageStatusId = searchParams.get('patientOrderTriageStatusId');
-	const patientOrderSafetyPlanningStatusId = searchParams.get('patientOrderSafetyPlanningStatusId');
 	const [navigationItems, setNavigationItems] = useState<MhicNavigationItemModel[]>([]);
 
 	const navigate = useNavigate();
 
 	const { patientOrderPanelCountsPromise } = useMhicMyPanelLoaderData();
 
-	const rootMatch = useMatch({
-		path: '/ic/mhic',
-		end: true,
+	const overviewMatch = useMatch({
+		path: '/ic/mhic/overview/*',
 	});
 
 	const myPatientsMatch = useMatch({
-		path: '/ic/mhic/my-patients',
-		end: true,
+		path: '/ic/mhic/my-patients/:mhicView/*',
 	});
 
-	const updateSelectedOrderTriageStatusId = useCallback(
-		(statusId?: PatientOrderTriageStatusId) => {
-			const params = new URLSearchParams(searchParams);
-
-			if (statusId) {
-				params.set('patientOrderTriageStatusId', statusId);
-			} else {
-				params.delete('patientOrderTriageStatusId');
-			}
-
-			params.delete('patientOrderSafetyPlanningStatusId');
-
-			navigate({
-				pathname: '/ic/mhic/my-patients',
-				search: params.toString(),
-			});
-		},
-		[navigate, searchParams]
-	);
-
-	const updateSelectedOrderSafetyPlanningStatusId = useCallback(
-		(statusId?: PatientOrderSafetyPlanningStatusId) => {
-			const params = new URLSearchParams(searchParams);
-
-			if (statusId) {
-				params.set('patientOrderSafetyPlanningStatusId', statusId);
-			} else {
-				params.delete('patientOrderSafetyPlanningStatusId');
-			}
-
-			params.delete('patientOrderTriageStatusId');
-
-			navigate({
-				pathname: '/ic/mhic/my-patients',
-				search: params.toString(),
-			});
-		},
-		[navigate, searchParams]
-	);
-
-	const isTodayActive = !!rootMatch;
-	const isMyPatientsActive = !!myPatientsMatch && !patientOrderTriageStatusId && !patientOrderSafetyPlanningStatusId;
-	const isNeedsAssessmentActive =
-		!!myPatientsMatch && patientOrderTriageStatusId === PatientOrderTriageStatusId.NEEDS_ASSESSMENT;
-	const isSafetPlanningActive =
-		!!myPatientsMatch &&
-		patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING;
-	const isBhpActive = !!myPatientsMatch && patientOrderTriageStatusId === PatientOrderTriageStatusId.BHP;
-	const isSpecialtyCareActive =
-		!!myPatientsMatch && patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE;
+	const isTodayActive = !!overviewMatch;
+	const isMyPatientsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.All;
+	const isWaitingForConsentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.WaitingForConsent;
+	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
+	const isSafetyPlanningActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SafetyPlanning;
+	const isMhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.MHP;
+	const isSpecialtyCareActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SpecialtyCare;
+	const isClosedActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Closed;
 
 	useEffect(() => {
 		patientOrderPanelCountsPromise.then((patientOrderPanelCountsResponse) => {
@@ -123,7 +66,7 @@ export const Component = () => {
 					title: 'My Patients',
 					icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
 					onClick: () => {
-						navigate('/ic/mhic/my-patients');
+						navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);
 					},
 					isActive: isMyPatientsActive,
 				},
@@ -131,13 +74,23 @@ export const Component = () => {
 					title: 'My Patient Views',
 					navigationItems: [
 						{
+							title: 'Waiting for Consent',
+							description:
+								patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ?? '0',
+							icon: () => <DotIcon width={24} height={24} className="text-n300" />,
+							onClick: () => {
+								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
+							},
+							isActive: isWaitingForConsentActive,
+						},
+						{
 							title: 'Need Assessment',
 							description:
 								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
 									.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 							onClick: () => {
-								updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.NEEDS_ASSESSMENT);
+								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
 							},
 							isActive: isNeedsAssessmentActive,
 						},
@@ -146,23 +99,21 @@ export const Component = () => {
 							description: patientOrderPanelCountsResponse?.safetyPlanningPatientOrderCountDescription,
 							icon: () => <DotIcon width={24} height={24} className="text-danger" />,
 							onClick: () => {
-								updateSelectedOrderSafetyPlanningStatusId(
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
-								);
+								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SafetyPlanning);
 							},
-							isActive: isSafetPlanningActive,
+							isActive: isSafetyPlanningActive,
 						},
 
 						{
-							title: 'BHP',
+							title: 'MHP',
 							description:
-								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.BHP
+								patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
 									.patientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-success" />,
 							onClick: () => {
-								updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.BHP);
+								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
 							},
-							isActive: isBhpActive,
+							isActive: isMhpActive,
 						},
 						{
 							title: 'Specialty Care',
@@ -171,25 +122,34 @@ export const Component = () => {
 									.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
 							icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 							onClick: () => {
-								updateSelectedOrderTriageStatusId(PatientOrderTriageStatusId.SPECIALTY_CARE);
+								navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SpecialtyCare);
 							},
 							isActive: isSpecialtyCareActive,
+						},
+						{
+							title: 'Closed',
+							description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
+							icon: () => <DotIcon width={24} height={24} className="text-gray" />,
+							onClick: () => {
+								navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
+							},
+							isActive: isClosedActive,
 						},
 					],
 				},
 			]);
 		});
 	}, [
-		isBhpActive,
+		isClosedActive,
+		isMhpActive,
 		isMyPatientsActive,
 		isNeedsAssessmentActive,
-		isSafetPlanningActive,
+		isSafetyPlanningActive,
 		isSpecialtyCareActive,
 		isTodayActive,
+		isWaitingForConsentActive,
 		navigate,
 		patientOrderPanelCountsPromise,
-		updateSelectedOrderSafetyPlanningStatusId,
-		updateSelectedOrderTriageStatusId,
 	]);
 
 	return (
