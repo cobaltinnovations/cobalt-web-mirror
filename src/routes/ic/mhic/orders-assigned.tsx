@@ -10,6 +10,7 @@ import {
 	MhicSortDropdown,
 	MhicViewDropdown,
 	parseMhicFilterQueryParamsFromURL,
+	parseMhicViewDropdownQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -32,6 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromURL(url);
+	const viewFilters = parseMhicViewDropdownQueryParamsFromURL(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -39,6 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				pageSize: '15',
 				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.ASSIGNED,
 				...filters,
+				...viewFilters,
 				...(pageNumber && { pageNumber }),
 			})
 			.fetch()

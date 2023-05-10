@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import React, { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
@@ -12,13 +13,13 @@ import {
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
 
-interface Props {
-	align?: AlignType;
-	className?: string;
+interface DropdownSection {
+	dropdownSectionId: string;
+	dropdownMenuItems: DropdownItem[];
 }
 
 interface DropdownItem {
-	optionId: string;
+	dropdownItemId: string;
 	title: string;
 	apiParameters: {
 		patientOrderOutreachStatusId?: PatientOrderOutreachStatusId;
@@ -28,36 +29,36 @@ interface DropdownItem {
 	};
 }
 
-const dropdownMenuSections: { sectionId: string; options: DropdownItem[] }[] = [
+const dropdownMenuSections: DropdownSection[] = [
 	{
-		sectionId: 'FIRST',
-		options: [
+		dropdownSectionId: uuidv4(),
+		dropdownMenuItems: [
 			{
-				optionId: 'ALL',
+				dropdownItemId: uuidv4(),
 				title: 'All',
 				apiParameters: {},
 			},
 		],
 	},
 	{
-		sectionId: 'SECOND',
-		options: [
+		dropdownSectionId: uuidv4(),
+		dropdownMenuItems: [
 			{
-				optionId: PatientOrderOutreachStatusId.NO_OUTREACH,
+				dropdownItemId: uuidv4(),
 				title: 'New Review',
 				apiParameters: {
 					patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
 				},
 			},
 			{
-				optionId: PatientOrderConsentStatusId.UNKNOWN,
+				dropdownItemId: uuidv4(),
 				title: 'Waiting for Consent',
 				apiParameters: {
 					patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
 				},
 			},
 			{
-				optionId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+				dropdownItemId: uuidv4(),
 				title: 'Need Assessment',
 				apiParameters: {
 					patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
@@ -66,31 +67,31 @@ const dropdownMenuSections: { sectionId: string; options: DropdownItem[] }[] = [
 		],
 	},
 	{
-		sectionId: 'THIRD',
-		options: [
+		dropdownSectionId: uuidv4(),
+		dropdownMenuItems: [
 			{
-				optionId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+				dropdownItemId: uuidv4(),
 				title: 'Safety Planning',
 				apiParameters: {
 					patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
 				},
 			},
 			{
-				optionId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+				dropdownItemId: uuidv4(),
 				title: 'Specialty Care',
 				apiParameters: {
 					patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
 				},
 			},
 			{
-				optionId: PatientOrderTriageStatusId.MHP,
+				dropdownItemId: uuidv4(),
 				title: 'MHP',
 				apiParameters: {
 					patientOrderTriageStatusId: PatientOrderTriageStatusId.MHP,
 				},
 			},
 			{
-				optionId: PatientOrderTriageStatusId.SUBCLINICAL,
+				dropdownItemId: uuidv4(),
 				title: 'Subclinical',
 				apiParameters: {
 					patientOrderTriageStatusId: PatientOrderTriageStatusId.SUBCLINICAL,
@@ -100,20 +101,41 @@ const dropdownMenuSections: { sectionId: string; options: DropdownItem[] }[] = [
 	},
 ];
 
-const flattendOptions = dropdownMenuSections.reduce((accumulator, currentValue) => {
-	return [...accumulator, ...currentValue.options];
+const flattenedDropdownMenuItems = dropdownMenuSections.reduce((accumulator, currentValue) => {
+	return [...accumulator, ...currentValue.dropdownMenuItems];
 }, [] as DropdownItem[]);
 
-export const MhicViewDropdown = ({ align, className }: Props) => {
+const availableQueryParams = flattenedDropdownMenuItems.reduce((accumulator, currentValue) => {
+	return [...accumulator, ...Object.keys(currentValue.apiParameters)];
+}, [] as string[]);
+
+export function parseMhicViewDropdownQueryParamsFromURL(url: URL) {
+	const parsed: Record<string, string[]> = {};
+
+	for (const param of availableQueryParams) {
+		parsed[param] = url.searchParams.getAll(param);
+	}
+
+	return parsed;
+}
+
+interface MhicViewDropdownProps {
+	align?: AlignType;
+	className?: string;
+}
+
+export const MhicViewDropdown = ({ align, className }: MhicViewDropdownProps) => {
 	const [show, setShow] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const handleDropdownItemClick = useCallback(
 		(option: DropdownItem) => {
-			const unselectedOptions = flattendOptions.filter((flatOption) => flatOption.optionId !== option.optionId);
+			const unselectedItems = flattenedDropdownMenuItems.filter(
+				(flatOption) => flatOption.dropdownItemId !== option.dropdownItemId
+			);
 
-			unselectedOptions.forEach((unselectedOption) => {
-				Object.keys(unselectedOption.apiParameters).forEach((key) => {
+			unselectedItems.forEach((unselectedItem) => {
+				Object.keys(unselectedItem.apiParameters).forEach((key) => {
 					searchParams.delete(key);
 				});
 			});
@@ -149,19 +171,19 @@ export const MhicViewDropdown = ({ align, className }: Props) => {
 				popperConfig={{ strategy: 'fixed' }}
 				renderOnMount
 			>
-				{dropdownMenuSections.map((section, sectionIndex) => {
+				{dropdownMenuSections.map((dropdownSection, sectionIndex) => {
 					const isLastSection = dropdownMenuSections.length - 1 === sectionIndex;
 
 					return (
-						<React.Fragment key={section.sectionId}>
-							{section.options.map((option) => (
+						<React.Fragment key={dropdownSection.dropdownSectionId}>
+							{dropdownSection.dropdownMenuItems.map((dropdownMenuItem) => (
 								<Dropdown.Item
-									key={option.title}
+									key={dropdownMenuItem.dropdownItemId}
 									onClick={() => {
-										handleDropdownItemClick(option);
+										handleDropdownItemClick(dropdownMenuItem);
 									}}
 								>
-									{option.title}
+									{dropdownMenuItem.title}
 								</Dropdown.Item>
 							))}
 							{!isLastSection && <Dropdown.Divider />}
