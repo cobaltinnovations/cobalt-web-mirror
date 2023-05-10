@@ -1,91 +1,27 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import {
-	LoaderFunctionArgs,
-	defer,
-	useNavigate,
-	useParams,
-	useRevalidator,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
+	MhicFilterDropdown,
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
+	MhicSortDropdown,
+	MhicViewDropdown,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-import {
-	PatientOrderAssignmentStatusId,
-	PatientOrderConsentStatusId,
-	PatientOrderOutreachStatusId,
-	PatientOrderSafetyPlanningStatusId,
-	PatientOrderTriageStatusId,
-} from '@/lib/models';
-import TabBar from '@/components/tab-bar';
+import { PatientOrderAssignmentStatusId } from '@/lib/models';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { AwaitedString } from '@/components/awaited-string';
-
-const unassignedTabsConfig = [
-	{
-		tabTitle: 'New Review',
-		routePath: 'new',
-		apiParameters: {
-			patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
-		},
-	},
-	{
-		tabTitle: 'Waiting for Consent',
-		routePath: 'pending-consent',
-		apiParameters: {
-			patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
-		},
-	},
-	{
-		tabTitle: 'Need Assessment',
-		routePath: 'need-assessment',
-		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
-		},
-	},
-	{
-		tabTitle: 'Safety Planning',
-		routePath: 'safety-planning',
-		apiParameters: {
-			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-		},
-	},
-	{
-		tabTitle: 'MHP',
-		routePath: 'mhp',
-		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.MHP,
-		},
-	},
-	{
-		tabTitle: 'Specialty',
-		routePath: 'specialty-care',
-		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
-		},
-	},
-];
-
-const uiTabs = unassignedTabsConfig.map((tabConfig) => {
-	return {
-		title: tabConfig.tabTitle,
-		value: tabConfig.routePath,
-	};
-});
 
 interface MhicOrdersUnassignedLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
@@ -95,19 +31,15 @@ export function useMhicOrdersUnassignedLoaderData() {
 	return useRouteLoaderData('mhic-orders-unassigned') as MhicOrdersUnassignedLoaderData;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
-
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
-
-	const apiParameters = unassignedTabsConfig.find((c) => c.routePath === params.activeTab)?.apiParameters;
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
 			.getPatientOrders({
 				pageSize: '15',
 				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
-				...apiParameters,
 				...(pageNumber && { pageNumber }),
 			})
 			.fetch()
@@ -120,10 +52,7 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { activeTab = uiTabs[0].value } = useParams<{ activeTab: string }>();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
-	const navigate = useNavigate();
-
 	const revalidator = useRevalidator();
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
@@ -266,17 +195,22 @@ export const Component = () => {
 								</Button>
 							</div>
 						</MhicPageHeader>
-						<hr />
-						<TabBar
-							key="mhic-orders-unassigned-tabbar"
-							value={activeTab}
-							tabs={uiTabs}
-							onTabClick={(value) => {
-								navigate({
-									pathname: '/ic/mhic/orders/unassigned/' + value,
-								});
-							}}
-						/>
+						<hr className="mb-6" />
+						<div className="d-flex justify-content-between align-items-center">
+							<div className="d-flex align-items-center">
+								<MhicViewDropdown className="me-2" />
+								<MhicFilterDropdown align="start" />
+							</div>
+							<div>
+								<MhicSortDropdown
+									className="me-2"
+									align="end"
+									onApply={(selectedFilters) => {
+										console.log(selectedFilters);
+									}}
+								/>
+							</div>
+						</div>
 					</Col>
 				</Row>
 				<Row>

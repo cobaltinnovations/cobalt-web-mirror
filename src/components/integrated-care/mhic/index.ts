@@ -31,3 +31,4 @@ export * from './mhic-schedule-assessment-modal';
 export * from './mhic-shelf-outlet';
 export * from './mhic-sort-dropdown';
 export * from './mhic-triage-card';
+export * from './mhic-view-dropdown';

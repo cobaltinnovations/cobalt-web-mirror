@@ -8,6 +8,7 @@ import {
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
+	MhicViewDropdown,
 	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
@@ -126,10 +127,11 @@ export const Component = () => {
 						</MhicPageHeader>
 						<hr className="mb-6" />
 						<div className="d-flex justify-content-between align-items-center">
-							<div>
+							<div className="d-flex align-items-center">
+								<MhicViewDropdown className="me-2" />
 								<MhicFilterDropdown align="start" />
 							</div>
-							<div className="d-flex align-items-center">
+							<div>
 								<MhicSortDropdown
 									className="me-2"
 									align="end"
@@ -137,15 +139,6 @@ export const Component = () => {
 										console.log(selectedFilters);
 									}}
 								/>
-								<Button
-									onClick={() => {
-										setShowAssignOrderModal(true);
-									}}
-									disabled={selectedPatientOrderIds.length <= 0}
-								>
-									Assign{' '}
-									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
-								</Button>
 							</div>
 						</div>
 					</Col>

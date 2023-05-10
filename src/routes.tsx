@@ -651,19 +651,10 @@ export const routes: RouteObject[] = [
 										children: [mhicShelfRouteObject],
 									},
 									{
+										id: 'mhic-orders-unassigned',
 										path: 'orders/unassigned',
-										children: [
-											{
-												index: true,
-												element: <Navigate to="new" />,
-											},
-											{
-												id: 'mhic-orders-unassigned',
-												path: ':activeTab',
-												lazy: () => import('@/routes/ic/mhic/orders-unassigned'),
-												children: [mhicShelfRouteObject],
-											},
-										],
+										lazy: () => import('@/routes/ic/mhic/orders-unassigned'),
+										children: [mhicShelfRouteObject],
 									},
 									{
 										id: 'mhic-orders-assigned',
