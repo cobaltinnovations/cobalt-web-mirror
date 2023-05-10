@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { Link, useMatches } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -26,8 +26,17 @@ const Footer: FC = () => {
 	const classes = useFooterStyles();
 	const footer = useRef<HTMLElement | null>(null);
 	const { account, institution } = useAccount();
+	const routeMatches = useMatches();
+
+	const hideFooter = useMemo(() => {
+		return !account || routeMatches.some((match) => (match.handle as Record<string, boolean>)?.hideFooter);
+	}, [account, routeMatches]);
 
 	useEffect(() => {
+		if (hideFooter) {
+			return;
+		}
+
 		function handleResize() {
 			if (!footer.current) return;
 
@@ -44,7 +53,11 @@ const Footer: FC = () => {
 			document.body.style.paddingBottom = '0';
 			document.body.style.minBlockSize = '100%';
 		};
-	}, []);
+	}, [hideFooter]);
+
+	if (hideFooter) {
+		return null;
+	}
 
 	return (
 		<footer ref={footer} className={classNames(classes.footer, 'py-10 py-md-12')}>

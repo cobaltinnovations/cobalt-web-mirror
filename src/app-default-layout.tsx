@@ -6,6 +6,7 @@ import React, { Suspense, useMemo } from 'react';
 import { Outlet, useRouteError } from 'react-router-dom';
 import ErrorDisplay from './components/error-display';
 import Loader from './components/loader';
+import Footer from './components/footer';
 
 interface AppDefaultLayoutProps {
 	hideHeaderButtons?: boolean;
@@ -38,6 +39,8 @@ export const AppDefaultLayout = (layoutProps: AppDefaultLayoutProps) => {
 			<Suspense fallback={<Loader />}>
 				<Outlet />
 			</Suspense>
+
+			<Footer />
 		</>
 	);
 };
@@ -57,6 +60,8 @@ export const AppErrorDefaultLayout = (layoutProps: AppDefaultLayoutProps) => {
 					window.location.reload();
 				}}
 			/>
+
+			<Footer />
 		</>
 	);
 };

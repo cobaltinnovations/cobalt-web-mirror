@@ -15,14 +15,12 @@ import ConsentModal from '@/components/consent-modal';
 import ErrorDisplay from '@/components/error-display';
 import ErrorModal from '@/components/error-modal';
 import Flags from '@/components/flags';
-import Footer from '@/components/footer';
 import HeaderUnauthenticated from '@/components/header-unauthenticated';
 import InCrisisModal from '@/components/in-crisis-modal';
 import ReauthModal from '@/components/reauth-modal';
 import { AccountProvider } from '@/contexts/account-context';
 import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
-import useAccount from '@/hooks/use-account';
 import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useUrlViewTracking from '@/hooks/use-url-view-tracking';
@@ -123,7 +121,6 @@ export const Component = () => {
 const Layout = () => {
 	const { show, isCall, closeInCrisisModal } = useInCrisisModal();
 
-	const { account } = useAccount();
 	const { showConsentModal } = useConsentState();
 
 	return (
@@ -141,8 +138,6 @@ const Layout = () => {
 			</Suspense>
 
 			<ScrollRestoration />
-
-			{account && <Footer />}
 		</>
 	);
 };
