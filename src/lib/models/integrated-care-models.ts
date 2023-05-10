@@ -122,6 +122,9 @@ export interface PatientOrderModel {
 	outreachCountDescription?: string;
 	totalOutreachCount?: number;
 	totalOutreachCountDescription?: string;
+	mostRecentOutreachDateTimeDescription?: string;
+	mostRecentTotalOutreachDateTime: string;
+	mostRecentTotalOutreachDateTimeDescription: string;
 	patientOrderCareTypeId?: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription?: string;
 	mostRecentScreeningSessionId: string;
