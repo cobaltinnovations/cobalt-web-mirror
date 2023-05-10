@@ -1,4 +1,12 @@
-import { LoaderFunctionArgs, RouteObject, defer, useLoaderData, useMatches, useNavigate } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	RouteObject,
+	defer,
+	useLoaderData,
+	useLocation,
+	useMatches,
+	useNavigate,
+} from 'react-router-dom';
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
@@ -130,6 +138,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 const ShelfContent = ({ tabBar }: { tabBar: React.ReactNode }) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const patientOrderResponse = useAsyncValue() as PatientOrderResponse | null;
 	const { addFlag } = useFlags();
 
@@ -146,7 +155,10 @@ const ShelfContent = ({ tabBar }: { tabBar: React.ReactNode }) => {
 					variant="light"
 					className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
 					onClick={() => {
-						navigate('..');
+						navigate({
+							pathname: '..',
+							search: location.search,
+						});
 					}}
 				>
 					<CloseIcon className="d-block" />
