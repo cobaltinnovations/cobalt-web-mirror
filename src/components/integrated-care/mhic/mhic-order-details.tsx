@@ -4,6 +4,7 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
+	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
@@ -17,6 +18,7 @@ import useFlags from '@/hooks/use-flags';
 import {
 	MhicAssessmentModal,
 	MhicCloseEpisodeModal,
+	MhicConsentModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
 	MhicEpisodeCard,
@@ -53,6 +55,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
+	const [showConsentModal, setShowConsentModal] = useState(false);
 
 	const handleCloseEpisodeModalSave = useCallback(
 		async (patientOrderClosureReasonId: string) => {
@@ -89,8 +92,24 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					setShowScheduleAssessmentModal(false);
 				}}
 				onSave={() => {
-					setShowScheduleAssessmentModal(false);
 					revalidator.revalidate();
+					setShowScheduleAssessmentModal(false);
+				}}
+			/>
+
+			<MhicConsentModal
+				patientOrder={patientOrder}
+				show={showConsentModal}
+				onHide={() => {
+					setShowConsentModal(false);
+				}}
+				onSave={(updatedPatientOrder) => {
+					if (updatedPatientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.CONSENTED) {
+						navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+					} else {
+						revalidator.revalidate();
+						setShowConsentModal(false);
+					}
 				}}
 			/>
 
@@ -114,9 +133,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onHide={() => {
 					setShowDemographicsModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
-					setShowDemographicsModal(false);
+				onSave={() => {
 					revalidator.revalidate();
+					setShowDemographicsModal(false);
 				}}
 			/>
 
@@ -142,9 +161,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onHide={() => {
 					setShowContactInformationModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
-					setShowContactInformationModal(false);
+				onSave={() => {
 					revalidator.revalidate();
+					setShowContactInformationModal(false);
 				}}
 			/>
 
@@ -335,9 +354,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigate(
-														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
-													);
+													setShowConsentModal(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -379,9 +396,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigate(
-														`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`
-													);
+													setShowConsentModal(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===

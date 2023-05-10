@@ -423,7 +423,7 @@ export const integratedCareService = {
 		patientOrderId: string,
 		data: { patientOrderConsentStatusId: PatientOrderConsentStatusId }
 	) {
-		return httpSingleton.orchestrateRequest({
+		return httpSingleton.orchestrateRequest<{ patientOrder: PatientOrderModel }>({
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/consent-status`,
 			data,
