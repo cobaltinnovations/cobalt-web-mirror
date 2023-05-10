@@ -26,7 +26,7 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 					setShowInsuranceStatementModal(false);
 				}}
 				onContinue={() => {
-					navigate(`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder.patientOrderId}`);
+					navigate(`/ic/patient/connect-with-support/mhppatientOrderId=${patientOrder.patientOrderId}`);
 				}}
 			/>
 

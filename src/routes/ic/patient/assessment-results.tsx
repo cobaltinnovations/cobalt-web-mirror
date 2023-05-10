@@ -30,7 +30,7 @@ export const PatientAssessmentResults = () => {
 					setShowInsuranceStatementModal(false);
 				}}
 				onContinue={() => {
-					navigate(`/ic/patient/connect-with-support/bhp?patientOrderId=${patientOrder?.patientOrderId}`);
+					navigate(`/ic/patient/connect-with-support/mhp?patientOrderId=${patientOrder?.patientOrderId}`);
 				}}
 			/>
 

@@ -698,6 +698,10 @@ export const routes: RouteObject[] = [
 										element: <NoMatch />,
 									},
 									{
+										path: 'connect-with-support/mhp',
+										element: <ConnectWithSupportV2 />,
+									},
+									{
 										path: '*',
 										element: <NoMatch />,
 									},
@@ -736,7 +740,7 @@ export const routes: RouteObject[] = [
 										element: <PatientAssessmentResults />,
 									},
 									{
-										path: 'connect-with-support/bhp',
+										path: 'connect-with-support/mhp',
 										element: <ConnectWithSupportV2 />,
 									},
 									{

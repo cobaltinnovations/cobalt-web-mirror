@@ -481,7 +481,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row className="mb-4">
 											<Col xs={3}>
-												<p className="m-0 text-gray">Callback Number</p>
+												<p className="m-0 text-gray">Phone Number</p>
 											</Col>
 											<Col xs={9}>
 												<p className="m-0">{patientOrder.patientPhoneNumberDescription}</p>
