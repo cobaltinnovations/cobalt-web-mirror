@@ -53,10 +53,38 @@ interface Props {
 	disabled?: boolean;
 	required?: boolean;
 	className?: string;
+	date?: Date;
 }
 
-const TimeInputV2 = ({ id, label, value, onChange, disabled, required, className }: Props) => {
+const timeFormat = 'h:mm A';
+const totalSlotsInDay = moment.duration(1, 'day').as('minutes');
+
+const TimeInputV2 = ({ id, label, value, onChange, disabled, required, className, date }: Props) => {
 	const classes = useStyles();
+
+	const timeSlots: TimeInputV2Option[] = useMemo(() => {
+		const todayDate = new Date();
+		const timeSlotOptions = [];
+		const startingTimeSlot =
+			date && moment(date).isSame(todayDate, 'day')
+				? moment(todayDate, timeFormat).startOf('hour')
+				: moment(todayDate, timeFormat).set('hour', 9).startOf('hour');
+
+		for (let i = 0; i < totalSlotsInDay; i += 15) {
+			startingTimeSlot.add(i === 0 ? 0 : 15, 'minutes');
+
+			const title = startingTimeSlot.format(timeFormat);
+			const value = startingTimeSlot.format(timeFormat);
+
+			timeSlotOptions.push({
+				title,
+				value,
+			});
+		}
+
+		return timeSlotOptions;
+	}, [date]);
+
 	const selectedValue = useMemo(() => {
 		const timeSlot = timeSlots.find((ts) => ts.value === value);
 
@@ -68,7 +96,7 @@ const TimeInputV2 = ({ id, label, value, onChange, disabled, required, className
 			title: value,
 			value,
 		};
-	}, [value]);
+	}, [timeSlots, value]);
 
 	return (
 		<Typeahead
@@ -117,22 +145,5 @@ const TimeInputV2 = ({ id, label, value, onChange, disabled, required, className
 		/>
 	);
 };
-
-const timeFormat = 'h:mm A';
-const timeSlots: TimeInputV2Option[] = [];
-const totalSlotsInDay = moment.duration(1, 'day').as('minutes');
-const timeSlot = moment(new Date(), timeFormat).startOf('hour');
-
-for (let i = 0; i < totalSlotsInDay; i += 15) {
-	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
-
-	const title = timeSlot.format(timeFormat);
-	const value = timeSlot.format(timeFormat);
-
-	timeSlots.push({
-		title,
-		value,
-	});
-}
 
 export default TimeInputV2;

@@ -224,6 +224,7 @@ export const MhicOutreachModal: FC<Props> = ({
 						</div>
 						<div className={classNames(classes.flex1, 'ms-2')}>
 							<TimeInputV2
+								date={formValues.date}
 								id="outreact-modal__time-input"
 								label="Time"
 								value={formValues.time}

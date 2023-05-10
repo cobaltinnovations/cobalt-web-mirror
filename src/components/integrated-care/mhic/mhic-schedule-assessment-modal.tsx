@@ -133,6 +133,7 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 						disabled={isSaving}
 					/>
 					<TimeInputV2
+						date={formValues.date}
 						id="schedule-assessment__time-input"
 						className="mb-4"
 						label="Assessment Time"

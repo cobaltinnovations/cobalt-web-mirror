@@ -118,6 +118,7 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 						</div>
 						<div className={classNames(classes.flex1, 'ms-2')}>
 							<TimeInputV2
+								date={formValues.date}
 								id="outreact-modal__time-input"
 								label="Time"
 								value={formValues.time}
