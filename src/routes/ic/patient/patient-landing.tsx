@@ -11,6 +11,7 @@ import NoData from '@/components/no-data';
 import useAccount from '@/hooks/use-account';
 import { NextStepsAssessmentComplete, NextStepsItem } from '@/components/integrated-care/patient';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 
 enum PAGE_STATES {
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
@@ -18,6 +19,7 @@ enum PAGE_STATES {
 	ASSESSMENT_REFUSED = 'ASSESSMENT_REFUSED',
 	ASSESSMENT_IN_PROGRESS = 'ASSESSMENT_IN_PROGRESS',
 	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
+	SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 const pageStates = [
@@ -40,6 +42,10 @@ const pageStates = [
 	{
 		homescreenStateId: PAGE_STATES.ASSESSMENT_COMPLETE,
 		title: 'Assessment Complete',
+	},
+	{
+		homescreenStateId: PAGE_STATES.SERVICE_UNAVAILABLE,
+		title: 'Service Unavailable',
 	},
 ];
 
@@ -64,6 +70,14 @@ const PatientLanding = () => {
 				return;
 			} else if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
 				setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
+				return;
+			}
+
+			if (
+				response.patientOrder.patientAddressRegionAccepted ||
+				response.patientOrder.patientOrderInsurancePlanAccepted
+			) {
+				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
 				return;
 			}
 
@@ -121,7 +135,7 @@ const PatientLanding = () => {
 
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-6">Welcome back, {patientOrder?.patientFirstName ?? 'patient'}</h1>
+						<h1 className="mb-6">Welcome, {patientOrder?.patientFirstName ?? 'patient'}</h1>
 						<hr className="mb-8" />
 						{homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
 							<p className="mb-0">
@@ -160,7 +174,16 @@ const PatientLanding = () => {
 							</Card>
 						)}
 
-						{homescreenState !== PAGE_STATES.ASSESSMENT_REFUSED &&
+						{homescreenState === PAGE_STATES.SERVICE_UNAVAILABLE && (
+							<MhicInlineAlert
+								variant="warning"
+								title="Service not available"
+								description="Your insurance plan, state, or residence may not be eligible for PIC services. Please call us at 215-615-4222 for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care."
+							/>
+						)}
+
+						{homescreenState !== PAGE_STATES.SERVICE_UNAVAILABLE &&
+							homescreenState !== PAGE_STATES.ASSESSMENT_REFUSED &&
 							homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
 								<Card bsPrefix="ic-card" className="mb-10">
 									<Card.Header>
