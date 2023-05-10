@@ -24,6 +24,7 @@ import { PatientOrdersListResponse, integratedCareService } from '@/lib/services
 
 import {
 	PatientOrderAssignmentStatusId,
+	PatientOrderConsentStatusId,
 	PatientOrderOutreachStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
@@ -35,7 +36,7 @@ import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 
 const unassignedTabsConfig = [
 	{
-		tabTitle: 'No Outreach (New)',
+		tabTitle: 'New Review',
 		routePath: 'new',
 		apiParameters: {
 			patientOrderOutreachStatusId: PatientOrderOutreachStatusId.NO_OUTREACH,
@@ -45,7 +46,7 @@ const unassignedTabsConfig = [
 		tabTitle: 'Waiting for Consent',
 		routePath: 'pending-consent',
 		apiParameters: {
-			// TODO: WAITING_FOR_CONSENT query
+			patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
 		},
 	},
 	{

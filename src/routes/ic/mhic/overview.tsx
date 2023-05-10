@@ -239,7 +239,7 @@ export const Component = () => {
 								tabs={[
 									{
 										value: TAB_KEYS.NEW_PATIENTS,
-										title: `New Patients (${countsByStatus.NEW_PATIENTS})`,
+										title: `New Review Patients (${countsByStatus.NEW_PATIENTS})`,
 									},
 									{
 										value: TAB_KEYS.VOICEMAILS,
