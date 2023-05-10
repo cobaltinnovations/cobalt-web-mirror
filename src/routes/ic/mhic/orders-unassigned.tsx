@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import {
 	LoaderFunctionArgs,
@@ -33,6 +33,7 @@ import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
+import { AwaitedString } from '@/components/awaited-string';
 
 const unassignedTabsConfig = [
 	{
@@ -122,8 +123,7 @@ export const Component = () => {
 	const { activeTab = uiTabs[0].value } = useParams<{ activeTab: string }>();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const navigate = useNavigate();
-	const [totalCount, setTotalCount] = useState(0);
-	const [totalCountDescription, setTotalCountDescription] = useState('');
+
 	const revalidator = useRevalidator();
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
@@ -195,13 +195,6 @@ export const Component = () => {
 		[clearSelections, searchParams, setSearchParams]
 	);
 
-	useEffect(() => {
-		patientOrdersListPromise.then((result) => {
-			setTotalCount(result.totalCount);
-			setTotalCountDescription(result.totalCountDescription);
-		});
-	}, [patientOrdersListPromise]);
-
 	return (
 		<>
 			<MhicGenerateOrdersModal
@@ -235,7 +228,13 @@ export const Component = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Unassigned"
-							description={`${totalCountDescription ?? 0} Order${totalCount === 1 ? '' : 's'}`}
+							description={
+								<AwaitedString
+									resolve={patientOrdersListPromise.then((r) => {
+										return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+									})}
+								/>
+							}
 						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (

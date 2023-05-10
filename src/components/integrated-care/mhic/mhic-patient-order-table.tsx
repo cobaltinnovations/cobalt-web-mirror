@@ -160,11 +160,17 @@ export const MhicPatientOrderTable = ({
 
 		setIsLoading(true);
 
+		// TODO: Perhaps better moving resolution behind <Await />
 		patientOrderFindResultPromise
 			.then((response) => {
 				setPatientOrders(response.patientOrders);
 				setTotalPatientOrdersCount(response.totalCount);
 				setTotalPatientOrdersDescription(response.totalCountDescription);
+			})
+			.catch((e) => {
+				setPatientOrders([]);
+				setTotalPatientOrdersCount(0);
+				setTotalPatientOrdersDescription('0');
 			})
 			.finally(() => {
 				setIsLoading(false);

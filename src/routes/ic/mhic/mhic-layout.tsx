@@ -35,32 +35,36 @@ export const Component = () => {
 			return;
 		}
 
-		shelfLoaderData.patientOrderPromise.then((patientOrderResponse) => {
-			const result = {
-				patientOrderId: patientOrderResponse.patientOrder.patientOrderId,
-				patientMrn: patientOrderResponse.patientOrder.patientMrn,
-				patientId: patientOrderResponse.patientOrder.patientId,
-				patientIdType: patientOrderResponse.patientOrder.patientIdType,
-				patientFirstName: patientOrderResponse.patientOrder.patientFirstName,
-				patientLastName: patientOrderResponse.patientOrder.patientLastName,
-				patientDisplayName: patientOrderResponse.patientOrder.patientDisplayName,
-				patientPhoneNumber: patientOrderResponse.patientOrder.patientPhoneNumber,
-				patientPhoneNumberDescription: patientOrderResponse.patientOrder.patientPhoneNumberDescription,
-			} as PatientOrderAutocompleteResult & { patientOrderId: string };
+		shelfLoaderData.patientOrderPromise
+			.then((patientOrderResponse) => {
+				const result = {
+					patientOrderId: patientOrderResponse.patientOrder.patientOrderId,
+					patientMrn: patientOrderResponse.patientOrder.patientMrn,
+					patientId: patientOrderResponse.patientOrder.patientId,
+					patientIdType: patientOrderResponse.patientOrder.patientIdType,
+					patientFirstName: patientOrderResponse.patientOrder.patientFirstName,
+					patientLastName: patientOrderResponse.patientOrder.patientLastName,
+					patientDisplayName: patientOrderResponse.patientOrder.patientDisplayName,
+					patientPhoneNumber: patientOrderResponse.patientOrder.patientPhoneNumber,
+					patientPhoneNumberDescription: patientOrderResponse.patientOrder.patientPhoneNumberDescription,
+				} as PatientOrderAutocompleteResult & { patientOrderId: string };
 
-			setRecentOrders((orders) => {
-				const newOrders = orders.slice(0, 4);
-				const index = newOrders.findIndex((o) => o.patientMrn === result.patientMrn);
+				setRecentOrders((orders) => {
+					const newOrders = orders.slice(0, 4);
+					const index = newOrders.findIndex((o) => o.patientMrn === result.patientMrn);
 
-				if (index > -1) {
+					if (index > -1) {
+						return newOrders;
+					}
+
+					newOrders.unshift(result);
+					window.localStorage.setItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY, JSON.stringify(newOrders));
 					return newOrders;
-				}
-
-				newOrders.unshift(result);
-				window.localStorage.setItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY, JSON.stringify(newOrders));
-				return newOrders;
+				});
+			})
+			.catch((e) => {
+				// don't update recent orders on rejection/fail/cancellation
 			});
-		});
 	}, [shelfLoaderData?.patientOrderPromise]);
 
 	return (

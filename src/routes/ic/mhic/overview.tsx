@@ -105,6 +105,14 @@ export async function loader() {
 	});
 }
 
+const INITIAL_COUNTS = {
+	[TAB_KEYS.ASSESSMENTS]: 0,
+	[TAB_KEYS.FOLLOW_UPS]: 0,
+	[TAB_KEYS.NEW_PATIENTS]: 0,
+	[TAB_KEYS.RESOURCES]: 0,
+	[TAB_KEYS.VOICEMAILS]: 0,
+};
+
 export const Component = () => {
 	const classes = useStyles();
 	const { account } = useAccount();
@@ -121,26 +129,26 @@ export const Component = () => {
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
 	const [safetyPlanningOrderCount, setSafetyPlanningOrderCount] = useState(0);
-	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({
-		[TAB_KEYS.ASSESSMENTS]: 0,
-		[TAB_KEYS.FOLLOW_UPS]: 0,
-		[TAB_KEYS.NEW_PATIENTS]: 0,
-		[TAB_KEYS.RESOURCES]: 0,
-		[TAB_KEYS.VOICEMAILS]: 0,
-	});
+	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({ ...INITIAL_COUNTS });
 
 	useEffect(() => {
-		overviewResponsePromise.then((res) => {
-			setSafetyPlanningOrderCount(res.safetyPlanningPatientOrders.length);
+		// TODO: Perhaps better moving resolution behind <Await />
+		overviewResponsePromise
+			.then((res) => {
+				setSafetyPlanningOrderCount(res.safetyPlanningPatientOrders.length);
 
-			setCountsByStatus({
-				[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
-				[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
-				[TAB_KEYS.NEW_PATIENTS]: res.newPatientPatientOrders.length,
-				[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
-				[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
+				setCountsByStatus({
+					[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
+					[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
+					[TAB_KEYS.NEW_PATIENTS]: res.newPatientPatientOrders.length,
+					[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
+					[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
+				});
+			})
+			.catch((e) => {
+				setSafetyPlanningOrderCount(0);
+				setCountsByStatus({ ...INITIAL_COUNTS });
 			});
-		});
 	}, [overviewResponsePromise]);
 
 	return (

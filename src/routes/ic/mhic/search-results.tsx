@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
-import { MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
-import { Container } from 'react-bootstrap';
+import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
+import { Col, Container, Row } from 'react-bootstrap';
 import { PatientOrderDispositionId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import { AwaitedString } from '@/components/awaited-string';
 
 interface MhicSearchResultsLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
@@ -47,9 +48,6 @@ export const Component = () => {
 	const patientMrn = searchParams.get('patientMrn');
 	const searchQuery = searchParams.get('searchQuery');
 
-	const [totalCount, setTotalCount] = useState(0);
-	const [totalCountDescription, setTotalCountDescription] = useState('');
-
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
@@ -58,40 +56,45 @@ export const Component = () => {
 		[searchParams, setSearchParams]
 	);
 
-	useEffect(() => {
-		patientOrdersListPromise.then((result) => {
-			setTotalCount(result.totalCount);
-			setTotalCountDescription(result.totalCountDescription);
-		});
-	}, [patientOrdersListPromise]);
-
 	return (
 		<>
-			<Container fluid className="px-8">
-				<div className="py-8">
-					<h2>Search Results for "{patientMrn || searchQuery}" </h2>
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-6">
+					<Col>
+						<MhicPageHeader
+							className="mb-6"
+							title={`Search Results for "${patientMrn || searchQuery}"`}
+							description={
+								<AwaitedString
+									resolve={patientOrdersListPromise.then((r) => {
+										return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+									})}
+								/>
+							}
+						/>
+					</Col>
+				</Row>
 
-					<p className="mb-0 text-gray fs-large fw-normal">
-						{totalCountDescription} {totalCount === 1 ? 'Order' : 'Orders'}
-					</p>
-				</div>
-
-				<MhicPatientOrderTable
-					patientOrderFindResultPromise={patientOrdersListPromise}
-					selectAll={false}
-					pageNumber={parseInt(pageNumber, 10)}
-					pageSize={15}
-					onPaginationClick={handlePaginationClick}
-					columnConfig={{
-						patient: true,
-						mrn: true,
-						preferredPhone: true,
-						practice: true,
-						orderState: true,
-						assignedMhic: true,
-					}}
-					coloredRows
-				/>
+				<Row>
+					<Col>
+						<MhicPatientOrderTable
+							patientOrderFindResultPromise={patientOrdersListPromise}
+							selectAll={false}
+							pageNumber={parseInt(pageNumber, 10)}
+							pageSize={15}
+							onPaginationClick={handlePaginationClick}
+							columnConfig={{
+								patient: true,
+								mrn: true,
+								preferredPhone: true,
+								practice: true,
+								orderState: true,
+								assignedMhic: true,
+							}}
+							coloredRows
+						/>
+					</Col>
+				</Row>
 			</Container>
 
 			<MhicShelfOutlet />

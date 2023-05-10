@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, redirect, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
@@ -20,6 +20,7 @@ import {
 } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import Cookies from 'js-cookie';
+import { AwaitedString } from '@/components/awaited-string';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -115,9 +116,6 @@ export const Component = () => {
 	const { pageTitle, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
-
-	const [totalCountDescription, setTotalCountDescription] = useState('');
-
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 
 	const handlePaginationClick = useCallback(
@@ -127,12 +125,6 @@ export const Component = () => {
 		},
 		[searchParams, setSearchParams]
 	);
-
-	useEffect(() => {
-		patientOrdersListPromise.then((result) => {
-			setTotalCountDescription(result.totalCountDescription);
-		});
-	}, [patientOrdersListPromise]);
 
 	return (
 		<>
@@ -149,7 +141,20 @@ export const Component = () => {
 			<Container fluid className="py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader title={pageTitle} description={`${totalCountDescription ?? 0} Patients`}>
+						<MhicPageHeader
+							title={pageTitle}
+							description={
+								<AwaitedString
+									resolve={patientOrdersListPromise.then((result) => {
+										return (
+											result.totalCountDescription +
+											' Patient' +
+											(result.totalCount > 1 ? 's' : '')
+										);
+									})}
+								/>
+							}
+						>
 							<div className="d-flex align-items-center">
 								<MhicFilterDropdown align="end" className="me-2" />
 								<MhicSortDropdown
