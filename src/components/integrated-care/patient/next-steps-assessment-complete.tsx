@@ -65,13 +65,16 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 				<>
 					{!patientOrder.resourcesSentAt ? (
 						<NextStepsItem
-							title="Step 3: Receive resources"
-							description={`Check ${
-								institution?.myChartName ?? 'MyChart'
-							} or call us for resources available in your area.`}
-						>
-							<RecieveResourcesInformation />
-						</NextStepsItem>
+							title="Step 3: Call us for resources"
+							description={`Call us at ${institution.integratedCarePhoneNumberDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
+							button={{
+								variant: 'primary',
+								title: 'Call Us',
+								onClick: () => {
+									document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
+								},
+							}}
+						/>
 					) : (
 						<>
 							<NextStepsItem
@@ -101,76 +104,18 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 			)}
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
-				<>
-					<NextStepsItem
-						title="Step 3: Receive resources"
-						description={`Check ${
-							institution?.myChartName ?? 'MyChart'
-						} or call us for resources available in your area.`}
-					>
-						<RecieveResourcesInformation />
-					</NextStepsItem>
-				</>
+				<NextStepsItem
+					title="Step 3: Call us for resources"
+					description={`Call us at ${institution.integratedCarePhoneNumberDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
+					button={{
+						variant: 'primary',
+						title: 'Call Us',
+						onClick: () => {
+							document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
+						},
+					}}
+				/>
 			)}
 		</>
-	);
-};
-
-const RecieveResourcesInformation = () => {
-	const { institution } = useAccount();
-
-	return (
-		<Container fluid>
-			<Row>
-				<Col md={6} className="mb-6 mb-md-0">
-					<Card bsPrefix="ic-card" className="h-100">
-						<Card.Header className="bg-white">
-							<Card.Title>Check {institution?.myChartName ?? 'MyChart'}</Card.Title>
-						</Card.Header>
-						<Card.Body>
-							<p className="mb-5">
-								A Mental Health Intake Coordinator will review your results and send a list of resources
-								that work with your insurance <strong>within the next 2 business days</strong>. Please
-								check {institution?.myChartName ?? 'MyChart'} for more details.
-							</p>
-							<Button
-								className="d-flex align-items-center"
-								onClick={() => {
-									window.open(institution.myChartDefaultUrl, '_blank');
-								}}
-							>
-								Visit {institution?.myChartName ?? 'MyChart'}
-								<ExternalIcon className="ms-2" width={20} height={20} />
-							</Button>
-						</Card.Body>
-					</Card>
-				</Col>
-				<Col md={6}>
-					<Card bsPrefix="ic-card" className="h-100">
-						<Card.Header className="bg-white">
-							<Card.Title>Call Us</Card.Title>
-						</Card.Header>
-						<Card.Body>
-							<p className="mb-5">
-								Feel free to call us at{' '}
-								<strong>
-									{institution?.integratedCarePhoneNumberDescription ?? 'phone number unavailable'}
-								</strong>{' '}
-								if you do not receive the {institution?.myChartName ?? 'MyChart'} message or if you wish
-								to speak to a Mental Health Intake Coordinator about your options.
-							</p>
-							<Button
-								as="a"
-								className="d-inline-block text-decoration-none"
-								variant="outline-primary"
-								href={`tel:${institution?.integratedCarePhoneNumber}`}
-							>
-								Call Us
-							</Button>
-						</Card.Body>
-					</Card>
-				</Col>
-			</Row>
-		</Container>
 	);
 };
