@@ -146,7 +146,6 @@ export const MhicContactInformationModal: FC<Props> = ({ patientOrder, onSave, .
 				addFlag({
 					variant: 'success',
 					title: 'Patient Contact Information Saved',
-					description: '{Message}',
 					actions: [],
 				});
 

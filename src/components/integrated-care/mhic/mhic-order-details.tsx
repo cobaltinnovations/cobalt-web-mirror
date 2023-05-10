@@ -69,7 +69,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				addFlag({
 					variant: 'success',
 					title: 'Episode Closed',
-					description: '{Message}',
 					actions: [],
 				});
 			} catch (error) {

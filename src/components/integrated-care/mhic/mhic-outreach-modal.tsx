@@ -158,7 +158,6 @@ export const MhicOutreachModal: FC<Props> = ({
 					addFlag({
 						variant: 'success',
 						title: 'Outreach updated',
-						description: '{Message}',
 						actions: [],
 					});
 				} else {
@@ -175,7 +174,6 @@ export const MhicOutreachModal: FC<Props> = ({
 					addFlag({
 						variant: 'success',
 						title: 'Outreach added',
-						description: '{Message}',
 						actions: [],
 					});
 				}

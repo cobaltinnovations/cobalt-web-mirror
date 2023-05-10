@@ -121,7 +121,6 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 						addFlag({
 							variant: 'success',
 							title: 'Episode Closed',
-							description: '{Message}',
 							actions: [],
 						});
 					} catch (error) {

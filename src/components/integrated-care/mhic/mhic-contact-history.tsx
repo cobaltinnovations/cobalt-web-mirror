@@ -65,7 +65,6 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 				addFlag({
 					variant: 'success',
 					title: 'Outreach deleted',
-					description: '{Message}',
 					actions: [],
 				});
 			} catch (error) {

@@ -51,7 +51,6 @@ export const MhicInsuranceModal: FC<Props> = ({ patientOrder, onSave, ...props }
 				addFlag({
 					variant: 'success',
 					title: 'Patient Insurance Information Saved',
-					description: '{Message}',
 					actions: [],
 				});
 
