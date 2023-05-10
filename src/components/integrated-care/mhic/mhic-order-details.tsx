@@ -148,18 +148,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			/>
 
 			<MhicInsuranceModal
+				patientOrder={patientOrder}
 				show={showInsuranceModal}
 				onHide={() => {
 					setShowInsuranceModal(false);
 				}}
 				onSave={() => {
+					revalidator.revalidate();
 					setShowInsuranceModal(false);
-					addFlag({
-						variant: 'success',
-						title: 'Insurance Information Saved',
-						description: '{Message}',
-						actions: [],
-					});
 				}}
 			/>
 
@@ -707,7 +703,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							<Card bsPrefix="ic-card">
 								<Card.Header>
 									<Card.Title>Insurance</Card.Title>
-									{/* <div className="button-container">
+									<div className="button-container">
 										<Button
 											variant="light"
 											className="p-2"
@@ -721,30 +717,22 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										>
 											<EditIcon className="d-flex" />
 										</Button>
-									</div> */}
+									</div>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="m-0">{patientOrder.primaryPayorName}</p>
+												<p className="m-0">{patientOrder.patientOrderInsurancePayorName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">Plan: {patientOrder.primaryPlanName}</p>
-											</Col>
-										</Row>
-										{/* <Row>
-											<Col>
 												<p className="m-0">
-													Coverage Until:{' '}
-													<span className="text-danger">
-														[TODO]: Primary plan expiration date
-													</span>
+													Plan: {patientOrder.patientOrderInsurancePlanName}
 												</p>
 											</Col>
-										</Row> */}
+										</Row>
 									</Container>
 								</Card.Body>
 							</Card>
