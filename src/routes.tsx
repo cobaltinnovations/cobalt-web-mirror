@@ -366,6 +366,9 @@ export const routes: RouteObject[] = [
 
 					{
 						element: <ProviderOnlyRoutes />,
+						handle: {
+							hideFooter: true,
+						},
 						children: [
 							{
 								path: 'scheduling',

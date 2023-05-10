@@ -126,9 +126,9 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 	return (
 		<AsyncTypeahead
 			ref={typeAheadRef}
-			id="search"
+			id="mhic-header-search"
 			className={classNames('header-rbt', classes.autocompleteWrapper)}
-			placeholder="Search for Provider or Entity"
+			placeholder="Search"
 			filterBy={() => true}
 			labelKey="patientDisplayName"
 			isLoading={true}
@@ -186,6 +186,10 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 									pathname: '/ic/mhic/orders/search',
 									search: `?searchQuery=${searchQuery}`,
 								}}
+								onClick={() => {
+									typeAheadRef.current.blur();
+									typeAheadRef.current._handleClear();
+								}}
 								className={classNames('d-flex align-items-center', classes.viewAllSearch)}
 							>
 								<SearchIcon />
@@ -200,13 +204,22 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 								{recentOrders.length !== 0 && <Menu.Header>Recent</Menu.Header>}
 
 								{resultOptions.map((item, index) => {
-									const result = item as typeof resultOptions[number];
+									const result = item as (typeof resultOptions)[number];
 									if (!result.isRecent) {
 										return null;
 									}
 
 									return (
-										<PatientSearchResult openShelf key={index} option={result} position={index} />
+										<PatientSearchResult
+											openShelf
+											key={index}
+											option={result}
+											position={index}
+											onClick={() => {
+												typeAheadRef.current.blur();
+												typeAheadRef.current._handleClear();
+											}}
+										/>
 									);
 								})}
 							</>
@@ -221,7 +234,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 						)}
 
 						{resultOptions.map((item, index) => {
-							const result = item as typeof resultOptions[number];
+							const result = item as (typeof resultOptions)[number];
 							if (!result.isSearchResult) {
 								return null;
 							}
@@ -231,6 +244,10 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 									key={index}
 									position={index}
 									option={item as PatientOrderAutocompleteResult}
+									onClick={() => {
+										typeAheadRef.current.blur();
+										typeAheadRef.current._handleClear();
+									}}
 								/>
 							);
 						})}
@@ -256,12 +273,14 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 
 interface PatientSearchResultProps extends MenuItemProps {
 	option: PatientOrderAutocompleteResult & { patientOrderId?: string };
+	onClick: () => void;
 	openShelf?: boolean;
 }
 
-const PatientSearchResult = ({ option, openShelf, ...itemProps }: PatientSearchResultProps) => {
+const PatientSearchResult = ({ option, openShelf, onClick, ...itemProps }: PatientSearchResultProps) => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const [searchParams] = useSearchParams();
 
 	return (
 		<MenuItem
@@ -269,14 +288,18 @@ const PatientSearchResult = ({ option, openShelf, ...itemProps }: PatientSearchR
 			{...itemProps}
 			className="d-flex justify-content-between"
 			onClick={(e) => {
+				onClick();
+
 				if (openShelf && option.patientOrderId) {
 					navigate({
 						pathname: pathname + '/' + option.patientOrderId,
+						search: '?' + searchParams.toString(),
 					});
 				} else {
+					searchParams.set('patientMrn', option.patientMrn);
 					navigate({
 						pathname: '/ic/mhic/orders/search',
-						search: '?patientMrn=' + option.patientMrn,
+						search: '?' + searchParams.toString(),
 					});
 				}
 			}}
