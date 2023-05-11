@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
 import classNames from 'classnames';
@@ -125,31 +125,32 @@ interface MhicViewDropdownProps {
 }
 
 export const MhicViewDropdown = ({ align, className }: MhicViewDropdownProps) => {
-	const [show, setShow] = useState(false);
+	const { pathname, search } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [show, setShow] = useState(false);
 
 	const dropdownToggleTitle = useMemo(() => {
-		const url = new URL(document.location.href);
+		const url = new URL(`${window.location.origin}${pathname}${search}`);
 		const selectedQueryParams = parseMhicViewDropdownQueryParamsFromURL(url);
-		const selectedQueryParamValues = Object.values(selectedQueryParams)
-			.map((selections) => selections)
-			.flat();
+		const selectedQueryParamValues = Object.values(selectedQueryParams).flat();
 
 		if (selectedQueryParamValues.length <= 0) {
 			return 'All';
-		} else if (selectedQueryParamValues.length === 1) {
+		}
+
+		if (selectedQueryParamValues.length === 1) {
 			const matchingItem = flattenedDropdownMenuItems.find((item) =>
 				Object.values(item.apiParameters).find((p) => p === selectedQueryParamValues[0])
 			);
 			return matchingItem?.title ?? 'Unknown';
-		} else if (selectedQueryParamValues.length > 1) {
-			return `${selectedQueryParamValues.length} Selections`;
-		} else {
-			return 'View';
 		}
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [document.location.href]);
+		if (selectedQueryParamValues.length > 1) {
+			return `${selectedQueryParamValues.length} Selections`;
+		}
+
+		return 'View';
+	}, [pathname, search]);
 
 	const handleDropdownItemClick = useCallback(
 		(option: DropdownItem) => {
