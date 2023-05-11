@@ -8,7 +8,9 @@ import {
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
+	MhicViewDropdown,
 	parseMhicFilterQueryParamsFromURL,
+	parseMhicViewDropdownQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -31,6 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromURL(url);
+	const viewFilters = parseMhicViewDropdownQueryParamsFromURL(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -38,6 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				pageSize: '15',
 				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.ASSIGNED,
 				...filters,
+				...viewFilters,
 				...(pageNumber && { pageNumber }),
 			})
 			.fetch()
@@ -126,10 +130,11 @@ export const Component = () => {
 						</MhicPageHeader>
 						<hr className="mb-6" />
 						<div className="d-flex justify-content-between align-items-center">
-							<div>
+							<div className="d-flex align-items-center">
+								<MhicViewDropdown className="me-2" />
 								<MhicFilterDropdown align="start" />
 							</div>
-							<div className="d-flex align-items-center">
+							<div>
 								<MhicSortDropdown
 									className="me-2"
 									align="end"
@@ -137,15 +142,6 @@ export const Component = () => {
 										console.log(selectedFilters);
 									}}
 								/>
-								<Button
-									onClick={() => {
-										setShowAssignOrderModal(true);
-									}}
-									disabled={selectedPatientOrderIds.length <= 0}
-								>
-									Assign{' '}
-									{selectedPatientOrderIds.length > 0 && <>({selectedPatientOrderIds.length})</>}
-								</Button>
 							</div>
 						</div>
 					</Col>
