@@ -1,17 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
+import { DropdownToggleProps } from 'react-bootstrap/esm/DropdownToggle';
 import classNames from 'classnames';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 
-import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import { DropdownMenu } from '@/components/dropdown';
 import {
 	PatientOrderConsentStatusId,
 	PatientOrderOutreachStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface DropdownSection {
 	dropdownSectionId: string;
@@ -175,46 +178,89 @@ export const MhicViewDropdown = ({ align, className }: MhicViewDropdownProps) =>
 	);
 
 	return (
-		<Dropdown
-			className={classNames('d-flex align-items-center', className)}
-			autoClose="outside"
-			show={show}
-			onToggle={setShow}
-		>
-			<Dropdown.Toggle
-				as={DropdownToggle}
-				className="d-inline-flex align-items-center"
-				id="order-filters--add-filter"
+		<div className="d-flex align-items-center">
+			<span className="me-2">View:</span>
+			<Dropdown
+				className={classNames('d-flex align-items-center', className)}
+				autoClose="outside"
+				show={show}
+				onToggle={setShow}
 			>
-				<span>{dropdownToggleTitle}</span>
-			</Dropdown.Toggle>
-			<Dropdown.Menu
-				as={DropdownMenu}
-				align={align ?? 'start'}
-				flip={false}
-				popperConfig={{ strategy: 'fixed' }}
-				renderOnMount
-			>
-				{dropdownMenuSections.map((dropdownSection, sectionIndex) => {
-					const isLastSection = dropdownMenuSections.length - 1 === sectionIndex;
+				<Dropdown.Toggle
+					as={MhicViewDropdownToggle}
+					id="mhic-view-dropdown-toggle"
+					className="d-flex align-items-center justify-content-between"
+				>
+					<span>{dropdownToggleTitle}</span>
+					<DownChevron className="text-n500" />
+				</Dropdown.Toggle>
+				<Dropdown.Menu
+					as={DropdownMenu}
+					align={align ?? 'start'}
+					flip={false}
+					popperConfig={{ strategy: 'fixed' }}
+					renderOnMount
+				>
+					{dropdownMenuSections.map((dropdownSection, sectionIndex) => {
+						const isLastSection = dropdownMenuSections.length - 1 === sectionIndex;
 
-					return (
-						<React.Fragment key={dropdownSection.dropdownSectionId}>
-							{dropdownSection.dropdownMenuItems.map((dropdownMenuItem) => (
-								<Dropdown.Item
-									key={dropdownMenuItem.dropdownItemId}
-									onClick={() => {
-										handleDropdownItemClick(dropdownMenuItem);
-									}}
-								>
-									{dropdownMenuItem.title}
-								</Dropdown.Item>
-							))}
-							{!isLastSection && <Dropdown.Divider />}
-						</React.Fragment>
-					);
-				})}
-			</Dropdown.Menu>
-		</Dropdown>
+						return (
+							<React.Fragment key={dropdownSection.dropdownSectionId}>
+								{dropdownSection.dropdownMenuItems.map((dropdownMenuItem) => (
+									<Dropdown.Item
+										key={dropdownMenuItem.dropdownItemId}
+										onClick={() => {
+											handleDropdownItemClick(dropdownMenuItem);
+										}}
+									>
+										{dropdownMenuItem.title}
+									</Dropdown.Item>
+								))}
+								{!isLastSection && <Dropdown.Divider />}
+							</React.Fragment>
+						);
+					})}
+				</Dropdown.Menu>
+			</Dropdown>
+		</div>
 	);
 };
+
+const useMhicViewDropdownToggleStyles = createUseThemedStyles((theme) => ({
+	useMhicViewDropdownToggle: {
+		width: 240,
+		height: 40,
+		borderRadius: 5,
+		textAlign: 'left',
+		appearance: 'none',
+		padding: '10px 12px',
+		backgroundColor: theme.colors.n0,
+		border: `1px solid ${theme.colors.n100}`,
+		'&:hover': {
+			border: `1px solid ${theme.colors.n300}`,
+		},
+	},
+}));
+
+const MhicViewDropdownToggle = React.forwardRef(
+	(
+		{ className, children, style, onClick, disabled }: DropdownToggleProps,
+		ref: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
+	) => {
+		const classes = useMhicViewDropdownToggleStyles();
+		const classNameProp = useMemo(() => (className ?? '').replace('dropdown-toggle', ''), [className]);
+
+		return (
+			<Button
+				bsPrefix="mhic-view-dropdown-toggle"
+				ref={ref}
+				className={classNames(classes.useMhicViewDropdownToggle, classNameProp)}
+				style={style}
+				onClick={onClick}
+				disabled={disabled}
+			>
+				{children}
+			</Button>
+		);
+	}
+);
