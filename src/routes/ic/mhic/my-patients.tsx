@@ -146,11 +146,9 @@ export const Component = () => {
 							description={
 								<AwaitedString
 									resolve={patientOrdersListPromise.then((result) => {
-										return (
-											result.totalCountDescription +
-											' Patient' +
-											(result.totalCount > 1 ? 's' : '')
-										);
+										return `${result.totalCountDescription} Patient${
+											result.totalCount === 1 ? '' : 's'
+										}`;
 									})}
 								/>
 							}
