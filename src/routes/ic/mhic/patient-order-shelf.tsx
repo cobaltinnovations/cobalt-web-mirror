@@ -161,7 +161,7 @@ const ShelfContent = ({ tabBar }: { tabBar: React.ReactNode }) => {
 						});
 					}}
 				>
-					<CloseIcon className="d-block" />
+					<CloseIcon width={20} height={20} className="d-block" />
 				</Button>
 
 				<div className="mb-2 d-flex align-items-center">
