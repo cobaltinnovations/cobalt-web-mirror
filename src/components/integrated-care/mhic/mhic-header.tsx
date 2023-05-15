@@ -215,6 +215,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 											<Dropdown.Toggle
 												as={DropdownToggle}
 												id={`mhic-header__${link.navigationItemId}`}
+												className="border-0"
 											>
 												<span>{link.title}</span>
 												<DownChevron width={16} height={16} />

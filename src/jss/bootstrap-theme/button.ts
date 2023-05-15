@@ -131,6 +131,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-light': {
 				color: theme.colors.p700,
 				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.n100}`,
 				'&:hover': {
 					backgroundColor: theme.colors.n50,
 				},
