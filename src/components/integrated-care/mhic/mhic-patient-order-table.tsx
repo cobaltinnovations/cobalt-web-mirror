@@ -56,12 +56,12 @@ export type MhicPatientOrderTableColumnConfig = {
 	practice?: boolean;
 	orderState?: boolean;
 	referralReason?: boolean;
+	insurance?: boolean;
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
 	lastOutreach?: boolean;
 	assessmentScheduled?: boolean;
 	assessmentCompleted?: boolean;
-	completedBy?: boolean;
 	triage?: boolean;
 	resources?: boolean;
 	checkInScheduled?: boolean;
@@ -222,7 +222,7 @@ export const MhicPatientOrderTable = ({
 								></TableCell>
 							)}
 							{columnConfig.patient && (
-								<TableCell header width={280} sticky stickyOffset={patientColumnOffset} stickyBorder>
+								<TableCell header width={240} sticky stickyOffset={patientColumnOffset} stickyBorder>
 									Patient
 								</TableCell>
 							)}
@@ -231,6 +231,7 @@ export const MhicPatientOrderTable = ({
 							{columnConfig.preferredPhone && <TableCell header>Pref. Phone</TableCell>}
 							{columnConfig.practice && <TableCell header>Practice</TableCell>}
 							{columnConfig.referralReason && <TableCell header>Referral Reason</TableCell>}
+							{columnConfig.insurance && <TableCell header>Insurance</TableCell>}
 							{columnConfig.orderState && <TableCell header>Order State</TableCell>}
 							{columnConfig.assessmentStatus && <TableCell header>Assessment Status</TableCell>}
 							{columnConfig.outreachNumber && (
@@ -241,7 +242,6 @@ export const MhicPatientOrderTable = ({
 							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
 							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
-							{columnConfig.completedBy && <TableCell header>Completed By</TableCell>}
 							{columnConfig.triage && <TableCell header>Triage</TableCell>}
 							{columnConfig.resources && <TableCell header>Resources?</TableCell>}
 							{columnConfig.checkInScheduled && <TableCell header>Check-In Scheduled</TableCell>}
@@ -344,7 +344,7 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.patient && (
 												<TableCell
-													width={280}
+													width={240}
 													sticky
 													stickyOffset={patientColumnOffset}
 													stickyBorder
@@ -384,6 +384,16 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
+											{columnConfig.insurance && (
+												<TableCell width={240}>
+													<span className="d-block text-nowrap text-truncate">
+														{po.patientOrderInsurancePayorName}
+													</span>
+													<span className="d-block text-gray text-nowrap text-truncate">
+														{po.patientOrderInsurancePlanName}
+													</span>
+												</TableCell>
+											)}
 											{columnConfig.orderState && (
 												<TableCell>
 													<div>
@@ -406,7 +416,7 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.assessmentStatus && (
 												<TableCell
-													width={248}
+													width={140}
 													className="flex-row align-items-center justify-content-start"
 												>
 													{po.patientOrderScreeningStatusId ===
@@ -433,9 +443,6 @@ export const MhicPatientOrderTable = ({
 															{po.patientOrderScreeningStatusDescription}
 														</Badge>
 													)}
-													<span className="ms-4 fs-small text-nowrap">
-														{po.patientOrderInsurancePlanName}
-													</span>
 												</TableCell>
 											)}
 											{columnConfig.outreachNumber && (
@@ -466,21 +473,8 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
-											{columnConfig.completedBy && (
-												<TableCell width={240}>
-													<span className="text-nowrap text-truncate">
-														{po.mostRecentScreeningSessionCreatedByAccountDisplayName}
-													</span>
-												</TableCell>
-											)}
 											{columnConfig.triage && (
 												<TableCell className="flex-row align-items-center justify-content-start">
-													{po.patientOrderSafetyPlanningStatusId ===
-														PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-														<Badge pill bg="outline-danger" className="text-nowrap me-2">
-															Safety Planning
-														</Badge>
-													)}
 													{po.patientOrderCareTypeId ===
 														PatientOrderCareTypeId.SUBCLINICAL && (
 														<Badge pill bg="outline-dark" className="text-nowrap">

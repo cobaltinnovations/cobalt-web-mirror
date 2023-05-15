@@ -363,7 +363,6 @@ export const Component = () => {
 											flag: true,
 											patient: true,
 											assessmentCompleted: true,
-											completedBy: true,
 											triage: true,
 											episode: true,
 										}}
