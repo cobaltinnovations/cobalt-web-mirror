@@ -1,4 +1,8 @@
-import { PatientOrderDispositionId, PatientOrderTriageStatusId } from './integrated-care-models';
+import {
+	PatientOrderDispositionId,
+	PatientOrderResourcingTypeId,
+	PatientOrderTriageStatusId,
+} from './integrated-care-models';
 
 interface BirthSex {
 	birthSexId: string;
@@ -22,12 +26,6 @@ export interface GenderIdentity {
 
 export interface PatientOrderDisposition {
 	patientOrderDispositionId: PatientOrderDispositionId;
-	description: string;
-}
-
-interface Insurance {
-	insuranceId: string;
-	insuranceTypeId: string;
 	description: string;
 }
 
@@ -88,6 +86,11 @@ export interface PatientOrderFocusType {
 	patientOrderFocusTypeId: string;
 }
 
+export interface PatientOrderResourcingType {
+	description: string;
+	patientOrderResourcingTypeId: PatientOrderResourcingTypeId;
+}
+
 export interface PatientOrderInsurancePayors {
 	institutionId: string;
 	name: string;
@@ -117,6 +120,7 @@ export interface ReferenceDataResponse {
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
 	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];
+	patientOrderResourcingTypes: PatientOrderResourcingType[];
 	races: Race[];
 	reasonsForReferral: string[];
 	referringPracticeNames: string[];

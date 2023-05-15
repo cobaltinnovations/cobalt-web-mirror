@@ -42,6 +42,7 @@ interface MhicAssessmentCompleteProps {
 export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
 	const classes = useStyles();
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [notTakenScreeningTypes, setNotTakeScreeningTypes] = useState<ScreeningType[]>([]);
 
 	const conditionsAndSymptomsResults = useMemo(
@@ -154,7 +155,11 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 
 							<MhicTriageCard className="mb-6" patientOrder={patientOrder} />
 
-							<MhicNextStepsCard className="mb-8" patientOrder={patientOrder} />
+							<MhicNextStepsCard
+								className="mb-8"
+								patientOrder={patientOrder}
+								referenceData={referenceDataResponse}
+							/>
 							<hr className="mb-8" />
 
 							{conditionsAndSymptomsResults.length > 0 && (

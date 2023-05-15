@@ -14,6 +14,7 @@ import {
 	PatientOrderOutreachModel,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
+	PatientOrderResourcingTypeId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
 	PatientOrderScheduledScreening,
@@ -329,6 +330,7 @@ export const integratedCareService = {
 		patientOrderId: string,
 		data: {
 			patientOrderResourcingStatusId: PatientOrderResourcingStatusId;
+			patientOrderResourcingTypeId?: PatientOrderResourcingTypeId;
 			resourcesSentAtDate?: string;
 			resourcesSentAtTime?: string;
 			resourcesSentNote?: string;

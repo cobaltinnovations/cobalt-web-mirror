@@ -4,7 +4,12 @@ import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseStyles } from 'react-jss';
 
-import { PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderResourcingTypeId,
+	ReferenceDataResponse,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -24,10 +29,11 @@ const useStyles = createUseStyles({
 
 interface Props extends ModalProps {
 	patientOrder: PatientOrderModel;
+	referenceData: ReferenceDataResponse;
 	onSave(patientOrder: PatientOrderModel): void;
 }
 
-export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }) => {
+export const MhicResourcesModal: FC<Props> = ({ patientOrder, referenceData, onSave, ...props }) => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const { addFlag } = useFlags();
@@ -36,6 +42,7 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
+		sentVia: '',
 		comment: '',
 	});
 
@@ -43,6 +50,7 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 		setFormValues({
 			date: new Date(),
 			time: moment().format('h:mm A'),
+			sentVia: '',
 			comment: '',
 		});
 	}, []);
@@ -57,6 +65,7 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 				const response = await integratedCareService
 					.updateResourcingStatus(patientOrder.patientOrderId, {
 						patientOrderResourcingStatusId: PatientOrderResourcingStatusId.SENT_RESOURCES,
+						patientOrderResourcingTypeId: formValues.sentVia as PatientOrderResourcingTypeId,
 						resourcesSentAtDate: moment(formValues.date).format('YYYY-MM-DD'),
 						resourcesSentAtTime: formValues.time,
 						resourcesSentNote: formValues.comment,
@@ -80,6 +89,7 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 			addFlag,
 			formValues.comment,
 			formValues.date,
+			formValues.sentVia,
 			formValues.time,
 			handleError,
 			onSave,
@@ -133,6 +143,30 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, onSave, ...props }
 							/>
 						</div>
 					</div>
+					<InputHelper
+						className="mb-4"
+						as="select"
+						label="Resources sent via"
+						value={formValues.sentVia}
+						onChange={({ currentTarget }) => {
+							setFormValues((previousValues) => ({
+								...previousValues,
+								sentVia: currentTarget.value,
+							}));
+						}}
+						required
+					>
+						<option value="" disabled>
+							Select...
+						</option>
+						{referenceData.patientOrderResourcingTypes
+							.filter((rt) => rt.patientOrderResourcingTypeId !== PatientOrderResourcingTypeId.NONE)
+							.map((rt) => (
+								<option key={rt.patientOrderResourcingTypeId} value={rt.patientOrderResourcingTypeId}>
+									{rt.description}
+								</option>
+							))}
+					</InputHelper>
 					<InputHelper
 						as="textarea"
 						label="Comment"
