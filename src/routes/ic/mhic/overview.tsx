@@ -173,9 +173,7 @@ export const Component = () => {
 								action={{
 									title: 'View Safety Planning',
 									onClick: () => {
-										navigate(
-											'/ic/mhic/my-patients?patientOrderSafetyPlanningStatusId=NEEDS_SAFETY_PLANNING'
-										);
+										navigate('/ic/mhic/my-patients/safety-planning');
 									},
 								}}
 							/>
