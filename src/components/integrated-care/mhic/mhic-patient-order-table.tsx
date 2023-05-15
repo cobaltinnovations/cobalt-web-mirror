@@ -18,6 +18,7 @@ import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-c
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import { PatientOrdersListResponse } from '@/lib/services';
+import NoData from '@/components/no-data';
 
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
@@ -257,6 +258,18 @@ export const MhicPatientOrderTable = ({
 					<TableBody>
 						<Suspense>
 							<Await resolve={patientOrderFindResultPromise}>
+								{!isLoading && patientOrders.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={Object.values(columnConfig).filter((v) => v).length}>
+											<NoData
+												className="bg-white border-0"
+												title="No Orders"
+												description="There are 0 orders matching your selection"
+												actions={[]}
+											/>
+										</TableCell>
+									</TableRow>
+								)}
 								{patientOrders.map((po) => {
 									return (
 										<TableRow
