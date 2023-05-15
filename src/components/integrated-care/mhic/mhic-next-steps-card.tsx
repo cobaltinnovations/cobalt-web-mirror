@@ -7,6 +7,7 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
+	ReferenceDataResponse,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -15,11 +16,12 @@ import NoData from '@/components/no-data';
 
 interface Props {
 	patientOrder: PatientOrderModel;
+	referenceData: ReferenceDataResponse;
 	disabled?: boolean;
 	className?: string;
 }
 
-export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) => {
+export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, className }: Props) => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
@@ -102,6 +104,7 @@ export const MhicNextStepsCard = ({ patientOrder, disabled, className }: Props) 
 
 			<MhicResourcesModal
 				patientOrder={patientOrder}
+				referenceData={referenceData}
 				show={showResourcesModal}
 				onHide={() => {
 					setShowResourcesModal(false);

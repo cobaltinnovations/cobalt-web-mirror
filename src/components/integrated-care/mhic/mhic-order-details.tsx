@@ -335,6 +335,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							<MhicNextStepsCard
 								className="mb-6"
 								patientOrder={patientOrder}
+								referenceData={referenceDataResponse}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 						</>

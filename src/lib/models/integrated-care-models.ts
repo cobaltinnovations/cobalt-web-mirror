@@ -249,6 +249,12 @@ export enum PatientOrderResourcingStatusId {
 	SENT_RESOURCES = 'SENT_RESOURCES',
 }
 
+export enum PatientOrderResourcingTypeId {
+	NONE = 'NONE',
+	PHONE_CALL = 'PHONE_CALL',
+	MYCHART_MESSAGE = 'MYCHART_MESSAGE',
+}
+
 export enum PatientOrderTriageSourceId {
 	COBALT = 'COBALT',
 	MANUALLY_SET = 'MANUALLY_SET',
