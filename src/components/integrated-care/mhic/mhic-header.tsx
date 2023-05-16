@@ -9,7 +9,6 @@ import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
@@ -150,34 +149,9 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			{
 				testId: '',
 				navigationItemId: 'ORDERS',
+				to: '/ic/mhic/orders',
 				title: 'Orders',
 				active: ordersMatch,
-				items: [
-					{
-						testId: '',
-						navigationItemId: 'ORDERS_UNASSIGNED',
-						title: 'Unassigned',
-						to: {
-							pathname: '/ic/mhic/orders/unassigned',
-						},
-					},
-					{
-						testId: '',
-						navigationItemId: 'ORDERS_ASSIGNED',
-						title: 'Assigned',
-						to: {
-							pathname: '/ic/mhic/orders/assigned',
-						},
-					},
-					{
-						testId: '',
-						navigationItemId: 'ORDERS_CLOSED',
-						title: 'Closed',
-						to: {
-							pathname: '/ic/mhic/orders/closed',
-						},
-					},
-				],
 			},
 			{
 				testId: '',
@@ -210,31 +184,6 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 							{navigationLinks.map((link, index) => (
 								<li key={index} className={classNames({ active: link.active })}>
 									{link.to && <Link to={link.to}>{link.title}</Link>}
-									{link.items && (
-										<Dropdown>
-											<Dropdown.Toggle
-												as={DropdownToggle}
-												id={`mhic-header__${link.navigationItemId}`}
-												className="border-0"
-											>
-												<span>{link.title}</span>
-												<DownChevron width={16} height={16} />
-											</Dropdown.Toggle>
-											<Dropdown.Menu
-												as={DropdownMenu}
-												align="start"
-												flip={false}
-												popperConfig={{ strategy: 'fixed' }}
-												renderOnMount
-											>
-												{link.items.map((item, itemIndex) => (
-													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
-														<span className="fw-semibold">{item.title}</span>
-													</Dropdown.Item>
-												))}
-											</Dropdown.Menu>
-										</Dropdown>
-									)}
 								</li>
 							))}
 						</ul>

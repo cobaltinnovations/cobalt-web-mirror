@@ -30,12 +30,12 @@ import { AwaitedString } from '@/components/awaited-string';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 
-interface MhicOrdersUnassignedLoaderData {
+interface MhicOrdersLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
 }
 
-export function useMhicOrdersUnassignedLoaderData() {
-	return useRouteLoaderData('mhic-orders-unassigned') as MhicOrdersUnassignedLoaderData;
+export function useMhicOrdersLoaderData() {
+	return useRouteLoaderData('mhic-orders') as MhicOrdersLoaderData;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -64,7 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export const Component = () => {
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
-	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
+	const { patientOrdersListPromise } = useMhicOrdersLoaderData();
 
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
