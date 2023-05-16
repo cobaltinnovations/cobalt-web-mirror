@@ -77,44 +77,6 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 	const availableFilters = useMemo<Filter[]>(() => {
 		return [
 			{
-				filterId: 'patientOrderFilterFlagTypeId',
-				title: 'Flag',
-				options: [
-					{
-						title: 'None',
-						value: PatientOrderFilterFlagTypeId.NONE,
-					},
-					{
-						title: 'Patient below age threshold',
-						value: PatientOrderFilterFlagTypeId.PATIENT_BELOW_AGE_THRESHOLD,
-					},
-					{
-						title: 'Most recent episode closed within date threshold',
-						value: PatientOrderFilterFlagTypeId.MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD,
-					},
-				],
-			},
-			{
-				filterId: 'referringPracticeNames',
-				title: 'Practice',
-				options: referenceDataResponse.referringPracticeNames.map((p) => {
-					return {
-						title: p,
-						value: p,
-					};
-				}),
-			},
-			{
-				filterId: 'reasonsForReferral',
-				title: 'Referral Reason',
-				options: referenceDataResponse.reasonsForReferral.map((r) => {
-					return {
-						title: r,
-						value: r,
-					};
-				}),
-			},
-			{
 				filterId: 'patientOrderScreeningStatusId',
 				title: 'Assessment Status',
 				options: [
@@ -185,7 +147,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 				],
 			},
 		];
-	}, [referenceDataResponse.reasonsForReferral, referenceDataResponse.referringPracticeNames]);
+	}, []);
 
 	const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({});
 
