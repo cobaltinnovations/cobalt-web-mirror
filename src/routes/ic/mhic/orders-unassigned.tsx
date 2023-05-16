@@ -41,9 +41,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
 	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
 
-	console.log('state', mhicFilterStateParsedQueryParams);
-	console.log('flag', mhicFilterFlagParsedQueryParams);
-
 	return defer({
 		patientOrdersListPromise: integratedCareService
 			.getPatientOrders({

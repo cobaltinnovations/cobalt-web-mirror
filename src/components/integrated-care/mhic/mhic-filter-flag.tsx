@@ -1,18 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
 import { PatientOrderCareTypeId, PatientOrderFilterFlagTypeId } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
-import { cloneDeep, uniq } from 'lodash';
+import { cloneDeep } from 'lodash';
 
-interface MhicFilterOption {
-	optionId: string;
-	title: string;
-	queryParameters: Record<string, string | string[]>;
-}
-
-const options: MhicFilterOption[] = [
+const queryParamName = 'flag';
+const options = [
 	{
 		optionId: 'SAFETY_PLANNING',
 		title: 'Safety Planning',
@@ -50,14 +45,16 @@ const options: MhicFilterOption[] = [
 	},
 ];
 
-const availableQueryParams = uniq(options.map((option) => Object.keys(option.queryParameters)).flat());
-
 export function MhicFilterFlagGetParsedQueryParams(url: URL) {
+	const activeOptionsIds = url.searchParams.getAll(queryParamName);
+	const activeOptions = options.filter((option) => activeOptionsIds.includes(option.optionId));
 	const parsed: Record<string, string[]> = {};
 
-	for (const param of availableQueryParams) {
-		parsed[param] = url.searchParams.getAll(param);
-	}
+	activeOptions.forEach(({ queryParameters }) => {
+		Object.entries(queryParameters).forEach(([key, value]) => {
+			parsed[key] = [...(parsed[key] ?? []), ...(Array.isArray(value) ? value : [value])];
+		});
+	});
 
 	return parsed;
 }
@@ -67,50 +64,34 @@ interface MhicFilterFlagProps {
 }
 
 export const MhicFilterFlag = ({ className }: MhicFilterFlagProps) => {
-	const { pathname, search } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const activeOptionIds = useMemo(() => searchParams.getAll(queryParamName), [searchParams]);
+
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
-	const isActive = useMemo(() => {
-		const url = new URL(`${window.location.origin}${pathname}${search}`);
-		const parseQueryParams = MhicFilterFlagGetParsedQueryParams(url);
-
-		return Object.values(parseQueryParams).flat().length > 0;
-	}, [pathname, search]);
-
 	const handleDismiss = useCallback(() => {
-		availableQueryParams.forEach((param) => {
-			searchParams.delete(param);
-			setSearchParams(searchParams);
-		});
+		searchParams.delete(queryParamName);
+		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
 	const handleConfirm = useCallback(() => {
-		availableQueryParams.forEach((param) => {
-			searchParams.delete(param);
-		});
+		searchParams.delete(queryParamName);
 
-		const selectedOptions = options.filter((option) => selectedValues.includes(option.optionId));
-
-		selectedOptions.forEach((option) => {
-			Object.entries(option.queryParameters).forEach(([key, value]) => {
-				if (Array.isArray(value)) {
-					value.forEach((v) => {
-						searchParams.append(key, v);
-					});
-				} else {
-					searchParams.append(key, value);
-				}
-			});
+		selectedValues.forEach((value) => {
+			searchParams.append(queryParamName, value);
 		});
 
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValues, setSearchParams]);
 
+	useEffect(() => {
+		setSelectedValues(activeOptionIds);
+	}, [activeOptionIds]);
+
 	return (
 		<FilterDropdown
 			className={className}
-			active={isActive}
+			active={activeOptionIds.length > 0}
 			id="pic-mhic__flag-filter"
 			title="Flag"
 			dismissText="Clear"
