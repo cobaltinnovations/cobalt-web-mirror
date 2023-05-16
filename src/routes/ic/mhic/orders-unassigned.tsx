@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
+	MhicFilterAssignment,
 	MhicFilterDropdown,
 	MhicFilterFlag,
 	MhicFilterFlagGetParsedQueryParams,
@@ -15,6 +16,7 @@ import {
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
+	mhicFilterAssignmentGetParsedQueryParams,
 	mhicFilterPracticeGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
@@ -25,7 +27,6 @@ import { PatientOrdersListResponse, integratedCareService } from '@/lib/services
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { AwaitedString } from '@/components/awaited-string';
-import FilterDropdown from '@/components/filter-dropdown';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 
@@ -43,6 +44,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
 	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
 	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
+	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -52,6 +54,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				...mhicFilterStateParsedQueryParams,
 				...mhicFilterFlagParsedQueryParams,
 				...mhicFilterPracticeParsedQueryParams,
+				...mhicFilterAssignmentParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),
@@ -167,11 +170,11 @@ export const Component = () => {
 			/>
 
 			<Container fluid className="px-8 py-8">
-				<Row className="mb-8">
+				<Row className="mb-6">
 					<Col>
 						<MhicPageHeader
 							className="mb-6"
-							title="Unassigned"
+							title="Patient Orders"
 							description={
 								<AwaitedString
 									resolve={patientOrdersListPromise.then((r) => {
@@ -216,35 +219,7 @@ export const Component = () => {
 								<MhicFilterState className="me-2" />
 								<MhicFilterFlag className="me-2" />
 								<MhicFilterPractice referenceData={referenceDataResponse} className="me-2" />
-								<FilterDropdown
-									className="me-2"
-									active={false}
-									id={`pic-mhic__assignment-filter`}
-									title="Assignment"
-									dismissText="Clear"
-									onDismiss={() => {
-										return;
-									}}
-									confirmText="Apply"
-									onConfirm={() => {
-										return;
-									}}
-								>
-									{panelAccounts.map((panelAccount) => (
-										<Form.Check
-											key={panelAccount.accountId}
-											type="checkbox"
-											name="panel-account-id"
-											id={`panel-account-id--${panelAccount.accountId}`}
-											label={panelAccount.displayName}
-											value={panelAccount.accountId}
-											checked={false}
-											onChange={({ currentTarget }) => {
-												return;
-											}}
-										/>
-									))}
-								</FilterDropdown>
+								<MhicFilterAssignment panelAccounts={panelAccounts} className="me-2" />
 								<MhicFilterDropdown align="start" />
 							</div>
 							<div>
