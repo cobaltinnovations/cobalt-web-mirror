@@ -12,21 +12,21 @@ interface MhicFilterStateProps {
 
 const options = [
 	{
-		optionId: 'OPEN',
+		optionId: PatientOrderDispositionId.OPEN,
 		title: 'Open',
 		queryParameters: {
 			patientOrderDispositionId: PatientOrderDispositionId.OPEN,
 		},
 	},
 	{
-		optionId: 'CLOSED',
+		optionId: PatientOrderDispositionId.CLOSED,
 		title: 'Closed',
 		queryParameters: {
 			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
 		},
 	},
 	{
-		optionId: 'ARCHIVED',
+		optionId: PatientOrderDispositionId.ARCHIVED,
 		title: 'Archived',
 		queryParameters: {
 			patientOrderDispositionId: PatientOrderDispositionId.ARCHIVED,

@@ -8,12 +8,14 @@ import {
 	MhicFilterDropdown,
 	MhicFilterFlag,
 	MhicFilterFlagGetParsedQueryParams,
+	MhicFilterPractice,
 	MhicFilterState,
 	MhicFilterStateGetParsedQueryParams,
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
+	mhicFilterPracticeGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -40,6 +42,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
 	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
+	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -48,6 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				...(pageNumber && { pageNumber }),
 				...mhicFilterStateParsedQueryParams,
 				...mhicFilterFlagParsedQueryParams,
+				...mhicFilterPracticeParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),
@@ -211,37 +215,7 @@ export const Component = () => {
 							<div className="d-flex align-items-center">
 								<MhicFilterState className="me-2" />
 								<MhicFilterFlag className="me-2" />
-								<FilterDropdown
-									className="me-2"
-									active={false}
-									id={`pic-mhic__practice-filter`}
-									title="Practice"
-									dismissText="Clear"
-									onDismiss={() => {
-										return;
-									}}
-									confirmText="Apply"
-									onConfirm={() => {
-										return;
-									}}
-								>
-									{referenceDataResponse.referringPracticeNames.map((practiceName) => (
-										<Form.Check
-											key={practiceName.replaceAll(' ', '-').toLowerCase()}
-											type="checkbox"
-											name="referring-practice-names"
-											id={`referring-practice-names--${practiceName
-												.replaceAll(' ', '-')
-												.toLowerCase()}`}
-											label={practiceName}
-											value={practiceName}
-											checked={false}
-											onChange={({ currentTarget }) => {
-												return;
-											}}
-										/>
-									))}
-								</FilterDropdown>
+								<MhicFilterPractice referenceData={referenceDataResponse} className="me-2" />
 								<FilterDropdown
 									className="me-2"
 									active={false}

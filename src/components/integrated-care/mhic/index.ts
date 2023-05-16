@@ -14,6 +14,7 @@ export * from './mhic-edit-comment-modal';
 export * from './mhic-episode-card';
 export * from './mhic-filter-dropdown';
 export * from './mhic-filter-flag';
+export * from './mhic-filter-practice';
 export * from './mhic-filter-state';
 export * from './mhic-generate-orders-modal';
 export * from './mhic-header';
