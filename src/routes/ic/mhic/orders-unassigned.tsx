@@ -1,28 +1,31 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
 	MhicFilterDropdown,
+	MhicFilterFlag,
+	MhicFilterFlagGetParsedQueryParams,
+	MhicFilterState,
+	MhicFilterStateGetParsedQueryParams,
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
-	MhicViewDropdown,
-	parseMhicViewDropdownQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-import { PatientOrderAssignmentStatusId } from '@/lib/models';
-
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { AwaitedString } from '@/components/awaited-string';
+import FilterDropdown from '@/components/filter-dropdown';
+import { useIntegratedCareLoaderData } from '../landing';
+import { useMhicLayoutLoaderData } from './mhic-layout';
 
 interface MhicOrdersUnassignedLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
@@ -35,15 +38,19 @@ export function useMhicOrdersUnassignedLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
-	const viewFilters = parseMhicViewDropdownQueryParamsFromURL(url);
+	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
+	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
+
+	console.log('state', mhicFilterStateParsedQueryParams);
+	console.log('flag', mhicFilterFlagParsedQueryParams);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
 			.getPatientOrders({
 				pageSize: '15',
-				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
-				...viewFilters,
 				...(pageNumber && { pageNumber }),
+				...mhicFilterStateParsedQueryParams,
+				...mhicFilterFlagParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),
@@ -51,9 +58,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+	const { panelAccounts } = useMhicLayoutLoaderData();
+	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
+
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
-	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const revalidator = useRevalidator();
@@ -201,7 +212,68 @@ export const Component = () => {
 						<hr className="mb-6" />
 						<div className="d-flex justify-content-between align-items-center">
 							<div className="d-flex align-items-center">
-								<MhicViewDropdown className="me-2" />
+								<MhicFilterState className="me-2" />
+								<MhicFilterFlag className="me-2" />
+								<FilterDropdown
+									className="me-2"
+									active={false}
+									id={`pic-mhic__practice-filter`}
+									title="Practice"
+									dismissText="Clear"
+									onDismiss={() => {
+										return;
+									}}
+									confirmText="Apply"
+									onConfirm={() => {
+										return;
+									}}
+								>
+									{referenceDataResponse.referringPracticeNames.map((practiceName) => (
+										<Form.Check
+											key={practiceName.replaceAll(' ', '-').toLowerCase()}
+											type="checkbox"
+											name="referring-practice-names"
+											id={`referring-practice-names--${practiceName
+												.replaceAll(' ', '-')
+												.toLowerCase()}`}
+											label={practiceName}
+											value={practiceName}
+											checked={false}
+											onChange={({ currentTarget }) => {
+												return;
+											}}
+										/>
+									))}
+								</FilterDropdown>
+								<FilterDropdown
+									className="me-2"
+									active={false}
+									id={`pic-mhic__assignment-filter`}
+									title="Assignment"
+									dismissText="Clear"
+									onDismiss={() => {
+										return;
+									}}
+									confirmText="Apply"
+									onConfirm={() => {
+										return;
+									}}
+								>
+									{panelAccounts.map((panelAccount) => (
+										<Form.Check
+											key={panelAccount.accountId}
+											type="checkbox"
+											name="panel-account-id"
+											id={`panel-account-id--${panelAccount.accountId}`}
+											label={panelAccount.displayName}
+											value={panelAccount.accountId}
+											checked={false}
+											onChange={({ currentTarget }) => {
+												return;
+											}}
+										/>
+									))}
+								</FilterDropdown>
 								<MhicFilterDropdown align="start" />
 							</div>
 							<div>
