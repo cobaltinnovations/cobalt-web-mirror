@@ -22,7 +22,7 @@ export function useScreeningNavigation() {
 	const revalidator = useRevalidator();
 
 	const mhicScreeningRouteMatch = useMatch({
-		path: '/ic/mhic/orders/:patientOrderId',
+		path: '/ic/mhic/order-assessment/:patientOrderId',
 		end: false,
 	});
 
@@ -59,7 +59,7 @@ export function useScreeningNavigation() {
 					revalidator.revalidate();
 					navigate(
 						{
-							pathname: `/ic/mhic/orders/${destination.context.patientOrderId}/assessment`,
+							pathname: `/ic/mhic/order-assessment/${destination.context.patientOrderId}`,
 						},
 						{
 							replace,
@@ -103,7 +103,7 @@ export function useScreeningNavigation() {
 		(contextId: string) => {
 			navigate(
 				mhicScreeningRouteMatch
-					? `/ic/mhic/orders/${mhicScreeningRouteMatch.params.patientOrderId}/assessment/${contextId}`
+					? `/ic/mhic/order-assessment/${mhicScreeningRouteMatch.params.patientOrderId}/${contextId}`
 					: `/screening-questions/${contextId}`,
 				{ state: location.state }
 			);

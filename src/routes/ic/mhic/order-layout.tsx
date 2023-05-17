@@ -6,7 +6,7 @@ import { LoaderFunctionArgs, Outlet, useRouteLoaderData } from 'react-router-dom
 type MhicOrderLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
 export function useMhicOrderLayoutLoaderData() {
-	return useRouteLoaderData('mhic-patient-order') as MhicOrderLayoutLoaderData;
+	return useRouteLoaderData('mhic-order-assessment') as MhicOrderLayoutLoaderData;
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {

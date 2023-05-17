@@ -154,7 +154,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							<Dropdown.Divider />
 							<Dropdown.Item
 								onClick={() => {
-									navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+									navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 								}}
 							>
 								<AssessmentIcon className="text-gray" /> Start Assessment

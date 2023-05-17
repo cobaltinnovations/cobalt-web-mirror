@@ -130,7 +130,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		path: '/ic/mhic/reports',
 	});
 	const assessmentMatch = useMatch({
-		path: '/ic/mhic/orders/:patientOrderId/assessment/*',
+		path: '/ic/mhic/order-assessment/:patientOrderId/*',
 	});
 
 	const isInAssessmentView = !!assessmentMatch;
@@ -192,8 +192,8 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				<div className="d-flex align-items-center">
 					{isInAssessmentView ? (
 						<Button
-							variant="light"
-							className="p-0 me-10"
+							variant="link"
+							className="p-0 me-10 text-decoration-none"
 							size="sm"
 							onClick={() => {
 								navigate({

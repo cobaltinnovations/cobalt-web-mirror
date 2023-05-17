@@ -86,7 +86,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 			setShowConsentModal(true);
 		} else {
-			navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+			navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 		}
 	}, [navigate, patientOrder.patientOrderConsentStatusId, patientOrder.patientOrderId]);
 
@@ -112,7 +112,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 				onSave={(updatedPatientOrder) => {
 					if (updatedPatientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.CONSENTED) {
-						navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+						navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 					} else {
 						revalidator.revalidate();
 						setShowConsentModal(false);
@@ -273,7 +273,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											variant="primary"
 											className="d-flex align-items-center"
 											onClick={() => {
-												navigate(`/ic/mhic/orders/${patientOrder.patientOrderId}/assessment`);
+												navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 											}}
 											disabled={
 												patientOrder.patientOrderDispositionId ===
