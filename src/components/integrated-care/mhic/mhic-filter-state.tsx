@@ -81,6 +81,7 @@ export const MhicFilterState = ({ className }: MhicFilterStateProps) => {
 			onDismiss={handleDismiss}
 			confirmText="Apply"
 			onConfirm={handleConfirm}
+			width={240}
 		>
 			{options.map((option) => (
 				<Form.Check

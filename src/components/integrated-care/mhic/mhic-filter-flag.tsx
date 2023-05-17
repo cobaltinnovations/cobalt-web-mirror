@@ -98,6 +98,7 @@ export const MhicFilterFlag = ({ className }: MhicFilterFlagProps) => {
 			onDismiss={handleDismiss}
 			confirmText="Apply"
 			onConfirm={handleConfirm}
+			width={320}
 		>
 			{options.map((option) => (
 				<Form.Check

@@ -54,6 +54,7 @@ export const MhicFilterPractice = ({ referenceData, className }: MhicFilterPract
 			onDismiss={handleDismiss}
 			confirmText="Apply"
 			onConfirm={handleConfirm}
+			width={320}
 		>
 			{referenceData.referringPracticeNames.map((practiceName) => (
 				<Form.Check

@@ -54,6 +54,7 @@ export const MhicFilterAssignment = ({ panelAccounts, className }: MhicFilterAss
 			onDismiss={handleDismiss}
 			confirmText="Apply"
 			onConfirm={handleConfirm}
+			width={320}
 		>
 			{panelAccounts.map((panelAccount) => (
 				<Form.Check
