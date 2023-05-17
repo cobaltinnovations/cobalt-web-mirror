@@ -152,8 +152,8 @@ const PatientLanding = () => {
 						{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
 							<NoData
 								className="mb-10"
-								title="Awaiting Patient Order"
-								description="Your patient order has not been sent yet. You will get an email when we are ready for you."
+								title={`Awaiting ${institution.name} Enrollment`}
+								description={`We are waiting for your primary care provider to send us your information. We will send you an email or text message when we are ready for you. Call us at ${institution.integratedCarePhoneNumberDescription} if you have any questions.`}
 								actions={[]}
 							/>
 						)}
