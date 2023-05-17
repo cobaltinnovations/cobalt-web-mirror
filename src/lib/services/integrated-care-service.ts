@@ -106,7 +106,7 @@ export interface PatientOrderApiQueryParameters {
 	patientOrderResponseStatusId?: string;
 	patientOrderSafetyPlanningStatusId?: string;
 	patientOrderDispositionId?: string | string[];
-	panelAccountId?: string;
+	panelAccountId?: string | string[];
 	patientMrn?: string;
 	searchQuery?: string;
 	pageNumber?: string;

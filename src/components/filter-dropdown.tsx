@@ -87,7 +87,7 @@ const FilterDropdown = ({
 			onToggle={setShow}
 		>
 			<Dropdown.Toggle
-				variant={active ? 'primary' : 'outline-primary'}
+				variant={active ? 'primary' : 'light'}
 				as={DropdownToggle}
 				className="d-inline-flex align-items-center pe-3"
 				id={id}
