@@ -12,13 +12,7 @@ import {
 	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 
-import {
-	PatientOrderConsentStatusId,
-	PatientOrderDispositionId,
-	PatientOrderOutreachStatusId,
-	PatientOrderScreeningStatusId,
-	PatientOrderTriageStatusId,
-} from '@/lib/models';
+import { PatientOrderDispositionId, PatientOrderScreeningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import Cookies from 'js-cookie';
 import { AwaitedString } from '@/components/awaited-string';
