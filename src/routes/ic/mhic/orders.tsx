@@ -5,45 +5,56 @@ import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearc
 import FileInputButton from '@/components/file-input-button';
 import {
 	MhicAssignOrderModal,
+	MhicFilterAssignment,
 	MhicFilterDropdown,
+	MhicFilterFlag,
+	MhicFilterFlagGetParsedQueryParams,
+	MhicFilterPractice,
+	MhicFilterState,
+	MhicFilterStateGetParsedQueryParams,
 	MhicGenerateOrdersModal,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
-	MhicViewDropdown,
-	parseMhicViewDropdownQueryParamsFromURL,
+	mhicFilterAssignmentGetParsedQueryParams,
+	mhicFilterPracticeGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
-import { PatientOrderAssignmentStatusId } from '@/lib/models';
-
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { AwaitedString } from '@/components/awaited-string';
+import { useIntegratedCareLoaderData } from '../landing';
+import { useMhicLayoutLoaderData } from './mhic-layout';
 
-interface MhicOrdersUnassignedLoaderData {
+interface MhicOrdersLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
 }
 
-export function useMhicOrdersUnassignedLoaderData() {
-	return useRouteLoaderData('mhic-orders-unassigned') as MhicOrdersUnassignedLoaderData;
+export function useMhicOrdersLoaderData() {
+	return useRouteLoaderData('mhic-orders') as MhicOrdersLoaderData;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
-	const viewFilters = parseMhicViewDropdownQueryParamsFromURL(url);
+	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
+	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
+	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
+	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
 			.getPatientOrders({
 				pageSize: '15',
-				patientOrderAssignmentStatusId: PatientOrderAssignmentStatusId.UNASSIGNED,
-				...viewFilters,
 				...(pageNumber && { pageNumber }),
+				...mhicFilterStateParsedQueryParams,
+				...mhicFilterFlagParsedQueryParams,
+				...mhicFilterPracticeParsedQueryParams,
+				...mhicFilterAssignmentParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),
@@ -51,9 +62,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
+	const { panelAccounts } = useMhicLayoutLoaderData();
+	const { patientOrdersListPromise } = useMhicOrdersLoaderData();
+
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
-	const { patientOrdersListPromise } = useMhicOrdersUnassignedLoaderData();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const revalidator = useRevalidator();
@@ -155,11 +170,11 @@ export const Component = () => {
 			/>
 
 			<Container fluid className="px-8 py-8">
-				<Row className="mb-8">
+				<Row className="mb-6">
 					<Col>
 						<MhicPageHeader
 							className="mb-6"
-							title="Unassigned"
+							title="Patient Orders"
 							description={
 								<AwaitedString
 									resolve={patientOrdersListPromise.then((r) => {
@@ -201,7 +216,10 @@ export const Component = () => {
 						<hr className="mb-6" />
 						<div className="d-flex justify-content-between align-items-center">
 							<div className="d-flex align-items-center">
-								<MhicViewDropdown className="me-2" />
+								<MhicFilterState className="me-2" />
+								<MhicFilterFlag className="me-2" />
+								<MhicFilterPractice referenceData={referenceDataResponse} className="me-2" />
+								<MhicFilterAssignment panelAccounts={panelAccounts} className="me-2" />
 								<MhicFilterDropdown align="start" />
 							</div>
 							<div>
@@ -234,7 +252,9 @@ export const Component = () => {
 								referralDate: true,
 								practice: true,
 								referralReason: true,
+								insurance: true,
 								outreachNumber: true,
+								lastOutreach: true,
 								episode: true,
 							}}
 						/>

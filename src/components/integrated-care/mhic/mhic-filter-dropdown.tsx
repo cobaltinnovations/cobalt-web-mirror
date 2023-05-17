@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
 import classNames from 'classnames';
@@ -12,13 +13,10 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
-	PatientOrderFilterFlagTypeId,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
-import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { useSearchParams } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
@@ -73,47 +71,8 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 	const [show, setShow] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const availableFilters = useMemo<Filter[]>(() => {
 		return [
-			{
-				filterId: 'patientOrderFilterFlagTypeId',
-				title: 'Flag',
-				options: [
-					{
-						title: 'None',
-						value: PatientOrderFilterFlagTypeId.NONE,
-					},
-					{
-						title: 'Patient below age threshold',
-						value: PatientOrderFilterFlagTypeId.PATIENT_BELOW_AGE_THRESHOLD,
-					},
-					{
-						title: 'Most recent episode closed within date threshold',
-						value: PatientOrderFilterFlagTypeId.MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD,
-					},
-				],
-			},
-			{
-				filterId: 'referringPracticeNames',
-				title: 'Practice',
-				options: referenceDataResponse.referringPracticeNames.map((p) => {
-					return {
-						title: p,
-						value: p,
-					};
-				}),
-			},
-			{
-				filterId: 'reasonsForReferral',
-				title: 'Referral Reason',
-				options: referenceDataResponse.reasonsForReferral.map((r) => {
-					return {
-						title: r,
-						value: r,
-					};
-				}),
-			},
 			{
 				filterId: 'patientOrderScreeningStatusId',
 				title: 'Assessment Status',
@@ -185,7 +144,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 				],
 			},
 		];
-	}, [referenceDataResponse.reasonsForReferral, referenceDataResponse.referringPracticeNames]);
+	}, []);
 
 	const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({});
 
