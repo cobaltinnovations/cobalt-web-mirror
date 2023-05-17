@@ -15,7 +15,8 @@ import {
 import {
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
-	PatientOrderSafetyPlanningStatusId,
+	PatientOrderOutreachStatusId,
+	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
@@ -24,9 +25,9 @@ import { AwaitedString } from '@/components/awaited-string';
 
 export enum MhicMyPatientView {
 	All = 'all',
-	WaitingForConsent = 'waiting-for-consent',
 	NeedAssessment = 'need-assessment',
-	SafetyPlanning = 'safety-planning',
+	Scheduled = 'scheduled',
+	Subclinical = 'subclinical',
 	MHP = 'mhp',
 	SpecialtyCare = 'specialty-care',
 	Closed = 'closed',
@@ -37,22 +38,22 @@ const viewConfig = {
 		pageTitle: 'All Assigned',
 		apiParameters: {},
 	},
-	[MhicMyPatientView.WaitingForConsent]: {
-		pageTitle: 'Waiting for Consent',
-		apiParameters: {
-			patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
-		},
-	},
 	[MhicMyPatientView.NeedAssessment]: {
 		pageTitle: 'Need Assessment',
 		apiParameters: {
 			patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
 		},
 	},
-	[MhicMyPatientView.SafetyPlanning]: {
-		pageTitle: 'Safety Planning',
+	[MhicMyPatientView.Scheduled]: {
+		pageTitle: 'Scheduled',
 		apiParameters: {
-			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+			patientOrderScreeningStatusId: PatientOrderScreeningStatusId.SCHEDULED,
+		},
+	},
+	[MhicMyPatientView.Subclinical]: {
+		pageTitle: 'Subclinical',
+		apiParameters: {
+			patientOrderTriageStatusId: PatientOrderTriageStatusId.SUBCLINICAL,
 		},
 	},
 	[MhicMyPatientView.MHP]: {

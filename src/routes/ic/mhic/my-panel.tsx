@@ -44,9 +44,9 @@ export const Component = () => {
 
 	const isTodayActive = !!overviewMatch;
 	const isMyPatientsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.All;
-	const isWaitingForConsentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.WaitingForConsent;
 	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
-	const isSafetyPlanningActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SafetyPlanning;
+	const isScheduledActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Scheduled;
+	const isSubclinicalActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Subclinical;
 	const isMhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.MHP;
 	const isSpecialtyCareActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SpecialtyCare;
 	const isClosedActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Closed;
@@ -80,44 +80,44 @@ export const Component = () => {
 						title: 'My Patient Views',
 						navigationItems: [
 							{
-								title: 'Waiting for Consent',
-								description:
-									patientOrderPanelCountsResponse.waitingForConsentPatientOrderCountDescription ??
-									'0',
-								icon: () => <DotIcon width={24} height={24} className="text-n300" />,
-								onClick: () => {
-									navigate(`/ic/mhic/my-patients/${MhicMyPatientView.WaitingForConsent}`);
-								},
-								isActive: isWaitingForConsentActive,
-							},
-							{
 								title: 'Need Assessment',
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
 										.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
-								icon: () => <DotIcon width={24} height={24} className="text-warning" />,
+								icon: () => <DotIcon width={24} height={24} className="text-n300" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
 								},
 								isActive: isNeedsAssessmentActive,
 							},
 							{
-								title: 'Safety Planning',
+								title: 'Scheduled',
 								description:
-									patientOrderPanelCountsResponse?.safetyPlanningPatientOrderCountDescription,
-								icon: () => <DotIcon width={24} height={24} className="text-danger" />,
+									patientOrderPanelCountsResponse.screeningScheduledPatientOrderCountDescription ??
+									'0',
+								icon: () => <DotIcon width={24} height={24} className="text-secondary" />,
 								onClick: () => {
-									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SafetyPlanning);
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.Scheduled);
 								},
-								isActive: isSafetyPlanningActive,
+								isActive: isScheduledActive,
 							},
-
+							{
+								title: 'Subclinical',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
+										.SUBCLINICAL.patientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-p100" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.Subclinical);
+								},
+								isActive: isSubclinicalActive,
+							},
 							{
 								title: 'MHP',
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
 										.patientOrderCountDescription ?? '0',
-								icon: () => <DotIcon width={24} height={24} className="text-success" />,
+								icon: () => <DotIcon width={24} height={24} className="text-p300" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
 								},
@@ -155,10 +155,10 @@ export const Component = () => {
 		isMhpActive,
 		isMyPatientsActive,
 		isNeedsAssessmentActive,
-		isSafetyPlanningActive,
+		isScheduledActive,
 		isSpecialtyCareActive,
+		isSubclinicalActive,
 		isTodayActive,
-		isWaitingForConsentActive,
 		navigate,
 		patientOrderPanelCountsPromise,
 	]);

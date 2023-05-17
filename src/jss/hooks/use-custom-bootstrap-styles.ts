@@ -40,6 +40,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-p50': {
 			color: `${theme.colors.p50} !important`,
 		},
+		'.text-p100': {
+			color: `${theme.colors.p100} !important`,
+		},
 		'.text-p300': {
 			color: `${theme.colors.p300} !important`,
 		},

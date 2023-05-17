@@ -52,6 +52,8 @@ export interface PatientOrderPanelCountsResponse {
 	closedPatientOrderCountDescription: string;
 	waitingForConsentPatientOrderCount: number;
 	waitingForConsentPatientOrderCountDescription: string;
+	screeningScheduledPatientOrderCount: number;
+	screeningScheduledPatientOrderCountDescription: string;
 }
 
 export interface PatientOrderResponse {
