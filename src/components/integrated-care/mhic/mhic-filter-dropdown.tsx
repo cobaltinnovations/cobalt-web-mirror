@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
 import classNames from 'classnames';
@@ -12,13 +13,10 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
-	PatientOrderFilterFlagTypeId,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
-import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { useSearchParams } from 'react-router-dom';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
@@ -73,7 +71,6 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 	const [show, setShow] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const availableFilters = useMemo<Filter[]>(() => {
 		return [
 			{

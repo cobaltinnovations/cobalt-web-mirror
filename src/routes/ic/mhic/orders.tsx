@@ -252,7 +252,9 @@ export const Component = () => {
 								referralDate: true,
 								practice: true,
 								referralReason: true,
+								insurance: true,
 								outreachNumber: true,
+								lastOutreach: true,
 								episode: true,
 							}}
 						/>
