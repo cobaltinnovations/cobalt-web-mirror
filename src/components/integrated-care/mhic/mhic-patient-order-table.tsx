@@ -401,7 +401,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.insurance && (
-												<TableCell width={240}>
+												<TableCell width={240} className="py-2">
 													<span className="d-block text-nowrap text-truncate">
 														{po.patientOrderInsurancePayorName}
 													</span>

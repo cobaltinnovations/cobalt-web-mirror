@@ -1,10 +1,12 @@
+import Cookies from 'js-cookie';
 import React, { useCallback, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, redirect, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Col, Container, Row } from 'react-bootstrap';
 
+import { PatientOrderViewTypeId } from '@/lib/models';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import {
 	MhicCustomizeTableModal,
-	MhicFilterDropdown,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
@@ -12,11 +14,6 @@ import {
 	parseMhicFilterQueryParamsFromURL,
 	MhicPatientOrderTableColumnConfig,
 } from '@/components/integrated-care/mhic';
-
-import { PatientOrderViewTypeId } from '@/lib/models';
-import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
-import Cookies from 'js-cookie';
-import { AwaitedString } from '@/components/awaited-string';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -32,6 +29,7 @@ type ViewConfig = Record<
 	MhicMyPatientView,
 	{
 		pageTitle: string;
+		pageDescription: string;
 		apiParameters: Record<string, string | string[]>;
 		columnConfig: MhicPatientOrderTableColumnConfig;
 	}
@@ -40,6 +38,7 @@ type ViewConfig = Record<
 const viewConfig: ViewConfig = {
 	[MhicMyPatientView.All]: {
 		pageTitle: 'All Assigned',
+		pageDescription: '',
 		apiParameters: {},
 		columnConfig: {
 			patient: true,
@@ -53,6 +52,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.NeedAssessment]: {
 		pageTitle: 'Need Assessment',
+		pageDescription: 'Patients that have not started or been scheduled for an assessment',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.NEED_ASSESSMENT,
 		},
@@ -70,6 +70,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.Scheduled]: {
 		pageTitle: 'Scheduled',
+		pageDescription: 'Patients scheduled to take the assessment by phone',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED,
 		},
@@ -85,6 +86,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.Subclinical]: {
 		pageTitle: 'Subclinical',
+		pageDescription: 'Patients triaged to subclinical',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.SUBCLINICAL,
 		},
@@ -100,6 +102,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.MHP]: {
 		pageTitle: 'MHP',
+		pageDescription: 'Patients triaged to MHP',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.MHP,
 		},
@@ -115,6 +118,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.SpecialtyCare]: {
 		pageTitle: 'Specialty Care',
+		pageDescription: 'Patients triaged to specialty care',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.SPECIALTY_CARE,
 		},
@@ -130,6 +134,7 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.Closed]: {
 		pageTitle: 'Closed',
+		pageDescription: 'Orders that have been closed. Order closed for more than 30 days will be archived.',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.CLOSED,
 		},
@@ -147,6 +152,7 @@ const viewConfig: ViewConfig = {
 
 interface MhicMyPatientsLoaderData {
 	pageTitle: string;
+	pageDescription: string;
 	columnConfig: MhicPatientOrderTableColumnConfig;
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
 }
@@ -165,7 +171,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const accountId = Cookies.get('accountId');
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromURL(url);
-	const { pageTitle, columnConfig, apiParameters } = viewConfig[params.mhicView as MhicMyPatientView];
+	const { pageTitle, pageDescription, columnConfig, apiParameters } =
+		viewConfig[params.mhicView as MhicMyPatientView];
 
 	const responsePromise = integratedCareService
 		.getPatientOrders({
@@ -179,13 +186,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return defer({
 		pageTitle,
+		pageDescription,
 		columnConfig,
 		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
 	});
 }
 
 export const Component = () => {
-	const { pageTitle, columnConfig, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
+	const { pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
@@ -213,36 +221,14 @@ export const Component = () => {
 			<Container fluid className="py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader
-							title={pageTitle}
-							description={
-								<AwaitedString
-									resolve={patientOrdersListPromise.then((result) => {
-										return `${result.totalCountDescription} Patient${
-											result.totalCount === 1 ? '' : 's'
-										}`;
-									})}
-								/>
-							}
-						>
-							<div className="d-flex align-items-center">
-								<MhicFilterDropdown align="end" className="me-2" />
-								<MhicSortDropdown
-									align="end"
-									className="me-2"
-									onApply={(selectedFilters) => {
-										console.log(selectedFilters);
-									}}
-								/>
-								{/* <Button
-									variant="light"
-									onClick={() => {
-										setShowCustomizeTableModal(true);
-									}}
-								>
-									Customize
-								</Button> */}
-							</div>
+						<MhicPageHeader title={pageTitle} description={pageDescription}>
+							<MhicSortDropdown
+								align="end"
+								onApply={(selectedFilters) => {
+									window.alert('TODO: Apply sort');
+									console.log(selectedFilters);
+								}}
+							/>
 						</MhicPageHeader>
 					</Col>
 				</Row>
@@ -251,9 +237,6 @@ export const Component = () => {
 						<MhicPatientOrderTable
 							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
-							onSelectPatientOrderIdsChange={() => {
-								return;
-							}}
 							pageNumber={parseInt(pageNumber, 10)}
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}
