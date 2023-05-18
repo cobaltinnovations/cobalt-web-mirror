@@ -35,7 +35,7 @@ interface MhicOrdersLoaderData {
 }
 
 export function useMhicOrdersLoaderData() {
-	return useRouteLoaderData('mhic-orders') as MhicOrdersLoaderData;
+	return useRouteLoaderData('mhic-patient-orders') as MhicOrdersLoaderData;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
