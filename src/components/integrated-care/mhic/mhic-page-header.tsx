@@ -9,7 +9,7 @@ interface MhicPageHeaderProps {
 export const MhicPageHeader = ({ title, description, className, children }: PropsWithChildren<MhicPageHeaderProps>) => {
 	return (
 		<div className={className}>
-			<div className="d-flex align-items-center justify-content-between">
+			<div className="mb-1 d-flex align-items-center justify-content-between">
 				<h3 className="mb-0">{title}</h3>
 				{children}
 			</div>
