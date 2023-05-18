@@ -54,7 +54,7 @@ export const Component = () => {
 	useEffect(() => {
 		const itemsWithoutCounts = [
 			{
-				title: 'Today',
+				title: 'To Do',
 				icon: () => <DashboardIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic');
@@ -62,7 +62,7 @@ export const Component = () => {
 				isActive: isTodayActive,
 			},
 			{
-				title: 'My Patients',
+				title: 'My Patient Orders',
 				icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);
@@ -77,7 +77,7 @@ export const Component = () => {
 				setNavigationItems([
 					...itemsWithoutCounts,
 					{
-						title: 'My Patient Views',
+						title: 'Order Views',
 						navigationItems: [
 							{
 								title: 'Need Assessment',

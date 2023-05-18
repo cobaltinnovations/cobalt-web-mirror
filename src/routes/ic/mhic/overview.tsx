@@ -1,46 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { defer, useNavigate, useRouteLoaderData } from 'react-router-dom';
+import { defer, useRouteLoaderData } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
-import classNames from 'classnames';
 
 import { MhicPanelTodayResponse, PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import TabBar from '@/components/tab-bar';
-import {
-	MhicInlineAlert,
-	MhicPageHeader,
-	MhicPatientOrderTable,
-	MhicShelfOutlet,
-} from '@/components/integrated-care/mhic';
-import { createUseThemedStyles } from '@/jss/theme';
-
-import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone-2.svg';
-import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
-
-const useStyles = createUseThemedStyles((theme) => ({
-	overviewCard: {
-		padding: 16,
-		display: 'flex',
-		borderRadius: 8,
-		boxShadow: theme.elevation.e200,
-		backgroundColor: theme.colors.n0,
-	},
-	iconOuter: {
-		width: 48,
-		flexShrink: 0,
-		marginRight: 16,
-	},
-	icon: {
-		width: 48,
-		height: 48,
-		display: 'flex',
-		borderRadius: 4,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-}));
+import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 
 enum TAB_KEYS {
 	NEW_PATIENTS = 'NEW_PATIENTS',
@@ -48,6 +13,7 @@ enum TAB_KEYS {
 	FOLLOW_UPS = 'FOLLOW_UPS',
 	ASSESSMENTS = 'ASSESSMENTS',
 	RESOURCES = 'RESOURCES',
+	SAFETY_PLANNING = 'SAFETY_PLANNING',
 }
 
 interface MhicOverviewLoaderData {
@@ -57,6 +23,7 @@ interface MhicOverviewLoaderData {
 	followupResults: Promise<PatientOrdersListResponse['findResult']>;
 	assessmentResults: Promise<PatientOrdersListResponse['findResult']>;
 	resourcesResults: Promise<PatientOrdersListResponse['findResult']>;
+	safetyPlanningResults: Promise<PatientOrdersListResponse['findResult']>;
 }
 
 export function useMhicOverviewLoaderData() {
@@ -102,6 +69,13 @@ export async function loader() {
 				totalCountDescription: res.needResourcesPatientOrders.length.toString(),
 			};
 		}),
+		safetyPlanningResults: overviewResponsePromise.then((res) => {
+			return {
+				patientOrders: res.safetyPlanningPatientOrders,
+				totalCount: res.safetyPlanningPatientOrders.length,
+				totalCountDescription: res.safetyPlanningPatientOrders.length.toString(),
+			};
+		}),
 	});
 }
 
@@ -111,12 +85,11 @@ const INITIAL_COUNTS = {
 	[TAB_KEYS.NEW_PATIENTS]: 0,
 	[TAB_KEYS.RESOURCES]: 0,
 	[TAB_KEYS.VOICEMAILS]: 0,
+	[TAB_KEYS.SAFETY_PLANNING]: 0,
 };
 
 export const Component = () => {
-	const classes = useStyles();
 	const { account } = useAccount();
-	const navigate = useNavigate();
 	const {
 		overviewResponsePromise,
 		newPatientResults,
@@ -124,29 +97,27 @@ export const Component = () => {
 		followupResults,
 		assessmentResults,
 		resourcesResults,
+		safetyPlanningResults,
 	} = useMhicOverviewLoaderData();
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
 
-	const [safetyPlanningOrderCount, setSafetyPlanningOrderCount] = useState(0);
 	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({ ...INITIAL_COUNTS });
 
 	useEffect(() => {
 		// TODO: Perhaps better moving resolution behind <Await />
 		overviewResponsePromise
 			.then((res) => {
-				setSafetyPlanningOrderCount(res.safetyPlanningPatientOrders.length);
-
 				setCountsByStatus({
 					[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
 					[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
 					[TAB_KEYS.NEW_PATIENTS]: res.newPatientPatientOrders.length,
 					[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
 					[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
+					[TAB_KEYS.SAFETY_PLANNING]: res.safetyPlanningPatientOrders.length,
 				});
 			})
 			.catch((e) => {
-				setSafetyPlanningOrderCount(0);
 				setCountsByStatus({ ...INITIAL_COUNTS });
 			});
 	}, [overviewResponsePromise]);
@@ -154,102 +125,30 @@ export const Component = () => {
 	return (
 		<>
 			<Container fluid className="py-8 overflow-visible">
-				<Row className="mb-8">
+				<Row className="mb-6">
 					<Col>
-						<MhicPageHeader title={`Welcome, ${account?.firstName ?? 'MHIC'}`} />
+						<MhicPageHeader
+							title={`Welcome back, ${account?.firstName ?? 'MHIC'}`}
+							description="Your priorities for today"
+						/>
 					</Col>
 				</Row>
-				{safetyPlanningOrderCount > 0 && (
-					<Row className="mb-9">
-						<Col>
-							<MhicInlineAlert
-								variant="danger"
-								title={`${safetyPlanningOrderCount} order${
-									safetyPlanningOrderCount === 1 ? '' : 's'
-								} require${safetyPlanningOrderCount === 1 ? 's' : ''} safety planning`}
-								description={`Please review ${
-									safetyPlanningOrderCount === 1 ? 'this order' : 'these orders'
-								} first`}
-								action={{
-									title: 'View Safety Planning',
-									onClick: () => {
-										navigate('/ic/mhic/my-patients/safety-planning');
-									},
-								}}
-							/>
-						</Col>
-					</Row>
-				)}
-				<Row className="mb-10">
+				<Row>
 					<Col>
-						<div className={classes.overviewCard}>
-							<div className={classes.iconOuter}>
-								<div className={classNames(classes.icon, 'bg-a50')}>
-									<ClipboardIcon className="text-secondary" width={24} height={24} />
-								</div>
-							</div>
-							<div>
-								<p className="mb-0">New Patients</p>
-								<h4 className="mb-0">{countsByStatus.NEW_PATIENTS}</h4>
-							</div>
-						</div>
-					</Col>
-					<Col>
-						<div className={classes.overviewCard}>
-							<div className={classes.iconOuter}>
-								<div className={classNames(classes.icon, 'bg-w50')}>
-									<TherapyIcon className="text-warning" width={24} height={24} />
-								</div>
-							</div>
-							<div>
-								<p className="mb-0">Voicemail Tasks</p>
-								<h4 className="mb-0">{countsByStatus.VOICEMAILS}</h4>
-							</div>
-						</div>
-					</Col>
-					<Col>
-						<div className={classes.overviewCard}>
-							<div className={classes.iconOuter}>
-								<div className={classNames(classes.icon, 'bg-p50')}>
-									<PhoneIcon className="text-primary" width={24} height={24} />
-								</div>
-							</div>
-							<div>
-								<p className="mb-0">Follow Ups</p>
-								<h4 className="mb-0">{countsByStatus.FOLLOW_UPS}</h4>
-							</div>
-						</div>
-					</Col>
-					<Col>
-						<div className={classes.overviewCard}>
-							<div className={classes.iconOuter}>
-								<div className={classNames(classes.icon, 'bg-s50')}>
-									<EventIcon className="text-success" width={24} height={24} />
-								</div>
-							</div>
-							<div>
-								<p className="mb-0">Scheduled Assessments</p>
-								<h4 className="mb-0">{countsByStatus.ASSESSMENTS}</h4>
-							</div>
-						</div>
-					</Col>
-				</Row>
-				<Row className="mb-5">
-					<Col>
-						<h4 className="mb-2">My Prioirities</h4>
-						<Tab.Container id="shelf-tabs" defaultActiveKey={TAB_KEYS.NEW_PATIENTS} activeKey={tabKey}>
+						<Tab.Container id="overview-tabs" defaultActiveKey={TAB_KEYS.NEW_PATIENTS} activeKey={tabKey}>
+							<hr />
 							<TabBar
 								key="mhic-orders-overview-tabbar"
-								className="mb-5"
+								className="mb-8"
 								value={tabKey}
 								tabs={[
 									{
 										value: TAB_KEYS.NEW_PATIENTS,
-										title: `New Review Patients (${countsByStatus.NEW_PATIENTS})`,
+										title: `Outreach Review (${countsByStatus.NEW_PATIENTS})`,
 									},
 									{
 										value: TAB_KEYS.VOICEMAILS,
-										title: `Voicemails (${countsByStatus.VOICEMAILS})`,
+										title: `Voicemail (${countsByStatus.VOICEMAILS})`,
 									},
 									{
 										value: TAB_KEYS.FOLLOW_UPS,
@@ -257,11 +156,15 @@ export const Component = () => {
 									},
 									{
 										value: TAB_KEYS.ASSESSMENTS,
-										title: `Assessments (${countsByStatus.ASSESSMENTS})`,
+										title: `Assessment (${countsByStatus.ASSESSMENTS})`,
 									},
 									{
 										value: TAB_KEYS.RESOURCES,
 										title: `Resources (${countsByStatus.RESOURCES})`,
+									},
+									{
+										value: TAB_KEYS.SAFETY_PLANNING,
+										title: `Safety Planning (${countsByStatus.SAFETY_PLANNING})`,
 									},
 								]}
 								onTabClick={(value) => {
@@ -360,6 +263,26 @@ export const Component = () => {
 										columnConfig={{
 											flag: true,
 											patient: true,
+											assessmentCompleted: true,
+											triage: true,
+											episode: true,
+										}}
+									/>
+								</Tab.Pane>
+								<Tab.Pane eventKey={TAB_KEYS.SAFETY_PLANNING}>
+									<MhicPatientOrderTable
+										patientOrderFindResultPromise={safetyPlanningResults}
+										selectAll={false}
+										pageNumber={0}
+										pageSize={1000}
+										showPagination={false}
+										onPaginationClick={() => {
+											return;
+										}}
+										columnConfig={{
+											flag: true,
+											patient: true,
+											referralReason: true,
 											assessmentCompleted: true,
 											triage: true,
 											episode: true,
