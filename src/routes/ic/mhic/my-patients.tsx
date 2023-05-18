@@ -1,82 +1,159 @@
+import Cookies from 'js-cookie';
 import React, { useCallback, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, redirect, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Col, Container, Row } from 'react-bootstrap';
 
+import { PatientOrderViewTypeId } from '@/lib/models';
+import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import {
 	MhicCustomizeTableModal,
-	MhicFilterDropdown,
 	MhicPageHeader,
 	MhicPatientOrderTable,
 	MhicSortDropdown,
 	MhicShelfOutlet,
 	parseMhicFilterQueryParamsFromURL,
+	MhicPatientOrderTableColumnConfig,
 } from '@/components/integrated-care/mhic';
-
-import {
-	PatientOrderConsentStatusId,
-	PatientOrderDispositionId,
-	PatientOrderSafetyPlanningStatusId,
-	PatientOrderTriageStatusId,
-} from '@/lib/models';
-import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
-import Cookies from 'js-cookie';
-import { AwaitedString } from '@/components/awaited-string';
 
 export enum MhicMyPatientView {
 	All = 'all',
-	WaitingForConsent = 'waiting-for-consent',
 	NeedAssessment = 'need-assessment',
-	SafetyPlanning = 'safety-planning',
+	Scheduled = 'scheduled',
+	Subclinical = 'subclinical',
 	MHP = 'mhp',
 	SpecialtyCare = 'specialty-care',
 	Closed = 'closed',
 }
 
-const viewConfig = {
+type ViewConfig = Record<
+	MhicMyPatientView,
+	{
+		pageTitle: string;
+		pageDescription: string;
+		apiParameters: Record<string, string | string[]>;
+		columnConfig: MhicPatientOrderTableColumnConfig;
+	}
+>;
+
+const viewConfig: ViewConfig = {
 	[MhicMyPatientView.All]: {
 		pageTitle: 'All Assigned',
+		pageDescription: '',
 		apiParameters: {},
-	},
-	[MhicMyPatientView.WaitingForConsent]: {
-		pageTitle: 'Waiting for Consent',
-		apiParameters: {
-			patientOrderConsentStatusId: PatientOrderConsentStatusId.UNKNOWN,
+		columnConfig: {
+			patient: true,
+			flag: true,
+			referralDate: true,
+			practice: true,
+			referralReason: true,
+			insurance: true,
+			episode: true,
 		},
 	},
 	[MhicMyPatientView.NeedAssessment]: {
 		pageTitle: 'Need Assessment',
+		pageDescription: 'Patients that have not started or been scheduled for an assessment',
 		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+			patientOrderViewTypeId: PatientOrderViewTypeId.NEED_ASSESSMENT,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			referralDate: true,
+			practice: true,
+			insurance: true,
+			outreachNumber: true,
+			lastOutreach: true,
+			consent: true,
+			episode: true,
 		},
 	},
-	[MhicMyPatientView.SafetyPlanning]: {
-		pageTitle: 'Safety Planning',
+	[MhicMyPatientView.Scheduled]: {
+		pageTitle: 'Scheduled',
+		pageDescription: 'Patients scheduled to take the assessment by phone',
 		apiParameters: {
-			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+			patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			referralDate: true,
+			practice: true,
+			referralReason: true,
+			assessmentScheduled: true,
+			episode: true,
+		},
+	},
+	[MhicMyPatientView.Subclinical]: {
+		pageTitle: 'Subclinical',
+		pageDescription: 'Patients triaged to subclinical',
+		apiParameters: {
+			patientOrderViewTypeId: PatientOrderViewTypeId.SUBCLINICAL,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			assessmentCompleted: true,
+			resources: true,
+			checkInScheduled: true,
+			checkInResponse: true,
+			episode: true,
 		},
 	},
 	[MhicMyPatientView.MHP]: {
 		pageTitle: 'MHP',
+		pageDescription: 'Patients triaged to MHP',
 		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.MHP,
+			patientOrderViewTypeId: PatientOrderViewTypeId.MHP,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			assessmentCompleted: true,
+			//appointmentScheduled: true,
+			//appointmentProvider: true,
+			checkInResponse: true,
+			episode: true,
 		},
 	},
 	[MhicMyPatientView.SpecialtyCare]: {
 		pageTitle: 'Specialty Care',
+		pageDescription: 'Patients triaged to specialty care',
 		apiParameters: {
-			patientOrderTriageStatusId: PatientOrderTriageStatusId.SPECIALTY_CARE,
+			patientOrderViewTypeId: PatientOrderViewTypeId.SPECIALTY_CARE,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			assessmentCompleted: true,
+			resources: true,
+			checkInScheduled: true,
+			checkInResponse: true,
+			episode: true,
 		},
 	},
 	[MhicMyPatientView.Closed]: {
 		pageTitle: 'Closed',
+		pageDescription: 'Orders that have been closed. Order closed for more than 30 days will be archived.',
 		apiParameters: {
-			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
+			patientOrderViewTypeId: PatientOrderViewTypeId.CLOSED,
+		},
+		columnConfig: {
+			patient: true,
+			flag: true,
+			assessmentCompleted: true,
+			resources: true,
+			checkInScheduled: true,
+			checkInResponse: true,
+			episode: true,
 		},
 	},
 };
 
 interface MhicMyPatientsLoaderData {
 	pageTitle: string;
+	pageDescription: string;
+	columnConfig: MhicPatientOrderTableColumnConfig;
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
 }
 
@@ -94,7 +171,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const accountId = Cookies.get('accountId');
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromURL(url);
-	const { pageTitle, apiParameters } = viewConfig[params.mhicView as MhicMyPatientView];
+	const { pageTitle, pageDescription, columnConfig, apiParameters } =
+		viewConfig[params.mhicView as MhicMyPatientView];
 
 	const responsePromise = integratedCareService
 		.getPatientOrders({
@@ -108,12 +186,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	return defer({
 		pageTitle,
+		pageDescription,
+		columnConfig,
 		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
 	});
 }
 
 export const Component = () => {
-	const { pageTitle, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
+	const { pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
@@ -141,36 +221,14 @@ export const Component = () => {
 			<Container fluid className="py-8">
 				<Row className="mb-8">
 					<Col>
-						<MhicPageHeader
-							title={pageTitle}
-							description={
-								<AwaitedString
-									resolve={patientOrdersListPromise.then((result) => {
-										return `${result.totalCountDescription} Patient${
-											result.totalCount === 1 ? '' : 's'
-										}`;
-									})}
-								/>
-							}
-						>
-							<div className="d-flex align-items-center">
-								<MhicFilterDropdown align="end" className="me-2" />
-								<MhicSortDropdown
-									align="end"
-									className="me-2"
-									onApply={(selectedFilters) => {
-										console.log(selectedFilters);
-									}}
-								/>
-								{/* <Button
-									variant="light"
-									onClick={() => {
-										setShowCustomizeTableModal(true);
-									}}
-								>
-									Customize
-								</Button> */}
-							</div>
+						<MhicPageHeader title={pageTitle} description={pageDescription}>
+							<MhicSortDropdown
+								align="end"
+								onApply={(selectedFilters) => {
+									window.alert('TODO: Apply sort');
+									console.log(selectedFilters);
+								}}
+							/>
 						</MhicPageHeader>
 					</Col>
 				</Row>
@@ -179,20 +237,10 @@ export const Component = () => {
 						<MhicPatientOrderTable
 							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
-							onSelectPatientOrderIdsChange={() => {
-								return;
-							}}
 							pageNumber={parseInt(pageNumber, 10)}
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}
-							columnConfig={{
-								flag: true,
-								patient: true,
-								referralDate: true,
-								practice: true,
-								referralReason: true,
-								assessmentStatus: true,
-							}}
+							columnConfig={columnConfig}
 						/>
 					</Col>
 				</Row>

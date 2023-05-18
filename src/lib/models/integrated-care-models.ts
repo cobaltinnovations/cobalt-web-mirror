@@ -169,6 +169,15 @@ export interface PatientOrderModel {
 	providerName?: string;
 }
 
+export enum PatientOrderViewTypeId {
+	NEED_ASSESSMENT = 'NEED_ASSESSMENT',
+	SCHEDULED = 'SCHEDULED',
+	SUBCLINICAL = 'SUBCLINICAL',
+	MHP = 'MHP',
+	SPECIALTY_CARE = 'SPECIALTY_CARE',
+	CLOSED = 'CLOSED',
+}
+
 export enum PatientOrderCareTypeId {
 	UNSPECIFIED = 'UNSPECIFIED',
 	SUBCLINICAL = 'SUBCLINICAL',
