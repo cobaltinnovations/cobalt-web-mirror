@@ -5,6 +5,7 @@ import { Badge, Col, Container, Form, Row } from 'react-bootstrap';
 
 import {
 	PatientOrderCareTypeId,
+	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
@@ -61,6 +62,7 @@ export type MhicPatientOrderTableColumnConfig = {
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
 	lastOutreach?: boolean;
+	consent?: boolean;
 	assessmentScheduled?: boolean;
 	assessmentCompleted?: boolean;
 	triage?: boolean;
@@ -241,10 +243,11 @@ export const MhicPatientOrderTable = ({
 								</TableCell>
 							)}
 							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
+							{columnConfig.consent && <TableCell header>Consent</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
 							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.triage && <TableCell header>Triage</TableCell>}
-							{columnConfig.resources && <TableCell header>Resources?</TableCell>}
+							{columnConfig.resources && <TableCell header>Resources</TableCell>}
 							{columnConfig.checkInScheduled && <TableCell header>Check-In Scheduled</TableCell>}
 							{columnConfig.checkInResponse && <TableCell header>Check-In Response</TableCell>}
 							{columnConfig.episode && (
@@ -468,21 +471,34 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.lastOutreach && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
-														{po.mostRecentTotalOutreachDateTimeDescription}
+														{po.mostRecentTotalOutreachDateTimeDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.consent && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														{po.patientOrderConsentStatusId ===
+															PatientOrderConsentStatusId.UNKNOWN && '-'}
+														{po.patientOrderConsentStatusId ===
+															PatientOrderConsentStatusId.CONSENTED && 'Yes'}
+														{po.patientOrderConsentStatusId ===
+															PatientOrderConsentStatusId.REJECTED && 'No'}
 													</span>
 												</TableCell>
 											)}
 											{columnConfig.assessmentScheduled && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
-														{po.patientOrderScheduledScreeningScheduledDateTimeDescription}
+														{po.patientOrderScheduledScreeningScheduledDateTimeDescription ??
+															'-'}
 													</span>
 												</TableCell>
 											)}
 											{columnConfig.assessmentCompleted && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
-														{po.mostRecentScreeningSessionCompletedAtDescription}
+														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
 													</span>
 												</TableCell>
 											)}
@@ -519,16 +535,12 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.checkInScheduled && (
 												<TableCell width={180}>
-													<span className="text-nowrap text-truncate">
-														[TODO]: Jan 30, 2023
-													</span>
+													<span className="text-nowrap text-truncate">[TODO]</span>
 												</TableCell>
 											)}
 											{columnConfig.checkInResponse && (
 												<TableCell width={172}>
-													<span className="text-nowrap text-truncate">
-														[TODO]: No Response
-													</span>
+													<span className="text-nowrap text-truncate">[TODO]</span>
 												</TableCell>
 											)}
 											{columnConfig.episode && (
