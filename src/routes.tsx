@@ -651,9 +651,9 @@ export const routes: RouteObject[] = [
 										children: [mhicShelfRouteObject],
 									},
 									{
-										id: 'mhic-orders',
-										path: 'orders',
-										lazy: () => import('@/routes/ic/mhic/orders'),
+										id: 'mhic-patient-orders',
+										path: 'patient-orders',
+										lazy: () => import('@/routes/ic/mhic/patient-orders'),
 										children: [mhicShelfRouteObject],
 									},
 									{

@@ -123,8 +123,8 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const myPatientsMatch = useMatch({
 		path: '/ic/mhic/my-patients/*',
 	});
-	const ordersMatch = useMatch({
-		path: '/ic/mhic/orders/*',
+	const patientOrdersMatch = useMatch({
+		path: '/ic/mhic/patient-orders/*',
 	});
 	const reportsMatch = useMatch({
 		path: '/ic/mhic/reports',
@@ -148,10 +148,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			},
 			{
 				testId: '',
-				navigationItemId: 'ORDERS',
-				to: '/ic/mhic/orders',
-				title: 'Orders',
-				active: ordersMatch,
+				navigationItemId: 'PATIENT_ORDERS',
+				to: '/ic/mhic/patient-orders',
+				title: 'Patient Orders',
+				active: patientOrdersMatch,
 			},
 			{
 				testId: '',
@@ -161,7 +161,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				active: !!reportsMatch,
 			},
 		],
-		[myPatientsMatch, ordersMatch, overviewMatch, reportsMatch]
+		[myPatientsMatch, patientOrdersMatch, overviewMatch, reportsMatch]
 	);
 
 	return (
