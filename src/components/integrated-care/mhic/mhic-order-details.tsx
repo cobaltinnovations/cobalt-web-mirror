@@ -475,7 +475,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
-									<Card.Title>Patient</Card.Title>
+									<Card.Title>Primary Contact</Card.Title>
 									<div className="button-container">
 										<Button
 											variant="light"
@@ -569,30 +569,47 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row className="mb-4">
 											<Col>
-												<p className="m-0">{patientOrder.patientDisplayName}</p>
-											</Col>
-										</Row>
-										<Row className="mb-4">
-											<Col>
 												<p className="m-0 text-gray">Date of birth</p>
 											</Col>
 											<Col>
 												<p className="m-0">{patientOrder.patientBirthdateDescription}</p>
 											</Col>
 										</Row>
-										<Row>
+										<Row className="mb-4">
 											<Col>
-												<p className="m-0 text-gray">Pref. Language</p>
+												<p className="m-0 text-gray">Age</p>
 											</Col>
 											<Col>
-												<p className="m-0">
-													{
-														referenceDataResponse.languages.find(
-															(language) =>
-																language.languageCode ===
-																patientOrder.patientLanguageCode
-														)?.description
-													}
+												<p className="m-0 text danger">
+													{patientOrder.patientAgeOnOrderDateDescription}
+												</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col>
+												<p className="m-0 text-gray">City</p>
+											</Col>
+											<Col>
+												<p className="m-0 text danger">
+													{patientOrder.patientAddress?.locality}
+												</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col>
+												<p className="m-0 text-gray">State</p>
+											</Col>
+											<Col>
+												<p className="m-0 text danger">{patientOrder.patientAddress?.region}</p>
+											</Col>
+										</Row>
+										<Row>
+											<Col>
+												<p className="m-0 text-gray">State</p>
+											</Col>
+											<Col>
+												<p className="m-0 text danger">
+													{patientOrder.patientAddress?.postalCode}
 												</p>
 											</Col>
 										</Row>
@@ -624,6 +641,22 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row className="mb-4">
 											<Col>
+												<p className="m-0 text-gray">Pref. Language</p>
+											</Col>
+											<Col>
+												<p className="m-0">
+													{
+														referenceDataResponse.languages.find(
+															(language) =>
+																language.languageCode ===
+																patientOrder.patientLanguageCode
+														)?.description
+													}
+												</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col>
 												<p className="m-0 text-gray">Race</p>
 											</Col>
 											<Col>
@@ -643,6 +676,19 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													{referenceDataResponse.ethnicities.find(
 														(ethnicity) =>
 															ethnicity.ethnicityId === patientOrder.patientEthnicityId
+													)?.description ?? 'Not Specified'}
+												</p>
+											</Col>
+										</Row>
+										<Row className="mb-4">
+											<Col>
+												<p className="m-0 text-gray">Birth Sex</p>
+											</Col>
+											<Col>
+												<p className="m-0">
+													{referenceDataResponse.birthSexes.find(
+														(birthSex) =>
+															birthSex.birthSexId === patientOrder.patientBirthSexId
 													)?.description ?? 'Not Specified'}
 												</p>
 											</Col>
@@ -670,28 +716,19 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
-									<Card.Title>Address</Card.Title>
+									<Card.Title>Insurance</Card.Title>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
-										<Row>
+										<Row className="mb-4">
 											<Col>
-												<p className="m-0">{patientOrder.patientAddress?.streetAddress1}</p>
+												<p className="m-0">{patientOrder.patientOrderInsurancePayorName}</p>
 											</Col>
 										</Row>
-										{patientOrder.patientAddress?.streetAddress2 && (
-											<Row>
-												<Col>
-													<p className="m-0">{patientOrder.patientAddress.streetAddress2}</p>
-												</Col>
-											</Row>
-										)}
 										<Row>
 											<Col>
 												<p className="m-0">
-													{patientOrder.patientAddress?.locality},{' '}
-													{patientOrder.patientAddress?.region}{' '}
-													{patientOrder.patientAddress?.postalCode}{' '}
+													Plan: {patientOrder.patientOrderInsurancePlanName}
 												</p>
 											</Col>
 										</Row>
@@ -702,35 +739,24 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
-									<Card.Title>Insurance</Card.Title>
-									{/* <div className="button-container">
-										<Button
-											variant="light"
-											className="p-2"
-											onClick={() => {
-												setShowInsuranceModal(true);
-											}}
-											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
-											}
-										>
-											<EditIcon className="d-flex" />
-										</Button>
-									</div> */}
+									<Card.Title>Care Preferences</Card.Title>
 								</Card.Header>
 								<Card.Body>
 									<Container fluid>
-										<Row>
+										<Row className="mb-4">
 											<Col>
-												<p className="m-0">{patientOrder.patientOrderInsurancePayorName}</p>
+												<p className="m-0 text-gray">Appointment Type</p>
+											</Col>
+											<Col>
+												<p className="m-0 text-danger">[TODO]</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">
-													Plan: {patientOrder.patientOrderInsurancePlanName}
-												</p>
+												<p className="m-0 text-gray">Travel Radius</p>
+											</Col>
+											<Col>
+												<p className="m-0 text-danger">[TODO]</p>
 											</Col>
 										</Row>
 									</Container>

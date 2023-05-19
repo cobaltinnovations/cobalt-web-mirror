@@ -167,6 +167,9 @@ export interface PatientOrderModel {
 	appointmentStartTimeDescription?: string;
 	providerId?: string;
 	providerName?: string;
+
+	patientAgeOnOrderDate: number;
+	patientAgeOnOrderDateDescription: string;
 }
 
 export enum PatientOrderViewTypeId {

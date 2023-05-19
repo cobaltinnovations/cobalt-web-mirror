@@ -128,11 +128,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.patientBelowAgeThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
-										variant="warning"
-										title="Order Flagged"
-										description="Patient under 18"
-									/>
+									<MhicInlineAlert variant="warning" title="Patient under 18" />
 								</Col>
 							</Row>
 						)}
