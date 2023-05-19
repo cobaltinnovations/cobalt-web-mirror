@@ -82,8 +82,8 @@ export const Component = () => {
 							{
 								title: 'Need Assessment',
 								description:
-									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
-										.NEEDS_ASSESSMENT.patientOrderCountDescription ?? '0',
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
+										.NEED_ASSESSMENT.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-n300" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
@@ -93,8 +93,8 @@ export const Component = () => {
 							{
 								title: 'Scheduled',
 								description:
-									patientOrderPanelCountsResponse.screeningScheduledPatientOrderCountDescription ??
-									'0',
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
+										.SCHEDULED.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-secondary" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.Scheduled);
@@ -104,7 +104,7 @@ export const Component = () => {
 							{
 								title: 'Subclinical',
 								description:
-									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SUBCLINICAL.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-p100" />,
 								onClick: () => {
@@ -115,7 +115,7 @@ export const Component = () => {
 							{
 								title: 'MHP',
 								description:
-									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId.MHP
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId.MHP
 										.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-p300" />,
 								onClick: () => {
@@ -126,7 +126,7 @@ export const Component = () => {
 							{
 								title: 'Specialty Care',
 								description:
-									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderTriageStatusId
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-primary" />,
 								onClick: () => {
@@ -136,7 +136,9 @@ export const Component = () => {
 							},
 							{
 								title: 'Closed',
-								description: patientOrderPanelCountsResponse.closedPatientOrderCountDescription ?? '0',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId.CLOSED
+										.patientOrderCountDescription ?? '0',
 								icon: () => <DotIcon width={24} height={24} className="text-gray" />,
 								onClick: () => {
 									navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
