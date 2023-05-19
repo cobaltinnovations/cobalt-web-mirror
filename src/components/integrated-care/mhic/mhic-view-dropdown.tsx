@@ -62,9 +62,9 @@ const dropdownMenuSections: DropdownSection[] = [
 			},
 			{
 				dropdownItemId: uuidv4(),
-				title: 'Need Assessment',
+				title: 'Not Triaged',
 				apiParameters: {
-					patientOrderTriageStatusId: PatientOrderTriageStatusId.NEEDS_ASSESSMENT,
+					patientOrderTriageStatusId: PatientOrderTriageStatusId.NOT_TRIAGED,
 				},
 			},
 		],
