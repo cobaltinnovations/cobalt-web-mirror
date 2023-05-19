@@ -18,6 +18,7 @@ import {
 	MhicSortDropdown,
 	mhicFilterAssignmentGetParsedQueryParams,
 	mhicFilterPracticeGetParsedQueryParams,
+	mhicSortDropdownGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -45,6 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
 	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
 	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(url);
+	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -55,6 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				...mhicFilterFlagParsedQueryParams,
 				...mhicFilterPracticeParsedQueryParams,
 				...mhicFilterAssignmentParsedQueryParams,
+				...mhicSortDropdownParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),
@@ -223,13 +226,7 @@ export const Component = () => {
 								<MhicFilterDropdown align="start" />
 							</div>
 							<div>
-								<MhicSortDropdown
-									className="me-2"
-									align="end"
-									onApply={(selectedFilters) => {
-										console.log(selectedFilters);
-									}}
-								/>
+								<MhicSortDropdown className="me-2" align="end" />
 							</div>
 						</div>
 					</Col>
