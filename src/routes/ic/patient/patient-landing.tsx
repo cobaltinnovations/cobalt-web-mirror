@@ -178,7 +178,7 @@ const PatientLanding = () => {
 							<MhicInlineAlert
 								variant="warning"
 								title="Service not available"
-								description="Your insurance plan, state, or residence may not be eligible for PIC services. Please call us at 215-615-4222 for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care."
+								description={`Your insurance plan or state of residence may not be eligible for ${institution.name} services. Please call us at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`}
 							/>
 						)}
 
