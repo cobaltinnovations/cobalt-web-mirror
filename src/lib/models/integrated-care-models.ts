@@ -199,7 +199,7 @@ export enum PatientOrderClosureReasonId {
 }
 
 export enum PatientOrderTriageStatusId {
-	NEEDS_ASSESSMENT = 'NEEDS_ASSESSMENT',
+	NOT_TRIAGED = 'NOT_TRIAGED',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	MHP = 'MHP',
