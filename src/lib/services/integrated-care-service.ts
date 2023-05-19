@@ -7,7 +7,6 @@ import {
 	PatientOrderClosureReasonModel,
 	PatientOrderConsentStatusId,
 	PatientOrderCountModel,
-	PatientOrderCountsByPatientOrderTriageStatusId,
 	PatientOrderFilterFlagTypeId,
 	PatientOrderModel,
 	PatientOrderNoteModel,
@@ -20,6 +19,7 @@ import {
 	PatientOrderScheduledScreening,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
+	PatientOrderViewTypeId,
 	ReferenceDataResponse,
 } from '@/lib/models';
 
@@ -45,15 +45,13 @@ export interface PatientOrdersListResponse {
 }
 
 export interface PatientOrderPanelCountsResponse {
-	patientOrderCountsByPatientOrderTriageStatusId: PatientOrderCountsByPatientOrderTriageStatusId;
-	safetyPlanningPatientOrderCount: number;
-	safetyPlanningPatientOrderCountDescription: string;
-	closedPatientOrderCount: number;
-	closedPatientOrderCountDescription: string;
-	waitingForConsentPatientOrderCount: number;
-	waitingForConsentPatientOrderCountDescription: string;
-	screeningScheduledPatientOrderCount: number;
-	screeningScheduledPatientOrderCountDescription: string;
+	patientOrderCountsByPatientOrderViewTypeId: Record<
+		PatientOrderViewTypeId,
+		{
+			patientOrderCount: number;
+			patientOrderCountDescription: string;
+		}
+	>;
 }
 
 export interface PatientOrderResponse {
