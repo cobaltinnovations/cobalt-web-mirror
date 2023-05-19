@@ -19,11 +19,8 @@ import {
 	PatientOrderScheduledMessageGroup,
 	PatientOrderScheduledScreening,
 	PatientOrderScreeningStatusId,
-	PatientOrderSortColumnId,
 	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
-	SortDirectionId,
-	SortNullsId,
 } from '@/lib/models';
 
 export interface MhicPanelTodayResponse {
@@ -62,7 +59,6 @@ export interface PatientOrderPanelCountsResponse {
 export interface PatientOrderResponse {
 	patientOrder: PatientOrderModel;
 	associatedPatientOrders: PatientOrderModel[];
-	patientAccount?: AccountModel;
 }
 
 export interface PanelAccountsResponse {
