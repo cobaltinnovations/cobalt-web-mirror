@@ -19,8 +19,11 @@ import {
 	PatientOrderScheduledMessageGroup,
 	PatientOrderScheduledScreening,
 	PatientOrderScreeningStatusId,
+	PatientOrderSortColumnId,
 	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
+	SortDirectionId,
+	SortNullsId,
 } from '@/lib/models';
 
 export interface MhicPanelTodayResponse {
@@ -119,6 +122,9 @@ export interface PatientOrderApiQueryParameters {
 	patientOrderResourceCheckInResponseStatusId?:
 		| PatientOrderResourceCheckInResponseStatusId
 		| PatientOrderResourceCheckInResponseStatusId[];
+	patientOrderSortColumnId?: string;
+	sortDirectionId?: string;
+	sortNullsId?: string;
 }
 
 export const integratedCareService = {

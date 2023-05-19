@@ -13,6 +13,7 @@ import {
 	MhicShelfOutlet,
 	parseMhicFilterQueryParamsFromURL,
 	MhicPatientOrderTableColumnConfig,
+	mhicSortDropdownGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
 
 export enum MhicMyPatientView {
@@ -173,6 +174,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const filters = parseMhicFilterQueryParamsFromURL(url);
 	const { pageTitle, pageDescription, columnConfig, apiParameters } =
 		viewConfig[params.mhicView as MhicMyPatientView];
+	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
 
 	const responsePromise = integratedCareService
 		.getPatientOrders({
@@ -181,6 +183,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			...filters,
 			...(pageNumber && { pageNumber }),
 			pageSize: '15',
+			...mhicSortDropdownParsedQueryParams,
 		})
 		.fetch();
 
@@ -222,13 +225,7 @@ export const Component = () => {
 				<Row className="mb-8">
 					<Col>
 						<MhicPageHeader title={pageTitle} description={pageDescription}>
-							<MhicSortDropdown
-								align="end"
-								onApply={(selectedFilters) => {
-									window.alert('TODO: Apply sort');
-									console.log(selectedFilters);
-								}}
-							/>
+							<MhicSortDropdown align="end" />
 						</MhicPageHeader>
 					</Col>
 				</Row>
