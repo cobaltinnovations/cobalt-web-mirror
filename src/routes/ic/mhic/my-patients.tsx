@@ -14,7 +14,16 @@ import {
 	parseMhicFilterQueryParamsFromURL,
 	MhicPatientOrderTableColumnConfig,
 	mhicSortDropdownGetParsedQueryParams,
+	MhicFilterDropdown,
+	MhicFilterFlag,
+	MhicFilterPractice,
+	MhicFilterState,
+	MhicFilterStateGetParsedQueryParams,
+	MhicFilterFlagGetParsedQueryParams,
+	mhicFilterPracticeGetParsedQueryParams,
 } from '@/components/integrated-care/mhic';
+import { useIntegratedCareLoaderData } from '../landing';
+import classNames from 'classnames';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -29,6 +38,7 @@ export enum MhicMyPatientView {
 type ViewConfig = Record<
 	MhicMyPatientView,
 	{
+		viewTypeId?: PatientOrderViewTypeId;
 		pageTitle: string;
 		pageDescription: string;
 		apiParameters: Record<string, string | string[]>;
@@ -38,20 +48,24 @@ type ViewConfig = Record<
 
 const viewConfig: ViewConfig = {
 	[MhicMyPatientView.All]: {
-		pageTitle: 'All Assigned',
+		pageTitle: 'My Patient Orders',
 		pageDescription: '',
 		apiParameters: {},
 		columnConfig: {
-			patient: true,
+			checkbox: true,
 			flag: true,
+			patient: true,
 			referralDate: true,
 			practice: true,
 			referralReason: true,
 			insurance: true,
+			outreachNumber: true,
+			lastOutreach: true,
 			episode: true,
 		},
 	},
 	[MhicMyPatientView.NeedAssessment]: {
+		viewTypeId: PatientOrderViewTypeId.NEED_ASSESSMENT,
 		pageTitle: 'Need Assessment',
 		pageDescription: 'Patients that have not started or been scheduled for an assessment',
 		apiParameters: {
@@ -70,6 +84,7 @@ const viewConfig: ViewConfig = {
 		},
 	},
 	[MhicMyPatientView.Scheduled]: {
+		viewTypeId: PatientOrderViewTypeId.SCHEDULED,
 		pageTitle: 'Scheduled',
 		pageDescription: 'Patients scheduled to take the assessment by phone',
 		apiParameters: {
@@ -86,6 +101,7 @@ const viewConfig: ViewConfig = {
 		},
 	},
 	[MhicMyPatientView.Subclinical]: {
+		viewTypeId: PatientOrderViewTypeId.SUBCLINICAL,
 		pageTitle: 'Subclinical',
 		pageDescription: 'Patients triaged to subclinical',
 		apiParameters: {
@@ -102,6 +118,7 @@ const viewConfig: ViewConfig = {
 		},
 	},
 	[MhicMyPatientView.MHP]: {
+		viewTypeId: PatientOrderViewTypeId.MHP,
 		pageTitle: 'MHP',
 		pageDescription: 'Patients triaged to MHP',
 		apiParameters: {
@@ -111,13 +128,15 @@ const viewConfig: ViewConfig = {
 			patient: true,
 			flag: true,
 			assessmentCompleted: true,
-			//appointmentScheduled: true,
-			//appointmentProvider: true,
+			// TODO
+			// appointmentScheduled: true,
+			// appointmentProvider: true,
 			checkInResponse: true,
 			episode: true,
 		},
 	},
 	[MhicMyPatientView.SpecialtyCare]: {
+		viewTypeId: PatientOrderViewTypeId.SPECIALTY_CARE,
 		pageTitle: 'Specialty Care',
 		pageDescription: 'Patients triaged to specialty care',
 		apiParameters: {
@@ -134,6 +153,7 @@ const viewConfig: ViewConfig = {
 		},
 	},
 	[MhicMyPatientView.Closed]: {
+		viewTypeId: PatientOrderViewTypeId.CLOSED,
 		pageTitle: 'Closed',
 		pageDescription: 'Orders that have been closed. Order closed for more than 30 days will be archived.',
 		apiParameters: {
@@ -152,6 +172,7 @@ const viewConfig: ViewConfig = {
 };
 
 interface MhicMyPatientsLoaderData {
+	viewTypeId?: PatientOrderViewTypeId;
 	pageTitle: string;
 	pageDescription: string;
 	columnConfig: MhicPatientOrderTableColumnConfig;
@@ -163,31 +184,38 @@ export function useMhicMyPatientsLoaderData() {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-	const url = new URL(request.url);
-
 	if (!Object.keys(viewConfig).includes(params.mhicView ?? '')) {
 		return redirect('/ic/mhic/my-patients/all');
 	}
 
+	const url = new URL(request.url);
 	const accountId = Cookies.get('accountId');
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromURL(url);
-	const { pageTitle, pageDescription, columnConfig, apiParameters } =
-		viewConfig[params.mhicView as MhicMyPatientView];
+	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
+	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
+	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
 	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
+
+	const { viewTypeId, pageTitle, pageDescription, columnConfig, apiParameters } =
+		viewConfig[params.mhicView as MhicMyPatientView];
 
 	const responsePromise = integratedCareService
 		.getPatientOrders({
 			...(accountId && { panelAccountId: accountId }),
 			...apiParameters,
 			...filters,
-			...(pageNumber && { pageNumber }),
 			pageSize: '15',
+			...(pageNumber && { pageNumber }),
+			...mhicFilterStateParsedQueryParams,
+			...mhicFilterFlagParsedQueryParams,
+			...mhicFilterPracticeParsedQueryParams,
 			...mhicSortDropdownParsedQueryParams,
 		})
 		.fetch();
 
 	return defer({
+		viewTypeId,
 		pageTitle,
 		pageDescription,
 		columnConfig,
@@ -196,10 +224,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
-	const { pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = useMhicMyPatientsLoaderData();
+	const { viewTypeId, pageTitle, pageDescription, columnConfig, patientOrdersListPromise } =
+		useMhicMyPatientsLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const { referenceDataResponse } = useIntegratedCareLoaderData();
 
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
@@ -222,11 +252,31 @@ export const Component = () => {
 			/>
 
 			<Container fluid className="py-8">
-				<Row className="mb-8">
+				<Row className={classNames({ 'mb-6': !viewTypeId, 'mb-8': viewTypeId })}>
 					<Col>
-						<MhicPageHeader title={pageTitle} description={pageDescription}>
-							<MhicSortDropdown align="end" />
+						<MhicPageHeader
+							className={classNames({ 'mb-6': !viewTypeId })}
+							title={pageTitle}
+							description={pageDescription}
+						>
+							{viewTypeId && <MhicSortDropdown align="end" />}
 						</MhicPageHeader>
+						{!viewTypeId && (
+							<>
+								<hr className="mb-6" />
+								<div className="d-flex justify-content-between align-items-center">
+									<div className="d-flex align-items-center">
+										<MhicFilterState className="me-2" />
+										<MhicFilterFlag className="me-2" />
+										<MhicFilterPractice referenceData={referenceDataResponse} className="me-2" />
+										<MhicFilterDropdown align="start" />
+									</div>
+									<div>
+										<MhicSortDropdown className="me-2" align="end" />
+									</div>
+								</div>
+							</>
+						)}
 					</Col>
 				</Row>
 				<Row>
