@@ -26,6 +26,7 @@ import MhicOrderAssessment from './routes/ic/mhic/order-assessment';
 import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
 import PatientDemographics from './routes/ic/patient/patient-demographics';
+import PatientDemographicsV2 from './routes/ic/patient/patient-demographics-v2';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
 import PatientLanding from './routes/ic/patient/patient-landing';
 import PatientConsent from './routes/ic/patient/patient-consent';
@@ -704,6 +705,10 @@ export const routes: RouteObject[] = [
 									{
 										path: 'demographics',
 										element: <PatientDemographics />,
+									},
+									{
+										path: 'demographics-v2',
+										element: <PatientDemographicsV2 />,
 									},
 									{
 										path: 'demographics-thanks',
