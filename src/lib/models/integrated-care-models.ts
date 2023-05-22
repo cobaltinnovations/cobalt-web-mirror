@@ -170,6 +170,9 @@ export interface PatientOrderModel {
 
 	patientAgeOnOrderDate: number;
 	patientAgeOnOrderDateDescription: string;
+
+	patientOrderCarePreferenceId?: string;
+	inPersonCareRadius?: number;
 }
 
 export enum PatientOrderViewTypeId {
@@ -305,6 +308,12 @@ export enum SortDirectionId {
 export enum SortNullsId {
 	NULLS_FIRST = 'NULLS_FIRST',
 	NULLS_LAST = 'NULLS_LAST',
+}
+
+export enum PatientOrderCarePreferenceId {
+	NO_PREFERENCE = 'NO_PREFERENCE',
+	TELEHEALTH = 'TELEHEALTH',
+	IN_PERSON = 'IN_PERSON',
 }
 
 export interface PatientAddressModel {

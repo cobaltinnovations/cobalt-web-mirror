@@ -1,19 +1,88 @@
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
-import { PatientOrderModel } from '@/lib/models';
+import { PatientOrderCarePreferenceId, PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import { useIntegratedCareLoaderData } from '../landing';
 import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 
+const carePreferences = [
+	{
+		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.NO_PREFERENCE,
+		title: 'No Preference',
+	},
+	{
+		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.TELEHEALTH,
+		title: 'Telehealth',
+	},
+	{
+		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.IN_PERSON,
+		title: 'In-persion',
+	},
+];
+
+const careRadii = [
+	{
+		inPersonCareRadiusId: 'TEN_MILES',
+		inPersonCareRadius: 10,
+		title: '10 miles',
+	},
+	{
+		inPersonCareRadiusId: 'TWENTY_MILES',
+		inPersonCareRadius: 20,
+		title: '20 miles',
+	},
+	{
+		inPersonCareRadiusId: 'THIRTY_MILES',
+		inPersonCareRadius: 30,
+		title: '30 miles',
+	},
+	{
+		inPersonCareRadiusId: 'FORTY_FIVE_MILES',
+		inPersonCareRadius: 45,
+		title: '45 miles',
+	},
+	{
+		inPersonCareRadiusId: 'SIXTY_MILES',
+		inPersonCareRadius: 60,
+		title: '60 miles',
+	},
+];
+
 const PatientDemographicsV2 = () => {
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
+	const [formValues, setFormValues] = useState({
+		patientPhoneNumber: '',
+		patientEmailAddress: '',
+		patientOrderCarePreferenceId: '',
+		inPersonCareRadius: 0,
+		patientLanguageCode: '',
+		patientRaceId: '',
+		patientEthnicityId: '',
+		patientBirthSexId: '',
+		patientGenderIdentityId: '',
+		verified: false,
+	});
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
+
 		setPatientOrder(response.patientOrder);
+		setFormValues({
+			patientPhoneNumber: response.patientOrder.patientPhoneNumberDescription ?? '',
+			patientEmailAddress:
+				response.patientOrder.patientEmailAddress ?? response.patientOrder.patientAccount?.emailAddress ?? '',
+			patientOrderCarePreferenceId: response.patientOrder.patientOrderCarePreferenceId ?? '',
+			inPersonCareRadius: response.patientOrder.inPersonCareRadius ?? 0,
+			patientLanguageCode: response.patientOrder.patientLanguageCode ?? '',
+			patientRaceId: response.patientOrder.patientRaceId ?? '',
+			patientEthnicityId: response.patientOrder.patientEthnicityId ?? '',
+			patientBirthSexId: response.patientOrder.patientBirthSexId ?? '',
+			patientGenderIdentityId: response.patientOrder.patientGenderIdentityId ?? '',
+			verified: false,
+		});
 	}, []);
 
 	return (
@@ -33,8 +102,32 @@ const PatientDemographicsV2 = () => {
 					<Row className="mb-6">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<h4 className="mb-6">Contact Information</h4>
-							<InputHelper className="mb-2" label="Phone Number" type="tel" required />
-							<InputHelper className="mb-6" label="Email Address" type="email" required />
+							<InputHelper
+								className="mb-2"
+								label="Phone Number"
+								type="tel"
+								value={formValues.patientPhoneNumber}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientPhoneNumber: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+							<InputHelper
+								className="mb-6"
+								label="Email Address"
+								type="email"
+								value={formValues.patientEmailAddress}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientEmailAddress: currentTarget.value,
+									}));
+								}}
+								required
+							/>
 							<hr />
 						</Col>
 					</Row>
@@ -45,68 +138,47 @@ const PatientDemographicsV2 = () => {
 								<h5 className="mb-2">
 									How would you prefer to connect with a mental health care provider?
 								</h5>
-								<Form.Check
-									type="radio"
-									name="care-preference"
-									id="care-preference--no-preference"
-									label="No preference"
-									value="NO_PREFERENCE"
-								/>
-								<Form.Check
-									type="radio"
-									name="care-preference"
-									id="care-preference--telehealth"
-									label="Telehealth"
-									value="TELEHEALth"
-								/>
-								<Form.Check
-									type="radio"
-									name="care-preference"
-									id="care-preference--in-person"
-									label="In-person"
-									value="IN_PERSON"
-								/>
+								{carePreferences.map((carePreference) => (
+									<Form.Check
+										type="radio"
+										name="care-preference"
+										id={`care-preference--${carePreference.patientOrderCarePreferenceId}`}
+										label={carePreference.title}
+										value={carePreference.patientOrderCarePreferenceId}
+										checked={
+											formValues.patientOrderCarePreferenceId ===
+											carePreference.patientOrderCarePreferenceId
+										}
+										onChange={({ currentTarget }) => {
+											setFormValues((previousValue) => ({
+												...previousValue,
+												patientOrderCarePreferenceId: currentTarget.value,
+											}));
+										}}
+									/>
+								))}
 							</Form.Group>
 							<Form.Group className="mb-6">
 								<h5 className="mb-2">
 									How far would you be willing to travel from your location (
 									{patientOrder?.patientAddress?.postalCode}) to see an in-person provider?
 								</h5>
-								<Form.Check
-									type="radio"
-									name="travel-preference"
-									id="travel-preference--10-miles"
-									label="10 miles"
-									value="TEN_MILES"
-								/>
-								<Form.Check
-									type="radio"
-									name="travel-preference"
-									id="travel-preference--20-miles"
-									label="20 miles"
-									value="TWENTY_MILES"
-								/>
-								<Form.Check
-									type="radio"
-									name="travel-preference"
-									id="travel-preference--30-miles"
-									label="30 miles"
-									value="THIRTY_MILES"
-								/>
-								<Form.Check
-									type="radio"
-									name="travel-preference"
-									id="travel-preference--45-miles"
-									label="45 miles"
-									value="FORTY_FIVE_MILES"
-								/>
-								<Form.Check
-									type="radio"
-									name="travel-preference"
-									id="travel-preference--60-miles"
-									label="60 miles"
-									value="SIXTY_MILES"
-								/>
+								{careRadii.map((careRadius) => (
+									<Form.Check
+										type="radio"
+										name="care-radius"
+										id={`care-radius--${careRadius.inPersonCareRadiusId}`}
+										label={careRadius.title}
+										value={careRadius.inPersonCareRadius}
+										checked={formValues.inPersonCareRadius === careRadius.inPersonCareRadius}
+										onChange={({ currentTarget }) => {
+											setFormValues((previousValue) => ({
+												...previousValue,
+												inPersonCareRadius: parseInt(currentTarget.value, 10),
+											}));
+										}}
+									/>
+								))}
 							</Form.Group>
 							<hr />
 						</Col>
@@ -117,7 +189,18 @@ const PatientDemographicsV2 = () => {
 							<p className="mb-6">
 								This information is not required but can be helpful for your care team to know.{' '}
 							</p>
-							<InputHelper className="mb-2" label="Preferred Language" as="select">
+							<InputHelper
+								className="mb-2"
+								label="Preferred Language"
+								as="select"
+								value={formValues.patientLanguageCode}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientLanguageCode: currentTarget.value,
+									}));
+								}}
+							>
 								<option value="">Select...</option>
 								{referenceDataResponse.languages.map((language) => {
 									return (
@@ -127,7 +210,18 @@ const PatientDemographicsV2 = () => {
 									);
 								})}
 							</InputHelper>
-							<InputHelper className="mb-2" label="Race" as="select">
+							<InputHelper
+								className="mb-2"
+								label="Race"
+								as="select"
+								value={formValues.patientRaceId}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientRaceId: currentTarget.value,
+									}));
+								}}
+							>
 								<option value="">Select...</option>
 								{referenceDataResponse.races.map((race) => {
 									return (
@@ -137,7 +231,18 @@ const PatientDemographicsV2 = () => {
 									);
 								})}
 							</InputHelper>
-							<InputHelper className="mb-2" label="Ethnicity" as="select">
+							<InputHelper
+								className="mb-2"
+								label="Ethnicity"
+								as="select"
+								value={formValues.patientEthnicityId}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientEthnicityId: currentTarget.value,
+									}));
+								}}
+							>
 								<option value="">Select...</option>
 								{referenceDataResponse.ethnicities.map((ethnicity) => {
 									return (
@@ -147,7 +252,18 @@ const PatientDemographicsV2 = () => {
 									);
 								})}
 							</InputHelper>
-							<InputHelper className="mb-2" label="Birth Sex" as="select">
+							<InputHelper
+								className="mb-2"
+								label="Birth Sex"
+								as="select"
+								value={formValues.patientBirthSexId}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientBirthSexId: currentTarget.value,
+									}));
+								}}
+							>
 								<option value="">Select...</option>
 								{referenceDataResponse.birthSexes.map((birthSex) => {
 									return (
@@ -157,7 +273,18 @@ const PatientDemographicsV2 = () => {
 									);
 								})}
 							</InputHelper>
-							<InputHelper className="mb-6" label="Gender Identity" as="select">
+							<InputHelper
+								className="mb-6"
+								label="Gender Identity"
+								as="select"
+								value={formValues.patientGenderIdentityId}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										patientGenderIdentityId: currentTarget.value,
+									}));
+								}}
+							>
 								<option value="">Select...</option>
 								{referenceDataResponse.genderIdentities.map((genderIdentity) => {
 									return (
@@ -181,6 +308,13 @@ const PatientDemographicsV2 = () => {
 								id="verify--information-correct"
 								label="I verify that all information entered is correct and complete to the best of my knowledge."
 								value="VERIFIED"
+								checked={formValues.verified}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										verified: currentTarget.checked,
+									}));
+								}}
 							/>
 						</Col>
 					</Row>
