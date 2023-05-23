@@ -23,12 +23,12 @@ export const PatientAssessmentComplete = () => {
 
 	return (
 		<Container className="py-20">
-			<Row className="mb-32">
+			<Row className="mb-14">
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-					<h3 className="mb-2">Assessment Complete</h3>
-					<p className="mb-0">
-						We are working on your recommendation. Please wait while we determine what type of care is best
-						for you.
+					<h1 className="mb-6 text-center">Assessment Complete</h1>
+					<p className="mb-0 text-center">
+						Thank you for taking the time to answer those questions. We are working on your recommendation.
+						Please wait while we determine what type of care is best for you.
 					</p>
 				</Col>
 			</Row>
