@@ -70,6 +70,7 @@ const PatientDemographics = () => {
 		verified: false,
 	});
 	const [isSaving, setIsSaving] = useState(false);
+	const [readOnly, setReadOnly] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
@@ -88,6 +89,7 @@ const PatientDemographics = () => {
 			patientGenderIdentityId: response.patientOrder.patientGenderIdentityId ?? '',
 			verified: false,
 		});
+		setReadOnly(response.patientOrder.patientDemographicsCompleted ?? false);
 	}, []);
 
 	const handleFormSubmit = useCallback(
@@ -145,7 +147,8 @@ const PatientDemographics = () => {
 										patientPhoneNumber: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
+								readOnly={readOnly}
 								required
 							/>
 							<InputHelper
@@ -159,7 +162,7 @@ const PatientDemographics = () => {
 										patientEmailAddress: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 								required
 							/>
 							<hr />
@@ -190,34 +193,36 @@ const PatientDemographics = () => {
 												patientOrderCarePreferenceId: currentTarget.value,
 											}));
 										}}
-										disabled={isSaving}
+										disabled={isSaving || readOnly}
 									/>
 								))}
 							</Form.Group>
-							<Form.Group className="mb-6">
-								<h5 className="mb-2">
-									How far would you be willing to travel from your location (
-									{patientOrder?.patientAddress?.postalCode}) to see an in-person provider?
-								</h5>
-								{careRadii.map((careRadius) => (
-									<Form.Check
-										key={careRadius.inPersonCareRadiusId}
-										type="radio"
-										name="care-radius"
-										id={`care-radius--${careRadius.inPersonCareRadiusId}`}
-										label={careRadius.title}
-										value={careRadius.inPersonCareRadius}
-										checked={formValues.inPersonCareRadius === careRadius.inPersonCareRadius}
-										onChange={({ currentTarget }) => {
-											setFormValues((previousValue) => ({
-												...previousValue,
-												inPersonCareRadius: parseInt(currentTarget.value, 10),
-											}));
-										}}
-										disabled={isSaving}
-									/>
-								))}
-							</Form.Group>
+							{formValues.patientOrderCarePreferenceId === PatientOrderCarePreferenceId.IN_PERSON && (
+								<Form.Group className="mb-6">
+									<h5 className="mb-2">
+										How far would you be willing to travel from your location (
+										{patientOrder?.patientAddress?.postalCode}) to see an in-person provider?
+									</h5>
+									{careRadii.map((careRadius) => (
+										<Form.Check
+											key={careRadius.inPersonCareRadiusId}
+											type="radio"
+											name="care-radius"
+											id={`care-radius--${careRadius.inPersonCareRadiusId}`}
+											label={careRadius.title}
+											value={careRadius.inPersonCareRadius}
+											checked={formValues.inPersonCareRadius === careRadius.inPersonCareRadius}
+											onChange={({ currentTarget }) => {
+												setFormValues((previousValue) => ({
+													...previousValue,
+													inPersonCareRadius: parseInt(currentTarget.value, 10),
+												}));
+											}}
+											disabled={isSaving || readOnly}
+										/>
+									))}
+								</Form.Group>
+							)}
 							<hr />
 						</Col>
 					</Row>
@@ -238,7 +243,7 @@ const PatientDemographics = () => {
 										patientLanguageCode: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							>
 								<option value="">Select...</option>
 								{referenceDataResponse.languages.map((language) => {
@@ -260,7 +265,7 @@ const PatientDemographics = () => {
 										patientRaceId: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							>
 								<option value="">Select...</option>
 								{referenceDataResponse.races.map((race) => {
@@ -282,7 +287,7 @@ const PatientDemographics = () => {
 										patientEthnicityId: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							>
 								<option value="">Select...</option>
 								{referenceDataResponse.ethnicities.map((ethnicity) => {
@@ -304,7 +309,7 @@ const PatientDemographics = () => {
 										patientBirthSexId: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							>
 								<option value="">Select...</option>
 								{referenceDataResponse.birthSexes.map((birthSex) => {
@@ -326,7 +331,7 @@ const PatientDemographics = () => {
 										patientGenderIdentityId: currentTarget.value,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							>
 								<option value="">Select...</option>
 								{referenceDataResponse.genderIdentities.map((genderIdentity) => {
@@ -358,14 +363,18 @@ const PatientDemographics = () => {
 										verified: currentTarget.checked,
 									}));
 								}}
-								disabled={isSaving}
+								disabled={isSaving || readOnly}
 							/>
 						</Col>
 					</Row>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<div className="d-flex align-items-center justify-content-end">
-								<Button variant="primary" type="submit" disabled={isSaving}>
+								<Button
+									variant="primary"
+									type="submit"
+									disabled={!formValues.verified || isSaving || readOnly}
+								>
 									Continue
 								</Button>
 							</div>
