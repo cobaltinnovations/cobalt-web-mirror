@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { PatientOrderModel, PatientOrderTriageStatusId } from '@/lib/models';
+import { PatientOrderModel, PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
+import { appointmentService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { NextStepsItem } from './next-steps-item';
-
 import { PatientInsuranceStatementModal } from './patient-insurance-statement-modal';
+import { MhicInlineAlert } from '../mhic';
+import ConfirmDialog from '@/components/confirm-dialog';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface NextStepsAssessmentCompleteProps {
 	patientOrder: PatientOrderModel;
+	onAppointmentCanceled(): void;
 }
 
-export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmentCompleteProps) => {
+export const NextStepsAssessmentComplete = ({
+	patientOrder,
+	onAppointmentCanceled,
+}: NextStepsAssessmentCompleteProps) => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
+	const handleError = useHandleError();
 	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+	const handleCancelAppointmentConfirm = useCallback(async () => {
+		try {
+			if (!patientOrder.appointmentId) {
+				throw new Error('appointment is undefined.');
+			}
+
+			await appointmentService.cancelAppointment(patientOrder.appointmentId).fetch();
+			setShowConfirmDialog(false);
+			onAppointmentCanceled();
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, onAppointmentCanceled, patientOrder.appointmentId]);
 
 	return (
 		<>
@@ -24,8 +48,21 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 					setShowInsuranceStatementModal(false);
 				}}
 				onContinue={() => {
-					navigate(`/ic/patient/connect-with-support/mhppatientOrderId=${patientOrder.patientOrderId}`);
+					navigate(`/ic/patient/connect-with-support/mhp?patientOrderId=${patientOrder.patientOrderId}`);
 				}}
+			/>
+
+			<ConfirmDialog
+				show={showConfirmDialog}
+				onHide={() => {
+					setShowConfirmDialog(false);
+				}}
+				titleText="Cancel Appointment"
+				bodyText="Are you sure you want to cancel this appointment?"
+				dismissText="Do Not Cancel"
+				confirmText="Cancel Appointment"
+				onConfirm={handleCancelAppointmentConfirm}
+				displayButtonsBlock
 			/>
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
@@ -33,19 +70,24 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 					{patientOrder.appointmentId ? (
 						<NextStepsItem
 							complete
-							title="Step 3: Schedule appointment with Behavioral Health Provider"
+							title="Step 3: Schedule appointment with Mental Health Provider"
 							description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
 							button={{
 								variant: 'danger',
 								title: 'Cancel Appointment',
 								onClick: () => {
-									window.alert('[TODO]: Show cancel appointment UI.');
+									setShowConfirmDialog(true);
 								},
 							}}
-						/>
+						>
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+								<SafetyPlanningAlert patientOrder={patientOrder} />
+							)}
+						</NextStepsItem>
 					) : (
 						<NextStepsItem
-							title="Step 3: Schedule appointment with Behavioral Health Provider"
+							title="Step 3: Schedule appointment with Mental Health Provider"
 							description="Find an appointment by browsing the list of providers and choosing an available appointment time."
 							button={{
 								variant: 'primary',
@@ -54,7 +96,12 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 									setShowInsuranceStatementModal(true);
 								},
 							}}
-						/>
+						>
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+								<SafetyPlanningAlert patientOrder={patientOrder} />
+							)}
+						</NextStepsItem>
 					)}
 				</>
 			)}
@@ -63,7 +110,7 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 				<>
 					{!patientOrder.resourcesSentAt ? (
 						<NextStepsItem
-							title="Step 3: Call us for resources"
+							title="Step 3: Receive resources"
 							description={`Call us at ${institution.integratedCarePhoneNumberDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
 							button={{
 								variant: 'primary',
@@ -72,7 +119,12 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 									document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
 								},
 							}}
-						/>
+						>
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+								<SafetyPlanningAlert patientOrder={patientOrder} />
+							)}
+						</NextStepsItem>
 					) : (
 						<>
 							<NextStepsItem
@@ -95,7 +147,12 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 								description={`Schedule an appointment by contacting one of the resources provided through ${
 									institution?.myChartName ?? 'MyChart'
 								}`}
-							/>
+							>
+								{patientOrder.patientOrderSafetyPlanningStatusId ===
+									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+									<SafetyPlanningAlert patientOrder={patientOrder} />
+								)}
+							</NextStepsItem>
 						</>
 					)}
 				</>
@@ -112,8 +169,31 @@ export const NextStepsAssessmentComplete = ({ patientOrder }: NextStepsAssessmen
 							document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
 						},
 					}}
-				/>
+				>
+					{patientOrder.patientOrderSafetyPlanningStatusId ===
+						PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+						<SafetyPlanningAlert patientOrder={patientOrder} />
+					)}
+				</NextStepsItem>
 			)}
 		</>
+	);
+};
+
+const SafetyPlanningAlert = ({ patientOrder }: { patientOrder: PatientOrderModel }) => {
+	const { openInCrisisModal } = useInCrisisModal();
+
+	return (
+		<MhicInlineAlert
+			variant="warning"
+			title="A clinician will reach out"
+			description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+			action={{
+				title: 'View all crisis resources',
+				onClick: () => {
+					openInCrisisModal();
+				},
+			}}
+		/>
 	);
 };

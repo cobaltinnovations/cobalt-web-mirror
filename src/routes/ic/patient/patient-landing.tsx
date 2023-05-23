@@ -103,6 +103,10 @@ const PatientLanding = () => {
 		}
 	}, [navigate]);
 
+	const handleAppointmentCanceled = useCallback(() => {
+		fetchData();
+	}, [fetchData]);
+
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<Container className="py-10">
@@ -327,7 +331,10 @@ const PatientLanding = () => {
 											<>
 												<hr />
 												{patientOrder && (
-													<NextStepsAssessmentComplete patientOrder={patientOrder} />
+													<NextStepsAssessmentComplete
+														patientOrder={patientOrder}
+														onAppointmentCanceled={handleAppointmentCanceled}
+													/>
 												)}
 											</>
 										)}
