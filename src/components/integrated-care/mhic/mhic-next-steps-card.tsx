@@ -117,7 +117,7 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 					<Card.Title>Next Steps</Card.Title>
 				</Card.Header>
 				<Card.Body>
-					{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+					{/* {patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 						<>
 							{patientOrder.appointmentId ? (
 								<NoData
@@ -153,7 +153,7 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 								/>
 							)}
 						</>
-					)}
+					)} */}
 					<div className="mb-4 d-flex align-items-center justify-content-between">
 						<Form.Check
 							type="switch"
