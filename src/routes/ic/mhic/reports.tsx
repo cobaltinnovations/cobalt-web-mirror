@@ -8,6 +8,8 @@ import { useMhicLayoutLoaderData } from './mhic-layout';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import { buildQueryParamUrl } from '@/lib/utils';
+import moment from 'moment';
 
 enum REPORT_TYPE_ID {
 	PIPELINE = 'PIPELINE',
@@ -38,41 +40,63 @@ export const Component = () => {
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
 	const [formValues, setFormValues] = useState({
-		from: undefined as Date | undefined,
-		to: undefined as Date | undefined,
-		reportType: '',
+		startDateTime: undefined as Date | undefined,
+		endDateTime: undefined as Date | undefined,
+		reportTypeId: '',
 
 		// PIPELINE specific
-		practice: [] as string[],
-		payor: [] as PatientOrderInsurancePayors[],
-		patientRace: [] as Race[],
-		patientGender: [] as GenderIdentity[],
-		patientAgeMin: undefined as number | undefined,
-		patientAgeMax: undefined as number | undefined,
+		referringPracticeNames: [] as string[],
+		patientOrderInsurancePayors: [] as PatientOrderInsurancePayors[],
+		race: [] as Race[],
+		genderIdentity: [] as GenderIdentity[],
+		minimumPatientAge: undefined as number | undefined,
+		maximumPatientAge: undefined as number | undefined,
 
 		// MHIC specific
-		mhic: [] as AccountModel[],
+		panelAccounts: [] as AccountModel[],
 	});
 
 	// Must clear all the reportType specific filters on reportTypeChange
 	const handleReportTypeInputChange = useCallback(({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
 		setFormValues((previousValue) => ({
 			...previousValue,
-			reportType: currentTarget.value,
-			practice: [],
-			payor: [],
-			patientRace: [],
-			patientGender: [],
-			patientAgeMin: undefined,
-			patientAgeMax: undefined,
-			mhic: [],
+			reportTypeId: currentTarget.value,
+			referringPracticeNames: [],
+			patientOrderInsurancePayors: [],
+			race: [],
+			genderIdentity: [],
+			minimumPatientAge: undefined,
+			maximumPatientAge: undefined,
+			panelAccounts: [],
 		}));
 	}, []);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
-			console.log(formValues);
+
+			window.location.href = buildQueryParamUrl('/reporting/run-report', {
+				// Generic
+				startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
+				endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
+				reportTypeId: formValues.reportTypeId,
+
+				// PIPELINE specific
+				referringPracticeNames: formValues.referringPracticeNames,
+				patientOrderInsurancePayorId: formValues.patientOrderInsurancePayors.map(
+					(p) => p.patientOrderInsurancePayorId
+				),
+				patientRaceId: formValues.race.map((r) => r.raceId),
+				patientGenderIdentityId: formValues.genderIdentity.map((g) => g.genderIdentityId),
+				minimumPatientAge: formValues.minimumPatientAge,
+				maximumPatientAge: formValues.maximumPatientAge,
+
+				// MHIC specific
+				panelAccountId: formValues.panelAccounts.map((a) => a.accountId),
+
+				// Required
+				reportFormatId: 'CSV',
+			});
 		},
 		[formValues]
 	);
@@ -96,11 +120,11 @@ export const Component = () => {
 							<Col>
 								<DatePicker
 									labelText="From"
-									selected={formValues.from}
+									selected={formValues.startDateTime}
 									onChange={(date) => {
 										setFormValues((previousValue) => ({
 											...previousValue,
-											from: date ?? undefined,
+											startDateTime: date ?? undefined,
 										}));
 									}}
 									required
@@ -109,11 +133,11 @@ export const Component = () => {
 							<Col>
 								<DatePicker
 									labelText="To"
-									selected={formValues.to}
+									selected={formValues.endDateTime}
 									onChange={(date) => {
 										setFormValues((previousValue) => ({
 											...previousValue,
-											to: date ?? undefined,
+											endDateTime: date ?? undefined,
 										}));
 									}}
 									required
@@ -122,16 +146,16 @@ export const Component = () => {
 						</Row>
 						<Row
 							className={classNames({
-								'mb-8': formValues.reportType === REPORT_TYPE_ID.PIPELINE,
-								'mb-10': formValues.reportType === REPORT_TYPE_ID.OUTREACH,
-								'mb-4': formValues.reportType === REPORT_TYPE_ID.MHIC,
+								'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE,
+								'mb-10': formValues.reportTypeId === REPORT_TYPE_ID.OUTREACH,
+								'mb-4': formValues.reportTypeId === REPORT_TYPE_ID.MHIC,
 							})}
 						>
 							<Col>
 								<InputHelper
 									as="select"
 									label="Report Type"
-									value={formValues.reportType}
+									value={formValues.reportTypeId}
 									onChange={handleReportTypeInputChange}
 									required
 								>
@@ -147,7 +171,7 @@ export const Component = () => {
 							</Col>
 						</Row>
 
-						{formValues.reportType === REPORT_TYPE_ID.PIPELINE && (
+						{formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE && (
 							<Row className="mb-10">
 								<Col>
 									<h5 className="mb-2">Filters</h5>
@@ -157,11 +181,11 @@ export const Component = () => {
 										label="Practice"
 										multiple
 										options={referenceDataResponse.referringPracticeNames}
-										selected={formValues.practice}
+										selected={formValues.referringPracticeNames}
 										onChange={(selected) => {
 											setFormValues((previousValues) => ({
 												...previousValues,
-												practice: selected as string[],
+												referringPracticeNames: selected as string[],
 											}));
 										}}
 									/>
@@ -172,11 +196,11 @@ export const Component = () => {
 										multiple
 										labelKey="name"
 										options={referenceDataResponse.patientOrderInsurancePayors}
-										selected={formValues.payor}
+										selected={formValues.patientOrderInsurancePayors}
 										onChange={(selected) => {
 											setFormValues((previousValues) => ({
 												...previousValues,
-												payor: selected as PatientOrderInsurancePayors[],
+												patientOrderInsurancePayors: selected as PatientOrderInsurancePayors[],
 											}));
 										}}
 									/>
@@ -187,11 +211,11 @@ export const Component = () => {
 										multiple
 										labelKey="description"
 										options={referenceDataResponse.races}
-										selected={formValues.patientRace}
+										selected={formValues.race}
 										onChange={(selected) => {
 											setFormValues((previousValues) => ({
 												...previousValues,
-												patientRace: selected as Race[],
+												race: selected as Race[],
 											}));
 										}}
 									/>
@@ -202,11 +226,11 @@ export const Component = () => {
 										multiple
 										labelKey="description"
 										options={referenceDataResponse.genderIdentities}
-										selected={formValues.patientGender}
+										selected={formValues.genderIdentity}
 										onChange={(selected) => {
 											setFormValues((previousValues) => ({
 												...previousValues,
-												patientGender: selected as GenderIdentity[],
+												genderIdentity: selected as GenderIdentity[],
 											}));
 										}}
 									/>
@@ -216,11 +240,11 @@ export const Component = () => {
 											<InputHelper
 												type="number"
 												label="From"
-												value={formValues.patientAgeMin}
+												value={formValues.minimumPatientAge}
 												onChange={({ currentTarget }) => {
 													setFormValues((previousValues) => ({
 														...previousValues,
-														patientAgeMin: parseInt(currentTarget.value, 10),
+														minimumPatientAge: parseInt(currentTarget.value, 10),
 													}));
 												}}
 											/>
@@ -229,11 +253,11 @@ export const Component = () => {
 											<InputHelper
 												type="number"
 												label="To"
-												value={formValues.patientAgeMax}
+												value={formValues.maximumPatientAge}
 												onChange={({ currentTarget }) => {
 													setFormValues((previousValues) => ({
 														...previousValues,
-														patientAgeMax: parseInt(currentTarget.value, 10),
+														maximumPatientAge: parseInt(currentTarget.value, 10),
 													}));
 												}}
 											/>
@@ -243,7 +267,7 @@ export const Component = () => {
 							</Row>
 						)}
 
-						{formValues.reportType === REPORT_TYPE_ID.MHIC && (
+						{formValues.reportTypeId === REPORT_TYPE_ID.MHIC && (
 							<Row className="mb-10">
 								<Col>
 									<TypeaheadHelper
@@ -253,20 +277,20 @@ export const Component = () => {
 										multiple
 										labelKey="displayName"
 										options={panelAccounts}
-										selected={formValues.mhic}
+										selected={formValues.panelAccounts}
 										onChange={(selected) => {
 											setFormValues((previousValues) => ({
 												...previousValues,
-												mhic: selected as AccountModel[],
+												panelAccounts: selected as AccountModel[],
 											}));
 										}}
-										required={formValues.reportType === REPORT_TYPE_ID.MHIC}
+										required={formValues.reportTypeId === REPORT_TYPE_ID.MHIC}
 									/>
 								</Col>
 							</Row>
 						)}
 
-						{formValues.reportType && (
+						{formValues.reportTypeId && (
 							<>
 								<hr className="mb-8" />
 								<div className="text-right">
