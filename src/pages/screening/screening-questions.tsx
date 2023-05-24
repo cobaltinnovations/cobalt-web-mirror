@@ -9,8 +9,6 @@ import {
 	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
-	UserExperienceTypeId,
-	ScreeningSessionDestinationId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -102,19 +100,7 @@ const ScreeningQuestionsPage = () => {
 						if (r.nextScreeningQuestionContextId) {
 							navigateToQuestion(r.nextScreeningQuestionContextId);
 						} else if (r.screeningSessionDestination) {
-							let actualDestinationId = r.screeningSessionDestination.screeningSessionDestinationId;
-
-							if (
-								institution?.integratedCareEnabled &&
-								institution?.userExperienceTypeId === UserExperienceTypeId.PATIENT
-							) {
-								actualDestinationId =
-									ScreeningSessionDestinationId.IC_PATIENT_SCREENING_SESSION_RESULTS;
-							}
-							navigateToDestination({
-								...r.screeningSessionDestination,
-								screeningSessionDestinationId: actualDestinationId,
-							});
+							navigateToDestination(r.screeningSessionDestination);
 						}
 					};
 
@@ -146,7 +132,6 @@ const ScreeningQuestionsPage = () => {
 		[
 			handleError,
 			institution?.integratedCareEnabled,
-			institution?.userExperienceTypeId,
 			navigateToDestination,
 			navigateToQuestion,
 			screeningQuestionContextId,
