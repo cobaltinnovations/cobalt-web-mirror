@@ -672,8 +672,9 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
+										id: 'reports',
 										path: 'reports',
-										element: <NoMatch />,
+										lazy: () => import('@/routes/ic/mhic/reports'),
 									},
 									{
 										path: 'connect-with-support/mhp',
