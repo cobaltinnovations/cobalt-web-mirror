@@ -166,6 +166,19 @@ app.get('/ic/patient-order-csv-generator', (req, res, next) => {
 	return proxy(proxyUrl)(req, res, next);
 });
 
+// Patient Order Reporting CSV downloads can proxy through to backend and tack on access token.
+// This way FE does not have access token embedded in URL, preventing
+// unintentional "copy-paste" sharing
+app.get('/patient-order-reports', (req, res, next) => {
+	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
+	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
+
+	req.url = proxyUrl;
+
+	return proxy(proxyUrl)(req, res, next);
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

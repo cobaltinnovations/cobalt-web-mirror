@@ -75,7 +75,7 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			window.location.href = buildQueryParamUrl('/reporting/run-report', {
+			window.location.href = buildQueryParamUrl('/patient-order-reports', {
 				// Generic
 				startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
 				endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
