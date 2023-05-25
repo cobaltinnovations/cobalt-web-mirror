@@ -48,7 +48,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 
 	const handleAssignOrdersSave = useCallback(
-		async (patientOrderCount: number, panelAccountDisplayName: string) => {
+		async (_patientOrderCount: number, panelAccountDisplayName: string) => {
 			revalidator.revalidate();
 			setShowAssignOrderModal(false);
 			addFlag({
