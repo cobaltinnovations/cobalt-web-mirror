@@ -47,7 +47,6 @@ export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => 
 								<span className="text-uppercase">{triageGroup.patientOrderCareTypeDescription}</span>
 							</Card.Title>
 							<div className="button-container">
-								<span className="me-3 text-uppercase text-gray">Enrolled</span>
 								<Button
 									variant="light"
 									size="sm"

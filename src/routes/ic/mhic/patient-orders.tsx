@@ -200,25 +200,27 @@ export const Component = () => {
 										Generate
 									</Button>
 								)}
-								<FileInputButton
-									className="me-2"
-									accept=".csv"
-									onChange={handleImportButtonChange}
-									disabled={!account?.accountCapabilityFlags.canImportIcPatientOrders}
-								>
-									<Button
-										as="div"
-										variant={
-											account?.accountCapabilityFlags.canImportIcPatientOrders
-												? 'outline-primary'
-												: 'dark'
-										}
-										className="d-flex align-items-center"
+								{account?.accountCapabilityFlags.canImportIcPatientOrders && (
+									<FileInputButton
+										className="me-2"
+										accept=".csv"
+										onChange={handleImportButtonChange}
+										disabled={!account?.accountCapabilityFlags.canImportIcPatientOrders}
 									>
-										<UploadIcon className="me-2" />
-										Import
-									</Button>
-								</FileInputButton>
+										<Button
+											as="div"
+											variant={
+												account?.accountCapabilityFlags.canImportIcPatientOrders
+													? 'outline-primary'
+													: 'dark'
+											}
+											className="d-flex align-items-center"
+										>
+											<UploadIcon className="me-2" />
+											Import
+										</Button>
+									</FileInputButton>
+								)}
 								<Button
 									onClick={() => {
 										// fetchPanelAccounts();
