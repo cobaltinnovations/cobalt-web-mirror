@@ -53,6 +53,7 @@ export const MhicConsentModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 				onSave(response.patientOrder);
 			} catch (error) {
 				handleError(error);
+			} finally {
 				setIsSaving(false);
 			}
 		},

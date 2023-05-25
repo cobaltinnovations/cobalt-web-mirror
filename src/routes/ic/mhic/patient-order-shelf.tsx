@@ -8,7 +8,7 @@ import {
 	useNavigate,
 } from 'react-router-dom';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -66,16 +66,7 @@ enum TAB_KEYS {
 
 export const Component = () => {
 	const shelfData = useLoaderData() as MhicPatientOrderShelfLoaderData;
-
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
-
-	useEffect(() => {
-		document.body.style.overflow = 'hidden';
-
-		return () => {
-			document.body.style.overflow = 'visible';
-		};
-	}, []);
 
 	return (
 		<Suspense fallback={<Loader />}>
