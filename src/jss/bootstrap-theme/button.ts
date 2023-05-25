@@ -141,6 +141,22 @@ export const button = (theme: CobaltTheme) => {
 			},
 
 			/* ----------------------------------------------------------- */
+			/* Dark variant / Disabled */
+			/* ----------------------------------------------------------- */
+			'&-dark': {
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n100,
+				cursor: 'not-allowed',
+				'&:hover': {
+					color: theme.colors.n500,
+					backgroundColor: theme.colors.n100,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n100,
+				},
+			},
+
+			/* ----------------------------------------------------------- */
 			/* Link variant */
 			/* ----------------------------------------------------------- */
 			'&-link': {
