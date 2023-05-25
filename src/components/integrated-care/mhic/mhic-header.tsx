@@ -116,6 +116,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
+	const { account } = useAccount();
 
 	const overviewMatch = useMatch({
 		path: '/ic/mhic/overview/*',
@@ -153,15 +154,25 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Patient Orders',
 				active: patientOrdersMatch,
 			},
-			{
-				testId: '',
-				navigationItemId: 'REPORTS',
-				to: '/ic/mhic/reports',
-				title: 'Reports',
-				active: !!reportsMatch,
-			},
+			...(account?.accountCapabilityFlags.canViewIcReports
+				? [
+						{
+							testId: '',
+							navigationItemId: 'REPORTS',
+							to: '/ic/mhic/reports',
+							title: 'Reports',
+							active: !!reportsMatch,
+						},
+				  ]
+				: []),
 		],
-		[myPatientsMatch, patientOrdersMatch, overviewMatch, reportsMatch]
+		[
+			overviewMatch,
+			myPatientsMatch,
+			patientOrdersMatch,
+			account?.accountCapabilityFlags.canViewIcReports,
+			reportsMatch,
+		]
 	);
 
 	return (

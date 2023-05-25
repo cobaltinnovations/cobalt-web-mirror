@@ -30,6 +30,7 @@ import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { AwaitedString } from '@/components/awaited-string';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
+import useAccount from '@/hooks/use-account';
 
 interface MhicOrdersLoaderData {
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
@@ -65,6 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
+	const { account } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
 	const { patientOrdersListPromise } = useMhicOrdersLoaderData();
@@ -198,12 +200,27 @@ export const Component = () => {
 										Generate
 									</Button>
 								)}
-								<FileInputButton className="me-2" accept=".csv" onChange={handleImportButtonChange}>
-									<Button as="div" variant="outline-primary" className="d-flex align-items-center">
-										<UploadIcon className="me-2" />
-										Import
-									</Button>
-								</FileInputButton>
+								{account?.accountCapabilityFlags.canImportIcPatientOrders && (
+									<FileInputButton
+										className="me-2"
+										accept=".csv"
+										onChange={handleImportButtonChange}
+										disabled={!account?.accountCapabilityFlags.canImportIcPatientOrders}
+									>
+										<Button
+											as="div"
+											variant={
+												account?.accountCapabilityFlags.canImportIcPatientOrders
+													? 'outline-primary'
+													: 'dark'
+											}
+											className="d-flex align-items-center"
+										>
+											<UploadIcon className="me-2" />
+											Import
+										</Button>
+									</FileInputButton>
+								)}
 								<Button
 									onClick={() => {
 										// fetchPanelAccounts();

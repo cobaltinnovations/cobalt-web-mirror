@@ -61,6 +61,12 @@ export interface AccountModel {
 	roleId: string;
 	sourceSystemId: string;
 	timeZone: string;
+	accountCapabilityFlags: {
+		canEditIcSafetyPlanning: boolean;
+		canEditIcTriages: boolean;
+		canImportIcPatientOrders: boolean;
+		canViewIcReports: boolean;
+	};
 }
 
 export interface AccountInstitutionCapabilities {

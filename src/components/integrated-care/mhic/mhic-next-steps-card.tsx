@@ -1,18 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate, useRevalidator } from 'react-router-dom';
+import { useRevalidator } from 'react-router-dom';
 import { Button, Card, Form } from 'react-bootstrap';
 
 import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
-	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
-import NoData from '@/components/no-data';
+import useAccount from '@/hooks/use-account';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -22,7 +21,7 @@ interface Props {
 }
 
 export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, className }: Props) => {
-	const navigate = useNavigate();
+	const { account } = useAccount();
 	const handleError = useHandleError();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
@@ -168,7 +167,7 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
 							}
 							onChange={handleSafetyPlanningToggleChange}
-							disabled={disabled || isSaving}
+							disabled={disabled || isSaving || !account?.accountCapabilityFlags.canEditIcSafetyPlanning}
 						/>
 						{patientOrder.patientOrderSafetyPlanningStatusId ===
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
@@ -180,7 +179,9 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 									onClick={() => {
 										setShowSafetyPlanningModal(true);
 									}}
-									disabled={disabled || isSaving}
+									disabled={
+										disabled || isSaving || !account?.accountCapabilityFlags.canEditIcSafetyPlanning
+									}
 								>
 									Mark Complete
 								</Button>

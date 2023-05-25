@@ -5,6 +5,7 @@ import { PatientOrderModel } from '@/lib/models';
 import { MhicChangeTriageModal } from '@/components/integrated-care/mhic';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { useRevalidator } from 'react-router-dom';
+import useAccount from '@/hooks/use-account';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => {
+	const { account } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [showChangeTriageModal, setShowChangeTriageModal] = useState(false);
 	const revalidator = useRevalidator();
@@ -45,14 +47,13 @@ export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => 
 								<span className="text-uppercase">{triageGroup.patientOrderCareTypeDescription}</span>
 							</Card.Title>
 							<div className="button-container">
-								<span className="me-3 text-uppercase text-gray">Enrolled</span>
 								<Button
 									variant="light"
 									size="sm"
 									onClick={() => {
 										setShowChangeTriageModal(true);
 									}}
-									disabled={disabled}
+									disabled={disabled || !account?.accountCapabilityFlags.canEditIcTriages}
 								>
 									Override
 								</Button>
