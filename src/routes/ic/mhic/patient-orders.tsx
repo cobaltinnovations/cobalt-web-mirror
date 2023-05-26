@@ -19,6 +19,7 @@ import {
 	mhicFilterAssignmentGetParsedQueryParams,
 	mhicFilterPracticeGetParsedQueryParams,
 	mhicSortDropdownGetParsedQueryParams,
+	parseMhicFilterQueryParamsFromURL,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -43,11 +44,13 @@ export function useMhicOrdersLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
+
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
 	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
 	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
 	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(url);
 	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
+	const mhicFilterParsedQueryParams = parseMhicFilterQueryParamsFromURL(url);
 
 	return defer({
 		patientOrdersListPromise: integratedCareService
@@ -59,6 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				...mhicFilterPracticeParsedQueryParams,
 				...mhicFilterAssignmentParsedQueryParams,
 				...mhicSortDropdownParsedQueryParams,
+				...mhicFilterParsedQueryParams,
 			})
 			.fetch()
 			.then((r) => r.findResult),

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
 import { AlignType } from 'react-bootstrap/esm/types';
@@ -17,6 +17,102 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
+
+interface Filter {
+	filterId: string;
+	title: string;
+	options: {
+		title: string;
+		value: string;
+	}[];
+}
+
+const availableFilters: Filter[] = [
+	{
+		filterId: 'patientOrderScreeningStatusId',
+		title: 'Assessment Status',
+		options: [
+			{
+				title: 'Not screened',
+				value: PatientOrderScreeningStatusId.NOT_SCREENED,
+			},
+			{
+				title: 'In progress',
+				value: PatientOrderScreeningStatusId.IN_PROGRESS,
+			},
+			{
+				title: 'Scheduled',
+				value: PatientOrderScreeningStatusId.SCHEDULED,
+			},
+			{
+				title: 'Compelte',
+				value: PatientOrderScreeningStatusId.COMPLETE,
+			},
+		],
+	},
+	{
+		filterId: 'patientOrderResourcingStatusId',
+		title: 'Resource Status',
+		options: [
+			{
+				title: 'None needed',
+				value: PatientOrderResourcingStatusId.NONE_NEEDED,
+			},
+			{
+				title: 'Needs resources',
+				value: PatientOrderResourcingStatusId.NEEDS_RESOURCES,
+			},
+			{
+				title: 'Sent resources',
+				value: PatientOrderResourcingStatusId.SENT_RESOURCES,
+			},
+			{
+				title: 'Unknown',
+				value: PatientOrderResourcingStatusId.UNKNOWN,
+			},
+		],
+	},
+	{
+		filterId: 'patientOrderResourceCheckInResponseStatusId',
+		title: 'Resource Check-In Response',
+		options: [
+			{
+				title: 'None',
+				value: PatientOrderResourceCheckInResponseStatusId.NONE,
+			},
+			{
+				title: 'No longer need care',
+				value: PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE,
+			},
+			{
+				title: 'Need followup',
+				value: PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP,
+			},
+			{
+				title: 'Appointment scheduled',
+				value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED,
+			},
+			{
+				title: 'Appointment attended',
+				value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_ATTENDED,
+			},
+		],
+	},
+];
+
+const mhicFilterQueryParams = availableFilters.reduce((accumulator, currentValue) => {
+	return [...accumulator, currentValue.filterId];
+}, [] as string[]);
+
+export function parseMhicFilterQueryParamsFromURL(url: URL) {
+	const parsed: Record<string, string[]> = {};
+
+	for (const param of mhicFilterQueryParams) {
+		parsed[param] = url.searchParams.getAll(param);
+	}
+
+	return parsed;
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
@@ -38,113 +134,10 @@ interface Props {
 	className?: string;
 }
 
-interface Filter {
-	filterId: string;
-	title: string;
-	options: {
-		title: string;
-		value: string;
-	}[];
-}
-
-const MHIC_FITER_QUERY_PARAMS = [
-	'patientOrderFilterFlagTypeId',
-	'referringPracticeNames',
-	'reasonsForReferral',
-	'patientOrderScreeningStatusId',
-	'patientOrderResourcingStatusId',
-	'patientOrderResourceCheckInResponseStatusId',
-];
-
-export function parseMhicFilterQueryParamsFromURL(url: URL) {
-	const parsed: Record<string, string[]> = {};
-
-	for (const param of MHIC_FITER_QUERY_PARAMS) {
-		parsed[param] = url.searchParams.getAll(param);
-	}
-
-	return parsed;
-}
-
 export const MhicFilterDropdown = ({ align, className }: Props) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
-
-	const availableFilters = useMemo<Filter[]>(() => {
-		return [
-			{
-				filterId: 'patientOrderScreeningStatusId',
-				title: 'Assessment Status',
-				options: [
-					{
-						title: 'Not screened',
-						value: PatientOrderScreeningStatusId.NOT_SCREENED,
-					},
-					{
-						title: 'In progress',
-						value: PatientOrderScreeningStatusId.IN_PROGRESS,
-					},
-					{
-						title: 'Scheduled',
-						value: PatientOrderScreeningStatusId.SCHEDULED,
-					},
-					{
-						title: 'Compelte',
-						value: PatientOrderScreeningStatusId.COMPLETE,
-					},
-				],
-			},
-			{
-				filterId: 'patientOrderResourcingStatusId',
-				title: 'Resource Status',
-				options: [
-					{
-						title: 'None needed',
-						value: PatientOrderResourcingStatusId.NONE_NEEDED,
-					},
-					{
-						title: 'Needs resources',
-						value: PatientOrderResourcingStatusId.NEEDS_RESOURCES,
-					},
-					{
-						title: 'Sent resources',
-						value: PatientOrderResourcingStatusId.SENT_RESOURCES,
-					},
-					{
-						title: 'Unknown',
-						value: PatientOrderResourcingStatusId.UNKNOWN,
-					},
-				],
-			},
-			{
-				filterId: 'patientOrderResourceCheckInResponseStatusId',
-				title: 'Resource Check-In Response',
-				options: [
-					{
-						title: 'None',
-						value: PatientOrderResourceCheckInResponseStatusId.NONE,
-					},
-					{
-						title: 'No longer need care',
-						value: PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE,
-					},
-					{
-						title: 'Need followup',
-						value: PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP,
-					},
-					{
-						title: 'Appointment scheduled',
-						value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED,
-					},
-					{
-						title: 'Appointment attended',
-						value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_ATTENDED,
-					},
-				],
-			},
-		];
-	}, []);
 
 	const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({});
 
@@ -180,7 +173,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 
 			setSelectedFilters(active);
 		}
-	}, [availableFilters, searchParams, show]);
+	}, [searchParams, show]);
 
 	return (
 		<Dropdown
@@ -288,8 +281,8 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 							setSelectedFilters({});
 							setShow(false);
 
-							for (const filter of availableFilters) {
-								searchParams.delete(filter.filterId);
+							for (const param of mhicFilterQueryParams) {
+								searchParams.delete(param);
 							}
 
 							setSearchParams(searchParams);
