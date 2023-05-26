@@ -163,7 +163,7 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 	const { trackEvent } = useAnalytics();
 	const classes = useStyles();
 
-	const { startScreeningFlowWithoutChecks, renderedCollectPhoneModal } = useScreeningFlow({
+	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
 		instantiateOnLoad: false,
 	});
@@ -220,7 +220,7 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 										<Button
 											variant="link"
 											className="ms-1 p-0 fw-normal"
-											onClick={startScreeningFlowWithoutChecks}
+											onClick={startScreeningFlow}
 										>
 											Retake the assessment
 										</Button>
