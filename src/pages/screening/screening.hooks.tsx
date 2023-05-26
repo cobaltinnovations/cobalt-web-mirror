@@ -13,7 +13,7 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useMatch, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 export function useScreeningNavigation() {
 	const location = useLocation();
@@ -21,10 +21,7 @@ export function useScreeningNavigation() {
 	const { trackEvent } = useAnalytics();
 	const revalidator = useRevalidator();
 
-	const mhicScreeningRouteMatch = useMatch({
-		path: '/ic/mhic/order-assessment/:patientOrderId',
-		end: false,
-	});
+	const matches = useMatches();
 
 	const navigateToDestination = useCallback(
 		(destination?: ScreeningSessionDestination, params?: Record<string, any>, replace = false) => {
@@ -101,14 +98,18 @@ export function useScreeningNavigation() {
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
+			const mhicRouteMatch = matches.reverse().find((match) => {
+				return match.pathname.includes('/ic/mhic') && !!match.params['patientOrderId'];
+			});
+
 			navigate(
-				mhicScreeningRouteMatch
-					? `/ic/mhic/order-assessment/${mhicScreeningRouteMatch.params.patientOrderId}/${contextId}`
+				mhicRouteMatch
+					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
 					: `/screening-questions/${contextId}`,
 				{ state: location.state }
 			);
 		},
-		[mhicScreeningRouteMatch, location.state, navigate]
+		[location.state, matches, navigate]
 	);
 
 	const navigateToNext = useCallback(
@@ -150,6 +151,7 @@ export function useScreeningFlow({
 	const [activeFlowVersion, setActiveFlowVersion] = useState<ScreeningFlowVersion>();
 	const handleError = useHandleError();
 	const { navigateToNext, navigateToDestination } = useScreeningNavigation();
+	const [isCreatingScreeningSession, setIsCreatingScreeningSession] = useState(false);
 
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
@@ -160,7 +162,11 @@ export function useScreeningFlow({
 		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
-	const createNewScreeningFlow = useCallback(() => {
+	const hasIncompleteScreening = incompleteSessions.length > 0;
+
+	const createScreeningSession = useCallback(() => {
+		setIsCreatingScreeningSession(true);
+
 		return screeningService
 			.createScreeningSession({
 				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
@@ -174,16 +180,74 @@ export function useScreeningFlow({
 				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
 					handleError(e);
 				}
+			})
+			.finally(() => {
+				setIsCreatingScreeningSession(false);
 			});
 	}, [activeFlowVersion?.screeningFlowVersionId, handleError, navigateToNext, patientOrderId]);
 
-	const startScreeningFlow = useCallback(() => {
-		if (incompleteSessions.length === 0) {
-			return createNewScreeningFlow();
-		} else {
-			navigateToNext(incompleteSessions[incompleteSessions.length - 1]);
+	const resumeScreeningSession = useCallback(
+		(screeningSessionId?: string | null) => {
+			if (!activeFlowVersion) {
+				throw new Error('Unknown Active Flow Version');
+			}
+
+			if (!hasIncompleteScreening) {
+				throw new Error('No incomplete sessions to resume');
+			}
+
+			const lastIncomplete = incompleteSessions[incompleteSessions.length - 1];
+
+			// resume session by id if specified
+			if (screeningSessionId) {
+				const incompleteSession = incompleteSessions.find(
+					(session) => session.screeningSessionId === screeningSessionId
+				);
+
+				if (!incompleteSession) {
+					throw new Error('Unknown Screening Session');
+				}
+
+				return navigateToNext(incompleteSession);
+			}
+
+			// default to last incomplete session known for user
+			return navigateToNext(lastIncomplete);
+		},
+		[activeFlowVersion, hasIncompleteScreening, incompleteSessions, navigateToNext]
+	);
+
+	const resumeOrCreateScreeningSession = useCallback(
+		(screeningSessionId?: string | null) => {
+			if (hasIncompleteScreening) {
+				return resumeScreeningSession(screeningSessionId);
+			} else {
+				return createScreeningSession();
+			}
+		},
+		[createScreeningSession, hasIncompleteScreening, resumeScreeningSession]
+	);
+
+	const startScreeningFlow = useCallback(async () => {
+		if (!activeFlowVersion) {
+			throw new Error('Unknown Active Flow Version');
 		}
-	}, [createNewScreeningFlow, incompleteSessions, navigateToNext]);
+
+		if (activeFlowVersion.phoneNumberRequired) {
+			setShowPhoneModal(true);
+		} else {
+			resumeOrCreateScreeningSession();
+		}
+	}, [activeFlowVersion, resumeOrCreateScreeningSession]);
+
+	const startScreeningFlowIfNoneCompleted = useCallback(async () => {
+		if (hasCompletedScreening) {
+			setDidCheckScreeningSessions(true);
+			return;
+		}
+
+		return startScreeningFlow();
+	}, [hasCompletedScreening, startScreeningFlow]);
 
 	useEffect(() => {
 		if (isImmediateSession || isSkipped) {
@@ -221,39 +285,13 @@ export function useScreeningFlow({
 		};
 	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
-	const checkAndStartScreeningFlow = useCallback(async () => {
-		if (!activeFlowVersion) {
-			return;
-		}
-
-		if (!hasCompletedScreening && activeFlowVersion.phoneNumberRequired) {
-			setShowPhoneModal(true);
-		} else if (!hasCompletedScreening) {
-			return startScreeningFlow();
-		} else {
-			setDidCheckScreeningSessions(true);
-		}
-	}, [activeFlowVersion, hasCompletedScreening, startScreeningFlow]);
-
-	const startScreeningFlowWithoutChecks = useCallback(async () => {
-		if (!activeFlowVersion) {
-			return;
-		}
-
-		if (activeFlowVersion.phoneNumberRequired) {
-			setShowPhoneModal(true);
-		} else {
-			startScreeningFlow();
-		}
-	}, [activeFlowVersion, startScreeningFlow]);
-
 	useEffect(() => {
 		if (!instantiateOnLoad) {
 			return;
 		}
 
-		checkAndStartScreeningFlow();
-	}, [instantiateOnLoad, checkAndStartScreeningFlow]);
+		startScreeningFlowIfNoneCompleted();
+	}, [instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
@@ -291,7 +329,7 @@ export function useScreeningFlow({
 
 				setShowPhoneModal(false);
 
-				startScreeningFlow();
+				createScreeningSession();
 			}}
 		/>
 	);
@@ -300,8 +338,10 @@ export function useScreeningFlow({
 		didCheckScreeningSessions,
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
-		checkAndStartScreeningFlow,
-		startScreeningFlowWithoutChecks,
-		createNewScreeningFlow,
+		startScreeningFlow,
+		startScreeningFlowIfNoneCompleted,
+		createScreeningSession,
+		resumeScreeningSession,
+		isCreatingScreeningSession,
 	};
 }

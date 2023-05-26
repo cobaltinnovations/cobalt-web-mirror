@@ -1,20 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate, useRevalidator } from 'react-router-dom';
-import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { useNavigate, useRevalidator } from 'react-router-dom';
 
-import {
-	PatientOrderConsentStatusId,
-	PatientOrderDispositionId,
-	PatientOrderModel,
-	PatientOrderResourcingStatusId,
-	PatientOrderSafetyPlanningStatusId,
-	PatientOrderScreeningStatusId,
-	ScreeningSessionScreeningResult,
-} from '@/lib/models';
-import { integratedCareService } from '@/lib/services';
-import useHandleError from '@/hooks/use-handle-error';
-import useFlags from '@/hooks/use-flags';
 import {
 	MhicAssessmentModal,
 	MhicCloseEpisodeModal,
@@ -29,9 +17,23 @@ import {
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
+import useFlags from '@/hooks/use-flags';
+import useHandleError from '@/hooks/use-handle-error';
+import {
+	PatientOrderConsentStatusId,
+	PatientOrderDispositionId,
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderScreeningStatusId,
+	ScreeningSessionScreeningResult,
+} from '@/lib/models';
+import { integratedCareService } from '@/lib/services';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import useAccount from '@/hooks/use-account';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 
@@ -41,6 +43,7 @@ interface Props {
 }
 
 export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => {
+	const { institution } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
@@ -56,6 +59,11 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 	const [showConsentModal, setShowConsentModal] = useState(false);
+	const { isCreatingScreeningSession, resumeScreeningSession, createScreeningSession } = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		patientOrderId: patientOrder.patientOrderId,
+		instantiateOnLoad: false,
+	});
 
 	const handleCloseEpisodeModalSave = useCallback(
 		async (patientOrderClosureReasonId: string) => {
@@ -82,13 +90,27 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		return patientOrder.patientOrderVoicemailTasks.find((vmt) => !vmt.completed);
 	}, [patientOrder.patientOrderVoicemailTasks]);
 
-	const navigateToAssessment = useCallback(() => {
-		if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
-			setShowConsentModal(true);
-		} else {
-			navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
-		}
-	}, [navigate, patientOrder.patientOrderConsentStatusId, patientOrder.patientOrderId]);
+	const navigateToAssessment = useCallback(
+		(options: { createNew?: boolean; resumeRecent?: boolean }) => {
+			if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+				setShowConsentModal(true);
+			} else {
+				if (options.createNew) {
+					createScreeningSession();
+				}
+
+				if (options.resumeRecent) {
+					resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+				}
+			}
+		},
+		[
+			createScreeningSession,
+			patientOrder.patientOrderConsentStatusId,
+			patientOrder.mostRecentScreeningSessionId,
+			resumeScreeningSession,
+		]
+	);
 
 	return (
 		<>
@@ -358,11 +380,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigateToAssessment();
+													navigateToAssessment({
+														createNew: true,
+													});
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
 											},
 											{
 												variant: 'outline-primary',
@@ -400,11 +424,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigateToAssessment();
+													navigateToAssessment({
+														createNew: true,
+													});
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
 											},
 											{
 												variant: 'outline-primary',
@@ -440,7 +466,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Continue Assessment',
 												onClick: () => {
-													navigateToAssessment();
+													navigateToAssessment({
+														resumeRecent: true,
+													});
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -450,11 +478,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Retake Assessment',
 												onClick: () => {
-													navigateToAssessment();
+													navigateToAssessment({
+														createNew: true,
+													});
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
 											},
 										]}
 									/>

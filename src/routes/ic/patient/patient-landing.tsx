@@ -54,7 +54,7 @@ const PatientLanding = () => {
 	const { institution } = useAccount();
 	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
-	const { checkAndStartScreeningFlow } = useScreeningFlow({
+	const { isCreatingScreeningSession, createScreeningSession, resumeScreeningSession } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
@@ -261,8 +261,9 @@ const PatientLanding = () => {
 																				answers.
 																			</p>
 																			<Button
+																				disabled={isCreatingScreeningSession}
 																				onClick={() => {
-																					checkAndStartScreeningFlow();
+																					createScreeningSession();
 																				}}
 																			>
 																				Take the Assessment
@@ -309,8 +310,14 @@ const PatientLanding = () => {
 																	variant: 'primary',
 																	title: 'Continue Assessment',
 																	onClick: () => {
-																		window.alert(
-																			'[TODO]: link to current assessment question'
+																		if (
+																			!patientOrder.mostRecentScreeningSessionId
+																		) {
+																			throw new Error('Unknown Recent Screening');
+																		}
+
+																		resumeScreeningSession(
+																			patientOrder.mostRecentScreeningSessionId
 																		);
 																	},
 																},
@@ -318,8 +325,9 @@ const PatientLanding = () => {
 																	variant: 'outline-primary',
 																	title: 'Restart from Beginning',
 																	onClick: () => {
-																		checkAndStartScreeningFlow();
+																		createScreeningSession();
 																	},
+																	disabled: isCreatingScreeningSession,
 																},
 															]}
 														/>

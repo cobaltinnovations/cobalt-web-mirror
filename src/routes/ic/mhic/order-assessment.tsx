@@ -13,7 +13,7 @@ export const MhicOrderAssessment = () => {
 	const revalidator = useRevalidator();
 
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow, createNewScreeningFlow } = useScreeningFlow({
+	const { resumeScreeningSession, createScreeningSession } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId,
 		instantiateOnLoad: false,
@@ -36,11 +36,7 @@ export const MhicOrderAssessment = () => {
 					isMhic
 					patientOrder={patientOrderResponse.patientOrder}
 					onBegin={async () => {
-						if (isRecreate) {
-							await createNewScreeningFlow();
-						} else {
-							await checkAndStartScreeningFlow();
-						}
+						await createScreeningSession();
 
 						revalidator.revalidate();
 					}}
@@ -63,7 +59,9 @@ export const MhicOrderAssessment = () => {
 
 							<Button
 								onClick={() => {
-									checkAndStartScreeningFlow();
+									resumeScreeningSession(
+										patientOrderResponse.patientOrder.mostRecentScreeningSessionId
+									);
 								}}
 							>
 								Continue Current Assessment

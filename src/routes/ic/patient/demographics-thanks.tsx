@@ -19,7 +19,7 @@ const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
-	const { checkAndStartScreeningFlow } = useScreeningFlow({
+	const { createScreeningSession } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
@@ -49,7 +49,7 @@ const PatientDemographicsThanks = () => {
 							<div className="text-center">
 								<Button
 									onClick={() => {
-										checkAndStartScreeningFlow();
+										createScreeningSession();
 									}}
 								>
 									Continue

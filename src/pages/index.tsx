@@ -77,7 +77,7 @@ const Index: FC = () => {
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
-	const { startScreeningFlowWithoutChecks, renderedCollectPhoneModal } = useScreeningFlow({
+	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
 		instantiateOnLoad: false,
 	});
@@ -169,7 +169,7 @@ const Index: FC = () => {
 												variant: 'primary',
 												title: 'Take the Assessment',
 												onClick: () => {
-													startScreeningFlowWithoutChecks();
+													startScreeningFlow();
 													trackEvent({
 														action: 'HP Take Assessment',
 													});

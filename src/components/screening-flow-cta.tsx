@@ -25,7 +25,7 @@ interface Props {
 const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 	const classes = useStyles();
 	const { institution } = useAccount();
-	const { checkAndStartScreeningFlow } = useScreeningFlow({
+	const { startScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.contentScreeningFlowId,
 		instantiateOnLoad: false,
 	});
@@ -41,7 +41,7 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 					size="lg"
 					variant={buttonVariant ?? 'primary'}
 					className="d-inline-flex align-items-center"
-					onClick={checkAndStartScreeningFlow}
+					onClick={startScreeningFlow}
 				>
 					<AssessmentIcon className="me-2" />
 					Take the Assessment
