@@ -13,6 +13,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
+	PatientOrderAssignmentStatusId,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
 	PatientOrderScreeningStatusId,
@@ -95,6 +96,20 @@ const availableFilters: Filter[] = [
 			{
 				title: 'Appointment attended',
 				value: PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_ATTENDED,
+			},
+		],
+	},
+	{
+		filterId: 'patientOrderAssignmentStatusId',
+		title: 'Assignment Status',
+		options: [
+			{
+				title: 'Unassigned',
+				value: PatientOrderAssignmentStatusId.UNASSIGNED,
+			},
+			{
+				title: 'Assigned',
+				value: PatientOrderAssignmentStatusId.ASSIGNED,
 			},
 		],
 	},
