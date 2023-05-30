@@ -75,10 +75,7 @@ export const PatientAssessmentResults = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<h1 className="mb-1">Assessment Results</h1>
 						<p className="mb-6 fs-large text-gray">
-							Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'} by{' '}
-							<span className="text-danger">
-								[TODO]: mostRecentScreeningSessionCompletedByAccountDisplayName
-							</span>
+							Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'}
 						</p>
 						<hr className="mb-8" />
 
