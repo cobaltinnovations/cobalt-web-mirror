@@ -89,7 +89,9 @@ const PatientDemographics = () => {
 			patientGenderIdentityId: response.patientOrder.patientGenderIdentityId ?? '',
 			verified: false,
 		});
-		setReadOnly(response.patientOrder.patientDemographicsCompleted ?? false);
+
+		// Always permit for now
+		setReadOnly(false);
 	}, []);
 
 	const handleFormSubmit = useCallback(
