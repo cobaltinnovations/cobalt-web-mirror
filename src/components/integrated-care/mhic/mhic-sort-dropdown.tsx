@@ -106,6 +106,7 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 
 		searchParams.set('patientOrderSortColumnId', sortByValue);
 		searchParams.set('sortDirectionId', orderValue);
+		searchParams.set('pageNumber', '0');
 
 		setSearchParams(searchParams);
 	}, [orderValue, searchParams, setSearchParams, sortByValue]);
@@ -116,6 +117,7 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 		searchParams.delete('patientOrderSortColumnId');
 		searchParams.delete('sortDirectionId');
 		searchParams.delete('sortNullsId');
+		searchParams.set('pageNumber', '0');
 
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);

@@ -27,6 +27,7 @@ export const MhicFilterPractice = ({ referenceData, className }: MhicFilterPract
 
 	const handleDismiss = useCallback(() => {
 		searchParams.delete(queryParamName);
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
@@ -37,6 +38,7 @@ export const MhicFilterPractice = ({ referenceData, className }: MhicFilterPract
 			searchParams.append(queryParamName, value);
 		});
 
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValues, setSearchParams]);
 

@@ -62,12 +62,14 @@ export const MhicFilterState = ({ className }: MhicFilterStateProps) => {
 	const handleDismiss = useCallback(() => {
 		availableQueryParams.forEach((param) => {
 			searchParams.delete(param);
+			searchParams.set('pageNumber', '0');
 			setSearchParams(searchParams);
 		});
 	}, [searchParams, setSearchParams]);
 
 	const handleConfirm = useCallback(() => {
 		searchParams.set('patientOrderDispositionId', selectedValue);
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValue, setSearchParams]);
 
