@@ -5,6 +5,7 @@ import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import {
+	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -95,189 +96,211 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<Container className="py-10">
-				<Row className="mb-11">
-					<Col md={{ span: 10, offset: 1 }}>
-						<div className="d-flex align-items-center justify-content-between">
-							<h2 className="mb-0">Assessment Review</h2>
-							<Button onClick={onStartNewAssessment}>Retake Assessment</Button>
-						</div>
-						<p className="mb-0">
-							Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
-							{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
-						</p>
-					</Col>
-				</Row>
-				<Row className="mb-8">
-					<Col md={{ span: 10, offset: 1 }}>
-						<hr />
-					</Col>
-				</Row>
 				{patientOrder && (
-					<Row>
-						<Col md={{ span: 7, offset: 1 }}>
-							<div className={classes.scrollAnchor} id="results" />
-							<h3 className="mb-8">Results</h3>
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<MhicInlineAlert
+					<>
+						<Row className="mb-11">
+							<Col md={{ span: 10, offset: 1 }}>
+								<div className="d-flex align-items-center justify-content-between">
+									<h2 className="mb-0">Assessment Review</h2>
+									<Button
+										onClick={onStartNewAssessment}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									>
+										Retake Assessment
+									</Button>
+								</div>
+								<p className="mb-0">
+									Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
+									{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
+								</p>
+							</Col>
+						</Row>
+						<Row className="mb-8">
+							<Col md={{ span: 10, offset: 1 }}>
+								<hr />
+							</Col>
+						</Row>
+						<Row>
+							<Col md={{ span: 7, offset: 1 }}>
+								<div className={classes.scrollAnchor} id="results" />
+								<h3 className="mb-8">Results</h3>
+								{patientOrder.patientOrderSafetyPlanningStatusId ===
+									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+									<MhicInlineAlert
+										className="mb-6"
+										variant="danger"
+										title="Patient needs safety planning"
+									/>
+								)}
+								{patientOrder.patientOrderResourcingStatusId ===
+									PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+									<MhicInlineAlert
+										className="mb-6"
+										variant="warning"
+										title="Patient needs resources"
+									/>
+								)}
+								{patientOrder.patientOrderSafetyPlanningStatusId ===
+									PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
+									<MhicInlineAlert
+										className="mb-6"
+										variant="success"
+										title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
+										description="[TODO]: Reason for Safety Planning: [Reason]"
+									/>
+								)}
+								{patientOrder.patientOrderResourcingStatusId ===
+									PatientOrderResourcingStatusId.SENT_RESOURCES && (
+									<MhicInlineAlert
+										className="mb-6"
+										variant="success"
+										title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+										action={{
+											title: 'Review contact history for more details',
+											onClick: () => {
+												window.alert('[TODO]: where does this link to.');
+											},
+										}}
+									/>
+								)}
+
+								<MhicTriageCard
 									className="mb-6"
-									variant="danger"
-									title="Patient needs safety planning"
+									patientOrder={patientOrder}
+									disabled={
+										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+									}
 								/>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
-							)}
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="success"
-									title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
-									description="[TODO]: Reason for Safety Planning: [Reason]"
+
+								<MhicNextStepsCard
+									className="mb-8"
+									patientOrder={patientOrder}
+									referenceData={referenceDataResponse}
+									disabled={
+										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+									}
 								/>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.SENT_RESOURCES && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="success"
-									title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-									action={{
-										title: 'Review contact history for more details',
-										onClick: () => {
-											window.alert('[TODO]: where does this link to.');
+								<hr className="mb-8" />
+
+								{conditionsAndSymptomsResults.length > 0 && (
+									<>
+										<div className={classes.scrollAnchor} id="conditions-and-symptoms" />
+										<h3 className="mb-8">Conditions &amp; Symptoms</h3>
+										{conditionsAndSymptomsResults.map((screening) => (
+											<ScreeningResultCard
+												key={screening.screeningId}
+												screening={screening}
+												id={screening.screeningId}
+											/>
+										))}
+										<hr className="mb-8" />
+									</>
+								)}
+
+								{completedAssessmentsResults.length > 0 && (
+									<>
+										<div className={classes.scrollAnchor} id="completed-assessments" />
+										<h3 className="mb-8">Completed Assessments</h3>
+										{completedAssessmentsResults.map((screening) => (
+											<ScreeningResultCard
+												key={screening.screeningId}
+												screening={screening}
+												id={screening.screeningId}
+											/>
+										))}
+									</>
+								)}
+
+								{notTakenScreeningTypes.length > 0 && (
+									<>
+										<hr className="mb-8" />
+										<div className={classes.scrollAnchor} id="other-assessments" />
+										<h3 className="mb-2">Other Assessments</h3>
+										<p className="mb-8">These assessments were not applicable to the patient.</p>
+										{notTakenScreeningTypes.map((screeningType) => (
+											<ScreeningResultCard
+												key={screeningType.screeningTypeId}
+												screening={{
+													screeningVersionId: '',
+													screeningId: '',
+													screeningVersionNumber: 0,
+													screeningTypeId: screeningType.screeningTypeId,
+													screeningName: screeningType.description,
+													screeningScore: {
+														overallScore: undefined,
+														personalAccomplishmentScore: 0,
+														depersonalizationScore: 0,
+														emotionalExhaustionScore: 0,
+													},
+													belowScoringThreshold: undefined,
+												}}
+												id={screeningType.screeningTypeId}
+											/>
+										))}
+									</>
+								)}
+							</Col>
+							<Col md={{ span: 2, offset: 1 }}>
+								<TabBar
+									key="mhic-assessment-tabbar"
+									className="position-sticky"
+									style={{ top: MHIC_HEADER_HEIGHT + 32 }}
+									orientation="vertical"
+									value="RESULTS"
+									tabs={[
+										{
+											title: 'Results',
+											value: '#results',
 										},
+										...(conditionsAndSymptomsResults.length > 0
+											? [
+													{
+														title: 'Conditions & Symptoms',
+														value: '#conditions-and-symptoms',
+													},
+											  ]
+											: []),
+										...conditionsAndSymptomsResults.map((result) => ({
+											title: result.screeningName ?? '',
+											value: `#${result.screeningId}` ?? '#',
+											level: 1,
+										})),
+										...(completedAssessmentsResults.length > 0
+											? [
+													{
+														title: 'Completed Assessments',
+														value: '#completed-assessments',
+													},
+											  ]
+											: []),
+										...completedAssessmentsResults.map((result) => ({
+											title: result.screeningName ?? '',
+											value: `#${result.screeningId}` ?? '#',
+											level: 1,
+										})),
+										...(notTakenScreeningTypes.length > 0
+											? [
+													{
+														title: 'Other Assessments',
+														value: '#other-assessments',
+													},
+											  ]
+											: []),
+										...notTakenScreeningTypes.map((result) => ({
+											title: result.description ?? '',
+											value: `#${result.screeningTypeId}` ?? '#',
+											level: 1,
+										})),
+									]}
+									onTabClick={(value) => {
+										window.location.href = `${pathname}${value}`;
 									}}
 								/>
-							)}
-
-							<MhicTriageCard className="mb-6" patientOrder={patientOrder} />
-
-							<MhicNextStepsCard
-								className="mb-8"
-								patientOrder={patientOrder}
-								referenceData={referenceDataResponse}
-							/>
-							<hr className="mb-8" />
-
-							{conditionsAndSymptomsResults.length > 0 && (
-								<>
-									<div className={classes.scrollAnchor} id="conditions-and-symptoms" />
-									<h3 className="mb-8">Conditions &amp; Symptoms</h3>
-									{conditionsAndSymptomsResults.map((screening) => (
-										<ScreeningResultCard
-											key={screening.screeningId}
-											screening={screening}
-											id={screening.screeningId}
-										/>
-									))}
-									<hr className="mb-8" />
-								</>
-							)}
-
-							{completedAssessmentsResults.length > 0 && (
-								<>
-									<div className={classes.scrollAnchor} id="completed-assessments" />
-									<h3 className="mb-8">Completed Assessments</h3>
-									{completedAssessmentsResults.map((screening) => (
-										<ScreeningResultCard
-											key={screening.screeningId}
-											screening={screening}
-											id={screening.screeningId}
-										/>
-									))}
-								</>
-							)}
-
-							{notTakenScreeningTypes.length > 0 && (
-								<>
-									<hr className="mb-8" />
-									<div className={classes.scrollAnchor} id="other-assessments" />
-									<h3 className="mb-2">Other Assessments</h3>
-									<p className="mb-8">These assessments were not applicable to the patient.</p>
-									{notTakenScreeningTypes.map((screeningType) => (
-										<ScreeningResultCard
-											key={screeningType.screeningTypeId}
-											screening={{
-												screeningVersionId: '',
-												screeningId: '',
-												screeningVersionNumber: 0,
-												screeningTypeId: screeningType.screeningTypeId,
-												screeningName: screeningType.description,
-												screeningScore: {
-													overallScore: undefined,
-													personalAccomplishmentScore: 0,
-													depersonalizationScore: 0,
-													emotionalExhaustionScore: 0,
-												},
-												belowScoringThreshold: undefined,
-											}}
-											id={screeningType.screeningTypeId}
-										/>
-									))}
-								</>
-							)}
-						</Col>
-						<Col md={{ span: 2, offset: 1 }}>
-							<TabBar
-								key="mhic-assessment-tabbar"
-								className="position-sticky"
-								style={{ top: MHIC_HEADER_HEIGHT + 32 }}
-								orientation="vertical"
-								value="RESULTS"
-								tabs={[
-									{
-										title: 'Results',
-										value: '#results',
-									},
-									...(conditionsAndSymptomsResults.length > 0
-										? [
-												{
-													title: 'Conditions & Symptoms',
-													value: '#conditions-and-symptoms',
-												},
-										  ]
-										: []),
-									...conditionsAndSymptomsResults.map((result) => ({
-										title: result.screeningName ?? '',
-										value: `#${result.screeningId}` ?? '#',
-										level: 1,
-									})),
-									...(completedAssessmentsResults.length > 0
-										? [
-												{
-													title: 'Completed Assessments',
-													value: '#completed-assessments',
-												},
-										  ]
-										: []),
-									...completedAssessmentsResults.map((result) => ({
-										title: result.screeningName ?? '',
-										value: `#${result.screeningId}` ?? '#',
-										level: 1,
-									})),
-									...(notTakenScreeningTypes.length > 0
-										? [
-												{
-													title: 'Other Assessments',
-													value: '#other-assessments',
-												},
-										  ]
-										: []),
-									...notTakenScreeningTypes.map((result) => ({
-										title: result.description ?? '',
-										value: `#${result.screeningTypeId}` ?? '#',
-										level: 1,
-									})),
-								]}
-								onTabClick={(value) => {
-									window.location.href = `${pathname}${value}`;
-								}}
-							/>
-						</Col>
-					</Row>
+							</Col>
+						</Row>
+					</>
 				)}
 			</Container>
 		</AsyncWrapper>
