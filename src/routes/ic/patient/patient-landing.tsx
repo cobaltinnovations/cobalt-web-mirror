@@ -229,7 +229,7 @@ const PatientLanding = () => {
 													description={
 														homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
 															? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
-															: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next {x} days.'
+															: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
 													}
 													button={
 														homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
