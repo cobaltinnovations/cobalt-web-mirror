@@ -282,9 +282,12 @@ const PatientLanding = () => {
 																				{
 																					institution?.integratedCarePhoneNumberDescription
 																				}{' '}
-																				Monday-Friday, 9am to 4pm and a Mental
-																				Health Intake Coordinator will guide you
-																				through the assessment over the phone.
+																				{
+																					institution?.integratedCareAvailabilityDescription
+																				}{' '}
+																				and a Mental Health Intake Coordinator
+																				will guide you through the assessment
+																				over the phone.
 																			</p>
 																			<Button
 																				as="a"
