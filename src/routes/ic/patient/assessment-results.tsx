@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import {
 	PatientOrderClosureReasonId,
+	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
@@ -26,8 +27,14 @@ export const PatientAssessmentResults = () => {
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
+
+		if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
+			navigate('/ic/patient');
+			return;
+		}
+
 		setPatientOrder(response.patientOrder);
-	}, []);
+	}, [navigate]);
 
 	const handleSubclinicalFormSubmit = useCallback(
 		async (event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
