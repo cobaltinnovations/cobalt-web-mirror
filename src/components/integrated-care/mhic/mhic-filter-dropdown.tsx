@@ -46,7 +46,7 @@ const availableFilters: Filter[] = [
 				value: PatientOrderScreeningStatusId.SCHEDULED,
 			},
 			{
-				title: 'Compelte',
+				title: 'Complete',
 				value: PatientOrderScreeningStatusId.COMPLETE,
 			},
 		],
