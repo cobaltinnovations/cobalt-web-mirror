@@ -300,6 +300,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 								searchParams.delete(param);
 							}
 
+							searchParams.set('pageNumber', '0');
 							setSearchParams(searchParams);
 						}}
 					>
@@ -322,6 +323,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 								searchParams
 							);
 
+							filters.set('pageNumber', '0');
 							setSearchParams(filters);
 						}}
 					>

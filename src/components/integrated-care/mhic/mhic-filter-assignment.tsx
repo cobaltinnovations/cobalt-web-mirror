@@ -27,6 +27,7 @@ export const MhicFilterAssignment = ({ panelAccounts, className }: MhicFilterAss
 
 	const handleDismiss = useCallback(() => {
 		searchParams.delete(queryParamName);
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
@@ -37,6 +38,7 @@ export const MhicFilterAssignment = ({ panelAccounts, className }: MhicFilterAss
 			searchParams.append(queryParamName, value);
 		});
 
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValues, setSearchParams]);
 

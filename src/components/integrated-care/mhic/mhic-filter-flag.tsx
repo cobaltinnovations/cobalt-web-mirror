@@ -71,6 +71,7 @@ export const MhicFilterFlag = ({ className }: MhicFilterFlagProps) => {
 
 	const handleDismiss = useCallback(() => {
 		searchParams.delete(queryParamName);
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
@@ -81,6 +82,7 @@ export const MhicFilterFlag = ({ className }: MhicFilterFlagProps) => {
 			searchParams.append(queryParamName, value);
 		});
 
+		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValues, setSearchParams]);
 
