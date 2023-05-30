@@ -297,10 +297,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											onClick={() => {
 												navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 											}}
-											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
-											}
 										>
 											Review <ExternalIcon className="ms-2" width={20} height={20} />
 										</Button>
