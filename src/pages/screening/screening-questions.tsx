@@ -49,6 +49,7 @@ const ScreeningQuestionsPage = () => {
 		const response = await request.fetch();
 
 		setScreeningQuestionContextResponse(response);
+		window.scrollTo(0, 0);
 
 		if (response.preQuestionScreeningConfirmationPrompt) {
 			setConfirmationPrompt(response.preQuestionScreeningConfirmationPrompt);
