@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
-import config from '@/lib/config';
 import { PatientOrderConsentStatusId, PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -21,33 +20,6 @@ enum PAGE_STATES {
 	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
 	SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
-
-const pageStates = [
-	{
-		homescreenStateId: PAGE_STATES.AWAITING_PATIENT_ORDER,
-		title: 'Awaiting Patient Order',
-	},
-	{
-		homescreenStateId: PAGE_STATES.ASSESSMENT_READY,
-		title: 'Assessment Ready',
-	},
-	{
-		homescreenStateId: PAGE_STATES.ASSESSMENT_REFUSED,
-		title: 'Assessment Refused',
-	},
-	{
-		homescreenStateId: PAGE_STATES.ASSESSMENT_IN_PROGRESS,
-		title: 'Assessment In Progress',
-	},
-	{
-		homescreenStateId: PAGE_STATES.ASSESSMENT_COMPLETE,
-		title: 'Assessment Complete',
-	},
-	{
-		homescreenStateId: PAGE_STATES.SERVICE_UNAVAILABLE,
-		title: 'Service Unavailable',
-	},
-];
 
 const PatientLanding = () => {
 	const navigate = useNavigate();
@@ -110,33 +82,6 @@ const PatientLanding = () => {
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<Container className="py-10">
-				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-					<Row className="mb-10">
-						<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-							<Form>
-								<Form.Label className="mb-2">Homescreen State (For Dev Only)</Form.Label>
-								<Form.Group>
-									{pageStates.map((hs) => (
-										<Form.Check
-											inline
-											key={hs.homescreenStateId}
-											type="radio"
-											name="homescreen-state"
-											id={`homescreen-state--${hs.homescreenStateId}`}
-											value={hs.homescreenStateId}
-											label={hs.title}
-											checked={homescreenState === hs.homescreenStateId}
-											onChange={({ currentTarget }) => {
-												setHomescreenState(currentTarget.value as PAGE_STATES);
-											}}
-										/>
-									))}
-								</Form.Group>
-							</Form>
-						</Col>
-					</Row>
-				)}
-
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 						<h1 className="mb-6">Welcome, {patientOrder?.patientFirstName ?? 'patient'}</h1>
