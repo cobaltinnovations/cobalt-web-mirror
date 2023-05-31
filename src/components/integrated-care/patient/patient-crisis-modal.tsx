@@ -33,13 +33,8 @@ export const IcScreeningCrisisModal: FC<useIcScreeningCrisisModalProps> = ({ ...
 				<h5 className="mb-8">
 					If you think you might harm yourself or others, please immediately contact one of the following
 				</h5>
-
 				<InCrisisTemplate isModal />
-
-				<p className="my-4">
-					The resources above can be accessed at any time from the link at the bottom of your screen.
-				</p>
-
+				<p className="my-4">The resources above can be accessed at any time from "In Crisis" button.</p>
 				<Button
 					className="w-100"
 					variant="primary"
