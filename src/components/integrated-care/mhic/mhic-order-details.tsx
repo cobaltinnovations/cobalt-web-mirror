@@ -328,7 +328,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									className="mb-6"
 									variant="success"
 									title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
-									description="[TODO]: Reason for Safety Planning: [Reason]"
 								/>
 							)}
 							{patientOrder.patientOrderResourcingStatusId ===
@@ -337,12 +336,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									className="mb-6"
 									variant="success"
 									title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-									action={{
-										title: 'Review contact history for more details',
-										onClick: () => {
-											window.alert('[TODO]: where does this link to.');
-										},
-									}}
 								/>
 							)}
 							<MhicTriageCard
