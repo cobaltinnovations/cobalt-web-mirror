@@ -6,12 +6,15 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
+	PatientOrderTriageStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
-import { integratedCareService } from '@/lib/services';
+import { appointmentService, integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import useAccount from '@/hooks/use-account';
+import NoData from '@/components/no-data';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -27,6 +30,7 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const revalidator = useRevalidator();
 	const [isSaving, setIsSaving] = useState(false);
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
 	const handleSafetyPlanningModalSave = useCallback(
 		(updatedPatientOrder: PatientOrderModel) => {
@@ -90,6 +94,21 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 		[handleError, patientOrder.patientOrderId, revalidator]
 	);
 
+	const handleCancelAppointmentConfirm = useCallback(async () => {
+		try {
+			if (!patientOrder.appointmentId) {
+				throw new Error('appointment is undefined.');
+			}
+
+			await appointmentService.cancelAppointment(patientOrder.appointmentId).fetch();
+			revalidator.revalidate();
+
+			setShowConfirmDialog(false);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, patientOrder.appointmentId, revalidator]);
+
 	return (
 		<>
 			<MhicSafetyPlanningModal
@@ -111,12 +130,25 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 				onSave={handleResourcesModalSave}
 			/>
 
+			<ConfirmDialog
+				show={showConfirmDialog}
+				onHide={() => {
+					setShowConfirmDialog(false);
+				}}
+				titleText="Cancel Appointment"
+				bodyText="Are you sure you want to cancel this appointment?"
+				dismissText="Do Not Cancel"
+				confirmText="Cancel Appointment"
+				onConfirm={handleCancelAppointmentConfirm}
+				displayButtonsBlock
+			/>
+
 			<Card bsPrefix="ic-card" className={className}>
 				<Card.Header>
 					<Card.Title>Next Steps</Card.Title>
 				</Card.Header>
 				<Card.Body>
-					{/* {patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+					{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 						<>
 							{patientOrder.appointmentId ? (
 								<NoData
@@ -128,7 +160,7 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 											variant: 'primary',
 											title: 'Cancel Appointment',
 											onClick: () => {
-												window.alert('TODO: Cancel appointment UI');
+												setShowConfirmDialog(true);
 											},
 										},
 									]}
@@ -137,22 +169,12 @@ export const MhicNextStepsCard = ({ patientOrder, referenceData, disabled, class
 								<NoData
 									className="mb-4"
 									title="No Appointment"
-									description="The patient's appointment information will appear here"
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Schedule Appointment',
-											onClick: () => {
-												navigate(
-													`/ic/mhic/connect-with-support/mhp?patientOrderId=${patientOrder.patientOrderId}`
-												);
-											},
-										},
-									]}
+									description="Patient must schedule an appointment through Cobalt"
+									actions={[]}
 								/>
 							)}
 						</>
-					)} */}
+					)}
 					<div className="mb-4 d-flex align-items-center justify-content-between">
 						<Form.Check
 							type="switch"
