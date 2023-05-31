@@ -774,7 +774,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">Appointment Type</p>
 											</Col>
 											<Col>
-												<p className="m-0 text-danger">[TODO]</p>
+												<p className="m-0">
+													{referenceDataResponse.patientOrderCarePreferences.find(
+														(c) =>
+															c.patientOrderCarePreferenceId ===
+															patientOrder.patientOrderCarePreferenceId
+													)?.description ?? 'N/A'}
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -782,7 +788,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">Travel Radius</p>
 											</Col>
 											<Col>
-												<p className="m-0 text-danger">[TODO]</p>
+												<p className="m-0">
+													{patientOrder.inPersonCareRadiusWithDistanceUnitDescription ??
+														'N/A'}
+												</p>
 											</Col>
 										</Row>
 									</Container>
