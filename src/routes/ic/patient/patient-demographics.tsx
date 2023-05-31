@@ -9,21 +9,6 @@ import { useIntegratedCareLoaderData } from '../landing';
 import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 
-const carePreferences = [
-	{
-		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.NO_PREFERENCE,
-		title: 'No Preference',
-	},
-	{
-		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.TELEHEALTH,
-		title: 'Telehealth',
-	},
-	{
-		patientOrderCarePreferenceId: PatientOrderCarePreferenceId.IN_PERSON,
-		title: 'In-persion',
-	},
-];
-
 const careRadii = [
 	{
 		inPersonCareRadiusId: 'TEN_MILES',
@@ -177,13 +162,13 @@ const PatientDemographics = () => {
 								<h5 className="mb-2">
 									How would you prefer to connect with a mental health care provider?
 								</h5>
-								{carePreferences.map((carePreference) => (
+								{referenceDataResponse.patientOrderCarePreferences.map((carePreference) => (
 									<Form.Check
 										key={carePreference.patientOrderCarePreferenceId}
 										type="radio"
 										name="care-preference"
 										id={`care-preference--${carePreference.patientOrderCarePreferenceId}`}
-										label={carePreference.title}
+										label={carePreference.description}
 										value={carePreference.patientOrderCarePreferenceId}
 										checked={
 											formValues.patientOrderCarePreferenceId ===

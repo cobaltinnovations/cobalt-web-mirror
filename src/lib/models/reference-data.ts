@@ -1,4 +1,5 @@
 import {
+	PatientOrderCarePreferenceId,
 	PatientOrderDispositionId,
 	PatientOrderResourcingTypeId,
 	PatientOrderTriageStatusId,
@@ -76,6 +77,11 @@ export interface PatientOrderScheduledMessageType {
 	patientOrderScheduledMessageTypeId: string;
 }
 
+export interface PatientOrderCarePreference {
+	description: string;
+	patientOrderCarePreferenceId: PatientOrderCarePreferenceId;
+}
+
 export interface PatientOrderCareType {
 	description: string;
 	patientOrderCareTypeId: string;
@@ -112,6 +118,7 @@ export interface ReferenceDataResponse {
 	ethnicities: Ethnicity[];
 	genderIdentities: GenderIdentity[];
 	languages: Language[];
+	patientOrderCarePreferences: PatientOrderCarePreference[];
 	patientOrderCareTypes: PatientOrderCareType[];
 	patientOrderDispositions: PatientOrderDisposition[];
 	patientOrderFocusTypes: PatientOrderFocusType[];

@@ -76,6 +76,13 @@ export interface PatientOrderModel {
 	episodeClosedByAccountId?: string;
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
+
+	followupNeeded?: boolean;
+	inPersonCareRadius?: number;
+	inPersonCareRadiusDescription?: string;
+	inPersonCareRadiusDistanceUnitId?: string;
+	inPersonCareRadiusWithDistanceUnitDescription?: string;
+
 	patientEthnicityId: string;
 	patientRaceId: string;
 	patientGenderIdentityId: string;
@@ -172,7 +179,6 @@ export interface PatientOrderModel {
 	patientAgeOnOrderDateDescription: string;
 
 	patientOrderCarePreferenceId?: string;
-	inPersonCareRadius?: number;
 }
 
 export enum PatientOrderViewTypeId {
