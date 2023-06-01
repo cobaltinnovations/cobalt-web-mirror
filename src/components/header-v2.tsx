@@ -70,6 +70,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			'& li': {
 				position: 'relative',
 				'& a:not(.dropdown-item), & .dropdown button': {
+					border: 0,
 					height: '100%',
 					display: 'flex',
 					padding: '0 12px',
@@ -211,6 +212,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			},
 		},
 		'& button': {
+			border: 0,
 			width: '100%',
 			textAlign: 'left',
 		},
@@ -783,7 +785,11 @@ const HeaderV2 = () => {
 							<small className="fw-bold">In Crisis?</small>
 						</Button>
 						<Dropdown className="ms-4 d-flex align-items-center">
-							<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
+							<Dropdown.Toggle
+								as={DropdownToggle}
+								id="mhic-header__dropdown-menu"
+								className="p-0 border-0"
+							>
 								<AvatarIcon className="d-flex" />
 							</Dropdown.Toggle>
 							<Dropdown.Menu

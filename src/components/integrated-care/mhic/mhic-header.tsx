@@ -219,7 +219,11 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 							<MhicHeaderAutoComplete recentOrders={recentOrders} />
 
 							<Dropdown className="ms-6 d-flex align-items-center">
-								<Dropdown.Toggle as={DropdownToggle} className="p-0" id="mhic-header__dropdown-menu">
+								<Dropdown.Toggle
+									as={DropdownToggle}
+									className="p-0 border-0"
+									id="mhic-header__dropdown-menu"
+								>
 									<AvatarIcon className="d-flex" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu

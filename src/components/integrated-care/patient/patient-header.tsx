@@ -77,7 +77,7 @@ export const PatientHeader = () => {
 					<small className="fw-bold">In Crisis?</small>
 				</Button>
 				<Dropdown className="ms-4 d-flex align-items-center">
-					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0">
+					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0 border-0">
 						<AvatarIcon className="d-flex" />
 					</Dropdown.Toggle>
 					<Dropdown.Menu
