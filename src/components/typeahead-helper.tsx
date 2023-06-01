@@ -6,30 +6,31 @@ import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
-interface useInputHelperStylesProps {
+interface UseStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
-	value: boolean;
+	hasValue: boolean;
 	hasError: boolean;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	typeaheadHelper: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+	typeaheadHelper: {
 		minHeight: 54,
 		borderRadius: 5,
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
-		border: `1px solid ${
-			hasError
-				? theme.colors.d500
-				: isFocused
-				? theme.colors.p500
-				: isHovered
-				? theme.colors.n300
-				: theme.colors.n100
-		}`,
-	}),
-	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
+		border: ({ isHovered, isFocused, hasError }: UseStylesProps) =>
+			`1px solid ${
+				hasError
+					? theme.colors.d500
+					: isFocused
+					? theme.colors.p500
+					: isHovered
+					? theme.colors.n300
+					: theme.colors.n100
+			}`,
+	},
+	label: {
 		top: 18,
 		left: 16,
 		margin: 0,
@@ -40,10 +41,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.default,
 		...theme.fonts.headingBold,
 		transformOrigin: 'left top',
-		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
+		color: ({ isFocused, hasError }: UseStylesProps) =>
+			hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
-	}),
+		transform: ({ isFocused, hasValue }: UseStylesProps) =>
+			isFocused || hasValue ? 'translateY(-50%) scale(0.75)' : '',
+	},
 }));
 
 interface TypeaheadHelperProps extends TypeaheadComponentProps {
@@ -70,7 +73,7 @@ export function TypeaheadHelper({
 	const classes = useStyles({
 		isHovered,
 		isFocused,
-		value: !!props.selected?.length,
+		hasValue: !!props.selected?.length,
 		hasError: !!error,
 	});
 

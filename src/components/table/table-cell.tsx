@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { SORT_DIRECTION } from '.';
 import { createUseThemedStyles } from '@/jss/theme';
 
-interface useStylesProps {
+interface UseStylesProps {
 	header?: boolean;
 	width?: string | number;
 	sticky?: boolean;
@@ -15,31 +15,27 @@ interface useStylesProps {
 }
 
 const useTableCellStyles = createUseThemedStyles((theme) => ({
-	tableCell: ({ width, sticky, stickyOffset }: useStylesProps) => ({
+	tableCell: {
 		height: 1, // Don't worry, this is ignored by the browser. It's a hack to allow a 100% height inner <div/>
 		padding: 0,
-		width: width ?? 'auto',
+		width: ({ width }: UseStylesProps) => width ?? 'auto',
 		backgroundColor: 'inherit',
-		...(sticky && {
-			position: 'sticky',
-			left: stickyOffset ?? 0,
-		}),
-	}),
-	tableCellContent: ({ width, stickyBorder, header }: useStylesProps) => ({
+		position: ({ sticky }: UseStylesProps) => (sticky ? 'sticky' : undefined),
+		left: ({ sticky, stickyOffset }: UseStylesProps) => (sticky ? stickyOffset ?? 0 : undefined),
+	},
+	tableCellContent: {
 		height: '100%',
 		padding: '14px 20px',
-		width: width ?? '100%',
+		width: ({ width }: UseStylesProps) => width ?? '100%',
 		display: 'inline-flex',
 		flexDirection: 'column',
 		justifyContent: 'center',
-		...(stickyBorder && {
-			borderRight: `1px solid ${theme.colors.n100}`,
-		}),
-		...(header && {
-			fontWeight: 500,
-			whiteSpace: 'nowrap',
-		}),
-	}),
+		borderRight: ({ stickyBorder }: UseStylesProps) =>
+			stickyBorder ? `1px solid ${theme.colors.n100}` : undefined,
+
+		fontWeight: ({ header }: UseStylesProps) => (header ? 500 : undefined),
+		whiteSpace: ({ header }: UseStylesProps) => (header ? 'nowrap' : undefined),
+	},
 	sortableButton: {
 		width: 44,
 		height: 44,

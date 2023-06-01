@@ -8,24 +8,25 @@ interface UseStylesProps {
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	tabBar: ({ vertical, hideBorder }: UseStylesProps) => ({
-		overflowX: vertical ? 'visible' : 'auto',
-		...(vertical
-			? { borderLeft: hideBorder ? '' : `1px solid ${theme.colors.n100}` }
-			: { borderBottom: hideBorder ? '' : `1px solid ${theme.colors.n100}` }),
+	tabBar: {
+		overflowX: ({ vertical }: UseStylesProps) => (vertical ? 'visible' : 'auto'),
+		borderLeft: ({ vertical, hideBorder }: UseStylesProps) =>
+			vertical && !hideBorder ? `1px solid ${theme.colors.n100}` : '',
+		borderBottom: ({ vertical, hideBorder }: UseStylesProps) =>
+			!vertical && !hideBorder ? `1px solid ${theme.colors.n100}` : '',
 
 		'& ul': {
 			margin: 0,
 			padding: 0,
 			display: 'flex',
 			listStyle: 'none',
-			flexDirection: vertical ? 'column' : 'row',
+			flexDirection: ({ vertical }: UseStylesProps) => (vertical ? 'column' : 'row'),
 			'& li': {
 				position: 'relative',
 				'& button': {
 					border: 0,
 					fontWeight: 500,
-					padding: vertical ? '10px 16px' : '18px 12px',
+					padding: ({ vertical }: UseStylesProps) => (vertical ? '10px 16px' : '18px 12px'),
 					appearance: 'none',
 					whiteSpace: 'nowrap',
 					color: theme.colors.n500,
@@ -45,42 +46,32 @@ const useStyles = createUseThemedStyles((theme) => ({
 						content: '""',
 						position: 'absolute',
 						backgroundColor: theme.colors.p700,
-						...(vertical
-							? {
-									top: 0,
-									left: 0,
-									bottom: 0,
-									width: 2,
-							  }
-							: {
-									left: 10,
-									right: 10,
-									bottom: 0,
-									height: 2,
-							  }),
+						left: ({ vertical }: UseStylesProps) => (vertical ? 0 : 10),
+						top: ({ vertical }: UseStylesProps) => (vertical ? 10 : undefined),
+						right: ({ vertical }: UseStylesProps) => (vertical ? undefined : 10),
+						bottom: 0,
+						height: ({ vertical }: UseStylesProps) => (vertical ? undefined : 2),
 					},
 				},
-				...(!vertical && {
-					'&:first-child': {
-						'& button': {
-							paddingLeft: 0,
-						},
-						'&.active:after': {
-							left: 0,
-						},
+				'&:first-child': {
+					'& button': {
+						paddingLeft: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
 					},
-					'&:last-child': {
-						'& button': {
-							paddingRight: 0,
-						},
-						'&.active:after': {
-							right: 0,
-						},
+					'&.active:after': {
+						left: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
 					},
-				}),
+				},
+				'&:last-child': {
+					'& button': {
+						paddingRight: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
+					},
+					'&.active:after': {
+						right: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
+					},
+				},
 			},
 		},
-	}),
+	},
 }));
 
 interface TabBarProps {

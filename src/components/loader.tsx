@@ -2,21 +2,25 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	size: number;
+}
+
 const useLoaderStyles = createUseThemedStyles((theme) => ({
-	loader: ({ size }: { size: number }) => ({
+	loader: {
 		zIndex: 0,
 		top: '50vh',
 		left: '50%',
 		position: 'absolute',
-		width: size || 56,
-		height: size || 56,
-		marginTop: -(size / 2) || -28,
-		marginLeft: -(size / 2) || -28,
+		width: ({ size }: UseStylesProps) => size || 56,
+		height: ({ size }: UseStylesProps) => size || 56,
+		marginTop: ({ size }: UseStylesProps) => -(size / 2) || -28,
+		marginLeft: ({ size }: UseStylesProps) => -(size / 2) || -28,
 		borderRadius: '50%',
 		borderTopColor: theme.colors.p500,
 		border: `8px solid ${theme.colors.border}`,
 		animation: `$rotate 1000ms linear 0ms infinite normal`,
-	}),
+	},
 	'@keyframes rotate': {
 		'0%': {
 			transform: 'rotate(0deg)',

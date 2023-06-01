@@ -5,15 +5,15 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
 
-interface UseStyleProps {
+interface UseStylesProps {
 	dialogWidth: number;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	modal: ({ dialogWidth }: UseStyleProps) => ({
+	modal: {
 		width: '90%',
 		height: '100%',
-		maxWidth: dialogWidth,
+		maxWidth: ({ dialogWidth }: UseStylesProps) => dialogWidth,
 		margin: '0 auto',
 		'& .modal-content': {
 			maxHeight: '90vh',
@@ -24,7 +24,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'& .cobalt-modal__footer': {
 			padding: '12px 16px',
 		},
-	}),
+	},
 	button: {
 		minHeight: 40,
 		borderRadius: 500,

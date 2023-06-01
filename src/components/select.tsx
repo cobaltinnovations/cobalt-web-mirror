@@ -5,6 +5,10 @@ import classNames from 'classnames';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	disabled: boolean;
+}
+
 const useSelectStyles = createUseThemedStyles((theme) => ({
 	select: {
 		position: 'relative',
@@ -46,13 +50,13 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 	},
-	downChevron: (props: any) => ({
+	downChevron: {
 		right: 15,
 		top: '50%',
 		position: 'absolute',
 		transform: 'translateY(-50%)',
-		fill: props.disabled ? theme.colors.n500 : theme.colors.n900,
-	}),
+		fill: ({ disabled }: UseStylesProps) => (disabled ? theme.colors.n500 : theme.colors.n900),
+	},
 }));
 
 interface SelectProps extends PropsWithChildren {
@@ -65,7 +69,7 @@ interface SelectProps extends PropsWithChildren {
 }
 
 const Select: FC<SelectProps> = ({ className, ...props }) => {
-	const classes = useSelectStyles({ disabled: props.disabled });
+	const classes = useSelectStyles({ disabled: !!props.disabled });
 
 	function handleOnChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		props.onChange(event);

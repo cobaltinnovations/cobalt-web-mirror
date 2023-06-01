@@ -5,7 +5,7 @@ import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg
 import { createUseThemedStyles } from '@/jss/theme';
 import moment from 'moment';
 
-interface useStyleProps {
+interface UseStylesProps {
 	value: boolean;
 }
 
@@ -40,7 +40,7 @@ const useDatePickerStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.headingBold,
 			transformOrigin: 'left top',
 			transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-			transform: ({ value }: useStyleProps) => (value ? 'translateY(-50%) scale(0.75)' : ''),
+			transform: ({ value }: UseStylesProps) => (value ? 'translateY(-50%) scale(0.75)' : ''),
 		},
 		'& .date-picker-value': {
 			...theme.fonts.default,

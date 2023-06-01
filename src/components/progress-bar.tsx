@@ -13,14 +13,14 @@ const useProgressBarStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		backgroundColor: theme.colors.n100,
 	},
-	progressBar: (props: ProgressBarProps) => ({
+	progressBar: {
 		top: 0,
 		left: 0,
 		bottom: 0,
 		position: 'absolute',
 		backgroundColor: theme.colors.s300,
-		width: `${(props.current / props.max) * 100}%`,
-	}),
+		width: (props: ProgressBarProps) => `${(props.current / props.max) * 100}%`,
+	},
 }));
 
 const ProgressBar: FC<ProgressBarProps> = (props) => {

@@ -8,34 +8,30 @@ export enum SESSION_STATUS {
 	CANCELED = 'CANCELED',
 }
 
+interface UseStylesProps {
+	status: string;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
-	sessionStatusDot: ({ status }: { status: SESSION_STATUS | string }) => {
-		let statusColor;
-
-		switch (status) {
-			case SESSION_STATUS.NEW: // Now called "Pending"
-				statusColor = theme.colors.n500;
-				break;
-			case SESSION_STATUS.ADDED:
-				statusColor = theme.colors.s500;
-				break;
-			case SESSION_STATUS.ARCHIVED:
-				statusColor = theme.colors.border;
-				break;
-			case SESSION_STATUS.CANCELED:
-				statusColor = theme.colors.d500;
-				break;
-			default:
-				statusColor = theme.colors.n100;
-		}
-
-		return {
-			width: 12,
-			height: 12,
-			marginRight: 12,
-			borderRadius: 6,
-			backgroundColor: statusColor,
-		};
+	sessionStatusDot: {
+		width: 12,
+		height: 12,
+		marginRight: 12,
+		borderRadius: 6,
+		backgroundColor: ({ status }: UseStylesProps) => {
+			switch (status) {
+				case SESSION_STATUS.NEW: // Now called "Pending"
+					return theme.colors.n500;
+				case SESSION_STATUS.ADDED:
+					return theme.colors.s500;
+				case SESSION_STATUS.ARCHIVED:
+					return theme.colors.border;
+				case SESSION_STATUS.CANCELED:
+					return theme.colors.d500;
+				default:
+					return theme.colors.n100;
+			}
+		},
 	},
 }));
 
