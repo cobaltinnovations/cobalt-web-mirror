@@ -3,42 +3,42 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Badge, Button } from 'react-bootstrap';
 
-interface useStylesProps {
+interface UseStylesProps {
 	bgColor?: string;
 }
 
 const defaultBg = 'rgba(0, 0, 0, 0.05)';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	skeleton: ({ bgColor }: useStylesProps) => ({
+	skeleton: {
 		backgroundPosition: '0 0',
 		backgroundSize: '50px 100%',
 		backgroundRepeat: 'repeat-y',
 		animation: '$skeleton-loading 1s linear infinite',
-		background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
-			bgColor ?? defaultBg
-		}`,
-	}),
+		background: ({ bgColor }: UseStylesProps) =>
+			`linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${bgColor ?? defaultBg}`,
+	},
 	skeletonText: {
 		borderRadius: 4,
 		display: 'inline-block',
 	},
-	skeletonImage: ({ bgColor }: useStylesProps) => ({
-		backgroundColor: `${bgColor ?? defaultBg} !important`,
-	}),
-	skeletonBadge: ({ bgColor }: useStylesProps) => ({
+	skeletonImage: {
+		backgroundColor: ({ bgColor }: UseStylesProps) => `${bgColor ?? defaultBg} !important`,
+	},
+	skeletonBadge: {
 		width: 85,
-		backgroundColor: `${bgColor ?? defaultBg} !important`,
-	}),
-	skeletonButton: ({ bgColor }: useStylesProps) => ({
+		backgroundColor: ({ bgColor }: UseStylesProps) => `${bgColor ?? defaultBg} !important`,
+	},
+	skeletonButton: {
 		cursor: 'default',
 		display: 'inline-block',
 		'&:hover, &:active': {
-			background: `linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
-				bgColor ?? defaultBg
-			}`,
+			background: ({ bgColor }: UseStylesProps) =>
+				`linear-gradient(to right, transparent, ${theme.colors.n0} 50px, transparent 0), ${
+					bgColor ?? defaultBg
+				}`,
 		},
-	}),
+	},
 	'@keyframes skeleton-loading': {
 		'0%': {
 			backgroundPosition: '-50px 0',

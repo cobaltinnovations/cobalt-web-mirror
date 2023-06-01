@@ -2,22 +2,23 @@ import React, { FC, PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	imageUrl: string;
+	size?: number;
+}
+
 const useBackgroundImageContainerStyles = createUseThemedStyles((theme) => ({
-	backgroundImageContainer: ({ imageUrl, size }: { imageUrl: string; size?: number }) => ({
+	backgroundImageContainer: {
 		flexShrink: 0,
 		position: 'relative',
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
 		backgroundColor: theme.colors.n300,
-		backgroundImage: `url(${imageUrl})`,
-		...(size
-			? {
-					width: size,
-					height: size,
-			  }
-			: {}),
-	}),
+		backgroundImage: ({ imageUrl }: UseStylesProps) => `url(${imageUrl})`,
+		width: ({ size }: UseStylesProps) => size,
+		height: ({ size }: UseStylesProps) => size,
+	},
 }));
 
 interface BackgroundImageContainerProps extends PropsWithChildren {

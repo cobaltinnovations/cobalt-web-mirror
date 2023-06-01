@@ -17,13 +17,13 @@ const useAccordionStyles = createUseStyles({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
-	chevronIcon: ({ open }: AccordionStyleProps) => ({
+	chevronIcon: {
 		width: 12,
 		height: 12,
 		opacity: 0.48,
 		transition: '0.2s transform',
-		transform: open ? '' : 'rotate(90deg)',
-	}),
+		transform: ({ open }: AccordionStyleProps) => (open ? '' : 'rotate(90deg)'),
+	},
 });
 
 interface AccordionProps extends PropsWithChildren {

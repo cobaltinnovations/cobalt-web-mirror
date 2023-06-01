@@ -98,13 +98,20 @@ export function useScreeningNavigation() {
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
-			const mhicRouteMatch = matches.reverse().find((match) => {
+			const routeMatches = matches.reverse();
+			const mhicRouteMatch = routeMatches.find((match) => {
 				return match.pathname.includes('/ic/mhic') && !!match.params['patientOrderId'];
+			});
+
+			const icPatientRouteMatch = routeMatches.find((match) => {
+				return match.pathname.includes('/ic/patient');
 			});
 
 			navigate(
 				mhicRouteMatch
 					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
+					: icPatientRouteMatch
+					? `/ic/patient/assessment/${contextId}`
 					: `/screening-questions/${contextId}`,
 				{ state: location.state }
 			);

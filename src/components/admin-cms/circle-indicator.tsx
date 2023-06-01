@@ -3,19 +3,23 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	size?: number;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
-	circleIndicator: ({ size }: { size?: number }) => ({
+	circleIndicator: {
 		flexShrink: 0,
 		borderRadius: 100,
-		width: size ? size : 35,
-		height: size ? size : 35,
-		lineHeight: size ? `${size}px` : '35px',
+		width: ({ size }: UseStylesProps) => size ?? 35,
+		height: ({ size }: UseStylesProps) => size ?? 35,
+		lineHeight: ({ size }: UseStylesProps) => `${size ?? 35}px`,
 		textAlign: 'center',
 		color: theme.colors.n0,
 		display: 'inline-block',
 		...theme.fonts.headingBold,
 		backgroundColor: theme.colors.a500,
-	}),
+	},
 }));
 
 interface CircleIndicatorProps extends PropsWithChildren {

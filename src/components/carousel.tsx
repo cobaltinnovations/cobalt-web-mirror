@@ -48,37 +48,38 @@ interface UseCustomButtonGroupStylesProps {
 }
 
 const useCustomButtonGroupStyles = createUseStyles({
-	customButtonGroupOuter: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
+	customButtonGroupOuter: {
 		top: 0,
 		left: 0,
 		right: 0,
 		position: 'absolute',
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
-		...(floatingButtonGroup && { transform: 'translateY(calc(-50% + 16px))' }),
-	}),
-	customButtonGroup: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
+		transform: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
+			floatingButtonGroup ? 'translateY(calc(-50% + 16px))' : undefined,
+	},
+	customButtonGroup: {
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		[mediaQueries.lg]: {
-			display: floatingButtonGroup ? 'flex' : 'block',
+			display: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
+				floatingButtonGroup ? 'flex' : 'block',
 		},
-	}),
+	},
 	descriptionText: {
 		marginBottom: 0,
 		[mediaQueries.lg]: {
 			marginBottom: 16,
 		},
 	},
-	carouselButtons: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => ({
+	carouselButtons: {
 		padding: 0,
-		width: floatingButtonGroup ? 48 : 32,
-		height: floatingButtonGroup ? 48 : 32,
-		...(floatingButtonGroup && {
-			boxShadow: '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)',
-		}),
-	}),
+		width: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => (floatingButtonGroup ? 48 : 32),
+		height: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => (floatingButtonGroup ? 48 : 32),
+		boxShadow: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
+			floatingButtonGroup ? '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)' : undefined,
+	},
 });
 
 interface CustomButtonGroupProps extends ButtonGroupProps {
@@ -193,17 +194,18 @@ interface UseCarouselStylesProps {
 }
 
 const useCarouselStyles = createUseStyles({
-	carouselOuter: ({ customButtonGroupHeight, trackStyles, floatingButtonGroup }: UseCarouselStylesProps) => ({
-		paddingTop: floatingButtonGroup ? 0 : customButtonGroupHeight,
+	carouselOuter: {
+		paddingTop: ({ customButtonGroupHeight, floatingButtonGroup }: UseCarouselStylesProps) =>
+			floatingButtonGroup ? 0 : customButtonGroupHeight,
 		position: 'relative',
 		marginLeft: -gutterWidth / 2,
 		marginRight: -gutterWidth / 2,
-		'& .react-multi-carousel-track': {
+		'& .react-multi-carousel-track': ({ trackStyles }: UseCarouselStylesProps) => ({
 			paddingTop: 16,
 			paddingBottom: 24,
 			...(trackStyles ? trackStyles : {}),
-		},
-	}),
+		}),
+	},
 	carouselItem: {
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,

@@ -5,32 +5,33 @@ import classNames from 'classnames';
 import { ReactComponent as SelectIcon } from '@/assets/icons/icon-select.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
-interface useInputHelperStylesProps {
+interface UseStylesProps {
 	isHovered: boolean;
 	isFocused: boolean;
 	as?: ElementType<any> | undefined;
-	value: string | number | string[] | undefined;
+	hasValue: boolean;
 	hasError: boolean;
 }
 
 const useInputHelperStyles = createUseThemedStyles((theme) => ({
-	inputHelper: ({ as, isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+	inputHelper: {
 		borderRadius: 5,
 		overflow: 'hidden',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
-		height: as === 'textarea' ? 130 : 54,
-		border: `1px solid ${
-			hasError
-				? theme.colors.d500
-				: isFocused
-				? theme.colors.p500
-				: isHovered
-				? theme.colors.n300
-				: theme.colors.n100
-		}`,
-	}),
-	label: ({ isFocused, value, hasError }: useInputHelperStylesProps) => ({
+		height: ({ as }: UseStylesProps) => (as === 'textarea' ? 130 : 54),
+		border: ({ isHovered, isFocused, hasError }: UseStylesProps) =>
+			`1px solid ${
+				hasError
+					? theme.colors.d500
+					: isFocused
+					? theme.colors.p500
+					: isHovered
+					? theme.colors.n300
+					: theme.colors.n100
+			}`,
+	},
+	label: {
 		top: 16,
 		left: 16,
 		margin: 0,
@@ -41,11 +42,13 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.default,
 		...theme.fonts.headingBold,
 		transformOrigin: 'left top',
-		color: hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
+		color: ({ isFocused, hasError }: UseStylesProps) =>
+			hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-		transform: isFocused || value ? 'translateY(-50%) scale(0.75)' : '',
-	}),
-	input: ({ as, value }: useInputHelperStylesProps) => ({
+		transform: ({ isFocused, hasValue }: UseStylesProps) =>
+			isFocused || hasValue ? 'translateY(-50%) scale(0.75)' : '',
+	},
+	input: {
 		margin: 0,
 		border: 0,
 		...theme.fonts.default,
@@ -55,32 +58,33 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 0,
 		display: 'block',
 		appearance: 'none',
-		padding: as === 'textarea' ? '25px 16px 20px' : '20px 16px 6px',
+		padding: ({ as }: UseStylesProps) => (as === 'textarea' ? '25px 16px 20px' : '20px 16px 6px'),
 		backgroundColor: 'transparent',
 		'&:focus': {
 			outline: 'none',
 			boxShadow: 'none',
 		},
-		opacity: as === 'select' ? (value ? 1 : 0) : 1,
+		opacity: ({ as, hasValue }: UseStylesProps) => (as === 'select' ? (hasValue ? 1 : 0) : 1),
 		'&:disabled': {
 			backgroundColor: theme.colors.background,
 		},
-	}),
-	downChevron: ({ isHovered, isFocused, hasError }: useInputHelperStylesProps) => ({
+	},
+	downChevron: {
 		zIndex: 1,
 		right: 16,
 		top: '50%',
 		position: 'absolute',
 		pointerEvents: 'none',
 		transform: 'translateY(-50%)',
-		fill: hasError
-			? theme.colors.d500
-			: isFocused
-			? theme.colors.p500
-			: isHovered
-			? theme.colors.n500
-			: theme.colors.n500,
-	}),
+		fill: ({ isHovered, isFocused, hasError }: UseStylesProps) =>
+			hasError
+				? theme.colors.d500
+				: isFocused
+				? theme.colors.p500
+				: isHovered
+				? theme.colors.n500
+				: theme.colors.n500,
+	},
 }));
 
 interface InputHelperProps extends FormControlProps, PropsWithChildren {
@@ -104,7 +108,7 @@ const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
 			isHovered,
 			isFocused,
 			as: props.as,
-			value: props.value,
+			hasValue: !!props.value,
 			hasError: !!error,
 		});
 

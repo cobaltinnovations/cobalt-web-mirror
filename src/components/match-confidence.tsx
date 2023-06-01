@@ -4,18 +4,23 @@ import classNames from 'classnames';
 import { ReactComponent as ConfidenceSearchIcon } from '@/assets/icons/confidence.svg';
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
+interface UseStylesProps {
+	percent: number;
+	color: string;
+}
+
 const useMatchConfidenceStyles = createUseThemedStyles((theme) => ({
 	barOuter: {
 		height: 4,
 		width: '100%',
 		backgroundColor: theme.colors.n500,
 	},
-	bar: ({ percent, color }: { percent: number; color: string }) => ({
-		width: `${percent}%`,
+	bar: {
+		width: ({ percent }: UseStylesProps) => `${percent}%`,
 		height: '100%',
-		backgroundColor: color,
+		backgroundColor: ({ color }: UseStylesProps) => color,
 		transition: '0.2s width, 0.5s background-color',
-	}),
+	},
 }));
 
 interface MatchConfidenceProps {

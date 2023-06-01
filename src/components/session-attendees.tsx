@@ -1,6 +1,10 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
 
+interface UseStylesProps {
+	percentage: number;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	sessionAttendees: {
 		display: 'flex',
@@ -15,11 +19,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		backgroundColor: theme.colors.n300,
 	},
-	progressBarFill: ({ percentage }: { percentage: number }) => ({
+	progressBarFill: {
 		height: '100%',
-		width: `${percentage * 100}%`,
+		width: ({ percentage }: UseStylesProps) => `${percentage * 100}%`,
 		backgroundColor: theme.colors.s500,
-	}),
+	},
 }));
 
 interface SessionAttendeesProps {
