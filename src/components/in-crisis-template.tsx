@@ -10,31 +10,28 @@ import { CRISIS_RESOURCES } from '@/crisis-resources';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 
-const useStyles = createUseThemedStyles(
-	(theme) => ({
-		linkButton: {
-			padding: 24,
-			width: '100%',
-			display: 'flex',
-			borderRadius: 8,
-			alignItems: 'center',
-			textDecoration: 'none',
-			justifyContent: 'space-between',
-			border: `1px solid ${theme.colors.n100}`,
-			[mediaQueries.lg]: {
-				padding: 16,
-			},
-		},
-		iconOuter: {
+const useStyles = createUseThemedStyles((theme) => ({
+	linkButton: {
+		padding: 24,
+		width: '100%',
+		display: 'flex',
+		borderRadius: 8,
+		alignItems: 'center',
+		textDecoration: 'none',
+		justifyContent: 'space-between',
+		border: `1px solid ${theme.colors.n100}`,
+		[mediaQueries.lg]: {
 			padding: 16,
-			flexShrink: 0,
-			borderRadius: 500,
-			backgroundColor: theme.colors.p50,
-			border: `2px solid ${theme.colors.p500}`,
 		},
-	}),
-	{ index: 1 }
-);
+	},
+	iconOuter: {
+		padding: 16,
+		flexShrink: 0,
+		borderRadius: 500,
+		backgroundColor: theme.colors.p50,
+		border: `2px solid ${theme.colors.p500}`,
+	},
+}));
 
 interface InCrisisTemplateProps {
 	isModal?: boolean;

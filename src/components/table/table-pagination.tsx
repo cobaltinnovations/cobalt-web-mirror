@@ -7,37 +7,34 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
-const useTablePaginationStyles = createUseThemedStyles(
-	(theme) => ({
-		paginationButton: {
-			width: 32,
-			height: 32,
-			padding: 0,
-			borderRadius: 4,
+const useTablePaginationStyles = createUseThemedStyles((theme) => ({
+	paginationButton: {
+		width: 32,
+		height: 32,
+		padding: 0,
+		borderRadius: 4,
+		textDecoration: 'none',
+		...theme.fonts.bodyNormal,
+		'&:hover': {
 			textDecoration: 'none',
-			...theme.fonts.bodyNormal,
+		},
+		'&:disabled': {
+			color: theme.colors.n300,
+			backgroundColor: 'transparent',
 			'&:hover': {
-				textDecoration: 'none',
-			},
-			'&:disabled': {
 				color: theme.colors.n300,
 				backgroundColor: 'transparent',
-				'&:hover': {
-					color: theme.colors.n300,
-					backgroundColor: 'transparent',
-				},
 			},
 		},
-		active: {
-			backgroundColor: theme.colors.p500,
-			color: `${theme.colors.n0} !important`,
-			'&:hover': {
-				backgroundColor: theme.colors.p300,
-			},
+	},
+	active: {
+		backgroundColor: theme.colors.p500,
+		color: `${theme.colors.n0} !important`,
+		'&:hover': {
+			backgroundColor: theme.colors.p300,
 		},
-	}),
-	{ index: 1 }
-);
+	},
+}));
 
 interface TablePaginationProps {
 	page: number;

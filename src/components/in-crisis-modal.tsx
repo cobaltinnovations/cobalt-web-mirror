@@ -5,18 +5,15 @@ import { createUseStyles } from 'react-jss';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import InCrisisTemplate from '@/components/in-crisis-template';
 
-const useInCrisisModalStyles = createUseStyles(
-	{
-		inCrisisModal: {
-			maxWidth: 408,
-		},
-		header: {
-			border: 0,
-			backgroundColor: 'transparent',
-		},
+const useInCrisisModalStyles = createUseStyles({
+	inCrisisModal: {
+		maxWidth: 408,
 	},
-	{ index: 1 }
-);
+	header: {
+		border: 0,
+		backgroundColor: 'transparent',
+	},
+});
 
 interface InCrisisModalProps extends ModalProps {
 	isCall?: boolean;
