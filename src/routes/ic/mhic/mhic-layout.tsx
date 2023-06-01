@@ -2,11 +2,12 @@ import { MHIC_HEADER_HEIGHT, MhicHeader } from '@/components/integrated-care/mhi
 import { STORAGE_KEYS } from '@/lib/config/constants';
 import { PatientOrderAutocompleteResult } from '@/lib/models';
 import React, { Suspense, useEffect, useState } from 'react';
-import { Outlet, useRouteLoaderData } from 'react-router-dom';
+import { Outlet, useRouteError, useRouteLoaderData } from 'react-router-dom';
 import { useMhicOrderLayoutLoaderData } from './order-layout';
 import Loader from '@/components/loader';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 import { integratedCareService } from '@/lib/services';
+import ErrorDisplay from '@/components/error-display';
 
 type MhicLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -22,13 +23,15 @@ export async function loader() {
 	};
 }
 
+function getRecentOrdersFromStorage() {
+	return JSON.parse(window.localStorage.getItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY) ?? '[]');
+}
+
 export const Component = () => {
 	const mhicOrderLayoutLoaderData = useMhicOrderLayoutLoaderData();
 	const shelfLoaderData = useMhicPatientOrdereShelfLoaderData();
 
-	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(
-		JSON.parse(window.localStorage.getItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY) ?? '[]')
-	);
+	const [recentOrders, setRecentOrders] = useState<PatientOrderAutocompleteResult[]>(getRecentOrdersFromStorage());
 
 	useEffect(() => {
 		if (!shelfLoaderData?.patientOrderPromise) {
@@ -86,3 +89,28 @@ export const Component = () => {
 		</>
 	);
 };
+
+const MhicErrorLayout = () => {
+	const error = useRouteError();
+	const mhicOrderLayoutLoaderData = useMhicOrderLayoutLoaderData();
+
+	const recentOrders = getRecentOrdersFromStorage();
+
+	return (
+		<>
+			<MhicHeader
+				patientOrder={mhicOrderLayoutLoaderData?.patientOrderResponse.patientOrder}
+				recentOrders={recentOrders}
+			/>
+
+			<ErrorDisplay
+				error={error}
+				onRetryButtonClick={() => {
+					window.location.reload();
+				}}
+			/>
+		</>
+	);
+};
+
+export const errorElement = <MhicErrorLayout />;

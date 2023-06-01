@@ -10,7 +10,6 @@ import {
 	ProviderManagementPersonalDetails,
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
-import ScreeningQuestionsPage from '@/pages/screening/screening-questions';
 import Cookies from 'js-cookie';
 import React from 'react';
 import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
@@ -29,7 +28,6 @@ import PatientDemographics from './routes/ic/patient/patient-demographics';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
 import PatientLanding from './routes/ic/patient/patient-landing';
 import PatientConsent from './routes/ic/patient/patient-consent';
-import { IntegratedCarePatientLayout } from './routes/ic/patient/patient-layout';
 import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
 import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
 import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-availability-panel';
@@ -97,7 +95,7 @@ export const StatsDashboard = lazyLoadWithRefresh(() => import('@/pages/stats-da
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
 
-export const ScreeningQuestions = lazyLoadWithRefresh(() => import('@/pages/screening/screening-questions'));
+export const ScreeningQuestionsPage = lazyLoadWithRefresh(() => import('@/pages/screening/screening-questions'));
 export const Interaction = lazyLoadWithRefresh(() => import('@/pages/interaction'));
 export const InteractionInstances = lazyLoadWithRefresh(() => import('@/pages/interaction-instances'));
 export const InCrisis = lazyLoadWithRefresh(() => import('@/pages/in-crisis'));
@@ -423,7 +421,7 @@ export const routes: RouteObject[] = [
 
 					{
 						path: 'screening-questions/:screeningQuestionContextId',
-						element: <ScreeningQuestions />,
+						element: <ScreeningQuestionsPage />,
 					},
 					{
 						path: 'appointments/:appointmentId',
@@ -688,7 +686,7 @@ export const routes: RouteObject[] = [
 							},
 							{
 								path: 'patient',
-								element: <IntegratedCarePatientLayout />,
+								lazy: () => import('@/routes/ic/patient/patient-layout'),
 								children: [
 									{
 										index: true,
@@ -721,6 +719,10 @@ export const routes: RouteObject[] = [
 									{
 										path: 'connect-with-support/mhp',
 										element: <ConnectWithSupportV2 />,
+									},
+									{
+										path: 'assessment/:screeningQuestionContextId',
+										element: <ScreeningQuestionsPage />,
 									},
 									{
 										path: '*',
