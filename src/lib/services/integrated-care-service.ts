@@ -462,4 +462,16 @@ export const integratedCareService = {
 			url: '/patient-orders/latest',
 		});
 	},
+	updatePatientOrderResourceCheckInResponseStatusId(
+		patientOrderId: string,
+		data: { patientOrderResourceCheckInResponseStatusId: PatientOrderResourceCheckInResponseStatusId }
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `patient-orders/${patientOrderId}/patient-order-resource-check-in-response-status-id`,
+			data,
+		});
+	},
 };

@@ -77,7 +77,6 @@ export interface PatientOrderModel {
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
 
-	followupNeeded?: boolean;
 	inPersonCareRadius?: number;
 	inPersonCareRadiusDescription?: string;
 	inPersonCareRadiusDistanceUnitId?: string;
@@ -179,6 +178,11 @@ export interface PatientOrderModel {
 	patientAgeOnOrderDateDescription: string;
 
 	patientOrderCarePreferenceId?: string;
+
+	// New for checkin
+	resourceCheckInNeeded?: boolean;
+	resourceCheckInScheduledAt?: string;
+	resourceCheckInScheduledAtDescription?: string;
 }
 
 export enum PatientOrderViewTypeId {
