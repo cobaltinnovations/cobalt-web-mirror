@@ -82,7 +82,7 @@ const PatientCheckIn = () => {
 								size="lg"
 								name="check-in"
 								id="check-in--none"
-								value={PatientOrderResourceCheckInResponseStatusId.NONE}
+								value={PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP}
 								type="submit"
 								disabled={isSaving}
 							>

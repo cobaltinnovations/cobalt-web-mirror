@@ -469,7 +469,7 @@ export const integratedCareService = {
 			patientOrder: PatientOrderModel;
 		}>({
 			method: 'PUT',
-			url: `patient-orders/${patientOrderId}/patient-order-resource-check-in-response-status-id`,
+			url: `patient-orders/${patientOrderId}/patient-order-resource-check-in-response-status`,
 			data,
 		});
 	},
