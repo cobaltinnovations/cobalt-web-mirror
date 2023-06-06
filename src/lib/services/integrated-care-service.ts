@@ -26,7 +26,7 @@ import {
 export interface MhicPanelTodayResponse {
 	scheduledAssessmentPatientOrders: PatientOrderModel[];
 	safetyPlanningPatientOrders: PatientOrderModel[];
-	newPatientPatientOrders: PatientOrderModel[];
+	outreachReviewPatientOrders: PatientOrderModel[];
 	outreachNeededPatientOrders: PatientOrderModel[];
 	followupPatientOrders: PatientOrderModel[];
 	needResourcesPatientOrders: PatientOrderModel[];

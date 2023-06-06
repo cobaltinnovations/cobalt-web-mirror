@@ -152,7 +152,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 									<MhicInlineAlert
 										variant="warning"
 										title="Order Flagged"
-										description="Patient does not live in a state supported by our program"
+										description="Patient does not live in a state supported by the Integrated Care program"
 									/>
 								</Col>
 							</Row>
