@@ -180,9 +180,12 @@ export interface PatientOrderModel {
 	patientOrderCarePreferenceId?: string;
 
 	// New for checkin
-	resourceCheckInNeeded?: boolean;
-	resourceCheckInScheduledAt?: string;
-	resourceCheckInScheduledAtDescription?: string;
+	patientOrderResourceCheckInResponseStatusId: PatientOrderResourceCheckInResponseStatusId;
+	patientOrderResourceCheckInResponseStatusDescription: string;
+	resourceCheckInScheduledMessageGroupId?: string;
+	resourceCheckInResponseNeeded?: boolean;
+	resourceCheckInScheduledAtDateTime?: string;
+	resourceCheckInScheduledAtDateTimeDescription?: string;
 }
 
 export enum PatientOrderViewTypeId {
