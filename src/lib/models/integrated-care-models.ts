@@ -186,6 +186,9 @@ export interface PatientOrderModel {
 	resourceCheckInResponseNeeded?: boolean;
 	resourceCheckInScheduledAtDateTime?: string;
 	resourceCheckInScheduledAtDateTimeDescription?: string;
+
+	// Do we need another outreach?
+	outreachFollowupNeeded?: boolean;
 }
 
 export enum PatientOrderViewTypeId {

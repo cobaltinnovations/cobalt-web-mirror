@@ -50,9 +50,9 @@ export async function loader() {
 		}),
 		followupResults: overviewResponsePromise.then((res) => {
 			return {
-				patientOrders: res.followupPatientOrders,
-				totalCount: res.followupPatientOrders.length,
-				totalCountDescription: res.followupPatientOrders.length.toString(),
+				patientOrders: res.outreachFollowupNeededPatientOrders,
+				totalCount: res.outreachFollowupNeededPatientOrders.length,
+				totalCountDescription: res.outreachFollowupNeededPatientOrders.length.toString(),
 			};
 		}),
 		assessmentResults: overviewResponsePromise.then((res) => {
@@ -110,7 +110,7 @@ export const Component = () => {
 			.then((res) => {
 				setCountsByStatus({
 					[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
-					[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
+					[TAB_KEYS.FOLLOW_UPS]: res.outreachFollowupNeededPatientOrders.length,
 					[TAB_KEYS.OUTREACH_REVIEW]: res.outreachReviewPatientOrders.length,
 					[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
 					[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,

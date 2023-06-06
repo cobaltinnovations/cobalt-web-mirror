@@ -27,8 +27,7 @@ export interface MhicPanelTodayResponse {
 	scheduledAssessmentPatientOrders: PatientOrderModel[];
 	safetyPlanningPatientOrders: PatientOrderModel[];
 	outreachReviewPatientOrders: PatientOrderModel[];
-	outreachNeededPatientOrders: PatientOrderModel[];
-	followupPatientOrders: PatientOrderModel[];
+	outreachFollowupNeededPatientOrders: PatientOrderModel[];
 	needResourcesPatientOrders: PatientOrderModel[];
 	voicemailTaskPatientOrders: PatientOrderModel[];
 }
