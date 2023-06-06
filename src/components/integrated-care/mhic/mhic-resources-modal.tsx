@@ -105,7 +105,8 @@ export const MhicResourcesModal: FC<Props> = ({ patientOrder, referenceData, onS
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
 					<p className="mb-4 fw-semibold">
-						Confirm resources have been sent through {institution?.myChartName ?? 'MyChart'}
+						Confirm resources have been sent to the patient through {institution?.myChartName ?? 'MyChart'}{' '}
+						or over the phone.
 					</p>
 					<p className="mb-4">
 						A check-in message will be scheduled automatically based on the date the resources were marked
