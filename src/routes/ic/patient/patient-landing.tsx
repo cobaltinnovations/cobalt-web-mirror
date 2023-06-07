@@ -37,6 +37,11 @@ const PatientLanding = () => {
 			const response = await integratedCareService.getLatestPatientOrder().fetch();
 			setPatientOrder(response.patientOrder);
 
+			if (response.patientOrder.resourceCheckInResponseNeeded) {
+				navigate('/ic/patient/check-in');
+				return;
+			}
+
 			if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 				navigate('/ic/patient/consent');
 				return;

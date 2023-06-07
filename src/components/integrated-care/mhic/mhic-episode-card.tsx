@@ -128,7 +128,10 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.patientBelowAgeThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert variant="warning" title="Patient under 18" />
+									<MhicInlineAlert
+										variant="warning"
+										title="Patient was under 18 at the time the order was created"
+									/>
 								</Col>
 							</Row>
 						)}
@@ -138,7 +141,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 									<MhicInlineAlert
 										variant="warning"
 										title="Order Flagged"
-										description="Episode closed within date threshold"
+										description="Patient had a recently-closed episode"
 									/>
 								</Col>
 							</Row>
@@ -149,7 +152,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 									<MhicInlineAlert
 										variant="warning"
 										title="Order Flagged"
-										description="Address region not accepted"
+										description="Patient does not live in a state supported by the Integrated Care program"
 									/>
 								</Col>
 							</Row>

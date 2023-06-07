@@ -8,7 +8,7 @@ import TabBar from '@/components/tab-bar';
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 
 enum TAB_KEYS {
-	NEW_PATIENTS = 'NEW_PATIENTS',
+	OUTREACH_REVIEW = 'OUTREACH_REVIEW',
 	VOICEMAILS = 'VOICEMAILS',
 	FOLLOW_UPS = 'FOLLOW_UPS',
 	ASSESSMENTS = 'ASSESSMENTS',
@@ -36,9 +36,9 @@ export async function loader() {
 		overviewResponsePromise,
 		newPatientResults: overviewResponsePromise.then((res) => {
 			return {
-				patientOrders: res.newPatientPatientOrders,
-				totalCount: res.newPatientPatientOrders.length,
-				totalCountDescription: res.newPatientPatientOrders.length.toString(),
+				patientOrders: res.outreachReviewPatientOrders,
+				totalCount: res.outreachReviewPatientOrders.length,
+				totalCountDescription: res.outreachReviewPatientOrders.length.toString(),
 			};
 		}),
 		voicemailResults: overviewResponsePromise.then((res) => {
@@ -50,9 +50,9 @@ export async function loader() {
 		}),
 		followupResults: overviewResponsePromise.then((res) => {
 			return {
-				patientOrders: res.followupPatientOrders,
-				totalCount: res.followupPatientOrders.length,
-				totalCountDescription: res.followupPatientOrders.length.toString(),
+				patientOrders: res.outreachFollowupNeededPatientOrders,
+				totalCount: res.outreachFollowupNeededPatientOrders.length,
+				totalCountDescription: res.outreachFollowupNeededPatientOrders.length.toString(),
 			};
 		}),
 		assessmentResults: overviewResponsePromise.then((res) => {
@@ -82,7 +82,7 @@ export async function loader() {
 const INITIAL_COUNTS = {
 	[TAB_KEYS.ASSESSMENTS]: 0,
 	[TAB_KEYS.FOLLOW_UPS]: 0,
-	[TAB_KEYS.NEW_PATIENTS]: 0,
+	[TAB_KEYS.OUTREACH_REVIEW]: 0,
 	[TAB_KEYS.RESOURCES]: 0,
 	[TAB_KEYS.VOICEMAILS]: 0,
 	[TAB_KEYS.SAFETY_PLANNING]: 0,
@@ -100,7 +100,7 @@ export const Component = () => {
 		safetyPlanningResults,
 	} = useMhicOverviewLoaderData();
 
-	const [tabKey, setTabKey] = useState(TAB_KEYS.NEW_PATIENTS);
+	const [tabKey, setTabKey] = useState(TAB_KEYS.OUTREACH_REVIEW);
 
 	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({ ...INITIAL_COUNTS });
 
@@ -110,8 +110,8 @@ export const Component = () => {
 			.then((res) => {
 				setCountsByStatus({
 					[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
-					[TAB_KEYS.FOLLOW_UPS]: res.followupPatientOrders.length,
-					[TAB_KEYS.NEW_PATIENTS]: res.newPatientPatientOrders.length,
+					[TAB_KEYS.FOLLOW_UPS]: res.outreachFollowupNeededPatientOrders.length,
+					[TAB_KEYS.OUTREACH_REVIEW]: res.outreachReviewPatientOrders.length,
 					[TAB_KEYS.RESOURCES]: res.needResourcesPatientOrders.length,
 					[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
 					[TAB_KEYS.SAFETY_PLANNING]: res.safetyPlanningPatientOrders.length,
@@ -135,7 +135,11 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col>
-						<Tab.Container id="overview-tabs" defaultActiveKey={TAB_KEYS.NEW_PATIENTS} activeKey={tabKey}>
+						<Tab.Container
+							id="overview-tabs"
+							defaultActiveKey={TAB_KEYS.OUTREACH_REVIEW}
+							activeKey={tabKey}
+						>
 							<hr />
 							<TabBar
 								key="mhic-orders-overview-tabbar"
@@ -143,8 +147,8 @@ export const Component = () => {
 								value={tabKey}
 								tabs={[
 									{
-										value: TAB_KEYS.NEW_PATIENTS,
-										title: `Outreach Review (${countsByStatus.NEW_PATIENTS})`,
+										value: TAB_KEYS.OUTREACH_REVIEW,
+										title: `Outreach Review (${countsByStatus.OUTREACH_REVIEW})`,
 									},
 									{
 										value: TAB_KEYS.VOICEMAILS,
@@ -172,7 +176,7 @@ export const Component = () => {
 								}}
 							/>
 							<Tab.Content>
-								<Tab.Pane eventKey={TAB_KEYS.NEW_PATIENTS}>
+								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_REVIEW}>
 									<MhicPatientOrderTable
 										patientOrderFindResultPromise={newPatientResults}
 										selectAll={false}

@@ -77,7 +77,6 @@ export interface PatientOrderModel {
 	episodeDurationInDays?: number;
 	episodeDurationInDaysDescription?: string;
 
-	followupNeeded?: boolean;
 	inPersonCareRadius?: number;
 	inPersonCareRadiusDescription?: string;
 	inPersonCareRadiusDistanceUnitId?: string;
@@ -179,6 +178,17 @@ export interface PatientOrderModel {
 	patientAgeOnOrderDateDescription: string;
 
 	patientOrderCarePreferenceId?: string;
+
+	// New for checkin
+	patientOrderResourceCheckInResponseStatusId: PatientOrderResourceCheckInResponseStatusId;
+	patientOrderResourceCheckInResponseStatusDescription: string;
+	resourceCheckInScheduledMessageGroupId?: string;
+	resourceCheckInResponseNeeded?: boolean;
+	resourceCheckInScheduledAtDateTime?: string;
+	resourceCheckInScheduledAtDateTimeDescription?: string;
+
+	// Do we need another outreach?
+	outreachFollowupNeeded?: boolean;
 }
 
 export enum PatientOrderViewTypeId {

@@ -37,6 +37,7 @@ import { routeRedirects } from './route-redirects';
 import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
+import PatientCheckIn from './routes/ic/patient/patient-check-in';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -723,6 +724,10 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment/:screeningQuestionContextId',
 										element: <ScreeningQuestionsPage />,
+									},
+									{
+										path: 'check-in',
+										element: <PatientCheckIn />,
 									},
 									{
 										path: '*',

@@ -26,9 +26,8 @@ import {
 export interface MhicPanelTodayResponse {
 	scheduledAssessmentPatientOrders: PatientOrderModel[];
 	safetyPlanningPatientOrders: PatientOrderModel[];
-	newPatientPatientOrders: PatientOrderModel[];
-	outreachNeededPatientOrders: PatientOrderModel[];
-	followupPatientOrders: PatientOrderModel[];
+	outreachReviewPatientOrders: PatientOrderModel[];
+	outreachFollowupNeededPatientOrders: PatientOrderModel[];
 	needResourcesPatientOrders: PatientOrderModel[];
 	voicemailTaskPatientOrders: PatientOrderModel[];
 }
@@ -460,6 +459,18 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: '/patient-orders/latest',
+		});
+	},
+	updatePatientOrderResourceCheckInResponseStatusId(
+		patientOrderId: string,
+		data: { patientOrderResourceCheckInResponseStatusId: PatientOrderResourceCheckInResponseStatusId }
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `patient-orders/${patientOrderId}/patient-order-resource-check-in-response-status`,
+			data,
 		});
 	},
 };
