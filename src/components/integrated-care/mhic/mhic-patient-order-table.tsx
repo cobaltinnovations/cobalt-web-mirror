@@ -535,12 +535,16 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.checkInScheduled && (
 												<TableCell width={180}>
-													<span className="text-nowrap text-truncate">[TODO]</span>
+													<span className="text-nowrap text-truncate">
+														{po.resourceCheckInScheduledAtDateTimeDescription}
+													</span>
 												</TableCell>
 											)}
 											{columnConfig.checkInResponse && (
 												<TableCell width={172}>
-													<span className="text-nowrap text-truncate">[TODO]</span>
+													<span className="text-nowrap text-truncate">
+														{po.patientOrderResourceCheckInResponseStatusDescription}
+													</span>
 												</TableCell>
 											)}
 											{columnConfig.episode && (
