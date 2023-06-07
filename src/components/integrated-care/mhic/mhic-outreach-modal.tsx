@@ -122,7 +122,7 @@ export const MhicOutreachModal: FC<Props> = ({
 	const handleOnEnter = useCallback(() => {
 		if (outreachToEdit) {
 			setFormValues({
-				date: new Date(outreachToEdit.outreachDate),
+				date: moment(outreachToEdit.outreachDate, 'YYYY-MM-DD').toDate(),
 				time: moment(outreachToEdit.outreachTime, 'HH:mm').format('h:mm A'),
 				resultId: outreachToEdit.patientOrderOutreachResultId,
 				comment: outreachToEdit.note,
