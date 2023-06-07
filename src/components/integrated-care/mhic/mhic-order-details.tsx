@@ -805,6 +805,24 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						<Col>
 							<Card bsPrefix="ic-card">
 								<Card.Header>
+									<Card.Title>Comment</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row>
+											<Col>
+												<p className="mb-0">{patientOrder.comments}</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+					<Row className="mb-6">
+						<Col>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
 									<Card.Title>Diagnoses</Card.Title>
 								</Card.Header>
 								<Card.Body>
