@@ -31,17 +31,6 @@ enum CONTACT_METHOD_IDS {
 	SMS = 'SMS',
 }
 
-const messageTypes = [
-	{
-		patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME,
-		title: 'Welcome',
-	},
-	{
-		patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.RESOURCE_CHECK_IN,
-		title: 'Check-in',
-	},
-];
-
 interface Props extends ModalProps {
 	patientOrder: PatientOrderModel;
 	messageToEdit?: PatientOrderScheduledMessageGroup;
@@ -52,6 +41,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+
 	const contactMethods = useMemo(
 		() => [
 			{
@@ -67,12 +57,41 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 		],
 		[patientOrder.patientEmailAddress, patientOrder.patientPhoneNumber]
 	);
+
+	const messageTypes = useMemo(
+		() => [
+			{
+				patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME,
+				title: 'Welcome',
+				disabled:
+					patientOrder.patientOrderScheduledMessageGroups.filter(
+						(mg) =>
+							!mg.scheduledAtDateTimeHasPassed &&
+							mg.patientOrderScheduledMessageTypeId === PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME
+					).length > 0,
+			},
+			{
+				patientOrderScheduledMessageTypeId: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.RESOURCE_CHECK_IN,
+				title: 'Check-in',
+				disabled:
+					patientOrder.patientOrderScheduledMessageGroups.filter(
+						(mg) =>
+							!mg.scheduledAtDateTimeHasPassed &&
+							mg.patientOrderScheduledMessageTypeId ===
+								PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.RESOURCE_CHECK_IN
+					).length > 0,
+			},
+		],
+		[patientOrder.patientOrderScheduledMessageGroups]
+	);
+
 	const [formValues, setFormValues] = useState({
 		messageType: '',
 		date: undefined as Date | undefined,
 		time: '',
 		contactMethods: [] as string[],
 	});
+
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleOnEnter = useCallback(() => {
@@ -87,7 +106,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 		}
 
 		setFormValues({
-			messageType: PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME,
+			messageType: '',
 			date: new Date(),
 			time: moment().format('h:mm A'),
 			contactMethods: [],
@@ -266,10 +285,14 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 						required
 						disabled={!!messageToEdit}
 					>
+						<option value="" disabled>
+							Select...
+						</option>
 						{messageTypes.map((messageType) => (
 							<option
 								key={messageType.patientOrderScheduledMessageTypeId}
 								value={messageType.patientOrderScheduledMessageTypeId}
+								disabled={messageType.disabled}
 							>
 								{messageType.title}
 							</option>
