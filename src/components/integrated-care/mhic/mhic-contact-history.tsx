@@ -4,9 +4,12 @@ import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
+	MessageStatusId,
+	MessageTypeId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderOutreachModel,
+	PatientOrderOutreachResultStatusId,
 	PatientOrderOutreachTypeId,
 	PatientOrderScheduledMessageGroup,
 } from '@/lib/models';
@@ -28,6 +31,11 @@ import {
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
 
+import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
+import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
+import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
+import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
+
 interface Props {
 	patientOrder: PatientOrderModel;
 }
@@ -38,8 +46,9 @@ interface PastScheduledMessageGroupsOrOutreach {
 	name: string;
 	date: string;
 	dateDescription: string;
+	icon: JSX.Element;
 	title: string;
-	description: string;
+	descriptionHtml: string;
 	original: any;
 	// actual TS Types are "PatientOrderScheduledMessageGroup | PatientOrderOutreachModel"
 	// currently using "any" to avoid type mismatch in template logic for now
@@ -110,30 +119,98 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 	const pastScheduledMessageGroupsAndOutreaches: PastScheduledMessageGroupsOrOutreach[] = useMemo(() => {
 		const formattedScheduledMessageGroups = patientOrder.patientOrderScheduledMessageGroups
 			.filter((message) => message.scheduledAtDateTimeHasPassed)
-			.map((msg) => ({
-				id: msg.patientOrderScheduledMessageGroupId,
-				type: PastScheduledMessageGroupsOrOutreachType.SCHEDULED_MESSAGE,
-				name: '',
-				date: msg.scheduledAtDateTime,
-				dateDescription: msg.scheduledAtDateTimeDescription,
-				title: msg.patientOrderScheduledMessageTypeDescription,
-				description: msg.patientOrderScheduledMessages.map((m) => m.messageTypeDescription).join(', '),
-				original: msg,
-			}));
+			.map((msg) => {
+				const showSuccess = msg.patientOrderScheduledMessages.every(
+					(msg) => msg.messageStatusId === MessageStatusId.DELIVERED
+				);
+				const showError = msg.patientOrderScheduledMessages.some(
+					(msg) =>
+						msg.messageStatusId === MessageStatusId.ERROR ||
+						msg.messageStatusId === MessageStatusId.DELIVERY_FAILED
+				);
 
-		const formattedOutreaches = (patientOrder.patientOrderOutreaches ?? []).map((outreach) => ({
-			id: outreach.patientOrderOutreachId,
-			type: PastScheduledMessageGroupsOrOutreachType.OUTREACH,
-			name: outreach.account.displayName ?? '',
-			date: outreach.outreachDateTime,
-			dateDescription: outreach.outreachDateTimeDescription,
-			title:
-				referenceDataResponse.patientOrderOutreachResults.find(
-					(result) => result.patientOrderOutreachResultId === outreach.patientOrderOutreachResultId
-				)?.patientOrderOutreachResultTypeDescription ?? '',
-			description: outreach.note,
-			original: outreach,
-		}));
+				return {
+					id: msg.patientOrderScheduledMessageGroupId,
+					type: PastScheduledMessageGroupsOrOutreachType.SCHEDULED_MESSAGE,
+					name: '',
+					date: msg.scheduledAtDateTime,
+					dateDescription: msg.scheduledAtDateTimeDescription,
+					icon: showSuccess ? (
+						<FlagSuccess className="text-success" />
+					) : showError ? (
+						<FlagDanger className="text-danger" />
+					) : (
+						<NaIcon />
+					),
+					title: `Sent ${msg.patientOrderScheduledMessageTypeDescription} Message`,
+					descriptionHtml: msg.patientOrderScheduledMessages
+						.map((m) => {
+							const messageStatusClassMap = {
+								[MessageStatusId.ENQUEUED]: 'text-n300',
+								[MessageStatusId.SENT]: 'text-n300',
+								[MessageStatusId.DELIVERED]: 'text-success',
+								[MessageStatusId.DELIVERY_FAILED]: 'text-danger',
+								[MessageStatusId.ERROR]: 'text-danger',
+							};
+
+							const messageStatusDescriptionMap = {
+								[MessageStatusId.ENQUEUED]: '',
+								[MessageStatusId.SENT]: '',
+								[MessageStatusId.DELIVERED]: '',
+								[MessageStatusId.DELIVERY_FAILED]: 'Failed',
+								[MessageStatusId.ERROR]: 'Failed',
+							};
+
+							if (m.messageTypeId === MessageTypeId.SMS) {
+								return `<p class="mb-0">${m.messageTypeDescription} sent to ${
+									m.smsToNumberDescription
+								} <span class="fw-bold ${messageStatusClassMap[m.messageStatusId]}">${
+									messageStatusDescriptionMap[m.messageStatusId]
+								}</span></p>`;
+							}
+
+							if (m.messageTypeId === MessageTypeId.EMAIL) {
+								return `<p class="mb-0">${m.messageTypeDescription} sent to ${m.emailToAddresses.join(
+									', '
+								)} <span class="fw-bold ${messageStatusClassMap[m.messageStatusId]}">${
+									messageStatusDescriptionMap[m.messageStatusId]
+								}</span></p>`;
+							}
+
+							return '';
+						})
+						.join(''),
+					original: msg,
+				};
+			});
+
+		const formattedOutreaches = (patientOrder.patientOrderOutreaches ?? []).map((outreach) => {
+			const outreachResult = referenceDataResponse.patientOrderOutreachResults.find(
+				(result) => result.patientOrderOutreachResultId === outreach.patientOrderOutreachResultId
+			);
+
+			return {
+				id: outreach.patientOrderOutreachId,
+				type: PastScheduledMessageGroupsOrOutreachType.OUTREACH,
+				name: outreach.account.displayName ?? '',
+				date: outreach.outreachDateTime,
+				dateDescription: outreach.outreachDateTimeDescription,
+				icon:
+					outreachResult?.patientOrderOutreachResultStatusId ===
+					PatientOrderOutreachResultStatusId.CONNECTED ? (
+						<FlagSuccess className="text-success" />
+					) : PatientOrderOutreachResultStatusId.NOT_CONNECTED ? (
+						<div style={{ padding: 2 }}>
+							<SearchCloseIcon className="text-n300" />
+						</div>
+					) : (
+						<NaIcon />
+					),
+				title: outreachResult?.patientOrderOutreachResultTypeDescription ?? '',
+				descriptionHtml: outreach.note,
+				original: outreach,
+			};
+		});
 
 		return [...formattedScheduledMessageGroups, ...formattedOutreaches].sort((a, b) => {
 			return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -263,6 +340,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 							{futureScheduledMessageGroups.map((message) => {
 								return (
 									<MhicScheduledMessageGroup
+										key={message.patientOrderScheduledMessageGroupId}
 										message={message}
 										onEditClick={() => {
 											setMessageToEdit(message);
@@ -283,6 +361,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 
 										return (
 											<MhicOutreachItem
+												key={outreach.id}
 												className={classNames({ 'border-bottom': !isLast })}
 												id={outreach.id}
 												type={outreach.type}
@@ -302,8 +381,9 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 												onDeleteClick={() => {
 													handleDeleteOutreach(outreach.id);
 												}}
+												icon={outreach.icon}
 												title={outreach.title}
-												description={outreach.description}
+												description={outreach.descriptionHtml}
 											/>
 										);
 									})}

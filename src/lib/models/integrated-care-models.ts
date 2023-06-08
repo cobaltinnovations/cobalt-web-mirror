@@ -332,6 +332,19 @@ export enum PatientOrderCarePreferenceId {
 	IN_PERSON = 'IN_PERSON',
 }
 
+export enum MessageStatusId {
+	ENQUEUED = 'ENQUEUED', // Waiting to leave Cobalt
+	SENT = 'SENT', // Left Cobalt, turned over to vendor for delivery attempt - not sure if delivered or not yet
+	DELIVERED = 'DELIVERED', // Confirmed with vendor that delivery occurred
+	DELIVERY_FAILED = 'DELIVERY_FAILED', // Confirmed with vendor that delivery failed
+	ERROR = 'ERROR', // Failed before ever leaving Cobalt (e.g. vendor rejected send attempt)
+}
+
+export enum MessageTypeId {
+	EMAIL = 'EMAIL',
+	SMS = 'SMS',
+}
+
 export interface PatientAddressModel {
 	addressId: string;
 	countryCode: string;
@@ -436,11 +449,23 @@ export interface PatientOrderScheduledMessageGroup {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	patientOrderScheduledMessages: {
+		emailToAddresses: string[];
+		institutionId: string;
+		messageId: string;
+		messageStatusDescription: string;
+		messageStatusId: MessageStatusId;
+		messageTypeDescription: string;
+		messageTypeId: MessageTypeId;
 		patientOrderScheduledMessageId: string;
+		processedAt: string;
+		processedAtDescription: string;
 		scheduledMessageId: string;
 		scheduledMessageStatusId: ScheduledMessageStatusId;
-		messageTypeId: string;
-		messageTypeDescription: string;
+		sentAt: string;
+		sentAtDescription: string;
+		smsToNumber: string;
+		smsToNumberDescription: string;
+		scheduledAtDate: string;
 	}[];
 	scheduledAtDateTimeHasPassed: boolean;
 }

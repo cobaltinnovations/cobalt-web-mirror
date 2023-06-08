@@ -17,6 +17,7 @@ interface MhicOutreachItemProps {
 	date: string;
 	onEditClick(): void;
 	onDeleteClick(): void;
+	icon: JSX.Element;
 	title: string;
 	description: string;
 	disabled?: boolean;
@@ -30,6 +31,7 @@ export const MhicOutreachItem = ({
 	date,
 	onEditClick,
 	onDeleteClick,
+	icon,
 	title,
 	description,
 	disabled,
@@ -64,8 +66,11 @@ export const MhicOutreachItem = ({
 					</Dropdown>
 				)}
 			</div>
-			<p className="mb-1 fw-bold">{title}</p>
-			<p className="mb-0">{description}</p>
+			<div className="mb-1 d-flex align-items-center">
+				{icon}
+				<p className="mb-0 ms-1 fw-bold">{title}</p>
+			</div>
+			<div dangerouslySetInnerHTML={{ __html: description }} />
 		</div>
 	);
 };
