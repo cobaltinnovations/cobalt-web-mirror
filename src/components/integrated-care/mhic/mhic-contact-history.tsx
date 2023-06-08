@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useRevalidator } from 'react-router-dom';
+import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import {
@@ -10,22 +11,39 @@ import {
 	PatientOrderScheduledMessageGroup,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
+import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import NoData from '@/components/no-data';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { MhicMessageModal, MhicOutreachModal } from '@/components/integrated-care/mhic';
+import {
+	MhicMessageModal,
+	MhicOutreachItem,
+	MhicOutreachModal,
+	MhicScheduledMessageGroup,
+	PastScheduledMessageGroupsOrOutreachType,
+} from '@/components/integrated-care/mhic';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as EnvelopeIcon } from '@/assets/icons/envelope.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
-import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { useRevalidator } from 'react-router-dom';
-import useAccount from '@/hooks/use-account';
 
 interface Props {
 	patientOrder: PatientOrderModel;
+}
+
+interface PastScheduledMessageGroupsOrOutreach {
+	id: string;
+	type: PastScheduledMessageGroupsOrOutreachType;
+	name: string;
+	date: string;
+	dateDescription: string;
+	title: string;
+	description: string;
+	original: any;
+	// actual TS Types are "PatientOrderScheduledMessageGroup | PatientOrderOutreachModel"
+	// currently using "any" to avoid type mismatch in template logic for now
+	// revisit later and make util functions for type checking
 }
 
 export const MhicContactHistory = ({ patientOrder }: Props) => {
@@ -82,6 +100,49 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 		setMessageToEdit(undefined);
 		setShowMessageModal(false);
 	}, [revalidator]);
+
+	const futureScheduledMessageGroups = useMemo(
+		() =>
+			patientOrder.patientOrderScheduledMessageGroups.filter((message) => !message.scheduledAtDateTimeHasPassed),
+		[patientOrder.patientOrderScheduledMessageGroups]
+	);
+
+	const pastScheduledMessageGroupsAndOutreaches: PastScheduledMessageGroupsOrOutreach[] = useMemo(() => {
+		const formattedScheduledMessageGroups = patientOrder.patientOrderScheduledMessageGroups
+			.filter((message) => message.scheduledAtDateTimeHasPassed)
+			.map((msg) => ({
+				id: msg.patientOrderScheduledMessageGroupId,
+				type: PastScheduledMessageGroupsOrOutreachType.SCHEDULED_MESSAGE,
+				name: '',
+				date: msg.scheduledAtDateTime,
+				dateDescription: msg.scheduledAtDateTimeDescription,
+				title: msg.patientOrderScheduledMessageTypeDescription,
+				description: msg.patientOrderScheduledMessages.map((m) => m.messageTypeDescription).join(', '),
+				original: msg,
+			}));
+
+		const formattedOutreaches = (patientOrder.patientOrderOutreaches ?? []).map((outreach) => ({
+			id: outreach.patientOrderOutreachId,
+			type: PastScheduledMessageGroupsOrOutreachType.OUTREACH,
+			name: outreach.account.displayName ?? '',
+			date: outreach.outreachDateTime,
+			dateDescription: outreach.outreachDateTimeDescription,
+			title:
+				referenceDataResponse.patientOrderOutreachResults.find(
+					(result) => result.patientOrderOutreachResultId === outreach.patientOrderOutreachResultId
+				)?.patientOrderOutreachResultTypeDescription ?? '',
+			description: outreach.note,
+			original: outreach,
+		}));
+
+		return [...formattedScheduledMessageGroups, ...formattedOutreaches].sort((a, b) => {
+			return new Date(b.date).getTime() - new Date(a.date).getTime();
+		});
+	}, [
+		patientOrder.patientOrderOutreaches,
+		patientOrder.patientOrderScheduledMessageGroups,
+		referenceDataResponse.patientOrderOutreachResults,
+	]);
 
 	return (
 		<>
@@ -199,141 +260,51 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 									/>
 								)}
 
-							{patientOrder.patientOrderScheduledMessageGroups.map((message) => {
+							{futureScheduledMessageGroups.map((message) => {
 								return (
-									<Card
-										key={message.patientOrderScheduledMessageGroupId}
-										className="mb-6"
-										bsPrefix="ic-card"
-									>
-										<Card.Header>
-											<Card.Title>
-												Message scheduled for {message.scheduledAtDateTimeDescription}
-											</Card.Title>
-											<div className="button-container">
-												<Button
-													variant="light"
-													className="p-2"
-													onClick={() => {
-														setMessageToEdit(message);
-														setShowMessageModal(true);
-													}}
-													disabled={
-														patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED
-													}
-												>
-													<EditIcon className="d-flex" />
-												</Button>
-											</div>
-										</Card.Header>
-										<Card.Body>
-											<Container fluid>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Message Type</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															{message.patientOrderScheduledMessageTypeDescription}
-														</p>
-													</Col>
-												</Row>
-												<Row>
-													<Col xs={3}>
-														<p className="m-0 text-gray">Contact Method</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															{message.patientOrderScheduledMessages
-																.map((m) => m.messageTypeDescription)
-																.join(', ')}
-														</p>
-													</Col>
-												</Row>
-											</Container>
-										</Card.Body>
-									</Card>
+									<MhicScheduledMessageGroup
+										message={message}
+										onEditClick={() => {
+											setMessageToEdit(message);
+											setShowMessageModal(true);
+										}}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 								);
 							})}
 
-							{(patientOrder.patientOrderOutreaches ?? []).length > 0 && (
+							{pastScheduledMessageGroupsAndOutreaches.length > 0 && (
 								<div className="border rounded bg-white">
-									{(patientOrder.patientOrderOutreaches ?? []).map((outreach, outreachIndex) => {
+									{pastScheduledMessageGroupsAndOutreaches.map((outreach, outreachIndex) => {
 										const isLast =
-											(patientOrder.patientOrderOutreaches ?? []).length - 1 === outreachIndex;
+											pastScheduledMessageGroupsAndOutreaches.length - 1 === outreachIndex;
 
 										return (
-											<div
-												key={outreach.patientOrderOutreachId}
-												className={classNames('py-3 px-4', {
-													'border-bottom': !isLast,
-												})}
-											>
-												<div className="d-flex align-items-center justify-content-between">
-													<p className="mb-0 text-gray">
-														<span className="fw-semibold">
-															{outreach.account.displayName}
-														</span>{' '}
-														{outreach.outreachDateTimeDescription}
-													</p>
-													<Dropdown>
-														<Dropdown.Toggle
-															as={DropdownToggle}
-															id={`mhic-outreach-attempt__dropdown-menu--${outreach.patientOrderOutreachId}`}
-															className="p-2"
-															disabled={
-																patientOrder.patientOrderDispositionId ===
-																PatientOrderDispositionId.CLOSED
-															}
-														>
-															<MoreIcon className="d-flex" />
-														</Dropdown.Toggle>
-														<Dropdown.Menu
-															as={DropdownMenu}
-															align="end"
-															popperConfig={{ strategy: 'fixed' }}
-															renderOnMount
-														>
-															<Dropdown.Item
-																onClick={() => {
-																	setOutreachTypeId(
-																		referenceDataResponse.patientOrderOutreachResults.find(
-																			(result) =>
-																				result.patientOrderOutreachResultId ===
-																				outreach.patientOrderOutreachResultId
-																		)
-																			?.patientOrderOutreachTypeId as PatientOrderOutreachTypeId
-																	);
-																	setOutreachToEdit(outreach);
-																	setShowOutreachModal(true);
-																}}
-															>
-																Edit
-															</Dropdown.Item>
-															<Dropdown.Item
-																onClick={() => {
-																	handleDeleteOutreach(
-																		outreach.patientOrderOutreachId
-																	);
-																}}
-															>
-																<span className="text-danger">Delete</span>
-															</Dropdown.Item>
-														</Dropdown.Menu>
-													</Dropdown>
-												</div>
-												<p className="mb-1 fw-bold">
-													{
+											<MhicOutreachItem
+												className={classNames({ 'border-bottom': !isLast })}
+												id={outreach.id}
+												type={outreach.type}
+												name={outreach.name}
+												date={outreach.dateDescription}
+												onEditClick={() => {
+													setOutreachTypeId(
 														referenceDataResponse.patientOrderOutreachResults.find(
 															(result) =>
 																result.patientOrderOutreachResultId ===
-																outreach.patientOrderOutreachResultId
-														)?.patientOrderOutreachResultTypeDescription
-													}
-												</p>
-												<p className="mb-0">{outreach.note}</p>
-											</div>
+																outreach.original.patientOrderOutreachResultId
+														)?.patientOrderOutreachTypeId as PatientOrderOutreachTypeId
+													);
+													setOutreachToEdit(outreach.original);
+													setShowOutreachModal(true);
+												}}
+												onDeleteClick={() => {
+													handleDeleteOutreach(outreach.id);
+												}}
+												title={outreach.title}
+												description={outreach.description}
+											/>
 										);
 									})}
 								</div>
