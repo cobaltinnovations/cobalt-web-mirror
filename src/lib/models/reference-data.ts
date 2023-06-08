@@ -62,10 +62,16 @@ export enum PatientOrderOutreachTypeId {
 	MYCHART_MESSAGE = 'MYCHART_MESSAGE',
 }
 
+export enum PatientOrderOutreachResultStatusId {
+	UNKNOWN = 'UNKNOWN',
+	CONNECTED = 'CONNECTED',
+	NOT_CONNECTED = 'NOT_CONNECTED',
+}
+
 export interface PatientOrderOutreachResult {
 	patientOrderOutreachResultId: string;
 	patientOrderOutreachResultStatusDescription: string;
-	patientOrderOutreachResultStatusId: string;
+	patientOrderOutreachResultStatusId: PatientOrderOutreachResultStatusId;
 	patientOrderOutreachResultTypeDescription: string;
 	patientOrderOutreachResultTypeId: string;
 	patientOrderOutreachTypeDescription: string;
