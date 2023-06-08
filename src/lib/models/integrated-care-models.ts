@@ -442,6 +442,7 @@ export interface PatientOrderScheduledMessageGroup {
 		messageTypeId: string;
 		messageTypeDescription: string;
 	}[];
+	scheduledAtDateTimeHasPassed: boolean;
 }
 
 export type PatientOrderCountsByPatientOrderTriageStatusId = Record<
