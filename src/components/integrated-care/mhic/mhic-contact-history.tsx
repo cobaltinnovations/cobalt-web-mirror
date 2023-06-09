@@ -12,6 +12,7 @@ import {
 	PatientOrderOutreachResultStatusId,
 	PatientOrderOutreachTypeId,
 	PatientOrderScheduledMessageGroup,
+	ScheduledMessageStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
@@ -120,13 +121,16 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 		const formattedScheduledMessageGroups = patientOrder.patientOrderScheduledMessageGroups
 			.filter((message) => message.scheduledAtDateTimeHasPassed)
 			.map((msg) => {
-				const showSuccess = msg.patientOrderScheduledMessages.every(
+				const showSuccessIcon = msg.patientOrderScheduledMessages.every(
 					(msg) => msg.messageStatusId === MessageStatusId.DELIVERED
 				);
-				const showError = msg.patientOrderScheduledMessages.some(
+				const showErrorIcon = msg.patientOrderScheduledMessages.some(
 					(msg) =>
 						msg.messageStatusId === MessageStatusId.ERROR ||
 						msg.messageStatusId === MessageStatusId.DELIVERY_FAILED
+				);
+				const messageEnqueued = msg.patientOrderScheduledMessages.some(
+					(msg) => msg.messageStatusId === MessageStatusId.ENQUEUED
 				);
 
 				return {
@@ -135,14 +139,16 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					name: '',
 					date: msg.scheduledAtDateTime,
 					dateDescription: msg.scheduledAtDateTimeDescription,
-					icon: showSuccess ? (
+					icon: showSuccessIcon ? (
 						<FlagSuccess className="text-success" />
-					) : showError ? (
+					) : showErrorIcon ? (
 						<FlagDanger className="text-danger" />
 					) : (
 						<NaIcon />
 					),
-					title: `Sent ${msg.patientOrderScheduledMessageTypeDescription} Message`,
+					title: `${messageEnqueued ? '' : 'Sent'} ${
+						msg.patientOrderScheduledMessageTypeDescription
+					} Message`,
 					descriptionHtml: msg.patientOrderScheduledMessages
 						.map((m) => {
 							const messageStatusClassMap = {
@@ -162,6 +168,10 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 							};
 
 							if (m.messageTypeId === MessageTypeId.SMS) {
+								if (m.messageStatusId === MessageStatusId.ENQUEUED) {
+									return `<p class="mb-0">SMS sending...</p>`;
+								}
+
 								return `<p class="mb-0">${m.messageTypeDescription} sent to ${
 									m.smsToNumberDescription
 								} <span class="fw-bold ${messageStatusClassMap[m.messageStatusId]}">${
@@ -170,6 +180,10 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 							}
 
 							if (m.messageTypeId === MessageTypeId.EMAIL) {
+								if (m.messageStatusId === MessageStatusId.ENQUEUED) {
+									return `<p class="mb-0">Email sending...</p>`;
+								}
+
 								return `<p class="mb-0">${m.messageTypeDescription} sent to ${m.emailToAddresses.join(
 									', '
 								)} <span class="fw-bold ${messageStatusClassMap[m.messageStatusId]}">${
