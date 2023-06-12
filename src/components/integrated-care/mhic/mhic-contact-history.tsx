@@ -12,7 +12,6 @@ import {
 	PatientOrderOutreachResultStatusId,
 	PatientOrderOutreachTypeId,
 	PatientOrderScheduledMessageGroup,
-	ScheduledMessageStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';

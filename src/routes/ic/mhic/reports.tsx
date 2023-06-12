@@ -104,7 +104,7 @@ export const Component = () => {
 	return (
 		<Container className="py-16">
 			<Row>
-				<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }} xl={{ span: 4, offset: 4 }}>
+				<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }} xl={{ span: 6, offset: 3 }}>
 					<h2 className="mb-1">Generate a Report</h2>
 					<p className="mb-6 text-gray fs-large">
 						To generate a report, please select the type of report and any applicable filters.
