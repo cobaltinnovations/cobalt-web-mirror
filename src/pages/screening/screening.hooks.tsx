@@ -293,12 +293,12 @@ export function useScreeningFlow({
 	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
 	useEffect(() => {
-		if (!instantiateOnLoad) {
+		if (!instantiateOnLoad || !activeFlowVersion) {
 			return;
 		}
 
 		startScreeningFlowIfNoneCompleted();
-	}, [instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
+	}, [activeFlowVersion, instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
