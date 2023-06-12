@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicInlineAlert } from '@/components/integrated-care/mhic';
@@ -14,6 +14,7 @@ const PatientConsent = () => {
 
 	const [isSaving, setIsSaving] = useState(false);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
+	const [showCloseOrderModal, setShowCloseOrderModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
@@ -24,6 +25,11 @@ const PatientConsent = () => {
 		async (event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
 			event.preventDefault();
 			const { value } = event.nativeEvent.submitter as HTMLButtonElement;
+
+			if (value === PatientOrderConsentStatusId.REJECTED) {
+				setShowCloseOrderModal(true);
+				return;
+			}
 
 			try {
 				if (!patientOrder) {
@@ -47,8 +53,61 @@ const PatientConsent = () => {
 		[handleError, navigate, patientOrder]
 	);
 
+	const handleCloseOrderModalConfirmButtonClick = useCallback(async () => {
+		try {
+			if (!patientOrder) {
+				throw new Error('patientOrder is undefined.');
+			}
+
+			setIsSaving(true);
+
+			await integratedCareService
+				.updatePatientOrderConsentStatus(patientOrder.patientOrderId, {
+					patientOrderConsentStatusId: PatientOrderConsentStatusId.REJECTED,
+				})
+				.fetch();
+
+			navigate('/ic/patient');
+		} catch (error) {
+			handleError(error);
+			setIsSaving(false);
+		}
+	}, [handleError, navigate, patientOrder]);
+
 	return (
 		<AsyncWrapper fetchData={fetchData}>
+			<Modal
+				centered
+				show={showCloseOrderModal}
+				onHide={() => {
+					setShowCloseOrderModal(false);
+				}}
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Close Order</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p className="mb-0 fw-bold">
+						Please confirm that you are no longer interested in seeking services for mental health concerns
+					</p>
+				</Modal.Body>
+				<Modal.Footer className="text-right">
+					<Button
+						variant="outline-primary"
+						className="me-2"
+						onClick={() => {
+							setShowCloseOrderModal(false);
+						}}
+						disabled={isSaving}
+					>
+						Cancel
+					</Button>
+					<Button variant="primary" onClick={handleCloseOrderModalConfirmButtonClick} disabled={isSaving}>
+						Confirm
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
 			<Container className="py-20">
 				<Row className="mb-8">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
