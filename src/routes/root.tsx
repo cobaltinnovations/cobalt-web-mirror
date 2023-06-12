@@ -108,13 +108,13 @@ export const Component = () => {
 	useUrlViewTracking();
 
 	return (
-		<AnalyticsProvider>
-			<AccountProvider>
+		<AccountProvider>
+			<AnalyticsProvider>
 				<BookingProvider>
 					<Layout />
 				</BookingProvider>
-			</AccountProvider>
-		</AnalyticsProvider>
+			</AnalyticsProvider>
+		</AccountProvider>
 	);
 };
 
