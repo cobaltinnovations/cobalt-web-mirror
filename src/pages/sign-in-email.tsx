@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
@@ -32,6 +32,10 @@ const SignInEmail = () => {
 	const classes = useSignInStyles();
 	const navigate = useNavigate();
 
+	const autofocusCheckComplete = useRef(false);
+	const emailAddressInputRef = useRef<HTMLInputElement>(null);
+	const passwordInputRef = useRef<HTMLInputElement>(null);
+
 	// Sign In
 	const [signInForm, setSignInForm] = useState({
 		emailAddress: '',
@@ -41,6 +45,20 @@ const SignInEmail = () => {
 	// Forgot Password
 	const [forgotPasswordModalIsOpen, setForgotPasswordModalIsOpen] = useState(false);
 	const [forgotPasswordEmailAddress, setForgotPasswordEmailAddress] = useState('');
+
+	useEffect(() => {
+		if (autofocusCheckComplete.current) {
+			return;
+		}
+
+		if (!signInForm.emailAddress) {
+			emailAddressInputRef.current?.focus();
+		} else if (!signInForm.password) {
+			passwordInputRef.current?.focus();
+		}
+
+		autofocusCheckComplete.current = true;
+	}, [signInForm.emailAddress, signInForm.password]);
 
 	async function handleSignInFormSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -126,6 +144,7 @@ const SignInEmail = () => {
 
 								<Form className="mb-6" onSubmit={handleSignInFormSubmit}>
 									<InputHelper
+										ref={emailAddressInputRef}
 										data-testid="signInEmailAddressInput"
 										className="mb-2"
 										label="Email address"
@@ -140,6 +159,7 @@ const SignInEmail = () => {
 										required
 									/>
 									<InputHelper
+										ref={passwordInputRef}
 										data-testid="signInPasswordInput"
 										className="mb-4"
 										label="Password"
