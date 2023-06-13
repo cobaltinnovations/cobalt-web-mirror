@@ -19,7 +19,7 @@ import {
 	mhicFilterAssignmentGetParsedQueryParams,
 	mhicFilterPracticeGetParsedQueryParams,
 	mhicSortDropdownGetParsedQueryParams,
-	parseMhicFilterQueryParamsFromURL,
+	parseMhicFilterQueryParamsFromSearchParams,
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -32,8 +32,10 @@ import { AwaitedString } from '@/components/awaited-string';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 import useAccount from '@/hooks/use-account';
+import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 
 interface MhicOrdersLoaderData {
+	getResponseChecksum: () => Promise<string | undefined>;
 	patientOrdersListPromise: Promise<PatientOrdersListResponse['findResult']>;
 }
 
@@ -41,45 +43,63 @@ export function useMhicOrdersLoaderData() {
 	return useRouteLoaderData('mhic-patient-orders') as MhicOrdersLoaderData;
 }
 
+function loadPatientOrders({ searchParams }: { searchParams: URLSearchParams }) {
+	const pageNumber = searchParams.get('pageNumber') ?? 0;
+
+	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(searchParams);
+	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(searchParams);
+	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(searchParams);
+	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(searchParams);
+	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(searchParams);
+	const mhicFilterParsedQueryParams = parseMhicFilterQueryParamsFromSearchParams(searchParams);
+
+	const request = integratedCareService.getPatientOrders({
+		pageSize: '15',
+		...(pageNumber && { pageNumber }),
+		...mhicFilterStateParsedQueryParams,
+		...mhicFilterFlagParsedQueryParams,
+		...mhicFilterPracticeParsedQueryParams,
+		...mhicFilterAssignmentParsedQueryParams,
+		...mhicSortDropdownParsedQueryParams,
+		...mhicFilterParsedQueryParams,
+	});
+
+	const patientOrdersListPromise = request.fetch();
+
+	return {
+		getResponseChecksum: () => patientOrdersListPromise.then(() => request.cobaltResponseChecksum),
+		patientOrdersListPromise: patientOrdersListPromise.then((r) => r.findResult),
+	};
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
-	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
 
-	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
-	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
-	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
-	const mhicFilterAssignmentParsedQueryParams = mhicFilterAssignmentGetParsedQueryParams(url);
-	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
-	const mhicFilterParsedQueryParams = parseMhicFilterQueryParamsFromURL(url);
-
-	return defer({
-		patientOrdersListPromise: integratedCareService
-			.getPatientOrders({
-				pageSize: '15',
-				...(pageNumber && { pageNumber }),
-				...mhicFilterStateParsedQueryParams,
-				...mhicFilterFlagParsedQueryParams,
-				...mhicFilterPracticeParsedQueryParams,
-				...mhicFilterAssignmentParsedQueryParams,
-				...mhicSortDropdownParsedQueryParams,
-				...mhicFilterParsedQueryParams,
-			})
-			.fetch()
-			.then((r) => r.findResult),
-	});
+	return defer(
+		loadPatientOrders({
+			searchParams: url.searchParams,
+		})
+	);
 }
 
 export const Component = () => {
 	const { account } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
-	const { patientOrdersListPromise } = useMhicOrdersLoaderData();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const pollingFn = useCallback(() => {
+		return loadPatientOrders({ searchParams });
+	}, [searchParams]);
+	const { data } = usePolledLoaderData({
+		useLoaderHook: useMhicOrdersLoaderData,
+		pollingFn,
+	});
+	const { patientOrdersListPromise } = data;
 
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
 
-	const [searchParams, setSearchParams] = useSearchParams();
-	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	const revalidator = useRevalidator();
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
@@ -151,6 +171,12 @@ export const Component = () => {
 		[clearSelections, searchParams, setSearchParams]
 	);
 
+	const headerDescription = useMemo(() => {
+		return patientOrdersListPromise.then((r) => {
+			return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+		});
+	}, [patientOrdersListPromise]);
+
 	return (
 		<>
 			<MhicGenerateOrdersModal
@@ -184,13 +210,7 @@ export const Component = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Patient Orders"
-							description={
-								<AwaitedString
-									resolve={patientOrdersListPromise.then((r) => {
-										return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
-									})}
-								/>
-							}
+							description={<AwaitedString resolve={headerDescription} />}
 						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (

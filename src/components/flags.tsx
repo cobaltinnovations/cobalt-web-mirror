@@ -279,7 +279,7 @@ const Flag = ({
 	const isSuccess = useMemo(() => flag.variant.includes('success'), [flag.variant]);
 	const isWarning = useMemo(() => flag.variant.includes('warning'), [flag.variant]);
 	const isDanger = useMemo(() => flag.variant.includes('danger'), [flag.variant]);
-	const [isExpanded, setIsExpanded] = useState(isBold ? false : true);
+	const [isExpanded, setIsExpanded] = useState(flag.initExpanded || (isBold ? false : true));
 
 	return (
 		<div key={flag.flagId} ref={flag.nodeRef} className={classNames('flag', `flag--${flag.variant}`)}>

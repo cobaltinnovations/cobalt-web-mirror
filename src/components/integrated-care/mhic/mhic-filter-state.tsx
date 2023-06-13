@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
 import { PatientOrderDispositionId } from '@/lib/models';
@@ -36,28 +36,26 @@ const options = [
 
 const availableQueryParams = uniq(options.map((option) => Object.keys(option.queryParameters)).flat());
 
-export function MhicFilterStateGetParsedQueryParams(url: URL) {
+export function MhicFilterStateGetParsedQueryParams(searchParams: URLSearchParams) {
 	const parsed: Record<string, string[]> = {};
 
 	for (const param of availableQueryParams) {
-		parsed[param] = url.searchParams.getAll(param);
+		parsed[param] = searchParams.getAll(param);
 	}
 
 	return parsed;
 }
 
 export const MhicFilterState = ({ className }: MhicFilterStateProps) => {
-	const { pathname, search } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedValue, setSelectedValue] = useState('');
 
 	const isActive = useMemo(() => {
-		const url = new URL(`${window.location.origin}${pathname}${search}`);
-		const parseQueryParams = MhicFilterStateGetParsedQueryParams(url);
+		const parseQueryParams = MhicFilterStateGetParsedQueryParams(searchParams);
 		const selectedQueryParamValues = Object.values(parseQueryParams).flat();
 
 		return selectedQueryParamValues.length > 0;
-	}, [pathname, search]);
+	}, [searchParams]);
 
 	const handleDismiss = useCallback(() => {
 		availableQueryParams.forEach((param) => {

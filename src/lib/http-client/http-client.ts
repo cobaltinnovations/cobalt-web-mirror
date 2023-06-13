@@ -21,6 +21,7 @@ export type OrchestratedRequest<T = undefined> = {
 	config: AxiosRequestConfig;
 	fetch(): Promise<T>;
 	abort(): void;
+	cobaltResponseChecksum?: string;
 };
 
 export class HttpClient {
@@ -77,7 +78,7 @@ export class HttpClient {
 	async _fetch(config: AxiosRequestConfig) {
 		try {
 			const response: AxiosResponse = await this._axiosInstance(config);
-			return response.data;
+			return response;
 		} catch (error) {
 			if (axios.isCancel(error)) {
 				throw errors[ERROR_CODES.REQUEST_ABORTED](error as any);
@@ -137,12 +138,14 @@ export class HttpClient {
 
 			this._requests[orchestratedRequest.requestId] = orchestratedRequest;
 
-			const data = await this._fetch(orchestratedRequest.config);
+			const response = await this._fetch(orchestratedRequest.config);
 
 			orchestratedRequest.requestComplete = true;
+			orchestratedRequest.cobaltResponseChecksum = response.headers['x-cobalt-checksum'];
+
 			delete this._requests[orchestratedRequest.requestId];
 
-			return data as T;
+			return response.data as T;
 		};
 
 		orchestratedRequest.abort = () => {

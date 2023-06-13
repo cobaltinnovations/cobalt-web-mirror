@@ -8,7 +8,7 @@ import {
 	useNavigate,
 } from 'react-router-dom';
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useCallback, useMemo, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -26,6 +26,7 @@ import { Await, useAsyncValue } from 'react-router-dom';
 
 import Loader from '@/components/loader';
 import { MhicPatientOrderShelfActions } from '@/components/integrated-care/mhic/mhic-patient-order-shelf-actions';
+import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 
 export const mhicShelfRouteObject: RouteObject = {
 	path: ':patientOrderId',
@@ -43,7 +44,18 @@ export function useMhicPatientOrdereShelfLoaderData() {
 }
 
 interface MhicPatientOrderShelfLoaderData {
+	getResponseChecksum: () => Promise<string | undefined>;
 	patientOrderPromise: Promise<PatientOrderResponse>;
+}
+
+function loadShelfData(patientOrderId: string) {
+	const request = integratedCareService.getPatientOrder(patientOrderId);
+	const patientOrderPromise = request.fetch();
+
+	return {
+		getResponseChecksum: () => patientOrderPromise.then(() => request.cobaltResponseChecksum),
+		patientOrderPromise,
+	};
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -53,9 +65,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		throw new Error('Unknown Patient Order');
 	}
 
-	return defer({
-		patientOrderPromise: integratedCareService.getPatientOrder(patientOrderId).fetch(),
-	});
+	return defer(loadShelfData(patientOrderId));
 }
 
 enum TAB_KEYS {
@@ -65,7 +75,23 @@ enum TAB_KEYS {
 }
 
 export const Component = () => {
-	const shelfData = useLoaderData() as MhicPatientOrderShelfLoaderData;
+	const matches = useMatches();
+	const patientOrderId = useMemo(() => {
+		const id = matches[matches.length - 1].params.patientOrderId;
+		if (!id) {
+			throw new Error('Unknonw patient order');
+		}
+		return id;
+	}, [matches]);
+
+	const pollingFn = useCallback(() => {
+		return loadShelfData(patientOrderId);
+	}, [patientOrderId]);
+
+	const { data: shelfData } = usePolledLoaderData({
+		useLoaderHook: useLoaderData as () => MhicPatientOrderShelfLoaderData,
+		pollingFn,
+	});
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
 
 	return (

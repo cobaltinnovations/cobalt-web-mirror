@@ -8,9 +8,9 @@ import FilterDropdown from '@/components/filter-dropdown';
 
 const queryParamName = 'referringPracticeNames';
 
-export const mhicFilterPracticeGetParsedQueryParams = (url: URL) => {
+export const mhicFilterPracticeGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
-		[queryParamName]: url.searchParams.getAll(queryParamName),
+		[queryParamName]: searchParams.getAll(queryParamName),
 	};
 };
 

@@ -119,11 +119,11 @@ const mhicFilterQueryParams = availableFilters.reduce((accumulator, currentValue
 	return [...accumulator, currentValue.filterId];
 }, [] as string[]);
 
-export function parseMhicFilterQueryParamsFromURL(url: URL) {
+export function parseMhicFilterQueryParamsFromSearchParams(searchParams: URLSearchParams) {
 	const parsed: Record<string, string[]> = {};
 
 	for (const param of mhicFilterQueryParams) {
-		parsed[param] = url.searchParams.getAll(param);
+		parsed[param] = searchParams.getAll(param);
 	}
 
 	return parsed;

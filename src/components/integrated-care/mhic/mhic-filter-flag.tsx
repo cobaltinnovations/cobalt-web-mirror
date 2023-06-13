@@ -45,8 +45,8 @@ const options = [
 	},
 ];
 
-export function MhicFilterFlagGetParsedQueryParams(url: URL) {
-	const activeOptionsIds = url.searchParams.getAll(queryParamName);
+export function MhicFilterFlagGetParsedQueryParams(searchParams: URLSearchParams) {
+	const activeOptionsIds = searchParams.getAll(queryParamName);
 	const activeOptions = options.filter((option) => activeOptionsIds.includes(option.optionId));
 	const parsed: Record<string, string[]> = {};
 
