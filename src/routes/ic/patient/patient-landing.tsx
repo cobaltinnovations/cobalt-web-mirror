@@ -107,7 +107,7 @@ const PatientLanding = () => {
 							<NoData
 								className="mb-10"
 								title={`Awaiting ${institution.name} Enrollment`}
-								description={`We are waiting for your primary care provider to send us your information. We will send you an email or text message when we are ready for you. Call us at ${institution.integratedCarePhoneNumberDescription} if you have any questions.`}
+								description={`We are waiting for your primary care provider to send us your information. We will send you an email or text message when we are ready for you. Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you have any questions.`}
 								actions={[]}
 							/>
 						)}
@@ -121,7 +121,7 @@ const PatientLanding = () => {
 									<NoData
 										className="border-0 bg-white"
 										title="No further action required"
-										description={`You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at ${institution?.integratedCarePhoneNumberDescription} if you change your mind.`}
+										description={`You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at ${institution?.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you change your mind.`}
 										actions={[]}
 									/>
 								</Card.Body>
@@ -132,7 +132,7 @@ const PatientLanding = () => {
 							<MhicInlineAlert
 								variant="warning"
 								title="Service not available"
-								description={`Your insurance plan or state of residence may not be eligible for ${institution.name} services. Please call us at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`}
+								description={`Your insurance plan or state of residence may not be eligible for ${institution.name} services. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`}
 							/>
 						)}
 

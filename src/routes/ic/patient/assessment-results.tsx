@@ -102,8 +102,8 @@ export const PatientAssessmentResults = () => {
 									time. If you need an in-person appointment, please call us at{' '}
 									<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 										{institution?.integratedCarePhoneNumberDescription}
-									</a>
-									.
+									</a>{' '}
+									{institution.integratedCareAvailabilityDescription}.
 								</p>
 								<div className="mb-4 text-center">
 									<Button
@@ -142,7 +142,8 @@ export const PatientAssessmentResults = () => {
 											{institution?.integratedCarePhoneNumberDescription}
 										</a>
 									</strong>{' '}
-									to speak to a Mental Health Intake Coordinator about your options.
+									{institution.integratedCareAvailabilityDescription} to speak to a Mental Health
+									Intake Coordinator about your options.
 								</p>
 								<div className="text-center">
 									<Button

@@ -111,7 +111,7 @@ export const NextStepsAssessmentComplete = ({
 					{!patientOrder.resourcesSentAt ? (
 						<NextStepsItem
 							title="Step 3: Receive resources"
-							description={`Call us at ${institution.integratedCarePhoneNumberDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
+							description={`Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
 							button={{
 								variant: 'primary',
 								title: 'Call Us',
@@ -161,7 +161,7 @@ export const NextStepsAssessmentComplete = ({
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
 				<NextStepsItem
 					title="Step 3: Call us for resources"
-					description={`Call us at ${institution.integratedCarePhoneNumberDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
+					description={`Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
 					button={{
 						variant: 'primary',
 						title: 'Call Us',
