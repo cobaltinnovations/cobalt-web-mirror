@@ -6,6 +6,7 @@ import { MhicPanelTodayResponse, PatientOrdersListResponse, integratedCareServic
 import useAccount from '@/hooks/use-account';
 import TabBar from '@/components/tab-bar';
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
+import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 
 enum TAB_KEYS {
 	OUTREACH_REVIEW = 'OUTREACH_REVIEW',
@@ -17,6 +18,7 @@ enum TAB_KEYS {
 }
 
 interface MhicOverviewLoaderData {
+	getResponseChecksum: () => Promise<string | undefined>;
 	overviewResponsePromise: Promise<MhicPanelTodayResponse>;
 	newPatientResults: Promise<PatientOrdersListResponse['findResult']>;
 	voicemailResults: Promise<PatientOrdersListResponse['findResult']>;
@@ -30,9 +32,12 @@ export function useMhicOverviewLoaderData() {
 	return useRouteLoaderData('mhic-overview') as MhicOverviewLoaderData;
 }
 
-export async function loader() {
-	const overviewResponsePromise = integratedCareService.getOverview().fetch();
-	return defer({
+function loadOverviewData() {
+	const request = integratedCareService.getOverview();
+	const overviewResponsePromise = request.fetch();
+
+	return {
+		getResponseChecksum: () => overviewResponsePromise.then(() => request.cobaltResponseChecksum),
 		overviewResponsePromise,
 		newPatientResults: overviewResponsePromise.then((res) => {
 			return {
@@ -76,7 +81,11 @@ export async function loader() {
 				totalCountDescription: res.safetyPlanningPatientOrders.length.toString(),
 			};
 		}),
-	});
+	};
+}
+
+export async function loader() {
+	return defer(loadOverviewData());
 }
 
 const INITIAL_COUNTS = {
@@ -90,6 +99,10 @@ const INITIAL_COUNTS = {
 
 export const Component = () => {
 	const { account } = useAccount();
+	const { data } = usePolledLoaderData({
+		useLoaderHook: useMhicOverviewLoaderData,
+		pollingFn: loadOverviewData,
+	});
 	const {
 		overviewResponsePromise,
 		newPatientResults,
@@ -98,7 +111,7 @@ export const Component = () => {
 		assessmentResults,
 		resourcesResults,
 		safetyPlanningResults,
-	} = useMhicOverviewLoaderData();
+	} = data;
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.OUTREACH_REVIEW);
 

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { useCallback, useState } from 'react';
-import { LoaderFunctionArgs, defer, redirect, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderViewTypeId } from '@/lib/models';
@@ -11,7 +11,7 @@ import {
 	MhicPatientOrderTable,
 	MhicSortDropdown,
 	MhicShelfOutlet,
-	parseMhicFilterQueryParamsFromURL,
+	parseMhicFilterQueryParamsFromSearchParams,
 	MhicPatientOrderTableColumnConfig,
 	mhicSortDropdownGetParsedQueryParams,
 	MhicFilterDropdown,
@@ -24,6 +24,7 @@ import {
 } from '@/components/integrated-care/mhic';
 import { useIntegratedCareLoaderData } from '../landing';
 import classNames from 'classnames';
+import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -172,6 +173,7 @@ const viewConfig: ViewConfig = {
 };
 
 interface MhicMyPatientsLoaderData {
+	getResponseChecksum: () => Promise<string | undefined>;
 	viewTypeId?: PatientOrderViewTypeId;
 	pageTitle: string;
 	pageDescription: string;
@@ -183,50 +185,68 @@ export function useMhicMyPatientsLoaderData() {
 	return useRouteLoaderData('mhic-my-patients') as MhicMyPatientsLoaderData;
 }
 
+function loadMyPatients({ mhicView, searchParams }: { mhicView: string; searchParams: URLSearchParams }) {
+	const accountId = Cookies.get('accountId');
+	const pageNumber = searchParams.get('pageNumber') ?? 0;
+	const filters = parseMhicFilterQueryParamsFromSearchParams(searchParams);
+	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(searchParams);
+	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(searchParams);
+	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(searchParams);
+	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(searchParams);
+
+	const { viewTypeId, pageTitle, pageDescription, columnConfig, apiParameters } =
+		viewConfig[mhicView as MhicMyPatientView];
+
+	const request = integratedCareService.getPatientOrders({
+		...(accountId && { panelAccountId: accountId }),
+		...apiParameters,
+		...filters,
+		pageSize: '15',
+		...(pageNumber && { pageNumber }),
+		...mhicFilterStateParsedQueryParams,
+		...mhicFilterFlagParsedQueryParams,
+		...mhicFilterPracticeParsedQueryParams,
+		...mhicSortDropdownParsedQueryParams,
+	});
+	const responsePromise = request.fetch();
+
+	return {
+		getResponseChecksum: () => responsePromise.then(() => request.cobaltResponseChecksum),
+		viewTypeId,
+		pageTitle,
+		pageDescription,
+		columnConfig,
+		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
+	};
+}
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	if (!Object.keys(viewConfig).includes(params.mhicView ?? '')) {
 		return redirect('/ic/mhic/my-patients/all');
 	}
 
 	const url = new URL(request.url);
-	const accountId = Cookies.get('accountId');
-	const pageNumber = url.searchParams.get('pageNumber') ?? 0;
-	const filters = parseMhicFilterQueryParamsFromURL(url);
-	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(url);
-	const mhicFilterFlagParsedQueryParams = MhicFilterFlagGetParsedQueryParams(url);
-	const mhicFilterPracticeParsedQueryParams = mhicFilterPracticeGetParsedQueryParams(url);
-	const mhicSortDropdownParsedQueryParams = mhicSortDropdownGetParsedQueryParams(url);
 
-	const { viewTypeId, pageTitle, pageDescription, columnConfig, apiParameters } =
-		viewConfig[params.mhicView as MhicMyPatientView];
-
-	const responsePromise = integratedCareService
-		.getPatientOrders({
-			...(accountId && { panelAccountId: accountId }),
-			...apiParameters,
-			...filters,
-			pageSize: '15',
-			...(pageNumber && { pageNumber }),
-			...mhicFilterStateParsedQueryParams,
-			...mhicFilterFlagParsedQueryParams,
-			...mhicFilterPracticeParsedQueryParams,
-			...mhicSortDropdownParsedQueryParams,
+	return defer(
+		loadMyPatients({
+			mhicView: params.mhicView as MhicMyPatientView,
+			searchParams: url.searchParams,
 		})
-		.fetch();
-
-	return defer({
-		viewTypeId,
-		pageTitle,
-		pageDescription,
-		columnConfig,
-		patientOrdersListPromise: responsePromise.then((r) => r.findResult),
-	});
+	);
 }
 
 export const Component = () => {
-	const { viewTypeId, pageTitle, pageDescription, columnConfig, patientOrdersListPromise } =
-		useMhicMyPatientsLoaderData();
+	const match = useMatch('/ic/mhic/my-patients/:mhicView');
 	const [searchParams, setSearchParams] = useSearchParams();
+	const pollingFn = useCallback(() => {
+		return loadMyPatients({ mhicView: match?.params.mhicView ?? '', searchParams });
+	}, [match?.params.mhicView, searchParams]);
+	const { data } = usePolledLoaderData({
+		useLoaderHook: useMhicMyPatientsLoaderData,
+		pollingFn,
+	});
+	const { viewTypeId, pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = data;
+
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
