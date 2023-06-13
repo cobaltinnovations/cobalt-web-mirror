@@ -8,9 +8,9 @@ import FilterDropdown from '@/components/filter-dropdown';
 
 const queryParamName = 'panelAccountId';
 
-export const mhicFilterAssignmentGetParsedQueryParams = (url: URL) => {
+export const mhicFilterAssignmentGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
-		[queryParamName]: url.searchParams.getAll(queryParamName),
+		[queryParamName]: searchParams.getAll(queryParamName),
 	};
 };
 

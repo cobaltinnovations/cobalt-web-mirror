@@ -35,11 +35,11 @@ interface MhicSortDropdownProps {
 	className?: string;
 }
 
-export const mhicSortDropdownGetParsedQueryParams = (url: URL) => {
+export const mhicSortDropdownGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
-		patientOrderSortColumnId: url.searchParams.get('patientOrderSortColumnId') ?? '',
-		sortDirectionId: url.searchParams.get('sortDirectionId') ?? '',
-		sortNullsId: url.searchParams.get('sortNullsId') ?? '',
+		patientOrderSortColumnId: searchParams.get('patientOrderSortColumnId') ?? '',
+		sortDirectionId: searchParams.get('sortDirectionId') ?? '',
+		sortNullsId: searchParams.get('sortNullsId') ?? '',
 	};
 };
 
