@@ -24,6 +24,7 @@ export interface FlagModel {
 		| 'bold-danger';
 	title: string;
 	description?: string;
+	initExpanded?: boolean;
 	actions: FlagAction[];
 	nodeRef: React.RefObject<HTMLDivElement>;
 }
