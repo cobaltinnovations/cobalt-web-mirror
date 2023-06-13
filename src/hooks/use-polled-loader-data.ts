@@ -23,9 +23,10 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	const [data, setData] = useState(loaderData);
 	const [polledData, setPolledData] = useState(loaderData);
 	const [immediateNext, setImmediateNext] = useState(false);
-	const [[currentChecksum, pendingChecksum], setChecksums] = useState(['', '']);
+	const [pendingChecksum, setPendingChecksum] = useState('');
+	const [[currentChecksum, polledChecksum], setChecksums] = useState(['', '']);
 
-	const hasUpdates = !!pendingChecksum && currentChecksum !== pendingChecksum;
+	const hasUpdates = !!polledChecksum && currentChecksum !== polledChecksum;
 
 	useEffect(() => {
 		loaderData.getResponseChecksum().then((checksum) => {
@@ -56,13 +57,13 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 
 	useEffect(() => {
 		Promise.all([data.getResponseChecksum(), polledData.getResponseChecksum()]).then(
-			([dataChecksum, polledChecksum]) => {
+			([dataChecksum, polledDataChecksum]) => {
 				console.log({
 					ui: dataChecksum,
-					polled: polledChecksum,
+					polled: polledDataChecksum,
 				});
 
-				setChecksums([dataChecksum ?? '', polledChecksum ?? '']);
+				setChecksums([dataChecksum ?? '', polledDataChecksum ?? '']);
 			}
 		);
 	}, [data, polledData]);
@@ -76,7 +77,8 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 			return;
 		} else if (immediateUpdate) {
 			updateData();
-		} else {
+		} else if (pendingChecksum !== polledChecksum) {
+			setPendingChecksum(polledChecksum);
 			addFlag({
 				initExpanded: true,
 				variant: 'bold-primary',
@@ -92,7 +94,7 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 				],
 			});
 		}
-	}, [addFlag, hasUpdates, immediateUpdate, updateData]);
+	}, [addFlag, hasUpdates, immediateUpdate, pendingChecksum, polledChecksum, updateData]);
 
 	return {
 		data,
