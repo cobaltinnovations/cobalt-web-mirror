@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { PatientOrderDispositionId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
-import { AwaitedString } from '@/components/awaited-string';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 
 interface MhicSearchResultsLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -50,14 +50,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const pollingFn = useCallback(() => {
 		return loadSearchResults({ searchParams });
 	}, [searchParams]);
-	const { data } = usePolledLoaderData({
+	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicSearchResulsLoaderData,
+		immediateUpdate: !!shelfData,
 		pollingFn,
 	});
 	const { patientOrdersListPromise } = data;
+	const [headerDescription, setHeaderDescription] = useState('');
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	const patientMrn = searchParams.get('patientMrn');
 	const searchQuery = searchParams.get('searchQuery');
@@ -70,9 +73,9 @@ export const Component = () => {
 		[searchParams, setSearchParams]
 	);
 
-	const headerDescription = useMemo(() => {
-		return patientOrdersListPromise.then((r) => {
-			return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+	useEffect(() => {
+		patientOrdersListPromise.then((r) => {
+			setHeaderDescription(`${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`);
 		});
 	}, [patientOrdersListPromise]);
 
@@ -84,7 +87,7 @@ export const Component = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title={`Search Results for "${patientMrn || searchQuery}"`}
-							description={<AwaitedString resolve={headerDescription} />}
+							description={headerDescription || <Spinner as="span" animation="border" size="sm" />}
 						/>
 					</Col>
 				</Row>
@@ -92,6 +95,7 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
+							isLoading={isLoading}
 							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
 							pageNumber={parseInt(pageNumber, 10)}

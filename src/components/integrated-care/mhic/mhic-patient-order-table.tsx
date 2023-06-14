@@ -83,6 +83,7 @@ interface MhicPatientOrderTableProps {
 	pageSize: number;
 	onPaginationClick(pageIndex: number): void;
 	columnConfig: MhicPatientOrderTableColumnConfig;
+	isLoading?: boolean;
 	coloredRows?: boolean;
 	showPagination?: boolean;
 }
@@ -97,6 +98,7 @@ export const MhicPatientOrderTable = ({
 	pageSize,
 	onPaginationClick,
 	columnConfig,
+	isLoading = false,
 	coloredRows = false,
 	showPagination = true,
 }: MhicPatientOrderTableProps) => {
@@ -104,7 +106,7 @@ export const MhicPatientOrderTable = ({
 	const location = useLocation();
 	const navigate = useNavigate();
 
-	const [isLoading, setIsLoading] = useState(false);
+	const [didLoad, setDidLoad] = useState(false);
 	const [patientOrders, setPatientOrders] = useState<PatientOrderModel[]>([]);
 
 	const [totalPatientOrdersCount, setTotalPatientOrdersCount] = useState(0);
@@ -161,8 +163,6 @@ export const MhicPatientOrderTable = ({
 			return;
 		}
 
-		setIsLoading(true);
-
 		// TODO: Perhaps better moving resolution behind <Await />
 		patientOrderFindResultPromise
 			.then((response) => {
@@ -176,7 +176,7 @@ export const MhicPatientOrderTable = ({
 				setTotalPatientOrdersDescription('0');
 			})
 			.finally(() => {
-				setIsLoading(false);
+				setDidLoad(true);
 			});
 	}, [patientOrderFindResultPromise]);
 
@@ -260,7 +260,7 @@ export const MhicPatientOrderTable = ({
 					</TableHead>
 					<TableBody>
 						<Suspense>
-							<Await resolve={patientOrderFindResultPromise}>
+							<Await resolve={didLoad || patientOrderFindResultPromise}>
 								{!isLoading && patientOrders.length === 0 && (
 									<TableRow>
 										<TableCell colSpan={Object.values(columnConfig).filter((v) => v).length}>
