@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigation } from 'react-router-dom';
 import useFlags from './use-flags';
 
 interface LoaderDataWithResponseChecksum {
@@ -19,23 +20,49 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	enabled?: boolean;
 }) {
 	const { addFlag } = useFlags();
+	const { state } = useNavigation();
 	const loaderData = useLoaderHook();
-	const [data, setData] = useState(loaderData);
+
+	const isLoading = state === 'loading';
+	const [isPolling, setIsPolling] = useState(false);
+	const [usingPolled, setUsingPolled] = useState(false);
 	const [polledData, setPolledData] = useState(loaderData);
 	const [immediateNext, setImmediateNext] = useState(false);
-	const [pendingChecksum, setPendingChecksum] = useState('');
-	const [[currentChecksum, polledChecksum], setChecksums] = useState(['', '']);
+	const [flaggedChecksum, setFlaggedChecksum] = useState('');
+	const [[uiChecksum, polledChecksum], setChecksums] = useState(['', '']);
 
-	const hasUpdates = !!polledChecksum && currentChecksum !== polledChecksum;
+	const hasUpdates = !!polledChecksum && uiChecksum !== polledChecksum;
+
+	const pollLoader = useCallback(() => {
+		setIsPolling(true);
+		const result = pollingFn();
+
+		result.getResponseChecksum().then((checksum) => {
+			setIsPolling(false);
+			setPolledData(result);
+			setChecksums((curr) => {
+				return [curr[0], checksum ?? ''];
+			});
+		});
+	}, [pollingFn]);
+
+	const swapData = useCallback(() => {
+		setUsingPolled(true);
+		setChecksums((curr) => {
+			return [curr[1], curr[1]];
+		});
+	}, []);
 
 	useEffect(() => {
+		setUsingPolled(false);
+
 		loaderData.getResponseChecksum().then((checksum) => {
 			setPolledData(loaderData);
-			setData(loaderData);
 			setChecksums([checksum ?? '', checksum ?? '']);
 		});
 	}, [loaderData]);
 
+	// start/stop intervals-- or update immediately
 	useEffect(() => {
 		if (!enabled) {
 			setImmediateNext(true);
@@ -43,42 +70,28 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 		}
 
 		if (immediateNext) {
-			setPolledData(pollingFn());
 			setImmediateNext(false);
+			pollLoader();
 		}
 
 		const intervalId = setInterval(() => {
-			const result = pollingFn();
-			setPolledData(result);
+			pollLoader();
 		}, intervalSeconds);
 
 		return () => clearInterval(intervalId);
-	}, [enabled, immediateNext, intervalSeconds, pollingFn]);
+	}, [enabled, immediateNext, intervalSeconds, pollLoader]);
 
-	useEffect(() => {
-		Promise.all([data.getResponseChecksum(), polledData.getResponseChecksum()]).then(
-			([dataChecksum, polledDataChecksum]) => {
-				console.log({
-					ui: dataChecksum,
-					polled: polledDataChecksum,
-				});
-
-				setChecksums([dataChecksum ?? '', polledDataChecksum ?? '']);
-			}
-		);
-	}, [data, polledData]);
-
-	const updateData = useCallback(() => {
-		setData(polledData);
-	}, [polledData]);
-
+	// update data immediately if configured, or display flag
 	useEffect(() => {
 		if (!hasUpdates) {
 			return;
-		} else if (immediateUpdate) {
-			updateData();
-		} else if (pendingChecksum !== polledChecksum) {
-			setPendingChecksum(polledChecksum);
+		}
+
+		if (immediateUpdate) {
+			swapData();
+		} else if (flaggedChecksum !== polledChecksum) {
+			setFlaggedChecksum(polledChecksum);
+
 			addFlag({
 				initExpanded: true,
 				variant: 'bold-primary',
@@ -88,17 +101,21 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 					{
 						title: 'Refresh screen',
 						onClick: () => {
-							updateData();
+							swapData();
 						},
 					},
 				],
 			});
 		}
-	}, [addFlag, hasUpdates, immediateUpdate, pendingChecksum, polledChecksum, updateData]);
+	}, [addFlag, hasUpdates, immediateUpdate, flaggedChecksum, polledChecksum, swapData]);
 
 	return {
-		data,
+		loaderData,
+		polledData,
+		data: usingPolled ? polledData : loaderData,
 		hasUpdates,
-		updateData,
+		swapData,
+		isLoading,
+		isPolling,
 	};
 }
