@@ -23,6 +23,8 @@ export * from './mhic-inline-alert';
 export * from './mhic-insurance-modal';
 export * from './mhic-message-modal';
 export * from './mhic-navigation';
+export * from './mhic-next-steps-alerts';
+export * from './mhic-next-steps-appointment';
 export * from './mhic-next-steps-card';
 export * from './mhic-order-details';
 export * from './mhic-outreach-item';

@@ -68,6 +68,7 @@ interface MhicInlineAlertProps {
 	action?: {
 		title: string;
 		onClick(): void;
+		disabled?: boolean;
 	};
 	className?: string;
 }
