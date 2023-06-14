@@ -339,6 +339,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="mb-6"
 										title="No Assessment"
@@ -381,6 +388,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="mb-6 bg-white"
 										title="Assessment is Scheduled"
@@ -425,6 +439,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"
