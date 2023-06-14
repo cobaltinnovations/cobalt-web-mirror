@@ -8,7 +8,7 @@ import {
 	useNavigate,
 } from 'react-router-dom';
 
-import React, { Suspense, useCallback, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
@@ -22,7 +22,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
-import { Await, useAsyncValue } from 'react-router-dom';
+import { Await } from 'react-router-dom';
 
 import Loader from '@/components/loader';
 import { MhicPatientOrderShelfActions } from '@/components/integrated-care/mhic/mhic-patient-order-shelf-actions';
@@ -93,10 +93,15 @@ export const Component = () => {
 		pollingFn,
 	});
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
+	const [patientOrderResponse, setPatientORderResponse] = useState<PatientOrderResponse | null>(null);
+
+	useEffect(() => {
+		shelfData?.patientOrderPromise.then((response) => setPatientORderResponse(response));
+	}, [shelfData?.patientOrderPromise]);
 
 	return (
 		<Suspense fallback={<Loader />}>
-			<Await resolve={shelfData?.patientOrderPromise}>
+			<Await resolve={!!patientOrderResponse || shelfData?.patientOrderPromise}>
 				<Tab.Container
 					id="shelf-tabs"
 					defaultActiveKey={TAB_KEYS.ORDER_DETAILS}
@@ -105,6 +110,7 @@ export const Component = () => {
 					unmountOnExit
 				>
 					<ShelfContent
+						patientOrderResponse={patientOrderResponse}
 						tabBar={
 							<TabBar
 								key="mhic-shelf-tabbar"
@@ -152,11 +158,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const ShelfContent = ({ tabBar }: { tabBar: React.ReactNode }) => {
+const ShelfContent = ({
+	tabBar,
+	patientOrderResponse,
+}: {
+	tabBar: React.ReactNode;
+	patientOrderResponse: PatientOrderResponse | null;
+}) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const patientOrderResponse = useAsyncValue() as PatientOrderResponse | null;
 	const { addFlag } = useFlags();
 
 	if (!patientOrderResponse) {
