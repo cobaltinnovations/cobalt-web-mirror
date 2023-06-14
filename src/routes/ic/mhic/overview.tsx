@@ -7,6 +7,7 @@ import useAccount from '@/hooks/use-account';
 import TabBar from '@/components/tab-bar';
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 
 enum TAB_KEYS {
 	OUTREACH_REVIEW = 'OUTREACH_REVIEW',
@@ -99,8 +100,10 @@ const INITIAL_COUNTS = {
 
 export const Component = () => {
 	const { account } = useAccount();
-	const { data } = usePolledLoaderData({
+	const shelfData = useMhicPatientOrdereShelfLoaderData();
+	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicOverviewLoaderData,
+		immediateUpdate: !!shelfData,
 		pollingFn: loadOverviewData,
 	});
 	const {
@@ -191,6 +194,7 @@ export const Component = () => {
 							<Tab.Content>
 								<Tab.Pane eventKey={TAB_KEYS.OUTREACH_REVIEW}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={newPatientResults}
 										selectAll={false}
 										pageNumber={0}
@@ -211,6 +215,7 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.VOICEMAILS}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={voicemailResults}
 										selectAll={false}
 										pageNumber={0}
@@ -231,6 +236,7 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.FOLLOW_UPS}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={followupResults}
 										selectAll={false}
 										pageNumber={0}
@@ -251,6 +257,7 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.ASSESSMENTS}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={assessmentResults}
 										selectAll={false}
 										pageNumber={0}
@@ -269,6 +276,7 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.RESOURCES}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={resourcesResults}
 										selectAll={false}
 										pageNumber={0}
@@ -288,6 +296,7 @@ export const Component = () => {
 								</Tab.Pane>
 								<Tab.Pane eventKey={TAB_KEYS.SAFETY_PLANNING}>
 									<MhicPatientOrderTable
+										isLoading={isLoading}
 										patientOrderFindResultPromise={safetyPlanningResults}
 										selectAll={false}
 										pageNumber={0}

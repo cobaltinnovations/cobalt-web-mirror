@@ -25,6 +25,7 @@ import {
 import { useIntegratedCareLoaderData } from '../landing';
 import classNames from 'classnames';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -237,12 +238,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const match = useMatch('/ic/mhic/my-patients/:mhicView');
+	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pollingFn = useCallback(() => {
 		return loadMyPatients({ mhicView: match?.params.mhicView ?? '', searchParams });
 	}, [match?.params.mhicView, searchParams]);
-	const { data } = usePolledLoaderData({
+	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicMyPatientsLoaderData,
+		immediateUpdate: !!shelfData,
 		pollingFn,
 	});
 	const { viewTypeId, pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = data;
@@ -250,7 +253,6 @@ export const Component = () => {
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
-
 	const handlePaginationClick = useCallback(
 		(pageIndex: number) => {
 			searchParams.set('pageNumber', String(pageIndex));
@@ -302,6 +304,7 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
+							isLoading={isLoading}
 							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={false}
 							pageNumber={parseInt(pageNumber, 10)}

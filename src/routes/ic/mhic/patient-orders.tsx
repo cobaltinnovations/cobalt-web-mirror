@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import FileInputButton from '@/components/file-input-button';
@@ -28,11 +28,11 @@ import { PatientOrdersListResponse, integratedCareService } from '@/lib/services
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
-import { AwaitedString } from '@/components/awaited-string';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 import useAccount from '@/hooks/use-account';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 
 interface MhicOrdersLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -87,18 +87,20 @@ export const Component = () => {
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const pollingFn = useCallback(() => {
 		return loadPatientOrders({ searchParams });
 	}, [searchParams]);
-	const { data } = usePolledLoaderData({
+	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicOrdersLoaderData,
+		immediateUpdate: !!shelfData,
 		pollingFn,
 	});
 	const { patientOrdersListPromise } = data;
 
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
-
+	const [headerDescription, setHeaderDescription] = useState('');
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
 	const revalidator = useRevalidator();
 
@@ -171,9 +173,9 @@ export const Component = () => {
 		[clearSelections, searchParams, setSearchParams]
 	);
 
-	const headerDescription = useMemo(() => {
-		return patientOrdersListPromise.then((r) => {
-			return `${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`;
+	useEffect(() => {
+		patientOrdersListPromise.then((r) => {
+			setHeaderDescription(`${r.totalCountDescription ?? 0} Order${r.totalCount === 1 ? '' : 's'}`);
 		});
 	}, [patientOrdersListPromise]);
 
@@ -210,7 +212,7 @@ export const Component = () => {
 						<MhicPageHeader
 							className="mb-6"
 							title="Patient Orders"
-							description={<AwaitedString resolve={headerDescription} />}
+							description={headerDescription || <Spinner as="span" animation="border" size="sm" />}
 						>
 							<div className="d-flex align-items-center">
 								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
@@ -275,6 +277,7 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<MhicPatientOrderTable
+							isLoading={isLoading}
 							patientOrderFindResultPromise={patientOrdersListPromise}
 							selectAll={selectAll}
 							onSelectAllChange={setSelectAll}
