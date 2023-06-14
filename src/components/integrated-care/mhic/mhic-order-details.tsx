@@ -10,9 +10,9 @@ import {
 	MhicContactInformationModal,
 	MhicDemographicsModal,
 	MhicEpisodeCard,
-	MhicInlineAlert,
 	MhicInsuranceModal,
-	MhicNextStepsCard,
+	MhicNextStepsAlerts,
+	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
@@ -23,9 +23,8 @@ import {
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
-	PatientOrderResourcingStatusId,
-	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
+	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -310,43 +309,23 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									</p>
 								</Col>
 							</Row>
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="danger"
-									title="Patient needs safety planning"
-								/>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-								<MhicInlineAlert className="mb-6" variant="warning" title="Patient needs resources" />
-							)}
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="success"
-									title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
-								/>
-							)}
-							{patientOrder.patientOrderResourcingStatusId ===
-								PatientOrderResourcingStatusId.SENT_RESOURCES && (
-								<MhicInlineAlert
-									className="mb-6"
-									variant="success"
-									title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-								/>
-							)}
+
+							<MhicNextStepsAlerts
+								patientOrder={patientOrder}
+								referenceData={referenceDataResponse}
+								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+							/>
+
 							<MhicTriageCard
-								className="mb-6"
+								className={classNames({
+									'mb-6': patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP,
+								})}
 								patientOrder={patientOrder}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
-							<MhicNextStepsCard
-								className="mb-6"
+
+							<MhicNextStepsAppointment
 								patientOrder={patientOrder}
-								referenceData={referenceDataResponse}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
 						</>
@@ -360,6 +339,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="mb-6"
 										title="No Assessment"
@@ -402,6 +388,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="mb-6 bg-white"
 										title="Assessment is Scheduled"
@@ -446,6 +439,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 							<Row>
 								<Col>
+									<MhicNextStepsAlerts
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+										}
+									/>
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"

@@ -7,16 +7,14 @@ import classNames from 'classnames';
 import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
-	PatientOrderResourcingStatusId,
-	PatientOrderSafetyPlanningStatusId,
 	ScreeningSessionScreeningResult,
 	ScreeningType,
 } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 import {
 	MHIC_HEADER_HEIGHT,
-	MhicInlineAlert,
-	MhicNextStepsCard,
+	MhicNextStepsAlerts,
+	MhicNextStepsAppointment,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 
@@ -126,39 +124,13 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 							<Col md={{ span: 7, offset: 1 }}>
 								<div className={classes.scrollAnchor} id="results" />
 								<h3 className="mb-8">Results</h3>
-								{patientOrder.patientOrderSafetyPlanningStatusId ===
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-									<MhicInlineAlert
-										className="mb-6"
-										variant="danger"
-										title="Patient needs safety planning"
-									/>
-								)}
-								{patientOrder.patientOrderResourcingStatusId ===
-									PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-									<MhicInlineAlert
-										className="mb-6"
-										variant="warning"
-										title="Patient needs resources"
-									/>
-								)}
-								{patientOrder.patientOrderSafetyPlanningStatusId ===
-									PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
-									<MhicInlineAlert
-										className="mb-6"
-										variant="success"
-										title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
-									/>
-								)}
-								{patientOrder.patientOrderResourcingStatusId ===
-									PatientOrderResourcingStatusId.SENT_RESOURCES && (
-									<MhicInlineAlert
-										className="mb-6"
-										variant="success"
-										title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
-									/>
-								)}
-
+								<MhicNextStepsAlerts
+									patientOrder={patientOrder}
+									referenceData={referenceDataResponse}
+									disabled={
+										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+									}
+								/>
 								<MhicTriageCard
 									className="mb-6"
 									patientOrder={patientOrder}
@@ -166,11 +138,9 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
 									}
 								/>
-
-								<MhicNextStepsCard
-									className="mb-8"
+								<MhicNextStepsAppointment
+									className="mb-6"
 									patientOrder={patientOrder}
-									referenceData={referenceDataResponse}
 									disabled={
 										patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
 									}
