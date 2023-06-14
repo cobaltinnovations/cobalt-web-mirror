@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
-import { Card } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderTriageStatusId } from '@/lib/models';
 import { appointmentService } from '@/lib/services';
