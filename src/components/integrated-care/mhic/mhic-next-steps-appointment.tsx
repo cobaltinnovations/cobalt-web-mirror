@@ -49,41 +49,33 @@ export const MhicNextStepsAppointment = ({ patientOrder, disabled, className }: 
 				displayButtonsBlock
 			/>
 
-			<Card bsPrefix="ic-card" className={className}>
-				<Card.Header>
-					<Card.Title>Next Steps</Card.Title>
-				</Card.Header>
-				<Card.Body>
-					{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
-						<>
-							{patientOrder.appointmentId ? (
-								<NoData
-									className="mb-4 bg-white"
-									title="Appointment is Scheduled"
-									description={`${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Cancel Appointment',
-											onClick: () => {
-												setShowConfirmDialog(true);
-											},
-											disabled,
-										},
-									]}
-								/>
-							) : (
-								<NoData
-									className="mb-4"
-									title="No Appointment"
-									description="Patient must schedule an appointment through Cobalt"
-									actions={[]}
-								/>
-							)}
-						</>
+			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+				<div className={className}>
+					{patientOrder.appointmentId ? (
+						<NoData
+							className="bg-white"
+							title="Appointment is Scheduled"
+							description={`${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
+							actions={[
+								{
+									variant: 'primary',
+									title: 'Cancel Appointment',
+									onClick: () => {
+										setShowConfirmDialog(true);
+									},
+									disabled,
+								},
+							]}
+						/>
+					) : (
+						<NoData
+							title="No Appointment"
+							description="Patient must schedule an appointment through Cobalt"
+							actions={[]}
+						/>
 					)}
-				</Card.Body>
-			</Card>
+				</div>
+			)}
 		</>
 	);
 };

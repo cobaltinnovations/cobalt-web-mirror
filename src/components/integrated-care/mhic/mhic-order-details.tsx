@@ -24,6 +24,7 @@ import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
+	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -316,7 +317,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 
 							<MhicTriageCard
-								className="mb-6"
+								className={classNames({
+									'mb-6': patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP,
+								})}
 								patientOrder={patientOrder}
 								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
 							/>
