@@ -237,7 +237,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
-	const match = useMatch('/ic/mhic/my-patients/:mhicView');
+	const match = useMatch('/ic/mhic/my-patients/:mhicView/*');
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pollingFn = useCallback(() => {
