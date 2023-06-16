@@ -473,4 +473,12 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	getClinicalReport(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			clinicalReport: string;
+		}>({
+			method: 'GET',
+			url: `/patient-orders/${patientOrderId}/clinical-report`,
+		});
+	},
 };

@@ -1,3 +1,4 @@
+import { compact } from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
@@ -22,9 +23,12 @@ import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dis
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { screeningService } from '@/lib/services';
+import { integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { compact } from 'lodash';
+
+import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import useHandleError from '@/hooks/use-handle-error';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -43,6 +47,10 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	const classes = useStyles();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [notTakenScreeningTypes, setNotTakeScreeningTypes] = useState<ScreeningType[]>([]);
+
+	const [isExportingResults, setIsExportingResults] = useState(false);
+	const copyTextToClipboard = useCopyTextToClipboard();
+	const handleError = useHandleError();
 
 	const conditionsAndSymptomsResults = useMemo(
 		() =>
@@ -91,6 +99,32 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 		patientOrder?.screeningSessionResult?.screeningSessionScreeningResults,
 	]);
 
+	const handleExportResultsClick = useCallback(async () => {
+		try {
+			if (!patientOrder) {
+				throw new Error('patientOrder is undefined');
+			}
+
+			setIsExportingResults(true);
+
+			const { clinicalReport } = await integratedCareService
+				.getClinicalReport(patientOrder.patientOrderId)
+				.fetch();
+
+			copyTextToClipboard(clinicalReport, {
+				successTitle: 'Report copied to clipboard',
+				successDescription:
+					'The clinical report was copied to your clipboard. Paste the report into EPIC to edit.',
+				errorTitle: 'Failed to copy report',
+				errorDesctiption: 'Please try again.',
+			});
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsExportingResults(false);
+		}
+	}, [copyTextToClipboard, handleError, patientOrder]);
+
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<Container className="py-10">
@@ -100,14 +134,30 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 							<Col md={{ span: 10, offset: 1 }}>
 								<div className="d-flex align-items-center justify-content-between">
 									<h2 className="mb-0">Assessment Review</h2>
-									<Button
-										onClick={onStartNewAssessment}
-										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
-										}
-									>
-										Retake Assessment
-									</Button>
+									<div className="d-flex align-items-center">
+										<Button
+											className="me-2"
+											variant="outline-primary"
+											onClick={onStartNewAssessment}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+												PatientOrderDispositionId.CLOSED
+											}
+										>
+											Retake Assessment
+										</Button>
+										<Button
+											className="d-flex align-items-center"
+											onClick={handleExportResultsClick}
+											disabled={
+												patientOrder.patientOrderDispositionId ===
+													PatientOrderDispositionId.CLOSED || isExportingResults
+											}
+										>
+											Export Results
+											<ExternalIcon className="ms-2" width={20} height={20} />
+										</Button>
+									</div>
 								</div>
 								<p className="mb-0">
 									Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
