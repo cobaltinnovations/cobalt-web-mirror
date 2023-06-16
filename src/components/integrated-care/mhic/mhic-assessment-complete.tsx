@@ -23,7 +23,7 @@ import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dis
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { screeningService } from '@/lib/services';
+import { integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
@@ -101,10 +101,17 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 
 	const handleExportResultsClick = useCallback(async () => {
 		try {
+			if (!patientOrder) {
+				throw new Error('patientOrder is undefined');
+			}
+
 			setIsExportingResults(true);
 
-			// generate report text...
-			copyTextToClipboard('hello world', {
+			const { clinicalReport } = await integratedCareService
+				.getClinicalReport(patientOrder.patientOrderId)
+				.fetch();
+
+			copyTextToClipboard(clinicalReport, {
 				successTitle: 'Report copied to clipboard',
 				successDescription:
 					'The clinical report was copied to your clipboard. Paste the report into EPIC to edit.',
@@ -116,7 +123,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 		} finally {
 			setIsExportingResults(false);
 		}
-	}, [copyTextToClipboard, handleError]);
+	}, [copyTextToClipboard, handleError, patientOrder]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>

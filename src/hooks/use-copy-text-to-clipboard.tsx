@@ -27,7 +27,7 @@ export const useCopyTextToClipboard = () => {
 				},
 				() => {
 					addFlag({
-						variant: 'success',
+						variant: 'danger',
 						title: messageConfig.errorTitle,
 						description: messageConfig.errorDesctiption,
 						actions: [],
