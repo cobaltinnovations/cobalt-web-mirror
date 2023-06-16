@@ -91,8 +91,11 @@ export const Component = () => {
 	const pollingFn = useCallback(() => {
 		return loadPatientOrders({ searchParams });
 	}, [searchParams]);
+	const revalidator = useRevalidator();
+	const [isImporting, setIsImporting] = useState(false);
 	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicOrdersLoaderData,
+		enabled: !isImporting && revalidator.state !== 'loading',
 		immediateUpdate: !!shelfData,
 		pollingFn,
 	});
@@ -102,7 +105,6 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const [headerDescription, setHeaderDescription] = useState('');
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
-	const revalidator = useRevalidator();
 
 	const [showGenerateOrdersModal, setShowGenerateOrdersModal] = useState(false);
 
@@ -122,6 +124,7 @@ export const Component = () => {
 						throw new Error('Could not read file.');
 					}
 
+					setIsImporting(true);
 					await integratedCareService.importPatientOrders({ csvContent: fileContent }).fetch();
 
 					revalidator.revalidate();
@@ -134,6 +137,8 @@ export const Component = () => {
 					});
 				} catch (error) {
 					handleError(error);
+				} finally {
+					setIsImporting(false);
 				}
 			});
 
