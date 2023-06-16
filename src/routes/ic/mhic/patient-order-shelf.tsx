@@ -90,6 +90,7 @@ export const Component = () => {
 
 	const { data: shelfData } = usePolledLoaderData({
 		useLoaderHook: useLoaderData as () => MhicPatientOrderShelfLoaderData,
+		immediateUpdate: true,
 		pollingFn,
 	});
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
