@@ -21,7 +21,7 @@ const SessionRequestThankYou: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Request Group Session</title>
+				<title>Cobalt | Request Group Session - Thank You</title>
 			</Helmet>
 
 			<HeroContainer>

@@ -151,7 +151,7 @@ const GroupSessionsRequest = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - Request as Group Session</title>
+				<title>Cobalt | Group Sessions - Request a Group Session</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>
