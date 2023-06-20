@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import InCrisisTemplate from '@/components/in-crisis-template';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -17,28 +18,34 @@ const DownForMaintenance = (): ReactElement => {
 	const classes = useStyles();
 
 	return (
-		<Container className="pt-20">
-			<Row>
-				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-					<div className="d-flex justify-content-center mb-12">
-						<LogoIconText className={classes.logoIconText} />
-					</div>
+		<>
+			<Helmet>
+				<title>Cobalt | Maintenance</title>
+			</Helmet>
 
-					<p className="mb-2 text-center">
-						We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and will be
-						back online shortly.
-					</p>
-					<p className="mb-8 text-center">
-						If you need immediate help, please contact one of the following numbers:
-					</p>
+			<Container className="pt-20">
+				<Row>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<div className="d-flex justify-content-center mb-12">
+							<LogoIconText className={classes.logoIconText} />
+						</div>
 
-					<InCrisisTemplate />
-					<div className="mb-8" />
+						<p className="mb-2 text-center">
+							We're sorry for the inconvenience, but Cobalt is temporarily offline for maintenance and
+							will be back online shortly.
+						</p>
+						<p className="mb-8 text-center">
+							If you need immediate help, please contact one of the following numbers:
+						</p>
 
-					<h5 className="text-center">or go to your nearest emergency department or crisis center</h5>
-				</Col>
-			</Row>
-		</Container>
+						<InCrisisTemplate />
+						<div className="mb-8" />
+
+						<h5 className="text-center">or go to your nearest emergency department or crisis center</h5>
+					</Col>
+				</Row>
+			</Container>
+		</>
 	);
 };
 

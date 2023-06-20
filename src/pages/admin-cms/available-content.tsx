@@ -15,6 +15,7 @@ import SearchInput from '@/components/admin-cms/search-input';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
 import useFlags from '@/hooks/use-flags';
+import { Helmet } from 'react-helmet';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -163,6 +164,10 @@ const CmsAvailableContent: FC = () => {
 	// @ts-ignore
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Available Content</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">On Your Time - Available Content</h2>
 			</HeroContainer>

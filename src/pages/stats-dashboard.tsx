@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useEffect, useState } from 'react';
 import { Button, Col, Container, Form, InputGroup, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import config from '@/lib/config';
 import { Chart as ChartModel } from '@/lib/models';
@@ -87,6 +88,10 @@ const StatsDashboard: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Stats Dashboard</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Stats Dashboard</h2>
 			</HeroContainer>

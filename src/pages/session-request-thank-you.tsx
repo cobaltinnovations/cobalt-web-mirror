@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { Helmet } from 'react-helmet';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	card: {
@@ -19,6 +20,10 @@ const SessionRequestThankYou: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Request Group Session</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Request Group Session</h2>
 			</HeroContainer>

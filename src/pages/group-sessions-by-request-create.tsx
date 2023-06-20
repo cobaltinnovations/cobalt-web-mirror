@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
+import { Helmet } from 'react-helmet';
 
 import Breadcrumb from '@/components/breadcrumb';
 import InputHelper from '@/components/input-helper';
@@ -151,324 +152,338 @@ const GroupSessionsByRequestCreate: FC = () => {
 	}
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">
-					{initialValues?.title ? initialValues?.title : 'Create Group Session'}
-				</h2>
-			</HeroContainer>
+		<>
+			<Helmet>
+				<title>Cobalt | Group Sessions - Create Group Session</title>
+			</Helmet>
 
-			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
-				<Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/group-sessions/by-request',
-							title: 'Group Sessions by Request',
-						},
-						{
-							to: '/group-sessions/by-request/create',
-							title: initialValues?.title ? initialValues.title : 'Create Group Session',
-						},
-					]}
-				/>
-			)}
-			<Container className="pt-5 pb-32">
-				<Row className="mb-5">
-					<Col lg={{ span: 8, offset: 2 }}>
-						<h1 className="mb-2 fs-h3">
-							{initialValues?.title ? initialValues.title : 'Create Group Session by Request'}
-						</h1>
-						<p className="mb-0 text-danger">Required*</p>
-					</Col>
-				</Row>
-				<Row>
-					<Col lg={{ span: 8, offset: 2 }}>
-						<Formik<GroupSessionByRequestFormData>
-							enableReinitialize
-							validationSchema={groupSessionByRequestSchema}
-							initialValues={initialValues || groupSessionByRequestSchema.cast(undefined)}
-							onSubmit={handleFormSubmit}
-						>
-							{(formikBag) => {
-								const {
-									values,
-									setFieldValue,
-									setFieldTouched,
-									handleChange,
-									handleBlur,
-									handleSubmit,
-									touched,
-									errors,
-								} = formikBag;
+			<AsyncPage fetchData={fetchData}>
+				<HeroContainer>
+					<h2 className="mb-0 text-center">
+						{initialValues?.title ? initialValues?.title : 'Create Group Session'}
+					</h2>
+				</HeroContainer>
 
-								return (
-									<>
-										<SessionCropModal
-											imageSource={sessionCropModalImageSource}
-											show={sessionCropModalIsOpen}
-											onHide={() => {
-												setSessionCropModalIsOpen(false);
-											}}
-											onSave={async (blob) => {
-												setSessionCropModalIsOpen(false);
+				{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+					<Breadcrumb
+						breadcrumbs={[
+							{
+								to: '/group-sessions/by-request',
+								title: 'Group Sessions by Request',
+							},
+							{
+								to: '/group-sessions/by-request/create',
+								title: initialValues?.title ? initialValues.title : 'Create Group Session',
+							},
+						]}
+					/>
+				)}
+				<Container className="pt-5 pb-32">
+					<Row className="mb-5">
+						<Col lg={{ span: 8, offset: 2 }}>
+							<h1 className="mb-2 fs-h3">
+								{initialValues?.title ? initialValues.title : 'Create Group Session by Request'}
+							</h1>
+							<p className="mb-0 text-danger">Required*</p>
+						</Col>
+					</Row>
+					<Row>
+						<Col lg={{ span: 8, offset: 2 }}>
+							<Formik<GroupSessionByRequestFormData>
+								enableReinitialize
+								validationSchema={groupSessionByRequestSchema}
+								initialValues={initialValues || groupSessionByRequestSchema.cast(undefined)}
+								onSubmit={handleFormSubmit}
+							>
+								{(formikBag) => {
+									const {
+										values,
+										setFieldValue,
+										setFieldTouched,
+										handleChange,
+										handleBlur,
+										handleSubmit,
+										touched,
+										errors,
+									} = formikBag;
 
-												imageUploader(
-													blob,
-													groupSessionsService.getPresignedUploadUrl({
-														contentType: blob.type,
-														filename: `${uuidv4()}.jpg`,
-													}).fetch
-												)
-													.onBeforeUpload((previewImageUrl) => {
-														setImagePreview(previewImageUrl);
-													})
-													.onPresignedUploadObtained((accessUrl) => {
-														setIsUploading(true);
+									return (
+										<>
+											<SessionCropModal
+												imageSource={sessionCropModalImageSource}
+												show={sessionCropModalIsOpen}
+												onHide={() => {
+													setSessionCropModalIsOpen(false);
+												}}
+												onSave={async (blob) => {
+													setSessionCropModalIsOpen(false);
 
-														setFieldTouched('imageUrl', true);
-														setFieldValue('imageUrl', accessUrl);
-													})
-													.onProgress((percentage) => {
-														setProgress(percentage);
-													})
-													.onComplete((accessUrl) => {
-														setIsUploading(false);
-														setImagePreview(accessUrl);
-													})
-													.onError((error: any) => {
-														handleError(error);
+													imageUploader(
+														blob,
+														groupSessionsService.getPresignedUploadUrl({
+															contentType: blob.type,
+															filename: `${uuidv4()}.jpg`,
+														}).fetch
+													)
+														.onBeforeUpload((previewImageUrl) => {
+															setImagePreview(previewImageUrl);
+														})
+														.onPresignedUploadObtained((accessUrl) => {
+															setIsUploading(true);
 
-														setIsUploading(false);
+															setFieldTouched('imageUrl', true);
+															setFieldValue('imageUrl', accessUrl);
+														})
+														.onProgress((percentage) => {
+															setProgress(percentage);
+														})
+														.onComplete((accessUrl) => {
+															setIsUploading(false);
+															setImagePreview(accessUrl);
+														})
+														.onError((error: any) => {
+															handleError(error);
 
-														setImagePreview('');
-														setFieldValue('imageUrl', undefined);
-													})
-													.start();
-											}}
-										/>
+															setIsUploading(false);
 
-										<Form onSubmit={handleSubmit}>
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Facilitator</h5>
-
-												<Form.Label className="mb-2" style={{ ...fonts.default }}>
-													Are you the facilitator of this session?
-												</Form.Label>
-												<Form.Check
-													type="radio"
-													id="responsible-yes"
-													name="responsible"
-													label="Yes"
-													checked={values.responsible}
-													onChange={() => {
-														setFieldTouched('responsible', true);
-														setFieldValue('responsible', true);
-													}}
-												/>
-												<Form.Check
-													className="mb-5"
-													type="radio"
-													id="responsible-no"
-													name="responsible"
-													label="No"
-													checked={!values.responsible}
-													onChange={() => {
-														setFieldTouched('responsible', true);
-														setFieldValue('responsible', false);
-													}}
-												/>
-
-												<InputHelper
-													className="mb-5"
-													label="Facilitator Name"
-													type="text"
-													name="managersName"
-													value={values.managersName}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.responsible}
-													error={
-														touched.managersName && errors.managersName
-															? errors.managersName
-															: ''
-													}
-												/>
-
-												<InputHelper
-													label="Facilitator Email"
-													type="text"
-													name="managersEmail"
-													value={values.managersEmail}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.managersEmail}
-													error={
-														touched.managersEmail && errors.managersEmail
-															? errors.managersEmail
-															: ''
-													}
-												/>
-											</Card>
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Session Details</h5>
-
-												<InputHelper
-													className="mb-5"
-													label="Session Title"
-													type="text"
-													name="title"
-													value={values.title}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.title}
-													error={touched.title && errors.title ? errors.title : ''}
-												/>
-
-												<Form.Label className="mb-1" style={{ ...fonts.default }}>
-													Description {requiredFields.description && <span>*</span>}
-												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.small }}>
-													How would you like to describe your session? (This will be featured
-													on the Cobalt Platform, should be 2-3 sentences long, and should
-													highlight the benefit for participants).
-												</p>
-												<Field name="description">
-													{({ field, meta }: FieldProps) => {
-														return (
-															<Wysiwyg
-																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
-																initialValue={meta.initialValue}
-																onChange={field.onChange(field.name)}
-															/>
-														);
-													}}
-												</Field>
-												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.small }}>
-														description is a required field
-													</p>
-												)}
-
-												<ImageUpload
-													imagePreview={imagePreview}
-													isUploading={isUploading}
-													progress={progress}
-													onChange={(file) => {
-														const sourceUrl = URL.createObjectURL(file);
-
-														setSessionCropModalImageSource(sourceUrl);
-														setSessionCropModalIsOpen(true);
-													}}
-													onRemove={() => {
-														setFieldValue('imageUrl', undefined);
-														setImagePreview('');
-													}}
-												/>
-
-												<InputHelper
-													label="Session Handle"
-													name="sessionHandle"
-													value={values.sessionHandle}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
-													required={requiredFields.sessionHandle}
-													error={
-														touched.sessionHandle && errors.sessionHandle
-															? errors.sessionHandle
-															: ''
-													}
-												/>
-											</Card>
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Session Form Customization</h5>
-												<p className="mb-0">Our standard form asks for:</p>
-												<ul className="mb-0 ps-4 fs-default">
-													<li>Name*</li>
-													<li>Email Address*</li>
-													<li>Phone Number</li>
-													<li>Preferred session date(s)</li>
-													<li>Preferred session time(s)</li>
-													<li>Estimated Number of Attendees*</li>
-													<li>
-														Is there anything you’d like the facilitator to know about your
-														group in particular?
-													</li>
-												</ul>
-												<p className="mb-3">(*Required)</p>
-												<p className="mb-5">
-													If you’d like to add custom questions, please add them below.
-												</p>
-
-												<Form.Check
-													type="checkbox"
-													id="customQuestionOne"
-													name="customQuestionOne"
-													label="Custom Question 1"
-													checked={values.customQuestionOne}
-													onChange={() => {
-														setFieldTouched('customQuestionOne', true);
-														setFieldValue('customQuestionOne', !values.customQuestionOne);
-													}}
-												/>
-												{values.customQuestionOne && (
-													<div className="mt-2 mb-3 ps-6">
-														<InputHelper
-															label="Enter Question"
-															name="customQuestionOneDescription"
-															value={values.customQuestionOneDescription}
-															as="textarea"
-															onBlur={handleBlur}
-															onChange={handleChange}
-														/>
-													</div>
-												)}
-
-												<Form.Check
-													type="checkbox"
-													id="customQuestionTwo"
-													name="customQuestionTwo"
-													label="Custom Question 2"
-													checked={values.customQuestionTwo}
-													onChange={() => {
-														setFieldTouched('customQuestionTwo', true);
-														setFieldValue('customQuestionTwo', !values.customQuestionTwo);
-													}}
-												/>
-												{values.customQuestionTwo && (
-													<div className="mt-2 ps-6">
-														<InputHelper
-															label="Enter Question"
-															name="customQuestionTwoDescription"
-															value={values.customQuestionTwoDescription}
-															as="textarea"
-															onBlur={handleBlur}
-															onChange={handleChange}
-														/>
-													</div>
-												)}
-											</Card>
-
-											<SessionFormSubmitBanner
-												title={
-													isEdit
-														? 'Update group session by request'
-														: 'Add group session by request'
-												}
+															setImagePreview('');
+															setFieldValue('imageUrl', undefined);
+														})
+														.start();
+												}}
 											/>
-										</Form>
-									</>
-								);
-							}}
-						</Formik>
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+
+											<Form onSubmit={handleSubmit}>
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Facilitator</h5>
+
+													<Form.Label className="mb-2" style={{ ...fonts.default }}>
+														Are you the facilitator of this session?
+													</Form.Label>
+													<Form.Check
+														type="radio"
+														id="responsible-yes"
+														name="responsible"
+														label="Yes"
+														checked={values.responsible}
+														onChange={() => {
+															setFieldTouched('responsible', true);
+															setFieldValue('responsible', true);
+														}}
+													/>
+													<Form.Check
+														className="mb-5"
+														type="radio"
+														id="responsible-no"
+														name="responsible"
+														label="No"
+														checked={!values.responsible}
+														onChange={() => {
+															setFieldTouched('responsible', true);
+															setFieldValue('responsible', false);
+														}}
+													/>
+
+													<InputHelper
+														className="mb-5"
+														label="Facilitator Name"
+														type="text"
+														name="managersName"
+														value={values.managersName}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.responsible}
+														error={
+															touched.managersName && errors.managersName
+																? errors.managersName
+																: ''
+														}
+													/>
+
+													<InputHelper
+														label="Facilitator Email"
+														type="text"
+														name="managersEmail"
+														value={values.managersEmail}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.managersEmail}
+														error={
+															touched.managersEmail && errors.managersEmail
+																? errors.managersEmail
+																: ''
+														}
+													/>
+												</Card>
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Session Details</h5>
+
+													<InputHelper
+														className="mb-5"
+														label="Session Title"
+														type="text"
+														name="title"
+														value={values.title}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.title}
+														error={touched.title && errors.title ? errors.title : ''}
+													/>
+
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
+														Description {requiredFields.description && <span>*</span>}
+													</Form.Label>
+													<p className="text-muted" style={{ ...fonts.small }}>
+														How would you like to describe your session? (This will be
+														featured on the Cobalt Platform, should be 2-3 sentences long,
+														and should highlight the benefit for participants).
+													</p>
+													<Field name="description">
+														{({ field, meta }: FieldProps) => {
+															return (
+																<Wysiwyg
+																	className={
+																		meta.touched && meta.error ? 'mb-2' : 'mb-5'
+																	}
+																	initialValue={meta.initialValue}
+																	onChange={field.onChange(field.name)}
+																/>
+															);
+														}}
+													</Field>
+													{touched.description && errors.description && (
+														<p className="text-danger" style={{ ...fonts.small }}>
+															description is a required field
+														</p>
+													)}
+
+													<ImageUpload
+														imagePreview={imagePreview}
+														isUploading={isUploading}
+														progress={progress}
+														onChange={(file) => {
+															const sourceUrl = URL.createObjectURL(file);
+
+															setSessionCropModalImageSource(sourceUrl);
+															setSessionCropModalIsOpen(true);
+														}}
+														onRemove={() => {
+															setFieldValue('imageUrl', undefined);
+															setImagePreview('');
+														}}
+													/>
+
+													<InputHelper
+														label="Session Handle"
+														name="sessionHandle"
+														value={values.sessionHandle}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
+														required={requiredFields.sessionHandle}
+														error={
+															touched.sessionHandle && errors.sessionHandle
+																? errors.sessionHandle
+																: ''
+														}
+													/>
+												</Card>
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Session Form Customization</h5>
+													<p className="mb-0">Our standard form asks for:</p>
+													<ul className="mb-0 ps-4 fs-default">
+														<li>Name*</li>
+														<li>Email Address*</li>
+														<li>Phone Number</li>
+														<li>Preferred session date(s)</li>
+														<li>Preferred session time(s)</li>
+														<li>Estimated Number of Attendees*</li>
+														<li>
+															Is there anything you’d like the facilitator to know about
+															your group in particular?
+														</li>
+													</ul>
+													<p className="mb-3">(*Required)</p>
+													<p className="mb-5">
+														If you’d like to add custom questions, please add them below.
+													</p>
+
+													<Form.Check
+														type="checkbox"
+														id="customQuestionOne"
+														name="customQuestionOne"
+														label="Custom Question 1"
+														checked={values.customQuestionOne}
+														onChange={() => {
+															setFieldTouched('customQuestionOne', true);
+															setFieldValue(
+																'customQuestionOne',
+																!values.customQuestionOne
+															);
+														}}
+													/>
+													{values.customQuestionOne && (
+														<div className="mt-2 mb-3 ps-6">
+															<InputHelper
+																label="Enter Question"
+																name="customQuestionOneDescription"
+																value={values.customQuestionOneDescription}
+																as="textarea"
+																onBlur={handleBlur}
+																onChange={handleChange}
+															/>
+														</div>
+													)}
+
+													<Form.Check
+														type="checkbox"
+														id="customQuestionTwo"
+														name="customQuestionTwo"
+														label="Custom Question 2"
+														checked={values.customQuestionTwo}
+														onChange={() => {
+															setFieldTouched('customQuestionTwo', true);
+															setFieldValue(
+																'customQuestionTwo',
+																!values.customQuestionTwo
+															);
+														}}
+													/>
+													{values.customQuestionTwo && (
+														<div className="mt-2 ps-6">
+															<InputHelper
+																label="Enter Question"
+																name="customQuestionTwoDescription"
+																value={values.customQuestionTwoDescription}
+																as="textarea"
+																onBlur={handleBlur}
+																onChange={handleChange}
+															/>
+														</div>
+													)}
+												</Card>
+
+												<SessionFormSubmitBanner
+													title={
+														isEdit
+															? 'Update group session by request'
+															: 'Add group session by request'
+													}
+												/>
+											</Form>
+										</>
+									);
+								}}
+							</Formik>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

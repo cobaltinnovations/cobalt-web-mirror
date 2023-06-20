@@ -5,6 +5,7 @@ import InputMask from 'react-input-mask';
 import Lottie from 'lottie-web';
 import { Link, useNavigate, useLocation, useRevalidator } from 'react-router-dom';
 import { pick } from 'lodash';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 import DatePicker from '@/components/date-picker';
@@ -198,6 +199,10 @@ const EhrLookup: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | EHR Lookup</title>
+			</Helmet>
+
 			<HealthRecordsModal
 				show={healthRecordsModalIsOpen}
 				onHide={() => {

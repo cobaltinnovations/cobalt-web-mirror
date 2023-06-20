@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 
@@ -8,6 +9,10 @@ import { COVID_19_RESOURCES } from '@/covid-19-resources';
 const Covid19Resources: FC = () => {
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Covid-19 Resources</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Covid-19 Resources</h2>
 			</HeroContainer>

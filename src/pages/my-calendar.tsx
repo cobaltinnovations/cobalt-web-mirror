@@ -1,6 +1,7 @@
 import React, { FC, useState, useCallback, useEffect, useMemo, createRef, RefObject, useLayoutEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
@@ -100,141 +101,152 @@ const MyCalendar: FC = () => {
 	}, [pendingCancellation]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<ConfirmCancelBookingModal
-				show={showConfirmCancelModal}
-				onHide={() => {
-					setPendingCancellation(undefined);
-				}}
-				onConfirm={async () => {
-					if (isCancelling || !pendingCancellation) {
-						return;
-					}
+		<>
+			<Helmet>
+				<title>Cobalt | My Events</title>
+			</Helmet>
 
-					try {
-						setIsCancelling(true);
-
-						if (
-							pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.GROUP_SESSION_RESERVATION
-						) {
-							await groupSessionsService
-								.cancelGroupSessionReservation(pendingCancellation.eventId)
-								.fetch();
-						}
-
-						if (pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.APPOINTMENT) {
-							await appointmentService.cancelAppointment(pendingCancellation.eventId).fetch();
-						}
-
-						await fetchData();
-
-						setShowConfirmCancelModal(false);
+			<AsyncPage fetchData={fetchData}>
+				<ConfirmCancelBookingModal
+					show={showConfirmCancelModal}
+					onHide={() => {
 						setPendingCancellation(undefined);
-					} catch (error) {
-						handleError(error);
-					}
+					}}
+					onConfirm={async () => {
+						if (isCancelling || !pendingCancellation) {
+							return;
+						}
 
-					setIsCancelling(false);
-				}}
-			/>
+						try {
+							setIsCancelling(true);
 
-			<HeroContainer>
-				<h2 className="mb-2 text-center">My Events</h2>
-				<p className="text-center mb-0">
-					Your booked appointments, group session seats, and more will be available here.
-				</p>
-			</HeroContainer>
+							if (
+								pendingCancellation.calendarEventTypeId ===
+								CALENDAR_EVENT_TYPE_ID.GROUP_SESSION_RESERVATION
+							) {
+								await groupSessionsService
+									.cancelGroupSessionReservation(pendingCancellation.eventId)
+									.fetch();
+							}
 
-			<div className="pb-8">
-				{locationState?.successBooking ? (
-					<HeroContainer className="bg-success">
-						{locationState?.emailAddress ? (
-							<h5 className="text-center text-light mb-0">
-								Your session is reserved and we have sent a confirmation to{' '}
-								{locationState?.emailAddress}.
-							</h5>
-						) : (
-							<h5 className="text-center mb-0">Your appointment was reserved.</h5>
-						)}
-					</HeroContainer>
-				) : null}
+							if (pendingCancellation.calendarEventTypeId === CALENDAR_EVENT_TYPE_ID.APPOINTMENT) {
+								await appointmentService.cancelAppointment(pendingCancellation.eventId).fetch();
+							}
 
-				{calendarEventGroups.length <= 0 && (
-					<Container className="pt-5 pb-5">
-						<Row>
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								<p className="text-center mb-0">There are no scheduled events on your calendar.</p>
-							</Col>
-						</Row>
-					</Container>
-				)}
+							await fetchData();
 
-				{calendarEventGroups.map((calendarEventGroup, index) => {
-					return (
-						<div key={index}>
-							<DayContainer className={'mb-2'}>
-								<p className="mb-0 fw-bold">{calendarEventGroup.date}</p>
-							</DayContainer>
-							<Container>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										{calendarEventGroup.calendarEvents.map((calendarEvent) => {
-											const {
-												calendarEventTypeId,
-												appointment,
-												groupSession,
-												groupSessionReservation,
-											} = calendarEvent;
+							setShowConfirmCancelModal(false);
+							setPendingCancellation(undefined);
+						} catch (error) {
+							handleError(error);
+						}
 
-											if (appointment) {
-												return (
-													<CalendarAppointment
-														ref={eventRefs[appointment.appointmentId]}
-														key={appointment.appointmentId}
-														appointment={appointment}
-														className="mb-2"
-														onCancel={() => {
-															setPendingCancellation({
-																calendarEventTypeId,
-																eventId: appointment.appointmentId,
-															});
-														}}
-													/>
-												);
-											}
+						setIsCancelling(false);
+					}}
+				/>
 
-											if (groupSession && groupSessionReservation) {
-												return (
-													<CalendarAppointment
-														ref={eventRefs[groupSession.groupSessionId]}
-														key={groupSession.groupSessionId}
-														groupSession={groupSession}
-														className="mb-2"
-														onCancel={() => {
-															setPendingCancellation({
-																calendarEventTypeId,
-																eventId:
-																	groupSessionReservation.groupSessionReservationId,
-															});
-														}}
-													/>
-												);
-											}
+				<HeroContainer>
+					<h2 className="mb-2 text-center">My Events</h2>
+					<p className="text-center mb-0">
+						Your booked appointments, group session seats, and more will be available here.
+					</p>
+				</HeroContainer>
 
-											return null;
-										})}
-									</Col>
-								</Row>
-							</Container>
-						</div>
-					);
-				})}
-			</div>
-		</AsyncPage>
+				<div className="pb-8">
+					{locationState?.successBooking ? (
+						<HeroContainer className="bg-success">
+							{locationState?.emailAddress ? (
+								<h5 className="text-center text-light mb-0">
+									Your session is reserved and we have sent a confirmation to{' '}
+									{locationState?.emailAddress}.
+								</h5>
+							) : (
+								<h5 className="text-center mb-0">Your appointment was reserved.</h5>
+							)}
+						</HeroContainer>
+					) : null}
+
+					{calendarEventGroups.length <= 0 && (
+						<Container className="pt-5 pb-5">
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<p className="text-center mb-0">There are no scheduled events on your calendar.</p>
+								</Col>
+							</Row>
+						</Container>
+					)}
+
+					{calendarEventGroups.map((calendarEventGroup, index) => {
+						return (
+							<div key={index}>
+								<DayContainer className={'mb-2'}>
+									<p className="mb-0 fw-bold">{calendarEventGroup.date}</p>
+								</DayContainer>
+								<Container>
+									<Row>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
+											{calendarEventGroup.calendarEvents.map((calendarEvent) => {
+												const {
+													calendarEventTypeId,
+													appointment,
+													groupSession,
+													groupSessionReservation,
+												} = calendarEvent;
+
+												if (appointment) {
+													return (
+														<CalendarAppointment
+															ref={eventRefs[appointment.appointmentId]}
+															key={appointment.appointmentId}
+															appointment={appointment}
+															className="mb-2"
+															onCancel={() => {
+																setPendingCancellation({
+																	calendarEventTypeId,
+																	eventId: appointment.appointmentId,
+																});
+															}}
+														/>
+													);
+												}
+
+												if (groupSession && groupSessionReservation) {
+													return (
+														<CalendarAppointment
+															ref={eventRefs[groupSession.groupSessionId]}
+															key={groupSession.groupSessionId}
+															groupSession={groupSession}
+															className="mb-2"
+															onCancel={() => {
+																setPendingCancellation({
+																	calendarEventTypeId,
+																	eventId:
+																		groupSessionReservation.groupSessionReservationId,
+																});
+															}}
+														/>
+													);
+												}
+
+												return null;
+											})}
+										</Col>
+									</Row>
+								</Container>
+							</div>
+						);
+					})}
+				</div>
+			</AsyncPage>
+		</>
 	);
 };
 

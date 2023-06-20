@@ -2,6 +2,8 @@ import React, { FC, useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
+import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import useReactPlayerSettings from '@/hooks/use-react-player-settings';
@@ -14,7 +16,7 @@ import { contentService, activityTrackingService } from '@/lib/services';
 import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import classNames from 'classnames';
+
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 
 const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
@@ -97,6 +99,10 @@ const ResourceLibraryDetail: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Resource Library</title>
+			</Helmet>
+
 			<Breadcrumb
 				breadcrumbs={[
 					{

@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 
@@ -28,6 +29,10 @@ const Profile: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Your Profile</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-2 text-center">Your Profile</h2>
 				<p className="mb-0 fw-normal text-center">

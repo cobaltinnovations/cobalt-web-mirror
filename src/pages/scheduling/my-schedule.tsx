@@ -13,6 +13,7 @@ import { useContainerStyles } from './use-scheduling-styles';
 import { FetchProviderCalendarConfig, useProviderCalendar } from './use-provider-calendar';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
+import { Helmet } from 'react-helmet';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',
@@ -142,78 +143,83 @@ export const MySchedule: FC = () => {
 	}, []);
 
 	return (
-		<div className={classes.wrapper}>
-			<div className={classNames('h-100 px-5', classes.sideBar)}>
-				<h4 className="my-6">My Calendar</h4>
+		<>
+			<Helmet>
+				<title>Cobalt | Patient Scheduling</title>
+			</Helmet>
 
-				<div data-testid="schedulingLeftCalendar" className={classNames('mb-9', classes.leftCalendar)}>
-					<FullCalendar
-						ref={leftCalendarRef}
-						height="auto"
-						plugins={[dayGridPlugin, interactionPlugin]}
-						initialView={MainCalendarView.Month}
-						events={renderedLeftCalendarEvents}
-						headerToolbar={{
-							left: 'title',
-							right: 'today prev next',
-						}}
-						dateClick={(clickInfo) => {
-							const mainCalendarApi = mainCalendarRef.current?.getApi();
-							const mainMoment = moment(mainCalendarApi?.getDate());
-							const clickedDate = clickInfo.date;
-							const clickedMoment = moment(clickedDate);
+			<div className={classes.wrapper}>
+				<div className={classNames('h-100 px-5', classes.sideBar)}>
+					<h4 className="my-6">My Calendar</h4>
 
-							setCalendarDate(clickedDate);
+					<div data-testid="schedulingLeftCalendar" className={classNames('mb-9', classes.leftCalendar)}>
+						<FullCalendar
+							ref={leftCalendarRef}
+							height="auto"
+							plugins={[dayGridPlugin, interactionPlugin]}
+							initialView={MainCalendarView.Month}
+							events={renderedLeftCalendarEvents}
+							headerToolbar={{
+								left: 'title',
+								right: 'today prev next',
+							}}
+							dateClick={(clickInfo) => {
+								const mainCalendarApi = mainCalendarRef.current?.getApi();
+								const mainMoment = moment(mainCalendarApi?.getDate());
+								const clickedDate = clickInfo.date;
+								const clickedMoment = moment(clickedDate);
 
-							if (currentMainCalendarView === MainCalendarView.Week) {
-								clickedMoment.week() === mainMoment.week() && fetchMainData();
-							} else if (currentMainCalendarView === MainCalendarView.Day) {
-								clickedMoment.day() === mainMoment.day() && fetchMainData();
-							}
-						}}
-						datesSet={({ start, end }) => {
-							setLeftStartDate(moment(start).format('YYYY-MM-DD'));
-							setLeftEndDate(moment(end).format('YYYY-MM-DD'));
-						}}
-					/>
-				</div>
+								setCalendarDate(clickedDate);
 
-				<h5 className="mb-2">view by</h5>
-				<div className="mb-9 d-flex">
-					<Form.Check
-						type="radio"
-						id="calendarView-day"
-						label="day"
-						checked={currentMainCalendarView === MainCalendarView.Day}
-						onChange={() => {
-							setCurrentMainCalendarView(MainCalendarView.Day);
-						}}
-					/>
-					<Form.Check
-						type="radio"
-						id="calendarView-week"
-						label="week"
-						className="ms-2"
-						checked={currentMainCalendarView === MainCalendarView.Week}
-						onChange={() => {
-							setCurrentMainCalendarView(MainCalendarView.Week);
-						}}
-					/>
-					<Form.Check
-						type="radio"
-						id="calendarView-month"
-						label="month"
-						className="ms-2"
-						checked={currentMainCalendarView === MainCalendarView.Month}
-						onChange={() => {
-							setCurrentMainCalendarView(MainCalendarView.Month);
-						}}
-					/>
-				</div>
+								if (currentMainCalendarView === MainCalendarView.Week) {
+									clickedMoment.week() === mainMoment.week() && fetchMainData();
+								} else if (currentMainCalendarView === MainCalendarView.Day) {
+									clickedMoment.day() === mainMoment.day() && fetchMainData();
+								}
+							}}
+							datesSet={({ start, end }) => {
+								setLeftStartDate(moment(start).format('YYYY-MM-DD'));
+								setLeftEndDate(moment(end).format('YYYY-MM-DD'));
+							}}
+						/>
+					</div>
 
-				<h5 className=" mb-5">actions</h5>
-				<div className="d-flex flex-column align-items-start">
-					{/* <Link to={`appointments/new-appointment`}>
+					<h5 className="mb-2">view by</h5>
+					<div className="mb-9 d-flex">
+						<Form.Check
+							type="radio"
+							id="calendarView-day"
+							label="day"
+							checked={currentMainCalendarView === MainCalendarView.Day}
+							onChange={() => {
+								setCurrentMainCalendarView(MainCalendarView.Day);
+							}}
+						/>
+						<Form.Check
+							type="radio"
+							id="calendarView-week"
+							label="week"
+							className="ms-2"
+							checked={currentMainCalendarView === MainCalendarView.Week}
+							onChange={() => {
+								setCurrentMainCalendarView(MainCalendarView.Week);
+							}}
+						/>
+						<Form.Check
+							type="radio"
+							id="calendarView-month"
+							label="month"
+							className="ms-2"
+							checked={currentMainCalendarView === MainCalendarView.Month}
+							onChange={() => {
+								setCurrentMainCalendarView(MainCalendarView.Month);
+							}}
+						/>
+					</div>
+
+					<h5 className=" mb-5">actions</h5>
+					<div className="d-flex flex-column align-items-start">
+						{/* <Link to={`appointments/new-appointment`}>
 						<Button
 							data-testid="schedulingNewAppointmentButton"
 							variant="link"
@@ -224,102 +230,103 @@ export const MySchedule: FC = () => {
 						</Button>
 					</Link> */}
 
-					<Link to={`availabilities`}>
-						<Button
-							data-testid="schedulingManageAvailabilityButton"
-							variant="link"
-							size="sm"
-							className="p-0 mb-5 fs-default"
-							onClick={() => {
-								setManagingAvailabilties(true);
-							}}
-						>
-							Manage Availability
-						</Button>
-					</Link>
+						<Link to={`availabilities`}>
+							<Button
+								data-testid="schedulingManageAvailabilityButton"
+								variant="link"
+								size="sm"
+								className="p-0 mb-5 fs-default"
+								onClick={() => {
+									setManagingAvailabilties(true);
+								}}
+							>
+								Manage Availability
+							</Button>
+						</Link>
+					</div>
 				</div>
-			</div>
 
-			<div data-testid="schedulingMainCalendar" className={classes.mainCalendar}>
-				<FullCalendar
-					ref={mainCalendarRef}
-					height="100%"
-					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-					headerToolbar={false}
-					initialView={currentMainCalendarView}
-					// editable={true}
-					// selectable={true}
-					// selectMirror={true}
-					// dayMaxEvents={true}
-					// weekends={weekendsVisible}
-					// allDayContent={(...args) => {
-					// 	console.log({args})
-					// }}
-					nowIndicator
-					events={[...renderedMainCalendarEvents]}
-					eventContent={(evtInfo) => {
-						if (evtInfo.event.display === 'background') {
-							return;
-						}
+				<div data-testid="schedulingMainCalendar" className={classes.mainCalendar}>
+					<FullCalendar
+						ref={mainCalendarRef}
+						height="100%"
+						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+						headerToolbar={false}
+						initialView={currentMainCalendarView}
+						// editable={true}
+						// selectable={true}
+						// selectMirror={true}
+						// dayMaxEvents={true}
+						// weekends={weekendsVisible}
+						// allDayContent={(...args) => {
+						// 	console.log({args})
+						// }}
+						nowIndicator
+						events={[...renderedMainCalendarEvents]}
+						eventContent={(evtInfo) => {
+							if (evtInfo.event.display === 'background') {
+								return;
+							}
 
-						const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
+							const startTime = evtInfo.event.allDay ? null : moment(evtInfo.event.start).format('h:mma');
 
-						return (
-							<div>
-								<p className={classes.eventText}>
-									<strong>{evtInfo.event.title}</strong>
-								</p>
-								<p className={classes.eventText}>{startTime}</p>
-							</div>
-						);
-					}}
-					eventClick={(clickInfo) => {
-						if (clickInfo.event.allDay) {
-							// setFollowupPatientList(clickInfo.event.extendedProps.patients);
-							return;
-						} else if (
-							clickInfo.event.extendedProps.isAvailability ||
-							clickInfo.event.extendedProps.isBlockedTime
-						) {
-							setManagingAvailabilties(false);
-							navigate(
-								`/scheduling/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
+							return (
+								<div>
+									<p className={classes.eventText}>
+										<strong>{evtInfo.event.title}</strong>
+									</p>
+									<p className={classes.eventText}>{startTime}</p>
+								</div>
 							);
-							return;
-						} else if (clickInfo.event.extendedProps.appointmentId) {
-							setFocusDateOnLoad(false);
-							setAccountIdForDetailsPanel(clickInfo.event.extendedProps.accountId);
-							navigate(`/scheduling/appointments/${clickInfo.event.extendedProps.appointmentId}`);
-						}
-					}}
-					datesSet={({ start, end }) => {
-						setMainStartDate(moment(start).format('YYYY-MM-DD'));
-						setMainEndDate(moment(end).format('YYYY-MM-DD'));
+						}}
+						eventClick={(clickInfo) => {
+							if (clickInfo.event.allDay) {
+								// setFollowupPatientList(clickInfo.event.extendedProps.patients);
+								return;
+							} else if (
+								clickInfo.event.extendedProps.isAvailability ||
+								clickInfo.event.extendedProps.isBlockedTime
+							) {
+								setManagingAvailabilties(false);
+								navigate(
+									`/scheduling/availabilities/${clickInfo.event.extendedProps.logicalAvailabilityId}`
+								);
+								return;
+							} else if (clickInfo.event.extendedProps.appointmentId) {
+								setFocusDateOnLoad(false);
+								setAccountIdForDetailsPanel(clickInfo.event.extendedProps.accountId);
+								navigate(`/scheduling/appointments/${clickInfo.event.extendedProps.appointmentId}`);
+							}
+						}}
+						datesSet={({ start, end }) => {
+							setMainStartDate(moment(start).format('YYYY-MM-DD'));
+							setMainEndDate(moment(end).format('YYYY-MM-DD'));
+						}}
+					/>
+				</div>
+
+				<Outlet
+					context={{
+						focusDateOnLoad,
+						setFocusDateOnLoad,
+						setCalendarDate,
+						fetchMainData,
+						fetchLeftData,
+						accountIdForDetailsPanel,
+						managingAvailabilties,
+						setManagingAvailabilties,
 					}}
 				/>
-			</div>
 
-			<Outlet
-				context={{
-					focusDateOnLoad,
-					setFocusDateOnLoad,
-					setCalendarDate,
-					fetchMainData,
-					fetchLeftData,
-					accountIdForDetailsPanel,
-					managingAvailabilties,
-					setManagingAvailabilties,
-				}}
-			/>
-
-			{/* {followupPatientList.length > 0 ? (
+				{/* {followupPatientList.length > 0 ? (
 						<FollowUpsListPanel
 							onClose={() => {
 								setFollowupPatientList([]);
 							}}
 						/>
 					) : null} */}
-		</div>
+			</div>
+		</>
 	);
 };
 

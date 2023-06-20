@@ -1,6 +1,7 @@
 import React, { FC, useState, useCallback, useContext, useMemo, useEffect } from 'react';
 import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 
@@ -166,135 +167,144 @@ const IntakeAssessment: FC = () => {
 	}, [exitUrl, groupSessionId, navigate, providerId, selectedProvider, selectedTimeSlot]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			{isGroupSessionAssessment && (
-				<Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/',
-							title: 'Home',
-						},
-						{
-							to: '/in-the-studio',
-							title: 'Group Sessions',
-						},
-						{
-							to: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
-							title: 'Group Session',
-						},
-						{
-							to: '/#',
-							title: 'Appointment',
-						},
-					]}
+		<>
+			<Helmet>
+				<title>Cobalt | Assessment</title>
+			</Helmet>
+
+			<AsyncPage fetchData={fetchData}>
+				{isGroupSessionAssessment && (
+					<Breadcrumb
+						breadcrumbs={[
+							{
+								to: '/',
+								title: 'Home',
+							},
+							{
+								to: '/in-the-studio',
+								title: 'Group Sessions',
+							},
+							{
+								to: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
+								title: 'Group Session',
+							},
+							{
+								to: '/#',
+								title: 'Appointment',
+							},
+						]}
+					/>
+				)}
+				{!isGroupSessionAssessment && (
+					<Breadcrumb
+						breadcrumbs={[
+							{
+								to: '/',
+								title: 'Home',
+							},
+							{
+								to: exitUrl,
+								title: 'Connect with Support',
+							},
+							{
+								to: '/#',
+								title: 'Appointment',
+							},
+						]}
+					/>
+				)}
+
+				<ProgressBar
+					current={assessment?.assessmentProgress || 0}
+					max={assessment?.assessmentProgressTotal || 0}
 				/>
-			)}
-			{!isGroupSessionAssessment && (
-				<Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/',
-							title: 'Home',
-						},
-						{
-							to: exitUrl,
-							title: 'Connect with Support',
-						},
-						{
-							to: '/#',
-							title: 'Appointment',
-						},
-					]}
-				/>
-			)}
 
-			<ProgressBar current={assessment?.assessmentProgress || 0} max={assessment?.assessmentProgressTotal || 0} />
+				<HeroContainer>
+					<h2 className="mb-0 text-center">Assessment</h2>
+				</HeroContainer>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">Assessment</h2>
-			</HeroContainer>
-
-			<Container className="pt-5 pb-5">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form
-							autoComplete="off"
-							autoCorrect="off"
-							onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-								e.preventDefault();
-							}}
-						>
-							{assessment?.question && (
-								<SurveyQuestion
-									key={assessment.question.questionId}
-									question={{
-										...assessment.question,
-										selectedAssessmentAnswers: selectedQuestionAnswers,
-									}}
-									onChange={(_, selectedAssessmentAswers) => {
-										setSelectedQuestionAnswers(selectedAssessmentAswers);
-										if (assessment.question.questionType === QUESTION_TYPE.QUAD) {
-											submitAnswers(selectedAssessmentAswers);
-										}
-									}}
-								>
-									{isGroupSessionAssessment && (
-										<p className="mb-5">
-											Only people who answer "Yes" are eligible to reserve a seat.
-										</p>
-									)}
-								</SurveyQuestion>
-							)}
-
-							<div className="d-flex">
-								{assessment?.previousQuestionId && (
-									<Button
-										type="button"
-										variant="outline-primary"
-										onClick={() => {
-											navigate(
-												`/intake-assessment?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
-												{ state: location.state }
-											);
+				<Container className="pt-5 pb-5">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<Form
+								autoComplete="off"
+								autoCorrect="off"
+								onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+									e.preventDefault();
+								}}
+							>
+								{assessment?.question && (
+									<SurveyQuestion
+										key={assessment.question.questionId}
+										question={{
+											...assessment.question,
+											selectedAssessmentAnswers: selectedQuestionAnswers,
+										}}
+										onChange={(_, selectedAssessmentAswers) => {
+											setSelectedQuestionAnswers(selectedAssessmentAswers);
+											if (assessment.question.questionType === QUESTION_TYPE.QUAD) {
+												submitAnswers(selectedAssessmentAswers);
+											}
 										}}
 									>
-										Back
-									</Button>
+										{isGroupSessionAssessment && (
+											<p className="mb-5">
+												Only people who answer "Yes" are eligible to reserve a seat.
+											</p>
+										)}
+									</SurveyQuestion>
 								)}
 
-								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
-									<Button
-										type="submit"
-										className="ms-auto"
-										variant="primary"
-										onClick={() => submitAnswers(selectedQuestionAnswers)}
-									>
-										{assessment?.nextQuestionId ? 'Next' : 'Done'}
-									</Button>
-								)}
-							</div>
-						</Form>
-					</Col>
-				</Row>
+								<div className="d-flex">
+									{assessment?.previousQuestionId && (
+										<Button
+											type="button"
+											variant="outline-primary"
+											onClick={() => {
+												navigate(
+													`/intake-assessment?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
+													{ state: location.state }
+												);
+											}}
+										>
+											Back
+										</Button>
+									)}
 
-				<p className="text-center">
-					<Link
-						to={
-							isGroupSessionAssessment
-								? `/in-the-studio/group-session-scheduled/${groupSessionId}`
-								: exitUrl
-						}
-						onClick={(e) => {
-							if (!window.confirm('Are you sure you want to exit booking?')) {
-								e.preventDefault();
+									{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
+										<Button
+											type="submit"
+											className="ms-auto"
+											variant="primary"
+											onClick={() => submitAnswers(selectedQuestionAnswers)}
+										>
+											{assessment?.nextQuestionId ? 'Next' : 'Done'}
+										</Button>
+									)}
+								</div>
+							</Form>
+						</Col>
+					</Row>
+
+					<p className="text-center">
+						<Link
+							to={
+								isGroupSessionAssessment
+									? `/in-the-studio/group-session-scheduled/${groupSessionId}`
+									: exitUrl
 							}
-						}}
-					>
-						exit booking
-					</Link>
-				</p>
-			</Container>
-		</AsyncPage>
+							onClick={(e) => {
+								if (!window.confirm('Are you sure you want to exit booking?')) {
+									e.preventDefault();
+								}
+							}}
+						>
+							exit booking
+						</Link>
+					</p>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

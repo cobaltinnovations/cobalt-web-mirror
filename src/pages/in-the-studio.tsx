@@ -1,6 +1,7 @@
 import React, { FC, useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 import { groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
@@ -127,6 +128,10 @@ const InTheStudio: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | In the Studio</title>
+			</Helmet>
+
 			{actionSheetEnabled && (
 				<ActionSheet
 					show={actionSheetIsOpen}

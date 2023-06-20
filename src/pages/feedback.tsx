@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { feedbackService } from '@/lib/services/feedback-service';
 import useHandleError from '@/hooks/use-handle-error';
@@ -39,6 +40,10 @@ const Feedback: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Feedback</title>
+			</Helmet>
+
 			<Container className="pt-4">
 				<Row className="mb-4">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>

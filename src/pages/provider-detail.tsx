@@ -12,6 +12,7 @@ import { Scrollspy } from '@makotot/ghostui';
 import classNames from 'classnames';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 import { useLocation, useParams } from 'react-router-dom';
 
 const useProviderDetailStyles = createUseThemedStyles((theme) => ({
@@ -161,198 +162,204 @@ const ProviderDetail = () => {
 	}, []);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<BookingModals ref={bookingRef} />
+		<>
+			<Helmet>
+				<title>Cobalt | Provider Details</title>
+			</Helmet>
 
-			<Breadcrumb
-				breadcrumbs={[
-					{
-						to: '/connect-with-support',
-						title: 'Connect With Support',
-					},
-					{
-						to: '/#',
-						title: selectedProvider?.name ?? '',
-					},
-				]}
-			/>
+			<AsyncPage fetchData={fetchData}>
+				<BookingModals ref={bookingRef} />
 
-			<Scrollspy sectionRefs={sectionRefs} offset={-100}>
-				{({ currentElementIndexInViewport }) => {
-					return (
-						<>
-							<Container className="py-4">
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
+				<Breadcrumb
+					breadcrumbs={[
+						{
+							to: '/connect-with-support',
+							title: 'Connect With Support',
+						},
+						{
+							to: '/#',
+							title: selectedProvider?.name ?? '',
+						},
+					]}
+				/>
+
+				<Scrollspy sectionRefs={sectionRefs} offset={-100}>
+					{({ currentElementIndexInViewport }) => {
+						return (
+							<>
+								<Container className="py-4">
+									<Row>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
+											{selectedProvider && (
+												<ProviderInfoCard
+													linkToExternalBio
+													hideSpecifics
+													provider={selectedProvider}
+												/>
+											)}
+										</Col>
+									</Row>
+								</Container>
+								<div className={classes.navOuter} ref={navRef}>
+									<Container
+										fluid
+										className={classNames('bg-white', {
+											[classes.stickyNavbar]: scrolled,
+										})}
 									>
-										{selectedProvider && (
-											<ProviderInfoCard
-												linkToExternalBio
-												hideSpecifics
-												provider={selectedProvider}
-											/>
-										)}
-									</Col>
-								</Row>
-							</Container>
-							<div className={classes.navOuter} ref={navRef}>
-								<Container
-									fluid
-									className={classNames('bg-white', {
-										[classes.stickyNavbar]: scrolled,
-									})}
-								>
-									<Container>
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<TabBar
-													key="provider-detail-tabbar"
-													hideBorder
-													value={
-														currentElementIndexInViewport === 0
-															? '#about'
-															: currentElementIndexInViewport === 2
-															? '#payment'
-															: currentElementIndexInViewport === 3
-															? '#availability'
-															: ''
-													}
-													tabs={[
-														{ value: '#about', title: 'About' },
-														{ value: '#payment', title: 'Payment' },
-														{ value: '#availability', title: 'Availability' },
-													]}
-													onTabClick={(value) => {
-														window.location.href = `${pathname}${value}`;
+										<Container>
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<TabBar
+														key="provider-detail-tabbar"
+														hideBorder
+														value={
+															currentElementIndexInViewport === 0
+																? '#about'
+																: currentElementIndexInViewport === 2
+																? '#payment'
+																: currentElementIndexInViewport === 3
+																? '#availability'
+																: ''
+														}
+														tabs={[
+															{ value: '#about', title: 'About' },
+															{ value: '#payment', title: 'Payment' },
+															{ value: '#availability', title: 'Availability' },
+														]}
+														onTabClick={(value) => {
+															window.location.href = `${pathname}${value}`;
+														}}
+													/>
+												</Col>
+											</Row>
+										</Container>
+									</Container>
+								</div>
+								<Container>
+									<Row className="mb-8">
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
+											<div ref={sectionRefs[0]}>
+												<div id="about" className={classes.sectionAnchor} />
+												<h4>About</h4>
+												<div
+													className="wysiwyg-display"
+													dangerouslySetInnerHTML={{
+														__html: selectedProvider?.bio ?? '<p>Not available.</p>',
 													}}
 												/>
-											</Col>
-										</Row>
-									</Container>
-								</Container>
-							</div>
-							<Container>
-								<Row className="mb-8">
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<div ref={sectionRefs[0]}>
-											<div id="about" className={classes.sectionAnchor} />
-											<h4>About</h4>
-											<div
-												className="wysiwyg-display"
-												dangerouslySetInnerHTML={{
-													__html: selectedProvider?.bio ?? '<p>Not available.</p>',
-												}}
-											/>
-										</div>
-									</Col>
-								</Row>
-								<Row className="mb-8">
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<div ref={sectionRefs[2]}>
-											<div id="payment" className={classes.sectionAnchor} />
-											<h4>Payment</h4>
-											{!!selectedProvider?.paymentFundingDescriptions?.length ? (
-												<ul>
-													{selectedProvider?.paymentFundingDescriptions?.map(
-														(paymentOption, index) => {
-															return <li key={index}>{paymentOption}</li>;
-														}
-													)}
-												</ul>
-											) : (
-												<p>Not available.</p>
-											)}
-										</div>
-									</Col>
-								</Row>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-										ref={sectionRefs[3]}
-									>
-										<div id="availability" className={classes.sectionAnchor} />
-										<h3>Book an appointment</h3>
+											</div>
+										</Col>
+									</Row>
+									<Row className="mb-8">
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+										>
+											<div ref={sectionRefs[2]}>
+												<div id="payment" className={classes.sectionAnchor} />
+												<h4>Payment</h4>
+												{!!selectedProvider?.paymentFundingDescriptions?.length ? (
+													<ul>
+														{selectedProvider?.paymentFundingDescriptions?.map(
+															(paymentOption, index) => {
+																return <li key={index}>{paymentOption}</li>;
+															}
+														)}
+													</ul>
+												) : (
+													<p>Not available.</p>
+												)}
+											</div>
+										</Col>
+									</Row>
+									<Row>
+										<Col
+											md={{ span: 10, offset: 1 }}
+											lg={{ span: 8, offset: 2 }}
+											xl={{ span: 6, offset: 3 }}
+											ref={sectionRefs[3]}
+										>
+											<div id="availability" className={classes.sectionAnchor} />
+											<h3>Book an appointment</h3>
 
-										{selectedProvider
-											? availableSections.map((section, idx) => {
-													const sectionProvider = section.providers[0];
-													const timeSlots = sectionProvider.times ?? {};
+											{selectedProvider
+												? availableSections.map((section, idx) => {
+														const sectionProvider = section.providers[0];
+														const timeSlots = sectionProvider.times ?? {};
 
-													return (
-														<div key={section.date}>
-															<DayContainer className="mb-4">
-																<p className="mb-0 fw-bold">
-																	{section.dateDescription}
-																</p>
-															</DayContainer>
+														return (
+															<div key={section.date}>
+																<DayContainer className="mb-4">
+																	<p className="mb-0 fw-bold">
+																		{section.dateDescription}
+																	</p>
+																</DayContainer>
 
-															<div className={classes.horizontalScroller}>
-																{sectionProvider.fullyBooked ? (
-																	<p>all appointments are booked for this date</p>
-																) : (
-																	timeSlots.map((availability) => (
-																		<Button
-																			size="sm"
-																			variant={
-																				selectedTimeSlot === availability
-																					? 'primary'
-																					: 'light'
-																			}
-																			className={classNames(
-																				`${classes.availabilityButton}`,
-																				'me-1',
-																				'mb-1'
-																			)}
-																			disabled={
-																				availability.status !== 'AVAILABLE'
-																			}
-																			key={availability.time}
-																			onClick={() => {
-																				bookingRef.current?.kickoffBookingProcess(
-																					{
-																						source: BookingSource.ProviderDetail,
-																						exitUrl: `${pathname}${search}`,
-																						timeSlot: availability,
-																						date: section.date,
-																						provider: sectionProvider,
-																					}
-																				);
-																			}}
-																		>
-																			{availability.timeDescription}
-																		</Button>
-																	))
-																)}
+																<div className={classes.horizontalScroller}>
+																	{sectionProvider.fullyBooked ? (
+																		<p>all appointments are booked for this date</p>
+																	) : (
+																		timeSlots.map((availability) => (
+																			<Button
+																				size="sm"
+																				variant={
+																					selectedTimeSlot === availability
+																						? 'primary'
+																						: 'light'
+																				}
+																				className={classNames(
+																					`${classes.availabilityButton}`,
+																					'me-1',
+																					'mb-1'
+																				)}
+																				disabled={
+																					availability.status !== 'AVAILABLE'
+																				}
+																				key={availability.time}
+																				onClick={() => {
+																					bookingRef.current?.kickoffBookingProcess(
+																						{
+																							source: BookingSource.ProviderDetail,
+																							exitUrl: `${pathname}${search}`,
+																							timeSlot: availability,
+																							date: section.date,
+																							provider: sectionProvider,
+																						}
+																					);
+																				}}
+																			>
+																				{availability.timeDescription}
+																			</Button>
+																		))
+																	)}
+																</div>
 															</div>
-														</div>
-													);
-											  })
-											: null}
-									</Col>
-								</Row>
-							</Container>
-						</>
-					);
-				}}
-			</Scrollspy>
-		</AsyncPage>
+														);
+												  })
+												: null}
+										</Col>
+									</Row>
+								</Container>
+							</>
+						);
+					}}
+				</Scrollspy>
+			</AsyncPage>
+		</>
 	);
 };
 

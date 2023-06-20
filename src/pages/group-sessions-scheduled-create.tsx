@@ -7,6 +7,7 @@ import { Container, Row, Col, Form, Card, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import { Helmet } from 'react-helmet';
 
 import { ReactComponent as ContentCopyIcon } from '@/assets/icons/icon-content-copy.svg';
 // import { ReactComponent as CloseIcon } from '@/assets/icons/trash.svg';
@@ -381,541 +382,556 @@ const GroupSessionsCreate: FC = () => {
 	}, [isViewMode, session?.groupSessionStatusId]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<SessionCancelModal
-				show={showSessionCancelModal}
-				onCancel={handleCancelSessionModalCancel}
-				onHide={handleCancelSessionModalHide}
-			/>
+		<>
+			<Helmet>
+				<title>Cobalt | Group Sessions - Submit Group Session</title>
+			</Helmet>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">
-					{initialValues?.title ? initialValues.title : 'Submit Group Session'}
-					{isCopy ? ' (Copy)' : ''}
-				</h2>
-			</HeroContainer>
-			{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
-				<Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/group-sessions/scheduled',
-							title: 'Group Sessions',
-						},
-						{
-							to: '/group-sessions/scheduled/create',
-							title: `${initialValues?.title || 'Submit Group Session'}${isCopy ? ' (Copy)' : ''}`,
-						},
-					]}
+			<AsyncPage fetchData={fetchData}>
+				<SessionCancelModal
+					show={showSessionCancelModal}
+					onCancel={handleCancelSessionModalCancel}
+					onHide={handleCancelSessionModalHide}
 				/>
-			)}
 
-			<Container className="py-14">
-				<Row className="mb-8">
-					<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
-						<div className="mb-6 d-flex align-items-center">
-							<h1 className="mb-0">
-								{initialValues?.title || 'Submit Group Session'}
-								{isCopy ? ' (Copy)' : ''}
-							</h1>
-							{!isViewMode && groupSessionId && (
-								<>
-									<Button
-										className="ms-auto me-2"
-										variant="danger"
-										onClick={handleCancelSessionButtonClick}
-									>
-										Cancel Session
-									</Button>
+				<HeroContainer>
+					<h2 className="mb-0 text-center">
+						{initialValues?.title ? initialValues.title : 'Submit Group Session'}
+						{isCopy ? ' (Copy)' : ''}
+					</h2>
+				</HeroContainer>
+				{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+					<Breadcrumb
+						breadcrumbs={[
+							{
+								to: '/group-sessions/scheduled',
+								title: 'Group Sessions',
+							},
+							{
+								to: '/group-sessions/scheduled/create',
+								title: `${initialValues?.title || 'Submit Group Session'}${isCopy ? ' (Copy)' : ''}`,
+							},
+						]}
+					/>
+				)}
 
-									<CopyToClipboard
-										onCopy={() => {
-											addFlag({
-												variant: 'success',
-												title: 'Copied!',
-												description: 'The URL for this session was copied to your clipboard',
-												actions: [],
-											});
-										}}
-										text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${groupSessionId}?immediateAccess=true`}
-									>
-										<Button size="sm" className="p-2">
-											<ContentCopyIcon height={24} width={24} />
-										</Button>
-									</CopyToClipboard>
-								</>
-							)}
-						</div>
-
-						<p className="mb-4">
-							Please fill out this form to submit your event or session for approval on Cobalt. Approved
-							submissions will appear in the “Group Session” section of the website. Events/sessions must
-							be virtual and have a meeting link already created. Please allow 1-2 business days for your
-							submission to be approved.
-						</p>
-						<p className="mb-0 text-danger">Required *</p>
-					</Col>
-				</Row>
-
-				<Row>
-					<Col lg={isEdit ? 8 : { span: 8, offset: 2 }}>
-						<Formik<GroupSessionFormData>
-							enableReinitialize
-							validationSchema={groupSessionSchema}
-							initialValues={initialValues || groupSessionSchema.cast(undefined)}
-							onSubmit={handleSubmit}
-						>
-							{(formikBag) => {
-								const {
-									values,
-									setFieldValue,
-									setFieldTouched,
-									handleChange,
-									handleBlur,
-									touched,
-									errors,
-									handleSubmit,
-								} = formikBag;
-								const selectedStartTimeSlotIdx = timeSlots.findIndex(
-									(time) => time === values.startTime
-								);
-
-								return (
+				<Container className="py-14">
+					<Row className="mb-8">
+						<Col lg={isEdit ? 12 : { span: 8, offset: 2 }}>
+							<div className="mb-6 d-flex align-items-center">
+								<h1 className="mb-0">
+									{initialValues?.title || 'Submit Group Session'}
+									{isCopy ? ' (Copy)' : ''}
+								</h1>
+								{!isViewMode && groupSessionId && (
 									<>
-										<SessionCropModal
-											imageSource={sessionCropModalImageSource}
-											show={sessionCropModalIsOpen}
-											onHide={() => {
-												setSessionCropModalIsOpen(false);
+										<Button
+											className="ms-auto me-2"
+											variant="danger"
+											onClick={handleCancelSessionButtonClick}
+										>
+											Cancel Session
+										</Button>
+
+										<CopyToClipboard
+											onCopy={() => {
+												addFlag({
+													variant: 'success',
+													title: 'Copied!',
+													description:
+														'The URL for this session was copied to your clipboard',
+													actions: [],
+												});
 											}}
-											onSave={async (blob) => {
-												setSessionCropModalIsOpen(false);
+											text={`https://${window.location.host}/in-the-studio/group-session-scheduled/${groupSessionId}?immediateAccess=true`}
+										>
+											<Button size="sm" className="p-2">
+												<ContentCopyIcon height={24} width={24} />
+											</Button>
+										</CopyToClipboard>
+									</>
+								)}
+							</div>
 
-												imageUploader(
-													blob,
-													groupSessionsService.getPresignedUploadUrl({
-														contentType: blob.type,
-														filename: `${uuidv4()}.jpg`,
-													}).fetch
-												)
-													.onBeforeUpload((previewImageUrl) => {
-														setImagePreview(previewImageUrl);
-													})
-													.onPresignedUploadObtained((accessUrl) => {
-														setIsUploading(true);
+							<p className="mb-4">
+								Please fill out this form to submit your event or session for approval on Cobalt.
+								Approved submissions will appear in the “Group Session” section of the website.
+								Events/sessions must be virtual and have a meeting link already created. Please allow
+								1-2 business days for your submission to be approved.
+							</p>
+							<p className="mb-0 text-danger">Required *</p>
+						</Col>
+					</Row>
 
-														setFieldTouched('imageUrl', true);
-														setFieldValue('imageUrl', accessUrl);
-													})
-													.onProgress((percentage) => {
-														setProgress(percentage);
-													})
-													.onComplete((accessUrl) => {
-														setIsUploading(false);
-														setImagePreview(accessUrl);
-													})
-													.onError((error: any) => {
-														handleError(error);
+					<Row>
+						<Col lg={isEdit ? 8 : { span: 8, offset: 2 }}>
+							<Formik<GroupSessionFormData>
+								enableReinitialize
+								validationSchema={groupSessionSchema}
+								initialValues={initialValues || groupSessionSchema.cast(undefined)}
+								onSubmit={handleSubmit}
+							>
+								{(formikBag) => {
+									const {
+										values,
+										setFieldValue,
+										setFieldTouched,
+										handleChange,
+										handleBlur,
+										touched,
+										errors,
+										handleSubmit,
+									} = formikBag;
+									const selectedStartTimeSlotIdx = timeSlots.findIndex(
+										(time) => time === values.startTime
+									);
 
-														setIsUploading(false);
+									return (
+										<>
+											<SessionCropModal
+												imageSource={sessionCropModalImageSource}
+												show={sessionCropModalIsOpen}
+												onHide={() => {
+													setSessionCropModalIsOpen(false);
+												}}
+												onSave={async (blob) => {
+													setSessionCropModalIsOpen(false);
 
-														setImagePreview('');
-														setFieldValue('imageUrl', undefined);
-													})
-													.start();
-											}}
-										/>
+													imageUploader(
+														blob,
+														groupSessionsService.getPresignedUploadUrl({
+															contentType: blob.type,
+															filename: `${uuidv4()}.jpg`,
+														}).fetch
+													)
+														.onBeforeUpload((previewImageUrl) => {
+															setImagePreview(previewImageUrl);
+														})
+														.onPresignedUploadObtained((accessUrl) => {
+															setIsUploading(true);
 
-										<SessionRemoveImageModal
-											imageSource={imagePreview || ''}
-											show={showRemoveImageModal}
-											onHide={() => {
-												setShowRemoveImageModal(false);
-											}}
-											onRemove={() => {
-												setShowRemoveImageModal(false);
+															setFieldTouched('imageUrl', true);
+															setFieldValue('imageUrl', accessUrl);
+														})
+														.onProgress((percentage) => {
+															setProgress(percentage);
+														})
+														.onComplete((accessUrl) => {
+															setIsUploading(false);
+															setImagePreview(accessUrl);
+														})
+														.onError((error: any) => {
+															handleError(error);
 
-												setImagePreview('');
-												setFieldValue('imageUrl', undefined);
-											}}
-										/>
+															setIsUploading(false);
 
-										<Form onSubmit={handleSubmit}>
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Scheduling</h5>
+															setImagePreview('');
+															setFieldValue('imageUrl', undefined);
+														})
+														.start();
+												}}
+											/>
 
-												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.default }}>
-														Would you like to use Cobalt's scheduling system?
-													</Form.Label>
-													<Form.Check
-														disabled={isViewMode}
-														type="radio"
-														id="isCobaltScheduling-Yes"
-														name="isCobaltScheduling"
-														label="Yes"
-														checked={values.isCobaltScheduling}
-														onChange={() => {
-															setFieldTouched('isCobaltScheduling', true);
-															setFieldValue('isCobaltScheduling', true);
-														}}
-													/>
-													<Form.Check
-														disabled={isViewMode}
-														type="radio"
-														id="isCobaltScheduling-No"
-														name="isCobaltScheduling"
-														label="No"
-														checked={!values.isCobaltScheduling}
-														onChange={() => {
-															setFieldTouched('isCobaltScheduling', true);
-															setFieldValue('isCobaltScheduling', false);
-														}}
-													/>
-												</Form.Group>
+											<SessionRemoveImageModal
+												imageSource={imagePreview || ''}
+												show={showRemoveImageModal}
+												onHide={() => {
+													setShowRemoveImageModal(false);
+												}}
+												onRemove={() => {
+													setShowRemoveImageModal(false);
 
-												<Form.Group controlId="date" className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.default }}>
-														Date
-													</Form.Label>
-													<DatePicker
-														showYearDropdown
-														showMonthDropdown
-														dropdownMode="select"
-														selected={
-															values.date ? moment(values.date).toDate() : undefined
-														}
-														onChange={(date) => {
-															setFieldTouched('date', true);
-															setFieldValue(
-																'date',
-																date ? moment(date).format('YYYY-MM-DD') : ''
-															);
-														}}
-														disabled={hasReservations || isViewMode}
-													/>
-												</Form.Group>
+													setImagePreview('');
+													setFieldValue('imageUrl', undefined);
+												}}
+											/>
 
-												<Row>
-													<Col>
-														<InputHelper
-															label="Start Time"
-															value={values.startTime || ''}
-															as="select"
-															onChange={(event) => {
-																setFieldTouched('startTime', true);
-																setFieldValue('startTime', event.target.value);
+											<Form onSubmit={handleSubmit}>
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Scheduling</h5>
+
+													<Form.Group className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
+															Would you like to use Cobalt's scheduling system?
+														</Form.Label>
+														<Form.Check
+															disabled={isViewMode}
+															type="radio"
+															id="isCobaltScheduling-Yes"
+															name="isCobaltScheduling"
+															label="Yes"
+															checked={values.isCobaltScheduling}
+															onChange={() => {
+																setFieldTouched('isCobaltScheduling', true);
+																setFieldValue('isCobaltScheduling', true);
 															}}
-															required={requiredFields.startTime}
-															error={
-																touched.startTime && errors.startTime
-																	? errors.startTime
-																	: ''
-															}
-															disabled={hasReservations || isViewMode}
-														>
-															<option value="" disabled>
-																Select...
-															</option>
-															{timeSlots.map((time) => (
-																<option key={time} value={time}>
-																	{time}
-																</option>
-															))}
-														</InputHelper>
-													</Col>
-
-													<Col>
-														<InputHelper
-															label="End Time"
-															value={values.endTime || ''}
-															as="select"
-															onChange={(event) => {
-																setFieldTouched('endTime', true);
-																setFieldValue('endTime', event.target.value);
+														/>
+														<Form.Check
+															disabled={isViewMode}
+															type="radio"
+															id="isCobaltScheduling-No"
+															name="isCobaltScheduling"
+															label="No"
+															checked={!values.isCobaltScheduling}
+															onChange={() => {
+																setFieldTouched('isCobaltScheduling', true);
+																setFieldValue('isCobaltScheduling', false);
 															}}
-															required={requiredFields.endTime}
-															error={
-																touched.endTime && errors.endTime ? errors.endTime : ''
+														/>
+													</Form.Group>
+
+													<Form.Group controlId="date" className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
+															Date
+														</Form.Label>
+														<DatePicker
+															showYearDropdown
+															showMonthDropdown
+															dropdownMode="select"
+															selected={
+																values.date ? moment(values.date).toDate() : undefined
 															}
+															onChange={(date) => {
+																setFieldTouched('date', true);
+																setFieldValue(
+																	'date',
+																	date ? moment(date).format('YYYY-MM-DD') : ''
+																);
+															}}
 															disabled={hasReservations || isViewMode}
-														>
-															<option value="" disabled>
-																Select...
-															</option>
-															{timeSlots.map((time, idx) => {
-																if (idx <= selectedStartTimeSlotIdx) {
-																	return null;
+														/>
+													</Form.Group>
+
+													<Row>
+														<Col>
+															<InputHelper
+																label="Start Time"
+																value={values.startTime || ''}
+																as="select"
+																onChange={(event) => {
+																	setFieldTouched('startTime', true);
+																	setFieldValue('startTime', event.target.value);
+																}}
+																required={requiredFields.startTime}
+																error={
+																	touched.startTime && errors.startTime
+																		? errors.startTime
+																		: ''
 																}
-
-																return (
+																disabled={hasReservations || isViewMode}
+															>
+																<option value="" disabled>
+																	Select...
+																</option>
+																{timeSlots.map((time) => (
 																	<option key={time} value={time}>
 																		{time}
 																	</option>
-																);
-															})}
-														</InputHelper>
-													</Col>
-												</Row>
+																))}
+															</InputHelper>
+														</Col>
 
-												{!values.isCobaltScheduling && (
+														<Col>
+															<InputHelper
+																label="End Time"
+																value={values.endTime || ''}
+																as="select"
+																onChange={(event) => {
+																	setFieldTouched('endTime', true);
+																	setFieldValue('endTime', event.target.value);
+																}}
+																required={requiredFields.endTime}
+																error={
+																	touched.endTime && errors.endTime
+																		? errors.endTime
+																		: ''
+																}
+																disabled={hasReservations || isViewMode}
+															>
+																<option value="" disabled>
+																	Select...
+																</option>
+																{timeSlots.map((time, idx) => {
+																	if (idx <= selectedStartTimeSlotIdx) {
+																		return null;
+																	}
+
+																	return (
+																		<option key={time} value={time}>
+																			{time}
+																		</option>
+																	);
+																})}
+															</InputHelper>
+														</Col>
+													</Row>
+
+													{!values.isCobaltScheduling && (
+														<InputHelper
+															className="my-5"
+															label="Scheduling URL"
+															type="text"
+															name="schedulingUrl"
+															value={values.schedulingUrl}
+															as="input"
+															onBlur={handleBlur}
+															onChange={handleChange}
+															required={!values.isCobaltScheduling}
+															error={
+																touched.schedulingUrl && errors.schedulingUrl
+																	? errors.schedulingUrl
+																	: ''
+															}
+															disabled={isViewMode}
+														/>
+													)}
+												</Card>
+
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Your Information</h5>
 													<InputHelper
-														className="my-5"
-														label="Scheduling URL"
+														className="mb-5"
+														label="Your Name"
 														type="text"
-														name="schedulingUrl"
-														value={values.schedulingUrl}
+														name="yourName"
+														value={values.yourName}
 														as="input"
 														onBlur={handleBlur}
 														onChange={handleChange}
-														required={!values.isCobaltScheduling}
+														required={requiredFields.yourName}
 														error={
-															touched.schedulingUrl && errors.schedulingUrl
-																? errors.schedulingUrl
-																: ''
+															touched.yourName && errors.yourName ? errors.yourName : ''
 														}
 														disabled={isViewMode}
 													/>
-												)}
-											</Card>
-
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Your Information</h5>
-												<InputHelper
-													className="mb-5"
-													label="Your Name"
-													type="text"
-													name="yourName"
-													value={values.yourName}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.yourName}
-													error={touched.yourName && errors.yourName ? errors.yourName : ''}
-													disabled={isViewMode}
-												/>
-												<InputHelper
-													className="mb-5"
-													label="Your Email"
-													type="email"
-													name="yourEmail"
-													value={values.yourEmail}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.yourEmail}
-													error={
-														touched.yourEmail && errors.yourEmail ? errors.yourEmail : ''
-													}
-													disabled={isViewMode}
-												/>
-
-												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.default }}>
-														Are you the facilitator of this session?
-													</Form.Label>
-													<Form.Check
-														disabled={isViewMode}
-														type="radio"
-														id="isModerator-Yes"
-														name="isModerator"
-														label="Yes"
-														checked={values.isModerator}
-														onChange={() => {
-															setFieldTouched('isModerator', true);
-															setFieldValue('isModerator', true);
-														}}
-													/>
-													<Form.Check
-														disabled={isViewMode}
-														type="radio"
-														id="isModerator-No"
-														name="isModerator"
-														label="No"
-														checked={!values.isModerator}
-														onChange={() => {
-															setFieldTouched('isModerator', true);
-															setFieldValue('isModerator', false);
-														}}
-													/>
-												</Form.Group>
-
-												{!values.isModerator && (
-													<>
-														<InputHelper
-															className="mb-5"
-															label="Facilitator's Name"
-															type="text"
-															name="facilitatorsName"
-															value={values.facilitatorsName}
-															as="input"
-															onBlur={handleBlur}
-															onChange={handleChange}
-															required={!values.isModerator}
-															error={
-																touched.facilitatorsName && errors.facilitatorsName
-																	? errors.facilitatorsName
-																	: ''
-															}
-															disabled={isViewMode}
-														/>
-														<InputHelper
-															className="mb-5"
-															label="Facilitator's Email"
-															type="email"
-															name="facilitatorsEmail"
-															value={values.facilitatorsEmail}
-															as="input"
-															onBlur={handleBlur}
-															onChange={handleChange}
-															required={!values.isModerator}
-															error={
-																touched.facilitatorsEmail && errors.facilitatorsEmail
-																	? errors.facilitatorsEmail
-																	: ''
-															}
-															disabled={isViewMode}
-														/>
-													</>
-												)}
-
-												<Form.Group>
-													<Form.Label className="mb-3" style={{ ...fonts.default }}>
-														Which email should receive notifications when people register
-														for the event or cancel registration?
-													</Form.Label>
 													<InputHelper
-														label="Notification Email"
+														className="mb-5"
+														label="Your Email"
 														type="email"
-														name="notificationEmail"
-														value={values.notificationEmail}
+														name="yourEmail"
+														value={values.yourEmail}
 														as="input"
 														onBlur={handleBlur}
 														onChange={handleChange}
-														required={requiredFields.notificationEmail}
+														required={requiredFields.yourEmail}
 														error={
-															touched.notificationEmail && errors.notificationEmail
-																? errors.notificationEmail
+															touched.yourEmail && errors.yourEmail
+																? errors.yourEmail
 																: ''
 														}
+														disabled={isViewMode}
 													/>
-												</Form.Group>
-											</Card>
 
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Session Details</h5>
+													<Form.Group className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
+															Are you the facilitator of this session?
+														</Form.Label>
+														<Form.Check
+															disabled={isViewMode}
+															type="radio"
+															id="isModerator-Yes"
+															name="isModerator"
+															label="Yes"
+															checked={values.isModerator}
+															onChange={() => {
+																setFieldTouched('isModerator', true);
+																setFieldValue('isModerator', true);
+															}}
+														/>
+														<Form.Check
+															disabled={isViewMode}
+															type="radio"
+															id="isModerator-No"
+															name="isModerator"
+															label="No"
+															checked={!values.isModerator}
+															onChange={() => {
+																setFieldTouched('isModerator', true);
+																setFieldValue('isModerator', false);
+															}}
+														/>
+													</Form.Group>
 
-												<InputHelper
-													className="mb-5"
-													label="Session Title"
-													type="text"
-													name="title"
-													value={values.title}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.title}
-													error={touched.title && errors.title ? errors.title : ''}
-													disabled={hasReservations || isViewMode}
-												/>
-
-												<Form.Label className="mb-1" style={{ ...fonts.default }}>
-													Description {requiredFields.description && <span>*</span>}
-												</Form.Label>
-												<p className="text-muted" style={{ ...fonts.small }}>
-													How would you like to describe your session? (This will be featured
-													on the Cobalt Platform, should be 2-3 sentences long, and should
-													highlight the benefit for participants).
-												</p>
-												<Field name="description">
-													{({ field, meta }: FieldProps) => {
-														return (
-															<Wysiwyg
-																className={meta.touched && meta.error ? 'mb-2' : 'mb-5'}
-																readOnly={isViewMode}
-																initialValue={meta.initialValue}
-																onChange={field.onChange(field.name)}
+													{!values.isModerator && (
+														<>
+															<InputHelper
+																className="mb-5"
+																label="Facilitator's Name"
+																type="text"
+																name="facilitatorsName"
+																value={values.facilitatorsName}
+																as="input"
+																onBlur={handleBlur}
+																onChange={handleChange}
+																required={!values.isModerator}
+																error={
+																	touched.facilitatorsName && errors.facilitatorsName
+																		? errors.facilitatorsName
+																		: ''
+																}
+																disabled={isViewMode}
 															/>
-														);
-													}}
-												</Field>
-												{touched.description && errors.description && (
-													<p className="text-danger" style={{ ...fonts.small }}>
-														description is a required field
+															<InputHelper
+																className="mb-5"
+																label="Facilitator's Email"
+																type="email"
+																name="facilitatorsEmail"
+																value={values.facilitatorsEmail}
+																as="input"
+																onBlur={handleBlur}
+																onChange={handleChange}
+																required={!values.isModerator}
+																error={
+																	touched.facilitatorsEmail &&
+																	errors.facilitatorsEmail
+																		? errors.facilitatorsEmail
+																		: ''
+																}
+																disabled={isViewMode}
+															/>
+														</>
+													)}
+
+													<Form.Group>
+														<Form.Label className="mb-3" style={{ ...fonts.default }}>
+															Which email should receive notifications when people
+															register for the event or cancel registration?
+														</Form.Label>
+														<InputHelper
+															label="Notification Email"
+															type="email"
+															name="notificationEmail"
+															value={values.notificationEmail}
+															as="input"
+															onBlur={handleBlur}
+															onChange={handleChange}
+															required={requiredFields.notificationEmail}
+															error={
+																touched.notificationEmail && errors.notificationEmail
+																	? errors.notificationEmail
+																	: ''
+															}
+														/>
+													</Form.Group>
+												</Card>
+
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Session Details</h5>
+
+													<InputHelper
+														className="mb-5"
+														label="Session Title"
+														type="text"
+														name="title"
+														value={values.title}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.title}
+														error={touched.title && errors.title ? errors.title : ''}
+														disabled={hasReservations || isViewMode}
+													/>
+
+													<Form.Label className="mb-1" style={{ ...fonts.default }}>
+														Description {requiredFields.description && <span>*</span>}
+													</Form.Label>
+													<p className="text-muted" style={{ ...fonts.small }}>
+														How would you like to describe your session? (This will be
+														featured on the Cobalt Platform, should be 2-3 sentences long,
+														and should highlight the benefit for participants).
 													</p>
-												)}
+													<Field name="description">
+														{({ field, meta }: FieldProps) => {
+															return (
+																<Wysiwyg
+																	className={
+																		meta.touched && meta.error ? 'mb-2' : 'mb-5'
+																	}
+																	readOnly={isViewMode}
+																	initialValue={meta.initialValue}
+																	onChange={field.onChange(field.name)}
+																/>
+															);
+														}}
+													</Field>
+													{touched.description && errors.description && (
+														<p className="text-danger" style={{ ...fonts.small }}>
+															description is a required field
+														</p>
+													)}
 
-												<ImageUpload
-													imagePreview={imagePreview}
-													isUploading={isUploading}
-													progress={progress}
-													disabled={isViewMode}
-													onChange={(file) => {
-														const sourceUrl = URL.createObjectURL(file);
+													<ImageUpload
+														imagePreview={imagePreview}
+														isUploading={isUploading}
+														progress={progress}
+														disabled={isViewMode}
+														onChange={(file) => {
+															const sourceUrl = URL.createObjectURL(file);
 
-														setSessionCropModalImageSource(sourceUrl);
-														setSessionCropModalIsOpen(true);
-													}}
-													onRemove={() => {
-														setShowRemoveImageModal(true);
-													}}
-												/>
+															setSessionCropModalImageSource(sourceUrl);
+															setSessionCropModalIsOpen(true);
+														}}
+														onRemove={() => {
+															setShowRemoveImageModal(true);
+														}}
+													/>
 
-												{values.isCobaltScheduling && (
-													<>
-														<InputHelper
-															className="mb-5"
-															label="What is the BlueJeans/Zoom/etc. URL for this session?"
-															type="text"
-															name="meetingUrl"
-															value={values.meetingUrl}
-															as="input"
-															onBlur={handleBlur}
-															onChange={handleChange}
-															required
-															disabled={isViewMode}
-															error={
-																touched.meetingUrl && errors.meetingUrl
-																	? errors.meetingUrl
-																	: ''
-															}
-														/>
+													{values.isCobaltScheduling && (
+														<>
+															<InputHelper
+																className="mb-5"
+																label="What is the BlueJeans/Zoom/etc. URL for this session?"
+																type="text"
+																name="meetingUrl"
+																value={values.meetingUrl}
+																as="input"
+																onBlur={handleBlur}
+																onChange={handleChange}
+																required
+																disabled={isViewMode}
+																error={
+																	touched.meetingUrl && errors.meetingUrl
+																		? errors.meetingUrl
+																		: ''
+																}
+															/>
 
-														<InputHelper
-															className="mb-5"
-															label="What is the capacity limit of your class? (ex: 15 people, 25 people)"
-															type="number"
-															name="capacity"
-															value={'' + values.capacity}
-															as="input"
-															onBlur={handleBlur}
-															onChange={handleChange}
-															required={requiredFields.capacity}
-															error={
-																touched.capacity && errors.capacity
-																	? errors.capacity
-																	: ''
-															}
-															disabled={isViewMode}
-														/>
-													</>
-												)}
+															<InputHelper
+																className="mb-5"
+																label="What is the capacity limit of your class? (ex: 15 people, 25 people)"
+																type="number"
+																name="capacity"
+																value={'' + values.capacity}
+																as="input"
+																onBlur={handleBlur}
+																onChange={handleChange}
+																required={requiredFields.capacity}
+																error={
+																	touched.capacity && errors.capacity
+																		? errors.capacity
+																		: ''
+																}
+																disabled={isViewMode}
+															/>
+														</>
+													)}
 
-												<InputHelper
-													label="Session Handle"
-													type="text"
-													name="slug"
-													value={values.slug}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
-													required={requiredFields.slug}
-													error={touched.slug && errors.slug ? errors.slug : ''}
-													disabled={hasReservations || isViewMode}
-												/>
-											</Card>
+													<InputHelper
+														label="Session Handle"
+														type="text"
+														name="slug"
+														value={values.slug}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														helperText='What would you like to use as the short "handle" for your class? This will be featured at the end of the Cobalt Platform URL. It should be 1-3 words connected by hyphens (ex. tolerating-uncertainty)'
+														required={requiredFields.slug}
+														error={touched.slug && errors.slug ? errors.slug : ''}
+														disabled={hasReservations || isViewMode}
+													/>
+												</Card>
 
-											{/* <Card className="mb-5 border-0 p-6">
+												{/* <Card className="mb-5 border-0 p-6">
 												<h5 className="mb-5">Attendee Information</h5>
 
 												<Form.Group className="mb-5">
@@ -1076,124 +1092,127 @@ const GroupSessionsCreate: FC = () => {
 												</div>
 											</Card> */}
 
-											{values.isCobaltScheduling && (
-												<Card className="mb-5 border-0 p-6">
-													<h5 className="mb-5">Confirmation Email</h5>
+												{values.isCobaltScheduling && (
+													<Card className="mb-5 border-0 p-6">
+														<h5 className="mb-5">Confirmation Email</h5>
 
+														<InputHelper
+															disabled={isViewMode}
+															label="Email Copy"
+															name="confirmationEmailTemplate"
+															value={values.confirmationEmailTemplate}
+															as="textarea"
+															onBlur={handleBlur}
+															onChange={handleChange}
+															helperText="This email will be sent to attendees after they reserve a seat for the session."
+															required={requiredFields.confirmationEmailTemplate}
+															error={
+																touched.confirmationEmailTemplate &&
+																errors.confirmationEmailTemplate
+																	? errors.confirmationEmailTemplate
+																	: ''
+															}
+														/>
+													</Card>
+												)}
+
+												<Card className="mb-5 border-0 p-6">
+													<h5 className="mb-5">Follow-Up Email</h5>
+
+													<Form.Group className="mb-5">
+														<Form.Label className="mb-1" style={{ ...fonts.default }}>
+															Do you want to include a follow-up email?{' '}
+															<span className="text-danger">*</span>
+														</Form.Label>
+														<p className="mb-2 ms-0 me-auto text-muted fs-small">
+															This email will be sent to attendees at 11:30am the day
+															following the session.
+														</p>
+														<Form.Check
+															type="radio"
+															id="follow-up-email-no"
+															name="followUpEmail"
+															label="No"
+															checked={!values.followUpEmail}
+															onBlur={handleBlur}
+															onChange={() => {
+																setFieldValue('followUpEmail', false);
+															}}
+															disabled={!isFollowupEmailFlagEditable}
+														/>
+														<Form.Check
+															type="radio"
+															id="follow-up-email-yes"
+															name="followUpEmail"
+															label="Yes"
+															checked={values.followUpEmail}
+															onBlur={handleBlur}
+															onChange={() => {
+																setFieldValue('followUpEmail', true);
+															}}
+															disabled={!isFollowupEmailFlagEditable}
+														/>
+													</Form.Group>
 													<InputHelper
 														disabled={isViewMode}
-														label="Email Copy"
-														name="confirmationEmailTemplate"
-														value={values.confirmationEmailTemplate}
+														className="mb-5"
+														label="Email Text"
+														name="followUpEmailTemplate"
+														value={values.followUpEmailTemplate}
 														as="textarea"
 														onBlur={handleBlur}
 														onChange={handleChange}
-														helperText="This email will be sent to attendees after they reserve a seat for the session."
-														required={requiredFields.confirmationEmailTemplate}
+														required={requiredFields.followUpEmailTemplate}
 														error={
-															touched.confirmationEmailTemplate &&
-															errors.confirmationEmailTemplate
-																? errors.confirmationEmailTemplate
+															touched.followUpEmailTemplate &&
+															errors.followUpEmailTemplate
+																? errors.followUpEmailTemplate
 																: ''
 														}
 													/>
+													<InputHelper
+														label="Survey URL"
+														type="text"
+														name="followUpEmailSurveyUrl"
+														value={values.followUpEmailSurveyUrl}
+														as="input"
+														onBlur={handleBlur}
+														onChange={handleChange}
+														required={requiredFields.followUpEmailSurveyUrl}
+														error={
+															touched.followUpEmailSurveyUrl &&
+															errors.followUpEmailSurveyUrl
+																? errors.followUpEmailSurveyUrl
+																: ''
+														}
+														disabled={isViewMode}
+													/>
 												</Card>
-											)}
 
-											<Card className="mb-5 border-0 p-6">
-												<h5 className="mb-5">Follow-Up Email</h5>
-
-												<Form.Group className="mb-5">
-													<Form.Label className="mb-1" style={{ ...fonts.default }}>
-														Do you want to include a follow-up email?{' '}
-														<span className="text-danger">*</span>
-													</Form.Label>
-													<p className="mb-2 ms-0 me-auto text-muted fs-small">
-														This email will be sent to attendees at 11:30am the day
-														following the session.
-													</p>
-													<Form.Check
-														type="radio"
-														id="follow-up-email-no"
-														name="followUpEmail"
-														label="No"
-														checked={!values.followUpEmail}
-														onBlur={handleBlur}
-														onChange={() => {
-															setFieldValue('followUpEmail', false);
-														}}
-														disabled={!isFollowupEmailFlagEditable}
-													/>
-													<Form.Check
-														type="radio"
-														id="follow-up-email-yes"
-														name="followUpEmail"
-														label="Yes"
-														checked={values.followUpEmail}
-														onBlur={handleBlur}
-														onChange={() => {
-															setFieldValue('followUpEmail', true);
-														}}
-														disabled={!isFollowupEmailFlagEditable}
-													/>
-												</Form.Group>
-												<InputHelper
+												<SessionFormSubmitBanner
 													disabled={isViewMode}
-													className="mb-5"
-													label="Email Text"
-													name="followUpEmailTemplate"
-													value={values.followUpEmailTemplate}
-													as="textarea"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.followUpEmailTemplate}
-													error={
-														touched.followUpEmailTemplate && errors.followUpEmailTemplate
-															? errors.followUpEmailTemplate
-															: ''
-													}
-												/>
-												<InputHelper
-													label="Survey URL"
-													type="text"
-													name="followUpEmailSurveyUrl"
-													value={values.followUpEmailSurveyUrl}
-													as="input"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													required={requiredFields.followUpEmailSurveyUrl}
-													error={
-														touched.followUpEmailSurveyUrl && errors.followUpEmailSurveyUrl
-															? errors.followUpEmailSurveyUrl
-															: ''
-													}
-													disabled={isViewMode}
-												/>
-											</Card>
-
-											<SessionFormSubmitBanner
-												disabled={isViewMode}
-												title={isEdit ? 'Update group session' : 'Add group session'}
-											></SessionFormSubmitBanner>
-										</Form>
-									</>
-								);
-							}}
-						</Formik>
-					</Col>
-					{isEdit && (
-						<Col lg={4}>
-							{session && (
-								<SessionAttendeeList
-									attendees={reservations}
-									capacity={(session?.seatsReserved || 0) + (session?.seatsAvailable || 0)}
-								/>
-							)}
+													title={isEdit ? 'Update group session' : 'Add group session'}
+												></SessionFormSubmitBanner>
+											</Form>
+										</>
+									);
+								}}
+							</Formik>
 						</Col>
-					)}
-				</Row>
-			</Container>
-		</AsyncPage>
+						{isEdit && (
+							<Col lg={4}>
+								{session && (
+									<SessionAttendeeList
+										attendees={reservations}
+										capacity={(session?.seatsReserved || 0) + (session?.seatsAvailable || 0)}
+									/>
+								)}
+							</Col>
+						)}
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

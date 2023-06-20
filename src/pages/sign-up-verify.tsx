@@ -4,6 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import { Helmet } from 'react-helmet';
 
 const SignUpVerify: FC = () => {
 	const handleError = useHandleError();
@@ -32,21 +33,28 @@ const SignUpVerify: FC = () => {
 	}
 
 	return (
-		<Container className="pt-4 pb-4">
-			<Row>
-				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-					<p className="mb-6 text-center">
-						We sent a link to {locationState?.emailAddress}. Please follow this link to verify your account.
-					</p>
-					<p className="mb-0 text-center fw-bold">didn’t get an email?</p>
-					<div className="text-center">
-						<Button variant="link" onClick={handleResendButtonClick}>
-							Resend
-						</Button>
-					</div>
-				</Col>
-			</Row>
-		</Container>
+		<>
+			<Helmet>
+				<title>Cobalt | Verify Account</title>
+			</Helmet>
+
+			<Container className="pt-4 pb-4">
+				<Row>
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						<p className="mb-6 text-center">
+							We sent a link to {locationState?.emailAddress}. Please follow this link to verify your
+							account.
+						</p>
+						<p className="mb-0 text-center fw-bold">didn’t get an email?</p>
+						<div className="text-center">
+							<Button variant="link" onClick={handleResendButtonClick}>
+								Resend
+							</Button>
+						</div>
+					</Col>
+				</Row>
+			</Container>
+		</>
 	);
 };
 

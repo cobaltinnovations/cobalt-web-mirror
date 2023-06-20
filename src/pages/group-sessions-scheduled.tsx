@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
 import { Table, TableHead, TableCell, TableBody, TableRow, TablePagination } from '@/components/table';
@@ -137,6 +138,10 @@ const GroupSessions: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Group Sessions - Scheduled</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Group Sessions - Scheduled</h2>
 			</HeroContainer>

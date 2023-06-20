@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 
@@ -8,6 +9,10 @@ import { WELL_BEING_RESOURCES } from '@/well-being-resources';
 const WellBeingResources: FC = () => {
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Well-Being Resources</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">Well-Being Resources</h2>
 			</HeroContainer>

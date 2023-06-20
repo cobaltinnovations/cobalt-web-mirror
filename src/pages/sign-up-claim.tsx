@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import AsyncPage from '@/components/async-page';
 import { accountService } from '@/lib/services';
@@ -19,39 +20,45 @@ const SignUpClaim: FC = () => {
 	}, [accountInviteId]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<Container className="pt-4 pb-4">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{inviteExpired ? (
-							<p className="mb-6 text-center">Account verification email has expired.</p>
-						) : (
-							<p className="mb-6 text-center">Account successfully verified.</p>
-						)}
+		<>
+			<Helmet>
+				<title>Cobalt | Claim Account</title>
+			</Helmet>
 
-						{inviteExpired ? (
-							<p className="mb-0 text-center fw-bold">
-								You will need to create an account again in order to continue.
-							</p>
-						) : (
-							<p className="mb-0 text-center fw-bold">
-								You're all set! please let us know if you need anything.
-							</p>
-						)}
+			<AsyncPage fetchData={fetchData}>
+				<Container className="pt-4 pb-4">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							{inviteExpired ? (
+								<p className="mb-6 text-center">Account verification email has expired.</p>
+							) : (
+								<p className="mb-6 text-center">Account successfully verified.</p>
+							)}
 
-						{inviteExpired ? (
-							<div className="text-center">
-								<Link to="/sign-up">Create account</Link>
-							</div>
-						) : (
-							<div className="text-center">
-								<Link to="/sign-in-email">Sign in</Link>
-							</div>
-						)}
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+							{inviteExpired ? (
+								<p className="mb-0 text-center fw-bold">
+									You will need to create an account again in order to continue.
+								</p>
+							) : (
+								<p className="mb-0 text-center fw-bold">
+									You're all set! please let us know if you need anything.
+								</p>
+							)}
+
+							{inviteExpired ? (
+								<div className="text-center">
+									<Link to="/sign-up">Create account</Link>
+								</div>
+							) : (
+								<div className="text-center">
+									<Link to="/sign-in-email">Sign in</Link>
+								</div>
+							)}
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 
