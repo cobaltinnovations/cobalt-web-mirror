@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { PatientOrderModel, PatientOrderResourceCheckInResponseStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -49,68 +50,74 @@ const PatientCheckIn = () => {
 	);
 
 	return (
-		<AsyncWrapper fetchData={fetchData}>
-			<Container className="py-20">
-				<Row className="mb-6">
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<p className="mb-6 fs-large">Hello {patientOrder?.patientFirstName ?? 'patient'},</p>
-						<p className="mb-2 fs-large">
-							We recently helped you find a mental health care provider in the community. We are checking
-							in to see if you were able to schedule or attend an appointment.
-						</p>
-						<h2 className="mb-2">
-							Were you able to schedule an appointment with a mental health provider?
-						</h2>
-						<p className="mb-8 fs-large">(Choose the best answer)</p>
+		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Check In</title>
+			</Helmet>
 
-						<Form className="mb-8" onSubmit={handleFormSubmit}>
-							<Button
-								className="mb-2 d-block w-100 text-left border"
-								variant="light"
-								size="lg"
-								name="check-in"
-								id="check-in--scheduled"
-								value={PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED}
-								type="submit"
-								disabled={isSaving}
-							>
-								Yes. I have already scheduled or attended an appointment.
-							</Button>
-							<Button
-								className="mb-2 d-block w-100 text-left border"
-								variant="light"
-								size="lg"
-								name="check-in"
-								id="check-in--none"
-								value={PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP}
-								type="submit"
-								disabled={isSaving}
-							>
-								No. The referral didn't work out, and I would like to talk to someone for additional
-								options.
-							</Button>
-							<Button
-								className="mb-2 d-block w-100 text-left border"
-								variant="light"
-								size="lg"
-								name="check-in"
-								id="check-in--no-longer-need-care"
-								value={PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE}
-								type="submit"
-								disabled={isSaving}
-							>
-								I am no longer in need of mental health care.
-							</Button>
-						</Form>
+			<AsyncWrapper fetchData={fetchData}>
+				<Container className="py-20">
+					<Row className="mb-6">
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<p className="mb-6 fs-large">Hello {patientOrder?.patientFirstName ?? 'patient'},</p>
+							<p className="mb-2 fs-large">
+								We recently helped you find a mental health care provider in the community. We are
+								checking in to see if you were able to schedule or attend an appointment.
+							</p>
+							<h2 className="mb-2">
+								Were you able to schedule an appointment with a mental health provider?
+							</h2>
+							<p className="mb-8 fs-large">(Choose the best answer)</p>
 
-						<MhicInlineAlert
-							title="Your responses are not reviewed in real time"
-							description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
-						/>
-					</Col>
-				</Row>
-			</Container>
-		</AsyncWrapper>
+							<Form className="mb-8" onSubmit={handleFormSubmit}>
+								<Button
+									className="mb-2 d-block w-100 text-left border"
+									variant="light"
+									size="lg"
+									name="check-in"
+									id="check-in--scheduled"
+									value={PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED}
+									type="submit"
+									disabled={isSaving}
+								>
+									Yes. I have already scheduled or attended an appointment.
+								</Button>
+								<Button
+									className="mb-2 d-block w-100 text-left border"
+									variant="light"
+									size="lg"
+									name="check-in"
+									id="check-in--none"
+									value={PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP}
+									type="submit"
+									disabled={isSaving}
+								>
+									No. The referral didn't work out, and I would like to talk to someone for additional
+									options.
+								</Button>
+								<Button
+									className="mb-2 d-block w-100 text-left border"
+									variant="light"
+									size="lg"
+									name="check-in"
+									id="check-in--no-longer-need-care"
+									value={PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE}
+									type="submit"
+									disabled={isSaving}
+								>
+									I am no longer in need of mental health care.
+								</Button>
+							</Form>
+
+							<MhicInlineAlert
+								title="Your responses are not reviewed in real time"
+								description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+							/>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncWrapper>
+		</>
 	);
 };
 

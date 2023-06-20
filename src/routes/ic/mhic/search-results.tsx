@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
@@ -81,6 +82,10 @@ export const Component = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Search Results</title>
+			</Helmet>
+
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>

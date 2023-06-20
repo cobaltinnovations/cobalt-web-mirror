@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -186,6 +187,10 @@ export const Component = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Patient Orders</title>
+			</Helmet>
+
 			<MhicGenerateOrdersModal
 				show={showGenerateOrdersModal}
 				onHide={() => {

@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import React, { useCallback, useState } from 'react';
 import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { PatientOrderViewTypeId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
@@ -263,6 +264,10 @@ export const Component = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - My Patients</title>
+			</Helmet>
+
 			<MhicCustomizeTableModal
 				show={showCustomizeTableModal}
 				onHide={() => {

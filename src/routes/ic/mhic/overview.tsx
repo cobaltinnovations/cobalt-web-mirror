@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { defer, useRouteLoaderData } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { MhicPanelTodayResponse, PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
@@ -140,6 +141,10 @@ export const Component = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Overview</title>
+			</Helmet>
+
 			<Container fluid className="py-8 overflow-visible">
 				<Row className="mb-6">
 					<Col>
