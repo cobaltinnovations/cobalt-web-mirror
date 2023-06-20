@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
-import { PatientOrderCareTypeId, PatientOrderFilterFlagTypeId } from '@/lib/models';
+import { PatientOrderFilterFlagTypeId, PatientOrderSafetyPlanningStatusId } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
 import { cloneDeep } from 'lodash';
 
@@ -12,7 +12,7 @@ const options = [
 		optionId: 'SAFETY_PLANNING',
 		title: 'Safety Planning',
 		queryParameters: {
-			patientOrderCareTypeId: PatientOrderCareTypeId.SAFETY_PLANNING,
+			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
 		},
 	},
 	{
