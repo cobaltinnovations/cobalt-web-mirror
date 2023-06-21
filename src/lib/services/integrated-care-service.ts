@@ -415,6 +415,12 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	deleteScheduledAssessment(patientOrderScheduledScreeningId: string) {
+		return httpSingleton.orchestrateRequest({
+			method: 'DELETE',
+			url: `/patient-order-scheduled-screenings/${patientOrderScheduledScreeningId}`,
+		});
+	},
 	getOverview(data?: { panelAccountId?: string }) {
 		return httpSingleton.orchestrateRequest<MhicPanelTodayResponse>({
 			method: 'GET',

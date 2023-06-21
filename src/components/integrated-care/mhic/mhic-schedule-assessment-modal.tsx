@@ -42,6 +42,27 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 		});
 	}, [patientOrder.patientOrderScheduledScreeningScheduledDateTime]);
 
+	const handleDeleteButtonClick = useCallback(async () => {
+		try {
+			if (!patientOrder.patientOrderScheduledScreeningId) {
+				throw new Error('patientOrderScheduledScreeningId is undefined.');
+			}
+
+			setIsSaving(true);
+
+			await integratedCareService
+				.deleteScheduledAssessment(patientOrder.patientOrderScheduledScreeningId)
+				.fetch();
+			const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
+
+			onSave(response.patientOrder);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	}, [handleError, onSave, patientOrder.patientOrderId, patientOrder.patientOrderScheduledScreeningId]);
+
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
@@ -137,13 +158,22 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 						disabled={isSaving}
 					/>
 				</Modal.Body>
-				<Modal.Footer className="text-right">
-					<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
-						Cancel
-					</Button>
-					<Button variant="primary" type="submit" disabled={isSaving}>
-						Save
-					</Button>
+				<Modal.Footer className="d-flex align-items-center justify-content-between">
+					<div>
+						{patientOrder.patientOrderScheduledScreeningId && (
+							<Button variant="danger" disabled={isSaving} onClick={handleDeleteButtonClick}>
+								Delete
+							</Button>
+						)}
+					</div>
+					<div>
+						<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
+							Cancel
+						</Button>
+						<Button variant="primary" type="submit" disabled={isSaving}>
+							Save
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>
