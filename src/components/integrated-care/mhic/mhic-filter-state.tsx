@@ -25,13 +25,6 @@ const options = [
 			patientOrderDispositionId: PatientOrderDispositionId.CLOSED,
 		},
 	},
-	{
-		optionId: PatientOrderDispositionId.ARCHIVED,
-		title: 'Archived',
-		queryParameters: {
-			patientOrderDispositionId: PatientOrderDispositionId.ARCHIVED,
-		},
-	},
 ];
 
 const availableQueryParams = uniq(options.map((option) => Object.keys(option.queryParameters)).flat());
