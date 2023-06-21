@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import {
 	CallToActionModel,
@@ -283,6 +284,10 @@ const ResourceLibrary = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Resource Library</title>
+			</Helmet>
+
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-4 text-center">Resource Library</h1>
 				<p className="mb-6 text-center fs-large">

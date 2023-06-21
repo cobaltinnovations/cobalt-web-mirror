@@ -1,5 +1,6 @@
 import React, { FC, ReactNode, useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import ConfirmDialog from '@/components/confirm-dialog';
 import useAccount from '@/hooks/use-account';
@@ -17,6 +18,10 @@ const UserSettings: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | User Settings</title>
+			</Helmet>
+
 			<ConsentModal
 				readOnly
 				show={isViewingAgreement}

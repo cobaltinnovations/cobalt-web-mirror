@@ -4,6 +4,7 @@ import React, { FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Formik } from 'formik';
+import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import InputHelper from '@/components/input-helper';
@@ -50,6 +51,10 @@ const PasswordReset: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Password Reset</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">We'll get you back in.</h2>
 			</HeroContainer>

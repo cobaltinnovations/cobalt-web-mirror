@@ -5,6 +5,7 @@ import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
 import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 const Consent = () => {
@@ -29,6 +30,10 @@ const Consent = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Consent</title>
+			</Helmet>
+
 			<ConsentContent />
 
 			<Container className="my-6">

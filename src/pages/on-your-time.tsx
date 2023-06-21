@@ -1,6 +1,7 @@
 import React, { FC, useState, useCallback, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { contentService, assessmentService, ContentListFormat, callToActionService } from '@/lib/services';
 import {
@@ -125,6 +126,10 @@ const OnYourTime: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | On Your Time</title>
+			</Helmet>
+
 			{institution?.userSubmittedContentEnabled && (
 				<ActionSheet
 					show={false}

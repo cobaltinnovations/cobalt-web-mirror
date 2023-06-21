@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import {
@@ -140,6 +141,10 @@ const ResourceLibraryTags = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Resource Library</title>
+			</Helmet>
+
 			<AsyncPage
 				fetchData={fetchTag}
 				loadingComponent={

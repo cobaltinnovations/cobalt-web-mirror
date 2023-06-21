@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
@@ -15,6 +16,10 @@ const ConnectWithSupportMedicationPrescriber = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Connect with Support - Medication Prescriber</title>
+			</Helmet>
+
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>

@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 
@@ -143,6 +144,10 @@ const Index: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Employee Mental Health &amp; Wellness @ {institution.name}</title>
+			</Helmet>
+
 			{institution?.featuresEnabled ? (
 				<>
 					{renderedCollectPhoneModal}

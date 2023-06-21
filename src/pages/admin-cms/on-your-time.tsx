@@ -3,6 +3,7 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import { Helmet } from 'react-helmet';
 
 import { AdminContentRow, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
 import { adminService, ContentFiltersResponse } from '@/lib/services';
@@ -245,6 +246,10 @@ const CmsOnYourTime: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | My Content</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">On Your Time - My Content</h2>
 			</HeroContainer>

@@ -15,6 +15,7 @@ import { Col, Container, Row, Button } from 'react-bootstrap';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 
@@ -349,6 +350,10 @@ const ConnectWithSupport: FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Connect with Support</title>
+			</Helmet>
+
 			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />
 
 			{/* <CovidCopayModal

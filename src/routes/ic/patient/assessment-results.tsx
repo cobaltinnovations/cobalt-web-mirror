@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import {
 	PatientOrderClosureReasonId,
@@ -66,161 +67,168 @@ export const PatientAssessmentResults = () => {
 	);
 
 	return (
-		<AsyncWrapper fetchData={fetchData}>
-			<PatientInsuranceStatementModal
-				show={showInsuranceStatementModal}
-				onHide={() => {
-					setShowInsuranceStatementModal(false);
-				}}
-				onContinue={() => {
-					navigate(`/ic/patient/connect-with-support/mhp?patientOrderId=${patientOrder?.patientOrderId}`);
-				}}
-			/>
+		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Assessment Results</title>
+			</Helmet>
 
-			<Container className="py-10">
-				<Row className="mb-6">
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h1 className="mb-1">Assessment Results</h1>
-						<p className="mb-6 fs-large text-gray">
-							Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'}
-						</p>
-						<hr className="mb-8" />
+			<AsyncWrapper fetchData={fetchData}>
+				<PatientInsuranceStatementModal
+					show={showInsuranceStatementModal}
+					onHide={() => {
+						setShowInsuranceStatementModal(false);
+					}}
+					onContinue={() => {
+						navigate(`/ic/patient/connect-with-support/mhp?patientOrderId=${patientOrder?.patientOrderId}`);
+					}}
+				/>
 
-						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
-							<>
-								<p className="mb-6 fs-large">
-									Based on the symptoms reported and your provider's request, we recommend that you
-									meet with a <strong>Mental Health Provider</strong> in your primary care practice.
-								</p>
-								<p className="mb-6 fs-large">
-									The Mental Health Provider will discuss treatment options that will work in
-									collaboration with your primary care provider.
-								</p>
-								<p className="mb-6 fs-large">
-									You can <strong>schedule a telehealth appointment</strong> with a Mental Health
-									Provider by browsing the list of providers and choosing an available appointment
-									time. If you need an in-person appointment, please call us at{' '}
-									<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
-										{institution?.integratedCarePhoneNumberDescription}
-									</a>{' '}
-									{institution.integratedCareAvailabilityDescription}.
-								</p>
-								<div className="mb-4 text-center">
-									<Button
-										size="lg"
-										onClick={() => {
-											setShowInsuranceStatementModal(true);
-										}}
-									>
-										Find Appointment
-									</Button>
-								</div>
-								<div className="text-center">
-									<Button
-										variant="outline-primary"
-										size="lg"
-										onClick={() => {
-											navigate('/ic/patient');
-										}}
-									>
-										Return to Home
-									</Button>
-								</div>
-							</>
-						)}
+				<Container className="py-10">
+					<Row className="mb-6">
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<h1 className="mb-1">Assessment Results</h1>
+							<p className="mb-6 fs-large text-gray">
+								Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'}
+							</p>
+							<hr className="mb-8" />
 
-						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
-							<>
-								<p className="mb-6 fs-large">
-									Based on the symptoms reported and your provider's request, we would like to set you
-									up with a <strong>Mental Health Specialist</strong> in your area.
-								</p>
-								<p className="mb-6 fs-large">
-									Please call us at{' '}
-									<strong>
+							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+								<>
+									<p className="mb-6 fs-large">
+										Based on the symptoms reported and your provider's request, we recommend that
+										you meet with a <strong>Mental Health Provider</strong> in your primary care
+										practice.
+									</p>
+									<p className="mb-6 fs-large">
+										The Mental Health Provider will discuss treatment options that will work in
+										collaboration with your primary care provider.
+									</p>
+									<p className="mb-6 fs-large">
+										You can <strong>schedule a telehealth appointment</strong> with a Mental Health
+										Provider by browsing the list of providers and choosing an available appointment
+										time. If you need an in-person appointment, please call us at{' '}
 										<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 											{institution?.integratedCarePhoneNumberDescription}
-										</a>
-									</strong>{' '}
-									{institution.integratedCareAvailabilityDescription} to speak to a Mental Health
-									Intake Coordinator about your options.
-								</p>
-								<div className="text-center">
-									<Button
-										size="lg"
-										onClick={() => {
-											navigate('/ic/patient');
-										}}
-									>
-										Return to Home
-									</Button>
-								</div>
-							</>
-						)}
+										</a>{' '}
+										{institution.integratedCareAvailabilityDescription}.
+									</p>
+									<div className="mb-4 text-center">
+										<Button
+											size="lg"
+											onClick={() => {
+												setShowInsuranceStatementModal(true);
+											}}
+										>
+											Find Appointment
+										</Button>
+									</div>
+									<div className="text-center">
+										<Button
+											variant="outline-primary"
+											size="lg"
+											onClick={() => {
+												navigate('/ic/patient');
+											}}
+										>
+											Return to Home
+										</Button>
+									</div>
+								</>
+							)}
 
-						{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
-							<>
-								<p className="mb-8 fs-large">
-									You reported a low severity of symptoms which may or may not require treatment. If
-									you are interested in an appointment with a therapist, we can help set that up for
-									you.
-								</p>
-								<h3 className="mb-6">Are you interested in mental health care?</h3>
-								<Form className="mb-8" onSubmit={handleSubclinicalFormSubmit}>
-									<Button
-										className="mb-2 d-block w-100 text-left border"
-										variant="light"
-										size="lg"
-										name="subclincal"
-										id="subclincal-yes"
-										value="YES"
-										type="submit"
-										disabled={isSaving}
-									>
-										Yes
-									</Button>
-									<Button
-										className="d-block w-100 text-left border"
-										variant="light"
-										size="lg"
-										name="subclincal"
-										id="subclincal-no"
-										value="NO"
-										type="submit"
-										disabled={isSaving}
-									>
-										No
-									</Button>
-								</Form>
-							</>
-						)}
+							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
+								<>
+									<p className="mb-6 fs-large">
+										Based on the symptoms reported and your provider's request, we would like to set
+										you up with a <strong>Mental Health Specialist</strong> in your area.
+									</p>
+									<p className="mb-6 fs-large">
+										Please call us at{' '}
+										<strong>
+											<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+												{institution?.integratedCarePhoneNumberDescription}
+											</a>
+										</strong>{' '}
+										{institution.integratedCareAvailabilityDescription} to speak to a Mental Health
+										Intake Coordinator about your options.
+									</p>
+									<div className="text-center">
+										<Button
+											size="lg"
+											onClick={() => {
+												navigate('/ic/patient');
+											}}
+										>
+											Return to Home
+										</Button>
+									</div>
+								</>
+							)}
 
-						{patientOrder?.patientOrderSafetyPlanningStatusId ===
-							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
+								<>
+									<p className="mb-8 fs-large">
+										You reported a low severity of symptoms which may or may not require treatment.
+										If you are interested in an appointment with a therapist, we can help set that
+										up for you.
+									</p>
+									<h3 className="mb-6">Are you interested in mental health care?</h3>
+									<Form className="mb-8" onSubmit={handleSubclinicalFormSubmit}>
+										<Button
+											className="mb-2 d-block w-100 text-left border"
+											variant="light"
+											size="lg"
+											name="subclincal"
+											id="subclincal-yes"
+											value="YES"
+											type="submit"
+											disabled={isSaving}
+										>
+											Yes
+										</Button>
+										<Button
+											className="d-block w-100 text-left border"
+											variant="light"
+											size="lg"
+											name="subclincal"
+											id="subclincal-no"
+											value="NO"
+											type="submit"
+											disabled={isSaving}
+										>
+											No
+										</Button>
+									</Form>
+								</>
+							)}
+
+							{patientOrder?.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+								<MhicInlineAlert
+									className="mt-8"
+									variant="warning"
+									title="A clinician will reach out"
+									description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
+								/>
+							)}
 							<MhicInlineAlert
-								className="mt-8"
-								variant="warning"
-								title="A clinician will reach out"
-								description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
+								className={classNames({
+									'mt-6':
+										patientOrder?.patientOrderSafetyPlanningStatusId ===
+										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+									'mt-8':
+										patientOrder?.patientOrderSafetyPlanningStatusId !==
+										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+								})}
+								variant="primary"
+								title="Your responses are not reviewed in real time"
+								description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
 							/>
-						)}
-						<MhicInlineAlert
-							className={classNames({
-								'mt-6':
-									patientOrder?.patientOrderSafetyPlanningStatusId ===
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-								'mt-8':
-									patientOrder?.patientOrderSafetyPlanningStatusId !==
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-							})}
-							variant="primary"
-							title="Your responses are not reviewed in real time"
-							description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
-						/>
-					</Col>
-				</Row>
-			</Container>
-		</AsyncWrapper>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncWrapper>
+		</>
 	);
 };
 

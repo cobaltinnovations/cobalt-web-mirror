@@ -4,6 +4,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import { useLocation, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import { InstitutionLocation } from '@/lib/models';
 import {
@@ -214,6 +215,10 @@ const ConnectWithSupportV2 = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Connect with Support - {featureDetails?.name}</title>
+			</Helmet>
+
 			<Modal centered show={showEmployerModal}>
 				<Modal.Header>
 					<Modal.Title>Select Employer</Modal.Title>

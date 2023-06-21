@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import AsyncPage from '@/components/async-page';
 
@@ -22,25 +23,31 @@ const AppointmentDetails: FC = () => {
 	}, [appointmentId, navigate]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">Appointment</h2>
-			</HeroContainer>
-			{details?.videoconferencePlatformId === VideoconferencePlatformId.TELEPHONE ? (
-				<Container className="pt-5">
-					<Row>
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<p className="text-center fs-large mt-5">
-								Your telephone consultation is scheduled for {details.timeDescription}. Your intake
-								counselor will call you at that time.
-							</p>
-						</Col>
-					</Row>
-				</Container>
-			) : (
-				<></>
-			)}
-		</AsyncPage>
+		<>
+			<Helmet>
+				<title>Cobalt | Appointment</title>
+			</Helmet>
+
+			<AsyncPage fetchData={fetchData}>
+				<HeroContainer>
+					<h2 className="mb-0 text-center">Appointment</h2>
+				</HeroContainer>
+				{details?.videoconferencePlatformId === VideoconferencePlatformId.TELEPHONE ? (
+					<Container className="pt-5">
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<p className="text-center fs-large mt-5">
+									Your telephone consultation is scheduled for {details.timeDescription}. Your intake
+									counselor will call you at that time.
+								</p>
+							</Col>
+						</Row>
+					</Container>
+				) : (
+					<></>
+				)}
+			</AsyncPage>
+		</>
 	);
 };
 

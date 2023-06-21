@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { accountService, appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -200,98 +201,104 @@ const ConfirmAppointment = () => {
 	};
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<Container className="py-6">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{!confirmationCodeRequested && (
-							<>
-								<h2 className="mb-4">
-									{promptForPhoneNumber
-										? 'Provide an email address and phone number to finish booking your appointment'
-										: 'Provide an email address to finish booking your appointment'}
-								</h2>
+		<>
+			<Helmet>
+				<title>Cobalt | Confirm Appointment</title>
+			</Helmet>
 
-								<p className="mb-6">
-									We need your contact information to send appointment details and will also share
-									your name and email address with your appointment provider. Please make sure that
-									your email address is entered correctly.
-								</p>
+			<AsyncPage fetchData={fetchData}>
+				<Container className="py-6">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							{!confirmationCodeRequested && (
+								<>
+									<h2 className="mb-4">
+										{promptForPhoneNumber
+											? 'Provide an email address and phone number to finish booking your appointment'
+											: 'Provide an email address to finish booking your appointment'}
+									</h2>
 
-								<Form onSubmit={handleContactInformationFormSubmit}>
-									<InputHelper
-										required
-										className={promptForPhoneNumber ? 'mb-2' : 'mb-6'}
-										type="email"
-										value={emailInputValue}
-										label="Email Address"
-										autoFocus
-										onChange={({ currentTarget }) => {
-											setEmailInputValue(currentTarget.value);
-										}}
-										disabled={submitting}
-									/>
-									{promptForPhoneNumber && (
+									<p className="mb-6">
+										We need your contact information to send appointment details and will also share
+										your name and email address with your appointment provider. Please make sure
+										that your email address is entered correctly.
+									</p>
+
+									<Form onSubmit={handleContactInformationFormSubmit}>
 										<InputHelper
 											required
-											className="mb-6"
-											type="tel"
-											value={phoneNumberInputValue}
-											label="Your Phone Number"
+											className={promptForPhoneNumber ? 'mb-2' : 'mb-6'}
+											type="email"
+											value={emailInputValue}
+											label="Email Address"
+											autoFocus
 											onChange={({ currentTarget }) => {
-												setPhoneNumberInputValue(currentTarget.value);
+												setEmailInputValue(currentTarget.value);
 											}}
 											disabled={submitting}
 										/>
-									)}
-									<div className="text-right">
-										<Button type="submit" size="lg" disabled={submitting}>
-											Continue
-										</Button>
-									</div>
-								</Form>
-							</>
-						)}
-						{confirmationCodeRequested && (
-							<>
-								<h2 className="mb-4">We need to verify your email address.</h2>
-								<p className="mb-6">
-									Enter the confirmation code that was sent to {emailInputValue} to finish booking
-									your appointment.
-								</p>
-								<Form onSubmit={handleConfirmationCodeFormSubmit}>
-									<InputHelper
-										required
-										className="mb-6"
-										type="text"
-										value={confirmationCodeInputValue}
-										label="Confirmation Code"
-										onChange={({ currentTarget }) => {
-											setConfirmationCodeInputValue(currentTarget.value);
-										}}
-										disabled={submitting}
-									/>
-									<div className="text-right">
-										<Button
-											className="me-4"
-											variant="light"
-											size="lg"
-											onClick={handleResendCodeButtonClick}
+										{promptForPhoneNumber && (
+											<InputHelper
+												required
+												className="mb-6"
+												type="tel"
+												value={phoneNumberInputValue}
+												label="Your Phone Number"
+												onChange={({ currentTarget }) => {
+													setPhoneNumberInputValue(currentTarget.value);
+												}}
+												disabled={submitting}
+											/>
+										)}
+										<div className="text-right">
+											<Button type="submit" size="lg" disabled={submitting}>
+												Continue
+											</Button>
+										</div>
+									</Form>
+								</>
+							)}
+							{confirmationCodeRequested && (
+								<>
+									<h2 className="mb-4">We need to verify your email address.</h2>
+									<p className="mb-6">
+										Enter the confirmation code that was sent to {emailInputValue} to finish booking
+										your appointment.
+									</p>
+									<Form onSubmit={handleConfirmationCodeFormSubmit}>
+										<InputHelper
+											required
+											className="mb-6"
+											type="text"
+											value={confirmationCodeInputValue}
+											label="Confirmation Code"
+											onChange={({ currentTarget }) => {
+												setConfirmationCodeInputValue(currentTarget.value);
+											}}
 											disabled={submitting}
-										>
-											Resend Code
-										</Button>
-										<Button type="submit" size="lg" disabled={submitting}>
-											Continue
-										</Button>
-									</div>
-								</Form>
-							</>
-						)}
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+										/>
+										<div className="text-right">
+											<Button
+												className="me-4"
+												variant="light"
+												size="lg"
+												onClick={handleResendCodeButtonClick}
+												disabled={submitting}
+											>
+												Resend Code
+											</Button>
+											<Button type="submit" size="lg" disabled={submitting}>
+												Continue
+											</Button>
+										</div>
+									</Form>
+								</>
+							)}
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

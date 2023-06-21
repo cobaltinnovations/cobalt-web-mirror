@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { interactionService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
@@ -25,16 +26,22 @@ const Interaction: FC = () => {
 	}, [interactionInstanceId, interactionOptionId]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<Container className="py-5">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h1>Interaction</h1>
-						<p>{optionResponse}</p>
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+		<>
+			<Helmet>
+				<title>Cobalt | Interaction</title>
+			</Helmet>
+
+			<AsyncPage fetchData={fetchData}>
+				<Container className="py-5">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<h1>Interaction</h1>
+							<p>{optionResponse}</p>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

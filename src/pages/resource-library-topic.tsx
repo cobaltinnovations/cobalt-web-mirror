@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import Color from 'color';
+import { Helmet } from 'react-helmet';
 
 import {
 	ContentDurationFilterModel,
@@ -25,6 +26,7 @@ import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonText } from '@/components/skeleton-loaders';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+
 // import useAnalytics from '@/hooks/use-analytics';
 // import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
 
@@ -259,6 +261,10 @@ const ResourceLibraryTopic = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Resource Library</title>
+			</Helmet>
+
 			<AsyncPage
 				fetchData={fetchTagGroup}
 				loadingComponent={

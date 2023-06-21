@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { InteractionInstance, InteractionOption, InteractionOptionAction } from '@/lib/models';
 import { interactionService } from '@/lib/services';
@@ -54,67 +55,73 @@ const InteractionInstances: FC = () => {
 	};
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			<HeroContainer className="text-center">
-				<h3 className="mb-3">{interactionInstance?.caseNumber}</h3>
-				<small className="text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
-			</HeroContainer>
-			<Container className="py-5">
-				<Row className="pb-3">
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<h3 className="mb-4 text-center">Interaction Data</h3>
-						<div
-							className="wysiwyg-display"
-							dangerouslySetInnerHTML={{
-								__html: interactionInstance?.metadata.endUserHtmlRepresentation || '',
-							}}
-						/>
-					</Col>
-				</Row>
-				{interactionOptionActions.length > 0 && (
+		<>
+			<Helmet>
+				<title>Cobalt | Interaction</title>
+			</Helmet>
+
+			<AsyncPage fetchData={fetchData}>
+				<HeroContainer className="text-center">
+					<h3 className="mb-3">{interactionInstance?.caseNumber}</h3>
+					<small className="text-uppercase">{interactionInstance?.startDateTimeDescription}</small>
+				</HeroContainer>
+				<Container className="py-5">
 					<Row className="pb-3">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<h3 className="mb-4 text-center">Followups Already Recorded</h3>
-							<ul>
-								{interactionOptionActions.map((interactionOptionAction) => {
+							<h3 className="mb-4 text-center">Interaction Data</h3>
+							<div
+								className="wysiwyg-display"
+								dangerouslySetInnerHTML={{
+									__html: interactionInstance?.metadata.endUserHtmlRepresentation || '',
+								}}
+							/>
+						</Col>
+					</Row>
+					{interactionOptionActions.length > 0 && (
+						<Row className="pb-3">
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<h3 className="mb-4 text-center">Followups Already Recorded</h3>
+								<ul>
+									{interactionOptionActions.map((interactionOptionAction) => {
+										return (
+											<li key={interactionOptionAction.interactionOptionActionId}>
+												<div
+													className="wysiwyg-display"
+													dangerouslySetInnerHTML={{
+														__html: interactionOptionAction.descriptionAsHtml,
+													}}
+												/>
+											</li>
+										);
+									})}
+								</ul>
+							</Col>
+						</Row>
+					)}
+					{interactionOptions.length > 0 && (
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<h3 className="mb-4 text-center">Record Your Followup</h3>
+								{interactionOptions.map((interactionOption) => {
 									return (
-										<li key={interactionOptionAction.interactionOptionActionId}>
-											<div
-												className="wysiwyg-display"
-												dangerouslySetInnerHTML={{
-													__html: interactionOptionAction.descriptionAsHtml,
-												}}
-											/>
-										</li>
+										<Button
+											key={interactionOption.interactionOptionId}
+											className="d-block w-100 mb-1"
+											variant="light"
+											onClick={() => {
+												handleInteractionOptionButtonClick(interactionOption);
+											}}
+										>
+											{interactionOption.optionDescription}
+										</Button>
 									);
 								})}
-							</ul>
-						</Col>
-					</Row>
-				)}
-				{interactionOptions.length > 0 && (
-					<Row>
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<h3 className="mb-4 text-center">Record Your Followup</h3>
-							{interactionOptions.map((interactionOption) => {
-								return (
-									<Button
-										key={interactionOption.interactionOptionId}
-										className="d-block w-100 mb-1"
-										variant="light"
-										onClick={() => {
-											handleInteractionOptionButtonClick(interactionOption);
-										}}
-									>
-										{interactionOption.optionDescription}
-									</Button>
-								);
-							})}
-						</Col>
-					</Row>
-				)}
-			</Container>
-		</AsyncPage>
+							</Col>
+						</Row>
+					)}
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

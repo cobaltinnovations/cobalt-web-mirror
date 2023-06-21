@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningIntro } from '@/components/integrated-care/common';
@@ -16,14 +17,20 @@ const PatientDemographicsIntroduction = () => {
 	}, []);
 
 	return (
-		<AsyncWrapper fetchData={fetchData}>
-			<ScreeningIntro
-				patientOrder={patientOrder}
-				onBegin={() => {
-					navigate('/ic/patient/demographics-part-1');
-				}}
-			/>
-		</AsyncWrapper>
+		<>
+			<Helmet>
+				<title>Cobalt | Integrated Care - Introduction</title>
+			</Helmet>
+
+			<AsyncWrapper fetchData={fetchData}>
+				<ScreeningIntro
+					patientOrder={patientOrder}
+					onBegin={() => {
+						navigate('/ic/patient/demographics-part-1');
+					}}
+				/>
+			</AsyncWrapper>
+		</>
 	);
 };
 

@@ -13,6 +13,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseStyles } from 'react-jss';
+import { Helmet } from 'react-helmet';
 
 const useStyles = createUseStyles({
 	requestSessionCta: {
@@ -162,6 +163,10 @@ const GroupSessions = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Group Sessions</title>
+			</Helmet>
+
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<p className="mb-6 fs-large text-center">

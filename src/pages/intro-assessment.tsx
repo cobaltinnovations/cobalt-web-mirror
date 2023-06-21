@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
+import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 
@@ -155,44 +156,50 @@ const IntroAssessment: FC = () => {
 	}
 
 	return (
-		<AsyncPage fetchData={fetchData} abortFetch={questionRequest.abort}>
-			<HeroContainer>
-				<h2 className="mb-0 text-center">Assessment</h2>
-			</HeroContainer>
-			<Container className="pt-5 pb-5">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Form>
-							{assessment?.question && (
-								<SurveyQuestion
-									key={assessment.question.questionId}
-									question={assessment.question}
-									onChange={handleSurveyQuestionChange}
-								/>
-							)}
-							<div
-								className={classNames({
-									'd-flex': true,
-									'justify-content-end': !assessment?.previousQuestionId,
-									'justify-content-between': assessment?.previousQuestionId,
-								})}
-							>
-								{assessment?.previousQuestionId && (
-									<Button variant="outline-primary" onClick={handleBackButtonClick}>
-										back
-									</Button>
+		<>
+			<Helmet>
+				<title>Cobalt | Assessment</title>
+			</Helmet>
+
+			<AsyncPage fetchData={fetchData} abortFetch={questionRequest.abort}>
+				<HeroContainer>
+					<h2 className="mb-0 text-center">Assessment</h2>
+				</HeroContainer>
+				<Container className="pt-5 pb-5">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<Form>
+								{assessment?.question && (
+									<SurveyQuestion
+										key={assessment.question.questionId}
+										question={assessment.question}
+										onChange={handleSurveyQuestionChange}
+									/>
 								)}
-								{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
-									<Button variant="primary" onClick={handleNextButtonClick}>
-										{assessment?.nextQuestionId ? 'Next' : 'Done'}
-									</Button>
-								)}
-							</div>
-						</Form>
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+								<div
+									className={classNames({
+										'd-flex': true,
+										'justify-content-end': !assessment?.previousQuestionId,
+										'justify-content-between': assessment?.previousQuestionId,
+									})}
+								>
+									{assessment?.previousQuestionId && (
+										<Button variant="outline-primary" onClick={handleBackButtonClick}>
+											back
+										</Button>
+									)}
+									{assessment?.question.questionType !== QUESTION_TYPE.QUAD && (
+										<Button variant="primary" onClick={handleNextButtonClick}>
+											{assessment?.nextQuestionId ? 'Next' : 'Done'}
+										</Button>
+									)}
+								</div>
+							</Form>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import InCrisisTemplate from '@/components/in-crisis-template';
@@ -7,6 +8,10 @@ import InCrisisTemplate from '@/components/in-crisis-template';
 const InCrisis = () => {
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Crisis Support</title>
+			</Helmet>
+
 			<HeroContainer>
 				<h2 className="mb-0 text-center">In Crisis</h2>
 			</HeroContainer>

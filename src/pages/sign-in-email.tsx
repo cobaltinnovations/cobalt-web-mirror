@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
@@ -102,6 +103,10 @@ const SignInEmail = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Cobalt | Sign In</title>
+			</Helmet>
+
 			<Modal
 				show={forgotPasswordModalIsOpen}
 				onHide={() => {

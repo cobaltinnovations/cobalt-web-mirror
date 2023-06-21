@@ -19,6 +19,7 @@ import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
+import { Helmet } from 'react-helmet';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -405,212 +406,221 @@ const ScreeningQuestionsPage = () => {
 	}, [isSubmitting, confirmationPrompt, screeningQuestionContextResponse, selectedAnswers.length]);
 
 	return (
-		<AsyncPage fetchData={fetchData}>
-			{institution?.integratedCareEnabled && (
-				<IcScreeningCrisisModal
-					show={showCrisisModal}
-					onHide={() => {
-						setShowCrisisModal(false);
-						navigateNext?.();
-						setNavigateNext(undefined);
-					}}
-				/>
-			)}
+		<>
+			<Helmet>
+				<title>Cobalt | Screening</title>
+			</Helmet>
 
-			<Container className="py-5">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						{confirmationPrompt ? (
-							<>
-								{confirmationPrompt.screeningImageId && (
-									<ScreeningPromptImage
-										screeningImageId={confirmationPrompt.screeningImageId}
-										className="mt-6 mx-auto d-block"
-									/>
-								)}
+			<AsyncPage fetchData={fetchData}>
+				{institution?.integratedCareEnabled && (
+					<IcScreeningCrisisModal
+						show={showCrisisModal}
+						onHide={() => {
+							setShowCrisisModal(false);
+							navigateNext?.();
+							setNavigateNext(undefined);
+						}}
+					/>
+				)}
 
-								<div
-									className="my-6 wysiwyg-display"
-									dangerouslySetInnerHTML={{
-										__html: confirmationPrompt.text,
-									}}
-								/>
+				<Container className="py-5">
+					<Row>
+						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							{confirmationPrompt ? (
+								<>
+									{confirmationPrompt.screeningImageId && (
+										<ScreeningPromptImage
+											screeningImageId={confirmationPrompt.screeningImageId}
+											className="mt-6 mx-auto d-block"
+										/>
+									)}
 
-								<div className="d-flex">
-									<Button
-										disabled={isSubmitting}
-										className="me-2"
-										type="button"
-										onClick={() => {
-											if (isSubmitPrompt) {
-												clearPrompt();
-											} else if (
-												screeningQuestionContextResponse?.previousScreeningQuestionContextId
-											) {
-												navigateToQuestion(
-													screeningQuestionContextResponse.previousScreeningQuestionContextId
-												);
-											}
-										}}
-									>
-										Previous
-									</Button>
-
-									<Button
-										disabled={disableNextBtn}
-										className="ms-auto"
-										onClick={async () => {
-											if (isSubmitPrompt) {
-												submitAnswers({
-													answers: selectedAnswers,
-													answerText,
-													supplementText,
-													force: true,
-												});
-											} else {
-												clearPrompt();
-											}
-										}}
-									>
-										{confirmationPrompt.actionText}
-									</Button>
-								</div>
-							</>
-						) : (
-							<>
-								{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
 									<div
-										className="mb-3"
+										className="my-6 wysiwyg-display"
 										dangerouslySetInnerHTML={{
-											__html: screeningQuestionContextResponse.screeningQuestion.introText,
+											__html: confirmationPrompt.text,
 										}}
 									/>
-								)}
 
-								<h3 className="mb-5">
-									<div
-										className="wysiwyg-display"
-										dangerouslySetInnerHTML={{
-											__html: screeningQuestionContextResponse?.screeningQuestion.questionText!,
-										}}
-									/>
-								</h3>
+									<div className="d-flex">
+										<Button
+											disabled={isSubmitting}
+											className="me-2"
+											type="button"
+											onClick={() => {
+												if (isSubmitPrompt) {
+													clearPrompt();
+												} else if (
+													screeningQuestionContextResponse?.previousScreeningQuestionContextId
+												) {
+													navigateToQuestion(
+														screeningQuestionContextResponse.previousScreeningQuestionContextId
+													);
+												}
+											}}
+										>
+											Previous
+										</Button>
 
-								<Form
-									onSubmit={(e) => {
-										e.preventDefault();
-										submitAnswers({
-											answers: selectedAnswers,
-											answerText,
-											supplementText,
-										});
-									}}
-								>
-									{renderedAnswerOptions}
-
-									{screeningQuestionContextResponse?.screeningQuestion.footerText && (
+										<Button
+											disabled={disableNextBtn}
+											className="ms-auto"
+											onClick={async () => {
+												if (isSubmitPrompt) {
+													submitAnswers({
+														answers: selectedAnswers,
+														answerText,
+														supplementText,
+														force: true,
+													});
+												} else {
+													clearPrompt();
+												}
+											}}
+										>
+											{confirmationPrompt.actionText}
+										</Button>
+									</div>
+								</>
+							) : (
+								<>
+									{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
 										<div
-											className="mt-3 mb-5 wysiwyg-display"
+											className="mb-3"
 											dangerouslySetInnerHTML={{
-												__html: screeningQuestionContextResponse?.screeningQuestion.footerText,
+												__html: screeningQuestionContextResponse.screeningQuestion.introText,
 											}}
 										/>
 									)}
 
-									<div className="d-flex">
-										{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
-											<Button
-												disabled={isSubmitting}
-												type="button"
-												onClick={() => {
-													navigateToQuestion(
-														screeningQuestionContextResponse.previousScreeningQuestionContextId
-													);
+									<h3 className="mb-5">
+										<div
+											className="wysiwyg-display"
+											dangerouslySetInnerHTML={{
+												__html: screeningQuestionContextResponse?.screeningQuestion
+													.questionText!,
+											}}
+										/>
+									</h3>
+
+									<Form
+										onSubmit={(e) => {
+											e.preventDefault();
+											submitAnswers({
+												answers: selectedAnswers,
+												answerText,
+												supplementText,
+											});
+										}}
+									>
+										{renderedAnswerOptions}
+
+										{screeningQuestionContextResponse?.screeningQuestion.footerText && (
+											<div
+												className="mt-3 mb-5 wysiwyg-display"
+												dangerouslySetInnerHTML={{
+													__html: screeningQuestionContextResponse?.screeningQuestion
+														.footerText,
 												}}
-											>
-												Previous
-											</Button>
+											/>
 										)}
 
-										<div className="ms-auto">
-											{showSkipBtn && (
+										<div className="d-flex">
+											{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
 												<Button
-													variant="outline-primary"
 													disabled={isSubmitting}
-													className={classNames({
-														'me-2': !hideNextBtn,
-													})}
 													type="button"
 													onClick={() => {
-														submitAnswers({
-															answers: [],
-															answerText: {},
-															supplementText: {},
-														});
+														navigateToQuestion(
+															screeningQuestionContextResponse.previousScreeningQuestionContextId
+														);
 													}}
 												>
-													Skip Question
+													Previous
 												</Button>
 											)}
 
-											{!hideNextBtn && (
-												<Button disabled={disableNextBtn} type="submit">
-													Next
+											<div className="ms-auto">
+												{showSkipBtn && (
+													<Button
+														variant="outline-primary"
+														disabled={isSubmitting}
+														className={classNames({
+															'me-2': !hideNextBtn,
+														})}
+														type="button"
+														onClick={() => {
+															submitAnswers({
+																answers: [],
+																answerText: {},
+																supplementText: {},
+															});
+														}}
+													>
+														Skip Question
+													</Button>
+												)}
+
+												{!hideNextBtn && (
+													<Button disabled={disableNextBtn} type="submit">
+														Next
+													</Button>
+												)}
+											</div>
+										</div>
+
+										{screeningQuestionContextResponse?.screeningFlowVersion.skippable && (
+											<div className="d-flex">
+												<Button
+													variant="link"
+													className="mx-auto"
+													type="button"
+													disabled={isSubmitting}
+													onClick={() => {
+														if (isSubmitting || !screeningQuestionContextId) {
+															return;
+														}
+
+														if (
+															!window.confirm(
+																'Are you sure you want to skip this assessment?'
+															)
+														) {
+															return;
+														}
+
+														screeningService
+															.skipScreeningQuestionContext(screeningQuestionContextId)
+															.fetch()
+															.then((response) => {
+																navigateToDestination(
+																	response.screeningSession
+																		.screeningSessionDestination,
+																	{ skipped: true }
+																);
+															})
+															.catch((e) => {
+																if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+																	handleError(e);
+																}
+															});
+													}}
+												>
+													{screeningQuestionContextResponse?.screeningFlowVersion
+														.screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
+														? 'Exit Assessment'
+														: 'Skip Assessment'}
 												</Button>
-											)}
-										</div>
-									</div>
-
-									{screeningQuestionContextResponse?.screeningFlowVersion.skippable && (
-										<div className="d-flex">
-											<Button
-												variant="link"
-												className="mx-auto"
-												type="button"
-												disabled={isSubmitting}
-												onClick={() => {
-													if (isSubmitting || !screeningQuestionContextId) {
-														return;
-													}
-
-													if (
-														!window.confirm(
-															'Are you sure you want to skip this assessment?'
-														)
-													) {
-														return;
-													}
-
-													screeningService
-														.skipScreeningQuestionContext(screeningQuestionContextId)
-														.fetch()
-														.then((response) => {
-															navigateToDestination(
-																response.screeningSession.screeningSessionDestination,
-																{ skipped: true }
-															);
-														})
-														.catch((e) => {
-															if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-																handleError(e);
-															}
-														});
-												}}
-											>
-												{screeningQuestionContextResponse?.screeningFlowVersion
-													.screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
-													? 'Exit Assessment'
-													: 'Skip Assessment'}
-											</Button>
-										</div>
-									)}
-								</Form>
-							</>
-						)}
-					</Col>
-				</Row>
-			</Container>
-		</AsyncPage>
+											</div>
+										)}
+									</Form>
+								</>
+							)}
+						</Col>
+					</Row>
+				</Container>
+			</AsyncPage>
+		</>
 	);
 };
 
