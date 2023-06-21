@@ -9,7 +9,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
-import InputHelper from '@/components/input-helper';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -29,7 +28,6 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
-		link: '',
 	});
 	const [isSaving, setIsSaving] = useState(false);
 
@@ -41,12 +39,8 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 			time: patientOrder.patientOrderScheduledScreeningScheduledDateTime
 				? moment(patientOrder.patientOrderScheduledScreeningScheduledDateTime).format('h:mm A')
 				: '',
-			link: patientOrder.patientOrderScheduledScreeningCalendarUrl ?? '',
 		});
-	}, [
-		patientOrder.patientOrderScheduledScreeningCalendarUrl,
-		patientOrder.patientOrderScheduledScreeningScheduledDateTime,
-	]);
+	}, [patientOrder.patientOrderScheduledScreeningScheduledDateTime]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -60,7 +54,6 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 						.updateScheduledAssessment(patientOrder.patientOrderScheduledScreeningId, {
 							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
 							scheduledTime: formValues.time,
-							calendarUrl: formValues.link,
 						})
 						.fetch();
 
@@ -76,7 +69,6 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 							scheduledDate: moment(formValues.date).format('YYYY-MM-DD'),
 							scheduledTime: formValues.time,
 							patientOrderId: patientOrder.patientOrderId,
-							calendarUrl: formValues.link,
 						})
 						.fetch();
 
@@ -99,7 +91,6 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 		[
 			addFlag,
 			formValues.date,
-			formValues.link,
 			formValues.time,
 			handleError,
 			onSave,
@@ -135,25 +126,12 @@ export const MhicScheduleAssessmentModal: FC<Props> = ({ patientOrder, onSave, .
 					<TimeInputV2
 						date={formValues.date}
 						id="schedule-assessment__time-input"
-						className="mb-4"
 						label="Assessment Time"
 						value={formValues.time}
 						onChange={(time) => {
 							setFormValues((previousValues) => ({
 								...previousValues,
 								time,
-							}));
-						}}
-						disabled={isSaving}
-					/>
-					<InputHelper
-						type="text"
-						label="Outlook Calendar Link"
-						value={formValues.link}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValues) => ({
-								...previousValues,
-								link: currentTarget.value,
 							}));
 						}}
 						disabled={isSaving}
