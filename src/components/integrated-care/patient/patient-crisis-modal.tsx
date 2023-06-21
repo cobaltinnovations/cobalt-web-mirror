@@ -28,7 +28,7 @@ export const IcScreeningCrisisModal: FC<useIcScreeningCrisisModalProps> = ({ ...
 			</Modal.Header>
 			<Modal.Body className="pt-2 pb-8">
 				<h3 className="mb-4">
-					A clinician will follow up with you in the next 24 hours to see how we can help.
+					A clinician will follow up with you within the next business day to see how we can help.
 				</h3>
 				<h5 className="mb-8">
 					If you think you might harm yourself or others, please immediately contact one of the following
