@@ -28,6 +28,7 @@ import { accountService, institutionService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
+import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
@@ -90,7 +91,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	}
 
 	if (accessToken && accountResponse) {
-		accountId = updateTokenCookies(accessToken);
+		accountId = updateTokenCookies(
+			accessToken,
+			institutionResponse.institution.anonymousAccountExpirationStrategyId ===
+				AnonymousAccountExpirationStrategyId.SINGLE_SESSION
+		);
 	}
 
 	return {

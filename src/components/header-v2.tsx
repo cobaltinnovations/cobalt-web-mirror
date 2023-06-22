@@ -674,6 +674,7 @@ const HeaderV2 = () => {
 
 					return (
 						<HeaderAlert
+							key={alert.alertId}
 							variant={variantMap[alert.alertTypeId]}
 							title={alert.title}
 							message={alert.message}
