@@ -40,7 +40,9 @@ const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity
 		});
 		const subject = 'Cobalt - Regarding your group session';
 
-		window.open(`mailto:?bcc=${recipients}&subject=${subject}`);
+		if (!window.open(`mailto:?bcc=${recipients}&subject=${subject}`)) {
+			window.alert('Sorry, there are too many participants.');
+		}
 	}
 
 	return (
