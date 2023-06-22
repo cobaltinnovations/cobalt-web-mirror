@@ -40,9 +40,25 @@ const SessionAttendeeList: FC<SessionAttendeeListProps> = ({ attendees, capacity
 		});
 		const subject = 'Cobalt - Regarding your group session';
 
-		if (!window.open(`mailto:?bcc=${recipients}&subject=${subject}`)) {
+		// Hack to see if a mail client window actually opened (window blurred).
+		// If there are many attendees, we might become too large for the mailto.
+		// It's not sufficient to check `if(!window.open(...))`
+		// See https://stackoverflow.com/a/28994993
+		let windowOpenFailureTimeout: number;
+
+		const windowBlurListener = () => {
+			window.clearTimeout(windowOpenFailureTimeout);
+			window.removeEventListener('blur', windowBlurListener);
+		};
+
+		windowOpenFailureTimeout = window.setTimeout(() => {
 			window.alert('Sorry, there are too many participants.');
-		}
+			window.removeEventListener('blur', windowBlurListener);
+		}, 500 /* "long enough" to determine if another application was opened */);
+
+		window.addEventListener('blur', windowBlurListener);
+
+		window.open(`mailto:?bcc=${recipients}&subject=${subject}`);
 	}
 
 	return (
