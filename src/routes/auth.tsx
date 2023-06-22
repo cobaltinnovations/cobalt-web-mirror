@@ -6,17 +6,28 @@ import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator }
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
-import { accountService } from '@/lib/services';
+import { accountService, institutionService } from '@/lib/services';
 import Loader from '@/components/loader';
+import { getSubdomain } from '@/lib/utils';
+import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
 
 type AuthLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
+	let subdomain = getSubdomain(url);
 
 	const myChartAccessToken = url.searchParams.get('myChartAccessToken');
+	const accountSourceId = url.searchParams.get('accountSourceId');
 
 	let accessToken = url.searchParams.get('accessToken');
+
+	const institutionResponse = await institutionService
+		.getInstitution({
+			subdomain,
+			accountSourceId,
+		})
+		.fetch();
 
 	if (myChartAccessToken) {
 		const myChartAccountRequest = accountService.getMyChartAccount(myChartAccessToken);
@@ -31,7 +42,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		return redirect('/sign-in');
 	}
 
-	const accountId = updateTokenCookies(accessToken);
+	const accountId = updateTokenCookies(
+		accessToken,
+		institutionResponse.institution.anonymousAccountExpirationStrategyId ===
+			AnonymousAccountExpirationStrategyId.SINGLE_SESSION
+	);
 
 	const ssoRedirectUrl = Cookies.get('ssoRedirectUrl');
 	let authRedirectUrl = ssoRedirectUrl || Cookies.get('authRedirectUrl') || '/';
@@ -87,13 +102,13 @@ export const Component = () => {
 	return <Navigate to={destination === '/' ? LoginDestinationIdRouteMap[account.loginDestinationId] : destination} />;
 };
 
-export function updateTokenCookies(accessToken: string) {
+export function updateTokenCookies(accessToken: string, isSession: boolean = false) {
 	const decodedAccessToken = jwtDecode(accessToken) as { sub: string; exp: number };
 	const expirationDate = new Date(decodedAccessToken.exp * 1000);
 	const accountId = decodedAccessToken.sub;
 
 	const cookieOptions = {
-		expires: expirationDate,
+		...(!isSession && { expires: expirationDate }),
 	};
 
 	Cookies.set('accessToken', accessToken, cookieOptions);

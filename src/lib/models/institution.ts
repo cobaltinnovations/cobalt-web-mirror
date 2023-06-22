@@ -1,9 +1,15 @@
 import { AccountSourceId } from './account';
 import { SupportRoleId } from './provider';
 
+export enum AnonymousAccountExpirationStrategyId {
+	DEFAULT = 'DEFAULT',
+	SINGLE_SESSION = 'SINGLE_SESSION',
+}
+
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
 	alerts: InstitutionAlert[];
+	anonymousAccountExpirationStrategyId: AnonymousAccountExpirationStrategyId;
 	anonymousEnabled: boolean;
 	contactUsEnabled: boolean;
 	contentScreeningFlowId?: string;
