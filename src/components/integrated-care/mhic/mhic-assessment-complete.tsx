@@ -115,7 +115,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 			copyTextToClipboard(clinicalReport, {
 				successTitle: 'Report copied to clipboard',
 				successDescription:
-					'The clinical report was copied to your clipboard. Paste the report into EPIC to edit.',
+					'The clinical report was copied to your clipboard. Paste the report into Epic to edit.',
 				errorTitle: 'Failed to copy report',
 				errorDesctiption: 'Please try again.',
 			});
