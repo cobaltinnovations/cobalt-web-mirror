@@ -84,10 +84,19 @@ const ErrorModal: FC = () => {
 				>
 					Send Us a Note
 				</Button>
-				<p className="mb-1 fw-bold">Need clinical support?</p>
-				<a className="mb-4 d-block fs-large font-heading-bold text-decoration-none" href="tel:866-301-4724">
-					Call 866-301-4724
-				</a>
+
+				{institution.clinicalSupportPhoneNumber && (
+					<>
+						<p className="mb-1 fw-bold">Need clinical support?</p>
+						<a
+							className="mb-4 d-block fs-large font-heading-bold text-decoration-none"
+							href={`tel:${institution.clinicalSupportPhoneNumber}`}
+						>
+							Call {institution.clinicalSupportPhoneNumberDescription}
+						</a>
+					</>
+				)}
+
 				<p className="mb-1 fw-bold">Have a clinical emergency?</p>
 				<Button
 					variant="link"

@@ -38,6 +38,8 @@ export interface Institution {
 	integratedCareProgramName: string;
 	myChartName: string;
 	myChartDefaultUrl: string;
+	clinicalSupportPhoneNumber: string;
+	clinicalSupportPhoneNumberDescription: string;
 }
 
 export interface InstitutionFeature {
