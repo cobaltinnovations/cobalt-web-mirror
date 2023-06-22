@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, Dropdown } from 'react-bootstrap';
@@ -7,6 +8,7 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import InputHelper from '@/components/input-helper';
+import DatePicker from '@/components/date-picker';
 
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
@@ -19,6 +21,11 @@ import {
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
 
+enum FilterTypeId {
+	SELECT = 'SELECT',
+	DATE = 'DATE',
+}
+
 interface Filter {
 	filterId: string;
 	title: string;
@@ -26,6 +33,7 @@ interface Filter {
 		title: string;
 		value: string;
 	}[];
+	filterTypeId?: FilterTypeId;
 }
 
 const availableFilters: Filter[] = [
@@ -50,6 +58,12 @@ const availableFilters: Filter[] = [
 				value: PatientOrderScreeningStatusId.COMPLETE,
 			},
 		],
+	},
+	{
+		filterId: 'patientOrderScheduledScreeningScheduledDate',
+		title: 'Assessment Scheduled Date',
+		options: [],
+		filterTypeId: FilterTypeId.DATE,
 	},
 	{
 		filterId: 'patientOrderResourcingStatusId',
@@ -223,22 +237,38 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 
 						return (
 							<div key={filterId} className="mb-3 d-flex align-items-center">
-								<InputHelper
-									as="select"
-									className="flex-grow-1 me-2"
-									label={filter.title}
-									value={value}
-									onChange={({ currentTarget }) => {
-										handleFilterChange(filterId, currentTarget.value);
-									}}
-								>
-									<option value="" label={`Select ${filter.title}`} disabled />
-									{filter.options.map((option) => (
-										<option key={option.value} value={option.value}>
-											{option.title}
-										</option>
-									))}
-								</InputHelper>
+								{filter.filterTypeId === FilterTypeId.DATE ? (
+									<div className="flex-grow-1 me-2">
+										<DatePicker
+											labelText={filter.title}
+											selected={value ? moment(value, 'YYYY-MM-DD').toDate() : undefined}
+											onChange={(date) => {
+												if (date) {
+													handleFilterChange(filterId, moment(date).format('YYYY-MM-DD'));
+												} else {
+													handleFilterChange(filterId, '');
+												}
+											}}
+										/>
+									</div>
+								) : (
+									<InputHelper
+										as="select"
+										className="flex-grow-1 me-2"
+										label={filter.title}
+										value={value}
+										onChange={({ currentTarget }) => {
+											handleFilterChange(filterId, currentTarget.value);
+										}}
+									>
+										<option value="" label={`Select ${filter.title}`} disabled />
+										{filter.options.map((option) => (
+											<option key={option.value} value={option.value}>
+												{option.title}
+											</option>
+										))}
+									</InputHelper>
+								)}
 								<Button
 									variant="light"
 									className="p-2 flex-shrink-0"
@@ -311,6 +341,10 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 						size="sm"
 						onClick={() => {
 							setShow(false);
+
+							for (const param of mhicFilterQueryParams) {
+								searchParams.delete(param);
+							}
 
 							const filters = Object.entries(selectedFilters).reduce(
 								(params, [filterId, filterValue]) => {
