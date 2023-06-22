@@ -77,7 +77,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 					alignItems: 'center',
 					textDecoration: 'none',
 					...theme.fonts.default,
-					color: theme.colors.n500,
+					color: theme.colors.n900,
 					...theme.fonts.bodyNormal,
 					'&:hover': {
 						color: theme.colors.p700,
