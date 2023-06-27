@@ -42,15 +42,17 @@ export const imageUploader = (
 			return imageUpload;
 		},
 		start: () => {
-			new Promise((_resolve, reject) => {
+			new Promise((resolve, reject) => {
 				if (blob.size > maxFileSizeInBytes) {
 					reject({
 						code: 'FILE_SIZE_LIMIT_EXCEEDED',
 						message: 'File size exceeds limit of 3mb.',
 					});
 				}
+
+				resolve(true);
 			})
-				.then(() => {
+				.then(async () => {
 					return presignedUploadGetter();
 				})
 				.then(({ presignedUpload }) => {
