@@ -9,7 +9,7 @@ interface ImageUploadShape {
 	onError: (callback: (error: any) => void) => this;
 }
 
-const maxFileSizeInBytes = 375000; // 3mb;
+const maxFileSizeInBytes = 3000000; // 3mb;
 
 export const imageUploader = (
 	blob: Blob,
