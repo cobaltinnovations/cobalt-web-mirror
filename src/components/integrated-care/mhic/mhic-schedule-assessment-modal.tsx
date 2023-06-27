@@ -13,6 +13,9 @@ import TimeInputV2 from '@/components/time-input-v2';
 const useStyles = createUseStyles({
 	modal: {
 		maxWidth: 480,
+		'& .cobalt-modal__body': {
+			overflow: 'visible',
+		},
 	},
 });
 
