@@ -91,7 +91,7 @@ export const Component = () => {
 								isActive: isNeedsAssessmentActive,
 							},
 							{
-								title: 'Scheduled',
+								title: 'Assessment Scheduled',
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SCHEDULED.patientOrderCountDescription ?? '0',
