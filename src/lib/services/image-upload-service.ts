@@ -52,7 +52,7 @@ export const imageUploader = (
 
 				resolve(true);
 			})
-				.then(async () => {
+				.then(() => {
 					return presignedUploadGetter();
 				})
 				.then(({ presignedUpload }) => {
