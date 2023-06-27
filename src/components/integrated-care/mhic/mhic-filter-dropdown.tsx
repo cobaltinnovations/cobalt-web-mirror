@@ -16,6 +16,7 @@ import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg'
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,
+	PatientOrderOutreachStatusId,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
 	PatientOrderScreeningStatusId,
@@ -37,6 +38,20 @@ interface Filter {
 }
 
 const availableFilters: Filter[] = [
+	{
+		filterId: 'patientOrderOutreachStatusId',
+		title: 'Outreach Status',
+		options: [
+			{
+				title: 'No Outreach',
+				value: PatientOrderOutreachStatusId.NO_OUTREACH,
+			},
+			{
+				title: 'Has Outreach',
+				value: PatientOrderOutreachStatusId.HAS_OUTREACH,
+			},
+		],
+	},
 	{
 		filterId: 'patientOrderScreeningStatusId',
 		title: 'Assessment Status',
