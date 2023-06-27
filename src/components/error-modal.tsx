@@ -30,7 +30,7 @@ const ErrorModal: FC = () => {
 			institution.integratedCareEnabled && institution.userExperienceTypeId === 'PATIENT';
 		const isIntegratedCareStaff = institution.integratedCareEnabled && institution.userExperienceTypeId === 'STAFF';
 
-		if (error?.code === 'VALIDATION_FAILED') {
+		if (error?.code === 'VALIDATION_FAILED' || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
 			return <p className="mb-0 fw-bold">{error?.message}</p>;
 		}
 
@@ -115,6 +115,8 @@ const ErrorModal: FC = () => {
 	}, [
 		error?.code,
 		error?.message,
+		institution.clinicalSupportPhoneNumber,
+		institution.clinicalSupportPhoneNumberDescription,
 		institution.integratedCareEnabled,
 		institution.integratedCarePhoneNumber,
 		institution.integratedCarePhoneNumberDescription,
