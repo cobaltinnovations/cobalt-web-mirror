@@ -163,6 +163,10 @@ const CreateOnYourTimeContent: FC = () => {
 
 	async function handleSubmit(values: onYourTimeFormData) {
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
 			let visibilityId: ContentVisibilityTypeId | undefined = undefined;
 			if (values.visibilityPrivate) {
 				visibilityId = ContentVisibilityTypeId.Private;

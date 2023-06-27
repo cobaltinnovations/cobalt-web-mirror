@@ -99,6 +99,10 @@ const GroupSessionsByRequestCreate: FC = () => {
 		};
 
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
 			if (isEdit) {
 				if (!groupSessionId) {
 					throw new Error('groupSessionId not found.');

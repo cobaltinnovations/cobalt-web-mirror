@@ -286,6 +286,10 @@ const GroupSessionsCreate: FC = () => {
 
 	async function handleSubmit(values: GroupSessionFormData) {
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
 			const startDateTime = moment(`${values.date} ${values.startTime}`, 'YYYY-MM-DD HH:mm A').format(
 				'YYYY-MM-DD[T]HH:mm'
 			);
