@@ -171,6 +171,7 @@ const GroupSessionsCreate: FC = () => {
 	const [imagePreview, setImagePreview] = useState(initialValues ? initialValues.imageUrl : '');
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
+	const [isSaving, setIsSaving] = useState(false);
 
 	const accountId = account?.accountId;
 	const fetchData = useCallback(async () => {
@@ -286,6 +287,12 @@ const GroupSessionsCreate: FC = () => {
 
 	async function handleSubmit(values: GroupSessionFormData) {
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
+			setIsSaving(true);
+
 			const startDateTime = moment(`${values.date} ${values.startTime}`, 'YYYY-MM-DD HH:mm A').format(
 				'YYYY-MM-DD[T]HH:mm'
 			);
@@ -370,6 +377,7 @@ const GroupSessionsCreate: FC = () => {
 			}
 		} catch (error) {
 			handleError(error);
+			setIsSaving(false);
 		}
 	}
 
@@ -1190,9 +1198,9 @@ const GroupSessionsCreate: FC = () => {
 												</Card>
 
 												<SessionFormSubmitBanner
-													disabled={isViewMode}
+													disabled={isSaving || isViewMode}
 													title={isEdit ? 'Update group session' : 'Add group session'}
-												></SessionFormSubmitBanner>
+												/>
 											</Form>
 										</>
 									);

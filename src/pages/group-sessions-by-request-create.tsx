@@ -60,6 +60,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 	const [isEdit, setIsEdit] = useState(false);
 	const [initialValues, setInitialValues] = useState<GroupSessionByRequestFormData>();
+	const [isSaving, setIsSaving] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!groupSessionId) {
@@ -99,6 +100,12 @@ const GroupSessionsByRequestCreate: FC = () => {
 		};
 
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
+			setIsSaving(true);
+
 			if (isEdit) {
 				if (!groupSessionId) {
 					throw new Error('groupSessionId not found.');
@@ -148,6 +155,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 			}
 		} catch (error) {
 			handleError(error);
+			setIsSaving(false);
 		}
 	}
 
@@ -473,6 +481,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 															? 'Update group session by request'
 															: 'Add group session by request'
 													}
+													disabled={isSaving}
 												/>
 											</Form>
 										</>

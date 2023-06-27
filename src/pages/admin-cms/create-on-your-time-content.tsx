@@ -93,6 +93,7 @@ const CreateOnYourTimeContent: FC = () => {
 	const [imagePreview, setImagePreview] = useState(initialValues ? initialValues.imageUrl : '');
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
+	const [isSaving, setIsSaving] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		setIsEditing(!!editing && editing.toLowerCase() === 'true');
@@ -163,6 +164,12 @@ const CreateOnYourTimeContent: FC = () => {
 
 	async function handleSubmit(values: onYourTimeFormData) {
 		try {
+			if (isUploading) {
+				throw new Error('Upload is in progress.');
+			}
+
+			setIsSaving(true);
+
 			let visibilityId: ContentVisibilityTypeId | undefined = undefined;
 			if (values.visibilityPrivate) {
 				visibilityId = ContentVisibilityTypeId.Private;
@@ -212,6 +219,7 @@ const CreateOnYourTimeContent: FC = () => {
 			}
 		} catch (error) {
 			handleError(error);
+			setIsSaving(false);
 		}
 	}
 
@@ -956,7 +964,7 @@ const CreateOnYourTimeContent: FC = () => {
 
 												<SessionFormSubmitBanner
 													title={isEditing ? 'Update Content' : 'Add Content'}
-													disabled={Object.keys(errors).length > 0}
+													disabled={isSaving || Object.keys(errors).length > 0}
 												/>
 											</Form>
 										</>

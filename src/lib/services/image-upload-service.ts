@@ -9,6 +9,8 @@ interface ImageUploadShape {
 	onError: (callback: (error: any) => void) => this;
 }
 
+const maxFileSizeInBytes = 3000000; // 3mb;
+
 export const imageUploader = (
 	blob: Blob,
 	presignedUploadGetter: () => Promise<{ presignedUpload: PresignedUploadModel }>
@@ -40,7 +42,19 @@ export const imageUploader = (
 			return imageUpload;
 		},
 		start: () => {
-			presignedUploadGetter()
+			new Promise((resolve, reject) => {
+				if (blob.size > maxFileSizeInBytes) {
+					reject({
+						code: 'FILE_SIZE_LIMIT_EXCEEDED',
+						message: 'File size exceeds limit of 3mb.',
+					});
+				}
+
+				resolve(true);
+			})
+				.then(() => {
+					return presignedUploadGetter();
+				})
 				.then(({ presignedUpload }) => {
 					onPresignedUploadObtainedCallback(presignedUpload.accessUrl);
 
