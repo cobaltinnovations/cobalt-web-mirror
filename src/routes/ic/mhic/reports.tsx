@@ -3,7 +3,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { AccountModel, GenderIdentity, PatientOrderInsurancePayors, Race } from '@/lib/models';
+import { AccountModel, GenderIdentity, Race } from '@/lib/models';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 import DatePicker from '@/components/date-picker';
@@ -47,7 +47,7 @@ export const Component = () => {
 
 		// PIPELINE specific
 		referringPracticeNames: [] as string[],
-		patientOrderInsurancePayors: [] as PatientOrderInsurancePayors[],
+		patientOrderInsurancePayors: [] as string[],
 		race: [] as Race[],
 		genderIdentity: [] as GenderIdentity[],
 		minimumPatientAge: undefined as number | undefined,
@@ -84,9 +84,7 @@ export const Component = () => {
 
 				// PIPELINE specific
 				referringPracticeNames: formValues.referringPracticeNames,
-				patientOrderInsurancePayorId: formValues.patientOrderInsurancePayors.map(
-					(p) => p.patientOrderInsurancePayorId
-				),
+				patientOrderInsurancePayorId: formValues.patientOrderInsurancePayors,
 				patientRaceId: formValues.race.map((r) => r.raceId),
 				patientGenderIdentityId: formValues.genderIdentity.map((g) => g.genderIdentityId),
 				minimumPatientAge: formValues.minimumPatientAge,
@@ -200,14 +198,12 @@ export const Component = () => {
 											id="typeahead--payor"
 											label="Payor"
 											multiple
-											labelKey="name"
-											options={referenceDataResponse.patientOrderInsurancePayors}
+											options={referenceDataResponse.primaryPayorNames}
 											selected={formValues.patientOrderInsurancePayors}
 											onChange={(selected) => {
 												setFormValues((previousValues) => ({
 													...previousValues,
-													patientOrderInsurancePayors:
-														selected as PatientOrderInsurancePayors[],
+													patientOrderInsurancePayors: selected as string[],
 												}));
 											}}
 										/>

@@ -157,7 +157,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								</Col>
 							</Row>
 						)}
-						{!patientOrder.patientOrderInsurancePlanAccepted && (
+						{!patientOrder.primaryPlanAccepted && (
 							<Row className="mb-4">
 								<Col>
 									<MhicInlineAlert

@@ -85,7 +85,6 @@ export interface PatientOrderDemographicsFormData {
 		postalCode: string;
 		countryCode: string;
 	};
-	patientOrderInsurancePlanId: string;
 	patientDemographicsConfirmed: boolean;
 }
 

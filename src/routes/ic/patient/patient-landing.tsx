@@ -51,10 +51,7 @@ const PatientLanding = () => {
 				return;
 			}
 
-			if (
-				!response.patientOrder.patientAddressRegionAccepted ||
-				!response.patientOrder.patientOrderInsurancePlanAccepted
-			) {
+			if (!response.patientOrder.patientAddressRegionAccepted || !response.patientOrder.primaryPlanAccepted) {
 				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
 				return;
 			}
