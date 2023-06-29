@@ -184,6 +184,7 @@ export const Component = () => {
 											id="typeahead--practice"
 											label="Practice"
 											multiple
+											labelKey=""
 											options={referenceDataResponse.referringPracticeNames}
 											selected={formValues.referringPracticeNames}
 											onChange={(selected) => {
@@ -198,6 +199,7 @@ export const Component = () => {
 											id="typeahead--payor"
 											label="Payor"
 											multiple
+											labelKey=""
 											options={referenceDataResponse.primaryPayorNames}
 											selected={formValues.patientOrderInsurancePayors}
 											onChange={(selected) => {
