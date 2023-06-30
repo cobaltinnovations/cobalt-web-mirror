@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { PatientOrderConsentStatusId, PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
+import {
+	PatientOrderConsentStatusId,
+	PatientOrderDispositionId,
+	PatientOrderModel,
+	PatientOrderScreeningStatusId,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
@@ -37,6 +42,11 @@ const PatientLanding = () => {
 		try {
 			const response = await integratedCareService.getLatestPatientOrder().fetch();
 			setPatientOrder(response.patientOrder);
+
+			if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
+				return;
+			}
 
 			if (response.patientOrder.resourceCheckInResponseNeeded) {
 				navigate('/ic/patient/check-in');
