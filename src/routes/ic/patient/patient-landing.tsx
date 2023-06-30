@@ -169,7 +169,8 @@ const PatientLanding = () => {
 
 							{homescreenState !== PAGE_STATES.SERVICE_UNAVAILABLE &&
 								homescreenState !== PAGE_STATES.ASSESSMENT_REFUSED &&
-								homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
+								homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER &&
+								homescreenState !== PAGE_STATES.ORDER_CLOSED && (
 									<Card bsPrefix="ic-card" className="mb-10">
 										<Card.Header>
 											<Card.Title>Next Steps</Card.Title>
