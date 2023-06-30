@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import {
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderClosureReasonId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
@@ -44,7 +45,21 @@ const PatientLanding = () => {
 			const response = await integratedCareService.getLatestPatientOrder().fetch();
 			setPatientOrder(response.patientOrder);
 
-			if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
+			const patientOrderClosed =
+				response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED;
+
+			if (
+				(patientOrderClosed &&
+					response.patientOrder.patientOrderClosureReasonId ===
+						PatientOrderClosureReasonId.INELIGIBLE_DUE_TO_LOCATION) ||
+				!response.patientOrder.patientAddressRegionAccepted ||
+				!response.patientOrder.primaryPlanAccepted
+			) {
+				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
+				return;
+			}
+
+			if (patientOrderClosed) {
 				setHomescreenState(PAGE_STATES.ORDER_CLOSED);
 				return;
 			}
@@ -59,11 +74,6 @@ const PatientLanding = () => {
 				return;
 			} else if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
 				setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
-				return;
-			}
-
-			if (!response.patientOrder.patientAddressRegionAccepted || !response.patientOrder.primaryPlanAccepted) {
-				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
 				return;
 			}
 
