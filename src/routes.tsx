@@ -592,7 +592,53 @@ export const routes: RouteObject[] = [
 					},
 				],
 			},
-
+			{
+				errorElement: <AppErrorDefaultLayout />,
+				loader: requireAuthLoader,
+				children: [
+					{
+						id: 'admin',
+						path: 'admin',
+						lazy: () => import('@/routes/admin/layout'),
+						children: [
+							{
+								index: true,
+								element: <Navigate to="content" />,
+							},
+							{
+								id: 'content',
+								path: 'content',
+								element: <>TODO: Content</>,
+							},
+							{
+								id: 'group-sessions',
+								path: 'group-sessions',
+								lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
+							},
+							{
+								id: 'add-group-session-external',
+								path: 'add-group-session-external',
+								lazy: () => import('@/routes/admin/group-sessions/add-group-session-external'),
+							},
+							{
+								id: 'add-group-session-internal',
+								path: 'add-group-session-internal',
+								lazy: () => import('@/routes/admin/group-sessions/add-group-session-internal'),
+							},
+							{
+								id: 'scheduling',
+								path: 'scheduling',
+								element: <>TODO: Scheduling</>,
+							},
+							{
+								id: 'analytics',
+								path: 'analytics',
+								element: <>TODO: Analytics</>,
+							},
+						],
+					},
+				],
+			},
 			{
 				element: <IntegratedCareEnabledRoutes />,
 				errorElement: <AppErrorDefaultLayout />,
