@@ -46,9 +46,7 @@ export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 
 	const isActive = useMemo(() => {
 		const parseQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(searchParams);
-		const selectedQueryParamValues = Object.values(parseQueryParams).flat();
-
-		return selectedQueryParamValues.length > 0;
+		return !!parseQueryParams.groupSessionStatusId;
 	}, [searchParams]);
 
 	const handleDismiss = useCallback(() => {
