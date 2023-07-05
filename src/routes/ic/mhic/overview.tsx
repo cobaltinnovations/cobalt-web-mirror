@@ -34,9 +34,9 @@ export function useMhicOverviewLoaderData() {
 	return useRouteLoaderData('mhic-overview') as MhicOverviewLoaderData;
 }
 
-function loadOverviewData() {
+function loadOverviewData(isPolling = false) {
 	const request = integratedCareService.getOverview();
-	const overviewResponsePromise = request.fetch();
+	const overviewResponsePromise = request.fetch({ isPolling });
 
 	return {
 		getResponseChecksum: () => overviewResponsePromise.then(() => request.cobaltResponseChecksum),
@@ -105,7 +105,7 @@ export const Component = () => {
 	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicOverviewLoaderData,
 		immediateUpdate: !!shelfData,
-		pollingFn: loadOverviewData,
+		pollingFn: () => loadOverviewData(true),
 	});
 	const {
 		overviewResponsePromise,

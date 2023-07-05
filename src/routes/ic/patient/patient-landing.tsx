@@ -24,9 +24,9 @@ enum PAGE_STATES {
 	SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
-function loadLatestPatientOrder() {
+function loadLatestPatientOrder(isPolling = false) {
 	const request = integratedCareService.getLatestPatientOrder();
-	const patientOrderPromise = request.fetch().catch((error) => {
+	const patientOrderPromise = request.fetch({ isPolling }).catch((error) => {
 		// Do not throw error, backend will 404  if there is no order, but that is ok.
 		if (isErrorConfig(error) && error.axiosError.response?.status === 404) {
 			return null;
@@ -62,7 +62,7 @@ export const Component = () => {
 	const revalidator = useRevalidator();
 
 	const pollingFn = useCallback(() => {
-		return loadLatestPatientOrder();
+		return loadLatestPatientOrder(true);
 	}, []);
 	const { data } = usePolledLoaderData({
 		useLoaderHook: usePatientLandingLoaderData,
