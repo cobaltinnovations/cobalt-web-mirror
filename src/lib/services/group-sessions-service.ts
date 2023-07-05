@@ -69,7 +69,7 @@ interface GetGroupSessionsQueryParameters {
 	searchQuery?: string;
 }
 
-interface GetGroupSessionsResponseBody {
+export interface GetGroupSessionsResponseBody {
 	totalCountDescription: string;
 	totalCount: number;
 	groupSessions: GroupSessionModel[];
@@ -93,7 +93,7 @@ interface ReserveGroupSessionResponseBody {
 	account: AccountModel;
 }
 
-interface GetGroupSessionCountsResponseBody {
+export interface GetGroupSessionCountsResponseBody {
 	groupSessionCounts: GroupSessionCountModel[];
 }
 

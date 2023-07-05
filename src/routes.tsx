@@ -606,32 +606,32 @@ export const routes: RouteObject[] = [
 								element: <Navigate to="content" />,
 							},
 							{
-								id: 'content',
+								id: 'admin-content',
 								path: 'content',
 								element: <>TODO: Content</>,
 							},
 							{
-								id: 'group-sessions',
+								id: 'admin-group-sessions',
 								path: 'group-sessions',
 								lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
 							},
 							{
-								id: 'add-group-session-external',
+								id: 'admin-add-group-session-external',
 								path: 'add-group-session-external',
 								lazy: () => import('@/routes/admin/group-sessions/add-group-session-external'),
 							},
 							{
-								id: 'add-group-session-internal',
+								id: 'admin-add-group-session-internal',
 								path: 'add-group-session-internal',
 								lazy: () => import('@/routes/admin/group-sessions/add-group-session-internal'),
 							},
 							{
-								id: 'scheduling',
+								id: 'admin-scheduling',
 								path: 'scheduling',
 								element: <>TODO: Scheduling</>,
 							},
 							{
-								id: 'analytics',
+								id: 'admin-analytics',
 								path: 'analytics',
 								element: <>TODO: Analytics</>,
 							},
