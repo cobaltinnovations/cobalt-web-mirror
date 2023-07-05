@@ -1,11 +1,26 @@
+import { cloneDeep } from 'lodash';
 import React, { Suspense, useEffect, useState } from 'react';
-import { Await, LoaderFunctionArgs, defer, useNavigate, useRouteLoaderData } from 'react-router-dom';
+import {
+	Await,
+	Link,
+	LoaderFunctionArgs,
+	defer,
+	useNavigate,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
-import { GetGroupSessionCountsResponseBody, GetGroupSessionsResponseBody, groupSessionsService } from '@/lib/services';
+import {
+	GetGroupSessionCountsResponseBody,
+	GetGroupSessionsResponseBody,
+	GroupSessionSchedulingSystemId,
+	groupSessionsService,
+} from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
+import { GroupSessionTableDropdown } from '@/components/admin';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -38,7 +53,13 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 
+	const [searchParams, setSearchParams] = useSearchParams();
+	const pageNumber = searchParams.get('pageNumber') ?? '0';
+
+	const [isLoading, setIsLoading] = useState(false);
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
+	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
+	const [groupSessionsTotalCountDescription, setGroupSessionsTotalCountDescription] = useState('0');
 
 	useEffect(() => {
 		if (!groupSessionsPromise) {
@@ -47,12 +68,12 @@ export const Component = () => {
 
 		const loadGroupSessions = async () => {
 			try {
-				const [groupSessionsResponse, groupSessionCountResponse] = await groupSessionsPromise;
+				const [groupSessionsResponse] = await groupSessionsPromise;
 
 				setGroupSessions(groupSessionsResponse.groupSessions);
-
+				setGroupSessionsTotalCount(groupSessionsResponse.totalCount);
+				setGroupSessionsTotalCountDescription(groupSessionsResponse.totalCountDescription);
 				console.log('groupSessionsResponse', groupSessionsResponse);
-				console.log('groupSessionCountResponse', groupSessionCountResponse);
 			} catch (error) {
 				handleError(error);
 			}
@@ -60,6 +81,61 @@ export const Component = () => {
 
 		loadGroupSessions();
 	}, [groupSessionsPromise, handleError]);
+
+	const handleStatusUpdate = async (
+		groupSessionId: string,
+		actionId: GROUP_SESSION_STATUS_ID.ADDED | GROUP_SESSION_STATUS_ID.CANCELED | GROUP_SESSION_STATUS_ID.DELETED
+	) => {
+		if (actionId === GROUP_SESSION_STATUS_ID.CANCELED) {
+			if (!window.confirm('Are you sure you want to cancel this group session?')) {
+				return;
+			}
+		}
+
+		if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
+			if (!window.confirm('Are you sure you want to delete this group session?')) {
+				return;
+			}
+		}
+
+		const groupSessionsClone = cloneDeep(groupSessions);
+		const replacementIndex = groupSessionsClone.findIndex((gs) => gs.groupSessionId === groupSessionId);
+
+		setIsLoading(true);
+
+		try {
+			const { groupSession } = await groupSessionsService
+				.updateGroupSessionStatusById(groupSessionId, actionId)
+				.fetch();
+			// const { groupSessionCounts } = await groupSessionsService.getGroupSessionCounts().fetch();
+
+			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
+				groupSessionsClone.splice(replacementIndex, 1);
+			} else {
+				groupSessionsClone.splice(replacementIndex, 1, groupSession);
+			}
+
+			setGroupSessions(groupSessionsClone);
+			// setSessionCounts(groupSessionCounts);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleEdit = (groupSessionId: string) => {
+		navigate(`/group-sessions/scheduled/${groupSessionId}/edit`);
+	};
+
+	const handleDuplicate = (groupSessionId: string) => {
+		navigate(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
+	};
+
+	const handlePaginationClick = (pageIndex: number) => {
+		searchParams.set('pageNumber', String(pageIndex));
+		setSearchParams(searchParams);
+	};
 
 	return (
 		<Container fluid className="px-8 py-8">
@@ -78,17 +154,15 @@ export const Component = () => {
 					<hr />
 				</Col>
 			</Row>
-
 			<Row className="mb-6">
 				<Col>filters</Col>
 				<Col>sort</Col>
 			</Row>
-
 			<Suspense>
 				<Await resolve={groupSessionsPromise}>
-					<Row>
+					<Row className="mb-8">
 						<Col>
-							<Table isLoading={false}>
+							<Table isLoading={isLoading}>
 								<TableHead>
 									<TableRow>
 										<TableCell header>Date Added</TableCell>
@@ -98,14 +172,22 @@ export const Component = () => {
 										<TableCell header>Capacity</TableCell>
 										<TableCell header>Status</TableCell>
 										<TableCell header>Visible</TableCell>
-										<TableCell header>Start Date</TableCell>
+										<TableCell header colSpan={2}>
+											Start Date
+										</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
 									{groupSessions.map((groupSession) => (
-										<TableRow>
+										<TableRow key={groupSession.groupSessionId}>
 											<TableCell>{groupSession.createdDateDescription}</TableCell>
-											<TableCell>{groupSession.title}</TableCell>
+											<TableCell>
+												<Link
+													to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+												>
+													{groupSession.title}
+												</Link>
+											</TableCell>
 											<TableCell>
 												<span className="d-block">{groupSession.facilitatorName}</span>
 												<span className="d-block text-muted">
@@ -113,7 +195,10 @@ export const Component = () => {
 												</span>
 											</TableCell>
 											<TableCell>
-												<span className="text-danger">[TODO]: Internal/External</span>
+												{groupSession.groupSessionSchedulingSystemId ===
+												GroupSessionSchedulingSystemId.COBALT
+													? 'Cobalt'
+													: 'External'}
 											</TableCell>
 											<TableCell>
 												{groupSession.seatsReserved}/{groupSession.seats}
@@ -153,10 +238,56 @@ export const Component = () => {
 												<span className="text-danger">[TODO]: Yes/No</span>
 											</TableCell>
 											<TableCell>{groupSession.startDateTimeDescription}</TableCell>
+											<TableCell>
+												<GroupSessionTableDropdown
+													groupSession={groupSession}
+													onAdd={(groupSessionId) => {
+														handleStatusUpdate(
+															groupSessionId,
+															GROUP_SESSION_STATUS_ID.ADDED
+														);
+													}}
+													onEdit={handleEdit}
+													onDuplicate={handleDuplicate}
+													onCancel={(groupSessionId) => {
+														handleStatusUpdate(
+															groupSessionId,
+															GROUP_SESSION_STATUS_ID.CANCELED
+														);
+													}}
+													onDelete={(groupSessionId) => {
+														handleStatusUpdate(
+															groupSessionId,
+															GROUP_SESSION_STATUS_ID.DELETED
+														);
+													}}
+												/>
+											</TableCell>
 										</TableRow>
 									))}
 								</TableBody>
 							</Table>
+						</Col>
+					</Row>
+					<Row>
+						<Col xs={{ span: 4, offset: 4 }}>
+							<div className="d-flex justify-content-center align-items-center">
+								<TablePagination
+									total={groupSessionsTotalCount}
+									page={parseInt(pageNumber, 10)}
+									size={15}
+									onClick={handlePaginationClick}
+								/>
+							</div>
+						</Col>
+						<Col xs={4}>
+							<div className="d-flex justify-content-end align-items-center">
+								<p className="mb-0 fw-semibold text-gray">
+									<span className="text-dark">{groupSessions.length}</span> of{' '}
+									<span className="text-dark">{groupSessionsTotalCountDescription}</span> Group
+									Sessions
+								</p>
+							</div>
 						</Col>
 					</Row>
 				</Await>
