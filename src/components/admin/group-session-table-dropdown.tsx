@@ -4,7 +4,14 @@ import { Dropdown } from 'react-bootstrap';
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel, ROLE_ID } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
+import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-x-close.svg';
+import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
 
 interface GroupSessionTableDropdownProps {
 	groupSession: GroupSessionModel;
@@ -55,56 +62,68 @@ export const GroupSessionTableDropdown = ({
 			</Dropdown.Toggle>
 			<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				<Dropdown.Item
+					className="d-flex align-items-center"
 					onClick={() => {
 						window.alert('[TODO]: View Registrants');
 					}}
 				>
+					<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />
 					View Registrants
 				</Dropdown.Item>
 				<Dropdown.Divider />
 				{canAdd && (
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							onAdd(groupSession.groupSessionId);
 						}}
 					>
+						<PlusIcon className="me-2 text-n500" width={24} height={24} />
 						Add
 					</Dropdown.Item>
 				)}
 				{canEdit && (
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							onEdit(groupSession.groupSessionId);
 						}}
 					>
+						<EditIcon className="me-2 text-n500" width={24} height={24} />
 						Edit
 					</Dropdown.Item>
 				)}
 				{canDuplicate && (
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							onDuplicate(groupSession.groupSessionId);
 						}}
 					>
+						<CopyIcon className="me-2 text-n500" width={24} height={24} />
 						Duplicate
 					</Dropdown.Item>
 				)}
 				<Dropdown.Divider />
 				{canCancel && (
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
+						<XCloseIcon className="me-2 text-n500" width={24} height={24} />
 						Cancel
 					</Dropdown.Item>
 				)}
 				{canDelete && (
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							onDelete(groupSession.groupSessionId);
 						}}
 					>
+						<TrashIcon className="me-2 text-n500" width={24} height={24} />
 						Delete
 					</Dropdown.Item>
 				)}
