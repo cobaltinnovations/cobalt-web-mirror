@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import {
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderClosureReasonId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
@@ -79,13 +80,15 @@ export const Component = () => {
 
 	useEffect(() => {
 		data.patientOrderPromise.then((response) => {
-			if (response?.patientOrder.resourceCheckInResponseNeeded) {
-				navigate('/ic/patient/check-in');
-				return;
+			const patientOrderClosed =
+				response?.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED;
+
+			if (response?.patientOrder) {
+				setPatientOrder(response.patientOrder);
 			}
 
-			if (response?.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
-				setHomescreenState(PAGE_STATES.ORDER_CLOSED);
+			if (response?.patientOrder.resourceCheckInResponseNeeded) {
+				navigate('/ic/patient/check-in');
 				return;
 			}
 
@@ -97,16 +100,20 @@ export const Component = () => {
 				return;
 			}
 
-			if (response?.patientOrder) {
-				setPatientOrder(response.patientOrder);
+			if (
+				(patientOrderClosed &&
+					response.patientOrder.patientOrderClosureReasonId ===
+						PatientOrderClosureReasonId.INELIGIBLE_DUE_TO_LOCATION) ||
+				!response?.patientOrder.patientAddressRegionAccepted ||
+				!response?.patientOrder.primaryPlanAccepted
+			) {
+				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
+				return;
+			}
 
-				if (
-					!response.patientOrder.patientAddressRegionAccepted ||
-					!response?.patientOrder.primaryPlanAccepted
-				) {
-					setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
-					return;
-				}
+			if (patientOrderClosed) {
+				setHomescreenState(PAGE_STATES.ORDER_CLOSED);
+				return;
 			}
 
 			switch (response?.patientOrder.patientOrderScreeningStatusId) {
