@@ -20,7 +20,12 @@ import {
 } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { GroupSessionTableDropdown } from '@/components/admin';
+import {
+	AdminAddGroupSessionModal,
+	AdminGroupSessionFilterStatus,
+	GroupSessionTableDropdown,
+	adminGroupSessionFilterStatusGetParsedQueryParams,
+} from '@/components/admin';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -33,12 +38,13 @@ export function useAdminGroupSessionsLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
+	const filterStatusQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(url.searchParams);
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
 		viewType: 'ADMINISTRATOR',
 		pageNumber,
 		pageSize: 15,
-		// ...(statusFilterValue ? { groupSessionStatusId: statusFilterValue } : {}),
+		...filterStatusQueryParams,
 	});
 	const groupSessionCountsRequest = groupSessionsService.getGroupSessionCounts();
 	const groupSessionsPromise = Promise.all([groupSessionsrequest.fetch(), groupSessionCountsRequest.fetch()]);
@@ -61,6 +67,8 @@ export const Component = () => {
 	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
 	const [groupSessionsTotalCountDescription, setGroupSessionsTotalCountDescription] = useState('0');
 
+	const [showAddGroupSessionModal, setShowAddGroupSessionModal] = useState(false);
+
 	useEffect(() => {
 		if (!groupSessionsPromise) {
 			return;
@@ -68,14 +76,16 @@ export const Component = () => {
 
 		const loadGroupSessions = async () => {
 			try {
+				setIsLoading(true);
 				const [groupSessionsResponse] = await groupSessionsPromise;
 
 				setGroupSessions(groupSessionsResponse.groupSessions);
 				setGroupSessionsTotalCount(groupSessionsResponse.totalCount);
 				setGroupSessionsTotalCountDescription(groupSessionsResponse.totalCountDescription);
-				console.log('groupSessionsResponse', groupSessionsResponse);
 			} catch (error) {
 				handleError(error);
+			} finally {
+				setIsLoading(false);
 			}
 		};
 
@@ -107,7 +117,6 @@ export const Component = () => {
 			const { groupSession } = await groupSessionsService
 				.updateGroupSessionStatusById(groupSessionId, actionId)
 				.fetch();
-			// const { groupSessionCounts } = await groupSessionsService.getGroupSessionCounts().fetch();
 
 			if (actionId === GROUP_SESSION_STATUS_ID.DELETED) {
 				groupSessionsClone.splice(replacementIndex, 1);
@@ -116,7 +125,6 @@ export const Component = () => {
 			}
 
 			setGroupSessions(groupSessionsClone);
-			// setSessionCounts(groupSessionCounts);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -138,160 +146,175 @@ export const Component = () => {
 	};
 
 	return (
-		<Container fluid className="px-8 py-8">
-			<Row className="mb-6">
-				<Col>
-					<div className="mb-6 d-flex align-items-center justify-content-between">
-						<h2 className="mb-0">Group Sessions</h2>
-						<Button
-							onClick={() => {
-								navigate('/group-sessions/scheduled/create');
-							}}
-						>
-							Add Group Session
-						</Button>
-					</div>
-					<hr />
-				</Col>
-			</Row>
-			<Row className="mb-6">
-				<Col>filters</Col>
-				<Col>sort</Col>
-			</Row>
-			<Suspense>
-				<Await resolve={groupSessionsPromise}>
-					<Row className="mb-8">
-						<Col>
-							<Table isLoading={isLoading}>
-								<TableHead>
-									<TableRow>
-										<TableCell header>Date Added</TableCell>
-										<TableCell header>Session</TableCell>
-										<TableCell header>Facilitator</TableCell>
-										<TableCell header>Scheduling</TableCell>
-										<TableCell header>Capacity</TableCell>
-										<TableCell header>Status</TableCell>
-										<TableCell header>Visible</TableCell>
-										<TableCell header colSpan={2}>
-											Start Date
-										</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{groupSessions.map((groupSession) => (
-										<TableRow key={groupSession.groupSessionId}>
-											<TableCell>{groupSession.createdDateDescription}</TableCell>
-											<TableCell>
-												<Link
-													to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
-												>
-													{groupSession.title}
-												</Link>
-											</TableCell>
-											<TableCell>
-												<span className="d-block">{groupSession.facilitatorName}</span>
-												<span className="d-block text-muted">
-													{groupSession.facilitatorEmailAddress}
-												</span>
-											</TableCell>
-											<TableCell>
-												{groupSession.groupSessionSchedulingSystemId ===
-												GroupSessionSchedulingSystemId.COBALT
-													? 'Cobalt'
-													: 'External'}
-											</TableCell>
-											<TableCell>
-												{groupSession.seatsReserved}/{groupSession.seats}
-											</TableCell>
-											<TableCell className="flex-row align-items-center justify-content-start">
-												{groupSession.groupSessionStatusId ===
-													GROUP_SESSION_STATUS_ID.ADDED && (
-													<Badge pill bg="outline-success" className="text-nowrap">
-														{groupSession.groupSessionStatusIdDescription}
-													</Badge>
-												)}
-												{groupSession.groupSessionStatusId ===
-													GROUP_SESSION_STATUS_ID.ARCHIVED && (
-													<Badge pill bg="outline-light" className="text-nowrap">
-														{groupSession.groupSessionStatusIdDescription}
-													</Badge>
-												)}
-												{groupSession.groupSessionStatusId ===
-													GROUP_SESSION_STATUS_ID.CANCELED && (
-													<Badge pill bg="outline-danger" className="text-nowrap">
-														{groupSession.groupSessionStatusIdDescription}
-													</Badge>
-												)}
-												{groupSession.groupSessionStatusId ===
-													GROUP_SESSION_STATUS_ID.DELETED && (
-													<Badge pill bg="outline-danger" className="text-nowrap">
-														{groupSession.groupSessionStatusIdDescription}
-													</Badge>
-												)}
-												{groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW && (
-													<Badge pill bg="outline-warning" className="text-nowrap">
-														{groupSession.groupSessionStatusIdDescription}
-													</Badge>
-												)}
-											</TableCell>
-											<TableCell>
-												<span className="text-danger">[TODO]: Yes/No</span>
-											</TableCell>
-											<TableCell>{groupSession.startDateTimeDescription}</TableCell>
-											<TableCell>
-												<GroupSessionTableDropdown
-													groupSession={groupSession}
-													onAdd={(groupSessionId) => {
-														handleStatusUpdate(
-															groupSessionId,
-															GROUP_SESSION_STATUS_ID.ADDED
-														);
-													}}
-													onEdit={handleEdit}
-													onDuplicate={handleDuplicate}
-													onCancel={(groupSessionId) => {
-														handleStatusUpdate(
-															groupSessionId,
-															GROUP_SESSION_STATUS_ID.CANCELED
-														);
-													}}
-													onDelete={(groupSessionId) => {
-														handleStatusUpdate(
-															groupSessionId,
-															GROUP_SESSION_STATUS_ID.DELETED
-														);
-													}}
-												/>
+		<>
+			<AdminAddGroupSessionModal
+				show={showAddGroupSessionModal}
+				onHide={() => {
+					setShowAddGroupSessionModal(false);
+				}}
+				onContinue={() => {
+					navigate('/group-sessions/scheduled/create');
+				}}
+			/>
+
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-6">
+					<Col>
+						<div className="mb-6 d-flex align-items-center justify-content-between">
+							<h2 className="mb-0">Group Sessions</h2>
+							<Button
+								onClick={() => {
+									setShowAddGroupSessionModal(true);
+								}}
+							>
+								Add Group Session
+							</Button>
+						</div>
+						<hr />
+					</Col>
+				</Row>
+				<Row className="mb-6">
+					<Col>
+						<AdminGroupSessionFilterStatus />
+					</Col>
+					<Col>sort</Col>
+				</Row>
+				<Suspense>
+					<Await resolve={groupSessionsPromise}>
+						<Row className="mb-8">
+							<Col>
+								<Table isLoading={isLoading}>
+									<TableHead>
+										<TableRow>
+											<TableCell header>Date Added</TableCell>
+											<TableCell header>Session</TableCell>
+											<TableCell header>Facilitator</TableCell>
+											<TableCell header>Scheduling</TableCell>
+											<TableCell header>Capacity</TableCell>
+											<TableCell header>Status</TableCell>
+											<TableCell header>Visible</TableCell>
+											<TableCell header colSpan={2}>
+												Start Date
 											</TableCell>
 										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						</Col>
-					</Row>
-					<Row>
-						<Col xs={{ span: 4, offset: 4 }}>
-							<div className="d-flex justify-content-center align-items-center">
-								<TablePagination
-									total={groupSessionsTotalCount}
-									page={parseInt(pageNumber, 10)}
-									size={15}
-									onClick={handlePaginationClick}
-								/>
-							</div>
-						</Col>
-						<Col xs={4}>
-							<div className="d-flex justify-content-end align-items-center">
-								<p className="mb-0 fw-semibold text-gray">
-									<span className="text-dark">{groupSessions.length}</span> of{' '}
-									<span className="text-dark">{groupSessionsTotalCountDescription}</span> Group
-									Sessions
-								</p>
-							</div>
-						</Col>
-					</Row>
-				</Await>
-			</Suspense>
-		</Container>
+									</TableHead>
+									<TableBody>
+										{groupSessions.map((groupSession) => (
+											<TableRow key={groupSession.groupSessionId}>
+												<TableCell>{groupSession.createdDateDescription}</TableCell>
+												<TableCell>
+													<Link
+														to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+													>
+														{groupSession.title}
+													</Link>
+												</TableCell>
+												<TableCell>
+													<span className="d-block">{groupSession.facilitatorName}</span>
+													<span className="d-block text-muted">
+														{groupSession.facilitatorEmailAddress}
+													</span>
+												</TableCell>
+												<TableCell>
+													{groupSession.groupSessionSchedulingSystemId ===
+													GroupSessionSchedulingSystemId.COBALT
+														? 'Cobalt'
+														: 'External'}
+												</TableCell>
+												<TableCell>
+													{groupSession.seatsReserved}/{groupSession.seats}
+												</TableCell>
+												<TableCell className="flex-row align-items-center justify-content-start">
+													{groupSession.groupSessionStatusId ===
+														GROUP_SESSION_STATUS_ID.ADDED && (
+														<Badge pill bg="outline-success" className="text-nowrap">
+															{groupSession.groupSessionStatusIdDescription}
+														</Badge>
+													)}
+													{groupSession.groupSessionStatusId ===
+														GROUP_SESSION_STATUS_ID.ARCHIVED && (
+														<Badge pill bg="outline-light" className="text-nowrap">
+															{groupSession.groupSessionStatusIdDescription}
+														</Badge>
+													)}
+													{groupSession.groupSessionStatusId ===
+														GROUP_SESSION_STATUS_ID.CANCELED && (
+														<Badge pill bg="outline-danger" className="text-nowrap">
+															{groupSession.groupSessionStatusIdDescription}
+														</Badge>
+													)}
+													{groupSession.groupSessionStatusId ===
+														GROUP_SESSION_STATUS_ID.DELETED && (
+														<Badge pill bg="outline-danger" className="text-nowrap">
+															{groupSession.groupSessionStatusIdDescription}
+														</Badge>
+													)}
+													{groupSession.groupSessionStatusId ===
+														GROUP_SESSION_STATUS_ID.NEW && (
+														<Badge pill bg="outline-warning" className="text-nowrap">
+															{groupSession.groupSessionStatusIdDescription}
+														</Badge>
+													)}
+												</TableCell>
+												<TableCell>
+													<span className="text-danger">[TODO]: Yes/No</span>
+												</TableCell>
+												<TableCell>{groupSession.startDateTimeDescription}</TableCell>
+												<TableCell>
+													<GroupSessionTableDropdown
+														groupSession={groupSession}
+														onAdd={(groupSessionId) => {
+															handleStatusUpdate(
+																groupSessionId,
+																GROUP_SESSION_STATUS_ID.ADDED
+															);
+														}}
+														onEdit={handleEdit}
+														onDuplicate={handleDuplicate}
+														onCancel={(groupSessionId) => {
+															handleStatusUpdate(
+																groupSessionId,
+																GROUP_SESSION_STATUS_ID.CANCELED
+															);
+														}}
+														onDelete={(groupSessionId) => {
+															handleStatusUpdate(
+																groupSessionId,
+																GROUP_SESSION_STATUS_ID.DELETED
+															);
+														}}
+													/>
+												</TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</Col>
+						</Row>
+						<Row>
+							<Col xs={{ span: 4, offset: 4 }}>
+								<div className="d-flex justify-content-center align-items-center">
+									<TablePagination
+										total={groupSessionsTotalCount}
+										page={parseInt(pageNumber, 10)}
+										size={15}
+										onClick={handlePaginationClick}
+									/>
+								</div>
+							</Col>
+							<Col xs={4}>
+								<div className="d-flex justify-content-end align-items-center">
+									<p className="mb-0 fw-semibold text-gray">
+										<span className="text-dark">{groupSessions.length}</span> of{' '}
+										<span className="text-dark">{groupSessionsTotalCountDescription}</span> Group
+										Sessions
+									</p>
+								</div>
+							</Col>
+						</Row>
+					</Await>
+				</Suspense>
+			</Container>
+		</>
 	);
 };
