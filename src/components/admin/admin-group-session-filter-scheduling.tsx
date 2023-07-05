@@ -4,6 +4,7 @@ import { Form } from 'react-bootstrap';
 
 import { GROUP_SESSION_STATUS_ID } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
+import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
 interface Props {
 	className?: string;
@@ -11,52 +12,42 @@ interface Props {
 
 const options = [
 	{
-		groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-		title: 'Added',
+		groupSessionSchedulingSystemId: GroupSessionSchedulingSystemId.COBALT,
+		title: 'Cobalt',
 	},
 	{
-		groupSessionStatusId: GROUP_SESSION_STATUS_ID.ARCHIVED,
-		title: 'Archived',
-	},
-	{
-		groupSessionStatusId: GROUP_SESSION_STATUS_ID.CANCELED,
-		title: 'Canceled',
-	},
-	{
-		groupSessionStatusId: GROUP_SESSION_STATUS_ID.DELETED,
-		title: 'Deleted',
-	},
-	{
-		groupSessionStatusId: GROUP_SESSION_STATUS_ID.NEW,
-		title: 'New',
+		groupSessionSchedulingSystemId: GroupSessionSchedulingSystemId.EXTERNAL,
+		title: 'External',
 	},
 ];
 
-export const adminGroupSessionFilterStatusGetParsedQueryParams = (searchParams: URLSearchParams) => {
+export const adminGroupSessionFilterSchedulingGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
-		...(searchParams.get('groupSessionStatusId') && {
-			groupSessionStatusId: searchParams.get('groupSessionStatusId') as GROUP_SESSION_STATUS_ID,
+		...(searchParams.get('groupSessionSchedulingSystemId') && {
+			groupSessionSchedulingSystemId: searchParams.get(
+				'groupSessionSchedulingSystemId'
+			) as GROUP_SESSION_STATUS_ID,
 		}),
 	};
 };
 
-export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
+export const AdminGroupSessionFilterScheduling = ({ className }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedValue, setSelectedValue] = useState('');
 
 	const isActive = useMemo(() => {
-		const parseQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(searchParams);
-		return !!parseQueryParams.groupSessionStatusId;
+		const parseQueryParams = adminGroupSessionFilterSchedulingGetParsedQueryParams(searchParams);
+		return !!parseQueryParams.groupSessionSchedulingSystemId;
 	}, [searchParams]);
 
 	const handleDismiss = useCallback(() => {
-		searchParams.delete('groupSessionStatusId');
+		searchParams.delete('groupSessionSchedulingSystemId');
 		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
 	const handleConfirm = useCallback(() => {
-		searchParams.set('groupSessionStatusId', selectedValue);
+		searchParams.set('groupSessionSchedulingSystemId', selectedValue);
 		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValue, setSearchParams]);
@@ -65,8 +56,8 @@ export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 		<FilterDropdown
 			className={className}
 			active={isActive}
-			id="admin-group-session-filter-status"
-			title="Status"
+			id="admin-group-session-filter-scheduling"
+			title="Scheduling"
 			dismissText="Clear"
 			onDismiss={handleDismiss}
 			confirmText="Apply"
@@ -75,13 +66,13 @@ export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 		>
 			{options.map((option) => (
 				<Form.Check
-					key={option.groupSessionStatusId}
+					key={option.groupSessionSchedulingSystemId}
 					type="radio"
-					name="admin-group-session-filter-status"
-					id={`admin-group-session-filter-status--${option.groupSessionStatusId}`}
+					name="admin-group-session-filter-scheduling"
+					id={`admin-group-session-filter-scheduling--${option.groupSessionSchedulingSystemId}`}
 					label={option.title}
-					value={option.groupSessionStatusId}
-					checked={selectedValue === option.groupSessionStatusId}
+					value={option.groupSessionSchedulingSystemId}
+					checked={selectedValue === option.groupSessionSchedulingSystemId}
 					onChange={({ currentTarget }) => {
 						setSelectedValue(currentTarget.value);
 					}}

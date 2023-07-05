@@ -10,7 +10,6 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import {
 	GetGroupSessionCountsResponseBody,
@@ -22,10 +21,13 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
 	AdminAddGroupSessionModal,
+	AdminGroupSessionFilterScheduling,
 	AdminGroupSessionFilterStatus,
 	GroupSessionTableDropdown,
+	adminGroupSessionFilterSchedulingGetParsedQueryParams,
 	adminGroupSessionFilterStatusGetParsedQueryParams,
 } from '@/components/admin';
+import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -39,12 +41,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
 	const filterStatusQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(url.searchParams);
+	const filterSchedulingQueryParams = adminGroupSessionFilterSchedulingGetParsedQueryParams(url.searchParams);
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
 		viewType: 'ADMINISTRATOR',
 		pageNumber,
 		pageSize: 15,
 		...filterStatusQueryParams,
+		...filterSchedulingQueryParams,
 	});
 	const groupSessionCountsRequest = groupSessionsService.getGroupSessionCounts();
 	const groupSessionsPromise = Promise.all([groupSessionsrequest.fetch(), groupSessionCountsRequest.fetch()]);
@@ -175,7 +179,12 @@ export const Component = () => {
 				</Row>
 				<Row className="mb-6">
 					<Col>
-						<AdminGroupSessionFilterStatus />
+						<div className="d-flex align-items-center">
+							<FilterIcon className="me-2 text-n500" />
+							<span className="me-4 text-n500">Filters</span>
+							<AdminGroupSessionFilterStatus className="me-2" />
+							<AdminGroupSessionFilterScheduling />
+						</div>
 					</Col>
 					<Col>sort</Col>
 				</Row>
