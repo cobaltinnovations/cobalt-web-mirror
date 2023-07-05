@@ -48,9 +48,9 @@ interface MhicPatientOrderShelfLoaderData {
 	patientOrderPromise: Promise<PatientOrderResponse>;
 }
 
-function loadShelfData(patientOrderId: string) {
+function loadShelfData(patientOrderId: string, isPolling = false) {
 	const request = integratedCareService.getPatientOrder(patientOrderId);
-	const patientOrderPromise = request.fetch();
+	const patientOrderPromise = request.fetch({ isPolling });
 
 	return {
 		getResponseChecksum: () => patientOrderPromise.then(() => request.cobaltResponseChecksum),
@@ -85,7 +85,7 @@ export const Component = () => {
 	}, [matches]);
 
 	const pollingFn = useCallback(() => {
-		return loadShelfData(patientOrderId);
+		return loadShelfData(patientOrderId, true);
 	}, [patientOrderId]);
 
 	const { data: shelfData } = usePolledLoaderData({
