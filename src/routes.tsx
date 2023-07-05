@@ -26,7 +26,6 @@ import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
 import PatientDemographics from './routes/ic/patient/patient-demographics';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
-import PatientLanding from './routes/ic/patient/patient-landing';
 import PatientConsent from './routes/ic/patient/patient-consent';
 import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
 import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
@@ -690,8 +689,9 @@ export const routes: RouteObject[] = [
 								lazy: () => import('@/routes/ic/patient/patient-layout'),
 								children: [
 									{
+										id: 'patient-landing',
 										index: true,
-										element: <PatientLanding />,
+										lazy: () => import('@/routes/ic/patient/patient-landing'),
 									},
 									{
 										path: 'consent',

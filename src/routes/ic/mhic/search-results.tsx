@@ -18,7 +18,13 @@ export function useMhicSearchResulsLoaderData() {
 	return useRouteLoaderData('mhic-search-results') as MhicSearchResultsLoaderData;
 }
 
-function loadSearchResults({ searchParams }: { searchParams: URLSearchParams }) {
+function loadSearchResults({
+	searchParams,
+	isPolling = false,
+}: {
+	searchParams: URLSearchParams;
+	isPolling?: boolean;
+}) {
 	const pageNumber = searchParams.get('pageNumber') ?? 0;
 	const patientMrn = searchParams.get('patientMrn') ?? 0;
 	const searchQuery = searchParams.get('searchQuery') ?? 0;
@@ -35,7 +41,7 @@ function loadSearchResults({ searchParams }: { searchParams: URLSearchParams }) 
 		pageSize: '15',
 	});
 
-	const responsePromise = request.fetch();
+	const responsePromise = request.fetch({ isPolling });
 
 	return {
 		getResponseChecksum: () => responsePromise.then(() => request.cobaltResponseChecksum),
@@ -53,7 +59,7 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const pollingFn = useCallback(() => {
-		return loadSearchResults({ searchParams });
+		return loadSearchResults({ searchParams, isPolling: true });
 	}, [searchParams]);
 	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicSearchResulsLoaderData,

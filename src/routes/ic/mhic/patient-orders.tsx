@@ -44,7 +44,13 @@ export function useMhicOrdersLoaderData() {
 	return useRouteLoaderData('mhic-patient-orders') as MhicOrdersLoaderData;
 }
 
-function loadPatientOrders({ searchParams }: { searchParams: URLSearchParams }) {
+function loadPatientOrders({
+	searchParams,
+	isPolling = false,
+}: {
+	searchParams: URLSearchParams;
+	isPolling?: boolean;
+}) {
 	const pageNumber = searchParams.get('pageNumber') ?? 0;
 
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(searchParams);
@@ -65,7 +71,7 @@ function loadPatientOrders({ searchParams }: { searchParams: URLSearchParams }) 
 		...mhicFilterParsedQueryParams,
 	});
 
-	const patientOrdersListPromise = request.fetch();
+	const patientOrdersListPromise = request.fetch({ isPolling });
 
 	return {
 		getResponseChecksum: () => patientOrdersListPromise.then(() => request.cobaltResponseChecksum),
@@ -90,7 +96,7 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const pollingFn = useCallback(() => {
-		return loadPatientOrders({ searchParams });
+		return loadPatientOrders({ searchParams, isPolling: true });
 	}, [searchParams]);
 	const revalidator = useRevalidator();
 	const [isImporting, setIsImporting] = useState(false);
