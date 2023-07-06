@@ -128,8 +128,7 @@ export interface ReferenceDataResponse {
 	patientOrderCareTypes: PatientOrderCareType[];
 	patientOrderDispositions: PatientOrderDisposition[];
 	patientOrderFocusTypes: PatientOrderFocusType[];
-	patientOrderInsurancePayors: PatientOrderInsurancePayors[];
-	patientOrderInsurancePlans: PatientOrderInsurancePlans[];
+	primaryPayorNames: string[];
 	patientOrderOutreachResults: PatientOrderOutreachResult[];
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
 	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];

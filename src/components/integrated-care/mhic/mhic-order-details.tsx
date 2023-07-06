@@ -10,7 +10,6 @@ import {
 	MhicContactInformationModal,
 	MhicDemographicsModal,
 	MhicEpisodeCard,
-	MhicInsuranceModal,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
@@ -51,7 +50,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showDemographicsModal, setShowDemographicsModal] = useState(false);
-	const [showInsuranceModal, setShowInsuranceModal] = useState(false);
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
@@ -164,18 +162,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onSave={() => {
 					revalidator.revalidate();
 					setShowDemographicsModal(false);
-				}}
-			/>
-
-			<MhicInsuranceModal
-				patientOrder={patientOrder}
-				show={showInsuranceModal}
-				onHide={() => {
-					setShowInsuranceModal(false);
-				}}
-				onSave={() => {
-					revalidator.revalidate();
-					setShowInsuranceModal(false);
 				}}
 			/>
 
@@ -741,14 +727,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row className="mb-4">
 											<Col>
-												<p className="m-0">{patientOrder.patientOrderInsurancePayorName}</p>
+												<p className="m-0">{patientOrder.primaryPayorName}</p>
 											</Col>
 										</Row>
 										<Row>
 											<Col>
-												<p className="m-0">
-													Plan: {patientOrder.patientOrderInsurancePlanName}
-												</p>
+												<p className="m-0">Plan: {patientOrder.primaryPlanName}</p>
 											</Col>
 										</Row>
 									</Container>

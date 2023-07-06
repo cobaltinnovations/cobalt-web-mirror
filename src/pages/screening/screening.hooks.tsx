@@ -78,6 +78,9 @@ export function useScreeningNavigation() {
 				case ScreeningSessionDestinationId.HOME:
 					window.location.href = '/';
 					return;
+				case ScreeningSessionDestinationId.MENTAL_HEALTH_PROVIDER_RECOMMENDATIONS:
+					window.location.href = '/connect-with-support/recommendations';
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					navigate(
