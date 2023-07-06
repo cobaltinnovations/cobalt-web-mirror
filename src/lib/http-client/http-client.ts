@@ -19,7 +19,7 @@ export type OrchestratedRequest<T = undefined> = {
 	requestComplete: boolean;
 	source: CancelTokenSource;
 	config: AxiosRequestConfig;
-	fetch(): Promise<T>;
+	fetch(fetchConfig?: { isPolling?: boolean }): Promise<T>;
 	abort(): void;
 	cobaltResponseChecksum?: string;
 };
@@ -111,7 +111,7 @@ export class HttpClient {
 			requestComplete: false,
 		} as any;
 
-		orchestratedRequest.fetch = async () => {
+		orchestratedRequest.fetch = async (config) => {
 			const source = axios.CancelToken.source();
 
 			let body = requestConfig.data;
@@ -131,6 +131,7 @@ export class HttpClient {
 				headers: {
 					...this._headers,
 					...requestConfig.headers,
+					...(config?.isPolling ? { 'X-Cobalt-Autorefresh': true } : {}),
 				},
 				cancelToken: source.token,
 				...(body ? { data: body } : {}),

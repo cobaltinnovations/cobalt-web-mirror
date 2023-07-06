@@ -187,7 +187,10 @@ export function useMhicMyPatientsLoaderData() {
 	return useRouteLoaderData('mhic-my-patients') as MhicMyPatientsLoaderData;
 }
 
-function loadMyPatients({ mhicView, searchParams }: { mhicView: string; searchParams: URLSearchParams }) {
+function loadMyPatients(
+	{ mhicView, searchParams }: { mhicView: string; searchParams: URLSearchParams },
+	isPolling = false
+) {
 	const accountId = Cookies.get('accountId');
 	const pageNumber = searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromSearchParams(searchParams);
@@ -210,7 +213,7 @@ function loadMyPatients({ mhicView, searchParams }: { mhicView: string; searchPa
 		...mhicFilterPracticeParsedQueryParams,
 		...mhicSortDropdownParsedQueryParams,
 	});
-	const responsePromise = request.fetch();
+	const responsePromise = request.fetch({ isPolling });
 
 	return {
 		getResponseChecksum: () => responsePromise.then(() => request.cobaltResponseChecksum),
@@ -242,7 +245,7 @@ export const Component = () => {
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pollingFn = useCallback(() => {
-		return loadMyPatients({ mhicView: match?.params.mhicView ?? '', searchParams });
+		return loadMyPatients({ mhicView: match?.params.mhicView ?? '', searchParams }, true);
 	}, [match?.params.mhicView, searchParams]);
 	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicMyPatientsLoaderData,

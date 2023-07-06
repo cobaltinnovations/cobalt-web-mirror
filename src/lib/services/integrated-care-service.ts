@@ -53,6 +53,10 @@ export interface PatientOrderPanelCountsResponse {
 	>;
 }
 
+export interface LatestPatientOrderResponse {
+	patientOrder: PatientOrderModel;
+}
+
 export interface PatientOrderResponse {
 	patientOrder: PatientOrderModel;
 	associatedPatientOrders: PatientOrderModel[];
@@ -460,9 +464,7 @@ export const integratedCareService = {
 		});
 	},
 	getLatestPatientOrder() {
-		return httpSingleton.orchestrateRequest<{
-			patientOrder: PatientOrderModel;
-		}>({
+		return httpSingleton.orchestrateRequest<LatestPatientOrderResponse>({
 			method: 'GET',
 			url: '/patient-orders/latest',
 		});
