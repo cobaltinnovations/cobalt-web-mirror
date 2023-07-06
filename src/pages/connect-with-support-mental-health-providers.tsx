@@ -1,24 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { AccountSupportRole } from '@/lib/models';
-import { accountService, screeningService } from '@/lib/services';
+import { screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import { useBookingRequirementsNavigation } from '@/hooks/use-booking-requirements-navigation';
 import HeroContainer from '@/components/hero-container';
 import NoData from '@/components/no-data';
 import AsyncWrapper from '@/components/async-page';
-import RenderJson from '@/components/render-json';
 
 const ConnectWithSupportMentalHealthProviders = () => {
 	const navigate = useNavigate();
-	const { account, institution } = useAccount();
+	const { institution } = useAccount();
 	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
 		screeningFlowId: institution?.providerTriageScreeningFlowId,
 		instantiateOnLoad: false,
 	});
+	const checkBookingRequirementsAndRedirect = useBookingRequirementsNavigation();
 
 	const featureDetails = useMemo(
 		() => (institution?.features ?? []).find((feature) => feature.featureId === 'MENTAL_HEALTH_PROVIDERS'),
@@ -26,7 +26,6 @@ const ConnectWithSupportMentalHealthProviders = () => {
 	);
 
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
-	const [supportRoles, setSupportRoles] = useState<AccountSupportRole[]>([]);
 
 	const fetchData = useCallback(async () => {
 		if (!institution?.providerTriageScreeningFlowId) {
@@ -41,16 +40,8 @@ const ConnectWithSupportMentalHealthProviders = () => {
 			setHasCompletedScreening(true);
 		} else {
 			setHasCompletedScreening(false);
-			return;
 		}
-
-		if (!account?.accountId) {
-			throw new Error('accountId is undefined.');
-		}
-
-		const response = await accountService.getRecommendedSupportRoles(account.accountId).fetch();
-		setSupportRoles(response.supportRoles);
-	}, [account?.accountId, institution.providerTriageScreeningFlowId]);
+	}, [institution.providerTriageScreeningFlowId]);
 
 	return (
 		<>
@@ -68,9 +59,32 @@ const ConnectWithSupportMentalHealthProviders = () => {
 			{renderedCollectPhoneModal}
 
 			<AsyncWrapper fetchData={fetchData}>
-				<Container>
+				<Container className="py-15">
 					<Row>
 						<Col>
+							{hasCompletedScreening && (
+								<NoData
+									title={`Connect to ${institution.myChartName}`}
+									description={`Connect to ${institution.myChartName} to see a list of providers and their available telehealth appointment times. If you need an in-person appointment, please call us at ${institution.clinicalSupportPhoneNumberDescription}.`}
+									actions={[
+										{
+											variant: 'primary',
+											title: `Connect to ${institution.myChartName}`,
+											onClick: checkBookingRequirementsAndRedirect,
+										},
+										{
+											variant: 'outline-primary',
+											title: 'View my Results',
+											onClick: () => {
+												navigate(
+													'/connect-with-support/mental-health-providers/recommendations'
+												);
+											},
+										},
+									]}
+								/>
+							)}
+
 							{!hasCompletedScreening && (
 								<NoData
 									title="No Providers Recommended"
@@ -79,25 +93,10 @@ const ConnectWithSupportMentalHealthProviders = () => {
 										{
 											variant: 'primary',
 											title: 'Take Assessment',
-											onClick: () => {
-												startScreeningFlow();
-											},
+											onClick: startScreeningFlow,
 										},
 									]}
 								/>
-							)}
-
-							{hasCompletedScreening && (
-								<>
-									<RenderJson json={supportRoles} />
-									<Button
-										onClick={() => {
-											navigate('/connect-with-support/mental-health-providers/recommendations');
-										}}
-									>
-										See Assessment Results
-									</Button>
-								</>
 							)}
 						</Col>
 					</Row>
