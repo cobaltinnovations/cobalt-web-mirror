@@ -8,6 +8,7 @@ import {
 	PersonalizationDetails,
 	Institution,
 	AccountSupportRole,
+	AccountFeature,
 } from '@/lib/models';
 
 export interface AccountResponse {
@@ -319,6 +320,12 @@ export const accountService = {
 		return httpSingleton.orchestrateRequest<{ supportRoles: AccountSupportRole[] }>({
 			method: 'GET',
 			url: `/accounts/${accountId}/recommended-support-roles`,
+		});
+	},
+	getRecommendedFeatures(accountId: string) {
+		return httpSingleton.orchestrateRequest<{ features: AccountFeature[] }>({
+			method: 'GET',
+			url: `/accounts/${accountId}/provider-triage-recommended-features`,
 		});
 	},
 	getBookingRequirements(accountId: string) {

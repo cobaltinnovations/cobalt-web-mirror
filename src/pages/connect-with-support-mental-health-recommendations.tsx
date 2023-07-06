@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { AccountSupportRole } from '@/lib/models';
+import { AccountFeature } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
@@ -14,15 +14,15 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	const navigate = useNavigate();
 	const checkBookingRequirementsAndRedirect = useBookingRequirementsNavigation();
 	const { account, institution } = useAccount();
-	const [supportRoles, setSupportRoles] = useState<AccountSupportRole[]>([]);
+	const [recommendedFeature, setRecommendedFeatures] = useState<AccountFeature[]>([]);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) {
 			throw new Error('accountId is undefined.');
 		}
 
-		const response = await accountService.getRecommendedSupportRoles(account.accountId).fetch();
-		setSupportRoles(response.supportRoles);
+		const response = await accountService.getRecommendedFeatures(account.accountId).fetch();
+		setRecommendedFeatures(response.features);
 	}, [account?.accountId]);
 
 	return (
@@ -35,14 +35,14 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 				<Container className="py-20">
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							{supportRoles.length > 0 ? (
+							{recommendedFeature.length > 0 ? (
 								<>
 									<h1 className="mb-1">Assessment Results</h1>
 									<p className="mb-6 fs-large text-gray">Completed XXX</p>
 									<hr className="mb-8" />
 									<p className="mb-6 fs-large">
 										Based on the symptoms reported we recommend that you meet with a{' '}
-										<strong>{supportRoles[0]?.description}</strong>
+										<strong>{recommendedFeature[0]?.name}</strong>
 									</p>
 									<p className="mb-6 fs-large">
 										You can <strong>schedule a telehealth appointment</strong> with a Mental health

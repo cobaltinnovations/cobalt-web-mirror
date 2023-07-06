@@ -102,3 +102,8 @@ export interface AccountSupportRole {
 	supportRoleId: string;
 	description: string;
 }
+
+export interface AccountFeature {
+	featureId: string;
+	name: string;
+}
