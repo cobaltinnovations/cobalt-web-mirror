@@ -7,6 +7,7 @@ import {
 	BetaStatusId,
 	PersonalizationDetails,
 	Institution,
+	AccountSupportRole,
 } from '@/lib/models';
 
 export interface AccountResponse {
@@ -312,6 +313,18 @@ export const accountService = {
 			method: 'PUT',
 			url: `/accounts/${accountId}/location`,
 			data,
+		});
+	},
+	getRecommendedSupportRoles(accountId: string) {
+		return httpSingleton.orchestrateRequest<{ supportRoles: AccountSupportRole[] }>({
+			method: 'GET',
+			url: `/accounts/${accountId}/recommended-support-roles`,
+		});
+	},
+	getBookingRequirements(accountId: string) {
+		return httpSingleton.orchestrateRequest<{ myChartConnectionRequired: boolean }>({
+			method: 'GET',
+			url: `/accounts/${accountId}/provider-booking-requirements`,
 		});
 	},
 };
