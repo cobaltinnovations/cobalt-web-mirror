@@ -76,9 +76,7 @@ const ConnectWithSupportMentalHealthProviders = () => {
 											variant: 'outline-primary',
 											title: 'View my Results',
 											onClick: () => {
-												navigate(
-													'/connect-with-support/mental-health-providers/recommendations'
-												);
+												navigate('/connect-with-support/recommendations');
 											},
 										},
 									]}
