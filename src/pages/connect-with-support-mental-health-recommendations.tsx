@@ -58,7 +58,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 											size="lg"
 											onClick={checkBookingRequirementsAndRedirect}
 										>
-											Find Appointment
+											Connect to {institution.myChartName}
 										</Button>
 									</div>
 								</>

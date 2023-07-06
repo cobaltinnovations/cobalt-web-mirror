@@ -216,7 +216,7 @@ const ConnectWithSupportV2 = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Connect with Support - {featureDetails?.name}</title>
+				<title>{`Cobalt | Connect with Support - ${featureDetails?.name}`}</title>
 			</Helmet>
 
 			<Modal centered show={showEmployerModal}>

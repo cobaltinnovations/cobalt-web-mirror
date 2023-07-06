@@ -145,7 +145,7 @@ const Index: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Employee Mental Health &amp; Wellness @ {institution.name}</title>
+				<title>{`Cobalt | Employee Mental Health &amp; Wellness @ ${institution.name}`}</title>
 			</Helmet>
 
 			{institution?.featuresEnabled ? (

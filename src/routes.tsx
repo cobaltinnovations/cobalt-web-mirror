@@ -358,7 +358,7 @@ export const routes: RouteObject[] = [
 								element: <ConnectWithSupportMentalHealthProviders />,
 							},
 							{
-								path: '/connect-with-support/mental-health-providers/recommendations',
+								path: '/connect-with-support/recommendations',
 								element: <ConnectWithSupportMentalHealthRecommendations />,
 							},
 							{
