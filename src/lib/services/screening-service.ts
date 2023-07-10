@@ -95,6 +95,8 @@ export const screeningService = {
 	getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId: string) {
 		return httpSingleton.orchestrateRequest<{
 			sessionFullyCompleted: boolean;
+			sessionFullyCompletedAt: string;
+			sessionFullyCompletedAtDescription: string;
 		}>({
 			method: 'GET',
 			url: `/screening-flows/${screeningFlowId}/session-fully-completed`,

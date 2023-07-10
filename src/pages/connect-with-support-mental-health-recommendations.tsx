@@ -4,7 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { InstitutionFeature } from '@/lib/models';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService, institutionService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
@@ -12,6 +12,7 @@ import NoData from '@/components/no-data';
 const ConnectWithSupportMentalHealthRecommendations = () => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
+	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
 	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
 
@@ -38,7 +39,21 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			.fetch();
 
 		setMyChartAuthUrl(authenticationUrl);
-	}, [account?.accountId, institution.features, institution.institutionId]);
+
+		if (!institution.providerTriageScreeningFlowId) {
+			throw new Error('institution.providerTriageScreeningFlowId is undefined.');
+		}
+
+		const { sessionFullyCompletedAtDescription } = await screeningService
+			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
+			.fetch();
+		setCompletedAtDescription(sessionFullyCompletedAtDescription);
+	}, [
+		account?.accountId,
+		institution.features,
+		institution.institutionId,
+		institution.providerTriageScreeningFlowId,
+	]);
 
 	return (
 		<>
@@ -53,7 +68,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 							{recommendedFeature ? (
 								<>
 									<h1 className="mb-1">Assessment Results</h1>
-									<p className="mb-6 fs-large text-gray">Completed XXX</p>
+									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-8" />
 									<p className="mb-6 fs-large">
 										Based on the symptoms reported we recommend that you meet with a{' '}
