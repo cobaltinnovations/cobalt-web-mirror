@@ -21,17 +21,26 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			throw new Error('accountId is undefined.');
 		}
 
-		const { features } = await accountService.getRecommendedFeatures(account.accountId).fetch();
-		const matchingInstitutionFeature = institution.features.find((f) => f.featureId === features[0]?.featureId);
-		setRecommendedFeature(matchingInstitutionFeature);
-
-		const { myChartConnectionRequired } = await accountService.getBookingRequirements(account.accountId).fetch();
-		if (!myChartConnectionRequired) {
-			return;
+		if (!institution.providerTriageScreeningFlowId) {
+			throw new Error('institution.providerTriageScreeningFlowId is undefined.');
 		}
 
-		if (!institution.institutionId) {
-			throw new Error('institutionId is undefined.');
+		const [{ sessionFullyCompletedAtDescription }, { features }, { myChartConnectionRequired }] = await Promise.all(
+			[
+				screeningService
+					.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
+					.fetch(),
+				accountService.getRecommendedFeatures(account.accountId).fetch(),
+				accountService.getBookingRequirements(account.accountId).fetch(),
+			]
+		);
+		const matchingInstitutionFeature = institution.features.find((f) => f.featureId === features[0]?.featureId);
+
+		setCompletedAtDescription(sessionFullyCompletedAtDescription);
+		setRecommendedFeature(matchingInstitutionFeature);
+
+		if (!myChartConnectionRequired) {
+			return;
 		}
 
 		const { authenticationUrl } = await institutionService
@@ -39,15 +48,6 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			.fetch();
 
 		setMyChartAuthUrl(authenticationUrl);
-
-		if (!institution.providerTriageScreeningFlowId) {
-			throw new Error('institution.providerTriageScreeningFlowId is undefined.');
-		}
-
-		const { sessionFullyCompletedAtDescription } = await screeningService
-			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
-			.fetch();
-		setCompletedAtDescription(sessionFullyCompletedAtDescription);
 	}, [
 		account?.accountId,
 		institution.features,
