@@ -49,8 +49,12 @@ export interface PaymentType {
 }
 
 export interface AvailabilityTimeSlot {
+	appointmentParticipantStatusCodesByAppointmentTypeId?: Record<string, string>;
+	appointmentStatusCodesByAppointmentTypeId: Record<string, string>;
 	appointmentTypeIds: string[];
+	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
+	slotStatusCodesByAppointmentTypeId?: Record<string, string>;
 	status: string;
 	time: string;
 	timeDescription: string;

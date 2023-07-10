@@ -97,3 +97,13 @@ export interface BetaFeature {
 	betaFeatureAlertStatusId: BetaStatusId;
 	description: string;
 }
+
+export interface AccountSupportRole {
+	supportRoleId: string;
+	description: string;
+}
+
+export interface AccountFeature {
+	featureId: string;
+	name: string;
+}

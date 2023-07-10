@@ -53,6 +53,7 @@ export interface InstitutionFeature {
 	featureId: string;
 	name: string;
 	navDescription: string;
+	navVisible: boolean;
 	navigationHeaderId: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];

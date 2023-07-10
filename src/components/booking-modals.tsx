@@ -125,7 +125,11 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				}
 
 				if (timeSlot?.time) {
-					params.set('time', timeSlot?.time);
+					params.set('time', timeSlot.time);
+				}
+
+				if (timeSlot?.epicAppointmentFhirId) {
+					params.set('epicAppointmentFhirId', timeSlot.epicAppointmentFhirId);
 				}
 
 				if (appointmentType?.assessmentId) {

@@ -63,6 +63,12 @@ export const ConnectWithSupportV2 = lazyLoadWithRefresh(() => import('@/pages/co
 export const ConnectWithSupportMedicationPrescriber = lazyLoadWithRefresh(
 	() => import('@/pages/connect-with-support-medication-prescriber')
 );
+export const ConnectWithSupportMentalHealthProviders = lazyLoadWithRefresh(
+	() => import('@/pages/connect-with-support-mental-health-providers')
+);
+export const ConnectWithSupportMentalHealthRecommendations = lazyLoadWithRefresh(
+	() => import('@/pages/connect-with-support-mental-health-recommendations')
+);
 export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
 export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
@@ -346,6 +352,14 @@ export const routes: RouteObject[] = [
 							{
 								path: 'connect-with-support/medication-prescriber',
 								element: <ConnectWithSupportMedicationPrescriber />,
+							},
+							{
+								path: 'connect-with-support/mental-health-providers',
+								element: <ConnectWithSupportMentalHealthProviders />,
+							},
+							{
+								path: '/connect-with-support/recommendations',
+								element: <ConnectWithSupportMentalHealthRecommendations />,
 							},
 							{
 								path: 'connect-with-support/:urlName',

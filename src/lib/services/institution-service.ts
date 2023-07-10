@@ -52,4 +52,10 @@ export const institutionService = {
 			url: `/alerts/${alertId}/dismiss`,
 		});
 	},
+	getMyChartAuthenticationUrl(institutionId: string) {
+		return httpSingleton.orchestrateRequest<{ authenticationUrl: string }>({
+			method: 'GET',
+			url: `/institutions/${institutionId}/mychart-authentication-url`,
+		});
+	},
 };

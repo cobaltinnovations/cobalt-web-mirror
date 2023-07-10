@@ -419,10 +419,12 @@ const HeaderV2 = () => {
 							title: 'Connect with Support',
 							active: (institution?.features ?? [])
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
+								.filter((feature) => feature.navVisible)
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName, pathname)),
 							items: (institution?.features ?? [])
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
+								.filter((feature) => feature.navVisible)
 								.map(({ featureId, name, navDescription, urlName }) => ({
 									navigationItemId: featureId,
 									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
