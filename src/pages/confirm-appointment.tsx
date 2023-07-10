@@ -18,8 +18,9 @@ const ConfirmAppointment = () => {
 	const appointmentTypeId = searchParams.get('appointmentTypeId') ?? '';
 	const date = searchParams.get('date') ?? '';
 	const time = searchParams.get('time') ?? '';
-	const intakeAssessmentId = searchParams.get('intakeAssessmentId') || undefined;
-	const patientOrderId = searchParams.get('patientOrderId') || undefined;
+	const intakeAssessmentId = searchParams.get('intakeAssessmentId') ?? undefined;
+	const patientOrderId = searchParams.get('patientOrderId') ?? undefined;
+	const epicAppointmentFhirId = searchParams.get('epicAppointmentFhirId') ?? undefined;
 
 	const { addFlag } = useFlags();
 	const { account } = useAccount();
@@ -140,6 +141,7 @@ const ConfirmAppointment = () => {
 					emailAddress: emailInputValue,
 					...(promptForPhoneNumber && { phoneNumber: phoneNumberInputValue }),
 					...(patientOrderId && { patientOrderId }),
+					...(epicAppointmentFhirId && { epicAppointmentFhirId }),
 				})
 				.fetch();
 
