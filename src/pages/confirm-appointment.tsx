@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -33,6 +33,10 @@ const ConfirmAppointment = () => {
 	const [confirmationCodeInputValue, setConfirmationCodeInputValue] = useState('');
 
 	const [submitting, setSubmitting] = useState(false);
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 
 	const fetchData = useCallback(async () => {
 		if (!account) {
