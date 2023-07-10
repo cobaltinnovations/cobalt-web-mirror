@@ -19,15 +19,14 @@ const ConnectWithSupportMentalHealthProviders = () => {
 		instantiateOnLoad: false,
 	});
 
-	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
-	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
-
 	const featureDetails = useMemo(
 		() => (institution?.features ?? []).find((feature) => feature.featureId === 'MENTAL_HEALTH_PROVIDERS'),
 		[institution?.features]
 	);
 
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
+	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
+	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
 
 	const fetchData = useCallback(async () => {
 		if (!institution.providerTriageScreeningFlowId) {
