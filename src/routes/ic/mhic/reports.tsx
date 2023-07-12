@@ -150,8 +150,8 @@ export const Component = () => {
 							</Row>
 							<Row
 								className={classNames({
-									'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE,
-									'mb-4':
+									'mb-8':
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE ||
 										formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
 										formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT,
 								})}
@@ -176,8 +176,10 @@ export const Component = () => {
 								</Col>
 							</Row>
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE && (
-								<Row className="mb-10">
+							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
+								<Row className="mb-8">
 									<Col>
 										<h5 className="mb-2">Filters</h5>
 										<TypeaheadHelper
@@ -226,7 +228,7 @@ export const Component = () => {
 											}}
 										/>
 										<TypeaheadHelper
-											className="mb-4"
+											className="mb-8"
 											id="typeahead--patient-gender"
 											label="Patient Gender"
 											multiple
@@ -275,25 +277,28 @@ export const Component = () => {
 
 							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
 								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
-								<Row className="mb-10">
-									<Col>
-										<TypeaheadHelper
-											className="mb-4"
-											id="typeahead--mhic"
-											label="Select MHIC"
-											multiple
-											labelKey="displayName"
-											options={panelAccounts}
-											selected={formValues.panelAccounts}
-											onChange={(selected) => {
-												setFormValues((previousValues) => ({
-													...previousValues,
-													panelAccounts: selected as AccountModel[],
-												}));
-											}}
-										/>
-									</Col>
-								</Row>
+								<>
+									<h5 className="mb-2">MHIC</h5>
+									<Row className="mb-8">
+										<Col>
+											<TypeaheadHelper
+												className="mb-4"
+												id="typeahead--mhic"
+												label="Select MHIC"
+												multiple
+												labelKey="displayName"
+												options={panelAccounts}
+												selected={formValues.panelAccounts}
+												onChange={(selected) => {
+													setFormValues((previousValues) => ({
+														...previousValues,
+														panelAccounts: selected as AccountModel[],
+													}));
+												}}
+											/>
+										</Col>
+									</Row>
+								</>
 							)}
 
 							{formValues.reportTypeId && (
