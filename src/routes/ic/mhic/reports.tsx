@@ -151,8 +151,9 @@ export const Component = () => {
 							<Row
 								className={classNames({
 									'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE,
-									'mb-10': formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH,
-									'mb-4': formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT,
+									'mb-4':
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT,
 								})}
 							>
 								<Col>
@@ -272,7 +273,8 @@ export const Component = () => {
 								</Row>
 							)}
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT && (
+							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
 								<Row className="mb-10">
 									<Col>
 										<TypeaheadHelper
@@ -289,7 +291,6 @@ export const Component = () => {
 													panelAccounts: selected as AccountModel[],
 												}));
 											}}
-											required={formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT}
 										/>
 									</Col>
 								</Row>
