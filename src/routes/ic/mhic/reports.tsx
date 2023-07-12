@@ -13,23 +13,23 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import moment from 'moment';
 
 enum REPORT_TYPE_ID {
-	PIPELINE = 'PIPELINE',
-	OUTREACH = 'OUTREACH',
-	MHIC = 'MHIC',
+	IC_PIPELINE = 'IC_PIPELINE',
+	IC_OUTREACH = 'IC_OUTREACH',
+	IC_ASSESSMENT = 'IC_ASSESSMENT',
 }
 
 const reportTypes = [
 	{
-		reportTypeId: REPORT_TYPE_ID.PIPELINE,
+		reportTypeId: REPORT_TYPE_ID.IC_PIPELINE,
 		title: 'Pipeline',
 	},
 	{
-		reportTypeId: REPORT_TYPE_ID.OUTREACH,
-		title: 'Overall Outreach',
+		reportTypeId: REPORT_TYPE_ID.IC_OUTREACH,
+		title: 'Outreach',
 	},
 	{
-		reportTypeId: REPORT_TYPE_ID.MHIC,
-		title: 'MHIC Outreach',
+		reportTypeId: REPORT_TYPE_ID.IC_ASSESSMENT,
+		title: 'Assessment',
 	},
 ];
 
@@ -76,7 +76,7 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			window.location.href = buildQueryParamUrl('/patient-order-reports', {
+			window.location.href = buildQueryParamUrl('/reporting/run-report', {
 				// Generic
 				startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
 				endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
@@ -150,9 +150,10 @@ export const Component = () => {
 							</Row>
 							<Row
 								className={classNames({
-									'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE,
-									'mb-10': formValues.reportTypeId === REPORT_TYPE_ID.OUTREACH,
-									'mb-4': formValues.reportTypeId === REPORT_TYPE_ID.MHIC,
+									'mb-8':
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE ||
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+										formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT,
 								})}
 							>
 								<Col>
@@ -175,8 +176,10 @@ export const Component = () => {
 								</Col>
 							</Row>
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE && (
-								<Row className="mb-10">
+							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
+								<Row className="mb-8">
 									<Col>
 										<h5 className="mb-2">Filters</h5>
 										<TypeaheadHelper
@@ -225,7 +228,7 @@ export const Component = () => {
 											}}
 										/>
 										<TypeaheadHelper
-											className="mb-4"
+											className="mb-8"
 											id="typeahead--patient-gender"
 											label="Patient Gender"
 											multiple
@@ -272,27 +275,30 @@ export const Component = () => {
 								</Row>
 							)}
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.MHIC && (
-								<Row className="mb-10">
-									<Col>
-										<TypeaheadHelper
-											className="mb-4"
-											id="typeahead--mhic"
-											label="Select MHIC"
-											multiple
-											labelKey="displayName"
-											options={panelAccounts}
-											selected={formValues.panelAccounts}
-											onChange={(selected) => {
-												setFormValues((previousValues) => ({
-													...previousValues,
-													panelAccounts: selected as AccountModel[],
-												}));
-											}}
-											required={formValues.reportTypeId === REPORT_TYPE_ID.MHIC}
-										/>
-									</Col>
-								</Row>
+							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
+								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
+								<>
+									<h5 className="mb-2">MHIC</h5>
+									<Row className="mb-8">
+										<Col>
+											<TypeaheadHelper
+												className="mb-4"
+												id="typeahead--mhic"
+												label="Select MHIC"
+												multiple
+												labelKey="displayName"
+												options={panelAccounts}
+												selected={formValues.panelAccounts}
+												onChange={(selected) => {
+													setFormValues((previousValues) => ({
+														...previousValues,
+														panelAccounts: selected as AccountModel[],
+													}));
+												}}
+											/>
+										</Col>
+									</Row>
+								</>
 							)}
 
 							{formValues.reportTypeId && (
