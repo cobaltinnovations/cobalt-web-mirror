@@ -275,8 +275,7 @@ export const Component = () => {
 								</Row>
 							)}
 
-							{(formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH ||
-								formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT) && (
+							{formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH && (
 								<>
 									<h5 className="mb-2">MHIC</h5>
 									<Row className="mb-8">
