@@ -155,10 +155,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											<Button
 												className="d-flex align-items-center"
 												onClick={handleExportResultsClick}
-												disabled={
-													patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED || isExportingResults
-												}
+												disabled={isExportingResults}
 											>
 												Export Results
 												<ExternalIcon className="ms-2" width={20} height={20} />
