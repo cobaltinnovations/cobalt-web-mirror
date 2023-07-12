@@ -13,23 +13,23 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import moment from 'moment';
 
 enum REPORT_TYPE_ID {
-	PIPELINE = 'PIPELINE',
-	OUTREACH = 'OUTREACH',
-	MHIC = 'MHIC',
+	IC_PIPELINE = 'IC_PIPELINE',
+	IC_OUTREACH = 'IC_OUTREACH',
+	IC_ASSESSMENT = 'IC_ASSESSMENT',
 }
 
 const reportTypes = [
 	{
-		reportTypeId: REPORT_TYPE_ID.PIPELINE,
+		reportTypeId: REPORT_TYPE_ID.IC_PIPELINE,
 		title: 'Pipeline',
 	},
 	{
-		reportTypeId: REPORT_TYPE_ID.OUTREACH,
-		title: 'Overall Outreach',
+		reportTypeId: REPORT_TYPE_ID.IC_OUTREACH,
+		title: 'Outreach',
 	},
 	{
-		reportTypeId: REPORT_TYPE_ID.MHIC,
-		title: 'MHIC Outreach',
+		reportTypeId: REPORT_TYPE_ID.IC_ASSESSMENT,
+		title: 'Assessment',
 	},
 ];
 
@@ -76,7 +76,7 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			window.location.href = buildQueryParamUrl('/patient-order-reports', {
+			window.location.href = buildQueryParamUrl('/reporting/run-report', {
 				// Generic
 				startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
 				endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
@@ -150,9 +150,9 @@ export const Component = () => {
 							</Row>
 							<Row
 								className={classNames({
-									'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE,
-									'mb-10': formValues.reportTypeId === REPORT_TYPE_ID.OUTREACH,
-									'mb-4': formValues.reportTypeId === REPORT_TYPE_ID.MHIC,
+									'mb-8': formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE,
+									'mb-10': formValues.reportTypeId === REPORT_TYPE_ID.IC_OUTREACH,
+									'mb-4': formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT,
 								})}
 							>
 								<Col>
@@ -175,7 +175,7 @@ export const Component = () => {
 								</Col>
 							</Row>
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.PIPELINE && (
+							{formValues.reportTypeId === REPORT_TYPE_ID.IC_PIPELINE && (
 								<Row className="mb-10">
 									<Col>
 										<h5 className="mb-2">Filters</h5>
@@ -272,7 +272,7 @@ export const Component = () => {
 								</Row>
 							)}
 
-							{formValues.reportTypeId === REPORT_TYPE_ID.MHIC && (
+							{formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT && (
 								<Row className="mb-10">
 									<Col>
 										<TypeaheadHelper
@@ -289,7 +289,7 @@ export const Component = () => {
 													panelAccounts: selected as AccountModel[],
 												}));
 											}}
-											required={formValues.reportTypeId === REPORT_TYPE_ID.MHIC}
+											required={formValues.reportTypeId === REPORT_TYPE_ID.IC_ASSESSMENT}
 										/>
 									</Col>
 								</Row>
