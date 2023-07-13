@@ -224,7 +224,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									className="p-0 border-0"
 									id="mhic-header__dropdown-menu"
 								>
-									<AvatarIcon className="d-flex" />
+									<AvatarIcon className="d-flex text-p700" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu
 									as={DropdownMenu}
