@@ -9,6 +9,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import config from '@/lib/config';
 
 export const ADMIN_HEADER_HEIGHT = 56;
 
@@ -119,6 +120,9 @@ export const AdminHeader = () => {
 	const analyticsMatch = useMatch({
 		path: '/admin/analytics/*',
 	});
+	const debugMatch = useMatch({
+		path: '/admin/debug/*',
+	});
 
 	const navigationLinks = useMemo(
 		() => [
@@ -150,8 +154,19 @@ export const AdminHeader = () => {
 				title: 'Analytics',
 				active: !!analyticsMatch,
 			},
+			...(config.COBALT_WEB_SHOW_DEBUG === 'true'
+				? [
+						{
+							testId: '',
+							navigationItemId: 'DEBUG',
+							to: '/admin/debug',
+							title: 'Debug',
+							active: !!debugMatch,
+						},
+				  ]
+				: []),
 		],
-		[analyticsMatch, contentMatch, groupSessionsMatch, schedulingMatch]
+		[analyticsMatch, contentMatch, debugMatch, groupSessionsMatch, schedulingMatch]
 	);
 
 	return (
