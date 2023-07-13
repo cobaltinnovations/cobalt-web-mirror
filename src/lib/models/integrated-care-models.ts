@@ -51,10 +51,7 @@ export interface PatientOrderModel {
 	patientBirthSexId?: string;
 	patientBirthdate?: string;
 	patientBirthdateDescription?: string;
-	primaryPayorId?: string;
-	primaryPayorName?: string;
-	primaryPlanId?: string;
-	primaryPlanName?: string;
+
 	orderDate?: string;
 	orderDateDescription?: string;
 	orderAgeInMinutes?: number;
@@ -159,13 +156,11 @@ export interface PatientOrderModel {
 	patientConsentedAtDescription?: string;
 
 	// Insurance
-	patientOrderInsurancePayorId: string;
-	patientOrderInsurancePayorName: string;
-	patientOrderInsurancePayorTypeId: string;
-	patientOrderInsurancePlanAccepted: boolean;
-	patientOrderInsurancePlanId: string;
-	patientOrderInsurancePlanName: string;
-	patientOrderInsurancePlanTypeId: string;
+	primaryPayorId?: string;
+	primaryPayorName?: string;
+	primaryPlanName?: string;
+	primaryPlanId?: string;
+	primaryPlanAccepted?: boolean;
 
 	// Scheduled appointment through connect-with-support
 	appointmentId?: string;
@@ -211,6 +206,7 @@ export enum PatientOrderCareTypeId {
 export enum PatientOrderClosureReasonId {
 	NOT_CLOSED = 'NOT_CLOSED',
 	INELIGIBLE_DUE_TO_INSURANCE = 'INELIGIBLE_DUE_TO_INSURANCE',
+	INELIGIBLE_DUE_TO_LOCATION = 'INELIGIBLE_DUE_TO_LOCATION',
 	REFUSED_CARE = 'REFUSED_CARE',
 	TRANSFERRED_TO_SAFETY_PLANNING = 'TRANSFERRED_TO_SAFETY_PLANNING',
 	SCHEDULED_WITH_SPECIALTY_CARE = 'SCHEDULED_WITH_SPECIALTY_CARE',

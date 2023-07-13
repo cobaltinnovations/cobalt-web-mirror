@@ -3,7 +3,13 @@ import { Await, defer, useNavigate, useRevalidator, useRouteLoaderData } from 'r
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { PatientOrderConsentStatusId, PatientOrderModel, PatientOrderScreeningStatusId } from '@/lib/models';
+import {
+	PatientOrderConsentStatusId,
+	PatientOrderDispositionId,
+	PatientOrderClosureReasonId,
+	PatientOrderModel,
+	PatientOrderScreeningStatusId,
+} from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import NoData from '@/components/no-data';
 
@@ -16,6 +22,7 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 
 enum PAGE_STATES {
+	ORDER_CLOSED = 'ORDER_CLOSED',
 	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
 	ASSESSMENT_READY = 'ASSESSMENT_READY',
 	ASSESSMENT_REFUSED = 'ASSESSMENT_REFUSED',
@@ -73,6 +80,13 @@ export const Component = () => {
 
 	useEffect(() => {
 		data.patientOrderPromise.then((response) => {
+			const patientOrderClosed =
+				response?.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED;
+
+			if (response?.patientOrder) {
+				setPatientOrder(response.patientOrder);
+			}
+
 			if (response?.patientOrder.resourceCheckInResponseNeeded) {
 				navigate('/ic/patient/check-in');
 				return;
@@ -86,16 +100,20 @@ export const Component = () => {
 				return;
 			}
 
-			if (response?.patientOrder) {
-				setPatientOrder(response.patientOrder);
+			if (
+				(patientOrderClosed &&
+					response.patientOrder.patientOrderClosureReasonId ===
+						PatientOrderClosureReasonId.INELIGIBLE_DUE_TO_LOCATION) ||
+				!response?.patientOrder.patientAddressRegionAccepted ||
+				!response?.patientOrder.primaryPlanAccepted
+			) {
+				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
+				return;
+			}
 
-				if (
-					!response.patientOrder.patientAddressRegionAccepted ||
-					!response?.patientOrder.patientOrderInsurancePlanAccepted
-				) {
-					setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
-					return;
-				}
+			if (patientOrderClosed) {
+				setHomescreenState(PAGE_STATES.ORDER_CLOSED);
+				return;
 			}
 
 			switch (response?.patientOrder.patientOrderScreeningStatusId) {
@@ -138,9 +156,24 @@ export const Component = () => {
 								)}
 							</Col>
 						</Row>
-
 						<Row className="mb-10">
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+								{homescreenState === PAGE_STATES.ORDER_CLOSED && (
+									<Card bsPrefix="ic-card" className="mb-10">
+										<Card.Header>
+											<Card.Title>Next Steps</Card.Title>
+										</Card.Header>
+										<Card.Body className="p-0">
+											<NoData
+												className="border-0 bg-white"
+												title="No further action is required"
+												description={`Your order has been closed. This may be because you have successfully connected to care, because there was no response, or because care was refused. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you have questions.`}
+												actions={[]}
+											/>
+										</Card.Body>
+									</Card>
+								)}
+
 								{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
 									<NoData
 										className="mb-10"
@@ -176,7 +209,8 @@ export const Component = () => {
 
 								{homescreenState !== PAGE_STATES.SERVICE_UNAVAILABLE &&
 									homescreenState !== PAGE_STATES.ASSESSMENT_REFUSED &&
-									homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
+									homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER &&
+									homescreenState !== PAGE_STATES.ORDER_CLOSED && (
 										<Card bsPrefix="ic-card" className="mb-10">
 											<Card.Header>
 												<Card.Title>Next Steps</Card.Title>

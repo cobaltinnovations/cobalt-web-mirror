@@ -175,8 +175,9 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 				<Row>
 					<Col>
 						<div className={classes.pathways}>
-							{(institution?.features ?? []).map(
-								({ featureId, urlName, name, recommended }, featureIndex) => (
+							{(institution?.features ?? [])
+								.filter((feature) => feature.navVisible)
+								.map(({ featureId, urlName, name, recommended }, featureIndex) => (
 									<div key={featureId} className={classes.pathwayOuter}>
 										<Link
 											to={
@@ -201,8 +202,7 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 											{recommended && <div className={classes.recommended}>Recommended</div>}
 										</Link>
 									</div>
-								)
-							)}
+								))}
 						</div>
 					</Col>
 				</Row>

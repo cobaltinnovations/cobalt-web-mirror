@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -18,8 +18,9 @@ const ConfirmAppointment = () => {
 	const appointmentTypeId = searchParams.get('appointmentTypeId') ?? '';
 	const date = searchParams.get('date') ?? '';
 	const time = searchParams.get('time') ?? '';
-	const intakeAssessmentId = searchParams.get('intakeAssessmentId') || undefined;
-	const patientOrderId = searchParams.get('patientOrderId') || undefined;
+	const intakeAssessmentId = searchParams.get('intakeAssessmentId') ?? undefined;
+	const patientOrderId = searchParams.get('patientOrderId') ?? undefined;
+	const epicAppointmentFhirId = searchParams.get('epicAppointmentFhirId') ?? undefined;
 
 	const { addFlag } = useFlags();
 	const { account } = useAccount();
@@ -32,6 +33,10 @@ const ConfirmAppointment = () => {
 	const [confirmationCodeInputValue, setConfirmationCodeInputValue] = useState('');
 
 	const [submitting, setSubmitting] = useState(false);
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 
 	const fetchData = useCallback(async () => {
 		if (!account) {
@@ -140,6 +145,7 @@ const ConfirmAppointment = () => {
 					emailAddress: emailInputValue,
 					...(promptForPhoneNumber && { phoneNumber: phoneNumberInputValue }),
 					...(patientOrderId && { patientOrderId }),
+					...(epicAppointmentFhirId && { epicAppointmentFhirId }),
 				})
 				.fetch();
 

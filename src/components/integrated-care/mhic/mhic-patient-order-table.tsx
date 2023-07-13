@@ -141,7 +141,7 @@ export const MhicPatientOrderTable = ({
 		if (!patientOrder.patientAddressRegionAccepted) {
 			count++;
 		}
-		if (!patientOrder.patientOrderInsurancePlanAccepted) {
+		if (!patientOrder.primaryPlanAccepted) {
 			count++;
 		}
 
@@ -403,10 +403,10 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.insurance && (
 												<TableCell width={240} className="py-2">
 													<span className="d-block text-nowrap text-truncate">
-														{po.patientOrderInsurancePayorName}
+														{po.primaryPayorName}
 													</span>
 													<span className="d-block text-gray text-nowrap text-truncate">
-														{po.patientOrderInsurancePlanName}
+														{po.primaryPlanName}
 													</span>
 												</TableCell>
 											)}
