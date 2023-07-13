@@ -23,18 +23,18 @@ const SentryDebugButtons = () => {
 	return (
 		<Row className="my-6">
 			<Col xs={12}>
-				<h3 className="mb-2 text-center">Sentry Debug UI</h3>
+				<h3 className="mb-2">Sentry Debug UI</h3>
 			</Col>
 
-			<Col xs={12} className="d-flex justify-content-center">
+			<Col>
 				<Button
+					className="me-2"
 					onClick={() => {
 						throw new Error('Thrown from an event');
 					}}
 				>
 					Throw Error inside event
 				</Button>
-
 				<Button
 					onClick={() => {
 						setShowRenderError(true);

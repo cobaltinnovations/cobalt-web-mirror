@@ -201,6 +201,10 @@ const ContactUsEnabledRoutes = () => {
 	return institution?.contactUsEnabled ? <Outlet /> : <NoMatch />;
 };
 
+const DebugEnabledRoutes = () => {
+	return config.COBALT_WEB_SHOW_DEBUG === 'true' ? <Outlet /> : <NoMatch />;
+};
+
 export const routes: RouteObject[] = [
 	{
 		id: 'root',
@@ -647,6 +651,22 @@ export const routes: RouteObject[] = [
 								id: 'admin-analytics',
 								path: 'analytics',
 								element: <>TODO: Analytics</>,
+							},
+							{
+								id: 'admin-debug',
+								path: 'debug',
+								element: <DebugEnabledRoutes />,
+								children: [
+									{
+										index: true,
+										element: <Navigate to="ui" />,
+									},
+									{
+										id: 'admin-debug-ui',
+										path: 'ui',
+										lazy: () => import('@/routes/admin/debug/ui'),
+									},
+								],
 							},
 						],
 					},
