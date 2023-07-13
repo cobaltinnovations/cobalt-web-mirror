@@ -46,6 +46,12 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-p300': {
 			color: `${theme.colors.p300} !important`,
 		},
+		'.text-p500': {
+			color: `${theme.colors.p500} !important`,
+		},
+		'.text-p700': {
+			color: `${theme.colors.p700} !important`,
+		},
 		'.text-primary': {
 			color: `${theme.colors.p500} !important`,
 		},

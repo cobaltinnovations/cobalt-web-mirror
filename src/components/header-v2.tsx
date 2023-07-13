@@ -626,7 +626,7 @@ const HeaderV2 = () => {
 							<MobileAccordianItem
 								toggleElement={
 									<div className="d-flex align-items-center">
-										<AvatarIcon width={20} height={20} />
+										<AvatarIcon width={20} height={20} className="text-p700" />
 										<span className="ms-4">My Account</span>
 									</div>
 								}
