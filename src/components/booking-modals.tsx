@@ -140,10 +140,10 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 					params.set('patientOrderId', patientOrderId);
 				}
 
-				navigate(`/confirm-appointment?${params.toString()}`);
+				window.location.href = `/confirm-appointment?${params.toString()}`;
 			}
 		},
-		[account?.epicPatientId, navigate, navigateToEhrLookup, navigateToIntakeAssessment]
+		[account?.epicPatientId, navigateToEhrLookup, navigateToIntakeAssessment]
 	);
 
 	const kickoffBookingProcess = useCallback(
