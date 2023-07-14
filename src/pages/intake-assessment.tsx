@@ -138,7 +138,7 @@ const IntakeAssessment: FC = () => {
 							params.set('time', selectedTimeSlot?.time ?? '');
 							params.set('intakeAssessmentId', assessment?.assessmentId);
 
-							navigate(`/confirm-appointment?${params.toString()}`);
+							window.location.href = `/confirm-appointment?${params.toString()}`;
 						}
 					} else {
 						setIsEligible(false);
