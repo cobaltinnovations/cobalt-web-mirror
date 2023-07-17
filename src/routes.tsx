@@ -498,6 +498,10 @@ export const routes: RouteObject[] = [
 						element: <RedirectToBackend />,
 					},
 					{
+						path: 'group-session-internal',
+						lazy: () => import('@/routes/group-session-detail-internal'),
+					},
+					{
 						path: 'appointments/:appointmentId/ical',
 						element: <RedirectToBackend />,
 					},

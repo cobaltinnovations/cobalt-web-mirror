@@ -30,6 +30,8 @@ import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
+export const HEADER_HEIGHT = 56;
+
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
 		top: 0,
