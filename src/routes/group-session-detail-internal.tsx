@@ -1,10 +1,13 @@
-import React from 'react';
-import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Badge, Button, Col, Container, Modal, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { HEADER_HEIGHT } from '@/components/header-v2';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import useFlags from '@/hooks/use-flags';
+import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -44,12 +47,76 @@ export const loader = async () => {
 
 export const Component = () => {
 	const classes = useStyles();
+	const navigate = useNavigate();
+	const { addFlag } = useFlags();
+	const copyTextToClipboard = useCopyTextToClipboard();
+	const [confirmModalIsShowing, setConfirmModalIsShowing] = useState(false);
+
+	const handleModalConfirmButtonClick = useCallback(() => {
+		setConfirmModalIsShowing(false);
+		addFlag({
+			variant: 'success',
+			title: 'Your seat is reserved',
+			description: 'This session was added to your events list',
+			actions: [
+				{
+					title: 'View My Events',
+					onClick: () => {
+						navigate('/my-calendar');
+					},
+				},
+			],
+		});
+	}, [addFlag, navigate]);
+
+	const handleCopyLinkButtonClick = useCallback(() => {
+		copyTextToClipboard(
+			`https://${window.location.host}/in-the-studio/group-session-scheduled/${'XXX'}?immediateAccess=true`,
+			{
+				successTitle: 'Copied!',
+				successDescription: 'The URL for this session was copied to your clipboard',
+				errorTitle: 'Failed to copy link',
+				errorDesctiption: 'Please try again.',
+			}
+		);
+	}, [copyTextToClipboard]);
 
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Group Session - Internal</title>
 			</Helmet>
+
+			<Modal
+				show={confirmModalIsShowing}
+				centered
+				onHide={() => {
+					setConfirmModalIsShowing(false);
+				}}
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Confirm Reservation</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p className="mb-0 fw-bold">Praesent Sollicitudin Lacus</p>
+					<p className="mb-0">Tuesday Oct 27 &bull; 10-10:30AM</p>
+				</Modal.Body>
+				<Modal.Footer className="text-right">
+					<Button
+						variant="outline-primary"
+						className="me-2"
+						onClick={() => {
+							setConfirmModalIsShowing(false);
+						}}
+					>
+						Cancel
+					</Button>
+					<Button variant="primary" type="submit" onClick={handleModalConfirmButtonClick}>
+						Confirm
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
 			<Container className="pb-0 pt-8 py-lg-16" fluid="lg">
 				<Row>
 					<Col lg={7} className="mb-6 mb-lg-0">
@@ -121,7 +188,7 @@ export const Component = () => {
 								<Row className="mb-6">
 									<Col>
 										<p className="mb-1 fw-bold">Oct 27, 2023</p>
-										<p className="mb-0">2:00PM - 12:20PM</p>
+										<p className="mb-0">10:00AM - 10:30AM</p>
 									</Col>
 								</Row>
 								<Row className="mb-6">
@@ -138,8 +205,19 @@ export const Component = () => {
 								</Row>
 								<Row>
 									<Col>
-										<Button className="mb-3 d-block w-100">Reserve My Seat</Button>
-										<Button variant="outline-primary" className="d-block w-100">
+										<Button
+											className="mb-3 d-block w-100"
+											onClick={() => {
+												setConfirmModalIsShowing(true);
+											}}
+										>
+											Reserve My Seat
+										</Button>
+										<Button
+											variant="outline-primary"
+											className="d-block w-100"
+											onClick={handleCopyLinkButtonClick}
+										>
 											Copy Session Link
 										</Button>
 									</Col>
