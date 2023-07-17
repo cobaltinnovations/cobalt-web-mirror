@@ -601,7 +601,10 @@ export const routes: RouteObject[] = [
 						path: 'resource-library/:contentId',
 						element: <ResourceLibraryDetail />,
 					},
-
+					{
+						path: 'institution-resources',
+						lazy: () => import('@/routes/institution-resources'),
+					},
 					{
 						path: '*',
 						loader: redirectCheckLoader,

@@ -74,7 +74,8 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 								<hr className="mb-6" />
 								<h3 className="mb-4">Sign in</h3>
 								<p className="mb-6">
-									Click "{institution?.myChartName}" below, then enter your details to sign in.
+									Click "Sign In With {institution?.myChartName}" below, then enter your details to
+									sign in.
 								</p>
 								<div className="text-center mb-8">
 									{accountSources.map((accountSource, index) => {

@@ -78,8 +78,12 @@ export const Component = () => {
 
 			window.location.href = buildQueryParamUrl('/reporting/run-report', {
 				// Generic
-				startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
-				endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
+				...(formValues.startDateTime && {
+					startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,
+				}),
+				...(formValues.endDateTime && {
+					endDateTime: `${moment(formValues.endDateTime).format('YYYY-MM-DD')}T23:59:59`,
+				}),
 				reportTypeId: formValues.reportTypeId,
 
 				// PIPELINE specific
@@ -252,7 +256,9 @@ export const Component = () => {
 													onChange={({ currentTarget }) => {
 														setFormValues((previousValues) => ({
 															...previousValues,
-															minimumPatientAge: parseInt(currentTarget.value, 10),
+															minimumPatientAge: currentTarget.value
+																? parseInt(currentTarget.value, 10)
+																: undefined,
 														}));
 													}}
 												/>
@@ -265,7 +271,9 @@ export const Component = () => {
 													onChange={({ currentTarget }) => {
 														setFormValues((previousValues) => ({
 															...previousValues,
-															maximumPatientAge: parseInt(currentTarget.value, 10),
+															maximumPatientAge: currentTarget.value
+																? parseInt(currentTarget.value, 10)
+																: undefined,
 														}));
 													}}
 												/>
@@ -304,7 +312,16 @@ export const Component = () => {
 								<>
 									<hr className="mb-8" />
 									<div className="text-right">
-										<Button type="submit">Generate Report</Button>
+										<Button
+											type="submit"
+											disabled={
+												!formValues.startDateTime ||
+												!formValues.endDateTime ||
+												!formValues.reportTypeId
+											}
+										>
+											Generate Report
+										</Button>
 									</div>
 								</>
 							)}
