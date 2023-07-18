@@ -1,14 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Badge, Button, Col, Container, Modal, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { HEADER_HEIGHT } from '@/components/header-v2';
-import { createUseThemedStyles } from '@/jss/theme';
-import mediaQueries from '@/jss/media-queries';
+import { groupSessionsService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
+import { HEADER_HEIGHT } from '@/components/header-v2';
 import InlineAlert from '@/components/inline-alert';
+import { createUseThemedStyles } from '@/jss/theme';
+import mediaQueries from '@/jss/media-queries';
+import moment from 'moment';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -42,11 +44,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const loader = async () => {
-	return null;
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+	const { groupSession, groupSessionReservation } = await groupSessionsService
+		.getGroupSessionById((params as { groupSessionId: string }).groupSessionId)
+		.fetch();
+
+	return { groupSession, groupSessionReservation };
 };
 
 export const Component = () => {
+	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
@@ -182,18 +190,9 @@ export const Component = () => {
 							</Row>
 							<Row>
 								<Col>
-									<h2 className="mb-2 mb-lg-3">Praesent Sollicitudin Lacus</h2>
-									<p className="mb-6 text-muted">with Provider, Psy.D.</p>
-									<p className="mb-6 mb-lg-10 fs-large">
-										Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam dignissim,
-										nulla quis lacinia molestie, dui arcu pharetra eros, vel vehicula est libero sit
-										amet felis. Integer tempor erat sapien. Nam ac lacus quis massa cursus egestas.
-										Vestibulum finibus, nunc nec finibus dictum, leo turpis feugiat ex, ut
-										sollicitudin est ligula id lectus. Phasellus ut mi a massa venenatis tempus ac
-										in leo. Curabitur vitae semper erat. Curabitur ut condimentum tellus.
-										Pellentesque quis tortor at augue vehicula fermentum. Etiam finibus sem
-										dignissim ex hendrerit sollicitudin.
-									</p>
+									<h2 className="mb-2 mb-lg-3">{groupSession.title}</h2>
+									<p className="mb-6 text-muted">with {groupSession.facilitatorName}</p>
+									<p className="mb-6 mb-lg-10 fs-large">{groupSession.description}</p>
 									<div className="d-flex flex-wrap">
 										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
 											Tag Text
@@ -260,14 +259,24 @@ export const Component = () => {
 								</Row>
 								<Row className="mb-6">
 									<Col>
-										<p className="mb-1 fw-bold">Oct 27, 2023</p>
-										<p className="mb-0">10:00AM - 10:30AM</p>
+										<p className="mb-1 fw-bold">
+											{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+												'MMM D[,] YYYY'
+											)}
+										</p>
+										<p className="mb-0">
+											{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')}{' '}
+											- {moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')}
+										</p>
 									</Col>
 								</Row>
 								<Row className="mb-6">
 									<Col>
-										<p className="mb-1 fw-bold">12 seats left</p>
-										<p className="mb-0">50 seats total</p>
+										<p className="mb-1 fw-bold">{groupSession.seatsAvailableDescription}</p>
+										<p className="mb-0">
+											{(groupSession.seatsReserved ?? 0) + (groupSession.seatsAvailable ?? 0)}{' '}
+											seats total
+										</p>
 									</Col>
 								</Row>
 								<Row className="mb-8">
