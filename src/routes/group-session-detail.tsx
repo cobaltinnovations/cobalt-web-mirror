@@ -1,16 +1,19 @@
+import moment from 'moment';
 import React, { useCallback, useState } from 'react';
-import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { Badge, Button, Col, Container, Modal, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { groupSessionsService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import { HEADER_HEIGHT } from '@/components/header-v2';
 import InlineAlert from '@/components/inline-alert';
+import CollectEmailModal from '@/components/collect-email-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import moment from 'moment';
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -54,51 +57,85 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-
+	const handleError = useHandleError();
+	const revalidator = useRevalidator();
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
 	const copyTextToClipboard = useCopyTextToClipboard();
+	const placeholderImage = useRandomPlaceholderImage();
+
+	const [collectedEmail, setCollectedEmail] = useState('');
+	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [confirmModalIsShowing, setConfirmModalIsShowing] = useState(false);
 	const [cancelModalIsShowing, setCancelModalIsShowing] = useState(false);
 
-	const handleModalConfirmButtonClick = useCallback(() => {
-		setConfirmModalIsShowing(false);
-		addFlag({
-			variant: 'success',
-			title: 'Your seat is reserved',
-			description: 'This session was added to your events list',
-			actions: [
-				{
-					title: 'View My Events',
-					onClick: () => {
-						navigate('/my-calendar');
-					},
-				},
-			],
-		});
-	}, [addFlag, navigate]);
+	const handleReserveButtonClick = useCallback(() => {
+		if (groupSession?.assessmentId) {
+			navigate(`/intake-assessment?groupSessionId=${groupSession.groupSessionId}`);
+			return;
+		}
 
-	const handleModalCancelButtonClick = useCallback(() => {
-		setCancelModalIsShowing(false);
-		addFlag({
-			variant: 'success',
-			title: 'Your reservation has been canceled',
-			description: 'This session was removed from your events list',
-			actions: [
-				{
-					title: 'View My Events',
-					onClick: () => {
-						navigate('/my-calendar');
+		setShowCollectEmailModal(true);
+	}, [groupSession?.assessmentId, groupSession.groupSessionId, navigate]);
+
+	const handleModalConfirmButtonClick = useCallback(async () => {
+		try {
+			await groupSessionsService.reserveGroupSession(groupSession.groupSessionId, collectedEmail).fetch();
+			revalidator.revalidate();
+
+			setConfirmModalIsShowing(false);
+			addFlag({
+				variant: 'success',
+				title: 'Your seat is reserved',
+				description: 'This session was added to your events list',
+				actions: [
+					{
+						title: 'View My Events',
+						onClick: () => {
+							navigate('/my-calendar');
+						},
 					},
-				},
-			],
-		});
-	}, [addFlag, navigate]);
+				],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, collectedEmail, groupSession.groupSessionId, handleError, navigate, revalidator]);
+
+	const handleModalCancelButtonClick = useCallback(async () => {
+		try {
+			if (!groupSessionReservation) {
+				throw new Error('groupSessionReservation is undefined');
+			}
+
+			await groupSessionsService
+				.cancelGroupSessionReservation(groupSessionReservation.groupSessionReservationId)
+				.fetch();
+			revalidator.revalidate();
+
+			setCancelModalIsShowing(false);
+			addFlag({
+				variant: 'success',
+				title: 'Your reservation has been canceled',
+				description: 'This session was removed from your events list',
+				actions: [
+					{
+						title: 'View My Events',
+						onClick: () => {
+							navigate('/my-calendar');
+						},
+					},
+				],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, groupSessionReservation, handleError, navigate, revalidator]);
 
 	const handleCopyLinkButtonClick = useCallback(() => {
 		copyTextToClipboard(
-			`https://${window.location.host}/in-the-studio/group-session-scheduled/${'XXX'}?immediateAccess=true`,
+			`https://${window.location.host}/group-sessions/${groupSession.groupSessionId}?immediateAccess=true`,
 			{
 				successTitle: 'Copied!',
 				successDescription: 'The URL for this session was copied to your clipboard',
@@ -106,13 +143,26 @@ export const Component = () => {
 				errorDesctiption: 'Please try again.',
 			}
 		);
-	}, [copyTextToClipboard]);
+	}, [copyTextToClipboard, groupSession.groupSessionId]);
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Session - Internal</title>
+				<title>Cobalt | Group Session Detail</title>
 			</Helmet>
+
+			<CollectEmailModal
+				show={showCollectEmailModal}
+				collectedEmail={collectedEmail}
+				onHide={() => {
+					setShowCollectEmailModal(false);
+				}}
+				onSubmitEmail={(email) => {
+					setCollectedEmail(email);
+					setShowCollectEmailModal(false);
+					setConfirmModalIsShowing(true);
+				}}
+			/>
 
 			<Modal
 				show={confirmModalIsShowing}
@@ -125,8 +175,8 @@ export const Component = () => {
 					<Modal.Title>Confirm Reservation</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<p className="mb-0 fw-bold">Praesent Sollicitudin Lacus</p>
-					<p className="mb-0">Tuesday Oct 27 &bull; 10-10:30AM</p>
+					<p className="mb-0 fw-bold">{groupSession.title}</p>
+					<p className="mb-0 text-danger">[TODO]: Tuesday Oct 27 &bull; 10-10:30AM</p>
 				</Modal.Body>
 				<Modal.Footer className="text-right">
 					<Button
@@ -157,8 +207,8 @@ export const Component = () => {
 				<Modal.Body>
 					<p className="mb-4 fw-bold">Are you sure you want to cancel this reservation?</p>
 					<p className="mb-0 fw-bold">Reservation Details</p>
-					<p className="mb-0">Praesent Sollicitudin Lacus</p>
-					<p className="mb-0">Tuesday Oct 27 &bull; 10-10:30AM</p>
+					<p className="mb-0">{groupSession.title}</p>
+					<p className="mb-0 text-danger">[TODO]: Tuesday Oct 27 &bull; 10-10:30AM</p>
 				</Modal.Body>
 				<Modal.Footer className="text-right">
 					<Button
@@ -184,7 +234,7 @@ export const Component = () => {
 								<Col>
 									<div
 										className={classes.imageOuter}
-										style={{ backgroundImage: `url(${'https://placehold.co/1696x944'})` }}
+										style={{ backgroundImage: `url(${groupSession.imageUrl ?? placeholderImage})` }}
 									/>
 								</Col>
 							</Row>
@@ -195,37 +245,7 @@ export const Component = () => {
 									<p className="mb-6 mb-lg-10 fs-large">{groupSession.description}</p>
 									<div className="d-flex flex-wrap">
 										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
-										</Badge>
-										<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-											Tag Text
+											[TODO]: Tag Text
 										</Badge>
 									</div>
 								</Col>
@@ -235,28 +255,34 @@ export const Component = () => {
 					<Col lg={5}>
 						<Container fluid className={classes.schedulingOuter}>
 							<Container className="p-lg-0">
-								<Row className="mb-8">
-									<Col>
-										<InlineAlert
-											variant="success"
-											title="Your seat is reserved"
-											action={[
-												{
-													title: 'View My Events',
-													onClick: () => {
-														navigate('/my-calendar');
+								{groupSessionReservation && (
+									<Row className="mb-8">
+										<Col>
+											<InlineAlert
+												variant="success"
+												title="Your seat is reserved"
+												action={[
+													{
+														title: 'View My Events',
+														onClick: () => {
+															navigate('/my-calendar');
+														},
 													},
-												},
-												{
-													title: 'Join Now',
-													onClick: () => {
-														window.alert('TODO: Join session');
+													{
+														title: 'Join Now',
+														onClick: () => {
+															window.open(
+																groupSession.videoconferenceUrl,
+																'_blank',
+																'noopener, noreferrer'
+															);
+														},
 													},
-												},
-											]}
-										/>
-									</Col>
-								</Row>
+												]}
+											/>
+										</Col>
+									</Row>
+								)}
 								<Row className="mb-6">
 									<Col>
 										<p className="mb-1 fw-bold">
@@ -281,29 +307,27 @@ export const Component = () => {
 								</Row>
 								<Row className="mb-8">
 									<Col>
-										<p className="mb-1 fw-bold">Online Video Call</p>
-										<p className="mb-0">Attend this session virtually</p>
+										<p className="mb-1 fw-bold text-danger">[TODO]: Online Video Call</p>
+										<p className="mb-0 text-danger">[TODO]: Attend this session virtually</p>
 									</Col>
 								</Row>
 								<Row>
 									<Col>
-										<Button
-											variant="danger"
-											className="mb-3 d-block w-100"
-											onClick={() => {
-												setCancelModalIsShowing(true);
-											}}
-										>
-											Cancel My Reservation
-										</Button>
-										<Button
-											className="mb-3 d-block w-100"
-											onClick={() => {
-												setConfirmModalIsShowing(true);
-											}}
-										>
-											Reserve My Seat
-										</Button>
+										{groupSessionReservation ? (
+											<Button
+												variant="danger"
+												className="mb-3 d-block w-100"
+												onClick={() => {
+													setCancelModalIsShowing(true);
+												}}
+											>
+												Cancel My Reservation
+											</Button>
+										) : (
+											<Button className="mb-3 d-block w-100" onClick={handleReserveButtonClick}>
+												Reserve My Seat
+											</Button>
+										)}
 										<Button
 											variant="outline-primary"
 											className="d-block w-100"
