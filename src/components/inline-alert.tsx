@@ -128,13 +128,20 @@ export const InlineAlert = ({ title, description, action, variant = 'primary', c
 					</p>
 				)}
 				{actionsToRender.length > 0 && (
-					<>
-						{actionsToRender.map((a) => (
-							<Button variant="link" size="sm" className="p-0 fw-normal" onClick={a.onClick}>
-								{a.title}
-							</Button>
-						))}
-					</>
+					<div>
+						{actionsToRender.map((a, actionIndex) => {
+							const isLast = actionIndex === actionsToRender.length - 1;
+
+							return (
+								<>
+									<Button variant="link" size="sm" className="p-0 fw-normal" onClick={a.onClick}>
+										{a.title}
+									</Button>
+									{!isLast && <span className="mx-1">&bull;</span>}
+								</>
+							);
+						})}
+					</div>
 				)}
 			</div>
 		</div>

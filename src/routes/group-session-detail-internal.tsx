@@ -8,6 +8,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import useFlags from '@/hooks/use-flags';
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
+import InlineAlert from '@/components/inline-alert';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -51,6 +52,7 @@ export const Component = () => {
 	const { addFlag } = useFlags();
 	const copyTextToClipboard = useCopyTextToClipboard();
 	const [confirmModalIsShowing, setConfirmModalIsShowing] = useState(false);
+	const [cancelModalIsShowing, setCancelModalIsShowing] = useState(false);
 
 	const handleModalConfirmButtonClick = useCallback(() => {
 		setConfirmModalIsShowing(false);
@@ -58,6 +60,23 @@ export const Component = () => {
 			variant: 'success',
 			title: 'Your seat is reserved',
 			description: 'This session was added to your events list',
+			actions: [
+				{
+					title: 'View My Events',
+					onClick: () => {
+						navigate('/my-calendar');
+					},
+				},
+			],
+		});
+	}, [addFlag, navigate]);
+
+	const handleModalCancelButtonClick = useCallback(() => {
+		setCancelModalIsShowing(false);
+		addFlag({
+			variant: 'success',
+			title: 'Your reservation has been canceled',
+			description: 'This session was removed from your events list',
 			actions: [
 				{
 					title: 'View My Events',
@@ -113,6 +132,38 @@ export const Component = () => {
 					</Button>
 					<Button variant="primary" type="submit" onClick={handleModalConfirmButtonClick}>
 						Confirm
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
+			<Modal
+				show={cancelModalIsShowing}
+				centered
+				onHide={() => {
+					setCancelModalIsShowing(false);
+				}}
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Cancel Reservation</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p className="mb-4 fw-bold">Are you sure you want to cancel this reservation?</p>
+					<p className="mb-0 fw-bold">Reservation Details</p>
+					<p className="mb-0">Praesent Sollicitudin Lacus</p>
+					<p className="mb-0">Tuesday Oct 27 &bull; 10-10:30AM</p>
+				</Modal.Body>
+				<Modal.Footer className="text-right">
+					<Button
+						variant="outline-primary"
+						className="me-2"
+						onClick={() => {
+							setCancelModalIsShowing(false);
+						}}
+					>
+						No, Don't Cancel
+					</Button>
+					<Button variant="primary" type="submit" onClick={handleModalCancelButtonClick}>
+						Yes, Cancel
 					</Button>
 				</Modal.Footer>
 			</Modal>
@@ -185,6 +236,28 @@ export const Component = () => {
 					<Col lg={5}>
 						<Container fluid className={classes.schedulingOuter}>
 							<Container className="p-lg-0">
+								<Row className="mb-8">
+									<Col>
+										<InlineAlert
+											variant="success"
+											title="Your seat is reserved"
+											action={[
+												{
+													title: 'View My Events',
+													onClick: () => {
+														navigate('/my-calendar');
+													},
+												},
+												{
+													title: 'Join Now',
+													onClick: () => {
+														window.alert('TODO: Join session');
+													},
+												},
+											]}
+										/>
+									</Col>
+								</Row>
 								<Row className="mb-6">
 									<Col>
 										<p className="mb-1 fw-bold">Oct 27, 2023</p>
@@ -205,6 +278,15 @@ export const Component = () => {
 								</Row>
 								<Row>
 									<Col>
+										<Button
+											variant="danger"
+											className="mb-3 d-block w-100"
+											onClick={() => {
+												setCancelModalIsShowing(true);
+											}}
+										>
+											Cancel My Reservation
+										</Button>
 										<Button
 											className="mb-3 d-block w-100"
 											onClick={() => {
