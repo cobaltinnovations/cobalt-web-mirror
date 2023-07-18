@@ -4,10 +4,10 @@ import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import useHandleError from '@/hooks/use-handle-error';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 import { integratedCareService } from '@/lib/services';
 import { PatientOrderConsentStatusId, PatientOrderModel } from '@/lib/models';
 import AsyncWrapper from '@/components/async-page';
+import InlineAlert from '@/components/inline-alert';
 
 const PatientConsent = () => {
 	const handleError = useHandleError();
@@ -154,7 +154,7 @@ const PatientConsent = () => {
 									No
 								</Button>
 							</Form>
-							<MhicInlineAlert
+							<InlineAlert
 								variant="primary"
 								title="Your responses are not reviewed in real time"
 								description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."

@@ -4,7 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
+import { InlineAlert } from '@/components/inline-alert';
 import useAccount from '@/hooks/use-account';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -98,7 +98,7 @@ export const SignInStaff = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										);
 									})}
 								</div>
-								<MhicInlineAlert
+								<InlineAlert
 									variant="primary"
 									title="Are you a patient?"
 									description={`This platform is for Staff only. Please visit ${institution?.patientUserExperienceBaseUrl} if you are a patient seeking mental health services through Cobalt`}

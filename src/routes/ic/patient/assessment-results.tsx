@@ -16,7 +16,7 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import { PatientInsuranceStatementModal } from '@/components/integrated-care/patient';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
+import InlineAlert from '@/components/inline-alert';
 
 export const PatientAssessmentResults = () => {
 	const navigate = useNavigate();
@@ -204,14 +204,14 @@ export const PatientAssessmentResults = () => {
 
 							{patientOrder?.patientOrderSafetyPlanningStatusId ===
 								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<MhicInlineAlert
+								<InlineAlert
 									className="mt-8"
 									variant="warning"
 									title="A clinician will reach out"
 									description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
 								/>
 							)}
-							<MhicInlineAlert
+							<InlineAlert
 								className={classNames({
 									'mt-6':
 										patientOrder?.patientOrderSafetyPlanningStatusId ===

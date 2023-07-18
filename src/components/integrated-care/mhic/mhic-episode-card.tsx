@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from 'react';
+import { useRevalidator } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderDispositionId, PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { MhicCloseEpisodeModal, MhicInlineAlert } from '@/components/integrated-care/mhic';
-import { useRevalidator } from 'react-router-dom';
+import { MhicCloseEpisodeModal } from '@/components/integrated-care/mhic';
+import InlineAlert from '@/components/inline-alert';
 
 interface MhicEpisodeCardProps {
 	patientOrder: PatientOrderModel;
@@ -128,7 +129,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.patientBelowAgeThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient was under 18 at the time the order was created"
 									/>
@@ -138,7 +139,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.mostRecentEpisodeClosedWithinDateThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Order Flagged"
 										description="Patient had a recently-closed episode"
@@ -149,7 +150,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{!patientOrder.patientAddressRegionAccepted && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Order Flagged"
 										description="Patient does not live in a state supported by the Integrated Care program"
@@ -160,7 +161,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{!patientOrder.primaryPlanAccepted && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Order Flagged"
 										description="Insurance plan not accepted"

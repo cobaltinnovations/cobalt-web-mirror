@@ -19,7 +19,7 @@ import Loader from '@/components/loader';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { isErrorConfig } from '@/lib/utils/error-utils';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
+import InlineAlert from '@/components/inline-alert';
 
 enum PAGE_STATES {
 	ORDER_CLOSED = 'ORDER_CLOSED',
@@ -200,7 +200,7 @@ export const Component = () => {
 								)}
 
 								{homescreenState === PAGE_STATES.SERVICE_UNAVAILABLE && (
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Service not available"
 										description={`Your insurance plan or state of residence may not be eligible for ${institution.name} services. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`}
