@@ -1,5 +1,5 @@
 function fallbackCopyTextToClipboard(text: string, successCallback?: () => void, errorCallback?: (error: any) => void) {
-	const tempInput = document.createElement('input');
+	const tempInput = document.createElement('textarea');
 
 	tempInput.value = text;
 
