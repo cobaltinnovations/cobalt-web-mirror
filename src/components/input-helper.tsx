@@ -87,7 +87,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface InputHelperProps extends FormControlProps, PropsWithChildren {
+export interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	label: string;
 	name?: string;
 	onFocus?: (...args: any[]) => void;
