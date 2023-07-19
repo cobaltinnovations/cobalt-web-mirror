@@ -156,8 +156,14 @@ export const Component = () => {
 				onHide={() => {
 					setShowAddGroupSessionModal(false);
 				}}
-				onContinue={() => {
-					navigate('/group-sessions/scheduled/create');
+				onContinue={(schedulingSystemId) => {
+					if (schedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL) {
+						navigate('/admin/group-sessions/add-external');
+					} else if (schedulingSystemId === GroupSessionSchedulingSystemId.COBALT) {
+						navigate('/admin/group-sessions/add-internal');
+					} else {
+						throw new Error(`Invalid scheduling system ID: ${schedulingSystemId}`);
+					}
 				}}
 			/>
 

@@ -635,19 +635,19 @@ export const routes: RouteObject[] = [
 								element: <>TODO: Content</>,
 							},
 							{
-								id: 'admin-group-sessions',
 								path: 'group-sessions',
-								lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
-							},
-							{
-								id: 'admin-add-group-session-external',
-								path: 'add-group-session-external',
-								lazy: () => import('@/routes/admin/group-sessions/add-group-session-external'),
-							},
-							{
-								id: 'admin-add-group-session-internal',
-								path: 'add-group-session-internal',
-								lazy: () => import('@/routes/admin/group-sessions/add-group-session-internal'),
+								children: [
+									{
+										id: 'admin-group-sessions',
+										index: true,
+										lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
+									},
+									{
+										id: 'admin-group-session-form',
+										path: ':action?/:groupSessionId?',
+										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+									},
+								],
 							},
 							{
 								id: 'admin-scheduling',
