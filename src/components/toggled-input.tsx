@@ -28,7 +28,9 @@ const ToggledInput = ({ detail, hideChildren, className, children, ...formCheckP
 
 			{!hideChildren && (
 				<Collapse in={isExpanded}>
-					<Card.Body>{children}</Card.Body>
+					<div>
+						<Card.Body>{children}</Card.Body>
+					</div>
 				</Collapse>
 			)}
 		</Card>
