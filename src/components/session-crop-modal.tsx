@@ -44,7 +44,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 				resolve(blob);
 			},
 			'image/jpeg',
-			1
+			0.9
 		);
 	});
 }
