@@ -69,7 +69,7 @@ export const MhicFilterState = ({ className }: MhicFilterStateProps) => {
 			className={className}
 			active={isActive}
 			id={`pic-mhic__state-filter`}
-			title="State"
+			title="Order State"
 			dismissText="Clear"
 			onDismiss={handleDismiss}
 			confirmText="Apply"
