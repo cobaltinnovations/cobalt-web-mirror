@@ -306,6 +306,7 @@ export const Component = () => {
 								checkbox: true,
 								flag: true,
 								patient: true,
+								assignedMhic: true,
 								referralDate: true,
 								practice: true,
 								referralReason: true,
