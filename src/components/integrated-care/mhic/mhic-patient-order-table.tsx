@@ -52,6 +52,7 @@ export type MhicPatientOrderTableColumnConfig = {
 	checkbox?: boolean;
 	flag?: boolean;
 	patient?: boolean;
+	assignedMhic?: boolean;
 	mrn?: boolean;
 	referralDate?: boolean;
 	preferredPhone?: boolean;
@@ -70,7 +71,6 @@ export type MhicPatientOrderTableColumnConfig = {
 	checkInScheduled?: boolean;
 	checkInResponse?: boolean;
 	episode?: boolean;
-	assignedMhic?: boolean;
 };
 
 interface MhicPatientOrderTableProps {
@@ -229,6 +229,7 @@ export const MhicPatientOrderTable = ({
 									Patient
 								</TableCell>
 							)}
+							{columnConfig.assignedMhic && <TableCell header>Assigned MHIC</TableCell>}
 							{columnConfig.mrn && <TableCell header>MRN</TableCell>}
 							{columnConfig.referralDate && <TableCell header>Referral Date</TableCell>}
 							{columnConfig.preferredPhone && <TableCell header>Pref. Phone</TableCell>}
@@ -255,7 +256,6 @@ export const MhicPatientOrderTable = ({
 									Episode
 								</TableCell>
 							)}
-							{columnConfig.assignedMhic && <TableCell header>Assigned MHIC</TableCell>}
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -372,9 +372,14 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
-
+											{columnConfig.assignedMhic && (
+												<TableCell width={280}>
+													<span className="text-nowrap text-truncate">
+														{po.panelAccountDisplayName ?? 'Unassigned'}
+													</span>
+												</TableCell>
+											)}
 											{columnConfig.mrn && <TableCell header>{po.patientMrn}</TableCell>}
-
 											{columnConfig.referralDate && (
 												<TableCell width={144}>
 													<span className="text-nowrap text-truncate">
@@ -551,13 +556,6 @@ export const MhicPatientOrderTable = ({
 												<TableCell width={120} className="text-right">
 													<span className="text-nowrap text-truncate">
 														{po.episodeDurationInDaysDescription}
-													</span>
-												</TableCell>
-											)}
-											{columnConfig.assignedMhic && (
-												<TableCell width={280}>
-													<span className="text-nowrap text-truncate">
-														{po.panelAccountDisplayName}
 													</span>
 												</TableCell>
 											)}
