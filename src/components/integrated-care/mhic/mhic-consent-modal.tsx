@@ -63,16 +63,16 @@ export const MhicConsentModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEntering={handleOnEnter}>
 			<Modal.Header closeButton>
-				<Modal.Title>Patient Consent</Modal.Title>
+				<Modal.Title>Service Confirmation</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
-					<Form.Label className="mb-1">Does the patient consent to taking the assessment?</Form.Label>
+					<Form.Label className="mb-1">Is the patient still interested in mental health services?</Form.Label>
 					<Form.Check
 						type="radio"
 						name="patient-consent"
 						id={`patient-consent__${PatientOrderConsentStatusId.CONSENTED}`}
-						label="Yes, patient consents"
+						label="Yes"
 						value={PatientOrderConsentStatusId.CONSENTED}
 						checked={PatientOrderConsentStatusId.CONSENTED === selectedPatientOrderConsentStatusId}
 						onChange={({ currentTarget }) => {
@@ -83,7 +83,7 @@ export const MhicConsentModal: FC<Props> = ({ patientOrder, onSave, ...props }) 
 						type="radio"
 						name="patient-consent"
 						id={`patient-consent__${PatientOrderConsentStatusId.REJECTED}`}
-						label="No, patient does not consent"
+						label='No (Order will be closed and marked as "refused care")'
 						value={PatientOrderConsentStatusId.REJECTED}
 						checked={PatientOrderConsentStatusId.REJECTED === selectedPatientOrderConsentStatusId}
 						onChange={({ currentTarget }) => {
