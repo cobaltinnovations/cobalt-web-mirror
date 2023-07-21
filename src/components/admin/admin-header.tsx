@@ -104,7 +104,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const AdminHeader = () => {
+interface AdminHeaderProps {
+	isGroupSessionPreview?: boolean;
+}
+
+export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 
@@ -172,41 +176,51 @@ export const AdminHeader = () => {
 	return (
 		<header className={classes.header}>
 			<div className={classes.brandingOuter}>
-				<LogoSmallText className="me-3 text-primary" width={105.78} height={14} />
+				<LogoSmallText className="me-3 text-primary text-uppercase" width={105.78} height={14} />
 				<span className="d-block text-gray">Admin</span>
 			</div>
 			<div className={classes.navigationOuter}>
-				<nav className="h-100">
-					<ul>
-						{navigationLinks.map((link, index) => (
-							<li key={index} className={classNames({ active: link.active })}>
-								{link.to && <Link to={link.to}>{link.title}</Link>}
-							</li>
-						))}
-					</ul>
-				</nav>
-				<div className="d-flex align-items-center">
-					<Dropdown className="d-flex align-items-center">
-						<Dropdown.Toggle as={DropdownToggle} className="p-0 border-0" id="admin-header__dropdown-menu">
-							<AvatarIcon className="d-flex" />
-						</Dropdown.Toggle>
-						<Dropdown.Menu
-							as={DropdownMenu}
-							align="end"
-							flip={false}
-							popperConfig={{ strategy: 'fixed' }}
-							renderOnMount
-						>
-							<Dropdown.Item
-								onClick={() => {
-									signOutAndClearContext();
-								}}
-							>
-								<span className="text-danger">Sign Out</span>
-							</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
-				</div>
+				{isGroupSessionPreview ? (
+					<p className="mb-0 text-muted">Preview Group Session</p>
+				) : (
+					<>
+						<nav className="h-100">
+							<ul>
+								{navigationLinks.map((link, index) => (
+									<li key={index} className={classNames({ active: link.active })}>
+										{link.to && <Link to={link.to}>{link.title}</Link>}
+									</li>
+								))}
+							</ul>
+						</nav>
+						<div className="d-flex align-items-center">
+							<Dropdown className="d-flex align-items-center">
+								<Dropdown.Toggle
+									as={DropdownToggle}
+									className="p-0 border-0"
+									id="admin-header__dropdown-menu"
+								>
+									<AvatarIcon className="d-flex" />
+								</Dropdown.Toggle>
+								<Dropdown.Menu
+									as={DropdownMenu}
+									align="end"
+									flip={false}
+									popperConfig={{ strategy: 'fixed' }}
+									renderOnMount
+								>
+									<Dropdown.Item
+										onClick={() => {
+											signOutAndClearContext();
+										}}
+									>
+										<span className="text-danger">Sign Out</span>
+									</Dropdown.Item>
+								</Dropdown.Menu>
+							</Dropdown>
+						</div>
+					</>
+				)}
 			</div>
 		</header>
 	);
