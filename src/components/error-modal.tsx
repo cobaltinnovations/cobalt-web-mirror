@@ -141,6 +141,12 @@ const ErrorModal: FC = () => {
 			centered
 			onHide={() => {
 				setShow(false);
+
+				if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
+					navigate('/ic/patient');
+				} else if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCareStaff) {
+					navigate('/ic/mhic');
+				}
 			}}
 		>
 			<Modal.Header closeButton>
