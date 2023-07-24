@@ -406,6 +406,17 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 			);
 		}
 
+		if (patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.MHIC) {
+			return (
+				<NoData
+					className="bg-white"
+					title="Assessment in Progress"
+					description={`Your assessment with a mental health intake coordinator is in progress. If you have been disconnected please call us back at ${institution.integratedCarePhoneNumberDescription}`}
+					actions={[]}
+				/>
+			);
+		}
+
 		return null;
 	}
 
