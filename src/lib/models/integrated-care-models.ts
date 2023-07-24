@@ -46,8 +46,8 @@ export interface PatientOrderModel {
 	patientFirstName?: string;
 	patientDisplayName?: string;
 	patientMrn?: string;
-	patientId?: string;
-	patientIdType?: string;
+	patientUniqueId?: string;
+	patientUniqueIdType?: string;
 	patientBirthSexId?: string;
 	patientBirthdate?: string;
 	patientBirthdateDescription?: string;
