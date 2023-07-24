@@ -417,8 +417,8 @@ export interface PatientOrderClosureReasonModel {
 
 export interface PatientOrderAutocompleteResult {
 	patientMrn: string;
-	patientId: string;
-	patientIdType: string;
+	patientUniqueId: string;
+	patientUniqueIdType: string;
 	patientFirstName: string;
 	patientLastName: string;
 	patientDisplayName: string;

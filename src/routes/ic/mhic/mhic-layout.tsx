@@ -43,8 +43,8 @@ export const Component = () => {
 				const result = {
 					patientOrderId: patientOrderResponse.patientOrder.patientOrderId,
 					patientMrn: patientOrderResponse.patientOrder.patientMrn,
-					patientId: patientOrderResponse.patientOrder.patientId,
-					patientIdType: patientOrderResponse.patientOrder.patientIdType,
+					patientUniqueId: patientOrderResponse.patientOrder.patientUniqueId,
+					patientUniqueIdType: patientOrderResponse.patientOrder.patientUniqueIdType,
 					patientFirstName: patientOrderResponse.patientOrder.patientFirstName,
 					patientLastName: patientOrderResponse.patientOrder.patientLastName,
 					patientDisplayName: patientOrderResponse.patientOrder.patientDisplayName,
