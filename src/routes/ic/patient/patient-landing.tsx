@@ -9,6 +9,7 @@ import {
 	PatientOrderClosureReasonId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
+	ROLE_ID,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import NoData from '@/components/no-data';
@@ -374,34 +375,38 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 	}
 
 	if (inProgress) {
-		return (
-			<NoData
-				className="bg-white"
-				title="Continue Assessment"
-				description="You previously made progress on the assessment. If now is a good time, we can start from where you left off. Before we continue, please make sure you are in a comfortable place."
-				actions={[
-					{
-						variant: 'primary',
-						title: 'Continue Assessment',
-						onClick: () => {
-							if (!patientOrder.mostRecentScreeningSessionId) {
-								throw new Error('Unknown Recent Screening');
-							}
+		if (patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) {
+			return (
+				<NoData
+					className="bg-white"
+					title="Continue Assessment"
+					description="You previously made progress on the assessment. If now is a good time, we can start from where you left off. Before we continue, please make sure you are in a comfortable place."
+					actions={[
+						{
+							variant: 'primary',
+							title: 'Continue Assessment',
+							onClick: () => {
+								if (!patientOrder.mostRecentScreeningSessionId) {
+									throw new Error('Unknown Recent Screening');
+								}
 
-							resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+								resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+							},
 						},
-					},
-					{
-						variant: 'outline-primary',
-						title: 'Restart from Beginning',
-						onClick: () => {
-							createScreeningSession();
+						{
+							variant: 'outline-primary',
+							title: 'Restart from Beginning',
+							onClick: () => {
+								createScreeningSession();
+							},
+							disabled: isCreatingScreeningSession,
 						},
-						disabled: isCreatingScreeningSession,
-					},
-				]}
-			/>
-		);
+					]}
+				/>
+			);
+		}
+
+		return null;
 	}
 
 	return null;

@@ -1,4 +1,5 @@
 import { AccountModel } from './account';
+import { ROLE_ID } from './roles';
 import { ScreeningSession, ScreeningSessionResult } from './screening-models';
 
 export interface PatientOrderCountModel {
@@ -136,6 +137,7 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionCreatedByAccountLastName: string;
 	mostRecentScreeningSessionCreatedByAccountDisplayName: string;
 	mostRecentScreeningSessionCreatedByAccountDisplayNameWithLastFirst: string;
+	mostRecentScreeningSessionCreatedByAccountRoleId: ROLE_ID;
 	mostRecentScreeningSessionCompleted: boolean;
 	mostRecentScreeningSessionCompletedAt: string;
 	mostRecentScreeningSessionCompletedAtDescription: string;

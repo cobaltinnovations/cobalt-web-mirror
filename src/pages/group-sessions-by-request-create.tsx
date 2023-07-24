@@ -148,7 +148,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 				});
 			}
 
-			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
+			if (account?.roleId === ROLE_ID.ADMINISTRATOR) {
 				navigate('/group-sessions/by-request');
 			} else {
 				navigate('/in-the-studio-thanks');
@@ -172,7 +172,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 					</h2>
 				</HeroContainer>
 
-				{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+				{account?.roleId === ROLE_ID.ADMINISTRATOR && (
 					<Breadcrumb
 						breadcrumbs={[
 							{

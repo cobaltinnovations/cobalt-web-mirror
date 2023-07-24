@@ -54,13 +54,12 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 	const { account } = useAccount();
 
 	const canEditSession =
-		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
+		account?.roleId === ROLE_ID.ADMINISTRATOR &&
 		(session.groupSessionRequestStatusId === SESSION_STATUS.NEW ||
 			session.groupSessionRequestStatusId === SESSION_STATUS.ADDED);
 
 	const canAddSession =
-		(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) &&
-		session.groupSessionRequestStatusId === SESSION_STATUS.NEW;
+		account?.roleId === ROLE_ID.ADMINISTRATOR && session.groupSessionRequestStatusId === SESSION_STATUS.NEW;
 
 	const hasDropdown =
 		canAddSession ||
