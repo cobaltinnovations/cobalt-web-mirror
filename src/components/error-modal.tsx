@@ -158,9 +158,9 @@ const ErrorModal: FC = () => {
 						onClick={() => {
 							setShow(false);
 
-							if (error?.apiError?.metaData?.shouldExitScreeningSession && isIntegratedCarePatient) {
+							if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
 								navigate('/ic/patient');
-							} else if (error?.apiError?.metaData?.shouldExitScreeningSession && isIntegratedCareStaff) {
+							} else if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCareStaff) {
 								navigate('/ic/mhic');
 							}
 						}}
