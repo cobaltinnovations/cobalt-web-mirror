@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext } from 'react';
+import React, { FC, useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -9,6 +9,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import useAccount from '@/hooks/use-account';
+import { UserExperienceTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	errorModal: {
@@ -25,11 +26,17 @@ const ErrorModal: FC = () => {
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 
-	const ErrorBody = useCallback(() => {
-		const isIntegratedCarePatient =
-			institution.integratedCareEnabled && institution.userExperienceTypeId === 'PATIENT';
-		const isIntegratedCareStaff = institution.integratedCareEnabled && institution.userExperienceTypeId === 'STAFF';
+	const isIntegratedCarePatient = useMemo(
+		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.PATIENT,
+		[institution.integratedCareEnabled, institution.userExperienceTypeId]
+	);
 
+	const isIntegratedCareStaff = useMemo(
+		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.STAFF,
+		[institution.integratedCareEnabled, institution.userExperienceTypeId]
+	);
+
+	const ErrorBody = useCallback(() => {
 		if (error?.code === 'VALIDATION_FAILED' || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
 			return <p className="mb-0 fw-bold">{error?.message}</p>;
 		}
@@ -117,10 +124,10 @@ const ErrorModal: FC = () => {
 		error?.message,
 		institution.clinicalSupportPhoneNumber,
 		institution.clinicalSupportPhoneNumberDescription,
-		institution.integratedCareEnabled,
 		institution.integratedCarePhoneNumber,
 		institution.integratedCarePhoneNumberDescription,
-		institution.userExperienceTypeId,
+		isIntegratedCarePatient,
+		isIntegratedCareStaff,
 		navigate,
 		openInCrisisModal,
 		setShow,
@@ -150,6 +157,12 @@ const ErrorModal: FC = () => {
 						variant="outline-primary"
 						onClick={() => {
 							setShow(false);
+
+							if (error?.apiError?.metaData?.shouldExitScreeningSession && isIntegratedCarePatient) {
+								navigate('/ic/patient');
+							} else if (error?.apiError?.metaData?.shouldExitScreeningSession && isIntegratedCareStaff) {
+								navigate('/ic/mhic');
+							}
 						}}
 					>
 						Dismiss
