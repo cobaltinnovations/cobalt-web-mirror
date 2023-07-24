@@ -113,16 +113,33 @@ export const MhicPatientOrderTable = ({
 	const [totalPatientOrdersDescription, setTotalPatientOrdersDescription] = useState('0');
 
 	const patientColumnOffset = useMemo(() => {
-		if (columnConfig.checkbox && columnConfig.flag) {
-			return 100;
-		} else if (columnConfig.checkbox) {
-			return 56;
-		} else if (columnConfig.flag) {
-			return 44;
+		let offset = 0;
+
+		if (columnConfig.checkbox) {
+			offset += 56;
+		}
+		if (columnConfig.flag) {
+			offset += 44;
 		}
 
-		return 0;
+		return offset;
 	}, [columnConfig.checkbox, columnConfig.flag]);
+
+	const mhicColumnOffset = useMemo(() => {
+		let offset = 0;
+
+		if (columnConfig.checkbox) {
+			offset += 56;
+		}
+		if (columnConfig.flag) {
+			offset += 44;
+		}
+		if (columnConfig.patient) {
+			offset += 240;
+		}
+
+		return offset;
+	}, [columnConfig.checkbox, columnConfig.flag, columnConfig.patient]);
 
 	const getFlagCount = useCallback((patientOrder: PatientOrderModel) => {
 		let count = 0;
@@ -187,7 +204,15 @@ export const MhicPatientOrderTable = ({
 					<TableHead>
 						<TableRow>
 							{columnConfig.checkbox && (
-								<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
+								<TableCell
+									header
+									width={56}
+									sticky
+									className="ps-6 pe-0 align-items-start"
+									stickyBorder={
+										!columnConfig.flag && !columnConfig.patient && !columnConfig.assignedMhic
+									}
+								>
 									<Form.Check
 										className="no-label"
 										type="checkbox"
@@ -221,15 +246,26 @@ export const MhicPatientOrderTable = ({
 									width={44}
 									stickyOffset={columnConfig.checkbox ? 56 : 0}
 									sticky
+									stickyBorder={!columnConfig.patient && !columnConfig.assignedMhic}
 									className="align-items-center"
 								></TableCell>
 							)}
 							{columnConfig.patient && (
-								<TableCell header width={240} sticky stickyOffset={patientColumnOffset} stickyBorder>
+								<TableCell
+									header
+									width={240}
+									sticky
+									stickyOffset={patientColumnOffset}
+									stickyBorder={!columnConfig.assignedMhic}
+								>
 									Patient
 								</TableCell>
 							)}
-							{columnConfig.assignedMhic && <TableCell header>Assigned MHIC</TableCell>}
+							{columnConfig.assignedMhic && (
+								<TableCell header width={280} sticky stickyOffset={mhicColumnOffset} stickyBorder>
+									Assigned MHIC
+								</TableCell>
+							)}
 							{columnConfig.mrn && <TableCell header>MRN</TableCell>}
 							{columnConfig.referralDate && <TableCell header>Referral Date</TableCell>}
 							{columnConfig.preferredPhone && <TableCell header>Pref. Phone</TableCell>}
@@ -297,6 +333,11 @@ export const MhicPatientOrderTable = ({
 													header
 													width={56}
 													sticky
+													stickyBorder={
+														!columnConfig.flag &&
+														!columnConfig.patient &&
+														!columnConfig.assignedMhic
+													}
 													className="ps-6 pe-0 align-items-start"
 												>
 													<Form.Check
@@ -347,6 +388,7 @@ export const MhicPatientOrderTable = ({
 												<TableCell
 													width={44}
 													sticky
+													stickyBorder={!columnConfig.patient && !columnConfig.assignedMhic}
 													stickyOffset={columnConfig.checkbox ? 56 : 0}
 													className="px-0 flex-row align-items-center justify-content-end"
 												>
@@ -363,7 +405,7 @@ export const MhicPatientOrderTable = ({
 													width={240}
 													sticky
 													stickyOffset={patientColumnOffset}
-													stickyBorder
+													stickyBorder={!columnConfig.assignedMhic}
 													className="py-2"
 												>
 													<span className="d-block text-nowrap">{po.patientDisplayName}</span>
@@ -373,7 +415,12 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.assignedMhic && (
-												<TableCell width={280}>
+												<TableCell
+													width={280}
+													sticky
+													stickyOffset={mhicColumnOffset}
+													stickyBorder
+												>
 													<span className="text-nowrap text-truncate">
 														{po.panelAccountDisplayName ?? 'Unassigned'}
 													</span>
