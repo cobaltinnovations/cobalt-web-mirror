@@ -144,6 +144,7 @@ export interface PatientOrderModel {
 	patientDemographicsAccepted?: boolean;
 	patientDemographicsCompleted?: boolean;
 	patientAddressRegionAccepted?: boolean;
+	patientDemographicsConfirmed?: boolean;
 	patientDemographicsConfirmedAt?: string;
 	patientDemographicsConfirmedAtDescription?: string;
 	patientDemographicsConfirmedByAccountId?: string;

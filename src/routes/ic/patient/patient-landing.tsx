@@ -217,18 +217,18 @@ export const Component = () => {
 											</Card.Header>
 											<Card.Body className="p-0">
 												<NextStepsItem
-													complete={patientOrder?.patientDemographicsAccepted}
+													complete={patientOrder?.patientDemographicsConfirmed}
 													title="Step 1: Verify your information"
 													description={
-														patientOrder?.patientDemographicsAccepted
+														patientOrder?.patientDemographicsConfirmed
 															? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
 															: 'Review the information provided by your primary care provider and make sure it is correct.'
 													}
 													button={{
-														variant: patientOrder?.patientDemographicsAccepted
+														variant: patientOrder?.patientDemographicsConfirmed
 															? 'outline-primary'
 															: 'primary',
-														title: patientOrder?.patientDemographicsAccepted
+														title: patientOrder?.patientDemographicsConfirmed
 															? 'Edit Information'
 															: 'Verify Information',
 														onClick: () => {
@@ -242,7 +242,7 @@ export const Component = () => {
 															<hr />
 														</>
 													)}
-												{patientOrder?.patientDemographicsAccepted && (
+												{patientOrder?.patientDemographicsConfirmed && (
 													<>
 														<hr />
 														<NextStepsItem
