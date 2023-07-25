@@ -15,11 +15,10 @@ import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
 
-import { AdminContentRow, AdminContentActions, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
+import { AdminContentRow, AdminContentActions, ContentApprovalStatusId, ContentTypeId } from '@/lib/models';
 
 import SessionDropdown from '@/components/session-dropdown';
 import { Link } from 'react-router-dom';
-import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -111,8 +110,7 @@ interface AvailableContentRowProps {
 const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 	({ content, onEditClick, onApproveClick, onRejectClick, onDeleteClick, onArchiveToggle }) => {
 		const classes = useStyles();
-		const { account } = useAccount();
-		const isSuperAdmin = account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR;
+		const isSuperAdmin = false;
 
 		function getIcon(contentTypeId: ContentTypeId) {
 			switch (contentTypeId) {

@@ -200,7 +200,7 @@ const CreateOnYourTimeContent: FC = () => {
 				await adminService.createContent(submissionValues).fetch();
 			}
 
-			if (account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) {
+			if (account?.roleId === ROLE_ID.ADMINISTRATOR) {
 				let targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
 
 				if (returnToAvailable) {
@@ -230,7 +230,7 @@ const CreateOnYourTimeContent: FC = () => {
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>
-				{(account?.roleId === ROLE_ID.ADMINISTRATOR || account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+				{account?.roleId === ROLE_ID.ADMINISTRATOR && (
 					<Breadcrumb
 						breadcrumbs={[
 							{
@@ -614,9 +614,7 @@ const CreateOnYourTimeContent: FC = () => {
 														</Card>
 														{!isAdding && (
 															<>
-																{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
-																	account?.roleId ===
-																		ROLE_ID.SUPER_ADMINISTRATOR) && (
+																{account?.roleId === ROLE_ID.ADMINISTRATOR && (
 																	<Card className="mb-5 border-0 p-6">
 																		<h5 className="mb-2">Visibility *</h5>
 																		<div
@@ -847,8 +845,7 @@ const CreateOnYourTimeContent: FC = () => {
 															</>
 														)}
 
-														{(account?.roleId === ROLE_ID.ADMINISTRATOR ||
-															account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR) && (
+														{account?.roleId === ROLE_ID.ADMINISTRATOR && (
 															<Card className="mb-5 border-0">
 																<div
 																	className="p-6"

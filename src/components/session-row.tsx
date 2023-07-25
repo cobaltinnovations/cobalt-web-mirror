@@ -59,8 +59,7 @@ const SessionRow: FC<SessionRowProps> = ({
 	const { account } = useAccount();
 
 	const canAddSession =
-		(account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR || account?.roleId === ROLE_ID.ADMINISTRATOR) &&
-		session.groupSessionStatusId === SESSION_STATUS.NEW;
+		account?.roleId === ROLE_ID.ADMINISTRATOR && session.groupSessionStatusId === SESSION_STATUS.NEW;
 
 	const hasDropdown =
 		session.groupSessionStatusId === SESSION_STATUS.NEW ||
