@@ -313,6 +313,8 @@ export const Component = () => {
 								insurance: true,
 								outreachNumber: true,
 								lastOutreach: true,
+								assessmentCompleted: true,
+								episodeClosed: true,
 								episode: true,
 							}}
 						/>

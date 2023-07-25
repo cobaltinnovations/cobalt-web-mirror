@@ -63,13 +63,14 @@ export type MhicPatientOrderTableColumnConfig = {
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
 	lastOutreach?: boolean;
+	assessmentCompleted?: boolean;
 	consent?: boolean;
 	assessmentScheduled?: boolean;
-	assessmentCompleted?: boolean;
 	triage?: boolean;
 	resources?: boolean;
 	checkInScheduled?: boolean;
 	checkInResponse?: boolean;
+	episodeClosed?: boolean;
 	episode?: boolean;
 };
 
@@ -280,13 +281,14 @@ export const MhicPatientOrderTable = ({
 								</TableCell>
 							)}
 							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
+							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.consent && <TableCell header>Consent</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
-							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.triage && <TableCell header>Triage</TableCell>}
 							{columnConfig.resources && <TableCell header>Resources</TableCell>}
 							{columnConfig.checkInScheduled && <TableCell header>Check-In Scheduled</TableCell>}
 							{columnConfig.checkInResponse && <TableCell header>Check-In Response</TableCell>}
+							{columnConfig.episodeClosed && <TableCell header>Episode Closed</TableCell>}
 							{columnConfig.episode && (
 								<TableCell header className="text-right">
 									Episode
@@ -527,6 +529,13 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
+											{columnConfig.assessmentCompleted && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
 											{columnConfig.consent && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
@@ -544,13 +553,6 @@ export const MhicPatientOrderTable = ({
 													<span className="text-nowrap text-truncate">
 														{po.patientOrderScheduledScreeningScheduledDateTimeDescription ??
 															'-'}
-													</span>
-												</TableCell>
-											)}
-											{columnConfig.assessmentCompleted && (
-												<TableCell width={170}>
-													<span className="text-nowrap text-truncate">
-														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
 													</span>
 												</TableCell>
 											)}
@@ -596,6 +598,13 @@ export const MhicPatientOrderTable = ({
 												<TableCell width={172}>
 													<span className="text-nowrap text-truncate">
 														{po.patientOrderResourceCheckInResponseStatusDescription}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.episodeClosed && (
+												<TableCell width={170} className="text-right">
+													<span className="text-nowrap text-truncate">
+														{po.episodeClosedAtDescription ?? '-'}
 													</span>
 												</TableCell>
 											)}
