@@ -213,7 +213,10 @@ const CmsOnYourTime: FC = () => {
 	}
 
 	function handleEditClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true`);
+		navigate({
+			pathname: '/cms/on-your-time/create',
+			search: `?contentId=${contentId}&editing=true`,
+		});
 	}
 
 	async function handleRejectClick(contentId: string) {

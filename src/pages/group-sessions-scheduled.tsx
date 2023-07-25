@@ -87,7 +87,10 @@ const GroupSessions: FC = () => {
 	}
 
 	function handleSessionCreateCopyClicked(groupSessionId: string) {
-		navigate(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
+		navigate({
+			pathname: '/group-sessions/scheduled/create',
+			search: `?groupSessionIdToCopy=${groupSessionId}`,
+		});
 	}
 
 	async function handleSessionActionClicked(

@@ -116,7 +116,10 @@ const IntakeAssessment: FC = () => {
 				}
 
 				navigate(
-					`/intake-assessment?groupSessionId=${groupSessionId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
+					{
+						pathname: '/intake-assessment',
+						search: `?groupSessionId=${groupSessionId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
+					},
 					{ state: location.state }
 				);
 			} else {
@@ -151,7 +154,10 @@ const IntakeAssessment: FC = () => {
 				}
 
 				navigate(
-					`/intake-assessment?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
+					{
+						pathname: '/intake-assessment',
+						search: `?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
+					},
 					{ state: location.state }
 				);
 			}
@@ -262,7 +268,10 @@ const IntakeAssessment: FC = () => {
 											variant="outline-primary"
 											onClick={() => {
 												navigate(
-													`/intake-assessment?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
+													{
+														pathname: '/intake-assessment',
+														search: `?providerId=${providerId}&questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
+													},
 													{ state: location.state }
 												);
 											}}

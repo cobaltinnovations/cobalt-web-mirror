@@ -69,9 +69,15 @@ const IntroAssessment: FC = () => {
 				sessionId: assessment.sessionId,
 			});
 
-			navigate(`/intro-assessment?${searchParams.toString()}`, {
-				state: location.state,
-			});
+			navigate(
+				{
+					pathname: '/intro-assessment',
+					search: `?${searchParams.toString()}`,
+				},
+				{
+					state: location.state,
+				}
+			);
 		} else {
 			if (account?.accountId) {
 				revalidator.revalidate();
@@ -90,7 +96,10 @@ const IntroAssessment: FC = () => {
 		if (!assessment) return;
 
 		if (assessment.previousQuestionId) {
-			navigate(`/intro-assessment?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`);
+			navigate({
+				pathname: '/intro-assessment',
+				search: `?questionId=${assessment.previousQuestionId}&sessionId=${assessment.sessionId}`,
+			});
 		}
 	}, [assessment, navigate]);
 

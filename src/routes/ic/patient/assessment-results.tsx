@@ -79,7 +79,10 @@ export const PatientAssessmentResults = () => {
 						setShowInsuranceStatementModal(false);
 					}}
 					onContinue={() => {
-						navigate(`/ic/patient/connect-with-support/mhp?patientOrderId=${patientOrder?.patientOrderId}`);
+						navigate({
+							pathname: '/ic/patient/connect-with-support/mhp',
+							search: `?patientOrderId=${patientOrder?.patientOrderId}`,
+						});
 					}}
 				/>
 

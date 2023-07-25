@@ -77,7 +77,13 @@ const AppointmentSearchBar: FC<AppointmentSearchBarProps> = (props) => {
 			const params = new URLSearchParams(location.search);
 			params.delete('providerId');
 			params.delete('clinicId');
-			navigate(`/connect-with-support?${params.toString()}`, { state: location.state });
+			navigate(
+				{
+					pathname: '/connect-with-support',
+					search: `?${params.toString()}`,
+				},
+				{ state: location.state }
+			);
 		}
 	}
 

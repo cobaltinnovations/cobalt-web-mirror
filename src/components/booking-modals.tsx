@@ -89,11 +89,17 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				setPreservedFilterQueryString(currentSearchString);
 			}
 
-			navigate(`/intake-assessment?providerId=${provider.providerId}`, {
-				state: {
-					skipAssessment,
+			navigate(
+				{
+					pathname: '/intake-assessment',
+					search: `?providerId=${provider.providerId}`,
 				},
-			});
+				{
+					state: {
+						skipAssessment,
+					},
+				}
+			);
 		},
 		[currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]
 	);

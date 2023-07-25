@@ -152,12 +152,18 @@ const ConfirmAppointment = () => {
 			if (response.appointment.patientOrderId) {
 				navigate(`/ic/patient`);
 			} else {
-				navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-					state: {
-						successBooking: true,
-						emailAddress: response.account.emailAddress,
+				navigate(
+					{
+						pathname: '/my-calendar',
+						search: `?appointmentId=${response.appointment.appointmentId}`,
 					},
-				});
+					{
+						state: {
+							successBooking: true,
+							emailAddress: response.account.emailAddress,
+						},
+					}
+				);
 			}
 
 			addFlag({

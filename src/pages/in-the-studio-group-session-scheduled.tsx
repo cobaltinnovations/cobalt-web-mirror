@@ -105,7 +105,10 @@ const InTheStudioGroupSessionScheduled = () => {
 
 	function handleReserveButtonClick() {
 		if (session?.assessmentId) {
-			navigate(`/intake-assessment?groupSessionId=${session.groupSessionId}`);
+			navigate({
+				pathname: '/intake-assessment',
+				search: `?groupSessionId=${session.groupSessionId}`,
+			});
 		}
 
 		setShowCollectEmailModal(true);

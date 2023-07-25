@@ -177,13 +177,19 @@ const EhrLookup: FC = () => {
 			setSelectedProvider(undefined);
 			setSelectedTimeSlot(undefined);
 
-			navigate(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
-				replace: true,
-				state: {
-					successBooking: true,
-					emailAddress: response.account.emailAddress,
+			navigate(
+				{
+					pathname: '/my-calendar',
+					search: `?appointmentId=${appointment.appointmentId}`,
 				},
-			});
+				{
+					replace: true,
+					state: {
+						successBooking: true,
+						emailAddress: response.account.emailAddress,
+					},
+				}
+			);
 		} catch (e) {
 			handleError(e);
 		}

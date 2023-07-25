@@ -130,11 +130,17 @@ const CmsAvailableContent: FC = () => {
 	}
 
 	function handleAddClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
+		navigate({
+			pathname: '/cms/on-your-time/create',
+			search: `?contentId=${contentId}&adding=true`,
+		});
 	}
 
 	function handleEditClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true&returnToAvailable=true`);
+		navigate({
+			pathname: '/cms/on-your-time/create',
+			search: `?contentId=${contentId}&editing=true&returnToAvailable=true`,
+		});
 	}
 
 	function updateContentItem(content: AdminContentRow) {
