@@ -77,11 +77,14 @@ const Footer: FC = () => {
 										<li key={featureId} className="mb-3">
 											<Link
 												className="fw-normal text-decoration-none"
-												to={
-													featureId === 'THERAPY' && account?.institutionLocationId
-														? `${urlName}?institutionLocationId=${account.institutionLocationId}`
-														: urlName
-												}
+												to={{
+													pathname: urlName,
+													...(featureId === 'THERAPY' && account?.institutionLocationId
+														? {
+																search: `?institutionLocationId=${account.institutionLocationId}`,
+														  }
+														: {}),
+												}}
 											>
 												{name}
 											</Link>

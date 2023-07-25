@@ -430,11 +430,13 @@ const HeaderV2 = () => {
 									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
 									title: name,
 									description: navDescription,
-									to:
-										featureIdsWithLocationFilter.includes(featureId) &&
+									to: {
+										pathname: urlName,
+										...(featureIdsWithLocationFilter.includes(featureId) &&
 										account?.institutionLocationId
-											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
-											: urlName,
+											? { search: `?institutionLocationId=${account.institutionLocationId}` }
+											: {}),
+									},
 								})),
 						},
 				  ]

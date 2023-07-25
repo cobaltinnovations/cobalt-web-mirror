@@ -180,11 +180,14 @@ const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 								.map(({ featureId, urlName, name, recommended }, featureIndex) => (
 									<div key={featureId} className={classes.pathwayOuter}>
 										<Link
-											to={
-												featureId === 'THERAPY' && account?.institutionLocationId
-													? `${urlName}?institutionLocationId=${account.institutionLocationId}`
-													: urlName
-											}
+											to={{
+												pathname: urlName,
+												...(featureId === 'THERAPY' && account?.institutionLocationId
+													? {
+															search: `?institutionLocationId=${account.institutionLocationId}`,
+													  }
+													: {}),
+											}}
 											className={classNames(classes.pathway, {
 												recommended: recommended,
 											})}
