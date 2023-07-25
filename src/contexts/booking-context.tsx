@@ -241,11 +241,17 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 				};
 			}
 
-			const exitUrl = Cookies.get('bookingExitUrl') ?? '/';
+			const exitUrl = new URL(`${window.location.origin}${Cookies.get('bookingExitUrl') ?? '/'}`);
+			const paramsFromExitUrl = new URLSearchParams(exitUrl.search);
+			const existingParams = new URLSearchParams(preservedFilterQueryString);
+			const combinedParams = new URLSearchParams({
+				...Object.fromEntries(paramsFromExitUrl),
+				...Object.fromEntries(existingParams),
+			});
 
 			return {
-				pathname: exitUrl,
-				search: preservedFilterQueryString,
+				pathname: exitUrl.pathname,
+				search: combinedParams.toString(),
 				state,
 			};
 		},
