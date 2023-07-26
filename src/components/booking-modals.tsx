@@ -63,6 +63,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 	const currentSearchString = searchParams.toString();
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
+
 	const navigateToEhrLookup = useCallback(() => {
 		const bookingSource = Cookies.get('bookingSource');
 
@@ -100,9 +101,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 	const continueBookingProcess = useCallback(
 		({ provider, appointmentType, timeSlot, date, patientOrderId }: ContinueBookingOptions) => {
-			if (provider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-				navigateToEhrLookup();
-			} else if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
+			if (provider?.intakeAssessmentRequired && provider?.skipIntakePrompt) {
 				navigateToIntakeAssessment(provider);
 			} else if (provider?.intakeAssessmentRequired || !!appointmentType?.assessmentId) {
 				setShowConfirmIntakeAssessmentModal(true);
@@ -143,7 +142,7 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 				window.location.href = `/confirm-appointment?${params.toString()}`;
 			}
 		},
-		[account?.epicPatientId, navigateToEhrLookup, navigateToIntakeAssessment]
+		[navigateToIntakeAssessment]
 	);
 
 	const kickoffBookingProcess = useCallback(
