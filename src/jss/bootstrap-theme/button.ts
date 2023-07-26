@@ -9,7 +9,7 @@ export const button = (theme: CobaltTheme) => {
 			appearance: 'none',
 			padding: '10px 20px',
 			...theme.fonts.bodyBold,
-			fontSize: '1.6rem',
+			fontSize: '1.4rem',
 			lineHeight: '2rem',
 			position: 'relative',
 			textTransform: 'none',
@@ -27,7 +27,7 @@ export const button = (theme: CobaltTheme) => {
 				},
 			},
 			'&-lg': {
-				fontSize: '1.8rem',
+				fontSize: '1.6rem',
 				lineHeight: '2.4rem',
 				padding: '12px 28px',
 			},
