@@ -1,6 +1,6 @@
 import { compact } from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
@@ -45,6 +45,7 @@ interface MhicAssessmentCompleteProps {
 
 export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
+	const navigate = useNavigate();
 	const classes = useStyles();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [notTakenScreeningTypes, setNotTakeScreeningTypes] = useState<ScreeningType[]>([]);
@@ -313,7 +314,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											})),
 										]}
 										onTabClick={(value) => {
-											window.location.href = `${pathname}${value}`;
+											navigate(`${pathname}${value}`);
 										}}
 									/>
 								</Col>
