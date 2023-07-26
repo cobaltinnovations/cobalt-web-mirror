@@ -254,7 +254,8 @@ export const Component = () => {
 															description={
 																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
 																	? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
-																	: PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																	: homescreenState ===
+																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
 																	? ''
 																	: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
 															}
@@ -272,16 +273,20 @@ export const Component = () => {
 																	: undefined
 															}
 														>
-															<AssessmentNextStepItems
-																isReady={
-																	homescreenState === PAGE_STATES.ASSESSMENT_READY
-																}
-																inProgress={
-																	homescreenState ===
-																	PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																}
-																patientOrder={patientOrder}
-															/>
+															{(homescreenState === PAGE_STATES.ASSESSMENT_READY ||
+																homescreenState ===
+																	PAGE_STATES.ASSESSMENT_IN_PROGRESS) && (
+																<AssessmentNextStepItems
+																	isReady={
+																		homescreenState === PAGE_STATES.ASSESSMENT_READY
+																	}
+																	inProgress={
+																		homescreenState ===
+																		PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																	}
+																	patientOrder={patientOrder}
+																/>
+															)}
 														</NextStepsItem>
 													</>
 												)}
