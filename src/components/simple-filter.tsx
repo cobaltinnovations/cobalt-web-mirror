@@ -35,7 +35,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: 'transparent',
 		border: `2px solid ${theme.colors.p500}`,
 		'& span': {
-			fontSize: '1.6rem',
+			fontSize: '1.4rem',
 			lineHeight: '2.0rem',
 			whiteSpace: 'nowrap',
 			...theme.fonts.bodyBold,
