@@ -1,4 +1,5 @@
 import ErrorDisplay from '@/components/error-display';
+import Footer from '@/components/footer';
 import { PatientHeader } from '@/components/integrated-care/patient';
 import Loader from '@/components/loader';
 import React, { Suspense } from 'react';
@@ -12,6 +13,8 @@ export const Component = () => {
 			<Suspense fallback={<Loader />}>
 				<Outlet />
 			</Suspense>
+
+			<Footer />
 		</>
 	);
 };
