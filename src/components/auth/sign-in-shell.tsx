@@ -7,7 +7,7 @@ import { SignInStaff } from '@/components/auth/sign-in-staff';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import config from '@/lib/config';
-import { AccountSource, AccountSourceId, UserExperienceTypeId } from '@/lib/models';
+import { AccountSource, AccountSourceId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import { useAppRootLoaderData } from '@/routes/root';
 
@@ -19,7 +19,7 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 	const { subdomain } = useAppRootLoaderData();
 
 	const handleError = useHandleError();
-	const { institution } = useAccount();
+	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();
 
 	const handleEnterAnonymouslyButtonClick = useCallback(async () => {
@@ -62,12 +62,10 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 		onAccountSourceClick: handleAccountSourceClick,
 	};
 
-	if (institution?.integratedCareEnabled) {
-		if (institution?.userExperienceTypeId === UserExperienceTypeId.PATIENT) {
-			return <SignInPatient {...signInProps} />;
-		} else if (institution?.userExperienceTypeId === UserExperienceTypeId.STAFF) {
-			return <SignInStaff {...signInProps} />;
-		}
+	if (isIntegratedCarePatient) {
+		return <SignInPatient {...signInProps} />;
+	} else if (isIntegratedCareStaff) {
+		return <SignInStaff {...signInProps} />;
 	}
 
 	return <>{defaultView(signInProps)}</>;
