@@ -41,11 +41,11 @@ const GroupSessions = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isFirstLoad, setIsFirstLoad] = useState(true);
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
-	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
+	const [viewAll, setViewAll] = useState(false);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -61,47 +61,34 @@ const GroupSessions = () => {
 		try {
 			setIsLoading(true);
 
-			const { groupSessions, totalCount } = await groupSessionsService
+			const { groupSessions } = await groupSessionsService
 				.getGroupSessions({
 					viewType: 'PATIENT',
 					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
 					urlName: groupSessionUrlName,
 					searchQuery: groupSessionSearchQuery,
-					pageSize: pageSize.current,
+					pageSize: viewAll ? 1000 : pageSize.current,
 					pageNumber: pageNumber.current,
 				})
 				.fetch();
 
-			setGroupSessions((previousValue) => {
-				if (pageNumber.current === 0) {
-					return groupSessions;
-				}
-
-				return previousValue.concat(groupSessions);
-			});
-			setGroupSessionsTotalCount(totalCount);
+			setGroupSessions(groupSessions);
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsLoading(false);
 			setIsFirstLoad(false);
 		}
-	}, [groupSessionSearchQuery, groupSessionUrlName, handleError]);
+	}, [groupSessionSearchQuery, groupSessionUrlName, handleError, viewAll]);
 
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
 
-	const disableViewMore = groupSessionsTotalCount <= (pageNumber.current + 1) * pageSize.current;
 	const handleViewMoreButtonClick = useCallback(() => {
-		if (disableViewMore) {
-			return;
-		}
-
-		pageNumber.current++;
-		fetchData();
-	}, [disableViewMore, fetchData]);
+		setViewAll(true);
+	}, []);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -266,9 +253,9 @@ const GroupSessions = () => {
 								<Loader className="position-static d-inline-flex" />
 							) : (
 								<>
-									{!disableViewMore && (
+									{!viewAll && (
 										<Button onClick={handleViewMoreButtonClick} disabled={isLoading}>
-											View More
+											View All
 										</Button>
 									)}
 								</>
