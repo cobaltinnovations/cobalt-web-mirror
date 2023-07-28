@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useMemo } from 'react';
+import React, { FC, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
@@ -9,7 +9,6 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import useAccount from '@/hooks/use-account';
-import { UserExperienceTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	errorModal: {
@@ -18,23 +17,13 @@ const useStyles = createUseStyles({
 });
 
 const ErrorModal: FC = () => {
-	const { institution } = useAccount();
+	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();
 	const classes = useStyles();
 	const { show, setShow, error } = useContext(ErrorModalContext);
 	useTrackModalView('ErrorModal', show);
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
-
-	const isIntegratedCarePatient = useMemo(
-		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.PATIENT,
-		[institution.integratedCareEnabled, institution.userExperienceTypeId]
-	);
-
-	const isIntegratedCareStaff = useMemo(
-		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.STAFF,
-		[institution.integratedCareEnabled, institution.userExperienceTypeId]
-	);
 
 	const ErrorBody = useCallback(() => {
 		if (error?.code === 'VALIDATION_FAILED' || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
