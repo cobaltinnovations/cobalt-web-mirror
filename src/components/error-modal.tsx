@@ -24,8 +24,8 @@ const ErrorModal: FC = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const classes = useStyles();
-	const { show, setShow, error } = useContext(ErrorModalContext);
-	useTrackModalView('ErrorModal', show);
+	const { isErrorModalShown, dismissErrorModal, error } = useContext(ErrorModalContext);
+	useTrackModalView('ErrorModal', isErrorModalShown);
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 
@@ -60,7 +60,7 @@ const ErrorModal: FC = () => {
 						size="sm"
 						className="mb-2 p-0 text-decoration-none"
 						onClick={() => {
-							setShow(false);
+							dismissErrorModal();
 							trackEvent(CrisisAnalyticsEvent.clickCrisisError());
 							openInCrisisModal(true);
 						}}
@@ -88,7 +88,7 @@ const ErrorModal: FC = () => {
 					size="sm"
 					className="mb-4 p-0 text-decoration-none"
 					onClick={() => {
-						setShow(false);
+						dismissErrorModal();
 						navigate('/feedback');
 					}}
 				>
@@ -113,7 +113,7 @@ const ErrorModal: FC = () => {
 					size="sm"
 					className="mb-2 p-0 text-decoration-none"
 					onClick={() => {
-						setShow(false);
+						dismissErrorModal();
 						trackEvent(CrisisAnalyticsEvent.clickCrisisError());
 						openInCrisisModal(true);
 					}}
@@ -123,6 +123,7 @@ const ErrorModal: FC = () => {
 			</>
 		);
 	}, [
+		dismissErrorModal,
 		error?.code,
 		error?.message,
 		institution.clinicalSupportPhoneNumber,
@@ -133,18 +134,17 @@ const ErrorModal: FC = () => {
 		isIntegratedCareStaff,
 		navigate,
 		openInCrisisModal,
-		setShow,
 		trackEvent,
 	]);
 
 	return (
 		<Modal
-			show={show}
+			show={isErrorModalShown}
 			className={classes.modalWrapper}
 			dialogClassName={classes.errorModal}
 			centered
 			onHide={() => {
-				setShow(false);
+				dismissErrorModal();
 
 				if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
 					navigate('/ic/patient');
@@ -166,7 +166,7 @@ const ErrorModal: FC = () => {
 					<Button
 						variant="outline-primary"
 						onClick={() => {
-							setShow(false);
+							dismissErrorModal();
 
 							if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
 								navigate('/ic/patient');

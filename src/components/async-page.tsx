@@ -1,11 +1,8 @@
-import React, { FC, useState, useEffect, useCallback, useContext, PropsWithChildren, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { FC, useState, useEffect, useCallback, PropsWithChildren, ReactNode } from 'react';
 
 import Loader from '@/components/loader';
 import ErrorDisplay from '@/components/error-display';
-import { ERROR_CODES } from '@/lib/http-client';
-import { isErrorConfig } from '@/lib/utils/error-utils';
-import { ReauthModalContext } from '@/contexts/reauth-modal-context';
+import useHandleError from '@/hooks/use-handle-error';
 
 enum DISPLAY_STATES {
 	LOADING = 'LOADING',
@@ -14,7 +11,7 @@ enum DISPLAY_STATES {
 }
 
 interface AsyncWrapperProps extends PropsWithChildren {
-	fetchData(): void;
+	fetchData(): void | Promise<void>;
 	abortFetch?(): void;
 	showBackButton?: boolean;
 	showRetryButton?: boolean;
@@ -29,10 +26,14 @@ const AsyncWrapper: FC<AsyncWrapperProps> = ({
 	showRetryButton = true,
 	loadingComponent,
 }) => {
-	const navigate = useNavigate();
 	const [fetchPageDataError, setFetchPageDataError] = useState<unknown | undefined>(undefined);
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.LOADING);
-	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
+
+	const fetchPageDataErrorHandler = useCallback((error: unknown) => {
+		setFetchPageDataError(error);
+		setDisplayState(DISPLAY_STATES.ERROR);
+	}, []);
+	const handleError = useHandleError(fetchPageDataErrorHandler);
 
 	const fetchPageData = useCallback(async () => {
 		setDisplayState(DISPLAY_STATES.LOADING);
@@ -42,32 +43,9 @@ const AsyncWrapper: FC<AsyncWrapperProps> = ({
 			await fetchData();
 			setDisplayState(DISPLAY_STATES.SUCCESS);
 		} catch (error) {
-			if (isErrorConfig(error)) {
-				if (error.code === ERROR_CODES.REQUEST_ABORTED) {
-					// nothing to handle
-					// -- AsyncPage likely unmounted
-					return;
-				}
-
-				if (error.code === 'AUTHENTICATION_REQUIRED') {
-					if (error.apiError?.accessTokenStatus === 'PARTIALLY_EXPIRED') {
-						if (error.apiError.signOnUrl) {
-							setSignOnUrl(error.apiError.signOnUrl);
-						}
-
-						setShowReauthModal(true);
-						return;
-					}
-
-					navigate('/sign-in', { replace: true });
-					return;
-				}
-			}
-
-			setFetchPageDataError(error);
-			setDisplayState(DISPLAY_STATES.ERROR);
+			handleError(error);
 		}
-	}, [fetchData, navigate, setShowReauthModal, setSignOnUrl]);
+	}, [fetchData, handleError]);
 
 	useEffect(() => {
 		fetchPageData();

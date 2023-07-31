@@ -18,9 +18,9 @@ import useAccount from '@/hooks/use-account';
 import { NextStepsAssessmentComplete, NextStepsItem } from '@/components/integrated-care/patient';
 import Loader from '@/components/loader';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
-import { isErrorConfig } from '@/lib/utils/error-utils';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { MhicInlineAlert } from '@/components/integrated-care/mhic';
+import { CobaltError } from '@/lib/http-client';
 
 enum PAGE_STATES {
 	ORDER_CLOSED = 'ORDER_CLOSED',
@@ -36,7 +36,7 @@ function loadLatestPatientOrder(isPolling = false) {
 	const request = integratedCareService.getLatestPatientOrder();
 	const patientOrderPromise = request.fetch({ isPolling }).catch((error) => {
 		// Do not throw error, backend will 404  if there is no order, but that is ok.
-		if (isErrorConfig(error) && error.axiosError.response?.status === 404) {
+		if (error instanceof CobaltError && error.axiosError?.response?.status === 404) {
 			return null;
 		}
 

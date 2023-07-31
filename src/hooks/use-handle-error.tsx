@@ -1,50 +1,51 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback, useContext } from 'react';
 
-import { ErrorConfig } from '@/lib/http-client';
-import { isErrorConfig } from '@/lib/utils/error-utils';
+import { CobaltError, isApiError } from '@/lib/http-client';
 
 import { ErrorModalContext } from '@/contexts/error-modal-context';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
+import useAccount from './use-account';
+import axios from 'axios';
 
-function useHandleError(): (error: ErrorConfig | unknown) => void {
-	const navigate = useNavigate();
-	const { setShow, setError } = useContext(ErrorModalContext);
+function useHandleError(handler?: (error: CobaltError) => void): (error: unknown) => void {
+	const { signOutAndClearContext } = useAccount();
+	const { displayModalForError } = useContext(ErrorModalContext);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
-	const [redirectToSignIn, setRedirectToSignIn] = useState(false);
 
 	const handleError = useCallback(
-		(error: ErrorConfig | unknown) => {
-			if (isErrorConfig(error)) {
-				if (error.code === 'AUTHENTICATION_REQUIRED') {
-					if (error.apiError?.accessTokenStatus === 'PARTIALLY_EXPIRED') {
-						if (error.apiError.signOnUrl) {
-							setSignOnUrl(error.apiError.signOnUrl);
-						}
+		(error: unknown) => {
+			let handled: CobaltError;
 
-						setShowReauthModal(true);
-						return;
-					}
-
-					setRedirectToSignIn(true);
-					return;
-				} else {
-					setShow(true);
-					setError(error);
-				}
+			if (error instanceof CobaltError) {
+				handled = error;
+			} else if (axios.isAxiosError(error)) {
+				handled = CobaltError.fromAxiosError(error);
+			} else if (isApiError(error)) {
+				handled = CobaltError.fromApiError(error);
 			} else {
-				setShow(true);
-				setError(error as ErrorConfig);
+				handled = CobaltError.fromUnknownError(error);
 			}
-		},
-		[setSignOnUrl, setShowReauthModal, setShow, setError]
-	);
 
-	useEffect(() => {
-		if (redirectToSignIn) {
-			navigate('/sign-in', { replace: true });
-		}
-	}, [navigate, redirectToSignIn]);
+			if (handled.apiError?.code === 'AUTHENTICATION_REQUIRED') {
+				if (handled.apiError?.accessTokenStatus === 'PARTIALLY_EXPIRED' && handled.apiError.signOnUrl) {
+					setSignOnUrl(handled.apiError.signOnUrl);
+					setShowReauthModal(true);
+				} else {
+					signOutAndClearContext();
+				}
+
+				return;
+			}
+
+			if (handler) {
+				handler(handled);
+				return;
+			}
+
+			displayModalForError(handled);
+		},
+		[displayModalForError, handler, setShowReauthModal, setSignOnUrl, signOutAndClearContext]
+	);
 
 	return handleError;
 }
