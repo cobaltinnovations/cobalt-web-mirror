@@ -32,6 +32,9 @@ function useHandleError(): (error: ErrorConfig | unknown) => void {
 					setShow(true);
 					setError(error);
 				}
+			} else {
+				setShow(true);
+				setError(error as ErrorConfig);
 			}
 		},
 		[setSignOnUrl, setShowReauthModal, setShow, setError]
