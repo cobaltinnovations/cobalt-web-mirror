@@ -12,6 +12,9 @@ import useAccount from '@/hooks/use-account';
 import { UserExperienceTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
+	modalWrapper: {
+		zIndex: 1075,
+	},
 	errorModal: {
 		maxWidth: 295,
 	},
@@ -137,6 +140,7 @@ const ErrorModal: FC = () => {
 	return (
 		<Modal
 			show={show}
+			className={classes.modalWrapper}
 			dialogClassName={classes.errorModal}
 			centered
 			onHide={() => {
