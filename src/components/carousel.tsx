@@ -194,18 +194,23 @@ interface UseCarouselStylesProps {
 }
 
 const useCarouselStyles = createUseStyles({
-	carouselOuter: {
-		paddingTop: ({ customButtonGroupHeight, floatingButtonGroup }: UseCarouselStylesProps) =>
-			floatingButtonGroup ? 0 : customButtonGroupHeight,
+	carouselOuter: ({ customButtonGroupHeight, floatingButtonGroup, trackStyles }: UseCarouselStylesProps) => ({
+		paddingTop: floatingButtonGroup ? 0 : customButtonGroupHeight,
 		position: 'relative',
 		marginLeft: -gutterWidth / 2,
 		marginRight: -gutterWidth / 2,
-		'& .react-multi-carousel-track': ({ trackStyles }: UseCarouselStylesProps) => ({
+		'& .react-multi-carousel-track': {
 			paddingTop: 16,
 			paddingBottom: 24,
-			...(trackStyles ? trackStyles : {}),
-		}),
-	},
+		},
+		...(trackStyles
+			? {
+					'& .react-multi-carousel-track': {
+						...trackStyles,
+					},
+			  }
+			: {}),
+	}),
 	carouselItem: {
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
