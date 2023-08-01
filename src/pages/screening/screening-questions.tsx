@@ -9,10 +9,11 @@ import {
 	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
+	UserExperienceTypeId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Col, Container, Form, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
@@ -20,6 +21,8 @@ import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
+import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -39,6 +42,7 @@ const ScreeningQuestionsPage = () => {
 
 	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt | null>(null);
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
+	const [showHelpModal, setShowHelpModal] = useState(false);
 
 	const clearPrompt = useCallback(() => {
 		setConfirmationPrompt(null);
@@ -620,6 +624,62 @@ const ScreeningQuestionsPage = () => {
 					</Row>
 				</Container>
 			</AsyncPage>
+
+			{screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+				institution.integratedCareScreeningFlowId &&
+				institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
+					<>
+						<Container className="py-8">
+							<Row>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<div className="text-center">
+										<Button
+											variant="link"
+											className="d-inline-flex align-items-center text-decoration-none"
+											onClick={() => {
+												setShowHelpModal(true);
+											}}
+										>
+											<QuestionMarkIcon className="me-2" />
+											Need help with the assessment?
+										</Button>
+									</div>
+								</Col>
+							</Row>
+						</Container>
+						<Modal
+							show={showHelpModal}
+							centered
+							onHide={() => {
+								setShowHelpModal(false);
+							}}
+						>
+							<Modal.Body className="pt-8">
+								<AppointmentIllustration className="mb-8 w-100 h-auto" />
+								<h3 className="mb-6">Need help with the assessment?</h3>
+								<p>
+									Call the {institution.integratedCareProgramName} resource center at{' '}
+									{institution.integratedCarePhoneNumberDescription}. Mental Health Intake
+									Coordinators are available {institution.integratedCareAvailabilityDescription} to
+									answer questions and help connect you to care.
+								</p>
+							</Modal.Body>
+							<Modal.Footer className="pb-6 bg-transparent border-0 text-right">
+								<Button
+									onClick={() => {
+										setShowHelpModal(false);
+									}}
+								>
+									OK
+								</Button>
+							</Modal.Footer>
+						</Modal>
+					</>
+				)}
 		</>
 	);
 };
