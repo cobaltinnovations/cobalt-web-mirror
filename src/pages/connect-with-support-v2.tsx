@@ -142,11 +142,11 @@ const ConnectWithSupportV2 = () => {
 	/* Employer submission (reload page for simplicity) */
 	/* --------------------------------------------------- */
 	const handleEmployerModalContinueButton = useCallback(async () => {
-		if (!account) {
-			return;
-		}
-
 		try {
+			if (!account) {
+				throw new Error('account is undefined.');
+			}
+
 			const response = await accountService
 				.setAccountLocation(account.accountId, {
 					accountId: account.accountId,

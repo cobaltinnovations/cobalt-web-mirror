@@ -1,29 +1,44 @@
-import { ErrorConfig } from '@/lib/http-client';
-import React, { FC, createContext, useState, PropsWithChildren } from 'react';
+import { CobaltError } from '@/lib/http-client';
+import * as Sentry from '@sentry/react';
+import React, { FC, PropsWithChildren, createContext, useCallback, useState } from 'react';
 
 type ErrorModalContextConfig = {
-	show: boolean;
-	setShow: React.Dispatch<React.SetStateAction<boolean>>;
-	error: ErrorConfig | undefined;
-	setError: React.Dispatch<React.SetStateAction<ErrorConfig | undefined>>;
+	isErrorModalShown: boolean;
+	dismissErrorModal: () => void;
+	displayModalForError: (error: CobaltError) => void;
+	error: CobaltError | undefined;
 };
 
 const ErrorModalContext = createContext({} as ErrorModalContextConfig);
 
 const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
-	const [show, setShow] = useState(false);
-	const [error, setError] = useState<ErrorConfig>();
+	const [isErrorModalShown, setIsErrorModalShown] = useState(false);
+	const [error, setError] = useState<CobaltError>();
 
-	const value = {
-		show,
-		setShow,
-		error,
-		setError,
-	};
+	const dismissErrorModal = useCallback(() => {
+		setIsErrorModalShown(false);
+		setError(undefined);
+	}, []);
 
-	return <ErrorModalContext.Provider value={value}>{props.children}</ErrorModalContext.Provider>;
+	const displayModalForError = useCallback((capturedError: CobaltError) => {
+		setIsErrorModalShown(true);
+		setError(capturedError);
+
+		Sentry.captureException(capturedError);
+	}, []);
+
+	return (
+		<ErrorModalContext.Provider
+			value={{
+				isErrorModalShown,
+				dismissErrorModal,
+				displayModalForError,
+				error,
+			}}
+		>
+			{props.children}
+		</ErrorModalContext.Provider>
+	);
 };
 
-const ErrorModalConsumer = ErrorModalContext.Consumer;
-
-export { ErrorModalContext, ErrorModalProvider, ErrorModalConsumer };
+export { ErrorModalContext, ErrorModalProvider };

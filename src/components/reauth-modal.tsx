@@ -8,6 +8,9 @@ import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 
 const usStyles = createUseStyles({
+	modalWrapper: {
+		zIndex: 1065,
+	},
 	modal: {
 		maxWidth: 400,
 	},
@@ -28,6 +31,7 @@ const ReauthModal: FC<ModalProps> = ({ ...props }) => {
 	return (
 		<Modal
 			show={showReauthModal}
+			className={classes.modalWrapper}
 			dialogClassName={classes.modal}
 			centered
 			{...props}
