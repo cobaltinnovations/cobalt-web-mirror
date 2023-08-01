@@ -427,7 +427,22 @@ const ScreeningQuestionsPage = () => {
 					/>
 				)}
 
-				<Container className="py-5">
+				<Container className="py-8">
+					{screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+						institution.integratedCareScreeningFlowId &&
+						institution.userExperienceTypeId === UserExperienceTypeId.STAFF && (
+							<Row className="mb-8">
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<h1 className="mb-8">{screeningQuestionContextResponse?.screening.name}</h1>
+									<hr />
+								</Col>
+							</Row>
+						)}
+
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							{confirmationPrompt ? (
