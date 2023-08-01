@@ -478,6 +478,19 @@ const ConnectWithSupportV2 = () => {
 				)}
 			</AsyncWrapper>
 			<AsyncWrapper fetchData={fetchProviders}>
+				{providerSections.length <= 0 && (
+					<Container className="py-8">
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<NoData
+									title="No Available Providers"
+									description={`Please call the ${institution.name} at ${institution.clinicalSupportPhoneNumberDescription} (${institution.integratedCareAvailabilityDescription}) for assistance.`}
+									actions={[]}
+								/>
+							</Col>
+						</Row>
+					</Container>
+				)}
 				{providerSections.map((section) => (
 					<React.Fragment key={section.date}>
 						<Container
