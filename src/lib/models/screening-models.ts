@@ -125,6 +125,13 @@ export interface ScreeningConfirmationPrompt {
 
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
+	screening: {
+		screeningId: string;
+		name: string;
+		activeScreeningVersionId: string;
+		created: string;
+		createdDescription: string;
+	};
 	screeningSession: ScreeningSession;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];
