@@ -94,6 +94,8 @@ export interface PatientOrderModel {
 	patientOrderOutreaches?: PatientOrderOutreachModel[];
 	patientOrderTriageGroups?: PateintOrderTriageGroupModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
+	patientOrderIntakeScreeningStatusId: PatientOrderIntakeScreeningStatusId;
+	patientOrderIntakeScreeningStatusDescription?: string;
 	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
 	patientOrderScreeningStatusDescription?: string;
 	screeningSession?: ScreeningSession;
@@ -105,6 +107,8 @@ export interface PatientOrderModel {
 	patientOrderScheduledScreeningScheduledDateTimeDescription?: string;
 	patientOrderScheduledScreeningCalendarUrl?: string;
 	patientOrderVoicemailTasks: PatientOrderVoicemailTask[];
+	patientOrderTriageOverrideReasonDescription?: string;
+	patientOrderTriageOverrideReasonId?: PatientOrderIntakeScreeningStatusId;
 	crisisIndicated?: boolean;
 	crisisIndicatedAt?: string;
 	crisisIndicatedAtDescription?: string;
@@ -131,6 +135,21 @@ export interface PatientOrderModel {
 	mostRecentTotalOutreachDateTimeDescription: string;
 	patientOrderCareTypeId?: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription?: string;
+
+	mostRecentIntakeScreeningSessionId?: string;
+	mostRecentIntakeScreeningSessionCreatedAt?: string;
+	mostRecentIntakeScreeningSessionCreatedAtDescription?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountId?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountRoleId?: ROLE_ID;
+	mostRecentIntakeScreeningSessionCreatedByAccountFirstName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountLastName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountDisplayName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountDisplayNameWithLastFirst?: string;
+	mostRecentIntakeScreeningSessionCompleted?: boolean;
+	mostRecentIntakeScreeningSessionCompletedAt?: string;
+	mostRecentIntakeScreeningSessionCompletedAtDescription?: string;
+	mostRecentIntakeScreeningSessionByPatient?: boolean;
+
 	mostRecentScreeningSessionId: string;
 	mostRecentScreeningSessionCreatedByAccountId: string;
 	mostRecentScreeningSessionCreatedByAccountFirstName: string;
@@ -189,6 +208,12 @@ export interface PatientOrderModel {
 	outreachFollowupNeeded?: boolean;
 }
 
+export enum PatientOrderIntakeScreeningStatusId {
+	NOT_SCREENED = 'NOT_SCREENED',
+	IN_PROGRESS = 'IN_PROGRESS',
+	COMPLETE = 'COMPLETE',
+}
+
 export enum PatientOrderViewTypeId {
 	NEED_ASSESSMENT = 'NEED_ASSESSMENT',
 	SCHEDULED = 'SCHEDULED',
@@ -221,6 +246,17 @@ export enum PatientOrderTriageStatusId {
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	MHP = 'MHP',
+}
+
+export enum PatientOrderTriageOverrideReasonId {
+	NOT_OVERRIDDEN = 'NOT_OVERRIDDEN',
+	PATIENT_PREFERENCE = 'PATIENT_PREFERENCE',
+	HIGHER_LEVEL_OF_CARE_REQUIRED = 'HIGHER_LEVEL_OF_CARE_REQUIRED',
+	PATIENT_REQUESTED_RESOURCES = 'PATIENT_REQUESTED_RESOURCES',
+	CLINICAL_REVIEW_WITH_BHS = 'CLINICAL_REVIEW_WITH_BHS',
+	CLINICAL_REVIEW_WITH_PSYCHIATRIST = 'CLINICAL_REVIEW_WITH_PSYCHIATRIST',
+	PCP_REQUEST = 'PCP_REQUEST',
+	OTHER = 'OTHER',
 }
 
 export enum PatientOrderAssignmentStatusId {

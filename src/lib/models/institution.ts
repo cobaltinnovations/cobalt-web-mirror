@@ -22,6 +22,7 @@ export interface Institution {
 	userSubmittedGroupSessionRequestEnabled: boolean;
 	institutionId: string;
 	integratedCareEnabled: boolean;
+	integratedCareIntakeScreeningFlowId?: string;
 	integratedCareScreeningFlowId?: string;
 	name: string;
 	providerTriageScreeningFlowId?: string;
