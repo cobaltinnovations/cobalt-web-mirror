@@ -18,6 +18,7 @@ interface Props extends ModalProps {
 	detailText?: string;
 	isConfirming?: boolean;
 	onConfirm(): void;
+	destructive?: boolean;
 	displayButtonsBlock?: boolean;
 }
 
@@ -29,6 +30,7 @@ const ConfirmDialog = ({
 	detailText,
 	onConfirm,
 	isConfirming = false,
+	destructive = false,
 	displayButtonsBlock,
 	...props
 }: Props) => {
@@ -63,7 +65,7 @@ const ConfirmDialog = ({
 							'd-block': displayButtonsBlock,
 							'w-100': displayButtonsBlock,
 						})}
-						variant="primary"
+						variant={destructive ? 'danger' : 'primary'}
 						onClick={onConfirm}
 					>
 						{confirmText}

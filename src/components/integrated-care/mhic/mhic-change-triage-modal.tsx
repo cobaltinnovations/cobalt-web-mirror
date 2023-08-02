@@ -14,6 +14,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { integratedCareService } from '@/lib/services';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -37,6 +38,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	const classes = useStyles();
 	const { addFlag } = useFlags();
 	const handleError = useHandleError();
+	const [showConfirmRevert, setShowConfirmRevert] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [formValues, setFormValues] = useState(initialFormValues);
 
@@ -142,154 +144,178 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	const isManuallySet = currentTriageGroup?.patientOrderTriageSourceId === PatientOrderTriageSourceId.MANUALLY_SET;
 
 	return (
-		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
-			<Modal.Header closeButton>
-				<Modal.Title>{isManuallySet ? 'Edit MHIC Triage' : 'Override Assessment Triage'}</Modal.Title>
-			</Modal.Header>
+		<>
+			<ConfirmDialog
+				show={showConfirmRevert}
+				onHide={() => {
+					setShowConfirmRevert(false);
+				}}
+				titleText="Revert Triage"
+				bodyText="Are you sure you want to revert the enrolled triage to the Assessment Triage?"
+				dismissText="Cancel"
+				confirmText="Revert"
+				onConfirm={() => {
+					setShowConfirmRevert(false);
+					handleRevertToAssessmentButtonClick();
+				}}
+				destructive
+			/>
 
-			<Modal.Body>
-				<Form id="triage-override-modal-form" onSubmit={handleFormSubmit}>
-					<p className="mb-4 fw-semibold">
-						Please review proposed changes with a clinician before overriding the assessment triage.
-					</p>
-					<p className="mb-5">The patient will be enrolled in the new triage selected</p>
-					<InputHelper
-						required
-						as="select"
-						className="mb-4"
-						label="Care Type"
-						value={formValues.patientOrderCareTypeId}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValues) => ({
-								...previousValues,
-								patientOrderCareTypeId: currentTarget.value as PatientOrderCareTypeId,
-							}));
-						}}
-						disabled={isSaving}
-					>
-						<option value="" disabled>
-							Select Care Type...
-						</option>
-						{careTypeOptions.map((o) => (
-							<option key={o.patientOrderCareTypeId} value={o.patientOrderCareTypeId}>
-								{o.description}
+			<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
+				<Modal.Header closeButton>
+					<Modal.Title>{isManuallySet ? 'Edit MHIC Triage' : 'Override Assessment Triage'}</Modal.Title>
+				</Modal.Header>
+
+				<Modal.Body>
+					<Form id="triage-override-modal-form" onSubmit={handleFormSubmit}>
+						<p className="mb-4 fw-semibold">
+							Please review proposed changes with a clinician before overriding the assessment triage.
+						</p>
+						<p className="mb-5">The patient will be enrolled in the new triage selected</p>
+						<InputHelper
+							required
+							as="select"
+							className="mb-4"
+							label="Care Type"
+							value={formValues.patientOrderCareTypeId}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									patientOrderCareTypeId: currentTarget.value as PatientOrderCareTypeId,
+								}));
+							}}
+							disabled={isSaving}
+						>
+							<option value="" disabled>
+								Select Care Type...
 							</option>
-						))}
-					</InputHelper>
+							{careTypeOptions.map((o) => (
+								<option key={o.patientOrderCareTypeId} value={o.patientOrderCareTypeId}>
+									{o.description}
+								</option>
+							))}
+						</InputHelper>
 
-					{formValues.patientOrderFocusTypeIds.map((selectedFocusTypeId, idx) => {
-						return (
-							<InputHelper
-								key={idx}
-								as="select"
-								className="mb-4"
-								label="Treatment Disposition"
-								required={idx === 0}
-								value={selectedFocusTypeId}
-								onChange={({ currentTarget }) => {
-									setFormValues((previousValues) => {
-										const updated = [...previousValues.patientOrderFocusTypeIds];
-										updated[idx] = currentTarget.value;
+						{formValues.patientOrderFocusTypeIds.map((selectedFocusTypeId, idx) => {
+							return (
+								<InputHelper
+									key={idx}
+									as="select"
+									className="mb-4"
+									label="Treatment Disposition"
+									required={idx === 0}
+									value={selectedFocusTypeId}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValues) => {
+											const updated = [...previousValues.patientOrderFocusTypeIds];
+											updated[idx] = currentTarget.value;
 
-										return {
-											...previousValues,
-											patientOrderFocusTypeIds: updated,
-										};
-									});
+											return {
+												...previousValues,
+												patientOrderFocusTypeIds: updated,
+											};
+										});
+									}}
+									disabled={isSaving}
+								>
+									<option value="" disabled>
+										Select Treatment Disposition...
+									</option>
+									{referenceData.patientOrderFocusTypes.map((o) => {
+										if (
+											o.patientOrderFocusTypeId !== selectedFocusTypeId &&
+											formValues.patientOrderFocusTypeIds.includes(o.patientOrderFocusTypeId)
+										) {
+											return null;
+										}
+										return (
+											<option key={o.patientOrderFocusTypeId} value={o.patientOrderFocusTypeId}>
+												{o.description}
+											</option>
+										);
+									})}
+								</InputHelper>
+							);
+						})}
+
+						<div className="d-flex">
+							<Button
+								disabled={isSaving}
+								variant="link"
+								className="mb-4 ms-auto text-decoration-none"
+								onClick={() => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										patientOrderFocusTypeIds: [...previousValues.patientOrderFocusTypeIds, ''],
+									}));
+								}}
+							>
+								<PlusIcon /> Add Treatment Disposition
+							</Button>
+						</div>
+
+						<InputHelper
+							required
+							as="select"
+							className="mb-4"
+							label="Reason for Override"
+							value={formValues.patientOrderTriageOverrideReasonId}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									patientOrderTriageOverrideReasonId:
+										currentTarget.value as PatientOrderTriageOverrideReasonId,
+								}));
+							}}
+							disabled={isSaving}
+						>
+							<option value="" disabled>
+								Select Reason for Override...
+							</option>
+							{overrideReasonOptions.map((o) => (
+								<option
+									key={o.patientOrderTriageOverrideReasonId}
+									value={o.patientOrderTriageOverrideReasonId}
+								>
+									{o.description}
+								</option>
+							))}
+						</InputHelper>
+					</Form>
+				</Modal.Body>
+
+				<Modal.Footer className="d-flex align-items-center justify-content-between">
+					<div>
+						{isManuallySet && (
+							<Button
+								variant="danger"
+								onClick={() => {
+									setShowConfirmRevert(true);
 								}}
 								disabled={isSaving}
 							>
-								<option value="" disabled>
-									Select Treatment Disposition...
-								</option>
-								{referenceData.patientOrderFocusTypes.map((o) => {
-									if (
-										o.patientOrderFocusTypeId !== selectedFocusTypeId &&
-										formValues.patientOrderFocusTypeIds.includes(o.patientOrderFocusTypeId)
-									) {
-										return null;
-									}
-									return (
-										<option key={o.patientOrderFocusTypeId} value={o.patientOrderFocusTypeId}>
-											{o.description}
-										</option>
-									);
-								})}
-							</InputHelper>
-						);
-					})}
-
-					<div className="d-flex">
-						<Button
-							disabled={isSaving}
-							variant="link"
-							className="mb-4 ms-auto text-decoration-none"
-							onClick={() => {
-								setFormValues((previousValues) => ({
-									...previousValues,
-									patientOrderFocusTypeIds: [...previousValues.patientOrderFocusTypeIds, ''],
-								}));
-							}}
-						>
-							<PlusIcon /> Add Treatment Disposition
-						</Button>
+								Revert to Assessment
+							</Button>
+						)}
 					</div>
 
-					<InputHelper
-						required
-						as="select"
-						className="mb-4"
-						label="Reason for Override"
-						value={formValues.patientOrderTriageOverrideReasonId}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValues) => ({
-								...previousValues,
-								patientOrderTriageOverrideReasonId:
-									currentTarget.value as PatientOrderTriageOverrideReasonId,
-							}));
-						}}
-						disabled={isSaving}
-					>
-						<option value="" disabled>
-							Select Reason for Override...
-						</option>
-						{overrideReasonOptions.map((o) => (
-							<option
-								key={o.patientOrderTriageOverrideReasonId}
-								value={o.patientOrderTriageOverrideReasonId}
-							>
-								{o.description}
-							</option>
-						))}
-					</InputHelper>
-				</Form>
-			</Modal.Body>
-
-			<Modal.Footer className="d-flex align-items-center justify-content-between">
-				<div>
-					{isManuallySet && (
-						<Button variant="danger" onClick={handleRevertToAssessmentButtonClick} disabled={isSaving}>
-							Revert to Assessment
+					<div>
+						<Button
+							form="triage-override-modal-form"
+							variant="outline-primary"
+							className="me-2"
+							onClick={props.onHide}
+							disabled={isSaving}
+						>
+							Cancel
 						</Button>
-					)}
-				</div>
 
-				<div>
-					<Button
-						form="triage-override-modal-form"
-						variant="outline-primary"
-						className="me-2"
-						onClick={props.onHide}
-						disabled={isSaving}
-					>
-						Cancel
-					</Button>
-
-					<Button form="triage-override-modal-form" variant="primary" type="submit" disabled={isSaving}>
-						Save
-					</Button>
-				</div>
-			</Modal.Footer>
-		</Modal>
+						<Button form="triage-override-modal-form" variant="primary" type="submit" disabled={isSaving}>
+							Save
+						</Button>
+					</div>
+				</Modal.Footer>
+			</Modal>
+		</>
 	);
 };
