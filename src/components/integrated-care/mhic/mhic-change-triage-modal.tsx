@@ -40,8 +40,6 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	const [isSaving, setIsSaving] = useState(false);
 	const [formValues, setFormValues] = useState(initialFormValues);
 
-	console.log({ formValues });
-
 	const currentTriageGroup = useMemo(
 		() =>
 			patientOrder.patientOrderTriageGroups?.find(
@@ -49,8 +47,6 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 			),
 		[patientOrder.patientOrderCareTypeId, patientOrder.patientOrderTriageGroups]
 	);
-
-	console.log({ currentTriageGroup });
 
 	const { careTypeOptions, overrideReasonOptions } = useMemo(() => {
 		// Remove SAFETY_PLANNING and UNSPECIFIED as they break the UI
@@ -191,7 +187,6 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 								required={idx === 0}
 								value={selectedFocusTypeId}
 								onChange={({ currentTarget }) => {
-									console.log({ currentTarget });
 									setFormValues((previousValues) => {
 										const updated = [...previousValues.patientOrderFocusTypeIds];
 										updated[idx] = currentTarget.value;
