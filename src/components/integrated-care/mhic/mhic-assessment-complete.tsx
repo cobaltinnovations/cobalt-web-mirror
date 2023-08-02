@@ -9,12 +9,14 @@ import { Helmet } from 'react-helmet';
 import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
+	PatientOrderSafetyPlanningStatusId,
 	ScreeningSessionScreeningResult,
 	ScreeningType,
 } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 import {
 	MHIC_HEADER_HEIGHT,
+	MhicFlagOrderForSafetyPlanning,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicTriageCard,
@@ -127,6 +129,13 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 		}
 	}, [copyTextToClipboard, handleError, patientOrder]);
 
+	const canFlagForSafetyPlanning =
+		!!patientOrder &&
+		patientOrder.patientOrderDispositionId === PatientOrderDispositionId.OPEN &&
+		[PatientOrderSafetyPlanningStatusId.UNKNOWN, PatientOrderSafetyPlanningStatusId.NONE_NEEDED].includes(
+			patientOrder.patientOrderSafetyPlanningStatusId ?? PatientOrderSafetyPlanningStatusId.UNKNOWN
+		);
+
 	return (
 		<>
 			<Helmet>
@@ -177,7 +186,15 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 							<Row>
 								<Col md={{ span: 7, offset: 1 }}>
 									<div className={classes.scrollAnchor} id="results" />
-									<h3 className="mb-8">Results</h3>
+									<div className="mb-8 d-flex align-items-center justify-content-between">
+										<h3 className="mb-0">Results</h3>
+
+										{canFlagForSafetyPlanning && (
+											<MhicFlagOrderForSafetyPlanning
+												patientOrderId={patientOrder.patientOrderId}
+											/>
+										)}
+									</div>
 									<MhicNextStepsAlerts
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}

@@ -146,6 +146,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 	return (
 		<>
 			<ConfirmDialog
+				size="lg"
 				show={showConfirmRevert}
 				onHide={() => {
 					setShowConfirmRevert(false);
