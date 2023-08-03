@@ -15,6 +15,9 @@ export interface OpenPatientOrderCountModel {
 export interface PatientOrderModel {
 	patientOrderId: string;
 	patientOrderTriageStatusId: PatientOrderTriageStatusId;
+	patientOrderIntakeWantsServicesStatusId: PatientOrderIntakeWantsServicesStatusId;
+	patientOrderIntakeLocationStatusId: PatientOrderIntakeLocationStatusId;
+	patientOrderIntakeInsuranceStatusId: PatientOrderIntakeInsuranceStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
 	patientOrderDispositionDescription: string;
@@ -246,6 +249,25 @@ export enum PatientOrderTriageStatusId {
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	MHP = 'MHP',
+}
+
+export enum PatientOrderIntakeWantsServicesStatusId {
+	UNKNOWN = 'UNKNOWN',
+	YES = 'YES',
+	NO = 'NO',
+}
+
+export enum PatientOrderIntakeLocationStatusId {
+	UNKNOWN = 'UNKNOWN',
+	INVALID = 'INVALID',
+	VALID = 'VALID',
+}
+
+export enum PatientOrderIntakeInsuranceStatusId {
+	UNKNOWN = 'UNKNOWN',
+	INVALID = 'INVALID',
+	VALID = 'VALID',
+	CHANGED_RECENTLY = 'CHANGED_RECENTLY',
 }
 
 export enum PatientOrderTriageOverrideReasonId {
