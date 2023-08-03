@@ -70,18 +70,21 @@ export const Component = () => {
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const revalidator = useRevalidator();
 
+	const hasCompletedIntakeScreening =
+		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
+
 	const intakeScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
-		disabled: !patientOrder?.patientOrderId,
+		disabled: !patientOrder?.patientDemographicsConfirmed || !patientOrder?.patientOrderId,
 	});
 
 	const clinicalScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
-		disabled: !intakeScreeningFlow.didCheckScreeningSessions || !intakeScreeningFlow.hasCompletedScreening,
+		disabled: !intakeScreeningFlow.didCheckScreeningSessions || !hasCompletedIntakeScreening,
 	});
 
 	const pollingFn = useCallback(() => {
@@ -313,18 +316,14 @@ export const Component = () => {
 																		clinicalScreeningFlow.isCreatingScreeningSession
 																	}
 																	onStartAssessment={() => {
-																		if (
-																			!intakeScreeningFlow.hasCompletedScreening
-																		) {
+																		if (!hasCompletedIntakeScreening) {
 																			intakeScreeningFlow.createScreeningSession();
 																		} else {
 																			clinicalScreeningFlow.createScreeningSession();
 																		}
 																	}}
 																	onResumeAssessment={() => {
-																		if (
-																			!intakeScreeningFlow.hasCompletedScreening
-																		) {
+																		if (!hasCompletedIntakeScreening) {
 																			intakeScreeningFlow.resumeScreeningSession(
 																				patientOrder.mostRecentIntakeScreeningSessionId
 																			);
@@ -442,7 +441,11 @@ const AssessmentNextStepItems = ({
 	}
 
 	if (inProgress) {
-		if (patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) {
+		if (
+			(!!patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId &&
+				patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) ||
+			patientOrder.mostRecentIntakeScreeningSessionByPatient
+		) {
 			return (
 				<NoData
 					className="bg-white"
@@ -453,10 +456,6 @@ const AssessmentNextStepItems = ({
 							variant: 'primary',
 							title: 'Continue Assessment',
 							onClick: () => {
-								if (!patientOrder.mostRecentScreeningSessionId) {
-									throw new Error('Unknown Recent Screening');
-								}
-
 								onResumeAssessment();
 							},
 						},

@@ -23,6 +23,29 @@ export function useScreeningNavigation() {
 
 	const matches = useMatches();
 
+	const navigateToQuestion = useCallback(
+		(contextId: string) => {
+			const routeMatches = matches.reverse();
+			const mhicRouteMatch = routeMatches.find((match) => {
+				return match.pathname.includes('/ic/mhic') && !!match.params['patientOrderId'];
+			});
+
+			const icPatientRouteMatch = routeMatches.find((match) => {
+				return match.pathname.includes('/ic/patient');
+			});
+
+			navigate(
+				mhicRouteMatch
+					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
+					: icPatientRouteMatch
+					? `/ic/patient/assessment/${contextId}`
+					: `/screening-questions/${contextId}`,
+				{ state: location.state }
+			);
+		},
+		[location.state, matches, navigate]
+	);
+
 	const navigateToDestination = useCallback(
 		(destination?: ScreeningSessionDestination, params?: Record<string, any>, replace = false) => {
 			switch (destination?.screeningSessionDestinationId) {
@@ -75,6 +98,14 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.IC_PATIENT_CLINICAL_SCREENING:
+					const nextQuestionId = destination.context.nextScreeningQuestionContextId;
+					if (!nextQuestionId || typeof nextQuestionId !== 'string') {
+						throw new Error('Next Question Context Unknown');
+					}
+
+					navigateToQuestion(nextQuestionId);
+					return;
 				case ScreeningSessionDestinationId.HOME:
 					window.location.href = '/';
 					return;
@@ -96,30 +127,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[navigate, revalidator, trackEvent]
-	);
-
-	const navigateToQuestion = useCallback(
-		(contextId: string) => {
-			const routeMatches = matches.reverse();
-			const mhicRouteMatch = routeMatches.find((match) => {
-				return match.pathname.includes('/ic/mhic') && !!match.params['patientOrderId'];
-			});
-
-			const icPatientRouteMatch = routeMatches.find((match) => {
-				return match.pathname.includes('/ic/patient');
-			});
-
-			navigate(
-				mhicRouteMatch
-					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
-					: icPatientRouteMatch
-					? `/ic/patient/assessment/${contextId}`
-					: `/screening-questions/${contextId}`,
-				{ state: location.state }
-			);
-		},
-		[location.state, matches, navigate]
+		[navigate, navigateToQuestion, revalidator, trackEvent]
 	);
 
 	const navigateToNext = useCallback(

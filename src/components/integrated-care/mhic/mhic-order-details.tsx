@@ -57,6 +57,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 	const [showConsentModal, setShowConsentModal] = useState(false);
+	const hasCompletedIntakeScreening =
+		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
 	const intakeScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
@@ -66,7 +68,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
 		instantiateOnLoad: false,
-		disabled: !intakeScreeningFlow.hasCompletedScreening,
+		disabled: !hasCompletedIntakeScreening,
 	});
 
 	const handleCloseEpisodeModalSave = useCallback(
@@ -100,13 +102,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			// 	setShowConsentModal(true);
 			// } else {
 			if (options.createNew) {
-				if (!intakeScreeningFlow.hasCompletedScreening) {
+				if (!hasCompletedIntakeScreening) {
 					intakeScreeningFlow.createScreeningSession();
 				} else {
 					clinicalScreeningFlow.createScreeningSession();
 				}
 			} else if (options.resumeRecent) {
-				if (!intakeScreeningFlow.hasCompletedScreening) {
+				if (!hasCompletedIntakeScreening) {
 					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
 				} else {
 					clinicalScreeningFlow.resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
@@ -116,6 +118,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		},
 		[
 			clinicalScreeningFlow,
+			hasCompletedIntakeScreening,
 			intakeScreeningFlow,
 			patientOrder.mostRecentIntakeScreeningSessionId,
 			patientOrder.mostRecentScreeningSessionId,
