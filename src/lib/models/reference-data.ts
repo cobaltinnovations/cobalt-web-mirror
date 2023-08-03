@@ -141,7 +141,7 @@ export interface ReferenceDataResponse {
 	patientOrderResourcingTypes: PatientOrderResourcingType[];
 	patientOrderTriageOverrideReasons: PatientOrderTriageOverrideReason[];
 	races: Race[];
-	reasonsForReferral: string[];
+	patientOrderReferralReasons: string[];
 	referringPracticeNames: string[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];

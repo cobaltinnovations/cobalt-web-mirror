@@ -89,24 +89,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 
 	const navigateToAssessment = useCallback(
 		(options: { createNew?: boolean; resumeRecent?: boolean }) => {
-			if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
-				setShowConsentModal(true);
-			} else {
-				if (options.createNew) {
-					createScreeningSession();
-				}
-
-				if (options.resumeRecent) {
-					resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
-				}
+			// if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+			// 	setShowConsentModal(true);
+			// } else {
+			if (options.createNew) {
+				createScreeningSession();
+			} else if (options.resumeRecent) {
+				resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
 			}
+			// }
 		},
-		[
-			createScreeningSession,
-			patientOrder.patientOrderConsentStatusId,
-			patientOrder.mostRecentScreeningSessionId,
-			resumeScreeningSession,
-		]
+		[createScreeningSession, patientOrder.mostRecentScreeningSessionId, resumeScreeningSession]
 	);
 
 	return (
@@ -123,7 +116,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
-			<MhicConsentModal
+			{/* <MhicConsentModal
 				patientOrder={patientOrder}
 				show={showConsentModal}
 				onHide={() => {
@@ -137,7 +130,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						setShowConsentModal(false);
 					}
 				}}
-			/>
+			/> */}
 
 			<MhicAssessmentModal
 				show={!!screeningSessionScreeningResult}

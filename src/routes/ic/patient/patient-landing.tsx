@@ -93,13 +93,13 @@ export const Component = () => {
 				return;
 			}
 
-			if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
-				navigate('/ic/patient/consent');
-				return;
-			} else if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
-				return;
-			}
+			// if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+			// 	navigate('/ic/patient/consent');
+			// 	return;
+			// } else if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
+			// 	setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
+			// 	return;
+			// }
 
 			if (
 				(patientOrderClosed &&
