@@ -21,6 +21,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import {
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
@@ -56,10 +57,16 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 	const [showConsentModal, setShowConsentModal] = useState(false);
-	const { isCreatingScreeningSession, resumeScreeningSession, createScreeningSession } = useScreeningFlow({
+	const intakeScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
+		patientOrderId: patientOrder.patientOrderId,
+		instantiateOnLoad: false,
+	});
+	const clinicalScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
 		instantiateOnLoad: false,
+		disabled: !intakeScreeningFlow.hasCompletedScreening,
 	});
 
 	const handleCloseEpisodeModalSave = useCallback(
@@ -93,14 +100,33 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			// 	setShowConsentModal(true);
 			// } else {
 			if (options.createNew) {
-				createScreeningSession();
+				if (!intakeScreeningFlow.hasCompletedScreening) {
+					intakeScreeningFlow.createScreeningSession();
+				} else {
+					clinicalScreeningFlow.createScreeningSession();
+				}
 			} else if (options.resumeRecent) {
-				resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+				if (!intakeScreeningFlow.hasCompletedScreening) {
+					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
+				} else {
+					clinicalScreeningFlow.resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+				}
 			}
 			// }
 		},
-		[createScreeningSession, patientOrder.mostRecentScreeningSessionId, resumeScreeningSession]
+		[
+			clinicalScreeningFlow,
+			intakeScreeningFlow,
+			patientOrder.mostRecentIntakeScreeningSessionId,
+			patientOrder.mostRecentScreeningSessionId,
+		]
 	);
+
+	const isCreatingScreeningSession =
+		intakeScreeningFlow.isCreatingScreeningSession || clinicalScreeningFlow.isCreatingScreeningSession;
+	const isAssessmentInProgress =
+		patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+		patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS;
 
 	return (
 		<>
@@ -309,7 +335,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 						</>
 					)}
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED && (
+					{patientOrder.patientOrderIntakeScreeningStatusId ===
+						PatientOrderIntakeScreeningStatusId.NOT_SCREENED && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -409,7 +436,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 						</>
 					)}
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS && (
+					{isAssessmentInProgress && (
 						<>
 							<Row className="mb-6">
 								<Col>

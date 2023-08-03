@@ -10,6 +10,7 @@ import {
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 	ROLE_ID,
+	PatientOrderIntakeScreeningStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import NoData from '@/components/no-data';
@@ -69,6 +70,20 @@ export const Component = () => {
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const revalidator = useRevalidator();
 
+	const intakeScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
+		patientOrderId: patientOrder?.patientOrderId,
+		instantiateOnLoad: false,
+		disabled: !patientOrder?.patientOrderId,
+	});
+
+	const clinicalScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		patientOrderId: patientOrder?.patientOrderId,
+		instantiateOnLoad: false,
+		disabled: !intakeScreeningFlow.didCheckScreeningSessions || !intakeScreeningFlow.hasCompletedScreening,
+	});
+
 	const pollingFn = useCallback(() => {
 		return loadLatestPatientOrder(true);
 	}, []);
@@ -117,11 +132,21 @@ export const Component = () => {
 				return;
 			}
 
+			if (
+				response?.patientOrder.patientOrderIntakeScreeningStatusId ===
+				PatientOrderIntakeScreeningStatusId.NOT_SCREENED
+			) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
+				return;
+			}
+
 			switch (response?.patientOrder.patientOrderScreeningStatusId) {
 				case PatientOrderScreeningStatusId.COMPLETE:
 					setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
 					break;
 				case PatientOrderScreeningStatusId.NOT_SCREENED:
+					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+					break;
 				case PatientOrderScreeningStatusId.SCHEDULED:
 					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
 					break;
@@ -284,6 +309,34 @@ export const Component = () => {
 																		homescreenState ===
 																		PAGE_STATES.ASSESSMENT_IN_PROGRESS
 																	}
+																	disabled={
+																		clinicalScreeningFlow.isCreatingScreeningSession
+																	}
+																	onStartAssessment={() => {
+																		if (
+																			!intakeScreeningFlow.hasCompletedScreening
+																		) {
+																			intakeScreeningFlow.createScreeningSession();
+																		} else {
+																			clinicalScreeningFlow.createScreeningSession();
+																		}
+																	}}
+																	onResumeAssessment={() => {
+																		if (
+																			!intakeScreeningFlow.hasCompletedScreening
+																		) {
+																			intakeScreeningFlow.resumeScreeningSession(
+																				patientOrder.mostRecentIntakeScreeningSessionId
+																			);
+																		} else {
+																			clinicalScreeningFlow.resumeScreeningSession(
+																				patientOrder.mostRecentScreeningSessionId
+																			);
+																		}
+																	}}
+																	onRestartAssessment={() => {
+																		clinicalScreeningFlow.createScreeningSession();
+																	}}
 																	patientOrder={patientOrder}
 																/>
 															)}
@@ -319,15 +372,22 @@ interface AssessmentNextStepItemsProps {
 	patientOrder: PatientOrderModel;
 	isReady: boolean;
 	inProgress: boolean;
+	disabled?: boolean;
+	onStartAssessment: () => void;
+	onResumeAssessment: () => void;
+	onRestartAssessment: () => void;
 }
 
-const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: AssessmentNextStepItemsProps) => {
+const AssessmentNextStepItems = ({
+	patientOrder,
+	isReady,
+	inProgress,
+	disabled,
+	onStartAssessment,
+	onResumeAssessment,
+	onRestartAssessment,
+}: AssessmentNextStepItemsProps) => {
 	const { institution } = useAccount();
-	const { isCreatingScreeningSession, createScreeningSession, resumeScreeningSession } = useScreeningFlow({
-		screeningFlowId: institution?.integratedCareScreeningFlowId,
-		patientOrderId: patientOrder?.patientOrderId,
-		instantiateOnLoad: false,
-	});
 
 	if (isReady) {
 		return (
@@ -344,9 +404,9 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 									team will have access to your answers.
 								</p>
 								<Button
-									disabled={isCreatingScreeningSession}
+									disabled={disabled}
 									onClick={() => {
-										createScreeningSession();
+										onStartAssessment();
 									}}
 								>
 									Take the Assessment
@@ -397,16 +457,16 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 									throw new Error('Unknown Recent Screening');
 								}
 
-								resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+								onResumeAssessment();
 							},
 						},
 						{
 							variant: 'outline-primary',
 							title: 'Restart from Beginning',
 							onClick: () => {
-								createScreeningSession();
+								onRestartAssessment();
 							},
-							disabled: isCreatingScreeningSession,
+							disabled,
 						},
 					]}
 				/>

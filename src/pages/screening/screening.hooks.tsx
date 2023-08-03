@@ -144,10 +144,12 @@ export function useScreeningFlow({
 	screeningFlowId,
 	patientOrderId,
 	instantiateOnLoad = true,
+	disabled = false,
 }: {
 	screeningFlowId?: string;
 	patientOrderId?: string;
 	instantiateOnLoad?: boolean;
+	disabled?: boolean;
 }) {
 	const { isImmediateSession } = useAppRootLoaderData();
 	const [searchParams] = useSearchParams();
@@ -175,6 +177,10 @@ export function useScreeningFlow({
 	const hasIncompleteScreening = incompleteSessions.length > 0;
 
 	const createScreeningSession = useCallback(() => {
+		if (disabled) {
+			throw new Error('Screening Flow is disabled');
+		}
+
 		setIsCreatingScreeningSession(true);
 
 		return screeningService
@@ -194,10 +200,14 @@ export function useScreeningFlow({
 			.finally(() => {
 				setIsCreatingScreeningSession(false);
 			});
-	}, [activeFlowVersion?.screeningFlowVersionId, handleError, navigateToNext, patientOrderId]);
+	}, [activeFlowVersion?.screeningFlowVersionId, disabled, handleError, navigateToNext, patientOrderId]);
 
 	const resumeScreeningSession = useCallback(
 		(screeningSessionId?: string | null) => {
+			if (disabled) {
+				throw new Error('Screening Flow is disabled');
+			}
+
 			if (!activeFlowVersion) {
 				throw new Error('Unknown Active Flow Version');
 			}
@@ -224,21 +234,29 @@ export function useScreeningFlow({
 			// default to last incomplete session known for user
 			return navigateToNext(lastIncomplete);
 		},
-		[activeFlowVersion, hasIncompleteScreening, incompleteSessions, navigateToNext]
+		[activeFlowVersion, disabled, hasIncompleteScreening, incompleteSessions, navigateToNext]
 	);
 
 	const resumeOrCreateScreeningSession = useCallback(
 		(screeningSessionId?: string | null) => {
+			if (disabled) {
+				throw new Error('Screening Flow is disabled');
+			}
+
 			if (hasIncompleteScreening) {
 				return resumeScreeningSession(screeningSessionId);
 			} else {
 				return createScreeningSession();
 			}
 		},
-		[createScreeningSession, hasIncompleteScreening, resumeScreeningSession]
+		[createScreeningSession, disabled, hasIncompleteScreening, resumeScreeningSession]
 	);
 
 	const startScreeningFlow = useCallback(async () => {
+		if (disabled) {
+			throw new Error('Screening Flow is disabled');
+		}
+
 		if (!activeFlowVersion) {
 			throw new Error('Unknown Active Flow Version');
 		}
@@ -248,18 +266,26 @@ export function useScreeningFlow({
 		} else {
 			resumeOrCreateScreeningSession();
 		}
-	}, [activeFlowVersion, resumeOrCreateScreeningSession]);
+	}, [activeFlowVersion, disabled, resumeOrCreateScreeningSession]);
 
 	const startScreeningFlowIfNoneCompleted = useCallback(async () => {
+		if (disabled) {
+			throw new Error('Screening Flow is disabled');
+		}
+
 		if (hasCompletedScreening) {
 			setDidCheckScreeningSessions(true);
 			return;
 		}
 
 		return startScreeningFlow();
-	}, [hasCompletedScreening, startScreeningFlow]);
+	}, [disabled, hasCompletedScreening, startScreeningFlow]);
 
 	useEffect(() => {
+		if (disabled) {
+			return;
+		}
+
 		if (isImmediateSession || isSkipped) {
 			setDidCheckScreeningSessions(true);
 			return;
@@ -293,15 +319,15 @@ export function useScreeningFlow({
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
+	}, [disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
 	useEffect(() => {
-		if (!instantiateOnLoad || !activeFlowVersion) {
+		if (disabled || !instantiateOnLoad || !activeFlowVersion) {
 			return;
 		}
 
 		startScreeningFlowIfNoneCompleted();
-	}, [activeFlowVersion, instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
+	}, [activeFlowVersion, disabled, instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
 
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
