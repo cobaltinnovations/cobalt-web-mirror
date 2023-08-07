@@ -75,6 +75,17 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.IC_MHIC_CLINICAL_SCREENING:
+					revalidator.revalidate();
+					navigate(
+						{
+							pathname: `/ic/mhic/my-patients/all/${destination.context.patientOrderId}`,
+						},
+						{
+							replace,
+						}
+					);
+					return;
 				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
 					revalidator.revalidate();
 					navigate(
