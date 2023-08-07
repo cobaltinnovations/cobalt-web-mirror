@@ -4,7 +4,6 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
-	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderClosureReasonId,
 	PatientOrderModel,
