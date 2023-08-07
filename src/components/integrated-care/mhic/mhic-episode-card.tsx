@@ -190,7 +190,9 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<p className="m-0 text-gray">Practice</p>
 							</Col>
 							<Col xs={9}>
-								<p className="m-0">{patientOrder.referringPracticeName}</p>
+								<p className="m-0">
+									{patientOrder.referringPracticeName} ({patientOrder.referringPracticeId})
+								</p>
 							</Col>
 						</Row>
 						<Row className="mb-4">

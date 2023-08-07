@@ -443,7 +443,7 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.practice && (
 												<TableCell width={240}>
 													<span className="text-nowrap text-truncate">
-														{po.referringPracticeName}
+														{po.referringPracticeName} ({po.referringPracticeId})
 													</span>
 												</TableCell>
 											)}
