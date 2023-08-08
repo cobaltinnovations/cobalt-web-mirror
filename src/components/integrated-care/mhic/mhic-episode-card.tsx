@@ -1,7 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
-import { PatientOrderDispositionId, PatientOrderModel } from '@/lib/models';
+import {
+	PatientOrderConsentStatusId,
+	PatientOrderDispositionId,
+	PatientOrderIntakeInsuranceStatusId,
+	PatientOrderIntakeLocationStatusId,
+	PatientOrderIntakeWantsServicesStatusId,
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
+} from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -146,24 +155,96 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								</Col>
 							</Row>
 						)}
-						{!patientOrder.patientAddressRegionAccepted && (
+						{patientOrder.patientOrderIntakeWantsServicesStatusId ===
+							PatientOrderIntakeWantsServicesStatusId.NO && (
 							<Row className="mb-4">
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
 										title="Order Flagged"
-										description="Patient does not live in a state supported by the Integrated Care program"
+										description="Patient indicated they are no longer seeking mental health services"
 									/>
 								</Col>
 							</Row>
 						)}
-						{!patientOrder.primaryPlanAccepted && (
+						{patientOrder.patientOrderIntakeLocationStatusId ===
+							PatientOrderIntakeLocationStatusId.INVALID && (
 							<Row className="mb-4">
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
 										title="Order Flagged"
-										description="Insurance plan not accepted"
+										description="Patient lives in a state that is not supported by Integrated Care"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.patientOrderIntakeInsuranceStatusId ===
+							PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient's insurance has recently changed"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.patientOrderIntakeInsuranceStatusId ===
+							PatientOrderIntakeInsuranceStatusId.INVALID && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient's insurance is not accepted for Integrated Care"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient rejected consent to Integrated Care services"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.patientOrderSafetyPlanningStatusId ===
+							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient needs safety planning"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.patientOrderResourcingStatusId ===
+							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient needs resources"
+									/>
+								</Col>
+							</Row>
+						)}
+						{patientOrder.mostRecentScreeningSessionAppearsAbandoned && (
+							<Row className="mb-4">
+								<Col>
+									<MhicInlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Clinical assessment appears to have been abandoned"
 									/>
 								</Col>
 							</Row>

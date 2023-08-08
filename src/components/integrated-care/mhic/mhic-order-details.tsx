@@ -6,7 +6,7 @@ import { useNavigate, useRevalidator } from 'react-router-dom';
 import {
 	MhicAssessmentModal,
 	MhicCloseEpisodeModal,
-	MhicConsentModal,
+	// MhicConsentModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
 	MhicEpisodeCard,
@@ -19,7 +19,7 @@ import NoData from '@/components/no-data';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import {
-	PatientOrderConsentStatusId,
+	// PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
@@ -56,7 +56,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
-	const [showConsentModal, setShowConsentModal] = useState(false);
+	// const [showConsentModal, setShowConsentModal] = useState(false);
 	const hasCompletedIntakeScreening =
 		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
 	const intakeScreeningFlow = useScreeningFlow({

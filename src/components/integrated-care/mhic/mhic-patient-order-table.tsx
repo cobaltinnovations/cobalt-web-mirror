@@ -7,6 +7,9 @@ import {
 	PatientOrderCareTypeId,
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeInsuranceStatusId,
+	PatientOrderIntakeLocationStatusId,
+	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -151,10 +154,30 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.mostRecentEpisodeClosedWithinDateThreshold) {
 			count++;
 		}
-		if (!patientOrder.patientAddressRegionAccepted) {
+		if (patientOrder.patientOrderIntakeWantsServicesStatusId === PatientOrderIntakeWantsServicesStatusId.NO) {
 			count++;
 		}
-		if (!patientOrder.primaryPlanAccepted) {
+		if (patientOrder.patientOrderIntakeLocationStatusId === PatientOrderIntakeLocationStatusId.INVALID) {
+			count++;
+		}
+		if (patientOrder.patientOrderIntakeInsuranceStatusId === PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY) {
+			count++;
+		}
+		if (patientOrder.patientOrderIntakeInsuranceStatusId === PatientOrderIntakeInsuranceStatusId.INVALID) {
+			count++;
+		}
+		if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
+			count++;
+		}
+		if (
+			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
+		) {
+			count++;
+		}
+		if (patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES) {
+			count++;
+		}
+		if (patientOrder.mostRecentScreeningSessionAppearsAbandoned) {
 			count++;
 		}
 
