@@ -92,7 +92,7 @@ export const PatientAssessmentResults = () => {
 				} else if (value === 'NO') {
 					await integratedCareService
 						.closePatientOrder(patientOrder.patientOrderId, {
-							patientOrderClosureReasonId: PatientOrderClosureReasonId.REFUSED_CARE,
+							patientOrderClosureReasonId: PatientOrderClosureReasonId.DECLINED_CARE,
 						})
 						.fetch();
 				}
