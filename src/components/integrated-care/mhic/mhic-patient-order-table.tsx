@@ -136,7 +136,7 @@ export const MhicPatientOrderTable = ({
 			offset += 44;
 		}
 		if (columnConfig.patient) {
-			offset += 240;
+			offset += 280;
 		}
 
 		return offset;
@@ -151,11 +151,6 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.mostRecentEpisodeClosedWithinDateThreshold) {
 			count++;
 		}
-		if (
-			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
-		) {
-			count++;
-		}
 		if (!patientOrder.patientAddressRegionAccepted) {
 			count++;
 		}
@@ -167,12 +162,6 @@ export const MhicPatientOrderTable = ({
 	}, []);
 
 	const getFlagColor = useCallback((patientOrder: PatientOrderModel) => {
-		if (
-			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
-		) {
-			return 'text-danger';
-		}
-
 		return 'text-warning';
 	}, []);
 
@@ -254,7 +243,7 @@ export const MhicPatientOrderTable = ({
 							{columnConfig.patient && (
 								<TableCell
 									header
-									width={240}
+									width={280}
 									sticky
 									stickyOffset={patientColumnOffset}
 									stickyBorder={!columnConfig.assignedMhic}
@@ -404,16 +393,36 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.patient && (
 												<TableCell
-													width={240}
+													width={280}
 													sticky
 													stickyOffset={patientColumnOffset}
 													stickyBorder={!columnConfig.assignedMhic}
 													className="py-2"
 												>
-													<span className="d-block text-nowrap">{po.patientDisplayName}</span>
-													<span className="d-block text-nowrap text-gray">
-														{po.patientMrn}
-													</span>
+													<div className="d-flex align-items-center justify-content-between">
+														<div>
+															<span className="d-block text-nowrap">
+																{po.patientDisplayName}
+															</span>
+															<span className="d-block text-nowrap text-gray">
+																{po.patientMrn}
+															</span>
+														</div>
+														<div>
+															{po.patientOrderSafetyPlanningStatusId ===
+																PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+																<Badge pill bg="danger">
+																	S.Plan
+																</Badge>
+															)}
+															{po.patientOrderSafetyPlanningStatusId ===
+																PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
+																<Badge pill bg="outline-dark">
+																	S.Plan
+																</Badge>
+															)}
+														</div>
+													</div>
 												</TableCell>
 											)}
 											{columnConfig.assignedMhic && (
