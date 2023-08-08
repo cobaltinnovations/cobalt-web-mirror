@@ -7,6 +7,9 @@ import { Helmet } from 'react-helmet';
 import {
 	PatientOrderClosureReasonId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeInsuranceStatusId,
+	PatientOrderIntakeLocationStatusId,
+	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderModel,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
@@ -29,9 +32,44 @@ export const PatientAssessmentResults = () => {
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
 
-		if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED) {
+		if (!response.patientOrder) {
 			navigate('/ic/patient');
 			return;
+		}
+
+		if (
+			response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED ||
+			response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.ARCHIVED
+		) {
+			navigate('/ic/patient');
+			return;
+		}
+
+		if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.OPEN) {
+			if (
+				response.patientOrder.patientOrderIntakeWantsServicesStatusId ===
+				PatientOrderIntakeWantsServicesStatusId.NO
+			) {
+				navigate('/ic/patient');
+				return;
+			} else if (
+				response.patientOrder.patientOrderIntakeLocationStatusId === PatientOrderIntakeLocationStatusId.INVALID
+			) {
+				navigate('/ic/patient');
+				return;
+			} else if (
+				response.patientOrder.patientOrderIntakeInsuranceStatusId ===
+				PatientOrderIntakeInsuranceStatusId.INVALID
+			) {
+				navigate('/ic/patient');
+				return;
+			} else if (
+				response.patientOrder.patientOrderIntakeInsuranceStatusId ===
+				PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY
+			) {
+				navigate('/ic/patient');
+				return;
+			}
 		}
 
 		setPatientOrder(response.patientOrder);

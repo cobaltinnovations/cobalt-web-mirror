@@ -210,8 +210,8 @@ export interface PatientOrderModel {
 	// Do we need another outreach?
 	outreachFollowupNeeded?: boolean;
 
-	patientOrderScreeningAppearsAbandoned?: boolean;
-	patientOrderIntakeScreeningAppearsAbandoned?: boolean;
+	mostRecentScreeningSessionAppearsAbandoned?: boolean;
+	mostRecentIntakeScreeningSessionAppearsAbandoned?: boolean;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
