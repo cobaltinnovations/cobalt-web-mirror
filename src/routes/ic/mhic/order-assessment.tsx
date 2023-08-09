@@ -19,14 +19,12 @@ export const MhicOrderAssessment = () => {
 	});
 	const [isRecreate, setIsRecreate] = useState(false);
 
-	// const isCompleted =
-	// 	!!patientOrderResponse.patientOrder?.screeningSession?.completed &&
-	// 	!!patientOrderResponse.patientOrder.screeningSessionResult &&
-	// 	!!patientOrderResponse.patientOrder?.intakeScreeningSession?.completed &&
-	// 	!!patientOrderResponse.patientOrder.intakeScreeningSessionResult &&
-	// 	!isRecreate;
-
-	const isCompleted = true;
+	const isCompleted =
+		!!patientOrderResponse.patientOrder?.screeningSession?.completed &&
+		!!patientOrderResponse.patientOrder.screeningSessionResult &&
+		!!patientOrderResponse.patientOrder?.intakeScreeningSession?.completed &&
+		!!patientOrderResponse.patientOrder.intakeScreeningSessionResult &&
+		!isRecreate;
 
 	return (
 		<>
