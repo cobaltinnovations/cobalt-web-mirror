@@ -23,10 +23,14 @@ export const MhicOrderAssessment = () => {
 	const showInProgress =
 		!!patientOrderResponse.patientOrder?.screeningSession &&
 		!patientOrderResponse.patientOrder.screeningSession.completed &&
+		!!patientOrderResponse.patientOrder?.intakeScreeningSession &&
+		!patientOrderResponse.patientOrder.intakeScreeningSession.completed &&
 		!isRecreate;
 	const isCompleted =
 		!!patientOrderResponse.patientOrder?.screeningSession?.completed &&
 		!!patientOrderResponse.patientOrder.screeningSessionResult &&
+		!!patientOrderResponse.patientOrder?.intakeScreeningSession?.completed &&
+		!!patientOrderResponse.patientOrder.intakeScreeningSessionResult &&
 		!isRecreate;
 
 	return (

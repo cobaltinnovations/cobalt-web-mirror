@@ -37,10 +37,10 @@ const options = [
 		},
 	},
 	{
-		optionId: 'LOCATION_CHANGED_RECENTLY',
-		title: 'Location Changed Recently',
+		optionId: 'INSURANCE_CHANGED_RECENTLY',
+		title: 'Insurance Changed Recently',
 		queryParameters: {
-			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.LOCATION_CHANGED_RECENTLY,
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.INSURANCE_CHANGED_RECENTLY,
 		},
 	},
 	{
