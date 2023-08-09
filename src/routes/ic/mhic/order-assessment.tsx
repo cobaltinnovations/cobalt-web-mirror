@@ -13,7 +13,7 @@ export const MhicOrderAssessment = () => {
 
 	const { institution } = useAccount();
 	const { createScreeningSession } = useScreeningFlow({
-		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId,
 		instantiateOnLoad: false,
 	});
