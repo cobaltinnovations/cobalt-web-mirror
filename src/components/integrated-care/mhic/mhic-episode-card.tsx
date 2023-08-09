@@ -205,7 +205,8 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								</Col>
 							</Row>
 						)}
-						{patientOrder.patientOrderSafetyPlanningStatusId ===
+						{/* these 2 flags are unique and have user actions tied to them, can be found in mhic-next-steps-card.tsx  */}
+						{/* {patientOrder.patientOrderSafetyPlanningStatusId ===
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
 							<Row className="mb-4">
 								<Col>
@@ -220,7 +221,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 									<MhicInlineAlert variant="warning" title="Patient needs resources" />
 								</Col>
 							</Row>
-						)}
+						)} */}
 						{patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned && (
 							<Row className="mb-4">
 								<Col>
