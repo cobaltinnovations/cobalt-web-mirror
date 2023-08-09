@@ -206,34 +206,19 @@ export const Component = () => {
 				`Your primary care provider, <strong>${response.patientOrder.orderingProviderDisplayName}</strong>, has referred you to the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
 			);
 
-			if (
-				response?.patientOrder.patientOrderIntakeScreeningStatusId ===
-				PatientOrderIntakeScreeningStatusId.NOT_SCREENED
+			/* ------------------------------------------------------------------ */
+			/* Set page state */
+			/* ------------------------------------------------------------------ */
+			if (response.patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
+			} else if (
+				response.patientOrder.patientOrderIntakeScreeningStatusId ===
+					PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+				response?.patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS
 			) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+			} else {
 				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-				return;
-			}
-
-			switch (response?.patientOrder.patientOrderScreeningStatusId) {
-				case PatientOrderScreeningStatusId.COMPLETE:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
-					break;
-				case PatientOrderScreeningStatusId.NOT_SCREENED:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
-					break;
-				case PatientOrderScreeningStatusId.SCHEDULED:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-					break;
-				case PatientOrderScreeningStatusId.IN_PROGRESS:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
-					break;
-				default:
-					setHomescreenState(PAGE_STATES.TERMINAL);
-					setIntroductionText('');
-					setTerminalTitle('');
-					setTerminalDescription(
-						`We are waiting for your primary care provider to send us your information. We will send you an email or text message when we are ready for you. Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you have any questions.`
-					);
 			}
 		});
 	}, [
