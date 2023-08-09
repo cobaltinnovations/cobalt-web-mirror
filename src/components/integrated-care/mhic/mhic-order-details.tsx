@@ -310,9 +310,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									</div>
 									<p className="mb-0">
 										Completed{' '}
-										<strong>{patientOrder.screeningSession?.completedAtDescription}</strong> by{' '}
 										<strong>
-											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName}
+											{patientOrder.screeningSession?.completedAtDescription ??
+												patientOrder.intakeScreeningSession?.completedAtDescription}
+										</strong>{' '}
+										by{' '}
+										<strong>
+											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+												patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
 										</strong>
 									</p>
 								</Col>

@@ -161,8 +161,12 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										</div>
 									</div>
 									<p className="mb-0">
-										Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
-										{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
+										Completed{' '}
+										{patientOrder.screeningSession?.completedAtDescription ??
+											patientOrder.intakeScreeningSession?.completedAtDescription}{' '}
+										by{' '}
+										{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+											patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
 									</p>
 								</Col>
 							</Row>
