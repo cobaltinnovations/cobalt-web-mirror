@@ -147,11 +147,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.mostRecentEpisodeClosedWithinDateThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
-										variant="warning"
-										title="Order Flagged"
-										description="Patient had a recently-closed episode"
-									/>
+									<MhicInlineAlert variant="warning" title="Patient had a recently-closed episode" />
 								</Col>
 							</Row>
 						)}
@@ -161,8 +157,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient indicated they are no longer seeking mental health services"
+										title="Patient indicated they are no longer seeking mental health services"
 									/>
 								</Col>
 							</Row>
@@ -173,8 +168,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient lives in a state that is not supported by Integrated Care"
+										title="Patient lives in a state that is not supported by Integrated Care"
 									/>
 								</Col>
 							</Row>
@@ -185,8 +179,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient's insurance has recently changed"
+										title="Patient's insurance has recently changed"
 									/>
 								</Col>
 							</Row>
@@ -197,8 +190,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient's insurance is not accepted for Integrated Care"
+										title="Patient's insurance is not accepted for Integrated Care"
 									/>
 								</Col>
 							</Row>
@@ -208,8 +200,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient rejected consent to Integrated Care services"
+										title="Patient rejected consent to Integrated Care services"
 									/>
 								</Col>
 							</Row>
@@ -218,11 +209,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
-										variant="warning"
-										title="Order Flagged"
-										description="Patient needs safety planning"
-									/>
+									<MhicInlineAlert variant="warning" title="Patient needs safety planning" />
 								</Col>
 							</Row>
 						)}
@@ -230,10 +217,16 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
 							<Row className="mb-4">
 								<Col>
+									<MhicInlineAlert variant="warning" title="Patient needs resources" />
+								</Col>
+							</Row>
+						)}
+						{patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned && (
+							<Row className="mb-4">
+								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Patient needs resources"
+										title="Intake assessment appears to have been abandoned"
 									/>
 								</Col>
 							</Row>
@@ -243,8 +236,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<Col>
 									<MhicInlineAlert
 										variant="warning"
-										title="Order Flagged"
-										description="Clinical assessment appears to have been abandoned"
+										title="Clinical assessment appears to have been abandoned"
 									/>
 								</Col>
 							</Row>

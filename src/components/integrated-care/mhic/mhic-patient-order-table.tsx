@@ -180,6 +180,9 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.mostRecentScreeningSessionAppearsAbandoned) {
 			count++;
 		}
+		if (patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned) {
+			count++;
+		}
 
 		return count;
 	}, []);
