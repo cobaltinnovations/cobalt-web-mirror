@@ -170,7 +170,7 @@ export const Component = () => {
 					setIntroductionText('');
 					setTerminalTitle('No further action is required');
 					setTerminalDescription(
-						`Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care providers office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
+						`Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care provider's office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
 					);
 					return;
 				} else if (
