@@ -34,16 +34,13 @@ export function useScreeningNavigation() {
 				return match.pathname.includes('/ic/patient');
 			});
 
-			navigate(
-				mhicRouteMatch
-					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
-					: icPatientRouteMatch
-					? `/ic/patient/assessment/${contextId}`
-					: `/screening-questions/${contextId}`,
-				{ state: location.state }
-			);
+			window.location.href = mhicRouteMatch
+				? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
+				: icPatientRouteMatch
+				? `/ic/patient/assessment/${contextId}`
+				: `/screening-questions/${contextId}`;
 		},
-		[location.state, matches, navigate]
+		[matches]
 	);
 
 	const navigateToDestination = useCallback(
