@@ -13,10 +13,9 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 
 export function useScreeningNavigation() {
-	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
 	const revalidator = useRevalidator();
