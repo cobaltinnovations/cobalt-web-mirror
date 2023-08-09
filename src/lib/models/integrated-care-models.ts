@@ -214,6 +214,7 @@ export interface PatientOrderModel {
 
 	mostRecentScreeningSessionAppearsAbandoned?: boolean;
 	mostRecentIntakeScreeningSessionAppearsAbandoned?: boolean;
+	mostRecentIntakeAndClinicalScreeningsSatisfied?: boolean;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
