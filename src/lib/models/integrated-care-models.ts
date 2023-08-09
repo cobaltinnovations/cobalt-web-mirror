@@ -103,6 +103,8 @@ export interface PatientOrderModel {
 	patientOrderScreeningStatusDescription?: string;
 	screeningSession?: ScreeningSession;
 	screeningSessionResult?: ScreeningSessionResult;
+	intakeScreeningSession?: ScreeningSession;
+	intakeScreeningSessionResult?: ScreeningSessionResult;
 	patientOrderClosureReasonId?: PatientOrderClosureReasonId;
 	patientOrderClosureReasonDescription?: string;
 	patientOrderScheduledScreeningId?: string;
@@ -333,8 +335,14 @@ export enum PatientOrderFilterFlagTypeId {
 	NONE = 'NONE',
 	PATIENT_BELOW_AGE_THRESHOLD = 'PATIENT_BELOW_AGE_THRESHOLD',
 	MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD = 'MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD',
-	ADDRESS_REGION_NOT_ACCEPTED = 'ADDRESS_REGION_NOT_ACCEPTED',
-	INSURANCE_NOT_ACCEPTED = 'INSURANCE_NOT_ACCEPTED',
+	NO_INTEREST = 'NO_INTEREST',
+	LOCATION_INVALID = 'LOCATION_INVALID',
+	LOCATION_CHANGED_RECENTLY = 'LOCATION_CHANGED_RECENTLY',
+	INSURANCE_INVALID = 'INSURANCE_INVALID',
+	CONSENT_REJECTED = 'CONSENT_REJECTED',
+	NEEDS_SAFETY_PLANNING = 'NEEDS_SAFETY_PLANNING',
+	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
+	SESSION_ABANDONED = 'SESSION_ABANDONED',
 }
 
 export enum PatientOrderResourcingStatusId {
