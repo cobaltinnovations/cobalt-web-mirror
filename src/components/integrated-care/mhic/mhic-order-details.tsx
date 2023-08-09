@@ -292,7 +292,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			</section>
 			<section>
 				<Container fluid>
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.COMPLETE && (
+					{patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied && (
 						<>
 							<Row className="mb-6">
 								<Col>
