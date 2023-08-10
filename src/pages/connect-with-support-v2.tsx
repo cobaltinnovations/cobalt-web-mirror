@@ -142,11 +142,11 @@ const ConnectWithSupportV2 = () => {
 	/* Employer submission (reload page for simplicity) */
 	/* --------------------------------------------------- */
 	const handleEmployerModalContinueButton = useCallback(async () => {
-		if (!account) {
-			return;
-		}
-
 		try {
+			if (!account) {
+				throw new Error('account is undefined.');
+			}
+
 			const response = await accountService
 				.setAccountLocation(account.accountId, {
 					accountId: account.accountId,
@@ -478,6 +478,19 @@ const ConnectWithSupportV2 = () => {
 				)}
 			</AsyncWrapper>
 			<AsyncWrapper fetchData={fetchProviders}>
+				{institution.integratedCareEnabled && providerSections.length <= 0 && (
+					<Container className="py-8">
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<NoData
+									title="No Available Providers"
+									description={`Please call the ${institution.name} at ${institution.integratedCarePhoneNumberDescription} (${institution.integratedCareAvailabilityDescription}) for assistance.`}
+									actions={[]}
+								/>
+							</Col>
+						</Row>
+					</Container>
+				)}
 				{providerSections.map((section) => (
 					<React.Fragment key={section.date}>
 						<Container

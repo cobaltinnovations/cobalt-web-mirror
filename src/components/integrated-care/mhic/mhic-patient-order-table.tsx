@@ -7,6 +7,9 @@ import {
 	PatientOrderCareTypeId,
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeInsuranceStatusId,
+	PatientOrderIntakeLocationStatusId,
+	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
@@ -52,6 +55,7 @@ export type MhicPatientOrderTableColumnConfig = {
 	checkbox?: boolean;
 	flag?: boolean;
 	patient?: boolean;
+	assignedMhic?: boolean;
 	mrn?: boolean;
 	referralDate?: boolean;
 	preferredPhone?: boolean;
@@ -62,15 +66,15 @@ export type MhicPatientOrderTableColumnConfig = {
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
 	lastOutreach?: boolean;
+	assessmentCompleted?: boolean;
 	consent?: boolean;
 	assessmentScheduled?: boolean;
-	assessmentCompleted?: boolean;
 	triage?: boolean;
 	resources?: boolean;
 	checkInScheduled?: boolean;
 	checkInResponse?: boolean;
+	episodeClosed?: boolean;
 	episode?: boolean;
-	assignedMhic?: boolean;
 };
 
 interface MhicPatientOrderTableProps {
@@ -113,16 +117,33 @@ export const MhicPatientOrderTable = ({
 	const [totalPatientOrdersDescription, setTotalPatientOrdersDescription] = useState('0');
 
 	const patientColumnOffset = useMemo(() => {
-		if (columnConfig.checkbox && columnConfig.flag) {
-			return 100;
-		} else if (columnConfig.checkbox) {
-			return 56;
-		} else if (columnConfig.flag) {
-			return 44;
+		let offset = 0;
+
+		if (columnConfig.checkbox) {
+			offset += 56;
+		}
+		if (columnConfig.flag) {
+			offset += 44;
 		}
 
-		return 0;
+		return offset;
 	}, [columnConfig.checkbox, columnConfig.flag]);
+
+	const mhicColumnOffset = useMemo(() => {
+		let offset = 0;
+
+		if (columnConfig.checkbox) {
+			offset += 56;
+		}
+		if (columnConfig.flag) {
+			offset += 44;
+		}
+		if (columnConfig.patient) {
+			offset += 280;
+		}
+
+		return offset;
+	}, [columnConfig.checkbox, columnConfig.flag, columnConfig.patient]);
 
 	const getFlagCount = useCallback((patientOrder: PatientOrderModel) => {
 		let count = 0;
@@ -133,15 +154,33 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.mostRecentEpisodeClosedWithinDateThreshold) {
 			count++;
 		}
+		if (patientOrder.patientOrderIntakeWantsServicesStatusId === PatientOrderIntakeWantsServicesStatusId.NO) {
+			count++;
+		}
+		if (patientOrder.patientOrderIntakeLocationStatusId === PatientOrderIntakeLocationStatusId.INVALID) {
+			count++;
+		}
+		if (patientOrder.patientOrderIntakeInsuranceStatusId === PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY) {
+			count++;
+		}
+		if (patientOrder.patientOrderIntakeInsuranceStatusId === PatientOrderIntakeInsuranceStatusId.INVALID) {
+			count++;
+		}
+		if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
+			count++;
+		}
 		if (
 			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
 		) {
 			count++;
 		}
-		if (!patientOrder.patientAddressRegionAccepted) {
+		if (patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES) {
 			count++;
 		}
-		if (!patientOrder.primaryPlanAccepted) {
+		if (patientOrder.mostRecentScreeningSessionAppearsAbandoned) {
+			count++;
+		}
+		if (patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned) {
 			count++;
 		}
 
@@ -149,12 +188,6 @@ export const MhicPatientOrderTable = ({
 	}, []);
 
 	const getFlagColor = useCallback((patientOrder: PatientOrderModel) => {
-		if (
-			patientOrder.patientOrderSafetyPlanningStatusId === PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING
-		) {
-			return 'text-danger';
-		}
-
 		return 'text-warning';
 	}, []);
 
@@ -187,7 +220,15 @@ export const MhicPatientOrderTable = ({
 					<TableHead>
 						<TableRow>
 							{columnConfig.checkbox && (
-								<TableCell header width={56} sticky className="ps-6 pe-0 align-items-start">
+								<TableCell
+									header
+									width={56}
+									sticky
+									className="ps-6 pe-0 align-items-start"
+									stickyBorder={
+										!columnConfig.flag && !columnConfig.patient && !columnConfig.assignedMhic
+									}
+								>
 									<Form.Check
 										className="no-label"
 										type="checkbox"
@@ -221,12 +262,24 @@ export const MhicPatientOrderTable = ({
 									width={44}
 									stickyOffset={columnConfig.checkbox ? 56 : 0}
 									sticky
+									stickyBorder={!columnConfig.patient && !columnConfig.assignedMhic}
 									className="align-items-center"
 								></TableCell>
 							)}
 							{columnConfig.patient && (
-								<TableCell header width={240} sticky stickyOffset={patientColumnOffset} stickyBorder>
+								<TableCell
+									header
+									width={280}
+									sticky
+									stickyOffset={patientColumnOffset}
+									stickyBorder={!columnConfig.assignedMhic}
+								>
 									Patient
+								</TableCell>
+							)}
+							{columnConfig.assignedMhic && (
+								<TableCell header width={280} sticky stickyOffset={mhicColumnOffset} stickyBorder>
+									Assigned MHIC
 								</TableCell>
 							)}
 							{columnConfig.mrn && <TableCell header>MRN</TableCell>}
@@ -243,19 +296,19 @@ export const MhicPatientOrderTable = ({
 								</TableCell>
 							)}
 							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
+							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.consent && <TableCell header>Consent</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
-							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.triage && <TableCell header>Triage</TableCell>}
 							{columnConfig.resources && <TableCell header>Resources</TableCell>}
 							{columnConfig.checkInScheduled && <TableCell header>Check-In Scheduled</TableCell>}
 							{columnConfig.checkInResponse && <TableCell header>Check-In Response</TableCell>}
+							{columnConfig.episodeClosed && <TableCell header>Episode Closed</TableCell>}
 							{columnConfig.episode && (
 								<TableCell header className="text-right">
 									Episode
 								</TableCell>
 							)}
-							{columnConfig.assignedMhic && <TableCell header>Assigned MHIC</TableCell>}
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -297,6 +350,11 @@ export const MhicPatientOrderTable = ({
 													header
 													width={56}
 													sticky
+													stickyBorder={
+														!columnConfig.flag &&
+														!columnConfig.patient &&
+														!columnConfig.assignedMhic
+													}
 													className="ps-6 pe-0 align-items-start"
 												>
 													<Form.Check
@@ -347,6 +405,7 @@ export const MhicPatientOrderTable = ({
 												<TableCell
 													width={44}
 													sticky
+													stickyBorder={!columnConfig.patient && !columnConfig.assignedMhic}
 													stickyOffset={columnConfig.checkbox ? 56 : 0}
 													className="px-0 flex-row align-items-center justify-content-end"
 												>
@@ -360,21 +419,51 @@ export const MhicPatientOrderTable = ({
 											)}
 											{columnConfig.patient && (
 												<TableCell
-													width={240}
+													width={280}
 													sticky
 													stickyOffset={patientColumnOffset}
-													stickyBorder
+													stickyBorder={!columnConfig.assignedMhic}
 													className="py-2"
 												>
-													<span className="d-block text-nowrap">{po.patientDisplayName}</span>
-													<span className="d-block text-nowrap text-gray">
-														{po.patientMrn}
+													<div className="d-flex align-items-center justify-content-between">
+														<div>
+															<span className="d-block text-nowrap">
+																{po.patientDisplayName}
+															</span>
+															<span className="d-block text-nowrap text-gray">
+																{po.patientMrn}
+															</span>
+														</div>
+														<div>
+															{po.patientOrderSafetyPlanningStatusId ===
+																PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+																<Badge pill bg="danger">
+																	S.Plan
+																</Badge>
+															)}
+															{po.patientOrderSafetyPlanningStatusId ===
+																PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
+																<Badge pill bg="outline-dark">
+																	S.Plan
+																</Badge>
+															)}
+														</div>
+													</div>
+												</TableCell>
+											)}
+											{columnConfig.assignedMhic && (
+												<TableCell
+													width={280}
+													sticky
+													stickyOffset={mhicColumnOffset}
+													stickyBorder
+												>
+													<span className="text-nowrap text-truncate">
+														{po.panelAccountDisplayName ?? 'Unassigned'}
 													</span>
 												</TableCell>
 											)}
-
 											{columnConfig.mrn && <TableCell header>{po.patientMrn}</TableCell>}
-
 											{columnConfig.referralDate && (
 												<TableCell width={144}>
 													<span className="text-nowrap text-truncate">
@@ -389,7 +478,7 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.practice && (
 												<TableCell width={240}>
 													<span className="text-nowrap text-truncate">
-														{po.referringPracticeName}
+														{po.referringPracticeName} ({po.referringPracticeId})
 													</span>
 												</TableCell>
 											)}
@@ -475,6 +564,13 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
+											{columnConfig.assessmentCompleted && (
+												<TableCell width={170}>
+													<span className="text-nowrap text-truncate">
+														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
 											{columnConfig.consent && (
 												<TableCell width={170}>
 													<span className="text-nowrap text-truncate">
@@ -492,13 +588,6 @@ export const MhicPatientOrderTable = ({
 													<span className="text-nowrap text-truncate">
 														{po.patientOrderScheduledScreeningScheduledDateTimeDescription ??
 															'-'}
-													</span>
-												</TableCell>
-											)}
-											{columnConfig.assessmentCompleted && (
-												<TableCell width={170}>
-													<span className="text-nowrap text-truncate">
-														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
 													</span>
 												</TableCell>
 											)}
@@ -547,17 +636,17 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
+											{columnConfig.episodeClosed && (
+												<TableCell width={170} className="text-right">
+													<span className="text-nowrap text-truncate">
+														{po.episodeClosedAtDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
 											{columnConfig.episode && (
 												<TableCell width={120} className="text-right">
 													<span className="text-nowrap text-truncate">
 														{po.episodeDurationInDaysDescription}
-													</span>
-												</TableCell>
-											)}
-											{columnConfig.assignedMhic && (
-												<TableCell width={280}>
-													<span className="text-nowrap text-truncate">
-														{po.panelAccountDisplayName}
 													</span>
 												</TableCell>
 											)}

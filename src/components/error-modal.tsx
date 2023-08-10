@@ -11,25 +11,24 @@ import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
+	modalWrapper: {
+		zIndex: 1075,
+	},
 	errorModal: {
 		maxWidth: 295,
 	},
 });
 
 const ErrorModal: FC = () => {
-	const { institution } = useAccount();
+	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();
 	const classes = useStyles();
-	const { show, setShow, error } = useContext(ErrorModalContext);
-	useTrackModalView('ErrorModal', show);
+	const { isErrorModalShown, dismissErrorModal, error } = useContext(ErrorModalContext);
+	useTrackModalView('ErrorModal', isErrorModalShown);
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 
 	const ErrorBody = useCallback(() => {
-		const isIntegratedCarePatient =
-			institution.integratedCareEnabled && institution.userExperienceTypeId === 'PATIENT';
-		const isIntegratedCareStaff = institution.integratedCareEnabled && institution.userExperienceTypeId === 'STAFF';
-
 		if (error?.code === 'VALIDATION_FAILED' || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
 			return <p className="mb-0 fw-bold">{error?.message}</p>;
 		}
@@ -50,7 +49,7 @@ const ErrorModal: FC = () => {
 						size="sm"
 						className="mb-2 p-0 text-decoration-none"
 						onClick={() => {
-							setShow(false);
+							dismissErrorModal();
 							trackEvent(CrisisAnalyticsEvent.clickCrisisError());
 							openInCrisisModal(true);
 						}}
@@ -78,7 +77,7 @@ const ErrorModal: FC = () => {
 					size="sm"
 					className="mb-4 p-0 text-decoration-none"
 					onClick={() => {
-						setShow(false);
+						dismissErrorModal();
 						navigate('/feedback');
 					}}
 				>
@@ -103,7 +102,7 @@ const ErrorModal: FC = () => {
 					size="sm"
 					className="mb-2 p-0 text-decoration-none"
 					onClick={() => {
-						setShow(false);
+						dismissErrorModal();
 						trackEvent(CrisisAnalyticsEvent.clickCrisisError());
 						openInCrisisModal(true);
 					}}
@@ -113,27 +112,34 @@ const ErrorModal: FC = () => {
 			</>
 		);
 	}, [
+		dismissErrorModal,
 		error?.code,
 		error?.message,
 		institution.clinicalSupportPhoneNumber,
 		institution.clinicalSupportPhoneNumberDescription,
-		institution.integratedCareEnabled,
 		institution.integratedCarePhoneNumber,
 		institution.integratedCarePhoneNumberDescription,
-		institution.userExperienceTypeId,
+		isIntegratedCarePatient,
+		isIntegratedCareStaff,
 		navigate,
 		openInCrisisModal,
-		setShow,
 		trackEvent,
 	]);
 
 	return (
 		<Modal
-			show={show}
+			show={isErrorModalShown}
+			className={classes.modalWrapper}
 			dialogClassName={classes.errorModal}
 			centered
 			onHide={() => {
-				setShow(false);
+				dismissErrorModal();
+
+				if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
+					navigate('/ic/patient');
+				} else if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCareStaff) {
+					navigate('/ic/mhic');
+				}
 			}}
 		>
 			<Modal.Header closeButton>
@@ -149,7 +155,13 @@ const ErrorModal: FC = () => {
 					<Button
 						variant="outline-primary"
 						onClick={() => {
-							setShow(false);
+							dismissErrorModal();
+
+							if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCarePatient) {
+								navigate('/ic/patient');
+							} else if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCareStaff) {
+								navigate('/ic/mhic');
+							}
 						}}
 					>
 						Dismiss

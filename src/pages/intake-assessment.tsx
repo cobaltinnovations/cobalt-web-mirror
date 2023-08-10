@@ -122,24 +122,18 @@ const IntakeAssessment: FC = () => {
 			} else {
 				if (typeof response.assessment.bookingAllowed === 'boolean') {
 					if (response.assessment.bookingAllowed) {
-						if (selectedProvider?.schedulingSystemId === 'EPIC' && !account?.epicPatientId) {
-							navigate('/ehr-lookup', {
-								state: location.state,
-							});
-						} else {
-							const params = new URLSearchParams();
-							if (selectedProvider?.phoneNumberRequiredForAppointment) {
-								params.set('promptForPhoneNumber', 'true');
-							}
-
-							params.set('providerId', selectedProvider?.providerId ?? '');
-							params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
-							params.set('date', formattedAvailabilityDate);
-							params.set('time', selectedTimeSlot?.time ?? '');
-							params.set('intakeAssessmentId', assessment?.assessmentId);
-
-							window.location.href = `/confirm-appointment?${params.toString()}`;
+						const params = new URLSearchParams();
+						if (selectedProvider?.phoneNumberRequiredForAppointment) {
+							params.set('promptForPhoneNumber', 'true');
 						}
+
+						params.set('providerId', selectedProvider?.providerId ?? '');
+						params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
+						params.set('date', formattedAvailabilityDate);
+						params.set('time', selectedTimeSlot?.time ?? '');
+						params.set('intakeAssessmentId', assessment?.assessmentId);
+
+						window.location.href = `/confirm-appointment?${params.toString()}`;
 					} else {
 						setIsEligible(false);
 						navigate(exitUrl, {

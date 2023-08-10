@@ -56,32 +56,36 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 	const sortByOptions = useMemo(
 		() => [
 			{
+				value: PatientOrderSortColumnId.ORDER_DATE,
+				title: 'Referral Date',
+			},
+			{
+				value: PatientOrderSortColumnId.PRACTICE,
+				title: 'Practice',
+			},
+			{
+				value: PatientOrderSortColumnId.INSURANCE,
+				title: 'Insurance',
+			},
+			{
+				value: PatientOrderSortColumnId.OUTREACH_NUMBER,
+				title: 'Outreach #',
+			},
+			{
+				value: PatientOrderSortColumnId.MOST_RECENT_OUTREACH_DATE_TIME,
+				title: 'Last Outreach Date',
+			},
+			{
+				value: PatientOrderSortColumnId.MOST_RECENT_SCREENING_SESSION_COMPLETED_AT,
+				title: 'Assessment Completed Date',
+			},
+			{
 				value: PatientOrderSortColumnId.EPISODE_CLOSED_AT,
 				title: 'Episode Closed Date',
 			},
 			{
-				value: PatientOrderSortColumnId.MOST_RECENT_OUTREACH_DATE_TIME,
-				title: 'Outreach Date',
-			},
-			{
-				value: PatientOrderSortColumnId.MOST_RECENT_SCHEDULED_SCREENING_SCHEDULED_DATE_TIME,
-				title: 'Scheduled Assessment Date',
-			},
-			{
-				value: PatientOrderSortColumnId.MOST_RECENT_SCREENING_SESSION_COMPLETED_AT,
-				title: 'Session Completed Date',
-			},
-			{
-				value: PatientOrderSortColumnId.ORDER_DATE,
-				title: 'Order Date',
-			},
-			{
-				value: PatientOrderSortColumnId.PATIENT_FIRST_NAME,
-				title: 'Patient First Name',
-			},
-			{
-				value: PatientOrderSortColumnId.PATIENT_LAST_NAME,
-				title: 'Patient Last Name',
+				value: PatientOrderSortColumnId.EPISODE_LENGTH,
+				title: 'Episode Length',
 			},
 		],
 		[]

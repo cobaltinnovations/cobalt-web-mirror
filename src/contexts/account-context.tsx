@@ -1,10 +1,10 @@
 import Cookies from 'js-cookie';
-import React, { FC, PropsWithChildren, createContext, useCallback } from 'react';
+import React, { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react';
 
 import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 
-import { AccountSource, Institution } from '@/lib/models/institution';
+import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/institution';
 import { useAppRootLoaderData } from '@/routes/root';
 
 type AccountContextConfig = {
@@ -12,6 +12,8 @@ type AccountContextConfig = {
 	institution: Institution;
 	accountSources: AccountSource[];
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
+	isIntegratedCarePatient: boolean;
+	isIntegratedCareStaff: boolean;
 	signOutAndClearContext: () => void;
 };
 
@@ -58,11 +60,28 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [accountId]);
 
+	const institution = useMemo(
+		() => accountResponse?.institution || institutionResponse.institution,
+		[accountResponse?.institution, institutionResponse.institution]
+	);
+
+	const isIntegratedCarePatient = useMemo(
+		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.PATIENT,
+		[institution.integratedCareEnabled, institution.userExperienceTypeId]
+	);
+
+	const isIntegratedCareStaff = useMemo(
+		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.STAFF,
+		[institution.integratedCareEnabled, institution.userExperienceTypeId]
+	);
+
 	const value = {
 		account: accountResponse?.account,
-		institution: accountResponse?.institution || institutionResponse.institution,
+		institution,
 		accountSources: institutionResponse.accountSources,
 		institutionCapabilities: accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId],
+		isIntegratedCarePatient,
+		isIntegratedCareStaff,
 		signOutAndClearContext,
 	};
 

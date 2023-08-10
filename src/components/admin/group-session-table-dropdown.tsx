@@ -33,8 +33,7 @@ export const GroupSessionTableDropdown = ({
 	const { account } = useAccount();
 
 	const canAdd =
-		(account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR || account?.roleId === ROLE_ID.ADMINISTRATOR) &&
-		groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
+		account?.roleId === ROLE_ID.ADMINISTRATOR && groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 
 	const canEdit =
 		groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||

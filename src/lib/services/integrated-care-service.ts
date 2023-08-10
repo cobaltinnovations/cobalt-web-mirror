@@ -4,6 +4,7 @@ import {
 	AccountModel,
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
+	PatientOrderCareTypeId,
 	PatientOrderClosureReasonModel,
 	PatientOrderConsentStatusId,
 	PatientOrderCountModel,
@@ -365,10 +366,11 @@ export const integratedCareService = {
 	overrideTriage(
 		patientOrderId: string,
 		data: {
+			patientOrderCareTypeId: PatientOrderCareTypeId;
+			patientOrderTriageOverrideReasonId: string;
 			patientOrderTriages: {
-				patientOrderFocusTypeId: string;
 				patientOrderCareTypeId: string;
-				reason: string;
+				patientOrderFocusTypeId: string;
 			}[];
 		}
 	) {
@@ -376,7 +378,7 @@ export const integratedCareService = {
 			patientOrder: PatientOrderModel;
 		}>({
 			method: 'PUT',
-			url: `/patient-orders/${patientOrderId}/patient-order-triages`,
+			url: `/patient-orders/${patientOrderId}/patient-order-triage-groups`,
 			data,
 		});
 	},

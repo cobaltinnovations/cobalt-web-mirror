@@ -41,8 +41,10 @@ export enum ScreeningSessionDestinationId {
 	GROUP_SESSION_LIST = 'GROUP_SESSION_LIST',
 	IC_PATIENT_SCREENING_SESSION_RESULTS = 'IC_PATIENT_SCREENING_SESSION_RESULTS',
 	IC_MHIC_SCREENING_SESSION_RESULTS = 'IC_MHIC_SCREENING_SESSION_RESULTS',
+	IC_PATIENT_CLINICAL_SCREENING = 'IC_PATIENT_CLINICAL_SCREENING',
 	HOME = 'HOME',
 	MENTAL_HEALTH_PROVIDER_RECOMMENDATIONS = 'MENTAL_HEALTH_PROVIDER_RECOMMENDATIONS',
+	IC_MHIC_CLINICAL_SCREENING = 'IC_MHIC_CLINICAL_SCREENING',
 }
 
 export interface ScreeningSessionDestination {
@@ -125,6 +127,13 @@ export interface ScreeningConfirmationPrompt {
 
 export interface ScreeningQuestionContextResponse {
 	previousScreeningQuestionContextId: string;
+	screening: {
+		screeningId: string;
+		name: string;
+		activeScreeningVersionId: string;
+		created: string;
+		createdDescription: string;
+	};
 	screeningSession: ScreeningSession;
 	screeningQuestion: ScreeningQuestion;
 	screeningAnswerOptions: ScreeningAnswerOption[];

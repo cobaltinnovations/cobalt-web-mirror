@@ -780,10 +780,10 @@ export const routes: RouteObject[] = [
 										index: true,
 										lazy: () => import('@/routes/ic/patient/patient-landing'),
 									},
-									{
-										path: 'consent',
-										element: <PatientConsent />,
-									},
+									// {
+									// 	path: 'consent',
+									// 	element: <PatientConsent />,
+									// },
 									{
 										path: 'demographics-introduction',
 										element: <PatientDemographicsIntroduction />,

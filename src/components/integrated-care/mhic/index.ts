@@ -26,6 +26,7 @@ export * from './mhic-next-steps-appointment';
 export * from './mhic-next-steps-card';
 export * from './mhic-order-details';
 export * from './mhic-outreach-item';
+export * from './mhic-flag-order-for-safety-planning';
 export * from './mhic-comment';
 export * from './mhic-outreach-modal';
 export * from './mhic-page-header';

@@ -5,9 +5,8 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { Helmet } from 'react-helmet';
 
-import { AdminContentRow, ContentApprovalStatusId, ContentTypeId, ROLE_ID } from '@/lib/models';
+import { AdminContentRow, ContentApprovalStatusId, ContentTypeId } from '@/lib/models';
 import { adminService, ContentFiltersResponse } from '@/lib/services';
-import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
@@ -55,9 +54,8 @@ const CmsOnYourTime: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { account } = useAccount();
 	const { addFlag } = useFlags();
-	const isSuperAdmin = account?.roleId === ROLE_ID.SUPER_ADMINISTRATOR;
+	const isSuperAdmin = false;
 	const [tableIsUpdating, setTableIsUpdating] = useState(false);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
 	const [filters, setFilters] = useState<ContentFiltersResponse>({} as ContentFiltersResponse);

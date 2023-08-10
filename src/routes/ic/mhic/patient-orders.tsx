@@ -306,12 +306,15 @@ export const Component = () => {
 								checkbox: true,
 								flag: true,
 								patient: true,
+								assignedMhic: true,
 								referralDate: true,
 								practice: true,
 								referralReason: true,
 								insurance: true,
 								outreachNumber: true,
 								lastOutreach: true,
+								assessmentCompleted: true,
+								episodeClosed: true,
 								episode: true,
 							}}
 						/>

@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse, CancelTokenSource } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
 // https://github.com/axios/axios/blob/master/index.d.ts
 
-import { ERROR_CODES, errors, ErrorConfig, ApiError } from '@/lib/http-client/errors';
+import { CobaltError } from '@/lib/http-client/errors';
 
 export type HttpConfig = {
 	baseUrl?: string;
@@ -80,29 +80,12 @@ export class HttpClient {
 			const response: AxiosResponse = await this._axiosInstance(config);
 			return response;
 		} catch (error) {
-			if (axios.isCancel(error)) {
-				throw errors[ERROR_CODES.REQUEST_ABORTED](error as any);
+			if (axios.isAxiosError(error)) {
+				throw CobaltError.fromAxiosError(error);
 			} else {
-				throw this._getFormattedError(error as AxiosError<any>);
+				throw CobaltError.fromUnknownError(error);
 			}
 		}
-	}
-
-	_getFormattedError(error: AxiosError): ErrorConfig {
-		const errorFromApi: ApiError = error?.response?.data;
-
-		if (errorFromApi) {
-			const formattedApiError: ErrorConfig = {
-				code: errorFromApi.code,
-				message: errorFromApi.message,
-				apiError: errorFromApi,
-				axiosError: error,
-			};
-
-			return formattedApiError;
-		}
-
-		return errors[ERROR_CODES.GENERIC](error);
 	}
 
 	orchestrateRequest<T>(requestConfig: AxiosRequestConfig) {
