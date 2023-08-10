@@ -1329,20 +1329,23 @@ function prepareGroupSessionSubmission(
 ): CreateGroupSessionRequestBody {
 	const { startDate, endDate, startTime, endTime, ...groupSessionSubmission } = formValues;
 
-	const startDateTime = moment(
-		`${formValues.startDate?.toISOString().split('T')[0]} ${formValues.startTime}`,
-		'YYYY-MM-DD HH:mm A'
-	).format('YYYY-MM-DD[T]HH:mm');
+	let startDateTime = moment(`${startDate?.toISOString().split('T')[0]} ${startTime}`, 'YYYY-MM-DD HH:mm A').format(
+		'YYYY-MM-DD[T]HH:mm'
+	);
 
-	const endDateTime = moment(
-		`${formValues.startDate?.toISOString().split('T')[0]} ${formValues.endTime}`,
-		'YYYY-MM-DD HH:mm A'
-	).format('YYYY-MM-DD[T]HH:mm');
+	let endDateTime = moment(`${startDate?.toISOString().split('T')[0]} ${endTime}`, 'YYYY-MM-DD HH:mm A').format(
+		'YYYY-MM-DD[T]HH:mm'
+	);
 
 	if (isExternal) {
 		if (groupSessionSubmission.singleSessionFlag) {
 			// only for series
 			delete groupSessionSubmission.dateTimeDescription;
+		} else {
+			// default times to start of day
+			startDateTime = moment(startDate).startOf('day').format('YYYY-MM-DD[T]HH:mm');
+
+			endDateTime = moment(endDate).startOf('day').format('YYYY-MM-DD[T]HH:mm');
 		}
 	} else {
 		delete groupSessionSubmission.groupSessionLearnMoreMethodId;
