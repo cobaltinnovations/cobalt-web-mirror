@@ -113,6 +113,7 @@ export const Component = () => {
 				);
 				return;
 			}
+			setPatientOrder(response.patientOrder);
 
 			/* ------------------------------------------------------------------ */
 			/* Anything related redirecting or navigating */
@@ -201,7 +202,6 @@ export const Component = () => {
 			/* ------------------------------------------------------------------ */
 			/* Set defaults for if not terminal */
 			/* ------------------------------------------------------------------ */
-			setPatientOrder(response.patientOrder);
 			setIntroductionText(
 				`Your primary care provider, <strong>${response.patientOrder.orderingProviderDisplayName}</strong>, has referred you to the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
 			);
