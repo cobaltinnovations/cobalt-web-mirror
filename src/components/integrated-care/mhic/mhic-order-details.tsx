@@ -102,11 +102,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			// 	setShowConsentModal(true);
 			// } else {
 			if (options.createNew) {
-				if (!hasCompletedIntakeScreening) {
-					intakeScreeningFlow.createScreeningSession();
-				} else {
-					clinicalScreeningFlow.createScreeningSession();
-				}
+				intakeScreeningFlow.createScreeningSession();
 			} else if (options.resumeRecent) {
 				if (!hasCompletedIntakeScreening) {
 					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
