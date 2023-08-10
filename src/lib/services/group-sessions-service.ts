@@ -10,6 +10,7 @@ import {
 	GroupSessionResponseModel,
 	AccountModel,
 	GroupTopic,
+	GroupSessionCollectionModel,
 } from '@/lib/models';
 
 // Scheduled
@@ -147,7 +148,18 @@ interface SignUpForGroupSessionRequestResponseBody {
 	groupSessionResponse: GroupSessionResponseModel;
 }
 
+interface GroupSessionCollectionsResponse {
+	groupSessionCollections: GroupSessionCollectionModel[];
+}
+
 export const groupSessionsService = {
+	getGroupSessionCollections() {
+		return httpSingleton.orchestrateRequest<GroupSessionCollectionsResponse>({
+			method: 'get',
+			url: '/group-session-collections',
+		});
+	},
+
 	// Scheduled
 	getPresignedUploadUrl(data: GetPresignedUploadUrlRequestBody) {
 		return httpSingleton.orchestrateRequest<GetPresignedUploadUrlResponseBody>({

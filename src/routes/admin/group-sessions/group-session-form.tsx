@@ -50,20 +50,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	const groupSessionRequest = groupSessionId ? groupSessionsService.getGroupSessionById(groupSessionId) : null;
 	const tagGroupsRequest = tagService.getTagGroups();
+	const groupSessionCollectionsRequest = groupSessionsService.getGroupSessionCollections();
 
 	request.signal.addEventListener('abort', () => {
 		groupSessionRequest?.abort();
 		tagGroupsRequest.abort();
+		groupSessionCollectionsRequest.abort();
 	});
 
-	const [groupSessionResponse, tagGroupsResponse] = await Promise.all([
+	const [groupSessionResponse, tagGroupsResponse, groupSessionCollectionsResponse] = await Promise.all([
 		groupSessionRequest?.fetch(),
 		tagGroupsRequest.fetch(),
+		groupSessionCollectionsRequest.fetch(),
 	]);
 
-	console.log({ tagGroupsResponse });
+	console.log({ tagGroupsResponse, groupSessionCollectionsResponse });
 	return {
 		groupSession: groupSessionResponse?.groupSession ?? null,
+		groupSessionCollections: groupSessionCollectionsResponse.groupSessionCollections,
 		tagGroups: tagGroupsResponse.tagGroups,
 		screenings: [
 			{
@@ -765,7 +769,6 @@ export const Component = () => {
 								isHidden: false,
 							}));
 							setShowCollectionsDropdown(true);
-							// setShowCollectionsDropdown(currentTarget.checked);
 						}}
 					>
 						<InputHelper
@@ -781,8 +784,16 @@ export const Component = () => {
 							}}
 						>
 							<option value="">Select a collection</option>
-							<option value="1">Collection 1</option>
-							<option value="2">Collection 2</option>
+							{loaderData.groupSessionCollections.map((groupSessionCollection) => {
+								return (
+									<option
+										key={groupSessionCollection.groupSessionCollectionReponseId}
+										value={groupSessionCollection.groupSessionCollectionReponseId}
+									>
+										{groupSessionCollection.description}
+									</option>
+								);
+							})}
 						</InputHelper>
 					</ToggledInput>
 

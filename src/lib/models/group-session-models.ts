@@ -29,6 +29,13 @@ export interface ScreeningQuestionV2 {
 	question: string;
 }
 
+export interface GroupSessionCollectionModel {
+	groupSessionCollectionReponseId: string;
+	description: string;
+	displayOrder: number;
+	institutionId: string;
+}
+
 export interface GroupSessionModel {
 	assessmentId?: string;
 	groupSessionId: string;
