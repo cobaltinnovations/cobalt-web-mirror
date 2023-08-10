@@ -10,7 +10,7 @@ import SessionCropModal from '@/components/session-crop-modal';
 import TimeSlotInput from '@/components/time-slot-input';
 import ToggledInput from '@/components/toggled-input';
 import useHandleError from '@/hooks/use-handle-error';
-import { GroupSessionSchedulingSystemId, groupSessionsService, imageUploader } from '@/lib/services';
+import { GroupSessionSchedulingSystemId, groupSessionsService, imageUploader, tagService } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
@@ -26,7 +26,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import GroupSession from '@/components/group-session';
 import { AdminLayoutContext } from '../layout';
-import { set } from 'js-cookie';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -50,127 +49,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	}
 
 	const groupSessionRequest = groupSessionId ? groupSessionsService.getGroupSessionById(groupSessionId) : null;
+	const tagGroupsRequest = tagService.getTagGroups();
 
 	request.signal.addEventListener('abort', () => {
 		groupSessionRequest?.abort();
+		tagGroupsRequest.abort();
 	});
 
-	const groupSessionResponse = await groupSessionRequest?.fetch();
+	const [groupSessionResponse, tagGroupsResponse] = await Promise.all([
+		groupSessionRequest?.fetch(),
+		tagGroupsRequest.fetch(),
+	]);
 
+	console.log({ tagGroupsResponse });
 	return {
 		groupSession: groupSessionResponse?.groupSession ?? null,
-		tagGroups: [
-			{
-				id: uuidv4(),
-				name: 'Symptoms',
-				tags: [
-					{
-						id: uuidv4(),
-						name: 'Mood',
-					},
-					{
-						id: uuidv4(),
-						name: 'Anxiety',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-				],
-			},
-			{
-				id: uuidv4(),
-				name: 'Personal Life',
-				tags: [
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-				],
-			},
-			{
-				id: uuidv4(),
-				name: 'Work Life',
-				tags: [
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-				],
-			},
-			{
-				id: uuidv4(),
-				name: 'Identity',
-				tags: [
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-				],
-			},
-			{
-				id: uuidv4(),
-				name: 'World Events',
-				tags: [
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-					{
-						id: uuidv4(),
-						name: 'Tag',
-					},
-				],
-			},
-		],
+		tagGroups: tagGroupsResponse.tagGroups,
 		screenings: [
 			{
 				id: uuidv4(),
@@ -917,16 +811,16 @@ export const Component = () => {
 				>
 					{(loaderData?.tagGroups ?? []).map((tagGroup) => {
 						return (
-							<div key={tagGroup.id} className="mb-4">
+							<div key={tagGroup.tagGroupId} className="mb-4">
 								<h5 className="mb-2">{tagGroup.name}</h5>
 
 								<div className="d-flex flex-wrap">
 									{(tagGroup.tags ?? []).map((tag) => {
-										const isSelected = formValues.tagIds.includes(tag.id);
+										const isSelected = formValues.tagIds.includes(tag.tagId);
 
 										return (
 											<Button
-												key={tag.id}
+												key={tag.tagId}
 												size="sm"
 												variant={isSelected ? 'primary' : 'outline-primary'}
 												className="mb-2 me-2 fs-default text-nowrap"
@@ -934,8 +828,8 @@ export const Component = () => {
 													setFormValues((curr) => ({
 														...curr,
 														tagIds: isSelected
-															? curr.tagIds.filter((tagId) => tagId !== tag.id)
-															: [...curr.tagIds, tag.id],
+															? curr.tagIds.filter((tagId) => tagId !== tag.tagId)
+															: [...curr.tagIds, tag.tagId],
 													}));
 												}}
 											>

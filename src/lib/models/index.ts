@@ -17,4 +17,5 @@ export * from './resource-library-models';
 export * from './roles';
 export * from './scheduling-models';
 export * from './screening-models';
+export * from './tag-groups';
 export * from './topic-center-models';
