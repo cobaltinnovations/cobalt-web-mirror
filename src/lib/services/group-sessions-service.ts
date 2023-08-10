@@ -11,6 +11,7 @@ import {
 	AccountModel,
 	GroupTopic,
 	GroupSessionCollectionModel,
+	GroupSessionLearnMoreMethodId,
 } from '@/lib/models';
 
 // Scheduled
@@ -29,31 +30,34 @@ export enum GroupSessionSchedulingSystemId {
 }
 
 export interface CreateGroupSessionRequestBody {
-	submitterName: string;
-	submitterEmailAddress: string;
-	facilitatorAccountId: string | null;
-	facilitatorName: string;
-	facilitatorEmailAddress: string;
-	targetEmailAddress: string;
-	title: string;
-	description: string;
-	urlName: string;
-	startDateTime: string;
-	endDateTime: string;
-	seats?: number | null;
+	facilitatorName?: string;
+	facilitatorEmailAddress?: string;
+	targetEmailAddress?: string;
+	title?: string;
+	description?: string;
+	urlName?: string;
+	startDateTime?: string;
+	endDateTime?: string;
+	seats?: number;
 	imageUrl?: string;
-	videoconferenceUrl?: string | null;
-	screeningQuestions?: string[];
-	screeningQuestionsV2?: {
-		fontSizeId: string;
-		question: string;
-	}[];
+	videoconferenceUrl?: string;
 	confirmationEmailContent?: string;
 	groupSessionSchedulingSystemId?: GroupSessionSchedulingSystemId;
-	scheduleUrl?: string | null;
-	sendFollowupEmail: boolean;
+	sendFollowupEmail?: boolean;
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;
+	groupSessionCollectionId?: string;
+	visibleFlag?: boolean;
+	screeningFlowId?: string;
+	sendReminderEmail?: boolean;
+	reminderEmailContent?: string;
+	followupDayOffset?: string;
+	followupTimeOfDay?: string;
+	singleSessionFlag?: boolean;
+	dateTimeDescription?: string;
+	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
+	learnMoreDescription?: string;
+	tagIds?: string[];
 }
 
 interface CreateGroupSessionResponseBody {

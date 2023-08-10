@@ -77,9 +77,6 @@ export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/a
 export const GroupSessions = lazyLoadWithRefresh(() => import('@/pages/group-sessions'));
 export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-request'));
 export const GroupSessionsScheduled = lazyLoadWithRefresh(() => import('@/pages/group-sessions-scheduled'));
-export const GroupSessionsScheduledCreate = lazyLoadWithRefresh(
-	() => import('@/pages/group-sessions-scheduled-create')
-);
 export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
 export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
 	() => import('@/pages/group-sessions-by-request-create')
@@ -464,18 +461,6 @@ export const routes: RouteObject[] = [
 					{
 						path: 'group-sessions/scheduled',
 						element: <GroupSessionsScheduled />,
-					},
-					{
-						path: 'group-sessions/scheduled/create',
-						element: <GroupSessionsScheduledCreate />,
-					},
-					{
-						path: 'group-sessions/scheduled/:groupSessionId/edit',
-						element: <GroupSessionsScheduledCreate />,
-					},
-					{
-						path: 'group-sessions/scheduled/:groupSessionId/view',
-						element: <GroupSessionsScheduledCreate />,
 					},
 					{
 						path: 'group-sessions/by-request',

@@ -301,9 +301,9 @@ const GroupSessionsCreate: FC = () => {
 			);
 
 			const submissionValues: CreateGroupSessionRequestBody = {
-				submitterName: values.yourName,
-				submitterEmailAddress: values.yourEmail,
-				facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
+				// submitterName: values.yourName,
+				// submitterEmailAddress: values.yourEmail,
+				// facilitatorAccountId: values.isModerator ? account?.accountId ?? null : null,
 				facilitatorName: values.isModerator ? values.yourName : values.facilitatorsName,
 				facilitatorEmailAddress: values.isModerator ? values.yourEmail : values.facilitatorsEmail,
 				targetEmailAddress: values.notificationEmail,
@@ -313,7 +313,7 @@ const GroupSessionsCreate: FC = () => {
 				startDateTime,
 				endDateTime,
 				imageUrl: values.imageUrl,
-				screeningQuestionsV2: values.isRestricted ? values.screeningQuestions : [],
+				// screeningQuestionsV2: values.isRestricted ? values.screeningQuestions : [],
 				confirmationEmailContent: values.confirmationEmailTemplate,
 				sendFollowupEmail: values.followUpEmail,
 				...(values.followUpEmailTemplate ? { followupEmailContent: values.followUpEmailTemplate } : {}),
@@ -323,12 +323,12 @@ const GroupSessionsCreate: FC = () => {
 			if (values.isCobaltScheduling) {
 				submissionValues.seats = values.capacity;
 				submissionValues.videoconferenceUrl = values.meetingUrl;
-				submissionValues.scheduleUrl = null;
+				// submissionValues.scheduleUrl = null;
 				submissionValues.groupSessionSchedulingSystemId = GroupSessionSchedulingSystemId.COBALT;
 			} else {
-				submissionValues.seats = null;
-				submissionValues.videoconferenceUrl = null;
-				submissionValues.scheduleUrl = values.schedulingUrl;
+				// submissionValues.seats = null;
+				// submissionValues.videoconferenceUrl = null;
+				// submissionValues.scheduleUrl = values.schedulingUrl;
 				submissionValues.groupSessionSchedulingSystemId = GroupSessionSchedulingSystemId.EXTERNAL;
 			}
 

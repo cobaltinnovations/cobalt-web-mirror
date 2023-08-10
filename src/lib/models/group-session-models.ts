@@ -9,6 +9,12 @@ export enum GROUP_SESSION_STATUS_ID {
 	DELETED = 'DELETED',
 }
 
+export enum GroupSessionLearnMoreMethodId {
+	URL = 'URL',
+	EMAIL = 'EMAIL',
+	PHONE = 'PHONE',
+}
+
 export enum GROUP_SESSION_SORT_ORDER {
 	START_TIME_ASCENDING = 'START_TIME_ASCENDING',
 }
