@@ -12,6 +12,7 @@ import {
 	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderIntakeLocationStatusId,
 	PatientOrderIntakeInsuranceStatusId,
+	PatientOrderSafetyPlanningStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import NoData from '@/components/no-data';
@@ -22,6 +23,7 @@ import Loader from '@/components/loader';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { CobaltError } from '@/lib/http-client';
+import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 
 enum PAGE_STATES {
 	TERMINAL = 'TERMINAL',
@@ -248,7 +250,7 @@ export const Component = () => {
 								)}
 							</Col>
 						</Row>
-						<Row className="mb-10">
+						<Row className="mb-4">
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 								{homescreenState === PAGE_STATES.TERMINAL && (
 									<Card bsPrefix="ic-card" className="mb-10">
@@ -267,7 +269,7 @@ export const Component = () => {
 								)}
 
 								{homescreenState !== PAGE_STATES.TERMINAL && (
-									<Card bsPrefix="ic-card" className="mb-10">
+									<Card bsPrefix="ic-card">
 										<Card.Header>
 											<Card.Title>Next Steps</Card.Title>
 										</Card.Header>
@@ -375,6 +377,25 @@ export const Component = () => {
 											)}
 										</Card.Body>
 									</Card>
+								)}
+							</Col>
+						</Row>
+						<Row>
+							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
+								{patientOrder?.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING ? (
+									<MhicInlineAlert
+										className="mt-8"
+										variant="warning"
+										title="A clinician will reach out"
+										description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
+									/>
+								) : (
+									<MhicInlineAlert
+										variant="primary"
+										title="Your responses are not reviewed in real time"
+										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+									/>
 								)}
 							</Col>
 						</Row>
