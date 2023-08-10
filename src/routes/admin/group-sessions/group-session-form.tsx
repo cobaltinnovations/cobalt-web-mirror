@@ -2,7 +2,7 @@ import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import Wysiwyg from '@/components/admin-cms/wysiwyg';
+import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import ImageUploadCard from '@/components/image-upload-card';
 import InputHelper from '@/components/input-helper';
@@ -10,10 +10,16 @@ import SessionCropModal from '@/components/session-crop-modal';
 import TimeSlotInput from '@/components/time-slot-input';
 import ToggledInput from '@/components/toggled-input';
 import useHandleError from '@/hooks/use-handle-error';
-import { GroupSessionSchedulingSystemId, groupSessionsService, imageUploader, tagService } from '@/lib/services';
+import {
+	CreateGroupSessionRequestBody,
+	GroupSessionSchedulingSystemId,
+	groupSessionsService,
+	imageUploader,
+	tagService,
+} from '@/lib/services';
 import NoMatch from '@/pages/no-match';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import {
 	Link,
 	LoaderFunctionArgs,
@@ -26,6 +32,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import GroupSession from '@/components/group-session';
 import { AdminLayoutContext } from '../layout';
+import { GroupSessionLearnMoreMethodId } from '@/lib/models';
+import moment from 'moment';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -64,7 +72,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		groupSessionCollectionsRequest.fetch(),
 	]);
 
-	console.log({ tagGroupsResponse, groupSessionCollectionsResponse });
 	return {
 		groupSession: groupSessionResponse?.groupSession ?? null,
 		groupSessionCollections: groupSessionCollectionsResponse.groupSessionCollections,
@@ -84,48 +91,51 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	};
 }
 
+const initialGroupSessionFormValues = {
+	title: '', // existing
+	urlName: '', // existing
+	videoconferenceUrl: '', // existing -- COBALT ONLY
+	seats: undefined as number | undefined, // existing
+	facilitatorName: '', // existing
+	facilitatorEmailAddress: '', // existing
+	targetEmailAddress: '', // existing
+	singleSessionFlag: true,
+	dateTimeDescription: '',
+	startDate: moment().add(1, 'd').toDate() as Date | null, // existing
+	startTime: '', // existing -- COBALT ONLY
+	endTime: '', // existing -- COBALT ONLY
+	endDate: moment().add(2, 'd').toDate() as Date | null, // new -- EXTERNAL ONLY
+	imageUrl: '', // existing
+	description: '', // existing
+	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
+	learnMoreDescription: '',
+	groupSessionCollectionId: '',
+	visibleFlag: true,
+	tagIds: [] as string[],
+	screeningFlowId: '',
+	confirmationEmailContent: '', // existing, -- COBALT ONLY
+	sendReminderEmail: false,
+	reminderEmailContent: '',
+	sendFollowupEmail: false, // existing, -- COBALT ONLY
+	followupEmailContent: '', // existing, -- COBALT ONLY
+	followupEmailSurveyUrl: '', // existing, -- COBALT ONLY
+	followupDayOffset: '',
+	followupTimeOfDay: '',
+};
+
 export const Component = () => {
 	const { isGroupSessionPreview, setIsGroupSessionPreview } = useOutletContext() as AdminLayoutContext;
 	const loaderData = useAdminGroupSessionFormLoaderData();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; groupSessionId: string }>();
+	const handleError = useHandleError();
 
-	const [formValues, setFormValues] = useState({
-		title: '', // existing
-		urlName: '', // existing
-		videoconferenceUrl: '', // existing -- COBALT ONLY
-		seats: undefined as number | undefined, // existing
-		facilitatorName: '', // existing
-		facilitatorEmailAddress: '', // existing
-		targetEmailAddress: '', // existing
-		recurrence: '' as 'single' | 'series', // new -- EXTERNAL ONLY
-		startDate: new Date() as Date | null, // existing
-		startTime: '', // existing -- COBALT ONLY
-		endTime: '', // existing -- COBALT ONLY
-		endDate: new Date() as Date | null, // new -- EXTERNAL ONLY
-		recurrenceDescription: '', // new -- EXTERNAL ONLY
-		imageUrl: '', // existing
-		description: '', // existing
-		externalRegistrationType: '' as 'url' | 'email' | 'phone', // new -- EXTERNAL ONLY
-		externalRegistrationReference: '', // new -- EXTERNAL ONLY
-		groupSessionCollectionId: '', // new -- COBALT ONLY
-		isHidden: false, // new -- COBAL ONLY
-		tagIds: [] as string[], // new
-		screeningQuestionsGroupId: '', // new -- COBALT ONLY
-		confirmationEmailContent: '', // existing, -- COBALT ONLY
-		sendReminderEmail: false, // new -- COBALT ONLY
-		reminderEmailContent: '', // new -- COBALT ONLY
-		sendFollowupEmail: false, // existing, -- COBALT ONLY
-		followupEmailContent: '', // existing, -- COBALT ONLY
-		followupEmailSurveyUrl: '', // existing, -- COBALT ONLY
-		followupEmailDelayDays: '', // new, -- COBALT ONLY
-		followupEmailTime: '', // new -- COBALT ONLY
-	});
+	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
+	const [formValues, setFormValues] = useState(initialGroupSessionFormValues);
 
 	const [showContactEmailInput, setShowContactEmailInput] = useState(
 		formValues.facilitatorEmailAddress !== formValues.targetEmailAddress
 	);
-	const [showCollectionsDropdown, setShowCollectionsDropdown] = useState(!!formValues.groupSessionCollectionId);
 	const [selectedScreeningForModal, setSelectedScreeningForModal] =
 		useState<Exclude<AdminGroupSessionFormLoaderData, null>['screenings'][number]>();
 
@@ -142,6 +152,13 @@ export const Component = () => {
 		},
 		[setIsGroupSessionPreview]
 	);
+
+	const handleDescriptionChange = useCallback((nextDescription: string) => {
+		setFormValues((curr) => ({
+			...curr,
+			description: nextDescription,
+		}));
+	}, []);
 
 	useEffect(() => {
 		// cleanup layout/header on unmount
@@ -169,7 +186,7 @@ export const Component = () => {
 			<DatePicker
 				className="mb-4"
 				labelText="Date"
-				required
+				required={!isExternal || formValues.singleSessionFlag}
 				selected={formValues.startDate || new Date()}
 				onChange={(date) => {
 					setFormValues((previousValues) => ({
@@ -183,7 +200,8 @@ export const Component = () => {
 				<TimeSlotInput
 					className="w-100 me-1"
 					label="Start Time"
-					required
+					name="startTime"
+					required={!isExternal || formValues.singleSessionFlag}
 					value={formValues.startTime}
 					onChange={({ currentTarget }) => {
 						setFormValues((curr) => ({
@@ -196,8 +214,9 @@ export const Component = () => {
 				<TimeSlotInput
 					className="w-100 ms-1"
 					label="End Time"
-					required
-					value={formValues.followupEmailTime}
+					required={!isExternal || formValues.singleSessionFlag}
+					name="endTime"
+					value={formValues.endTime}
 					onChange={({ currentTarget }) => {
 						setFormValues((curr) => ({
 							...curr,
@@ -214,6 +233,7 @@ export const Component = () => {
 			<div className="py-10 d-flex justify-content-between">
 				<Button
 					variant="outline-primary"
+					type="button"
 					onClick={() => {
 						if (isGroupSessionPreview) {
 							togglePreview('off');
@@ -232,19 +252,7 @@ export const Component = () => {
 					)}
 				</Button>
 
-				<Button
-					variant="primary"
-					onClick={() => {
-						if (!isGroupSessionPreview) {
-							togglePreview('on');
-							return;
-						}
-
-						alert('Publish! =>' + JSON.stringify(formValues, null, 2));
-
-						console.log({ formValues });
-					}}
-				>
+				<Button variant="primary" type="submit">
 					{isGroupSessionPreview ? (
 						'Publish'
 					) : (
@@ -258,16 +266,51 @@ export const Component = () => {
 	);
 
 	if (isGroupSessionPreview) {
+		const submission = prepareGroupSessionSubmission(formValues, isExternal);
+
 		return (
-			<>
-				<GroupSession groupSession={formValues} />
+			<Form
+				onSubmit={(event) => {
+					event.preventDefault();
+
+					groupSessionsService
+						.createGroupSession(submission)
+						.fetch()
+						.then((response) => {
+							console.log({ response });
+						})
+						.catch((e) => {
+							handleError(e);
+						});
+				}}
+			>
+				<GroupSession groupSession={submission} />
 				{footer}
-			</>
+			</Form>
 		);
 	}
 
 	return (
-		<>
+		<Form
+			onSubmit={(event) => {
+				event.preventDefault();
+
+				// validate wysiwyg
+				if (!formValues.description) {
+					descriptionWysiwygRef.current?.quill?.focus();
+					descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
+						behavior: 'auto',
+						block: 'center',
+					});
+					return;
+				}
+
+				if (!isGroupSessionPreview) {
+					togglePreview('on');
+					return;
+				}
+			}}
+		>
 			<Container className="py-10">
 				<Row>
 					<Col>
@@ -311,6 +354,7 @@ export const Component = () => {
 						type="text"
 						label="Session Title"
 						required
+						name="title"
 						value={formValues.title}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -323,6 +367,8 @@ export const Component = () => {
 					<InputHelper
 						type="text"
 						label="Friendly URL"
+						name="urlName"
+						required
 						value={formValues.urlName}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -351,6 +397,7 @@ export const Component = () => {
 							className="mb-2"
 							type="text"
 							label="Video Link URL (Bluejeans/Zoom, etc.)"
+							name="videoconferenceUrl"
 							required
 							value={formValues.videoconferenceUrl}
 							onChange={({ currentTarget }) => {
@@ -375,6 +422,7 @@ export const Component = () => {
 					<InputHelper
 						type="number"
 						label="Number of seats available"
+						name="seats"
 						value={typeof formValues.seats === 'number' ? formValues.seats.toString() : ''}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -411,6 +459,7 @@ export const Component = () => {
 						type="text"
 						label="Facilitator Name"
 						required
+						name="facilitatorName"
 						value={formValues.facilitatorName}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -425,6 +474,7 @@ export const Component = () => {
 						type="email"
 						label="Facilitator Email Address"
 						required
+						name="facilitatorEmailAddress"
 						value={formValues.facilitatorEmailAddress}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -454,7 +504,8 @@ export const Component = () => {
 							<InputHelper
 								type="email"
 								label="Notification Email"
-								required
+								required={showContactEmailInput}
+								name="targetEmailAddress"
 								value={formValues.targetEmailAddress}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
@@ -482,11 +533,11 @@ export const Component = () => {
 								id="duration-single"
 								label="Single session"
 								className="mb-3"
-								checked={formValues.recurrence === 'single'}
+								checked={formValues.singleSessionFlag === true}
 								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										recurrence: 'single',
+										singleSessionFlag: true,
 									}));
 								}}
 							>
@@ -497,11 +548,11 @@ export const Component = () => {
 								type="radio"
 								id="duration-series"
 								label="Ongoing series"
-								checked={formValues.recurrence === 'series'}
+								checked={formValues.singleSessionFlag === false}
 								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										recurrence: 'series',
+										singleSessionFlag: false,
 									}));
 								}}
 							>
@@ -536,14 +587,15 @@ export const Component = () => {
 								<InputHelper
 									label="Description"
 									placeholder="Ex. Wednesdays 7-7:30 PM"
-									value={formValues.recurrenceDescription}
+									name="dateTimeDescription"
+									value={formValues.dateTimeDescription}
 									onChange={({ currentTarget }) => {
 										setFormValues((curr) => ({
 											...curr,
-											recurrenceDescription: currentTarget.value,
+											dateTimeDescription: currentTarget.value,
 										}));
 									}}
-									required
+									required={!formValues.singleSessionFlag}
 								/>
 							</ToggledInput>
 						</>
@@ -611,14 +663,10 @@ export const Component = () => {
 					description="Describe what your group session is about, who it is for, and any special requirements for participating. Your description should tell potential attendees everything they need to know to make a decision about joining."
 				>
 					<Wysiwyg
+						ref={descriptionWysiwygRef}
 						className="bg-white"
-						initialValue={formValues.description}
-						onChange={(nextDescription) => {
-							setFormValues((curr) => ({
-								...curr,
-								description: nextDescription,
-							}));
-						}}
+						initialValue={loaderData.groupSession?.description ?? ''}
+						onChange={handleDescriptionChange}
 					/>
 				</GroupSessionFormSection>
 
@@ -633,24 +681,31 @@ export const Component = () => {
 								id="more-info-call"
 								className="mb-3"
 								label="Call to learn more"
-								checked={formValues.externalRegistrationType === 'phone'}
+								checked={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE
+								}
 								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										externalRegistrationType: 'phone',
+										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.PHONE,
+										learnMoreDescription: '',
 									}));
 								}}
 							>
 								<InputHelper
 									label="Phone Number"
-									value={formValues.externalRegistrationReference}
+									value={formValues.learnMoreDescription}
+									name="learnMoreDescriptionPhone"
+									type="tel"
 									onChange={({ currentTarget }) => {
 										setFormValues((curr) => ({
 											...curr,
-											externalRegistrationReference: currentTarget.value,
+											learnMoreDescription: currentTarget.value,
 										}));
 									}}
-									required
+									required={
+										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE
+									}
 								/>
 							</ToggledInput>
 
@@ -659,25 +714,35 @@ export const Component = () => {
 								id="more-info-email"
 								className="mb-3"
 								label="Email to learn more"
-								checked={formValues.externalRegistrationType === 'email'}
+								checked={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
+								}
 								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										externalRegistrationType: 'email',
+										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.EMAIL,
+										learnMoreDescription: '',
 									}));
 								}}
 							>
 								<InputHelper
 									label="Email Address"
-									type="email"
-									value={formValues.externalRegistrationReference}
+									type={
+										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
+											? 'email'
+											: 'text'
+									}
+									name="learnMoreDescriptionEmail"
+									value={formValues.learnMoreDescription}
 									onChange={({ currentTarget }) => {
 										setFormValues((curr) => ({
 											...curr,
-											externalRegistrationReference: currentTarget.value,
+											learnMoreDescription: currentTarget.value,
 										}));
 									}}
-									required
+									required={
+										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
+									}
 								/>
 							</ToggledInput>
 
@@ -686,51 +751,29 @@ export const Component = () => {
 								id="more-info-url"
 								className="mb-3"
 								label="Click here to learn more (URL)"
-								checked={formValues.externalRegistrationType === 'url'}
+								checked={formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL}
 								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										externalRegistrationType: 'url',
+										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
+										learnMoreDescription: '',
 									}));
 								}}
 							>
 								<InputHelper
 									label="External URL"
-									value={formValues.externalRegistrationReference}
+									name="learnMoreDescriptionUrl"
+									value={formValues.learnMoreDescription}
 									onChange={({ currentTarget }) => {
 										setFormValues((curr) => ({
 											...curr,
-											externalRegistrationReference: currentTarget.value,
+											learnMoreDescription: currentTarget.value,
 										}));
 									}}
-									required
+									required={
+										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL
+									}
 									helperText="The external URL may be a link that participants use to register for the session or a link to a webpage with more information."
-								/>
-							</ToggledInput>
-
-							<ToggledInput
-								type="radio"
-								id="more-info-call"
-								className="mb-3"
-								label="Call to learn more"
-								checked={formValues.externalRegistrationType === 'phone'}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										externalRegistrationType: 'phone',
-									}));
-								}}
-							>
-								<InputHelper
-									label="Phone Number"
-									value={formValues.externalRegistrationReference}
-									onChange={({ currentTarget }) => {
-										setFormValues((curr) => ({
-											...curr,
-											externalRegistrationReference: currentTarget.value,
-										}));
-									}}
-									required
 								/>
 							</ToggledInput>
 						</GroupSessionFormSection>
@@ -762,24 +805,25 @@ export const Component = () => {
 						id="visibility-on"
 						label="Visible"
 						className="mb-3"
-						checked={!formValues.isHidden && showCollectionsDropdown}
+						required
+						checked={formValues.visibleFlag}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
-								isHidden: false,
+								visibleFlag: true,
 							}));
-							setShowCollectionsDropdown(true);
 						}}
 					>
 						<InputHelper
 							as="select"
 							label="Collection"
-							required
-							value={formValues.targetEmailAddress}
+							name="groupSessionCollectionId"
+							required={formValues.visibleFlag}
+							value={formValues.groupSessionCollectionId}
 							onChange={({ currentTarget }) => {
 								setFormValues((curr) => ({
 									...curr,
-									targetEmailAddress: currentTarget.value,
+									groupSessionCollectionId: currentTarget.value,
 								}));
 							}}
 						>
@@ -803,13 +847,12 @@ export const Component = () => {
 						name="visibility"
 						label="Hidden"
 						hideChildren
-						checked={formValues.isHidden}
+						checked={!formValues.visibleFlag}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
-								isHidden: true,
+								visibleFlag: false,
 							}));
-							setShowCollectionsDropdown(false);
 						}}
 					/>
 				</GroupSessionFormSection>
@@ -915,11 +958,11 @@ export const Component = () => {
 						id="no-screening"
 						label="Do not screen"
 						hideChildren
-						checked={!formValues.screeningQuestionsGroupId}
+						checked={!formValues.screeningFlowId}
 						onChange={() => {
 							setFormValues((curr) => ({
 								...curr,
-								screeningQuestionsGroupId: '',
+								screeningFlowId: '',
 							}));
 						}}
 					/>
@@ -942,11 +985,11 @@ export const Component = () => {
 										View Questions
 									</Button>
 								}
-								checked={formValues.screeningQuestionsGroupId === screening.id}
+								checked={formValues.screeningFlowId === screening.id}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										screeningQuestionsGroupId: currentTarget.checked ? screening.id : '',
+										screeningFlowId: currentTarget.checked ? screening.id : '',
 									}));
 								}}
 							/>
@@ -963,6 +1006,7 @@ export const Component = () => {
 					<InputHelper
 						label="Confirmation Email Text"
 						value={formValues.confirmationEmailContent}
+						name="confirmationEmailContent"
 						as="textarea"
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
@@ -1000,6 +1044,7 @@ export const Component = () => {
 						<InputHelper
 							label="Reminder Email Text"
 							value={formValues.reminderEmailContent}
+							name="reminderEmailContent"
 							as="textarea"
 							onChange={({ currentTarget }) => {
 								setFormValues((curr) => ({
@@ -1007,7 +1052,7 @@ export const Component = () => {
 									reminderEmailContent: currentTarget.value,
 								}));
 							}}
-							required
+							required={formValues.sendReminderEmail}
 						/>
 					</ToggledInput>
 
@@ -1034,12 +1079,13 @@ export const Component = () => {
 								className="w-100 me-1"
 								as="select"
 								label="# of days after session"
-								required
-								value={formValues.followupEmailDelayDays}
+								name="followupDayOffset"
+								required={formValues.sendFollowupEmail}
+								value={formValues.followupDayOffset}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										followupEmailDelayDays: currentTarget.value,
+										followupDayOffset: currentTarget.value,
 									}));
 								}}
 							>
@@ -1056,12 +1102,13 @@ export const Component = () => {
 							<TimeSlotInput
 								className="w-100 ms-1"
 								label="Time"
-								required
-								value={formValues.followupEmailTime}
+								name="followupTimeOfDay"
+								required={formValues.sendFollowupEmail}
+								value={formValues.followupTimeOfDay}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										followupEmailTime: currentTarget.value,
+										followupTimeOfDay: currentTarget.value,
 									}));
 								}}
 							/>
@@ -1070,17 +1117,18 @@ export const Component = () => {
 						<p className="mb-3">
 							The follow-up email will be sent{' '}
 							<span className="fw-bold text-decoration-underline">
-								{formValues.followupEmailDelayDays} day
+								{formValues.followupDayOffset} day
 							</span>{' '}
 							after the session ends at{' '}
 							<span className="fw-bold text-docration-underline">
-								{formValues.followupEmailTime || '--'}
+								{formValues.followupTimeOfDay || '--'}
 							</span>
 						</p>
 
 						<InputHelper
 							label="Follow-up Email Text"
 							value={formValues.followupEmailContent}
+							name="followupEmailContent"
 							as="textarea"
 							onChange={({ currentTarget }) => {
 								setFormValues((curr) => ({
@@ -1088,13 +1136,14 @@ export const Component = () => {
 									followupEmailContent: currentTarget.value,
 								}));
 							}}
-							required
+							required={formValues.sendFollowupEmail}
 							className="mb-3"
 						/>
 
 						<InputHelper
 							label="Survey URL"
 							value={formValues.followupEmailSurveyUrl}
+							name="followupEmailSurveyUrl"
 							onChange={({ currentTarget }) => {
 								setFormValues((curr) => ({
 									...curr,
@@ -1107,7 +1156,7 @@ export const Component = () => {
 			</Container>
 
 			{footer}
-		</>
+		</Form>
 	);
 };
 
@@ -1208,3 +1257,65 @@ const GroupSessionImageInput = ({ imageSrc, onSrcChange }: GroupSessionImageInpu
 		</>
 	);
 };
+
+function prepareGroupSessionSubmission(
+	formValues: Partial<typeof initialGroupSessionFormValues>,
+	isExternal: boolean
+): CreateGroupSessionRequestBody {
+	const { startDate, endDate, startTime, endTime, ...groupSessionSubmission } = formValues;
+
+	const startDateTime = moment(
+		`${formValues.startDate?.toISOString().split('T')[0]} ${formValues.startTime}`,
+		'YYYY-MM-DD HH:mm A'
+	).format('YYYY-MM-DD[T]HH:mm');
+
+	const endDateTime = moment(
+		`${formValues.startDate?.toISOString().split('T')[0]} ${formValues.endTime}`,
+		'YYYY-MM-DD HH:mm A'
+	).format('YYYY-MM-DD[T]HH:mm');
+
+	if (isExternal) {
+		if (groupSessionSubmission.singleSessionFlag) {
+			// only for series
+			delete groupSessionSubmission.dateTimeDescription;
+		}
+	} else {
+		delete groupSessionSubmission.groupSessionLearnMoreMethodId;
+		delete groupSessionSubmission.learnMoreDescription;
+
+		delete groupSessionSubmission.singleSessionFlag;
+		delete groupSessionSubmission.dateTimeDescription;
+
+		if (!groupSessionSubmission.targetEmailAddress) {
+			delete groupSessionSubmission.targetEmailAddress;
+		}
+	}
+
+	if (!groupSessionSubmission.imageUrl) {
+		delete groupSessionSubmission.imageUrl;
+	}
+
+	if (!groupSessionSubmission.screeningFlowId) {
+		delete groupSessionSubmission.screeningFlowId;
+	}
+
+	if (!groupSessionSubmission.sendReminderEmail) {
+		delete groupSessionSubmission.reminderEmailContent;
+	}
+
+	if (!groupSessionSubmission.sendFollowupEmail) {
+		delete groupSessionSubmission.followupDayOffset;
+		delete groupSessionSubmission.followupTimeOfDay;
+		delete groupSessionSubmission.followupEmailContent;
+		delete groupSessionSubmission.followupEmailSurveyUrl;
+	}
+
+	return {
+		startDateTime,
+		endDateTime,
+		groupSessionSchedulingSystemId: isExternal
+			? GroupSessionSchedulingSystemId.EXTERNAL
+			: GroupSessionSchedulingSystemId.COBALT,
+		...groupSessionSubmission,
+	};
+}

@@ -89,7 +89,11 @@ const GroupSession = ({
 							<Col>
 								<h2 className="mb-2 mb-lg-3">{groupSession.title}</h2>
 								<p className="mb-6 text-muted">with {groupSession.facilitatorName}</p>
-								<p className="mb-6 mb-lg-10 fs-large">{groupSession.description}</p>
+								<div
+									className="mb-6 mb-lg-10"
+									dangerouslySetInnerHTML={{ __html: groupSession.description ?? '' }}
+								/>
+
 								<div className="d-flex flex-wrap">
 									<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
 										[TODO]: Tag Text
