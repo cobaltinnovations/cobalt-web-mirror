@@ -43,6 +43,7 @@ export interface CreateGroupSessionRequestBody {
 	videoconferenceUrl?: string;
 	confirmationEmailContent?: string;
 	groupSessionSchedulingSystemId?: GroupSessionSchedulingSystemId;
+	groupSessionStatusId?: GROUP_SESSION_STATUS_ID;
 	sendFollowupEmail?: boolean;
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;

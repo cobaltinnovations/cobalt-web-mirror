@@ -32,8 +32,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import GroupSession from '@/components/group-session';
 import { AdminLayoutContext } from '../layout';
-import { GroupSessionLearnMoreMethodId } from '@/lib/models';
+import { GROUP_SESSION_STATUS_ID, GroupSessionLearnMoreMethodId, GroupSessionModel } from '@/lib/models';
 import moment from 'moment';
+import { SESSION_STATUS } from '@/components/session-status';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -57,23 +58,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	}
 
 	const groupSessionRequest = groupSessionId ? groupSessionsService.getGroupSessionById(groupSessionId) : null;
+	const groupSessionReservationsRequest = groupSessionId
+		? groupSessionsService.getGroupSessionReservationsById(groupSessionId)
+		: null;
 	const tagGroupsRequest = tagService.getTagGroups();
 	const groupSessionCollectionsRequest = groupSessionsService.getGroupSessionCollections();
 
 	request.signal.addEventListener('abort', () => {
 		groupSessionRequest?.abort();
+		groupSessionReservationsRequest?.abort();
 		tagGroupsRequest.abort();
 		groupSessionCollectionsRequest.abort();
 	});
 
-	const [groupSessionResponse, tagGroupsResponse, groupSessionCollectionsResponse] = await Promise.all([
-		groupSessionRequest?.fetch(),
-		tagGroupsRequest.fetch(),
-		groupSessionCollectionsRequest.fetch(),
-	]);
+	const [groupSessionResponse, groupSessionReservationsResponse, tagGroupsResponse, groupSessionCollectionsResponse] =
+		await Promise.all([
+			groupSessionRequest?.fetch(),
+			groupSessionReservationsRequest?.fetch(),
+			tagGroupsRequest.fetch(),
+			groupSessionCollectionsRequest.fetch(),
+		]);
 
 	return {
 		groupSession: groupSessionResponse?.groupSession ?? null,
+		groupSessionReservations: groupSessionReservationsResponse?.groupSessionReservations ?? [],
 		groupSessionCollections: groupSessionCollectionsResponse.groupSessionCollections,
 		tagGroups: tagGroupsResponse.tagGroups,
 		screenings: [
@@ -92,36 +100,56 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 const initialGroupSessionFormValues = {
-	title: '', // existing
-	urlName: '', // existing
-	videoconferenceUrl: '', // existing -- COBALT ONLY
-	seats: undefined as number | undefined, // existing
-	facilitatorName: '', // existing
-	facilitatorEmailAddress: '', // existing
-	targetEmailAddress: '', // existing
+	title: '',
+	urlName: '',
+	videoconferenceUrl: '',
+	seats: undefined as number | undefined,
+	facilitatorName: '',
+	facilitatorEmailAddress: '',
+	targetEmailAddress: '',
 	singleSessionFlag: true,
-	dateTimeDescription: '',
-	startDate: moment().add(1, 'd').toDate() as Date | null, // existing
-	startTime: '', // existing -- COBALT ONLY
-	endTime: '', // existing -- COBALT ONLY
-	endDate: moment().add(2, 'd').toDate() as Date | null, // new -- EXTERNAL ONLY
-	imageUrl: '', // existing
-	description: '', // existing
+	dateTimeDescription: '' as string | undefined,
+	startDate: moment().add(1, 'd').toDate() as Date | null,
+	startTime: '',
+	endTime: '',
+	endDate: moment().add(2, 'd').toDate() as Date | null,
+	imageUrl: '',
+	description: '',
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
 	visibleFlag: true,
 	tagIds: [] as string[],
 	screeningFlowId: '',
-	confirmationEmailContent: '', // existing, -- COBALT ONLY
+	confirmationEmailContent: '',
 	sendReminderEmail: false,
 	reminderEmailContent: '',
-	sendFollowupEmail: false, // existing, -- COBALT ONLY
-	followupEmailContent: '', // existing, -- COBALT ONLY
-	followupEmailSurveyUrl: '', // existing, -- COBALT ONLY
+	sendFollowupEmail: false,
+	followupEmailContent: '',
+	followupEmailSurveyUrl: '',
 	followupDayOffset: '',
 	followupTimeOfDay: '',
 };
+
+function getInitialGroupSessionFormValues(
+	groupSession?: GroupSessionModel | null
+): typeof initialGroupSessionFormValues {
+	const { startDateTime, endDateTime, ...rest } = groupSession ?? {};
+
+	const startDate = moment(startDateTime);
+	const endDate = moment(endDateTime);
+
+	return Object.assign(
+		{ ...initialGroupSessionFormValues },
+		{
+			...rest,
+			startDate: startDateTime && startDate.toDate(),
+			startTime: startDateTime ? startDate.format('hh:mm A') : '',
+			endTime: endDateTime ? endDate.format('hh:mm A') : '',
+			endDate: endDateTime && endDate.toDate(),
+		}
+	);
+}
 
 export const Component = () => {
 	const { isGroupSessionPreview, setIsGroupSessionPreview } = useOutletContext() as AdminLayoutContext;
@@ -131,13 +159,25 @@ export const Component = () => {
 	const handleError = useHandleError();
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
-	const [formValues, setFormValues] = useState(initialGroupSessionFormValues);
+	const [formValues, setFormValues] = useState(getInitialGroupSessionFormValues(loaderData?.groupSession));
 
 	const [showContactEmailInput, setShowContactEmailInput] = useState(
 		formValues.facilitatorEmailAddress !== formValues.targetEmailAddress
 	);
 	const [selectedScreeningForModal, setSelectedScreeningForModal] =
 		useState<Exclude<AdminGroupSessionFormLoaderData, null>['screenings'][number]>();
+
+	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
+	const isEdit = params.action === 'edit';
+	const groupSessionSchedulingSystemId =
+		params.action === 'add-external'
+			? GroupSessionSchedulingSystemId.EXTERNAL
+			: params.action === 'add-internal'
+			? GroupSessionSchedulingSystemId.COBALT
+			: loaderData?.groupSession?.groupSessionSchedulingSystemId ?? GroupSessionSchedulingSystemId.COBALT;
+
+	const isExternal = groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
+	const hasReservations = (loaderData?.groupSessionReservations ?? []).length > 0;
 
 	const togglePreview = useCallback(
 		(nextPreviewState: 'on' | 'off') => {
@@ -160,6 +200,35 @@ export const Component = () => {
 		}));
 	}, []);
 
+	const handleSaveForm = useCallback(
+		async (groupSessionStatusId: GROUP_SESSION_STATUS_ID) => {
+			const submission = prepareGroupSessionSubmission(formValues, isExternal);
+
+			return (
+				isEdit
+					? groupSessionsService
+							.updateGroupsession(loaderData!.groupSession!.groupSessionId, {
+								...submission,
+								groupSessionStatusId,
+							})
+							.fetch()
+					: groupSessionsService
+							.createGroupSession({
+								...submission,
+								groupSessionStatusId,
+							})
+							.fetch()
+			)
+				.then((response) => {
+					navigate('/admin/group-sessions');
+				})
+				.catch((e) => {
+					handleError(e);
+				});
+		},
+		[formValues, handleError, isEdit, isExternal, loaderData, navigate]
+	);
+
 	useEffect(() => {
 		// cleanup layout/header on unmount
 		return () => {
@@ -171,16 +240,6 @@ export const Component = () => {
 		return <NoMatch />;
 	}
 
-	const isAdd = params.action !== 'edit';
-	const groupSessionSchedulingSystemId =
-		params.action === 'add-external'
-			? GroupSessionSchedulingSystemId.EXTERNAL
-			: params.action === 'add-internal'
-			? GroupSessionSchedulingSystemId.COBALT
-			: loaderData?.groupSession?.groupSessionSchedulingSystemId ?? GroupSessionSchedulingSystemId.COBALT;
-
-	const isExternal = groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
-
 	const startAndEndTimeInputs = (
 		<>
 			<DatePicker
@@ -188,6 +247,7 @@ export const Component = () => {
 				labelText="Date"
 				required={!isExternal || formValues.singleSessionFlag}
 				selected={formValues.startDate || new Date()}
+				disabled={isEdit && hasReservations}
 				onChange={(date) => {
 					setFormValues((previousValues) => ({
 						...previousValues,
@@ -201,6 +261,7 @@ export const Component = () => {
 					className="w-100 me-1"
 					label="Start Time"
 					name="startTime"
+					disabled={isEdit && hasReservations}
 					required={!isExternal || formValues.singleSessionFlag}
 					value={formValues.startTime}
 					onChange={({ currentTarget }) => {
@@ -216,6 +277,7 @@ export const Component = () => {
 					label="End Time"
 					required={!isExternal || formValues.singleSessionFlag}
 					name="endTime"
+					disabled={isEdit && hasReservations}
 					value={formValues.endTime}
 					onChange={({ currentTarget }) => {
 						setFormValues((curr) => ({
@@ -240,13 +302,22 @@ export const Component = () => {
 							return;
 						}
 
-						navigate('/admin/group-sessions');
+						if (isEdit && isPublished) {
+							window.confirm(
+								'You have changes that have not been published, are your sure you want to exit?'
+							) && navigate('/admin/group-sessions');
+							return;
+						}
+
+						handleSaveForm(GROUP_SESSION_STATUS_ID.NEW);
 					}}
 				>
 					{isGroupSessionPreview ? (
 						<>
 							<LeftChevron /> Back to Edit
 						</>
+					) : isPublished ? (
+						'Exit'
 					) : (
 						'Save & Exit'
 					)}
@@ -273,15 +344,7 @@ export const Component = () => {
 				onSubmit={(event) => {
 					event.preventDefault();
 
-					groupSessionsService
-						.createGroupSession(submission)
-						.fetch()
-						.then((response) => {
-							console.log({ response });
-						})
-						.catch((e) => {
-							handleError(e);
-						});
+					handleSaveForm(GROUP_SESSION_STATUS_ID.ADDED);
 				}}
 			>
 				<GroupSession groupSession={submission} />
@@ -315,7 +378,7 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<h2 className="mb-1">
-							{isAdd ? 'Add' : 'Edit'} {isExternal ? 'External' : 'Cobalt'} Group Session
+							{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
 						</h2>
 						<p className="mb-0 fs-large">
 							Complete all <span className="text-danger">*required fields</span> before publishing.
@@ -356,6 +419,7 @@ export const Component = () => {
 						required
 						name="title"
 						value={formValues.title}
+						disabled={isExternal ? isPublished : isEdit && hasReservations}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
@@ -370,6 +434,7 @@ export const Component = () => {
 						name="urlName"
 						required
 						value={formValues.urlName}
+						disabled={isExternal ? isPublished : isEdit && hasReservations}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
@@ -831,8 +896,8 @@ export const Component = () => {
 							{loaderData.groupSessionCollections.map((groupSessionCollection) => {
 								return (
 									<option
-										key={groupSessionCollection.groupSessionCollectionReponseId}
-										value={groupSessionCollection.groupSessionCollectionReponseId}
+										key={groupSessionCollection.groupSessionCollectionId}
+										value={groupSessionCollection.groupSessionCollectionId}
 									>
 										{groupSessionCollection.description}
 									</option>

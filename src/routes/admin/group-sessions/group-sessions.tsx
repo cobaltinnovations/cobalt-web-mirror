@@ -228,9 +228,7 @@ export const Component = () => {
 											<TableRow key={groupSession.groupSessionId}>
 												<TableCell>{groupSession.createdDateDescription}</TableCell>
 												<TableCell>
-													<Link
-														to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
-													>
+													<Link to={`/group-sessions/${groupSession.groupSessionId}`}>
 														{groupSession.title}
 													</Link>
 												</TableCell>
