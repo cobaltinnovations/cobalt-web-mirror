@@ -55,7 +55,6 @@ const viewConfig: ViewConfig = {
 		pageDescription: '',
 		apiParameters: {},
 		columnConfig: {
-			checkbox: true,
 			flag: true,
 			patient: true,
 			referralDate: true,
