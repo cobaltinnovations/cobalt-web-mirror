@@ -459,10 +459,12 @@ const AssessmentNextStepItems = ({
 	}
 
 	if (inProgress) {
+		const intakeComplete = !!patientOrder.intakeScreeningSession?.completed;
+
 		if (
-			(!!patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId &&
-				patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) ||
-			patientOrder.mostRecentIntakeScreeningSessionByPatient
+			intakeComplete
+				? patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT
+				: patientOrder.mostRecentIntakeScreeningSessionByPatient
 		) {
 			return (
 				<NoData
@@ -490,7 +492,11 @@ const AssessmentNextStepItems = ({
 			);
 		}
 
-		if (patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.MHIC) {
+		if (
+			intakeComplete
+				? patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.MHIC
+				: patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountRoleId === ROLE_ID.MHIC
+		) {
 			return (
 				<NoData
 					className="bg-white"
