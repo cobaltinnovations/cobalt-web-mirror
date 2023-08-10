@@ -9,12 +9,14 @@ import { Helmet } from 'react-helmet';
 import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
+	PatientOrderSafetyPlanningStatusId,
 	ScreeningSessionScreeningResult,
 	ScreeningType,
 } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
 import {
 	MHIC_HEADER_HEIGHT,
+	MhicFlagOrderForSafetyPlanning,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicTriageCard,
@@ -54,25 +56,13 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	const copyTextToClipboard = useCopyTextToClipboard();
 	const handleError = useHandleError();
 
-	const conditionsAndSymptomsResults = useMemo(
-		() =>
-			(patientOrder?.screeningSessionResult?.screeningSessionScreeningResults ?? []).filter(
-				({ screeningTypeId }) =>
-					screeningTypeId === 'IC_INTRO' ||
-					screeningTypeId === 'IC_INTRO_CONDITIONS' ||
-					screeningTypeId === 'IC_INTRO_SYMPTOMS'
-			),
-		[patientOrder?.screeningSessionResult?.screeningSessionScreeningResults]
+	const eligilityResults = useMemo(
+		() => patientOrder?.intakeScreeningSessionResult?.screeningSessionScreeningResults ?? [],
+		[patientOrder?.intakeScreeningSessionResult?.screeningSessionScreeningResults]
 	);
 
 	const completedAssessmentsResults = useMemo(
-		() =>
-			(patientOrder?.screeningSessionResult?.screeningSessionScreeningResults ?? []).filter(
-				({ screeningTypeId }) =>
-					screeningTypeId !== 'IC_INTRO' &&
-					screeningTypeId !== 'IC_INTRO_CONDITIONS' &&
-					screeningTypeId !== 'IC_INTRO_SYMPTOMS'
-			),
+		() => patientOrder?.screeningSessionResult?.screeningSessionScreeningResults ?? [],
 		[patientOrder?.screeningSessionResult?.screeningSessionScreeningResults]
 	);
 
@@ -127,6 +117,13 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 		}
 	}, [copyTextToClipboard, handleError, patientOrder]);
 
+	const canFlagForSafetyPlanning =
+		!!patientOrder &&
+		patientOrder.patientOrderDispositionId === PatientOrderDispositionId.OPEN &&
+		[PatientOrderSafetyPlanningStatusId.UNKNOWN, PatientOrderSafetyPlanningStatusId.NONE_NEEDED].includes(
+			patientOrder.patientOrderSafetyPlanningStatusId ?? PatientOrderSafetyPlanningStatusId.UNKNOWN
+		);
+
 	return (
 		<>
 			<Helmet>
@@ -164,8 +161,12 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										</div>
 									</div>
 									<p className="mb-0">
-										Completed {patientOrder?.screeningSession?.completedAtDescription} by{' '}
-										{patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName}
+										Completed{' '}
+										{patientOrder.screeningSession?.completedAtDescription ??
+											patientOrder.intakeScreeningSession?.completedAtDescription}{' '}
+										by{' '}
+										{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+											patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
 									</p>
 								</Col>
 							</Row>
@@ -177,7 +178,15 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 							<Row>
 								<Col md={{ span: 7, offset: 1 }}>
 									<div className={classes.scrollAnchor} id="results" />
-									<h3 className="mb-8">Results</h3>
+									<div className="mb-8 d-flex align-items-center justify-content-between">
+										<h3 className="mb-0">Results</h3>
+
+										{canFlagForSafetyPlanning && (
+											<MhicFlagOrderForSafetyPlanning
+												patientOrderId={patientOrder.patientOrderId}
+											/>
+										)}
+									</div>
 									<MhicNextStepsAlerts
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}
@@ -201,11 +210,11 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 									/>
 									<hr className="mb-8" />
 
-									{conditionsAndSymptomsResults.length > 0 && (
+									{eligilityResults.length > 0 && (
 										<>
-											<div className={classes.scrollAnchor} id="conditions-and-symptoms" />
-											<h3 className="mb-8">Conditions &amp; Symptoms</h3>
-											{conditionsAndSymptomsResults.map((screening) => (
+											<div className={classes.scrollAnchor} id="eligibility" />
+											<h3 className="mb-8">Eligibility</h3>
+											{eligilityResults.map((screening) => (
 												<ScreeningResultCard
 													key={screening.screeningId}
 													screening={screening}
@@ -273,15 +282,15 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												title: 'Results',
 												value: '#results',
 											},
-											...(conditionsAndSymptomsResults.length > 0
+											...(eligilityResults.length > 0
 												? [
 														{
-															title: 'Conditions & Symptoms',
-															value: '#conditions-and-symptoms',
+															title: 'Eligibility',
+															value: '#eligibility',
 														},
 												  ]
 												: []),
-											...conditionsAndSymptomsResults.map((result) => ({
+											...eligilityResults.map((result) => ({
 												title: result.screeningName ?? '',
 												value: `#${result.screeningId}` ?? '#',
 												level: 1,

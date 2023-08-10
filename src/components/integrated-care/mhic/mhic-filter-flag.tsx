@@ -2,19 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
-import { PatientOrderFilterFlagTypeId, PatientOrderSafetyPlanningStatusId } from '@/lib/models';
+import { PatientOrderFilterFlagTypeId } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
 import { cloneDeep } from 'lodash';
 
 const queryParamName = 'flag';
 const options = [
-	{
-		optionId: 'SAFETY_PLANNING',
-		title: 'Safety Planning',
-		queryParameters: {
-			patientOrderSafetyPlanningStatusId: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-		},
-	},
 	{
 		optionId: 'UNDER_18',
 		title: 'Under 18',
@@ -23,24 +16,66 @@ const options = [
 		},
 	},
 	{
-		optionId: 'INVALID_STATE',
-		title: 'Invalid State',
-		queryParameters: {
-			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.ADDRESS_REGION_NOT_ACCEPTED,
-		},
-	},
-	{
-		optionId: 'INVALID_INSURANCE',
-		title: 'Invalid Insurance',
-		queryParameters: {
-			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.INSURANCE_NOT_ACCEPTED,
-		},
-	},
-	{
 		optionId: 'CLOSED_WITHIN_LAST_30_DAYS',
 		title: 'Closed within last 30 days',
 		queryParameters: {
 			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD,
+		},
+	},
+	{
+		optionId: 'NO_INTEREST',
+		title: 'No Interest',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.NO_INTEREST,
+		},
+	},
+	{
+		optionId: 'LOCATION_INVALID',
+		title: 'Location Invalid',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.LOCATION_INVALID,
+		},
+	},
+	{
+		optionId: 'INSURANCE_CHANGED_RECENTLY',
+		title: 'Insurance Changed Recently',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.INSURANCE_CHANGED_RECENTLY,
+		},
+	},
+	{
+		optionId: 'INSURANCE_INVALID',
+		title: 'Insurance Invalid',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.INSURANCE_INVALID,
+		},
+	},
+	{
+		optionId: 'CONSENT_REJECTED',
+		title: 'Consent Rejected',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.CONSENT_REJECTED,
+		},
+	},
+	{
+		optionId: 'NEEDS_SAFETY_PLANNING',
+		title: 'Needs Safety Planning',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.NEEDS_SAFETY_PLANNING,
+		},
+	},
+	{
+		optionId: 'NEEDS_RESOURCES',
+		title: 'Needs Resources',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.NEEDS_RESOURCES,
+		},
+	},
+	{
+		optionId: 'SESSION_ABANDONED',
+		title: 'Session Abandoned',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.SESSION_ABANDONED,
 		},
 	},
 ];

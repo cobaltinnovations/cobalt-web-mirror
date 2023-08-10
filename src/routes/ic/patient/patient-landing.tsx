@@ -4,12 +4,14 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
-	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
-	PatientOrderClosureReasonId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 	ROLE_ID,
+	PatientOrderIntakeScreeningStatusId,
+	PatientOrderIntakeWantsServicesStatusId,
+	PatientOrderIntakeLocationStatusId,
+	PatientOrderIntakeInsuranceStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import NoData from '@/components/no-data';
@@ -19,17 +21,13 @@ import { NextStepsAssessmentComplete, NextStepsItem } from '@/components/integra
 import Loader from '@/components/loader';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
 import { CobaltError } from '@/lib/http-client';
 
 enum PAGE_STATES {
-	ORDER_CLOSED = 'ORDER_CLOSED',
-	AWAITING_PATIENT_ORDER = 'AWAITING_PATIENT_ORDER',
+	TERMINAL = 'TERMINAL',
 	ASSESSMENT_READY = 'ASSESSMENT_READY',
-	ASSESSMENT_REFUSED = 'ASSESSMENT_REFUSED',
 	ASSESSMENT_IN_PROGRESS = 'ASSESSMENT_IN_PROGRESS',
 	ASSESSMENT_COMPLETE = 'ASSESSMENT_COMPLETE',
-	SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
 }
 
 function loadLatestPatientOrder(isPolling = false) {
@@ -65,13 +63,31 @@ function usePatientLandingLoaderData() {
 export const Component = () => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
-	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+	const [homescreenState, setHomescreenState] = useState(PAGE_STATES.TERMINAL);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const revalidator = useRevalidator();
+
+	const hasCompletedIntakeScreening =
+		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
+
+	const intakeScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
+		patientOrderId: patientOrder?.patientOrderId,
+		instantiateOnLoad: false,
+		disabled: !patientOrder?.patientDemographicsConfirmed || !patientOrder?.patientOrderId,
+	});
+
+	const clinicalScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareScreeningFlowId,
+		patientOrderId: patientOrder?.patientOrderId,
+		instantiateOnLoad: false,
+		disabled: !intakeScreeningFlow.didCheckScreeningSessions || !hasCompletedIntakeScreening,
+	});
 
 	const pollingFn = useCallback(() => {
 		return loadLatestPatientOrder(true);
 	}, []);
+
 	const { data } = usePolledLoaderData({
 		useLoaderHook: usePatientLandingLoaderData,
 		immediateUpdate: true,
@@ -79,60 +95,140 @@ export const Component = () => {
 		pollingFn,
 	});
 
+	const [introductionText, setIntroductionText] = useState('');
+	const [terminalTitle, setTerminalTitle] = useState('');
+	const [terminalDescription, setTerminalDescription] = useState('');
+
 	useEffect(() => {
 		data.patientOrderPromise.then((response) => {
-			const patientOrderClosed =
-				response?.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED;
-
-			if (response?.patientOrder) {
-				setPatientOrder(response.patientOrder);
+			/* ------------------------------------------------------------------ */
+			/* Anything related to the response containing no patientOrder */
+			/* ------------------------------------------------------------------ */
+			if (!response?.patientOrder) {
+				setHomescreenState(PAGE_STATES.TERMINAL);
+				setIntroductionText('');
+				setTerminalTitle('No further action is required');
+				setTerminalDescription(
+					`There is currently no order open for you with ${institution.integratedCareProgramName}. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+				);
+				return;
 			}
 
-			if (response?.patientOrder.resourceCheckInResponseNeeded) {
+			/* ------------------------------------------------------------------ */
+			/* Anything related redirecting or navigating */
+			/* ------------------------------------------------------------------ */
+			if (response.patientOrder.resourceCheckInResponseNeeded) {
 				navigate('/ic/patient/check-in');
 				return;
 			}
+			// if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+			// 	navigate('/ic/patient/consent');
+			// 	return;
+			// } else if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
+			// 	setHomescreenState(PAGE_STATES.TERMINAL);
+			// 	setIntroductionText('');
+			// 	setTerminalTitle('No further action is required');
+			// 	setTerminalDescription(
+			// 		`Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+			// 	);
+			// 	return;
+			// }
 
-			if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
-				navigate('/ic/patient/consent');
-				return;
-			} else if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
-				setHomescreenState(PAGE_STATES.ASSESSMENT_REFUSED);
-				return;
-			}
-
+			/* ------------------------------------------------------------------ */
+			/* All the terminal conditions */
+			/* ------------------------------------------------------------------ */
 			if (
-				(patientOrderClosed &&
-					response.patientOrder.patientOrderClosureReasonId ===
-						PatientOrderClosureReasonId.INELIGIBLE_DUE_TO_LOCATION) ||
-				!response?.patientOrder.patientAddressRegionAccepted ||
-				!response?.patientOrder.primaryPlanAccepted
+				response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED ||
+				response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.ARCHIVED
 			) {
-				setHomescreenState(PAGE_STATES.SERVICE_UNAVAILABLE);
+				setHomescreenState(PAGE_STATES.TERMINAL);
+				setIntroductionText('');
+				setTerminalTitle('No further action is required');
+				setTerminalDescription(
+					`There is currently no order open for you with ${institution.integratedCareProgramName}. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+				);
 				return;
 			}
 
-			if (patientOrderClosed) {
-				setHomescreenState(PAGE_STATES.ORDER_CLOSED);
-				return;
+			if (response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.OPEN) {
+				if (
+					response.patientOrder.patientOrderIntakeWantsServicesStatusId ===
+					PatientOrderIntakeWantsServicesStatusId.NO
+				) {
+					setHomescreenState(PAGE_STATES.TERMINAL);
+					setIntroductionText('');
+					setTerminalTitle('No further action is required');
+					setTerminalDescription(
+						`Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+					);
+					return;
+				} else if (
+					response.patientOrder.patientOrderIntakeLocationStatusId ===
+					PatientOrderIntakeLocationStatusId.INVALID
+				) {
+					setHomescreenState(PAGE_STATES.TERMINAL);
+					setIntroductionText('');
+					setTerminalTitle('No further action is required');
+					setTerminalDescription(
+						`Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care provider's office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
+					);
+					return;
+				} else if (
+					response.patientOrder.patientOrderIntakeInsuranceStatusId ===
+					PatientOrderIntakeInsuranceStatusId.INVALID
+				) {
+					setHomescreenState(PAGE_STATES.TERMINAL);
+					setIntroductionText('');
+					setTerminalTitle('No further action is required');
+					setTerminalDescription(
+						`Unfortunately, your insurance does not cover ${institution.integratedCareProgramName} services. Please call your insurance company for mental health services covered by your insurance. We will follow up with your PCP to inform them of the outcome of this referral.`
+					);
+					return;
+				} else if (
+					response.patientOrder.patientOrderIntakeInsuranceStatusId ===
+					PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY
+				) {
+					setHomescreenState(PAGE_STATES.TERMINAL);
+					setIntroductionText('');
+					setTerminalTitle('No further action is required');
+					setTerminalDescription(
+						`Thank you for answering the questions. Please contact your primary care provider with your updated insurance information. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
+					);
+					return;
+				}
 			}
 
-			switch (response?.patientOrder.patientOrderScreeningStatusId) {
-				case PatientOrderScreeningStatusId.COMPLETE:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
-					break;
-				case PatientOrderScreeningStatusId.NOT_SCREENED:
-				case PatientOrderScreeningStatusId.SCHEDULED:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
-					break;
-				case PatientOrderScreeningStatusId.IN_PROGRESS:
-					setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
-					break;
-				default:
-					setHomescreenState(PAGE_STATES.AWAITING_PATIENT_ORDER);
+			/* ------------------------------------------------------------------ */
+			/* Set defaults for if not terminal */
+			/* ------------------------------------------------------------------ */
+			setPatientOrder(response.patientOrder);
+			setIntroductionText(
+				`Your primary care provider, <strong>${response.patientOrder.orderingProviderDisplayName}</strong>, has referred you to the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
+			);
+
+			/* ------------------------------------------------------------------ */
+			/* Set page state */
+			/* ------------------------------------------------------------------ */
+			if (response.patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_COMPLETE);
+			} else if (
+				response.patientOrder.patientOrderIntakeScreeningStatusId ===
+					PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+				response?.patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS
+			) {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_IN_PROGRESS);
+			} else {
+				setHomescreenState(PAGE_STATES.ASSESSMENT_READY);
 			}
 		});
-	}, [data.patientOrderPromise, navigate]);
+	}, [
+		data.patientOrderPromise,
+		institution.integratedCareAvailabilityDescription,
+		institution.integratedCarePhoneNumberDescription,
+		institution.integratedCareProgramName,
+		institution.name,
+		navigate,
+	]);
 
 	return (
 		<>
@@ -147,19 +243,14 @@ export const Component = () => {
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
 								<h1 className="mb-6">Welcome, {patientOrder?.patientFirstName ?? 'patient'}</h1>
 								<hr className="mb-8" />
-								{homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER && (
-									<p className="mb-0">
-										Your primary care provider,{' '}
-										<strong>{patientOrder?.orderingProviderDisplayName}</strong>, has referred you
-										to the <strong>{institution.name}</strong> program for further assessment.
-										Follow the steps below to connect to mental health services.
-									</p>
+								{introductionText && (
+									<p className="mb-0" dangerouslySetInnerHTML={{ __html: introductionText }} />
 								)}
 							</Col>
 						</Row>
 						<Row className="mb-10">
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-								{homescreenState === PAGE_STATES.ORDER_CLOSED && (
+								{homescreenState === PAGE_STATES.TERMINAL && (
 									<Card bsPrefix="ic-card" className="mb-10">
 										<Card.Header>
 											<Card.Title>Next Steps</Card.Title>
@@ -167,145 +258,124 @@ export const Component = () => {
 										<Card.Body className="p-0">
 											<NoData
 												className="border-0 bg-white"
-												title="No further action is required"
-												description={`Your order has been closed. This may be because you have successfully connected to care, because there was no response, or because care was refused. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you have questions.`}
+												title={terminalTitle}
+												description={terminalDescription}
 												actions={[]}
 											/>
 										</Card.Body>
 									</Card>
 								)}
 
-								{homescreenState === PAGE_STATES.AWAITING_PATIENT_ORDER && (
-									<NoData
-										className="mb-10"
-										title={`Awaiting ${institution.name} Enrollment`}
-										description={`We are waiting for your primary care provider to send us your information. We will send you an email or text message when we are ready for you. Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you have any questions.`}
-										actions={[]}
-									/>
-								)}
-
-								{homescreenState === PAGE_STATES.ASSESSMENT_REFUSED && (
+								{homescreenState !== PAGE_STATES.TERMINAL && (
 									<Card bsPrefix="ic-card" className="mb-10">
 										<Card.Header>
 											<Card.Title>Next Steps</Card.Title>
 										</Card.Header>
 										<Card.Body className="p-0">
-											<NoData
-												className="border-0 bg-white"
-												title="No further action required"
-												description={`You indicated that you are no longer seeking services for mental health concerns. We will let your primary care provider know, but you should feel free to call us at ${institution?.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} if you change your mind.`}
-												actions={[]}
+											<NextStepsItem
+												complete={patientOrder?.patientDemographicsConfirmed}
+												title="Step 1: Verify your information"
+												description={
+													patientOrder?.patientDemographicsConfirmed
+														? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
+														: 'Review the information provided by your primary care provider and make sure it is correct.'
+												}
+												button={{
+													variant: patientOrder?.patientDemographicsConfirmed
+														? 'outline-primary'
+														: 'primary',
+													title: patientOrder?.patientDemographicsConfirmed
+														? 'Edit Information'
+														: 'Verify Information',
+													onClick: () => {
+														navigate('/ic/patient/demographics');
+													},
+												}}
 											/>
-										</Card.Body>
-									</Card>
-								)}
-
-								{homescreenState === PAGE_STATES.SERVICE_UNAVAILABLE && (
-									<MhicInlineAlert
-										variant="warning"
-										title="Service not available"
-										description={`Your insurance plan or state of residence may not be eligible for ${institution.name} services. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`}
-									/>
-								)}
-
-								{homescreenState !== PAGE_STATES.SERVICE_UNAVAILABLE &&
-									homescreenState !== PAGE_STATES.ASSESSMENT_REFUSED &&
-									homescreenState !== PAGE_STATES.AWAITING_PATIENT_ORDER &&
-									homescreenState !== PAGE_STATES.ORDER_CLOSED && (
-										<Card bsPrefix="ic-card" className="mb-10">
-											<Card.Header>
-												<Card.Title>Next Steps</Card.Title>
-											</Card.Header>
-											<Card.Body className="p-0">
-												<NextStepsItem
-													complete={patientOrder?.patientDemographicsConfirmed}
-													title="Step 1: Verify your information"
-													description={
-														patientOrder?.patientDemographicsConfirmed
-															? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
-															: 'Review the information provided by your primary care provider and make sure it is correct.'
-													}
-													button={{
-														variant: patientOrder?.patientDemographicsConfirmed
-															? 'outline-primary'
-															: 'primary',
-														title: patientOrder?.patientDemographicsConfirmed
-															? 'Edit Information'
-															: 'Verify Information',
-														onClick: () => {
-															navigate('/ic/patient/demographics');
-														},
-													}}
-												/>
-												{patientOrder?.patientDemographicsCompleted &&
-													!patientOrder?.patientAddressRegionAccepted && (
-														<>
-															<hr />
-														</>
-													)}
-												{patientOrder?.patientDemographicsConfirmed && (
+											{patientOrder?.patientDemographicsCompleted &&
+												!patientOrder?.patientAddressRegionAccepted && (
 													<>
 														<hr />
-														<NextStepsItem
-															complete={
-																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-															}
-															title="Step 2: Complete the assessment"
-															description={
-																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-																	? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
-																	: homescreenState ===
-																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																	? ''
-																	: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
-															}
-															button={
-																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-																	? {
-																			variant: 'outline-primary',
-																			title: 'Review Results',
-																			onClick: () => {
-																				navigate(
-																					'/ic/patient/assessment-results'
-																				);
-																			},
-																	  }
-																	: undefined
-															}
-														>
-															{(homescreenState === PAGE_STATES.ASSESSMENT_READY ||
-																homescreenState ===
-																	PAGE_STATES.ASSESSMENT_IN_PROGRESS) && (
-																<AssessmentNextStepItems
-																	isReady={
-																		homescreenState === PAGE_STATES.ASSESSMENT_READY
-																	}
-																	inProgress={
-																		homescreenState ===
-																		PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																	}
-																	patientOrder={patientOrder}
-																/>
-															)}
-														</NextStepsItem>
 													</>
 												)}
-												{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
-													<>
-														<hr />
-														{patientOrder && (
-															<NextStepsAssessmentComplete
-																patientOrder={patientOrder}
-																onAppointmentCanceled={() => {
-																	revalidator.revalidate();
+											{patientOrder?.patientDemographicsConfirmed && (
+												<>
+													<hr />
+													<NextStepsItem
+														complete={homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE}
+														title="Step 2: Complete the assessment"
+														description={
+															homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
+																? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
+																: homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																? ''
+																: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
+														}
+														button={
+															homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
+																? {
+																		variant: 'outline-primary',
+																		title: 'Review Results',
+																		onClick: () => {
+																			navigate('/ic/patient/assessment-results');
+																		},
+																  }
+																: undefined
+														}
+													>
+														{(homescreenState === PAGE_STATES.ASSESSMENT_READY ||
+															homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS) && (
+															<AssessmentNextStepItems
+																isReady={
+																	homescreenState === PAGE_STATES.ASSESSMENT_READY
+																}
+																inProgress={
+																	homescreenState ===
+																	PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																}
+																disabled={
+																	intakeScreeningFlow.isCreatingScreeningSession ||
+																	clinicalScreeningFlow.isCreatingScreeningSession
+																}
+																onStartAssessment={() => {
+																	intakeScreeningFlow.createScreeningSession();
 																}}
+																onResumeAssessment={() => {
+																	if (!hasCompletedIntakeScreening) {
+																		intakeScreeningFlow.resumeScreeningSession(
+																			patientOrder.mostRecentIntakeScreeningSessionId
+																		);
+																	} else {
+																		clinicalScreeningFlow.resumeScreeningSession(
+																			patientOrder.mostRecentScreeningSessionId
+																		);
+																	}
+																}}
+																onRestartAssessment={() => {
+																	intakeScreeningFlow.createScreeningSession();
+																}}
+																patientOrder={patientOrder}
 															/>
 														)}
-													</>
-												)}
-											</Card.Body>
-										</Card>
-									)}
+													</NextStepsItem>
+												</>
+											)}
+											{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
+												<>
+													<hr />
+													{patientOrder && (
+														<NextStepsAssessmentComplete
+															patientOrder={patientOrder}
+															onAppointmentCanceled={() => {
+																revalidator.revalidate();
+															}}
+														/>
+													)}
+												</>
+											)}
+										</Card.Body>
+									</Card>
+								)}
 							</Col>
 						</Row>
 					</Container>
@@ -319,15 +389,22 @@ interface AssessmentNextStepItemsProps {
 	patientOrder: PatientOrderModel;
 	isReady: boolean;
 	inProgress: boolean;
+	disabled?: boolean;
+	onStartAssessment: () => void;
+	onResumeAssessment: () => void;
+	onRestartAssessment: () => void;
 }
 
-const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: AssessmentNextStepItemsProps) => {
+const AssessmentNextStepItems = ({
+	patientOrder,
+	isReady,
+	inProgress,
+	disabled,
+	onStartAssessment,
+	onResumeAssessment,
+	onRestartAssessment,
+}: AssessmentNextStepItemsProps) => {
 	const { institution } = useAccount();
-	const { isCreatingScreeningSession, createScreeningSession, resumeScreeningSession } = useScreeningFlow({
-		screeningFlowId: institution?.integratedCareScreeningFlowId,
-		patientOrderId: patientOrder?.patientOrderId,
-		instantiateOnLoad: false,
-	});
 
 	if (isReady) {
 		return (
@@ -344,9 +421,9 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 									team will have access to your answers.
 								</p>
 								<Button
-									disabled={isCreatingScreeningSession}
+									disabled={disabled}
 									onClick={() => {
-										createScreeningSession();
+										onStartAssessment();
 									}}
 								>
 									Take the Assessment
@@ -382,7 +459,11 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 	}
 
 	if (inProgress) {
-		if (patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) {
+		if (
+			(!!patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId &&
+				patientOrder.mostRecentScreeningSessionCreatedByAccountRoleId === ROLE_ID.PATIENT) ||
+			patientOrder.mostRecentIntakeScreeningSessionByPatient
+		) {
 			return (
 				<NoData
 					className="bg-white"
@@ -393,20 +474,16 @@ const AssessmentNextStepItems = ({ patientOrder, isReady, inProgress }: Assessme
 							variant: 'primary',
 							title: 'Continue Assessment',
 							onClick: () => {
-								if (!patientOrder.mostRecentScreeningSessionId) {
-									throw new Error('Unknown Recent Screening');
-								}
-
-								resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+								onResumeAssessment();
 							},
 						},
 						{
 							variant: 'outline-primary',
 							title: 'Restart from Beginning',
 							onClick: () => {
-								createScreeningSession();
+								onRestartAssessment();
 							},
-							disabled: isCreatingScreeningSession,
+							disabled,
 						},
 					]}
 				/>

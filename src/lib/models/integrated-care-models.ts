@@ -15,6 +15,9 @@ export interface OpenPatientOrderCountModel {
 export interface PatientOrderModel {
 	patientOrderId: string;
 	patientOrderTriageStatusId: PatientOrderTriageStatusId;
+	patientOrderIntakeWantsServicesStatusId: PatientOrderIntakeWantsServicesStatusId;
+	patientOrderIntakeLocationStatusId: PatientOrderIntakeLocationStatusId;
+	patientOrderIntakeInsuranceStatusId: PatientOrderIntakeInsuranceStatusId;
 	patientOrderStatusDescription: string;
 	patientOrderDispositionId: PatientOrderDispositionId;
 	patientOrderDispositionDescription: string;
@@ -94,10 +97,14 @@ export interface PatientOrderModel {
 	patientOrderOutreaches?: PatientOrderOutreachModel[];
 	patientOrderTriageGroups?: PateintOrderTriageGroupModel[];
 	patientOrderNotes?: PatientOrderNoteModel[];
+	patientOrderIntakeScreeningStatusId: PatientOrderIntakeScreeningStatusId;
+	patientOrderIntakeScreeningStatusDescription?: string;
 	patientOrderScreeningStatusId: PatientOrderScreeningStatusId;
 	patientOrderScreeningStatusDescription?: string;
 	screeningSession?: ScreeningSession;
 	screeningSessionResult?: ScreeningSessionResult;
+	intakeScreeningSession?: ScreeningSession;
+	intakeScreeningSessionResult?: ScreeningSessionResult;
 	patientOrderClosureReasonId?: PatientOrderClosureReasonId;
 	patientOrderClosureReasonDescription?: string;
 	patientOrderScheduledScreeningId?: string;
@@ -105,6 +112,8 @@ export interface PatientOrderModel {
 	patientOrderScheduledScreeningScheduledDateTimeDescription?: string;
 	patientOrderScheduledScreeningCalendarUrl?: string;
 	patientOrderVoicemailTasks: PatientOrderVoicemailTask[];
+	patientOrderTriageOverrideReasonDescription?: string;
+	patientOrderTriageOverrideReasonId?: PatientOrderIntakeScreeningStatusId;
 	crisisIndicated?: boolean;
 	crisisIndicatedAt?: string;
 	crisisIndicatedAtDescription?: string;
@@ -131,6 +140,21 @@ export interface PatientOrderModel {
 	mostRecentTotalOutreachDateTimeDescription: string;
 	patientOrderCareTypeId?: PatientOrderCareTypeId;
 	patientOrderCareTypeDescription?: string;
+
+	mostRecentIntakeScreeningSessionId?: string;
+	mostRecentIntakeScreeningSessionCreatedAt?: string;
+	mostRecentIntakeScreeningSessionCreatedAtDescription?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountId?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountRoleId?: ROLE_ID;
+	mostRecentIntakeScreeningSessionCreatedByAccountFirstName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountLastName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountDisplayName?: string;
+	mostRecentIntakeScreeningSessionCreatedByAccountDisplayNameWithLastFirst?: string;
+	mostRecentIntakeScreeningSessionCompleted?: boolean;
+	mostRecentIntakeScreeningSessionCompletedAt?: string;
+	mostRecentIntakeScreeningSessionCompletedAtDescription?: string;
+	mostRecentIntakeScreeningSessionByPatient?: boolean;
+
 	mostRecentScreeningSessionId: string;
 	mostRecentScreeningSessionCreatedByAccountId: string;
 	mostRecentScreeningSessionCreatedByAccountFirstName: string;
@@ -187,6 +211,16 @@ export interface PatientOrderModel {
 
 	// Do we need another outreach?
 	outreachFollowupNeeded?: boolean;
+
+	mostRecentScreeningSessionAppearsAbandoned?: boolean;
+	mostRecentIntakeScreeningSessionAppearsAbandoned?: boolean;
+	mostRecentIntakeAndClinicalScreeningsSatisfied?: boolean;
+}
+
+export enum PatientOrderIntakeScreeningStatusId {
+	NOT_SCREENED = 'NOT_SCREENED',
+	IN_PROGRESS = 'IN_PROGRESS',
+	COMPLETE = 'COMPLETE',
 }
 
 export enum PatientOrderViewTypeId {
@@ -208,12 +242,14 @@ export enum PatientOrderCareTypeId {
 
 export enum PatientOrderClosureReasonId {
 	NOT_CLOSED = 'NOT_CLOSED',
-	INELIGIBLE_DUE_TO_INSURANCE = 'INELIGIBLE_DUE_TO_INSURANCE',
-	INELIGIBLE_DUE_TO_LOCATION = 'INELIGIBLE_DUE_TO_LOCATION',
-	REFUSED_CARE = 'REFUSED_CARE',
-	TRANSFERRED_TO_SAFETY_PLANNING = 'TRANSFERRED_TO_SAFETY_PLANNING',
-	SCHEDULED_WITH_SPECIALTY_CARE = 'SCHEDULED_WITH_SPECIALTY_CARE',
-	SCHEDULED_WITH_MHP = 'SCHEDULED_WITH_MHP',
+	REFERRED_TO_SPECIALTY_CARE_ENGAGED = 'REFERRED_TO_SPECIALTY_CARE_ENGAGED',
+	REFERRED_TO_SPECIALTY_CARE_NOT_ENGAGED = 'REFERRED_TO_SPECIALTY_CARE_NOT_ENGAGED',
+	REFERRED_TO_SPECIALTY_CARE_ENGAGEMENT_UNKNOWN = 'REFERRED_TO_SPECIALTY_CARE_ENGAGEMENT_UNKNOWN',
+	REFERRED_TO_PCP = 'REFERRED_TO_PCP',
+	LOST_TO_FOLLOWUP = 'LOST_TO_FOLLOWUP',
+	DECLINED_CARE = 'DECLINED_CARE',
+	INELIGIBLE_FOR_IC = 'INELIGIBLE_FOR_IC',
+	REFERRED_TO_QUARTET = 'REFERRED_TO_QUARTET',
 }
 
 export enum PatientOrderTriageStatusId {
@@ -221,6 +257,36 @@ export enum PatientOrderTriageStatusId {
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	SUBCLINICAL = 'SUBCLINICAL',
 	MHP = 'MHP',
+}
+
+export enum PatientOrderIntakeWantsServicesStatusId {
+	UNKNOWN = 'UNKNOWN',
+	YES = 'YES',
+	NO = 'NO',
+}
+
+export enum PatientOrderIntakeLocationStatusId {
+	UNKNOWN = 'UNKNOWN',
+	INVALID = 'INVALID',
+	VALID = 'VALID',
+}
+
+export enum PatientOrderIntakeInsuranceStatusId {
+	UNKNOWN = 'UNKNOWN',
+	INVALID = 'INVALID',
+	VALID = 'VALID',
+	CHANGED_RECENTLY = 'CHANGED_RECENTLY',
+}
+
+export enum PatientOrderTriageOverrideReasonId {
+	NOT_OVERRIDDEN = 'NOT_OVERRIDDEN',
+	PATIENT_PREFERENCE = 'PATIENT_PREFERENCE',
+	HIGHER_LEVEL_OF_CARE_REQUIRED = 'HIGHER_LEVEL_OF_CARE_REQUIRED',
+	PATIENT_REQUESTED_RESOURCES = 'PATIENT_REQUESTED_RESOURCES',
+	CLINICAL_REVIEW_WITH_BHS = 'CLINICAL_REVIEW_WITH_BHS',
+	CLINICAL_REVIEW_WITH_PSYCHIATRIST = 'CLINICAL_REVIEW_WITH_PSYCHIATRIST',
+	PCP_REQUEST = 'PCP_REQUEST',
+	OTHER = 'OTHER',
 }
 
 export enum PatientOrderAssignmentStatusId {
@@ -270,8 +336,14 @@ export enum PatientOrderFilterFlagTypeId {
 	NONE = 'NONE',
 	PATIENT_BELOW_AGE_THRESHOLD = 'PATIENT_BELOW_AGE_THRESHOLD',
 	MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD = 'MOST_RECENT_EPISODE_CLOSED_WITHIN_DATE_THRESHOLD',
-	ADDRESS_REGION_NOT_ACCEPTED = 'ADDRESS_REGION_NOT_ACCEPTED',
-	INSURANCE_NOT_ACCEPTED = 'INSURANCE_NOT_ACCEPTED',
+	NO_INTEREST = 'NO_INTEREST',
+	LOCATION_INVALID = 'LOCATION_INVALID',
+	INSURANCE_CHANGED_RECENTLY = 'INSURANCE_CHANGED_RECENTLY',
+	INSURANCE_INVALID = 'INSURANCE_INVALID',
+	CONSENT_REJECTED = 'CONSENT_REJECTED',
+	NEEDS_SAFETY_PLANNING = 'NEEDS_SAFETY_PLANNING',
+	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
+	SESSION_ABANDONED = 'SESSION_ABANDONED',
 }
 
 export enum PatientOrderResourcingStatusId {

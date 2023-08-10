@@ -5,8 +5,11 @@ import classNames from 'classnames';
 import LoadingButton from './loading-button';
 
 const useStyles = createUseStyles({
-	modal: {
+	smallModal: {
 		maxWidth: 295,
+	},
+	largeModal: {
+		maxWidth: 490,
 	},
 });
 
@@ -18,6 +21,8 @@ interface Props extends ModalProps {
 	detailText?: string;
 	isConfirming?: boolean;
 	onConfirm(): void;
+	destructive?: boolean;
+	size?: 'sm' | 'lg';
 	displayButtonsBlock?: boolean;
 }
 
@@ -29,13 +34,22 @@ const ConfirmDialog = ({
 	detailText,
 	onConfirm,
 	isConfirming = false,
+	destructive = false,
+	size = 'sm',
 	displayButtonsBlock,
 	...props
 }: Props) => {
 	const classes = useStyles();
 
 	return (
-		<Modal {...props} dialogClassName={classes.modal} centered>
+		<Modal
+			{...props}
+			dialogClassName={classNames({
+				[classes.largeModal]: size === 'lg',
+				[classes.smallModal]: size === 'sm',
+			})}
+			centered
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>{titleText}</Modal.Title>
 			</Modal.Header>
@@ -63,7 +77,7 @@ const ConfirmDialog = ({
 							'd-block': displayButtonsBlock,
 							'w-100': displayButtonsBlock,
 						})}
-						variant="primary"
+						variant={destructive ? 'danger' : 'primary'}
 						onClick={onConfirm}
 					>
 						{confirmText}

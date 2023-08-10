@@ -6,7 +6,7 @@ import { useNavigate, useRevalidator } from 'react-router-dom';
 import {
 	MhicAssessmentModal,
 	MhicCloseEpisodeModal,
-	MhicConsentModal,
+	// MhicConsentModal,
 	MhicContactInformationModal,
 	MhicDemographicsModal,
 	MhicEpisodeCard,
@@ -19,8 +19,9 @@ import NoData from '@/components/no-data';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import {
-	PatientOrderConsentStatusId,
+	// PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
@@ -55,11 +56,19 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
-	const [showConsentModal, setShowConsentModal] = useState(false);
-	const { isCreatingScreeningSession, resumeScreeningSession, createScreeningSession } = useScreeningFlow({
+	// const [showConsentModal, setShowConsentModal] = useState(false);
+	const hasCompletedIntakeScreening =
+		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
+	const intakeScreeningFlow = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
+		patientOrderId: patientOrder.patientOrderId,
+		instantiateOnLoad: false,
+	});
+	const clinicalScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
 		instantiateOnLoad: false,
+		disabled: !hasCompletedIntakeScreening,
 	});
 
 	const handleCloseEpisodeModalSave = useCallback(
@@ -89,25 +98,34 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 
 	const navigateToAssessment = useCallback(
 		(options: { createNew?: boolean; resumeRecent?: boolean }) => {
-			if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
-				setShowConsentModal(true);
-			} else {
-				if (options.createNew) {
-					createScreeningSession();
-				}
-
-				if (options.resumeRecent) {
-					resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
+			// if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
+			// 	setShowConsentModal(true);
+			// } else {
+			if (options.createNew) {
+				intakeScreeningFlow.createScreeningSession();
+			} else if (options.resumeRecent) {
+				if (!hasCompletedIntakeScreening) {
+					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
+				} else {
+					clinicalScreeningFlow.resumeScreeningSession(patientOrder.mostRecentScreeningSessionId);
 				}
 			}
+			// }
 		},
 		[
-			createScreeningSession,
-			patientOrder.patientOrderConsentStatusId,
+			clinicalScreeningFlow,
+			hasCompletedIntakeScreening,
+			intakeScreeningFlow,
+			patientOrder.mostRecentIntakeScreeningSessionId,
 			patientOrder.mostRecentScreeningSessionId,
-			resumeScreeningSession,
 		]
 	);
+
+	const isCreatingScreeningSession =
+		intakeScreeningFlow.isCreatingScreeningSession || clinicalScreeningFlow.isCreatingScreeningSession;
+	const isAssessmentInProgress =
+		patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+		patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS;
 
 	return (
 		<>
@@ -123,7 +141,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
-			<MhicConsentModal
+			{/* <MhicConsentModal
 				patientOrder={patientOrder}
 				show={showConsentModal}
 				onHide={() => {
@@ -137,7 +155,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 						setShowConsentModal(false);
 					}
 				}}
-			/>
+			/> */}
 
 			<MhicAssessmentModal
 				show={!!screeningSessionScreeningResult}
@@ -270,7 +288,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			</section>
 			<section>
 				<Container fluid>
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.COMPLETE && (
+					{patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -288,9 +306,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									</div>
 									<p className="mb-0">
 										Completed{' '}
-										<strong>{patientOrder.screeningSession?.completedAtDescription}</strong> by{' '}
 										<strong>
-											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName}
+											{patientOrder.screeningSession?.completedAtDescription ??
+												patientOrder.intakeScreeningSession?.completedAtDescription}
+										</strong>{' '}
+										by{' '}
+										<strong>
+											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+												patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
 										</strong>
 									</p>
 								</Col>
@@ -316,7 +339,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 						</>
 					)}
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.NOT_SCREENED && (
+					{patientOrder.patientOrderIntakeScreeningStatusId ===
+						PatientOrderIntakeScreeningStatusId.NOT_SCREENED && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -416,7 +440,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 						</>
 					)}
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS && (
+					{isAssessmentInProgress && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -435,7 +459,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"
-										description={`${patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName} began the assessment on ${patientOrder.mostRecentScreeningSessionCreatedAtDescription}`}
+										description={`${patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName} began the assessment on ${patientOrder.mostRecentIntakeScreeningSessionCreatedAtDescription}`}
 										actions={[
 											{
 												variant: 'primary',

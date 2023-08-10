@@ -3,7 +3,6 @@ import { MhicAssessmentComplete } from '@/components/integrated-care/mhic';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import React, { useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useParams, useRevalidator } from 'react-router-dom';
 import { useMhicOrderLayoutLoaderData } from './order-layout';
 
@@ -13,25 +12,19 @@ export const MhicOrderAssessment = () => {
 	const revalidator = useRevalidator();
 
 	const { institution } = useAccount();
-	const { resumeScreeningSession, createScreeningSession } = useScreeningFlow({
-		screeningFlowId: institution?.integratedCareScreeningFlowId,
+	const { createScreeningSession } = useScreeningFlow({
+		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId,
 		instantiateOnLoad: false,
 	});
 	const [isRecreate, setIsRecreate] = useState(false);
 
-	const showInProgress =
-		!!patientOrderResponse.patientOrder?.screeningSession &&
-		!patientOrderResponse.patientOrder.screeningSession.completed &&
-		!isRecreate;
 	const isCompleted =
-		!!patientOrderResponse.patientOrder?.screeningSession?.completed &&
-		!!patientOrderResponse.patientOrder.screeningSessionResult &&
-		!isRecreate;
+		!!patientOrderResponse.patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied && !isRecreate;
 
 	return (
 		<>
-			{!isCompleted && !showInProgress && (
+			{!isCompleted && (
 				<ScreeningIntro
 					isMhic
 					patientOrder={patientOrderResponse.patientOrder}
@@ -41,34 +34,6 @@ export const MhicOrderAssessment = () => {
 						revalidator.revalidate();
 					}}
 				/>
-			)}
-
-			{showInProgress && (
-				<Container className="py-20">
-					<Row className="mb-8">
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<p className="mb-0">Assessment in progress/incomplete.</p>
-
-							<Button
-								onClick={() => {
-									setIsRecreate(true);
-								}}
-							>
-								Start New Assessment
-							</Button>
-
-							<Button
-								onClick={() => {
-									resumeScreeningSession(
-										patientOrderResponse.patientOrder.mostRecentScreeningSessionId
-									);
-								}}
-							>
-								Continue Current Assessment
-							</Button>
-						</Col>
-					</Row>
-				</Container>
 			)}
 
 			{isCompleted && (

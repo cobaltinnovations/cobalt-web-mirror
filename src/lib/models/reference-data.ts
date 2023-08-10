@@ -2,6 +2,7 @@ import {
 	PatientOrderCarePreferenceId,
 	PatientOrderDispositionId,
 	PatientOrderResourcingTypeId,
+	PatientOrderTriageOverrideReasonId,
 	PatientOrderTriageStatusId,
 } from './integrated-care-models';
 
@@ -103,6 +104,11 @@ export interface PatientOrderResourcingType {
 	patientOrderResourcingTypeId: PatientOrderResourcingTypeId;
 }
 
+export interface PatientOrderTriageOverrideReason {
+	description: string;
+	patientOrderTriageOverrideReasonId: PatientOrderTriageOverrideReasonId;
+}
+
 export interface PatientOrderInsurancePayors {
 	institutionId: string;
 	name: string;
@@ -133,8 +139,9 @@ export interface ReferenceDataResponse {
 	patientOrderScheduledMessageTypes: PatientOrderScheduledMessageType[];
 	patientOrderTriageStatuses: Record<PatientOrderTriageStatusId, string>[];
 	patientOrderResourcingTypes: PatientOrderResourcingType[];
+	patientOrderTriageOverrideReasons: PatientOrderTriageOverrideReason[];
 	races: Race[];
-	reasonsForReferral: string[];
+	patientOrderReferralReasons: string[];
 	referringPracticeNames: string[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];

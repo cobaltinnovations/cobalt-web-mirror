@@ -640,8 +640,10 @@ const ScreeningQuestionsPage = () => {
 				</Container>
 			</AsyncPage>
 
-			{screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
-				institution.integratedCareScreeningFlowId &&
+			{(screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+				institution.integratedCareIntakeScreeningFlowId ||
+				screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+					institution.integratedCareScreeningFlowId) &&
 				institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
 					<>
 						<Container className="py-8">
