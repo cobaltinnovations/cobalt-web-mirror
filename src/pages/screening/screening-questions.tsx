@@ -638,65 +638,64 @@ const ScreeningQuestionsPage = () => {
 						</Col>
 					</Row>
 				</Container>
+				{(screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+					institution.integratedCareIntakeScreeningFlowId ||
+					screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+						institution.integratedCareScreeningFlowId) &&
+					institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
+						<>
+							<Container className="py-8">
+								<Row>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<div className="text-center">
+											<Button
+												variant="link"
+												className="d-inline-flex align-items-center text-decoration-none"
+												onClick={() => {
+													setShowHelpModal(true);
+												}}
+											>
+												<QuestionMarkIcon className="me-2" />
+												Need help with the assessment?
+											</Button>
+										</div>
+									</Col>
+								</Row>
+							</Container>
+							<Modal
+								show={showHelpModal}
+								centered
+								onHide={() => {
+									setShowHelpModal(false);
+								}}
+							>
+								<Modal.Body className="pt-8">
+									<AppointmentIllustration className="mb-8 w-100 h-auto" />
+									<h3 className="mb-6">Need help with the assessment?</h3>
+									<p>
+										Call the {institution.integratedCareProgramName} resource center at{' '}
+										{institution.integratedCarePhoneNumberDescription}. Mental Health Intake
+										Coordinators are available {institution.integratedCareAvailabilityDescription}{' '}
+										to answer questions and help connect you to care.
+									</p>
+								</Modal.Body>
+								<Modal.Footer className="pb-6 bg-transparent border-0 text-right">
+									<Button
+										onClick={() => {
+											setShowHelpModal(false);
+										}}
+									>
+										OK
+									</Button>
+								</Modal.Footer>
+							</Modal>
+						</>
+					)}
 			</AsyncPage>
-
-			{(screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
-				institution.integratedCareIntakeScreeningFlowId ||
-				screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
-					institution.integratedCareScreeningFlowId) &&
-				institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
-					<>
-						<Container className="py-8">
-							<Row>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<div className="text-center">
-										<Button
-											variant="link"
-											className="d-inline-flex align-items-center text-decoration-none"
-											onClick={() => {
-												setShowHelpModal(true);
-											}}
-										>
-											<QuestionMarkIcon className="me-2" />
-											Need help with the assessment?
-										</Button>
-									</div>
-								</Col>
-							</Row>
-						</Container>
-						<Modal
-							show={showHelpModal}
-							centered
-							onHide={() => {
-								setShowHelpModal(false);
-							}}
-						>
-							<Modal.Body className="pt-8">
-								<AppointmentIllustration className="mb-8 w-100 h-auto" />
-								<h3 className="mb-6">Need help with the assessment?</h3>
-								<p>
-									Call the {institution.integratedCareProgramName} resource center at{' '}
-									{institution.integratedCarePhoneNumberDescription}. Mental Health Intake
-									Coordinators are available {institution.integratedCareAvailabilityDescription} to
-									answer questions and help connect you to care.
-								</p>
-							</Modal.Body>
-							<Modal.Footer className="pb-6 bg-transparent border-0 text-right">
-								<Button
-									onClick={() => {
-										setShowHelpModal(false);
-									}}
-								>
-									OK
-								</Button>
-							</Modal.Footer>
-						</Modal>
-					</>
-				)}
 		</>
 	);
 };
