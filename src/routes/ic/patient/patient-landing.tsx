@@ -334,14 +334,11 @@ export const Component = () => {
 																	PAGE_STATES.ASSESSMENT_IN_PROGRESS
 																}
 																disabled={
+																	intakeScreeningFlow.isCreatingScreeningSession ||
 																	clinicalScreeningFlow.isCreatingScreeningSession
 																}
 																onStartAssessment={() => {
-																	if (!hasCompletedIntakeScreening) {
-																		intakeScreeningFlow.createScreeningSession();
-																	} else {
-																		clinicalScreeningFlow.createScreeningSession();
-																	}
+																	intakeScreeningFlow.createScreeningSession();
 																}}
 																onResumeAssessment={() => {
 																	if (!hasCompletedIntakeScreening) {
@@ -355,7 +352,7 @@ export const Component = () => {
 																	}
 																}}
 																onRestartAssessment={() => {
-																	clinicalScreeningFlow.createScreeningSession();
+																	intakeScreeningFlow.createScreeningSession();
 																}}
 																patientOrder={patientOrder}
 															/>
