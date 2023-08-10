@@ -552,7 +552,7 @@ const HeaderV2 = () => {
 							testId: 'menuLinkAdminScheduledGroupSessions',
 							icon: ExternalIcon,
 							title: 'Scheduled',
-							to: '/group-sessions/scheduled',
+							to: '/admin/group-sessions',
 						},
 				  ]
 				: []),

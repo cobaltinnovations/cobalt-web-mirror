@@ -264,7 +264,7 @@ const GroupSessions = () => {
 					</Col>
 					<Col>
 						<div className="text-right">
-							{institution?.userSubmittedGroupSessionEnabled && (
+							{/* {institution?.userSubmittedGroupSessionEnabled && (
 								<Button
 									variant="link"
 									onClick={() => {
@@ -274,7 +274,7 @@ const GroupSessions = () => {
 								>
 									Submit a Session
 								</Button>
-							)}
+							)} */}
 							{/* {institution?.userSubmittedGroupSessionRequestEnabled && (
 									<Button
 										variant="link"

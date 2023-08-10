@@ -261,7 +261,7 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				label: 'Scheduled',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminGroupSession ? '/group-sessions/scheduled' : null,
+					institutionCapabilities?.viewNavAdminGroupSession ? '/admin/group-sessions' : null,
 			},
 			// {
 			// 	testId: 'menuLinkAdminByRequestGroupSessions',

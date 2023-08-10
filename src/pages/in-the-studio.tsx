@@ -142,7 +142,7 @@ const InTheStudio: FC = () => {
 						setActionSheetIsOpen(false);
 					}}
 				>
-					{institution?.userSubmittedGroupSessionEnabled && (
+					{/* {institution?.userSubmittedGroupSessionEnabled && (
 						<Button
 							variant="secondary"
 							className="d-block w-100 mb-2"
@@ -153,8 +153,8 @@ const InTheStudio: FC = () => {
 						>
 							Offer Session at a Set Time
 						</Button>
-					)}
-					{institution?.userSubmittedGroupSessionRequestEnabled && (
+					)} */}
+					{/* {institution?.userSubmittedGroupSessionRequestEnabled && (
 						<Button
 							variant="primary"
 							className="d-block w-100"
@@ -165,7 +165,7 @@ const InTheStudio: FC = () => {
 						>
 							Make Session Available by Request
 						</Button>
-					)}
+					)} */}
 				</ActionSheet>
 			)}
 
