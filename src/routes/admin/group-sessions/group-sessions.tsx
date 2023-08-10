@@ -6,6 +6,7 @@ import {
 	LoaderFunctionArgs,
 	defer,
 	useNavigate,
+	useRevalidator,
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
@@ -60,6 +61,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const { groupSessionsPromise } = useAdminGroupSessionsLoaderData();
+	const revalidator = useRevalidator();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 
@@ -137,11 +139,19 @@ export const Component = () => {
 	};
 
 	const handleEdit = (groupSessionId: string) => {
-		navigate(`/group-sessions/scheduled/${groupSessionId}/edit`);
+		navigate(`/admin/group-sessions/edit/${groupSessionId}`);
 	};
 
 	const handleDuplicate = (groupSessionId: string) => {
-		navigate(`/group-sessions/scheduled/create?groupSessionIdToCopy=${groupSessionId}`);
+		groupSessionsService
+			.duplicateGroupSession(groupSessionId)
+			.fetch()
+			.then(() => {
+				revalidator.revalidate();
+			})
+			.catch((e) => {
+				handleError(e);
+			});
 	};
 
 	const handlePaginationClick = (pageIndex: number) => {
