@@ -40,7 +40,6 @@ const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 		useEffect(() => {
 			if (quill && onChange) {
 				const handleChange = () => {
-					setDidInit(true);
 					onChange(quill.root.innerHTML);
 				};
 
@@ -55,6 +54,7 @@ const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 		useEffect(() => {
 			if (quill && typeof initialValue === 'string') {
 				quill.clipboard.dangerouslyPasteHTML(initialValue);
+				setDidInit(true);
 			}
 		}, [quill, initialValue]);
 
