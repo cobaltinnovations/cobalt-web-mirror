@@ -40,7 +40,9 @@ const ScreeningQuestionsPage = () => {
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 	const [supplementText, setSupplementText] = useState({} as Record<string, string>);
 
+	// holds details of confirmation prompts (submission error & pre-question)
 	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt | null>(null);
+	// flags whether the confirmation prompt was due to a submission error
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 	const [showHelpModal, setShowHelpModal] = useState(false);
 
@@ -102,6 +104,8 @@ const ScreeningQuestionsPage = () => {
 			submit
 				.fetch()
 				.then((r) => {
+					clearPrompt();
+
 					const goToNext = () => {
 						if (r.nextScreeningQuestionContextId) {
 							navigateToQuestion(r.nextScreeningQuestionContextId);
@@ -136,6 +140,7 @@ const ScreeningQuestionsPage = () => {
 				});
 		},
 		[
+			clearPrompt,
 			handleError,
 			institution?.integratedCareEnabled,
 			navigateToDestination,

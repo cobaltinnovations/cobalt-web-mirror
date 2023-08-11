@@ -33,13 +33,15 @@ export function useScreeningNavigation() {
 				return match.pathname.includes('/ic/patient');
 			});
 
-			window.location.href = mhicRouteMatch
-				? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
-				: icPatientRouteMatch
-				? `/ic/patient/assessment/${contextId}`
-				: `/screening-questions/${contextId}`;
+			navigate(
+				mhicRouteMatch
+					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
+					: icPatientRouteMatch
+					? `/ic/patient/assessment/${contextId}`
+					: `/screening-questions/${contextId}`
+			);
 		},
-		[matches]
+		[matches, navigate]
 	);
 
 	const navigateToDestination = useCallback(
