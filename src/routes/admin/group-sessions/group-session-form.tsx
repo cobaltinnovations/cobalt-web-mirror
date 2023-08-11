@@ -883,7 +883,6 @@ export const Component = () => {
 							as="select"
 							label="Collection"
 							name="groupSessionCollectionId"
-							required={formValues.visibleFlag}
 							value={formValues.groupSessionCollectionId}
 							onChange={({ currentTarget }) => {
 								setFormValues((curr) => ({
@@ -1357,6 +1356,10 @@ function prepareGroupSessionSubmission(
 		if (!groupSessionSubmission.targetEmailAddress) {
 			delete groupSessionSubmission.targetEmailAddress;
 		}
+	}
+
+	if (!groupSessionSubmission.groupSessionCollectionId) {
+		delete groupSessionSubmission.groupSessionCollectionId;
 	}
 
 	if (!groupSessionSubmission.imageUrl) {
