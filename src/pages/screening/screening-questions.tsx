@@ -40,7 +40,9 @@ const ScreeningQuestionsPage = () => {
 	const [answerText, setAnswerText] = useState({} as Record<string, string>);
 	const [supplementText, setSupplementText] = useState({} as Record<string, string>);
 
+	// holds details of confirmation prompts (submission error & pre-question)
 	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt | null>(null);
+	// flags whether the confirmation prompt was due to a submission error
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 	const [showHelpModal, setShowHelpModal] = useState(false);
 
@@ -102,6 +104,8 @@ const ScreeningQuestionsPage = () => {
 			submit
 				.fetch()
 				.then((r) => {
+					clearPrompt();
+
 					const goToNext = () => {
 						if (r.nextScreeningQuestionContextId) {
 							navigateToQuestion(r.nextScreeningQuestionContextId);
@@ -136,6 +140,7 @@ const ScreeningQuestionsPage = () => {
 				});
 		},
 		[
+			clearPrompt,
 			handleError,
 			institution?.integratedCareEnabled,
 			navigateToDestination,
@@ -462,24 +467,27 @@ const ScreeningQuestionsPage = () => {
 									/>
 
 									<div className="d-flex">
-										<Button
-											disabled={isSubmitting}
-											className="me-2"
-											type="button"
-											onClick={() => {
-												if (isSubmitPrompt) {
-													clearPrompt();
-												} else if (
-													screeningQuestionContextResponse?.previousScreeningQuestionContextId
-												) {
-													navigateToQuestion(
-														screeningQuestionContextResponse.previousScreeningQuestionContextId
-													);
-												}
-											}}
-										>
-											Previous
-										</Button>
+										{(isSubmitPrompt ||
+											screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
+											<Button
+												disabled={isSubmitting}
+												className="me-2"
+												type="button"
+												onClick={() => {
+													if (isSubmitPrompt) {
+														clearPrompt();
+													} else if (
+														screeningQuestionContextResponse?.previousScreeningQuestionContextId
+													) {
+														navigateToQuestion(
+															screeningQuestionContextResponse.previousScreeningQuestionContextId
+														);
+													}
+												}}
+											>
+												Previous
+											</Button>
+										)}
 
 										<Button
 											disabled={disableNextBtn}
@@ -638,65 +646,64 @@ const ScreeningQuestionsPage = () => {
 						</Col>
 					</Row>
 				</Container>
+				{(screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+					institution.integratedCareIntakeScreeningFlowId ||
+					screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
+						institution.integratedCareScreeningFlowId) &&
+					institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
+						<>
+							<Container className="py-8">
+								<Row>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<div className="text-center">
+											<Button
+												variant="link"
+												className="d-inline-flex align-items-center text-decoration-none"
+												onClick={() => {
+													setShowHelpModal(true);
+												}}
+											>
+												<QuestionMarkIcon className="me-2" />
+												Need help with the assessment?
+											</Button>
+										</div>
+									</Col>
+								</Row>
+							</Container>
+							<Modal
+								show={showHelpModal}
+								centered
+								onHide={() => {
+									setShowHelpModal(false);
+								}}
+							>
+								<Modal.Body className="pt-8">
+									<AppointmentIllustration className="mb-8 w-100 h-auto" />
+									<h3 className="mb-6">Need help with the assessment?</h3>
+									<p>
+										Call the {institution.integratedCareProgramName} resource center at{' '}
+										{institution.integratedCarePhoneNumberDescription}. Mental Health Intake
+										Coordinators are available {institution.integratedCareAvailabilityDescription}{' '}
+										to answer questions and help connect you to care.
+									</p>
+								</Modal.Body>
+								<Modal.Footer className="pb-6 bg-transparent border-0 text-right">
+									<Button
+										onClick={() => {
+											setShowHelpModal(false);
+										}}
+									>
+										OK
+									</Button>
+								</Modal.Footer>
+							</Modal>
+						</>
+					)}
 			</AsyncPage>
-
-			{(screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
-				institution.integratedCareIntakeScreeningFlowId ||
-				screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
-					institution.integratedCareScreeningFlowId) &&
-				institution.userExperienceTypeId === UserExperienceTypeId.PATIENT && (
-					<>
-						<Container className="py-8">
-							<Row>
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									<div className="text-center">
-										<Button
-											variant="link"
-											className="d-inline-flex align-items-center text-decoration-none"
-											onClick={() => {
-												setShowHelpModal(true);
-											}}
-										>
-											<QuestionMarkIcon className="me-2" />
-											Need help with the assessment?
-										</Button>
-									</div>
-								</Col>
-							</Row>
-						</Container>
-						<Modal
-							show={showHelpModal}
-							centered
-							onHide={() => {
-								setShowHelpModal(false);
-							}}
-						>
-							<Modal.Body className="pt-8">
-								<AppointmentIllustration className="mb-8 w-100 h-auto" />
-								<h3 className="mb-6">Need help with the assessment?</h3>
-								<p>
-									Call the {institution.integratedCareProgramName} resource center at{' '}
-									{institution.integratedCarePhoneNumberDescription}. Mental Health Intake
-									Coordinators are available {institution.integratedCareAvailabilityDescription} to
-									answer questions and help connect you to care.
-								</p>
-							</Modal.Body>
-							<Modal.Footer className="pb-6 bg-transparent border-0 text-right">
-								<Button
-									onClick={() => {
-										setShowHelpModal(false);
-									}}
-								>
-									OK
-								</Button>
-							</Modal.Footer>
-						</Modal>
-					</>
-				)}
 		</>
 	);
 };

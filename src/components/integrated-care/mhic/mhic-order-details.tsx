@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { useNavigate, useRevalidator } from 'react-router-dom';
 
@@ -39,6 +39,13 @@ import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 interface Props {
 	patientOrder: PatientOrderModel;
 	pastPatientOrders: PatientOrderModel[];
+}
+
+enum ASSESSMENT_STATUS {
+	NO_ASSESSMENT = 'NO_ASSESSMENT',
+	SCHEDULED = 'SCHEDULED',
+	IN_PROGRESS = 'IN_PROGRESS',
+	COMPLETE = 'COMPLETE',
 }
 
 export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => {
@@ -123,9 +130,34 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 
 	const isCreatingScreeningSession =
 		intakeScreeningFlow.isCreatingScreeningSession || clinicalScreeningFlow.isCreatingScreeningSession;
-	const isAssessmentInProgress =
-		patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
-		patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS;
+
+	const [assessmentStatus, setAssessmentStatus] = useState<ASSESSMENT_STATUS>(ASSESSMENT_STATUS.NO_ASSESSMENT);
+
+	useEffect(() => {
+		if (patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied) {
+			setAssessmentStatus(ASSESSMENT_STATUS.COMPLETE);
+			return;
+		}
+
+		if (patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED) {
+			setAssessmentStatus(ASSESSMENT_STATUS.SCHEDULED);
+			return;
+		}
+
+		if (
+			patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+			patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS
+		) {
+			setAssessmentStatus(ASSESSMENT_STATUS.IN_PROGRESS);
+			return;
+		}
+
+		setAssessmentStatus(ASSESSMENT_STATUS.NO_ASSESSMENT);
+	}, [
+		patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied,
+		patientOrder.patientOrderIntakeScreeningStatusId,
+		patientOrder.patientOrderScreeningStatusId,
+	]);
 
 	return (
 		<>
@@ -288,7 +320,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			</section>
 			<section>
 				<Container fluid>
-					{patientOrder.mostRecentIntakeAndClinicalScreeningsSatisfied && (
+					{assessmentStatus === ASSESSMENT_STATUS.COMPLETE && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -339,8 +371,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 						</>
 					)}
-					{patientOrder.patientOrderIntakeScreeningStatusId ===
-						PatientOrderIntakeScreeningStatusId.NOT_SCREENED && (
+					{assessmentStatus === ASSESSMENT_STATUS.NO_ASSESSMENT && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -389,7 +420,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 						</>
 					)}
-					{patientOrder.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.SCHEDULED && (
+					{assessmentStatus === ASSESSMENT_STATUS.SCHEDULED && (
 						<>
 							<Row className="mb-6">
 								<Col>
@@ -440,7 +471,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							</Row>
 						</>
 					)}
-					{isAssessmentInProgress && (
+					{assessmentStatus === ASSESSMENT_STATUS.IN_PROGRESS && (
 						<>
 							<Row className="mb-6">
 								<Col>
