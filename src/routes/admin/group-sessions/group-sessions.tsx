@@ -138,22 +138,6 @@ export const Component = () => {
 		}
 	};
 
-	const handleEdit = (groupSessionId: string) => {
-		navigate(`/admin/group-sessions/edit/${groupSessionId}`);
-	};
-
-	const handleDuplicate = (groupSessionId: string) => {
-		groupSessionsService
-			.duplicateGroupSession(groupSessionId)
-			.fetch()
-			.then(() => {
-				revalidator.revalidate();
-			})
-			.catch((e) => {
-				handleError(e);
-			});
-	};
-
 	const handlePaginationClick = (pageIndex: number) => {
 		searchParams.set('pageNumber', String(pageIndex));
 		setSearchParams(searchParams);
@@ -215,6 +199,7 @@ export const Component = () => {
 											<TableCell header>Session</TableCell>
 											<TableCell header>Facilitator</TableCell>
 											<TableCell header>Scheduling</TableCell>
+											<TableCell header>Registrants</TableCell>
 											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Visible</TableCell>
@@ -224,92 +209,97 @@ export const Component = () => {
 										</TableRow>
 									</TableHead>
 									<TableBody>
-										{groupSessions.map((groupSession) => (
-											<TableRow key={groupSession.groupSessionId}>
-												<TableCell>{groupSession.createdDateDescription}</TableCell>
-												<TableCell>
-													<Link to={`/group-sessions/${groupSession.groupSessionId}`}>
-														{groupSession.title}
-													</Link>
-												</TableCell>
-												<TableCell>
-													<span className="d-block">{groupSession.facilitatorName}</span>
-													<span className="d-block text-muted">
-														{groupSession.facilitatorEmailAddress}
-													</span>
-												</TableCell>
-												<TableCell>
-													{groupSession.groupSessionSchedulingSystemId ===
-													GroupSessionSchedulingSystemId.COBALT
-														? 'Cobalt'
-														: 'External'}
-												</TableCell>
-												<TableCell>
-													{groupSession.seatsReserved}/{groupSession.seats}
-												</TableCell>
-												<TableCell className="flex-row align-items-center justify-content-start">
-													{groupSession.groupSessionStatusId ===
-														GROUP_SESSION_STATUS_ID.ADDED && (
-														<Badge pill bg="outline-success" className="text-nowrap">
-															{groupSession.groupSessionStatusIdDescription}
-														</Badge>
-													)}
-													{groupSession.groupSessionStatusId ===
-														GROUP_SESSION_STATUS_ID.ARCHIVED && (
-														<Badge pill bg="outline-light" className="text-nowrap">
-															{groupSession.groupSessionStatusIdDescription}
-														</Badge>
-													)}
-													{groupSession.groupSessionStatusId ===
-														GROUP_SESSION_STATUS_ID.CANCELED && (
-														<Badge pill bg="outline-danger" className="text-nowrap">
-															{groupSession.groupSessionStatusIdDescription}
-														</Badge>
-													)}
-													{groupSession.groupSessionStatusId ===
-														GROUP_SESSION_STATUS_ID.DELETED && (
-														<Badge pill bg="outline-danger" className="text-nowrap">
-															{groupSession.groupSessionStatusIdDescription}
-														</Badge>
-													)}
-													{groupSession.groupSessionStatusId ===
-														GROUP_SESSION_STATUS_ID.NEW && (
-														<Badge pill bg="outline-warning" className="text-nowrap">
-															{groupSession.groupSessionStatusIdDescription}
-														</Badge>
-													)}
-												</TableCell>
-												<TableCell>
-													<span className="text-danger">[TODO]: Yes/No</span>
-												</TableCell>
-												<TableCell>{groupSession.startDateTimeDescription}</TableCell>
-												<TableCell>
-													<GroupSessionTableDropdown
-														groupSession={groupSession}
-														onAdd={(groupSessionId) => {
-															handleStatusUpdate(
-																groupSessionId,
-																GROUP_SESSION_STATUS_ID.ADDED
-															);
-														}}
-														onEdit={handleEdit}
-														onDuplicate={handleDuplicate}
-														onCancel={(groupSessionId) => {
-															handleStatusUpdate(
-																groupSessionId,
-																GROUP_SESSION_STATUS_ID.CANCELED
-															);
-														}}
-														onDelete={(groupSessionId) => {
-															handleStatusUpdate(
-																groupSessionId,
-																GROUP_SESSION_STATUS_ID.DELETED
-															);
-														}}
-													/>
-												</TableCell>
-											</TableRow>
-										))}
+										{groupSessions.map((groupSession) => {
+											return (
+												<TableRow key={groupSession.groupSessionId}>
+													<TableCell>{groupSession.createdDateDescription}</TableCell>
+													<TableCell>
+														<Link
+															to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
+														>
+															{groupSession.title}
+														</Link>
+													</TableCell>
+													<TableCell>
+														<span className="d-block">{groupSession.facilitatorName}</span>
+														<span className="d-block text-muted">
+															{groupSession.facilitatorEmailAddress}
+														</span>
+													</TableCell>
+													<TableCell>
+														{groupSession.groupSessionSchedulingSystemId ===
+														GroupSessionSchedulingSystemId.COBALT
+															? 'Cobalt'
+															: 'External'}
+													</TableCell>
+													<TableCell>{groupSession.seatsReserved ?? 'N/A'}</TableCell>
+													<TableCell>{groupSession.seats ?? 'N/A'}</TableCell>
+													<TableCell className="flex-row align-items-center justify-content-start">
+														{groupSession.groupSessionStatusId ===
+															GROUP_SESSION_STATUS_ID.ADDED && (
+															<Badge pill bg="outline-success" className="text-nowrap">
+																{groupSession.groupSessionStatusIdDescription}
+															</Badge>
+														)}
+														{groupSession.groupSessionStatusId ===
+															GROUP_SESSION_STATUS_ID.ARCHIVED && (
+															<Badge pill bg="outline-light" className="text-nowrap">
+																{groupSession.groupSessionStatusIdDescription}
+															</Badge>
+														)}
+														{groupSession.groupSessionStatusId ===
+															GROUP_SESSION_STATUS_ID.CANCELED && (
+															<Badge pill bg="outline-danger" className="text-nowrap">
+																{groupSession.groupSessionStatusIdDescription}
+															</Badge>
+														)}
+														{groupSession.groupSessionStatusId ===
+															GROUP_SESSION_STATUS_ID.DELETED && (
+															<Badge pill bg="outline-danger" className="text-nowrap">
+																{groupSession.groupSessionStatusIdDescription}
+															</Badge>
+														)}
+														{groupSession.groupSessionStatusId ===
+															GROUP_SESSION_STATUS_ID.NEW && (
+															<Badge pill bg="outline-warning" className="text-nowrap">
+																{groupSession.groupSessionStatusIdDescription}
+															</Badge>
+														)}
+													</TableCell>
+													<TableCell>
+														{groupSession.visibleFlag ? (
+															<span className="text-success">Yes</span>
+														) : (
+															<span className="text-danger">No</span>
+														)}
+													</TableCell>
+													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
+													<TableCell>
+														<GroupSessionTableDropdown
+															groupSession={groupSession}
+															onAdd={(groupSessionId) => {
+																handleStatusUpdate(
+																	groupSessionId,
+																	GROUP_SESSION_STATUS_ID.ADDED
+																);
+															}}
+															onCancel={(groupSessionId) => {
+																handleStatusUpdate(
+																	groupSessionId,
+																	GROUP_SESSION_STATUS_ID.CANCELED
+																);
+															}}
+															onDelete={(groupSessionId) => {
+																handleStatusUpdate(
+																	groupSessionId,
+																	GROUP_SESSION_STATUS_ID.DELETED
+																);
+															}}
+														/>
+													</TableCell>
+												</TableRow>
+											);
+										})}
 									</TableBody>
 								</Table>
 							</Col>
