@@ -143,10 +143,10 @@ function getInitialGroupSessionFormValues(
 		{ ...initialGroupSessionFormValues },
 		{
 			...rest,
-			startDate: startDateTime && startDate.toDate(),
+			startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
 			startTime: startDateTime ? startDate.format('hh:mm A') : '',
 			endTime: endDateTime ? endDate.format('hh:mm A') : '',
-			endDate: endDateTime && endDate.toDate(),
+			endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
 		}
 	);
 }
