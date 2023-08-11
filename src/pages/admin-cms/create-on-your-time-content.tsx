@@ -201,10 +201,10 @@ const CreateOnYourTimeContent: FC = () => {
 			}
 
 			if (account?.roleId === ROLE_ID.ADMINISTRATOR) {
-				let targetPath = isAdding ? '/cms/available-content' : '/cms/on-your-time';
+				let targetPath = isAdding ? '/admin/available-content' : '/admin/my-content';
 
 				if (returnToAvailable) {
-					targetPath = '/cms/available-content';
+					targetPath = '/admin/available-content';
 				}
 
 				navigate(`${targetPath}`, {
@@ -234,7 +234,7 @@ const CreateOnYourTimeContent: FC = () => {
 					<Breadcrumb
 						breadcrumbs={[
 							{
-								to: isAdding ? '/cms/available-content' : '/cms/on-your-time',
+								to: isAdding ? '/admin/available-content' : '/admin/my-content',
 								title: isAdding ? 'Available Content' : 'My Content',
 							},
 							{

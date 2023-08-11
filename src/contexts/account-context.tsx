@@ -12,6 +12,7 @@ type AccountContextConfig = {
 	institution: Institution;
 	accountSources: AccountSource[];
 	institutionCapabilities: AccountInstitutionCapabilities | undefined;
+	hasAdminNavCapabilities: boolean;
 	isIntegratedCarePatient: boolean;
 	isIntegratedCareStaff: boolean;
 	signOutAndClearContext: () => void;
@@ -60,6 +61,10 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [accountId]);
 
+	const institutionCapabilities = useMemo(() => {
+		return accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId];
+	}, [accountResponse?.account.capabilities, institutionResponse.institution.institutionId]);
+
 	const institution = useMemo(
 		() => accountResponse?.institution || institutionResponse.institution,
 		[accountResponse?.institution, institutionResponse.institution]
@@ -75,11 +80,26 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		[institution.integratedCareEnabled, institution.userExperienceTypeId]
 	);
 
+	const hasAdminNavCapabilities = useMemo(() => {
+		return !!(
+			institutionCapabilities?.viewNavAdminMyContent ||
+			institutionCapabilities?.viewNavAdminAvailableContent ||
+			institutionCapabilities?.viewNavAdminGroupSession ||
+			institutionCapabilities?.viewNavAdminReports
+		);
+	}, [
+		institutionCapabilities?.viewNavAdminAvailableContent,
+		institutionCapabilities?.viewNavAdminGroupSession,
+		institutionCapabilities?.viewNavAdminMyContent,
+		institutionCapabilities?.viewNavAdminReports,
+	]);
+
 	const value = {
 		account: accountResponse?.account,
 		institution,
 		accountSources: institutionResponse.accountSources,
-		institutionCapabilities: accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId],
+		institutionCapabilities,
+		hasAdminNavCapabilities,
 		isIntegratedCarePatient,
 		isIntegratedCareStaff,
 		signOutAndClearContext,

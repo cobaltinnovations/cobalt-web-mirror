@@ -242,14 +242,14 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				label: 'My Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminMyContent ? '/cms/on-your-time' : null,
+					institutionCapabilities?.viewNavAdminMyContent ? '/admin/my-content' : null,
 			},
 			{
 				testId: 'menuLinkAdminAvailableContent',
 				label: 'Available Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminAvailableContent ? '/cms/available-content' : null,
+					institutionCapabilities?.viewNavAdminAvailableContent ? '/admin/available-content' : null,
 			},
 		],
 	},

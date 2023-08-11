@@ -164,6 +164,26 @@ export const RedirectToLoginDestination = () => {
 	return <Navigate to={account ? LoginDestinationIdRouteMap[account.loginDestinationId] : '/'} replace />;
 };
 
+const RedirectToAdminPath = ({ pathname }: { pathname: string }) => {
+	return <Navigate to={`/admin/${pathname}`} replace />;
+};
+
+const RedirectToAdminHome = () => {
+	const { institutionCapabilities } = useAccount();
+
+	if (institutionCapabilities?.viewNavAdminMyContent) {
+		return <Navigate to="my-content" />;
+	} else if (institutionCapabilities?.viewNavAdminAvailableContent) {
+		return <Navigate to="availble-content" />;
+	} else if (institutionCapabilities?.viewNavAdminGroupSession) {
+		return <Navigate to="group-sessions" />;
+	} else if (institutionCapabilities?.viewNavAdminReports) {
+		return <Navigate to="reports" />;
+	} else {
+		return <NoMatch />;
+	}
+};
+
 const RedirectToResourceLibrary = () => {
 	const { contentId } = useParams<{ contentId: string }>();
 
@@ -496,7 +516,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'cms/on-your-time',
-						element: <CmsOnYourTime />,
+						element: <RedirectToAdminPath pathname="my-content" />,
 					},
 					{
 						path: 'cms/on-your-time/create',
@@ -504,15 +524,11 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'cms/available-content',
-						element: <CmsAvailableContent />,
+						element: <RedirectToAdminPath pathname="available-content" />,
 					},
 					{
 						path: 'stats-dashboard',
 						element: <StatsDashboard />,
-					},
-					{
-						path: 'admin/reports',
-						element: <Reports />,
 					},
 					{
 						path: 'providers/:providerId',
@@ -612,12 +628,34 @@ export const routes: RouteObject[] = [
 						children: [
 							{
 								index: true,
-								element: <Navigate to="content" />,
+								element: <RedirectToAdminHome />,
 							},
 							{
-								id: 'admin-content',
-								path: 'content',
-								element: <>TODO: Content</>,
+								id: 'admin-my-content',
+								path: 'my-content',
+								element: (
+									<div className="pb-4">
+										<CmsOnYourTime />
+									</div>
+								),
+							},
+							{
+								id: 'admin-my-content-create',
+								path: 'my-content/create',
+								element: (
+									<div className="pb-4">
+										<CreateOnYourTimeContent />
+									</div>
+								),
+							},
+							{
+								id: 'admin-available-content',
+								path: 'available-content',
+								element: (
+									<div className="pb-4">
+										<CmsAvailableContent />
+									</div>
+								),
 							},
 							{
 								path: 'group-sessions',
@@ -633,6 +671,11 @@ export const routes: RouteObject[] = [
 										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
 									},
 								],
+							},
+							{
+								id: 'admin-reports',
+								path: 'reports',
+								element: <Reports />,
 							},
 							{
 								id: 'admin-scheduling',

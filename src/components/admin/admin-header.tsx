@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import config from '@/lib/config';
 
@@ -110,13 +111,19 @@ interface AdminHeaderProps {
 
 export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
 	const classes = useStyles();
-	const { signOutAndClearContext } = useAccount();
+	const { institutionCapabilities, signOutAndClearContext } = useAccount();
 
-	const contentMatch = useMatch({
-		path: '/admin/content/*',
+	const myContentMatch = useMatch({
+		path: '/admin/my-content/*',
+	});
+	const availableContentMatch = useMatch({
+		path: '/admin/available-content/*',
 	});
 	const groupSessionsMatch = useMatch({
 		path: '/admin/group-sessions/*',
+	});
+	const reportsMatch = useMatch({
+		path: '/admin/reports/*',
 	});
 	const schedulingMatch = useMatch({
 		path: '/admin/scheduling/*',
@@ -130,34 +137,64 @@ export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
 
 	const navigationLinks = useMemo(
 		() => [
-			{
-				testId: '',
-				navigationItemId: 'CONTENT',
-				to: '/admin/content',
-				title: 'Content',
-				active: !!contentMatch,
-			},
-			{
-				testId: '',
-				navigationItemId: 'GROUP_SESSIONS',
-				to: '/admin/group-sessions',
-				title: 'Group Sessions',
-				active: !!groupSessionsMatch,
-			},
-			{
-				testId: '',
-				navigationItemId: 'SCHEDULING',
-				to: '/admin/scheduling',
-				title: 'Scheduling',
-				active: !!schedulingMatch,
-			},
-			{
-				testId: '',
-				navigationItemId: 'ANALYTICS',
-				to: '/admin/analytics',
-				title: 'Analytics',
-				active: !!analyticsMatch,
-			},
+			...(institutionCapabilities?.viewNavAdminMyContent
+				? [
+						{
+							testId: '',
+							navigationItemId: 'MY_CONTENT',
+							to: '/admin/my-content',
+							title: 'My Content',
+							active: !!myContentMatch,
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminAvailableContent
+				? [
+						{
+							testId: '',
+							navigationItemId: 'AVAILABLE_CONTENT',
+							to: '/admin/available-content',
+							title: 'Available Content',
+							active: !!availableContentMatch,
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminGroupSession
+				? [
+						{
+							testId: '',
+							navigationItemId: 'GROUP_SESSIONS',
+							to: '/admin/group-sessions',
+							title: 'Group Sessions',
+							active: !!groupSessionsMatch,
+						},
+				  ]
+				: []),
+			...(institutionCapabilities?.viewNavAdminReports
+				? [
+						{
+							testId: '',
+							navigationItemId: 'REPORTS',
+							title: 'Provider Reports',
+							to: '/admin/reports',
+							active: !!reportsMatch,
+						},
+				  ]
+				: []),
+			// {
+			// 	testId: '',
+			// 	navigationItemId: 'SCHEDULING',
+			// 	to: '/admin/scheduling',
+			// 	title: 'Scheduling',
+			// 	active: !!schedulingMatch,
+			// },
+			// {
+			// 	testId: '',
+			// 	navigationItemId: 'ANALYTICS',
+			// 	to: '/admin/analytics',
+			// 	title: 'Analytics',
+			// 	active: !!analyticsMatch,
+			// },
 			...(config.COBALT_WEB_SHOW_DEBUG === 'true'
 				? [
 						{
@@ -170,7 +207,17 @@ export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
 				  ]
 				: []),
 		],
-		[analyticsMatch, contentMatch, debugMatch, groupSessionsMatch, schedulingMatch]
+		[
+			availableContentMatch,
+			debugMatch,
+			groupSessionsMatch,
+			institutionCapabilities?.viewNavAdminAvailableContent,
+			institutionCapabilities?.viewNavAdminGroupSession,
+			institutionCapabilities?.viewNavAdminMyContent,
+			institutionCapabilities?.viewNavAdminReports,
+			myContentMatch,
+			reportsMatch,
+		]
 	);
 
 	return (
@@ -209,6 +256,15 @@ export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
 									popperConfig={{ strategy: 'fixed' }}
 									renderOnMount
 								>
+									<Dropdown.Item as={Link} to="/" target="_blank">
+										<div className="d-flex justify-content-between align-items-center">
+											<p className="mb-0 pe-4 fw-semibold">Cobalt Home</p>
+											<ExternalIcon className="text-gray" />
+										</div>
+									</Dropdown.Item>
+
+									<Dropdown.Divider />
+
 									<Dropdown.Item
 										onClick={() => {
 											signOutAndClearContext();
