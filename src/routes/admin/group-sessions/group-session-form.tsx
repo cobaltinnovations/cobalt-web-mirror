@@ -15,11 +15,12 @@ import {
 	GroupSessionSchedulingSystemId,
 	groupSessionsService,
 	imageUploader,
+	screeningService,
 	tagService,
 } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import {
 	Link,
 	LoaderFunctionArgs,
@@ -37,10 +38,13 @@ import {
 	GroupSessionLearnMoreMethodId,
 	GroupSessionModel,
 	GroupSessionUrlNameValidationResult,
+	ScreeningFlow,
+	ScreeningFlowTypeId,
 } from '@/lib/models';
 import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
 import useDebouncedState from '@/hooks/use-debounced-state';
+import { ScreeningFlowQuestionsModal } from '@/components/screening-flow-questions-modal';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -69,39 +73,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		: null;
 	const tagGroupsRequest = tagService.getTagGroups();
 	const groupSessionCollectionsRequest = groupSessionsService.getGroupSessionCollections();
+	const screeningFlowsRequest = screeningService.getScreeningFlowsByFlowTypeId(
+		ScreeningFlowTypeId.GROUP_SESSION_INTAKE
+	);
 
 	request.signal.addEventListener('abort', () => {
 		groupSessionRequest?.abort();
 		groupSessionReservationsRequest?.abort();
 		tagGroupsRequest.abort();
 		groupSessionCollectionsRequest.abort();
+		screeningFlowsRequest.abort();
 	});
 
-	const [groupSessionResponse, groupSessionReservationsResponse, tagGroupsResponse, groupSessionCollectionsResponse] =
-		await Promise.all([
-			groupSessionRequest?.fetch(),
-			groupSessionReservationsRequest?.fetch(),
-			tagGroupsRequest.fetch(),
-			groupSessionCollectionsRequest.fetch(),
-		]);
+	const [
+		groupSessionResponse,
+		groupSessionReservationsResponse,
+		tagGroupsResponse,
+		groupSessionCollectionsResponse,
+		screeningFlowsResponse,
+	] = await Promise.all([
+		groupSessionRequest?.fetch(),
+		groupSessionReservationsRequest?.fetch(),
+		tagGroupsRequest.fetch(),
+		groupSessionCollectionsRequest.fetch(),
+		screeningFlowsRequest.fetch(),
+	]);
 
 	return {
 		groupSession: groupSessionResponse?.groupSession ?? null,
 		groupSessionReservations: groupSessionReservationsResponse?.groupSessionReservations ?? [],
 		groupSessionCollections: groupSessionCollectionsResponse.groupSessionCollections,
 		tagGroups: tagGroupsResponse.tagGroups,
-		screenings: [
-			{
-				id: uuidv4(),
-				name: 'Screening 1',
-				questions: ['Question 1', 'Question 2'],
-			},
-			{
-				id: uuidv4(),
-				name: 'Screening 2',
-				questions: ['Question 1', 'Question 2'],
-			},
-		],
+		screeningFlows: screeningFlowsResponse.screeningFlows,
 	};
 }
 
@@ -175,8 +178,7 @@ export const Component = () => {
 	const [showContactEmailInput, setShowContactEmailInput] = useState(
 		formValues.facilitatorEmailAddress !== formValues.targetEmailAddress
 	);
-	const [selectedScreeningForModal, setSelectedScreeningForModal] =
-		useState<Exclude<AdminGroupSessionFormLoaderData, null>['screenings'][number]>();
+	const [selectedScreeningFlowForModal, setSelectedScreeningFlowForModal] = useState<ScreeningFlow>();
 
 	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
 	const isEdit = params.action === 'edit';
@@ -1017,41 +1019,13 @@ export const Component = () => {
 						</>
 					}
 				>
-					<Modal
-						centered
-						show={!!selectedScreeningForModal}
+					<ScreeningFlowQuestionsModal
+						show={!!selectedScreeningFlowForModal}
+						screeningFlow={selectedScreeningFlowForModal}
 						onHide={() => {
-							setSelectedScreeningForModal(undefined);
+							setSelectedScreeningFlowForModal(undefined);
 						}}
-					>
-						<Modal.Header closeButton>
-							<Modal.Title>{selectedScreeningForModal?.name}</Modal.Title>
-						</Modal.Header>
-
-						<Modal.Body>
-							<p className="fs-large fw-bold mb-4">
-								{selectedScreeningForModal?.questions.length} Questions total
-							</p>
-
-							<ol>
-								{selectedScreeningForModal?.questions.map((question, idx) => {
-									return <li key={idx}>{question}</li>;
-								})}
-							</ol>
-						</Modal.Body>
-
-						<Modal.Footer className="text-right">
-							<Button
-								size="sm"
-								variant="primary"
-								onClick={() => {
-									setSelectedScreeningForModal(undefined);
-								}}
-							>
-								OK
-							</Button>
-						</Modal.Footer>
-					</Modal>
+					/>
 
 					<ToggledInput
 						className="mb-3"
@@ -1067,12 +1041,12 @@ export const Component = () => {
 						}}
 					/>
 
-					{(loaderData?.screenings ?? []).map((screening) => {
+					{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
 						return (
 							<ToggledInput
-								key={screening.id}
-								id={screening.id}
-								label={screening.name}
+								key={screeningFlow.screeningFlowId}
+								id={screeningFlow.screeningFlowId}
+								label={screeningFlow.name}
 								className="mb-3"
 								hideChildren
 								detail={
@@ -1080,16 +1054,16 @@ export const Component = () => {
 										size="sm"
 										variant="link"
 										className="p-0 text-decoration-none"
-										onClick={() => setSelectedScreeningForModal(screening)}
+										onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
 									>
 										View Questions
 									</Button>
 								}
-								checked={formValues.screeningFlowId === screening.id}
+								checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										screeningFlowId: currentTarget.checked ? screening.id : '',
+										screeningFlowId: currentTarget.checked ? screeningFlow.screeningFlowId : '',
 									}));
 								}}
 							/>

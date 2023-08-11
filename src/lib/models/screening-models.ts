@@ -1,3 +1,12 @@
+export interface ScreeningFlow {
+	screeningFlowId: string;
+	institutionId: string;
+	screeningFlowTypeId: ScreeningFlowTypeId;
+	activeScreeningFlowVersionId: string;
+	name: string;
+	createdByAccountId: string;
+}
+
 export interface ScreeningSession {
 	screeningSessionId: string;
 	screeningFlowVersionId: string;
@@ -32,6 +41,17 @@ export interface ScreeningFlowVersion {
 	screeningFlowVersionId: string;
 	skippable: boolean;
 	versionNumber: number;
+}
+
+export enum ScreeningFlowTypeId {
+	CUSTOM = 'CUSTOM',
+	PROVIDER_TRIAGE = 'PROVIDER_TRIAGE',
+	CONTENT_TRIAGE = 'CONTENT_TRIAGE',
+	PROVIDER_INTAKE = 'PROVIDER_INTAKE',
+	INTEGRATED_CARE = 'INTEGRATED_CARE',
+	INTEGRATED_CARE_INTAKE = 'INTEGRATED_CARE_INTAKE',
+	FEATURE = 'FEATURE',
+	GROUP_SESSION_INTAKE = 'GROUP_SESSION_INTAKE',
 }
 
 export enum ScreeningSessionDestinationId {

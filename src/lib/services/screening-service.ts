@@ -1,6 +1,9 @@
 import {
 	ScreeningAnswer,
+	ScreeningFlow,
+	ScreeningFlowTypeId,
 	ScreeningFlowVersion,
+	ScreeningQuestion,
 	ScreeningQuestionContextResponse,
 	ScreeningSession,
 	ScreeningSessionDestination,
@@ -35,6 +38,24 @@ export const screeningService = {
 		}>({
 			method: 'get',
 			url: buildQueryParamUrl('/screening-flow-versions', params),
+		});
+	},
+
+	getScreeningFlowsByFlowTypeId(screeningFlowTypeId: ScreeningFlowTypeId) {
+		return httpSingleton.orchestrateRequest<{
+			screeningFlows: ScreeningFlow[];
+		}>({
+			method: 'get',
+			url: `/screening-flows?screeningFlowTypeId=${screeningFlowTypeId}`,
+		});
+	},
+
+	getInitialScreeningQuestionsByFlowVersionId(screeningFlowVersionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			screeningQuestions: ScreeningQuestion[];
+		}>({
+			method: 'get',
+			url: `/screening-flow-versions/${screeningFlowVersionId}/initial-screening-questions`,
 		});
 	},
 
