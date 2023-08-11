@@ -104,6 +104,11 @@ export interface GroupSessionModel {
 	screeningFlowId?: string;
 }
 
+export interface GroupSessionUrlNameValidationResult {
+	available: boolean;
+	recommendation: string;
+}
+
 export interface GroupSessionRequestModel {
 	groupSessionRequestId: string;
 	institutionId: string;

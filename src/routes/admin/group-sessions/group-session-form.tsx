@@ -32,9 +32,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import GroupSession from '@/components/group-session';
 import { AdminLayoutContext } from '../layout';
-import { GROUP_SESSION_STATUS_ID, GroupSessionLearnMoreMethodId, GroupSessionModel } from '@/lib/models';
+import {
+	GROUP_SESSION_STATUS_ID,
+	GroupSessionLearnMoreMethodId,
+	GroupSessionModel,
+	GroupSessionUrlNameValidationResult,
+} from '@/lib/models';
 import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
+import useDebouncedState from '@/hooks/use-debounced-state';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -161,6 +167,11 @@ export const Component = () => {
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 	const [formValues, setFormValues] = useState(getInitialGroupSessionFormValues(loaderData?.groupSession));
 
+	const [debouncedSearchQuery] = useDebouncedState(formValues.urlName || formValues.title);
+	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
+		{}
+	);
+
 	const [showContactEmailInput, setShowContactEmailInput] = useState(
 		formValues.facilitatorEmailAddress !== formValues.targetEmailAddress
 	);
@@ -204,6 +215,8 @@ export const Component = () => {
 		async (groupSessionStatusId: GROUP_SESSION_STATUS_ID) => {
 			const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
+			const urlName = urlNameValidations[debouncedSearchQuery].recommendation;
+
 			return (
 				isEdit
 					? groupSessionsService
@@ -215,6 +228,7 @@ export const Component = () => {
 					: groupSessionsService
 							.createGroupSession({
 								...submission,
+								urlName,
 								groupSessionStatusId,
 							})
 							.fetch()
@@ -226,7 +240,7 @@ export const Component = () => {
 					handleError(e);
 				});
 		},
-		[formValues, handleError, isEdit, isExternal, loaderData, navigate]
+		[debouncedSearchQuery, formValues, handleError, isEdit, isExternal, loaderData, navigate, urlNameValidations]
 	);
 
 	useEffect(() => {
@@ -235,6 +249,24 @@ export const Component = () => {
 			setIsGroupSessionPreview(false);
 		};
 	}, [setIsGroupSessionPreview]);
+
+	useEffect(() => {
+		if (!debouncedSearchQuery) {
+			return;
+		}
+
+		groupSessionsService
+			.validateUrlName(debouncedSearchQuery, loaderData?.groupSession?.groupSessionId)
+			.fetch()
+			.then((response) => {
+				setUrlNameValidations((validations) => {
+					return {
+						...validations,
+						[debouncedSearchQuery]: response.groupSessionUrlNameValidationResult,
+					};
+				});
+			});
+	}, [debouncedSearchQuery, loaderData?.groupSession?.groupSessionId]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -402,9 +434,6 @@ export const Component = () => {
 							</p>
 
 							<p className="mb-4">
-								{!isExternal
-									? 'Write a clear, brief title to help people quickly understand what your group session is about. '
-									: ''}
 								Include a friendly URL to make the web address at {window.location.host} easier to read.
 								A friendly URL includes 1-3 words separated by hyphens that describe the content of the
 								webpage (ex. tolerating-uncertainty).
@@ -432,9 +461,11 @@ export const Component = () => {
 						type="text"
 						label="Friendly URL"
 						name="urlName"
-						required
+						error={
+							urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined
+						}
 						value={formValues.urlName}
-						disabled={isExternal ? isPublished : isEdit && hasReservations}
+						disabled={!formValues.title || (isExternal ? isPublished : isEdit && hasReservations)}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
@@ -443,12 +474,14 @@ export const Component = () => {
 						}}
 					/>
 
-					{formValues.urlName && (
+					{!formValues.title || urlNameValidations[debouncedSearchQuery]?.available === false ? null : (
 						<div className="d-flex mt-2">
 							<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
 							<p className="mb-0">
 								URL will appear as https://{window.location.host}/group-sessions/
-								<span className="fw-bold">{formValues.urlName}</span>
+								<span className="fw-bold">
+									{urlNameValidations[debouncedSearchQuery]?.recommendation}
+								</span>
 							</p>
 						</div>
 					)}
@@ -582,6 +615,8 @@ export const Component = () => {
 						</ToggledInput>
 					)}
 				</GroupSessionFormSection>
+
+				<hr />
 
 				<GroupSessionFormSection
 					title={isExternal ? 'Duration' : 'Scheduling'}
@@ -737,6 +772,8 @@ export const Component = () => {
 
 				{isExternal && (
 					<>
+						<hr />
+
 						<GroupSessionFormSection
 							title="Learn More"
 							description="How will participants learn more or sign up for this session?"
@@ -842,7 +879,6 @@ export const Component = () => {
 								/>
 							</ToggledInput>
 						</GroupSessionFormSection>
-						<hr />
 					</>
 				)}
 

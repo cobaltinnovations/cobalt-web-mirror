@@ -12,6 +12,7 @@ import {
 	GroupTopic,
 	GroupSessionCollectionModel,
 	GroupSessionLearnMoreMethodId,
+	GroupSessionUrlNameValidationResult,
 } from '@/lib/models';
 
 // Scheduled
@@ -162,6 +163,23 @@ export const groupSessionsService = {
 		return httpSingleton.orchestrateRequest<GroupSessionCollectionsResponse>({
 			method: 'get',
 			url: '/group-session-collections',
+		});
+	},
+
+	validateUrlName(searchQuery: string, groupSessionId?: string) {
+		const params = new URLSearchParams({
+			searchQuery,
+		});
+
+		if (groupSessionId) {
+			params.set('groupSessionId', groupSessionId);
+		}
+
+		return httpSingleton.orchestrateRequest<{
+			groupSessionUrlNameValidationResult: GroupSessionUrlNameValidationResult;
+		}>({
+			method: 'get',
+			url: '/group-sessions/validate-url-name?' + params.toString(),
 		});
 	},
 
