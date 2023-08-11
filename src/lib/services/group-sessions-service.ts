@@ -183,13 +183,6 @@ export const groupSessionsService = {
 		});
 	},
 
-	duplicateGroupSession(groupSessionId: string) {
-		return httpSingleton.orchestrateRequest<CreateGroupSessionResponseBody>({
-			method: 'post',
-			url: `/group-sessions/${groupSessionId}/duplicate`,
-		});
-	},
-
 	// Scheduled
 	getPresignedUploadUrl(data: GetPresignedUploadUrlRequestBody) {
 		return httpSingleton.orchestrateRequest<GetPresignedUploadUrlResponseBody>({

@@ -56,13 +56,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const groupSessionId = params.groupSessionId;
 
-	// can only add/edit group sessions.
+	// can only add/edit/duplicate group sessions.
 	// add, must not have a group session id.
-	// edit, must have a group session id.
+	// edit/duplicate, must have a group session id.
 	if (
 		!action ||
-		!['add-internal', 'add-external', 'edit'].includes(action) ||
-		(action === 'edit' && !groupSessionId)
+		!['add-internal', 'add-external', 'edit', 'duplicate'].includes(action) ||
+		(['edit', 'duplicate'].includes(action) && !groupSessionId)
 	) {
 		return null; // page renders a "404" in this case
 	}
@@ -140,22 +140,36 @@ const initialGroupSessionFormValues = {
 	followupTimeOfDay: '',
 };
 
-function getInitialGroupSessionFormValues(
-	groupSession?: GroupSessionModel | null
-): typeof initialGroupSessionFormValues {
+function getInitialGroupSessionFormValues({
+	groupSession,
+	isDuplicate,
+}: {
+	groupSession?: GroupSessionModel | null;
+	isDuplicate?: boolean;
+}): typeof initialGroupSessionFormValues {
 	const { startDateTime, endDateTime, ...rest } = groupSession ?? {};
 
 	const startDate = moment(startDateTime);
 	const endDate = moment(endDateTime);
 
+	const mergedDateInputValues = {
+		startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
+		startTime: startDateTime ? startDate.format('hh:mm A') : '',
+		endTime: endDateTime ? endDate.format('hh:mm A') : '',
+		endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
+	};
+
 	return Object.assign(
 		{ ...initialGroupSessionFormValues },
 		{
 			...rest,
-			startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
-			startTime: startDateTime ? startDate.format('hh:mm A') : '',
-			endTime: endDateTime ? endDate.format('hh:mm A') : '',
-			endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
+			// keep initial values when duplicating an existing session
+			...(isDuplicate
+				? {
+						title: '',
+						urlName: '',
+				  }
+				: mergedDateInputValues),
 		}
 	);
 }
@@ -168,7 +182,16 @@ export const Component = () => {
 	const handleError = useHandleError();
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
-	const [formValues, setFormValues] = useState(getInitialGroupSessionFormValues(loaderData?.groupSession));
+	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
+	const isEdit = params.action === 'edit';
+	const isDuplicate = params.action === 'duplicate';
+
+	const [formValues, setFormValues] = useState(
+		getInitialGroupSessionFormValues({
+			isDuplicate,
+			groupSession: loaderData?.groupSession,
+		})
+	);
 
 	const [debouncedSearchQuery] = useDebouncedState(formValues.urlName || formValues.title);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
@@ -180,8 +203,6 @@ export const Component = () => {
 	);
 	const [selectedScreeningFlowForModal, setSelectedScreeningFlowForModal] = useState<ScreeningFlow>();
 
-	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
-	const isEdit = params.action === 'edit';
 	const groupSessionSchedulingSystemId =
 		params.action === 'add-external'
 			? GroupSessionSchedulingSystemId.EXTERNAL
@@ -217,20 +238,20 @@ export const Component = () => {
 		async (groupSessionStatusId: GROUP_SESSION_STATUS_ID) => {
 			const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
-			const urlName = urlNameValidations[debouncedSearchQuery].recommendation;
+			const urlName = urlNameValidations[debouncedSearchQuery]?.recommendation ?? '';
 
 			return (
-				isEdit
+				!isEdit
 					? groupSessionsService
-							.updateGroupsession(loaderData!.groupSession!.groupSessionId, {
+							.createGroupSession({
 								...submission,
+								urlName,
 								groupSessionStatusId,
 							})
 							.fetch()
 					: groupSessionsService
-							.createGroupSession({
+							.updateGroupsession(loaderData!.groupSession!.groupSessionId, {
 								...submission,
-								urlName,
 								groupSessionStatusId,
 							})
 							.fetch()
@@ -258,7 +279,7 @@ export const Component = () => {
 		}
 
 		groupSessionsService
-			.validateUrlName(debouncedSearchQuery, loaderData?.groupSession?.groupSessionId)
+			.validateUrlName(debouncedSearchQuery, isDuplicate ? undefined : loaderData?.groupSession?.groupSessionId)
 			.fetch()
 			.then((response) => {
 				setUrlNameValidations((validations) => {
@@ -268,7 +289,7 @@ export const Component = () => {
 					};
 				});
 			});
-	}, [debouncedSearchQuery, loaderData?.groupSession?.groupSessionId]);
+	}, [debouncedSearchQuery, isDuplicate, loaderData?.groupSession?.groupSessionId]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -350,7 +371,7 @@ export const Component = () => {
 						<>
 							<LeftChevron /> Back to Edit
 						</>
-					) : isPublished ? (
+					) : isEdit && isPublished ? (
 						'Exit'
 					) : (
 						'Save & Exit'
@@ -390,6 +411,7 @@ export const Component = () => {
 	return (
 		<Form
 			onSubmit={(event) => {
+				console.log(event.currentTarget);
 				event.preventDefault();
 
 				// validate wysiwyg
@@ -450,7 +472,7 @@ export const Component = () => {
 						required
 						name="title"
 						value={formValues.title}
-						disabled={isExternal ? isPublished : isEdit && hasReservations}
+						disabled={isExternal ? !isDuplicate && isPublished : isEdit && hasReservations}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
@@ -467,7 +489,9 @@ export const Component = () => {
 							urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined
 						}
 						value={formValues.urlName}
-						disabled={!formValues.title || (isExternal ? isPublished : isEdit && hasReservations)}
+						disabled={
+							!formValues.title || (isExternal ? !isDuplicate && isPublished : isEdit && hasReservations)
+						}
 						onChange={({ currentTarget }) => {
 							setFormValues((curr) => ({
 								...curr,
