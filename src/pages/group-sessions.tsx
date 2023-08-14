@@ -210,7 +210,7 @@ const GroupSessions = () => {
 												<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
 													<Link
 														className="d-block text-decoration-none h-100"
-														to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+														to={`/group-sessions/${groupSession.groupSessionId}`}
 													>
 														<StudioEvent className="h-100" studioEvent={groupSession} />
 													</Link>
@@ -270,7 +270,7 @@ const GroupSessions = () => {
 																		<Link
 																			key={groupSession.groupSessionId}
 																			className="d-block text-decoration-none h-100"
-																			to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+																			to={`/group-sessions/${groupSession.groupSessionId}`}
 																		>
 																			<StudioEvent
 																				className="h-100"

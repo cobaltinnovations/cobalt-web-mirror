@@ -328,7 +328,7 @@ const GroupSessionsRequest = () => {
 									</Form.Group>
 								</div>
 								<div className="mb-8">
-									<h6 className="mb-1">Which (if any) dates do you prefer for your session(s)?</h6>
+									<h6 className="mb-1">Which (if any) dates do you prefer for your session?</h6>
 									<p className="mb-4">Enter “No Preference” if there is no preferred date.</p>
 									<InputHelper
 										as="textarea"
@@ -344,7 +344,7 @@ const GroupSessionsRequest = () => {
 									/>
 								</div>
 								<div className="mb-8">
-									<h6 className="mb-1">What time of day do you prefer for your session(s)?</h6>
+									<h6 className="mb-1">What time of day do you prefer for your session?</h6>
 									<p className="mb-4">Enter “No Preference” if there is no preferred time.</p>
 									<InputHelper
 										as="textarea"
@@ -361,7 +361,7 @@ const GroupSessionsRequest = () => {
 								</div>
 								<div className="mb-8">
 									<h6 className="mb-1">
-										Confirm the amount of people you expect to attend the session(s){' '}
+										Confirm the amount of people you expect to attend the session{' '}
 										<span className="text-danger">*</span>
 									</h6>
 									<p className="mb-2">
