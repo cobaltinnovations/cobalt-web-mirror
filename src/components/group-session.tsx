@@ -96,17 +96,17 @@ const GroupSession = ({
 									dangerouslySetInnerHTML={{ __html: groupSession.description ?? '' }}
 								/>
 
-								{(groupSession.tagIds ?? []).length > 0 && (
+								{(groupSession.tags ?? []).length > 0 && (
 									<div className="d-flex flex-wrap">
-										{groupSession.tagIds?.map((tagId) => {
+										{groupSession.tags?.map((tag) => {
 											return (
 												<Badge
-													key={tagId}
+													key={tag.tagId}
 													pill
 													bg="outline-dark"
 													className="mb-2 me-2 fs-default text-nowrap"
 												>
-													{tagId}
+													{tag.name}
 												</Badge>
 											);
 										})}

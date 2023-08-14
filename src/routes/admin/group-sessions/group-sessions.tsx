@@ -199,7 +199,7 @@ export const Component = () => {
 											<TableCell header>Session</TableCell>
 											<TableCell header>Facilitator</TableCell>
 											<TableCell header>Scheduling</TableCell>
-											<TableCell header>Registrants</TableCell>
+											<TableCell header>Registered</TableCell>
 											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Visible</TableCell>
@@ -215,6 +215,7 @@ export const Component = () => {
 													<TableCell>{groupSession.createdDateDescription}</TableCell>
 													<TableCell>
 														<Link
+															className="text-decoration-none"
 															to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
 														>
 															{groupSession.title}

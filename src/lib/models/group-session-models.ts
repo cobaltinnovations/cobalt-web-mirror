@@ -1,5 +1,6 @@
 import { Method } from 'axios';
 import { GroupSessionSchedulingSystemId } from '../services';
+import { Tag } from './tag-groups';
 
 export enum GROUP_SESSION_STATUS_ID {
 	NEW = 'NEW',
@@ -84,7 +85,7 @@ export interface GroupSessionModel {
 	submitterAccountId: string;
 	submitterEmailAddress: string;
 	submitterName: string;
-	tagIds: string[];
+	tags: Tag[];
 	targetEmailAddress: string;
 	timeZone: string;
 	title: string;
