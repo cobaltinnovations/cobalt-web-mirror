@@ -73,6 +73,16 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.GROUP_SESSION_DETAIL:
+					navigate(
+						{
+							pathname: '/group-sessions/' + destination.context.groupSessionId,
+						},
+						{
+							replace,
+						}
+					);
+					return;
 				case ScreeningSessionDestinationId.IC_MHIC_SCREENING_SESSION_RESULTS:
 					revalidator.revalidate();
 					navigate(
@@ -149,11 +159,13 @@ export function useScreeningNavigation() {
 
 export function useScreeningFlow({
 	screeningFlowId,
+	groupSessionId,
 	patientOrderId,
 	instantiateOnLoad = true,
 	disabled = false,
 }: {
 	screeningFlowId?: string;
+	groupSessionId?: string;
 	patientOrderId?: string;
 	instantiateOnLoad?: boolean;
 	disabled?: boolean;
@@ -171,14 +183,10 @@ export function useScreeningFlow({
 	const handleError = useHandleError();
 	const { navigateToNext, navigateToDestination } = useScreeningNavigation();
 	const [isCreatingScreeningSession, setIsCreatingScreeningSession] = useState(false);
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
-	}, [screeningSessions]);
-
-	// TODO: Replace this with 'getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)'
-	const hasCompletedScreening = useMemo(() => {
-		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
 	const hasIncompleteScreening = incompleteSessions.length > 0;
@@ -193,6 +201,7 @@ export function useScreeningFlow({
 		return screeningService
 			.createScreeningSession({
 				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+				groupSessionId,
 				patientOrderId,
 			})
 			.fetch()
@@ -308,25 +317,37 @@ export function useScreeningFlow({
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
 
-		Promise.all([fetchScreeningsRequest.fetch(), fetchFlowVersionsRequest.fetch()])
-			.then(([screeningsResponse, versionsResponse]) => {
-				setScreeningSessions(screeningsResponse.screeningSessions);
-				const activeVersion = versionsResponse.screeningFlowVersions.find(
-					(version) => version.screeningFlowVersionId === versionsResponse.activeScreeningFlowVersionId
+		Promise.all([
+			fetchScreeningsRequest.fetch().then((response) => setScreeningSessions(response.screeningSessions)),
+			fetchFlowVersionsRequest.fetch().then((response) => {
+				const activeVersion = response.screeningFlowVersions.find(
+					(version) => version.screeningFlowVersionId === response.activeScreeningFlowVersionId
 				);
 
 				setActiveFlowVersion(activeVersion);
-			})
-			.catch((e) => {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
-			});
+			}),
+		]).catch((e) => {
+			if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+				handleError(e);
+			}
+		});
 
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
 	}, [disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
+
+	useEffect(() => {
+		if (disabled || !screeningFlowId) {
+			return;
+		}
+
+		screeningService
+			.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)
+			.fetch()
+			.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
+			.catch((e) => handleError(e));
+	}, [disabled, handleError, screeningFlowId]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {

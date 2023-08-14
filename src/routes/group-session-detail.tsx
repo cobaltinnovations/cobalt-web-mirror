@@ -8,6 +8,9 @@ import GroupSession from '@/components/group-session';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { groupSessionsService } from '@/lib/services';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import useAccount from '@/hooks/use-account';
+import moment from 'moment';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { groupSession, groupSessionReservation } = await groupSessionsService
@@ -18,26 +21,32 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
+	const { account } = useAccount();
 	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
+	const { hasCompletedScreening, startScreeningFlow } = useScreeningFlow({
+		screeningFlowId: groupSession.screeningFlowId,
+		groupSessionId: groupSession.groupSessionId,
+		instantiateOnLoad: false,
+	});
 
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
 
-	const [collectedEmail, setCollectedEmail] = useState('');
+	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
 	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [confirmModalIsShowing, setConfirmModalIsShowing] = useState(false);
 	const [cancelModalIsShowing, setCancelModalIsShowing] = useState(false);
 
 	const handleReserveButtonClick = useCallback(() => {
-		if (groupSession?.assessmentId) {
-			navigate(`/intake-assessment?groupSessionId=${groupSession.groupSessionId}`);
+		if (groupSession.screeningFlowId && !hasCompletedScreening) {
+			startScreeningFlow();
 			return;
 		}
 
 		setShowCollectEmailModal(true);
-	}, [groupSession?.assessmentId, groupSession.groupSessionId, navigate]);
+	}, [groupSession.screeningFlowId, hasCompletedScreening, startScreeningFlow]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
@@ -93,6 +102,14 @@ export const Component = () => {
 		}
 	}, [addFlag, groupSessionReservation, handleError, navigate, revalidator]);
 
+	const groupSessionTime = (
+		<p className="mb-0">
+			{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('MMM D[,] YYYY')} &bull;{' '}
+			{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')} -{' '}
+			{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')}
+		</p>
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -124,7 +141,7 @@ export const Component = () => {
 				</Modal.Header>
 				<Modal.Body>
 					<p className="mb-0 fw-bold">{groupSession.title}</p>
-					<p className="mb-0 text-danger">[TODO]: Tuesday Oct 27 &bull; 10-10:30AM</p>
+					{groupSessionTime}
 				</Modal.Body>
 				<Modal.Footer className="text-right">
 					<Button
@@ -156,7 +173,8 @@ export const Component = () => {
 					<p className="mb-4 fw-bold">Are you sure you want to cancel this reservation?</p>
 					<p className="mb-0 fw-bold">Reservation Details</p>
 					<p className="mb-0">{groupSession.title}</p>
-					<p className="mb-0 text-danger">[TODO]: Tuesday Oct 27 &bull; 10-10:30AM</p>
+
+					{groupSessionTime}
 				</Modal.Body>
 				<Modal.Footer className="text-right">
 					<Button
