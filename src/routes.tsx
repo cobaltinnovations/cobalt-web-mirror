@@ -475,8 +475,8 @@ export const routes: RouteObject[] = [
 						element: <GroupSessions />,
 					},
 					{
-						path: 'group-sessions/request',
-						element: <GroupSessionsRequest />,
+						path: 'group-sessions',
+						element: <GroupSessions />,
 					},
 					// {
 					// 	path: 'group-sessions/scheduled',
@@ -501,6 +501,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/google-calendar',
 						element: <RedirectToBackend />,
+					},
+					{
+						path: 'group-sessions/collection/:groupSessionCollectionId',
+						lazy: () => import('@/routes/group-session-collection-detail'),
 					},
 					{
 						path: 'group-sessions/:groupSessionId',

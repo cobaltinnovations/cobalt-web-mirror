@@ -75,6 +75,7 @@ interface GetGroupSessionsQueryParameters {
 	orderBy?: GROUP_SESSION_SORT_ORDER;
 	urlName?: string;
 	searchQuery?: string;
+	groupSessionCollectionId?: string;
 }
 
 export interface GetGroupSessionsResponseBody {

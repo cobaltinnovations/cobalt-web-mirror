@@ -253,7 +253,9 @@ const GroupSessions = () => {
 															description={collection.description}
 															calloutTitle="See All"
 															calloutOnClick={() => {
-																navigate('/in-the-studio');
+																navigate(
+																	`/group-sessions/collection/${collection.groupSessionCollectionId}`
+																);
 															}}
 														>
 															{collection.groupSessions.map((groupSession) => {
@@ -343,10 +345,11 @@ const GroupSessions = () => {
 					<Container className="py-10 py-lg-20">
 						<Row>
 							<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
-								<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
+								<h2 className="mb-6 text-center">Looking for a different type of group session?</h2>
 								<p className="mb-6 fs-large text-center">
-									Request a session and we'll work with you to find a dedicated time for a
-									wellness-focused group session for your team.
+									Request a session to find a dedicated time for a wellness-focused group session for
+									your team. You can also suggest a session to let us know about any topics that are
+									not currently avaialble.
 								</p>
 								<div className="text-center">
 									<Button
