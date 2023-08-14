@@ -13,6 +13,7 @@ import {
 	GroupSessionCollectionModel,
 	GroupSessionLearnMoreMethodId,
 	GroupSessionUrlNameValidationResult,
+	GroupSessionCollectionWithSessionsIncludedModel,
 } from '@/lib/models';
 
 // Scheduled
@@ -158,11 +159,22 @@ interface GroupSessionCollectionsResponse {
 	groupSessionCollections: GroupSessionCollectionModel[];
 }
 
+interface GroupSessionCollectionsWithSessionsIncludedResponse {
+	groupSessionCollections: GroupSessionCollectionWithSessionsIncludedModel[];
+}
+
 export const groupSessionsService = {
 	getGroupSessionCollections() {
 		return httpSingleton.orchestrateRequest<GroupSessionCollectionsResponse>({
 			method: 'get',
 			url: '/group-session-collections',
+		});
+	},
+
+	getGroupSessionCollectionsWithSessionsIncluded() {
+		return httpSingleton.orchestrateRequest<GroupSessionCollectionsWithSessionsIncludedResponse>({
+			method: 'get',
+			url: '/group-sessions/collections',
 		});
 	},
 

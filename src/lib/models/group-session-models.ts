@@ -42,6 +42,10 @@ export interface GroupSessionCollectionModel {
 	institutionId: string;
 }
 
+export interface GroupSessionCollectionWithSessionsIncludedModel extends GroupSessionCollectionModel {
+	groupSessions: GroupSessionModel[];
+}
+
 export interface GroupSessionModel {
 	appointmentTimeDescription: string;
 	created: string;
