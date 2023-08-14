@@ -474,6 +474,10 @@ export const routes: RouteObject[] = [
 						path: 'group-sessions',
 						element: <GroupSessions />,
 					},
+					{
+						path: 'group-sessions/request',
+						element: <GroupSessionsRequest />,
+					},
 					// {
 					// 	path: 'group-sessions/scheduled',
 					// 	element: <GroupSessionsScheduled />,
