@@ -1028,229 +1028,237 @@ export const Component = () => {
 					})}
 				</GroupSessionFormSection>
 
-				<hr />
+				{!isExternal && (
+					<>
+						<hr />
+						<GroupSessionFormSection
+							title="Screening Questions"
+							description={
+								<>
+									<p className="mb-2">
+										You may restrict a group session to certain audiences by selecting a set of
+										pre-defined screening questions.
+									</p>
 
-				<GroupSessionFormSection
-					title="Screening Questions"
-					description={
-						<>
-							<p className="mb-2">
-								You may restrict a group session to certain audiences by selecting a set of pre-defined
-								screening questions.
-							</p>
+									<p>
+										Attendees must answer “Yes” to all screening questions in a set to reserve a
+										seat.
+									</p>
+								</>
+							}
+						>
+							<ScreeningFlowQuestionsModal
+								show={!!selectedScreeningFlowForModal}
+								screeningFlow={selectedScreeningFlowForModal}
+								onHide={() => {
+									setSelectedScreeningFlowForModal(undefined);
+								}}
+							/>
 
-							<p>Attendees must answer “Yes” to all screening questions in a set to reserve a seat.</p>
-						</>
-					}
-				>
-					<ScreeningFlowQuestionsModal
-						show={!!selectedScreeningFlowForModal}
-						screeningFlow={selectedScreeningFlowForModal}
-						onHide={() => {
-							setSelectedScreeningFlowForModal(undefined);
-						}}
-					/>
-
-					<ToggledInput
-						className="mb-3"
-						id="no-screening"
-						label="Do not screen"
-						hideChildren
-						checked={!formValues.screeningFlowId}
-						onChange={() => {
-							setFormValues((curr) => ({
-								...curr,
-								screeningFlowId: '',
-							}));
-						}}
-					/>
-
-					{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
-						return (
 							<ToggledInput
-								key={screeningFlow.screeningFlowId}
-								id={screeningFlow.screeningFlowId}
-								label={screeningFlow.name}
 								className="mb-3"
+								id="no-screening"
+								label="Do not screen"
 								hideChildren
-								detail={
-									<Button
-										size="sm"
-										variant="link"
-										className="p-0 text-decoration-none"
-										onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
-									>
-										View Questions
-									</Button>
-								}
-								checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
-								onChange={({ currentTarget }) => {
+								checked={!formValues.screeningFlowId}
+								onChange={() => {
 									setFormValues((curr) => ({
 										...curr,
-										screeningFlowId: currentTarget.checked ? screeningFlow.screeningFlowId : '',
+										screeningFlowId: '',
 									}));
 								}}
 							/>
-						);
-					})}
-				</GroupSessionFormSection>
 
-				<hr />
+							{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
+								return (
+									<ToggledInput
+										key={screeningFlow.screeningFlowId}
+										id={screeningFlow.screeningFlowId}
+										label={screeningFlow.name}
+										className="mb-3"
+										hideChildren
+										detail={
+											<Button
+												size="sm"
+												variant="link"
+												className="p-0 text-decoration-none"
+												onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
+											>
+												View Questions
+											</Button>
+										}
+										checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
+										onChange={({ currentTarget }) => {
+											setFormValues((curr) => ({
+												...curr,
+												screeningFlowId: currentTarget.checked
+													? screeningFlow.screeningFlowId
+													: '',
+											}));
+										}}
+									/>
+								);
+							})}
+						</GroupSessionFormSection>
 
-				<GroupSessionFormSection
-					title="Confirmation Email"
-					description="Write text for an email that will be sent when someone reserves a seat for this session."
-				>
-					<InputHelper
-						label="Confirmation Email Text"
-						value={formValues.confirmationEmailContent}
-						name="confirmationEmailContent"
-						as="textarea"
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								confirmationEmailContent: currentTarget.value,
-							}));
-						}}
-						required
-					/>
-				</GroupSessionFormSection>
+						<hr />
 
-				<hr />
-
-				<GroupSessionFormSection title="Other Emails (Optional)">
-					<ToggledInput
-						type="switch"
-						id="send-reminder-email"
-						className="mb-3"
-						label={
-							<div>
-								<p className="mb-0">Send Reminder Email</p>
-								<p className="fs-small text-muted mb-0">
-									Sent 24 hours before the start of the session
-								</p>
-							</div>
-						}
-						checked={formValues.sendReminderEmail}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								sendReminderEmail: currentTarget.checked,
-							}));
-						}}
-					>
-						<InputHelper
-							label="Reminder Email Text"
-							value={formValues.reminderEmailContent}
-							name="reminderEmailContent"
-							as="textarea"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									reminderEmailContent: currentTarget.value,
-								}));
-							}}
-							required={formValues.sendReminderEmail}
-						/>
-					</ToggledInput>
-
-					<ToggledInput
-						type="switch"
-						id="send-followup-email"
-						className="mb-3"
-						label={
-							<div>
-								<p className="mb-0">Send Follow-up Email</p>
-								<p className="fs-small text-muted mb-0">Sent after the session ends</p>
-							</div>
-						}
-						checked={formValues.sendFollowupEmail}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								sendFollowupEmail: currentTarget.checked,
-							}));
-						}}
-					>
-						<div className="d-flex mb-1">
+						<GroupSessionFormSection
+							title="Confirmation Email"
+							description="Write text for an email that will be sent when someone reserves a seat for this session."
+						>
 							<InputHelper
-								className="w-100 me-1"
-								as="select"
-								label="# of days after session"
-								name="followupDayOffset"
-								required={formValues.sendFollowupEmail}
-								value={formValues.followupDayOffset}
+								label="Confirmation Email Text"
+								value={formValues.confirmationEmailContent}
+								name="confirmationEmailContent"
+								as="textarea"
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										followupDayOffset: currentTarget.value,
+										confirmationEmailContent: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+						</GroupSessionFormSection>
+
+						<hr />
+
+						<GroupSessionFormSection title="Other Emails (Optional)">
+							<ToggledInput
+								type="switch"
+								id="send-reminder-email"
+								className="mb-3"
+								label={
+									<div>
+										<p className="mb-0">Send Reminder Email</p>
+										<p className="fs-small text-muted mb-0">
+											Sent 24 hours before the start of the session
+										</p>
+									</div>
+								}
+								checked={formValues.sendReminderEmail}
+								onChange={({ currentTarget }) => {
+									setFormValues((curr) => ({
+										...curr,
+										sendReminderEmail: currentTarget.checked,
 									}));
 								}}
 							>
-								<option value="" disabled>
-									Select...
-								</option>
-								{[...Array(14).keys()].map((num) => (
-									<option key={num} value={num + 1}>
-										{num + 1}
-									</option>
-								))}
-							</InputHelper>
+								<InputHelper
+									label="Reminder Email Text"
+									value={formValues.reminderEmailContent}
+									name="reminderEmailContent"
+									as="textarea"
+									onChange={({ currentTarget }) => {
+										setFormValues((curr) => ({
+											...curr,
+											reminderEmailContent: currentTarget.value,
+										}));
+									}}
+									required={formValues.sendReminderEmail}
+								/>
+							</ToggledInput>
 
-							<TimeSlotInput
-								className="w-100 ms-1"
-								label="Time"
-								name="followupTimeOfDay"
-								required={formValues.sendFollowupEmail}
-								value={formValues.followupTimeOfDay}
+							<ToggledInput
+								type="switch"
+								id="send-followup-email"
+								className="mb-3"
+								label={
+									<div>
+										<p className="mb-0">Send Follow-up Email</p>
+										<p className="fs-small text-muted mb-0">Sent after the session ends</p>
+									</div>
+								}
+								checked={formValues.sendFollowupEmail}
 								onChange={({ currentTarget }) => {
 									setFormValues((curr) => ({
 										...curr,
-										followupTimeOfDay: currentTarget.value,
+										sendFollowupEmail: currentTarget.checked,
 									}));
 								}}
-							/>
-						</div>
+							>
+								<div className="d-flex mb-1">
+									<InputHelper
+										className="w-100 me-1"
+										as="select"
+										label="# of days after session"
+										name="followupDayOffset"
+										required={formValues.sendFollowupEmail}
+										value={formValues.followupDayOffset}
+										onChange={({ currentTarget }) => {
+											setFormValues((curr) => ({
+												...curr,
+												followupDayOffset: currentTarget.value,
+											}));
+										}}
+									>
+										<option value="" disabled>
+											Select...
+										</option>
+										{[...Array(14).keys()].map((num) => (
+											<option key={num} value={num + 1}>
+												{num + 1}
+											</option>
+										))}
+									</InputHelper>
 
-						<p className="mb-3">
-							The follow-up email will be sent{' '}
-							<span className="fw-bold text-decoration-underline">
-								{formValues.followupDayOffset} day
-							</span>{' '}
-							after the session ends at{' '}
-							<span className="fw-bold text-docration-underline">
-								{formValues.followupTimeOfDay || '--'}
-							</span>
-						</p>
+									<TimeSlotInput
+										className="w-100 ms-1"
+										label="Time"
+										name="followupTimeOfDay"
+										required={formValues.sendFollowupEmail}
+										value={formValues.followupTimeOfDay}
+										onChange={({ currentTarget }) => {
+											setFormValues((curr) => ({
+												...curr,
+												followupTimeOfDay: currentTarget.value,
+											}));
+										}}
+									/>
+								</div>
 
-						<InputHelper
-							label="Follow-up Email Text"
-							value={formValues.followupEmailContent}
-							name="followupEmailContent"
-							as="textarea"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									followupEmailContent: currentTarget.value,
-								}));
-							}}
-							required={formValues.sendFollowupEmail}
-							className="mb-3"
-						/>
+								<p className="mb-3">
+									The follow-up email will be sent{' '}
+									<span className="fw-bold text-decoration-underline">
+										{formValues.followupDayOffset} day
+									</span>{' '}
+									after the session ends at{' '}
+									<span className="fw-bold text-docration-underline">
+										{formValues.followupTimeOfDay || '--'}
+									</span>
+								</p>
 
-						<InputHelper
-							label="Survey URL"
-							value={formValues.followupEmailSurveyUrl}
-							name="followupEmailSurveyUrl"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									followupEmailSurveyUrl: currentTarget.value,
-								}));
-							}}
-						/>
-					</ToggledInput>
-				</GroupSessionFormSection>
+								<InputHelper
+									label="Follow-up Email Text"
+									value={formValues.followupEmailContent}
+									name="followupEmailContent"
+									as="textarea"
+									onChange={({ currentTarget }) => {
+										setFormValues((curr) => ({
+											...curr,
+											followupEmailContent: currentTarget.value,
+										}));
+									}}
+									required={formValues.sendFollowupEmail}
+									className="mb-3"
+								/>
+
+								<InputHelper
+									label="Survey URL"
+									value={formValues.followupEmailSurveyUrl}
+									name="followupEmailSurveyUrl"
+									onChange={({ currentTarget }) => {
+										setFormValues((curr) => ({
+											...curr,
+											followupEmailSurveyUrl: currentTarget.value,
+										}));
+									}}
+								/>
+							</ToggledInput>
+						</GroupSessionFormSection>
+					</>
+				)}
 			</Container>
 
 			{footer}
@@ -1371,6 +1379,16 @@ function prepareGroupSessionSubmission(
 	);
 
 	if (isExternal) {
+		delete groupSessionSubmission.screeningFlowId;
+		delete groupSessionSubmission.confirmationEmailContent;
+		delete groupSessionSubmission.sendReminderEmail;
+		delete groupSessionSubmission.reminderEmailContent;
+		delete groupSessionSubmission.sendFollowupEmail;
+		delete groupSessionSubmission.followupDayOffset;
+		delete groupSessionSubmission.followupTimeOfDay;
+		delete groupSessionSubmission.followupEmailContent;
+		delete groupSessionSubmission.followupEmailSurveyUrl;
+
 		if (groupSessionSubmission.singleSessionFlag) {
 			// only for series
 			delete groupSessionSubmission.dateTimeDescription;
