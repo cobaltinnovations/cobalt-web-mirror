@@ -370,8 +370,9 @@ export const Component = () => {
 		</>
 	);
 
+	const showTopTabs = isPublished && !isExternal;
 	const formFields = (
-		<Container>
+		<Container fluid={showTopTabs}>
 			<ConfirmDialog
 				size="lg"
 				show={navigationBlocker.state === 'blocked'}
@@ -1253,7 +1254,7 @@ export const Component = () => {
 				</Row>
 			</Container>
 
-			{isPublished && !isExternal ? (
+			{showTopTabs ? (
 				<Container>
 					<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
 						<TabBar
@@ -1278,7 +1279,14 @@ export const Component = () => {
 							<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
 							<Tab.Pane eventKey="registrants">
 								<h4>Registrants</h4>
-								<p> todo </p>
+								<Button
+									variant="light"
+									onClick={() => {
+										alert('TODO: Download/export registrant emails addresses');
+									}}
+								>
+									Email Addresses
+								</Button>
 							</Tab.Pane>
 						</Tab.Content>
 					</Tab.Container>
