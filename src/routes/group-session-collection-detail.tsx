@@ -32,7 +32,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		(collection) => collection.groupSessionCollectionId === groupSessionCollectionId
 	) ?? {
 		groupSessionCollectionId: 'UPCOMING_SESSIONS',
-		description: 'Upcoming Sessions',
+		title: 'Upcoming Sessions',
+		description: 'Upcoming Sessions Description',
 		displayOrder: 0,
 		institutionId: '',
 	};
@@ -60,13 +61,13 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - {groupSessionCollection?.description}</title>
+				<title>Cobalt | Group Sessions - {groupSessionCollection?.title}</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">
 				<p className="mb-5 text-gray fs-large text-center">Group Sessions</p>
-				<h1 className="mb-6 text-center">{groupSessionCollection?.description}</h1>
-				<p className="fs-large text-center">[TODO]: Add description of the collection</p>
+				<h1 className="mb-6 text-center">{groupSessionCollection?.title}</h1>
+				<p className="fs-large text-center">{groupSessionCollection?.description}</p>
 			</HeroContainer>
 
 			<Container className="py-14">

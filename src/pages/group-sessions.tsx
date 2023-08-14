@@ -94,7 +94,8 @@ const GroupSessions = () => {
 				...[
 					{
 						groupSessionCollectionId: 'UPCOMING_SESSIONS',
-						description: 'Upcoming Sessions',
+						title: 'Upcoming Sessions',
+						description: 'Upcoming Sessions Description',
 						displayOrder: 0,
 						institutionId: '',
 						groupSessions,
@@ -257,7 +258,7 @@ const GroupSessions = () => {
 															<Carousel
 																className="mb-8 mb-lg-12"
 																responsive={responsiveDefaults}
-																description={collection.description}
+																description={collection.title}
 																calloutTitle="See All"
 																calloutOnClick={() => {
 																	navigate(
@@ -282,10 +283,10 @@ const GroupSessions = () => {
 															</Carousel>
 														) : (
 															<>
-																<h3 className="mb-4">{collection.description}</h3>
+																<h3 className="mb-4">{collection.title}</h3>
 																<NoData
 																	className="mb-12 mb-lg-16"
-																	title={collection.description}
+																	title={collection.title}
 																	description="There are no group sessions for this collection."
 																	actions={[
 																		...(groupSessionUrlName

@@ -37,6 +37,7 @@ export interface ScreeningQuestionV2 {
 
 export interface GroupSessionCollectionModel {
 	groupSessionCollectionId: string;
+	title: string;
 	description: string;
 	displayOrder: number;
 	institutionId: string;
