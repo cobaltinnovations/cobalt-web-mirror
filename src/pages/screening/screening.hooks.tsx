@@ -216,7 +216,14 @@ export function useScreeningFlow({
 			.finally(() => {
 				setIsCreatingScreeningSession(false);
 			});
-	}, [activeFlowVersion?.screeningFlowVersionId, disabled, handleError, navigateToNext, patientOrderId]);
+	}, [
+		activeFlowVersion?.screeningFlowVersionId,
+		disabled,
+		groupSessionId,
+		handleError,
+		navigateToNext,
+		patientOrderId,
+	]);
 
 	const resumeScreeningSession = useCallback(
 		(screeningSessionId?: string | null) => {
