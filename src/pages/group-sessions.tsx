@@ -4,7 +4,7 @@ import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import { groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER, GroupSessionModel } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
-import useAnalytics from '@/hooks/use-analytics';
+// import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
 import Loader from '@/components/loader';
@@ -12,27 +12,17 @@ import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import useHandleError from '@/hooks/use-handle-error';
-import { createUseStyles } from 'react-jss';
 import { Helmet } from 'react-helmet';
-
-const useStyles = createUseStyles({
-	requestSessionCta: {
-		maxWidth: 382,
-		margin: '0 auto',
-	},
-});
+import Carousel, { responsiveDefaults } from '@/components/carousel';
 
 const GroupSessions = () => {
-	const classes = useStyles();
 	const handleError = useHandleError();
-	const { mixpanel } = useAnalytics();
+	// const { mixpanel } = useAnalytics();
 	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
 	const groupSessionSearchQuery = searchParams.get('searchQuery') ?? '';
-	const pageSize = useRef(6);
-	const pageNumber = useRef(0);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +35,6 @@ const GroupSessions = () => {
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
-	const [viewAll, setViewAll] = useState(false);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -68,8 +57,8 @@ const GroupSessions = () => {
 					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
 					urlName: groupSessionUrlName,
 					searchQuery: groupSessionSearchQuery,
-					pageSize: viewAll ? 1000 : pageSize.current,
-					pageNumber: pageNumber.current,
+					pageSize: 12,
+					pageNumber: 0,
 				})
 				.fetch();
 
@@ -80,15 +69,11 @@ const GroupSessions = () => {
 			setIsLoading(false);
 			setIsFirstLoad(false);
 		}
-	}, [groupSessionSearchQuery, groupSessionUrlName, handleError, viewAll]);
+	}, [groupSessionSearchQuery, groupSessionUrlName, handleError]);
 
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
-
-	const handleViewMoreButtonClick = useCallback(() => {
-		setViewAll(true);
-	}, []);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -99,7 +84,6 @@ const GroupSessions = () => {
 			searchParams.delete('searchQuery');
 		}
 
-		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (hasTouchScreen) {
@@ -112,7 +96,6 @@ const GroupSessions = () => {
 
 		searchParams.delete('searchQuery');
 
-		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
@@ -175,11 +158,6 @@ const GroupSessions = () => {
 			</HeroContainer>
 
 			<Container className="py-10">
-				<Row className="mb-10">
-					<Col>
-						<h2>Upcoming Sessions</h2>
-					</Col>
-				</Row>
 				{!isLoading && groupSessions.length <= 0 && (
 					<Row className="mb-2">
 						<Col>
@@ -207,22 +185,34 @@ const GroupSessions = () => {
 						</Col>
 					</Row>
 				)}
+
 				{groupSessions.length > 0 && (
 					<Row className="mb-2">
-						{groupSessions.map((groupSession) => {
-							return (
-								<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
-									<Link
-										className="d-block text-decoration-none h-100"
-										to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
-									>
-										<StudioEvent className="h-100" studioEvent={groupSession} />
-									</Link>
-								</Col>
-							);
-						})}
+						<Col>
+							<Carousel
+								responsive={responsiveDefaults}
+								description="Upcoming Sessions"
+								calloutTitle="See All"
+								calloutOnClick={() => {
+									navigate('/in-the-studio');
+								}}
+							>
+								{groupSessions.map((groupSession) => {
+									return (
+										<Link
+											key={groupSession.groupSessionId}
+											className="d-block text-decoration-none h-100"
+											to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+										>
+											<StudioEvent className="h-100" studioEvent={groupSession} />
+										</Link>
+									);
+								})}
+							</Carousel>
+						</Col>
 					</Row>
 				)}
+
 				{isLoading && isFirstLoad && (
 					<Row className="mb-10">
 						<Col md={6} lg={4} className="mb-8">
@@ -245,47 +235,11 @@ const GroupSessions = () => {
 						</Col>
 					</Row>
 				)}
+
 				<Row>
-					<Col></Col>
 					<Col>
 						<div className="text-center">
-							{isLoading ? (
-								<Loader className="position-static d-inline-flex" />
-							) : (
-								<>
-									{!viewAll && (
-										<Button onClick={handleViewMoreButtonClick} disabled={isLoading}>
-											View All
-										</Button>
-									)}
-								</>
-							)}
-						</div>
-					</Col>
-					<Col>
-						<div className="text-right">
-							{/* {institution?.userSubmittedGroupSessionEnabled && (
-								<Button
-									variant="link"
-									onClick={() => {
-										mixpanel.track('Patient-Sourced Add Group Session Click', {});
-										navigate('/group-sessions/scheduled/create');
-									}}
-								>
-									Submit a Session
-								</Button>
-							)} */}
-							{/* {institution?.userSubmittedGroupSessionRequestEnabled && (
-									<Button
-										variant="link"
-										onClick={() => {
-											mixpanel.track('Patient-Sourced Add Group Session Request Click', {});
-											navigate('/group-sessions/by-request/create');
-										}}
-									>
-										Submit a Session
-									</Button>
-								)} */}
+							{isLoading && <Loader className="position-static d-inline-flex" />}
 						</div>
 					</Col>
 				</Row>
@@ -293,23 +247,35 @@ const GroupSessions = () => {
 			{institution?.groupSessionRequestsEnabled && (
 				<Container fluid className="bg-n75">
 					<Container className="py-10 py-lg-20">
-						<div className={classes.requestSessionCta}>
-							<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-							<p className="mb-6 fs-large text-center">
-								Request a session and we'll work with you to find a dedicated time for a
-								wellness-focused group session for your team.
-							</p>
-							<div className="text-center">
-								<Button
-									variant="outline-primary"
-									onClick={() => {
-										navigate('/group-sessions/request');
-									}}
-								>
-									Request a Session
-								</Button>
-							</div>
-						</div>
+						<Row>
+							<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
+								<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
+								<p className="mb-6 fs-large text-center">
+									Request a session and we'll work with you to find a dedicated time for a
+									wellness-focused group session for your team.
+								</p>
+								<div className="text-center">
+									<Button
+										variant="primary"
+										className="me-1"
+										onClick={() => {
+											navigate('/group-sessions/request');
+										}}
+									>
+										Request a Session
+									</Button>
+									<Button
+										variant="outline-primary"
+										className="ms-1"
+										onClick={() => {
+											window.alert('[TODO]: Suggest');
+										}}
+									>
+										Suggest a Session
+									</Button>
+								</div>
+							</Col>
+						</Row>
 					</Container>
 				</Container>
 			)}

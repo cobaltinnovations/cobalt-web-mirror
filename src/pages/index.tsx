@@ -263,16 +263,9 @@ const Index: FC = () => {
 						<Container className="pt-20">
 							<Row>
 								<Col>
-									<h3 className="mb-2">Group Sessions</h3>
-								</Col>
-							</Row>
-						</Container>
-						<Container>
-							<Row>
-								<Col>
 									<Carousel
 										responsive={responsiveDefaults}
-										description="Register for virtual group sessions led by experts covering a range of topics, from managing anxiety to healthy living and more."
+										description="Group Sessions"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/in-the-studio');
@@ -312,19 +305,12 @@ const Index: FC = () => {
 
 				{content.length > 0 && (
 					<>
-						<Container className="pt-20">
-							<Row>
-								<Col>
-									<h3 className="mb-2">Resource Library</h3>
-								</Col>
-							</Row>
-						</Container>
-						<Container className="pb-20">
+						<Container className="py-20 pb-20">
 							<Row>
 								<Col>
 									<Carousel
 										responsive={resourceLibraryCarouselConfig}
-										description="Browse a variety of digital resources to support your general wellness, including articles, podcasts, apps and more."
+										description="Resource Library"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/resource-library');
