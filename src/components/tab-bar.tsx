@@ -103,6 +103,7 @@ const TabBar = ({ orientation = 'horizontal', value, tabs, onTabClick, hideBorde
 							})}
 						>
 							<button
+								type="button"
 								onClick={(event) => {
 									onTabClick(tab.value, event);
 								}}

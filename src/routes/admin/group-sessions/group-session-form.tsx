@@ -20,19 +20,18 @@ import {
 } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import {
 	Link,
 	LoaderFunctionArgs,
+	unstable_useBlocker as useBlocker,
 	useNavigate,
-	useOutletContext,
 	useParams,
 	useRouteLoaderData,
 } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import GroupSession from '@/components/group-session';
-import { AdminLayoutContext } from '../layout';
 import {
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionLearnMoreMethodId,
@@ -45,6 +44,10 @@ import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { ScreeningFlowQuestionsModal } from '@/components/screening-flow-questions-modal';
+import { createUseThemedStyles } from '@/jss/theme';
+import TabBar from '@/components/tab-bar';
+import ConfirmDialog from '@/components/confirm-dialog';
+import useFlags from '@/hooks/use-flags';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -56,13 +59,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const groupSessionId = params.groupSessionId;
 
-	// can only add/edit/duplicate group sessions.
+	// can add/edit/duplicate/preview group sessions.
 	// add, must not have a group session id.
-	// edit/duplicate, must have a group session id.
+	// edit/duplicate/preview, must have a group session id.
 	if (
 		!action ||
-		!['add-internal', 'add-external', 'edit', 'duplicate'].includes(action) ||
-		(['edit', 'duplicate'].includes(action) && !groupSessionId)
+		!['add-internal', 'add-external', 'edit', 'duplicate', 'preview'].includes(action) ||
+		(['edit', 'duplicate', 'preview'].includes(action) && !groupSessionId)
 	) {
 		return null; // page renders a "404" in this case
 	}
@@ -174,15 +177,31 @@ function getInitialGroupSessionFormValues({
 	);
 }
 
+const useStyles = createUseThemedStyles((theme) => ({
+	formFooter: {
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 1,
+		padding: '20px 0',
+		position: 'fixed',
+		textAlign: 'center',
+		backgroundColor: theme.colors.n0,
+		borderTop: `1px solid ${theme.colors.border}`,
+	},
+}));
+
 export const Component = () => {
-	const { isGroupSessionPreview, setIsGroupSessionPreview } = useOutletContext() as AdminLayoutContext;
+	const classes = useStyles();
 	const loaderData = useAdminGroupSessionFormLoaderData();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; groupSessionId: string }>();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
+	const isGroupSessionPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
 
@@ -193,7 +212,12 @@ export const Component = () => {
 		})
 	);
 
-	const [debouncedSearchQuery] = useDebouncedState(formValues.urlName || formValues.title);
+	const [isDirty, setIsDirty] = useState(false);
+	const navigationBlocker = useBlocker(!isGroupSessionPreview && isDirty);
+	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
+	const [selectedTab, setSelectedTab] = useState('details');
+	const [urlNameSetByUser, setUrlNameSetByUser] = useState(!isDuplicate && !!loaderData?.groupSession?.urlName);
+	const [debouncedSearchQuery] = useDebouncedState(urlNameSetByUser ? formValues.urlName : formValues.title);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
 		{}
 	);
@@ -213,73 +237,78 @@ export const Component = () => {
 	const isExternal = groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 	const hasReservations = (loaderData?.groupSessionReservations ?? []).length > 0;
 
-	const togglePreview = useCallback(
-		(nextPreviewState: 'on' | 'off') => {
-			if (nextPreviewState === 'on') {
-				setIsGroupSessionPreview(true);
-				window.scrollTo(0, 0);
-
-				return;
-			}
-
-			setIsGroupSessionPreview(false);
-		},
-		[setIsGroupSessionPreview]
-	);
-
-	const handleDescriptionChange = useCallback((nextDescription: string) => {
-		setFormValues((curr) => ({
-			...curr,
-			description: nextDescription,
-		}));
+	const updateFormValue = useCallback((key: keyof typeof formValues, value: typeof formValues[typeof key]) => {
+		setIsDirty(true);
+		setFormValues((currentValues) => {
+			return {
+				...currentValues,
+				[key]: value,
+			};
+		});
 	}, []);
 
 	const handleSaveForm = useCallback(
-		async (groupSessionStatusId: GROUP_SESSION_STATUS_ID) => {
+		async (options?: { exitAfterSave?: boolean }) => {
 			const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
-			const urlName = urlNameValidations[debouncedSearchQuery]?.recommendation ?? '';
+			if (!isPublished) {
+				submission.groupSessionStatusId = GROUP_SESSION_STATUS_ID.NEW;
+			}
 
-			return (
-				!isEdit
-					? groupSessionsService
-							.createGroupSession({
-								...submission,
-								urlName,
-								groupSessionStatusId,
-							})
-							.fetch()
-					: groupSessionsService
-							.updateGroupsession(loaderData!.groupSession!.groupSessionId, {
-								...submission,
-								groupSessionStatusId,
-							})
-							.fetch()
-			)
+			const promise = !isEdit
+				? groupSessionsService.createGroupSession(submission).fetch()
+				: groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch();
+			setIsDirty(false);
+
+			promise
 				.then((response) => {
-					navigate('/admin/group-sessions');
+					if (isPublished || options?.exitAfterSave) {
+						if (isPublished) {
+							addFlag({
+								variant: 'success',
+								title: 'Changes published',
+								description: 'Your changes are now available on Cobalt',
+								actions: [
+									{
+										title: 'View Session',
+										onClick: () => {
+											navigate(`/group-sessions/${response.groupSession.groupSessionId}`);
+										},
+									},
+								],
+							});
+						}
+
+						navigate('/admin/group-sessions');
+					} else {
+						navigate('/admin/group-sessions/preview/' + response.groupSession.groupSessionId);
+					}
 				})
 				.catch((e) => {
+					setIsDirty(true);
 					handleError(e);
 				});
 		},
-		[debouncedSearchQuery, formValues, handleError, isEdit, isExternal, loaderData, navigate, urlNameValidations]
+		[addFlag, formValues, handleError, isEdit, isExternal, isPublished, navigate, params.groupSessionId]
 	);
 
 	useEffect(() => {
-		// cleanup layout/header on unmount
-		return () => {
-			setIsGroupSessionPreview(false);
-		};
-	}, [setIsGroupSessionPreview]);
+		if (isGroupSessionPreview) {
+			window.scroll(0, 0);
+		}
+	}, [isGroupSessionPreview]);
 
 	useEffect(() => {
 		if (!debouncedSearchQuery) {
+			setFormValues((previousValues) => ({
+				...previousValues,
+				urlName: isEdit ? loaderData?.groupSession?.urlName ?? '' : '',
+			}));
 			return;
 		}
 
 		groupSessionsService
-			.validateUrlName(debouncedSearchQuery, isDuplicate ? undefined : loaderData?.groupSession?.groupSessionId)
+			.validateUrlName(debouncedSearchQuery, isDuplicate ? undefined : params.groupSessionId)
 			.fetch()
 			.then((response) => {
 				setUrlNameValidations((validations) => {
@@ -288,8 +317,13 @@ export const Component = () => {
 						[debouncedSearchQuery]: response.groupSessionUrlNameValidationResult,
 					};
 				});
+
+				setFormValues((previousValues) => ({
+					...previousValues,
+					urlName: response.groupSessionUrlNameValidationResult.recommendation,
+				}));
 			});
-	}, [debouncedSearchQuery, isDuplicate, loaderData?.groupSession?.groupSessionId]);
+	}, [debouncedSearchQuery, isDuplicate, isEdit, loaderData?.groupSession?.urlName, params.groupSessionId]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -304,10 +338,7 @@ export const Component = () => {
 				selected={formValues.startDate || new Date()}
 				disabled={isEdit && hasReservations}
 				onChange={(date) => {
-					setFormValues((previousValues) => ({
-						...previousValues,
-						startDate: date,
-					}));
+					updateFormValue('startDate', date);
 				}}
 			/>
 
@@ -320,10 +351,7 @@ export const Component = () => {
 					required={!isExternal || formValues.singleSessionFlag}
 					value={formValues.startTime}
 					onChange={({ currentTarget }) => {
-						setFormValues((curr) => ({
-							...curr,
-							startTime: currentTarget.value,
-						}));
+						updateFormValue('startTime', currentTarget.value);
 					}}
 				/>
 
@@ -335,83 +363,853 @@ export const Component = () => {
 					disabled={isEdit && hasReservations}
 					value={formValues.endTime}
 					onChange={({ currentTarget }) => {
-						setFormValues((curr) => ({
-							...curr,
-							endTime: currentTarget.value,
-						}));
+						updateFormValue('endTime', currentTarget.value);
 					}}
 				/>
 			</div>
 		</>
 	);
 
-	const footer = (
+	const formFields = (
 		<Container>
-			<div className="py-10 d-flex justify-content-between">
-				<Button
-					variant="outline-primary"
-					type="button"
-					onClick={() => {
-						if (isGroupSessionPreview) {
-							togglePreview('off');
-							return;
-						}
+			<ConfirmDialog
+				size="lg"
+				show={navigationBlocker.state === 'blocked'}
+				onHide={() => {
+					navigationBlocker.reset?.();
+				}}
+				titleText={`Confirm Exit`}
+				bodyText={'You have changes that have not been saved or published, are your sure you want to exit?'}
+				dismissText="Cancel"
+				confirmText="Exit"
+				onConfirm={() => {
+					navigationBlocker.proceed?.();
+				}}
+			/>
 
-						if (isEdit && isPublished) {
-							window.confirm(
-								'You have changes that have not been published, are your sure you want to exit?'
-							) && navigate('/admin/group-sessions');
-							return;
-						}
+			<GroupSessionFormSection
+				title="Basic Info"
+				description={
+					<>
+						<p className="mb-4">
+							Write a clear, brief title to help people quickly understand what your group session is
+							about.
+						</p>
 
-						handleSaveForm(GROUP_SESSION_STATUS_ID.NEW);
+						<p className="mb-4">
+							Include a friendly URL to make the web address at {window.location.host} easier to read. A
+							friendly URL includes 1-3 words separated by hyphens that describe the content of the
+							webpage (ex. tolerating-uncertainty).
+						</p>
+					</>
+				}
+			>
+				<InputHelper
+					className="mb-3"
+					type="text"
+					label="Session Title"
+					required
+					name="title"
+					value={formValues.title}
+					disabled={isExternal ? !isDuplicate && isPublished : isEdit && hasReservations}
+					onChange={({ currentTarget }) => {
+						updateFormValue('title', currentTarget.value);
+					}}
+				/>
+
+				<InputHelper
+					type="text"
+					label="Friendly URL"
+					name="urlName"
+					error={urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined}
+					value={formValues.urlName}
+					disabled={
+						!formValues.title || (isExternal ? !isDuplicate && isPublished : isEdit && hasReservations)
+					}
+					onChange={({ currentTarget }) => {
+						setUrlNameSetByUser(true);
+						updateFormValue('urlName', currentTarget.value);
+					}}
+					onBlur={() => {
+						if (!formValues.urlName) {
+							setUrlNameSetByUser(false);
+						}
+					}}
+				/>
+
+				{!formValues.title || urlNameValidations[debouncedSearchQuery]?.available === false ? null : (
+					<div className="d-flex mt-2">
+						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+						<p className="mb-0">
+							URL will appear as https://{window.location.host}/group-sessions/
+							<span className="fw-bold">{urlNameValidations[debouncedSearchQuery]?.recommendation}</span>
+						</p>
+					</div>
+				)}
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
+				<ToggledInput label="Virtual" checked disabled hideChildren={isExternal}>
+					<InputHelper
+						className="mb-2"
+						type="text"
+						label="Video Link URL (Bluejeans/Zoom, etc.)"
+						name="videoconferenceUrl"
+						required
+						value={formValues.videoconferenceUrl}
+						onChange={({ currentTarget }) => {
+							updateFormValue('videoconferenceUrl', currentTarget.value);
+						}}
+					/>
+					<p className="mb-0 text-muted">
+						Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
+					</p>
+				</ToggledInput>
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title="Capacity (optional)"
+				description="Enter a number to set a limit on how many people are allowed to attend."
+			>
+				<InputHelper
+					type="number"
+					label="Number of seats available"
+					name="seats"
+					value={typeof formValues.seats === 'number' ? formValues.seats.toString() : ''}
+					onChange={({ currentTarget }) => {
+						updateFormValue('seats', parseInt(currentTarget.value));
+					}}
+				/>
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title={isExternal ? 'Facilitator' : 'Facilitator & Contact'}
+				description={
+					<>
+						<p className="mb-4">Enter the information for the person who will be running this session.</p>
+
+						{!isExternal && (
+							<p>
+								Enter the information for the person who will be running this session. By default, the
+								facilitator will receive an email whenever a user registers or cancels for the group
+								session. You can choose to add a different email address to receive these notifications
+								instead.
+							</p>
+						)}
+					</>
+				}
+			>
+				<InputHelper
+					className="mb-3"
+					type="text"
+					label="Facilitator Name"
+					required
+					name="facilitatorName"
+					value={formValues.facilitatorName}
+					onChange={({ currentTarget }) => {
+						updateFormValue('facilitatorName', currentTarget.value);
+					}}
+				/>
+
+				<InputHelper
+					className="mb-3"
+					type="email"
+					label="Facilitator Email Address"
+					required
+					name="facilitatorEmailAddress"
+					value={formValues.facilitatorEmailAddress}
+					onChange={({ currentTarget }) => {
+						updateFormValue('facilitatorEmailAddress', currentTarget.value);
+					}}
+				/>
+
+				{!isExternal && (
+					<ToggledInput
+						type="switch"
+						id="contact-is-facilitator"
+						label={
+							<div>
+								<p className="mb-0">Use a different email address for notifications</p>
+								<p className="fs-small mb-0 text-muted">
+									This address will receive emails when a person registers or cancels
+								</p>
+							</div>
+						}
+						checked={showContactEmailInput}
+						onChange={({ currentTarget }) => {
+							setShowContactEmailInput(currentTarget.checked);
+						}}
+					>
+						<InputHelper
+							type="email"
+							label="Notification Email"
+							required={showContactEmailInput}
+							name="targetEmailAddress"
+							value={formValues.targetEmailAddress}
+							onChange={({ currentTarget }) => {
+								updateFormValue('targetEmailAddress', currentTarget.value);
+							}}
+						/>
+					</ToggledInput>
+				)}
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title={isExternal ? 'Duration' : 'Scheduling'}
+				description={
+					isExternal
+						? 'A group session managed outside of Cobalt may be a single scheduled session or an ongoing series.'
+						: 'Add the scheduled date and time for the session.'
+				}
+			>
+				{isExternal ? (
+					<>
+						<ToggledInput
+							type="radio"
+							id="duration-single"
+							label="Single session"
+							className="mb-3"
+							checked={formValues.singleSessionFlag === true}
+							onChange={() => {
+								updateFormValue('singleSessionFlag', true);
+							}}
+						>
+							{startAndEndTimeInputs}
+						</ToggledInput>
+
+						<ToggledInput
+							type="radio"
+							id="duration-series"
+							label="Ongoing series"
+							checked={formValues.singleSessionFlag === false}
+							onChange={() => {
+								updateFormValue('singleSessionFlag', false);
+							}}
+						>
+							<div className="d-flex mb-3">
+								<DatePicker
+									className="w-100 me-1"
+									labelText="Start Date"
+									required
+									selected={formValues.startDate || new Date()}
+									onChange={(date) => {
+										updateFormValue('startDate', date);
+									}}
+								/>
+
+								<DatePicker
+									className="w-100 ms-1"
+									labelText="End Date"
+									required
+									selected={formValues.endDate || new Date()}
+									onChange={(date) => {
+										updateFormValue('endDate', date);
+									}}
+								/>
+							</div>
+
+							<InputHelper
+								label="Description"
+								placeholder="Ex. Wednesdays 7-7:30 PM"
+								name="dateTimeDescription"
+								value={formValues.dateTimeDescription}
+								onChange={({ currentTarget }) => {
+									updateFormValue('dateTimeDescription', currentTarget.value);
+								}}
+								required={!formValues.singleSessionFlag}
+							/>
+						</ToggledInput>
+					</>
+				) : (
+					startAndEndTimeInputs
+				)}
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title="Image"
+				description={
+					<>
+						<p className="mb-4">
+							Add an image that represents the subject matter of your group session. Choose one that looks
+							good at different sizes — this image will appear across the Cobalt website and mobile apps.
+						</p>
+						<p className="mb-4">
+							Your image should be at least 800×450px. It will be cropped to a 16:9 ratio.
+						</p>
+
+						<p className="mb-0">Tips for selecting a good image:</p>
+
+						<ul>
+							<li>Features a warm, bold color palette</li>
+							<li>
+								Has a subject that is one of the following: 1) a headshot, 2) a calming piece of art, 3)
+								an abstract image of nature
+							</li>
+							<li>Avoid scenes that depict low mood, anxiety, or other distress as well as clichés.</li>
+						</ul>
+					</>
+				}
+			>
+				<GroupSessionImageInput
+					imageSrc={formValues.imageUrl}
+					onSrcChange={(nextSrc) => {
+						updateFormValue('imageUrl', nextSrc);
+					}}
+				/>
+
+				<div className="d-flex  mt-2">
+					<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+					<p className="mb-0">
+						If you choose not to upload an image, a generic placeholder image will be added to your post.
+						Free images can be found at{' '}
+						<a href="https://unsplash.com/" target="_blank" rel="noopener noreferrer">
+							unsplash.com
+						</a>
+					</p>
+				</div>
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title="Description"
+				description="Describe what your group session is about, who it is for, and any special requirements for participating. Your description should tell potential attendees everything they need to know to make a decision about joining."
+			>
+				<Wysiwyg
+					ref={descriptionWysiwygRef}
+					className="bg-white"
+					initialValue={loaderData.groupSession?.description ?? ''}
+					onChange={(nextValue) => {
+						updateFormValue('description', nextValue);
+					}}
+				/>
+			</GroupSessionFormSection>
+
+			{isExternal && (
+				<>
+					<hr />
+
+					<GroupSessionFormSection
+						title="Learn More"
+						description="How will participants learn more or sign up for this session?"
+					>
+						<ToggledInput
+							type="radio"
+							id="more-info-call"
+							className="mb-3"
+							label="Call to learn more"
+							checked={formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE}
+							onChange={() => {
+								updateFormValue('groupSessionLearnMoreMethodId', GroupSessionLearnMoreMethodId.PHONE);
+								updateFormValue('learnMoreDescription', '');
+							}}
+						>
+							<InputHelper
+								label="Phone Number"
+								value={formValues.learnMoreDescription}
+								name="learnMoreDescriptionPhone"
+								type="tel"
+								onChange={({ currentTarget }) => {
+									updateFormValue('learnMoreDescription', currentTarget.value);
+								}}
+								required={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE
+								}
+							/>
+						</ToggledInput>
+
+						<ToggledInput
+							type="radio"
+							id="more-info-email"
+							className="mb-3"
+							label="Email to learn more"
+							checked={formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL}
+							onChange={() => {
+								updateFormValue('groupSessionLearnMoreMethodId', GroupSessionLearnMoreMethodId.EMAIL);
+								updateFormValue('learnMoreDescription', '');
+							}}
+						>
+							<InputHelper
+								label="Email Address"
+								type={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
+										? 'email'
+										: 'text'
+								}
+								name="learnMoreDescriptionEmail"
+								value={formValues.learnMoreDescription}
+								onChange={({ currentTarget }) => {
+									updateFormValue('learnMoreDescription', currentTarget.value);
+								}}
+								required={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
+								}
+							/>
+						</ToggledInput>
+
+						<ToggledInput
+							type="radio"
+							id="more-info-url"
+							className="mb-3"
+							label="Click here to learn more (URL)"
+							checked={formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL}
+							onChange={() => {
+								updateFormValue('groupSessionLearnMoreMethodId', GroupSessionLearnMoreMethodId.URL);
+								updateFormValue('learnMoreDescription', '');
+							}}
+						>
+							<InputHelper
+								label="External URL"
+								name="learnMoreDescriptionUrl"
+								value={formValues.learnMoreDescription}
+								onChange={({ currentTarget }) => {
+									updateFormValue('learnMoreDescription', currentTarget.value);
+								}}
+								required={
+									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL
+								}
+								helperText="The external URL may be a link that participants use to register for the session or a link to a webpage with more information."
+							/>
+						</ToggledInput>
+					</GroupSessionFormSection>
+				</>
+			)}
+
+			<hr />
+
+			<GroupSessionFormSection
+				title="Visibility"
+				description={
+					<>
+						<p className="mb-2">
+							Visible sessions can be displayed in a collection with other similar group sessions. If no
+							collection is selected, then the session will only be displayed in the Upcoming Sessions
+							section.
+						</p>
+
+						<p>
+							A hidden session will still be available on Cobalt, but users will need a direct link to
+							access it.
+						</p>
+					</>
+				}
+			>
+				<ToggledInput
+					type="radio"
+					id="visibility-on"
+					label="Visible"
+					className="mb-3"
+					required
+					checked={formValues.visibleFlag}
+					onChange={({ currentTarget }) => {
+						updateFormValue('visibleFlag', true);
 					}}
 				>
-					{isGroupSessionPreview ? (
-						<>
-							<LeftChevron /> Back to Edit
-						</>
-					) : isEdit && isPublished ? (
-						'Exit'
-					) : (
-						'Save & Exit'
-					)}
-				</Button>
+					<InputHelper
+						as="select"
+						label="Collection"
+						name="groupSessionCollectionId"
+						value={formValues.groupSessionCollectionId}
+						onChange={({ currentTarget }) => {
+							updateFormValue('groupSessionCollectionId', currentTarget.value);
+						}}
+					>
+						<option value="">Select a collection</option>
+						{loaderData.groupSessionCollections.map((groupSessionCollection) => {
+							return (
+								<option
+									key={groupSessionCollection.groupSessionCollectionId}
+									value={groupSessionCollection.groupSessionCollectionId}
+								>
+									{groupSessionCollection.description}
+								</option>
+							);
+						})}
+					</InputHelper>
+				</ToggledInput>
 
-				<Button variant="primary" type="submit">
-					{isGroupSessionPreview ? (
-						'Publish'
-					) : (
-						<>
-							Next: Preview <RightChevron />
-						</>
-					)}
-				</Button>
-			</div>
+				<ToggledInput
+					type="radio"
+					id="visibility-off"
+					name="visibility"
+					label="Hidden"
+					hideChildren
+					checked={!formValues.visibleFlag}
+					onChange={({ currentTarget }) => {
+						updateFormValue('visibleFlag', false);
+					}}
+				/>
+			</GroupSessionFormSection>
+
+			<hr />
+
+			<GroupSessionFormSection
+				title="Tags"
+				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
+			>
+				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
+					return (
+						<div key={tagGroup.tagGroupId} className="mb-4">
+							<h5 className="mb-2">{tagGroup.name}</h5>
+
+							<div className="d-flex flex-wrap">
+								{(tagGroup.tags ?? []).map((tag) => {
+									const isSelected = formValues.tagIds.includes(tag.tagId);
+
+									return (
+										<Button
+											key={tag.tagId}
+											size="sm"
+											variant={isSelected ? 'primary' : 'outline-primary'}
+											className="mb-2 me-2 fs-default text-nowrap"
+											onClick={() => {
+												updateFormValue(
+													'tagIds',
+													isSelected
+														? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
+														: [...formValues.tagIds, tag.tagId]
+												);
+											}}
+										>
+											{isSelected ? (
+												<CheckIcon className="me-2" />
+											) : (
+												<PlusIcon className="me-2" />
+											)}
+											{tag.name}
+										</Button>
+									);
+								})}
+							</div>
+						</div>
+					);
+				})}
+			</GroupSessionFormSection>
+
+			{!isExternal && (
+				<>
+					<hr />
+					<GroupSessionFormSection
+						title="Screening Questions"
+						description={
+							<>
+								<p className="mb-2">
+									You may restrict a group session to certain audiences by selecting a set of
+									pre-defined screening questions.
+								</p>
+
+								<p>
+									Attendees must answer “Yes” to all screening questions in a set to reserve a seat.
+								</p>
+							</>
+						}
+					>
+						<ScreeningFlowQuestionsModal
+							show={!!selectedScreeningFlowForModal}
+							screeningFlow={selectedScreeningFlowForModal}
+							onHide={() => {
+								setSelectedScreeningFlowForModal(undefined);
+							}}
+						/>
+
+						<ToggledInput
+							className="mb-3"
+							id="no-screening"
+							label="Do not screen"
+							hideChildren
+							checked={!formValues.screeningFlowId}
+							onChange={() => {
+								updateFormValue('screeningFlowId', '');
+							}}
+						/>
+
+						{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
+							return (
+								<ToggledInput
+									key={screeningFlow.screeningFlowId}
+									id={screeningFlow.screeningFlowId}
+									label={screeningFlow.name}
+									className="mb-3"
+									hideChildren
+									detail={
+										<Button
+											size="sm"
+											variant="link"
+											className="p-0 text-decoration-none"
+											onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
+										>
+											View Questions
+										</Button>
+									}
+									checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
+									onChange={({ currentTarget }) => {
+										updateFormValue(
+											'screeningFlowId',
+											currentTarget.checked ? screeningFlow.screeningFlowId : ''
+										);
+									}}
+								/>
+							);
+						})}
+					</GroupSessionFormSection>
+
+					<hr />
+
+					<GroupSessionFormSection
+						title="Confirmation Email"
+						description="Write text for an email that will be sent when someone reserves a seat for this session."
+					>
+						<InputHelper
+							label="Confirmation Email Text"
+							value={formValues.confirmationEmailContent}
+							name="confirmationEmailContent"
+							as="textarea"
+							onChange={({ currentTarget }) => {
+								updateFormValue('confirmationEmailContent', currentTarget.value);
+							}}
+							required
+						/>
+					</GroupSessionFormSection>
+
+					<hr />
+
+					<GroupSessionFormSection title="Other Emails (Optional)">
+						<ToggledInput
+							type="switch"
+							id="send-reminder-email"
+							className="mb-3"
+							label={
+								<div>
+									<p className="mb-0">Send Reminder Email</p>
+									<p className="fs-small text-muted mb-0">
+										Sent 24 hours before the start of the session
+									</p>
+								</div>
+							}
+							checked={formValues.sendReminderEmail}
+							onChange={({ currentTarget }) => {
+								updateFormValue('sendReminderEmail', currentTarget.checked);
+							}}
+						>
+							<InputHelper
+								label="Reminder Email Text"
+								value={formValues.reminderEmailContent}
+								name="reminderEmailContent"
+								as="textarea"
+								onChange={({ currentTarget }) => {
+									updateFormValue('reminderEmailContent', currentTarget.value);
+								}}
+								required={formValues.sendReminderEmail}
+							/>
+						</ToggledInput>
+
+						<ToggledInput
+							type="switch"
+							id="send-followup-email"
+							className="mb-3"
+							label={
+								<div>
+									<p className="mb-0">Send Follow-up Email</p>
+									<p className="fs-small text-muted mb-0">Sent after the session ends</p>
+								</div>
+							}
+							checked={formValues.sendFollowupEmail}
+							onChange={({ currentTarget }) => {
+								updateFormValue('sendFollowupEmail', currentTarget.checked);
+							}}
+						>
+							<div className="d-flex mb-1">
+								<InputHelper
+									className="w-100 me-1"
+									as="select"
+									label="# of days after session"
+									name="followupDayOffset"
+									required={formValues.sendFollowupEmail}
+									value={formValues.followupDayOffset}
+									onChange={({ currentTarget }) => {
+										updateFormValue('followupDayOffset', currentTarget.value);
+									}}
+								>
+									<option value="" disabled>
+										Select...
+									</option>
+									{[...Array(14).keys()].map((num) => (
+										<option key={num} value={num + 1}>
+											{num + 1}
+										</option>
+									))}
+								</InputHelper>
+
+								<TimeSlotInput
+									className="w-100 ms-1"
+									label="Time"
+									name="followupTimeOfDay"
+									required={formValues.sendFollowupEmail}
+									value={formValues.followupTimeOfDay}
+									onChange={({ currentTarget }) => {
+										updateFormValue('followupTimeOfDay', currentTarget.value);
+									}}
+								/>
+							</div>
+
+							<p className="mb-3">
+								The follow-up email will be sent{' '}
+								<span className="fw-bold text-decoration-underline">
+									{formValues.followupDayOffset} day
+								</span>{' '}
+								after the session ends at{' '}
+								<span className="fw-bold text-docration-underline">
+									{formValues.followupTimeOfDay || '--'}
+								</span>
+							</p>
+
+							<InputHelper
+								label="Follow-up Email Text"
+								value={formValues.followupEmailContent}
+								name="followupEmailContent"
+								as="textarea"
+								onChange={({ currentTarget }) => {
+									updateFormValue('followupEmailContent', currentTarget.value);
+								}}
+								required={formValues.sendFollowupEmail}
+								className="mb-3"
+							/>
+
+							<InputHelper
+								label="Survey URL"
+								value={formValues.followupEmailSurveyUrl}
+								name="followupEmailSurveyUrl"
+								onChange={({ currentTarget }) => {
+									updateFormValue('followupEmailSurveyUrl', currentTarget.value);
+								}}
+							/>
+						</ToggledInput>
+					</GroupSessionFormSection>
+				</>
+			)}
 		</Container>
+	);
+
+	const footer = (
+		<div className={classes.formFooter}>
+			<Container>
+				<div className="d-flex justify-content-between">
+					<Button
+						variant="outline-primary"
+						type={isGroupSessionPreview ? 'button' : 'submit'}
+						value="exit"
+						onClick={() => {
+							if (isGroupSessionPreview) {
+								navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
+								return;
+							}
+						}}
+					>
+						{isGroupSessionPreview ? (
+							<>
+								<LeftChevron /> Back to Edit
+							</>
+						) : isPublished ? (
+							'Exit'
+						) : (
+							'Save & Exit'
+						)}
+					</Button>
+
+					<Button
+						variant="primary"
+						type={isGroupSessionPreview ? 'button' : 'submit'}
+						onClick={() => {
+							if (!isGroupSessionPreview) {
+								return;
+							}
+
+							setShowConfirmPublishDialog(true);
+						}}
+					>
+						{isGroupSessionPreview ? (
+							'Publish'
+						) : (
+							<>
+								{isPublished ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+							</>
+						)}
+					</Button>
+				</div>
+			</Container>
+		</div>
+	);
+
+	const confirmPublishDialog = (
+		<ConfirmDialog
+			size="lg"
+			show={showConfirmPublishDialog}
+			onHide={() => {
+				setShowConfirmPublishDialog(false);
+			}}
+			titleText={`Publish ${isPublished ? 'Changes' : 'Group Session'}`}
+			bodyText={`Are you ready to publish ${isPublished ? 'your changes' : 'your group session'}?`}
+			detailText={`Your ${isPublished ? 'changes' : 'group session'} will become available on Cobalt immediately`}
+			dismissText="Cancel"
+			confirmText="Publish"
+			onConfirm={() => {
+				if (isPublished) {
+					handleSaveForm();
+				} else {
+					groupSessionsService
+						.updateGroupSessionStatusById(params.groupSessionId!, GROUP_SESSION_STATUS_ID.ADDED)
+						.fetch()
+						.then((response) => {
+							addFlag({
+								variant: 'success',
+								title: 'Group session published',
+								description: 'Your session is now available on Cobalt',
+								actions: [
+									{
+										title: 'View Session',
+										onClick: () => {
+											navigate(`/group-sessions/${response.groupSession.groupSessionId}`);
+										},
+									},
+								],
+							});
+
+							navigate('/admin/group-sessions');
+						})
+						.catch((e) => {
+							handleError(e);
+						});
+				}
+			}}
+		/>
 	);
 
 	if (isGroupSessionPreview) {
 		const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
 		return (
-			<Form
-				onSubmit={(event) => {
-					event.preventDefault();
-
-					handleSaveForm(GROUP_SESSION_STATUS_ID.ADDED);
-				}}
-			>
+			<div className="pb-11">
+				{confirmPublishDialog}
 				<GroupSession groupSession={submission} />
 				{footer}
-			</Form>
+			</div>
 		);
 	}
 
 	return (
 		<Form
+			className="pb-11"
 			onSubmit={(event) => {
-				console.log(event.currentTarget);
 				event.preventDefault();
 
 				// validate wysiwyg
@@ -424,834 +1222,70 @@ export const Component = () => {
 					return;
 				}
 
-				if (!isGroupSessionPreview) {
-					togglePreview('on');
-					return;
+				if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
+					handleSaveForm({ exitAfterSave: true });
+				} else if (!isPublished) {
+					handleSaveForm();
+				} else {
+					setShowConfirmPublishDialog(true);
 				}
 			}}
 		>
+			{confirmPublishDialog}
+
 			<Container className="py-10">
 				<Row>
 					<Col>
 						<h2 className="mb-1">
 							{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
 						</h2>
-						<p className="mb-0 fs-large">
-							Complete all <span className="text-danger">*required fields</span> before publishing.
-							Published group sessions will appear on the{' '}
-							<Link to="/admin/group-sessions">Group Sessions</Link> page of Cobalt.
-						</p>
+						{!isPublished && (
+							<p className="mb-0 fs-large">
+								Complete all <span className="text-danger">*required fields</span> before publishing.
+								Published group sessions will appear on the{' '}
+								<Link to="/group-sessions" target="_blank">
+									Group Sessions
+								</Link>{' '}
+								page of Cobalt.
+							</p>
+						)}
 					</Col>
 				</Row>
 			</Container>
 
-			<hr />
-
-			<Container>
-				<GroupSessionFormSection
-					title="Basic Info"
-					description={
-						<>
-							<p className="mb-4">
-								Write a clear, brief title to help people quickly understand what your group session is
-								about.
-							</p>
-
-							<p className="mb-4">
-								Include a friendly URL to make the web address at {window.location.host} easier to read.
-								A friendly URL includes 1-3 words separated by hyphens that describe the content of the
-								webpage (ex. tolerating-uncertainty).
-							</p>
-						</>
-					}
-				>
-					<InputHelper
-						className="mb-3"
-						type="text"
-						label="Session Title"
-						required
-						name="title"
-						value={formValues.title}
-						disabled={isExternal ? !isDuplicate && isPublished : isEdit && hasReservations}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								title: currentTarget.value,
-							}));
-						}}
-					/>
-
-					<InputHelper
-						type="text"
-						label="Friendly URL"
-						name="urlName"
-						error={
-							urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined
-						}
-						value={formValues.urlName}
-						disabled={
-							!formValues.title || (isExternal ? !isDuplicate && isPublished : isEdit && hasReservations)
-						}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								urlName: currentTarget.value,
-							}));
-						}}
-					/>
-
-					{!formValues.title || urlNameValidations[debouncedSearchQuery]?.available === false ? null : (
-						<div className="d-flex mt-2">
-							<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-							<p className="mb-0">
-								URL will appear as https://{window.location.host}/group-sessions/
-								<span className="fw-bold">
-									{urlNameValidations[debouncedSearchQuery]?.recommendation}
-								</span>
-							</p>
-						</div>
-					)}
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
-					<ToggledInput label="Virtual" checked disabled hideChildren={isExternal}>
-						<InputHelper
-							className="mb-2"
-							type="text"
-							label="Video Link URL (Bluejeans/Zoom, etc.)"
-							name="videoconferenceUrl"
-							required
-							value={formValues.videoconferenceUrl}
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									videoconferenceUrl: currentTarget.value,
-								}));
+			{isPublished && !isExternal ? (
+				<Container>
+					<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
+						<TabBar
+							key="mhic-orders-overview-tabbar"
+							className="mb-8"
+							value={selectedTab}
+							tabs={[
+								{
+									value: 'details',
+									title: 'Details',
+								},
+								{
+									value: 'registrants',
+									title: `Registrants`,
+								},
+							]}
+							onTabClick={(value) => {
+								setSelectedTab(value);
 							}}
 						/>
-						<p className="mb-0 text-muted">
-							Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
-						</p>
-					</ToggledInput>
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Capacity (optional)"
-					description="Enter a number to set a limit on how many people are allowed to attend."
-				>
-					<InputHelper
-						type="number"
-						label="Number of seats available"
-						name="seats"
-						value={typeof formValues.seats === 'number' ? formValues.seats.toString() : ''}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								seats: parseInt(currentTarget.value),
-							}));
-						}}
-					/>
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title={isExternal ? 'Facilitator' : 'Facilitator & Contact'}
-					description={
-						<>
-							<p className="mb-4">
-								Enter the information for the person who will be running this session.
-							</p>
-
-							{!isExternal && (
-								<p>
-									Enter the information for the person who will be running this session. By default,
-									the facilitator will receive an email whenever a user registers or cancels for the
-									group session. You can choose to add a different email address to receive these
-									notifications instead.
-								</p>
-							)}
-						</>
-					}
-				>
-					<InputHelper
-						className="mb-3"
-						type="text"
-						label="Facilitator Name"
-						required
-						name="facilitatorName"
-						value={formValues.facilitatorName}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								facilitatorName: currentTarget.value,
-							}));
-						}}
-					/>
-
-					<InputHelper
-						className="mb-3"
-						type="email"
-						label="Facilitator Email Address"
-						required
-						name="facilitatorEmailAddress"
-						value={formValues.facilitatorEmailAddress}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								facilitatorEmailAddress: currentTarget.value,
-							}));
-						}}
-					/>
-
-					{!isExternal && (
-						<ToggledInput
-							type="switch"
-							id="contact-is-facilitator"
-							label={
-								<div>
-									<p className="mb-0">Use a different email address for notifications</p>
-									<p className="fs-small mb-0 text-muted">
-										This address will receive emails when a person registers or cancels
-									</p>
-								</div>
-							}
-							checked={showContactEmailInput}
-							onChange={({ currentTarget }) => {
-								setShowContactEmailInput(currentTarget.checked);
-							}}
-						>
-							<InputHelper
-								type="email"
-								label="Notification Email"
-								required={showContactEmailInput}
-								name="targetEmailAddress"
-								value={formValues.targetEmailAddress}
-								onChange={({ currentTarget }) => {
-									setFormValues((curr) => ({
-										...curr,
-										targetEmailAddress: currentTarget.value,
-									}));
-								}}
-							/>
-						</ToggledInput>
-					)}
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title={isExternal ? 'Duration' : 'Scheduling'}
-					description={
-						isExternal
-							? 'A group session managed outside of Cobalt may be a single scheduled session or an ongoing series.'
-							: 'Add the scheduled date and time for the session.'
-					}
-				>
-					{isExternal ? (
-						<>
-							<ToggledInput
-								type="radio"
-								id="duration-single"
-								label="Single session"
-								className="mb-3"
-								checked={formValues.singleSessionFlag === true}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										singleSessionFlag: true,
-									}));
-								}}
-							>
-								{startAndEndTimeInputs}
-							</ToggledInput>
-
-							<ToggledInput
-								type="radio"
-								id="duration-series"
-								label="Ongoing series"
-								checked={formValues.singleSessionFlag === false}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										singleSessionFlag: false,
-									}));
-								}}
-							>
-								<div className="d-flex mb-3">
-									<DatePicker
-										className="w-100 me-1"
-										labelText="Start Date"
-										required
-										selected={formValues.startDate || new Date()}
-										onChange={(date) => {
-											setFormValues((previousValues) => ({
-												...previousValues,
-												startDate: date,
-											}));
-										}}
-									/>
-
-									<DatePicker
-										className="w-100 ms-1"
-										labelText="End Date"
-										required
-										selected={formValues.endDate || new Date()}
-										onChange={(date) => {
-											setFormValues((previousValues) => ({
-												...previousValues,
-												endDate: date,
-											}));
-										}}
-									/>
-								</div>
-
-								<InputHelper
-									label="Description"
-									placeholder="Ex. Wednesdays 7-7:30 PM"
-									name="dateTimeDescription"
-									value={formValues.dateTimeDescription}
-									onChange={({ currentTarget }) => {
-										setFormValues((curr) => ({
-											...curr,
-											dateTimeDescription: currentTarget.value,
-										}));
-									}}
-									required={!formValues.singleSessionFlag}
-								/>
-							</ToggledInput>
-						</>
-					) : (
-						startAndEndTimeInputs
-					)}
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Image"
-					description={
-						<>
-							<p className="mb-4">
-								Add an image that represents the subject matter of your group session. Choose one that
-								looks good at different sizes — this image will appear across the Cobalt website and
-								mobile apps.
-							</p>
-							<p className="mb-4">
-								Your image should be at least 800×450px. It will be cropped to a 16:9 ratio.
-							</p>
-
-							<p className="mb-0">Tips for selecting a good image:</p>
-
-							<ul>
-								<li>Features a warm, bold color palette</li>
-								<li>
-									Has a subject that is one of the following: 1) a headshot, 2) a calming piece of
-									art, 3) an abstract image of nature
-								</li>
-								<li>
-									Avoid scenes that depict low mood, anxiety, or other distress as well as clichés.
-								</li>
-							</ul>
-						</>
-					}
-				>
-					<GroupSessionImageInput
-						imageSrc={formValues.imageUrl}
-						onSrcChange={(nextSrc) => {
-							setFormValues((curr) => ({
-								...curr,
-								imageUrl: nextSrc,
-							}));
-						}}
-					/>
-
-					<div className="d-flex  mt-2">
-						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
-						<p className="mb-0">
-							If you choose not to upload an image, a generic placeholder image will be added to your
-							post. Free images can be found at{' '}
-							<a href="https://unsplash.com/" target="_blank" rel="noopener noreferrer">
-								unsplash.com
-							</a>
-						</p>
-					</div>
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Description"
-					description="Describe what your group session is about, who it is for, and any special requirements for participating. Your description should tell potential attendees everything they need to know to make a decision about joining."
-				>
-					<Wysiwyg
-						ref={descriptionWysiwygRef}
-						className="bg-white"
-						initialValue={loaderData.groupSession?.description ?? ''}
-						onChange={handleDescriptionChange}
-					/>
-				</GroupSessionFormSection>
-
-				{isExternal && (
-					<>
-						<hr />
-
-						<GroupSessionFormSection
-							title="Learn More"
-							description="How will participants learn more or sign up for this session?"
-						>
-							<ToggledInput
-								type="radio"
-								id="more-info-call"
-								className="mb-3"
-								label="Call to learn more"
-								checked={
-									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE
-								}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.PHONE,
-										learnMoreDescription: '',
-									}));
-								}}
-							>
-								<InputHelper
-									label="Phone Number"
-									value={formValues.learnMoreDescription}
-									name="learnMoreDescriptionPhone"
-									type="tel"
-									onChange={({ currentTarget }) => {
-										setFormValues((curr) => ({
-											...curr,
-											learnMoreDescription: currentTarget.value,
-										}));
-									}}
-									required={
-										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.PHONE
-									}
-								/>
-							</ToggledInput>
-
-							<ToggledInput
-								type="radio"
-								id="more-info-email"
-								className="mb-3"
-								label="Email to learn more"
-								checked={
-									formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
-								}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.EMAIL,
-										learnMoreDescription: '',
-									}));
-								}}
-							>
-								<InputHelper
-									label="Email Address"
-									type={
-										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
-											? 'email'
-											: 'text'
-									}
-									name="learnMoreDescriptionEmail"
-									value={formValues.learnMoreDescription}
-									onChange={({ currentTarget }) => {
-										setFormValues((curr) => ({
-											...curr,
-											learnMoreDescription: currentTarget.value,
-										}));
-									}}
-									required={
-										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.EMAIL
-									}
-								/>
-							</ToggledInput>
-
-							<ToggledInput
-								type="radio"
-								id="more-info-url"
-								className="mb-3"
-								label="Click here to learn more (URL)"
-								checked={formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL}
-								onChange={() => {
-									setFormValues((curr) => ({
-										...curr,
-										groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
-										learnMoreDescription: '',
-									}));
-								}}
-							>
-								<InputHelper
-									label="External URL"
-									name="learnMoreDescriptionUrl"
-									value={formValues.learnMoreDescription}
-									onChange={({ currentTarget }) => {
-										setFormValues((curr) => ({
-											...curr,
-											learnMoreDescription: currentTarget.value,
-										}));
-									}}
-									required={
-										formValues.groupSessionLearnMoreMethodId === GroupSessionLearnMoreMethodId.URL
-									}
-									helperText="The external URL may be a link that participants use to register for the session or a link to a webpage with more information."
-								/>
-							</ToggledInput>
-						</GroupSessionFormSection>
-					</>
-				)}
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Visibility"
-					description={
-						<>
-							<p className="mb-2">
-								Visible sessions can be displayed in a collection with other similar group sessions. If
-								no collection is selected, then the session will only be displayed in the Upcoming
-								Sessions section.
-							</p>
-
-							<p>
-								A hidden session will still be available on Cobalt, but users will need a direct link to
-								access it.
-							</p>
-						</>
-					}
-				>
-					<ToggledInput
-						type="radio"
-						id="visibility-on"
-						label="Visible"
-						className="mb-3"
-						required
-						checked={formValues.visibleFlag}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								visibleFlag: true,
-							}));
-						}}
-					>
-						<InputHelper
-							as="select"
-							label="Collection"
-							name="groupSessionCollectionId"
-							value={formValues.groupSessionCollectionId}
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									groupSessionCollectionId: currentTarget.value,
-								}));
-							}}
-						>
-							<option value="">Select a collection</option>
-							{loaderData.groupSessionCollections.map((groupSessionCollection) => {
-								return (
-									<option
-										key={groupSessionCollection.groupSessionCollectionId}
-										value={groupSessionCollection.groupSessionCollectionId}
-									>
-										{groupSessionCollection.description}
-									</option>
-								);
-							})}
-						</InputHelper>
-					</ToggledInput>
-
-					<ToggledInput
-						type="radio"
-						id="visibility-off"
-						name="visibility"
-						label="Hidden"
-						hideChildren
-						checked={!formValues.visibleFlag}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								visibleFlag: false,
-							}));
-						}}
-					/>
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Tags"
-					description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
-				>
-					{(loaderData?.tagGroups ?? []).map((tagGroup) => {
-						return (
-							<div key={tagGroup.tagGroupId} className="mb-4">
-								<h5 className="mb-2">{tagGroup.name}</h5>
-
-								<div className="d-flex flex-wrap">
-									{(tagGroup.tags ?? []).map((tag) => {
-										const isSelected = formValues.tagIds.includes(tag.tagId);
-
-										return (
-											<Button
-												key={tag.tagId}
-												size="sm"
-												variant={isSelected ? 'primary' : 'outline-primary'}
-												className="mb-2 me-2 fs-default text-nowrap"
-												onClick={() => {
-													setFormValues((curr) => ({
-														...curr,
-														tagIds: isSelected
-															? curr.tagIds.filter((tagId) => tagId !== tag.tagId)
-															: [...curr.tagIds, tag.tagId],
-													}));
-												}}
-											>
-												{isSelected ? (
-													<CheckIcon className="me-2" />
-												) : (
-													<PlusIcon className="me-2" />
-												)}
-												{tag.name}
-											</Button>
-										);
-									})}
-								</div>
-							</div>
-						);
-					})}
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Screening Questions"
-					description={
-						<>
-							<p className="mb-2">
-								You may restrict a group session to certain audiences by selecting a set of pre-defined
-								screening questions.
-							</p>
-
-							<p>Attendees must answer “Yes” to all screening questions in a set to reserve a seat.</p>
-						</>
-					}
-				>
-					<ScreeningFlowQuestionsModal
-						show={!!selectedScreeningFlowForModal}
-						screeningFlow={selectedScreeningFlowForModal}
-						onHide={() => {
-							setSelectedScreeningFlowForModal(undefined);
-						}}
-					/>
-
-					<ToggledInput
-						className="mb-3"
-						id="no-screening"
-						label="Do not screen"
-						hideChildren
-						checked={!formValues.screeningFlowId}
-						onChange={() => {
-							setFormValues((curr) => ({
-								...curr,
-								screeningFlowId: '',
-							}));
-						}}
-					/>
-
-					{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
-						return (
-							<ToggledInput
-								key={screeningFlow.screeningFlowId}
-								id={screeningFlow.screeningFlowId}
-								label={screeningFlow.name}
-								className="mb-3"
-								hideChildren
-								detail={
-									<Button
-										size="sm"
-										variant="link"
-										className="p-0 text-decoration-none"
-										onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
-									>
-										View Questions
-									</Button>
-								}
-								checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
-								onChange={({ currentTarget }) => {
-									setFormValues((curr) => ({
-										...curr,
-										screeningFlowId: currentTarget.checked ? screeningFlow.screeningFlowId : '',
-									}));
-								}}
-							/>
-						);
-					})}
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection
-					title="Confirmation Email"
-					description="Write text for an email that will be sent when someone reserves a seat for this session."
-				>
-					<InputHelper
-						label="Confirmation Email Text"
-						value={formValues.confirmationEmailContent}
-						name="confirmationEmailContent"
-						as="textarea"
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								confirmationEmailContent: currentTarget.value,
-							}));
-						}}
-						required
-					/>
-				</GroupSessionFormSection>
-
-				<hr />
-
-				<GroupSessionFormSection title="Other Emails (Optional)">
-					<ToggledInput
-						type="switch"
-						id="send-reminder-email"
-						className="mb-3"
-						label={
-							<div>
-								<p className="mb-0">Send Reminder Email</p>
-								<p className="fs-small text-muted mb-0">
-									Sent 24 hours before the start of the session
-								</p>
-							</div>
-						}
-						checked={formValues.sendReminderEmail}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								sendReminderEmail: currentTarget.checked,
-							}));
-						}}
-					>
-						<InputHelper
-							label="Reminder Email Text"
-							value={formValues.reminderEmailContent}
-							name="reminderEmailContent"
-							as="textarea"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									reminderEmailContent: currentTarget.value,
-								}));
-							}}
-							required={formValues.sendReminderEmail}
-						/>
-					</ToggledInput>
-
-					<ToggledInput
-						type="switch"
-						id="send-followup-email"
-						className="mb-3"
-						label={
-							<div>
-								<p className="mb-0">Send Follow-up Email</p>
-								<p className="fs-small text-muted mb-0">Sent after the session ends</p>
-							</div>
-						}
-						checked={formValues.sendFollowupEmail}
-						onChange={({ currentTarget }) => {
-							setFormValues((curr) => ({
-								...curr,
-								sendFollowupEmail: currentTarget.checked,
-							}));
-						}}
-					>
-						<div className="d-flex mb-1">
-							<InputHelper
-								className="w-100 me-1"
-								as="select"
-								label="# of days after session"
-								name="followupDayOffset"
-								required={formValues.sendFollowupEmail}
-								value={formValues.followupDayOffset}
-								onChange={({ currentTarget }) => {
-									setFormValues((curr) => ({
-										...curr,
-										followupDayOffset: currentTarget.value,
-									}));
-								}}
-							>
-								<option value="" disabled>
-									Select...
-								</option>
-								{[...Array(14).keys()].map((num) => (
-									<option key={num} value={num + 1}>
-										{num + 1}
-									</option>
-								))}
-							</InputHelper>
-
-							<TimeSlotInput
-								className="w-100 ms-1"
-								label="Time"
-								name="followupTimeOfDay"
-								required={formValues.sendFollowupEmail}
-								value={formValues.followupTimeOfDay}
-								onChange={({ currentTarget }) => {
-									setFormValues((curr) => ({
-										...curr,
-										followupTimeOfDay: currentTarget.value,
-									}));
-								}}
-							/>
-						</div>
-
-						<p className="mb-3">
-							The follow-up email will be sent{' '}
-							<span className="fw-bold text-decoration-underline">
-								{formValues.followupDayOffset} day
-							</span>{' '}
-							after the session ends at{' '}
-							<span className="fw-bold text-docration-underline">
-								{formValues.followupTimeOfDay || '--'}
-							</span>
-						</p>
-
-						<InputHelper
-							label="Follow-up Email Text"
-							value={formValues.followupEmailContent}
-							name="followupEmailContent"
-							as="textarea"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									followupEmailContent: currentTarget.value,
-								}));
-							}}
-							required={formValues.sendFollowupEmail}
-							className="mb-3"
-						/>
-
-						<InputHelper
-							label="Survey URL"
-							value={formValues.followupEmailSurveyUrl}
-							name="followupEmailSurveyUrl"
-							onChange={({ currentTarget }) => {
-								setFormValues((curr) => ({
-									...curr,
-									followupEmailSurveyUrl: currentTarget.value,
-								}));
-							}}
-						/>
-					</ToggledInput>
-				</GroupSessionFormSection>
-			</Container>
+						<Tab.Content>
+							<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
+							<Tab.Pane eventKey="registrants">
+								<h4>Registrants</h4>
+								<p> todo </p>
+							</Tab.Pane>
+						</Tab.Content>
+					</Tab.Container>
+				</Container>
+			) : (
+				formFields
+			)}
 
 			{footer}
 		</Form>
@@ -1371,6 +1405,16 @@ function prepareGroupSessionSubmission(
 	);
 
 	if (isExternal) {
+		delete groupSessionSubmission.screeningFlowId;
+		delete groupSessionSubmission.confirmationEmailContent;
+		delete groupSessionSubmission.sendReminderEmail;
+		delete groupSessionSubmission.reminderEmailContent;
+		delete groupSessionSubmission.sendFollowupEmail;
+		delete groupSessionSubmission.followupDayOffset;
+		delete groupSessionSubmission.followupTimeOfDay;
+		delete groupSessionSubmission.followupEmailContent;
+		delete groupSessionSubmission.followupEmailSurveyUrl;
+
 		if (groupSessionSubmission.singleSessionFlag) {
 			// only for series
 			delete groupSessionSubmission.dateTimeDescription;

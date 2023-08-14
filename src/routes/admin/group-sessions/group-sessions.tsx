@@ -277,12 +277,6 @@ export const Component = () => {
 													<TableCell>
 														<GroupSessionTableDropdown
 															groupSession={groupSession}
-															onAdd={(groupSessionId) => {
-																handleStatusUpdate(
-																	groupSessionId,
-																	GROUP_SESSION_STATUS_ID.ADDED
-																);
-															}}
 															onCancel={(groupSessionId) => {
 																handleStatusUpdate(
 																	groupSessionId,

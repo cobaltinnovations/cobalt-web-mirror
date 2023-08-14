@@ -2,13 +2,11 @@ import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-import { GROUP_SESSION_STATUS_ID, GroupSessionModel, ROLE_ID } from '@/lib/models';
-import useAccount from '@/hooks/use-account';
+import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-x-close.svg';
@@ -17,21 +15,12 @@ import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg
 
 interface GroupSessionTableDropdownProps {
 	groupSession: GroupSessionModel;
-	onAdd(groupSessionId: string): void;
 	onCancel(groupSessionId: string): void;
 	onDelete(groupSessionId: string): void;
 }
 
-export const GroupSessionTableDropdown = ({
-	groupSession,
-	onAdd,
-	onCancel,
-	onDelete,
-}: GroupSessionTableDropdownProps) => {
-	const { account } = useAccount();
-
-	const canAdd =
-		account?.roleId === ROLE_ID.ADMINISTRATOR && groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
+export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: GroupSessionTableDropdownProps) => {
+	const canPreview = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 
 	const canEdit =
 		groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||
@@ -58,16 +47,16 @@ export const GroupSessionTableDropdown = ({
 				<MoreIcon className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
-				{canAdd && (
+				{canPreview && (
 					<>
 						<Dropdown.Item
 							className="d-flex align-items-center"
-							onClick={() => {
-								onAdd(groupSession.groupSessionId);
-							}}
+							as={Link}
+							target="_blank"
+							to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
 						>
-							<PlusIcon className="me-2 text-n500" width={24} height={24} />
-							Add
+							<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+							Preview
 						</Dropdown.Item>
 
 						<Dropdown.Divider />

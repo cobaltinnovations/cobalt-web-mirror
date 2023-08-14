@@ -72,6 +72,8 @@ const GroupSession = ({
 		);
 	}, [copyTextToClipboard, groupSession.urlName]);
 
+	const totalSeats = (groupSession.seatsReserved ?? 0) + (groupSession.seatsAvailable ?? 0);
+
 	return (
 		<Container className="pb-0 pt-8 py-lg-16" fluid="lg">
 			<Row>
@@ -94,11 +96,22 @@ const GroupSession = ({
 									dangerouslySetInnerHTML={{ __html: groupSession.description ?? '' }}
 								/>
 
-								<div className="d-flex flex-wrap">
-									<Badge pill bg="outline-dark" className="mb-2 me-2 fs-default text-nowrap">
-										[TODO]: Tag Text
-									</Badge>
-								</div>
+								{(groupSession.tagIds ?? []).length > 0 && (
+									<div className="d-flex flex-wrap">
+										{groupSession.tagIds?.map((tagId) => {
+											return (
+												<Badge
+													key={tagId}
+													pill
+													bg="outline-dark"
+													className="mb-2 me-2 fs-default text-nowrap"
+												>
+													{tagId}
+												</Badge>
+											);
+										})}
+									</div>
+								)}
 							</Col>
 						</Row>
 					</Container>
@@ -150,10 +163,7 @@ const GroupSession = ({
 							<Row className="mb-6">
 								<Col>
 									<p className="mb-1 fw-bold">{groupSession.seatsAvailableDescription}</p>
-									<p className="mb-0">
-										{(groupSession.seatsReserved ?? 0) + (groupSession.seatsAvailable ?? 0)} seats
-										total
-									</p>
+									{totalSeats > 0 && <p className="mb-0">{totalSeats} seats total</p>}
 								</Col>
 							</Row>
 							<Row className="mb-8">
