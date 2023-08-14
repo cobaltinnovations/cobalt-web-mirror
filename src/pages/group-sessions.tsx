@@ -47,27 +47,31 @@ const GroupSessions = () => {
 	}, [didCheckScreeningSessions, hasTouchScreen]);
 
 	const fetchData = useCallback(async () => {
-		try {
-			setIsLoading(true);
+		if (groupSessionSearchQuery) {
+			setGroupSessions([]);
+		} else {
+			try {
+				setIsLoading(true);
 
-			const { groupSessions } = await groupSessionsService
-				.getGroupSessions({
-					viewType: 'PATIENT',
-					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-					urlName: groupSessionUrlName,
-					searchQuery: groupSessionSearchQuery,
-					pageSize: 12,
-					pageNumber: 0,
-				})
-				.fetch();
+				const { groupSessions } = await groupSessionsService
+					.getGroupSessions({
+						viewType: 'PATIENT',
+						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+						urlName: groupSessionUrlName,
+						searchQuery: groupSessionSearchQuery,
+						pageSize: 12,
+						pageNumber: 0,
+					})
+					.fetch();
 
-			setGroupSessions(groupSessions);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsLoading(false);
-			setIsFirstLoad(false);
+				setGroupSessions(groupSessions);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsLoading(false);
+				setIsFirstLoad(false);
+			}
 		}
 	}, [groupSessionSearchQuery, groupSessionUrlName, handleError]);
 
@@ -186,31 +190,52 @@ const GroupSessions = () => {
 					</Row>
 				)}
 
+				{}
+
 				{groupSessions.length > 0 && (
-					<Row className="mb-2">
-						<Col>
-							<Carousel
-								responsive={responsiveDefaults}
-								description="Upcoming Sessions"
-								calloutTitle="See All"
-								calloutOnClick={() => {
-									navigate('/in-the-studio');
-								}}
-							>
+					<>
+						{groupSessionSearchQuery ? (
+							<Row className="mb-2">
 								{groupSessions.map((groupSession) => {
 									return (
-										<Link
-											key={groupSession.groupSessionId}
-											className="d-block text-decoration-none h-100"
-											to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
-										>
-											<StudioEvent className="h-100" studioEvent={groupSession} />
-										</Link>
+										<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
+											<Link
+												className="d-block text-decoration-none h-100"
+												to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+											>
+												<StudioEvent className="h-100" studioEvent={groupSession} />
+											</Link>
+										</Col>
 									);
 								})}
-							</Carousel>
-						</Col>
-					</Row>
+							</Row>
+						) : (
+							<Row className="mb-2">
+								<Col>
+									<Carousel
+										responsive={responsiveDefaults}
+										description="Upcoming Sessions"
+										calloutTitle="See All"
+										calloutOnClick={() => {
+											navigate('/in-the-studio');
+										}}
+									>
+										{groupSessions.map((groupSession) => {
+											return (
+												<Link
+													key={groupSession.groupSessionId}
+													className="d-block text-decoration-none h-100"
+													to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
+												>
+													<StudioEvent className="h-100" studioEvent={groupSession} />
+												</Link>
+											);
+										})}
+									</Carousel>
+								</Col>
+							</Row>
+						)}
+					</>
 				)}
 
 				{isLoading && isFirstLoad && (
