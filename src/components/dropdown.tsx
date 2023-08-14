@@ -30,14 +30,15 @@ export const DropdownToggle = React.forwardRef(
 const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 	dropdownMenu: {
 		border: 0,
-		padding: '8px 0',
+		padding: 16,
 		minWidth: 176,
 		marginTop: 8,
-		borderRadius: 4,
+		borderRadius: 8,
 		boxShadow: theme.elevation.e200,
 		backgroundColor: theme.colors.n0,
 		'& .dropdown-item': {
-			padding: '8px 16px',
+			padding: 12,
+			borderRadius: 4,
 			...theme.fonts.default,
 			color: theme.colors.n900,
 			'&:hover, &:focus': {
@@ -48,15 +49,31 @@ const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 		'& .dropdown-divider': {
-			margin: '8px 0',
+			margin: '16px 0',
 			borderColor: theme.colors.n100,
+		},
+	},
+	compact: {
+		padding: '8px 0',
+		borderRadius: 4,
+		'& .dropdown-item': {
+			padding: '8px 16px',
+		},
+		'& .dropdown-divider': {
+			margin: '8px 0',
 		},
 	},
 }));
 
 export const DropdownMenu = React.forwardRef(
 	(
-		{ children, style, className, 'aria-labelledby': labeledBy }: DropdownMenuProps,
+		{
+			children,
+			style,
+			className,
+			'aria-labelledby': labeledBy,
+			compact = false,
+		}: DropdownMenuProps & { compact?: boolean },
 		ref: React.LegacyRef<HTMLDivElement> | undefined
 	) => {
 		const classes = useDropdownMenuStyles();
@@ -65,7 +82,7 @@ export const DropdownMenu = React.forwardRef(
 			<div
 				ref={ref}
 				style={style}
-				className={classNames(classes.dropdownMenu, className)}
+				className={classNames(classes.dropdownMenu, className, { [classes.compact]: compact })}
 				aria-labelledby={labeledBy}
 			>
 				{children}

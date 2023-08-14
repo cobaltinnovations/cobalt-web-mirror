@@ -57,7 +57,7 @@ export const GroupSessionTableDropdown = ({
 			>
 				<MoreIcon className="d-flex" />
 			</Dropdown.Toggle>
-			<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
+			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				{canAdd && (
 					<>
 						<Dropdown.Item
@@ -114,7 +114,7 @@ export const GroupSessionTableDropdown = ({
 					View Registrants
 				</Dropdown.Item>
 
-				<Dropdown.Divider />
+				{(canCancel || canDelete) && <Dropdown.Divider />}
 
 				{canCancel && (
 					<Dropdown.Item
