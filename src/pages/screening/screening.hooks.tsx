@@ -3,7 +3,6 @@ import CollectPhoneModal from '@/components/collect-phone-modal';
 import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import useHandleError from '@/hooks/use-handle-error';
-import { ERROR_CODES } from '@/lib/http-client';
 import {
 	ScreeningFlowVersion,
 	ScreeningSession,
@@ -200,9 +199,7 @@ export function useScreeningFlow({
 				navigateToNext(sessionResponse.screeningSession);
 			})
 			.catch((e) => {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
+				handleError(e);
 			})
 			.finally(() => {
 				setIsCreatingScreeningSession(false);
@@ -318,9 +315,7 @@ export function useScreeningFlow({
 				setActiveFlowVersion(activeVersion);
 			})
 			.catch((e) => {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
+				handleError(e);
 			});
 
 		return () => {
@@ -360,9 +355,7 @@ export function useScreeningFlow({
 						);
 					})
 					.catch((e) => {
-						if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-							handleError(e);
-						}
+						handleError(e);
 					});
 			}}
 			onSuccess={() => {

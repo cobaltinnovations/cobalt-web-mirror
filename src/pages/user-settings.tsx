@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import ConfirmDialog from '@/components/confirm-dialog';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
 import ConsentModal from '@/components/consent-modal';
 
@@ -96,9 +95,7 @@ const UserSettings: FC = () => {
 										signOutAndClearContext();
 									})
 									.catch((e) => {
-										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-											handleError(e);
-										}
+										handleError(e);
 									})
 									.finally(() => {
 										setIsRejectingConsent(false);

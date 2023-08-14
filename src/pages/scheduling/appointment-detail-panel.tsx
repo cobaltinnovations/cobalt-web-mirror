@@ -12,7 +12,6 @@ import {
 
 import useHandleError from '@/hooks/use-handle-error';
 
-import { ERROR_CODES } from '@/lib/http-client';
 import { accountService, appointmentService } from '@/lib/services';
 
 import { AppointmentTypeItem } from './appointment-type-item';
@@ -130,9 +129,7 @@ export const AppointmentDetailPanel = ({
 					setAllAppointments(response.appointments);
 				})
 				.catch((e) => {
-					if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-						handleError(e);
-					}
+					handleError(e);
 				});
 
 			return request;

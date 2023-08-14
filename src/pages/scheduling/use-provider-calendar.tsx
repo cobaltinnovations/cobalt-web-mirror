@@ -1,8 +1,6 @@
 import useHandleError from '@/hooks/use-handle-error';
-import { ERROR_CODES } from '@/lib/http-client';
 import { ProviderCalendar } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
-import { AxiosError } from 'axios';
 import Color from 'color';
 import moment from 'moment';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -40,7 +38,7 @@ export const useProviderCalendar = ({
 			} catch (error) {
 				if (config?.throwErrors) {
 					throw error;
-				} else if ((error as AxiosError).code !== ERROR_CODES.REQUEST_ABORTED) {
+				} else {
 					handleError(error);
 				}
 			}
@@ -49,6 +47,10 @@ export const useProviderCalendar = ({
 	);
 
 	useEffect(() => {
+		if (!startDate || !endDate) {
+			return;
+		}
+
 		fetchData();
 
 		const intervalId = setInterval(() => {
@@ -61,7 +63,7 @@ export const useProviderCalendar = ({
 			inFlightRequest.current?.abort();
 			clearInterval(intervalId);
 		};
-	}, [fetchData]);
+	}, [endDate, fetchData, startDate]);
 
 	return {
 		fetchData,

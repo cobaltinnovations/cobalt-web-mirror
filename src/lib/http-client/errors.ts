@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import { AxiosError, Cancel } from 'axios';
 
 export enum ERROR_CODES {
 	GENERIC = 'GENERIC',
@@ -20,10 +20,7 @@ export class CobaltError extends Error {
 		const errorData = error.response?.data;
 		const apiError = isApiError(errorData) ? errorData : undefined;
 
-		if (axios.isCancel(error)) {
-			instance = new CobaltError('Sorry, the request was cancelled.');
-			instance.code = ERROR_CODES.REQUEST_ABORTED;
-		} else if (apiError) {
+		if (apiError) {
 			instance = CobaltError.fromApiError(apiError);
 		} else {
 			instance = new CobaltError('Sorry, an error occurred.');
@@ -42,7 +39,22 @@ export class CobaltError extends Error {
 		return instance;
 	}
 
-	code: string = ERROR_CODES.GENERIC;
+	static fromCancelledRequest(error: Cancel) {
+		const instance = new CobaltError('Request was cancelled');
+		instance.code = ERROR_CODES.REQUEST_ABORTED;
+
+		return instance;
+	}
+
+	get reportableToUser() {
+		return this.code !== ERROR_CODES.REQUEST_ABORTED;
+	}
+
+	get reportableToSentry() {
+		return this.code !== ERROR_CODES.REQUEST_ABORTED && this.apiError?.code !== 'VALIDATION_FAILED';
+	}
+
+	code?: string = ERROR_CODES.GENERIC;
 	apiError?: ApiError;
 	axiosError?: AxiosError;
 	unknownError?: unknown;

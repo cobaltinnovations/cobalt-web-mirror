@@ -1,7 +1,6 @@
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { ERROR_CODES } from '@/lib/http-client';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
@@ -48,7 +47,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 			.catch((e) => {
 				if (e.code === 'NOT_FOUND') {
 					setClosePanel(true);
-				} else if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
+				} else {
 					handleError(e);
 				}
 			});
