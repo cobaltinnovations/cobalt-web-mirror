@@ -105,14 +105,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface AdminHeaderProps {
-	isGroupSessionPreview?: boolean;
-}
-
-export const AdminHeader = ({ isGroupSessionPreview }: AdminHeaderProps) => {
+export const AdminHeader = () => {
 	const classes = useStyles();
 	const { institutionCapabilities, signOutAndClearContext } = useAccount();
 
+	const isGroupSessionPreview = useMatch({
+		path: '/admin/group-sessions/preview/*',
+	});
 	const myContentMatch = useMatch({
 		path: '/admin/my-content/*',
 	});
