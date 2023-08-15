@@ -2,7 +2,6 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
 import useHandleError from '@/hooks/use-handle-error';
-import { ERROR_CODES } from '@/lib/http-client';
 import {
 	ScreeningAnswerFormatId,
 	ScreeningAnswerSelection,
@@ -131,7 +130,7 @@ const ScreeningQuestionsPage = () => {
 							e?.apiError?.metadata?.screeningConfirmationPrompt;
 						setIsSubmitPrompt(true);
 						setConfirmationPrompt(newConfirmationPrompt);
-					} else if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
+					} else {
 						handleError(e);
 					}
 				})
@@ -627,9 +626,7 @@ const ScreeningQuestionsPage = () => {
 																);
 															})
 															.catch((e) => {
-																if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-																	handleError(e);
-																}
+																handleError(e);
 															});
 													}}
 												>

@@ -3,7 +3,6 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ERROR_CODES } from '@/lib/http-client';
 import { PatientOrderAutocompleteResult } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import classNames from 'classnames';
@@ -93,10 +92,8 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 				setIsSearching(false);
 			})
 			.catch((e) => {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-					setIsSearching(false);
-				}
+				handleError(e);
+				setIsSearching(false);
 			});
 
 		return () => {
@@ -204,7 +201,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 								{recentOrders.length !== 0 && <Menu.Header>Recent</Menu.Header>}
 
 								{resultOptions.map((item, index) => {
-									const result = item as (typeof resultOptions)[number];
+									const result = item as typeof resultOptions[number];
 									if (!result.isRecent) {
 										return null;
 									}
@@ -234,7 +231,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 						)}
 
 						{resultOptions.map((item, index) => {
-							const result = item as (typeof resultOptions)[number];
+							const result = item as typeof resultOptions[number];
 							if (!result.isSearchResult) {
 								return null;
 							}

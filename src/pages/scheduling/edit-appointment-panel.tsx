@@ -6,7 +6,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { appointmentService } from '@/lib/services';
-import { ERROR_CODES } from '@/lib/http-client';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { AppointmentForm } from './appointment-form';
@@ -57,9 +56,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 				setAppointment(response.appointment);
 			})
 			.catch((e) => {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
+				handleError(e);
 			});
 
 		return () => {

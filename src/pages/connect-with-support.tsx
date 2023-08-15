@@ -50,7 +50,6 @@ import {
 	mapClinicToResult,
 	mapProviderToResult,
 } from '@/contexts/booking-context';
-import { ERROR_CODES } from '@/lib/http-client';
 import Accordion from '@/components/accordion';
 import useHandleError from '@/hooks/use-handle-error';
 import FilterSpecialtyModal from '@/components/filter-specialty-modal';
@@ -206,9 +205,7 @@ const ConnectWithSupport: FC = () => {
 					setDidInitSearch(true);
 				});
 			} catch (e) {
-				if ((e as any).code !== ERROR_CODES.REQUEST_ABORTED) {
-					handleError(e);
-				}
+				handleError(e);
 			}
 		}
 
@@ -275,10 +272,8 @@ const ConnectWithSupport: FC = () => {
 				}
 			})
 			.catch((e) => {
-				if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-					setIsLoading(false);
-					handleError(e);
-				}
+				setIsLoading(false);
+				handleError(e);
 			});
 
 		return () => {
