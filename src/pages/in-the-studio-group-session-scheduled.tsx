@@ -188,9 +188,7 @@ const InTheStudioGroupSessionScheduled = () => {
 							try {
 								setIsBooking(true);
 
-								await groupSessionsService
-									.reserveGroupSession(session.groupSessionId, collectedEmail)
-									.fetch();
+								await groupSessionsService.reserveGroupSession(session.groupSessionId).fetch();
 
 								revalidator.revalidate();
 								await fetchData();
