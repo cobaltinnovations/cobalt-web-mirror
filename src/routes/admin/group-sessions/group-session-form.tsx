@@ -150,16 +150,20 @@ function getInitialGroupSessionFormValues({
 	groupSession?: GroupSessionModel | null;
 	isDuplicate?: boolean;
 }): typeof initialGroupSessionFormValues {
-	const { startDateTime, endDateTime, ...rest } = groupSession ?? {};
+	const { startDateTime, endDateTime, followupTimeOfDay: formattedFollowupTimeOfDay, ...rest } = groupSession ?? {};
 
 	const startDate = moment(startDateTime);
 	const endDate = moment(endDateTime);
+	const followupTimeOfDay = formattedFollowupTimeOfDay
+		? moment(formattedFollowupTimeOfDay, 'HH:mm').format('hh:mm A')
+		: '';
 
 	const mergedDateInputValues = {
 		startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
 		startTime: startDateTime ? startDate.format('hh:mm A') : '',
 		endTime: endDateTime ? endDate.format('hh:mm A') : '',
 		endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
+		followupTimeOfDay: followupTimeOfDay,
 	};
 
 	return Object.assign(
@@ -1465,6 +1469,10 @@ function prepareGroupSessionSubmission(
 		delete groupSessionSubmission.followupTimeOfDay;
 		delete groupSessionSubmission.followupEmailContent;
 		delete groupSessionSubmission.followupEmailSurveyUrl;
+	} else {
+		groupSessionSubmission.followupTimeOfDay = moment(groupSessionSubmission.followupTimeOfDay, 'hh:mm A').format(
+			'HH:mm'
+		);
 	}
 
 	return {
