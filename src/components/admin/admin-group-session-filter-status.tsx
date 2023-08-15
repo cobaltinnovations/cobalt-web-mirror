@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
@@ -32,26 +32,16 @@ const options = [
 	},
 ];
 
-export const adminGroupSessionFilterStatusGetParsedQueryParams = (searchParams: URLSearchParams) => {
-	return {
-		...(searchParams.get('groupSessionStatusId') && {
-			groupSessionStatusId: searchParams.get('groupSessionStatusId') as GROUP_SESSION_STATUS_ID,
-		}),
-	};
-};
-
 export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [selectedValue, setSelectedValue] = useState('');
-
-	const isActive = useMemo(() => {
-		const parseQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(searchParams);
-		return !!parseQueryParams.groupSessionStatusId;
-	}, [searchParams]);
+	const currentStatus = searchParams.get('groupSessionStatusId');
+	const [selectedValue, setSelectedValue] = useState(currentStatus ?? '');
+	const isActive = !!currentStatus;
 
 	const handleDismiss = useCallback(() => {
 		searchParams.delete('groupSessionStatusId');
 		searchParams.set('pageNumber', '0');
+		setSelectedValue('');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 

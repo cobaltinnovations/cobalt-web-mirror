@@ -6,7 +6,6 @@ import {
 	LoaderFunctionArgs,
 	defer,
 	useNavigate,
-	useRevalidator,
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
@@ -14,6 +13,7 @@ import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import {
 	GetGroupSessionCountsResponseBody,
+	GetGroupSessionsQueryParameters,
 	GetGroupSessionsResponseBody,
 	GroupSessionSchedulingSystemId,
 	groupSessionsService,
@@ -25,10 +25,9 @@ import {
 	AdminGroupSessionFilterScheduling,
 	AdminGroupSessionFilterStatus,
 	GroupSessionTableDropdown,
-	adminGroupSessionFilterSchedulingGetParsedQueryParams,
-	adminGroupSessionFilterStatusGetParsedQueryParams,
 } from '@/components/admin';
-import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
+import { AdminGroupSessionSort } from '@/components/admin/admin-group-session-sort';
+import { AdminGroupSessionFilterVisibility } from '@/components/admin/admin-group-session-filter-visibility';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -41,15 +40,33 @@ export function useAdminGroupSessionsLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
-	const filterStatusQueryParams = adminGroupSessionFilterStatusGetParsedQueryParams(url.searchParams);
-	const filterSchedulingQueryParams = adminGroupSessionFilterSchedulingGetParsedQueryParams(url.searchParams);
+	const groupSessionStatusId = url.searchParams.get('groupSessionStatusId');
+	const groupSessionSchedulingSystemId = url.searchParams.get('groupSessionSchedulingSystemId');
+	const visibleFlag = url.searchParams.get('visibleFlag');
+	const orderBy = url.searchParams.get('orderBy');
+	const queryParams: GetGroupSessionsQueryParameters = {};
+
+	if (groupSessionStatusId) {
+		queryParams.groupSessionStatusId = groupSessionStatusId;
+	}
+
+	if (groupSessionSchedulingSystemId) {
+		queryParams.groupSessionSchedulingSystemId = groupSessionSchedulingSystemId;
+	}
+
+	if (visibleFlag) {
+		queryParams.visibleFlag = visibleFlag;
+	}
+
+	if (orderBy) {
+		queryParams.orderBy = orderBy;
+	}
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
 		viewType: 'ADMINISTRATOR',
 		pageNumber,
 		pageSize: 15,
-		...filterStatusQueryParams,
-		...filterSchedulingQueryParams,
+		...queryParams,
 	});
 	const groupSessionCountsRequest = groupSessionsService.getGroupSessionCounts();
 	const groupSessionsPromise = Promise.all([groupSessionsrequest.fetch(), groupSessionCountsRequest.fetch()]);
@@ -61,7 +78,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const { groupSessionsPromise } = useAdminGroupSessionsLoaderData();
-	const revalidator = useRevalidator();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 
@@ -180,13 +196,16 @@ export const Component = () => {
 				<Row className="mb-6">
 					<Col>
 						<div className="d-flex align-items-center">
-							<FilterIcon className="me-2 text-n500" />
-							<span className="me-4 text-n500">Filters</span>
-							<AdminGroupSessionFilterStatus className="me-2" />
-							<AdminGroupSessionFilterScheduling />
+							<AdminGroupSessionFilterStatus />
+							<AdminGroupSessionFilterScheduling className="mx-2" />
+							<AdminGroupSessionFilterVisibility />
 						</div>
 					</Col>
-					<Col>sort</Col>
+					<Col>
+						<div className="d-flex">
+							<AdminGroupSessionSort className="ms-auto" />
+						</div>
+					</Col>
 				</Row>
 				<Suspense>
 					<Await resolve={groupSessionsPromise}>

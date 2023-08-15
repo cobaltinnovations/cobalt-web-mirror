@@ -5,7 +5,6 @@ import {
 	GroupSessionRequestModel,
 	GroupSessionReservationModel,
 	GROUP_SESSION_STATUS_ID,
-	GROUP_SESSION_SORT_ORDER,
 	GroupSessionCountModel,
 	GroupSessionResponseModel,
 	AccountModel,
@@ -67,15 +66,17 @@ interface CreateGroupSessionResponseBody {
 	groupSession: GroupSessionModel;
 }
 
-interface GetGroupSessionsQueryParameters {
+export interface GetGroupSessionsQueryParameters {
 	pageNumber?: number;
 	pageSize?: number;
 	viewType?: 'ADMINISTRATOR' | 'PATIENT';
-	groupSessionStatusId?: GROUP_SESSION_STATUS_ID;
-	orderBy?: GROUP_SESSION_SORT_ORDER;
+	groupSessionStatusId?: string;
+	orderBy?: string;
 	urlName?: string;
 	searchQuery?: string;
 	groupSessionCollectionId?: string;
+	groupSessionSchedulingSystemId?: string;
+	visibleFlag?: string;
 }
 
 export interface GetGroupSessionsResponseBody {

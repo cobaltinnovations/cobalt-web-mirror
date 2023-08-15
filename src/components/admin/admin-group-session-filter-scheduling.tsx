@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 
-import { GROUP_SESSION_STATUS_ID } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
@@ -21,28 +20,16 @@ const options = [
 	},
 ];
 
-export const adminGroupSessionFilterSchedulingGetParsedQueryParams = (searchParams: URLSearchParams) => {
-	return {
-		...(searchParams.get('groupSessionSchedulingSystemId') && {
-			groupSessionSchedulingSystemId: searchParams.get(
-				'groupSessionSchedulingSystemId'
-			) as GROUP_SESSION_STATUS_ID,
-		}),
-	};
-};
-
 export const AdminGroupSessionFilterScheduling = ({ className }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [selectedValue, setSelectedValue] = useState('');
-
-	const isActive = useMemo(() => {
-		const parseQueryParams = adminGroupSessionFilterSchedulingGetParsedQueryParams(searchParams);
-		return !!parseQueryParams.groupSessionSchedulingSystemId;
-	}, [searchParams]);
+	const currentScheduling = searchParams.get('groupSessionSchedulingSystemId');
+	const [selectedValue, setSelectedValue] = useState(currentScheduling ?? '');
+	const isActive = !!currentScheduling;
 
 	const handleDismiss = useCallback(() => {
 		searchParams.delete('groupSessionSchedulingSystemId');
 		searchParams.set('pageNumber', '0');
+		setSelectedValue('');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 

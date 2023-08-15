@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
+import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
 
 interface UseStylesProps {
 	width: number;
@@ -62,6 +63,8 @@ interface FilterDropdownProps {
 	onDismiss(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onConfirm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	className?: string;
+	showSortIcon?: boolean;
+	iconLeft?: boolean;
 }
 
 const FilterDropdown = ({
@@ -74,10 +77,14 @@ const FilterDropdown = ({
 	onDismiss,
 	onConfirm,
 	className,
+	showSortIcon = false,
+	iconLeft = false,
 	children,
 }: PropsWithChildren<FilterDropdownProps>) => {
 	const classes = useStyles({ width });
 	const [show, setShow] = useState(false);
+
+	const icon = showSortIcon ? <SortIcon /> : <ArrowDown />;
 
 	return (
 		<Dropdown
@@ -89,11 +96,15 @@ const FilterDropdown = ({
 			<Dropdown.Toggle
 				variant={active ? 'primary' : 'light'}
 				as={DropdownToggle}
-				className="d-inline-flex align-items-center pe-3"
+				className={classNames('d-inline-flex align-items-center', {
+					'pe-3': !iconLeft,
+					'ps-3': iconLeft,
+				})}
 				id={id}
 			>
+				{iconLeft && <div className="me-1">{icon}</div>}
 				<span>{title}</span>
-				<ArrowDown className="ms-1" />
+				{!iconLeft && <div className="ms-1">{icon}</div>}
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}
