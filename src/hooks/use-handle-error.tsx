@@ -42,7 +42,9 @@ function useHandleError(handler?: (error: CobaltError) => void): (error: unknown
 				return;
 			}
 
-			displayModalForError(handled);
+			if (handled.reportableToUser) {
+				displayModalForError(handled);
+			}
 		},
 		[displayModalForError, handler, setShowReauthModal, setSignOnUrl, signOutAndClearContext]
 	);

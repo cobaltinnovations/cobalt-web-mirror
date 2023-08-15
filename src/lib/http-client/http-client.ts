@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Cancel, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
 // https://github.com/axios/axios/blob/master/index.d.ts
 
@@ -80,7 +80,9 @@ export class HttpClient {
 			const response: AxiosResponse = await this._axiosInstance(config);
 			return response;
 		} catch (error) {
-			if (axios.isAxiosError(error)) {
+			if (axios.isCancel(error)) {
+				throw CobaltError.fromCancelledRequest(error as Cancel);
+			} else if (axios.isAxiosError(error)) {
 				throw CobaltError.fromAxiosError(error);
 			} else {
 				throw CobaltError.fromUnknownError(error);

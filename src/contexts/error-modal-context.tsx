@@ -24,7 +24,15 @@ const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
 		setIsErrorModalShown(true);
 		setError(capturedError);
 
-		Sentry.captureException(capturedError);
+		if (capturedError.reportableToSentry) {
+			Sentry.captureException(capturedError, {
+				extra: {
+					apiError: capturedError.apiError,
+					axiosError: capturedError.axiosError,
+					unknownError: capturedError.unknownError,
+				},
+			});
+		}
 	}, []);
 
 	return (

@@ -3,7 +3,6 @@ import ConsentContent from '@/components/consent-content';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useTrackModalView from '@/hooks/use-track-modal-view';
-import { ERROR_CODES } from '@/lib/http-client';
 import { accountService } from '@/lib/services';
 import React, { FC, useState } from 'react';
 import { Modal, ModalProps } from 'react-bootstrap';
@@ -69,9 +68,7 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 										signOutAndClearContext();
 									})
 									.catch((e) => {
-										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-											handleError(e);
-										}
+										handleError(e);
 									})
 									.finally(() => {
 										setIsRejecting(false);
@@ -97,9 +94,7 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 									.acceptConsent(account.accountId)
 									.fetch()
 									.catch((e) => {
-										if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-											handleError(e);
-										}
+										handleError(e);
 									})
 									.finally(() => {
 										revalidator.revalidate();

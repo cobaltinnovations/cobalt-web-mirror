@@ -7,7 +7,6 @@ import React from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import TimeInput from '@/components/time-input';
 import { appointmentService } from '@/lib/services';
-import { ERROR_CODES } from '@/lib/http-client';
 import { AppointmentTypeDropdown } from './appointment-type-dropdown';
 
 interface AppointmentFormSchema {
@@ -67,9 +66,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 						onSuccess(response?.appointment?.appointmentId);
 					})
 					.catch((e) => {
-						if (e.code !== ERROR_CODES.REQUEST_ABORTED) {
-							handleError(e);
-						}
+						handleError(e);
 					});
 			}}
 		>
