@@ -15,7 +15,7 @@ const options = [
 		title: 'Date Added Descending',
 	},
 	{
-		orderBy: GROUP_SESSION_SORT_ORDER.DATE_ADDED_ASSCENDING,
+		orderBy: GROUP_SESSION_SORT_ORDER.DATE_ADDED_ASCENDING,
 		title: 'Date Added Ascending',
 	},
 	{
@@ -23,7 +23,7 @@ const options = [
 		title: 'Registered Descending',
 	},
 	{
-		orderBy: GROUP_SESSION_SORT_ORDER.REGISTERED_ASSCENDING,
+		orderBy: GROUP_SESSION_SORT_ORDER.REGISTERED_ASCENDING,
 		title: 'Registered Ascending',
 	},
 	{
@@ -31,7 +31,7 @@ const options = [
 		title: 'Capacity Descending',
 	},
 	{
-		orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_ASSCENDING,
+		orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_ASCENDING,
 		title: 'Capacity Ascending',
 	},
 	{
