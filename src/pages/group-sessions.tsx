@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
@@ -20,6 +20,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
 import NoData from '@/components/no-data';
+import InputHelper from '@/components/input-helper';
 
 const GroupSessions = () => {
 	const handleError = useHandleError();
@@ -42,6 +43,14 @@ const GroupSessions = () => {
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
+
+	const [showSuggestModal, setShowSuggestModal] = useState(false);
+	const [suggestionFormValues, setSuggestionFormValues] = useState({
+		emailAddress: '',
+		suggestedTitle: '',
+		message: '',
+	});
+	const [isSubmittingSuggestion, setIsSubmittingSuggestion] = useState(false);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -161,6 +170,23 @@ const GroupSessions = () => {
 		};
 	}, [handleKeydown]);
 
+	const handleSuggestionFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			try {
+				setIsSubmittingSuggestion(true);
+
+				console.log(suggestionFormValues);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSubmittingSuggestion(false);
+			}
+		},
+		[handleError, suggestionFormValues]
+	);
+
 	if (!didCheckScreeningSessions) {
 		return (
 			<>
@@ -172,6 +198,77 @@ const GroupSessions = () => {
 
 	return (
 		<>
+			<Modal
+				show={showSuggestModal}
+				centered
+				onHide={() => {
+					setShowSuggestModal(false);
+				}}
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Suggest a Group Session</Modal.Title>
+				</Modal.Header>
+				<Form onSubmit={handleSuggestionFormSubmit}>
+					<Modal.Body>
+						<InputHelper
+							type="email"
+							className="mb-4"
+							label="Your Email"
+							value={suggestionFormValues.emailAddress}
+							onChange={({ currentTarget }) => {
+								setSuggestionFormValues((previousValues) => ({
+									...previousValues,
+									emailAddress: currentTarget.value,
+								}));
+							}}
+							disabled={isSubmittingSuggestion}
+							required
+						/>
+						<InputHelper
+							type="text"
+							className="mb-4"
+							label="Suggested Session Title or Topic"
+							value={suggestionFormValues.suggestedTitle}
+							onChange={({ currentTarget }) => {
+								setSuggestionFormValues((previousValues) => ({
+									...previousValues,
+									suggestedTitle: currentTarget.value,
+								}));
+							}}
+							disabled={isSubmittingSuggestion}
+							required
+						/>
+						<InputHelper
+							as="textarea"
+							label="Message"
+							value={suggestionFormValues.message}
+							onChange={({ currentTarget }) => {
+								setSuggestionFormValues((previousValues) => ({
+									...previousValues,
+									message: currentTarget.value,
+								}));
+							}}
+							disabled={isSubmittingSuggestion}
+						/>
+					</Modal.Body>
+					<Modal.Footer className="text-right">
+						<Button
+							type="button"
+							variant="outline-primary"
+							onClick={() => {
+								setShowSuggestModal(false);
+							}}
+							disabled={isSubmittingSuggestion}
+						>
+							Cancel
+						</Button>
+						<Button className="ms-2" type="submit" variant="primary" disabled={isSubmittingSuggestion}>
+							Submit
+						</Button>
+					</Modal.Footer>
+				</Form>
+			</Modal>
+
 			<Helmet>
 				<title>Cobalt | Group Sessions</title>
 			</Helmet>
@@ -379,7 +476,7 @@ const GroupSessions = () => {
 										variant="outline-primary"
 										className="ms-1"
 										onClick={() => {
-											window.alert('[TODO]: Suggest Modal');
+											setShowSuggestModal(true);
 										}}
 									>
 										Suggest a Session
