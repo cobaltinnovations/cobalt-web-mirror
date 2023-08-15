@@ -14,6 +14,7 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
+import useFlags from '@/hooks/use-flags';
 import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
@@ -25,6 +26,7 @@ import InputHelper from '@/components/input-helper';
 const GroupSessions = () => {
 	const handleError = useHandleError();
 	const navigate = useNavigate();
+	const { addFlag } = useFlags();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
@@ -177,14 +179,33 @@ const GroupSessions = () => {
 			try {
 				setIsSubmittingSuggestion(true);
 
-				console.log(suggestionFormValues);
+				await groupSessionsService
+					.postGroupSuggestion({
+						emailAddress: suggestionFormValues.emailAddress,
+						title: suggestionFormValues.suggestedTitle,
+						description: suggestionFormValues.message,
+					})
+					.fetch();
+
+				addFlag({
+					variant: 'success',
+					title: 'Your idea has been submitted',
+					description: 'Thanks for your suggestion!',
+					actions: [],
+				});
 			} catch (error) {
 				handleError(error);
 			} finally {
 				setIsSubmittingSuggestion(false);
 			}
 		},
-		[handleError, suggestionFormValues]
+		[
+			addFlag,
+			handleError,
+			suggestionFormValues.emailAddress,
+			suggestionFormValues.message,
+			suggestionFormValues.suggestedTitle,
+		]
 	);
 
 	if (!didCheckScreeningSessions) {

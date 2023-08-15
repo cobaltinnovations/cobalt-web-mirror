@@ -382,4 +382,11 @@ export const groupSessionsService = {
 			data,
 		});
 	},
+	postGroupSuggestion(data: { emailAddress: string; title: string; description: string }) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'POST',
+			url: '/group-suggestions',
+			data,
+		});
+	},
 };
