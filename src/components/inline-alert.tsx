@@ -133,12 +133,12 @@ export const InlineAlert = ({ title, description, action, variant = 'primary', c
 							const isLast = actionIndex === actionsToRender.length - 1;
 
 							return (
-								<>
+								<React.Fragment key={actionIndex}>
 									<Button variant="link" size="sm" className="p-0 fw-normal" onClick={a.onClick}>
 										{a.title}
 									</Button>
 									{!isLast && <span className="mx-1">&bull;</span>}
-								</>
+								</React.Fragment>
 							);
 						})}
 					</div>

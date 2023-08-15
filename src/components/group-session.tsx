@@ -1,7 +1,8 @@
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
-import { GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
+import { GroupSessionLearnMoreMethodId, GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
+import { GroupSessionSchedulingSystemId } from '@/lib/services';
 import React, { useCallback } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import { HEADER_HEIGHT } from './header-v2';
@@ -9,6 +10,11 @@ import mediaQueries from '@/jss/media-queries';
 import InlineAlert from './inline-alert';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+
+import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import { ReactComponent as ChairIcon } from '@/assets/icons/chair.svg';
+import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
+import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -42,6 +48,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const learnMoreTypeUrlPrefix = {
+	[GroupSessionLearnMoreMethodId.EMAIL]: 'mailto:',
+	[GroupSessionLearnMoreMethodId.PHONE]: 'tel:',
+	[GroupSessionLearnMoreMethodId.URL]: '',
+};
+
+const learnMoreCallToAction = {
+	[GroupSessionLearnMoreMethodId.EMAIL]: 'Email to learn more',
+	[GroupSessionLearnMoreMethodId.PHONE]: 'Call to learn more',
+	[GroupSessionLearnMoreMethodId.URL]: 'Click to learn more',
+};
+
 interface GroupSessionProps {
 	groupSession: Partial<GroupSessionModel>;
 	groupSessionReservation?: GroupSessionReservationModel;
@@ -72,7 +90,7 @@ const GroupSession = ({
 		);
 	}, [copyTextToClipboard, groupSession.urlName]);
 
-	const totalSeats = (groupSession.seatsReserved ?? 0) + (groupSession.seatsAvailable ?? 0);
+	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 
 	return (
 		<Container className="pb-0 pt-8 py-lg-16" fluid="lg">
@@ -149,27 +167,76 @@ const GroupSession = ({
 							) : null}
 							<Row className="mb-6">
 								<Col>
-									<p className="mb-1 fw-bold">
-										{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-											'MMM D[,] YYYY'
+									<div className="d-flex">
+										{isExternal ? (
+											<CalendarIcon height={20} width={20} className="text-primary me-4" />
+										) : (
+											<ClockIcon height={20} width={20} className="text-primary me-4" />
 										)}
-									</p>
-									<p className="mb-0">
-										{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')} -{' '}
-										{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')}
-									</p>
+
+										{groupSession.singleSessionFlag ? (
+											<div>
+												<p className="mb-1 fw-bold">
+													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+														'MMM D[,] YYYY'
+													)}
+												</p>
+												<p className="mb-0">
+													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+														'hh:mmA'
+													)}{' '}
+													-{' '}
+													{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+														'hh:mmA'
+													)}
+												</p>
+											</div>
+										) : (
+											<div>
+												<p className="mb-1 fw-bold">
+													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+														'MMM D[,] YYYY'
+													)}{' '}
+													-{' '}
+													{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format(
+														'MMM D[,] YYYY'
+													)}
+												</p>
+												<p className="mb-0">{groupSession.dateTimeDescription}</p>
+											</div>
+										)}
+									</div>
 								</Col>
 							</Row>
-							<Row className="mb-6">
-								<Col>
-									<p className="mb-1 fw-bold">{groupSession.seatsAvailableDescription}</p>
-									{totalSeats > 0 && <p className="mb-0">{totalSeats} seats total</p>}
-								</Col>
-							</Row>
+							{groupSession.seats && (
+								<Row className="mb-6">
+									<Col>
+										<div className="d-flex">
+											<ChairIcon className="text-primary me-4" />
+
+											{isExternal ? (
+												<p className="mb-0">{groupSession.seats} offered</p>
+											) : (
+												<div>
+													<p className="mb-1 fw-bold">
+														{groupSession.seatsAvailableDescription}
+													</p>
+													<p className="mb-0">{groupSession.seats} seats total</p>
+												</div>
+											)}
+										</div>
+									</Col>
+								</Row>
+							)}
 							<Row className="mb-8">
 								<Col>
-									<p className="mb-1 fw-bold text-danger">[TODO]: Online Video Call</p>
-									<p className="mb-0 text-danger">[TODO]: Attend this session virtually</p>
+									<div className="d-flex">
+										<DevicesIcon className="text-primary me-4" />
+										<div>
+											<p className="mb-1 fw-bold">Online Video Call</p>
+											<p className="mb-0">Attend this session virtually</p>
+										</div>
+									</div>
 								</Col>
 							</Row>
 							<Row>
@@ -182,18 +249,32 @@ const GroupSession = ({
 										>
 											Cancel My Reservation
 										</Button>
+									) : isExternal ? (
+										<Button
+											className="d-block w-100 text-center text-decoration-none"
+											href={
+												learnMoreTypeUrlPrefix[groupSession.groupSessionLearnMoreMethodId!] +
+												groupSession.learnMoreDescription
+											}
+											target="_blank"
+										>
+											{learnMoreCallToAction[groupSession.groupSessionLearnMoreMethodId!]}
+										</Button>
 									) : (
 										<Button className="mb-3 d-block w-100" onClick={onReserveSeat}>
 											Reserve My Seat
 										</Button>
 									)}
-									<Button
-										variant="outline-primary"
-										className="d-block w-100"
-										onClick={handleCopyLinkButtonClick}
-									>
-										Copy Session Link
-									</Button>
+
+									{!isExternal && (
+										<Button
+											variant="outline-primary"
+											className="d-block w-100"
+											onClick={handleCopyLinkButtonClick}
+										>
+											Copy Session Link
+										</Button>
+									)}
 								</Col>
 							</Row>
 						</Container>
