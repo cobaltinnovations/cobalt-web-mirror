@@ -342,6 +342,10 @@ const GroupSessions = () => {
 								{groupSessionCollections.length > 0 ? (
 									<>
 										{groupSessionCollections.map((collection, collectionIndex) => {
+											if (collection.groupSessions.length <= 0) {
+												return null;
+											}
+
 											const isLastCollection =
 												collectionIndex === groupSessionCollections.length - 1;
 
@@ -351,64 +355,32 @@ const GroupSessions = () => {
 													key={collection.groupSessionCollectionId}
 												>
 													<Col>
-														{collection.groupSessions.length > 0 ? (
-															<Carousel
-																className="mb-8 mb-lg-12"
-																responsive={responsiveDefaults}
-																description={collection.title}
-																calloutTitle="See All"
-																calloutOnClick={() => {
-																	navigate(
-																		`/group-sessions/collection/${collection.groupSessionCollectionId}`
-																	);
-																}}
-															>
-																{collection.groupSessions.map((groupSession) => {
-																	return (
-																		<Link
-																			key={groupSession.groupSessionId}
-																			className="d-block text-decoration-none h-100"
-																			to={`/group-sessions/${groupSession.groupSessionId}`}
-																		>
-																			<StudioEvent
-																				className="h-100"
-																				studioEvent={groupSession}
-																			/>
-																		</Link>
-																	);
-																})}
-															</Carousel>
-														) : (
-															<>
-																<h3 className="mb-4">{collection.title}</h3>
-																<NoData
-																	className="mb-12 mb-lg-16"
-																	title={collection.title}
-																	description="There are no group sessions for this collection."
-																	actions={[
-																		...(groupSessionUrlName
-																			? [
-																					{
-																						variant: 'primary',
-																						title: 'Click here to view all available group sessions',
-																						onClick: () => {
-																							searchParams.delete(
-																								'class'
-																							);
-																							setSearchParams(
-																								searchParams,
-																								{
-																									replace: true,
-																								}
-																							);
-																						},
-																					},
-																			  ]
-																			: []),
-																	]}
-																/>
-															</>
-														)}
+														<Carousel
+															className="mb-8 mb-lg-12"
+															responsive={responsiveDefaults}
+															description={collection.title}
+															calloutTitle="See All"
+															calloutOnClick={() => {
+																navigate(
+																	`/group-sessions/collection/${collection.groupSessionCollectionId}`
+																);
+															}}
+														>
+															{collection.groupSessions.map((groupSession) => {
+																return (
+																	<Link
+																		key={groupSession.groupSessionId}
+																		className="d-block text-decoration-none h-100"
+																		to={`/group-sessions/${groupSession.groupSessionId}`}
+																	>
+																		<StudioEvent
+																			className="h-100"
+																			studioEvent={groupSession}
+																		/>
+																	</Link>
+																);
+															})}
+														</Carousel>
 														{!isLastCollection && <hr />}
 													</Col>
 												</Row>
