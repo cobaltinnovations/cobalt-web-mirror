@@ -161,12 +161,14 @@ export function useScreeningFlow({
 	groupSessionId,
 	patientOrderId,
 	instantiateOnLoad = true,
+	checkCompletionState = true,
 	disabled = false,
 }: {
 	screeningFlowId?: string;
 	groupSessionId?: string;
 	patientOrderId?: string;
 	instantiateOnLoad?: boolean;
+	checkCompletionState?: boolean;
 	disabled?: boolean;
 }) {
 	const { isImmediateSession } = useAppRootLoaderData();
@@ -340,7 +342,7 @@ export function useScreeningFlow({
 	}, [disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
 	useEffect(() => {
-		if (disabled || !screeningFlowId) {
+		if (disabled || !screeningFlowId || !checkCompletionState) {
 			return;
 		}
 
@@ -349,7 +351,7 @@ export function useScreeningFlow({
 			.fetch()
 			.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
 			.catch((e) => handleError(e));
-	}, [disabled, handleError, screeningFlowId]);
+	}, [checkCompletionState, disabled, handleError, screeningFlowId]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {

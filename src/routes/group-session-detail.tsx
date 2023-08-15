@@ -25,10 +25,11 @@ export const Component = () => {
 	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
-	const { hasCompletedScreening, startScreeningFlow } = useScreeningFlow({
+	const { startScreeningFlow } = useScreeningFlow({
 		screeningFlowId: groupSession.screeningFlowId,
 		groupSessionId: groupSession.groupSessionId,
 		instantiateOnLoad: false,
+		checkCompletionState: false,
 	});
 
 	const navigate = useNavigate();
@@ -40,13 +41,13 @@ export const Component = () => {
 	const [cancelModalIsShowing, setCancelModalIsShowing] = useState(false);
 
 	const handleReserveButtonClick = useCallback(() => {
-		if (groupSession.screeningFlowId && !hasCompletedScreening) {
+		if (groupSession.screeningFlowId) {
 			startScreeningFlow();
 			return;
 		}
 
 		setShowCollectEmailModal(true);
-	}, [groupSession.screeningFlowId, hasCompletedScreening, startScreeningFlow]);
+	}, [groupSession.screeningFlowId, startScreeningFlow]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
