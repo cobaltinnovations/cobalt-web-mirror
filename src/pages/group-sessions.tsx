@@ -187,6 +187,7 @@ const GroupSessions = () => {
 					})
 					.fetch();
 
+				setShowSuggestModal(false);
 				addFlag({
 					variant: 'success',
 					title: 'Your idea has been submitted',
