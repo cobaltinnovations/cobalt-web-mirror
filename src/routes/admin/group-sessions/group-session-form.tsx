@@ -28,9 +28,11 @@ import {
 	useNavigate,
 	useParams,
 	useRouteLoaderData,
+	useSearchParams,
 } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import GroupSession from '@/components/group-session';
 import {
 	GROUP_SESSION_STATUS_ID,
@@ -202,6 +204,8 @@ export const Component = () => {
 	const params = useParams<{ action: string; groupSessionId: string }>();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const selectedTab = searchParams.get('tab') ?? 'details';
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
@@ -219,7 +223,7 @@ export const Component = () => {
 	const [isDirty, setIsDirty] = useState(false);
 	const navigationBlocker = useBlocker(!isGroupSessionPreview && isDirty);
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
-	const [selectedTab, setSelectedTab] = useState('details');
+	const [showConfirmCancelDialog, setShowConfirmCancelDialog] = useState(false);
 	const [urlNameSetByUser, setUrlNameSetByUser] = useState(!isDuplicate && !!loaderData?.groupSession?.urlName);
 	const [debouncedSearchQuery] = useDebouncedState(urlNameSetByUser ? formValues.urlName : formValues.title);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
@@ -1107,29 +1111,73 @@ export const Component = () => {
 
 	const footer = (
 		<div className={classes.formFooter}>
+			<ConfirmDialog
+				size="lg"
+				show={showConfirmCancelDialog}
+				onHide={() => {
+					setShowConfirmCancelDialog(false);
+				}}
+				titleText={'Cancel Group Session'}
+				bodyText={`Are you sure you want to cancel this group session?`}
+				dismissText="No"
+				confirmText="Yes"
+				onConfirm={() => {
+					groupSessionsService
+						.updateGroupSessionStatusById(params.groupSessionId!, GROUP_SESSION_STATUS_ID.CANCELED)
+						.fetch()
+						.then(() => {
+							navigate('/admin/group-sessions');
+							addFlag({
+								variant: 'success',
+								title: 'Group session cancelled',
+								description: 'Your session has been cancelled',
+								actions: [],
+							});
+						})
+						.catch((e) => {
+							handleError(e);
+						});
+				}}
+			/>
 			<Container>
 				<div className="d-flex justify-content-between">
-					<Button
-						variant="outline-primary"
-						type={isGroupSessionPreview ? 'button' : 'submit'}
-						value="exit"
-						onClick={() => {
-							if (isGroupSessionPreview) {
-								navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-								return;
-							}
-						}}
-					>
-						{isGroupSessionPreview ? (
-							<>
-								<LeftChevron /> Back to Edit
-							</>
-						) : isPublished ? (
-							'Exit'
-						) : (
-							'Save & Exit'
+					<div>
+						<Button
+							variant="outline-primary"
+							type={isGroupSessionPreview || isPublished ? 'button' : 'submit'}
+							value="exit"
+							onClick={() => {
+								if (isGroupSessionPreview) {
+									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
+								} else if (isPublished) {
+									navigate(`/admin/group-sessions`);
+								}
+							}}
+						>
+							{isGroupSessionPreview ? (
+								<>
+									<LeftChevron /> Back to Edit
+								</>
+							) : isPublished ? (
+								'Exit Editor'
+							) : (
+								'Save & Exit'
+							)}
+						</Button>
+
+						{isPublished && (
+							<Button
+								type="button"
+								variant="danger"
+								className="ms-4"
+								onClick={() => {
+									setShowConfirmCancelDialog(true);
+								}}
+							>
+								Cancel Session
+							</Button>
 						)}
-					</Button>
+					</div>
 
 					<Button
 						variant="primary"
@@ -1259,7 +1307,7 @@ export const Component = () => {
 			</Container>
 
 			{showTopTabs ? (
-				<Container>
+				<Container className="py-10">
 					<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
 						<TabBar
 							key="mhic-orders-overview-tabbar"
@@ -1272,25 +1320,43 @@ export const Component = () => {
 								},
 								{
 									value: 'registrants',
-									title: `Registrants`,
+									title: `Registrants (${loaderData?.groupSession?.seatsReserved}/${loaderData?.groupSession?.seats})`,
 								},
 							]}
 							onTabClick={(value) => {
-								setSelectedTab(value);
+								searchParams.set('tab', value);
+								setSearchParams(searchParams);
 							}}
 						/>
 						<Tab.Content>
 							<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
 							<Tab.Pane eventKey="registrants">
-								<h4>Registrants</h4>
-								<Button
-									variant="light"
-									onClick={() => {
-										alert('TODO: Download/export registrant emails addresses');
-									}}
-								>
-									Email Addresses
-								</Button>
+								<div className="my-10 d-flex align-items-center">
+									<h3>Registrants</h3>
+
+									<Button
+										variant="light"
+										className="ms-4"
+										onClick={() => {
+											alert('TODO: Download/export registrant emails addresses');
+										}}
+									>
+										<DownloadIcon className="text-primary me-2" />
+										Email Addresses
+									</Button>
+								</div>
+
+								{loaderData?.groupSessionReservations.map((reservation) => {
+									return (
+										<div key={reservation.groupSessionReservationId}>
+											<p className="fw-bold">{reservation.name ?? 'Anonymous'}</p>
+											<a href={'mailto:' + reservation.emailAddress}>
+												{reservation.emailAddress}
+											</a>
+											<hr className="my-4" />
+										</div>
+									);
+								})}
 							</Tab.Pane>
 						</Tab.Content>
 					</Tab.Container>
