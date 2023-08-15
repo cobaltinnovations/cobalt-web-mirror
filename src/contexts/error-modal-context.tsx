@@ -6,6 +6,7 @@ type ErrorModalContextConfig = {
 	isErrorModalShown: boolean;
 	dismissErrorModal: () => void;
 	displayModalForError: (error: CobaltError) => void;
+	clearError: () => void;
 	error: CobaltError | undefined;
 };
 
@@ -17,6 +18,9 @@ const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
 
 	const dismissErrorModal = useCallback(() => {
 		setIsErrorModalShown(false);
+	}, []);
+
+	const clearError = useCallback(() => {
 		setError(undefined);
 	}, []);
 
@@ -40,6 +44,7 @@ const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
 			value={{
 				isErrorModalShown,
 				dismissErrorModal,
+				clearError,
 				displayModalForError,
 				error,
 			}}

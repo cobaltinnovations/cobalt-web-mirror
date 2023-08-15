@@ -23,7 +23,7 @@ const ErrorModal: FC = () => {
 	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();
 	const classes = useStyles();
-	const { isErrorModalShown, dismissErrorModal, error } = useContext(ErrorModalContext);
+	const { isErrorModalShown, dismissErrorModal, clearError, error } = useContext(ErrorModalContext);
 	useTrackModalView('ErrorModal', isErrorModalShown);
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
@@ -140,6 +140,9 @@ const ErrorModal: FC = () => {
 				} else if (error?.apiError?.metadata?.shouldExitScreeningSession && isIntegratedCareStaff) {
 					navigate('/ic/mhic');
 				}
+			}}
+			onExited={() => {
+				clearError();
 			}}
 		>
 			<Modal.Header closeButton>

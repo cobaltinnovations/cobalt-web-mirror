@@ -1216,6 +1216,8 @@ export const Component = () => {
 			dismissText="Cancel"
 			confirmText="Publish"
 			onConfirm={() => {
+				setShowConfirmPublishDialog(false);
+
 				if (isPublished) {
 					handleSaveForm();
 				} else {
