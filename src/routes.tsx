@@ -37,6 +37,7 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
+import { ROLE_ID } from './lib/models';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -164,8 +165,10 @@ export const RedirectToLoginDestination = () => {
 	return <Navigate to={account ? LoginDestinationIdRouteMap[account.loginDestinationId] : '/'} replace />;
 };
 
-const RedirectToAdminPath = ({ pathname }: { pathname: string }) => {
-	return <Navigate to={`/admin/${pathname}`} replace />;
+const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; element: JSX.Element }) => {
+	const { account } = useAccount();
+
+	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Navigate to={`/admin/${pathname}`} replace /> : element;
 };
 
 const RedirectToAdminHome = () => {
@@ -206,10 +209,16 @@ const IntegratedCareEnabledRoutes = () => {
 	return institution?.integratedCareEnabled ? <Outlet /> : <NoMatch />;
 };
 
+const AdminOnlyRoutes = () => {
+	const { account } = useAccount();
+
+	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Outlet /> : <NoMatch />;
+};
+
 const ProviderOnlyRoutes = () => {
 	const { account } = useAccount();
 
-	return account?.roleId === 'PROVIDER' ? <Outlet /> : <NoMatch />;
+	return account?.roleId === ROLE_ID.PROVIDER ? <Outlet /> : <NoMatch />;
 };
 
 const ContactUsEnabledRoutes = () => {
@@ -520,15 +529,20 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'cms/on-your-time',
-						element: <RedirectToAdminPath pathname="my-content" />,
+						element: <RedirectToAdminPathOrRender pathname="my-content" element={<NoMatch />} />,
 					},
 					{
 						path: 'cms/on-your-time/create',
-						element: <CreateOnYourTimeContent />,
+						element: (
+							<RedirectToAdminPathOrRender
+								pathname="my-content/create"
+								element={<CreateOnYourTimeContent />}
+							/>
+						),
 					},
 					{
 						path: 'cms/available-content',
-						element: <RedirectToAdminPath pathname="available-content" />,
+						element: <RedirectToAdminPathOrRender pathname="available-content" element={<NoMatch />} />,
 					},
 					{
 						path: 'stats-dashboard',
@@ -622,6 +636,7 @@ export const routes: RouteObject[] = [
 				],
 			},
 			{
+				element: <AdminOnlyRoutes />,
 				errorElement: <AppErrorDefaultLayout />,
 				loader: requireAuthLoader,
 				children: [
