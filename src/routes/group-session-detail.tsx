@@ -3,13 +3,11 @@ import { Button, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 
-import CollectEmailModal from '@/components/collect-email-modal';
 import GroupSession from '@/components/group-session';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { groupSessionsService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import useAccount from '@/hooks/use-account';
 import moment from 'moment';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -21,7 +19,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
-	const { account } = useAccount();
 	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
@@ -35,8 +32,6 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
 
-	const [collectedEmail, setCollectedEmail] = useState(account?.emailAddress ?? '');
-	const [showCollectEmailModal, setShowCollectEmailModal] = useState(false);
 	const [confirmModalIsShowing, setConfirmModalIsShowing] = useState(false);
 	const [cancelModalIsShowing, setCancelModalIsShowing] = useState(false);
 
@@ -46,12 +41,12 @@ export const Component = () => {
 			return;
 		}
 
-		setShowCollectEmailModal(true);
+		setConfirmModalIsShowing(true);
 	}, [groupSession.screeningFlowId, startScreeningFlow]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
-			await groupSessionsService.reserveGroupSession(groupSession.groupSessionId, collectedEmail).fetch();
+			await groupSessionsService.reserveGroupSession(groupSession.groupSessionId).fetch();
 			revalidator.revalidate();
 
 			setConfirmModalIsShowing(false);
@@ -71,7 +66,7 @@ export const Component = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, collectedEmail, groupSession.groupSessionId, handleError, navigate, revalidator]);
+	}, [addFlag, groupSession.groupSessionId, handleError, navigate, revalidator]);
 
 	const handleModalCancelButtonClick = useCallback(async () => {
 		try {
@@ -116,19 +111,6 @@ export const Component = () => {
 			<Helmet>
 				<title>Cobalt | Group Session Detail</title>
 			</Helmet>
-
-			<CollectEmailModal
-				show={showCollectEmailModal}
-				collectedEmail={collectedEmail}
-				onHide={() => {
-					setShowCollectEmailModal(false);
-				}}
-				onSubmitEmail={(email) => {
-					setCollectedEmail(email);
-					setShowCollectEmailModal(false);
-					setConfirmModalIsShowing(true);
-				}}
-			/>
 
 			<Modal
 				show={confirmModalIsShowing}

@@ -257,13 +257,12 @@ export const groupSessionsService = {
 	isGroupSession(event: GroupSessionModel | GroupSessionRequestModel): event is GroupSessionModel {
 		return typeof (event as GroupSessionModel).groupSessionId !== 'undefined';
 	},
-	reserveGroupSession(groupSessionId: string, emailAddress: string) {
+	reserveGroupSession(groupSessionId: string) {
 		return httpSingleton.orchestrateRequest<ReserveGroupSessionResponseBody>({
 			method: 'post',
 			url: `/group-session-reservations`,
 			data: {
 				groupSessionId,
-				emailAddress,
 			},
 		});
 	},
