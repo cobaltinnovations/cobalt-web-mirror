@@ -1076,7 +1076,8 @@ export const Component = () => {
 							<p className="mb-3">
 								The follow-up email will be sent{' '}
 								<span className="fw-bold text-decoration-underline">
-									{formValues.followupDayOffset} day
+									{formValues.followupDayOffset || '--'} day
+									{parseInt(formValues.followupDayOffset || '0', 10) === 1 ? '' : 's'}
 								</span>{' '}
 								after the session ends at{' '}
 								<span className="fw-bold text-docration-underline">
