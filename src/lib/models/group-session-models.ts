@@ -119,7 +119,7 @@ export interface GroupSessionModel {
 	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
 	learnMoreDescription?: string;
 	reminderEmailContent?: string;
-	screeningFlowId?: string;
+	screeningFlowId: string;
 }
 
 export interface GroupSessionUrlNameValidationResult {

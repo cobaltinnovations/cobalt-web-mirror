@@ -53,6 +53,7 @@ import ConfirmDialog from '@/components/confirm-dialog';
 import useFlags from '@/hooks/use-flags';
 import { buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import useAccount from '@/hooks/use-account';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -152,11 +153,19 @@ const initialGroupSessionFormValues = {
 function getInitialGroupSessionFormValues({
 	groupSession,
 	isDuplicate,
+	defaultScreeningFlowId,
 }: {
 	groupSession?: GroupSessionModel | null;
 	isDuplicate?: boolean;
+	defaultScreeningFlowId: string;
 }): typeof initialGroupSessionFormValues {
-	const { startDateTime, endDateTime, followupTimeOfDay: formattedFollowupTimeOfDay, ...rest } = groupSession ?? {};
+	const {
+		screeningFlowId = defaultScreeningFlowId,
+		startDateTime,
+		endDateTime,
+		followupTimeOfDay: formattedFollowupTimeOfDay,
+		...rest
+	} = groupSession ?? {};
 
 	const startDate = moment(startDateTime);
 	const endDate = moment(endDateTime);
@@ -176,6 +185,7 @@ function getInitialGroupSessionFormValues({
 		{ ...initialGroupSessionFormValues },
 		{
 			...rest,
+			screeningFlowId,
 			// keep initial values when duplicating an existing session
 			...(isDuplicate
 				? {
@@ -203,6 +213,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export const Component = () => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const loaderData = useAdminGroupSessionFormLoaderData();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; groupSessionId: string }>();
@@ -221,6 +232,7 @@ export const Component = () => {
 		getInitialGroupSessionFormValues({
 			isDuplicate,
 			groupSession: loaderData?.groupSession,
+			defaultScreeningFlowId: institution.groupSessionDefaultIntakeScreeningFlowId,
 		})
 	);
 
@@ -956,40 +968,49 @@ export const Component = () => {
 							id="no-screening"
 							label="Do not screen"
 							hideChildren
-							checked={!formValues.screeningFlowId}
+							checked={
+								formValues.screeningFlowId === institution.groupSessionDefaultIntakeScreeningFlowId
+							}
 							onChange={() => {
-								updateFormValue('screeningFlowId', '');
+								updateFormValue(
+									'screeningFlowId',
+									institution.groupSessionDefaultIntakeScreeningFlowId
+								);
 							}}
 						/>
 
-						{(loaderData?.screeningFlows ?? []).map((screeningFlow) => {
-							return (
-								<ToggledInput
-									key={screeningFlow.screeningFlowId}
-									id={screeningFlow.screeningFlowId}
-									label={screeningFlow.name}
-									className="mb-3"
-									hideChildren
-									detail={
-										<Button
-											size="sm"
-											variant="link"
-											className="p-0 text-decoration-none"
-											onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
-										>
-											View Questions
-										</Button>
-									}
-									checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
-									onChange={({ currentTarget }) => {
-										updateFormValue(
-											'screeningFlowId',
-											currentTarget.checked ? screeningFlow.screeningFlowId : ''
-										);
-									}}
-								/>
-							);
-						})}
+						{(loaderData?.screeningFlows ?? [])
+							.filter(
+								(flow) => flow.screeningFlowId !== institution.groupSessionDefaultIntakeScreeningFlowId
+							)
+							.map((screeningFlow) => {
+								return (
+									<ToggledInput
+										key={screeningFlow.screeningFlowId}
+										id={screeningFlow.screeningFlowId}
+										label={screeningFlow.name}
+										className="mb-3"
+										hideChildren
+										detail={
+											<Button
+												size="sm"
+												variant="link"
+												className="p-0 text-decoration-none"
+												onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
+											>
+												View Questions
+											</Button>
+										}
+										checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
+										onChange={({ currentTarget }) => {
+											updateFormValue(
+												'screeningFlowId',
+												currentTarget.checked ? screeningFlow.screeningFlowId : ''
+											);
+										}}
+									/>
+								);
+							})}
 					</GroupSessionFormSection>
 
 					<hr />
