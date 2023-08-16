@@ -182,25 +182,15 @@ const GroupSession = ({
 													)}
 												</p>
 												<p className="mb-0">
-													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-														'hh:mmA'
-													)}{' '}
-													-{' '}
-													{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-														'hh:mmA'
-													)}
+													{groupSession.startTimeDescription} -{' '}
+													{groupSession.endTimeDescription}
 												</p>
 											</div>
 										) : (
 											<div>
 												<p className="mb-1 fw-bold">
-													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-														'MMM D[,] YYYY'
-													)}{' '}
-													-{' '}
-													{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-														'MMM D[,] YYYY'
-													)}
+													{groupSession.startTimeDescription} -{' '}
+													{groupSession.endTimeDescription}
 												</p>
 												<p className="mb-0">{groupSession.dateTimeDescription}</p>
 											</div>
@@ -221,7 +211,7 @@ const GroupSession = ({
 													<p className="mb-1 fw-bold">
 														{groupSession.seatsAvailableDescription}
 													</p>
-													<p className="mb-0">{groupSession.seats} seats total</p>
+													<p className="mb-0">{groupSession.seatsDescription}</p>
 												</div>
 											)}
 										</div>

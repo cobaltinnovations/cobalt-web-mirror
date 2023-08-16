@@ -63,8 +63,6 @@ export interface GroupSessionModel {
 	description: string;
 	durationInMinutes: number;
 	durationInMinutesDescription: string;
-	endDateTime: string;
-	endDateTimeDescription: string;
 	facilitatorEmailAddress: string;
 	facilitatorName: string;
 	groupSessionId: string;
@@ -87,8 +85,14 @@ export interface GroupSessionModel {
 	sendReminderEmail: boolean;
 	singleSessionFlag: boolean;
 	dateTimeDescription?: string;
+	startTime: string;
+	startTimeDescription: string;
+	endTime: string;
+	endTimeDescription: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
+	endDateTime: string;
+	endDateTimeDescription: string;
 	submitterAccountId: string;
 	submitterEmailAddress: string;
 	submitterName: string;

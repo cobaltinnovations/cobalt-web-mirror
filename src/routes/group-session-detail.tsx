@@ -101,8 +101,7 @@ export const Component = () => {
 	const groupSessionTime = (
 		<p className="mb-0">
 			{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('MMM D[,] YYYY')} &bull;{' '}
-			{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')} -{' '}
-			{moment(groupSession.endDateTime, 'YYYY-MM-DD[T]HH:mm').format('hh:mmA')}
+			{groupSession.startTimeDescription} - {groupSession.endTimeDescription}
 		</p>
 	);
 
