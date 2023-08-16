@@ -93,6 +93,7 @@ export interface GroupSessionModel {
 	submitterEmailAddress: string;
 	submitterName: string;
 	tags: Tag[];
+	differentEmailAddressForNotifications: boolean;
 	targetEmailAddress: string;
 	timeZone: string;
 	title: string;

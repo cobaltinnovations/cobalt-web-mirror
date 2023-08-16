@@ -33,6 +33,7 @@ export enum GroupSessionSchedulingSystemId {
 export interface CreateGroupSessionRequestBody {
 	facilitatorName?: string;
 	facilitatorEmailAddress?: string;
+	differentEmailAddressForNotifications?: boolean;
 	targetEmailAddress?: string;
 	title?: string;
 	description?: string;

@@ -120,6 +120,7 @@ const initialGroupSessionFormValues = {
 	seats: undefined as number | undefined,
 	facilitatorName: '',
 	facilitatorEmailAddress: '',
+	differentEmailAddressForNotifications: false,
 	targetEmailAddress: '',
 	singleSessionFlag: true,
 	dateTimeDescription: '' as string | undefined,
@@ -230,9 +231,6 @@ export const Component = () => {
 		{}
 	);
 
-	const [showContactEmailInput, setShowContactEmailInput] = useState(
-		formValues.facilitatorEmailAddress !== formValues.targetEmailAddress
-	);
 	const [selectedScreeningFlowForModal, setSelectedScreeningFlowForModal] = useState<ScreeningFlow>();
 
 	const groupSessionSchedulingSystemId =
@@ -550,15 +548,19 @@ export const Component = () => {
 								</p>
 							</div>
 						}
-						checked={showContactEmailInput}
+						checked={formValues.differentEmailAddressForNotifications}
 						onChange={({ currentTarget }) => {
-							setShowContactEmailInput(currentTarget.checked);
+							updateFormValue('differentEmailAddressForNotifications', currentTarget.checked);
+							updateFormValue(
+								'targetEmailAddress',
+								currentTarget.checked ? loaderData?.groupSession?.targetEmailAddress ?? '' : ''
+							);
 						}}
 					>
 						<InputHelper
 							type="email"
 							label="Notification Email"
-							required={showContactEmailInput}
+							required={formValues.differentEmailAddressForNotifications}
 							name="targetEmailAddress"
 							value={formValues.targetEmailAddress}
 							onChange={({ currentTarget }) => {
@@ -1514,6 +1516,10 @@ function prepareGroupSessionSubmission(
 		if (!groupSessionSubmission.targetEmailAddress) {
 			delete groupSessionSubmission.targetEmailAddress;
 		}
+	}
+
+	if (!groupSessionSubmission.differentEmailAddressForNotifications) {
+		delete groupSessionSubmission.targetEmailAddress;
 	}
 
 	if (!groupSessionSubmission.groupSessionCollectionId) {
