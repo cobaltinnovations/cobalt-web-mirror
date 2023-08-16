@@ -38,6 +38,8 @@ import Team from '@/components/team';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -260,6 +262,8 @@ const Index: FC = () => {
 			>
 				{inTheStudioEvents.length > 0 && (
 					<>
+						<IneligibleBookingModal uiType="group-session" />
+
 						<Container className="pt-20">
 							<Row>
 								<Col>
@@ -268,7 +272,7 @@ const Index: FC = () => {
 										description="Group Sessions"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
-											navigate('/in-the-studio');
+											navigate('/group-sessions');
 										}}
 									>
 										{inTheStudioEvents.map((groupSession) => {
@@ -277,7 +281,7 @@ const Index: FC = () => {
 
 											if (groupSessionsService.isGroupSession(groupSession)) {
 												renderKey = groupSession.groupSessionId;
-												detailUrl = `/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`;
+												detailUrl = `/group-sessions/${groupSession.groupSessionId}`;
 											} else if (groupSessionsService.isGroupSessionByRequest(groupSession)) {
 												renderKey = groupSession.groupSessionRequestId;
 												detailUrl = `/in-the-studio/group-session-by-request/${groupSession.groupSessionRequestId}`;
@@ -291,6 +295,9 @@ const Index: FC = () => {
 													key={renderKey}
 													className="d-block text-decoration-none h-100"
 													to={detailUrl}
+													state={{
+														navigationSource: GroupSessionDetailNavigationSource.HOME_PAGE,
+													}}
 												>
 													<StudioEvent className="h-100" studioEvent={groupSession} />
 												</Link>

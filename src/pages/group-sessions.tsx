@@ -22,6 +22,8 @@ import Carousel, { responsiveDefaults } from '@/components/carousel';
 import NoData from '@/components/no-data';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 import classNames from 'classnames';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 
 const GroupSessions = () => {
 	const handleError = useHandleError();
@@ -180,6 +182,8 @@ const GroupSessions = () => {
 				<title>Cobalt | Group Sessions</title>
 			</Helmet>
 
+			<IneligibleBookingModal uiType="group-session" />
+
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<p className="mb-6 fs-large text-center">
@@ -239,6 +243,10 @@ const GroupSessions = () => {
 													<Link
 														className="d-block text-decoration-none h-100"
 														to={`/group-sessions/${groupSession.groupSessionId}`}
+														state={{
+															navigationSource:
+																GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,
+														}}
 													>
 														<StudioEvent className="h-100" studioEvent={groupSession} />
 													</Link>
@@ -302,6 +310,10 @@ const GroupSessions = () => {
 																		key={groupSession.groupSessionId}
 																		className="d-block text-decoration-none h-100"
 																		to={`/group-sessions/${groupSession.groupSessionId}`}
+																		state={{
+																			navigationSource:
+																				GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,
+																		}}
 																	>
 																		<StudioEvent
 																			className="h-100"

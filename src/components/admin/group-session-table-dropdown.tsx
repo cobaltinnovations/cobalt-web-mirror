@@ -12,6 +12,7 @@ import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-x-close.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 
 interface GroupSessionTableDropdownProps {
 	groupSession: GroupSessionModel;
@@ -88,6 +89,9 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 					className="d-flex align-items-center"
 					as={Link}
 					to={`/group-sessions/${groupSession.groupSessionId}`}
+					state={{
+						navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
+					}}
 					target="_blank"
 				>
 					<ExternalIcon className="me-2 text-n500" width={24} height={24} />

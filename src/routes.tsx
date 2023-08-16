@@ -45,10 +45,6 @@ export const SignUpVerify = lazyLoadWithRefresh(() => import('@/pages/sign-up-ve
 export const SignIn = lazyLoadWithRefresh(() => import('@/pages/sign-in'));
 export const SignInEmail = lazyLoadWithRefresh(() => import('@/pages/sign-in-email'));
 export const Index = lazyLoadWithRefresh(() => import('@/pages'));
-export const InTheStudio = lazyLoadWithRefresh(() => import('@/pages/in-the-studio'));
-export const InTheStudioGroupSessionScheduled = lazyLoadWithRefresh(
-	() => import('@/pages/in-the-studio-group-session-scheduled')
-);
 export const InTheStudioGroupSessionByRequest = lazyLoadWithRefresh(
 	() => import('@/pages/in-the-studio-group-session-by-request')
 );
@@ -77,15 +73,14 @@ export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
 export const GroupSessions = lazyLoadWithRefresh(() => import('@/pages/group-sessions'));
 export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-request'));
-export const GroupSessionsScheduled = lazyLoadWithRefresh(() => import('@/pages/group-sessions-scheduled'));
-export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
-export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
-	() => import('@/pages/group-sessions-by-request-create')
-);
+// export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
+// export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
+// 	() => import('@/pages/group-sessions-by-request-create')
+// );
 export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redirect-to-backend'));
 export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
 export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
-export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
+// export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
 export const ProviderDetail = lazyLoadWithRefresh(() => import('@/pages/provider-detail'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
@@ -195,6 +190,16 @@ const RedirectToResourceLibrary = () => {
 	}
 
 	return <Navigate to="/resource-library" replace />;
+};
+
+const RedirectToGroupSessionDetail = () => {
+	const { groupSessionId } = useParams<{ groupSessionId: string }>();
+
+	if (groupSessionId) {
+		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
+	}
+
+	return <Navigate to="/group-sessions" replace />;
 };
 
 const SupportEnabledRoutes = () => {
@@ -319,13 +324,13 @@ export const routes: RouteObject[] = [
 						path: 'in-the-studio',
 						element: <Navigate to="/group-sessions" replace />,
 					},
-					{
-						path: 'in-the-studio-thanks',
-						element: <InTheStudioThanks />,
-					},
+					// {
+					// 	path: 'in-the-studio-thanks',
+					// 	element: <InTheStudioThanks />,
+					// },
 					{
 						path: 'in-the-studio/group-session-scheduled/:groupSessionId',
-						element: <InTheStudioGroupSessionScheduled />,
+						element: <RedirectToGroupSessionDetail />,
 					},
 					{
 						path: 'in-the-studio/group-session-by-request/:groupSessionRequestId',
@@ -487,21 +492,17 @@ export const routes: RouteObject[] = [
 						path: 'group-sessions/request',
 						element: <GroupSessionsRequest />,
 					},
-					// {
-					// 	path: 'group-sessions/scheduled',
-					// 	element: <GroupSessionsScheduled />,
-					// },
 					{
 						path: 'group-sessions/by-request',
-						element: <GroupSessionsByRequest />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-sessions/by-request/create',
-						element: <GroupSessionsByRequestCreate />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-sessions/by-request/:groupSessionId/edit',
-						element: <GroupSessionsByRequestCreate />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/ical',

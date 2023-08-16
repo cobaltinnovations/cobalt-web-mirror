@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate, useRevalidator } from 'react-router-dom';
 
 import GroupSession from '@/components/group-session';
 import useFlags from '@/hooks/use-flags';
@@ -9,6 +9,15 @@ import useHandleError from '@/hooks/use-handle-error';
 import { groupSessionsService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import moment from 'moment';
+import Cookies from 'js-cookie';
+
+export enum GroupSessionDetailNavigationSource {
+	HOME_PAGE = 'HOME_PAGE',
+	GROUP_SESSION_LIST = 'GROUP_SESSION_LIST',
+	GROUP_SESSION_COLLECTION = 'GROUP_SESSION_COLLECTION',
+	TOPIC_CENTER = 'TOPIC_CENTER',
+	ADMIN_LIST = 'ADMIN_LIST',
+}
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { groupSession, groupSessionReservation } = await groupSessionsService
@@ -22,7 +31,12 @@ export const Component = () => {
 	const { groupSession, groupSessionReservation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
-	const { startScreeningFlow } = useScreeningFlow({
+	const location = useLocation();
+
+	const navigationSource =
+		(location.state?.navigationSource as GroupSessionDetailNavigationSource) ??
+		GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
+	const { createScreeningSession } = useScreeningFlow({
 		screeningFlowId: groupSession.screeningFlowId,
 		groupSessionId: groupSession.groupSessionId,
 		instantiateOnLoad: false,
@@ -37,12 +51,13 @@ export const Component = () => {
 
 	const handleReserveButtonClick = useCallback(() => {
 		if (groupSession.screeningFlowId) {
-			startScreeningFlow();
+			Cookies.set('groupSessionDetailNavigationSource', navigationSource);
+			createScreeningSession();
 			return;
 		}
 
 		setConfirmModalIsShowing(true);
-	}, [groupSession.screeningFlowId, startScreeningFlow]);
+	}, [createScreeningSession, groupSession.screeningFlowId, navigationSource]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {

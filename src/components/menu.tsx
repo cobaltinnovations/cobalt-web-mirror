@@ -342,7 +342,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 				testId: 'menuLinkGroupSessions',
 				label: 'Group Sessions',
 				icon: <GroupSessionsIcon />,
-				to: () => '/in-the-studio',
+				to: () => '/group-sessions',
 			},
 			{
 				testId: 'menuLinkCrisisResources',

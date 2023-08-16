@@ -34,7 +34,7 @@ const FooterNav = () => {
 			: []),
 		{
 			label: 'Group Sessions',
-			to: '/in-the-studio',
+			to: '/group-sessions',
 		},
 		{
 			label: 'Resource Library',

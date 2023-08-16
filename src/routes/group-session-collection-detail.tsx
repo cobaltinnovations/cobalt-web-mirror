@@ -12,6 +12,8 @@ import HeroContainer from '@/components/hero-container';
 import StudioEvent from '@/components/studio-event';
 import NoData from '@/components/no-data';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
+import { GroupSessionDetailNavigationSource } from './group-session-detail';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { groupSessionCollectionId } = params as { groupSessionCollectionId: string };
@@ -70,6 +72,8 @@ export const Component = () => {
 				<p className="fs-large text-center">{groupSessionCollection?.description}</p>
 			</HeroContainer>
 
+			<IneligibleBookingModal uiType="group-session" />
+
 			<Container className="py-14">
 				{groupSessions.length > 0 ? (
 					<Row>
@@ -79,6 +83,10 @@ export const Component = () => {
 									<Link
 										className="d-block text-decoration-none h-100"
 										to={`/group-sessions/${groupSession.groupSessionId}`}
+										state={{
+											navigationSource:
+												GroupSessionDetailNavigationSource.GROUP_SESSION_COLLECTION,
+										}}
 									>
 										<StudioEvent className="h-100" studioEvent={groupSession} />
 									</Link>

@@ -54,6 +54,11 @@ export enum ScreeningFlowTypeId {
 	GROUP_SESSION_INTAKE = 'GROUP_SESSION_INTAKE',
 }
 
+export enum ScreeningSessionDestinationResultId {
+	SUCCESS = 'SUCCESS',
+	FAILURE = 'FAILURE',
+}
+
 export enum ScreeningSessionDestinationId {
 	CRISIS = 'CRISIS',
 	ONE_ON_ONE_PROVIDER_LIST = 'ONE_ON_ONE_PROVIDER_LIST',
@@ -71,6 +76,7 @@ export enum ScreeningSessionDestinationId {
 export interface ScreeningSessionDestination {
 	screeningSessionDestinationId: ScreeningSessionDestinationId;
 	context: Record<string, unknown>;
+	screeningSessionDestinationResultId: ScreeningSessionDestinationResultId;
 }
 
 export enum ScreeningAnswerFormatId {
