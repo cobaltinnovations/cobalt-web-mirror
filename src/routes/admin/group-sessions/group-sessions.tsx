@@ -10,7 +10,7 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
+import { GROUP_SESSION_SORT_ORDER, GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import {
 	GetGroupSessionCountsResponseBody,
 	GetGroupSessionsQueryParameters,
@@ -43,8 +43,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const groupSessionStatusId = url.searchParams.get('groupSessionStatusId');
 	const groupSessionSchedulingSystemId = url.searchParams.get('groupSessionSchedulingSystemId');
 	const visibleFlag = url.searchParams.get('visibleFlag');
-	const orderBy = url.searchParams.get('orderBy');
-	const queryParams: GetGroupSessionsQueryParameters = {};
+	const orderBy = url.searchParams.get('orderBy') ?? GROUP_SESSION_SORT_ORDER.DATE_ADDED_DESCENDING;
+	const queryParams: GetGroupSessionsQueryParameters = {
+		orderBy,
+	};
 
 	if (groupSessionStatusId) {
 		queryParams.groupSessionStatusId = groupSessionStatusId;
@@ -56,10 +58,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	if (visibleFlag) {
 		queryParams.visibleFlag = visibleFlag;
-	}
-
-	if (orderBy) {
-		queryParams.orderBy = orderBy;
 	}
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
