@@ -6,9 +6,8 @@ import { Helmet } from 'react-helmet';
 import { reportingSerive, ReportType } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
-import Select from '@/components/select';
 import DatePicker from '@/components/date-picker';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildBackendDownloadUrl } from '@/lib/utils';
 import InputHelper from '@/components/input-helper';
 
 const Reports = () => {
@@ -43,7 +42,7 @@ const Reports = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			window.location.href = buildQueryParamUrl('/reporting/run-report', {
+			window.location.href = buildBackendDownloadUrl('/reporting/run-report', {
 				reportTypeId: formValues.reportTypeId,
 				reportFormatId: 'CSV',
 				startDateTime: `${formValues.startDate}T00:00:00`,
