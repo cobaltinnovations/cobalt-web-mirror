@@ -8,7 +8,7 @@ const timeSlot = moment('00:00', 'hh:mm');
 
 for (let i = 0; i < totalSlotsInDay; i += 15) {
 	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
-	timeSlots.push(timeSlot.format('hh:mm A'));
+	timeSlots.push(timeSlot.format('h:mm A'));
 }
 
 const TimeSlotInput = (props: InputHelperProps) => {
