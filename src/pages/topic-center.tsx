@@ -16,6 +16,8 @@ import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import { SkeletonText } from '@/components/skeleton-loaders';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -41,6 +43,8 @@ const TopicCenter = () => {
 			<Helmet>
 				<title>Cobalt | Topic Center</title>
 			</Helmet>
+
+			<IneligibleBookingModal uiType="group-session" />
 
 			<AsyncPage
 				fetchData={fetchData}
@@ -193,7 +197,13 @@ const TopicCenter = () => {
 																});
 
 																navigate(
-																	`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`
+																	`/group-sessions/${groupSession.groupSessionId}`,
+																	{
+																		state: {
+																			navigationSource:
+																				GroupSessionDetailNavigationSource.TOPIC_CENTER,
+																		},
+																	}
 																);
 															}}
 															imageUrl={groupSession.imageUrl}

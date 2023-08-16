@@ -11,6 +11,7 @@ interface UseStylesProps {
 	as?: ElementType<any> | undefined;
 	hasValue: boolean;
 	hasError: boolean;
+	hasPlaceholder: boolean;
 }
 
 const useInputHelperStyles = createUseThemedStyles((theme) => ({
@@ -45,8 +46,8 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		color: ({ isFocused, hasError }: UseStylesProps) =>
 			hasError ? theme.colors.d500 : isFocused ? theme.colors.p500 : theme.colors.n500,
 		transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-		transform: ({ isFocused, hasValue }: UseStylesProps) =>
-			isFocused || hasValue ? 'translateY(-50%) scale(0.75)' : '',
+		transform: ({ isFocused, hasValue, hasPlaceholder }: UseStylesProps) =>
+			isFocused || hasValue || hasPlaceholder ? 'translateY(-50%) scale(0.75)' : '',
 	},
 	input: {
 		margin: 0,
@@ -87,7 +88,7 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface InputHelperProps extends FormControlProps, PropsWithChildren {
+export interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	label: string;
 	name?: string;
 	onFocus?: (...args: any[]) => void;
@@ -110,6 +111,7 @@ const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
 			as: props.as,
 			hasValue: !!props.value,
 			hasError: !!error,
+			hasPlaceholder: !!props.placeholder,
 		});
 
 		function handleMouseOver() {

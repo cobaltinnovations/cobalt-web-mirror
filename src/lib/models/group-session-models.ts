@@ -1,5 +1,6 @@
 import { Method } from 'axios';
 import { GroupSessionSchedulingSystemId } from '../services';
+import { Tag } from './tag-groups';
 
 export enum GROUP_SESSION_STATUS_ID {
 	NEW = 'NEW',
@@ -9,8 +10,21 @@ export enum GROUP_SESSION_STATUS_ID {
 	DELETED = 'DELETED',
 }
 
+export enum GroupSessionLearnMoreMethodId {
+	URL = 'URL',
+	EMAIL = 'EMAIL',
+	PHONE = 'PHONE',
+}
+
 export enum GROUP_SESSION_SORT_ORDER {
+	START_TIME_DESCENDING = 'START_TIME_DESCENDING',
 	START_TIME_ASCENDING = 'START_TIME_ASCENDING',
+	DATE_ADDED_DESCENDING = 'DATE_ADDED_DESCENDING',
+	DATE_ADDED_ASCENDING = 'DATE_ADDED_ASCENDING',
+	REGISTERED_DESCENDING = 'REGISTERED_DESCENDING',
+	REGISTERED_ASCENDING = 'REGISTERED_ASCENDING',
+	CAPACITY_DESCENDING = 'CAPACITY_DESCENDING',
+	CAPACITY_ASCENDING = 'CAPACITY_ASCENDING',
 }
 
 export interface PresignedUploadModel {
@@ -29,48 +43,88 @@ export interface ScreeningQuestionV2 {
 	question: string;
 }
 
-export interface GroupSessionModel {
-	assessmentId?: string;
-	groupSessionId: string;
-	groupSessionSchedulingSystemId: GroupSessionSchedulingSystemId;
-	institutionId: string;
-	groupSessionStatusId: string;
-	groupSessionStatusIdDescription: string;
+export interface GroupSessionCollectionModel {
+	groupSessionCollectionId: string;
 	title: string;
 	description: string;
-	urlName: string;
-	submitterName: string;
-	submitterEmailAddress: string;
-	facilitatorAccountId?: string;
-	facilitatorName: string;
+	displayOrder: number;
+	institutionId: string;
+}
+
+export interface GroupSessionCollectionWithSessionsIncludedModel extends GroupSessionCollectionModel {
+	groupSessions: GroupSessionModel[];
+}
+
+export interface GroupSessionModel {
+	appointmentTimeDescription: string;
+	created: string;
+	createdDateDescription: string;
+	createdDescription: string;
+	description: string;
+	durationInMinutes: number;
+	durationInMinutesDescription: string;
 	facilitatorEmailAddress: string;
-	targetEmailAddress: string;
+	facilitatorName: string;
+	groupSessionId: string;
+	groupSessionSchedulingSystemId: GroupSessionSchedulingSystemId;
+	groupSessionStatusId: string;
+	groupSessionStatusIdDescription: string;
+	institutionDescription: string;
+	institutionId: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	screeningQuestions: string[];
+	screeningQuestionsV2: ScreeningQuestionV2[];
+	seats: number;
+	seatsAvailable: number;
+	seatsAvailableDescription: string;
+	seatsDescription: string;
+	seatsReserved: number;
+	seatsReservedDescription: string;
+	sendFollowupEmail: boolean;
+	sendReminderEmail: boolean;
+	singleSessionFlag: boolean;
+	dateTimeDescription?: string;
+	startTime: string;
+	startTimeDescription: string;
+	endTime: string;
+	endTimeDescription: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
 	endDateTime: string;
 	endDateTimeDescription: string;
-	appointmentTimeDescription: string;
-	durationInMinutes: number;
-	durationInMinutesDescription: string;
-	scheduleUrl: string;
-	seats?: number;
-	seatsDescription?: string;
-	seatsAvailable?: number;
-	seatsAvailableDescription?: string;
-	seatsReserved?: number;
-	seatsReservedDescription?: string;
+	submitterAccountId: string;
+	submitterEmailAddress: string;
+	submitterName: string;
+	tags: Tag[];
+	differentEmailAddressForNotifications: boolean;
+	targetEmailAddress: string;
 	timeZone: string;
-	imageUrl: string;
-	videoconferenceUrl: string;
-	screeningQuestions: string[];
-	screeningQuestionsV2: ScreeningQuestionV2[];
-	confirmationEmailContent: string;
-	created: string;
-	createdDescription: string;
-	createdDateDescription: string;
-	sendFollowupEmail: boolean;
+	title: string;
+	urlName: string;
+	visibleFlag: boolean;
+
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;
+	assessmentId?: string;
+	facilitatorAccountId?: string;
+	scheduleUrl: string;
+	imageUrl: string;
+	videoconferenceUrl: string;
+	confirmationEmailContent: string;
+
+	followupDayOffset?: string;
+	followupTimeOfDay?: string;
+	groupSessionCollectionId?: string;
+	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
+	learnMoreDescription?: string;
+	reminderEmailContent?: string;
+	screeningFlowId: string;
+}
+
+export interface GroupSessionUrlNameValidationResult {
+	available: boolean;
+	recommendation: string;
 }
 
 export interface GroupSessionRequestModel {

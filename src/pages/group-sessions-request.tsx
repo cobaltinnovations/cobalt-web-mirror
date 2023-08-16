@@ -160,11 +160,16 @@ const GroupSessionsRequest = () => {
 						<Col lg={{ span: 8, offset: 2 }}>
 							<h1 className="mb-6">Request a Group Session</h1>
 							<p className="mb-4">
-								Use this form to request a group session for your team (minimum of 5 people). Topics can
-								range from mindfulness to resilience to how to increase daily activity. Please request
-								your session at least two weeks in advance of the desired date. Upon submission of this
-								form, please allow 1-2 business days to hear back from the session coordinator. Sessions
-								are held virtually.
+								Please use this form to request a wellness-focused group session for your team (minimum
+								of 5 people). Also please request your session at least two weeks in advance of the
+								desired date. Upon submission, please allow 1-2 business days to hear back from the
+								session coordinator. Sessions are held virtually.
+							</p>
+							<p className="mb-4">
+								Selecting multiple topics of interest will increase the likelihood of booking a session
+								on the desired date, however this form is intended to schedule a single session for your
+								team. Please submit a separate form for an additional session, or add a note in the
+								comments section.
 							</p>
 							<p className="mb-0 text-danger">Required *</p>
 						</Col>
@@ -323,7 +328,7 @@ const GroupSessionsRequest = () => {
 									</Form.Group>
 								</div>
 								<div className="mb-8">
-									<h6 className="mb-1">Which (if any) dates do you prefer for your session(s)?</h6>
+									<h6 className="mb-1">Which (if any) dates do you prefer for your session?</h6>
 									<p className="mb-4">Enter “No Preference” if there is no preferred date.</p>
 									<InputHelper
 										as="textarea"
@@ -339,7 +344,7 @@ const GroupSessionsRequest = () => {
 									/>
 								</div>
 								<div className="mb-8">
-									<h6 className="mb-1">What time of day do you prefer for your session(s)?</h6>
+									<h6 className="mb-1">What time of day do you prefer for your session?</h6>
 									<p className="mb-4">Enter “No Preference” if there is no preferred time.</p>
 									<InputHelper
 										as="textarea"
@@ -356,7 +361,7 @@ const GroupSessionsRequest = () => {
 								</div>
 								<div className="mb-8">
 									<h6 className="mb-1">
-										Confirm the amount of people you expect to attend the session(s){' '}
+										Confirm the amount of people you expect to attend the session{' '}
 										<span className="text-danger">*</span>
 									</h6>
 									<p className="mb-2">

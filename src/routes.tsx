@@ -37,6 +37,7 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
+import { ROLE_ID } from './lib/models';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -44,10 +45,6 @@ export const SignUpVerify = lazyLoadWithRefresh(() => import('@/pages/sign-up-ve
 export const SignIn = lazyLoadWithRefresh(() => import('@/pages/sign-in'));
 export const SignInEmail = lazyLoadWithRefresh(() => import('@/pages/sign-in-email'));
 export const Index = lazyLoadWithRefresh(() => import('@/pages'));
-export const InTheStudio = lazyLoadWithRefresh(() => import('@/pages/in-the-studio'));
-export const InTheStudioGroupSessionScheduled = lazyLoadWithRefresh(
-	() => import('@/pages/in-the-studio-group-session-scheduled')
-);
 export const InTheStudioGroupSessionByRequest = lazyLoadWithRefresh(
 	() => import('@/pages/in-the-studio-group-session-by-request')
 );
@@ -76,18 +73,14 @@ export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
 export const GroupSessions = lazyLoadWithRefresh(() => import('@/pages/group-sessions'));
 export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-request'));
-export const GroupSessionsScheduled = lazyLoadWithRefresh(() => import('@/pages/group-sessions-scheduled'));
-export const GroupSessionsScheduledCreate = lazyLoadWithRefresh(
-	() => import('@/pages/group-sessions-scheduled-create')
-);
-export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
-export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
-	() => import('@/pages/group-sessions-by-request-create')
-);
+// export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
+// export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
+// 	() => import('@/pages/group-sessions-by-request-create')
+// );
 export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redirect-to-backend'));
 export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
 export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
-export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
+// export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
 export const ProviderDetail = lazyLoadWithRefresh(() => import('@/pages/provider-detail'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
@@ -167,6 +160,28 @@ export const RedirectToLoginDestination = () => {
 	return <Navigate to={account ? LoginDestinationIdRouteMap[account.loginDestinationId] : '/'} replace />;
 };
 
+const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; element: JSX.Element }) => {
+	const { account } = useAccount();
+
+	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Navigate to={`/admin/${pathname}`} replace /> : element;
+};
+
+const RedirectToAdminHome = () => {
+	const { institutionCapabilities } = useAccount();
+
+	if (institutionCapabilities?.viewNavAdminMyContent) {
+		return <Navigate to="my-content" />;
+	} else if (institutionCapabilities?.viewNavAdminAvailableContent) {
+		return <Navigate to="availble-content" />;
+	} else if (institutionCapabilities?.viewNavAdminGroupSession) {
+		return <Navigate to="group-sessions" />;
+	} else if (institutionCapabilities?.viewNavAdminReports) {
+		return <Navigate to="reports" />;
+	} else {
+		return <NoMatch />;
+	}
+};
+
 const RedirectToResourceLibrary = () => {
 	const { contentId } = useParams<{ contentId: string }>();
 
@@ -175,6 +190,16 @@ const RedirectToResourceLibrary = () => {
 	}
 
 	return <Navigate to="/resource-library" replace />;
+};
+
+const RedirectToGroupSessionDetail = () => {
+	const { groupSessionId } = useParams<{ groupSessionId: string }>();
+
+	if (groupSessionId) {
+		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
+	}
+
+	return <Navigate to="/group-sessions" replace />;
 };
 
 const SupportEnabledRoutes = () => {
@@ -189,16 +214,26 @@ const IntegratedCareEnabledRoutes = () => {
 	return institution?.integratedCareEnabled ? <Outlet /> : <NoMatch />;
 };
 
+const AdminOnlyRoutes = () => {
+	const { account } = useAccount();
+
+	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Outlet /> : <NoMatch />;
+};
+
 const ProviderOnlyRoutes = () => {
 	const { account } = useAccount();
 
-	return account?.roleId === 'PROVIDER' ? <Outlet /> : <NoMatch />;
+	return account?.roleId === ROLE_ID.PROVIDER ? <Outlet /> : <NoMatch />;
 };
 
 const ContactUsEnabledRoutes = () => {
 	const { institution } = useAccount();
 
 	return institution?.contactUsEnabled ? <Outlet /> : <NoMatch />;
+};
+
+const DebugEnabledRoutes = () => {
+	return config.COBALT_WEB_SHOW_DEBUG === 'true' ? <Outlet /> : <NoMatch />;
 };
 
 export const routes: RouteObject[] = [
@@ -289,13 +324,13 @@ export const routes: RouteObject[] = [
 						path: 'in-the-studio',
 						element: <Navigate to="/group-sessions" replace />,
 					},
-					{
-						path: 'in-the-studio-thanks',
-						element: <InTheStudioThanks />,
-					},
+					// {
+					// 	path: 'in-the-studio-thanks',
+					// 	element: <InTheStudioThanks />,
+					// },
 					{
 						path: 'in-the-studio/group-session-scheduled/:groupSessionId',
-						element: <InTheStudioGroupSessionScheduled />,
+						element: <RedirectToGroupSessionDetail />,
 					},
 					{
 						path: 'in-the-studio/group-session-by-request/:groupSessionRequestId',
@@ -458,32 +493,16 @@ export const routes: RouteObject[] = [
 						element: <GroupSessionsRequest />,
 					},
 					{
-						path: 'group-sessions/scheduled',
-						element: <GroupSessionsScheduled />,
-					},
-					{
-						path: 'group-sessions/scheduled/create',
-						element: <GroupSessionsScheduledCreate />,
-					},
-					{
-						path: 'group-sessions/scheduled/:groupSessionId/edit',
-						element: <GroupSessionsScheduledCreate />,
-					},
-					{
-						path: 'group-sessions/scheduled/:groupSessionId/view',
-						element: <GroupSessionsScheduledCreate />,
-					},
-					{
 						path: 'group-sessions/by-request',
-						element: <GroupSessionsByRequest />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-sessions/by-request/create',
-						element: <GroupSessionsByRequestCreate />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-sessions/by-request/:groupSessionId/edit',
-						element: <GroupSessionsByRequestCreate />,
+						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/ical',
@@ -492,6 +511,14 @@ export const routes: RouteObject[] = [
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/google-calendar',
 						element: <RedirectToBackend />,
+					},
+					{
+						path: 'group-sessions/collection/:groupSessionCollectionId',
+						lazy: () => import('@/routes/group-session-collection-detail'),
+					},
+					{
+						path: 'group-sessions/:groupSessionId',
+						lazy: () => import('@/routes/group-session-detail'),
 					},
 					{
 						path: 'appointments/:appointmentId/ical',
@@ -503,23 +530,24 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'cms/on-your-time',
-						element: <CmsOnYourTime />,
+						element: <RedirectToAdminPathOrRender pathname="my-content" element={<NoMatch />} />,
 					},
 					{
 						path: 'cms/on-your-time/create',
-						element: <CreateOnYourTimeContent />,
+						element: (
+							<RedirectToAdminPathOrRender
+								pathname="my-content/create"
+								element={<CreateOnYourTimeContent />}
+							/>
+						),
 					},
 					{
 						path: 'cms/available-content',
-						element: <CmsAvailableContent />,
+						element: <RedirectToAdminPathOrRender pathname="available-content" element={<NoMatch />} />,
 					},
 					{
 						path: 'stats-dashboard',
 						element: <StatsDashboard />,
-					},
-					{
-						path: 'admin/reports',
-						element: <Reports />,
 					},
 					{
 						path: 'providers/:providerId',
@@ -608,7 +636,97 @@ export const routes: RouteObject[] = [
 					},
 				],
 			},
-
+			{
+				element: <AdminOnlyRoutes />,
+				errorElement: <AppErrorDefaultLayout />,
+				loader: requireAuthLoader,
+				children: [
+					{
+						id: 'admin',
+						path: 'admin',
+						lazy: () => import('@/routes/admin/layout'),
+						children: [
+							{
+								index: true,
+								element: <RedirectToAdminHome />,
+							},
+							{
+								id: 'admin-my-content',
+								path: 'my-content',
+								element: (
+									<div className="pb-4">
+										<CmsOnYourTime />
+									</div>
+								),
+							},
+							{
+								id: 'admin-my-content-create',
+								path: 'my-content/create',
+								element: (
+									<div className="pb-4">
+										<CreateOnYourTimeContent />
+									</div>
+								),
+							},
+							{
+								id: 'admin-available-content',
+								path: 'available-content',
+								element: (
+									<div className="pb-4">
+										<CmsAvailableContent />
+									</div>
+								),
+							},
+							{
+								path: 'group-sessions',
+								children: [
+									{
+										id: 'admin-group-sessions',
+										index: true,
+										lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
+									},
+									{
+										id: 'admin-group-session-form',
+										path: ':action?/:groupSessionId?',
+										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+									},
+								],
+							},
+							{
+								id: 'admin-reports',
+								path: 'reports',
+								element: <Reports />,
+							},
+							{
+								id: 'admin-scheduling',
+								path: 'scheduling',
+								element: <>TODO: Scheduling</>,
+							},
+							{
+								id: 'admin-analytics',
+								path: 'analytics',
+								element: <>TODO: Analytics</>,
+							},
+							{
+								id: 'admin-debug',
+								path: 'debug',
+								element: <DebugEnabledRoutes />,
+								children: [
+									{
+										index: true,
+										element: <Navigate to="ui" />,
+									},
+									{
+										id: 'admin-debug-ui',
+										path: 'ui',
+										lazy: () => import('@/routes/admin/debug/ui'),
+									},
+								],
+							},
+						],
+					},
+				],
+			},
 			{
 				element: <IntegratedCareEnabledRoutes />,
 				errorElement: <AppErrorDefaultLayout />,

@@ -61,25 +61,21 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface MhicInlineAlertProps {
+interface InlineAlertAction {
+	title: string;
+	onClick(): void;
+	disabled?: boolean;
+}
+
+interface InlineAlertProps {
 	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	title: string;
 	description?: string;
-	action?: {
-		title: string;
-		onClick(): void;
-		disabled?: boolean;
-	};
+	action?: InlineAlertAction | InlineAlertAction[];
 	className?: string;
 }
 
-export const MhicInlineAlert = ({
-	title,
-	description,
-	action,
-	variant = 'primary',
-	className,
-}: MhicInlineAlertProps) => {
+export const InlineAlert = ({ title, description, action, variant = 'primary', className }: InlineAlertProps) => {
 	const classes = useStyles({});
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
@@ -90,6 +86,16 @@ export const MhicInlineAlert = ({
 			danger: <DangerIcon width={24} height={24} />,
 		};
 	}, []);
+
+	const actionsToRender = useMemo(() => {
+		if (!action) {
+			return [];
+		} else if (Array.isArray(action)) {
+			return action;
+		} else {
+			return [action];
+		}
+	}, [action]);
 
 	return (
 		<div
@@ -121,12 +127,25 @@ export const MhicInlineAlert = ({
 						{description}
 					</p>
 				)}
-				{action && (
-					<Button variant="link" size="sm" className="p-0 fw-normal" onClick={action.onClick}>
-						{action.title}
-					</Button>
+				{actionsToRender.length > 0 && (
+					<div>
+						{actionsToRender.map((a, actionIndex) => {
+							const isLast = actionIndex === actionsToRender.length - 1;
+
+							return (
+								<React.Fragment key={actionIndex}>
+									<Button variant="link" size="sm" className="p-0 fw-normal" onClick={a.onClick}>
+										{a.title}
+									</Button>
+									{!isLast && <span className="mx-1">&bull;</span>}
+								</React.Fragment>
+							);
+						})}
+					</div>
 				)}
 			</div>
 		</div>
 	);
 };
+
+export default InlineAlert;

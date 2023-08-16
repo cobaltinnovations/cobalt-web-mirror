@@ -1,9 +1,17 @@
 ## Server Config
 
-The Express server can be configured at runtime with `COBALT_WEB_NAMESPACE` and `COBALT_WEB_ENV` to read config settings from this `.gitignored` folder.
+The Express server must be configured at runtime with:
+
+-   `COBALT_WEB_NAMESPACE`
+-   `COBALT_WEB_ENV`
+-   `COBALT_WEB_API_BASE_URL`
+
+The first two are to read config settings from this `.gitignored` folder.
+The last one is to point deployed bundles to backend deployments/instances.
 
 Config folder structrue is expected to follow:
 
+```
 config/
 ├─ namespace-a/
 │ ├─ dev/
@@ -15,33 +23,6 @@ config/
 │ │ ├─ settings.js
 │ ├─ prod/
 │ │ ├─ settings.js
-
-with an example settings.js:
-
 ```
-module.exports = {
-	sentry: {
-		dsn: '',
-		showDebug: false,
-	},
-	nodeApp: {
-		basicAuth: {
-			enabled: false,
-			username: '',
-			password: '',
-			secret: '',
-		},
-		subdomainMapping: '*:cobalt',
-	},
-	reactApp: {
-		apiBaseUrl: '',
-		gaTrackingId: '',
-		ga4MeasurementId: '',
-		mixpanelId: '',
-		showDebug: false,
-		googleMapsApiKey: '',
-		providerManagementFeatureEnabled: false,
-		downForMaintenance: false,
-	},
-};
-```
+
+with an example `config/local/dev/settings.js` file.

@@ -9,7 +9,7 @@ import { useMhicLayoutLoaderData } from './mhic-layout';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildBackendDownloadUrl } from '@/lib/utils';
 import moment from 'moment';
 
 enum REPORT_TYPE_ID {
@@ -76,7 +76,7 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			window.location.href = buildQueryParamUrl('/reporting/run-report', {
+			window.location.href = buildBackendDownloadUrl('/reporting/run-report', {
 				// Generic
 				...(formValues.startDateTime && {
 					startDateTime: `${moment(formValues.startDateTime).format('YYYY-MM-DD')}T00:00:00`,

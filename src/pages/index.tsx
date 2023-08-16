@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
@@ -31,16 +31,15 @@ import {
 	InstitutionBlurb,
 } from '@/lib/models';
 
-import config from '@/lib/config';
-import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
-import useFlags from '@/hooks/use-flags';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -68,7 +67,6 @@ const resourceLibraryCarouselConfig = {
 const Index: FC = () => {
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
-	const { addFlag } = useFlags();
 	const { trackEvent } = useAnalytics();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
@@ -264,22 +262,17 @@ const Index: FC = () => {
 			>
 				{inTheStudioEvents.length > 0 && (
 					<>
+						<IneligibleBookingModal uiType="group-session" />
+
 						<Container className="pt-20">
-							<Row>
-								<Col>
-									<h3 className="mb-2">Group Sessions</h3>
-								</Col>
-							</Row>
-						</Container>
-						<Container>
 							<Row>
 								<Col>
 									<Carousel
 										responsive={responsiveDefaults}
-										description="Register for virtual group sessions led by experts covering a range of topics, from managing anxiety to healthy living and more."
+										description="Group Sessions"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
-											navigate('/in-the-studio');
+											navigate('/group-sessions');
 										}}
 									>
 										{inTheStudioEvents.map((groupSession) => {
@@ -288,7 +281,7 @@ const Index: FC = () => {
 
 											if (groupSessionsService.isGroupSession(groupSession)) {
 												renderKey = groupSession.groupSessionId;
-												detailUrl = `/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`;
+												detailUrl = `/group-sessions/${groupSession.groupSessionId}`;
 											} else if (groupSessionsService.isGroupSessionByRequest(groupSession)) {
 												renderKey = groupSession.groupSessionRequestId;
 												detailUrl = `/in-the-studio/group-session-by-request/${groupSession.groupSessionRequestId}`;
@@ -302,6 +295,9 @@ const Index: FC = () => {
 													key={renderKey}
 													className="d-block text-decoration-none h-100"
 													to={detailUrl}
+													state={{
+														navigationSource: GroupSessionDetailNavigationSource.HOME_PAGE,
+													}}
 												>
 													<StudioEvent className="h-100" studioEvent={groupSession} />
 												</Link>
@@ -316,19 +312,12 @@ const Index: FC = () => {
 
 				{content.length > 0 && (
 					<>
-						<Container className="pt-20">
-							<Row>
-								<Col>
-									<h3 className="mb-2">Resource Library</h3>
-								</Col>
-							</Row>
-						</Container>
-						<Container className="pb-20">
+						<Container className="py-20 pb-20">
 							<Row>
 								<Col>
 									<Carousel
 										responsive={resourceLibraryCarouselConfig}
-										description="Browse a variety of digital resources to support your general wellness, including articles, podcasts, apps and more."
+										description="Resource Library"
 										calloutTitle="Explore all"
 										calloutOnClick={() => {
 											navigate('/resource-library');
@@ -363,237 +352,6 @@ const Index: FC = () => {
 						</Container>
 					</>
 				)}
-
-				{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
-					<Container className="mb-20">
-						<Row className="mb-2">
-							<Col>
-								<Button
-									variant="outline-primary"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'primary',
-											title: 'Regular news, everyone',
-											description: 'Nothing to worry about, everything is pretty normal!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Primary Flag
-								</Button>
-								<Button
-									variant="outline-success"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'success',
-											title: 'Good news, everyone',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Success Flag
-								</Button>
-								<Button
-									variant="outline-warning"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'warning',
-											title: 'Cautionary news, everyone',
-											description:
-												'Maybe something worry about, everything is sort of falling apart!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Warning Flag
-								</Button>
-								<Button
-									variant="outline-danger"
-									onClick={() => {
-										addFlag({
-											variant: 'danger',
-											title: 'Bad news, everyone',
-											description: 'Definitely should worry, everthing is broken!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No thanks',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Danger Flag
-								</Button>
-							</Col>
-						</Row>
-						<Row>
-							<Col>
-								<Button
-									variant="primary"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'bold-primary',
-											title: 'Hey, did you know...',
-											description:
-												'This alert needs your attention, but its not super important.',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No way!',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Bold Primary Flag
-								</Button>
-								<Button
-									variant="success"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'bold-success',
-											title: 'Your action was successful!',
-											description: 'Nothing to worry about, everything is going great!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No way!',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Bold Success Flag
-								</Button>
-								<Button
-									variant="warning"
-									className="me-2"
-									onClick={() => {
-										addFlag({
-											variant: 'bold-warning',
-											title: 'Uh oh!',
-											description: 'Pay attention to me, things are not going according to plan.',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No way!',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Bold Warning Flag
-								</Button>
-								<Button
-									variant="danger"
-									onClick={() => {
-										addFlag({
-											variant: 'bold-danger',
-											title: "Can't connect",
-											description: 'You need to take action, something has gone terribly wrong!',
-											actions: [
-												{
-													title: 'Understood',
-													onClick: () => {
-														return;
-													},
-												},
-												{
-													title: 'No way!',
-													onClick: () => {
-														return;
-													},
-												},
-											],
-										});
-									}}
-								>
-									Bold Danger Flag
-								</Button>
-							</Col>
-						</Row>
-					</Container>
-				)}
-
-				{config.COBALT_WEB_SENTRY_SHOW_DEBUG && <SentryDebugButtons />}
 
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
 					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />

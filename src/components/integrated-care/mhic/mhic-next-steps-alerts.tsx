@@ -7,8 +7,9 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
-import { MhicInlineAlert, MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import useAccount from '@/hooks/use-account';
+import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
+import InlineAlert from '@/components/inline-alert';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -63,7 +64,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 			<div className={className}>
 				{patientOrder.patientOrderSafetyPlanningStatusId ===
 					PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-					<MhicInlineAlert
+					<InlineAlert
 						className="mb-6"
 						variant="danger"
 						title="Patient needs safety planning"
@@ -78,7 +79,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 				)}
 
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-					<MhicInlineAlert
+					<InlineAlert
 						className="mb-6"
 						variant="warning"
 						title="Patient needs resources"
@@ -94,7 +95,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 
 				{patientOrder.patientOrderSafetyPlanningStatusId ===
 					PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING && (
-					<MhicInlineAlert
+					<InlineAlert
 						className="mb-6"
 						variant="success"
 						title={`Patient connected to Safety Planning on ${patientOrder.connectedToSafetyPlanningAtDescription}`}
@@ -102,7 +103,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 				)}
 
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.SENT_RESOURCES && (
-					<MhicInlineAlert
+					<InlineAlert
 						className="mb-6"
 						variant="success"
 						title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}

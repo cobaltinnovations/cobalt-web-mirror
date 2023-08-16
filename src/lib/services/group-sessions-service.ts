@@ -5,11 +5,14 @@ import {
 	GroupSessionRequestModel,
 	GroupSessionReservationModel,
 	GROUP_SESSION_STATUS_ID,
-	GROUP_SESSION_SORT_ORDER,
 	GroupSessionCountModel,
 	GroupSessionResponseModel,
 	AccountModel,
 	GroupTopic,
+	GroupSessionCollectionModel,
+	GroupSessionLearnMoreMethodId,
+	GroupSessionUrlNameValidationResult,
+	GroupSessionCollectionWithSessionsIncludedModel,
 } from '@/lib/models';
 
 // Scheduled
@@ -28,48 +31,56 @@ export enum GroupSessionSchedulingSystemId {
 }
 
 export interface CreateGroupSessionRequestBody {
-	submitterName: string;
-	submitterEmailAddress: string;
-	facilitatorAccountId: string | null;
-	facilitatorName: string;
-	facilitatorEmailAddress: string;
-	targetEmailAddress: string;
-	title: string;
-	description: string;
-	urlName: string;
-	startDateTime: string;
-	endDateTime: string;
-	seats?: number | null;
+	facilitatorName?: string;
+	facilitatorEmailAddress?: string;
+	differentEmailAddressForNotifications?: boolean;
+	targetEmailAddress?: string;
+	title?: string;
+	description?: string;
+	urlName?: string;
+	startDateTime?: string;
+	endDateTime?: string;
+	seats?: number;
 	imageUrl?: string;
-	videoconferenceUrl?: string | null;
-	screeningQuestions?: string[];
-	screeningQuestionsV2?: {
-		fontSizeId: string;
-		question: string;
-	}[];
+	videoconferenceUrl?: string;
 	confirmationEmailContent?: string;
 	groupSessionSchedulingSystemId?: GroupSessionSchedulingSystemId;
-	scheduleUrl?: string | null;
-	sendFollowupEmail: boolean;
+	groupSessionStatusId?: GROUP_SESSION_STATUS_ID;
+	sendFollowupEmail?: boolean;
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;
+	groupSessionCollectionId?: string;
+	visibleFlag?: boolean;
+	screeningFlowId?: string;
+	sendReminderEmail?: boolean;
+	reminderEmailContent?: string;
+	followupDayOffset?: string;
+	followupTimeOfDay?: string;
+	singleSessionFlag?: boolean;
+	dateTimeDescription?: string;
+	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
+	learnMoreDescription?: string;
+	tagIds?: string[];
 }
 
 interface CreateGroupSessionResponseBody {
 	groupSession: GroupSessionModel;
 }
 
-interface GetGroupSessionsQueryParameters {
+export interface GetGroupSessionsQueryParameters {
 	pageNumber?: number;
 	pageSize?: number;
 	viewType?: 'ADMINISTRATOR' | 'PATIENT';
-	groupSessionStatusId?: GROUP_SESSION_STATUS_ID;
-	orderBy?: GROUP_SESSION_SORT_ORDER;
+	groupSessionStatusId?: string;
+	orderBy?: string;
 	urlName?: string;
 	searchQuery?: string;
+	groupSessionCollectionId?: string;
+	groupSessionSchedulingSystemId?: string;
+	visibleFlag?: string;
 }
 
-interface GetGroupSessionsResponseBody {
+export interface GetGroupSessionsResponseBody {
 	totalCountDescription: string;
 	totalCount: number;
 	groupSessions: GroupSessionModel[];
@@ -93,7 +104,7 @@ interface ReserveGroupSessionResponseBody {
 	account: AccountModel;
 }
 
-interface GetGroupSessionCountsResponseBody {
+export interface GetGroupSessionCountsResponseBody {
 	groupSessionCounts: GroupSessionCountModel[];
 }
 
@@ -147,7 +158,46 @@ interface SignUpForGroupSessionRequestResponseBody {
 	groupSessionResponse: GroupSessionResponseModel;
 }
 
+interface GroupSessionCollectionsResponse {
+	groupSessionCollections: GroupSessionCollectionModel[];
+}
+
+interface GroupSessionCollectionsWithSessionsIncludedResponse {
+	groupSessionCollections: GroupSessionCollectionWithSessionsIncludedModel[];
+}
+
 export const groupSessionsService = {
+	getGroupSessionCollections() {
+		return httpSingleton.orchestrateRequest<GroupSessionCollectionsResponse>({
+			method: 'get',
+			url: '/group-session-collections',
+		});
+	},
+
+	getGroupSessionCollectionsWithSessionsIncluded() {
+		return httpSingleton.orchestrateRequest<GroupSessionCollectionsWithSessionsIncludedResponse>({
+			method: 'get',
+			url: '/group-sessions/collections',
+		});
+	},
+
+	validateUrlName(searchQuery: string, groupSessionId?: string) {
+		const params = new URLSearchParams({
+			searchQuery,
+		});
+
+		if (groupSessionId) {
+			params.set('groupSessionId', groupSessionId);
+		}
+
+		return httpSingleton.orchestrateRequest<{
+			groupSessionUrlNameValidationResult: GroupSessionUrlNameValidationResult;
+		}>({
+			method: 'get',
+			url: '/group-sessions/validate-url-name?' + params.toString(),
+		});
+	},
+
 	// Scheduled
 	getPresignedUploadUrl(data: GetPresignedUploadUrlRequestBody) {
 		return httpSingleton.orchestrateRequest<GetPresignedUploadUrlResponseBody>({
@@ -209,13 +259,12 @@ export const groupSessionsService = {
 	isGroupSession(event: GroupSessionModel | GroupSessionRequestModel): event is GroupSessionModel {
 		return typeof (event as GroupSessionModel).groupSessionId !== 'undefined';
 	},
-	reserveGroupSession(groupSessionId: string, emailAddress: string) {
+	reserveGroupSession(groupSessionId: string) {
 		return httpSingleton.orchestrateRequest<ReserveGroupSessionResponseBody>({
 			method: 'post',
 			url: `/group-session-reservations`,
 			data: {
 				groupSessionId,
-				emailAddress,
 			},
 		});
 	},
@@ -331,6 +380,13 @@ export const groupSessionsService = {
 		return httpSingleton.orchestrateRequest<any>({
 			method: 'POST',
 			url: '/group-requests',
+			data,
+		});
+	},
+	postGroupSuggestion(data: { emailAddress: string; title: string; description: string }) {
+		return httpSingleton.orchestrateRequest<any>({
+			method: 'POST',
+			url: '/group-suggestions',
 			data,
 		});
 	},

@@ -53,11 +53,27 @@ const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 			borderColor: theme.colors.n100,
 		},
 	},
+	compact: {
+		padding: '8px 0',
+		borderRadius: 4,
+		'& .dropdown-item': {
+			padding: '8px 16px',
+		},
+		'& .dropdown-divider': {
+			margin: '8px 0',
+		},
+	},
 }));
 
 export const DropdownMenu = React.forwardRef(
 	(
-		{ children, style, className, 'aria-labelledby': labeledBy }: DropdownMenuProps,
+		{
+			children,
+			style,
+			className,
+			'aria-labelledby': labeledBy,
+			compact = false,
+		}: DropdownMenuProps & { compact?: boolean },
 		ref: React.LegacyRef<HTMLDivElement> | undefined
 	) => {
 		const classes = useDropdownMenuStyles();
@@ -66,7 +82,7 @@ export const DropdownMenu = React.forwardRef(
 			<div
 				ref={ref}
 				style={style}
-				className={classNames(classes.dropdownMenu, className)}
+				className={classNames(classes.dropdownMenu, className, { [classes.compact]: compact })}
 				aria-labelledby={labeledBy}
 			>
 				{children}

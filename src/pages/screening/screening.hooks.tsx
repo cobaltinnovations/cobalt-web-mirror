@@ -13,6 +13,8 @@ import { screeningService } from '@/lib/services';
 import React, { useMemo } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import Cookies from 'js-cookie';
 
 export function useScreeningNavigation() {
 	const navigate = useNavigate();
@@ -61,11 +63,39 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
-				case ScreeningSessionDestinationId.GROUP_SESSION_LIST:
+				case ScreeningSessionDestinationId.GROUP_SESSION_LIST: {
+					const collectionId = Cookies.get('groupSessionCollectionId') ?? 'UPCOMING_SESSIONS';
+					const navigationSource =
+						(Cookies.get('groupSessionDetailNavigationSource') as GroupSessionDetailNavigationSource) ??
+						GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
+
+					const navigationSourceToDestinationUrlMap = {
+						[GroupSessionDetailNavigationSource.HOME_PAGE]: '/',
+						[GroupSessionDetailNavigationSource.GROUP_SESSION_LIST]: '/group-sessions',
+						[GroupSessionDetailNavigationSource.GROUP_SESSION_COLLECTION]:
+							'/group-sessions/collection/' + collectionId,
+						[GroupSessionDetailNavigationSource.TOPIC_CENTER]: '/topic-centers/spaces-of-color',
+						[GroupSessionDetailNavigationSource.ADMIN_LIST]: '/admin/group-sessions',
+					};
+
 					navigate(
 						{
-							pathname: '/in-the-studio',
+							pathname: navigationSourceToDestinationUrlMap[navigationSource] ?? '/group-sessions',
 							search: new URLSearchParams(params).toString(),
+						},
+						{
+							state: {
+								screeningSessionDestinationResultId: destination.screeningSessionDestinationResultId,
+							},
+							replace,
+						}
+					);
+					return;
+				}
+				case ScreeningSessionDestinationId.GROUP_SESSION_DETAIL:
+					navigate(
+						{
+							pathname: '/group-sessions/' + destination.context.groupSessionId,
 						},
 						{
 							replace,
@@ -148,13 +178,17 @@ export function useScreeningNavigation() {
 
 export function useScreeningFlow({
 	screeningFlowId,
+	groupSessionId,
 	patientOrderId,
 	instantiateOnLoad = true,
+	checkCompletionState = true,
 	disabled = false,
 }: {
 	screeningFlowId?: string;
+	groupSessionId?: string;
 	patientOrderId?: string;
 	instantiateOnLoad?: boolean;
+	checkCompletionState?: boolean;
 	disabled?: boolean;
 }) {
 	const { isImmediateSession } = useAppRootLoaderData();
@@ -170,14 +204,10 @@ export function useScreeningFlow({
 	const handleError = useHandleError();
 	const { navigateToNext, navigateToDestination } = useScreeningNavigation();
 	const [isCreatingScreeningSession, setIsCreatingScreeningSession] = useState(false);
+	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
-	}, [screeningSessions]);
-
-	// TODO: Replace this with 'getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)'
-	const hasCompletedScreening = useMemo(() => {
-		return screeningSessions.some((session) => session.completed && !session.skipped);
 	}, [screeningSessions]);
 
 	const hasIncompleteScreening = incompleteSessions.length > 0;
@@ -192,6 +222,7 @@ export function useScreeningFlow({
 		return screeningService
 			.createScreeningSession({
 				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+				groupSessionId,
 				patientOrderId,
 			})
 			.fetch()
@@ -204,7 +235,14 @@ export function useScreeningFlow({
 			.finally(() => {
 				setIsCreatingScreeningSession(false);
 			});
-	}, [activeFlowVersion?.screeningFlowVersionId, disabled, handleError, navigateToNext, patientOrderId]);
+	}, [
+		activeFlowVersion?.screeningFlowVersionId,
+		disabled,
+		groupSessionId,
+		handleError,
+		navigateToNext,
+		patientOrderId,
+	]);
 
 	const resumeScreeningSession = useCallback(
 		(screeningSessionId?: string | null) => {
@@ -305,23 +343,35 @@ export function useScreeningFlow({
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
 
-		Promise.all([fetchScreeningsRequest.fetch(), fetchFlowVersionsRequest.fetch()])
-			.then(([screeningsResponse, versionsResponse]) => {
-				setScreeningSessions(screeningsResponse.screeningSessions);
-				const activeVersion = versionsResponse.screeningFlowVersions.find(
-					(version) => version.screeningFlowVersionId === versionsResponse.activeScreeningFlowVersionId
+		Promise.all([
+			fetchScreeningsRequest.fetch().then((response) => setScreeningSessions(response.screeningSessions)),
+			fetchFlowVersionsRequest.fetch().then((response) => {
+				const activeVersion = response.screeningFlowVersions.find(
+					(version) => version.screeningFlowVersionId === response.activeScreeningFlowVersionId
 				);
 
 				setActiveFlowVersion(activeVersion);
-			})
-			.catch((e) => {
-				handleError(e);
-			});
+			}),
+		]).catch((e) => {
+			handleError(e);
+		});
 
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
 	}, [disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
+
+	useEffect(() => {
+		if (disabled || !screeningFlowId || !checkCompletionState) {
+			return;
+		}
+
+		screeningService
+			.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)
+			.fetch()
+			.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
+			.catch((e) => handleError(e));
+	}, [checkCompletionState, disabled, handleError, screeningFlowId]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {

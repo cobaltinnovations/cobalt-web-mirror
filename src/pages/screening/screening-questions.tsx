@@ -9,6 +9,7 @@ import {
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
 	UserExperienceTypeId,
+	ScreeningAnswerContentHintId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -337,9 +338,14 @@ const ScreeningQuestionsPage = () => {
 						disabled={isSubmitting}
 						className="mb-2"
 						label={option.answerOptionText ?? ''}
-						type="text"
+						type={
+							screeningQuestionContextResponse.screeningQuestion.screeningAnswerContentHintId ===
+							ScreeningAnswerContentHintId.EMAIL_ADDRESS
+								? 'email'
+								: 'text'
+						}
 						name={option.screeningAnswerOptionId}
-						value={answerText[option.screeningAnswerOptionId]}
+						value={answerText[option.screeningAnswerOptionId] ?? ''}
 						onChange={(e) => {
 							if (isSubmitting) {
 								return;
@@ -362,6 +368,7 @@ const ScreeningQuestionsPage = () => {
 		answerText,
 		isSubmitting,
 		screeningQuestionContextResponse?.screeningAnswerOptions,
+		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 		submitAnswers,
@@ -398,6 +405,16 @@ const ScreeningQuestionsPage = () => {
 	const disableNextBtn = useMemo(() => {
 		if (!screeningQuestionContextResponse) {
 			return isSubmitting;
+		} else if (
+			screeningQuestionContextResponse.screeningQuestion.screeningAnswerFormatId ===
+			ScreeningAnswerFormatId.FREEFORM_TEXT
+		) {
+			return (
+				isSubmitting ||
+				// the user has filled inputs for all available options
+				Object.values(answerText).filter(Boolean).length !==
+					screeningQuestionContextResponse.screeningAnswerOptions.length
+			);
 		} else if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
 			return (
 				isSubmitting ||
@@ -411,7 +428,7 @@ const ScreeningQuestionsPage = () => {
 			selectedAnswers.length > screeningQuestionContextResponse.screeningQuestion.maximumAnswerCount;
 
 		return isSubmitting || (!confirmationPrompt && answerCountMismatch);
-	}, [isSubmitting, confirmationPrompt, screeningQuestionContextResponse, selectedAnswers.length]);
+	}, [answerText, confirmationPrompt, isSubmitting, screeningQuestionContextResponse, selectedAnswers.length]);
 
 	return (
 		<>

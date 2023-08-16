@@ -30,6 +30,8 @@ import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
+export const HEADER_HEIGHT = 56;
+
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
 		top: 0,
@@ -295,7 +297,7 @@ const HeaderV2 = () => {
 	const classes = useHeaderV2Styles();
 	const revalidator = useRevalidator();
 
-	const { account, institution, institutionCapabilities, signOutAndClearContext } = useAccount();
+	const { account, institution, hasAdminNavCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -512,8 +514,8 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Admin navigation Config */
 	/* ----------------------------------------------------------- */
-	const adminNavigationConfig = useMemo(
-		() => [
+	const adminNavigationConfig = useMemo(() => {
+		return [
 			...(account?.providerId
 				? [
 						{
@@ -524,55 +526,18 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
-			...(institutionCapabilities?.viewNavAdminMyContent
+			...(hasAdminNavCapabilities
 				? [
 						{
-							testId: 'menuLinkAdminMyContent',
+							testId: '',
 							icon: ExternalIcon,
-							title: 'My Content',
-							to: '/cms/on-your-time',
+							title: 'Admin',
+							to: '/admin',
 						},
 				  ]
 				: []),
-			...(institutionCapabilities?.viewNavAdminAvailableContent
-				? [
-						{
-							testId: 'menuLinkAdminAvailableContent',
-							icon: ExternalIcon,
-							title: 'Available Content',
-							to: '/cms/available-content',
-						},
-				  ]
-				: []),
-			...(institutionCapabilities?.viewNavAdminGroupSession
-				? [
-						{
-							testId: 'menuLinkAdminScheduledGroupSessions',
-							icon: ExternalIcon,
-							title: 'Scheduled',
-							to: '/group-sessions/scheduled',
-						},
-				  ]
-				: []),
-			...(institutionCapabilities?.viewNavAdminReports
-				? [
-						{
-							testId: 'menuLinkAdminReports',
-							icon: ExternalIcon,
-							title: 'Provider Reports',
-							to: '/admin/reports',
-						},
-				  ]
-				: []),
-		],
-		[
-			account?.providerId,
-			institutionCapabilities?.viewNavAdminAvailableContent,
-			institutionCapabilities?.viewNavAdminGroupSession,
-			institutionCapabilities?.viewNavAdminMyContent,
-			institutionCapabilities?.viewNavAdminReports,
-		]
-	);
+		];
+	}, [account?.providerId, hasAdminNavCapabilities]);
 
 	const handleAlertDismiss = useCallback(
 		async (alertId: string) => {
@@ -643,7 +608,7 @@ const HeaderV2 = () => {
 									<>
 										<hr />
 										{adminNavigationConfig.map((item, itemIndex) => (
-											<Link key={itemIndex} to={item.to}>
+											<Link key={itemIndex} to={item.to} target="_blank">
 												<div className="d-flex justify-content-between align-items-center">
 													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
 													<item.icon className="text-gray" />
@@ -816,7 +781,7 @@ const HeaderV2 = () => {
 									<>
 										<Dropdown.Divider />
 										{adminNavigationConfig.map((item, itemIndex) => (
-											<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
+											<Dropdown.Item key={itemIndex} as={Link} to={item.to} target="_blank">
 												<div className="d-flex justify-content-between align-items-center">
 													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
 													<item.icon className="text-gray" />

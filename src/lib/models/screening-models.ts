@@ -1,3 +1,12 @@
+export interface ScreeningFlow {
+	screeningFlowId: string;
+	institutionId: string;
+	screeningFlowTypeId: ScreeningFlowTypeId;
+	activeScreeningFlowVersionId: string;
+	name: string;
+	createdByAccountId: string;
+}
+
 export interface ScreeningSession {
 	screeningSessionId: string;
 	screeningFlowVersionId: string;
@@ -34,11 +43,28 @@ export interface ScreeningFlowVersion {
 	versionNumber: number;
 }
 
+export enum ScreeningFlowTypeId {
+	CUSTOM = 'CUSTOM',
+	PROVIDER_TRIAGE = 'PROVIDER_TRIAGE',
+	CONTENT_TRIAGE = 'CONTENT_TRIAGE',
+	PROVIDER_INTAKE = 'PROVIDER_INTAKE',
+	INTEGRATED_CARE = 'INTEGRATED_CARE',
+	INTEGRATED_CARE_INTAKE = 'INTEGRATED_CARE_INTAKE',
+	FEATURE = 'FEATURE',
+	GROUP_SESSION_INTAKE = 'GROUP_SESSION_INTAKE',
+}
+
+export enum ScreeningSessionDestinationResultId {
+	SUCCESS = 'SUCCESS',
+	FAILURE = 'FAILURE',
+}
+
 export enum ScreeningSessionDestinationId {
 	CRISIS = 'CRISIS',
 	ONE_ON_ONE_PROVIDER_LIST = 'ONE_ON_ONE_PROVIDER_LIST',
 	CONTENT_LIST = 'CONTENT_LIST',
 	GROUP_SESSION_LIST = 'GROUP_SESSION_LIST',
+	GROUP_SESSION_DETAIL = 'GROUP_SESSION_DETAIL',
 	IC_PATIENT_SCREENING_SESSION_RESULTS = 'IC_PATIENT_SCREENING_SESSION_RESULTS',
 	IC_MHIC_SCREENING_SESSION_RESULTS = 'IC_MHIC_SCREENING_SESSION_RESULTS',
 	IC_PATIENT_CLINICAL_SCREENING = 'IC_PATIENT_CLINICAL_SCREENING',
@@ -50,6 +76,7 @@ export enum ScreeningSessionDestinationId {
 export interface ScreeningSessionDestination {
 	screeningSessionDestinationId: ScreeningSessionDestinationId;
 	context: Record<string, unknown>;
+	screeningSessionDestinationResultId: ScreeningSessionDestinationResultId;
 }
 
 export enum ScreeningAnswerFormatId {

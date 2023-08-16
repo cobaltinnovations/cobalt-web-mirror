@@ -7,9 +7,9 @@ import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { NextStepsItem } from './next-steps-item';
 import { PatientInsuranceStatementModal } from './patient-insurance-statement-modal';
-import { MhicInlineAlert } from '../mhic';
 import ConfirmDialog from '@/components/confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
+import InlineAlert from '@/components/inline-alert';
 
 interface NextStepsAssessmentCompleteProps {
 	patientOrder: PatientOrderModel;
@@ -81,9 +81,7 @@ export const NextStepsAssessmentComplete = ({
 							}}
 						>
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<SafetyPlanningAlert patientOrder={patientOrder} />
-							)}
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 						</NextStepsItem>
 					) : (
 						<NextStepsItem
@@ -98,9 +96,7 @@ export const NextStepsAssessmentComplete = ({
 							}}
 						>
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<SafetyPlanningAlert patientOrder={patientOrder} />
-							)}
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 						</NextStepsItem>
 					)}
 				</>
@@ -121,9 +117,7 @@ export const NextStepsAssessmentComplete = ({
 							}}
 						>
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-								<SafetyPlanningAlert patientOrder={patientOrder} />
-							)}
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 						</NextStepsItem>
 					) : (
 						<>
@@ -149,9 +143,7 @@ export const NextStepsAssessmentComplete = ({
 								}`}
 							>
 								{patientOrder.patientOrderSafetyPlanningStatusId ===
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-									<SafetyPlanningAlert patientOrder={patientOrder} />
-								)}
+									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 							</NextStepsItem>
 						</>
 					)}
@@ -171,20 +163,18 @@ export const NextStepsAssessmentComplete = ({
 					}}
 				>
 					{patientOrder.patientOrderSafetyPlanningStatusId ===
-						PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
-						<SafetyPlanningAlert patientOrder={patientOrder} />
-					)}
+						PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 				</NextStepsItem>
 			)}
 		</>
 	);
 };
 
-const SafetyPlanningAlert = ({ patientOrder }: { patientOrder: PatientOrderModel }) => {
+const SafetyPlanningAlert = () => {
 	const { openInCrisisModal } = useInCrisisModal();
 
 	return (
-		<MhicInlineAlert
+		<InlineAlert
 			variant="warning"
 			title="A clinician will reach out"
 			description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."

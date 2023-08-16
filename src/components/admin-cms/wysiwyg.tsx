@@ -1,7 +1,8 @@
-import React, { FC, useEffect } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 import 'quill/dist/quill.snow.css';
 import { useQuill } from 'react-quilljs';
+import Quill from 'quill';
 
 interface WysiwygProps {
 	className?: string;
@@ -20,35 +21,49 @@ const modules = {
 
 const formats = ['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
 
-const Wysiwyg: FC<WysiwygProps> = ({ initialValue, onChange, readOnly = false, className, ...props }) => {
-	const { quill, quillRef } = useQuill({
-		theme: 'snow',
-		modules,
-		formats,
-		readOnly,
-	});
+export type WysiwygRef = { quill: Quill | undefined; quillRef: React.RefObject<HTMLDivElement> };
 
-	useEffect(() => {
-		if (quill && onChange) {
-			const handleChange = () => {
-				onChange(quill.root.innerHTML);
-			};
+const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
+	({ initialValue, onChange, readOnly = false, className, ...props }, ref) => {
+		const didInitRef = useRef(false);
+		const { quill, quillRef } = useQuill({
+			theme: 'snow',
+			modules,
+			formats,
+			readOnly,
+		});
 
-			quill.on('text-change', handleChange);
+		useImperativeHandle(ref, () => {
+			return { quill, quillRef };
+		});
 
-			return () => {
-				quill.off('text-change', handleChange);
-			};
-		}
-	}, [onChange, quill]);
+		useEffect(() => {
+			if (quill && onChange) {
+				const handleChange = () => {
+					if (!didInitRef.current) {
+						return;
+					}
 
-	useEffect(() => {
-		if (quill && initialValue) {
-			quill.clipboard.dangerouslyPasteHTML(initialValue);
-		}
-	}, [quill, initialValue]);
+					onChange(quill.root.innerHTML);
+				};
 
-	return <div className={className} ref={quillRef} />;
-};
+				quill.on('text-change', handleChange);
+
+				return () => {
+					quill.off('text-change', handleChange);
+				};
+			}
+		}, [onChange, quill]);
+
+		useEffect(() => {
+			if (quill && typeof initialValue === 'string') {
+				quill.clipboard.dangerouslyPasteHTML(initialValue);
+				didInitRef.current = true;
+			}
+		}, [quill, initialValue]);
+
+		return <div style={{ display: didInitRef.current ? 'block' : 'none' }} className={className} ref={quillRef} />;
+	}
+);
 
 export default Wysiwyg;

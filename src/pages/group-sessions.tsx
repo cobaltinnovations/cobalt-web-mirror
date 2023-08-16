@@ -1,51 +1,51 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
+
+import {
+	GROUP_SESSION_STATUS_ID,
+	GROUP_SESSION_SORT_ORDER,
+	GroupSessionModel,
+	GroupSessionCollectionWithSessionsIncludedModel,
+} from '@/lib/models';
 import { groupSessionsService } from '@/lib/services';
-import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER, GroupSessionModel } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
-import useAnalytics from '@/hooks/use-analytics';
+import useHandleError from '@/hooks/use-handle-error';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
 import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
-import useHandleError from '@/hooks/use-handle-error';
-import { createUseStyles } from 'react-jss';
-import { Helmet } from 'react-helmet';
-
-const useStyles = createUseStyles({
-	requestSessionCta: {
-		maxWidth: 382,
-		margin: '0 auto',
-	},
-});
+import Carousel, { responsiveDefaults } from '@/components/carousel';
+import NoData from '@/components/no-data';
+import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
+import classNames from 'classnames';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 
 const GroupSessions = () => {
-	const classes = useStyles();
 	const handleError = useHandleError();
-	const { mixpanel } = useAnalytics();
 	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
 	const groupSessionSearchQuery = searchParams.get('searchQuery') ?? '';
-	const pageSize = useRef(6);
-	const pageNumber = useRef(0);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState(groupSessionSearchQuery);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [isFirstLoad, setIsFirstLoad] = useState(true);
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
+	const [groupSessionCollections, setGroupSessionCollections] = useState<
+		GroupSessionCollectionWithSessionsIncludedModel[]
+	>([]);
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
-	const [viewAll, setViewAll] = useState(false);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -61,34 +61,64 @@ const GroupSessions = () => {
 		try {
 			setIsLoading(true);
 
-			const { groupSessions } = await groupSessionsService
-				.getGroupSessions({
-					viewType: 'PATIENT',
-					groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
-					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-					urlName: groupSessionUrlName,
-					searchQuery: groupSessionSearchQuery,
-					pageSize: viewAll ? 1000 : pageSize.current,
-					pageNumber: pageNumber.current,
-				})
-				.fetch();
+			if (groupSessionSearchQuery) {
+				const { groupSessions } = await groupSessionsService
+					.getGroupSessions({
+						viewType: 'PATIENT',
+						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+						urlName: groupSessionUrlName,
+						searchQuery: groupSessionSearchQuery,
+						pageSize: 1000,
+						pageNumber: 0,
+					})
+					.fetch();
 
-			setGroupSessions(groupSessions);
+				setGroupSessions(groupSessions);
+				setGroupSessionCollections([]);
+				return;
+			}
+
+			const [{ groupSessions }, { groupSessionCollections }] = await Promise.all([
+				groupSessionsService
+					.getGroupSessions({
+						viewType: 'PATIENT',
+						groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
+						orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
+						urlName: groupSessionUrlName,
+						pageSize: 12,
+						pageNumber: 0,
+					})
+					.fetch(),
+				groupSessionsService.getGroupSessionCollectionsWithSessionsIncluded().fetch(),
+			]);
+
+			setGroupSessions([]);
+			setGroupSessionCollections(
+				[
+					...[
+						{
+							groupSessionCollectionId: 'UPCOMING_SESSIONS',
+							title: 'Upcoming Sessions',
+							description: 'Upcoming Sessions Description',
+							displayOrder: 0,
+							institutionId: '',
+							groupSessions,
+						},
+					],
+					...groupSessionCollections,
+				].filter((c) => c.groupSessions.length > 0)
+			);
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsLoading(false);
-			setIsFirstLoad(false);
 		}
-	}, [groupSessionSearchQuery, groupSessionUrlName, handleError, viewAll]);
+	}, [groupSessionSearchQuery, groupSessionUrlName, handleError]);
 
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
-
-	const handleViewMoreButtonClick = useCallback(() => {
-		setViewAll(true);
-	}, []);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -99,7 +129,6 @@ const GroupSessions = () => {
 			searchParams.delete('searchQuery');
 		}
 
-		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (hasTouchScreen) {
@@ -112,7 +141,6 @@ const GroupSessions = () => {
 
 		searchParams.delete('searchQuery');
 
-		pageNumber.current = 0;
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
@@ -154,6 +182,8 @@ const GroupSessions = () => {
 				<title>Cobalt | Group Sessions</title>
 			</Helmet>
 
+			<IneligibleBookingModal uiType="group-session" />
+
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<p className="mb-6 fs-large text-center">
@@ -175,55 +205,7 @@ const GroupSessions = () => {
 			</HeroContainer>
 
 			<Container className="py-10">
-				<Row className="mb-10">
-					<Col>
-						<h2>Upcoming Sessions</h2>
-					</Col>
-				</Row>
-				{!isLoading && groupSessions.length <= 0 && (
-					<Row className="mb-2">
-						<Col>
-							<p className="text-center mb-0">
-								{groupSessionSearchQuery ? (
-									'There are no matching results.'
-								) : groupSessionUrlName ? (
-									<>
-										There are no group sessions available for the selected type.
-										<Button
-											size="sm"
-											variant="link"
-											onClick={() => {
-												searchParams.delete('class');
-												setSearchParams(searchParams, { replace: true });
-											}}
-										>
-											Click here to view all available group sessions.
-										</Button>
-									</>
-								) : (
-									'There are no group sessions available.'
-								)}
-							</p>
-						</Col>
-					</Row>
-				)}
-				{groupSessions.length > 0 && (
-					<Row className="mb-2">
-						{groupSessions.map((groupSession) => {
-							return (
-								<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
-									<Link
-										className="d-block text-decoration-none h-100"
-										to={`/in-the-studio/group-session-scheduled/${groupSession.groupSessionId}`}
-									>
-										<StudioEvent className="h-100" studioEvent={groupSession} />
-									</Link>
-								</Col>
-							);
-						})}
-					</Row>
-				)}
-				{isLoading && isFirstLoad && (
+				{isLoading && (
 					<Row className="mb-10">
 						<Col md={6} lg={4} className="mb-8">
 							<StudioEventSkeleton />
@@ -245,74 +227,122 @@ const GroupSessions = () => {
 						</Col>
 					</Row>
 				)}
-				<Row>
-					<Col></Col>
-					<Col>
-						<div className="text-center">
-							{isLoading ? (
-								<Loader className="position-static d-inline-flex" />
-							) : (
-								<>
-									{!viewAll && (
-										<Button onClick={handleViewMoreButtonClick} disabled={isLoading}>
-											View All
-										</Button>
-									)}
-								</>
-							)}
-						</div>
-					</Col>
-					<Col>
-						<div className="text-right">
-							{institution?.userSubmittedGroupSessionEnabled && (
-								<Button
-									variant="link"
-									onClick={() => {
-										mixpanel.track('Patient-Sourced Add Group Session Click', {});
-										navigate('/group-sessions/scheduled/create');
-									}}
-								>
-									Submit a Session
-								</Button>
-							)}
-							{/* {institution?.userSubmittedGroupSessionRequestEnabled && (
-									<Button
-										variant="link"
-										onClick={() => {
-											mixpanel.track('Patient-Sourced Add Group Session Request Click', {});
-											navigate('/group-sessions/by-request/create');
-										}}
-									>
-										Submit a Session
-									</Button>
-								)} */}
-						</div>
-					</Col>
-				</Row>
+
+				{!isLoading && (
+					<>
+						{groupSessionSearchQuery ? (
+							<>
+								{/* ---------------------------------- */}
+								{/* SEARCH RESULTS GRID */}
+								{/* ---------------------------------- */}
+								{groupSessions.length > 0 ? (
+									<Row className="mb-2">
+										{groupSessions.map((groupSession) => {
+											return (
+												<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
+													<Link
+														className="d-block text-decoration-none h-100"
+														to={`/group-sessions/${groupSession.groupSessionId}`}
+														state={{
+															navigationSource:
+																GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,
+														}}
+													>
+														<StudioEvent className="h-100" studioEvent={groupSession} />
+													</Link>
+												</Col>
+											);
+										})}
+									</Row>
+								) : (
+									<Row>
+										<Col>
+											<NoData
+												title="No Search Results"
+												description={`There are no matching group sessions for "${groupSessionSearchQuery}"`}
+												actions={[
+													{
+														variant: 'primary',
+														title: 'Clear Search',
+														onClick: clearSearch,
+													},
+												]}
+											/>
+										</Col>
+									</Row>
+								)}
+							</>
+						) : (
+							<>
+								{/* ---------------------------------- */}
+								{/* LIST OF CAROUSELS */}
+								{/* ---------------------------------- */}
+								{groupSessionCollections.length > 0 ? (
+									<>
+										{groupSessionCollections.map((collection, collectionIndex) => {
+											const isLastCollection =
+												collectionIndex === groupSessionCollections.length - 1;
+
+											return (
+												<Row
+													key={collection.groupSessionCollectionId}
+													className={classNames({
+														'mb-8 mb-lg-12': !isLastCollection,
+													})}
+												>
+													<Col>
+														<Carousel
+															className={classNames({
+																'mb-8 mb-lg-12': !isLastCollection,
+															})}
+															responsive={responsiveDefaults}
+															description={collection.title}
+															calloutTitle="See All"
+															calloutOnClick={() => {
+																navigate(
+																	`/group-sessions/collection/${collection.groupSessionCollectionId}`
+																);
+															}}
+														>
+															{collection.groupSessions.map((groupSession) => {
+																return (
+																	<Link
+																		key={groupSession.groupSessionId}
+																		className="d-block text-decoration-none h-100"
+																		to={`/group-sessions/${groupSession.groupSessionId}`}
+																		state={{
+																			navigationSource:
+																				GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,
+																		}}
+																	>
+																		<StudioEvent
+																			className="h-100"
+																			studioEvent={groupSession}
+																		/>
+																	</Link>
+																);
+															})}
+														</Carousel>
+														{!isLastCollection && <hr />}
+													</Col>
+												</Row>
+											);
+										})}
+									</>
+								) : (
+									<NoData
+										title="Upcoming Sessions"
+										description="There are no group sessions available."
+										actions={[]}
+									/>
+								)}
+							</>
+						)}
+					</>
+				)}
 			</Container>
-			{institution?.groupSessionRequestsEnabled && (
-				<Container fluid className="bg-n75">
-					<Container className="py-10 py-lg-20">
-						<div className={classes.requestSessionCta}>
-							<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-							<p className="mb-6 fs-large text-center">
-								Request a session and we'll work with you to find a dedicated time for a
-								wellness-focused group session for your team.
-							</p>
-							<div className="text-center">
-								<Button
-									variant="outline-primary"
-									onClick={() => {
-										navigate('/group-sessions/request');
-									}}
-								>
-									Request a Session
-								</Button>
-							</div>
-						</div>
-					</Container>
-				</Container>
-			)}
+
+			<GroupSessionsRequestFooter />
 		</>
 	);
 };

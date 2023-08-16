@@ -138,7 +138,7 @@ const CmsOnYourTime: FC = () => {
 	]);
 
 	function handleAddContentButtonClick(): void {
-		navigate('/cms/on-your-time/create');
+		navigate('/admin/my-content/create');
 	}
 
 	function handleTypeFilterChange(value: ContentTypeId | undefined) {
@@ -211,7 +211,7 @@ const CmsOnYourTime: FC = () => {
 	}
 
 	function handleEditClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true`);
+		navigate(`/admin/my-content/create?contentId=${contentId}&editing=true`);
 	}
 
 	async function handleRejectClick(contentId: string) {

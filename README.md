@@ -77,10 +77,23 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 Starts the node server.<br />
 Server runs locally on port `3000`.
+Check [here](config/README.md) for app configuration.
 
-The node server is currently only used to populate configuration (`process.env`) variables at run time in production. It does not need to be running during local development, as default configuration variables are provided by `.env.local`.
+The node server is currently used to:
 
-If you ever need to test your code against the server, create a production build of the react app using `npm run build`. Then start the node server and point your browser to [http://localhost:3000](http://localhost:3000).
+-   Passthrough react-app configuration from server runtime (`process.env`) variables to the different pre-built app bundles.
+-   Expose few ops endpoints (like `/health-check`)
+-   Proxy for some api calls between react-app and backend
+-   Serve static bundles.
+
+It does not need to be running during local development because react-app configuration variables are provided by `.env.local` to the webpack dev server (which compiles/bundles/reloads typescript during development.)
+
+If you ever need to test your code "in production mode":
+
+-   create a production build of the react app using `npm run build`
+-   start the node server (assuming you also have a local version of backend also running) and point your browser to [http://localhost:3000](http://localhost:3000) (or any `/etc/host` config you might have for testing the varios bundles that could've been generated based on your other local/gitignored config)
+
+    `COBALT_WEB_NAMESPACE=local COBALT_WEB_ENV=dev COBALT_WEB_API_BASE_URL=http://localhost:8080 npm run start`
 
 ## Environment Variables
 
@@ -105,4 +118,4 @@ Copy `.env.local.example` to `.env.local` at the root of the repo
 
 All local development environment variables must start with `REACT_APP_`. This prefix can be ignored in production as it is only used by create-react-app's bundlers to set environment variables at build-time.
 
-In production, the variables are controlled by the node.js server run-time and this file is irrelevant.
+In production, the variables are controlled by the node.js server run-time and this file is irrelevant (other than being a reference to what variables can be passed-through/controlled by nodejs server).

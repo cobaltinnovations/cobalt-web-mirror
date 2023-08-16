@@ -4,7 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { MhicInlineAlert } from '@/components/integrated-care/mhic';
+import { InlineAlert } from '@/components/inline-alert';
 import useAccount from '@/hooks/use-account';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -102,7 +102,7 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										);
 									})}
 								</div>
-								<MhicInlineAlert
+								<InlineAlert
 									variant="primary"
 									title="If you are in crisis"
 									description="Contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."

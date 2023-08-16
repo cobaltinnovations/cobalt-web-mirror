@@ -23,7 +23,7 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 	return (
 		<Modal {...props} dialogClassName={classes.collectEmailModal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>Confirm Your Appointment</Modal.Title>
+				<Modal.Title>Confirm Your Reservation</Modal.Title>
 			</Modal.Header>
 			<Form
 				onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
@@ -34,8 +34,7 @@ const CollectEmailModal: FC<CollectEmailModalProps> = ({ onSubmitEmail, collecte
 			>
 				<Modal.Body>
 					<p className="mb-3 fw-normal">
-						To book an appointment with one of our resources, please supply your email address so that we
-						can keep in contact with you.
+						To reserve your seat, please supply your email address so that we can keep in contact with you.
 					</p>
 					<InputHelper
 						required

@@ -352,6 +352,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 		'.ql-container': {
+			height: 'auto !important',
 			'& .ql-editor': {
 				minHeight: 400,
 				'& a': {

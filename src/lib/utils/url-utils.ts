@@ -28,6 +28,18 @@ export function buildQueryParamUrl(url: string, queryParams?: Record<string, any
 	return url;
 }
 
+export function buildBackendDownloadUrl(proxiedPath: string, queryParams: Record<string, any>) {
+	// only points to backend instance & append access token in local dev
+	// otherwise, nodeapp server.js is used to proxy these requests to backend
+	if (__DEV__) {
+		// remove trailing slash from base url
+		proxiedPath = config.COBALT_WEB_API_BASE_URL.replace(/\/$/, '') + proxiedPath;
+		queryParams['X-Cobalt-Access-Token'] = Cookies.get('accessToken');
+	}
+
+	return buildQueryParamUrl(proxiedPath, queryParams);
+}
+
 export function getSubdomain(url: URL) {
 	let subdomain = 'cobalt';
 

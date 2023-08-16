@@ -3,8 +3,6 @@ import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-do
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import useAccount from '@/hooks/use-account';
-
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';
 
@@ -22,15 +20,11 @@ const IntakeAssessment: FC = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const providerId = searchParams.get('providerId') || '';
-	const groupSessionId = searchParams.get('groupSessionId') || '';
 	const questionId = searchParams.get('questionId') || '';
 	const sessionId = searchParams.get('sessionId') || '';
-	const { account } = useAccount();
 
 	const [assessment, setAssessment] = useState<Assessment>();
 	const [selectedQuestionAnswers, setSelectedQuestionAnswers] = useState<SelectedQuestionAnswer[]>([]);
-
-	const [isGroupSessionAssessment, setIsGroupSessionAssessment] = useState(false);
 
 	const {
 		selectedAppointmentTypeId,
@@ -54,14 +48,6 @@ const IntakeAssessment: FC = () => {
 			response = await assessmentService
 				.getIntakeAssessmentQuestion({ appointmentTypeId, providerId, questionId, sessionId })
 				.fetch();
-
-			setIsGroupSessionAssessment(false);
-		} else if (groupSessionId) {
-			response = await assessmentService
-				.getIntakeAssessmentQuestion({ questionId, sessionId, groupSessionId })
-				.fetch();
-
-			setIsGroupSessionAssessment(true);
 		} else {
 			throw new Error('No providerId or groupSessionId found.');
 		}
@@ -72,7 +58,7 @@ const IntakeAssessment: FC = () => {
 
 		setAssessment(response.assessment);
 		setSelectedQuestionAnswers(response.assessment.question.selectedAssessmentAnswers);
-	}, [appointmentTypeId, groupSessionId, providerId, questionId, sessionId]);
+	}, [appointmentTypeId, providerId, questionId, sessionId]);
 
 	const submitAnswers = async (assessmentAnswers: SelectedQuestionAnswer[]) => {
 		if (!assessment) {
@@ -88,77 +74,44 @@ const IntakeAssessment: FC = () => {
 				})
 				.fetch();
 
-			if (isGroupSessionAssessment) {
-				if (typeof response.assessment.bookingAllowed === 'boolean') {
-					navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
-						state: {
-							...(location.state as Record<string, unknown>),
-							passedAssessment: response.assessment.bookingAllowed ? true : false,
-						},
+			if (typeof response.assessment.bookingAllowed === 'boolean') {
+				if (response.assessment.bookingAllowed) {
+					const params = new URLSearchParams();
+					if (selectedProvider?.phoneNumberRequiredForAppointment) {
+						params.set('promptForPhoneNumber', 'true');
+					}
+
+					params.set('providerId', selectedProvider?.providerId ?? '');
+					params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
+					params.set('date', formattedAvailabilityDate);
+					params.set('time', selectedTimeSlot?.time ?? '');
+					params.set('intakeAssessmentId', assessment?.assessmentId);
+
+					window.location.href = `/confirm-appointment?${params.toString()}`;
+				} else {
+					setIsEligible(false);
+					navigate(exitUrl, {
+						state: location.state,
 					});
-					if (response.assessment.bookingAllowed) {
-						navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
-							state: {
-								...(location.state as Record<string, unknown>),
-								passedAssessment: true,
-							},
-						});
-					} else {
-						navigate(`/in-the-studio/group-session-scheduled/${groupSessionId}`, {
-							state: {
-								...(location.state as Record<string, unknown>),
-								passedAssessment: false,
-							},
-						});
-					}
-
-					return;
 				}
 
-				navigate(
-					`/intake-assessment?groupSessionId=${groupSessionId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
-					{ state: location.state }
-				);
-			} else {
-				if (typeof response.assessment.bookingAllowed === 'boolean') {
-					if (response.assessment.bookingAllowed) {
-						const params = new URLSearchParams();
-						if (selectedProvider?.phoneNumberRequiredForAppointment) {
-							params.set('promptForPhoneNumber', 'true');
-						}
-
-						params.set('providerId', selectedProvider?.providerId ?? '');
-						params.set('appointmentTypeId', selectedAppointmentTypeId ?? '');
-						params.set('date', formattedAvailabilityDate);
-						params.set('time', selectedTimeSlot?.time ?? '');
-						params.set('intakeAssessmentId', assessment?.assessmentId);
-
-						window.location.href = `/confirm-appointment?${params.toString()}`;
-					} else {
-						setIsEligible(false);
-						navigate(exitUrl, {
-							state: location.state,
-						});
-					}
-
-					return;
-				}
-
-				navigate(
-					`/intake-assessment?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
-					{ state: location.state }
-				);
+				return;
 			}
+
+			navigate(
+				`/intake-assessment?providerId=${providerId}&questionId=${response.assessment.question.questionId}&sessionId=${response.assessment.sessionId}`,
+				{ state: location.state }
+			);
 		} catch (e) {
 			handleError(e);
 		}
 	};
 
 	useEffect(() => {
-		if (!groupSessionId && (!providerId || !selectedProvider || !selectedTimeSlot)) {
+		if (!providerId || !selectedProvider || !selectedTimeSlot) {
 			navigate(exitUrl);
 		}
-	}, [exitUrl, groupSessionId, navigate, providerId, selectedProvider, selectedTimeSlot]);
+	}, [exitUrl, navigate, providerId, selectedProvider, selectedTimeSlot]);
 
 	return (
 		<>
@@ -167,46 +120,22 @@ const IntakeAssessment: FC = () => {
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>
-				{isGroupSessionAssessment && (
-					<Breadcrumb
-						breadcrumbs={[
-							{
-								to: '/',
-								title: 'Home',
-							},
-							{
-								to: '/in-the-studio',
-								title: 'Group Sessions',
-							},
-							{
-								to: `/in-the-studio/group-session-scheduled/${groupSessionId}`,
-								title: 'Group Session',
-							},
-							{
-								to: '/#',
-								title: 'Appointment',
-							},
-						]}
-					/>
-				)}
-				{!isGroupSessionAssessment && (
-					<Breadcrumb
-						breadcrumbs={[
-							{
-								to: '/',
-								title: 'Home',
-							},
-							{
-								to: exitUrl,
-								title: 'Connect with Support',
-							},
-							{
-								to: '/#',
-								title: 'Appointment',
-							},
-						]}
-					/>
-				)}
+				<Breadcrumb
+					breadcrumbs={[
+						{
+							to: '/',
+							title: 'Home',
+						},
+						{
+							to: exitUrl,
+							title: 'Connect with Support',
+						},
+						{
+							to: '/#',
+							title: 'Appointment',
+						},
+					]}
+				/>
 
 				<ProgressBar
 					current={assessment?.assessmentProgress || 0}
@@ -240,13 +169,7 @@ const IntakeAssessment: FC = () => {
 												submitAnswers(selectedAssessmentAswers);
 											}
 										}}
-									>
-										{isGroupSessionAssessment && (
-											<p className="mb-5">
-												Only people who answer "Yes" are eligible to reserve a seat.
-											</p>
-										)}
-									</SurveyQuestion>
+									/>
 								)}
 
 								<div className="d-flex">
@@ -282,11 +205,7 @@ const IntakeAssessment: FC = () => {
 
 					<p className="text-center">
 						<Link
-							to={
-								isGroupSessionAssessment
-									? `/in-the-studio/group-session-scheduled/${groupSessionId}`
-									: exitUrl
-							}
+							to={exitUrl}
 							onClick={(e) => {
 								if (!window.confirm('Are you sure you want to exit booking?')) {
 									e.preventDefault();

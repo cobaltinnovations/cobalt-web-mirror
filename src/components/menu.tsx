@@ -242,14 +242,14 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				label: 'My Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminMyContent ? '/cms/on-your-time' : null,
+					institutionCapabilities?.viewNavAdminMyContent ? '/admin/my-content' : null,
 			},
 			{
 				testId: 'menuLinkAdminAvailableContent',
 				label: 'Available Content',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminAvailableContent ? '/cms/available-content' : null,
+					institutionCapabilities?.viewNavAdminAvailableContent ? '/admin/available-content' : null,
 			},
 		],
 	},
@@ -261,7 +261,7 @@ const ADMIN_MENU_SECTIONS: MenuNavSection[] = [
 				label: 'Scheduled',
 				icon: <AdminIcon />,
 				to: ({ institutionCapabilities }) =>
-					institutionCapabilities?.viewNavAdminGroupSession ? '/group-sessions/scheduled' : null,
+					institutionCapabilities?.viewNavAdminGroupSession ? '/admin/group-sessions' : null,
 			},
 			// {
 			// 	testId: 'menuLinkAdminByRequestGroupSessions',
@@ -342,7 +342,7 @@ const MENU_SECTIONS: MenuNavSection[] = [
 				testId: 'menuLinkGroupSessions',
 				label: 'Group Sessions',
 				icon: <GroupSessionsIcon />,
-				to: () => '/in-the-studio',
+				to: () => '/group-sessions',
 			},
 			{
 				testId: 'menuLinkCrisisResources',

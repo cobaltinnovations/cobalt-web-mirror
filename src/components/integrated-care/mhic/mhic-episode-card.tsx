@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useRevalidator } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import {
@@ -8,14 +9,12 @@ import {
 	PatientOrderIntakeLocationStatusId,
 	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderModel,
-	PatientOrderResourcingStatusId,
-	PatientOrderSafetyPlanningStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { MhicCloseEpisodeModal, MhicInlineAlert } from '@/components/integrated-care/mhic';
-import { useRevalidator } from 'react-router-dom';
+import { MhicCloseEpisodeModal } from '@/components/integrated-care/mhic';
+import InlineAlert from '@/components/inline-alert';
 
 interface MhicEpisodeCardProps {
 	patientOrder: PatientOrderModel;
@@ -137,7 +136,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.patientBelowAgeThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient was under 18 at the time the order was created"
 									/>
@@ -147,7 +146,11 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.mostRecentEpisodeClosedWithinDateThreshold && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert variant="warning" title="Patient had a recently-closed episode" />
+									<InlineAlert
+										variant="warning"
+										title="Order Flagged"
+										description="Patient had a recently-closed episode"
+									/>
 								</Col>
 							</Row>
 						)}
@@ -155,7 +158,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderIntakeWantsServicesStatusId.NO && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient indicated they are no longer seeking mental health services"
 									/>
@@ -166,7 +169,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderIntakeLocationStatusId.INVALID && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient lives in a state that is not supported by Integrated Care"
 									/>
@@ -177,10 +180,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderIntakeInsuranceStatusId.CHANGED_RECENTLY && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
-										variant="warning"
-										title="Patient's insurance has recently changed"
-									/>
+									<InlineAlert variant="warning" title="Patient's insurance has recently changed" />
 								</Col>
 							</Row>
 						)}
@@ -188,7 +188,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderIntakeInsuranceStatusId.INVALID && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient's insurance is not accepted for Integrated Care"
 									/>
@@ -198,7 +198,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Patient rejected consent to Integrated Care services"
 									/>
@@ -210,7 +210,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert variant="warning" title="Patient needs safety planning" />
+									<InlineAlert variant="warning" title="Patient needs safety planning" />
 								</Col>
 							</Row>
 						)}
@@ -218,14 +218,14 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 							PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert variant="warning" title="Patient needs resources" />
+									<InlineAlert variant="warning" title="Patient needs resources" />
 								</Col>
 							</Row>
 						)} */}
 						{patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Intake assessment appears to have been abandoned"
 									/>
@@ -235,7 +235,7 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						{patientOrder.mostRecentScreeningSessionAppearsAbandoned && (
 							<Row className="mb-4">
 								<Col>
-									<MhicInlineAlert
+									<InlineAlert
 										variant="warning"
 										title="Clinical assessment appears to have been abandoned"
 									/>

@@ -130,11 +130,11 @@ const CmsAvailableContent: FC = () => {
 	}
 
 	function handleAddClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&adding=true`);
+		navigate(`/admin/my-content/create?contentId=${contentId}&adding=true`);
 	}
 
 	function handleEditClick(contentId: string) {
-		navigate(`/cms/on-your-time/create?contentId=${contentId}&editing=true&returnToAvailable=true`);
+		navigate(`/admin/my-content/create?contentId=${contentId}&editing=true&returnToAvailable=true`);
 	}
 
 	function updateContentItem(content: AdminContentRow) {

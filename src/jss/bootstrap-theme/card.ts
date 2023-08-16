@@ -61,5 +61,32 @@ export const card = (theme: CobaltTheme) => {
 				},
 			},
 		},
+		'.form-card': {
+			borderRadius: 4,
+			border: `1px solid ${theme.colors.n100}`,
+			'& .cobalt-card': {
+				'&__header': {
+					padding: 16,
+					position: 'relative',
+					borderTopLeftRadius: 4,
+					borderTopRightRadius: 4,
+					backgroundColor: theme.colors.n0,
+					borderBottom: `1px solid ${theme.colors.n100}`,
+					'&.collapsed': {
+						borderRadius: 4,
+						borderBottom: 'none',
+					},
+				},
+				'&__body': {
+					padding: 16,
+					borderBottomLeftRadius: 4,
+					borderBottomRightRadius: 4,
+					backgroundColor: theme.colors.n0,
+					'&.no-header': {
+						borderRadius: 4,
+					},
+				},
+			},
+		},
 	};
 };
