@@ -251,7 +251,15 @@ const GroupSession = ({
 											{learnMoreCallToAction[groupSession.groupSessionLearnMoreMethodId!]}
 										</Button>
 									) : (
-										<Button className="mb-3 d-block w-100" onClick={onReserveSeat}>
+										<Button
+											className="mb-3 d-block w-100"
+											onClick={onReserveSeat}
+											disabled={
+												typeof groupSession.seatsAvailable !== 'undefined'
+													? groupSession.seatsAvailable <= 0
+													: false
+											}
+										>
 											Reserve My Seat
 										</Button>
 									)}
