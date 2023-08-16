@@ -21,6 +21,7 @@ import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import Carousel, { responsiveDefaults } from '@/components/carousel';
 import NoData from '@/components/no-data';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
+import classNames from 'classnames';
 
 const GroupSessions = () => {
 	const handleError = useHandleError();
@@ -91,19 +92,21 @@ const GroupSessions = () => {
 			]);
 
 			setGroupSessions([]);
-			setGroupSessionCollections([
-				...[
-					{
-						groupSessionCollectionId: 'UPCOMING_SESSIONS',
-						title: 'Upcoming Sessions',
-						description: 'Upcoming Sessions Description',
-						displayOrder: 0,
-						institutionId: '',
-						groupSessions,
-					},
-				],
-				...groupSessionCollections,
-			]);
+			setGroupSessionCollections(
+				[
+					...[
+						{
+							groupSessionCollectionId: 'UPCOMING_SESSIONS',
+							title: 'Upcoming Sessions',
+							description: 'Upcoming Sessions Description',
+							displayOrder: 0,
+							institutionId: '',
+							groupSessions,
+						},
+					],
+					...groupSessionCollections,
+				].filter((c) => c.groupSessions.length > 0)
+			);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -198,6 +201,29 @@ const GroupSessions = () => {
 			</HeroContainer>
 
 			<Container className="py-10">
+				{isLoading && (
+					<Row className="mb-10">
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+						<Col md={6} lg={4} className="mb-8">
+							<StudioEventSkeleton />
+						</Col>
+					</Row>
+				)}
+
 				{!isLoading && (
 					<>
 						{groupSessionSearchQuery ? (
@@ -246,21 +272,21 @@ const GroupSessions = () => {
 								{groupSessionCollections.length > 0 ? (
 									<>
 										{groupSessionCollections.map((collection, collectionIndex) => {
-											if (collection.groupSessions.length <= 0) {
-												return null;
-											}
-
 											const isLastCollection =
 												collectionIndex === groupSessionCollections.length - 1;
 
 											return (
 												<Row
-													className="mb-12 mb-lg-16"
 													key={collection.groupSessionCollectionId}
+													className={classNames({
+														'mb-8 mb-lg-12': !isLastCollection,
+													})}
 												>
 													<Col>
 														<Carousel
-															className="mb-8 mb-lg-12"
+															className={classNames({
+																'mb-8 mb-lg-12': !isLastCollection,
+															})}
 															responsive={responsiveDefaults}
 															description={collection.title}
 															calloutTitle="See All"
@@ -301,29 +327,6 @@ const GroupSessions = () => {
 							</>
 						)}
 					</>
-				)}
-
-				{isLoading && (
-					<Row className="mb-10">
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-						<Col md={6} lg={4} className="mb-8">
-							<StudioEventSkeleton />
-						</Col>
-					</Row>
 				)}
 			</Container>
 
