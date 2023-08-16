@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
@@ -20,6 +20,7 @@ interface GroupSessionTableDropdownProps {
 }
 
 export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: GroupSessionTableDropdownProps) => {
+	const navigate = useNavigate();
 	const canPreview = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 
 	const canEdit =
@@ -96,7 +97,10 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 				<Dropdown.Item
 					className="d-flex align-items-center"
 					onClick={() => {
-						window.alert('[TODO]: View Registrants');
+						navigate({
+							pathname: `/admin/group-sessions/edit/${groupSession.groupSessionId}`,
+							search: '?tab=registrants',
+						});
 					}}
 				>
 					<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />

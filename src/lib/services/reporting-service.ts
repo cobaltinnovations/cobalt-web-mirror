@@ -20,6 +20,10 @@ export enum REPORTING_WINDOW_ID {
 	WEEKLY_12_WEEKS = 'WEEKLY_12_WEEKS',
 }
 
+export enum ReportTypeId {
+	GROUP_SESSION_RESERVATION_EMAILS = 'GROUP_SESSION_RESERVATION_EMAILS',
+}
+
 export interface ReportType {
 	reportTypeId: string;
 	description: string;

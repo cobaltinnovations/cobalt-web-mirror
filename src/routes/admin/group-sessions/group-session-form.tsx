@@ -13,13 +13,14 @@ import useHandleError from '@/hooks/use-handle-error';
 import {
 	CreateGroupSessionRequestBody,
 	GroupSessionSchedulingSystemId,
+	ReportTypeId,
 	groupSessionsService,
 	imageUploader,
 	screeningService,
 	tagService,
 } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import {
 	Link,
@@ -50,6 +51,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import TabBar from '@/components/tab-bar';
 import ConfirmDialog from '@/components/confirm-dialog';
 import useFlags from '@/hooks/use-flags';
+import { buildBackendDownloadUrl } from '@/lib/utils';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -242,6 +244,17 @@ export const Component = () => {
 
 	const isExternal = groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 	const hasReservations = (loaderData?.groupSessionReservations ?? []).length > 0;
+
+	const registrantDownloadLink = useMemo(() => {
+		if (!params.groupSessionId || !hasReservations) {
+			return '';
+		}
+
+		return buildBackendDownloadUrl('/reporting/run-report', {
+			reportTypeId: ReportTypeId.GROUP_SESSION_RESERVATION_EMAILS,
+			groupSessionId: params.groupSessionId,
+		});
+	}, [hasReservations, params.groupSessionId]);
 
 	const updateFormValue = useCallback((key: keyof typeof formValues, value: typeof formValues[typeof key]) => {
 		setIsDirty(true);
@@ -1340,10 +1353,9 @@ export const Component = () => {
 
 									<Button
 										variant="light"
-										className="ms-4"
-										onClick={() => {
-											alert('TODO: Download/export registrant emails addresses');
-										}}
+										className="ms-4 text-decoration-none"
+										disabled={!registrantDownloadLink}
+										href={registrantDownloadLink || undefined}
 									>
 										<DownloadIcon className="text-primary me-2" />
 										Email Addresses

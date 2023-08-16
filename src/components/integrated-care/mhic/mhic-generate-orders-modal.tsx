@@ -1,10 +1,8 @@
-import Cookies from 'js-cookie';
 import React, { FC, useCallback, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import config from '@/lib/config';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildBackendDownloadUrl } from '@/lib/utils';
 import InputHelper from '@/components/input-helper';
 
 const useStyles = createUseStyles({
@@ -34,19 +32,9 @@ export const MhicGenerateOrdersModal: FC<Props> = ({ onSave, ...props }) => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			if (__DEV__) {
-				window.location.href = buildQueryParamUrl(
-					`${config.COBALT_WEB_API_BASE_URL}/patient-order-csv-generator`,
-					{
-						orderCount: formValues.count,
-						'X-Cobalt-Access-Token': Cookies.get('accessToken'),
-					}
-				);
-			} else {
-				window.location.href = buildQueryParamUrl('/ic/patient-order-csv-generator', {
-					orderCount: formValues.count,
-				});
-			}
+			window.location.href = buildBackendDownloadUrl('/patient-order-csv-generator', {
+				orderCount: formValues.count,
+			});
 
 			onSave();
 		},
