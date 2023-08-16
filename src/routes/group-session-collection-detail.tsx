@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link, LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
@@ -11,6 +11,7 @@ import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import StudioEvent from '@/components/studio-event';
 import NoData from '@/components/no-data';
+import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { groupSessionCollectionId } = params as { groupSessionCollectionId: string };
@@ -42,7 +43,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
-	const navigate = useNavigate();
 	const { groupSessionCollection, groupSessions } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
@@ -99,31 +99,7 @@ export const Component = () => {
 				)}
 			</Container>
 
-			{institution?.groupSessionRequestsEnabled && (
-				<Container fluid className="bg-n75">
-					<Container className="py-10 py-lg-20">
-						<Row>
-							<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
-								<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-								<p className="mb-6 fs-large text-center">
-									Request a session and we'll work with you to find a dedicated time for a
-									wellness-focused group session for your team.
-								</p>
-								<div className="text-center">
-									<Button
-										variant="primary"
-										onClick={() => {
-											navigate('/group-sessions/request');
-										}}
-									>
-										Request a Session
-									</Button>
-								</div>
-							</Col>
-						</Row>
-					</Container>
-				</Container>
-			)}
+			<GroupSessionsRequestFooter />
 		</>
 	);
 };
