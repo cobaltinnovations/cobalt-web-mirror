@@ -14,7 +14,6 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
-import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
@@ -43,7 +42,7 @@ const GroupSessions = () => {
 		GroupSessionCollectionWithSessionsIncludedModel[]
 	>([]);
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+	const { renderedPreScreeningLoader, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
 
@@ -167,13 +166,8 @@ const GroupSessions = () => {
 		};
 	}, [handleKeydown]);
 
-	if (!didCheckScreeningSessions) {
-		return (
-			<>
-				{renderedCollectPhoneModal}
-				<Loader />
-			</>
-		);
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
 	}
 
 	return (
@@ -242,7 +236,7 @@ const GroupSessions = () => {
 												<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
 													<Link
 														className="d-block text-decoration-none h-100"
-														to={`/group-sessions/${groupSession.groupSessionId}`}
+														to={`/group-sessions/${groupSession.urlName}`}
 														state={{
 															navigationSource:
 																GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,
@@ -309,7 +303,7 @@ const GroupSessions = () => {
 																	<Link
 																		key={groupSession.groupSessionId}
 																		className="d-block text-decoration-none h-100"
-																		to={`/group-sessions/${groupSession.groupSessionId}`}
+																		to={`/group-sessions/${groupSession.urlName}`}
 																		state={{
 																			navigationSource:
 																				GroupSessionDetailNavigationSource.GROUP_SESSION_LIST,

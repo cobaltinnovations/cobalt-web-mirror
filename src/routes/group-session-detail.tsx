@@ -20,8 +20,14 @@ export enum GroupSessionDetailNavigationSource {
 }
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
+	const urlName = params.groupSessionIdOrUrlName;
+
+	if (!urlName) {
+		throw new Error('Unknown Session Id or Url Name');
+	}
+
 	const { groupSession, groupSessionReservation } = await groupSessionsService
-		.getGroupSessionById((params as { groupSessionId: string }).groupSessionId)
+		.getGroupSessionByIdOrUrlName(urlName)
 		.fetch();
 
 	return { groupSession, groupSessionReservation };
@@ -36,7 +42,7 @@ export const Component = () => {
 	const navigationSource =
 		(location.state?.navigationSource as GroupSessionDetailNavigationSource) ??
 		GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
-	const { createScreeningSession } = useScreeningFlow({
+	const { createScreeningSession, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: groupSession.screeningFlowId,
 		groupSessionId: groupSession.groupSessionId,
 		instantiateOnLoad: false,
@@ -52,12 +58,14 @@ export const Component = () => {
 	const handleReserveButtonClick = useCallback(() => {
 		if (groupSession.screeningFlowId) {
 			Cookies.set('groupSessionDetailNavigationSource', navigationSource);
+			groupSession.groupSessionCollectionId &&
+				Cookies.set('groupSessionCollectionId', groupSession.groupSessionCollectionId);
 			createScreeningSession();
 			return;
 		}
 
 		setConfirmModalIsShowing(true);
-	}, [createScreeningSession, groupSession.screeningFlowId, navigationSource]);
+	}, [createScreeningSession, groupSession.groupSessionCollectionId, groupSession.screeningFlowId, navigationSource]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
@@ -120,11 +128,17 @@ export const Component = () => {
 		</p>
 	);
 
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Group Session Detail</title>
 			</Helmet>
+
+			{renderedCollectPhoneModal}
 
 			<Modal
 				show={confirmModalIsShowing}

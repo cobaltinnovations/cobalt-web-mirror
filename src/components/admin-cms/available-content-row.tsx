@@ -143,7 +143,7 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 			</TableCell>
 			<TableCell>
 				<span className="d-block fs-default fw-bold">
-					<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
+					<Link to={`/resource-library/${content.contentId}`}>{content.title}</Link>
 				</span>
 				<span className="d-block fs-default fw-normal">{content.author}</span>
 			</TableCell>

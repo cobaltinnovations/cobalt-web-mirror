@@ -226,7 +226,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 				</TableCell>
 				<TableCell width={300}>
 					<span className="d-block fs-default fw-bold">
-						<Link to={`/on-your-time/${content.contentId}`}>{content.title}</Link>
+						<Link to={`/resource-library/${content.contentId}`}>{content.title}</Link>
 					</span>
 					<span className="d-block fs-default fw-normal">{content.author}</span>
 					<span className={`d-block fs-default fw-normal ${classes.description}`}>

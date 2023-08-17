@@ -12,7 +12,7 @@ export const MhicOrderAssessment = () => {
 	const revalidator = useRevalidator();
 
 	const { institution } = useAccount();
-	const { createScreeningSession } = useScreeningFlow({
+	const { createScreeningSession, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId,
 		instantiateOnLoad: false,
@@ -21,6 +21,10 @@ export const MhicOrderAssessment = () => {
 
 	const isCompleted =
 		!!patientOrderResponse.patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied && !isRecreate;
+
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
 
 	return (
 		<>

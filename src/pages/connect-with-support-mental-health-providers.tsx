@@ -14,7 +14,7 @@ import AsyncWrapper from '@/components/async-page';
 const ConnectWithSupportMentalHealthProviders = () => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
-	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.providerTriageScreeningFlowId,
 		instantiateOnLoad: false,
 	});
@@ -76,6 +76,10 @@ const ConnectWithSupportMentalHealthProviders = () => {
 		institution.providerTriageScreeningFlowId,
 		navigate,
 	]);
+
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
 
 	return (
 		<>

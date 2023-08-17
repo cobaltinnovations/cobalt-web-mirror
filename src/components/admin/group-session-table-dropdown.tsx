@@ -88,7 +88,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 				<Dropdown.Item
 					className="d-flex align-items-center"
 					as={Link}
-					to={`/group-sessions/${groupSession.groupSessionId}`}
+					to={`/group-sessions/${groupSession.urlName}`}
 					state={{
 						navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
 					}}

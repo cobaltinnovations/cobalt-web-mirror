@@ -21,8 +21,6 @@ const Reports = () => {
 	const fetchData = useCallback(async () => {
 		const response = await reportingSerive.getReportTypes().fetch();
 
-		console.log(response);
-
 		setReportingTypes(
 			response.reportTypes.filter((rt) => {
 				return (

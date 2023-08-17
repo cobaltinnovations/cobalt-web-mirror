@@ -196,15 +196,12 @@ const TopicCenter = () => {
 																		groupSession.startDateTime,
 																});
 
-																navigate(
-																	`/group-sessions/${groupSession.groupSessionId}`,
-																	{
-																		state: {
-																			navigationSource:
-																				GroupSessionDetailNavigationSource.TOPIC_CENTER,
-																		},
-																	}
-																);
+																navigate(`/group-sessions/${groupSession.urlName}`, {
+																	state: {
+																		navigationSource:
+																			GroupSessionDetailNavigationSource.TOPIC_CENTER,
+																	},
+																});
 															}}
 															imageUrl={groupSession.imageUrl}
 														/>

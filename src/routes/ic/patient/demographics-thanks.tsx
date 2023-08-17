@@ -20,7 +20,7 @@ const PatientDemographicsThanks = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
-	const { createScreeningSession } = useScreeningFlow({
+	const { createScreeningSession, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
@@ -31,11 +31,17 @@ const PatientDemographicsThanks = () => {
 		setPatientOrder(response.patientOrder);
 	}, []);
 
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Integrated Care - Thank You</title>
 			</Helmet>
+
+			{renderedCollectPhoneModal}
 
 			<AsyncWrapper fetchData={fetchData}>
 				<Container fluid className={classes.gradient}>

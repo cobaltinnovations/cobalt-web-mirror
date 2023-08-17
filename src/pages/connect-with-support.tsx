@@ -100,7 +100,7 @@ const ConnectWithSupport: FC = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
-	const { didCheckScreeningSessions, renderedCollectPhoneModal } = useScreeningFlow({
+	const { didCheckScreeningSessions, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.providerTriageScreeningFlowId,
 	});
 	const bookingRef = useRef<BookingRefHandle>(null);
@@ -334,13 +334,8 @@ const ConnectWithSupport: FC = () => {
 		Cookies.set('paymentDisclaimerSeen', 'true');
 	}, []);
 
-	if (!didInitSearch) {
-		return (
-			<>
-				{renderedCollectPhoneModal}
-				<Loader />
-			</>
-		);
+	if (!didInitSearch && renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
 	}
 
 	return (

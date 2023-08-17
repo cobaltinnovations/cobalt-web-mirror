@@ -193,10 +193,10 @@ const RedirectToResourceLibrary = () => {
 };
 
 const RedirectToGroupSessionDetail = () => {
-	const { groupSessionId } = useParams<{ groupSessionId: string }>();
+	const { groupSessionIdOrUrlName } = useParams<{ groupSessionIdOrUrlName: string }>();
 
-	if (groupSessionId) {
-		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
+	if (groupSessionIdOrUrlName) {
+		return <Navigate to={`/group-sessions/${groupSessionIdOrUrlName}`} replace />;
 	}
 
 	return <Navigate to="/group-sessions" replace />;
@@ -517,7 +517,7 @@ export const routes: RouteObject[] = [
 						lazy: () => import('@/routes/group-session-collection-detail'),
 					},
 					{
-						path: 'group-sessions/:groupSessionId',
+						path: 'group-sessions/:groupSessionIdOrUrlName',
 						lazy: () => import('@/routes/group-session-detail'),
 					},
 					{
@@ -865,10 +865,18 @@ export const routes: RouteObject[] = [
 										element: <PatientCheckIn />,
 									},
 									{
+										path: 'confirm-appointment',
+										element: <ConfirmAppointment />,
+									},
+									{
 										path: '*',
 										element: <NoMatch />,
 									},
 								],
+							},
+							{
+								path: '*',
+								element: <NoMatch />,
 							},
 						],
 					},

@@ -76,7 +76,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		return null; // page renders a "404" in this case
 	}
 
-	const groupSessionRequest = groupSessionId ? groupSessionsService.getGroupSessionById(groupSessionId) : null;
+	const groupSessionRequest = groupSessionId
+		? groupSessionsService.getGroupSessionByIdOrUrlName(groupSessionId)
+		: null;
 	const groupSessionReservationsRequest = groupSessionId
 		? groupSessionsService.getGroupSessionReservationsById(groupSessionId)
 		: null;
@@ -223,10 +225,13 @@ export const Component = () => {
 	const selectedTab = searchParams.get('tab') ?? 'details';
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
-	const isPublished = loaderData?.groupSession?.groupSessionStatusId === SESSION_STATUS.ADDED;
+	const isNotDraft = loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
 	const isGroupSessionPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
+	const canCancel =
+		loaderData?.groupSession?.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||
+		loaderData?.groupSession?.groupSessionStatusId === GROUP_SESSION_STATUS_ID.ADDED;
 
 	const [formValues, setFormValues] = useState(
 		getInitialGroupSessionFormValues({
@@ -283,7 +288,7 @@ export const Component = () => {
 		async (options?: { exitAfterSave?: boolean }) => {
 			const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
-			if (!isPublished) {
+			if (!isNotDraft) {
 				submission.groupSessionStatusId = GROUP_SESSION_STATUS_ID.NEW;
 			}
 
@@ -294,8 +299,8 @@ export const Component = () => {
 
 			promise
 				.then((response) => {
-					if (isPublished || options?.exitAfterSave) {
-						if (isPublished) {
+					if (isNotDraft || options?.exitAfterSave) {
+						if (isNotDraft) {
 							addFlag({
 								variant: 'success',
 								title: 'Changes published',
@@ -304,7 +309,7 @@ export const Component = () => {
 									{
 										title: 'View Session',
 										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.groupSessionId}`, {
+											navigate(`/group-sessions/${response.groupSession.urlName}`, {
 												state: {
 													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
 												},
@@ -325,7 +330,7 @@ export const Component = () => {
 					handleError(e);
 				});
 		},
-		[addFlag, formValues, handleError, isEdit, isExternal, isPublished, navigate, params.groupSessionId]
+		[addFlag, formValues, handleError, isEdit, isExternal, isNotDraft, navigate, params.groupSessionId]
 	);
 
 	useEffect(() => {
@@ -406,7 +411,7 @@ export const Component = () => {
 		</>
 	);
 
-	const showTopTabs = isPublished && !isExternal;
+	const showTopTabs = isNotDraft && !isExternal;
 	const formFields = (
 		<Container fluid={showTopTabs}>
 			<ConfirmDialog
@@ -448,7 +453,7 @@ export const Component = () => {
 					required
 					name="title"
 					value={formValues.title}
-					disabled={isExternal ? !isDuplicate && isPublished : isEdit && hasReservations}
+					disabled={isExternal ? !isDuplicate && isNotDraft : isEdit && hasReservations}
 					onChange={({ currentTarget }) => {
 						updateFormValue('title', currentTarget.value);
 					}}
@@ -461,7 +466,7 @@ export const Component = () => {
 					error={urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined}
 					value={formValues.urlName}
 					disabled={
-						!formValues.title || (isExternal ? !isDuplicate && isPublished : isEdit && hasReservations)
+						!formValues.title || (isExternal ? !isDuplicate && isNotDraft : isEdit && hasReservations)
 					}
 					onChange={({ currentTarget }) => {
 						setUrlNameSetByUser(true);
@@ -1186,12 +1191,12 @@ export const Component = () => {
 					<div>
 						<Button
 							variant="outline-primary"
-							type={isGroupSessionPreview || isPublished ? 'button' : 'submit'}
+							type={isGroupSessionPreview || isNotDraft ? 'button' : 'submit'}
 							value="exit"
 							onClick={() => {
 								if (isGroupSessionPreview) {
 									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-								} else if (isPublished) {
+								} else if (isNotDraft) {
 									navigate(`/admin/group-sessions`);
 								}
 							}}
@@ -1200,14 +1205,14 @@ export const Component = () => {
 								<>
 									<LeftChevron /> Back to Edit
 								</>
-							) : isPublished ? (
+							) : isNotDraft ? (
 								'Exit Editor'
 							) : (
 								'Save & Exit'
 							)}
 						</Button>
 
-						{isPublished && (
+						{isNotDraft && canCancel && (
 							<Button
 								type="button"
 								variant="danger"
@@ -1236,7 +1241,7 @@ export const Component = () => {
 							'Publish'
 						) : (
 							<>
-								{isPublished ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+								{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
 							</>
 						)}
 					</Button>
@@ -1252,15 +1257,15 @@ export const Component = () => {
 			onHide={() => {
 				setShowConfirmPublishDialog(false);
 			}}
-			titleText={`Publish ${isPublished ? 'Changes' : 'Group Session'}`}
-			bodyText={`Are you ready to publish ${isPublished ? 'your changes' : 'your group session'}?`}
-			detailText={`Your ${isPublished ? 'changes' : 'group session'} will become available on Cobalt immediately`}
+			titleText={`Publish ${isNotDraft ? 'Changes' : 'Group Session'}`}
+			bodyText={`Are you ready to publish ${isNotDraft ? 'your changes' : 'your group session'}?`}
+			detailText={`Your ${isNotDraft ? 'changes' : 'group session'} will become available on Cobalt immediately`}
 			dismissText="Cancel"
 			confirmText="Publish"
 			onConfirm={() => {
 				setShowConfirmPublishDialog(false);
 
-				if (isPublished) {
+				if (isNotDraft) {
 					handleSaveForm();
 				} else {
 					groupSessionsService
@@ -1275,7 +1280,7 @@ export const Component = () => {
 									{
 										title: 'View Session',
 										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.groupSessionId}`, {
+											navigate(`/group-sessions/${response.groupSession.urlName}`, {
 												state: {
 													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
 												},
@@ -1325,7 +1330,7 @@ export const Component = () => {
 
 				if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
 					handleSaveForm({ exitAfterSave: true });
-				} else if (!isPublished) {
+				} else if (!isNotDraft) {
 					handleSaveForm();
 				} else {
 					setShowConfirmPublishDialog(true);
@@ -1340,7 +1345,7 @@ export const Component = () => {
 						<h2 className="mb-1">
 							{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
 						</h2>
-						{!isPublished && (
+						{!isNotDraft && (
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 								Published group sessions will appear on the{' '}
