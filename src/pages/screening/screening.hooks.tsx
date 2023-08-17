@@ -90,6 +90,9 @@ export function useScreeningNavigation() {
 							replace,
 						}
 					);
+
+					Cookies.remove('groupSessionDetailNavigationSource');
+					Cookies.remove('groupSessionCollectionId');
 					return;
 				}
 				case ScreeningSessionDestinationId.GROUP_SESSION_DETAIL:

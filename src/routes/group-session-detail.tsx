@@ -52,12 +52,14 @@ export const Component = () => {
 	const handleReserveButtonClick = useCallback(() => {
 		if (groupSession.screeningFlowId) {
 			Cookies.set('groupSessionDetailNavigationSource', navigationSource);
+			groupSession.groupSessionCollectionId &&
+				Cookies.set('groupSessionCollectionId', groupSession.groupSessionCollectionId);
 			createScreeningSession();
 			return;
 		}
 
 		setConfirmModalIsShowing(true);
-	}, [createScreeningSession, groupSession.screeningFlowId, navigationSource]);
+	}, [createScreeningSession, groupSession.groupSessionCollectionId, groupSession.screeningFlowId, navigationSource]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
