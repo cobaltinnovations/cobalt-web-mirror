@@ -79,15 +79,12 @@ const GroupSession = ({
 	const placeholderImage = useRandomPlaceholderImage();
 
 	const handleCopyLinkButtonClick = useCallback(() => {
-		copyTextToClipboard(
-			`https://${window.location.host}/group-sessions/${groupSession.urlName}?immediateAccess=true`,
-			{
-				successTitle: 'Copied!',
-				successDescription: 'The URL for this session was copied to your clipboard',
-				errorTitle: 'Failed to copy link',
-				errorDesctiption: 'Please try again.',
-			}
-		);
+		copyTextToClipboard(`https://${window.location.host}/group-sessions/${groupSession.urlName}`, {
+			successTitle: 'Copied!',
+			successDescription: 'The URL for this session was copied to your clipboard',
+			errorTitle: 'Failed to copy link',
+			errorDesctiption: 'Please try again.',
+		});
 	}, [copyTextToClipboard, groupSession.urlName]);
 
 	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;

@@ -1,4 +1,3 @@
-import { useAppRootLoaderData } from '@/routes/root';
 import CollectPhoneModal from '@/components/collect-phone-modal';
 import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
@@ -148,7 +147,7 @@ export function useScreeningNavigation() {
 				default: {
 					navigate(
 						{
-							pathname: '/connect-with-support',
+							pathname: '/',
 							search: new URLSearchParams(params).toString(),
 						},
 						{
@@ -195,7 +194,6 @@ export function useScreeningFlow({
 	checkCompletionState?: boolean;
 	disabled?: boolean;
 }) {
-	const { isImmediateSession } = useAppRootLoaderData();
 	const [searchParams] = useSearchParams();
 	// For now - if not in "on load" mode, ignore the concept of "skipped"
 	const isSkipped = instantiateOnLoad ? searchParams.get('skipped') === 'true' : false;
@@ -327,7 +325,7 @@ export function useScreeningFlow({
 			return;
 		}
 
-		if (isImmediateSession || isSkipped) {
+		if (isSkipped) {
 			setDidCheckScreeningSessions(true);
 			return;
 		}
@@ -366,7 +364,7 @@ export function useScreeningFlow({
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [checkCompletionState, disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
+	}, [checkCompletionState, disabled, handleError, isSkipped, patientOrderId, screeningFlowId]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {

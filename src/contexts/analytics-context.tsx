@@ -15,6 +15,7 @@ import {
 } from '@/lib/models/ga-events';
 import { useLocation } from 'react-router-dom';
 import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
+import useUrlViewTracking from '@/hooks/use-url-view-tracking';
 
 /**
  * LeftNav Analytics
@@ -205,6 +206,7 @@ if (__DEV__) {
 }
 
 const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
+	useUrlViewTracking();
 	const location = useLocation();
 	const { institution, account } = useAccount();
 

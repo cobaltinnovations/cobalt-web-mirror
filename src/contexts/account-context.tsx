@@ -32,13 +32,15 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const signOutAndClearContext = useCallback(async () => {
 		Cookies.remove('accessToken');
 		Cookies.remove('accountId');
+		Cookies.remove('roleId');
 		Cookies.remove('authRedirectUrl');
-		Cookies.remove('ssoRedirectUrl');
 		Cookies.remove('immediateAccess');
 		Cookies.remove('seenWaivedCopay');
 		Cookies.remove('track');
 		Cookies.remove('bookingSource');
-		Cookies.remove('exitUrl');
+		Cookies.remove('bookingExitUrl');
+		Cookies.remove('groupSessionDetailNavigationSource');
+		Cookies.remove('groupSessionCollectionId');
 		window.localStorage.clear();
 
 		try {

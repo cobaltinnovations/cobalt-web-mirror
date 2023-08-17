@@ -17,7 +17,6 @@ import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
 import useAccount from './hooks/use-account';
-import { immediateSupportLoader } from './immediate-support-loader';
 
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
 
@@ -54,8 +53,7 @@ export const Covid19Resources = lazyLoadWithRefresh(() => import('@/pages/covid-
 export const WellBeingResources = lazyLoadWithRefresh(() => import('@/pages/well-being-resources'));
 export const Privacy = lazyLoadWithRefresh(() => import('@/pages/privacy'));
 export const IntakeAssessment = lazyLoadWithRefresh(() => import('@/pages/intake-assessment'));
-export const OneOnOneResources = lazyLoadWithRefresh(() => import('@/pages/one-on-one-resources'));
-export const ConnectWithSupport = lazyLoadWithRefresh(() => import('@/pages/connect-with-support'));
+
 export const ConnectWithSupportV2 = lazyLoadWithRefresh(() => import('@/pages/connect-with-support-v2'));
 export const ConnectWithSupportMedicationPrescriber = lazyLoadWithRefresh(
 	() => import('@/pages/connect-with-support-medication-prescriber')
@@ -253,8 +251,9 @@ export const routes: RouteObject[] = [
 			},
 
 			{
+				// legacy/backwards compatibility
 				path: 'immediate-support/:supportRoleId',
-				loader: immediateSupportLoader,
+				element: <Navigate to="/" replace />,
 			},
 
 			{
@@ -293,10 +292,12 @@ export const routes: RouteObject[] = [
 						element: <SignUpClaim />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'sign-in-sso',
 						element: <Navigate to="/sign-in" replace />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'sign-in-email',
 						element: <Navigate to="/sign-in/email" replace />,
 					},
@@ -321,6 +322,7 @@ export const routes: RouteObject[] = [
 						element: <Index />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'in-the-studio',
 						element: <Navigate to="/group-sessions" replace />,
 					},
@@ -329,14 +331,17 @@ export const routes: RouteObject[] = [
 					// 	element: <InTheStudioThanks />,
 					// },
 					{
+						// legacy/backwards compatibility
 						path: 'in-the-studio/group-session-scheduled/:groupSessionId',
 						element: <RedirectToGroupSessionDetail />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'in-the-studio/group-session-by-request/:groupSessionRequestId',
 						element: <InTheStudioGroupSessionByRequest />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'on-your-time',
 						element: <RedirectToResourceLibrary />,
 					},
@@ -349,6 +354,7 @@ export const routes: RouteObject[] = [
 						element: <SessionRequestThankYou />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'on-your-time/:contentId',
 						element: <RedirectToResourceLibrary />,
 					},
@@ -377,12 +383,14 @@ export const routes: RouteObject[] = [
 								element: <IntakeAssessment />,
 							},
 							{
+								// legacy/backwards compatibility
 								path: 'one-on-one-resources',
-								element: <OneOnOneResources />,
+								element: <Navigate to="/" replace />,
 							},
 							{
+								// legacy/backwards compatibility
 								path: 'connect-with-support',
-								element: <ConnectWithSupport />,
+								element: <Navigate to="/" replace />,
 							},
 							{
 								path: 'connect-with-support/medication-prescriber',
@@ -493,14 +501,17 @@ export const routes: RouteObject[] = [
 						element: <GroupSessionsRequest />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'group-sessions/by-request',
 						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'group-sessions/by-request/create',
 						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'group-sessions/by-request/:groupSessionId/edit',
 						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
 					},
@@ -529,10 +540,12 @@ export const routes: RouteObject[] = [
 						element: <RedirectToBackend />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'cms/on-your-time',
 						element: <RedirectToAdminPathOrRender pathname="my-content" element={<NoMatch />} />,
 					},
 					{
+						// legacy/backwards compatibility (redirect for admins, render old route otherwise)
 						path: 'cms/on-your-time/create',
 						element: (
 							<RedirectToAdminPathOrRender
@@ -542,6 +555,7 @@ export const routes: RouteObject[] = [
 						),
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'cms/available-content',
 						element: <RedirectToAdminPathOrRender pathname="available-content" element={<NoMatch />} />,
 					},
@@ -550,8 +564,9 @@ export const routes: RouteObject[] = [
 						element: <StatsDashboard />,
 					},
 					{
+						// legacy/backwards compatibility
 						path: 'providers/:providerId',
-						element: <ProviderDetail />,
+						element: <Navigate to="/" replace />,
 					},
 					...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
 						? [

@@ -333,12 +333,6 @@ const MENU_SECTIONS: MenuNavSection[] = [
 		title: 'Connect',
 		items: () => [
 			{
-				testId: 'menuLinkConnectWithSupport',
-				label: 'Connect with Support',
-				icon: <ConnectWithSupportIcon />,
-				to: ({ institution }) => (institution?.supportEnabled ? '/connect-with-support' : null),
-			},
-			{
 				testId: 'menuLinkGroupSessions',
 				label: 'Group Sessions',
 				icon: <GroupSessionsIcon />,
