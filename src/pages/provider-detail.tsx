@@ -173,10 +173,6 @@ const ProviderDetail = () => {
 				<Breadcrumb
 					breadcrumbs={[
 						{
-							to: '/connect-with-support',
-							title: 'Connect With Support',
-						},
-						{
 							to: '/#',
 							title: selectedProvider?.name ?? '',
 						},

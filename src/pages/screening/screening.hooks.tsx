@@ -147,7 +147,7 @@ export function useScreeningNavigation() {
 				default: {
 					navigate(
 						{
-							pathname: '/connect-with-support',
+							pathname: '/',
 							search: new URLSearchParams(params).toString(),
 						},
 						{
