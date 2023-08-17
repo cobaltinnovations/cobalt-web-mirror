@@ -237,10 +237,10 @@ export const groupSessionsService = {
 			url,
 		});
 	},
-	getGroupSessionById(groupSessionId: string) {
+	getGroupSessionByIdOrUrlName(groupSessionIdOrUrlName: string) {
 		return httpSingleton.orchestrateRequest<GetGroupSessionByIdResponseBody>({
 			method: 'get',
-			url: `/group-sessions/${groupSessionId}`,
+			url: `/group-sessions/${groupSessionIdOrUrlName}`,
 		});
 	},
 	getGroupSessionReservationsById(groupSessionId: string) {

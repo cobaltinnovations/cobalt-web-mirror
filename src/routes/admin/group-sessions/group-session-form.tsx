@@ -76,7 +76,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		return null; // page renders a "404" in this case
 	}
 
-	const groupSessionRequest = groupSessionId ? groupSessionsService.getGroupSessionById(groupSessionId) : null;
+	const groupSessionRequest = groupSessionId
+		? groupSessionsService.getGroupSessionByIdOrUrlName(groupSessionId)
+		: null;
 	const groupSessionReservationsRequest = groupSessionId
 		? groupSessionsService.getGroupSessionReservationsById(groupSessionId)
 		: null;
@@ -304,7 +306,7 @@ export const Component = () => {
 									{
 										title: 'View Session',
 										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.groupSessionId}`, {
+											navigate(`/group-sessions/${response.groupSession.urlName}`, {
 												state: {
 													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
 												},
@@ -1275,7 +1277,7 @@ export const Component = () => {
 									{
 										title: 'View Session',
 										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.groupSessionId}`, {
+											navigate(`/group-sessions/${response.groupSession.urlName}`, {
 												state: {
 													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
 												},

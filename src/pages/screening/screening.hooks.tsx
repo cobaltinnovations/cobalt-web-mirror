@@ -99,7 +99,7 @@ export function useScreeningNavigation() {
 				case ScreeningSessionDestinationId.GROUP_SESSION_DETAIL:
 					navigate(
 						{
-							pathname: '/group-sessions/' + destination.context.groupSessionId,
+							pathname: '/group-sessions/' + destination.context.urlName,
 						},
 						{
 							replace,

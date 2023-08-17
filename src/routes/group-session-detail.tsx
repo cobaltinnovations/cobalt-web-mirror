@@ -20,8 +20,14 @@ export enum GroupSessionDetailNavigationSource {
 }
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
+	const urlName = params.groupSessionIdOrUrlName;
+
+	if (!urlName) {
+		throw new Error('Unknown Session Id or Url Name');
+	}
+
 	const { groupSession, groupSessionReservation } = await groupSessionsService
-		.getGroupSessionById((params as { groupSessionId: string }).groupSessionId)
+		.getGroupSessionByIdOrUrlName(urlName)
 		.fetch();
 
 	return { groupSession, groupSessionReservation };

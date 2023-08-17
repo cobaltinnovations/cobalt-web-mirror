@@ -287,7 +287,7 @@ const Index: FC = () => {
 
 											if (groupSessionsService.isGroupSession(groupSession)) {
 												renderKey = groupSession.groupSessionId;
-												detailUrl = `/group-sessions/${groupSession.groupSessionId}`;
+												detailUrl = `/group-sessions/${groupSession.urlName}`;
 											} else if (groupSessionsService.isGroupSessionByRequest(groupSession)) {
 												renderKey = groupSession.groupSessionRequestId;
 												detailUrl = `/in-the-studio/group-session-by-request/${groupSession.groupSessionRequestId}`;

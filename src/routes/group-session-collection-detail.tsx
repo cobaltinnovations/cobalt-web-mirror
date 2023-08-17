@@ -76,7 +76,7 @@ export const Component = () => {
 								<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
 									<Link
 										className="d-block text-decoration-none h-100"
-										to={`/group-sessions/${groupSession.groupSessionId}`}
+										to={`/group-sessions/${groupSession.urlName}`}
 										state={{
 											navigationSource:
 												GroupSessionDetailNavigationSource.GROUP_SESSION_COLLECTION,

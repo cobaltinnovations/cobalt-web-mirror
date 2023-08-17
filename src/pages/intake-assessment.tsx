@@ -49,7 +49,7 @@ const IntakeAssessment: FC = () => {
 				.getIntakeAssessmentQuestion({ appointmentTypeId, providerId, questionId, sessionId })
 				.fetch();
 		} else {
-			throw new Error('No providerId or groupSessionId found.');
+			throw new Error('No providerId found.');
 		}
 
 		if (!response) {
