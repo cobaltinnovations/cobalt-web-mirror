@@ -16,7 +16,6 @@ import AsyncPage from '@/components/async-page';
 import OnYourTimeSectionHeader from '@/components/on-your-time-section-header';
 import OnYourTimeItem from '@/components/on-your-time-item';
 import PersonalizeRecommendationsModal from '@/components/personalize-recommendations-modal';
-import Loader from '@/components/loader';
 import FilterPill from '@/components/filter-pill';
 import FilterFormat from '@/components/filter-format';
 import FilterLength from '@/components/filter-length';
@@ -35,7 +34,7 @@ const OnYourTime: FC = () => {
 	const location = useLocation();
 	const { trackEvent, mixpanel } = useAnalytics();
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
+	const { renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.contentScreeningFlowId,
 	});
 
@@ -115,13 +114,8 @@ const OnYourTime: FC = () => {
 		setSearchParams(searchParams, { replace: true });
 	}, [debouncedSearchValue, searchParams, setSearchParams]);
 
-	if (!didCheckScreeningSessions) {
-		return (
-			<>
-				{renderedCollectPhoneModal}
-				<Loader />
-			</>
-		);
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
 	}
 
 	return (

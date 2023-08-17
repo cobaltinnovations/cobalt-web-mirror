@@ -7,7 +7,6 @@ import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models'
 import { groupSessionsService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import Loader from '@/components/loader';
 import HeroContainer from '@/components/hero-container';
 import StudioEvent from '@/components/studio-event';
 import NoData from '@/components/no-data';
@@ -47,17 +46,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const Component = () => {
 	const { groupSessionCollection, groupSessions } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { institution } = useAccount();
-	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
-		screeningFlowId: institution?.groupSessionsScreeningFlowId,
+	const { renderedPreScreeningLoader } = useScreeningFlow({
+		screeningFlowId: institution.groupSessionsScreeningFlowId,
 	});
 
-	if (!didCheckScreeningSessions) {
-		return (
-			<>
-				{renderedCollectPhoneModal}
-				<Loader />
-			</>
-		);
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
 	}
 
 	return (

@@ -76,10 +76,12 @@ const Index: FC = () => {
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 
-	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
+	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
 		instantiateOnLoad: false,
+		disabled: !institution?.featuresEnabled,
 	});
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = featuresScreeningFlow;
 
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
@@ -140,6 +142,10 @@ const Index: FC = () => {
 		return <Navigate to="/ic" />;
 	}
 
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
 	return (
 		<>
 			<Helmet>
@@ -158,7 +164,7 @@ const Index: FC = () => {
 							</Col>
 						</Row>
 					</Container>
-					<PathwaysSection className="mb-10" />
+					<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
 					{!institution.hasTakenFeatureScreening && (
 						<Container>
 							<Row>

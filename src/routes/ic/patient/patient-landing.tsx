@@ -72,14 +72,22 @@ export const Component = () => {
 	const hasCompletedIntakeScreening =
 		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
 
-	const intakeScreeningFlow = useScreeningFlow({
+	const {
+		renderedPreScreeningLoader: intakeLoading,
+		renderedCollectPhoneModal: intakePhoneModal,
+		...intakeScreeningFlow
+	} = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
 		disabled: !patientOrder?.patientDemographicsConfirmed || !patientOrder?.patientOrderId,
 	});
 
-	const clinicalScreeningFlow = useScreeningFlow({
+	const {
+		renderedPreScreeningLoader: clinicalLoading,
+		renderedCollectPhoneModal: clinicalPhoneModal,
+		...clinicalScreeningFlow
+	} = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder?.patientOrderId,
 		instantiateOnLoad: false,
@@ -232,11 +240,18 @@ export const Component = () => {
 		navigate,
 	]);
 
+	if (intakeLoading || clinicalLoading) {
+		return intakeLoading || clinicalLoading;
+	}
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Integrated Care - Welcome</title>
 			</Helmet>
+
+			{intakePhoneModal}
+			{clinicalPhoneModal}
 
 			<Suspense fallback={<Loader />}>
 				<Await resolve={!!patientOrder || data.patientOrderPromise}>

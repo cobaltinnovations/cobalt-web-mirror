@@ -66,12 +66,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	// const [showConsentModal, setShowConsentModal] = useState(false);
 	const hasCompletedIntakeScreening =
 		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.COMPLETE;
-	const intakeScreeningFlow = useScreeningFlow({
+	const { renderedPreScreeningLoader: loadingIntakeScreening, ...intakeScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareIntakeScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
 		instantiateOnLoad: false,
 	});
-	const clinicalScreeningFlow = useScreeningFlow({
+	const { renderedPreScreeningLoader: loadingClinicalScreening, ...clinicalScreeningFlow } = useScreeningFlow({
 		screeningFlowId: institution?.integratedCareScreeningFlowId,
 		patientOrderId: patientOrder.patientOrderId,
 		instantiateOnLoad: false,
@@ -158,6 +158,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		patientOrder.patientOrderIntakeScreeningStatusId,
 		patientOrder.patientOrderScreeningStatusId,
 	]);
+
+	if (loadingIntakeScreening || loadingClinicalScreening) {
+		return loadingIntakeScreening || loadingClinicalScreening;
+	}
 
 	return (
 		<>

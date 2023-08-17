@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import Cookies from 'js-cookie';
+import Loader from '@/components/loader';
 
 export function useScreeningNavigation() {
 	const navigate = useNavigate();
@@ -318,16 +319,11 @@ export function useScreeningFlow({
 			throw new Error('Screening Flow is disabled');
 		}
 
-		if (hasCompletedScreening) {
-			setDidCheckScreeningSessions(true);
-			return;
-		}
-
 		return startScreeningFlow();
-	}, [disabled, hasCompletedScreening, startScreeningFlow]);
+	}, [disabled, startScreeningFlow]);
 
 	useEffect(() => {
-		if (disabled) {
+		if (disabled || !screeningFlowId) {
 			return;
 		}
 
@@ -336,15 +332,14 @@ export function useScreeningFlow({
 			return;
 		}
 
-		if (!screeningFlowId) {
-			return;
-		}
-
 		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
 			screeningFlowId,
 			patientOrderId,
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
+
+		const fetchCheckCompletionRequest =
+			screeningService.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId);
 
 		Promise.all([
 			fetchScreeningsRequest.fetch().then((response) => setScreeningSessions(response.screeningSessions)),
@@ -355,26 +350,23 @@ export function useScreeningFlow({
 
 				setActiveFlowVersion(activeVersion);
 			}),
-		]).catch((e) => {
-			handleError(e);
-		});
+			checkCompletionState
+				? fetchCheckCompletionRequest
+						.fetch()
+						.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
+				: Promise.resolve(),
+		])
+			.then(() => {
+				setDidCheckScreeningSessions(true);
+			})
+			.catch((e) => {
+				handleError(e);
+			});
 
 		return () => {
 			fetchScreeningsRequest.abort();
 		};
-	}, [disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
-
-	useEffect(() => {
-		if (disabled || !screeningFlowId || !checkCompletionState) {
-			return;
-		}
-
-		screeningService
-			.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)
-			.fetch()
-			.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
-			.catch((e) => handleError(e));
-	}, [checkCompletionState, disabled, handleError, screeningFlowId]);
+	}, [checkCompletionState, disabled, handleError, isImmediateSession, isSkipped, patientOrderId, screeningFlowId]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {
@@ -384,6 +376,7 @@ export function useScreeningFlow({
 		startScreeningFlowIfNoneCompleted();
 	}, [activeFlowVersion, disabled, instantiateOnLoad, startScreeningFlowIfNoneCompleted]);
 
+	// TODO: Move components to layout/context provider
 	const renderedCollectPhoneModal = (
 		<CollectPhoneModal
 			show={showPhoneModal}
@@ -423,12 +416,21 @@ export function useScreeningFlow({
 		/>
 	);
 
+	// used to block render/ui until flowVersion/completion-state is resolved
+	const renderedPreScreeningLoader =
+		disabled || didCheckScreeningSessions ? null : (
+			<div className="my-10">
+				{renderedCollectPhoneModal}
+				<Loader />
+			</div>
+		);
+
 	return {
 		didCheckScreeningSessions,
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
+		renderedPreScreeningLoader,
 		startScreeningFlow,
-		startScreeningFlowIfNoneCompleted,
 		createScreeningSession,
 		resumeScreeningSession,
 		isCreatingScreeningSession,

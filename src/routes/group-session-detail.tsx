@@ -36,7 +36,7 @@ export const Component = () => {
 	const navigationSource =
 		(location.state?.navigationSource as GroupSessionDetailNavigationSource) ??
 		GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
-	const { createScreeningSession } = useScreeningFlow({
+	const { createScreeningSession, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: groupSession.screeningFlowId,
 		groupSessionId: groupSession.groupSessionId,
 		instantiateOnLoad: false,
@@ -122,11 +122,17 @@ export const Component = () => {
 		</p>
 	);
 
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Group Session Detail</title>
 			</Helmet>
+
+			{renderedCollectPhoneModal}
 
 			<Modal
 				show={confirmModalIsShowing}

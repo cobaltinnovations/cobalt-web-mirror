@@ -156,21 +156,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface PathwaysSectionProps {
 	className?: string;
+	featuresScreeningFlow: ReturnType<typeof useScreeningFlow>;
 }
 
-const PathwaysSection = ({ className }: PathwaysSectionProps) => {
+const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const classes = useStyles();
 
-	const { startScreeningFlow, renderedCollectPhoneModal } = useScreeningFlow({
-		screeningFlowId: institution?.featureScreeningFlowId,
-		instantiateOnLoad: false,
-	});
+	const { startScreeningFlow } = featuresScreeningFlow;
 
 	return (
 		<>
-			{renderedCollectPhoneModal}
 			<Container className={className}>
 				<Row>
 					<Col>

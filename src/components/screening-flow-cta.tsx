@@ -25,13 +25,18 @@ interface Props {
 const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 	const classes = useStyles();
 	const { institution } = useAccount();
-	const { startScreeningFlow } = useScreeningFlow({
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: institution?.contentScreeningFlowId,
 		instantiateOnLoad: false,
 	});
 
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
 	return (
 		<div className={classNames(classes.screeningFlowCta, className)}>
+			{renderedCollectPhoneModal}
 			<h2 className="mb-4 text-center">Get Personalized Recommendations</h2>
 			<p className="mb-6 fs-large text-center">
 				Complete a wellness assessment to get personalized recommendations
