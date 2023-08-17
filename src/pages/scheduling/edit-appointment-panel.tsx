@@ -23,7 +23,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { account } = useAccount();
-	const relativeUrl = `/providers/${account?.providerId}?&immediateAccess=true`;
+	const relativeUrl = `/providers/${account?.providerId}`;
 	const fullUrl = `${window.location.protocol}//${window.location.host}${relativeUrl}`;
 
 	const [appointment, setAppointment] = useState<AppointmentModel>();

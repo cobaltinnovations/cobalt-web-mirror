@@ -41,7 +41,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	let subdomain = getSubdomain(url);
 
 	const isTrackedSession = getCookieOrParamAsBoolean(url, 'track');
-	const isImmediateSession = getCookieOrParamAsBoolean(url, 'immediateAccess');
 	const accountSourceId = url.searchParams.get('accountSourceId');
 
 	let accessToken = Cookies.get('accessToken');
@@ -69,27 +68,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		return redirect('/sign-in');
 	}
 
-	if (
-		institutionResponse.institution.immediateAccessEnabled &&
-		!accessToken &&
-		!isTrackedSession &&
-		isImmediateSession
-	) {
-		const anonymousAccountDataRequest = accountService.createAnonymousAccount();
-
-		request.signal.addEventListener('abort', () => {
-			anonymousAccountDataRequest.abort();
-		});
-
-		const anonymousAccountResponse = await anonymousAccountDataRequest.fetch();
-
-		accessToken = anonymousAccountResponse.accessToken;
-		accountResponse = {
-			...anonymousAccountResponse,
-			institution: institutionResponse.institution,
-		};
-	}
-
 	if (accessToken && accountResponse) {
 		accountId = updateTokenCookies(
 			accessToken,
@@ -102,7 +80,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		subdomain,
 		accountSourceId,
 		isTrackedSession,
-		isImmediateSession,
 		accountId,
 		institutionResponse,
 		accountResponse,

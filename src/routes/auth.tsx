@@ -48,8 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			AnonymousAccountExpirationStrategyId.SINGLE_SESSION
 	);
 
-	const ssoRedirectUrl = Cookies.get('ssoRedirectUrl');
-	let authRedirectUrl = ssoRedirectUrl || Cookies.get('authRedirectUrl') || '/';
+	let authRedirectUrl = Cookies.get('authRedirectUrl') || '/';
 
 	if (AUTH_REDIRECT_URLS.some((url) => authRedirectUrl.startsWith(url))) {
 		authRedirectUrl = '/';
@@ -63,7 +62,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		authRedirectUrl = '/';
 	}
 
-	Cookies.remove('ssoRedirectUrl');
 	Cookies.remove('authRedirectUrl');
 
 	return {
@@ -82,7 +80,6 @@ export const Component = () => {
 		setDestination(authRedirectUrl);
 
 		return () => {
-			Cookies.remove('ssoRedirectUrl');
 			Cookies.remove('authRedirectUrl');
 		};
 	}, [authRedirectUrl]);

@@ -17,7 +17,6 @@ import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
 import useAccount from './hooks/use-account';
-import { immediateSupportLoader } from './immediate-support-loader';
 
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
 
@@ -254,7 +253,7 @@ export const routes: RouteObject[] = [
 
 			{
 				path: 'immediate-support/:supportRoleId',
-				loader: immediateSupportLoader,
+				element: <Navigate to="/" replace />,
 			},
 
 			{

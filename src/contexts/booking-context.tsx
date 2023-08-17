@@ -226,7 +226,7 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		setPreviousProviderId(undefined);
 
 		Cookies.remove('bookingSource');
-		Cookies.remove('exitUrl');
+		Cookies.remove('bookingExitUrl');
 	}, [accountId]);
 
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;

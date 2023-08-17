@@ -17,7 +17,6 @@ export interface Institution {
 	ga4MeasurementId?: string;
 	groupSessionsScreeningFlowId?: string;
 	groupSessionDefaultIntakeScreeningFlowId: string;
-	immediateAccessEnabled: boolean;
 	userSubmittedContentEnabled: boolean;
 	userSubmittedGroupSessionEnabled: boolean;
 	userSubmittedGroupSessionRequestEnabled: boolean;
