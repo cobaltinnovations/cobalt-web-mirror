@@ -334,6 +334,7 @@ const ScreeningQuestionsPage = () => {
 
 				return screeningQuestionContextResponse.screeningAnswerOptions.map((option) => (
 					<InputHelper
+						autoFocus
 						key={option.screeningAnswerOptionId}
 						disabled={isSubmitting}
 						className="mb-2"
