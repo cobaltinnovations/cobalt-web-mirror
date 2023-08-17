@@ -23,7 +23,6 @@ import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import useUrlViewTracking from '@/hooks/use-url-view-tracking';
 import { accountService, institutionService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
@@ -87,8 +86,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
-	useUrlViewTracking();
-
 	return (
 		<AccountProvider>
 			<AnalyticsProvider>
