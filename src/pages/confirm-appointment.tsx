@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -23,8 +23,11 @@ const ConfirmAppointment = () => {
 	const epicAppointmentFhirId = searchParams.get('epicAppointmentFhirId') ?? undefined;
 
 	const { addFlag } = useFlags();
-	const { account } = useAccount();
+	const { account, isIntegratedCarePatient } = useAccount();
 	const handleError = useHandleError();
+	const icMatch = useMatch({
+		path: '/ic/*',
+	});
 
 	const [emailInputValue, setEmailInputValue] = useState('');
 	const [phoneNumberInputValue, setPhoneNumberInputValue] = useState(account?.phoneNumber ?? '');
@@ -205,6 +208,18 @@ const ConfirmAppointment = () => {
 			setSubmitting(false);
 		}
 	};
+
+	if (isIntegratedCarePatient && !icMatch) {
+		return (
+			<Navigate
+				to={{
+					pathname: '/ic/patient/confirm-appointment',
+					search: `?${searchParams.toString()}`,
+				}}
+				replace
+			/>
+		);
+	}
 
 	return (
 		<>

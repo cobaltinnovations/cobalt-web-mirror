@@ -865,10 +865,18 @@ export const routes: RouteObject[] = [
 										element: <PatientCheckIn />,
 									},
 									{
+										path: 'confirm-appointment',
+										element: <ConfirmAppointment />,
+									},
+									{
 										path: '*',
 										element: <NoMatch />,
 									},
 								],
+							},
+							{
+								path: '*',
+								element: <NoMatch />,
 							},
 						],
 					},
