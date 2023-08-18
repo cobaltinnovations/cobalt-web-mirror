@@ -102,7 +102,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 					className="d-flex align-items-center"
 					onClick={() => {
 						navigate({
-							pathname: `/admin/group-sessions/edit/${groupSession.groupSessionId}`,
+							pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
 							search: '?tab=registrants',
 						});
 					}}

@@ -25,6 +25,7 @@ import { Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import {
 	Link,
 	LoaderFunctionArgs,
+	Navigate,
 	unstable_useBlocker as useBlocker,
 	useNavigate,
 	useParams,
@@ -54,6 +55,7 @@ import useFlags from '@/hooks/use-flags';
 import { buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
+import { ButtonLink } from '@/components/button-link';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -65,13 +67,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const groupSessionId = params.groupSessionId;
 
-	// can add/edit/duplicate/preview group sessions.
+	// can add/edit/duplicate/preview/view group sessions.
 	// add, must not have a group session id.
-	// edit/duplicate/preview, must have a group session id.
+	// edit/duplicate/preview/view, must have a group session id.
 	if (
 		!action ||
-		!['add-internal', 'add-external', 'edit', 'duplicate', 'preview'].includes(action) ||
-		(['edit', 'duplicate', 'preview'].includes(action) && !groupSessionId)
+		!['add-internal', 'add-external', 'edit', 'duplicate', 'preview', 'view'].includes(action) ||
+		(['edit', 'duplicate', 'preview', 'view'].includes(action) && !groupSessionId)
 	) {
 		return null; // page renders a "404" in this case
 	}
@@ -227,11 +229,14 @@ export const Component = () => {
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 	const reminderWysiwygRef = useRef<WysiwygRef>(null);
 	const followupWysiwygRef = useRef<WysiwygRef>(null);
-	const isNotDraft = loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
-	const isGroupSessionPreview = params.action === 'preview';
+	const isNotDraft =
+		!!loaderData?.groupSession && loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
+	const isPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
-	const canCancel =
+	const isView = params.action === 'view';
+
+	const isSessionEditable =
 		loaderData?.groupSession?.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||
 		loaderData?.groupSession?.groupSessionStatusId === GROUP_SESSION_STATUS_ID.ADDED;
 
@@ -248,7 +253,7 @@ export const Component = () => {
 		// ignore changes in `search`
 		const navigatingAway = currentLocation.pathname !== nextLocation.pathname;
 
-		return navigatingAway && isDirty && !isGroupSessionPreview;
+		return navigatingAway && isDirty && !isPreview;
 	});
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showConfirmCancelDialog, setShowConfirmCancelDialog] = useState(false);
@@ -341,10 +346,10 @@ export const Component = () => {
 	);
 
 	useEffect(() => {
-		if (isGroupSessionPreview) {
+		if (isPreview) {
 			window.scroll(0, 0);
 		}
-	}, [isGroupSessionPreview]);
+	}, [isPreview]);
 
 	useEffect(() => {
 		if (!debouncedSearchQuery) {
@@ -375,6 +380,8 @@ export const Component = () => {
 
 	if (loaderData === null) {
 		return <NoMatch />;
+	} else if ((isPreview && isNotDraft) || (isEdit && !isSessionEditable)) {
+		return <Navigate to={`/admin/group-sessions/view/${params.groupSessionId}`} replace />;
 	}
 
 	const startAndEndTimeInputs = (
@@ -418,7 +425,19 @@ export const Component = () => {
 		</>
 	);
 
-	const showTopTabs = isNotDraft && !isExternal;
+	const showTopTabs = isNotDraft && !isExternal && (!isDuplicate || isView);
+	const cancelSessionButton = isNotDraft && isSessionEditable && (
+		<Button
+			type="button"
+			variant="danger"
+			className="ms-2"
+			onClick={() => {
+				setShowConfirmCancelDialog(true);
+			}}
+		>
+			Cancel Session
+		</Button>
+	);
 	const formFields = (
 		<Container fluid={showTopTabs}>
 			<ConfirmDialog
@@ -1187,17 +1206,17 @@ export const Component = () => {
 					<div>
 						<Button
 							variant="outline-primary"
-							type={isGroupSessionPreview || isNotDraft ? 'button' : 'submit'}
+							type={isPreview || isNotDraft ? 'button' : 'submit'}
 							value="exit"
 							onClick={() => {
-								if (isGroupSessionPreview) {
+								if (isPreview) {
 									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
 								} else if (isNotDraft) {
-									navigate(`/admin/group-sessions`);
+									navigate(`/admin/group-sessions/view/${params.groupSessionId}`);
 								}
 							}}
 						>
-							{isGroupSessionPreview ? (
+							{isPreview ? (
 								<>
 									<LeftChevron /> Back to Edit
 								</>
@@ -1208,32 +1227,21 @@ export const Component = () => {
 							)}
 						</Button>
 
-						{isNotDraft && canCancel && (
-							<Button
-								type="button"
-								variant="danger"
-								className="ms-4"
-								onClick={() => {
-									setShowConfirmCancelDialog(true);
-								}}
-							>
-								Cancel Session
-							</Button>
-						)}
+						{cancelSessionButton}
 					</div>
 
 					<Button
 						variant="primary"
-						type={isGroupSessionPreview ? 'button' : 'submit'}
+						type={isPreview ? 'button' : 'submit'}
 						onClick={() => {
-							if (!isGroupSessionPreview) {
+							if (!isPreview) {
 								return;
 							}
 
 							setShowConfirmPublishDialog(true);
 						}}
 					>
-						{isGroupSessionPreview ? (
+						{isPreview ? (
 							'Publish'
 						) : (
 							<>
@@ -1296,7 +1304,7 @@ export const Component = () => {
 		/>
 	);
 
-	if (isGroupSessionPreview) {
+	if (isPreview) {
 		const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
 		return (
@@ -1314,9 +1322,27 @@ export const Component = () => {
 				<Container className="py-10">
 					<Row>
 						<Col>
-							<h2 className="mb-1">
-								{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
-							</h2>
+							<div className="d-flex align-items-center justify-content-between">
+								<h2 className="mb-1">
+									{isEdit ? 'Edit' : isView ? 'View' : 'Add'} {isExternal ? 'External' : 'Cobalt'}{' '}
+									Group Session
+								</h2>
+								{isView && isSessionEditable && (
+									<div>
+										<ButtonLink
+											className="text-decoration-none"
+											variant="outline-primary"
+											to={{
+												pathname: `/admin/group-sessions/edit/${params.groupSessionId}`,
+											}}
+										>
+											Edit
+										</ButtonLink>
+
+										{cancelSessionButton}
+									</div>
+								)}
+							</div>
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 								Published group sessions will appear on the{' '}
@@ -1401,7 +1427,9 @@ export const Component = () => {
 								}}
 							/>
 							<Tab.Content>
-								<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
+								<Tab.Pane eventKey="details">
+									{isView ? <GroupSession groupSession={loaderData?.groupSession!} /> : formFields}
+								</Tab.Pane>
 								<Tab.Pane eventKey="registrants">
 									<div className="my-10 d-flex align-items-center">
 										<h3>Registrants</h3>
@@ -1436,7 +1464,7 @@ export const Component = () => {
 					formFields
 				)}
 
-				{footer}
+				{!isView && footer}
 			</Form>
 		</>
 	);

@@ -227,13 +227,17 @@ export const Component = () => {
 									</TableHead>
 									<TableBody>
 										{groupSessions.map((groupSession) => {
+											const linkToEdit =
+												groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 											return (
 												<TableRow key={groupSession.groupSessionId}>
 													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
 													<TableCell>
 														<Link
 															className="text-decoration-none"
-															to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
+															to={`/admin/group-sessions/${
+																linkToEdit ? 'edit' : 'view'
+															}/${groupSession.groupSessionId}`}
 														>
 															{groupSession.title}
 														</Link>
@@ -250,7 +254,21 @@ export const Component = () => {
 															? 'Cobalt'
 															: 'External'}
 													</TableCell>
-													<TableCell>{groupSession.seatsReserved ?? 'N/A'}</TableCell>
+													<TableCell>
+														{groupSession.seatsReserved > 0 ? (
+															<Link
+																className="text-decoration-none"
+																to={{
+																	pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
+																	search: '?tab=registrants',
+																}}
+															>
+																{groupSession.seatsReserved}
+															</Link>
+														) : (
+															groupSession.seatsReserved ?? 'N/A'
+														)}
+													</TableCell>
 													<TableCell>{groupSession.seats ?? 'N/A'}</TableCell>
 													<TableCell className="flex-row align-items-center justify-content-start">
 														{groupSession.groupSessionStatusId ===
