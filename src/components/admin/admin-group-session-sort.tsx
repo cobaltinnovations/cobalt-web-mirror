@@ -26,14 +26,14 @@ const options = [
 		orderBy: GROUP_SESSION_SORT_ORDER.REGISTERED_ASCENDING,
 		title: 'Registered Ascending',
 	},
-	{
-		orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_DESCENDING,
-		title: 'Capacity Descending',
-	},
-	{
-		orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_ASCENDING,
-		title: 'Capacity Ascending',
-	},
+	// {
+	// 	orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_DESCENDING,
+	// 	title: 'Capacity Descending',
+	// },
+	// {
+	// 	orderBy: GROUP_SESSION_SORT_ORDER.CAPACITY_ASCENDING,
+	// 	title: 'Capacity Ascending',
+	// },
 	{
 		orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_DESCENDING,
 		title: 'Start Date Descending',

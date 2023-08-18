@@ -437,11 +437,9 @@ export const Component = () => {
 							Write a clear, brief title to help people quickly understand what your group session is
 							about.
 						</p>
-
 						<p className="mb-4">
-							Include a friendly URL to make the web address at {window.location.host} easier to read. A
-							friendly URL includes 1-3 words separated by hyphens that describe the content of the
-							webpage (ex. tolerating-uncertainty).
+							A friendly URL will be created from the session title. The friendly URL will appear at the
+							end of the regular URL and make the web address easy to read.
 						</p>
 					</>
 				}
@@ -538,10 +536,9 @@ export const Component = () => {
 
 						{!isExternal && (
 							<p>
-								Enter the information for the person who will be running this session. By default, the
-								facilitator will receive an email whenever a user registers or cancels for the group
-								session. You can choose to add a different email address to receive these notifications
-								instead.
+								By default, the facilitator will receive an email whenever a user registers or cancels
+								for the group session. You can choose to add a different email address to receive these
+								notifications instead.
 							</p>
 						)}
 					</>
@@ -1021,18 +1018,17 @@ export const Component = () => {
 					<hr />
 
 					<GroupSessionFormSection
-						title="Confirmation Email"
-						description="Write text for an email that will be sent when someone reserves a seat for this session."
+						title="Confirmation Email (optional)"
+						description="This text will be added to the default confirmation email we send to anyone who reserves a seat for this group session."
 					>
 						<InputHelper
-							label="Confirmation Email Text"
+							label="Confirmation Email Text:"
 							value={formValues.confirmationEmailContent}
 							name="confirmationEmailContent"
 							as="textarea"
 							onChange={({ currentTarget }) => {
 								updateFormValue('confirmationEmailContent', currentTarget.value);
 							}}
-							required
 						/>
 					</GroupSessionFormSection>
 
@@ -1313,112 +1309,116 @@ export const Component = () => {
 	}
 
 	return (
-		<Form
-			className="pb-11"
-			onSubmit={(event) => {
-				event.preventDefault();
-
-				// validate wysiwyg
-				if (!formValues.description) {
-					descriptionWysiwygRef.current?.quill?.focus();
-					descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
-						behavior: 'auto',
-						block: 'center',
-					});
-					return;
-				}
-
-				if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
-					handleSaveForm({ exitAfterSave: true });
-				} else if (!isNotDraft) {
-					handleSaveForm();
-				} else {
-					setShowConfirmPublishDialog(true);
-				}
-			}}
-		>
-			{confirmPublishDialog}
-
-			<Container className="py-10">
-				<Row>
-					<Col>
-						<h2 className="mb-1">
-							{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
-						</h2>
-						{!isNotDraft && (
+		<>
+			<Container fluid className="border-bottom">
+				<Container className="py-10">
+					<Row>
+						<Col>
+							<h2 className="mb-1">
+								{isEdit ? 'Edit' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group Session
+							</h2>
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 								Published group sessions will appear on the{' '}
-								<Link to="/group-sessions" target="_blank">
+								<Link className="fw-normal" to="/group-sessions" target="_blank">
 									Group Sessions
 								</Link>{' '}
 								page of Cobalt.
 							</p>
-						)}
-					</Col>
-				</Row>
+						</Col>
+					</Row>
+				</Container>
 			</Container>
 
-			{showTopTabs ? (
-				<Container className="py-10">
-					<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
-						<TabBar
-							key="mhic-orders-overview-tabbar"
-							className="mb-8"
-							value={selectedTab}
-							tabs={[
-								{
-									value: 'details',
-									title: 'Details',
-								},
-								{
-									value: 'registrants',
-									title: `Registrants (${loaderData?.groupSession?.seatsReserved}/${loaderData?.groupSession?.seats})`,
-								},
-							]}
-							onTabClick={(value) => {
-								searchParams.set('tab', value);
-								setSearchParams(searchParams);
-							}}
-						/>
-						<Tab.Content>
-							<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
-							<Tab.Pane eventKey="registrants">
-								<div className="my-10 d-flex align-items-center">
-									<h3>Registrants</h3>
+			<Form
+				className="pb-11"
+				onSubmit={(event) => {
+					event.preventDefault();
 
-									<Button
-										variant="light"
-										className="ms-4 text-decoration-none"
-										disabled={!registrantDownloadLink}
-										href={registrantDownloadLink || undefined}
-									>
-										<DownloadIcon className="text-primary me-2" />
-										Email Addresses
-									</Button>
-								</div>
+					// validate wysiwyg
+					if (!formValues.description) {
+						descriptionWysiwygRef.current?.quill?.focus();
+						descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
+							behavior: 'auto',
+							block: 'center',
+						});
+						return;
+					}
 
-								{loaderData?.groupSessionReservations.map((reservation) => {
-									return (
-										<div key={reservation.groupSessionReservationId}>
-											<p className="fw-bold">{reservation.name ?? 'Anonymous'}</p>
-											<a href={'mailto:' + reservation.emailAddress}>
-												{reservation.emailAddress}
-											</a>
-											<hr className="my-4" />
-										</div>
-									);
-								})}
-							</Tab.Pane>
-						</Tab.Content>
-					</Tab.Container>
-				</Container>
-			) : (
-				formFields
-			)}
+					if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
+						handleSaveForm({ exitAfterSave: true });
+					} else if (!isNotDraft) {
+						handleSaveForm();
+					} else {
+						setShowConfirmPublishDialog(true);
+					}
+				}}
+			>
+				{confirmPublishDialog}
 
-			{footer}
-		</Form>
+				{showTopTabs ? (
+					<Container className="py-10">
+						<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
+							<TabBar
+								key="mhic-orders-overview-tabbar"
+								className="mb-8"
+								value={selectedTab}
+								tabs={[
+									{
+										value: 'details',
+										title: 'Details',
+									},
+									{
+										value: 'registrants',
+										title: `Registrants (${loaderData?.groupSession?.seatsReserved ?? '0'}/${
+											loaderData?.groupSession?.seats ?? '0'
+										})`,
+									},
+								]}
+								onTabClick={(value) => {
+									searchParams.set('tab', value);
+									setSearchParams(searchParams);
+								}}
+							/>
+							<Tab.Content>
+								<Tab.Pane eventKey="details">{formFields}</Tab.Pane>
+								<Tab.Pane eventKey="registrants">
+									<div className="my-10 d-flex align-items-center">
+										<h3>Registrants</h3>
+
+										<Button
+											variant="light"
+											className="ms-4 text-decoration-none"
+											disabled={!registrantDownloadLink}
+											href={registrantDownloadLink || undefined}
+										>
+											<DownloadIcon className="text-primary me-2" />
+											Email Addresses
+										</Button>
+									</div>
+
+									{loaderData?.groupSessionReservations.map((reservation) => {
+										return (
+											<div key={reservation.groupSessionReservationId}>
+												<p className="fw-bold">{reservation.name ?? 'Anonymous'}</p>
+												<a href={'mailto:' + reservation.emailAddress}>
+													{reservation.emailAddress}
+												</a>
+												<hr className="my-4" />
+											</div>
+										);
+									})}
+								</Tab.Pane>
+							</Tab.Content>
+						</Tab.Container>
+					</Container>
+				) : (
+					formFields
+				)}
+
+				{footer}
+			</Form>
+		</>
 	);
 };
 

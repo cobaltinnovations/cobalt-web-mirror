@@ -212,16 +212,16 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Date Added</TableCell>
+											<TableCell header>Session Date and Time</TableCell>
 											<TableCell header>Session</TableCell>
 											<TableCell header>Facilitator</TableCell>
 											<TableCell header>Scheduling</TableCell>
-											<TableCell header>Registered</TableCell>
+											<TableCell header>Registrations</TableCell>
 											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Visible</TableCell>
 											<TableCell header colSpan={2}>
-												Start Date
+												Date Added
 											</TableCell>
 										</TableRow>
 									</TableHead>
@@ -229,7 +229,7 @@ export const Component = () => {
 										{groupSessions.map((groupSession) => {
 											return (
 												<TableRow key={groupSession.groupSessionId}>
-													<TableCell>{groupSession.createdDateDescription}</TableCell>
+													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
 													<TableCell>
 														<Link
 															className="text-decoration-none"
@@ -291,7 +291,7 @@ export const Component = () => {
 															<span className="text-danger">No</span>
 														)}
 													</TableCell>
-													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
+													<TableCell>{groupSession.createdDateDescription}</TableCell>
 													<TableCell>
 														<GroupSessionTableDropdown
 															groupSession={groupSession}
