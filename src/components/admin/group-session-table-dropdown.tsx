@@ -24,6 +24,8 @@ interface GroupSessionTableDropdownProps {
 export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: GroupSessionTableDropdownProps) => {
 	const navigate = useNavigate();
 	const isNew = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
+	const isArchived = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.ARCHIVED;
+	const isCanceled = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.CANCELED;
 
 	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 
@@ -41,6 +43,8 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 		groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.ADDED;
 
 	const canDelete = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.CANCELED;
+
+	const canViewOnCobalt = !isNew && !isArchived && !isCanceled;
 
 	return (
 		<Dropdown>
@@ -73,7 +77,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 					</Dropdown.Item>
 				)}
 				<Dropdown.Divider />
-				{isNew ? (
+				{isNew && (
 					<Dropdown.Item
 						className="d-flex align-items-center"
 						as={Link}
@@ -83,7 +87,8 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
 						Preview
 					</Dropdown.Item>
-				) : (
+				)}
+				{canViewOnCobalt && (
 					<Dropdown.Item
 						className="d-flex align-items-center"
 						as={Link}
