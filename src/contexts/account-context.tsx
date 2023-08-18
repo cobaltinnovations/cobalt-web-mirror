@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react';
 
-import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId } from '@/lib/models';
+import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId, ROLE_ID } from '@/lib/models';
 import { accountService } from '@/lib/services';
 
 import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/institution';
@@ -83,18 +83,8 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	);
 
 	const hasAdminNavCapabilities = useMemo(() => {
-		return !!(
-			institutionCapabilities?.viewNavAdminMyContent ||
-			institutionCapabilities?.viewNavAdminAvailableContent ||
-			institutionCapabilities?.viewNavAdminGroupSession ||
-			institutionCapabilities?.viewNavAdminReports
-		);
-	}, [
-		institutionCapabilities?.viewNavAdminAvailableContent,
-		institutionCapabilities?.viewNavAdminGroupSession,
-		institutionCapabilities?.viewNavAdminMyContent,
-		institutionCapabilities?.viewNavAdminReports,
-	]);
+		return accountResponse?.account.roleId === ROLE_ID.ADMINISTRATOR;
+	}, [accountResponse?.account.roleId]);
 
 	const value = {
 		account: accountResponse?.account,
