@@ -229,12 +229,14 @@ export const Component = () => {
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 	const reminderWysiwygRef = useRef<WysiwygRef>(null);
 	const followupWysiwygRef = useRef<WysiwygRef>(null);
-	const isNotDraft =
-		!!loaderData?.groupSession && loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
 	const isPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
 	const isView = params.action === 'view';
+	const isNotDraft =
+		!isDuplicate &&
+		!!loaderData?.groupSession &&
+		loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
 
 	const isSessionEditable =
 		loaderData?.groupSession?.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||
@@ -426,8 +428,7 @@ export const Component = () => {
 		</>
 	);
 
-	const showTopTabs = isView && !isExternal;
-	const cancelSessionButton = isNotDraft && isSessionEditable && (
+	const cancelSessionButton = !isDuplicate && isNotDraft && isSessionEditable && (
 		<Button
 			type="button"
 			variant="danger"
@@ -440,7 +441,7 @@ export const Component = () => {
 		</Button>
 	);
 	const formFields = (
-		<Container fluid={showTopTabs}>
+		<Container>
 			<ConfirmDialog
 				size="lg"
 				show={navigationBlocker.state === 'blocked'}
@@ -1214,7 +1215,7 @@ export const Component = () => {
 							onClick={() => {
 								if (isPreview) {
 									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-								} else {
+								} else if (isNotDraft) {
 									navigate(`/admin/group-sessions`);
 								}
 							}}
@@ -1362,7 +1363,7 @@ export const Component = () => {
 		</Container>
 	);
 
-	if (showTopTabs) {
+	if (isView && !isExternal) {
 		return (
 			<>
 				{pageTitle}
@@ -1422,6 +1423,14 @@ export const Component = () => {
 						</Tab.Content>
 					</Tab.Container>
 				</Container>
+			</>
+		);
+	} else if (isView) {
+		return (
+			<>
+				{pageTitle}
+
+				{details}
 			</>
 		);
 	}
