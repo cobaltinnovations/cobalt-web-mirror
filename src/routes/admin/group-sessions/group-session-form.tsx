@@ -479,7 +479,7 @@ export const Component = () => {
 					required
 					name="title"
 					value={formValues.title}
-					disabled={isExternal ? !isDuplicate && isNotDraft : isEdit && hasReservations}
+					disabled={isEdit && hasReservations}
 					onChange={({ currentTarget }) => {
 						updateFormValue('title', currentTarget.value);
 					}}
@@ -491,9 +491,7 @@ export const Component = () => {
 					name="urlName"
 					error={urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined}
 					value={formValues.urlName}
-					disabled={
-						!formValues.title || (isExternal ? !isDuplicate && isNotDraft : isEdit && hasReservations)
-					}
+					disabled={!formValues.title || (isEdit && hasReservations)}
 					onChange={({ currentTarget }) => {
 						setUrlNameSetByUser(true);
 						updateFormValue('urlName', currentTarget.value);
