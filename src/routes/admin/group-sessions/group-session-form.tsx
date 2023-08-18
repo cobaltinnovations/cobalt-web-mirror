@@ -225,6 +225,8 @@ export const Component = () => {
 	const selectedTab = searchParams.get('tab') ?? 'details';
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
+	const reminderWysiwygRef = useRef<WysiwygRef>(null);
+	const followupWysiwygRef = useRef<WysiwygRef>(null);
 	const isNotDraft = loaderData?.groupSession?.groupSessionStatusId !== SESSION_STATUS.NEW;
 	const isGroupSessionPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
@@ -1021,13 +1023,11 @@ export const Component = () => {
 						title="Confirmation Email (optional)"
 						description="This text will be added to the default confirmation email we send to anyone who reserves a seat for this group session."
 					>
-						<InputHelper
-							label="Confirmation Email Text:"
-							value={formValues.confirmationEmailContent}
-							name="confirmationEmailContent"
-							as="textarea"
-							onChange={({ currentTarget }) => {
-								updateFormValue('confirmationEmailContent', currentTarget.value);
+						<Wysiwyg
+							className="bg-white"
+							initialValue={loaderData.groupSession?.confirmationEmailContent ?? ''}
+							onChange={(nextValue) => {
+								updateFormValue('confirmationEmailContent', nextValue);
 							}}
 						/>
 					</GroupSessionFormSection>
@@ -1052,15 +1052,13 @@ export const Component = () => {
 								updateFormValue('sendReminderEmail', currentTarget.checked);
 							}}
 						>
-							<InputHelper
-								label="Reminder Email Text"
-								value={formValues.reminderEmailContent}
-								name="reminderEmailContent"
-								as="textarea"
-								onChange={({ currentTarget }) => {
-									updateFormValue('reminderEmailContent', currentTarget.value);
+							<Wysiwyg
+								ref={reminderWysiwygRef}
+								className="bg-white"
+								initialValue={loaderData.groupSession?.reminderEmailContent ?? ''}
+								onChange={(nextValue) => {
+									updateFormValue('reminderEmailContent', nextValue);
 								}}
-								required={formValues.sendReminderEmail}
 							/>
 						</ToggledInput>
 
@@ -1125,16 +1123,13 @@ export const Component = () => {
 								</span>
 							</p>
 
-							<InputHelper
-								label="Follow-up Email Text"
-								value={formValues.followupEmailContent}
-								name="followupEmailContent"
-								as="textarea"
-								onChange={({ currentTarget }) => {
-									updateFormValue('followupEmailContent', currentTarget.value);
+							<Wysiwyg
+								ref={followupWysiwygRef}
+								className="mb-3 bg-white"
+								initialValue={loaderData.groupSession?.followupEmailContent ?? ''}
+								onChange={(nextValue) => {
+									updateFormValue('followupEmailContent', nextValue);
 								}}
-								required={formValues.sendFollowupEmail}
-								className="mb-3"
 							/>
 
 							<InputHelper
@@ -1335,10 +1330,30 @@ export const Component = () => {
 				onSubmit={(event) => {
 					event.preventDefault();
 
-					// validate wysiwyg
+					// validate description wysiwyg
 					if (!formValues.description) {
 						descriptionWysiwygRef.current?.quill?.focus();
 						descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
+							behavior: 'auto',
+							block: 'center',
+						});
+						return;
+					}
+
+					// validate reminder email wysiwyg
+					if (formValues.sendReminderEmail && !formValues.reminderEmailContent) {
+						reminderWysiwygRef.current?.quill?.focus();
+						reminderWysiwygRef.current?.quillRef.current?.scrollIntoView({
+							behavior: 'auto',
+							block: 'center',
+						});
+						return;
+					}
+
+					// validate followup email wysiwyg
+					if (formValues.sendFollowupEmail && !formValues.followupEmailContent) {
+						followupWysiwygRef.current?.quill?.focus();
+						followupWysiwygRef.current?.quillRef.current?.scrollIntoView({
 							behavior: 'auto',
 							block: 'center',
 						});

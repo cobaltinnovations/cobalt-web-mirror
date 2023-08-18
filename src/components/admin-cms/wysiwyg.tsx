@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import 'quill/dist/quill.snow.css';
 import { useQuill } from 'react-quilljs';
@@ -25,7 +25,7 @@ export type WysiwygRef = { quill: Quill | undefined; quillRef: React.RefObject<H
 
 const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 	({ initialValue, onChange, readOnly = false, className, ...props }, ref) => {
-		const didInitRef = useRef(false);
+		const [didInit, setDidInit] = useState(false);
 		const { quill, quillRef } = useQuill({
 			theme: 'snow',
 			modules,
@@ -40,7 +40,7 @@ const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 		useEffect(() => {
 			if (quill && onChange) {
 				const handleChange = () => {
-					if (!didInitRef.current) {
+					if (!didInit) {
 						return;
 					}
 
@@ -53,16 +53,16 @@ const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 					quill.off('text-change', handleChange);
 				};
 			}
-		}, [onChange, quill]);
+		}, [didInit, onChange, quill]);
 
 		useEffect(() => {
 			if (quill && typeof initialValue === 'string') {
 				quill.clipboard.dangerouslyPasteHTML(initialValue);
-				didInitRef.current = true;
+				setDidInit(true);
 			}
 		}, [quill, initialValue]);
 
-		return <div style={{ display: didInitRef.current ? 'block' : 'none' }} className={className} ref={quillRef} />;
+		return <div style={{ display: didInit ? 'block' : 'none' }} className={className} ref={quillRef} />;
 	}
 );
 
