@@ -13,6 +13,7 @@ import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-x-close.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
+import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
 interface GroupSessionTableDropdownProps {
 	groupSession: GroupSessionModel;
@@ -22,7 +23,9 @@ interface GroupSessionTableDropdownProps {
 
 export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: GroupSessionTableDropdownProps) => {
 	const navigate = useNavigate();
-	const canPreview = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
+	const isNew = groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
+
+	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 
 	const canEdit =
 		groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW ||
@@ -49,21 +52,6 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 				<MoreIcon className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
-				{canPreview && (
-					<>
-						<Dropdown.Item
-							className="d-flex align-items-center"
-							as={Link}
-							target="_blank"
-							to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
-						>
-							<ExternalIcon className="me-2 text-n500" width={24} height={24} />
-							Preview
-						</Dropdown.Item>
-
-						<Dropdown.Divider />
-					</>
-				)}
 				{canEdit && (
 					<Dropdown.Item
 						className="d-flex align-items-center"
@@ -85,31 +73,45 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 					</Dropdown.Item>
 				)}
 				<Dropdown.Divider />
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					as={Link}
-					to={`/group-sessions/${groupSession.urlName}`}
-					state={{
-						navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
-					}}
-					target="_blank"
-				>
-					<ExternalIcon className="me-2 text-n500" width={24} height={24} />
-					View on Cobalt
-				</Dropdown.Item>
+				{isNew ? (
+					<Dropdown.Item
+						className="d-flex align-items-center"
+						as={Link}
+						target="_blank"
+						to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
+					>
+						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						Preview
+					</Dropdown.Item>
+				) : (
+					<Dropdown.Item
+						className="d-flex align-items-center"
+						as={Link}
+						to={`/group-sessions/${groupSession.urlName}`}
+						state={{
+							navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
+						}}
+						target="_blank"
+					>
+						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						View on Cobalt
+					</Dropdown.Item>
+				)}
 
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					onClick={() => {
-						navigate({
-							pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
-							search: '?tab=registrants',
-						});
-					}}
-				>
-					<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />
-					View Registrants
-				</Dropdown.Item>
+				{!isNew && !isExternal && (
+					<Dropdown.Item
+						className="d-flex align-items-center"
+						onClick={() => {
+							navigate({
+								pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
+								search: '?tab=registrants',
+							});
+						}}
+					>
+						<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />
+						View Registrants
+					</Dropdown.Item>
+				)}
 
 				{(canCancel || canDelete) && <Dropdown.Divider />}
 
