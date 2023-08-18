@@ -1307,6 +1307,7 @@ export const Component = () => {
 	if (isPreview) {
 		const submission = prepareGroupSessionSubmission(formValues, isExternal);
 
+		console.log('submission', { submission });
 		return (
 			<div className="pb-11">
 				{confirmPublishDialog}
@@ -1343,14 +1344,17 @@ export const Component = () => {
 									</div>
 								)}
 							</div>
-							<p className="mb-0 fs-large">
-								Complete all <span className="text-danger">*required fields</span> before publishing.
-								Published group sessions will appear on the{' '}
-								<Link className="fw-normal" to="/group-sessions" target="_blank">
-									Group Sessions
-								</Link>{' '}
-								page of Cobalt.
-							</p>
+
+							{!isView && (
+								<p className="mb-0 fs-large">
+									Complete all <span className="text-danger">*required fields</span> before
+									publishing. Published group sessions will appear on the{' '}
+									<Link className="fw-normal" to="/group-sessions" target="_blank">
+										Group Sessions
+									</Link>{' '}
+									page of Cobalt.
+								</p>
+							)}
 						</Col>
 					</Row>
 				</Container>
