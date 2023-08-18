@@ -244,7 +244,12 @@ export const Component = () => {
 	);
 
 	const [isDirty, setIsDirty] = useState(false);
-	const navigationBlocker = useBlocker(!isGroupSessionPreview && isDirty);
+	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
+		// ignore changes in `search`
+		const navigatingAway = currentLocation.pathname !== nextLocation.pathname;
+
+		return navigatingAway && isDirty && !isGroupSessionPreview;
+	});
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showConfirmCancelDialog, setShowConfirmCancelDialog] = useState(false);
 	const [urlNameSetByUser, setUrlNameSetByUser] = useState(!isDuplicate && !!loaderData?.groupSession?.urlName);
