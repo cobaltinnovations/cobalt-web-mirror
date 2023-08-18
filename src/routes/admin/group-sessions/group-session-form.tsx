@@ -1305,13 +1305,10 @@ export const Component = () => {
 	);
 
 	if (isPreview) {
-		const submission = prepareGroupSessionSubmission(formValues, isExternal);
-
-		console.log('submission', { submission });
 		return (
 			<div className="pb-11">
 				{confirmPublishDialog}
-				<GroupSession groupSession={submission} />
+				<GroupSession groupSession={loaderData?.groupSession!} />
 				{footer}
 			</div>
 		);
