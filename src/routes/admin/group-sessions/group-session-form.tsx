@@ -304,9 +304,10 @@ export const Component = () => {
 				submission.groupSessionStatusId = GROUP_SESSION_STATUS_ID.NEW;
 			}
 
-			const promise = !isEdit
-				? groupSessionsService.createGroupSession(submission).fetch()
-				: groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch();
+			const promise = isEdit
+				? groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch()
+				: groupSessionsService.createGroupSession(submission).fetch();
+
 			setIsDirty(false);
 
 			promise
@@ -425,7 +426,7 @@ export const Component = () => {
 		</>
 	);
 
-	const showTopTabs = isNotDraft && !isExternal && (!isDuplicate || isView);
+	const showTopTabs = isView && !isExternal;
 	const cancelSessionButton = isNotDraft && isSessionEditable && (
 		<Button
 			type="button"
@@ -1171,6 +1172,8 @@ export const Component = () => {
 		</Container>
 	);
 
+	const details = isPreview || isView ? <GroupSession groupSession={loaderData?.groupSession!} /> : formFields;
+
 	const footer = (
 		<div className={classes.formFooter}>
 			<ConfirmDialog
@@ -1211,8 +1214,8 @@ export const Component = () => {
 							onClick={() => {
 								if (isPreview) {
 									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-								} else if (isNotDraft) {
-									navigate(`/admin/group-sessions/view/${params.groupSessionId}`);
+								} else {
+									navigate(`/admin/group-sessions`);
 								}
 							}}
 						>
@@ -1308,54 +1311,124 @@ export const Component = () => {
 		return (
 			<div className="pb-11">
 				{confirmPublishDialog}
-				<GroupSession groupSession={loaderData?.groupSession!} />
+
+				{details}
+
 				{footer}
 			</div>
 		);
 	}
 
+	const pageTitle = (
+		<Container fluid className="border-bottom">
+			<Container className="py-10">
+				<Row>
+					<Col>
+						<div className="d-flex align-items-center justify-content-between">
+							<h2 className="mb-1">
+								{isEdit ? 'Edit' : isView ? 'View' : 'Add'} {isExternal ? 'External' : 'Cobalt'} Group
+								Session
+							</h2>
+							{isView && isSessionEditable && (
+								<div>
+									<ButtonLink
+										className="text-decoration-none"
+										variant="outline-primary"
+										to={{
+											pathname: `/admin/group-sessions/edit/${params.groupSessionId}`,
+										}}
+									>
+										Edit
+									</ButtonLink>
+
+									{cancelSessionButton}
+								</div>
+							)}
+						</div>
+
+						{!isView && (
+							<p className="mb-0 fs-large">
+								Complete all <span className="text-danger">*required fields</span> before publishing.
+								Published group sessions will appear on the{' '}
+								<Link className="fw-normal" to="/group-sessions" target="_blank">
+									Group Sessions
+								</Link>{' '}
+								page of Cobalt.
+							</p>
+						)}
+					</Col>
+				</Row>
+			</Container>
+		</Container>
+	);
+
+	if (showTopTabs) {
+		return (
+			<>
+				{pageTitle}
+
+				<Container className="py-10">
+					<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
+						<TabBar
+							key="mhic-orders-overview-tabbar"
+							className="mb-8"
+							value={selectedTab}
+							tabs={[
+								{
+									value: 'details',
+									title: 'Details',
+								},
+								{
+									value: 'registrants',
+									title: `Registrants (${loaderData?.groupSession?.seatsReserved ?? '0'}/${
+										loaderData?.groupSession?.seats ?? '0'
+									})`,
+								},
+							]}
+							onTabClick={(value) => {
+								searchParams.set('tab', value);
+								setSearchParams(searchParams);
+							}}
+						/>
+						<Tab.Content>
+							<Tab.Pane eventKey="details">{details}</Tab.Pane>
+							<Tab.Pane eventKey="registrants">
+								<div className="my-10 d-flex align-items-center">
+									<h3>Registrants</h3>
+
+									<Button
+										variant="light"
+										className="ms-4 text-decoration-none"
+										disabled={!registrantDownloadLink}
+										href={registrantDownloadLink || undefined}
+									>
+										<DownloadIcon className="text-primary me-2" />
+										Email Addresses
+									</Button>
+								</div>
+
+								{loaderData?.groupSessionReservations.map((reservation) => {
+									return (
+										<div key={reservation.groupSessionReservationId}>
+											<p className="fw-bold">{reservation.name ?? 'Anonymous'}</p>
+											<a href={'mailto:' + reservation.emailAddress}>
+												{reservation.emailAddress}
+											</a>
+											<hr className="my-4" />
+										</div>
+									);
+								})}
+							</Tab.Pane>
+						</Tab.Content>
+					</Tab.Container>
+				</Container>
+			</>
+		);
+	}
+
 	return (
 		<>
-			<Container fluid className="border-bottom">
-				<Container className="py-10">
-					<Row>
-						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<h2 className="mb-1">
-									{isEdit ? 'Edit' : isView ? 'View' : 'Add'} {isExternal ? 'External' : 'Cobalt'}{' '}
-									Group Session
-								</h2>
-								{isView && isSessionEditable && (
-									<div>
-										<ButtonLink
-											className="text-decoration-none"
-											variant="outline-primary"
-											to={{
-												pathname: `/admin/group-sessions/edit/${params.groupSessionId}`,
-											}}
-										>
-											Edit
-										</ButtonLink>
-
-										{cancelSessionButton}
-									</div>
-								)}
-							</div>
-
-							{!isView && (
-								<p className="mb-0 fs-large">
-									Complete all <span className="text-danger">*required fields</span> before
-									publishing. Published group sessions will appear on the{' '}
-									<Link className="fw-normal" to="/group-sessions" target="_blank">
-										Group Sessions
-									</Link>{' '}
-									page of Cobalt.
-								</p>
-							)}
-						</Col>
-					</Row>
-				</Container>
-			</Container>
+			{pageTitle}
 
 			<Form
 				className="pb-11"
@@ -1403,69 +1476,9 @@ export const Component = () => {
 			>
 				{confirmPublishDialog}
 
-				{showTopTabs ? (
-					<Container className="py-10">
-						<Tab.Container id="overview-tabs" defaultActiveKey="details" activeKey={selectedTab}>
-							<TabBar
-								key="mhic-orders-overview-tabbar"
-								className="mb-8"
-								value={selectedTab}
-								tabs={[
-									{
-										value: 'details',
-										title: 'Details',
-									},
-									{
-										value: 'registrants',
-										title: `Registrants (${loaderData?.groupSession?.seatsReserved ?? '0'}/${
-											loaderData?.groupSession?.seats ?? '0'
-										})`,
-									},
-								]}
-								onTabClick={(value) => {
-									searchParams.set('tab', value);
-									setSearchParams(searchParams);
-								}}
-							/>
-							<Tab.Content>
-								<Tab.Pane eventKey="details">
-									{isView ? <GroupSession groupSession={loaderData?.groupSession!} /> : formFields}
-								</Tab.Pane>
-								<Tab.Pane eventKey="registrants">
-									<div className="my-10 d-flex align-items-center">
-										<h3>Registrants</h3>
+				{details}
 
-										<Button
-											variant="light"
-											className="ms-4 text-decoration-none"
-											disabled={!registrantDownloadLink}
-											href={registrantDownloadLink || undefined}
-										>
-											<DownloadIcon className="text-primary me-2" />
-											Email Addresses
-										</Button>
-									</div>
-
-									{loaderData?.groupSessionReservations.map((reservation) => {
-										return (
-											<div key={reservation.groupSessionReservationId}>
-												<p className="fw-bold">{reservation.name ?? 'Anonymous'}</p>
-												<a href={'mailto:' + reservation.emailAddress}>
-													{reservation.emailAddress}
-												</a>
-												<hr className="my-4" />
-											</div>
-										);
-									})}
-								</Tab.Pane>
-							</Tab.Content>
-						</Tab.Container>
-					</Container>
-				) : (
-					formFields
-				)}
-
-				{!isView && footer}
+				{footer}
 			</Form>
 		</>
 	);
@@ -1610,13 +1623,28 @@ function prepareGroupSessionSubmission(
 		delete groupSessionSubmission.singleSessionFlag;
 		delete groupSessionSubmission.dateTimeDescription;
 
-		if (!groupSessionSubmission.targetEmailAddress) {
+		if (
+			!groupSessionSubmission.differentEmailAddressForNotifications ||
+			!groupSessionSubmission.targetEmailAddress
+		) {
 			delete groupSessionSubmission.targetEmailAddress;
 		}
-	}
 
-	if (!groupSessionSubmission.differentEmailAddressForNotifications) {
-		delete groupSessionSubmission.targetEmailAddress;
+		if (!groupSessionSubmission.sendReminderEmail) {
+			delete groupSessionSubmission.reminderEmailContent;
+		}
+
+		if (!groupSessionSubmission.sendFollowupEmail) {
+			delete groupSessionSubmission.followupDayOffset;
+			delete groupSessionSubmission.followupTimeOfDay;
+			delete groupSessionSubmission.followupEmailContent;
+			delete groupSessionSubmission.followupEmailSurveyUrl;
+		} else {
+			groupSessionSubmission.followupTimeOfDay = moment(
+				groupSessionSubmission.followupTimeOfDay,
+				'hh:mm A'
+			).format('HH:mm');
+		}
 	}
 
 	if (!groupSessionSubmission.groupSessionCollectionId) {
@@ -1625,25 +1653,6 @@ function prepareGroupSessionSubmission(
 
 	if (!groupSessionSubmission.imageUrl) {
 		delete groupSessionSubmission.imageUrl;
-	}
-
-	if (!groupSessionSubmission.screeningFlowId) {
-		delete groupSessionSubmission.screeningFlowId;
-	}
-
-	if (!groupSessionSubmission.sendReminderEmail) {
-		delete groupSessionSubmission.reminderEmailContent;
-	}
-
-	if (!groupSessionSubmission.sendFollowupEmail) {
-		delete groupSessionSubmission.followupDayOffset;
-		delete groupSessionSubmission.followupTimeOfDay;
-		delete groupSessionSubmission.followupEmailContent;
-		delete groupSessionSubmission.followupEmailSurveyUrl;
-	} else {
-		groupSessionSubmission.followupTimeOfDay = moment(groupSessionSubmission.followupTimeOfDay, 'hh:mm A').format(
-			'HH:mm'
-		);
 	}
 
 	return {
