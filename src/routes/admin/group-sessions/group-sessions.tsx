@@ -212,28 +212,32 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Date Added</TableCell>
+											<TableCell header>Session Date and Time</TableCell>
 											<TableCell header>Session</TableCell>
 											<TableCell header>Facilitator</TableCell>
 											<TableCell header>Scheduling</TableCell>
-											<TableCell header>Registered</TableCell>
+											<TableCell header>Registrations</TableCell>
 											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Visible</TableCell>
 											<TableCell header colSpan={2}>
-												Start Date
+												Date Added
 											</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
 										{groupSessions.map((groupSession) => {
+											const linkToEdit =
+												groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 											return (
 												<TableRow key={groupSession.groupSessionId}>
-													<TableCell>{groupSession.createdDateDescription}</TableCell>
+													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
 													<TableCell>
 														<Link
 															className="text-decoration-none"
-															to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
+															to={`/admin/group-sessions/${
+																linkToEdit ? 'edit' : 'view'
+															}/${groupSession.groupSessionId}`}
 														>
 															{groupSession.title}
 														</Link>
@@ -250,7 +254,21 @@ export const Component = () => {
 															? 'Cobalt'
 															: 'External'}
 													</TableCell>
-													<TableCell>{groupSession.seatsReserved ?? 'N/A'}</TableCell>
+													<TableCell>
+														{groupSession.seatsReserved > 0 ? (
+															<Link
+																className="text-decoration-none"
+																to={{
+																	pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
+																	search: '?tab=registrants',
+																}}
+															>
+																{groupSession.seatsReserved}
+															</Link>
+														) : (
+															groupSession.seatsReserved ?? 'N/A'
+														)}
+													</TableCell>
 													<TableCell>{groupSession.seats ?? 'N/A'}</TableCell>
 													<TableCell className="flex-row align-items-center justify-content-start">
 														{groupSession.groupSessionStatusId ===
@@ -291,7 +309,7 @@ export const Component = () => {
 															<span className="text-danger">No</span>
 														)}
 													</TableCell>
-													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
+													<TableCell>{groupSession.createdDateDescription}</TableCell>
 													<TableCell>
 														<GroupSessionTableDropdown
 															groupSession={groupSession}
