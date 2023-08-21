@@ -11,7 +11,7 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
@@ -555,7 +555,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'stats-dashboard',
-						element: <StatsDashboard />,
+						element: <RedirectToAdminPathOrRender pathname="analytics" element={<NoMatch />} />,
 					},
 					{
 						// legacy/backwards compatibility
@@ -718,9 +718,35 @@ export const routes: RouteObject[] = [
 								element: <>TODO: Scheduling</>,
 							},
 							{
-								id: 'admin-analytics',
+								id: 'admin-analytics-layout',
 								path: 'analytics',
-								element: <>TODO: Analytics</>,
+								lazy: () => import('@/routes/admin/analytics/layout'),
+								children: [
+									{
+										index: true,
+										element: <Navigate to="overview" />,
+									},
+									{
+										id: 'admin-analytics-overview',
+										path: 'overview',
+										lazy: () => import('@/routes/admin/analytics/overview'),
+									},
+									{
+										id: 'admin-analytics-assessments-and-appointments',
+										path: 'assessments-and-appointments',
+										lazy: () => import('@/routes/admin/analytics/assessments-and-appointments'),
+									},
+									{
+										id: 'admin-analytics-group-sessions',
+										path: 'group-sessions',
+										lazy: () => import('@/routes/admin/analytics/group-sessions'),
+									},
+									{
+										id: 'admin-analytics-resources-and-topics',
+										path: 'resources-and-topics',
+										lazy: () => import('@/routes/admin/analytics/resources-and-topics'),
+									},
+								],
 							},
 							{
 								id: 'admin-debug',

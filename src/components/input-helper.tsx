@@ -59,7 +59,8 @@ const useInputHelperStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 0,
 		display: 'block',
 		appearance: 'none',
-		padding: ({ as }: UseStylesProps) => (as === 'textarea' ? '25px 16px 20px' : '20px 16px 6px'),
+		padding: ({ as }: UseStylesProps) =>
+			as === 'textarea' ? '25px 16px 20px' : as === 'select' ? '20px 40px 6px 16px' : '20px 16px 6px',
 		backgroundColor: 'transparent',
 		'&:focus': {
 			outline: 'none',

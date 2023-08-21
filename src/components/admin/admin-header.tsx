@@ -187,13 +187,13 @@ export const AdminHeader = () => {
 			// 	title: 'Scheduling',
 			// 	active: !!schedulingMatch,
 			// },
-			// {
-			// 	testId: '',
-			// 	navigationItemId: 'ANALYTICS',
-			// 	to: '/admin/analytics',
-			// 	title: 'Analytics',
-			// 	active: !!analyticsMatch,
-			// },
+			{
+				testId: '',
+				navigationItemId: 'ANALYTICS',
+				to: '/admin/analytics',
+				title: 'Analytics',
+				active: !!analyticsMatch,
+			},
 			...(config.COBALT_WEB_SHOW_DEBUG === 'true'
 				? [
 						{
@@ -207,6 +207,7 @@ export const AdminHeader = () => {
 				: []),
 		],
 		[
+			analyticsMatch,
 			availableContentMatch,
 			debugMatch,
 			groupSessionsMatch,
