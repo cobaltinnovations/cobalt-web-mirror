@@ -1,9 +1,13 @@
 import InputHelper from '@/components/input-helper';
+import Loader from '@/components/loader';
 import TabBar from '@/components/tab-bar';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import { LoaderFunctionArgs, Outlet, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { ArcElement, Tooltip, Legend, Chart as ChartJS } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 type AdminAnalyticsLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -80,8 +84,6 @@ export const Component = () => {
 		startDate: dateOptions[0].startDate,
 		endDate: dateOptions[0].endDate,
 	});
-
-	console.log({ dateOptions });
 
 	const startDate = searchParams.get('startDate');
 	const endDate = searchParams.get('endDate');
@@ -174,7 +176,9 @@ export const Component = () => {
 							]}
 						/>
 						<Tab.Content>
-							<Outlet />
+							<Suspense fallback={<Loader />}>
+								<Outlet />
+							</Suspense>
 						</Tab.Content>
 					</Tab.Container>
 				</Col>
