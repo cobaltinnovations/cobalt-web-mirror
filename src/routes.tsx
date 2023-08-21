@@ -200,38 +200,14 @@ const RedirectToGroupSessionDetail = () => {
 	return <Navigate to="/group-sessions" replace />;
 };
 
-const SupportEnabledRoutes = () => {
-	const { institution } = useAccount();
+const ToggledOutlet = ({ isEnabled }: { isEnabled: (accountContext: ReturnType<typeof useAccount>) => boolean }) => {
+	const accountContext = useAccount();
 
-	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
-};
+	const canPassthrough = useMemo(() => {
+		return isEnabled(accountContext);
+	}, [accountContext, isEnabled]);
 
-const IntegratedCareEnabledRoutes = () => {
-	const { institution } = useAccount();
-
-	return institution?.integratedCareEnabled ? <Outlet /> : <NoMatch />;
-};
-
-const AdminOnlyRoutes = () => {
-	const { account } = useAccount();
-
-	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Outlet /> : <NoMatch />;
-};
-
-const ProviderOnlyRoutes = () => {
-	const { account } = useAccount();
-
-	return account?.roleId === ROLE_ID.PROVIDER ? <Outlet /> : <NoMatch />;
-};
-
-const ContactUsEnabledRoutes = () => {
-	const { institution } = useAccount();
-
-	return institution?.contactUsEnabled ? <Outlet /> : <NoMatch />;
-};
-
-const DebugEnabledRoutes = () => {
-	return config.COBALT_WEB_SHOW_DEBUG === 'true' ? <Outlet /> : <NoMatch />;
+	return canPassthrough ? <Outlet /> : <NoMatch />;
 };
 
 export const routes: RouteObject[] = [
@@ -376,7 +352,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <SupportEnabledRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return institution.supportEnabled;
+								}}
+							/>
+						),
 						children: [
 							{
 								path: 'intake-assessment',
@@ -420,7 +402,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <ProviderOnlyRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ account }) => {
+									return account?.roleId === ROLE_ID.PROVIDER;
+								}}
+							/>
+						),
 						handle: {
 							hideFooter: true,
 						},
@@ -467,7 +455,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <ContactUsEnabledRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return institution.contactUsEnabled;
+								}}
+							/>
+						),
 						children: [
 							{
 								path: 'feedback',
@@ -652,7 +646,13 @@ export const routes: RouteObject[] = [
 				],
 			},
 			{
-				element: <AdminOnlyRoutes />,
+				element: (
+					<ToggledOutlet
+						isEnabled={({ account }) => {
+							return account?.roleId === ROLE_ID.ADMINISTRATOR;
+						}}
+					/>
+				),
 				errorElement: <AppErrorDefaultLayout />,
 				loader: requireAuthLoader,
 				children: [
@@ -725,7 +725,7 @@ export const routes: RouteObject[] = [
 							{
 								id: 'admin-debug',
 								path: 'debug',
-								element: <DebugEnabledRoutes />,
+								element: <ToggledOutlet isEnabled={() => config.COBALT_WEB_SHOW_DEBUG === 'true'} />,
 								children: [
 									{
 										index: true,
@@ -743,7 +743,13 @@ export const routes: RouteObject[] = [
 				],
 			},
 			{
-				element: <IntegratedCareEnabledRoutes />,
+				element: (
+					<ToggledOutlet
+						isEnabled={({ institution }) => {
+							return institution.integratedCareEnabled;
+						}}
+					/>
+				),
 				errorElement: <AppErrorDefaultLayout />,
 				loader: requireAuthLoader,
 				children: [
