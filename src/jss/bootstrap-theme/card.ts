@@ -88,5 +88,26 @@ export const card = (theme: CobaltTheme) => {
 				},
 			},
 		},
+		'.table-card': {
+			border: 0,
+			borderRadius: 0,
+			'& .cobalt-card': {
+				'&__header': {
+					padding: 20,
+					borderTopLeftRadius: 4,
+					borderTopRightRadius: 4,
+					backgroundColor: theme.colors.n0,
+					border: `1px solid ${theme.colors.n100}`,
+					borderBottom: 0,
+				},
+				'&__body': {
+					padding: 0,
+					'& > div': {
+						borderTopLeftRadius: 0,
+						borderTopRightRadius: 0,
+					},
+				},
+			},
+		},
 	};
 };
