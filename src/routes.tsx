@@ -88,7 +88,6 @@ export const CreateOnYourTimeContent = lazyLoadWithRefresh(
 export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
 export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
 export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
-export const StatsDashboard = lazyLoadWithRefresh(() => import('@/pages/stats-dashboard'));
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
 
