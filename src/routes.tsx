@@ -726,24 +726,9 @@ export const routes: RouteObject[] = [
 										element: <Navigate to="overview" />,
 									},
 									{
-										id: 'admin-analytics-overview',
-										path: 'overview',
-										lazy: () => import('@/routes/admin/analytics/overview'),
-									},
-									{
-										id: 'admin-analytics-assessments-and-appointments',
-										path: 'assessments-and-appointments',
-										lazy: () => import('@/routes/admin/analytics/assessments-and-appointments'),
-									},
-									{
-										id: 'admin-analytics-group-sessions',
-										path: 'group-sessions',
-										lazy: () => import('@/routes/admin/analytics/group-sessions'),
-									},
-									{
-										id: 'admin-analytics-resources-and-topics',
-										path: 'resources-and-topics',
-										lazy: () => import('@/routes/admin/analytics/resources-and-topics'),
+										id: 'admin-analytics-dashboard-tab',
+										path: ':dashboardTab',
+										lazy: () => import('@/routes/admin/analytics/dashboard-tab'),
 									},
 								],
 							},
