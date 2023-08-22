@@ -1,6 +1,6 @@
-import React, { FC, PropsWithChildren } from 'react';
-import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
+import classNames from 'classnames';
+import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
 interface UseStylesProps {
 	clickable: boolean;
@@ -25,17 +25,25 @@ interface TableRowProps extends PropsWithChildren {
 	onClick?(event: React.MouseEvent<HTMLTableRowElement, MouseEvent>): void;
 	className?: string;
 	highlighted?: boolean;
+	isExpanded?: boolean;
+	expandedContent?: ReactNode;
 }
 
-export const TableRow: FC<TableRowProps> = React.memo(({ onClick, highlighted = false, className, children }) => {
-	const classes = useTableRowStyles({
-		clickable: !!onClick,
-		highlighted: highlighted,
-	});
+export const TableRow: FC<TableRowProps> = React.memo(
+	({ onClick, highlighted = false, className, children, isExpanded, expandedContent }) => {
+		const classes = useTableRowStyles({
+			clickable: !!onClick,
+			highlighted: highlighted,
+		});
 
-	return (
-		<tr className={classNames(classes.tableRow, className)} onClick={onClick}>
-			{children}
-		</tr>
-	);
-});
+		return (
+			<>
+				<tr className={classNames(classes.tableRow, className)} onClick={onClick}>
+					{children}
+				</tr>
+
+				{isExpanded && expandedContent}
+			</>
+		);
+	}
+);

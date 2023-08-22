@@ -89,13 +89,14 @@ export const card = (theme: CobaltTheme) => {
 			},
 		},
 		'.table-card': {
+			boxShadow: theme.elevation.e200,
 			border: 0,
-			borderRadius: 0,
+			borderRadius: 8,
 			'& .cobalt-card': {
 				'&__header': {
 					padding: 20,
-					borderTopLeftRadius: 4,
-					borderTopRightRadius: 4,
+					borderTopLeftRadius: 8,
+					borderTopRightRadius: 8,
 					backgroundColor: theme.colors.n0,
 					border: `1px solid ${theme.colors.n100}`,
 					borderBottom: 0,
@@ -105,7 +106,24 @@ export const card = (theme: CobaltTheme) => {
 					'& > div': {
 						borderTopLeftRadius: 0,
 						borderTopRightRadius: 0,
+						borderBottomLeftRadius: 8,
+						borderBottomRightRadius: 8,
 					},
+				},
+			},
+		},
+		'.analytics-card': {
+			boxShadow: theme.elevation.e200,
+			border: `1px solid ${theme.colors.n100}`,
+			borderRadius: 12,
+			backgroundColor: theme.colors.n0,
+			'& .cobalt-card': {
+				'&__header': {
+					padding: '20px 32px',
+					borderBottom: `1px solid ${theme.colors.n75}`,
+				},
+				'&__body': {
+					padding: '20px 32px',
 				},
 			},
 		},
