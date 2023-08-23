@@ -7,7 +7,7 @@ export const card = (theme: CobaltTheme) => {
 			boxShadow: theme.elevation.e400,
 			'&__header': {
 				padding: '15px 30px',
-				borderBottom: `1px solid ${theme.colors.border}`,
+				borderBottom: 0,
 			},
 			'&__title.h5': {
 				margin: 0,
@@ -23,6 +23,7 @@ export const card = (theme: CobaltTheme) => {
 				color: theme.colors.n500,
 			},
 			'&__body': {
+				borderTop: `1px solid ${theme.colors.n100}`,
 				padding: '15px 30px',
 			},
 		},
@@ -36,7 +37,7 @@ export const card = (theme: CobaltTheme) => {
 					borderTopLeftRadius: 4,
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n75,
-					borderBottom: `1px solid ${theme.colors.n100}`,
+					borderBottom: 0,
 					'& .button-container': {
 						right: 16,
 						top: '50%',
@@ -54,6 +55,7 @@ export const card = (theme: CobaltTheme) => {
 					textTransform: 'none',
 				},
 				'&__body': {
+					borderTop: `1px solid ${theme.colors.n100}`,
 					padding: '20px 16px',
 					borderBottomLeftRadius: 4,
 					borderBottomRightRadius: 4,
@@ -71,13 +73,13 @@ export const card = (theme: CobaltTheme) => {
 					borderTopLeftRadius: 4,
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n0,
-					borderBottom: `1px solid ${theme.colors.n100}`,
 					'&.collapsed': {
 						borderRadius: 4,
 						borderBottom: 'none',
 					},
 				},
 				'&__body': {
+					borderTop: `1px solid ${theme.colors.n100}`,
 					padding: 16,
 					borderBottomLeftRadius: 4,
 					borderBottomRightRadius: 4,
@@ -102,6 +104,7 @@ export const card = (theme: CobaltTheme) => {
 					borderBottom: 0,
 				},
 				'&__body': {
+					borderTop: 0,
 					padding: 0,
 					'& > div': {
 						borderTopLeftRadius: 0,
@@ -120,9 +123,10 @@ export const card = (theme: CobaltTheme) => {
 			'& .cobalt-card': {
 				'&__header': {
 					padding: '20px 32px',
-					borderBottom: `1px solid ${theme.colors.n75}`,
+					borderBottom: 0,
 				},
 				'&__body': {
+					borderTop: `1px solid ${theme.colors.n100}`,
 					padding: '20px 32px',
 				},
 			},
