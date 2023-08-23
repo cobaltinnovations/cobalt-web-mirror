@@ -4,11 +4,11 @@ import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import Loader from '@/components/loader';
-import RenderJson from '@/components/render-json';
 import useAccount from '@/hooks/use-account';
 import { InstitutionResource } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface InstitutionResourceGroupDetailLoaderData {
 	institutionResourceGroupDetailPromise: Promise<InstitutionResource[]>;
@@ -40,11 +40,24 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	});
 };
 
+const useStyles = createUseThemedStyles((theme) => ({
+	imageOuter: {
+		borderRadius: 8,
+		marginBottom: 20,
+		overflow: 'hidden',
+		paddingBottom: '66.66%',
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		backgroundRepeat: 'no-repeat',
+		// backgroundColor: theme.colors.n500,
+	},
+}));
+
 export const Component = () => {
 	const { institutionResourceGroupDetailPromise } = useInstitutionResourceGroupDetailLoaderData();
 	const { institution } = useAccount();
+	const classes = useStyles();
 
-	console.log({ institutionResourceGroupDetailPromise });
 	return (
 		<>
 			<Helmet>
@@ -53,7 +66,6 @@ export const Component = () => {
 			<Suspense fallback={<Loader />}>
 				<Await resolve={institutionResourceGroupDetailPromise}>
 					{(institutionResources: InstitutionResource[]) => {
-						console.log({ institutionResources });
 						return (
 							<>
 								<HeroContainer className="bg-n75">
@@ -65,11 +77,49 @@ export const Component = () => {
 								</HeroContainer>
 
 								<Container className="py-16">
-									<Row>
-										<Col>
-											<RenderJson json={institutionResources} />
-										</Col>
-									</Row>
+									{institutionResources.map((institutionResource, idx) => {
+										const isLast = idx === institutionResources.length - 1;
+
+										return (
+											<Row
+												key={institutionResource.institutionResourceId}
+												className="mb-10 gy-10"
+											>
+												<Col xs={12} md={4} className="order-md-1">
+													<div
+														className={classes.imageOuter}
+														style={{
+															backgroundImage: `url(${institutionResource.imageUrl})`,
+														}}
+													/>
+												</Col>
+
+												<Col xs={12} md={8}>
+													<a
+														href={institutionResource.url}
+														target="_blank"
+														rel="noreferrer"
+														className="fs-h2"
+													>
+														{institutionResource.name}
+													</a>
+
+													<div
+														className="mt-4"
+														dangerouslySetInnerHTML={{
+															__html: institutionResource.description,
+														}}
+													/>
+												</Col>
+
+												{!isLast && (
+													<Col xs={12} className="order-md-3">
+														<hr />
+													</Col>
+												)}
+											</Row>
+										);
+									})}
 								</Container>
 							</>
 						);
