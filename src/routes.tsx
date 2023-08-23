@@ -70,6 +70,7 @@ export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appo
 export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
 export const GroupSessions = lazyLoadWithRefresh(() => import('@/pages/group-sessions'));
+export const GroupSessionsOg = lazyLoadWithRefresh(() => import('@/pages/group-sessions-og'));
 export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-request'));
 // export const GroupSessionsByRequest = lazyLoadWithRefresh(() => import('@/pages/group-sessions-by-request'));
 // export const GroupSessionsByRequestCreate = lazyLoadWithRefresh(
@@ -487,7 +488,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'group-sessions',
-						element: <GroupSessions />,
+						element: <GroupSessionsOg />,
 					},
 					{
 						path: 'group-sessions/request',
