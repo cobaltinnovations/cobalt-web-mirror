@@ -65,7 +65,6 @@ export const ConnectWithSupportMentalHealthRecommendations = lazyLoadWithRefresh
 	() => import('@/pages/connect-with-support-mental-health-recommendations')
 );
 export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
-export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
 export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
@@ -372,8 +371,9 @@ export const routes: RouteObject[] = [
 						element: <Privacy />,
 					},
 					{
+						id: 'my-calendar',
 						path: 'my-calendar',
-						element: <MyCalendar />,
+						lazy: () => import('@/routes/my-calendar'),
 					},
 
 					{
