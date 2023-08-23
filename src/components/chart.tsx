@@ -1,18 +1,37 @@
-import { useCobaltTheme } from '@/jss/theme';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import { AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
-import { ChartDataset } from 'chart.js';
+import { ChartDataset, LinearScaleOptions } from 'chart.js';
 import Color from 'color';
 import React, { useMemo } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
+import { DeepPartial } from 'chart.js/dist/types/utils';
 
 interface ChartProps {
 	label: string;
 	data: AdminAnalyticsWidgetChartData[];
 }
 
+const useChartStyles = createUseThemedStyles((theme) => ({
+	labelCell: {
+		borderRight: `1px solid ${theme.colors.n100}`,
+	},
+}));
+
+const defaultScaleOptions: DeepPartial<LinearScaleOptions> = {
+	border: {
+		dash: [4, 4],
+	},
+	grid: {
+		color: '#bdbdbd',
+		lineWidth: 1,
+		tickWidth: 0,
+	},
+};
+
 const BarChart = ({ label, data }: ChartProps) => {
 	const theme = useCobaltTheme();
+	const classes = useChartStyles();
 
 	const chartData = useMemo(() => {
 		const labels: string[] = [];
@@ -35,6 +54,7 @@ const BarChart = ({ label, data }: ChartProps) => {
 				label,
 				data: [],
 				backgroundColor: [],
+				barPercentage: 0.25,
 			}
 		);
 
@@ -48,6 +68,10 @@ const BarChart = ({ label, data }: ChartProps) => {
 		<>
 			<Bar
 				options={{
+					scales: {
+						x: defaultScaleOptions,
+						y: defaultScaleOptions,
+					},
 					plugins: {
 						legend: {
 							display: false,
@@ -60,8 +84,10 @@ const BarChart = ({ label, data }: ChartProps) => {
 			<Table className="mt-10">
 				<TableHead>
 					<TableRow>
-						<TableCell />
-						<TableCell>{label}</TableCell>
+						<TableCell header />
+						<TableCell header className="text-right">
+							{label}
+						</TableCell>
 					</TableRow>
 				</TableHead>
 
@@ -69,8 +95,10 @@ const BarChart = ({ label, data }: ChartProps) => {
 					{data.map((bar, rowIdx) => {
 						return (
 							<TableRow key={rowIdx}>
-								<TableCell>{bar.label}</TableCell>
-								<TableCell>{bar.count}</TableCell>
+								<TableCell header className={classes.labelCell}>
+									{bar.label}
+								</TableCell>
+								<TableCell className="text-right">{bar.count}</TableCell>
 							</TableRow>
 						);
 					})}

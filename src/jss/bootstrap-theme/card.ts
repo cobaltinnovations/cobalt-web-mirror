@@ -111,6 +111,27 @@ export const card = (theme: CobaltTheme) => {
 						borderTopRightRadius: 0,
 						borderBottomLeftRadius: 8,
 						borderBottomRightRadius: 8,
+						'& tr': {
+							'& td': {
+								border: `1px solid ${theme.colors.n100}`,
+								'&:first-of-type': {
+									borderLeft: 0,
+								},
+								'&:last-of-type': {
+									borderRight: 0,
+								},
+							},
+							'&:first-of-type': {
+								'& td': {
+									borderTop: 0,
+								},
+							},
+							'&:last-of-type': {
+								'& td': {
+									borderBottom: 0,
+								},
+							},
+						},
 					},
 				},
 			},

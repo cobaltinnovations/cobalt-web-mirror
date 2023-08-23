@@ -239,7 +239,7 @@ const CmsAvailableContent: FC = () => {
 									<TableCell header>Title & Author</TableCell>
 									<TableCell header>Owner</TableCell>
 									<TableCell header>Status</TableCell>
-									<TableCell />
+									<TableCell header />
 								</TableRow>
 							</TableHead>
 							<TableBody>

@@ -22,6 +22,25 @@ const useAnalyticsWidgetStyles = createUseThemedStyles((theme) => ({
 	cardTotal: {
 		fontSize: 40,
 	},
+
+	expandableRow: {
+		'& td:first-of-type': {
+			borderRight: '0 !important',
+			'& + td': {
+				borderLeft: '0 !important',
+			},
+		},
+	},
+
+	nestedRow: {
+		backgroundColor: theme.colors.n75,
+		'& td:first-of-type': {
+			borderRight: '0 !important',
+			'& + td': {
+				borderLeft: '0 !important',
+			},
+		},
+	},
 }));
 
 interface AnalyticsWidgetCardProps {
@@ -56,8 +75,16 @@ interface AnalyticsWidgetTableCardProps {
 }
 
 export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardProps) => {
+	const classes = useAnalyticsWidgetStyles();
 	const [expandedTableRows, setExpandedTableRows] = useState<Record<string, boolean>>({});
 	const hasExpandableRows = widget.widgetData.rows.some((row) => row.nestedRows?.length);
+
+	const rowClasses = classNames({ [classes.expandableRow]: hasExpandableRows });
+
+	const getCellClasses = (index: number) =>
+		classNames({
+			'text-end': index >= 1,
+		});
 
 	return (
 		<Card bsPrefix="table-card">
@@ -72,12 +99,17 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 			<Card.Body>
 				<Table>
 					<TableHead>
-						<TableRow>
-							{hasExpandableRows && <TableCell width={48} />}
+						<TableRow className={classNames(rowClasses, 'align-middle')}>
+							{hasExpandableRows && <TableCell width={1} header />}
 
 							{widget.widgetData.headers.map((header, headerIdx) => {
 								return (
-									<TableCell key={headerIdx} header>
+									<TableCell
+										key={headerIdx}
+										header
+										width={headerIdx === 0 ? 'auto' : !header ? 1 : 200}
+										className={getCellClasses(headerIdx)}
+									>
 										{header}
 									</TableCell>
 								);
@@ -92,6 +124,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 
 							return (
 								<TableRow
+									className={rowClasses}
 									key={rowIdx}
 									onClick={
 										!hasExpandableRows
@@ -108,11 +141,18 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									isExpanded={isExpanded}
 									expandedContent={row.nestedRows?.map((nestedRow, nestedRowIdx) => {
 										return (
-											<TableRow key={nestedRowIdx}>
+											<TableRow className={classes.nestedRow} key={nestedRowIdx}>
 												<TableCell />
 
 												{nestedRow.data.map((nestedCell, nestedCellIdx) => {
-													return <TableCell key={nestedCellIdx}>{nestedCell}</TableCell>;
+													return (
+														<TableCell
+															key={nestedCellIdx}
+															className={getCellClasses(nestedCellIdx)}
+														>
+															{nestedCell}
+														</TableCell>
+													);
 												})}
 											</TableRow>
 										);
@@ -121,12 +161,16 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									{hasNestedRows && (
 										<TableCell>
 											<Button variant="link" size="sm">
-												{isExpanded ? <DownChevron /> : <RightChevron />}
+												{isExpanded ? <DownChevron /> : <RightChevron className="text-gray" />}
 											</Button>
 										</TableCell>
 									)}
 									{row.data.map((cell, cellIdx) => {
-										return <TableCell key={cellIdx}>{cell}</TableCell>;
+										return (
+											<TableCell key={cellIdx} className={getCellClasses(cellIdx)}>
+												{cell}
+											</TableCell>
+										);
 									})}
 								</TableRow>
 							);

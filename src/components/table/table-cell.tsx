@@ -19,14 +19,14 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		height: 1, // Don't worry, this is ignored by the browser. It's a hack to allow a 100% height inner <div/>
 		padding: 0,
 		width: ({ width }: UseStylesProps) => width ?? 'auto',
-		backgroundColor: 'inherit',
+		backgroundColor: ({ header }: UseStylesProps) => (header ? theme.colors.n75 : 'inherit'),
 		position: ({ sticky }: UseStylesProps) => (sticky ? 'sticky' : undefined),
 		left: ({ sticky, stickyOffset }: UseStylesProps) => (sticky ? stickyOffset ?? 0 : undefined),
 	},
 	tableCellContent: {
 		height: '100%',
 		padding: '14px 20px',
-		width: ({ width }: UseStylesProps) => width ?? '100%',
+		width: '100%',
 		display: 'inline-flex',
 		flexDirection: 'column',
 		justifyContent: 'center',

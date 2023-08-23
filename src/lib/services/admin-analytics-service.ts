@@ -277,9 +277,9 @@ export const adminAnalyticsService = {
 									widgetTitle: 'Referring Domains',
 									widgetTypeId: 'table',
 									widgetData: {
-										headers: ['', 'Domain', 'Users'],
+										headers: ['Domain', 'Users'],
 										rows: range(1, 10).map((i) => ({
-											data: [`${i}.`, 'Domain Name', '1,000,000'],
+											data: [`${i}. Domain Name`, '1,000,000'],
 										})),
 									},
 								},

@@ -174,7 +174,7 @@ const GroupSessionsByRequest: FC = () => {
 									<TableCell header>Date Added</TableCell>
 									<TableCell header>Session</TableCell>
 									<TableCell header>Status</TableCell>
-									<TableCell></TableCell>
+									<TableCell header />
 								</TableRow>
 							</TableHead>
 							{sessions && sessions.length > 0 && (
