@@ -157,9 +157,9 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 						</div>
 					</div>
 					<div className={classes.optionsContainer}>
-						<Link to="#" onClick={onCancel}>
+						<Button variant="link" className="p-0" onClick={onCancel}>
 							Cancel Reservation
-						</Link>
+						</Button>
 						<JoinButton
 							contactEmail={appointment.provider?.emailAddress}
 							joinUrl={appointment.videoconferenceUrl}
@@ -185,9 +185,9 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 						</div>
 					</div>
 					<div className={classes.optionsContainer}>
-						<Link to="#" onClick={onCancel}>
+						<Button variant="link" className="p-0" onClick={onCancel}>
 							Cancel Reservation
-						</Link>
+						</Button>
 						<Button
 							as="a"
 							href={groupSession.videoconferenceUrl}

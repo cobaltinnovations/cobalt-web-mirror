@@ -116,7 +116,15 @@ const Layout = () => {
 				<Outlet />
 			</Suspense>
 
-			<ScrollRestoration />
+			<ScrollRestoration
+				getKey={(location) => {
+					if (location.pathname.includes('my-calendar')) {
+						return location.pathname;
+					}
+
+					return location.key;
+				}}
+			/>
 		</>
 	);
 };
