@@ -234,6 +234,16 @@ const DebugEnabledRoutes = () => {
 	return config.COBALT_WEB_SHOW_DEBUG === 'true' ? <Outlet /> : <NoMatch />;
 };
 
+const InstitutionResourcesEnabled = () => {
+	const { institution } = useAccount();
+
+	return institution.features.findIndex((feature) => feature.featureId === 'INSTITUTION_RESOURCES') > -1 ? (
+		<Outlet />
+	) : (
+		<NoMatch />
+	);
+};
+
 export const routes: RouteObject[] = [
 	{
 		id: 'root',
@@ -643,7 +653,19 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'institution-resources',
-						lazy: () => import('@/routes/institution-resources'),
+						element: <InstitutionResourcesEnabled />,
+						children: [
+							{
+								id: 'institution-resource-groups',
+								index: true,
+								lazy: () => import('@/routes/institution-resource-groups'),
+							},
+							{
+								id: 'institution-resource-group-detail',
+								path: ':institutionResourceGroupUrlNameOrId',
+								lazy: () => import('@/routes/institution-resource-group-detail'),
+							},
+						],
 					},
 					{
 						path: '*',
