@@ -18,7 +18,7 @@ interface PendingCancellationModel {
 	eventId: string;
 }
 
-const MyCalendar: FC = () => {
+export const Component = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
@@ -249,5 +249,3 @@ const MyCalendar: FC = () => {
 		</>
 	);
 };
-
-export default MyCalendar;
