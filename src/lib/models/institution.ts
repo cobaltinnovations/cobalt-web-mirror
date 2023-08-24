@@ -1,4 +1,5 @@
 import { AccountSourceId } from './account';
+import { COLOR_IDS } from './color-ids';
 import { SupportRoleId } from './provider';
 
 export enum AnonymousAccountExpirationStrategyId {
@@ -55,11 +56,13 @@ export interface InstitutionFeature {
 	name: string;
 	navDescription: string;
 	navVisible: boolean;
+	landingPageVisible: boolean;
 	navigationHeaderId: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
 	locationPromptRequired: boolean;
+	treatmentDescription?: string;
 }
 
 export interface AdditionalNavigationItem {
@@ -129,4 +132,23 @@ export interface InstitutionAlert {
 	alertTypeId: AlertTypeId;
 	title: string;
 	message: string;
+}
+
+export interface InstitutionResourceGroup {
+	institutionResourceGroupId: string;
+	institutionId: string;
+	name: string;
+	urlName: string;
+	description: string;
+	colorId: COLOR_IDS;
+}
+
+export interface InstitutionResource {
+	institutionResourceId: string;
+	institutionId: string;
+	name: string;
+	urlName: string;
+	description: string;
+	url: string;
+	imageUrl: string;
 }

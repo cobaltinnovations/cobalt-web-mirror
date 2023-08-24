@@ -423,7 +423,7 @@ const HeaderV2 = () => {
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 								.filter((feature) => feature.navVisible)
 								.map(({ urlName }) => urlName)
-								.some((urlName) => matchPath(urlName, pathname)),
+								.some((urlName) => matchPath(urlName + '/*', pathname)),
 							items: (institution?.features ?? [])
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 								.filter((feature) => feature.navVisible)
@@ -450,7 +450,7 @@ const HeaderV2 = () => {
 						.map(({ urlName }) => urlName),
 					...(institution?.additionalNavigationItems ?? []).map(({ url }) => url),
 					...exploreLinks.map(({ to }) => to()),
-				].some((to) => matchPath(to, pathname)),
+				].some((to) => matchPath(to + '/*', pathname)),
 				items: [
 					...(institution?.features ?? [])
 						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')

@@ -1,5 +1,11 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AccountSource, Institution, InstitutionLocation } from '@/lib/models/institution';
+import {
+	AccountSource,
+	Institution,
+	InstitutionLocation,
+	InstitutionResource,
+	InstitutionResourceGroup,
+} from '@/lib/models/institution';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
 
@@ -15,6 +21,20 @@ interface GetAccountSourcesRequestBody {
 export interface GetInstitutionResponse {
 	accountSources: AccountSource[];
 	institution: Institution;
+}
+
+export interface GetInstitutionResourceGroupsResponse {
+	institutionResourceGroupsTitle: string;
+	institutionResourceGroupsDescription: string;
+	institutionResourceGroups: InstitutionResourceGroup[];
+}
+
+export interface GetInstitutionResourceGroupDetailResponse {
+	institutionResourceGroup: InstitutionResourceGroup;
+}
+
+export interface GetInstitutionResourcesResponse {
+	institutionResources: InstitutionResource[];
 }
 
 export const institutionService = {
@@ -56,6 +76,24 @@ export const institutionService = {
 		return httpSingleton.orchestrateRequest<{ authenticationUrl: string }>({
 			method: 'GET',
 			url: `/institutions/${institutionId}/mychart-authentication-url`,
+		});
+	},
+	getResourceGroups() {
+		return httpSingleton.orchestrateRequest<GetInstitutionResourceGroupsResponse>({
+			method: 'GET',
+			url: '/institution-resource-groups',
+		});
+	},
+	getResourceGroupDetail(resourceGroupUrlNameOrId: string) {
+		return httpSingleton.orchestrateRequest<GetInstitutionResourceGroupDetailResponse>({
+			method: 'GET',
+			url: '/institution-resource-groups/' + resourceGroupUrlNameOrId,
+		});
+	},
+	getResourcesByGroup(resourceGroupUrlNameOrId: string) {
+		return httpSingleton.orchestrateRequest<GetInstitutionResourcesResponse>({
+			method: 'GET',
+			url: '/institution-resources?institutionResourceGroupId=' + resourceGroupUrlNameOrId,
 		});
 	},
 };

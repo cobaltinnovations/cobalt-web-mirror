@@ -173,7 +173,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 					<Col>
 						<div className={classes.pathways}>
 							{(institution?.features ?? [])
-								.filter((feature) => feature.navVisible)
+								.filter((feature) => feature.landingPageVisible)
 								.map(({ featureId, urlName, name, recommended }, featureIndex) => (
 									<div key={featureId} className={classes.pathwayOuter}>
 										<Link

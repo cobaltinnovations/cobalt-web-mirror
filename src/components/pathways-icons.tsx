@@ -7,6 +7,7 @@ import { ReactComponent as SpiritualIcon } from '@/assets/icons/icon-spiritual.s
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
 import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
+import { ReactComponent as InstitutionResourcesIcon } from '@/assets/icons/icon-institution-resources.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 
 const PathwaysIcon = ({
@@ -31,6 +32,8 @@ const PathwaysIcon = ({
 			return <CoachingIcon className={className} {...svgProps} />;
 		case 'SELF_HELP_RESOURCES':
 			return <ResourceIcon className={className} {...svgProps} />;
+		case 'INSTITUTION_RESOURCES':
+			return <InstitutionResourcesIcon className={className} {...svgProps} />;
 		case 'SPIRITUAL_SUPPORT':
 			return <SpiritualIcon className={className} {...svgProps} />;
 		case 'CRISIS_SUPPORT':
