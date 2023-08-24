@@ -71,16 +71,11 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-8" />
 									<p className="mb-6 fs-large">
-										Based on the symptoms reported we recommend that you meet with a{' '}
-										<strong>{recommendedFeature.name}</strong>
+										Based on your answers, we recommend{' '}
+										<strong>{recommendedFeature.treatmentDescription}</strong>.
 									</p>
 									<p className="mb-6 fs-large">
-										You can <strong>schedule a telehealth appointment</strong> with a Mental health
-										Provider by browsing the list of providers and choosing an available appointment
-										time. If you need an in-person appointment, please call us at{' '}
-										<a href={`tel:${institution.clinicalSupportPhoneNumber}`}>
-											{institution.clinicalSupportPhoneNumberDescription ?? 'N/A'}
-										</a>
+										You can schedule a telehealth appointment with one of the providers listed.
 									</p>
 									<div className="text-center">
 										<Button

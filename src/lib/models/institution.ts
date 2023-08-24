@@ -62,6 +62,7 @@ export interface InstitutionFeature {
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
 	locationPromptRequired: boolean;
+	treatmentDescription?: string;
 }
 
 export interface AdditionalNavigationItem {
