@@ -5,13 +5,13 @@ import { Helmet } from 'react-helmet';
 import HeroContainer from '@/components/hero-container';
 import Loader from '@/components/loader';
 import useAccount from '@/hooks/use-account';
-import { InstitutionResource } from '@/lib/models';
+import { InstitutionResource, InstitutionResourceGroup } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
 
 interface InstitutionResourceGroupDetailLoaderData {
-	institutionResourceGroupDetailPromise: Promise<InstitutionResource[]>;
+	deferredData: Promise<[InstitutionResourceGroup, InstitutionResource[]]>;
 }
 
 export function useInstitutionResourceGroupDetailLoaderData() {
@@ -25,18 +25,21 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		throw new Error('Unknown institutionResourceGroupUrlNameOrId');
 	}
 
-	const institutionResourceGroupDetailRequest = institutionService.getResourcesByGroup(
+	const institutionResourceGroupRequest = institutionService.getResourceGroupDetail(
 		institutionResourceGroupUrlNameOrId
 	);
+	const institutionResourcesRequest = institutionService.getResourcesByGroup(institutionResourceGroupUrlNameOrId);
 
 	request.signal.addEventListener('abort', () => {
-		institutionResourceGroupDetailRequest.abort();
+		institutionResourceGroupRequest.abort();
+		institutionResourcesRequest.abort();
 	});
 
 	return defer({
-		institutionResourceGroupDetailPromise: institutionResourceGroupDetailRequest
-			.fetch()
-			.then((response) => response.institutionResources),
+		deferredData: Promise.all([
+			institutionResourceGroupRequest.fetch().then((response) => response.institutionResourceGroup),
+			institutionResourcesRequest.fetch().then((response) => response.institutionResources),
+		]),
 	});
 };
 
@@ -54,7 +57,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 export const Component = () => {
-	const { institutionResourceGroupDetailPromise } = useInstitutionResourceGroupDetailLoaderData();
+	const { deferredData } = useInstitutionResourceGroupDetailLoaderData();
 	const { institution } = useAccount();
 	const classes = useStyles();
 
@@ -64,16 +67,16 @@ export const Component = () => {
 				<title>Cobalt | Institution Resources</title>
 			</Helmet>
 			<Suspense fallback={<Loader />}>
-				<Await resolve={institutionResourceGroupDetailPromise}>
-					{(institutionResources: InstitutionResource[]) => {
+				<Await resolve={deferredData}>
+					{([institutionResourceGroup, institutionResources]: Awaited<typeof deferredData>) => {
 						return (
 							<>
 								<HeroContainer className="bg-n75">
 									<p className="text-center text-n500 fs-large">{institution.name} Resources</p>
 
-									<h1 className="mb-4 text-center">__Group Title__</h1>
+									<h1 className="mb-4 text-center">{institutionResourceGroup.name}</h1>
 
-									<p className="mb-0 text-center fs-large">__Group Description or Disclaimer__</p>
+									<p className="mb-0 text-center fs-large">{institutionResourceGroup.description}</p>
 								</HeroContainer>
 
 								<Container className="py-16">

@@ -30,6 +30,10 @@ export interface GetInstitutionResourceGroupsResponse {
 }
 
 export interface GetInstitutionResourceGroupDetailResponse {
+	institutionResourceGroup: InstitutionResourceGroup;
+}
+
+export interface GetInstitutionResourcesResponse {
 	institutionResources: InstitutionResource[];
 }
 
@@ -80,8 +84,14 @@ export const institutionService = {
 			url: '/institution-resource-groups',
 		});
 	},
-	getResourcesByGroup(resourceGroupUrlNameOrId: string) {
+	getResourceGroupDetail(resourceGroupUrlNameOrId: string) {
 		return httpSingleton.orchestrateRequest<GetInstitutionResourceGroupDetailResponse>({
+			method: 'GET',
+			url: '/institution-resource-groups/' + resourceGroupUrlNameOrId,
+		});
+	},
+	getResourcesByGroup(resourceGroupUrlNameOrId: string) {
+		return httpSingleton.orchestrateRequest<GetInstitutionResourcesResponse>({
 			method: 'GET',
 			url: '/institution-resources?institutionResourceGroupId=' + resourceGroupUrlNameOrId,
 		});
