@@ -90,7 +90,11 @@ const Footer: FC = () => {
 								<p className="mb-3 fs-large fw-semibold text-primary">Support</p>
 								<ul className="list-unstyled">
 									{(institution?.features ?? [])
-										.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
+										.filter(
+											(feature) =>
+												feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT' &&
+												feature.navVisible
+										)
 										.map(({ featureId, name, urlName }) => (
 											<li key={featureId} className="mb-3">
 												<Link
@@ -111,7 +115,10 @@ const Footer: FC = () => {
 								<p className="mb-3 fs-large fw-semibold text-primary">Resources</p>
 								<ul className="list-unstyled">
 									{(institution?.features ?? [])
-										.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
+										.filter(
+											(feature) =>
+												feature.navigationHeaderId === 'BROWSE_RESOURCES' && feature.navVisible
+										)
 										.map(({ featureId, name, urlName }) => (
 											<li key={featureId} className="mb-3">
 												<Link className="fw-normal text-decoration-none" to={urlName}>
