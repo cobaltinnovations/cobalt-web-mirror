@@ -1,15 +1,7 @@
 import React, { RefObject, Suspense, createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import {
-	Await,
-	LoaderFunctionArgs,
-	defer,
-	useAsyncValue,
-	useLocation,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import { Await, LoaderFunctionArgs, defer, useAsyncValue, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import CalendarAppointment from '@/components/calendar-appointment';
 import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
@@ -53,7 +45,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const handleError = useHandleError();
-	const location = useLocation();
 	const { calendarEventGroupsPromise } = useMyCalendarLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const appointmentId = searchParams.get('appointmentId') || '';
@@ -62,8 +53,6 @@ export const Component = () => {
 	const [isCancelling, setIsCancelling] = useState(false);
 	const [pendingCancellation, setPendingCancellation] = useState<PendingCancellationModel | undefined>(undefined);
 	const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(false);
-
-	const locationState = (location.state as { successBooking?: boolean; emailAddress?: string }) || {};
 
 	const sourceEventId = groupSessionReservationId || appointmentId;
 	useEffect(() => {
@@ -144,19 +133,6 @@ export const Component = () => {
 			</HeroContainer>
 
 			<div className="pb-8">
-				{locationState?.successBooking ? (
-					<HeroContainer className="bg-success">
-						{locationState?.emailAddress ? (
-							<h5 className="text-center text-light mb-0">
-								Your session is reserved and we have sent a confirmation to{' '}
-								{locationState?.emailAddress}.
-							</h5>
-						) : (
-							<h5 className="text-center mb-0">Your appointment was reserved.</h5>
-						)}
-					</HeroContainer>
-				) : null}
-
 				<Suspense fallback={<Loader />}>
 					<Await resolve={calendarEventGroupsPromise}>
 						<CalendarEventGroups
@@ -226,9 +202,24 @@ const CalendarEventGroups = ({ sourceEventId, onCancel }: CalendarEventGroupsPro
 			{calendarEventGroups.map((calendarEventGroup, index) => {
 				return (
 					<div key={index}>
-						<DayContainer className={'mb-2'}>
-							<p className="mb-0 fw-bold">{calendarEventGroup.date}</p>
-						</DayContainer>
+						<Container
+							fluid
+							className="py-3 bg-white border-top border-bottom position-sticky"
+							style={{ top: 55, zIndex: 2 }}
+						>
+							<Container>
+								<Row>
+									<Col
+										md={{ span: 10, offset: 1 }}
+										lg={{ span: 8, offset: 2 }}
+										xl={{ span: 6, offset: 3 }}
+									>
+										<p className="mb-0 text-center fw-bold">{calendarEventGroup.date}</p>
+									</Col>
+								</Row>
+							</Container>
+						</Container>
+
 						<Container>
 							<Row>
 								<Col
@@ -246,35 +237,42 @@ const CalendarEventGroups = ({ sourceEventId, onCancel }: CalendarEventGroupsPro
 
 										if (appointment) {
 											return (
-												<CalendarAppointment
-													ref={eventRefs[appointment.appointmentId]}
-													key={appointment.appointmentId}
-													appointment={appointment}
-													className="mb-2"
-													onCancel={() => {
-														onCancel({
-															calendarEventTypeId,
-															eventId: appointment.appointmentId,
-														});
-													}}
-												/>
+												<div className="py-8">
+													<CalendarAppointment
+														ref={eventRefs[appointment.appointmentId]}
+														key={appointment.appointmentId}
+														appointment={appointment}
+														className="mb-2"
+														onCancel={() => {
+															onCancel({
+																calendarEventTypeId,
+																eventId: appointment.appointmentId,
+															});
+														}}
+													/>
+												</div>
 											);
 										}
 
 										if (groupSession && groupSessionReservation) {
 											return (
-												<CalendarAppointment
-													ref={eventRefs[groupSessionReservation.groupSessionReservationId]}
-													key={groupSession.groupSessionId}
-													groupSession={groupSession}
-													className="mb-2"
-													onCancel={() => {
-														onCancel({
-															calendarEventTypeId,
-															eventId: groupSessionReservation.groupSessionReservationId,
-														});
-													}}
-												/>
+												<div className="py-8">
+													<CalendarAppointment
+														ref={
+															eventRefs[groupSessionReservation.groupSessionReservationId]
+														}
+														key={groupSession.groupSessionId}
+														groupSession={groupSession}
+														className="mb-2"
+														onCancel={() => {
+															onCancel({
+																calendarEventTypeId,
+																eventId:
+																	groupSessionReservation.groupSessionReservationId,
+															});
+														}}
+													/>
+												</div>
 											);
 										}
 
