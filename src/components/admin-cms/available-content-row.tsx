@@ -1,7 +1,11 @@
 import React, { FC } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
+import { AdminContentActions, AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
 import { TableCell, TableRow } from '@/components/table';
+import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as Article } from '@/assets/icons/article.svg';
 import { ReactComponent as BlogPost } from '@/assets/icons/blog-post.svg';
@@ -9,11 +13,8 @@ import { ReactComponent as Video } from '@/assets/icons/video.svg';
 import { ReactComponent as Audio, ReactComponent as Podcast } from '@/assets/icons/audio.svg';
 import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
 
-import { AdminContentActions, AdminContentRow, ContentAvailableStatusId, ContentTypeId } from '@/lib/models';
-
-import { Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	icon: {
@@ -27,6 +28,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 	rowButton: {
 		width: 96,
 		height: 44,
+		marginLeft: 14,
+	},
+	iconButton: {
+		width: 44,
+		height: 44,
+		padding: 0,
 	},
 	status: {
 		paddingLeft: 12,
@@ -102,7 +109,7 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 						key={index}
 						size="sm"
 						className={classes.rowButton}
-						variant="outline-primary"
+						variant="primary"
 						onClick={() => onAddClick(content.contentId)}
 					>
 						Add
@@ -113,16 +120,16 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 					<React.Fragment key={index}>
 						<Button
 							size="sm"
-							className={classNames(classes.rowButton, 'me-2')}
-							variant="outline-primary"
+							className={classes.iconButton}
+							variant="link"
 							onClick={() => onEditClick(content.contentId)}
 						>
-							Edit
+							<EditIcon />
 						</Button>
 						<Button
 							size="sm"
 							className={classes.rowButton}
-							variant="outline-danger"
+							variant="outline-primary"
 							onClick={() => onRemoveClick(content.contentId)}
 						>
 							Remove
@@ -144,7 +151,11 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 			</TableCell>
 			<TableCell>
 				<span className="d-block fs-default fw-bold">
-					<Link to={`/resource-library/${content.contentId}`}>{content.title}</Link>
+					<Link
+						to={`/admin/my-content/create?contentId=${content.contentId}&editing=true&returnToAvailable=true`}
+					>
+						{content.title}
+					</Link>
 				</span>
 				<span className="d-block fs-default fw-normal">{content.author}</span>
 			</TableCell>
@@ -162,7 +173,19 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 				</span>
 			</TableCell>
 			<TableCell className="d-flex justify-content-end">
-				<div className="text-nowrap text-right">{getButton()}</div>
+				<div className="text-nowrap text-right">
+					<Button
+						size="sm"
+						variant="link"
+						className={classes.iconButton}
+						onClick={() => {
+							window.open(`/resource-library/${content.contentId}`);
+						}}
+					>
+						<ExternalIcon />
+					</Button>
+					{getButton()}
+				</div>
 			</TableCell>
 		</TableRow>
 	);
