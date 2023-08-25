@@ -12,9 +12,8 @@ import useFlags from '@/hooks/use-flags';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import OnYourTimeContentRow from '@/components/admin-cms/on-your-time-row';
-import SearchInput from '@/components/admin-cms/search-input';
-import HeroContainer from '@/components/hero-container';
 import mediaQueries from '@/jss/media-queries';
+import InputHelperSearch from '@/components/input-helper-search';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -23,21 +22,6 @@ const useStyles = createUseStyles({
 		justifyContent: 'space-between',
 		[mediaQueries.lg]: {
 			display: 'block',
-		},
-	},
-	searchBarOuter: {
-		width: '30%',
-		[mediaQueries.lg]: {
-			width: 'auto',
-			marginBottom: 20,
-		},
-	},
-	filtersOuter: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		[mediaQueries.lg]: {
-			marginBottom: 15,
 		},
 	},
 });
@@ -83,6 +67,12 @@ const CmsOnYourTime: FC = () => {
 		},
 		[setDebouncedSearchInputValue]
 	);
+
+	const handleSearchInputClear = useCallback(() => {
+		setCurrentPageIndex(0);
+		setSearchInputValue('');
+		setDebouncedSearchInputValue('');
+	}, [setDebouncedSearchInputValue]);
 
 	useEffect(() => {
 		async function getTablePage() {
@@ -248,17 +238,30 @@ const CmsOnYourTime: FC = () => {
 				<title>Cobalt | My Content</title>
 			</Helmet>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">On Your Time - My Content</h2>
-			</HeroContainer>
-			<Container className="pt-5 mb-5">
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-6">
+					<Col>
+						<div className="mb-6 d-flex align-items-center justify-content-between">
+							<h2 className="mb-0">My Content</h2>
+							<div className="d-flex align-items-center">
+								<Button className="me-2" onClick={handleAddContentButtonClick}>
+									+ Add Content
+								</Button>
+								<InputHelperSearch
+									placeholder="Search"
+									value={searchInputValue}
+									onChange={handleSearchInputChange}
+									onClear={handleSearchInputClear}
+								/>
+							</div>
+						</div>
+						<hr />
+					</Col>
+				</Row>
 				<Row>
 					<Col>
 						<div className={classes.controlBar}>
-							<div className={classes.searchBarOuter}>
-								<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
-							</div>
-							<div className={classes.filtersOuter}>
+							<div className="d-flex align-items-center">
 								{!!filters?.contentTypes && (
 									<QuickFilterDropdown
 										active={!!typeFilterValue}
@@ -349,11 +352,6 @@ const CmsOnYourTime: FC = () => {
 										}
 									/>
 								)}
-							</div>
-							<div className="text-center">
-								<Button size="sm" onClick={handleAddContentButtonClick}>
-									+ Add Content
-								</Button>
 							</div>
 						</div>
 					</Col>

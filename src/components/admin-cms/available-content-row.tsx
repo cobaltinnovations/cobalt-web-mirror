@@ -25,6 +25,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		textAlign: 'center',
 	},
 	rowButton: {
+		width: 96,
 		height: 44,
 	},
 	status: {
@@ -99,9 +100,9 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 				return (
 					<Button
 						key={index}
-						size={'sm'}
+						size="sm"
 						className={classes.rowButton}
-						variant={'success'}
+						variant="outline-primary"
 						onClick={() => onAddClick(content.contentId)}
 					>
 						Add
@@ -111,17 +112,17 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 				return (
 					<React.Fragment key={index}>
 						<Button
-							size={'sm'}
+							size="sm"
 							className={classNames(classes.rowButton, 'me-2')}
-							variant={'success'}
+							variant="outline-primary"
 							onClick={() => onEditClick(content.contentId)}
 						>
 							Edit
 						</Button>
 						<Button
-							size={'sm'}
+							size="sm"
 							className={classes.rowButton}
-							variant={'danger'}
+							variant="outline-danger"
 							onClick={() => onRemoveClick(content.contentId)}
 						>
 							Remove
@@ -160,7 +161,9 @@ const AvailableContentRow: FC<AvailableContentRowProps> = ({ content, onAddClick
 					</span>
 				</span>
 			</TableCell>
-			<TableCell className="d-flex justify-content-end">{getButton()}</TableCell>
+			<TableCell className="d-flex justify-content-end">
+				<div className="text-nowrap text-right">{getButton()}</div>
+			</TableCell>
 		</TableRow>
 	);
 };
