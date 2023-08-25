@@ -57,10 +57,17 @@ const Reports = () => {
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>
-				<HeroContainer>
-					<h2 className="mb-0 text-center">Provider Reports</h2>
-				</HeroContainer>
-				<Container className="py-14">
+				<Container fluid className="px-8 py-8">
+					<Row className="mb-6">
+						<Col>
+							<div className="mb-6 d-flex align-items-center justify-content-between">
+								<h2 className="mb-0">Provider Reports</h2>
+							</div>
+							<hr />
+						</Col>
+					</Row>
+				</Container>
+				<Container>
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<Form className="p-8 pb-10 bg-white border rounded" onSubmit={handleFormSubmit}>
