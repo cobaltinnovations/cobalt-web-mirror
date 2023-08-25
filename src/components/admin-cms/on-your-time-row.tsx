@@ -14,6 +14,7 @@ import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 
 import { AdminContentRow, AdminContentActions, ContentApprovalStatusId, ContentTypeId } from '@/lib/models';
 
@@ -95,20 +96,16 @@ interface DropdownItem {
 
 interface AvailableContentRowProps {
 	content: AdminContentRow;
-
+	onViewClick(contentId: string): void;
 	onEditClick(contentId: string): void;
-
 	onApproveClick(contentId: string): void;
-
 	onRejectClick(contentId: string): void;
-
 	onDeleteClick(contentId: string): void;
-
 	onArchiveToggle(contentId: string, archiveFlag: boolean): void;
 }
 
 const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
-	({ content, onEditClick, onApproveClick, onRejectClick, onDeleteClick, onArchiveToggle }) => {
+	({ content, onViewClick, onEditClick, onApproveClick, onRejectClick, onDeleteClick, onArchiveToggle }) => {
 		const classes = useStyles();
 		const isSuperAdmin = false;
 
@@ -175,6 +172,12 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 
 		function getDropdownItem(action: AdminContentActions) {
 			switch (action) {
+				case AdminContentActions.VIEW:
+					return {
+						icon: <ExternalIcon className={classes.icon} />,
+						title: 'View on Cobalt',
+						onClick: () => onViewClick(content.contentId),
+					};
 				case AdminContentActions.EDIT:
 					return {
 						icon: <EditIcon className={classes.icon} />,
@@ -226,7 +229,9 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 				</TableCell>
 				<TableCell width={300}>
 					<span className="d-block fs-default fw-bold">
-						<Link to={`/resource-library/${content.contentId}`}>{content.title}</Link>
+						<Link to={`/admin/my-content/create?contentId=${content.contentId}&editing=true`}>
+							{content.title}
+						</Link>
 					</span>
 					<span className="d-block fs-default fw-normal">{content.author}</span>
 					<span className={`d-block fs-default fw-normal ${classes.description}`}>
@@ -260,7 +265,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 				<TableCell>
 					<SessionDropdown
 						id={content.contentId}
-						items={content.actions.map((action) => {
+						items={[AdminContentActions.VIEW, ...content.actions].map((action) => {
 							return getDropdownItem(action);
 						})}
 					/>

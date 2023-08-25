@@ -81,6 +81,7 @@ export interface ContentVisibility {
 }
 
 export enum AdminContentActions {
+	VIEW = 'VIEW',
 	EDIT = 'EDIT',
 	APPROVE = 'APPROVE',
 	REJECT = 'REJECT',

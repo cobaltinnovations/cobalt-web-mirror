@@ -392,6 +392,9 @@ const CmsOnYourTime: FC = () => {
 											onDeleteClick={handleDeleteClick}
 											onEditClick={handleEditClick}
 											onRejectClick={handleRejectClick}
+											onViewClick={() => {
+												window.open(`/resource-library/${content.contentId}`);
+											}}
 										/>
 									);
 								})}
