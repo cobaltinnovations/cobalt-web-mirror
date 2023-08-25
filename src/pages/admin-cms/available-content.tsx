@@ -12,7 +12,6 @@ import { debounce } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import mediaQueries from '@/jss/media-queries';
 import useHandleError from '@/hooks/use-handle-error';
-import HeroContainer from '@/components/hero-container';
 import useFlags from '@/hooks/use-flags';
 import { Helmet } from 'react-helmet';
 import InputHelperSearch from '@/components/input-helper-search';
@@ -26,6 +25,9 @@ const useStyles = createUseStyles({
 		[mediaQueries.lg]: {
 			display: 'block',
 		},
+	},
+	searchBarOuter: {
+		width: 335,
 	},
 });
 
@@ -174,6 +176,7 @@ const CmsAvailableContent: FC = () => {
 							<h2 className="mb-0">Available Content</h2>
 							<div className="d-flex align-items-center">
 								<InputHelperSearch
+									className={classes.searchBarOuter}
 									placeholder="Search"
 									value={searchInputValue}
 									onChange={handleSearchInputChange}

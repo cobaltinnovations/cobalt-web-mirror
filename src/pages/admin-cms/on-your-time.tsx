@@ -24,6 +24,9 @@ const useStyles = createUseStyles({
 			display: 'block',
 		},
 	},
+	searchBarOuter: {
+		width: 335,
+	},
 });
 
 export interface AlertLocationState {
@@ -248,6 +251,7 @@ const CmsOnYourTime: FC = () => {
 									+ Add Content
 								</Button>
 								<InputHelperSearch
+									className={classes.searchBarOuter}
 									placeholder="Search"
 									value={searchInputValue}
 									onChange={handleSearchInputChange}
