@@ -628,6 +628,14 @@ export const routes: RouteObject[] = [
 						element: <InCrisis />,
 					},
 					{
+						path: 'faqs',
+						lazy: () => import('@/routes/faqs'),
+					},
+					{
+						path: 'faqs/:faqUrlName',
+						lazy: () => import('@/routes/faqs-detail'),
+					},
+					{
 						path: 'topic-centers/:topicCenterId',
 						element: <TopicCenter />,
 					},
