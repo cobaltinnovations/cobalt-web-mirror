@@ -48,6 +48,7 @@ export interface Institution {
 	myChartDefaultUrl: string;
 	clinicalSupportPhoneNumber: string;
 	clinicalSupportPhoneNumberDescription: string;
+	faqEnabled: boolean;
 }
 
 export interface InstitutionFeature {

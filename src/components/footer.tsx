@@ -145,6 +145,13 @@ const Footer: FC = () => {
 							<Col xs={12} lg={2}>
 								<p className="mb-3 fs-large fw-semibold text-primary">Cobalt</p>
 								<ul className="list-unstyled">
+									{institution.faqEnabled && (
+										<li className="mb-3">
+											<Link className="fw-normal text-decoration-none" to="/faqs">
+												FAQ
+											</Link>
+										</li>
+									)}
 									<li className="mb-3">
 										<Link className="fw-normal text-decoration-none" to="/feedback">
 											Contact Us
