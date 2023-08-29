@@ -30,8 +30,10 @@ export const loader = async () => {
 export const Component = () => {
 	const classes = useStyles();
 	const { faqTopics, faqsByFaqTopicId } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-	const { pathname } = useLocation();
+	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
+
+	console.log(hash);
 
 	return (
 		<>
@@ -57,7 +59,7 @@ export const Component = () => {
 									<h2 className="mb-8">{faqTopic.name}</h2>
 									{faqsByFaqTopicId[faqTopic.faqTopicId].map((faq) => {
 										return (
-											<div className="mb-8 d-flex">
+											<div key={faq.faqId} className="mb-8 d-flex">
 												<QuestionMarkIcon className="me-4 text-primary flex-shrink-0 " />
 												<div>
 													<h5 className="mb-2">
@@ -84,7 +86,7 @@ export const Component = () => {
 							className="position-sticky"
 							style={{ top: HEADER_HEIGHT + 56 }}
 							orientation="vertical"
-							value="RESULTS"
+							value={hash}
 							tabs={faqTopics.map((faqTopic) => {
 								return {
 									title: faqTopic.name,
