@@ -40,7 +40,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 			'& .dropdown-header': {
 				padding: '16px 20px 2px 20px',
-				...theme.fonts.uiSmall,
+				...theme.fonts.small,
 				...theme.fonts.bodyBold,
 			},
 			'& .dropdown-item': {

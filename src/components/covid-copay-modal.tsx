@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
-import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
@@ -17,9 +16,6 @@ const useCovidCopayModalStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: theme.colors.s500,
 		},
 	},
-	subTitle: {
-		...theme.fonts.uiSmall,
-	},
 }));
 
 interface CovidCopayModalProps extends ModalProps {}
@@ -31,9 +27,7 @@ const CovidCopayModal: FC<CovidCopayModalProps> = ({ ...props }) => {
 	return (
 		<Modal {...props} dialogClassName={classes.covidCopayModal} centered>
 			<Modal.Header>
-				<p className={classNames('text-center text-white text-uppercase', classes.subTitle)}>
-					In light of covid-19
-				</p>
+				<p className="text-center text-white text-uppercase fs-small">In light of covid-19</p>
 				<h3 className="mb-0 text-center text-white">your co-pays are being waived</h3>
 			</Modal.Header>
 			<Modal.Body>

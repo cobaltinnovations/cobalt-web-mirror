@@ -177,9 +177,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 
-		'.fs-ui-small': {
-			...theme.fonts.uiSmall,
-		},
 		'.fs-small': {
 			...theme.fonts.small,
 		},

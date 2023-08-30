@@ -134,10 +134,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									<div className="d-flex">
 										<div className="position-relative">
 											{props?.contentTypeLabel && (
-												<span
-													className="text-muted text-uppercase fw-bold"
-													style={{ ...fonts.uiSmall }}
-												>
+												<span className="text-muted text-uppercase fw-bold fs-small">
 													<CircleIndicator size={16} className={classes.circleOne}>
 														1
 													</CircleIndicator>
@@ -148,8 +145,8 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 
 										{props?.duration && (
 											<span
-												className="position-relative text-muted text-uppercase fw-bold ms-auto "
-												style={{ ...fonts.uiSmall, whiteSpace: 'nowrap' }}
+												className="position-relative text-muted text-uppercase fw-bold ms-auto fs-small"
+												style={{ whiteSpace: 'nowrap' }}
 											>
 												<CircleIndicator size={16} className={classes.circleFour}>
 													4
