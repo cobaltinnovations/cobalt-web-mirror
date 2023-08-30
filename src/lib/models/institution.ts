@@ -49,6 +49,7 @@ export interface Institution {
 	clinicalSupportPhoneNumber: string;
 	clinicalSupportPhoneNumberDescription: string;
 	faqEnabled: boolean;
+	externalContactUsUrl: string;
 }
 
 export interface InstitutionFeature {
