@@ -193,7 +193,7 @@ export const adminService = {
 	getPreSignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
 		return httpSingleton.orchestrateRequest<GetPreSignedUploadUrlResponseBody>({
 			method: 'post',
-			url: 'admin/content/image-presigned-upload',
+			url: '/admin/content/image-presigned-upload',
 			data,
 		});
 	},
@@ -201,14 +201,14 @@ export const adminService = {
 	getEmailMessageTemplates() {
 		return httpSingleton.orchestrateRequest({
 			method: 'get',
-			url: 'email-message-templates',
+			url: '/email-message-templates',
 		});
 	},
 
 	testEmailMessageTemplate(payload: Record<string, any>) {
 		return httpSingleton.orchestrateRequest({
 			method: 'post',
-			url: 'email-message-templates',
+			url: '/email-message-templates',
 		});
 	},
 };
