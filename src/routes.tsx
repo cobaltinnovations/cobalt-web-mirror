@@ -767,6 +767,11 @@ export const routes: RouteObject[] = [
 										path: 'ui',
 										lazy: () => import('@/routes/admin/debug/ui'),
 									},
+									{
+										id: 'admin-debug-email-templates',
+										path: 'email-templates',
+										lazy: () => import('@/routes/admin/debug/email-templates'),
+									},
 								],
 							},
 						],

@@ -197,4 +197,18 @@ export const adminService = {
 			data,
 		});
 	},
+
+	getEmailMessageTemplates() {
+		return httpSingleton.orchestrateRequest({
+			method: 'get',
+			url: 'email-message-templates',
+		});
+	},
+
+	testEmailMessageTemplate(payload: Record<string, any>) {
+		return httpSingleton.orchestrateRequest({
+			method: 'post',
+			url: 'email-message-templates',
+		});
+	},
 };

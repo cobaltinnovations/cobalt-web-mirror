@@ -4,6 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import useFlags from '@/hooks/use-flags';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
 import Breadcrumb from '@/components/breadcrumb';
+import { ButtonLink } from '@/components/button-link';
 
 export async function loader() {
 	return null;
@@ -266,6 +267,13 @@ export const Component = () => {
 				<Row>
 					<Col>
 						<SentryDebugButtons />
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<ButtonLink className="text-decoration-none" to="/admin/debug/email-templates">
+							Email Templates
+						</ButtonLink>
 					</Col>
 				</Row>
 			</Container>
