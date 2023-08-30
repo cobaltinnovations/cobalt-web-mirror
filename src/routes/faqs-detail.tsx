@@ -22,10 +22,9 @@ export const Component = () => {
 			</Helmet>
 
 			<Container className="py-14">
-				<Row className="mb-10">
-					<Col lg={{ offset: 1, span: 10 }}>
-						<h2 className="mb-6">{faq.question}</h2>
-						<hr />
+				<Row className="mb-8">
+					<Col lg={{ offset: 1, span: 6 }}>
+						<h2 className="mb-0">{faq.question}</h2>
 					</Col>
 				</Row>
 				<Row>
