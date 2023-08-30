@@ -24,7 +24,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 }));
 

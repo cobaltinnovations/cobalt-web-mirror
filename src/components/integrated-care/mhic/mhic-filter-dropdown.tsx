@@ -169,7 +169,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderBottomLeftRadius: 8,
 		borderBottomRightRadius: 8,
 		backgroundColor: theme.colors.n50,
-		borderTop: `1px solid ${theme.colors.n100}`,
+		borderTop: `1px solid ${theme.colors.border}`,
 	},
 }));
 

@@ -22,7 +22,7 @@ const useDatePickerStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 		padding: '20px 16px 6px',
 		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'&:hover': {
 			borderColor: theme.colors.n300,
 		},

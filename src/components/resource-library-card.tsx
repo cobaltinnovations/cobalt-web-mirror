@@ -18,7 +18,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		transition: '0.2s all',
 		textDecoration: 'none',
 		'&:hover': {

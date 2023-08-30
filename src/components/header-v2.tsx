@@ -47,7 +47,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 		'& .dropdown-menu': {
 			'& svg': {
 				flexShrink: 0,
@@ -222,7 +222,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			padding: 16,
 			borderRadius: 8,
 			margin: '12px 0',
-			border: `1px solid ${theme.colors.n100}`,
+			border: `1px solid ${theme.colors.border}`,
 		},
 		'& hr': {
 			margin: '16px 0',

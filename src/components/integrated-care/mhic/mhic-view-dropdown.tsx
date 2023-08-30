@@ -235,7 +235,7 @@ const useMhicViewDropdownToggleStyles = createUseThemedStyles((theme) => ({
 		appearance: 'none',
 		padding: '10px 12px',
 		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'&:hover': {
 			border: `1px solid ${theme.colors.n300}`,
 		},

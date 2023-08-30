@@ -86,8 +86,8 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	sectionHeader: {
 		padding: '8px 20px',
 		backgroundColor: theme.colors.n50,
-		borderTop: `1px solid ${theme.colors.n100}`,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderTop: `1px solid ${theme.colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 		...theme.fonts.uiSmall,
 		...theme.fonts.bodyBold,
 		color: theme.colors.n500,
