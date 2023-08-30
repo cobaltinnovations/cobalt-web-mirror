@@ -8,6 +8,8 @@ import { accountService, institutionService, screeningService } from '@/lib/serv
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
+import InlineAlert from '@/components/inline-alert';
+import { cloneDeep } from 'lodash';
 
 const ConnectWithSupportMentalHealthRecommendations = () => {
 	const navigate = useNavigate();
@@ -15,6 +17,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
 	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
+	const [psychiatristFeature, setPsychiatristFeature] = useState<InstitutionFeature>();
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) {
@@ -34,7 +37,18 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 				accountService.getBookingRequirements(account.accountId).fetch(),
 			]
 		);
-		const matchingInstitutionFeature = institution.features.find((f) => f.featureId === features[0]?.featureId);
+
+		const featuresClone = cloneDeep(features);
+		const psychiatristIndex = featuresClone.findIndex((f) => f.featureId === 'PSYCHIATRIST');
+
+		if (psychiatristIndex > -1) {
+			featuresClone.splice(psychiatristIndex, 1);
+			setPsychiatristFeature(institution.features.find((f) => f.featureId === 'PSYCHIATRIST'));
+		}
+
+		const matchingInstitutionFeature = institution.features.find(
+			(f) => f.featureId === featuresClone[0]?.featureId
+		);
 
 		setCompletedAtDescription(sessionFullyCompletedAtDescription);
 		setRecommendedFeature(matchingInstitutionFeature);
@@ -77,7 +91,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large">
 										You can schedule a telehealth appointment with one of the providers listed.
 									</p>
-									<div className="text-center">
+									<div className="mb-8 text-center">
 										<Button
 											variant="primary"
 											size="lg"
@@ -95,6 +109,25 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 												: 'View Providers'}
 										</Button>
 									</div>
+									{psychiatristFeature && (
+										<InlineAlert
+											className="mb-4"
+											variant="warning"
+											title="Medication"
+											description="If you are interested in a medication evaluation or medication management you must schedule with our psychiatrist."
+											action={{
+												title: 'Schedule with Psychiatrist',
+												onClick: () => {
+													navigate(psychiatristFeature.urlName);
+												},
+											}}
+										/>
+									)}
+									<InlineAlert
+										variant="primary"
+										title="Your responses are not reviewed in real time"
+										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+									/>
 								</>
 							) : (
 								<NoData
