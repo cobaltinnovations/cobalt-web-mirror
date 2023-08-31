@@ -50,7 +50,7 @@ const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 		},
 		'& .dropdown-divider': {
 			margin: '16px 0',
-			borderColor: theme.colors.n100,
+			borderColor: theme.colors.border,
 		},
 	},
 	compact: {

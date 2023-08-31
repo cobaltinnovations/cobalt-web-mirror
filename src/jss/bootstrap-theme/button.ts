@@ -131,7 +131,7 @@ export const button = (theme: CobaltTheme) => {
 			'&-light': {
 				color: theme.colors.p700,
 				backgroundColor: theme.colors.n0,
-				border: `1px solid ${theme.colors.n100}`,
+				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
 					backgroundColor: theme.colors.n50,
 				},
@@ -309,7 +309,7 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 			},
 
 			'& .cobalt-button': {
-				border: `1px solid ${theme.colors.n100}`,
+				border: `1px solid ${theme.colors.border}`,
 
 				'&:hover': {
 					padding: '9px 19px',

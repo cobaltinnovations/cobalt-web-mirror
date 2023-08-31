@@ -49,7 +49,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		transition: '0.2s transform, 0.2s box-shadow',
 		color: theme.colors.n900,
 		backgroundColor: theme.colors.n75,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'& h5': {
 			wordBreak: 'initial',
 		},
