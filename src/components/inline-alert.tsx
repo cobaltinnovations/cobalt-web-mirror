@@ -7,6 +7,7 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	inlineAlert: {
@@ -50,6 +51,20 @@ const useStyles = createUseThemedStyles((theme) => ({
 				color: theme.colors.d500,
 			},
 		},
+		'&--info': {
+			backgroundColor: theme.colors.i50,
+			borderColor: theme.colors.i500,
+			'& svg': {
+				color: theme.colors.i500,
+			},
+		},
+		'&--attention': {
+			backgroundColor: theme.colors.t50,
+			borderColor: theme.colors.t500,
+			'& svg': {
+				color: theme.colors.t500,
+			},
+		},
 	},
 	iconOuter: {
 		width: 24,
@@ -68,14 +83,14 @@ interface InlineAlertAction {
 }
 
 interface InlineAlertProps {
-	variant?: 'primary' | 'success' | 'warning' | 'danger';
+	variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'attention';
 	title: string;
 	description?: string;
 	action?: InlineAlertAction | InlineAlertAction[];
 	className?: string;
 }
 
-export const InlineAlert = ({ title, description, action, variant = 'primary', className }: InlineAlertProps) => {
+export const InlineAlert = ({ title, description, action, variant = 'info', className }: InlineAlertProps) => {
 	const classes = useStyles({});
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
@@ -84,6 +99,8 @@ export const InlineAlert = ({ title, description, action, variant = 'primary', c
 			success: <SuccessIcon width={24} height={24} />,
 			warning: <WarningIcon width={24} height={24} />,
 			danger: <DangerIcon width={24} height={24} />,
+			info: <InfoIcon width={24} height={24} />,
+			attention: <QuestionMarkIcon width={24} height={24} />,
 		};
 	}, []);
 

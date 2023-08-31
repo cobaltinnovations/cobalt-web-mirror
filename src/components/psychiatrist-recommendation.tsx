@@ -19,7 +19,7 @@ export const PsychiatristRecommendation = () => {
 	return (
 		<InlineAlert
 			className="mb-4"
-			variant="warning"
+			variant="attention"
 			title="Medication"
 			description="If you are interested in a medication evaluation or medication management you must schedule with our psychiatrist."
 			action={{
