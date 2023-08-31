@@ -38,6 +38,11 @@ import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
 import { FeatureId, ROLE_ID } from './lib/models';
 
+export interface RouteHandle {
+	hideFooter?: boolean;
+	hideFooterContactUs?: boolean;
+}
+
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
 export const SignUpVerify = lazyLoadWithRefresh(() => import('@/pages/sign-up-verify'));
@@ -445,7 +450,7 @@ export const routes: RouteObject[] = [
 						element: <ProviderOnlyRoutes />,
 						handle: {
 							hideFooter: true,
-						},
+						} as RouteHandle,
 						children: [
 							{
 								path: 'scheduling',
@@ -501,6 +506,9 @@ export const routes: RouteObject[] = [
 					{
 						path: 'screening-questions/:screeningQuestionContextId',
 						element: <ScreeningQuestionsPage />,
+						handle: {
+							hideFooterContactUs: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'appointments/:appointmentId',
@@ -858,6 +866,9 @@ export const routes: RouteObject[] = [
 											{
 												path: ':screeningQuestionContextId',
 												element: <ScreeningQuestionsPage />,
+												handle: {
+													hideFooterContactUs: true,
+												} as RouteHandle,
 											},
 										],
 									},
@@ -916,6 +927,9 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment/:screeningQuestionContextId',
 										element: <ScreeningQuestionsPage />,
+										handle: {
+											hideFooterContactUs: true,
+										} as RouteHandle,
 									},
 									{
 										path: 'check-in',

@@ -14,6 +14,7 @@ import FooterNav from './footer-nav';
 
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { FeatureId } from '@/lib/models';
+import { RouteHandle } from '@/routes';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
 	footer: {
@@ -44,8 +45,19 @@ const Footer: FC = () => {
 	const routeMatches = useMatches();
 
 	const hideFooter = useMemo(() => {
-		return !account || routeMatches.some((match) => (match.handle as Record<string, boolean>)?.hideFooter);
+		// check config for any route in the rendered hierarchy
+		const routeHidesFooter = routeMatches.some((match) => {
+			return (match.handle as RouteHandle)?.hideFooter;
+		});
+		return !account || routeHidesFooter;
 	}, [account, routeMatches]);
+
+	const routeHidesContactUs = useMemo(() => {
+		// check config for any route in the rendered hierarchy
+		return routeMatches.some((match) => {
+			return (match.handle as RouteHandle)?.hideFooterContactUs;
+		});
+	}, [routeMatches]);
 
 	useEffect(() => {
 		if (hideFooter) {
@@ -76,7 +88,7 @@ const Footer: FC = () => {
 
 	return (
 		<>
-			{institution.externalContactUsUrl && (
+			{institution.externalContactUsUrl && !routeHidesContactUs && (
 				<Container fluid className="bg-n75">
 					<Container className="py-10 py-lg-20">
 						<Row>
@@ -99,6 +111,7 @@ const Footer: FC = () => {
 					</Container>
 				</Container>
 			)}
+
 			<footer
 				ref={footer}
 				className={classNames(classes.footer, {
