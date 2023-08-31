@@ -174,19 +174,19 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		},
 
 		'.border': {
-			border: `1px solid ${theme.colors.n100} !important`,
+			border: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-top': {
-			borderTop: `1px solid ${theme.colors.n100} !important`,
+			borderTop: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-end': {
-			borderRight: `1px solid ${theme.colors.n100} !important`,
+			borderRight: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-bottom': {
-			borderBottom: `1px solid ${theme.colors.n100} !important`,
+			borderBottom: `1px solid ${theme.colors.border} !important`,
 		},
 		'.border-start': {
-			borderLeft: `1px solid ${theme.colors.n100} !important`,
+			borderLeft: `1px solid ${theme.colors.border} !important`,
 		},
 		'.selected-border-bottom': {
 			borderBottom: `3px solid ${theme.colors.a500} !important`,

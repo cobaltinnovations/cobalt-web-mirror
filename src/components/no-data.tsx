@@ -9,7 +9,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: 48,
 		borderRadius: 4,
 		backgroundColor: theme.colors.n75,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 	},
 }));
 

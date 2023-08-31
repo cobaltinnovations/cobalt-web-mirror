@@ -213,7 +213,7 @@ export const useContainerStyles = createUseThemedStyles((theme) => ({
 				verticalAlign: 'top',
 			},
 			'& .fc-timegrid-slot-label-cushion': {
-				...theme.fonts.uiSmall,
+				...theme.fonts.small,
 				color: theme.colors.n500,
 				padding: '4px 4px 0 0',
 			},

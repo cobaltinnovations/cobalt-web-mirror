@@ -14,7 +14,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		borderRadius: 4,
 		backgroundColor: theme.colors.n50,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'&--primary': {
 			backgroundColor: theme.colors.p50,
 			borderColor: theme.colors.p500,

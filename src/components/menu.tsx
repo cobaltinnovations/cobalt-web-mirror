@@ -86,9 +86,8 @@ const useMenuStyles = createUseThemedStyles((theme) => ({
 	sectionHeader: {
 		padding: '8px 20px',
 		backgroundColor: theme.colors.n50,
-		borderTop: `1px solid ${theme.colors.n100}`,
-		borderBottom: `1px solid ${theme.colors.n100}`,
-		...theme.fonts.uiSmall,
+		borderTop: `1px solid ${theme.colors.border}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 		...theme.fonts.bodyBold,
 		color: theme.colors.n500,
 	},
@@ -495,7 +494,9 @@ const CobaltMenu = ({ sections, isSubNav, onHide, onSubNav }: CobaltMenuProps) =
 
 					return (
 						<React.Fragment key={index}>
-							{section.title && <div className={classes.sectionHeader}>{section.title}</div>}
+							{section.title && (
+								<div className={classNames('fs-small', classes.sectionHeader)}>{section.title}</div>
+							)}
 
 							<ul className={classNames(classes.menuList, classes.subMenuList, 'my-2')}>
 								{items.map((item, itemIndex) => {

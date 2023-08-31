@@ -52,7 +52,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		hr: {
 			margin: 0,
 			opacity: 1,
-			borderColor: theme.colors.n100,
+			borderColor: theme.colors.border,
 		},
 
 		/* ----------------------------------------------------------- */
@@ -177,9 +177,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 
-		'.fs-ui-small': {
-			...theme.fonts.uiSmall,
-		},
 		'.fs-small': {
 			...theme.fonts.small,
 		},

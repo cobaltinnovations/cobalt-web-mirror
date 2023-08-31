@@ -43,7 +43,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			boxShadow: 'none',
 			position: 'static',
 			padding: '32px 0 40px',
-			borderTop: `1px solid ${theme.colors.n100}`,
+			borderTop: `1px solid ${theme.colors.border}`,
 		},
 	},
 }));

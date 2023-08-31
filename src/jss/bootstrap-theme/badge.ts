@@ -4,7 +4,7 @@ export const badge = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-badge': {
 			padding: '5px 10px',
-			...theme.fonts.uiSmall,
+			...theme.fonts.small,
 			...theme.fonts.bodyNormal,
 			'&.bg-primary': {
 				color: theme.colors.n0,
@@ -62,7 +62,7 @@ export const badge = (theme: CobaltTheme) => {
 			'&.bg-outline-dark': {
 				color: theme.colors.n500,
 				backgroundColor: theme.colors.n50,
-				border: `1px solid ${theme.colors.n100}`,
+				border: `1px solid ${theme.colors.border}`,
 			},
 			'&.bg-outline-light': {
 				color: theme.colors.n900,

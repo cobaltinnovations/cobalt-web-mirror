@@ -31,11 +31,11 @@ const useSelectStyles = createUseThemedStyles((theme) => ({
 			'&:disabled': {
 				color: theme.colors.n500,
 				backgroundColor: theme.colors.n75,
-				border: `1px solid ${theme.colors.n100}`,
+				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
 					color: theme.colors.n500,
 					backgroundColor: theme.colors.n75,
-					border: `1px solid ${theme.colors.n100}`,
+					border: `1px solid ${theme.colors.border}`,
 				},
 			},
 			'&:invalid': {
