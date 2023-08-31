@@ -4,7 +4,7 @@ import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { AlertTypeId } from '@/lib/models';
+import { AlertTypeId, FeatureId } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
@@ -404,7 +404,7 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 
 	const navigationConfig = useMemo(() => {
-		const featureIdsWithLocationFilter = ['THERAPY', 'COACHING'];
+		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
 
 		return [
 			{

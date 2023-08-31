@@ -36,7 +36,7 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
-import { ROLE_ID } from './lib/models';
+import { FeatureId, ROLE_ID } from './lib/models';
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -237,7 +237,7 @@ const DebugEnabledRoutes = () => {
 const InstitutionResourcesEnabled = () => {
 	const { institution } = useAccount();
 
-	return institution.features.findIndex((feature) => feature.featureId === 'INSTITUTION_RESOURCES') > -1 ? (
+	return institution.features.findIndex((feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES) > -1 ? (
 		<Outlet />
 	) : (
 		<NoMatch />

@@ -13,6 +13,7 @@ import FooterLogo from './footer-logo';
 import FooterNav from './footer-nav';
 
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { FeatureId } from '@/lib/models';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
 	footer: {
@@ -126,7 +127,8 @@ const Footer: FC = () => {
 													<Link
 														className="fw-normal text-decoration-none"
 														to={
-															featureId === 'THERAPY' && account?.institutionLocationId
+															featureId === FeatureId.THERAPY &&
+															account?.institutionLocationId
 																? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 																: urlName
 														}

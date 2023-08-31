@@ -1,3 +1,5 @@
+import { FeatureId } from './institution';
+
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/AccountSource.java#L18
 export enum AccountSourceId {
 	COBALT_SSO = 'COBALT_SSO',
@@ -104,6 +106,6 @@ export interface AccountSupportRole {
 }
 
 export interface AccountFeature {
-	featureId: string;
+	featureId: FeatureId;
 	name: string;
 }

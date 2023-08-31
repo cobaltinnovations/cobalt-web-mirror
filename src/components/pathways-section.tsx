@@ -11,6 +11,7 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import useAnalytics from '@/hooks/use-analytics';
+import { FeatureId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	pathways: {
@@ -178,7 +179,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 									<div key={featureId} className={classes.pathwayOuter}>
 										<Link
 											to={
-												featureId === 'THERAPY' && account?.institutionLocationId
+												featureId === FeatureId.THERAPY && account?.institutionLocationId
 													? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 													: urlName
 											}

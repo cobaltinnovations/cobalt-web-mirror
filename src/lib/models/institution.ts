@@ -7,6 +7,24 @@ export enum AnonymousAccountExpirationStrategyId {
 	SINGLE_SESSION = 'SINGLE_SESSION',
 }
 
+export enum FeatureId {
+	THERAPY = 'THERAPY',
+	MEDICATION_PRESCRIBER = 'MEDICATION_PRESCRIBER',
+	GROUP_SESSIONS = 'GROUP_SESSIONS',
+	COACHING = 'COACHING',
+	SELF_HELP_RESOURCES = 'SELF_HELP_RESOURCES',
+	SPIRITUAL_SUPPORT = 'SPIRITUAL_SUPPORT',
+	CRISIS_SUPPORT = 'CRISIS_SUPPORT',
+	MHP = 'MHP',
+	MENTAL_HEALTH_PROVIDERS = 'MENTAL_HEALTH_PROVIDERS',
+	INSTITUTION_RESOURCES = 'INSTITUTION_RESOURCES',
+	PSYCHOLOGIST = 'PSYCHOLOGIST',
+	PSYCHIATRIST = 'PSYCHIATRIST',
+	MSW = 'MSW',
+	PSYCHOTHERAPIST = 'PSYCHOTHERAPIST',
+	RESOURCE_NAVIGATOR = 'RESOURCE_NAVIGATOR',
+}
+
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
 	alerts: InstitutionAlert[];
@@ -54,7 +72,7 @@ export interface Institution {
 
 export interface InstitutionFeature {
 	description: string;
-	featureId: string;
+	featureId: FeatureId;
 	name: string;
 	navDescription: string;
 	navVisible: boolean;
