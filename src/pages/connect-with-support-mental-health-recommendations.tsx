@@ -4,7 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { FeatureId, InstitutionFeature } from '@/lib/models';
-import { accountService, institutionService, screeningService } from '@/lib/services';
+import { accountService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
@@ -16,7 +16,6 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	const { account, institution } = useAccount();
 	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
-	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
 	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
 
 	const fetchData = useCallback(async () => {
@@ -57,23 +56,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 
 		setCompletedAtDescription(sessionFullyCompletedAtDescription);
 		setRecommendedFeature(matchingInstitutionFeature);
-
-		if (!myChartConnectionRequired) {
-			return;
-		}
-
-		const { authenticationUrl } = await institutionService
-			.getMyChartAuthenticationUrl(institution.institutionId)
-			.fetch();
-
-		setMyChartAuthUrl(authenticationUrl);
-	}, [
-		account?.accountId,
-		institution.features,
-		institution.institutionId,
-		institution.providerTriageScreeningFlowId,
-		navigate,
-	]);
+	}, [account?.accountId, institution.features, institution.providerTriageScreeningFlowId, navigate]);
 
 	return (
 		<>
@@ -102,17 +85,10 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 											variant="primary"
 											size="lg"
 											onClick={() => {
-												if (myChartAuthUrl) {
-													window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
-													return;
-												}
-
 												navigate(recommendedFeature.urlName);
 											}}
 										>
-											{myChartAuthUrl
-												? `Connect to ${institution.myChartName}`
-												: 'Schedule an Appointment'}
+											Schedule an Appointment
 										</Button>
 									</div>
 

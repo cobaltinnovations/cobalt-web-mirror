@@ -158,13 +158,17 @@ const ConnectWithSupportMentalHealthProviders = () => {
 								<InlineAlert
 									className="mb-4"
 									variant="success"
-									title="Assessment Complete"
+									title="Appointment Scheduled"
 									description={`Your appointment with ${recommendedFeature?.name} has been scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
 									action={[
 										{
 											title: 'Go to ' + institution.myChartName,
 											onClick: () => {
-												navigate(recommendedFeature?.urlName ?? '');
+												window.open(
+													institution.myChartDefaultUrl,
+													'_blank',
+													'noopener, noreferrer'
+												);
 											},
 										},
 										{
