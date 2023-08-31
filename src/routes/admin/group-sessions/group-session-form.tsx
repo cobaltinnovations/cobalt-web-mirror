@@ -52,7 +52,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import TabBar from '@/components/tab-bar';
 import ConfirmDialog from '@/components/confirm-dialog';
 import useFlags from '@/hooks/use-flags';
-import { buildBackendDownloadUrl } from '@/lib/utils';
+import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
@@ -174,13 +174,13 @@ function getInitialGroupSessionFormValues({
 	const startDate = moment(startDateTime);
 	const endDate = moment(endDateTime);
 	const followupTimeOfDay = formattedFollowupTimeOfDay
-		? moment(formattedFollowupTimeOfDay, 'HH:mm').format('hh:mm A')
+		? moment(formattedFollowupTimeOfDay, DateFormats.API.Time).format(DateFormats.UI.TimeSlotInput)
 		: '';
 
 	const mergedDateInputValues = {
 		startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
-		startTime: startDateTime ? startDate.format('hh:mm A') : '',
-		endTime: endDateTime ? endDate.format('hh:mm A') : '',
+		startTime: startDateTime ? startDate.format(DateFormats.UI.TimeSlotInput) : '',
+		endTime: endDateTime ? endDate.format(DateFormats.UI.TimeSlotInput) : '',
 		endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
 		followupTimeOfDay: followupTimeOfDay,
 	};
@@ -1595,13 +1595,15 @@ function prepareGroupSessionSubmission(
 ): CreateGroupSessionRequestBody {
 	const { startDate, endDate, startTime, endTime, ...groupSessionSubmission } = formValues;
 
-	let startDateTime = moment(`${startDate?.toISOString().split('T')[0]} ${startTime}`, 'YYYY-MM-DD HH:mm A').format(
-		'YYYY-MM-DD[T]HH:mm'
-	);
+	let startDateTime = moment(
+		`${startDate?.toISOString().split('T')[0]} ${startTime}`,
+		`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
+	).format(DateFormats.API.DateTime);
 
-	let endDateTime = moment(`${startDate?.toISOString().split('T')[0]} ${endTime}`, 'YYYY-MM-DD HH:mm A').format(
-		'YYYY-MM-DD[T]HH:mm'
-	);
+	let endDateTime = moment(
+		`${startDate?.toISOString().split('T')[0]} ${endTime}`,
+		`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
+	).format(DateFormats.API.DateTime);
 
 	if (isExternal) {
 		delete groupSessionSubmission.screeningFlowId;
@@ -1619,9 +1621,9 @@ function prepareGroupSessionSubmission(
 			delete groupSessionSubmission.dateTimeDescription;
 		} else {
 			// default times to start of day
-			startDateTime = moment(startDate).startOf('day').format('YYYY-MM-DD[T]HH:mm');
+			startDateTime = moment(startDate).startOf('day').format(DateFormats.API.DateTime);
 
-			endDateTime = moment(endDate).startOf('day').format('YYYY-MM-DD[T]HH:mm');
+			endDateTime = moment(endDate).startOf('day').format(DateFormats.API.DateTime);
 		}
 	} else {
 		delete groupSessionSubmission.groupSessionLearnMoreMethodId;
@@ -1649,8 +1651,8 @@ function prepareGroupSessionSubmission(
 		} else {
 			groupSessionSubmission.followupTimeOfDay = moment(
 				groupSessionSubmission.followupTimeOfDay,
-				'hh:mm A'
-			).format('HH:mm');
+				DateFormats.UI.TimeSlotInput
+			).format(DateFormats.API.Time);
 		}
 	}
 
