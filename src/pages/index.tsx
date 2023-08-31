@@ -166,7 +166,7 @@ const Index: FC = () => {
 					</Container>
 					<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
 					{!institution.hasTakenFeatureScreening && (
-						<Container>
+						<Container className="mb-10">
 							<Row>
 								<Col>
 									<NoData
