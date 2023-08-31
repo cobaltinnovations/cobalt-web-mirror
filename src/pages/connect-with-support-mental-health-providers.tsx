@@ -3,28 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { InstitutionFeature } from '@/lib/models';
-import { accountService, institutionService, screeningService } from '@/lib/services';
+import { FeatureId, InstitutionFeature } from '@/lib/models';
+import { accountService, institutionService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import HeroContainer from '@/components/hero-container';
 import NoData from '@/components/no-data';
 import AsyncWrapper from '@/components/async-page';
+import { PsychiatristRecommendation } from '@/components/psychiatrist-recommendation';
+import InlineAlert from '@/components/inline-alert';
 
 const ConnectWithSupportMentalHealthProviders = () => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
-		screeningFlowId: institution?.providerTriageScreeningFlowId,
-		instantiateOnLoad: false,
-	});
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, hasCompletedScreening } =
+		useScreeningFlow({
+			screeningFlowId: institution?.providerTriageScreeningFlowId,
+			instantiateOnLoad: false,
+		});
 
 	const featureDetails = useMemo(
-		() => (institution?.features ?? []).find((feature) => feature.featureId === 'MENTAL_HEALTH_PROVIDERS'),
+		() => (institution?.features ?? []).find((feature) => feature.featureId === FeatureId.MENTAL_HEALTH_PROVIDERS),
 		[institution?.features]
 	);
 
-	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
+	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
+	const [hasScheduled, setHasScheduled] = useState(false);
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
 	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
 
@@ -33,48 +37,42 @@ const ConnectWithSupportMentalHealthProviders = () => {
 			throw new Error('providerTriageScreeningFlowId is undefined.');
 		}
 
-		const { sessionFullyCompleted } = await screeningService
-			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
-			.fetch();
+		if (!account?.accountId) {
+			throw new Error('accountId is undefined.');
+		}
 
-		if (sessionFullyCompleted) {
-			setHasCompletedScreening(true);
+		const { myChartConnectionRequired } = await accountService.getBookingRequirements(account.accountId).fetch();
 
-			if (!account?.accountId) {
-				throw new Error('accountId is undefined.');
-			}
-
-			const { myChartConnectionRequired } = await accountService
-				.getBookingRequirements(account.accountId)
+		if (myChartConnectionRequired) {
+			const { authenticationUrl } = await institutionService
+				.getMyChartAuthenticationUrl(institution.institutionId)
 				.fetch();
 
-			if (myChartConnectionRequired) {
-				const { authenticationUrl } = await institutionService
-					.getMyChartAuthenticationUrl(institution.institutionId)
-					.fetch();
+			setMyChartAuthUrl(authenticationUrl);
+		}
 
-				setMyChartAuthUrl(authenticationUrl);
-			} else {
-				const { features } = await accountService.getRecommendedFeatures(account.accountId).fetch();
-				const matchingInstitutionFeature = institution.features.find(
-					(f) => f.featureId === features[0]?.featureId
-				);
+		if (hasCompletedScreening) {
+			const { appointmentAlreadyScheduled, features } = await accountService
+				.getRecommendedFeatures(account.accountId)
+				.fetch();
+			setHasScheduled(appointmentAlreadyScheduled);
 
-				setRecommendedFeature(matchingInstitutionFeature);
+			const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+			setShowPsychiatristRecommendation(psychiatristIndex > -1);
 
-				if (matchingInstitutionFeature) {
-					navigate(matchingInstitutionFeature.urlName, { replace: true });
-				}
-			}
-		} else {
-			setHasCompletedScreening(false);
+			const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
+			const matchingInstitutionFeature = institution.features.find(
+				(f) => f.featureId === firstRecommendation?.featureId
+			);
+
+			setRecommendedFeature(matchingInstitutionFeature);
 		}
 	}, [
 		account?.accountId,
+		hasCompletedScreening,
 		institution.features,
 		institution.institutionId,
 		institution.providerTriageScreeningFlowId,
-		navigate,
 	]);
 
 	if (renderedPreScreeningLoader) {
@@ -100,49 +98,86 @@ const ConnectWithSupportMentalHealthProviders = () => {
 				<Container className="py-15">
 					<Row>
 						<Col>
-							{hasCompletedScreening ? (
+							{myChartAuthUrl && (
 								<NoData
 									title={`Connect to ${institution.myChartName}`}
-									description={`Connect to ${institution.myChartName} to see a list of providers and their available telehealth appointment times. If you need an in-person appointment, please call us at ${institution.clinicalSupportPhoneNumberDescription}.`}
+									description={`In order to be connected with one of our providers, you will need to sign in to your ${institution.myChartName} account. If you do not have a ${institution.myChartName} account, click Learn More for instructions on how to sign up. If you have any difficulty getting an activation or access code, please contact ${institution.myChartName} technical support at ${institution.clinicalSupportPhoneNumberDescription}.`}
 									actions={[
 										{
 											variant: 'primary',
-											title: myChartAuthUrl
-												? `Connect to ${institution.myChartName}`
-												: 'View Providers',
+											title: `Connect to ${institution.myChartName}`,
 											onClick: () => {
-												if (myChartAuthUrl) {
-													window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
-													return;
-												}
-
-												if (recommendedFeature) {
-													navigate(recommendedFeature.urlName);
-												}
+												window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
 											},
 										},
 										{
 											variant: 'outline-primary',
-											title: 'View my Results',
+											title: 'Learn More',
 											onClick: () => {
-												navigate('/connect-with-support/recommendations');
+												window.open(
+													institution.myChartInstructionsUrl,
+													'_blank',
+													'noopener, noreferrer'
+												);
 											},
 										},
 									]}
 								/>
-							) : (
+							)}
+
+							{!hasCompletedScreening && !myChartAuthUrl && (
 								<NoData
-									title="No Providers Recommended"
-									description="Please take the assessment to see recommended providers."
+									title="Take the assessment"
+									description="Copy"
 									actions={[
 										{
 											variant: 'primary',
-											title: 'Take Assessment',
+											title: 'Take the assessment',
 											onClick: startScreeningFlow,
 										},
 									]}
 								/>
 							)}
+
+							{hasCompletedScreening && !hasScheduled && (
+								<InlineAlert
+									className="mb-4"
+									variant="success"
+									title="Assessment Complete"
+									description={`Based on the symptoms reported, we recommend ${recommendedFeature?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
+									action={{
+										title: 'Schedule with ' + recommendedFeature?.name,
+										onClick: () => {
+											navigate(recommendedFeature?.urlName ?? '');
+										},
+									}}
+								/>
+							)}
+
+							{hasCompletedScreening && hasScheduled && (
+								<InlineAlert
+									className="mb-4"
+									variant="success"
+									title="Assessment Complete"
+									description={`Your appointment with ${recommendedFeature?.name} has been scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
+									action={[
+										{
+											title: 'Go to ' + institution.myChartName,
+											onClick: () => {
+												navigate(recommendedFeature?.urlName ?? '');
+											},
+										},
+										{
+											title: 'View My Events',
+											onClick: () => {
+												navigate('/my-calendar');
+											},
+										},
+									]}
+								/>
+							)}
+
+							{showPsychiatristRecommendation && <PsychiatristRecommendation />}
 						</Col>
 					</Row>
 				</Container>

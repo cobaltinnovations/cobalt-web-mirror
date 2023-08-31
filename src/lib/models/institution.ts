@@ -64,6 +64,7 @@ export interface Institution {
 	integratedCareProgramName: string;
 	myChartName: string;
 	myChartDefaultUrl: string;
+	myChartInstructionsUrl: string;
 	clinicalSupportPhoneNumber: string;
 	clinicalSupportPhoneNumberDescription: string;
 	faqEnabled: boolean;
