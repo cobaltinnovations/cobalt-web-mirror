@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { InstitutionFeature } from '@/lib/models';
-import { accountService, institutionService, screeningService } from '@/lib/services';
+import { FeatureId, InstitutionFeature } from '@/lib/models';
+import { accountService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 import InlineAlert from '@/components/inline-alert';
-import { cloneDeep } from 'lodash';
+import { PsychiatristRecommendation } from '@/components/psychiatrist-recommendation';
 
 const ConnectWithSupportMentalHealthRecommendations = () => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
 	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
-	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
-	const [psychiatristFeature, setPsychiatristFeature] = useState<InstitutionFeature>();
+	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) {
@@ -28,46 +27,36 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			throw new Error('institution.providerTriageScreeningFlowId is undefined.');
 		}
 
-		const [{ sessionFullyCompletedAtDescription }, { features }, { myChartConnectionRequired }] = await Promise.all(
-			[
-				screeningService
-					.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
-					.fetch(),
-				accountService.getRecommendedFeatures(account.accountId).fetch(),
-				accountService.getBookingRequirements(account.accountId).fetch(),
-			]
-		);
+		const [
+			{ sessionFullyCompleted, sessionFullyCompletedAtDescription },
+			{ features },
+			{ myChartConnectionRequired },
+		] = await Promise.all([
+			screeningService
+				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
+				.fetch(),
+			accountService.getRecommendedFeatures(account.accountId).fetch(),
+			accountService.getBookingRequirements(account.accountId).fetch(),
+		]);
 
-		const featuresClone = cloneDeep(features);
-		const psychiatristIndex = featuresClone.findIndex((f) => f.featureId === 'PSYCHIATRIST');
-
-		if (psychiatristIndex > -1) {
-			featuresClone.splice(psychiatristIndex, 1);
-			setPsychiatristFeature(institution.features.find((f) => f.featureId === 'PSYCHIATRIST'));
+		if (myChartConnectionRequired || !sessionFullyCompleted) {
+			navigate('/connect-with-support/mental-health-providers', {
+				replace: true,
+			});
+			return;
 		}
 
+		const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+		setShowPsychiatristRecommendation(psychiatristIndex > -1);
+
+		const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
 		const matchingInstitutionFeature = institution.features.find(
-			(f) => f.featureId === featuresClone[0]?.featureId
+			(f) => f.featureId === firstRecommendation?.featureId
 		);
 
 		setCompletedAtDescription(sessionFullyCompletedAtDescription);
 		setRecommendedFeature(matchingInstitutionFeature);
-
-		if (!myChartConnectionRequired) {
-			return;
-		}
-
-		const { authenticationUrl } = await institutionService
-			.getMyChartAuthenticationUrl(institution.institutionId)
-			.fetch();
-
-		setMyChartAuthUrl(authenticationUrl);
-	}, [
-		account?.accountId,
-		institution.features,
-		institution.institutionId,
-		institution.providerTriageScreeningFlowId,
-	]);
+	}, [account?.accountId, institution.features, institution.providerTriageScreeningFlowId, navigate]);
 
 	return (
 		<>
@@ -85,7 +74,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-8" />
 									<p className="mb-6 fs-large">
-										Based on your answers, we recommend{' '}
+										Based on the symptoms reported we recommend{' '}
 										<strong>{recommendedFeature.treatmentDescription}</strong>.
 									</p>
 									<p className="mb-6 fs-large">
@@ -96,35 +85,17 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 											variant="primary"
 											size="lg"
 											onClick={() => {
-												if (myChartAuthUrl) {
-													window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
-													return;
-												}
-
 												navigate(recommendedFeature.urlName);
 											}}
 										>
-											{myChartAuthUrl
-												? `Connect to ${institution.myChartName}`
-												: 'View Providers'}
+											Schedule an Appointment
 										</Button>
 									</div>
-									{psychiatristFeature && (
-										<InlineAlert
-											className="mb-4"
-											variant="warning"
-											title="Medication"
-											description="If you are interested in a medication evaluation or medication management you must schedule with our psychiatrist."
-											action={{
-												title: 'Schedule with Psychiatrist',
-												onClick: () => {
-													navigate(psychiatristFeature.urlName);
-												},
-											}}
-										/>
-									)}
+
+									{showPsychiatristRecommendation && <PsychiatristRecommendation />}
+
 									<InlineAlert
-										variant="primary"
+										variant="info"
 										title="Your responses are not reviewed in real time"
 										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
 									/>

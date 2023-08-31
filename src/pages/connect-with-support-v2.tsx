@@ -6,7 +6,7 @@ import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { InstitutionLocation } from '@/lib/models';
+import { FeatureId, InstitutionLocation } from '@/lib/models';
 import {
 	accountService,
 	FindOptionsResponse,
@@ -547,7 +547,8 @@ const ConnectWithSupportV2 = () => {
 																		title: `Call ${provider.formattedPhoneNumber}`,
 																		onClick: () => {
 																			if (
-																				featureDetails?.featureId === 'THERAPY'
+																				featureDetails?.featureId ===
+																				FeatureId.THERAPY
 																			) {
 																				trackEvent({
 																					action: 'Therapy Phone Call',

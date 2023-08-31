@@ -36,7 +36,7 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
-import { ROLE_ID } from './lib/models';
+import { FeatureId, ROLE_ID } from './lib/models';
 
 export interface RouteHandle {
 	hideFooter?: boolean;
@@ -211,6 +211,12 @@ const SupportEnabledRoutes = () => {
 	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
 };
 
+const EpicFHIREnabledRoutes = () => {
+	const { institution } = useAccount();
+
+	return institution.epicFhirEnabled ? <Outlet /> : <NoMatch />;
+};
+
 const IntegratedCareEnabledRoutes = () => {
 	const { institution } = useAccount();
 
@@ -242,7 +248,7 @@ const DebugEnabledRoutes = () => {
 const InstitutionResourcesEnabled = () => {
 	const { institution } = useAccount();
 
-	return institution.features.findIndex((feature) => feature.featureId === 'INSTITUTION_RESOURCES') > -1 ? (
+	return institution.features.findIndex((feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES) > -1 ? (
 		<Outlet />
 	) : (
 		<NoMatch />
@@ -413,12 +419,17 @@ export const routes: RouteObject[] = [
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},
 							{
-								path: 'connect-with-support/mental-health-providers',
-								element: <ConnectWithSupportMentalHealthProviders />,
-							},
-							{
-								path: '/connect-with-support/recommendations',
-								element: <ConnectWithSupportMentalHealthRecommendations />,
+								element: <EpicFHIREnabledRoutes />,
+								children: [
+									{
+										path: 'connect-with-support/mental-health-providers',
+										element: <ConnectWithSupportMentalHealthProviders />,
+									},
+									{
+										path: '/connect-with-support/recommendations',
+										element: <ConnectWithSupportMentalHealthRecommendations />,
+									},
+								],
 							},
 							{
 								path: 'connect-with-support/:urlName',

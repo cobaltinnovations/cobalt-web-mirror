@@ -407,7 +407,7 @@ export const Component = () => {
 									/>
 								) : (
 									<InlineAlert
-										variant="primary"
+										variant="info"
 										title="Your responses are not reviewed in real time"
 										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
 									/>
