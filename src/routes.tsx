@@ -206,6 +206,12 @@ const SupportEnabledRoutes = () => {
 	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
 };
 
+const EpicFHIREnabledRoutes = () => {
+	const { institution } = useAccount();
+
+	return institution.epicFhirEnabled ? <Outlet /> : <NoMatch />;
+};
+
 const IntegratedCareEnabledRoutes = () => {
 	const { institution } = useAccount();
 
@@ -408,12 +414,17 @@ export const routes: RouteObject[] = [
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},
 							{
-								path: 'connect-with-support/mental-health-providers',
-								element: <ConnectWithSupportMentalHealthProviders />,
-							},
-							{
-								path: '/connect-with-support/recommendations',
-								element: <ConnectWithSupportMentalHealthRecommendations />,
+								element: <EpicFHIREnabledRoutes />,
+								children: [
+									{
+										path: 'connect-with-support/mental-health-providers',
+										element: <ConnectWithSupportMentalHealthProviders />,
+									},
+									{
+										path: '/connect-with-support/recommendations',
+										element: <ConnectWithSupportMentalHealthRecommendations />,
+									},
+								],
 							},
 							{
 								path: 'connect-with-support/:urlName',

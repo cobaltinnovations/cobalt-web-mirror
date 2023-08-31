@@ -67,6 +67,7 @@ export interface Institution {
 	clinicalSupportPhoneNumber: string;
 	clinicalSupportPhoneNumberDescription: string;
 	faqEnabled: boolean;
+	epicFhirEnabled: boolean;
 	externalContactUsUrl: string;
 }
 
