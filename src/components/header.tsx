@@ -1,19 +1,15 @@
 import React, { FC, useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
 
 import Menu from '@/components/menu';
 import useAccount from '@/hooks/use-account';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import mediaQueries from '@/jss/media-queries';
-import useAnalytics from '@/hooks/use-analytics';
-import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
+import InCrisisHeaderButton from './in-crisis-header-button';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -44,10 +40,6 @@ const useHeaderStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: 'rgba(255,255,255,0.12)',
 		},
 	},
-	inCrisisButton: {
-		display: 'flex',
-		alignItems: 'center',
-	},
 	menuIcon: {
 		'& path': {
 			fill: theme.colors.p500,
@@ -70,9 +62,7 @@ interface HeaderProps {
 const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 	const { account } = useAccount();
 	const classes = useHeaderStyles();
-	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
-	const { trackEvent } = useAnalytics();
 
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
@@ -125,11 +115,6 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 		setMenuOpen(true);
 	}
 
-	function handleInCrisisButtonClick() {
-		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
-		openInCrisisModal();
-	}
-
 	function handleMenuHide() {
 		setMenuOpen(false);
 	}
@@ -154,12 +139,7 @@ const Header: FC<HeaderProps> = ({ showHeaderButtons = true }) => {
 						<LogoSmallText className="text-primary d-block" />
 					</Link>
 				</div>
-				{showHeaderButtons && (
-					<Button className={classes.inCrisisButton} size="sm" onClick={handleInCrisisButtonClick}>
-						<PhoneIcon className={classes.phoneIcon} />
-						<small className="fw-bold">In Crisis?</small>
-					</Button>
-				)}
+				{showHeaderButtons && <InCrisisHeaderButton />}
 			</header>
 		</>
 	);

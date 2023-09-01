@@ -9,7 +9,6 @@ import { institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import PathwaysIcon from '@/components/pathways-icons';
 import HeaderAlert from '@/components/header-alert';
@@ -19,16 +18,14 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
-
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import InCrisisHeaderButton from './in-crisis-header-button';
 
 export const HEADER_HEIGHT = 56;
 
@@ -299,7 +296,6 @@ const HeaderV2 = () => {
 
 	const { account, institution, hasAdminNavCapabilities, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
-	const { openInCrisisModal } = useInCrisisModal();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
 
@@ -387,17 +383,6 @@ const HeaderV2 = () => {
 			return previousValue;
 		});
 	}, [pathname]);
-
-	/* ----------------------------------------------------------- */
-	/* Button handlers */
-	/* ----------------------------------------------------------- */
-	function handleInCrisisButtonClick() {
-		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
-		trackEvent({
-			action: 'In Crisis Button',
-		});
-		openInCrisisModal();
-	}
 
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
@@ -744,14 +729,7 @@ const HeaderV2 = () => {
 						</nav>
 					</div>
 					<div className="d-none d-lg-flex align-items-center justify-content-between">
-						<Button
-							className="py-1 d-flex align-items-center"
-							size="sm"
-							onClick={handleInCrisisButtonClick}
-						>
-							<PhoneIcon className="me-1" />
-							<small className="fw-bold">In Crisis?</small>
-						</Button>
+						<InCrisisHeaderButton />
 						<Dropdown className="ms-4 d-flex align-items-center">
 							<Dropdown.Toggle
 								as={DropdownToggle}
