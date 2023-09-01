@@ -198,7 +198,7 @@ const Index: FC = () => {
 															variant: 'outline-primary',
 															title: 'Speak with a Resource Navigator',
 															onClick: () => {
-																navigate(institution.externalContactUsUrl);
+																window.open(institution.externalContactUsUrl, '_blank');
 															},
 														},
 												  ]
