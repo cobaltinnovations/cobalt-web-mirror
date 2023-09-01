@@ -29,6 +29,7 @@ import {
 	TagModel,
 	INSTITUTION_BLURB_TYPE_ID,
 	InstitutionBlurb,
+	FeatureId,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -184,6 +185,29 @@ const Index: FC = () => {
 													});
 												},
 											},
+											// @ts-ignore: TS bug with `size: 'lg'`,
+											...(institution.epicFhirEnabled
+												? [
+														{
+															size: 'lg',
+															variant: 'outline-primary',
+															title: 'Speak with a Resource Navigator',
+															onClick: () => {
+																const resourceNavigatorFeature =
+																	institution.features.find(
+																		(f) =>
+																			f.featureId === FeatureId.RESOURCE_NAVIGATOR
+																	);
+
+																if (!resourceNavigatorFeature) {
+																	return;
+																}
+
+																navigate(resourceNavigatorFeature.urlName);
+															},
+														},
+												  ]
+												: []),
 										]}
 									/>
 								</Col>
