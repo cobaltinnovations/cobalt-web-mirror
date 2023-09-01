@@ -18,28 +18,33 @@ interface UseStylesProps {
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	pathways: {
+	pathways: ({ featuresLength }: UseStylesProps) => ({
 		display: 'flex',
 		flexWrap: 'wrap',
 		margin: '0 -16px',
 		justifyContent: 'center',
+		'& .pathway-outer': {
+			width: `${100 / featuresLength}%`,
+			padding: '0 16px',
+			marginBottom: 32,
+			[mediaQueries.xxl]: {
+				width: '25%',
+				marginBottom: 36,
+			},
+			[mediaQueries.lg]: {
+				padding: '0',
+				width: '100%',
+				marginBottom: 16,
+			},
+		},
 		[mediaQueries.lg]: {
 			margin: '0',
 			display: 'block',
-		},
-	},
-	pathwayOuter: ({ featuresLength }: UseStylesProps) => ({
-		width: `${100 / featuresLength}%`,
-		padding: '0 16px',
-		marginBottom: 32,
-		[mediaQueries.xxl]: {
-			width: '25%',
-			marginBottom: 36,
-		},
-		[mediaQueries.lg]: {
-			padding: '0',
-			width: '100%',
-			marginBottom: 16,
+			'& .pathway-outer': {
+				padding: '0',
+				width: '100%',
+				marginBottom: 16,
+			},
 		},
 	}),
 	pathway: {
@@ -180,8 +185,8 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 						<div className={classes.pathways}>
 							{(institution?.features ?? [])
 								.filter((feature) => feature.landingPageVisible)
-								.map(({ featureId, urlName, name, recommended }, featureIndex) => (
-									<div key={featureId} className={classes.pathwayOuter}>
+								.map(({ featureId, urlName, name, recommended }) => (
+									<div key={featureId} className="pathway-outer">
 										<Link
 											to={
 												featureId === FeatureId.THERAPY && account?.institutionLocationId
