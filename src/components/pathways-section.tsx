@@ -13,6 +13,10 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import useAnalytics from '@/hooks/use-analytics';
 import { FeatureId } from '@/lib/models';
 
+interface UseStylesProps {
+	featuresLength: number;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	pathways: {
 		display: 'flex',
@@ -24,11 +28,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 			display: 'block',
 		},
 	},
-	pathwayOuter: {
-		width: '14.2857%',
+	pathwayOuter: ({ featuresLength }: UseStylesProps) => ({
+		width: `${100 / featuresLength}%`,
 		padding: '0 16px',
 		marginBottom: 32,
-		[mediaQueries.xl]: {
+		[mediaQueries.xxl]: {
 			width: '25%',
 			marginBottom: 36,
 		},
@@ -37,7 +41,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			width: '100%',
 			marginBottom: 16,
 		},
-	},
+	}),
 	pathway: {
 		zIndex: 0,
 		height: '100%',
@@ -98,12 +102,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	iconOuter: {
-		width: '100%',
+		width: 100,
+		height: 100,
 		display: 'flex',
-		marginBottom: 32,
 		borderRadius: '50%',
 		position: 'relative',
-		paddingBottom: '100%',
+		margin: '0 auto 32px',
 		backgroundColor: theme.colors.n0,
 		'&:after': {
 			top: 0,
@@ -120,8 +124,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			width: 48,
 			height: 48,
 			padding: 0,
-			marginRight: 20,
-			marginBottom: 0,
+			margin: '0 20px 0 0',
 		},
 	},
 	icon: {
@@ -163,7 +166,9 @@ interface PathwaysSectionProps {
 const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
 	const { trackEvent } = useAnalytics();
-	const classes = useStyles();
+	const classes = useStyles({
+		featuresLength: (institution?.features ?? []).filter((feature) => feature.landingPageVisible).length,
+	});
 
 	const { startScreeningFlow } = featuresScreeningFlow;
 
