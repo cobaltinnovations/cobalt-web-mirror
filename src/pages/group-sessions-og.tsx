@@ -169,7 +169,7 @@ const GroupSessionsOg = () => {
 				{!isLoading && groupSessions.length <= 0 && (
 					<Row className="mb-2">
 						<Col>
-							<p className="text-center mb-0">
+							<div className="text-center mb-0">
 								{groupSessionSearchQuery ? (
 									<NoData
 										title="No Search Results"
@@ -204,7 +204,7 @@ const GroupSessionsOg = () => {
 										actions={[]}
 									/>
 								)}
-							</p>
+							</div>
 						</Col>
 					</Row>
 				)}
