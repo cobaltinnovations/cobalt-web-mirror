@@ -198,17 +198,7 @@ const Index: FC = () => {
 															variant: 'outline-primary',
 															title: 'Speak with a Resource Navigator',
 															onClick: () => {
-																const resourceNavigatorFeature =
-																	institution.features.find(
-																		(f) =>
-																			f.featureId === FeatureId.RESOURCE_NAVIGATOR
-																	);
-
-																if (!resourceNavigatorFeature) {
-																	return;
-																}
-
-																navigate(resourceNavigatorFeature.urlName);
+																navigate(institution.externalContactUsUrl);
 															},
 														},
 												  ]
