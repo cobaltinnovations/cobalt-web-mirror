@@ -1,15 +1,12 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Button, Dropdown } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import useAccount from '@/hooks/use-account';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import useAnalytics from '@/hooks/use-analytics';
-import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
+import InCrisisHeaderButton from '@/components/in-crisis-header-button';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -31,8 +28,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const PatientHeader = () => {
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
-	const { openInCrisisModal } = useInCrisisModal();
-	const { trackEvent } = useAnalytics();
 
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
@@ -63,19 +58,11 @@ export const PatientHeader = () => {
 		};
 	}, [handleWindowResize]);
 
-	function handleInCrisisButtonClick() {
-		trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
-		openInCrisisModal();
-	}
-
 	return (
 		<header ref={header} className={classes.header}>
 			<LogoSmallText className="text-primary" />
 			<div className="d-flex align-items-center justify-content-between">
-				<Button className="py-1 d-flex align-items-center" size="sm" onClick={handleInCrisisButtonClick}>
-					<PhoneIcon className="me-1" />
-					<small className="fw-bold">In Crisis?</small>
-				</Button>
+				<InCrisisHeaderButton />
 				<Dropdown className="ms-4 d-flex align-items-center">
 					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0 border-0">
 						<AvatarIcon className="d-flex text-p700" />

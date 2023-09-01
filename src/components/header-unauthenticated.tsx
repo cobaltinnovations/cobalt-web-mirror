@@ -5,6 +5,8 @@ import { Button } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import InCrisisHeaderButton from './in-crisis-header-button';
+import useAccount from '@/hooks/use-account';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -30,10 +32,11 @@ export interface HeaderUnauthenticatedProps {
 }
 
 const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps) => {
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
-	const match = !!useMatch({
+	const signInMatch = !!useMatch({
 		path: '/sign-in',
 		end: true,
 	});
@@ -68,16 +71,21 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 				<Logo className="text-primary d-block" />
 			</Link>
 
-			{!hideSignInButton && !match && (
-				<Button
-					size="sm"
-					onClick={() => {
-						navigate('/sign-in');
-					}}
-				>
-					Sign In
-				</Button>
-			)}
+			<div className="d-flex align-items-center">
+				{!hideSignInButton && !signInMatch && (
+					<Button
+						className="py-1"
+						size="sm"
+						onClick={() => {
+							navigate('/sign-in');
+						}}
+					>
+						Sign In
+					</Button>
+				)}
+
+				{institution.epicFhirEnabled && <InCrisisHeaderButton className="ms-2" />}
+			</div>
 		</header>
 	);
 };
