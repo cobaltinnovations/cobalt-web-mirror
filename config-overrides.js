@@ -62,6 +62,7 @@ module.exports.webpack = function (config, env) {
 	config = extendSourceMapLoader(config, fileReplaceLoader);
 	config = extendSvgLoader(config, fileReplaceLoader);
 	config = extendInternalBabelLoader(config, fileReplaceLoader);
+	config = addJsonLoader(config, fileReplaceLoader);
 
 	return config;
 };
@@ -108,17 +109,40 @@ function extendInternalBabelLoader(config, fileReplaceLoader) {
 	config.module.rules[1].oneOf[3] = {
 		test,
 		// updated included paths
-		include: [
-			...include,
-			...include.map((includePath) => {
-				const tokenized = includePath.split('/');
-				// adding overrides folder _before_ src
-				tokenized.splice(tokenized.length - 1, 0, 'institution-overrides');
-				return tokenized.join('/');
-			}),
-		],
+		include: extendIncludedPaths(include),
 		use: [babelInternalLoader, fileReplaceLoader],
 	};
 
 	return config;
+}
+
+function addJsonLoader(config, fileReplaceLoader) {
+	// grab the default ts/tsx loader config
+	const { include } = config.module.rules[1].oneOf[3];
+
+	const jsonLoaderConfig = {
+		test: /\.json$/,
+		include: extendIncludedPaths(include),
+		use: [fileReplaceLoader],
+	};
+
+	// add it to the top of the list as it gets inlined into `main` chunk
+	config.module.rules[1].oneOf.unshift(jsonLoaderConfig);
+
+	return config;
+}
+
+function extendIncludedPaths(initialInclude) {
+	return [
+		// retain same included paths
+		...initialInclude,
+		// add new paths by mapping default included paths to overrides folder
+		...initialInclude.map((includedPath) => {
+			// eg: /absolute/path/to/repo/src
+			const tokenized = includedPath.split('/');
+			// eg: /absolute/path/to/repo/institution-overrides/src
+			tokenized.splice(tokenized.length - 1, 0, 'institution-overrides');
+			return tokenized.join('/');
+		}),
+	];
 }
