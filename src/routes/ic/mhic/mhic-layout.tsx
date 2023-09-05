@@ -103,12 +103,19 @@ const MhicErrorLayout = () => {
 				recentOrders={recentOrders}
 			/>
 
-			<ErrorDisplay
-				error={error}
-				onRetryButtonClick={() => {
-					window.location.reload();
+			<div
+				style={{
+					paddingTop: MHIC_HEADER_HEIGHT,
 				}}
-			/>
+			>
+				<ErrorDisplay
+					error={error}
+					showRetryButton
+					onRetryButtonClick={() => {
+						window.location.reload();
+					}}
+				/>
+			</div>
 		</>
 	);
 };
