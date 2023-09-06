@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { TopicCenterModel } from '@/lib/models';
+import { TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
 import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
@@ -37,6 +37,8 @@ const TopicCenter = () => {
 			'Topic Center Title': response.topicCenter.name,
 		});
 	}, [mixpanel, topicCenterId]);
+
+	const isFeatured = topicCenter?.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED;
 
 	return (
 		<>
@@ -127,9 +129,33 @@ const TopicCenter = () => {
 					</>
 				}
 			>
-				<HeroContainer className="bg-p700">
-					<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
-				</HeroContainer>
+				{isFeatured ? (
+					<Container fluid className="bg-n75 p-16">
+						<Row>
+							<Col>
+								<h1 className="mb-6">{topicCenter?.featuredTitle}</h1>
+								<p>{topicCenter?.featuredDescription}</p>
+
+								<p>
+									If you or someone you know is struggling or in crisis the national Suicide & Crisis
+									Lifeline is avaliable 24 hours a day for calls or texts at 988.
+								</p>
+							</Col>
+
+							<Col xs={12} md={4}>
+								<img
+									className="mx-auto d-block"
+									src={topicCenter?.imageUrl}
+									alt={topicCenter?.featuredTitle}
+								/>
+							</Col>
+						</Row>
+					</Container>
+				) : (
+					<HeroContainer className="bg-p700">
+						<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
+					</HeroContainer>
+				)}
 
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
