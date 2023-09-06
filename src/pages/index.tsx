@@ -266,7 +266,7 @@ const Index: FC = () => {
 						<CallToActionBlock
 							subheading="Featured Topic"
 							heading={featuredTopicCenter.featuredTitle!}
-							description={featuredTopicCenter.featuredDescription!}
+							descriptionHTML={featuredTopicCenter.featuredDescription!}
 							imageUrl={featuredTopicCenter.imageUrl!}
 							primaryActionText={featuredTopicCenter.featuredCallToAction!}
 							onPrimaryActionClick={() => {

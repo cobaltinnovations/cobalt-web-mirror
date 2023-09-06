@@ -14,7 +14,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface CallToActionBlockProps {
 	heading: string;
-	description: string;
+	descriptionHTML: string;
 	imageUrl: string;
 	primaryActionText: string;
 	onPrimaryActionClick: () => void;
@@ -26,7 +26,7 @@ interface CallToActionBlockProps {
 
 const CallToActionBlock = ({
 	heading,
-	description,
+	descriptionHTML,
 	imageUrl,
 	subheading,
 	primaryActionText,
@@ -44,7 +44,12 @@ const CallToActionBlock = ({
 
 				<h1 className="text-white my-4">{heading}</h1>
 
-				<p className="text-white">{description}</p>
+				<div
+					className="text-white mb-10"
+					dangerouslySetInnerHTML={{
+						__html: descriptionHTML,
+					}}
+				/>
 
 				<div className="mt-auto">
 					<Button className="me-2" variant="light" onClick={onPrimaryActionClick}>
@@ -56,8 +61,8 @@ const CallToActionBlock = ({
 			</Col>
 
 			{imageUrl && (
-				<Col xs={12} md={4}>
-					<img src={imageUrl} alt={heading} />
+				<Col xs={12} md={4} className="d-flex">
+					<img className="w-100 align-self-center" src={imageUrl} alt={heading} />
 				</Col>
 			)}
 		</Row>

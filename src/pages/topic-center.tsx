@@ -133,20 +133,19 @@ const TopicCenter = () => {
 					<Container fluid className="bg-n75 p-16">
 						<Row>
 							<Col>
-								<h1 className="mb-6">{topicCenter?.featuredTitle}</h1>
-								<p>{topicCenter?.featuredDescription}</p>
-
-								<p>
-									If you or someone you know is struggling or in crisis the national Suicide & Crisis
-									Lifeline is avaliable 24 hours a day for calls or texts at 988.
-								</p>
+								<h1 className="mb-6">{topicCenter?.name}</h1>
+								<div
+									dangerouslySetInnerHTML={{
+										__html: topicCenter?.description,
+									}}
+								/>
 							</Col>
 
-							<Col xs={12} md={4}>
+							<Col xs={12} md={4} className="d-flex">
 								<img
-									className="mx-auto d-block"
+									className="w-100 align-self-center"
 									src={topicCenter?.imageUrl}
-									alt={topicCenter?.featuredTitle}
+									alt={topicCenter?.name}
 								/>
 							</Col>
 						</Row>

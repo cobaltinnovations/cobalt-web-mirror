@@ -7,6 +7,7 @@ export enum TopicCenterDisplayStyleId {
 
 export interface TopicCenterModel {
 	name: string;
+	description: string;
 	topicCenterId: string;
 	topicCenterRows: TopicCenterRowModel[];
 	urlName: string;
