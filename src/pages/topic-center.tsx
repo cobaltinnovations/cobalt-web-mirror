@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { TopicCenterModel } from '@/lib/models';
+import { TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
 import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
@@ -41,6 +41,18 @@ const TopicCenter = () => {
 			'Topic Center Title': response.topicCenter.name,
 		});
 	}, [mixpanel, topicCenterId]);
+
+	useEffect(() => {
+		if (!topicCenter) {
+			return;
+		}
+
+		if (isFeaturedMatch && topicCenter.topicCenterDisplayStyleId !== TopicCenterDisplayStyleId.FEATURED) {
+			navigate(`/topic-centers/${topicCenter.urlName}`, { replace: true });
+		} else if (!isFeaturedMatch && topicCenter.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED) {
+			navigate(`/featured-topics/${topicCenter.urlName}`, { replace: true });
+		}
+	}, [isFeaturedMatch, navigate, topicCenter]);
 
 	return (
 		<>
