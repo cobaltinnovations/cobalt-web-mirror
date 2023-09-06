@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -22,6 +22,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
 
@@ -225,6 +226,7 @@ const TopicCenter = () => {
 																	state: {
 																		navigationSource:
 																			GroupSessionDetailNavigationSource.TOPIC_CENTER,
+																		topicCenterPath: location.pathname,
 																	},
 																});
 															}}

@@ -42,6 +42,7 @@ export const Component = () => {
 	const navigationSource =
 		(location.state?.navigationSource as GroupSessionDetailNavigationSource) ??
 		GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
+	const topicCenterPath = location.state?.topicCenterPath ?? '';
 	const { createScreeningSession, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: groupSession.screeningFlowId,
 		groupSessionId: groupSession.groupSessionId,
@@ -58,6 +59,9 @@ export const Component = () => {
 	const handleReserveButtonClick = useCallback(() => {
 		if (groupSession.screeningFlowId) {
 			Cookies.set('groupSessionDetailNavigationSource', navigationSource);
+			if (navigationSource === GroupSessionDetailNavigationSource.TOPIC_CENTER && topicCenterPath) {
+				Cookies.set('groupSessionDetailFromTopicCenterPath', topicCenterPath);
+			}
 			groupSession.groupSessionCollectionId &&
 				Cookies.set('groupSessionCollectionId', groupSession.groupSessionCollectionId);
 			createScreeningSession();
@@ -65,7 +69,13 @@ export const Component = () => {
 		}
 
 		setConfirmModalIsShowing(true);
-	}, [createScreeningSession, groupSession.groupSessionCollectionId, groupSession.screeningFlowId, navigationSource]);
+	}, [
+		createScreeningSession,
+		groupSession.groupSessionCollectionId,
+		groupSession.screeningFlowId,
+		navigationSource,
+		topicCenterPath,
+	]);
 
 	const handleModalConfirmButtonClick = useCallback(async () => {
 		try {
