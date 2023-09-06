@@ -270,7 +270,7 @@ const Index: FC = () => {
 							imageUrl={featuredTopicCenter.imageUrl!}
 							primaryActionText={featuredTopicCenter.featuredCallToAction!}
 							onPrimaryActionClick={() => {
-								navigate('/topic-centers/' + featuredTopicCenter.urlName);
+								navigate('/featured-topics/' + featuredTopicCenter.urlName);
 							}}
 							className="mb-4"
 						/>

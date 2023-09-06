@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
+import { TopicCenterModel } from '@/lib/models';
 import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
@@ -15,7 +15,7 @@ import classNames from 'classnames';
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import { SkeletonText } from '@/components/skeleton-loaders';
+import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
@@ -25,6 +25,9 @@ const TopicCenter = () => {
 	const location = useLocation();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
+	const isFeaturedMatch = useMatch({
+		path: '/featured-topics/*',
+	});
 
 	const fetchData = useCallback(async () => {
 		if (!topicCenterId) {
@@ -39,8 +42,6 @@ const TopicCenter = () => {
 		});
 	}, [mixpanel, topicCenterId]);
 
-	const isFeatured = topicCenter?.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED;
-
 	return (
 		<>
 			<Helmet>
@@ -53,55 +54,80 @@ const TopicCenter = () => {
 				fetchData={fetchData}
 				loadingComponent={
 					<>
-						<HeroContainer className="bg-p700">
-							<SkeletonText type="h1" numberOfLines={2} className="mb-0 text-center" />
-						</HeroContainer>
-						<Container fluid className="bg-n50">
-							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+						{isFeaturedMatch ? (
+							<Container fluid className="bg-n75 p-16">
 								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
-										<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+									<Col xs={12} md={8}>
+										<SkeletonText type="h1" numberOfLines={1} />
+										<SkeletonText type="p" numberOfLines={3} />
 									</Col>
-								</Row>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										<SkeletonTopicCenterGroupSession />
+
+									<Col xs={12} md={4}>
+										<SkeletonImage height={200} />
 									</Col>
 								</Row>
 							</Container>
-						</Container>
-						<Container fluid className="bg-n75">
-							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
-										<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
-									</Col>
-								</Row>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										<SkeletonTopicCenterGroupSession />
-									</Col>
-								</Row>
-							</Container>
-						</Container>
+						) : (
+							<>
+								<HeroContainer className="bg-p700">
+									<SkeletonText type="h1" numberOfLines={2} className="mb-0 text-center" />
+								</HeroContainer>
+								<Container fluid className="bg-n50">
+									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
+												<SkeletonText
+													type="h2"
+													width="75%"
+													className="mb-2 mb-lg-4 text-center"
+												/>
+												<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+											</Col>
+										</Row>
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												<SkeletonTopicCenterGroupSession />
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+								<Container fluid className="bg-n75">
+									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
+												<SkeletonText
+													type="h2"
+													width="75%"
+													className="mb-2 mb-lg-4 text-center"
+												/>
+												<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+											</Col>
+										</Row>
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												<SkeletonTopicCenterGroupSession />
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+							</>
+						)}
 						<Container fluid className="bg-n50">
 							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 								<Row>
@@ -130,16 +156,18 @@ const TopicCenter = () => {
 					</>
 				}
 			>
-				{isFeatured ? (
+				{isFeaturedMatch ? (
 					<Container fluid className="bg-n75 p-16">
 						<Row>
 							<Col>
 								<h1 className="mb-6">{topicCenter?.name}</h1>
-								<div
-									dangerouslySetInnerHTML={{
-										__html: topicCenter?.description,
-									}}
-								/>
+								{topicCenter?.description && (
+									<div
+										dangerouslySetInnerHTML={{
+											__html: topicCenter?.description,
+										}}
+									/>
+								)}
 							</Col>
 
 							<Col xs={12} md={4} className="d-flex">
