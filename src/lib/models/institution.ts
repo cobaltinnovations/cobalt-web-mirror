@@ -53,6 +53,7 @@ export interface Institution {
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
 	featureScreeningFlowId?: string;
+	featuredTopicCenterId?: string;
 	hasTakenFeatureScreening: boolean;
 	takeFeatureScreening: boolean;
 	userExperienceTypeId: UserExperienceTypeId;

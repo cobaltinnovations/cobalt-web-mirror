@@ -19,6 +19,7 @@ import {
 	callToActionService,
 	screeningService,
 	institutionService,
+	topicCenterService,
 } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
@@ -29,7 +30,7 @@ import {
 	TagModel,
 	INSTITUTION_BLURB_TYPE_ID,
 	InstitutionBlurb,
-	FeatureId,
+	TopicCenterModel,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -41,6 +42,7 @@ import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import CallToActionBlock from '@/components/call-to-action-block';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -76,6 +78,7 @@ const Index: FC = () => {
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
+	const [featuredTopicCenter, setFeaturedTopicCenter] = useState<TopicCenterModel>();
 
 	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
@@ -139,6 +142,16 @@ const Index: FC = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
+	const fetchFeaturedTopicCenter = useCallback(async () => {
+		if (!institution.featuredTopicCenterId) {
+			return;
+		}
+
+		const response = await topicCenterService.getTopicCenterById(institution.featuredTopicCenterId).fetch();
+
+		setFeaturedTopicCenter(response.topicCenter);
+	}, [institution.featuredTopicCenterId]);
+
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;
 	}
@@ -190,11 +203,10 @@ const Index: FC = () => {
 													});
 												},
 											},
-											// @ts-ignore: TS bug with `size: 'lg'`,
 											...(institution.epicFhirEnabled
 												? [
 														{
-															size: 'lg',
+															size: 'lg' as const,
 															variant: 'outline-primary',
 															title: 'Speak with a Resource Navigator',
 															onClick: () => {
@@ -244,6 +256,24 @@ const Index: FC = () => {
 								})}
 							</Col>
 						</Row>
+					</Container>
+				)}
+			</AsyncPage>
+
+			<AsyncPage fetchData={fetchFeaturedTopicCenter}>
+				{featuredTopicCenter && (
+					<Container className="pt-4 pt-lg-8">
+						<CallToActionBlock
+							subheading="Featured Topic"
+							heading={featuredTopicCenter.featuredTitle!}
+							descriptionHTML={featuredTopicCenter.featuredDescription!}
+							imageUrl={featuredTopicCenter.imageUrl!}
+							primaryActionText={featuredTopicCenter.featuredCallToAction!}
+							onPrimaryActionClick={() => {
+								navigate('/featured-topics/' + featuredTopicCenter.urlName);
+							}}
+							className="mb-4"
+						/>
 					</Container>
 				)}
 			</AsyncPage>

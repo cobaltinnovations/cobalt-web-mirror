@@ -111,7 +111,7 @@ const ResourceLibraryTags = () => {
 		const { findResult } = await resourceLibraryService
 			.getResourceLibraryContentByTagId(tagId, {
 				pageNumber: 0,
-				pageSize: 100,
+				pageSize: 200,
 				contentTypeId: contentTypeIdQuery,
 				contentDurationId: contentDurationIdQuery,
 			})

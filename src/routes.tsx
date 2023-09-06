@@ -659,6 +659,10 @@ export const routes: RouteObject[] = [
 						element: <TopicCenter />,
 					},
 					{
+						path: 'featured-topics/:topicCenterId',
+						element: <TopicCenter />,
+					},
+					{
 						path: 'user-settings',
 						element: <UserSettings />,
 					},
