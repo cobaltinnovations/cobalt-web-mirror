@@ -51,17 +51,21 @@ const CallToActionBlock = ({
 					}}
 				/>
 
-				<div className="mt-auto">
-					<Button className="me-2" variant="light" onClick={onPrimaryActionClick}>
+				<div className="d-flex flex-column d-md-block mt-auto">
+					<Button className="align-self-md-start" variant="light" onClick={onPrimaryActionClick}>
 						{primaryActionText}
 					</Button>
 
-					{secondaryActionText && <Button onClick={onSecondaryActionClick}>{secondaryActionText}</Button>}
+					{secondaryActionText && (
+						<Button className="mt-4 mt-md-0 ms-md-2 align-self-md-start" onClick={onSecondaryActionClick}>
+							{secondaryActionText}
+						</Button>
+					)}
 				</div>
 			</Col>
 
 			{imageUrl && (
-				<Col xs={12} md={4} className="d-flex">
+				<Col xs={12} md={4} className="d-flex mt-12 mt-md-0">
 					<img className="w-100 align-self-center" src={imageUrl} alt={heading} />
 				</Col>
 			)}

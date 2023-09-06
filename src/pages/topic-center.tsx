@@ -182,7 +182,7 @@ const TopicCenter = () => {
 								)}
 							</Col>
 
-							<Col xs={12} md={4} className="d-flex">
+							<Col xs={12} md={4} className="d-flex mt-12 mt-md-0">
 								<img
 									className="w-100 align-self-center"
 									src={topicCenter?.imageUrl}
@@ -200,23 +200,45 @@ const TopicCenter = () => {
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 
+					let sectionsWithContent = 0;
+					if (topicCenterRow.groupSessions.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.groupSessionRequests.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.pinboardNotes.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.contents.length > 0) {
+						sectionsWithContent++;
+					}
+
+					const showSectionHeaders = sectionsWithContent > 1;
+					const containerClasseNames = classNames(
+						'pb-12 pt-lg-14 pb-lg-22',
+						showSectionHeaders ? 'pt-10' : 'pt-12'
+					);
+
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
 							{topicCenterRow.groupSessions.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -282,19 +304,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.groupSessionRequests.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -356,19 +380,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.pinboardNotes.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container fluid="lg" className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col>
 												<Masonry>
@@ -392,19 +418,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.contents.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											{topicCenterRow.contents.map((content) => {
 												return (
