@@ -93,6 +93,7 @@ export function useScreeningNavigation() {
 					);
 
 					Cookies.remove('groupSessionDetailNavigationSource');
+					Cookies.remove('groupSessionDetailFromTopicCenterPath');
 					Cookies.remove('groupSessionCollectionId');
 					return;
 				}
