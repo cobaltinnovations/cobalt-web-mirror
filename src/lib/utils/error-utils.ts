@@ -2,26 +2,32 @@ import { lazy } from 'react';
 
 const chunkloadRefreshKey = 'ChunkLoadError-refresh';
 
+export function clearChunkLoadErrorStorage() {
+	window.localStorage.removeItem(chunkloadRefreshKey);
+}
+
+export function checkShouldRefreshChunkLoadError(error: unknown) {
+	const pageHasAlreadyBeenForceRefreshed = JSON.parse(window.localStorage.getItem(chunkloadRefreshKey) || 'false');
+
+	return error instanceof Error && error.name === 'ChunkLoadError' && !pageHasAlreadyBeenForceRefreshed;
+}
+
+export function handleChunkLoadError() {
+	window.localStorage.setItem(chunkloadRefreshKey, 'true');
+	window.location.reload();
+}
+
 export function lazyLoadWithRefresh(componentImport: Parameters<typeof lazy>[0]) {
 	return lazy(async () => {
-		const pageHasAlreadyBeenForceRefreshed = JSON.parse(
-			window.localStorage.getItem(chunkloadRefreshKey) || 'false'
-		);
-
 		try {
 			const component = await componentImport();
 
-			window.localStorage.setItem(chunkloadRefreshKey, 'false');
-
 			return component;
 		} catch (error) {
-			if (error instanceof Error && error.name === 'ChunkLoadError' && !pageHasAlreadyBeenForceRefreshed) {
-				window.localStorage.setItem(chunkloadRefreshKey, 'true');
-				window.location.reload();
+			const shouldHandle = checkShouldRefreshChunkLoadError(error);
 
-				return {
-					default: () => null,
-				};
+			if (shouldHandle) {
+				handleChunkLoadError();
 			}
 
 			throw error;

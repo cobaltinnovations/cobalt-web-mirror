@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 
 import HeroContainer from '@/components/hero-container';
 import RenderJson from '@/components/render-json';
+import { checkShouldRefreshChunkLoadError, handleChunkLoadError } from '@/lib/utils/error-utils';
 
 interface ErrorDisplayProps {
 	error: any;
@@ -22,6 +23,14 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, showBackButton, showRetryB
 	function handleRetryClick() {
 		if (onRetryButtonClick) onRetryButtonClick();
 	}
+
+	useEffect(() => {
+		const shouldHandleChunkLoadError = checkShouldRefreshChunkLoadError(error);
+
+		if (shouldHandleChunkLoadError) {
+			handleChunkLoadError();
+		}
+	}, [error]);
 
 	return (
 		<>

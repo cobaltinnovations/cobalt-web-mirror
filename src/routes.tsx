@@ -196,10 +196,12 @@ const RedirectToResourceLibrary = () => {
 };
 
 const RedirectToGroupSessionDetail = () => {
-	const { groupSessionIdOrUrlName } = useParams<{ groupSessionIdOrUrlName: string }>();
+	const { groupSessionId } = useParams<{
+		groupSessionId: string;
+	}>();
 
-	if (groupSessionIdOrUrlName) {
-		return <Navigate to={`/group-sessions/${groupSessionIdOrUrlName}`} replace />;
+	if (groupSessionId) {
+		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
 	}
 
 	return <Navigate to="/group-sessions" replace />;

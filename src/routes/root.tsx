@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 
 import {
 	LoaderFunctionArgs,
@@ -28,6 +28,7 @@ import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
 import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
+import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
@@ -86,6 +87,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
+	useEffect(() => {
+		setTimeout(() => {
+			// removes the flag indicating a chunk load error has occurred and page force-refresed
+			// timeout so we don't get into an "infinite refresh loop"
+			// and gives enough time for ErrorDisplay to handle `ChunkLoadError`s
+			clearChunkLoadErrorStorage();
+		}, 1000);
+	}, []);
+
 	return (
 		<AccountProvider>
 			<AnalyticsProvider>
