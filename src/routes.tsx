@@ -415,6 +415,10 @@ export const routes: RouteObject[] = [
 								element: <Navigate to="/" replace />,
 							},
 							{
+								path: 'counseling-services',
+								lazy: () => import('@/routes/counseling-services'),
+							},
+							{
 								path: 'connect-with-support/medication-prescriber',
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},

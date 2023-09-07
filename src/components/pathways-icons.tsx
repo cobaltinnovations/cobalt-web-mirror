@@ -30,6 +30,8 @@ const PathwaysIcon = ({
 		case FeatureId.GROUP_SESSIONS:
 			return <GroupIcon className={className} {...svgProps} />;
 		case FeatureId.COACHING:
+		case FeatureId.COUNSELING_SERVICES:
+		case FeatureId.MENTAL_HEALTH_PROVIDERS:
 			return <CoachingIcon className={className} {...svgProps} />;
 		case FeatureId.SELF_HELP_RESOURCES:
 			return <ResourceIcon className={className} {...svgProps} />;
