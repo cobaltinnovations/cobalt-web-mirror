@@ -84,7 +84,7 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 					</Button>
 				)}
 
-				{institution.epicFhirEnabled && <InCrisisHeaderButton className="ms-2" />}
+				{institution?.epicFhirEnabled && <InCrisisHeaderButton className="ms-2" />}
 			</div>
 		</header>
 	);
