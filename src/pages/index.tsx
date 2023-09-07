@@ -160,6 +160,8 @@ const Index: FC = () => {
 		return renderedPreScreeningLoader;
 	}
 
+	const hasLandingPageFeatures = institution?.features.filter((f) => f.landingPageVisible).length > 0;
+
 	return (
 		<>
 			<Helmet>
@@ -172,14 +174,29 @@ const Index: FC = () => {
 
 					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>
-							<Col>
-								<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
-								<h1 className="mb-0 text-center">What can we help you find today?</h1>
-							</Col>
+							{hasLandingPageFeatures ? (
+								<Col>
+									<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
+									<h1 className="mb-0 text-center">What can we help you find today?</h1>
+								</Col>
+							) : (
+								<Col>
+									<h1 className="mb-5 text-center">Welcome to Cobalt!</h1>
+									<p className="mb-0 fs-large text-center">
+										Cobalt is a new wellness platform created specifically for {institution.name}{' '}
+										employees
+										<span className="d-block">
+											to connect you to accessible and affordable mental health resources.
+										</span>
+									</p>
+								</Col>
+							)}
 						</Row>
 					</Container>
-					<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
-					{!institution.hasTakenFeatureScreening && (
+					{hasLandingPageFeatures && (
+						<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
+					)}
+					{institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening && (
 						<Container className="mb-10">
 							<Row>
 								<Col>
