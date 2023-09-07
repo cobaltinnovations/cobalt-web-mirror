@@ -18,6 +18,7 @@ import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/r
 import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import PageHeader from '@/components/page-header';
 
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -169,28 +170,13 @@ const TopicCenter = () => {
 				}
 			>
 				{isFeaturedMatch ? (
-					<Container fluid className="bg-n75 p-16">
-						<Row>
-							<Col>
-								<h1 className="mb-6">{topicCenter?.name}</h1>
-								{topicCenter?.description && (
-									<div
-										dangerouslySetInnerHTML={{
-											__html: topicCenter?.description,
-										}}
-									/>
-								)}
-							</Col>
-
-							<Col xs={12} md={4} className="d-flex mt-12 mt-md-0">
-								<img
-									className="w-100 align-self-center"
-									src={topicCenter?.imageUrl}
-									alt={topicCenter?.name}
-								/>
-							</Col>
-						</Row>
-					</Container>
+					<PageHeader
+						className="bg-n75"
+						title={topicCenter?.name!}
+						descriptionHtml={topicCenter?.description}
+						imageUrl={topicCenter?.imageUrl}
+						imageAlt={topicCenter?.name}
+					/>
 				) : (
 					<HeroContainer className="bg-p700">
 						<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
