@@ -99,22 +99,22 @@ export const Component = () => {
 	return <Navigate to={destination === '/' ? LoginDestinationIdRouteMap[account.loginDestinationId] : destination} />;
 };
 
-export function updateTokenCookies(accessToken: string, isSession: boolean = false) {
+export function decodeAccessToken(accessToken: string) {
 	const decodedAccessToken = jwtDecode(accessToken) as { sub: string; exp: number };
-	const expirationDate = new Date(decodedAccessToken.exp * 1000);
 	const accountId = decodedAccessToken.sub;
+	const expirationDate = new Date(decodedAccessToken.exp * 1000);
+
+	return { accountId, expirationDate };
+}
+
+export function updateTokenCookies(accessToken: string, isSession: boolean = false) {
+	const { accountId, expirationDate } = decodeAccessToken(accessToken);
 
 	const cookieOptions = {
 		...(!isSession && { expires: expirationDate }),
 	};
 
 	Cookies.set('accessToken', accessToken, cookieOptions);
-	Cookies.set('accountId', accountId, cookieOptions);
 
 	return accountId;
-}
-
-export function clearTokenCookies() {
-	Cookies.remove('accessToken');
-	Cookies.remove('accountId');
 }
