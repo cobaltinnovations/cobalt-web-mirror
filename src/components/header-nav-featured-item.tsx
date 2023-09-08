@@ -55,21 +55,15 @@ export const HeaderNavFeaturedItem = ({
 		<div className={classNames(classes.featuredItemContainer, className)}>
 			<p className="text-n500 mb-5">{featuredItem.subtitle}</p>
 
-			<li>
-				<Link
-					className="h-auto p-0 m-0 mb-6"
-					to={featuredItem.linkTo}
-					onClick={() => {
-						onImageClick?.();
-					}}
-				>
-					<img
-						className={classes.featuredItemImage}
-						src={featuredItem.imageUrl}
-						alt={featuredItem.imageAlt}
-					/>
-				</Link>
-			</li>
+			<Link
+				className="h-auto p-0 m-0 mb-6"
+				to={featuredItem.linkTo}
+				onClick={() => {
+					onImageClick?.();
+				}}
+			>
+				<img className={classes.featuredItemImage} src={featuredItem.imageUrl} alt={featuredItem.imageAlt} />
+			</Link>
 
 			<p className="mb-1 fw-semibold">{featuredItem.name}</p>
 
