@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -26,34 +26,33 @@ const TopicCenter = () => {
 	const location = useLocation();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
-	const isFeaturedMatch = useMatch({
+	const featuredTopicsRouteMatch = useMatch({
 		path: '/featured-topics/*',
 	});
 
+	const isFeaturedMatch = !!featuredTopicsRouteMatch;
 	const fetchData = useCallback(async () => {
 		if (!topicCenterId) {
 			throw new Error('topicCenterId is undefined.');
 		}
 
 		const response = await topicCenterService.getTopicCenterById(topicCenterId).fetch();
+
+		if (isFeaturedMatch && response.topicCenter.topicCenterDisplayStyleId !== TopicCenterDisplayStyleId.FEATURED) {
+			navigate(`/topic-centers/${response.topicCenter.urlName}`, { replace: true });
+		} else if (
+			!isFeaturedMatch &&
+			response.topicCenter.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED
+		) {
+			navigate(`/featured-topics/${response.topicCenter.urlName}`, { replace: true });
+		}
+
 		setTopicCenter(response.topicCenter);
 		mixpanel.track('Topic Center Page View', {
 			'Topic Center ID': response.topicCenter.topicCenterId,
 			'Topic Center Title': response.topicCenter.name,
 		});
-	}, [mixpanel, topicCenterId]);
-
-	useEffect(() => {
-		if (!topicCenter) {
-			return;
-		}
-
-		if (isFeaturedMatch && topicCenter.topicCenterDisplayStyleId !== TopicCenterDisplayStyleId.FEATURED) {
-			navigate(`/topic-centers/${topicCenter.urlName}`, { replace: true });
-		} else if (!isFeaturedMatch && topicCenter.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED) {
-			navigate(`/featured-topics/${topicCenter.urlName}`, { replace: true });
-		}
-	}, [isFeaturedMatch, navigate, topicCenter]);
+	}, [isFeaturedMatch, mixpanel, navigate, topicCenterId]);
 
 	return (
 		<>
@@ -67,7 +66,7 @@ const TopicCenter = () => {
 				fetchData={fetchData}
 				loadingComponent={
 					<>
-						{isFeaturedMatch ? (
+						{featuredTopicsRouteMatch ? (
 							<Container fluid className="bg-n75 p-16">
 								<Row>
 									<Col xs={12} md={8}>
@@ -169,7 +168,7 @@ const TopicCenter = () => {
 					</>
 				}
 			>
-				{isFeaturedMatch ? (
+				{featuredTopicsRouteMatch ? (
 					<PageHeader
 						className="bg-n75"
 						title={topicCenter?.name!}
