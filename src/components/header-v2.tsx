@@ -550,13 +550,13 @@ const HeaderV2 = () => {
 		[handleError, revalidator]
 	);
 
-	const featuredTopicCenterItem: NavFeaturedItem = {
+	const featuredTopicCenterItem: NavFeaturedItem | undefined = featuredTopicCenter && {
 		subtitle: 'Featured Topic',
-		name: featuredTopicCenter?.featuredTitle!,
-		imageAlt: featuredTopicCenter?.name!,
-		imageUrl: featuredTopicCenter?.imageUrl!,
-		descriptionHtml: featuredTopicCenter?.featuredDescription!,
-		linkTo: `/featured-topics/${featuredTopicCenter?.urlName}`,
+		name: featuredTopicCenter.featuredTitle!,
+		imageAlt: featuredTopicCenter.name!,
+		imageUrl: featuredTopicCenter.imageUrl!,
+		descriptionHtml: featuredTopicCenter.featuredDescription!,
+		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
 	};
 
 	return (
@@ -565,7 +565,8 @@ const HeaderV2 = () => {
 				<div ref={movileNavRef} className={classNames('d-lg-none', classes.mobileNav)}>
 					<ul>
 						{navigationConfig.map((navigationItem) => {
-							const showFeaturedItem = navigationItem.navigationItemId === 'BROWSE_RESOURCES';
+							const showFeaturedItem =
+								navigationItem.navigationItemId === 'BROWSE_RESOURCES' && featuredTopicCenterItem;
 
 							return (
 								<li key={navigationItem.navigationItemId}>
@@ -685,7 +686,9 @@ const HeaderV2 = () => {
 						<nav className={classes.desktopNav}>
 							<ul>
 								{navigationConfig.map((navigationItem) => {
-									const showFeaturedItem = navigationItem.navigationItemId === 'BROWSE_RESOURCES';
+									const showFeaturedItem =
+										navigationItem.navigationItemId === 'BROWSE_RESOURCES' &&
+										featuredTopicCenterItem;
 
 									return (
 										<li
@@ -718,7 +721,12 @@ const HeaderV2 = () => {
 														}
 													}}
 													title={navigationItem.title}
-													subtitle={navigationItem.subtitle}
+													{...(showFeaturedItem
+														? {
+																subtitle: navigationItem.subtitle,
+																featuredItem: featuredTopicCenterItem,
+														  }
+														: null)}
 													featuredItem={showFeaturedItem ? featuredTopicCenterItem : null}
 												>
 													{navigationItem.items.map((item, itemIndex) => (
