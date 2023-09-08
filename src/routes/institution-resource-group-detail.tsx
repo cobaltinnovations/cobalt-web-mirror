@@ -46,13 +46,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
 		borderRadius: 8,
-		marginBottom: 20,
-		overflow: 'hidden',
-		paddingBottom: '66.66%',
-		backgroundSize: 'cover',
-		backgroundPosition: 'center',
-		backgroundRepeat: 'no-repeat',
-		// backgroundColor: theme.colors.n500,
+	},
+	resourceImage: {
+		width: '100%',
+		height: 'auto',
+		display: 'block',
 	},
 }));
 
@@ -88,13 +86,18 @@ export const Component = () => {
 												key={institutionResource.institutionResourceId}
 												className="mb-10 gy-10"
 											>
-												<Col xs={12} md={4} className="order-md-1">
-													<div
-														className={classes.imageOuter}
-														style={{
-															backgroundImage: `url(${institutionResource.imageUrl})`,
-														}}
-													/>
+												<Col
+													xs={12}
+													md={4}
+													className="order-md-1 d-flex align-items-center justify-content-center"
+												>
+													<div className={classes.imageOuter}>
+														<img
+															className={classes.resourceImage}
+															src={institutionResource.imageUrl}
+															alt={institutionResource.name}
+														/>
+													</div>
 												</Col>
 
 												<Col xs={12} md={8}>
