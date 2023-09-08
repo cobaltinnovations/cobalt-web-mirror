@@ -19,7 +19,6 @@ import {
 	callToActionService,
 	screeningService,
 	institutionService,
-	topicCenterService,
 } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
@@ -30,7 +29,6 @@ import {
 	TagModel,
 	INSTITUTION_BLURB_TYPE_ID,
 	InstitutionBlurb,
-	TopicCenterModel,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -43,6 +41,7 @@ import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import CallToActionBlock from '@/components/call-to-action-block';
+import { useAppRootLoaderData } from '@/routes/root';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -68,6 +67,7 @@ const resourceLibraryCarouselConfig = {
 };
 
 const Index: FC = () => {
+	const { featuredTopicCenter } = useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
@@ -78,7 +78,6 @@ const Index: FC = () => {
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
-	const [featuredTopicCenter, setFeaturedTopicCenter] = useState<TopicCenterModel>();
 
 	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
@@ -141,16 +140,6 @@ const Index: FC = () => {
 
 		setCallsToAction(response.callsToAction);
 	}, []);
-
-	const fetchFeaturedTopicCenter = useCallback(async () => {
-		if (!institution.featuredTopicCenterId) {
-			return;
-		}
-
-		const response = await topicCenterService.getTopicCenterById(institution.featuredTopicCenterId).fetch();
-
-		setFeaturedTopicCenter(response.topicCenter);
-	}, [institution.featuredTopicCenterId]);
 
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;
@@ -277,23 +266,21 @@ const Index: FC = () => {
 				)}
 			</AsyncPage>
 
-			<AsyncPage fetchData={fetchFeaturedTopicCenter}>
-				{featuredTopicCenter && (
-					<Container className="pt-4 pt-lg-8">
-						<CallToActionBlock
-							subheading="Featured Topic"
-							heading={featuredTopicCenter.featuredTitle!}
-							descriptionHtml={featuredTopicCenter.featuredDescription!}
-							imageUrl={featuredTopicCenter.imageUrl!}
-							primaryActionText={featuredTopicCenter.featuredCallToAction!}
-							onPrimaryActionClick={() => {
-								navigate('/featured-topics/' + featuredTopicCenter.urlName);
-							}}
-							className="mb-4"
-						/>
-					</Container>
-				)}
-			</AsyncPage>
+			{featuredTopicCenter && (
+				<Container className="pt-4 pt-lg-8">
+					<CallToActionBlock
+						subheading="Featured Topic"
+						heading={featuredTopicCenter.featuredTitle!}
+						descriptionHtml={featuredTopicCenter.featuredDescription!}
+						imageUrl={featuredTopicCenter.imageUrl!}
+						primaryActionText={featuredTopicCenter.featuredCallToAction!}
+						onPrimaryActionClick={() => {
+							navigate('/featured-topics/' + featuredTopicCenter.urlName);
+						}}
+						className="mb-4"
+					/>
+				</Container>
+			)}
 
 			<AsyncPage
 				fetchData={fetchData}
