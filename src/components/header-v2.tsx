@@ -26,6 +26,9 @@ import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import InCrisisHeaderButton from './in-crisis-header-button';
+import HeaderNavDropdown from './header-nav-dropdown';
+import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
+import { useAppRootLoaderData } from '@/routes/root';
 
 export const HEADER_HEIGHT = 56;
 
@@ -81,12 +84,6 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 					'&:hover': {
 						color: theme.colors.p700,
 						backgroundColor: 'transparent',
-					},
-				},
-				'& .dropdown': {
-					height: '100%',
-					'& .dropdown-menu': {
-						width: 344,
 					},
 				},
 				'&:after': {
@@ -216,10 +213,16 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			textAlign: 'left',
 		},
 		'& .collapse-inner': {
-			padding: 16,
 			borderRadius: 8,
 			margin: '12px 0',
 			border: `1px solid ${theme.colors.border}`,
+			'& a': {
+				margin: 8,
+				padding: '8px 12px',
+				'&:last-of-type': {
+					marginBottom: 0,
+				},
+			},
 		},
 		'& hr': {
 			margin: '16px 0',
@@ -264,7 +267,11 @@ const AdditionalNavigationItemIcon = ({
 	}
 };
 
-const MobileAccordianItem = ({ toggleElement, children }: PropsWithChildren<{ toggleElement: JSX.Element }>) => {
+const MobileAccordianItem = ({
+	toggleElement,
+	className,
+	children,
+}: PropsWithChildren<{ toggleElement: JSX.Element; className?: string }>) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
@@ -281,7 +288,7 @@ const MobileAccordianItem = ({ toggleElement, children }: PropsWithChildren<{ to
 			</Button>
 			<Collapse in={isExpanded}>
 				<div>
-					<div className="collapse-inner">{children}</div>
+					<div className={classNames('collapse-inner', className)}>{children}</div>
 				</div>
 			</Collapse>
 		</>
@@ -289,6 +296,7 @@ const MobileAccordianItem = ({ toggleElement, children }: PropsWithChildren<{ to
 };
 
 const HeaderV2 = () => {
+	const { featuredTopicCenter } = useAppRootLoaderData();
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
@@ -429,6 +437,7 @@ const HeaderV2 = () => {
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
 				title: 'Browse Resources',
+				subtitle: 'Resources',
 				active: [
 					...(institution?.features ?? [])
 						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
@@ -541,39 +550,69 @@ const HeaderV2 = () => {
 		[handleError, revalidator]
 	);
 
+	const featuredTopicCenterItem: NavFeaturedItem = {
+		subtitle: 'Featured Topic',
+		name: featuredTopicCenter?.featuredTitle!,
+		imageAlt: featuredTopicCenter?.name!,
+		imageUrl: featuredTopicCenter?.imageUrl!,
+		descriptionHtml: featuredTopicCenter?.featuredDescription!,
+		linkTo: `/featured-topics/${featuredTopicCenter?.urlName}`,
+	};
+
 	return (
 		<>
 			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
 				<div ref={movileNavRef} className={classNames('d-lg-none', classes.mobileNav)}>
 					<ul>
-						{navigationConfig.map((navigationItem) => (
-							<li key={navigationItem.navigationItemId}>
-								{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
-								{navigationItem.items && (
-									<MobileAccordianItem toggleElement={<span>{navigationItem.title}</span>}>
-										{(navigationItem.items ?? []).map((item, itemIndex) => (
-											<Link key={itemIndex} to={item.to ?? '/#'}>
-												<div
-													className={classNames('d-flex', {
-														'align-items-center': !item.description,
-													})}
-												>
-													{item.icon}
-													<div className="ps-4">
-														<p className="mb-0 fw-semibold">{item.title}</p>
-														{item.description && (
-															<p className="mb-0 text-gray">{item.description}</p>
-														)}
+						{navigationConfig.map((navigationItem) => {
+							const showFeaturedItem = navigationItem.navigationItemId === 'BROWSE_RESOURCES';
+
+							return (
+								<li key={navigationItem.navigationItemId}>
+									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
+									{navigationItem.items && (
+										<MobileAccordianItem
+											className={classNames({
+												'pt-2': !navigationItem.subtitle,
+												'pb-2': !showFeaturedItem,
+											})}
+											toggleElement={<span>{navigationItem.title}</span>}
+										>
+											{navigationItem.subtitle && (
+												<p className="text-n500 px-5 mb-3 mt-6">{navigationItem.subtitle}</p>
+											)}
+											{(navigationItem.items ?? []).map((item, itemIndex) => (
+												<Link key={itemIndex} to={item.to ?? '/#'}>
+													<div
+														className={classNames('d-flex', {
+															'align-items-center': !item.description,
+														})}
+													>
+														{item.icon}
+														<div className="ps-4">
+															<p className="mb-0 fw-semibold">{item.title}</p>
+															{item.description && (
+																<p className="mb-0 text-gray">{item.description}</p>
+															)}
+														</div>
 													</div>
-												</div>
-											</Link>
-										))}
-									</MobileAccordianItem>
-								)}
-							</li>
-						))}
+												</Link>
+											))}
+											{showFeaturedItem && (
+												<HeaderNavFeaturedItem
+													mobileNav
+													className="bg-n50 mt-6 px-4 py-6"
+													featuredItem={featuredTopicCenterItem}
+												/>
+											)}
+										</MobileAccordianItem>
+									)}
+								</li>
+							);
+						})}
 						<li>
 							<MobileAccordianItem
+								className="py-2"
 								toggleElement={
 									<div className="d-flex align-items-center">
 										<AvatarIcon width={20} height={20} className="text-p700" />
@@ -602,10 +641,10 @@ const HeaderV2 = () => {
 										))}
 									</>
 								)}
-								<hr />
+								<hr className="my" />
 								<Button
 									variant="light"
-									className="fw-semibold text-gray"
+									className="mx-2 fw-semibold text-gray"
 									onClick={signOutAndClearContext}
 								>
 									Log Out
@@ -645,50 +684,42 @@ const HeaderV2 = () => {
 						</Link>
 						<nav className={classes.desktopNav}>
 							<ul>
-								{navigationConfig.map((navigationItem) => (
-									<li
-										key={navigationItem.navigationItemId}
-										className={classNames({
-											active: navigationItem.active,
-										})}
-									>
-										{navigationItem.to && (
-											<Link
-												to={navigationItem.to}
-												onClick={() => {
-													trackEvent({
-														action: 'Top Nav',
-														link_text: navigationItem.title,
-													});
-												}}
-											>
-												{navigationItem.title}
-											</Link>
-										)}
-										{navigationItem.items && (
-											<Dropdown
-												onToggle={(nextShow) => {
-													if (nextShow) {
+								{navigationConfig.map((navigationItem) => {
+									const showFeaturedItem = navigationItem.navigationItemId === 'BROWSE_RESOURCES';
+
+									return (
+										<li
+											key={navigationItem.navigationItemId}
+											className={classNames({
+												active: navigationItem.active,
+											})}
+										>
+											{navigationItem.to && (
+												<Link
+													to={navigationItem.to}
+													onClick={() => {
 														trackEvent({
 															action: 'Top Nav',
 															link_text: navigationItem.title,
 														});
-													}
-												}}
-											>
-												<Dropdown.Toggle
-													as={DropdownToggle}
-													id={`employee-header__${navigationItem.navigationItemId}`}
+													}}
 												>
-													<span>{navigationItem.title}</span>
-													<DownChevron width={16} height={16} />
-												</Dropdown.Toggle>
-												<Dropdown.Menu
-													as={DropdownMenu}
-													align="start"
-													flip={false}
-													popperConfig={{ strategy: 'fixed' }}
-													renderOnMount
+													{navigationItem.title}
+												</Link>
+											)}
+											{navigationItem.items && (
+												<HeaderNavDropdown
+													onToggle={(nextShow) => {
+														if (nextShow) {
+															trackEvent({
+																action: 'Top Nav',
+																link_text: navigationItem.title,
+															});
+														}
+													}}
+													title={navigationItem.title}
+													subtitle={navigationItem.subtitle}
+													featuredItem={showFeaturedItem ? featuredTopicCenterItem : null}
 												>
 													{navigationItem.items.map((item, itemIndex) => (
 														<Dropdown.Item
@@ -720,11 +751,11 @@ const HeaderV2 = () => {
 															</div>
 														</Dropdown.Item>
 													))}
-												</Dropdown.Menu>
-											</Dropdown>
-										)}
-									</li>
-								))}
+												</HeaderNavDropdown>
+											)}
+										</li>
+									);
+								})}
 							</ul>
 						</nav>
 					</div>

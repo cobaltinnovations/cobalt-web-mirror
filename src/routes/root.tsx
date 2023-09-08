@@ -23,11 +23,11 @@ import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService, institutionService, topicCenterService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
-import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
+import { AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
 import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
@@ -81,6 +81,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		);
 	}
 
+	let featuredTopicCenter: TopicCenterModel | undefined;
+	if (accessToken && institutionResponse.institution.featuredTopicCenterId) {
+		const response = await topicCenterService
+			.getTopicCenterById(institutionResponse.institution.featuredTopicCenterId)
+			.fetch();
+
+		featuredTopicCenter = response.topicCenter;
+	}
+
 	return {
 		subdomain,
 		accountSourceId,
@@ -88,6 +97,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		accountId,
 		institutionResponse,
 		accountResponse,
+		featuredTopicCenter,
 	};
 }
 
