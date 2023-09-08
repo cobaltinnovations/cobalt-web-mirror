@@ -25,7 +25,7 @@ import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { accountService, institutionService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
-import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
+import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
 import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
 import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
@@ -44,7 +44,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const accountSourceId = url.searchParams.get('accountSourceId');
 
 	let accessToken = Cookies.get('accessToken');
-	let accountId = Cookies.get('accountId');
+	let accountId: string | undefined;
+
+	if (accessToken) {
+		const decodedToken = decodeAccessToken(accessToken);
+		accountId = decodedToken.accountId;
+	}
 
 	const institutionRequest = institutionService.getInstitution({
 		subdomain,
@@ -56,7 +61,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	let [institutionResponse, accountResponse] = await Promise.all([
 		institutionRequest.fetch(),
 		accountRequest?.fetch().catch(() => {
-			clearTokenCookies();
+			Cookies.remove('accessToken');
 
 			return new Error();
 		}),
