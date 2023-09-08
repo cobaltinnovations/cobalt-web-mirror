@@ -1,5 +1,5 @@
+import { CobaltColorName } from '@/jss/theme';
 import { AccountSourceId } from './account';
-import { COLOR_IDS } from './color-ids';
 import { SupportRoleId } from './provider';
 
 export enum AnonymousAccountExpirationStrategyId {
@@ -164,7 +164,13 @@ export interface InstitutionResourceGroup {
 	name: string;
 	urlName: string;
 	description: string;
-	colorId: COLOR_IDS;
+	backgroundColorId: string;
+	backgroundColorValueName: CobaltColorName;
+	backgroundColorValueCssRepresentation: string;
+	textColorId: string;
+	textColorValueName: CobaltColorName;
+	textColorValueCssRepresentation: string;
+	imageUrl?: string;
 }
 
 export interface InstitutionResource {
