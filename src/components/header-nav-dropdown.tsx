@@ -6,7 +6,7 @@ import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { FeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
+import { HeaderNavFeaturedItem, NavFeaturedItem } from './header-nav-featured-item';
 
 interface UseStylesProps {
 	hasFeaturedItem: boolean;
@@ -21,23 +21,30 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface HeaderNavDropdownProps {
 	title: string;
 	subtitle?: string;
-	featuredItem: FeaturedItem | null;
-	className?: string;
+	onToggle?: (show: boolean) => void;
+	featuredItem: NavFeaturedItem | null;
 	children: React.ReactNode;
 }
 
 const HeaderNavDropdown = ({
 	title,
 	subtitle,
+	onToggle,
 	featuredItem,
-	className,
 	children,
 }: PropsWithChildren<HeaderNavDropdownProps>) => {
 	const classes = useStyles({ hasFeaturedItem: !!featuredItem });
 	const [show, setShow] = useState(false);
 
 	return (
-		<Dropdown className="h-100" autoClose="outside" show={show} onToggle={setShow}>
+		<Dropdown
+			className="h-100"
+			show={show}
+			onToggle={(nextShow) => {
+				onToggle?.(nextShow);
+				setShow(nextShow);
+			}}
+		>
 			<Dropdown.Toggle as={DropdownToggle}>
 				{title}
 				<DownChevron width={16} height={16} />
@@ -46,7 +53,31 @@ const HeaderNavDropdown = ({
 				className={classNames(classes.dropdownMenu, 'p-0')}
 				as={DropdownMenu}
 				flip={false}
-				popperConfig={{ strategy: 'fixed' }}
+				popperConfig={{
+					strategy: 'fixed',
+					modifiers: [
+						{
+							name: 'offset',
+							options: {
+								offset: ({
+									popper,
+									reference,
+								}: {
+									popper: { width: number };
+									reference: { width: number };
+								}) => {
+									if (!featuredItem) {
+										return [0, 0];
+									}
+									const halfPopperWidth = popper.width / 2;
+									const halfRefWidth = reference.width / 2;
+
+									return [halfRefWidth - halfPopperWidth, 0];
+								},
+							},
+						},
+					],
+				}}
 				renderOnMount
 			>
 				<div className="d-flex">
@@ -60,7 +91,15 @@ const HeaderNavDropdown = ({
 						{children}
 					</div>
 
-					{featuredItem && <HeaderNavFeaturedItem className="bg-n50 px-8 py-6" featuredItem={featuredItem} />}
+					{featuredItem && (
+						<HeaderNavFeaturedItem
+							className="bg-n50 px-8 py-6"
+							featuredItem={featuredItem}
+							onImageClick={() => {
+								setShow(false);
+							}}
+						/>
+					)}
 				</div>
 			</Dropdown.Menu>
 		</Dropdown>
