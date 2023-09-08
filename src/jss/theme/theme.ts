@@ -1,4 +1,4 @@
-export type CobaltColor = keyof CobaltTheme['colors'];
+export type CobaltColorName = keyof CobaltTheme['colors'];
 
 export type CobaltFontFamily = {
 	fontFamily: string;
