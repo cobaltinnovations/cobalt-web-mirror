@@ -224,9 +224,6 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		setSelectedTimeSlot(undefined);
 		setIsEligible(true);
 		setPreviousProviderId(undefined);
-
-		Cookies.remove('bookingSource');
-		Cookies.remove('bookingExitUrl');
 	}, [accountId]);
 
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
