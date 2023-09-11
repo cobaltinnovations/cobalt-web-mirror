@@ -17,6 +17,7 @@ interface SupportMentalHealthProvidersShellProps {
 	connectDescription: string;
 	connectEnabled?: boolean;
 	onEnabledCheck?: () => void;
+	connectInstructionsLabel?: string;
 }
 
 export const SupportMentalHealthProvidersShell = ({
@@ -24,6 +25,7 @@ export const SupportMentalHealthProvidersShell = ({
 	connectDescription,
 	connectEnabled,
 	onEnabledCheck,
+	connectInstructionsLabel,
 }: SupportMentalHealthProvidersShellProps) => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
@@ -129,7 +131,7 @@ export const SupportMentalHealthProvidersShell = ({
 										},
 										{
 											variant: 'outline-primary',
-											title: 'Learn More',
+											title: connectInstructionsLabel ?? 'Learn More',
 											onClick: () => {
 												window.open(
 													institution.myChartInstructionsUrl,
