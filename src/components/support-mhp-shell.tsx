@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet';
 import AsyncWrapper from './async-page';
 import HeroContainer from './hero-container';
 import InlineAlert from './inline-alert';
-import NoData from './no-data';
+import NoData, { NoDataAction } from './no-data';
 import { PsychiatristRecommendation } from './psychiatrist-recommendation';
 import useAccount from '@/hooks/use-account';
 import { FeatureId, InstitutionFeature } from '@/lib/models';
@@ -13,17 +13,17 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useNavigate } from 'react-router-dom';
 
 interface SupportMentalHealthProvidersShellProps {
+	myChartAuthUrlState: [string, React.Dispatch<React.SetStateAction<string>>];
 	renderFeatureDetail: (featureDetail: InstitutionFeature) => ReactNode;
 	connectDescription: string;
-	connectEnabled?: boolean;
-	onEnabledCheck?: () => void;
+	connectActions: NoDataAction[];
 }
 
 export const SupportMentalHealthProvidersShell = ({
 	renderFeatureDetail,
 	connectDescription,
-	connectEnabled,
-	onEnabledCheck,
+	connectActions,
+	myChartAuthUrlState: [myChartAuthUrl, setMyChartAuthUrl],
 }: SupportMentalHealthProvidersShellProps) => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
@@ -41,7 +41,6 @@ export const SupportMentalHealthProvidersShell = ({
 	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
 	const [hasScheduled, setHasScheduled] = useState(false);
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
-	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
 
 	const fetchData = useCallback(async () => {
 		if (!institution.providerTriageScreeningFlowId) {
@@ -84,6 +83,7 @@ export const SupportMentalHealthProvidersShell = ({
 		institution.features,
 		institution.institutionId,
 		institution.providerTriageScreeningFlowId,
+		setMyChartAuthUrl,
 	]);
 
 	if (renderedPreScreeningLoader) {
@@ -114,31 +114,7 @@ export const SupportMentalHealthProvidersShell = ({
 								<NoData
 									title={`Connect to ${institution.myChartName}`}
 									description={connectDescription}
-									actions={[
-										{
-											variant: 'primary',
-											title: `Connect to ${institution.myChartName}`,
-											onClick: () => {
-												if (!connectEnabled) {
-													onEnabledCheck?.();
-													return;
-												}
-
-												window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
-											},
-										},
-										{
-											variant: 'outline-primary',
-											title: 'Learn More',
-											onClick: () => {
-												window.open(
-													institution.myChartInstructionsUrl,
-													'_blank',
-													'noopener, noreferrer'
-												);
-											},
-										},
-									]}
+									actions={connectActions}
 								/>
 							)}
 

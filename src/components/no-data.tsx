@@ -13,21 +13,23 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface Props {
+export interface NoDataAction {
+	size?: 'sm' | 'lg';
+	variant: ButtonVariant;
+	title: string;
+	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	disabled?: boolean;
+}
+
+export interface NoDataProps {
 	illustration?: ReactElement;
 	title: string;
 	description?: string;
-	actions: {
-		size?: 'sm' | 'lg';
-		variant: ButtonVariant;
-		title: string;
-		onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-		disabled?: boolean;
-	}[];
+	actions: NoDataAction[];
 	className?: string;
 }
 
-const NoData = ({ illustration, title, description, actions, className }: Props) => {
+const NoData = ({ illustration, title, description, actions, className }: NoDataProps) => {
 	const classes = useStyles();
 
 	return (
