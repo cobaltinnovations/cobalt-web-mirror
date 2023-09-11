@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 interface SupportMentalHealthProvidersShellProps {
 	myChartAuthUrlState: [string, React.Dispatch<React.SetStateAction<string>>];
 	renderFeatureDetail: (featureDetail: InstitutionFeature) => ReactNode;
-	connectDescription: string;
+	connectDescription: ReactNode;
 	connectActions: NoDataAction[];
 }
 

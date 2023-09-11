@@ -1,6 +1,6 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { Button } from 'react-bootstrap';
 import { ButtonVariant } from 'react-bootstrap/esm/types';
 
@@ -24,7 +24,7 @@ export interface NoDataAction {
 export interface NoDataProps {
 	illustration?: ReactElement;
 	title: string;
-	description?: string;
+	description?: string | ReactNode;
 	actions: NoDataAction[];
 	className?: string;
 }
