@@ -52,27 +52,27 @@ export const HeaderNavFeaturedItem = ({
 	const classes = useFeaturedItemStyles({ mobileNav });
 
 	return (
-		<div className={classNames(classes.featuredItemContainer, className)}>
+		<Link
+			className={classNames(classes.featuredItemContainer, 'd-block', className)}
+			to={featuredItem.linkTo}
+			onClick={() => {
+				onImageClick?.();
+			}}
+		>
 			<p className="text-n500 mb-5">{featuredItem.subtitle}</p>
 
-			<Link
-				className="h-auto p-0 m-0 mb-6"
-				to={featuredItem.linkTo}
-				onClick={() => {
-					onImageClick?.();
-				}}
-			>
+			<div className="h-auto p-0 m-0 mb-6">
 				<img className={classes.featuredItemImage} src={featuredItem.imageUrl} alt={featuredItem.imageAlt} />
-			</Link>
+			</div>
 
-			<p className="mb-1 fw-semibold">{featuredItem.name}</p>
+			<p className="mb-1 text-dark fw-semibold">{featuredItem.name}</p>
 
 			<div
-				className={classes.featuredItemDescriptionWrapper}
+				className={classNames(classes.featuredItemDescriptionWrapper, 'text-dark')}
 				dangerouslySetInnerHTML={{
 					__html: featuredItem.descriptionHtml,
 				}}
 			/>
-		</div>
+		</Link>
 	);
 };
