@@ -11,6 +11,7 @@ import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import AppointmentUnavailableModal from '@/components/appointment-unavailable-modal';
 import { CobaltError } from '@/lib/http-client';
+import Cookies from 'js-cookie';
 
 const ConfirmAppointment = () => {
 	const navigate = useNavigate();
@@ -168,6 +169,9 @@ const ConfirmAppointment = () => {
 			} else {
 				navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`);
 			}
+
+			Cookies.remove('bookingSource');
+			Cookies.remove('bookingExitUrl');
 
 			addFlag({
 				variant: 'success',
