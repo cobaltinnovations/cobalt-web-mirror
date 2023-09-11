@@ -192,16 +192,13 @@ const Index: FC = () => {
 									<NoData
 										className="bg-p50"
 										title="Not sure what you need?"
-										description={
-											institution.epicFhirEnabled
-												? 'Take an assessment for on your own time resources or speak with a resource navigator'
-												: ''
-										}
 										actions={[
 											{
 												size: 'lg',
 												variant: 'primary',
-												title: 'Take the Assessment',
+												title: institution.epicFhirEnabled
+													? 'Explore Your Interests'
+													: 'Take the Assessment',
 												onClick: () => {
 													startScreeningFlow();
 													trackEvent({
