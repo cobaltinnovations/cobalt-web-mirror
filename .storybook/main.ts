@@ -37,6 +37,10 @@ const config: StorybookConfig = {
 			}),
 		];
 
+		if (config.resolve.alias) {
+			config.resolve.alias['@sentry/react'] = path.resolve(__dirname, 'sentry-mock.js');
+		}
+
 		return config;
 	},
 	framework: {
