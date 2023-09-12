@@ -288,7 +288,7 @@ export const Component = () => {
 		});
 	}, [hasReservations, params.groupSessionId]);
 
-	const updateFormValue = useCallback((key: keyof typeof formValues, value: typeof formValues[typeof key]) => {
+	const updateFormValue = useCallback((key: keyof typeof formValues, value: (typeof formValues)[typeof key]) => {
 		setIsDirty(true);
 		setFormValues((currentValues) => {
 			return {
@@ -524,6 +524,7 @@ export const Component = () => {
 						label="Video Link URL (Bluejeans/Zoom, etc.)"
 						name="videoconferenceUrl"
 						required
+						disabled={isEdit && hasReservations}
 						value={formValues.videoconferenceUrl}
 						onChange={({ currentTarget }) => {
 							updateFormValue('videoconferenceUrl', currentTarget.value);
@@ -999,6 +1000,7 @@ export const Component = () => {
 							checked={
 								formValues.screeningFlowId === institution.groupSessionDefaultIntakeScreeningFlowId
 							}
+							disabled={isEdit && hasReservations}
 							onChange={() => {
 								updateFormValue(
 									'screeningFlowId',
@@ -1019,6 +1021,7 @@ export const Component = () => {
 										label={screeningFlow.name}
 										className="mb-3"
 										hideChildren
+										disabled={isEdit && hasReservations}
 										detail={
 											<Button
 												size="sm"

@@ -15,14 +15,22 @@ import { useNavigate } from 'react-router-dom';
 interface SupportMentalHealthProvidersShellProps {
 	myChartAuthUrlState: [string, React.Dispatch<React.SetStateAction<string>>];
 	renderFeatureDetail: (featureDetail: InstitutionFeature) => ReactNode;
+	connectTitle: string;
 	connectDescription: ReactNode;
 	connectActions: NoDataAction[];
+	connectedTitle: string;
+	connectedDescription: ReactNode;
+	connectedCta: string;
 }
 
 export const SupportMentalHealthProvidersShell = ({
 	renderFeatureDetail,
+	connectTitle,
 	connectDescription,
 	connectActions,
+	connectedTitle,
+	connectedDescription,
+	connectedCta,
 	myChartAuthUrlState: [myChartAuthUrl, setMyChartAuthUrl],
 }: SupportMentalHealthProvidersShellProps) => {
 	const navigate = useNavigate();
@@ -112,7 +120,7 @@ export const SupportMentalHealthProvidersShell = ({
 						<Col>
 							{myChartAuthUrl && (
 								<NoData
-									title={`Connect to ${institution.myChartName}`}
+									title={connectTitle}
 									description={connectDescription}
 									actions={connectActions}
 								/>
@@ -120,12 +128,12 @@ export const SupportMentalHealthProvidersShell = ({
 
 							{!hasCompletedScreening && !myChartAuthUrl && (
 								<NoData
-									title="Take the assessment"
-									description="Copy"
+									title={connectedTitle}
+									description={connectedDescription}
 									actions={[
 										{
 											variant: 'primary',
-											title: 'Take the assessment',
+											title: connectedCta,
 											onClick: startScreeningFlow,
 										},
 									]}
