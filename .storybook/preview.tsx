@@ -1,5 +1,7 @@
 import type { Preview } from '@storybook/react';
+import { ensure } from '@storybook/theming';
 import React from 'react';
+import cobaltStorybookTheme from './storybook-theme';
 
 import { AppProviders } from '../src/app-providers';
 import { useCustomBootstrapStyles } from '../src/jss/hooks/use-custom-bootstrap-styles';
@@ -14,6 +16,9 @@ const preview: Preview = {
 				color: /(background|color)$/i,
 				date: /Date$/,
 			},
+		},
+		docs: {
+			theme: cobaltStorybookTheme,
 		},
 	},
 
