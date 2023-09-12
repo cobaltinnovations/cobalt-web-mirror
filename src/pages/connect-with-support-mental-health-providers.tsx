@@ -13,6 +13,7 @@ const ConnectWithSupportMentalHealthProviders = () => {
 			renderFeatureDetail={(featureDetails) => {
 				return <p className="mb-0 text-center fs-large">{featureDetails.description}</p>;
 			}}
+			connectTitle={`Connect to ${institution.myChartName}`}
 			connectDescription={`In order to be connected with one of our providers, you will need to sign in to your ${institution.myChartName} account. If you do not have a ${institution.myChartName} account, click Learn More for instructions on how to sign up. If you have any difficulty getting an activation or access code, please contact ${institution.myChartName} technical support at ${institution.techSupportPhoneNumberDescription}.`}
 			connectActions={[
 				{
@@ -30,6 +31,9 @@ const ConnectWithSupportMentalHealthProviders = () => {
 					},
 				},
 			]}
+			connectedTitle={`Thank your for connecting to ${institution.myChartName}`}
+			connectedDescription={`Next, press the button below to take a brief assessment so we can learn more about how you're feeling.`}
+			connectedCta="Take the assessment"
 		/>
 	);
 };
