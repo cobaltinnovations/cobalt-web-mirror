@@ -1,11 +1,22 @@
 import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel, TagModel } from '@/lib/models';
 
+export enum TopicCenterDisplayStyleId {
+	DEFAULT = 'DEFAULT',
+	FEATURED = 'FEATURED',
+}
+
 export interface TopicCenterModel {
 	name: string;
+	description: string;
 	topicCenterId: string;
 	topicCenterRows: TopicCenterRowModel[];
 	urlName: string;
 	tagsByTagId: Record<string, TagModel>;
+	topicCenterDisplayStyleId: TopicCenterDisplayStyleId;
+	featuredTitle?: string;
+	featuredDescription?: string;
+	featuredCallToAction?: string;
+	imageUrl?: string;
 }
 
 export interface TopicCenterRowModel {

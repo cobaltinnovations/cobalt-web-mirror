@@ -160,7 +160,7 @@ const EhrLookup: FC = () => {
 		});
 
 		try {
-			const response = await request.fetch();
+			await request.fetch();
 			revalidator.revalidate();
 
 			setIsBooking(true);
@@ -179,10 +179,6 @@ const EhrLookup: FC = () => {
 
 			navigate(`/my-calendar?appointmentId=${appointment.appointmentId}`, {
 				replace: true,
-				state: {
-					successBooking: true,
-					emailAddress: response.account.emailAddress,
-				},
 			});
 		} catch (e) {
 			handleError(e);

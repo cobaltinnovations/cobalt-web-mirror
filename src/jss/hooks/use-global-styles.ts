@@ -52,7 +52,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		hr: {
 			margin: 0,
 			opacity: 1,
-			borderColor: theme.colors.n100,
+			borderColor: theme.colors.border,
 		},
 
 		/* ----------------------------------------------------------- */
@@ -141,27 +141,42 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		},
 
 		'.fs-h1': {
-			...theme.fonts.h1,
+			...theme.fonts.h1.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h1.mobile,
+			},
 		},
 		'.fs-h2': {
-			...theme.fonts.h2,
+			...theme.fonts.h2.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h2.mobile,
+			},
 		},
 		'.fs-h3': {
-			...theme.fonts.h3,
+			...theme.fonts.h3.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h3.mobile,
+			},
 		},
 		'.fs-h4': {
-			...theme.fonts.h4,
+			...theme.fonts.h4.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h4.mobile,
+			},
 		},
 		'.fs-h5': {
-			...theme.fonts.h5,
+			...theme.fonts.h5.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h5.mobile,
+			},
 		},
 		'.fs-h6': {
-			...theme.fonts.h6,
+			...theme.fonts.h6.default,
+			[mediaQueries.md]: {
+				...theme.fonts.h6.mobile,
+			},
 		},
 
-		'.fs-ui-small': {
-			...theme.fonts.uiSmall,
-		},
 		'.fs-small': {
 			...theme.fonts.small,
 		},

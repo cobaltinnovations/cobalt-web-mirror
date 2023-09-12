@@ -81,7 +81,7 @@ const ImageUpload: FC<ImageUploadProps> = ({
 			</div>
 			{!imagePreview && (
 				<>
-					<p className="fs-ui-small text-uppercase text-muted">Tips for choosing a good image</p>
+					<p className="fs-small text-uppercase text-muted">Tips for choosing a good image</p>
 					<ul className="mb-0 ps-4 fs-small">
 						<li>Is a minimum size of 800 x 450 px</li>
 						<li>Features a warm, bold color palette</li>

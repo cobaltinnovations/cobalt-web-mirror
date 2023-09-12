@@ -1,6 +1,6 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { Button } from 'react-bootstrap';
 import { ButtonVariant } from 'react-bootstrap/esm/types';
 
@@ -9,25 +9,27 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: 48,
 		borderRadius: 4,
 		backgroundColor: theme.colors.n75,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 	},
 }));
 
-interface Props {
+export interface NoDataAction {
+	size?: 'sm' | 'lg';
+	variant: ButtonVariant;
+	title: string;
+	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	disabled?: boolean;
+}
+
+export interface NoDataProps {
 	illustration?: ReactElement;
 	title: string;
-	description?: string;
-	actions: {
-		size?: 'sm' | 'lg';
-		variant: ButtonVariant;
-		title: string;
-		onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-		disabled?: boolean;
-	}[];
+	description?: string | ReactNode;
+	actions: NoDataAction[];
 	className?: string;
 }
 
-const NoData = ({ illustration, title, description, actions, className }: Props) => {
+const NoData = ({ illustration, title, description, actions, className }: NoDataProps) => {
 	const classes = useStyles();
 
 	return (

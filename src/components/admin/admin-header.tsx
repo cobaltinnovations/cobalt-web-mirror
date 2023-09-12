@@ -26,14 +26,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	brandingOuter: {
 		flexShrink: 0,
 		display: 'flex',
 		alignItems: 'center',
 		padding: '8px 16px 8px 40px',
-		borderRight: `1px solid ${theme.colors.n100}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	navigationOuter: {
 		flex: 1,

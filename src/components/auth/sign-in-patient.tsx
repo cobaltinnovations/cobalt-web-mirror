@@ -103,7 +103,7 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									})}
 								</div>
 								<InlineAlert
-									variant="primary"
+									variant="info"
 									title="If you are in crisis"
 									description="Contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
 								/>

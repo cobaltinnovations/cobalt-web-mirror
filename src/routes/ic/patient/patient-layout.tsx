@@ -28,6 +28,7 @@ const PatientErrorLayout = () => {
 
 			<ErrorDisplay
 				error={error}
+				showRetryButton
 				onRetryButtonClick={() => {
 					window.location.reload();
 				}}

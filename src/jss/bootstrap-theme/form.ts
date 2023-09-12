@@ -127,8 +127,8 @@ export const form = (theme: CobaltTheme) => {
 
 					'&:disabled': {
 						color: 'red',
-						borderColor: `${theme.colors.n100} !important`,
-						backgroundColor: `${theme.colors.n100} !important`,
+						borderColor: `${theme.colors.border} !important`,
+						backgroundColor: `${theme.colors.border} !important`,
 
 						'&:checked': {
 							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-dark.svg)`,

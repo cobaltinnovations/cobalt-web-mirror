@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 
 import {
 	LoaderFunctionArgs,
@@ -23,11 +23,12 @@ import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService, institutionService, topicCenterService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
-import { clearTokenCookies, updateTokenCookies } from '@/routes/auth';
+import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
-import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
+import { AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
+import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
@@ -43,7 +44,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const accountSourceId = url.searchParams.get('accountSourceId');
 
 	let accessToken = Cookies.get('accessToken');
-	let accountId = Cookies.get('accountId');
+	let accountId: string | undefined;
+
+	if (accessToken) {
+		const decodedToken = decodeAccessToken(accessToken);
+		accountId = decodedToken.accountId;
+	}
 
 	const institutionRequest = institutionService.getInstitution({
 		subdomain,
@@ -55,7 +61,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	let [institutionResponse, accountResponse] = await Promise.all([
 		institutionRequest.fetch(),
 		accountRequest?.fetch().catch(() => {
-			clearTokenCookies();
+			Cookies.remove('accessToken');
 
 			return new Error();
 		}),
@@ -75,6 +81,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		);
 	}
 
+	let featuredTopicCenter: TopicCenterModel | undefined;
+	if (accessToken && institutionResponse.institution.featuredTopicCenterId) {
+		const response = await topicCenterService
+			.getTopicCenterById(institutionResponse.institution.featuredTopicCenterId)
+			.fetch();
+
+		featuredTopicCenter = response.topicCenter;
+	}
+
 	return {
 		subdomain,
 		accountSourceId,
@@ -82,10 +97,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		accountId,
 		institutionResponse,
 		accountResponse,
+		featuredTopicCenter,
 	};
 }
 
 export const Component = () => {
+	useEffect(() => {
+		setTimeout(() => {
+			// removes the flag indicating a chunk load error has occurred and page force-refresed
+			// timeout so we don't get into an "infinite refresh loop"
+			// and gives enough time for ErrorDisplay to handle `ChunkLoadError`s
+			clearChunkLoadErrorStorage();
+		}, 1000);
+	}, []);
+
 	return (
 		<AccountProvider>
 			<AnalyticsProvider>
@@ -116,7 +141,15 @@ const Layout = () => {
 				<Outlet />
 			</Suspense>
 
-			<ScrollRestoration />
+			<ScrollRestoration
+				getKey={(location) => {
+					if (location.pathname.includes('my-calendar')) {
+						return location.pathname;
+					}
+
+					return location.key;
+				}}
+			/>
 		</>
 	);
 };

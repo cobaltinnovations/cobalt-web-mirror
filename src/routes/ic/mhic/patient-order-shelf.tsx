@@ -139,7 +139,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '28px 32px 0',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 	shelfCloseButton: {
 		top: 20,

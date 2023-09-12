@@ -43,7 +43,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			boxShadow: 'none',
 			position: 'static',
 			padding: '32px 0 40px',
-			borderTop: `1px solid ${theme.colors.n100}`,
+			borderTop: `1px solid ${theme.colors.border}`,
 		},
 	},
 }));
@@ -86,6 +86,8 @@ const GroupSession = ({
 			errorDesctiption: 'Please try again.',
 		});
 	}, [copyTextToClipboard, groupSession.urlName]);
+
+	const isPastEndDateTime = moment(groupSession.endDateTime).isBefore(moment());
 
 	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 
@@ -164,6 +166,10 @@ const GroupSession = ({
 							) : null}
 							<Row className="mb-6">
 								<Col>
+									{isPastEndDateTime && (
+										<InlineAlert className="mb-6" variant="warning" title="Group Session Ended" />
+									)}
+
 									<div className="d-flex">
 										{isExternal ? (
 											<CalendarIcon height={20} width={20} className="text-primary me-4" />
@@ -228,7 +234,7 @@ const GroupSession = ({
 							</Row>
 							<Row>
 								<Col>
-									{groupSessionReservation ? (
+									{isPastEndDateTime ? null : groupSessionReservation ? (
 										<Button
 											variant="danger"
 											className="mb-3 d-block w-100"
@@ -261,7 +267,7 @@ const GroupSession = ({
 										</Button>
 									)}
 
-									{!isExternal && (
+									{!isPastEndDateTime && !isExternal && (
 										<Button
 											variant="outline-primary"
 											className="d-block w-100"

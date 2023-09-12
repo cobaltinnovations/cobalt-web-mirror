@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { TopicCenterModel } from '@/lib/models';
+import { TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
 import { topicCenterService } from '@/lib/services';
 
 import AsyncPage from '@/components/async-page';
@@ -15,28 +15,44 @@ import classNames from 'classnames';
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import { SkeletonText } from '@/components/skeleton-loaders';
+import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import PageHeader from '@/components/page-header';
 
 const TopicCenter = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const [topicCenter, setTopicCenter] = useState<TopicCenterModel>();
+	const featuredTopicsRouteMatch = useMatch({
+		path: '/featured-topics/*',
+	});
 
+	const isFeaturedMatch = !!featuredTopicsRouteMatch;
 	const fetchData = useCallback(async () => {
 		if (!topicCenterId) {
 			throw new Error('topicCenterId is undefined.');
 		}
 
 		const response = await topicCenterService.getTopicCenterById(topicCenterId).fetch();
+
+		if (isFeaturedMatch && response.topicCenter.topicCenterDisplayStyleId !== TopicCenterDisplayStyleId.FEATURED) {
+			navigate(`/topic-centers/${response.topicCenter.urlName}`, { replace: true });
+		} else if (
+			!isFeaturedMatch &&
+			response.topicCenter.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED
+		) {
+			navigate(`/featured-topics/${response.topicCenter.urlName}`, { replace: true });
+		}
+
 		setTopicCenter(response.topicCenter);
 		mixpanel.track('Topic Center Page View', {
 			'Topic Center ID': response.topicCenter.topicCenterId,
 			'Topic Center Title': response.topicCenter.name,
 		});
-	}, [mixpanel, topicCenterId]);
+	}, [isFeaturedMatch, mixpanel, navigate, topicCenterId]);
 
 	return (
 		<>
@@ -50,55 +66,80 @@ const TopicCenter = () => {
 				fetchData={fetchData}
 				loadingComponent={
 					<>
-						<HeroContainer className="bg-p700">
-							<SkeletonText type="h1" numberOfLines={2} className="mb-0 text-center" />
-						</HeroContainer>
-						<Container fluid className="bg-n50">
-							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+						{featuredTopicsRouteMatch ? (
+							<Container fluid className="bg-n75 p-16">
 								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
-										<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+									<Col xs={12} md={8}>
+										<SkeletonText type="h1" numberOfLines={1} />
+										<SkeletonText type="p" numberOfLines={3} />
 									</Col>
-								</Row>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										<SkeletonTopicCenterGroupSession />
+
+									<Col xs={12} md={4}>
+										<SkeletonImage height={200} />
 									</Col>
 								</Row>
 							</Container>
-						</Container>
-						<Container fluid className="bg-n75">
-							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 8, offset: 2 }}
-										xl={{ span: 6, offset: 3 }}
-									>
-										<SkeletonText type="h2" width="75%" className="mb-2 mb-lg-4 text-center" />
-										<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
-									</Col>
-								</Row>
-								<Row>
-									<Col
-										md={{ span: 10, offset: 1 }}
-										lg={{ span: 10, offset: 1 }}
-										xl={{ span: 8, offset: 2 }}
-									>
-										<SkeletonTopicCenterGroupSession />
-									</Col>
-								</Row>
-							</Container>
-						</Container>
+						) : (
+							<>
+								<HeroContainer className="bg-p700">
+									<SkeletonText type="h1" numberOfLines={2} className="mb-0 text-center" />
+								</HeroContainer>
+								<Container fluid className="bg-n50">
+									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
+												<SkeletonText
+													type="h2"
+													width="75%"
+													className="mb-2 mb-lg-4 text-center"
+												/>
+												<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+											</Col>
+										</Row>
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												<SkeletonTopicCenterGroupSession />
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+								<Container fluid className="bg-n75">
+									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 8, offset: 2 }}
+												xl={{ span: 6, offset: 3 }}
+											>
+												<SkeletonText
+													type="h2"
+													width="75%"
+													className="mb-2 mb-lg-4 text-center"
+												/>
+												<SkeletonText type="p" className="mb-6 mb-lg-12 text-center" />
+											</Col>
+										</Row>
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												<SkeletonTopicCenterGroupSession />
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+							</>
+						)}
 						<Container fluid className="bg-n50">
 							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
 								<Row>
@@ -127,30 +168,62 @@ const TopicCenter = () => {
 					</>
 				}
 			>
-				<HeroContainer className="bg-p700">
-					<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
-				</HeroContainer>
+				{featuredTopicsRouteMatch ? (
+					<PageHeader
+						className="bg-n75"
+						title={topicCenter?.name!}
+						descriptionHtml={topicCenter?.description}
+						imageUrl={topicCenter?.imageUrl}
+						imageAlt={topicCenter?.name}
+					/>
+				) : (
+					<HeroContainer className="bg-p700">
+						<h1 className="mb-0 text-white text-center">{topicCenter?.name}</h1>
+					</HeroContainer>
+				)}
 
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
+
+					let sectionsWithContent = 0;
+					if (topicCenterRow.groupSessions.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.groupSessionRequests.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.pinboardNotes.length > 0) {
+						sectionsWithContent++;
+					}
+					if (topicCenterRow.contents.length > 0) {
+						sectionsWithContent++;
+					}
+
+					const showSectionHeaders = sectionsWithContent > 1;
+					const containerClasseNames = classNames(
+						'pb-12 pt-lg-14 pb-lg-22',
+						showSectionHeaders ? 'pt-10' : 'pt-12'
+					);
 
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
 							{topicCenterRow.groupSessions.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -200,6 +273,7 @@ const TopicCenter = () => {
 																	state: {
 																		navigationSource:
 																			GroupSessionDetailNavigationSource.TOPIC_CENTER,
+																		topicCenterPath: location.pathname,
 																	},
 																});
 															}}
@@ -215,19 +289,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.groupSessionRequests.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -289,19 +365,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.pinboardNotes.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container fluid="lg" className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container fluid="lg" className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											<Col>
 												<Masonry>
@@ -325,19 +403,21 @@ const TopicCenter = () => {
 
 							{topicCenterRow.contents.length > 0 && (
 								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
-									<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClasseNames}>
+										{showSectionHeaders && (
+											<Row>
+												<Col
+													md={{ span: 10, offset: 1 }}
+													lg={{ span: 8, offset: 2 }}
+													xl={{ span: 6, offset: 3 }}
+												>
+													<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+													<p className="mb-6 mb-lg-12 fs-large text-center">
+														{topicCenterRow.description}
+													</p>
+												</Col>
+											</Row>
+										)}
 										<Row>
 											{topicCenterRow.contents.map((content) => {
 												return (

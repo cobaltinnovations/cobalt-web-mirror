@@ -17,7 +17,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		top: MHIC_HEADER_HEIGHT,
 		width: sideNavWidth,
 		backgroundColor: theme.colors.n0,
-		borderRight: `1px solid ${theme.colors.n100}`,
+		borderRight: `1px solid ${theme.colors.border}`,
 	},
 	navigation: {
 		'& button': {

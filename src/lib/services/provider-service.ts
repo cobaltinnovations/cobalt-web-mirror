@@ -16,6 +16,7 @@ import {
 	FollowupModel,
 	Specialty,
 	ProviderVisitType,
+	FeatureId,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -40,7 +41,7 @@ export interface FindOptionsAppointmentTime {
 
 export interface FindOptionsFeature {
 	description: string;
-	featureId: string;
+	featureId: FeatureId;
 	name: string;
 }
 

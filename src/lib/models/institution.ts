@@ -1,9 +1,29 @@
+import { CobaltColorName } from '@/jss/theme';
 import { AccountSourceId } from './account';
 import { SupportRoleId } from './provider';
 
 export enum AnonymousAccountExpirationStrategyId {
 	DEFAULT = 'DEFAULT',
 	SINGLE_SESSION = 'SINGLE_SESSION',
+}
+
+export enum FeatureId {
+	THERAPY = 'THERAPY',
+	MEDICATION_PRESCRIBER = 'MEDICATION_PRESCRIBER',
+	GROUP_SESSIONS = 'GROUP_SESSIONS',
+	COACHING = 'COACHING',
+	SELF_HELP_RESOURCES = 'SELF_HELP_RESOURCES',
+	SPIRITUAL_SUPPORT = 'SPIRITUAL_SUPPORT',
+	CRISIS_SUPPORT = 'CRISIS_SUPPORT',
+	MHP = 'MHP',
+	MENTAL_HEALTH_PROVIDERS = 'MENTAL_HEALTH_PROVIDERS',
+	INSTITUTION_RESOURCES = 'INSTITUTION_RESOURCES',
+	PSYCHOLOGIST = 'PSYCHOLOGIST',
+	PSYCHIATRIST = 'PSYCHIATRIST',
+	MSW = 'MSW',
+	PSYCHOTHERAPIST = 'PSYCHOTHERAPIST',
+	RESOURCE_NAVIGATOR = 'RESOURCE_NAVIGATOR',
+	COUNSELING_SERVICES = 'COUNSELING_SERVICES',
 }
 
 export interface Institution {
@@ -34,6 +54,7 @@ export interface Institution {
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
 	featureScreeningFlowId?: string;
+	featuredTopicCenterId?: string;
 	hasTakenFeatureScreening: boolean;
 	takeFeatureScreening: boolean;
 	userExperienceTypeId: UserExperienceTypeId;
@@ -45,21 +66,29 @@ export interface Institution {
 	integratedCareProgramName: string;
 	myChartName: string;
 	myChartDefaultUrl: string;
+	myChartInstructionsUrl: string;
 	clinicalSupportPhoneNumber: string;
 	clinicalSupportPhoneNumberDescription: string;
+	techSupportPhoneNumber: string;
+	techSupportPhoneNumberDescription: string;
+	faqEnabled: boolean;
+	epicFhirEnabled: boolean;
+	externalContactUsUrl: string;
 }
 
 export interface InstitutionFeature {
 	description: string;
-	featureId: string;
+	featureId: FeatureId;
 	name: string;
 	navDescription: string;
 	navVisible: boolean;
+	landingPageVisible: boolean;
 	navigationHeaderId: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
 	locationPromptRequired: boolean;
+	treatmentDescription?: string;
 }
 
 export interface AdditionalNavigationItem {
@@ -129,4 +158,29 @@ export interface InstitutionAlert {
 	alertTypeId: AlertTypeId;
 	title: string;
 	message: string;
+}
+
+export interface InstitutionResourceGroup {
+	institutionResourceGroupId: string;
+	institutionId: string;
+	name: string;
+	urlName: string;
+	description: string;
+	backgroundColorId: string;
+	backgroundColorValueName: CobaltColorName;
+	backgroundColorValueCssRepresentation: string;
+	textColorId: string;
+	textColorValueName: CobaltColorName;
+	textColorValueCssRepresentation: string;
+	imageUrl?: string;
+}
+
+export interface InstitutionResource {
+	institutionResourceId: string;
+	institutionId: string;
+	name: string;
+	urlName: string;
+	description: string;
+	url: string;
+	imageUrl: string;
 }

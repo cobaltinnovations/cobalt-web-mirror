@@ -27,6 +27,7 @@ import { useIntegratedCareLoaderData } from '../landing';
 import classNames from 'classnames';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { decodeAccessToken } from '@/routes/auth';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -190,7 +191,13 @@ function loadMyPatients(
 	{ mhicView, searchParams }: { mhicView: string; searchParams: URLSearchParams },
 	isPolling = false
 ) {
-	const accountId = Cookies.get('accountId');
+	const accessToken = Cookies.get('accessToken');
+
+	if (!accessToken) {
+		throw new Error('Not authenticated');
+	}
+
+	const { accountId } = decodeAccessToken(accessToken);
 	const pageNumber = searchParams.get('pageNumber') ?? 0;
 	const filters = parseMhicFilterQueryParamsFromSearchParams(searchParams);
 	const mhicFilterStateParsedQueryParams = MhicFilterStateGetParsedQueryParams(searchParams);

@@ -12,9 +12,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 	tabBar: {
 		overflowX: ({ vertical }: UseStylesProps) => (vertical ? 'visible' : 'auto'),
 		borderLeft: ({ vertical, hideBorder }: UseStylesProps) =>
-			vertical && !hideBorder ? `1px solid ${theme.colors.n100}` : '',
+			vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
 		borderBottom: ({ vertical, hideBorder }: UseStylesProps) =>
-			!vertical && !hideBorder ? `1px solid ${theme.colors.n100}` : '',
+			!vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
 
 		'& ul': {
 			margin: 0,

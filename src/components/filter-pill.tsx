@@ -35,7 +35,7 @@ const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	},
 	disabledPill: {
 		color: theme.colors.n500,
-		borderColor: theme.colors.n100,
+		borderColor: theme.colors.border,
 		backgroundColor: theme.colors.n100,
 		'&:hover': {
 			cursor: 'not-allowed',

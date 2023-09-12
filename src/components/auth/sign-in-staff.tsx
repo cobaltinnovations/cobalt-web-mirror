@@ -99,7 +99,7 @@ export const SignInStaff = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									})}
 								</div>
 								<InlineAlert
-									variant="primary"
+									variant="info"
 									title="Are you a patient?"
 									description={`This platform is for Staff only. Please visit ${institution?.patientUserExperienceBaseUrl} if you are a patient seeking mental health services through Cobalt`}
 									action={{

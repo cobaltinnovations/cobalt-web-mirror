@@ -29,7 +29,7 @@ export const card = (theme: CobaltTheme) => {
 		},
 		'.ic-card': {
 			borderRadius: 4,
-			border: `1px solid ${theme.colors.n100}`,
+			border: `1px solid ${theme.colors.border}`,
 			'& .cobalt-card': {
 				'&__header': {
 					padding: '14px 16px',
@@ -37,7 +37,7 @@ export const card = (theme: CobaltTheme) => {
 					borderTopLeftRadius: 4,
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n75,
-					borderBottom: 0,
+					borderBottom: `1px solid ${theme.colors.border}`,
 					'& .button-container': {
 						right: 16,
 						top: '50%',
@@ -65,7 +65,7 @@ export const card = (theme: CobaltTheme) => {
 		},
 		'.form-card': {
 			borderRadius: 4,
-			border: `1px solid ${theme.colors.n100}`,
+			border: `1px solid ${theme.colors.border}`,
 			'& .cobalt-card': {
 				'&__header': {
 					padding: 16,
@@ -73,6 +73,7 @@ export const card = (theme: CobaltTheme) => {
 					borderTopLeftRadius: 4,
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n0,
+					borderBottom: `1px solid ${theme.colors.border}`,
 					'&.collapsed': {
 						borderRadius: 4,
 						borderBottom: 'none',

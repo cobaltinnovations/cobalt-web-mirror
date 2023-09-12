@@ -10,7 +10,7 @@ interface UseStylesProps {
 const useTableRowStyles = createUseThemedStyles((theme) => ({
 	tableRow: {
 		backgroundColor: ({ highlighted }: UseStylesProps) => (highlighted ? theme.colors.n75 : 'inherit'),
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 		cursor: ({ clickable }: UseStylesProps) => (clickable ? 'pointer' : 'default'),
 		'&:hover': {
 			backgroundColor: ({ clickable }: UseStylesProps) => (clickable ? theme.colors.n50 : 'inherit'),

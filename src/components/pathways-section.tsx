@@ -11,32 +11,42 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import useAnalytics from '@/hooks/use-analytics';
+import { FeatureId } from '@/lib/models';
+
+interface UseStylesProps {
+	featuresLength: number;
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
-	pathways: {
+	pathways: ({ featuresLength }: UseStylesProps) => ({
 		display: 'flex',
 		flexWrap: 'wrap',
 		margin: '0 -16px',
 		justifyContent: 'center',
+		'& .pathway-outer': {
+			width: `${100 / featuresLength}%`,
+			padding: '0 16px',
+			marginBottom: 32,
+			[mediaQueries.xxl]: {
+				width: '25%',
+				marginBottom: 36,
+			},
+			[mediaQueries.lg]: {
+				padding: '0',
+				width: '100%',
+				marginBottom: 16,
+			},
+		},
 		[mediaQueries.lg]: {
 			margin: '0',
 			display: 'block',
+			'& .pathway-outer': {
+				padding: '0',
+				width: '100%',
+				marginBottom: 16,
+			},
 		},
-	},
-	pathwayOuter: {
-		width: '14.2857%',
-		padding: '0 16px',
-		marginBottom: 32,
-		[mediaQueries.xl]: {
-			width: '25%',
-			marginBottom: 36,
-		},
-		[mediaQueries.lg]: {
-			padding: '0',
-			width: '100%',
-			marginBottom: 16,
-		},
-	},
+	}),
 	pathway: {
 		zIndex: 0,
 		height: '100%',
@@ -48,7 +58,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		transition: '0.2s transform, 0.2s box-shadow',
 		color: theme.colors.n900,
 		backgroundColor: theme.colors.n75,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'& h5': {
 			wordBreak: 'initial',
 		},
@@ -97,12 +107,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	iconOuter: {
-		width: '100%',
+		width: 100,
+		height: 100,
 		display: 'flex',
-		marginBottom: 32,
 		borderRadius: '50%',
 		position: 'relative',
-		paddingBottom: '100%',
+		margin: '0 auto 32px',
 		backgroundColor: theme.colors.n0,
 		'&:after': {
 			top: 0,
@@ -119,8 +129,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			width: 48,
 			height: 48,
 			padding: 0,
-			marginRight: 20,
-			marginBottom: 0,
+			margin: '0 20px 0 0',
 		},
 	},
 	icon: {
@@ -162,7 +171,9 @@ interface PathwaysSectionProps {
 const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
 	const { trackEvent } = useAnalytics();
-	const classes = useStyles();
+	const classes = useStyles({
+		featuresLength: (institution?.features ?? []).filter((feature) => feature.landingPageVisible).length,
+	});
 
 	const { startScreeningFlow } = featuresScreeningFlow;
 
@@ -173,12 +184,12 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 					<Col>
 						<div className={classes.pathways}>
 							{(institution?.features ?? [])
-								.filter((feature) => feature.navVisible)
-								.map(({ featureId, urlName, name, recommended }, featureIndex) => (
-									<div key={featureId} className={classes.pathwayOuter}>
+								.filter((feature) => feature.landingPageVisible)
+								.map(({ featureId, urlName, name, recommended }) => (
+									<div key={featureId} className="pathway-outer">
 										<Link
 											to={
-												featureId === 'THERAPY' && account?.institutionLocationId
+												featureId === FeatureId.THERAPY && account?.institutionLocationId
 													? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 													: urlName
 											}

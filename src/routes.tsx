@@ -36,7 +36,12 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
-import { ROLE_ID } from './lib/models';
+import { FeatureId, ROLE_ID } from './lib/models';
+
+export interface RouteHandle {
+	hideFooter?: boolean;
+	hideFooterContactUs?: boolean;
+}
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -65,7 +70,6 @@ export const ConnectWithSupportMentalHealthRecommendations = lazyLoadWithRefresh
 	() => import('@/pages/connect-with-support-mental-health-recommendations')
 );
 export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
-export const MyCalendar = lazyLoadWithRefresh(() => import('@/pages/my-calendar'));
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
 export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
@@ -191,10 +195,12 @@ const RedirectToResourceLibrary = () => {
 };
 
 const RedirectToGroupSessionDetail = () => {
-	const { groupSessionIdOrUrlName } = useParams<{ groupSessionIdOrUrlName: string }>();
+	const { groupSessionId } = useParams<{
+		groupSessionId: string;
+	}>();
 
-	if (groupSessionIdOrUrlName) {
-		return <Navigate to={`/group-sessions/${groupSessionIdOrUrlName}`} replace />;
+	if (groupSessionId) {
+		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
 	}
 
 	return <Navigate to="/group-sessions" replace />;
@@ -347,8 +353,9 @@ export const routes: RouteObject[] = [
 						element: <Privacy />,
 					},
 					{
+						id: 'my-calendar',
 						path: 'my-calendar',
-						element: <MyCalendar />,
+						lazy: () => import('@/routes/my-calendar'),
 					},
 
 					{
@@ -375,16 +382,31 @@ export const routes: RouteObject[] = [
 								element: <Navigate to="/" replace />,
 							},
 							{
+								path: 'counseling-services',
+								lazy: () => import('@/routes/counseling-services'),
+							},
+							{
 								path: 'connect-with-support/medication-prescriber',
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},
 							{
-								path: 'connect-with-support/mental-health-providers',
-								element: <ConnectWithSupportMentalHealthProviders />,
-							},
-							{
-								path: '/connect-with-support/recommendations',
-								element: <ConnectWithSupportMentalHealthRecommendations />,
+								element: (
+									<ToggledOutlet
+										isEnabled={({ institution }) => {
+											return institution.epicFhirEnabled;
+										}}
+									/>
+								),
+								children: [
+									{
+										path: 'connect-with-support/mental-health-providers',
+										element: <ConnectWithSupportMentalHealthProviders />,
+									},
+									{
+										path: '/connect-with-support/recommendations',
+										element: <ConnectWithSupportMentalHealthRecommendations />,
+									},
+								],
 							},
 							{
 								path: 'connect-with-support/:urlName',
@@ -411,7 +433,7 @@ export const routes: RouteObject[] = [
 						),
 						handle: {
 							hideFooter: true,
-						},
+						} as RouteHandle,
 						children: [
 							{
 								path: 'scheduling',
@@ -473,6 +495,9 @@ export const routes: RouteObject[] = [
 					{
 						path: 'screening-questions/:screeningQuestionContextId',
 						element: <ScreeningQuestionsPage />,
+						handle: {
+							hideFooterContactUs: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'appointments/:appointmentId',
@@ -611,7 +636,19 @@ export const routes: RouteObject[] = [
 						element: <InCrisis />,
 					},
 					{
+						path: 'faqs',
+						lazy: () => import('@/routes/faqs'),
+					},
+					{
+						path: 'faqs/:faqUrlName',
+						lazy: () => import('@/routes/faqs-detail'),
+					},
+					{
 						path: 'topic-centers/:topicCenterId',
+						element: <TopicCenter />,
+					},
+					{
+						path: 'featured-topics/:topicCenterId',
 						element: <TopicCenter />,
 					},
 					{
@@ -636,7 +673,29 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'institution-resources',
-						lazy: () => import('@/routes/institution-resources'),
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return (
+										institution.features.findIndex(
+											(feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES
+										) > -1
+									);
+								}}
+							/>
+						),
+						children: [
+							{
+								id: 'institution-resource-groups',
+								index: true,
+								lazy: () => import('@/routes/institution-resource-groups'),
+							},
+							{
+								id: 'institution-resource-group-detail',
+								path: ':institutionResourceGroupUrlNameOrId',
+								lazy: () => import('@/routes/institution-resource-group-detail'),
+							},
+						],
 					},
 					{
 						path: '*',
@@ -833,6 +892,9 @@ export const routes: RouteObject[] = [
 											{
 												path: ':screeningQuestionContextId',
 												element: <ScreeningQuestionsPage />,
+												handle: {
+													hideFooterContactUs: true,
+												} as RouteHandle,
 											},
 										],
 									},
@@ -891,6 +953,9 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment/:screeningQuestionContextId',
 										element: <ScreeningQuestionsPage />,
+										handle: {
+											hideFooterContactUs: true,
+										} as RouteHandle,
 									},
 									{
 										path: 'check-in',

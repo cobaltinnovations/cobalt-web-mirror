@@ -40,6 +40,8 @@ import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import CallToActionBlock from '@/components/call-to-action-block';
+import { useAppRootLoaderData } from '@/routes/root';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -65,6 +67,7 @@ const resourceLibraryCarouselConfig = {
 };
 
 const Index: FC = () => {
+	const { featuredTopicCenter } = useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
@@ -146,6 +149,8 @@ const Index: FC = () => {
 		return renderedPreScreeningLoader;
 	}
 
+	const hasLandingPageFeatures = institution?.features.filter((f) => f.landingPageVisible).length > 0;
+
 	return (
 		<>
 			<Helmet>
@@ -158,15 +163,30 @@ const Index: FC = () => {
 
 					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>
-							<Col>
-								<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
-								<h1 className="mb-0 text-center">What can we help you find today?</h1>
-							</Col>
+							{hasLandingPageFeatures ? (
+								<Col>
+									<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
+									<h1 className="mb-0 text-center">What can we help you find today?</h1>
+								</Col>
+							) : (
+								<Col>
+									<h1 className="mb-5 text-center">Welcome to Cobalt!</h1>
+									<p className="mb-0 fs-large text-center">
+										Cobalt is a new wellness platform created specifically for {institution.name}{' '}
+										employees
+										<span className="d-block">
+											to connect you to accessible and affordable mental health resources.
+										</span>
+									</p>
+								</Col>
+							)}
 						</Row>
 					</Container>
-					<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
-					{!institution.hasTakenFeatureScreening && (
-						<Container>
+					{hasLandingPageFeatures && (
+						<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
+					)}
+					{institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening && (
+						<Container className="mb-10">
 							<Row>
 								<Col>
 									<NoData
@@ -176,7 +196,9 @@ const Index: FC = () => {
 											{
 												size: 'lg',
 												variant: 'primary',
-												title: 'Take the Assessment',
+												title: institution.epicFhirEnabled
+													? 'Explore Your Interests'
+													: 'Take the Assessment',
 												onClick: () => {
 													startScreeningFlow();
 													trackEvent({
@@ -184,6 +206,18 @@ const Index: FC = () => {
 													});
 												},
 											},
+											...(institution.epicFhirEnabled
+												? [
+														{
+															size: 'lg' as const,
+															variant: 'outline-primary',
+															title: 'Speak with a Resource Navigator',
+															onClick: () => {
+																window.open(institution.externalContactUsUrl, '_blank');
+															},
+														},
+												  ]
+												: []),
 										]}
 									/>
 								</Col>
@@ -228,6 +262,22 @@ const Index: FC = () => {
 					</Container>
 				)}
 			</AsyncPage>
+
+			{featuredTopicCenter && (
+				<Container className="pt-4 pt-lg-8">
+					<CallToActionBlock
+						subheading="Featured Topic"
+						heading={featuredTopicCenter.featuredTitle!}
+						descriptionHtml={featuredTopicCenter.featuredDescription!}
+						imageUrl={featuredTopicCenter.imageUrl!}
+						primaryActionText={featuredTopicCenter.featuredCallToAction!}
+						onPrimaryActionClick={() => {
+							navigate('/featured-topics/' + featuredTopicCenter.urlName);
+						}}
+						className="mb-4"
+					/>
+				</Container>
+			)}
 
 			<AsyncPage
 				fetchData={fetchData}

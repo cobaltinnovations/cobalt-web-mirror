@@ -11,11 +11,10 @@ import { AlertLocationState } from '@/pages/admin-cms/on-your-time';
 import { debounce } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import mediaQueries from '@/jss/media-queries';
-import SearchInput from '@/components/admin-cms/search-input';
 import useHandleError from '@/hooks/use-handle-error';
-import HeroContainer from '@/components/hero-container';
 import useFlags from '@/hooks/use-flags';
 import { Helmet } from 'react-helmet';
+import InputHelperSearch from '@/components/input-helper-search';
 
 const useStyles = createUseStyles({
 	controlBar: {
@@ -28,11 +27,7 @@ const useStyles = createUseStyles({
 		},
 	},
 	searchBarOuter: {
-		width: '30%',
-		[mediaQueries.lg]: {
-			width: 'auto',
-			marginBottom: 20,
-		},
+		width: 335,
 	},
 });
 
@@ -65,6 +60,12 @@ const CmsAvailableContent: FC = () => {
 		},
 		[setDebouncedSearchInputValue]
 	);
+
+	const handleSearchInputClear = useCallback(() => {
+		setCurrentPageIndex(0);
+		setSearchInputValue('');
+		setDebouncedSearchInputValue('');
+	}, [setDebouncedSearchInputValue]);
 
 	useEffect(() => {
 		async function getTablePage() {
@@ -168,16 +169,28 @@ const CmsAvailableContent: FC = () => {
 				<title>Cobalt | Available Content</title>
 			</Helmet>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">On Your Time - Available Content</h2>
-			</HeroContainer>
-			<Container className="py-5">
+			<Container fluid className="px-8 py-8">
+				<Row className="mb-6">
+					<Col>
+						<div className="mb-6 d-flex align-items-center justify-content-between">
+							<h2 className="mb-0">Available Content</h2>
+							<div className="d-flex align-items-center">
+								<InputHelperSearch
+									className={classes.searchBarOuter}
+									placeholder="Search"
+									value={searchInputValue}
+									onChange={handleSearchInputChange}
+									onClear={handleSearchInputClear}
+								/>
+							</div>
+						</div>
+						<hr />
+					</Col>
+				</Row>
+
 				<Row>
 					<Col>
 						<div className={classes.controlBar}>
-							<div className={classes.searchBarOuter}>
-								<SearchInput value={searchInputValue} onChange={handleSearchInputChange} />
-							</div>
 							<div className="d-flex align-items-center justify-content-center">
 								{!!filters?.contentTypes && (
 									<QuickFilterDropdown

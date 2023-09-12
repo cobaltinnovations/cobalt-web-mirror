@@ -11,7 +11,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		maxWidth: '800px !important',
 		'& section': {
 			padding: 32,
-			borderBottom: `1px solid ${theme.colors.n100}`,
+			borderBottom: `1px solid ${theme.colors.border}`,
 		},
 	},
 }));

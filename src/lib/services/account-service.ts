@@ -323,7 +323,10 @@ export const accountService = {
 		});
 	},
 	getRecommendedFeatures(accountId: string) {
-		return httpSingleton.orchestrateRequest<{ features: AccountFeature[] }>({
+		return httpSingleton.orchestrateRequest<{
+			appointmentAlreadyScheduled: boolean;
+			features: AccountFeature[];
+		}>({
 			method: 'GET',
 			url: `/accounts/${accountId}/provider-triage-recommended-features`,
 		});

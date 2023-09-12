@@ -9,6 +9,9 @@ import useFlags from '@/hooks/use-flags';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
+import AppointmentUnavailableModal from '@/components/appointment-unavailable-modal';
+import { CobaltError } from '@/lib/http-client';
+import Cookies from 'js-cookie';
 
 const ConfirmAppointment = () => {
 	const navigate = useNavigate();
@@ -24,7 +27,15 @@ const ConfirmAppointment = () => {
 
 	const { addFlag } = useFlags();
 	const { account, isIntegratedCarePatient } = useAccount();
-	const handleError = useHandleError();
+	const confirmationErrorHandler = useCallback((error: CobaltError) => {
+		if (error.apiError?.metadata?.appointmentTimeslotUnavailable) {
+			setShowUnavailableModal(true);
+			return true;
+		}
+
+		return false;
+	}, []);
+	const handleError = useHandleError(confirmationErrorHandler);
 	const icMatch = useMatch({
 		path: '/ic/*',
 	});
@@ -36,6 +47,7 @@ const ConfirmAppointment = () => {
 	const [confirmationCodeInputValue, setConfirmationCodeInputValue] = useState('');
 
 	const [submitting, setSubmitting] = useState(false);
+	const [showUnavailableModal, setShowUnavailableModal] = useState(false);
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -155,13 +167,11 @@ const ConfirmAppointment = () => {
 			if (response.appointment.patientOrderId) {
 				navigate(`/ic/patient`);
 			} else {
-				navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`, {
-					state: {
-						successBooking: true,
-						emailAddress: response.account.emailAddress,
-					},
-				});
+				navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`);
 			}
+
+			Cookies.remove('bookingSource');
+			Cookies.remove('bookingExitUrl');
 
 			addFlag({
 				variant: 'success',
@@ -226,6 +236,13 @@ const ConfirmAppointment = () => {
 			<Helmet>
 				<title>Cobalt | Confirm Appointment</title>
 			</Helmet>
+
+			<AppointmentUnavailableModal
+				show={showUnavailableModal}
+				onHide={() => {
+					setShowUnavailableModal(false);
+				}}
+			/>
 
 			<AsyncPage fetchData={fetchData}>
 				<Container className="py-6">
