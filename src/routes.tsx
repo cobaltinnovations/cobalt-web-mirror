@@ -84,7 +84,6 @@ export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redir
 export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
 export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
 // export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
-export const ProviderDetail = lazyLoadWithRefresh(() => import('@/pages/provider-detail'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
 export const CreateOnYourTimeContent = lazyLoadWithRefresh(
