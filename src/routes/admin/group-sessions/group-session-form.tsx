@@ -1334,7 +1334,6 @@ export const Component = () => {
 							{isView && isSessionEditable && (
 								<div>
 									<ButtonLink
-										className="text-decoration-none"
 										variant="outline-primary"
 										to={{
 											pathname: `/admin/group-sessions/edit/${params.groupSessionId}`,
