@@ -20,7 +20,7 @@ const ConnectWithSupportMentalHealthProviders = () => {
 					variant: 'primary',
 					title: `Connect to ${institution.myChartName}`,
 					onClick: () => {
-						window.open(myChartAuthUrlState[0], '_blank', 'noopener, noreferrer');
+						window.location.href = myChartAuthUrlState[0];
 					},
 				},
 				{

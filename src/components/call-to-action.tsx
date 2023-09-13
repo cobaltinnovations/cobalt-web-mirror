@@ -79,7 +79,7 @@ const CallToAction = ({ callToAction, className }: Props) => {
 				window.open(actionLink.link, '_blank', 'noopener, noreferrer');
 				break;
 			case ACTION_LINK_TYPE_ID.INTERNAL:
-				window.open(actionLink.link, '_self');
+				window.location.href = actionLink.link;
 				break;
 			case ACTION_LINK_TYPE_ID.CRISIS:
 				openInCrisisModal();
