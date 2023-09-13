@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { ButtonLink } from '@/components/button-link';
 
 import { Button } from 'react-bootstrap';
+import React from 'react';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof Button> = {
@@ -34,5 +36,21 @@ export const Default: Story = {
 	args: {
 		variant: 'primary',
 		children: 'Button Text',
+	},
+};
+
+export const ButtonRouterLink: Story = {
+	render: (args) => {
+		return (
+			<ButtonLink
+				{...args}
+				to={{
+					pathname: `/path-to-somewhere`,
+				}}
+			/>
+		);
+	},
+	args: {
+		children: 'Link Text',
 	},
 };
