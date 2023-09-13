@@ -356,7 +356,9 @@ export const AppointmentDetailPanel = ({
 											<p className="mb-0">
 												<strong>{appointment.startTimeDescription}</strong>
 											</p>
-											<AppointmentTypeItem appointmentType={appointment.appointmentType} />
+											{appointment.appointmentType && (
+												<AppointmentTypeItem appointmentType={appointment.appointmentType} />
+											)}
 										</div>
 
 										{/* <AppointmentAttendance

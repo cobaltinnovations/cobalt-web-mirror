@@ -73,8 +73,8 @@ export interface GroupSessionModel {
 	institutionId: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
-	screeningQuestions: string[];
-	screeningQuestionsV2: ScreeningQuestionV2[];
+	screeningQuestions?: string[];
+	screeningQuestionsV2?: ScreeningQuestionV2[];
 	seats: number;
 	seatsAvailable: number;
 	seatsAvailableDescription: string;
@@ -94,11 +94,11 @@ export interface GroupSessionModel {
 	endDateTime: string;
 	endDateTimeDescription: string;
 	submitterAccountId: string;
-	submitterEmailAddress: string;
-	submitterName: string;
+	submitterEmailAddress?: string;
+	submitterName?: string;
 	tags: Tag[];
 	differentEmailAddressForNotifications: boolean;
-	targetEmailAddress: string;
+	targetEmailAddress?: string;
 	timeZone: string;
 	title: string;
 	urlName: string;
@@ -108,10 +108,10 @@ export interface GroupSessionModel {
 	followupEmailSurveyUrl?: string;
 	assessmentId?: string;
 	facilitatorAccountId?: string;
-	scheduleUrl: string;
-	imageUrl: string;
+	scheduleUrl?: string;
+	imageUrl?: string;
 	videoconferenceUrl: string;
-	confirmationEmailContent: string;
+	confirmationEmailContent?: string;
 
 	followupDayOffset?: string;
 	followupTimeOfDay?: string;

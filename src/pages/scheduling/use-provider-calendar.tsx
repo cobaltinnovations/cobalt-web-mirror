@@ -15,7 +15,7 @@ export const useProviderCalendar = ({
 	endDate,
 }: Partial<{ providerId: string; startDate: string; endDate: string }>) => {
 	const handleError = useHandleError();
-	const inFlightRequest = useRef<ReturnType<typeof schedulingService['getCalendar']>>();
+	const inFlightRequest = useRef<ReturnType<(typeof schedulingService)['getCalendar']>>();
 	const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
 
 	const fetchData = useCallback(
@@ -114,8 +114,8 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 			title: appointment.account?.displayName || 'Anonymous',
 			start: moment(appointment.startTime).toDate(),
 			end: moment(appointment.endTime).toDate(),
-			backgroundColor: Color(appointment.appointmentType.hexColor).lighten(0.7).hex(),
-			borderColor: appointment.appointmentType.hexColor,
+			backgroundColor: Color(appointment.appointmentType?.hexColor).lighten(0.7).hex(),
+			borderColor: appointment.appointmentType?.hexColor,
 			textColor: '#21312A',
 			extendedProps: {
 				testId,

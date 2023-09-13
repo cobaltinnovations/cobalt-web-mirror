@@ -18,7 +18,7 @@ export interface AppointmentType {
 	durationInMinutesDescription: string;
 	name: string;
 	visitTypeId: string;
-	hexColor: string;
+	hexColor?: string;
 	assessmentId?: string;
 }
 
@@ -34,14 +34,13 @@ export enum VideoconferencePlatformId {
 	EXTERNAL = 'EXTERNAL',
 	TELEPHONE = 'TELEPHONE',
 }
-
 export interface AppointmentModel {
 	appointmentId: string;
 	accountId: string;
 	appointmentTypeId: string;
-	acuityAppointmentId: number;
-	bluejeansMeetingId: number;
-	name: string;
+	acuityAppointmentId?: number;
+	bluejeansMeetingId?: number;
+	name?: string;
 	startTime: string;
 	startTimeDescription: string;
 	localStartDate: string;
@@ -54,17 +53,17 @@ export interface AppointmentModel {
 	timeZone: string;
 	videoconferenceUrl: string;
 	videoconferencePlatformId: VideoconferencePlatformId;
-	phoneNumberDescription: string;
+	phoneNumberDescription?: string;
 	canceled: boolean;
-	canceledAt: string;
-	canceledAtDescription: string;
+	canceledAt?: string;
+	canceledAtDescription?: string;
 	created: string;
 	createdDescription: string;
 	provider?: Partial<Provider>;
 	account?: AccountModel;
 	appointmentReason?: AppointmentReason;
 	appointmentDescription: string;
-	appointmentType: AppointmentType;
+	appointmentType?: AppointmentType;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
 	canceledForReschedule: boolean;
 	rescheduledAppointmentId?: string;
