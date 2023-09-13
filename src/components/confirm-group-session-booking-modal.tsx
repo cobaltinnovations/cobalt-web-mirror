@@ -33,7 +33,7 @@ const ConfirmGroupSessionBookingModal: FC<ConfirmGroupSessionBookingModalProps> 
 
 		const url = externalUrl?.startsWith('http') ? externalUrl : `https://${externalUrl}`;
 
-		window.open(url, '_self');
+		window.location.href = url;
 	}, [externalUrl]);
 
 	useEffect(() => {
