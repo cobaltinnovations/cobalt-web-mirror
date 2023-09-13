@@ -4,6 +4,7 @@ import { reactRouterParameters, withRouter } from 'storybook-addon-react-router-
 import cobaltStorybookTheme from './storybook-theme';
 
 import { AppProviders } from '../src/app-providers';
+import { AccountProvider } from '../src/contexts/account-context';
 import { AnalyticsProvider } from '../src/contexts/analytics-context';
 import { BookingProvider } from '../src/contexts/booking-context';
 import { useCustomBootstrapStyles } from '../src/jss/hooks/use-custom-bootstrap-styles';
@@ -26,7 +27,13 @@ const preview: Preview = {
 			routing: [
 				{
 					id: 'root',
-					loader: () => ({}),
+					loader: () => ({
+						institutionResponse: {
+							institution: {
+								epicFhirEnabled: false,
+							},
+						},
+					}),
 				},
 			],
 		}),
@@ -36,13 +43,15 @@ const preview: Preview = {
 		(Story) => (
 			<CobaltThemeProvider>
 				<AppProviders>
-					<AnalyticsProvider>
-						<BookingProvider>
-							<StoryWrapper>
-								<Story />
-							</StoryWrapper>
-						</BookingProvider>
-					</AnalyticsProvider>
+					<AccountProvider>
+						<AnalyticsProvider>
+							<BookingProvider>
+								<StoryWrapper>
+									<Story />
+								</StoryWrapper>
+							</BookingProvider>
+						</AnalyticsProvider>
+					</AccountProvider>
 				</AppProviders>
 			</CobaltThemeProvider>
 		),
