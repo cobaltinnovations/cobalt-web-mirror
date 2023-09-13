@@ -1,6 +1,5 @@
 import ResourceLibraryCard from '@/components/resource-library-card';
 import { ContentTypeId } from '@/lib/models';
-import { withRouter } from 'storybook-addon-react-router-v6';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Col, Container, Row } from 'react-bootstrap';
 import React from 'react';
@@ -10,7 +9,6 @@ const meta: Meta<typeof ResourceLibraryCard> = {
 	component: ResourceLibraryCard,
 	tags: ['autodocs'],
 	argTypes: {},
-	decorators: [withRouter],
 };
 
 export default meta;
