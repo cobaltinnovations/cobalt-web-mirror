@@ -1,5 +1,5 @@
 import React, { RefObject, Suspense, createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row, Button } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { Await, LoaderFunctionArgs, defer, useAsyncValue, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
@@ -136,7 +136,15 @@ export const Component = () => {
 				{institution.epicFhirEnabled && (
 					<p className="mt-2 text-center mb-0">
 						In order to view all of your scheduled appointments, please log in to your{' '}
-						{institution.myChartName} account.
+						<a
+							href={institution.myChartDefaultUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-primary"
+						>
+							{institution.myChartName}
+						</a>{' '}
+						account.
 					</p>
 				)}
 			</HeroContainer>
