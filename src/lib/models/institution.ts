@@ -74,6 +74,7 @@ export interface Institution {
 	faqEnabled: boolean;
 	epicFhirEnabled: boolean;
 	externalContactUsUrl: string;
+	privacyPolicyUrl?: string;
 }
 
 export interface InstitutionFeature {
