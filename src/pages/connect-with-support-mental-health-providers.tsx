@@ -20,7 +20,7 @@ const ConnectWithSupportMentalHealthProviders = () => {
 					variant: 'primary',
 					title: `Connect to ${institution.myChartName}`,
 					onClick: () => {
-						window.open(myChartAuthUrlState[0], '_blank', 'noopener, noreferrer');
+						window.location.href = myChartAuthUrlState[0];
 					},
 				},
 				{
@@ -31,7 +31,7 @@ const ConnectWithSupportMentalHealthProviders = () => {
 					},
 				},
 			]}
-			connectedTitle={`Thank your for connecting to ${institution.myChartName}`}
+			connectedTitle={`Thank you for connecting to ${institution.myChartName}`}
 			connectedDescription={`Next, press the button below to take a brief assessment so we can learn more about how you're feeling.`}
 			connectedCta="Take the assessment"
 		/>
