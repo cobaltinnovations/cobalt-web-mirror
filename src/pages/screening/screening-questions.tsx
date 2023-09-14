@@ -130,6 +130,7 @@ const ScreeningQuestionsPage = () => {
 							e?.apiError?.metadata?.screeningConfirmationPrompt;
 						setIsSubmitPrompt(true);
 						setConfirmationPrompt(newConfirmationPrompt);
+						window.scrollTo(0, 0);
 					} else {
 						handleError(e);
 					}
