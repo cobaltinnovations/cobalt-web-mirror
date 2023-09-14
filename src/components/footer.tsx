@@ -204,6 +204,17 @@ const Footer: FC = () => {
 												Privacy Policy
 											</Link>
 										</li>
+										{institution.privacyPolicyUrl && (
+											<li className="mb-3">
+												<a
+													className="fw-normal text-decoration-none"
+													href={institution.privacyPolicyUrl}
+													rel="noopener noreferrer"
+												>
+													{institution.name} Privacy Policy
+												</a>
+											</li>
+										)}
 									</ul>
 								</Col>
 							</Row>

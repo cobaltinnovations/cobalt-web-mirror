@@ -1,5 +1,5 @@
 import React, { RefObject, Suspense, createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row, Button } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { Await, LoaderFunctionArgs, defer, useAsyncValue, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
@@ -15,6 +15,7 @@ import {
 } from '@/lib/models/calendar-event-models';
 import { appointmentService, calendarEventsService, groupSessionsService } from '@/lib/services';
 import Loader from '@/components/loader';
+import useAccount from '@/hooks/use-account';
 
 interface PendingCancellationModel {
 	calendarEventTypeId: CALENDAR_EVENT_TYPE_ID;
@@ -44,6 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const Component = () => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { calendarEventGroupsPromise } = useMyCalendarLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const appointmentId = searchParams.get('appointmentId') || '';
@@ -129,6 +131,21 @@ export const Component = () => {
 				<p className="text-center mb-0">
 					Your booked appointments, group session seats, and more will be available here.
 				</p>
+
+				{institution.epicFhirEnabled && (
+					<p className="mt-2 text-center mb-0">
+						In order to view all of your scheduled appointments, please log in to your{' '}
+						<a
+							href={institution.myChartDefaultUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-primary"
+						>
+							{institution.myChartName}
+						</a>{' '}
+						account.
+					</p>
+				)}
 			</HeroContainer>
 
 			<div className="pb-8">

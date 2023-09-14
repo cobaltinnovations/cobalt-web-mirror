@@ -181,7 +181,7 @@ export interface AnalyticsEvent extends Record<string, any> {
 
 const AnalyticsContext = createContext<
 	| {
-			mixpanel: Mixpanel;
+			mixpanel: { track: Mixpanel['track'] };
 			trackEvent: (event: AnalyticsEvent) => void;
 			trackModalView: (modalName: string) => void;
 	  }
@@ -441,10 +441,22 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		[gtagPageView]
 	);
 
+	const wrappedMixpanel = useMemo(() => {
+		return {
+			track: (...args: Parameters<(typeof mixpanel)['track']>) => {
+				try {
+					mixpanel.track(...args);
+				} catch (e) {
+					// Catch & Fail silently
+				}
+			},
+		};
+	}, []);
+
 	return (
 		<AnalyticsContext.Provider
 			value={{
-				mixpanel,
+				mixpanel: wrappedMixpanel,
 				trackEvent,
 				trackModalView,
 			}}
