@@ -30,7 +30,7 @@ import SimpleFilter from '@/components/simple-filter';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 
-const carouselConfig = {
+export const resourceLibraryCarouselConfig = {
 	externalMonitor: {
 		breakpoint: { max: 3000, min: 1201 },
 		items: 2,
@@ -719,7 +719,7 @@ const ResourceLibrary = () => {
 										</Col>
 										<Col lg={9}>
 											<Carousel
-												responsive={carouselConfig}
+												responsive={resourceLibraryCarouselConfig}
 												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
 												floatingButtonGroup
 											>
