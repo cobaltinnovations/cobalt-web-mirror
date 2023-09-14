@@ -5,7 +5,6 @@ import { Await, LoaderFunctionArgs, defer, useAsyncValue, useRouteLoaderData, us
 
 import CalendarAppointment from '@/components/calendar-appointment';
 import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
-import DayContainer from '@/components/day-container';
 import HeroContainer from '@/components/hero-container';
 
 import useHandleError from '@/hooks/use-handle-error';
