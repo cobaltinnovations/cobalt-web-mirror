@@ -7,6 +7,7 @@ export const screenWidths = {
 	md: 768,
 	lg: 992,
 	xl: 1200,
+	xxl: 1400,
 };
 
 export const mediaQueries = {
@@ -15,6 +16,7 @@ export const mediaQueries = {
 	md: `@media(max-width: ${screenWidths.md}px)`,
 	lg: `@media(max-width: ${screenWidths.lg}px)`,
 	xl: `@media(max-width: ${screenWidths.xl}px)`,
+	xxl: `@media(max-width: ${screenWidths.xxl}px)`,
 };
 
 export default mediaQueries;

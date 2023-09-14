@@ -1,3 +1,4 @@
+import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { AppProviders } from './app-providers';

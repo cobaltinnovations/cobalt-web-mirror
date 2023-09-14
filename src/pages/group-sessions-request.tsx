@@ -251,7 +251,7 @@ const GroupSessionsRequest = () => {
 														{topic.description && (
 															<Button
 																variant="link"
-																className="p-0 fs-ui-small fw-normal text-decoration-none"
+																className="p-0 fs-small fw-normal text-decoration-none"
 																onClick={() => {
 																	const expandedTopicIdsClone =
 																		cloneDeep(expandedTopicIds);

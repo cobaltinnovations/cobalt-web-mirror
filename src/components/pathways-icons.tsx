@@ -9,34 +9,37 @@ import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as InstitutionResourcesIcon } from '@/assets/icons/icon-institution-resources.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
+import { FeatureId } from '@/lib/models';
 
 const PathwaysIcon = ({
 	featureId,
 	svgProps,
 	className,
 }: {
-	featureId: string;
+	featureId: FeatureId;
 	svgProps?: React.SVGProps<SVGSVGElement> & {
 		title?: string | undefined;
 	};
 	className?: string;
 }) => {
 	switch (featureId) {
-		case 'THERAPY':
+		case FeatureId.THERAPY:
 			return <TherapyIcon className={className} {...svgProps} />;
-		case 'MEDICATION_PRESCRIBER':
+		case FeatureId.MEDICATION_PRESCRIBER:
 			return <MedicationIcon className={className} {...svgProps} />;
-		case 'GROUP_SESSIONS':
+		case FeatureId.GROUP_SESSIONS:
 			return <GroupIcon className={className} {...svgProps} />;
-		case 'COACHING':
+		case FeatureId.COACHING:
+		case FeatureId.COUNSELING_SERVICES:
+		case FeatureId.MENTAL_HEALTH_PROVIDERS:
 			return <CoachingIcon className={className} {...svgProps} />;
-		case 'SELF_HELP_RESOURCES':
+		case FeatureId.SELF_HELP_RESOURCES:
 			return <ResourceIcon className={className} {...svgProps} />;
-		case 'INSTITUTION_RESOURCES':
+		case FeatureId.INSTITUTION_RESOURCES:
 			return <InstitutionResourcesIcon className={className} {...svgProps} />;
-		case 'SPIRITUAL_SUPPORT':
+		case FeatureId.SPIRITUAL_SUPPORT:
 			return <SpiritualIcon className={className} {...svgProps} />;
-		case 'CRISIS_SUPPORT':
+		case FeatureId.CRISIS_SUPPORT:
 			return <CrisisIcon className={className} {...svgProps} />;
 		default:
 			return <AdminIcon className={className} {...svgProps} />;

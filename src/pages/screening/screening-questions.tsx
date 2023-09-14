@@ -14,7 +14,7 @@ import {
 import { screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
 import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 import classNames from 'classnames';
@@ -28,6 +28,7 @@ const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
 	const { institution } = useAccount();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const location = useLocation();
 	const [screeningQuestionContextResponse, setScreeningQuestionContextResponse] =
 		useState<ScreeningQuestionContextResponse>();
 
@@ -104,8 +105,6 @@ const ScreeningQuestionsPage = () => {
 			submit
 				.fetch()
 				.then((r) => {
-					clearPrompt();
-
 					const goToNext = () => {
 						if (r.nextScreeningQuestionContextId) {
 							navigateToQuestion(r.nextScreeningQuestionContextId);
@@ -131,6 +130,7 @@ const ScreeningQuestionsPage = () => {
 							e?.apiError?.metadata?.screeningConfirmationPrompt;
 						setIsSubmitPrompt(true);
 						setConfirmationPrompt(newConfirmationPrompt);
+						window.scrollTo(0, 0);
 					} else {
 						handleError(e);
 					}
@@ -140,7 +140,6 @@ const ScreeningQuestionsPage = () => {
 				});
 		},
 		[
-			clearPrompt,
 			handleError,
 			institution?.integratedCareEnabled,
 			navigateToDestination,
@@ -149,6 +148,12 @@ const ScreeningQuestionsPage = () => {
 			screeningQuestionContextResponse?.screeningSession.crisisIndicated,
 		]
 	);
+
+	useEffect(() => {
+		if (location.pathname) {
+			clearPrompt();
+		}
+	}, [clearPrompt, location.pathname]);
 
 	useEffect(() => {
 		if (

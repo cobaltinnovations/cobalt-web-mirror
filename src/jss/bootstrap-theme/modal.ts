@@ -10,7 +10,7 @@ export const modal = (theme: CobaltTheme) => {
 		'.modal-content': {
 			borderRadius: 5,
 			maxHeight: '90vh',
-			border: `1px solid ${theme.colors.n100}`,
+			border: `1px solid ${theme.colors.border}`,
 			filter: 'drop-shadow(0px 10px 18px rgba(41, 40, 39, 0.15)) drop-shadow(0px 0px 1px rgba(41, 40, 39, 0.31))',
 		},
 		'.cobalt-modal': {
@@ -20,7 +20,7 @@ export const modal = (theme: CobaltTheme) => {
 				borderTopLeftRadius: 5,
 				borderTopRightRadius: 5,
 				backgroundColor: theme.colors.n50,
-				borderBottom: `1px solid ${theme.colors.n100}`,
+				borderBottom: `1px solid ${theme.colors.border}`,
 				'& button.btn-close': {
 					top: '50%',
 					right: 16,
@@ -125,12 +125,12 @@ export const modal = (theme: CobaltTheme) => {
 				borderBottomLeftRadius: 5,
 				borderBottomRightRadius: 5,
 				backgroundColor: theme.colors.n50,
-				borderTop: `1px solid ${theme.colors.n100}`,
+				borderTop: `1px solid ${theme.colors.border}`,
 				'&--admin': {
 					display: 'flex',
 					padding: '17px 30px',
 					position: 'relative',
-					backgroundColor: theme.colors.n100,
+					backgroundColor: theme.colors.border,
 					justifyContent: 'flex-end',
 				},
 			},

@@ -36,7 +36,12 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
-import { ROLE_ID } from './lib/models';
+import { FeatureId, ROLE_ID } from './lib/models';
+
+export interface RouteHandle {
+	hideFooter?: boolean;
+	hideFooterContactUs?: boolean;
+}
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
 export const SignUp = lazyLoadWithRefresh(() => import('@/pages/sign-up'));
@@ -191,10 +196,12 @@ const RedirectToResourceLibrary = () => {
 };
 
 const RedirectToGroupSessionDetail = () => {
-	const { groupSessionIdOrUrlName } = useParams<{ groupSessionIdOrUrlName: string }>();
+	const { groupSessionId } = useParams<{
+		groupSessionId: string;
+	}>();
 
-	if (groupSessionIdOrUrlName) {
-		return <Navigate to={`/group-sessions/${groupSessionIdOrUrlName}`} replace />;
+	if (groupSessionId) {
+		return <Navigate to={`/group-sessions/${groupSessionId}`} replace />;
 	}
 
 	return <Navigate to="/group-sessions" replace />;
@@ -204,6 +211,12 @@ const SupportEnabledRoutes = () => {
 	const { institution } = useAccount();
 
 	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
+};
+
+const EpicFHIREnabledRoutes = () => {
+	const { institution } = useAccount();
+
+	return institution.epicFhirEnabled ? <Outlet /> : <NoMatch />;
 };
 
 const IntegratedCareEnabledRoutes = () => {
@@ -237,7 +250,7 @@ const DebugEnabledRoutes = () => {
 const InstitutionResourcesEnabled = () => {
 	const { institution } = useAccount();
 
-	return institution.features.findIndex((feature) => feature.featureId === 'INSTITUTION_RESOURCES') > -1 ? (
+	return institution.features.findIndex((feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES) > -1 ? (
 		<Outlet />
 	) : (
 		<NoMatch />
@@ -404,16 +417,25 @@ export const routes: RouteObject[] = [
 								element: <Navigate to="/" replace />,
 							},
 							{
+								path: 'counseling-services',
+								lazy: () => import('@/routes/counseling-services'),
+							},
+							{
 								path: 'connect-with-support/medication-prescriber',
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},
 							{
-								path: 'connect-with-support/mental-health-providers',
-								element: <ConnectWithSupportMentalHealthProviders />,
-							},
-							{
-								path: '/connect-with-support/recommendations',
-								element: <ConnectWithSupportMentalHealthRecommendations />,
+								element: <EpicFHIREnabledRoutes />,
+								children: [
+									{
+										path: 'connect-with-support/mental-health-providers',
+										element: <ConnectWithSupportMentalHealthProviders />,
+									},
+									{
+										path: '/connect-with-support/recommendations',
+										element: <ConnectWithSupportMentalHealthRecommendations />,
+									},
+								],
 							},
 							{
 								path: 'connect-with-support/:urlName',
@@ -434,7 +456,7 @@ export const routes: RouteObject[] = [
 						element: <ProviderOnlyRoutes />,
 						handle: {
 							hideFooter: true,
-						},
+						} as RouteHandle,
 						children: [
 							{
 								path: 'scheduling',
@@ -490,6 +512,9 @@ export const routes: RouteObject[] = [
 					{
 						path: 'screening-questions/:screeningQuestionContextId',
 						element: <ScreeningQuestionsPage />,
+						handle: {
+							hideFooterContactUs: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'appointments/:appointmentId',
@@ -637,6 +662,10 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'topic-centers/:topicCenterId',
+						element: <TopicCenter />,
+					},
+					{
+						path: 'featured-topics/:topicCenterId',
 						element: <TopicCenter />,
 					},
 					{
@@ -852,6 +881,9 @@ export const routes: RouteObject[] = [
 											{
 												path: ':screeningQuestionContextId',
 												element: <ScreeningQuestionsPage />,
+												handle: {
+													hideFooterContactUs: true,
+												} as RouteHandle,
 											},
 										],
 									},
@@ -910,6 +942,9 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment/:screeningQuestionContextId',
 										element: <ScreeningQuestionsPage />,
+										handle: {
+											hideFooterContactUs: true,
+										} as RouteHandle,
 									},
 									{
 										path: 'check-in',

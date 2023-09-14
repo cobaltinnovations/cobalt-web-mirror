@@ -25,9 +25,9 @@ const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 		padding: '9px 16px 9px 36px',
 		...theme.fonts.default,
 		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'&:hover': {
-			border: `1px solid ${theme.colors.n300}`,
+			border: `1px solid ${theme.colors.border}`,
 		},
 		'&:focus': {
 			outline: 'none',

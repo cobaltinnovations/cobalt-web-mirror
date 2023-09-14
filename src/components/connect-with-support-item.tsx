@@ -207,11 +207,21 @@ const ConnectWithSupportItem = ({
 							style={{ backgroundImage: `url(${providerDetails?.imageUrl})` }}
 						/>
 						<div className={classes.information}>
-							<h5>{providerDetails?.name}</h5>
+							<p className="fs-large fw-bold">{providerDetails?.name}</p>
 							<p>{providerDetails?.title}</p>
 						</div>
 					</div>
-					<p className="mb-0">Choose a time with {providerDetails?.name} that works for you</p>
+					{providerDetails?.bio && (
+						<div
+							className="mb-4"
+							dangerouslySetInnerHTML={{
+								__html: providerDetails.bio,
+							}}
+						/>
+					)}
+					<p className="mb-0">
+						<strong>Choose a time with {providerDetails?.name} that works for you</strong>
+					</p>
 				</Modal.Header>
 				<Modal.Body>
 					{providerAvailability.map((section) => {

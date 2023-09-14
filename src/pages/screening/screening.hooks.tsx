@@ -68,13 +68,14 @@ export function useScreeningNavigation() {
 					const navigationSource =
 						(Cookies.get('groupSessionDetailNavigationSource') as GroupSessionDetailNavigationSource) ??
 						GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
+					const topicCenterPath = Cookies.get('groupSessionDetailFromTopicCenterPath');
 
 					const navigationSourceToDestinationUrlMap = {
 						[GroupSessionDetailNavigationSource.HOME_PAGE]: '/',
 						[GroupSessionDetailNavigationSource.GROUP_SESSION_LIST]: '/group-sessions',
 						[GroupSessionDetailNavigationSource.GROUP_SESSION_COLLECTION]:
 							'/group-sessions/collection/' + collectionId,
-						[GroupSessionDetailNavigationSource.TOPIC_CENTER]: '/topic-centers/spaces-of-color',
+						[GroupSessionDetailNavigationSource.TOPIC_CENTER]: topicCenterPath,
 						[GroupSessionDetailNavigationSource.ADMIN_LIST]: '/admin/group-sessions',
 					};
 
@@ -92,6 +93,7 @@ export function useScreeningNavigation() {
 					);
 
 					Cookies.remove('groupSessionDetailNavigationSource');
+					Cookies.remove('groupSessionDetailFromTopicCenterPath');
 					Cookies.remove('groupSessionCollectionId');
 					return;
 				}

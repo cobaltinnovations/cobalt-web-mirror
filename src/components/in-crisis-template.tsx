@@ -19,7 +19,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		textDecoration: 'none',
 		justifyContent: 'space-between',
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		[mediaQueries.lg]: {
 			padding: 16,
 		},

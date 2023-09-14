@@ -32,6 +32,7 @@ const AsyncWrapper: FC<AsyncWrapperProps> = ({
 	const fetchPageDataErrorHandler = useCallback((error: unknown) => {
 		setFetchPageDataError(error);
 		setDisplayState(DISPLAY_STATES.ERROR);
+		return true; // handled
 	}, []);
 	const handleError = useHandleError(fetchPageDataErrorHandler);
 

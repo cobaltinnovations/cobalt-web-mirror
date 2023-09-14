@@ -5,12 +5,13 @@ import { Helmet } from 'react-helmet';
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import MedicationPresriber from '@/components/medication-prescriber';
+import { FeatureId } from '@/lib/models';
 
 const ConnectWithSupportMedicationPrescriber = () => {
 	const { institution } = useAccount();
 
 	const featureDetails = useMemo(
-		() => (institution?.features ?? []).find((feature) => feature.featureId === 'MEDICATION_PRESCRIBER'),
+		() => (institution?.features ?? []).find((feature) => feature.featureId === FeatureId.MEDICATION_PRESCRIBER),
 		[institution?.features]
 	);
 

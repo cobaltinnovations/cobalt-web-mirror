@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateFormats } from '@/lib/utils';
 import moment from 'moment';
 import InputHelper, { InputHelperProps } from './input-helper';
 
@@ -8,7 +9,7 @@ const timeSlot = moment('00:00', 'hh:mm');
 
 for (let i = 0; i < totalSlotsInDay; i += 15) {
 	timeSlot.add(i === 0 ? 0 : 15, 'minutes');
-	timeSlots.push(timeSlot.format('h:mm A'));
+	timeSlots.push(timeSlot.format(DateFormats.UI.TimeSlotInput));
 }
 
 const TimeSlotInput = (props: InputHelperProps) => {

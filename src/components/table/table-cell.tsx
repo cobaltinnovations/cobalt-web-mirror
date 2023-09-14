@@ -31,7 +31,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		flexDirection: 'column',
 		justifyContent: 'center',
 		borderRight: ({ stickyBorder }: UseStylesProps) =>
-			stickyBorder ? `1px solid ${theme.colors.n100}` : undefined,
+			stickyBorder ? `1px solid ${theme.colors.border}` : undefined,
 
 		fontWeight: ({ header }: UseStylesProps) => (header ? 500 : undefined),
 		whiteSpace: ({ header }: UseStylesProps) => (header ? 'nowrap' : undefined),

@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { InstitutionFeature } from '@/lib/models';
-import { accountService, institutionService, screeningService } from '@/lib/services';
+import { FeatureId, InstitutionFeature } from '@/lib/models';
+import { accountService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
+import InlineAlert from '@/components/inline-alert';
+import { PsychiatristRecommendation } from '@/components/psychiatrist-recommendation';
 
 const ConnectWithSupportMentalHealthRecommendations = () => {
 	const navigate = useNavigate();
 	const { account, institution } = useAccount();
 	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
-	const [myChartAuthUrl, setMyChartAuthUrl] = useState('');
+	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) {
@@ -25,35 +27,36 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			throw new Error('institution.providerTriageScreeningFlowId is undefined.');
 		}
 
-		const [{ sessionFullyCompletedAtDescription }, { features }, { myChartConnectionRequired }] = await Promise.all(
-			[
-				screeningService
-					.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
-					.fetch(),
-				accountService.getRecommendedFeatures(account.accountId).fetch(),
-				accountService.getBookingRequirements(account.accountId).fetch(),
-			]
-		);
-		const matchingInstitutionFeature = institution.features.find((f) => f.featureId === features[0]?.featureId);
+		const [
+			{ sessionFullyCompleted, sessionFullyCompletedAtDescription },
+			{ features },
+			{ myChartConnectionRequired },
+		] = await Promise.all([
+			screeningService
+				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.providerTriageScreeningFlowId)
+				.fetch(),
+			accountService.getRecommendedFeatures(account.accountId).fetch(),
+			accountService.getBookingRequirements(account.accountId).fetch(),
+		]);
 
-		setCompletedAtDescription(sessionFullyCompletedAtDescription);
-		setRecommendedFeature(matchingInstitutionFeature);
-
-		if (!myChartConnectionRequired) {
+		if (myChartConnectionRequired || !sessionFullyCompleted) {
+			navigate('/connect-with-support/mental-health-providers', {
+				replace: true,
+			});
 			return;
 		}
 
-		const { authenticationUrl } = await institutionService
-			.getMyChartAuthenticationUrl(institution.institutionId)
-			.fetch();
+		const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+		setShowPsychiatristRecommendation(psychiatristIndex > -1);
 
-		setMyChartAuthUrl(authenticationUrl);
-	}, [
-		account?.accountId,
-		institution.features,
-		institution.institutionId,
-		institution.providerTriageScreeningFlowId,
-	]);
+		const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
+		const matchingInstitutionFeature = institution.features.find(
+			(f) => f.featureId === firstRecommendation?.featureId
+		);
+
+		setCompletedAtDescription(sessionFullyCompletedAtDescription);
+		setRecommendedFeature(matchingInstitutionFeature);
+	}, [account?.accountId, institution.features, institution.providerTriageScreeningFlowId, navigate]);
 
 	return (
 		<>
@@ -71,30 +74,31 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-8" />
 									<p className="mb-6 fs-large">
-										Based on your answers, we recommend{' '}
+										Based on the symptoms reported we recommend{' '}
 										<strong>{recommendedFeature.treatmentDescription}</strong>.
 									</p>
 									<p className="mb-6 fs-large">
 										You can schedule a telehealth appointment with one of the providers listed.
 									</p>
-									<div className="text-center">
+									<div className="mb-8 text-center">
 										<Button
 											variant="primary"
 											size="lg"
 											onClick={() => {
-												if (myChartAuthUrl) {
-													window.open(myChartAuthUrl, '_blank', 'noopener, noreferrer');
-													return;
-												}
-
 												navigate(recommendedFeature.urlName);
 											}}
 										>
-											{myChartAuthUrl
-												? `Connect to ${institution.myChartName}`
-												: 'View Providers'}
+											Schedule an Appointment
 										</Button>
 									</div>
+
+									{showPsychiatristRecommendation && <PsychiatristRecommendation />}
+
+									<InlineAlert
+										variant="info"
+										title="Your responses are not reviewed"
+										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+									/>
 								</>
 							) : (
 								<NoData

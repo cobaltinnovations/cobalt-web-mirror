@@ -7,13 +7,13 @@ import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 import useAccount from './use-account';
 import axios from 'axios';
 
-function useHandleError(handler?: (error: CobaltError) => void): (error: unknown) => void {
+function useHandleError(handler?: (error: CobaltError) => boolean | Promise<boolean>): (error: unknown) => void {
 	const { signOutAndClearContext } = useAccount();
 	const { displayModalForError } = useContext(ErrorModalContext);
 	const { setShowReauthModal, setSignOnUrl } = useContext(ReauthModalContext);
 
 	const handleError = useCallback(
-		(error: unknown) => {
+		async (error: unknown) => {
 			let handled: CobaltError;
 
 			if (error instanceof CobaltError) {
@@ -38,8 +38,11 @@ function useHandleError(handler?: (error: CobaltError) => void): (error: unknown
 			}
 
 			if (handler) {
-				handler(handled);
-				return;
+				const didHandle = await handler(handled);
+
+				if (didHandle) {
+					return;
+				}
 			}
 
 			if (handled.reportableToUser) {

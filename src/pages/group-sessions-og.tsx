@@ -33,7 +33,7 @@ const GroupSessionsOg = () => {
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
 		screeningFlowId: institution?.groupSessionsScreeningFlowId,
 	});
-	const [viewAll, setViewAll] = useState(false);
+	const [isViewingAll, setIsViewingAll] = useState(!!groupSessionUrlName);
 
 	useEffect(() => {
 		if (!didCheckScreeningSessions) {
@@ -56,7 +56,7 @@ const GroupSessionsOg = () => {
 					orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
 					urlName: groupSessionUrlName,
 					searchQuery: groupSessionSearchQuery,
-					pageSize: viewAll ? 1000 : 9,
+					pageSize: isViewingAll ? 1000 : 9,
 					pageNumber: 0,
 				})
 				.fetch();
@@ -68,14 +68,14 @@ const GroupSessionsOg = () => {
 			setIsLoading(false);
 			setIsFirstLoad(false);
 		}
-	}, [groupSessionSearchQuery, groupSessionUrlName, handleError, viewAll]);
+	}, [groupSessionSearchQuery, groupSessionUrlName, handleError, isViewingAll]);
 
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
 
 	const handleViewAllButtonClick = useCallback(() => {
-		setViewAll(true);
+		setIsViewingAll(true);
 	}, []);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -169,7 +169,7 @@ const GroupSessionsOg = () => {
 				{!isLoading && groupSessions.length <= 0 && (
 					<Row className="mb-2">
 						<Col>
-							<p className="text-center mb-0">
+							<div className="text-center mb-0">
 								{groupSessionSearchQuery ? (
 									<NoData
 										title="No Search Results"
@@ -204,7 +204,7 @@ const GroupSessionsOg = () => {
 										actions={[]}
 									/>
 								)}
-							</p>
+							</div>
 						</Col>
 					</Row>
 				)}
@@ -212,10 +212,10 @@ const GroupSessionsOg = () => {
 					<Row className="mb-2">
 						{groupSessions.map((groupSession) => {
 							return (
-								<Col md={6} lg={4} key={groupSession.groupSessionId} className="mb-8">
+								<Col md={6} lg={4} key={groupSession.urlName} className="mb-8">
 									<Link
 										className="d-block text-decoration-none h-100"
-										to={`/group-sessions/${groupSession.groupSessionId}`}
+										to={`/group-sessions/${groupSession.urlName}`}
 									>
 										<StudioEvent className="h-100" studioEvent={groupSession} />
 									</Link>
@@ -253,7 +253,7 @@ const GroupSessionsOg = () => {
 								<Loader className="position-static d-inline-flex" />
 							) : (
 								<>
-									{!viewAll && (
+									{!isViewingAll && groupSessions.length >= 9 && (
 										<Button onClick={handleViewAllButtonClick} disabled={isLoading}>
 											View All
 										</Button>

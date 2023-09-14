@@ -4,7 +4,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 const useTableHeadStyles = createUseThemedStyles((theme) => ({
 	tableHead: {
 		backgroundColor: theme.colors.n75,
-		borderBottom: `1px solid ${theme.colors.n100}`,
+		borderBottom: `1px solid ${theme.colors.border}`,
 	},
 }));
 

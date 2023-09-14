@@ -16,7 +16,7 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		transition: '0.2s all',
 		flexDirection: 'column',
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 		'&:hover': {
 			transform: 'translateY(-16px)',
 			boxShadow: theme.elevation.e400,
@@ -27,7 +27,7 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 8,
 		overflow: 'hidden',
 		flexDirection: 'column',
-		border: `1px solid ${theme.colors.n100}`,
+		border: `1px solid ${theme.colors.border}`,
 	},
 	imageContainer: {
 		flexShrink: 0,

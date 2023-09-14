@@ -1,4 +1,4 @@
-export type CobaltColor = keyof CobaltTheme['colors'];
+export type CobaltColorName = keyof CobaltTheme['colors'];
 
 export type CobaltFontFamily = {
 	fontFamily: string;
@@ -11,6 +11,7 @@ export type CobaltFontFamily = {
 type CobaltFontSizeConfig = {
 	fontSize: string;
 	lineHeight: string;
+	letterSpacing?: string;
 };
 
 type CobaltHeadingConfig = {
@@ -37,6 +38,7 @@ export type CobaltTheme = {
 		n100: string;
 		n300: string;
 		n500: string;
+		n700: string;
 		n900: string;
 
 		// brand -- primary
@@ -45,57 +47,55 @@ export type CobaltTheme = {
 		p300: string;
 		p500: string;
 		p700: string;
+		p900: string;
 
 		// brand -- accent
 		a50: string;
 		a100: string;
 		a300: string;
 		a500: string;
+		a700: string;
+		a900: string;
 
 		// semantic -- danger
 		d50: string;
 		d100: string;
 		d300: string;
 		d500: string;
+		d700: string;
+		d900: string;
 
 		// semantic -- warning
 		w50: string;
 		w100: string;
 		w300: string;
 		w500: string;
+		w700: string;
+		w900: string;
 
 		// semantic -- success
 		s50: string;
 		s100: string;
 		s300: string;
 		s500: string;
+		s700: string;
+		s900: string;
 
 		// semantic -- info
 		i50: string;
 		i100: string;
 		i300: string;
 		i500: string;
+		i700: string;
+		i900: string;
 
-		// extra -- marketing1
-		m50: string;
-		m100: string;
-		m300: string;
-		m500: string;
-		m700: string;
-
-		// extra -- marketing2
-		mm50: string;
-		mm100: string;
-		mm300: string;
-		mm500: string;
-		mm700: string;
-
-		// extra -- marketing3
-		mmm50: string;
-		mmm100: string;
-		mmm300: string;
-		mmm500: string;
-		mmm700: string;
+		// semantic -- attention
+		t50: string;
+		t100: string;
+		t300: string;
+		t500: string;
+		t700: string;
+		t900: string;
 
 		background: string;
 		border: string;
@@ -115,7 +115,6 @@ export type CobaltTheme = {
 		default: CobaltFontSizeConfig;
 		large: CobaltFontSizeConfig;
 		small: CobaltFontSizeConfig;
-		uiSmall: CobaltFontSizeConfig;
 
 		headingNormal: CobaltFontConfig;
 		headingBold: CobaltFontConfig;

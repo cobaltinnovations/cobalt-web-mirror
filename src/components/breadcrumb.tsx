@@ -16,7 +16,7 @@ const useBreadcrumbStyles = createUseThemedStyles((theme) => ({
 	breadcrumbLink: {
 		marginRight: 10,
 		textDecoration: 'none',
-		...theme.fonts.uiSmall,
+		...theme.fonts.small,
 		...theme.fonts.bodyBold,
 	},
 	chevron: {
@@ -53,7 +53,7 @@ const Breadcrumb: FC<BreadcrumbProps> = (props) => {
 				<Row>
 					<Col>
 						<div className="d-flex align-items-center">
-							<p className={classNames(classes.p, 'mb-0 fs-ui-small')}>
+							<p className={classNames(classes.p, 'mb-0 fs-small')}>
 								{props.breadcrumbs.map((breadcrumb, index) => {
 									const isLast = index === props.breadcrumbs.length - 1;
 

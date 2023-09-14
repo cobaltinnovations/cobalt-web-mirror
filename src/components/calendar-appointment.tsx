@@ -1,5 +1,4 @@
 import React, { forwardRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -122,6 +121,7 @@ interface CalendarAppointmentProps {
 
 const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>(
 	({ className, appointment, groupSession, onCancel }, ref) => {
+		const { institution } = useAccount();
 		const classes = useCalendarAppointmentStyles();
 		const placeholderImage = useRandomPlaceholderImage();
 
@@ -157,13 +157,30 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 						</div>
 					</div>
 					<div className={classes.optionsContainer}>
-						<Button variant="link" className="p-0" onClick={onCancel}>
-							Cancel Reservation
-						</Button>
-						<JoinButton
-							contactEmail={appointment.provider?.emailAddress}
-							joinUrl={appointment.videoconferenceUrl}
-						/>
+						{institution.epicFhirEnabled ? (
+							<p className="mb-0">
+								To cancel go to{' '}
+								<Button
+									href={institution.myChartDefaultUrl}
+									target="_blank"
+									variant="link"
+									className="p-0"
+								>
+									{institution.myChartName}
+								</Button>
+							</p>
+						) : (
+							<>
+								<Button variant="link" className="p-0" onClick={onCancel}>
+									Cancel Reservation
+								</Button>
+
+								<JoinButton
+									contactEmail={appointment.provider?.emailAddress}
+									joinUrl={appointment.videoconferenceUrl}
+								/>
+							</>
+						)}
 					</div>
 				</div>
 			);
