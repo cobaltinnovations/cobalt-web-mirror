@@ -158,25 +158,17 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					</div>
 					<div className={classes.optionsContainer}>
 						{institution.epicFhirEnabled ? (
-							<>
+							<p className="mb-0">
+								To cancel go to{' '}
 								<Button
 									href={institution.myChartDefaultUrl}
 									target="_blank"
 									variant="link"
 									className="p-0"
 								>
-									Go to {institution.myChartName}
+									{institution.myChartName}
 								</Button>
-
-								<Button
-									href={institution.myChartDefaultUrl}
-									target="_blank"
-									className="text-decoration-none"
-									size="sm"
-								>
-									Join Now
-								</Button>
-							</>
+							</p>
 						) : (
 							<>
 								<Button variant="link" className="p-0" onClick={onCancel}>
