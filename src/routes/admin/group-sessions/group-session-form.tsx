@@ -28,6 +28,7 @@ import {
 	Navigate,
 	unstable_useBlocker as useBlocker,
 	useLocation,
+	useMatch,
 	useNavigate,
 	useParams,
 	useRouteLoaderData,
@@ -62,7 +63,13 @@ import { ButtonLink } from '@/components/button-link';
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
 export function useAdminGroupSessionFormLoaderData() {
-	return useRouteLoaderData('group-session-form') as AdminGroupSessionFormLoaderData;
+	const isAdminMatch = useMatch({
+		path: '/admin/*',
+	});
+
+	return useRouteLoaderData(
+		isAdminMatch ? 'admin-group-session-form' : 'group-session-form'
+	) as AdminGroupSessionFormLoaderData;
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
