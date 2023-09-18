@@ -42,6 +42,7 @@ import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detai
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import CallToActionBlock from '@/components/call-to-action-block';
 import { useAppRootLoaderData } from '@/routes/root';
+import FeatureScreeningCta from '@/components/feature-screening-cta';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -150,6 +151,7 @@ const Index: FC = () => {
 	}
 
 	const hasLandingPageFeatures = institution?.features.filter((f) => f.landingPageVisible).length > 0;
+	const showFeatureScreeningCta = institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
 
 	return (
 		<>
@@ -185,51 +187,16 @@ const Index: FC = () => {
 					{hasLandingPageFeatures && (
 						<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
 					)}
-					{institution?.featureScreeningFlowId &&
-						!institution.hasTakenFeatureScreening &&
-						!institution.epicFhirEnabled && (
-							<Container className="mb-10">
-								<Row>
-									<Col>
-										<NoData
-											className="bg-p50"
-											title="Not sure what you need?"
-											actions={[
-												{
-													size: 'lg',
-													variant: 'primary',
-													title: 'Take the Assessment',
-													// title: institution.epicFhirEnabled
-													// 	? 'Explore Your Interests'
-													// 	: 'Take the Assessment',
-													onClick: () => {
-														startScreeningFlow();
-														trackEvent({
-															action: 'HP Take Assessment',
-														});
-													},
-												},
-												// ...(institution.epicFhirEnabled
-												// 	? [
-												// 			{
-												// 				size: 'lg' as const,
-												// 				variant: 'outline-primary',
-												// 				title: 'Speak with a Resource Navigator',
-												// 				onClick: () => {
-												// 					window.open(
-												// 						institution.externalContactUsUrl,
-												// 						'_blank'
-												// 					);
-												// 				},
-												// 			},
-												// 	  ]
-												// 	: []),
-											]}
-										/>
-									</Col>
-								</Row>
-							</Container>
-						)}
+					{showFeatureScreeningCta && (
+						<FeatureScreeningCta
+							onStartAssessment={() => {
+								startScreeningFlow();
+								trackEvent({
+									action: 'HP Take Assessment',
+								});
+							}}
+						/>
+					)}
 				</>
 			) : (
 				<>
