@@ -605,6 +605,7 @@ export const Component = () => {
 						id="locationType-inPerson"
 						className="mt-3"
 						label="In person"
+						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
 						onChange={({ currentTarget }) => {
 							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.IN_PERSON);
 						}}
