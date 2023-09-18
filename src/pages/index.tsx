@@ -185,51 +185,45 @@ const Index: FC = () => {
 					{hasLandingPageFeatures && (
 						<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
 					)}
-					{institution?.featureScreeningFlowId &&
-						!institution.hasTakenFeatureScreening &&
-						!institution.epicFhirEnabled && (
-							<Container className="mb-10">
-								<Row>
-									<Col>
-										<NoData
-											className="bg-p50"
-											title="Not sure what you need?"
-											actions={[
-												{
-													size: 'lg',
-													variant: 'primary',
-													title: 'Take the Assessment',
-													// title: institution.epicFhirEnabled
-													// 	? 'Explore Your Interests'
-													// 	: 'Take the Assessment',
-													onClick: () => {
-														startScreeningFlow();
-														trackEvent({
-															action: 'HP Take Assessment',
-														});
-													},
+					{institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening && (
+						<Container className="mb-10">
+							<Row>
+								<Col>
+									<NoData
+										className="bg-p50"
+										title="Not sure what you need?"
+										actions={[
+											{
+												size: 'lg',
+												variant: 'primary',
+												title: institution.epicFhirEnabled
+													? 'Explore Your Interests'
+													: 'Take the Assessment',
+												onClick: () => {
+													startScreeningFlow();
+													trackEvent({
+														action: 'HP Take Assessment',
+													});
 												},
-												// ...(institution.epicFhirEnabled
-												// 	? [
-												// 			{
-												// 				size: 'lg' as const,
-												// 				variant: 'outline-primary',
-												// 				title: 'Speak with a Resource Navigator',
-												// 				onClick: () => {
-												// 					window.open(
-												// 						institution.externalContactUsUrl,
-												// 						'_blank'
-												// 					);
-												// 				},
-												// 			},
-												// 	  ]
-												// 	: []),
-											]}
-										/>
-									</Col>
-								</Row>
-							</Container>
-						)}
+											},
+											...(institution.epicFhirEnabled
+												? [
+														{
+															size: 'lg' as const,
+															variant: 'outline-primary',
+															title: 'Speak with a Resource Navigator',
+															onClick: () => {
+																window.open(institution.externalContactUsUrl, '_blank');
+															},
+														},
+												  ]
+												: []),
+										]}
+									/>
+								</Col>
+							</Row>
+						</Container>
+					)}
 				</>
 			) : (
 				<>
