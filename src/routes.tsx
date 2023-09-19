@@ -256,6 +256,12 @@ const InstitutionResourcesEnabled = () => {
 	);
 };
 
+const UserSubmittedGroupSessionEnabled = () => {
+	const { institution } = useAccount();
+
+	return institution?.userSubmittedGroupSessionEnabled ? <Outlet /> : <NoMatch />;
+};
+
 export const routes: RouteObject[] = [
 	{
 		id: 'root',
@@ -522,26 +528,57 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'group-sessions',
-						element: <GroupSessionsOg />,
-					},
-					{
-						path: 'group-sessions/request',
-						element: <GroupSessionsRequest />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request/create',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request/:groupSessionId/edit',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
+						element: <Outlet />,
+						children: [
+							{
+								index: true,
+								element: <GroupSessionsOg />,
+							},
+							{
+								path: ':action?/:groupSessionId?',
+								element: <UserSubmittedGroupSessionEnabled />,
+								children: [
+									{
+										id: 'group-session-form',
+										index: true,
+										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+									},
+								],
+							},
+							{
+								path: 'request',
+								element: <GroupSessionsRequest />,
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request/create',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request/:groupSessionId/edit',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								path: 'collection/:groupSessionCollectionId',
+								lazy: () => import('@/routes/group-session-collection-detail'),
+							},
+							{
+								path: ':groupSessionIdOrUrlName',
+								lazy: () => import('@/routes/group-session-detail'),
+							},
+						],
 					},
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/ical',
@@ -550,14 +587,6 @@ export const routes: RouteObject[] = [
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/google-calendar',
 						element: <RedirectToBackend />,
-					},
-					{
-						path: 'group-sessions/collection/:groupSessionCollectionId',
-						lazy: () => import('@/routes/group-session-collection-detail'),
-					},
-					{
-						path: 'group-sessions/:groupSessionIdOrUrlName',
-						lazy: () => import('@/routes/group-session-detail'),
 					},
 					{
 						path: 'appointments/:appointmentId/ical',

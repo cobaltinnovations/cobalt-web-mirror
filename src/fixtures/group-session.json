@@ -30,6 +30,7 @@
 	"seatsReserved": 1,
 	"seatsReservedDescription": "1 reservation",
 	"timeZone": "America/New_York",
+	"groupSessionLocationTypeId": "VIRTUAL",
 	"videoconferenceUrl": "https://www.google.com",
 	"sendFollowupEmail": false,
 	"visibleFlag": true,
