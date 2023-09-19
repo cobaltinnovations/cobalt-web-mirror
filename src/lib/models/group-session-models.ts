@@ -116,8 +116,8 @@ export interface GroupSessionModel {
 	scheduleUrl?: string;
 	imageUrl?: string;
 	groupSessionLocationTypeId: GroupSessionLocationTypeId;
-	videoconferenceUrl: string;
-	inPersonLocation: string;
+	videoconferenceUrl?: string;
+	inPersonLocation?: string;
 	confirmationEmailContent?: string;
 
 	followupDayOffset?: string;
