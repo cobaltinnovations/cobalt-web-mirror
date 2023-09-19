@@ -63,7 +63,7 @@ const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface InputHelperSearchProps extends FormControlProps {
+export interface InputHelperSearchProps extends FormControlProps {
 	className?: string;
 	autoFocus?: boolean;
 	onClear(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
