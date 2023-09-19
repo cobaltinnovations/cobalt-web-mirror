@@ -1,0 +1,39 @@
+{
+	"accountId": "account-fixture-id-1",
+	"roleId": "PATIENT",
+	"institutionId": "COBALT",
+	"accountSourceId": "ANONYMOUS",
+	"sourceSystemId": "COBALT",
+	"betaStatusId": "UNKNOWN",
+	"timeZone": "America/New_York",
+	"locale": "en-US",
+	"languageCode": "en",
+	"countryCode": "US",
+	"consentFormAccepted": false,
+	"genderIdentityId": "NOT_ASKED",
+	"ethnicityId": "NOT_ASKED",
+	"birthSexId": "NOT_ASKED",
+	"raceId": "NOT_ASKED",
+	"created": "2023-09-15T16:27:21.294247Z",
+	"createdDescription": "September 15, 2023, 12:27 PM",
+	"lastUpdated": "2023-09-15T16:27:21.294247Z",
+	"lastUpdatedDescription": "September 15, 2023, 12:27 PM",
+	"loginDestinationId": "COBALT_PATIENT",
+	"capabilities": {
+		"COBALT": {
+			"viewNavAdminGroupSession": false,
+			"viewNavAdminGroupSessionRequest": false,
+			"viewNavAdminMyContent": false,
+			"viewNavAdminAvailableContent": false,
+			"viewNavAdminReports": false
+		}
+	},
+	"promptedForInstitutionLocation": false,
+	"accountCapabilityFlags": {
+		"canEditIcTriages": false,
+		"canViewIcReports": false,
+		"canEditIcSafetyPlanning": false,
+		"canImportIcPatientOrders": false
+	},
+	"testAccount": false
+}
