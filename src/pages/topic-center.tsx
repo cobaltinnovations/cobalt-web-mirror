@@ -54,6 +54,26 @@ const TopicCenter = () => {
 		});
 	}, [isFeaturedMatch, mixpanel, navigate, topicCenterId]);
 
+	const contentCount =
+		topicCenter?.topicCenterRows.reduce((count, topicCenterRow) => {
+			if (topicCenterRow.groupSessions.length > 0) {
+				count++;
+			}
+			if (topicCenterRow.groupSessionRequests.length > 0) {
+				count++;
+			}
+			if (topicCenterRow.pinboardNotes.length > 0) {
+				count++;
+			}
+			if (topicCenterRow.contents.length > 0) {
+				count++;
+			}
+
+			return count;
+		}, 0) ?? 0;
+
+	const showSectionHeaders = !featuredTopicsRouteMatch || contentCount > 1;
+
 	return (
 		<>
 			<Helmet>
@@ -185,21 +205,6 @@ const TopicCenter = () => {
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 
-					let sectionsWithContent = 0;
-					if (topicCenterRow.groupSessions.length > 0) {
-						sectionsWithContent++;
-					}
-					if (topicCenterRow.groupSessionRequests.length > 0) {
-						sectionsWithContent++;
-					}
-					if (topicCenterRow.pinboardNotes.length > 0) {
-						sectionsWithContent++;
-					}
-					if (topicCenterRow.contents.length > 0) {
-						sectionsWithContent++;
-					}
-
-					const showSectionHeaders = sectionsWithContent > 1;
 					const containerClasseNames = classNames(
 						'pb-12 pt-lg-14 pb-lg-22',
 						showSectionHeaders ? 'pt-10' : 'pt-12'
