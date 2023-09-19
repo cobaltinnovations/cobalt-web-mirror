@@ -294,13 +294,6 @@ export const routes: RouteObject[] = [
 						path: 'sign-in/email',
 						element: <SignInEmail />,
 					},
-				],
-			},
-
-			{
-				element: <AppDefaultLayout hideHeaderButtons />,
-				loader: requireAuthLoader,
-				children: [
 					{
 						path: 'onboarding',
 						element: <Onboarding />,

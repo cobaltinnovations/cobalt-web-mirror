@@ -13,20 +13,18 @@ interface AppDefaultLayoutProps {
 	unauthenticated?: boolean;
 }
 
-const AppHeader = ({ hideHeaderButtons, unauthenticated }: AppDefaultLayoutProps) => {
+export const AppHeader = ({ unauthenticated }: AppDefaultLayoutProps) => {
 	const { institution } = useAccount();
 
 	const activeHeader = useMemo(() => {
 		if (unauthenticated) {
 			return <HeaderUnauthenticated />;
-		} else if (hideHeaderButtons) {
-			return <Header showHeaderButtons={false} />;
 		} else if (institution?.featuresEnabled) {
 			return <HeaderV2 />;
 		} else {
 			return <Header />;
 		}
-	}, [hideHeaderButtons, institution?.featuresEnabled, unauthenticated]);
+	}, [institution?.featuresEnabled, unauthenticated]);
 
 	return activeHeader;
 };

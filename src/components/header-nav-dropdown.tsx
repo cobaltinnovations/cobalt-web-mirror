@@ -80,9 +80,9 @@ const HeaderNavDropdown = ({
 				}}
 				renderOnMount
 			>
-				<div className="d-flex">
+				<div className="d-flex w-100">
 					<div
-						className={classNames({
+						className={classNames('flex-grow-1', {
 							'px-5 py-6': featuredItem,
 							'p-4': !featuredItem,
 						})}
