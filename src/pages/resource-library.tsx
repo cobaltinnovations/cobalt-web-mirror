@@ -23,14 +23,14 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import InputHelperSearch from '@/components/input-helper-search';
-import ActionSheet from '@/components/action-sheet';
+import FloatingActionButton from '@/components/floating-action-button';
 import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
 import SimpleFilter from '@/components/simple-filter';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 
-const carouselConfig = {
+export const resourceLibraryCarouselConfig = {
 	externalMonitor: {
 		breakpoint: { max: 3000, min: 1201 },
 		items: 2,
@@ -329,14 +329,10 @@ const ResourceLibrary = () => {
 			</AsyncPage>
 
 			{institution?.userSubmittedContentEnabled && (
-				<ActionSheet
-					show={false}
-					onShow={() => {
+				<FloatingActionButton
+					onClick={() => {
 						mixpanel.track('Patient-Sourced Add Content Click', {});
 						navigate('/cms/on-your-time/create');
-					}}
-					onHide={() => {
-						return;
 					}}
 				/>
 			)}
@@ -723,7 +719,7 @@ const ResourceLibrary = () => {
 										</Col>
 										<Col lg={9}>
 											<Carousel
-												responsive={carouselConfig}
+												responsive={resourceLibraryCarouselConfig}
 												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
 												floatingButtonGroup
 											>

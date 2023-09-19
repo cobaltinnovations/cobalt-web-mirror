@@ -53,7 +53,7 @@ export const HeaderNavFeaturedItem = ({
 
 	return (
 		<Link
-			className={classNames(classes.featuredItemContainer, 'd-block', className)}
+			className={classNames(classes.featuredItemContainer, 'd-block text-decoration-none', className)}
 			to={featuredItem.linkTo}
 			onClick={() => {
 				onImageClick?.();

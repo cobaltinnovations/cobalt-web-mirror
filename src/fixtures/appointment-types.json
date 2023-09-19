@@ -1,0 +1,19 @@
+[
+	{
+		"appointmentTypeId": "appointment-type-fixture-id-1",
+		"schedulingSystemId": "COBALT",
+		"visitTypeId": "INITIAL",
+		"name": "1:1 Appointment",
+		"description": "Test Description",
+		"durationInMinutes": 60,
+		"durationInMinutesDescription": "60 minutes"
+	},
+	{
+		"appointmentTypeId": "appointment-type-fixture-id-2",
+		"schedulingSystemId": "COBALT",
+		"visitTypeId": "INITIAL",
+		"name": "Initial Consult",
+		"durationInMinutes": 30,
+		"durationInMinutesDescription": "30 minutes"
+	}
+]

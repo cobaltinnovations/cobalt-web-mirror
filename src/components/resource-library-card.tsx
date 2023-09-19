@@ -76,7 +76,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface Props {
+export interface ResourceLibraryCardProps {
 	// colorId: COLOR_IDS;
 	// subtopic: string;
 	// subtopicTo: string;
@@ -108,7 +108,7 @@ const ResourceLibraryCard = ({
 	duration,
 	className,
 	trackEvent,
-}: Props) => {
+}: ResourceLibraryCardProps) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
