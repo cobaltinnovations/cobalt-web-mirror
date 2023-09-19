@@ -16,6 +16,11 @@ export enum GroupSessionLearnMoreMethodId {
 	PHONE = 'PHONE',
 }
 
+export enum GroupSessionLocationTypeId {
+	VIRTUAL = 'VIRTUAL',
+	IN_PERSON = 'IN_PERSON',
+}
+
 export enum GROUP_SESSION_SORT_ORDER {
 	START_TIME_DESCENDING = 'START_TIME_DESCENDING',
 	START_TIME_ASCENDING = 'START_TIME_ASCENDING',
@@ -110,7 +115,9 @@ export interface GroupSessionModel {
 	facilitatorAccountId?: string;
 	scheduleUrl: string;
 	imageUrl: string;
+	groupSessionLocationTypeId: GroupSessionLocationTypeId;
 	videoconferenceUrl: string;
+	inPersonLocation: string;
 	confirmationEmailContent: string;
 
 	followupDayOffset?: string;

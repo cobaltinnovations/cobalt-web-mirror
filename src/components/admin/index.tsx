@@ -1,4 +1,3 @@
-export * from './admin-add-group-session-modal';
 export * from './admin-analytics-widget-card';
 export * from './admin-analytics-widget-group';
 export * from './admin-group-session-filter-scheduling';

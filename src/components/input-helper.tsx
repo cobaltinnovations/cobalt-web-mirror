@@ -1,4 +1,4 @@
-import React, { ElementType, PropsWithChildren, useState } from 'react';
+import React, { ElementType, PropsWithChildren, ReactNode, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -97,7 +97,7 @@ export interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	className?: string;
 	helperText?: string;
 	characterCounter?: number;
-	error?: string;
+	error?: ReactNode;
 	required?: boolean;
 	autoFocus?: boolean;
 }

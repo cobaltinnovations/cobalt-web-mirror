@@ -27,6 +27,8 @@ import {
 	LoaderFunctionArgs,
 	Navigate,
 	unstable_useBlocker as useBlocker,
+	useLocation,
+	useMatch,
 	useNavigate,
 	useParams,
 	useRouteLoaderData,
@@ -39,6 +41,7 @@ import GroupSession from '@/components/group-session';
 import {
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionLearnMoreMethodId,
+	GroupSessionLocationTypeId,
 	GroupSessionModel,
 	GroupSessionUrlNameValidationResult,
 	ScreeningFlow,
@@ -60,21 +63,38 @@ import { ButtonLink } from '@/components/button-link';
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
 export function useAdminGroupSessionFormLoaderData() {
-	return useRouteLoaderData('admin-group-session-form') as AdminGroupSessionFormLoaderData;
+	const isAdminMatch = useMatch({
+		path: '/admin/*',
+	});
+
+	return useRouteLoaderData(
+		isAdminMatch ? 'admin-group-session-form' : 'group-session-form'
+	) as AdminGroupSessionFormLoaderData;
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const groupSessionId = params.groupSessionId;
+	const isAdminRoute = request.url.includes('admin');
 
-	// can add/edit/duplicate/preview/view group sessions.
+	const supportedActions = [
+		'add-internal',
+		'add-external',
+		...(isAdminRoute ? ['edit', 'duplicate', 'preview', 'view'] : []),
+	];
+
+	// can add/preview/view edit/duplicate
+	// admins can also edit/duplicate them
+	const isSupportedAction = !!action && supportedActions.includes(action);
+
 	// add, must not have a group session id.
+	const isValidNoId = isSupportedAction && ['add-internal', 'add-external'].includes(action) && !groupSessionId;
+
 	// edit/duplicate/preview/view, must have a group session id.
-	if (
-		!action ||
-		!['add-internal', 'add-external', 'edit', 'duplicate', 'preview', 'view'].includes(action) ||
-		(['edit', 'duplicate', 'preview', 'view'].includes(action) && !groupSessionId)
-	) {
+	const isValidWithId =
+		isSupportedAction && ['edit', 'duplicate', 'preview', 'view'].includes(action) && !!groupSessionId;
+
+	if (!isValidNoId && !isValidWithId) {
 		return null; // page renders a "404" in this case
 	}
 
@@ -118,13 +138,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		groupSessionCollections: groupSessionCollectionsResponse.groupSessionCollections,
 		tagGroups: tagGroupsResponse.tagGroups,
 		screeningFlows: screeningFlowsResponse.screeningFlows,
+		isAdminRoute,
 	};
 }
 
 const initialGroupSessionFormValues = {
 	title: '',
 	urlName: '',
+	groupSessionLocationTypeId: undefined as GroupSessionLocationTypeId | undefined,
 	videoconferenceUrl: '',
+	inPersonLocation: '',
 	seats: undefined as number | undefined,
 	facilitatorName: '',
 	facilitatorEmailAddress: '',
@@ -158,18 +181,21 @@ function getInitialGroupSessionFormValues({
 	groupSession,
 	isDuplicate,
 	defaultScreeningFlowId,
+	initialGroupSessionLocationTypeId,
 }: {
 	groupSession?: GroupSessionModel | null;
 	isDuplicate?: boolean;
 	defaultScreeningFlowId: string;
+	initialGroupSessionLocationTypeId?: GroupSessionLocationTypeId;
 }): typeof initialGroupSessionFormValues {
 	const {
 		screeningFlowId = defaultScreeningFlowId,
+		groupSessionLocationTypeId = initialGroupSessionLocationTypeId,
 		startDateTime,
 		endDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
 		...rest
-	} = groupSession ?? {};
+	} = groupSession ?? ({} as GroupSessionModel);
 
 	const startDate = moment(startDateTime);
 	const endDate = moment(endDateTime);
@@ -190,6 +216,7 @@ function getInitialGroupSessionFormValues({
 		{
 			...rest,
 			screeningFlowId,
+			groupSessionLocationTypeId,
 			// keep initial values when duplicating an existing session
 			...(isDuplicate
 				? {
@@ -219,6 +246,7 @@ export const Component = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const loaderData = useAdminGroupSessionFormLoaderData();
+	const location = useLocation();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; groupSessionId: string }>();
 	const handleError = useHandleError();
@@ -247,6 +275,7 @@ export const Component = () => {
 			isDuplicate,
 			groupSession: loaderData?.groupSession,
 			defaultScreeningFlowId: institution.groupSessionDefaultIntakeScreeningFlowId,
+			initialGroupSessionLocationTypeId: location.state?.groupSessionLocationTypeId,
 		})
 	);
 
@@ -260,7 +289,8 @@ export const Component = () => {
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showConfirmCancelDialog, setShowConfirmCancelDialog] = useState(false);
 	const [urlNameSetByUser, setUrlNameSetByUser] = useState(!isDuplicate && !!loaderData?.groupSession?.urlName);
-	const [debouncedSearchQuery] = useDebouncedState(urlNameSetByUser ? formValues.urlName : formValues.title);
+	const [debouncedTitleQuery] = useDebouncedState(formValues.title);
+	const [debouncedUrlNameQuery] = useDebouncedState(formValues.urlName);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
 		{}
 	);
@@ -314,6 +344,19 @@ export const Component = () => {
 
 			promise
 				.then((response) => {
+					if (!loaderData?.isAdminRoute) {
+						addFlag({
+							variant: 'success',
+							title: 'Submission Accepted',
+							description: 'Your group session has been submitted for review.',
+							actions: [],
+						});
+
+						navigate('/group-sessions');
+
+						return;
+					}
+
 					if (isNotDraft || options?.exitAfterSave) {
 						if (isNotDraft) {
 							addFlag({
@@ -345,7 +388,17 @@ export const Component = () => {
 					handleError(e);
 				});
 		},
-		[addFlag, formValues, handleError, isEdit, isExternal, isNotDraft, navigate, params.groupSessionId]
+		[
+			addFlag,
+			formValues,
+			handleError,
+			isEdit,
+			isExternal,
+			isNotDraft,
+			loaderData?.isAdminRoute,
+			navigate,
+			params.groupSessionId,
+		]
 	);
 
 	useEffect(() => {
@@ -355,31 +408,38 @@ export const Component = () => {
 	}, [isPreview]);
 
 	useEffect(() => {
-		if (!debouncedSearchQuery) {
-			setFormValues((previousValues) => ({
-				...previousValues,
-				urlName: isEdit ? loaderData?.groupSession?.urlName ?? '' : '',
-			}));
+		if (!debouncedTitleQuery || urlNameSetByUser) {
 			return;
 		}
 
 		groupSessionsService
-			.validateUrlName(debouncedSearchQuery, isDuplicate ? undefined : params.groupSessionId)
+			.validateUrlName(debouncedTitleQuery, isDuplicate ? undefined : params.groupSessionId)
 			.fetch()
 			.then((response) => {
-				setUrlNameValidations((validations) => {
-					return {
-						...validations,
-						[debouncedSearchQuery]: response.groupSessionUrlNameValidationResult,
-					};
-				});
-
 				setFormValues((previousValues) => ({
 					...previousValues,
 					urlName: response.groupSessionUrlNameValidationResult.recommendation,
 				}));
 			});
-	}, [debouncedSearchQuery, isDuplicate, isEdit, loaderData?.groupSession?.urlName, params.groupSessionId]);
+	}, [debouncedTitleQuery, isDuplicate, params.groupSessionId, urlNameSetByUser]);
+
+	useEffect(() => {
+		if (!debouncedUrlNameQuery) {
+			return;
+		}
+
+		groupSessionsService
+			.validateUrlName(debouncedUrlNameQuery, isDuplicate ? undefined : params.groupSessionId)
+			.fetch()
+			.then((response) => {
+				setUrlNameValidations((validations) => {
+					return {
+						...validations,
+						[debouncedUrlNameQuery]: response.groupSessionUrlNameValidationResult,
+					};
+				});
+			});
+	}, [debouncedUrlNameQuery, isDuplicate, params.groupSessionId]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -489,7 +549,27 @@ export const Component = () => {
 					type="text"
 					label="Friendly URL"
 					name="urlName"
-					error={urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined}
+					error={
+						urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
+							<>
+								URL is in use. We suggest{' '}
+								<Button
+									size="sm"
+									variant="link"
+									className="p-0 d-inline-block"
+									onClick={() => {
+										updateFormValue(
+											'urlName',
+											urlNameValidations[debouncedUrlNameQuery].recommendation
+										);
+									}}
+								>
+									{urlNameValidations[debouncedUrlNameQuery].recommendation}
+								</Button>{' '}
+								instead.
+							</>
+						) : undefined
+					}
 					value={formValues.urlName}
 					disabled={!formValues.title || (isEdit && hasReservations)}
 					onChange={({ currentTarget }) => {
@@ -503,12 +583,12 @@ export const Component = () => {
 					}}
 				/>
 
-				{!formValues.title || urlNameValidations[debouncedSearchQuery]?.available === false ? null : (
+				{!formValues.title || urlNameValidations[debouncedUrlNameQuery]?.available === false ? null : (
 					<div className="d-flex mt-2">
 						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
 						<p className="mb-0">
 							URL will appear as https://{window.location.host}/group-sessions/
-							<span className="fw-bold">{urlNameValidations[debouncedSearchQuery]?.recommendation}</span>
+							<span className="fw-bold">{formValues.urlName}</span>
 						</p>
 					</div>
 				)}
@@ -517,7 +597,20 @@ export const Component = () => {
 			<hr />
 
 			<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
-				<ToggledInput label="Virtual" checked disabled hideChildren={isExternal}>
+				<ToggledInput
+					id="locationType-virtual"
+					label="Virtual"
+					checked={
+						isExternal ? true : formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL
+					}
+					disabled={isExternal}
+					hideChildren={
+						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON
+					}
+					onChange={({ currentTarget }) => {
+						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
+					}}
+				>
 					<InputHelper
 						className="mb-2"
 						type="text"
@@ -534,6 +627,30 @@ export const Component = () => {
 						Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
 					</p>
 				</ToggledInput>
+
+				{!isExternal && (
+					<ToggledInput
+						id="locationType-inPerson"
+						className="mt-3"
+						label="In person"
+						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
+						onChange={({ currentTarget }) => {
+							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.IN_PERSON);
+						}}
+						checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
+					>
+						<InputHelper
+							type="text"
+							label="Location"
+							name="inPersonLocation"
+							required
+							value={formValues.inPersonLocation}
+							onChange={({ currentTarget }) => {
+								updateFormValue('inPersonLocation', currentTarget.value);
+							}}
+						/>
+					</ToggledInput>
+				)}
 			</GroupSessionFormSection>
 
 			<hr />
@@ -1214,21 +1331,31 @@ export const Component = () => {
 							type={isPreview || isNotDraft ? 'button' : 'submit'}
 							value="exit"
 							onClick={() => {
-								if (isPreview) {
-									navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-								} else if (isNotDraft) {
-									navigate(`/admin/group-sessions`);
+								if (loaderData.isAdminRoute) {
+									if (isPreview) {
+										navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
+									} else if (isNotDraft) {
+										navigate(`/admin/group-sessions`);
+									}
+								} else {
+									navigate('/group-sessions');
 								}
 							}}
 						>
-							{isPreview ? (
+							{loaderData.isAdminRoute ? (
 								<>
-									<LeftChevron /> Back to Edit
+									{isPreview ? (
+										<>
+											<LeftChevron /> Back to Edit
+										</>
+									) : isNotDraft ? (
+										'Exit Editor'
+									) : (
+										'Save & Exit'
+									)}
 								</>
-							) : isNotDraft ? (
-								'Exit Editor'
 							) : (
-								'Save & Exit'
+								'Exit'
 							)}
 						</Button>
 
@@ -1246,12 +1373,18 @@ export const Component = () => {
 							setShowConfirmPublishDialog(true);
 						}}
 					>
-						{isPreview ? (
-							'Publish'
-						) : (
+						{loaderData.isAdminRoute ? (
 							<>
-								{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+								{isPreview ? (
+									'Publish'
+								) : (
+									<>
+										{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+									</>
+								)}
 							</>
+						) : (
+							'Submit'
 						)}
 					</Button>
 				</div>
@@ -1609,6 +1742,9 @@ function prepareGroupSessionSubmission(
 	).format(DateFormats.API.DateTime);
 
 	if (isExternal) {
+		groupSessionSubmission.groupSessionLocationTypeId = GroupSessionLocationTypeId.VIRTUAL;
+		delete groupSessionSubmission.videoconferenceUrl;
+		delete groupSessionSubmission.inPersonLocation;
 		delete groupSessionSubmission.screeningFlowId;
 		delete groupSessionSubmission.confirmationEmailContent;
 		delete groupSessionSubmission.sendReminderEmail;
@@ -1665,6 +1801,12 @@ function prepareGroupSessionSubmission(
 
 	if (!groupSessionSubmission.imageUrl) {
 		delete groupSessionSubmission.imageUrl;
+	}
+
+	if (groupSessionSubmission.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL) {
+		delete groupSessionSubmission.inPersonLocation;
+	} else if (groupSessionSubmission.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON) {
+		delete groupSessionSubmission.videoconferenceUrl;
 	}
 
 	return {
