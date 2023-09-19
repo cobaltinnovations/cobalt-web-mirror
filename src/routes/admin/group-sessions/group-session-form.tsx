@@ -289,7 +289,8 @@ export const Component = () => {
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showConfirmCancelDialog, setShowConfirmCancelDialog] = useState(false);
 	const [urlNameSetByUser, setUrlNameSetByUser] = useState(!isDuplicate && !!loaderData?.groupSession?.urlName);
-	const [debouncedSearchQuery] = useDebouncedState(urlNameSetByUser ? formValues.urlName : formValues.title);
+	const [debouncedTitleQuery] = useDebouncedState(formValues.title);
+	const [debouncedUrlNameQuery] = useDebouncedState(formValues.urlName);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, GroupSessionUrlNameValidationResult>>(
 		{}
 	);
@@ -317,7 +318,7 @@ export const Component = () => {
 		});
 	}, [hasReservations, params.groupSessionId]);
 
-	const updateFormValue = useCallback((key: keyof typeof formValues, value: typeof formValues[typeof key]) => {
+	const updateFormValue = useCallback((key: keyof typeof formValues, value: (typeof formValues)[typeof key]) => {
 		setIsDirty(true);
 		setFormValues((currentValues) => {
 			return {
@@ -407,31 +408,38 @@ export const Component = () => {
 	}, [isPreview]);
 
 	useEffect(() => {
-		if (!debouncedSearchQuery) {
-			setFormValues((previousValues) => ({
-				...previousValues,
-				urlName: isEdit ? loaderData?.groupSession?.urlName ?? '' : '',
-			}));
+		if (!debouncedTitleQuery || urlNameSetByUser) {
 			return;
 		}
 
 		groupSessionsService
-			.validateUrlName(debouncedSearchQuery, isDuplicate ? undefined : params.groupSessionId)
+			.validateUrlName(debouncedTitleQuery, isDuplicate ? undefined : params.groupSessionId)
 			.fetch()
 			.then((response) => {
-				setUrlNameValidations((validations) => {
-					return {
-						...validations,
-						[debouncedSearchQuery]: response.groupSessionUrlNameValidationResult,
-					};
-				});
-
 				setFormValues((previousValues) => ({
 					...previousValues,
 					urlName: response.groupSessionUrlNameValidationResult.recommendation,
 				}));
 			});
-	}, [debouncedSearchQuery, isDuplicate, isEdit, loaderData?.groupSession?.urlName, params.groupSessionId]);
+	}, [debouncedTitleQuery, isDuplicate, params.groupSessionId, urlNameSetByUser]);
+
+	useEffect(() => {
+		if (!debouncedUrlNameQuery) {
+			return;
+		}
+
+		groupSessionsService
+			.validateUrlName(debouncedUrlNameQuery, isDuplicate ? undefined : params.groupSessionId)
+			.fetch()
+			.then((response) => {
+				setUrlNameValidations((validations) => {
+					return {
+						...validations,
+						[debouncedUrlNameQuery]: response.groupSessionUrlNameValidationResult,
+					};
+				});
+			});
+	}, [debouncedUrlNameQuery, isDuplicate, params.groupSessionId]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -541,7 +549,27 @@ export const Component = () => {
 					type="text"
 					label="Friendly URL"
 					name="urlName"
-					error={urlNameValidations[debouncedSearchQuery]?.available === false ? 'URL is in use' : undefined}
+					error={
+						urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
+							<>
+								URL is in use. We suggest{' '}
+								<Button
+									size="sm"
+									variant="link"
+									className="p-0 d-inline-block"
+									onClick={() => {
+										updateFormValue(
+											'urlName',
+											urlNameValidations[debouncedUrlNameQuery].recommendation
+										);
+									}}
+								>
+									{urlNameValidations[debouncedUrlNameQuery].recommendation}
+								</Button>{' '}
+								instead.
+							</>
+						) : undefined
+					}
 					value={formValues.urlName}
 					disabled={!formValues.title || (isEdit && hasReservations)}
 					onChange={({ currentTarget }) => {
@@ -555,12 +583,12 @@ export const Component = () => {
 					}}
 				/>
 
-				{!formValues.title || urlNameValidations[debouncedSearchQuery]?.available === false ? null : (
+				{!formValues.title || urlNameValidations[debouncedUrlNameQuery]?.available === false ? null : (
 					<div className="d-flex mt-2">
 						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
 						<p className="mb-0">
 							URL will appear as https://{window.location.host}/group-sessions/
-							<span className="fw-bold">{urlNameValidations[debouncedSearchQuery]?.recommendation}</span>
+							<span className="fw-bold">{formValues.urlName}</span>
 						</p>
 					</div>
 				)}
