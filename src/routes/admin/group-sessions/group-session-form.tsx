@@ -596,39 +596,41 @@ export const Component = () => {
 
 			<hr />
 
-			<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
-				<ToggledInput
-					id="locationType-virtual"
-					label="Virtual"
-					checked={
-						isExternal ? true : formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL
-					}
-					disabled={isExternal}
-					hideChildren={
-						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON
-					}
-					onChange={({ currentTarget }) => {
-						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
-					}}
+			{isExternal ? (
+				<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
+					<ToggledInput id="locationType-virtual" label="Virtual" checked disabled hideChildren />
+				</GroupSessionFormSection>
+			) : (
+				<GroupSessionFormSection
+					title="Location"
+					description='Select "Online" to host your event virtually through a video conferencing platform or "In person" for an event at a physical venue.'
 				>
-					<InputHelper
-						className="mb-2"
-						type="text"
-						label="Video Link URL (Bluejeans/Zoom, etc.)"
-						name="videoconferenceUrl"
-						required
-						disabled={isEdit && hasReservations}
-						value={formValues.videoconferenceUrl}
+					<ToggledInput
+						id="locationType-virtual"
+						label="Online"
+						checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
+						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
 						onChange={({ currentTarget }) => {
-							updateFormValue('videoconferenceUrl', currentTarget.value);
+							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
 						}}
-					/>
-					<p className="mb-0 text-muted">
-						Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
-					</p>
-				</ToggledInput>
+					>
+						<InputHelper
+							className="mb-2"
+							type="text"
+							label="Video Link URL (Bluejeans/Zoom, etc.)"
+							name="videoconferenceUrl"
+							required
+							disabled={isEdit && hasReservations}
+							value={formValues.videoconferenceUrl}
+							onChange={({ currentTarget }) => {
+								updateFormValue('videoconferenceUrl', currentTarget.value);
+							}}
+						/>
+						<p className="mb-0 text-muted">
+							Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
+						</p>
+					</ToggledInput>
 
-				{!isExternal && (
 					<ToggledInput
 						id="locationType-inPerson"
 						className="mt-3"
@@ -650,8 +652,8 @@ export const Component = () => {
 							}}
 						/>
 					</ToggledInput>
-				)}
-			</GroupSessionFormSection>
+				</GroupSessionFormSection>
+			)}
 
 			<hr />
 

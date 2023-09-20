@@ -165,7 +165,7 @@ const GroupSessionsOg = () => {
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<p className="mb-6 fs-large text-center">
-					Virtual sessions led by experts and designed to foster connection and provide support for people
+					Sessions led by experts and designed to foster connection and provide support for people
 					experiencing similar issues or concerns. Topics range from managing anxiety to healthy living and
 					mindfulness.
 				</p>
