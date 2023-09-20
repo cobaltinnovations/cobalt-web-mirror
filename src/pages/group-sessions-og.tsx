@@ -146,15 +146,17 @@ const GroupSessionsOg = () => {
 					setShowSelectGroupSessionTypeModal(false);
 				}}
 				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
-					if (groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL) {
-						navigate('/group-sessions/add-external');
-					} else {
-						navigate(`/group-sessions/add-internal`, {
-							state: {
-								groupSessionLocationTypeId,
-							},
-						});
-					}
+					const destination = `/group-sessions/create/${
+						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
+							? 'add-external'
+							: 'add-internal'
+					}`;
+
+					navigate(destination, {
+						state: {
+							groupSessionLocationTypeId,
+						},
+					});
 				}}
 			/>
 

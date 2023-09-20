@@ -165,15 +165,17 @@ export const Component = () => {
 					setShowAddGroupSessionModal(false);
 				}}
 				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
-					if (groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL) {
-						navigate('/admin/group-sessions/add-external');
-					} else {
-						navigate('/admin/group-sessions/add-internal', {
-							state: {
-								groupSessionLocationTypeId,
-							},
-						});
-					}
+					const destination = `/admin/group-sessions/${
+						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
+							? 'add-external'
+							: 'add-internal'
+					}`;
+
+					navigate(destination, {
+						state: {
+							groupSessionLocationTypeId,
+						},
+					});
 				}}
 			/>
 

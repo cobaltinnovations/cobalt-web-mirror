@@ -1,10 +1,9 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 import { GroupSessionLocationTypeId } from '@/lib/models';
-import InputHelper from './input-helper';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -15,7 +14,7 @@ const useStyles = createUseStyles({
 interface Props extends ModalProps {
 	onContinue(options: {
 		groupSessionLocationTypeId: GroupSessionLocationTypeId;
-		groupSessionSchedulingSystemId?: GroupSessionSchedulingSystemId;
+		groupSessionSchedulingSystemId: GroupSessionSchedulingSystemId;
 	}): void;
 }
 
@@ -23,20 +22,14 @@ const SelectGroupSessionTypeModal: FC<Props> = ({ onContinue, ...props }) => {
 	const classes = useStyles();
 	const [groupSessionLocationTypeId, setGroupSessionLocationTypeId] = useState<GroupSessionLocationTypeId>();
 	const [groupSessionSchedulingSystemId, setGroupSessionSchedulingSystemId] =
-		useState<GroupSessionSchedulingSystemId>();
+		useState<GroupSessionSchedulingSystemId>(GroupSessionSchedulingSystemId.COBALT);
 
 	const handleOnEnter = useCallback(() => {
 		setGroupSessionLocationTypeId(undefined);
+		setGroupSessionSchedulingSystemId(GroupSessionSchedulingSystemId.COBALT);
 	}, []);
 
-	useEffect(() => {
-		if (groupSessionLocationTypeId) {
-			setGroupSessionSchedulingSystemId(undefined);
-		}
-	}, [groupSessionLocationTypeId]);
-
-	const canContinue =
-		groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON || !!groupSessionSchedulingSystemId;
+	const canContinue = !!groupSessionLocationTypeId && !!groupSessionSchedulingSystemId;
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -44,46 +37,62 @@ const SelectGroupSessionTypeModal: FC<Props> = ({ onContinue, ...props }) => {
 				<Modal.Title>Add Group Session</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<Form.Label className="mb-1">Which type of session would you like to add?</Form.Label>
-				<Form.Check
-					type="radio"
-					name="group-session-location-type"
-					id={`group-session-location-type${GroupSessionLocationTypeId.IN_PERSON}`}
-					label="In-person"
-					value={GroupSessionLocationTypeId.IN_PERSON}
-					checked={GroupSessionLocationTypeId.IN_PERSON === groupSessionLocationTypeId}
-					onChange={() => {
-						setGroupSessionLocationTypeId(GroupSessionLocationTypeId.IN_PERSON);
-					}}
-				/>
+				<Form.Label className="mb-1">What type of session would you like to add?</Form.Label>
 				<Form.Check
 					type="radio"
 					name="group-session-location-type"
 					id={`group-session-location-type${GroupSessionLocationTypeId.VIRTUAL}`}
 					label="Online"
 					value={GroupSessionLocationTypeId.VIRTUAL}
-					checked={GroupSessionLocationTypeId.VIRTUAL === groupSessionLocationTypeId}
+					checked={groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
 					onChange={() => {
 						setGroupSessionLocationTypeId(GroupSessionLocationTypeId.VIRTUAL);
 					}}
 				/>
-				{groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL && (
-					<InputHelper
-						as="select"
-						className="ms-8 mt-2"
-						label="Select scheduling platform"
-						required
-						value={groupSessionSchedulingSystemId ?? ''}
-						onChange={({ currentTarget }) => {
-							setGroupSessionSchedulingSystemId(currentTarget.value as GroupSessionSchedulingSystemId);
-						}}
-					>
-						<option value="" disabled>
-							Select scheduling platform
-						</option>
-						<option value={GroupSessionSchedulingSystemId.COBALT}>Cobalt</option>
-						<option value={GroupSessionSchedulingSystemId.EXTERNAL}>External</option>
-					</InputHelper>
+				<Form.Check
+					type="radio"
+					name="group-session-location-type"
+					id={`group-session-location-type${GroupSessionLocationTypeId.IN_PERSON}`}
+					label="In-person"
+					value={GroupSessionLocationTypeId.IN_PERSON}
+					checked={groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
+					onChange={() => {
+						setGroupSessionLocationTypeId(GroupSessionLocationTypeId.IN_PERSON);
+					}}
+				/>
+
+				{groupSessionLocationTypeId && (
+					<>
+						<hr className="my-4" />
+
+						<Form.Label className="mb-1">Where will people register for the session?</Form.Label>
+						<Form.Check
+							type="radio"
+							name="group-session-scheduling-system"
+							id={`group-session-scheduling-system${GroupSessionSchedulingSystemId.COBALT}`}
+							label={
+								<>
+									On Cobalt <span className="text-muted">(recommended)</span>
+								</>
+							}
+							value={GroupSessionSchedulingSystemId.COBALT}
+							checked={groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.COBALT}
+							onChange={() => {
+								setGroupSessionSchedulingSystemId(GroupSessionSchedulingSystemId.COBALT);
+							}}
+						/>
+						<Form.Check
+							type="radio"
+							name="group-session-scheduling-system"
+							id={`group-session-scheduling-system${GroupSessionSchedulingSystemId.EXTERNAL}`}
+							label="Through a different website"
+							value={GroupSessionSchedulingSystemId.EXTERNAL}
+							checked={groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL}
+							onChange={() => {
+								setGroupSessionSchedulingSystemId(GroupSessionSchedulingSystemId.EXTERNAL);
+							}}
+						/>
+					</>
 				)}
 			</Modal.Body>
 			<Modal.Footer className="text-right">
@@ -92,14 +101,14 @@ const SelectGroupSessionTypeModal: FC<Props> = ({ onContinue, ...props }) => {
 				</Button>
 				<Button
 					variant="primary"
+					disabled={!canContinue}
 					onClick={() => {
-						if (!canContinue || !groupSessionLocationTypeId) {
-							return;
+						if (!canContinue) {
+							throw new Error('Unable to Continue. Button should be disabled');
 						}
 
 						onContinue({ groupSessionSchedulingSystemId, groupSessionLocationTypeId });
 					}}
-					disabled={!canContinue}
 				>
 					Continue
 				</Button>
