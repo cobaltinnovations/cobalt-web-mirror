@@ -609,7 +609,6 @@ export const Component = () => {
 						id="locationType-virtual"
 						label="Online"
 						checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
-						disabled={isExternal}
 						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
 						onChange={({ currentTarget }) => {
 							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
