@@ -11,7 +11,7 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
@@ -84,7 +84,6 @@ export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redir
 export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
 export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
 // export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
-export const ProviderDetail = lazyLoadWithRefresh(() => import('@/pages/provider-detail'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
 export const CreateOnYourTimeContent = lazyLoadWithRefresh(
@@ -207,54 +206,14 @@ const RedirectToGroupSessionDetail = () => {
 	return <Navigate to="/group-sessions" replace />;
 };
 
-const SupportEnabledRoutes = () => {
-	const { institution } = useAccount();
+const ToggledOutlet = ({ isEnabled }: { isEnabled: (accountContext: ReturnType<typeof useAccount>) => boolean }) => {
+	const accountContext = useAccount();
 
-	return institution.supportEnabled ? <Outlet /> : <NoMatch />;
-};
+	const canPassthrough = useMemo(() => {
+		return isEnabled(accountContext);
+	}, [accountContext, isEnabled]);
 
-const EpicFHIREnabledRoutes = () => {
-	const { institution } = useAccount();
-
-	return institution.epicFhirEnabled ? <Outlet /> : <NoMatch />;
-};
-
-const IntegratedCareEnabledRoutes = () => {
-	const { institution } = useAccount();
-
-	return institution?.integratedCareEnabled ? <Outlet /> : <NoMatch />;
-};
-
-const AdminOnlyRoutes = () => {
-	const { account } = useAccount();
-
-	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Outlet /> : <NoMatch />;
-};
-
-const ProviderOnlyRoutes = () => {
-	const { account } = useAccount();
-
-	return account?.roleId === ROLE_ID.PROVIDER ? <Outlet /> : <NoMatch />;
-};
-
-const ContactUsEnabledRoutes = () => {
-	const { institution } = useAccount();
-
-	return institution?.contactUsEnabled ? <Outlet /> : <NoMatch />;
-};
-
-const DebugEnabledRoutes = () => {
-	return config.COBALT_WEB_SHOW_DEBUG === 'true' ? <Outlet /> : <NoMatch />;
-};
-
-const InstitutionResourcesEnabled = () => {
-	const { institution } = useAccount();
-
-	return institution.features.findIndex((feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES) > -1 ? (
-		<Outlet />
-	) : (
-		<NoMatch />
-	);
+	return canPassthrough ? <Outlet /> : <NoMatch />;
 };
 
 export const routes: RouteObject[] = [
@@ -295,13 +254,6 @@ export const routes: RouteObject[] = [
 						path: 'sign-in/email',
 						element: <SignInEmail />,
 					},
-				],
-			},
-
-			{
-				element: <AppDefaultLayout hideHeaderButtons />,
-				loader: requireAuthLoader,
-				children: [
 					{
 						path: 'onboarding',
 						element: <Onboarding />,
@@ -400,7 +352,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <SupportEnabledRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return institution.supportEnabled;
+								}}
+							/>
+						),
 						children: [
 							{
 								path: 'intake-assessment',
@@ -425,7 +383,13 @@ export const routes: RouteObject[] = [
 								element: <ConnectWithSupportMedicationPrescriber />,
 							},
 							{
-								element: <EpicFHIREnabledRoutes />,
+								element: (
+									<ToggledOutlet
+										isEnabled={({ institution }) => {
+											return institution?.epicFhirEnabled;
+										}}
+									/>
+								),
 								children: [
 									{
 										path: 'connect-with-support/mental-health-providers',
@@ -453,7 +417,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <ProviderOnlyRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ account }) => {
+									return account?.roleId === ROLE_ID.PROVIDER;
+								}}
+							/>
+						),
 						handle: {
 							hideFooter: true,
 						} as RouteHandle,
@@ -500,7 +470,13 @@ export const routes: RouteObject[] = [
 					},
 
 					{
-						element: <ContactUsEnabledRoutes />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return institution.contactUsEnabled;
+								}}
+							/>
+						),
 						children: [
 							{
 								path: 'feedback',
@@ -530,26 +506,66 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'group-sessions',
-						element: <GroupSessionsOg />,
-					},
-					{
-						path: 'group-sessions/request',
-						element: <GroupSessionsRequest />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request/create',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
-					},
-					{
-						// legacy/backwards compatibility
-						path: 'group-sessions/by-request/:groupSessionId/edit',
-						element: <RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />,
+						element: <Outlet />,
+						children: [
+							{
+								index: true,
+								element: <GroupSessionsOg />,
+							},
+							{
+								path: 'create/:action?/:groupSessionId?',
+								element: (
+									<ToggledOutlet
+										isEnabled={({ institution }) => {
+											return institution?.userSubmittedGroupSessionEnabled;
+										}}
+									/>
+								),
+								children: [
+									{
+										id: 'group-session-form',
+										index: true,
+										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+										handle: {
+											hideFooter: true,
+										} as RouteHandle,
+									},
+								],
+							},
+							{
+								path: 'request',
+								element: <GroupSessionsRequest />,
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request/create',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								// legacy/backwards compatibility
+								path: 'by-request/:groupSessionId/edit',
+								element: (
+									<RedirectToAdminPathOrRender pathname="group-sessions" element={<NoMatch />} />
+								),
+							},
+							{
+								path: 'collection/:groupSessionCollectionId',
+								lazy: () => import('@/routes/group-session-collection-detail'),
+							},
+							{
+								path: ':groupSessionIdOrUrlName',
+								lazy: () => import('@/routes/group-session-detail'),
+							},
+						],
 					},
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/ical',
@@ -558,14 +574,6 @@ export const routes: RouteObject[] = [
 					{
 						path: 'group-session-reservations/:groupSessionReservationId/google-calendar',
 						element: <RedirectToBackend />,
-					},
-					{
-						path: 'group-sessions/collection/:groupSessionCollectionId',
-						lazy: () => import('@/routes/group-session-collection-detail'),
-					},
-					{
-						path: 'group-sessions/:groupSessionIdOrUrlName',
-						lazy: () => import('@/routes/group-session-detail'),
 					},
 					{
 						path: 'appointments/:appointmentId/ical',
@@ -690,7 +698,17 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'institution-resources',
-						element: <InstitutionResourcesEnabled />,
+						element: (
+							<ToggledOutlet
+								isEnabled={({ institution }) => {
+									return (
+										institution.features.findIndex(
+											(feature) => feature.featureId === FeatureId.INSTITUTION_RESOURCES
+										) > -1
+									);
+								}}
+							/>
+						),
 						children: [
 							{
 								id: 'institution-resource-groups',
@@ -712,7 +730,13 @@ export const routes: RouteObject[] = [
 				],
 			},
 			{
-				element: <AdminOnlyRoutes />,
+				element: (
+					<ToggledOutlet
+						isEnabled={({ account }) => {
+							return account?.roleId === ROLE_ID.ADMINISTRATOR;
+						}}
+					/>
+				),
 				errorElement: <AppErrorDefaultLayout />,
 				loader: requireAuthLoader,
 				children: [
@@ -785,7 +809,7 @@ export const routes: RouteObject[] = [
 							{
 								id: 'admin-debug',
 								path: 'debug',
-								element: <DebugEnabledRoutes />,
+								element: <ToggledOutlet isEnabled={() => config.COBALT_WEB_SHOW_DEBUG === 'true'} />,
 								children: [
 									{
 										index: true,
@@ -808,7 +832,13 @@ export const routes: RouteObject[] = [
 				],
 			},
 			{
-				element: <IntegratedCareEnabledRoutes />,
+				element: (
+					<ToggledOutlet
+						isEnabled={({ institution }) => {
+							return institution.integratedCareEnabled;
+						}}
+					/>
+				),
 				errorElement: <AppErrorDefaultLayout />,
 				loader: requireAuthLoader,
 				children: [

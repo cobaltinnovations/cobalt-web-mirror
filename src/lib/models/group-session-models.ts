@@ -16,6 +16,11 @@ export enum GroupSessionLearnMoreMethodId {
 	PHONE = 'PHONE',
 }
 
+export enum GroupSessionLocationTypeId {
+	VIRTUAL = 'VIRTUAL',
+	IN_PERSON = 'IN_PERSON',
+}
+
 export enum GROUP_SESSION_SORT_ORDER {
 	START_TIME_DESCENDING = 'START_TIME_DESCENDING',
 	START_TIME_ASCENDING = 'START_TIME_ASCENDING',
@@ -73,8 +78,8 @@ export interface GroupSessionModel {
 	institutionId: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
-	screeningQuestions: string[];
-	screeningQuestionsV2: ScreeningQuestionV2[];
+	screeningQuestions?: string[];
+	screeningQuestionsV2?: ScreeningQuestionV2[];
 	seats: number;
 	seatsAvailable: number;
 	seatsAvailableDescription: string;
@@ -94,11 +99,11 @@ export interface GroupSessionModel {
 	endDateTime: string;
 	endDateTimeDescription: string;
 	submitterAccountId: string;
-	submitterEmailAddress: string;
-	submitterName: string;
+	submitterEmailAddress?: string;
+	submitterName?: string;
 	tags: Tag[];
 	differentEmailAddressForNotifications: boolean;
-	targetEmailAddress: string;
+	targetEmailAddress?: string;
 	timeZone: string;
 	title: string;
 	urlName: string;
@@ -108,10 +113,12 @@ export interface GroupSessionModel {
 	followupEmailSurveyUrl?: string;
 	assessmentId?: string;
 	facilitatorAccountId?: string;
-	scheduleUrl: string;
-	imageUrl: string;
-	videoconferenceUrl: string;
-	confirmationEmailContent: string;
+	scheduleUrl?: string;
+	imageUrl?: string;
+	groupSessionLocationTypeId: GroupSessionLocationTypeId;
+	videoconferenceUrl?: string;
+	inPersonLocation?: string;
+	confirmationEmailContent?: string;
 
 	followupDayOffset?: string;
 	followupTimeOfDay?: string;

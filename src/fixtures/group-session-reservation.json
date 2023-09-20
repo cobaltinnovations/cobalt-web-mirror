@@ -1,0 +1,12 @@
+{
+	"groupSessionReservationId": "group-session-reservation-fixture-id-1",
+	"groupSessionId": "group-session-fixture-id-1",
+	"accountId": "account-fixture-id-1",
+	"name": "Cobalt Admin",
+	"emailAddress": "test@email.com",
+	"canceled": false,
+	"created": "2023-09-13T20:21:09.550653Z",
+	"createdDescription": "September 13, 2023, 4:21 PM",
+	"lastUpdated": "2023-09-13T20:21:09.550653Z",
+	"lastUpdatedDescription": "September 13, 2023, 4:21 PM"
+}

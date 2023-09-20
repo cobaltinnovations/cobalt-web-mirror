@@ -50,7 +50,7 @@ export interface PaymentType {
 
 export interface AvailabilityTimeSlot {
 	appointmentParticipantStatusCodesByAppointmentTypeId?: Record<string, string>;
-	appointmentStatusCodesByAppointmentTypeId: Record<string, string>;
+	appointmentStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentTypeIds: string[];
 	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
@@ -75,23 +75,23 @@ export interface Clinic {
 export interface Provider {
 	fullyBooked: boolean;
 	providerId: string;
-	institutionId: string;
+	institutionId?: string;
 	schedulingSystemId: string;
 	epicProviderId?: string;
 	epicProviderIdType?: string;
 	name: string;
-	title: string;
-	entity: string;
-	clinic: string;
-	license: string;
-	specialty: string;
+	title?: string;
+	entity?: string;
+	clinic?: string;
+	license?: string;
+	specialty?: string;
 	imageUrl: string;
-	isDefaultImageUrl: boolean;
-	timeZone: string;
-	locale: string;
-	tags: string[];
+	isDefaultImageUrl?: boolean;
+	timeZone?: string;
+	locale?: string;
+	tags?: string[];
 	times: AvailabilityTimeSlot[];
-	supportRoles: SupportRole[];
+	supportRoles?: SupportRole[];
 	appointmentTypeIds: string[];
 	supportRolesDescription: string;
 	phoneNumber?: string;
@@ -100,7 +100,7 @@ export interface Provider {
 	paymentFundingDescriptions?: string[];
 	intakeAssessmentIneligible?: boolean;
 	intakeAssessmentRequired: boolean;
-	skipIntakePrompt: boolean;
+	skipIntakePrompt?: boolean;
 	treatmentDescription?: string;
 	emailAddress?: string;
 	bio?: string;

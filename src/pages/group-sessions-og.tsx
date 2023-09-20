@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
-import { groupSessionsService } from '@/lib/services';
+import { GroupSessionSchedulingSystemId, groupSessionsService } from '@/lib/services';
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER, GroupSessionModel } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
@@ -14,9 +14,12 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Helmet } from 'react-helmet';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 import NoData from '@/components/no-data';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
 
 const GroupSessionsOg = () => {
 	const handleError = useHandleError();
+	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
@@ -28,6 +31,7 @@ const GroupSessionsOg = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [isFirstLoad, setIsFirstLoad] = useState(true);
+	const [showSelectGroupSessionTypeModal, setShowSelectGroupSessionTypeModal] = useState(false);
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
 	const { institution } = useAccount();
 	const { renderedCollectPhoneModal, didCheckScreeningSessions } = useScreeningFlow({
@@ -136,6 +140,26 @@ const GroupSessionsOg = () => {
 
 	return (
 		<>
+			<SelectGroupSessionTypeModal
+				show={showSelectGroupSessionTypeModal}
+				onHide={() => {
+					setShowSelectGroupSessionTypeModal(false);
+				}}
+				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
+					const destination = `/group-sessions/create/${
+						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
+							? 'add-external'
+							: 'add-internal'
+					}`;
+
+					navigate(destination, {
+						state: {
+							groupSessionLocationTypeId,
+						},
+					});
+				}}
+			/>
+
 			<Helmet>
 				<title>Cobalt | Group Sessions</title>
 			</Helmet>
@@ -143,7 +167,7 @@ const GroupSessionsOg = () => {
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Group Sessions</h1>
 				<p className="mb-6 fs-large text-center">
-					Virtual sessions led by experts and designed to foster connection and provide support for people
+					Sessions led by experts and designed to foster connection and provide support for people
 					experiencing similar issues or concerns. Topics range from managing anxiety to healthy living and
 					mindfulness.
 				</p>
@@ -167,7 +191,7 @@ const GroupSessionsOg = () => {
 					</Col>
 				</Row>
 				{!isLoading && groupSessions.length <= 0 && (
-					<Row className="mb-2">
+					<Row className="mb-6">
 						<Col>
 							<div className="text-center mb-0">
 								{groupSessionSearchQuery ? (
@@ -247,21 +271,38 @@ const GroupSessionsOg = () => {
 					</Row>
 				)}
 				<Row>
-					<Col>
-						<div className="text-center">
-							{isLoading ? (
-								<Loader className="position-static d-inline-flex" />
-							) : (
-								<>
-									{!isViewingAll && groupSessions.length >= 9 && (
-										<Button onClick={handleViewAllButtonClick} disabled={isLoading}>
-											View All
-										</Button>
-									)}
-								</>
+					{isLoading ? (
+						<Col>
+							<Loader className="position-static d-inline-flex" />
+						</Col>
+					) : (
+						<>
+							<Col xs={12} lg={4} />
+
+							<Col xs={12} lg={4} className="text-center">
+								{!isViewingAll && groupSessions.length >= 9 && (
+									<Button onClick={handleViewAllButtonClick} disabled={isLoading}>
+										View All
+									</Button>
+								)}
+							</Col>
+
+							{institution?.userSubmittedGroupSessionEnabled && (
+								<Col xs={12} lg={4} className="text-center mt-4 mt-lg-0 text-lg-end">
+									<Button
+										variant="light"
+										className=""
+										onClick={() => {
+											setShowSelectGroupSessionTypeModal(true);
+										}}
+									>
+										<PlusIcon className="text-primary me-2" height={24} width={24} /> Submit a
+										Session
+									</Button>
+								</Col>
 							)}
-						</div>
-					</Col>
+						</>
+					)}
 				</Row>
 			</Container>
 

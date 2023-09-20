@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import Button, { ButtonProps } from 'react-bootstrap/Button';
 import { LinkProps, useHref, useLinkClickHandler } from 'react-router-dom';
@@ -14,6 +15,8 @@ export const ButtonLink = React.forwardRef<HTMLButtonElement, ButtonLinkProps>(
 		return (
 			<Button
 				{...props}
+				className={classNames('text-decoration-none', props.className)}
+				variant={props.variant ?? 'link'}
 				href={href}
 				onClick={(event) => {
 					onClick?.(event);

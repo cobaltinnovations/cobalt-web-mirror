@@ -21,13 +21,13 @@ import {
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
-	AdminAddGroupSessionModal,
 	AdminGroupSessionFilterScheduling,
 	AdminGroupSessionFilterStatus,
 	GroupSessionTableDropdown,
 } from '@/components/admin';
 import { AdminGroupSessionSort } from '@/components/admin/admin-group-session-sort';
 import { AdminGroupSessionFilterVisibility } from '@/components/admin/admin-group-session-filter-visibility';
+import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -159,19 +159,23 @@ export const Component = () => {
 
 	return (
 		<>
-			<AdminAddGroupSessionModal
+			<SelectGroupSessionTypeModal
 				show={showAddGroupSessionModal}
 				onHide={() => {
 					setShowAddGroupSessionModal(false);
 				}}
-				onContinue={(schedulingSystemId) => {
-					if (schedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL) {
-						navigate('/admin/group-sessions/add-external');
-					} else if (schedulingSystemId === GroupSessionSchedulingSystemId.COBALT) {
-						navigate('/admin/group-sessions/add-internal');
-					} else {
-						throw new Error(`Invalid scheduling system ID: ${schedulingSystemId}`);
-					}
+				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
+					const destination = `/admin/group-sessions/${
+						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
+							? 'add-external'
+							: 'add-internal'
+					}`;
+
+					navigate(destination, {
+						state: {
+							groupSessionLocationTypeId,
+						},
+					});
 				}}
 			/>
 

@@ -1,0 +1,26 @@
+{
+	"contentId": "content-id-1",
+	"title": "Card Title",
+	"author": "Card Author",
+	"description": "Card Description",
+	"tags": [
+		{
+			"description": "Tag 1 Description",
+			"name": "Tag 1",
+			"tagGroupId": "tag-group-id-1",
+			"tagId": "tag-id-1",
+			"urlName": "tag-1"
+		},
+		{
+			"description": "Tag 2 Description",
+			"name": "Tag 2",
+			"tagGroupId": "tag-group-id-1",
+			"tagId": "tag-id-2",
+			"urlName": "tag-2"
+		}
+	],
+	"contentTypeId": "ARTICLE",
+	"badgeTitle": "Badge Title",
+	"imageUrl": "https://picsum.photos/200/300",
+	"duration": "1h 30m"
+}
