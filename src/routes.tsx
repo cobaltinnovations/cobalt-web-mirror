@@ -542,6 +542,9 @@ export const routes: RouteObject[] = [
 										id: 'group-session-form',
 										index: true,
 										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+										handle: {
+											hideFooter: true,
+										} as RouteHandle,
 									},
 								],
 							},
