@@ -509,7 +509,9 @@ export const Component = () => {
 					navigationBlocker.reset?.();
 				}}
 				titleText={`Confirm Exit`}
-				bodyText={'You have changes that have not been saved or published, are your sure you want to exit?'}
+				bodyText={`You have changes that have not been ${
+					loaderData?.isAdminRoute ? 'saved or published' : 'submitted'
+				}, are your sure you want to exit?`}
 				dismissText="Cancel"
 				confirmText="Exit"
 				onConfirm={() => {
@@ -596,64 +598,62 @@ export const Component = () => {
 
 			<hr />
 
-			{isExternal ? (
-				<GroupSessionFormSection title="Location" description="Only virtual sessions are allowed at this time.">
-					<ToggledInput id="locationType-virtual" label="Virtual" checked disabled hideChildren />
-				</GroupSessionFormSection>
-			) : (
-				<GroupSessionFormSection
-					title="Location"
-					description='Select "Online" to host your event virtually through a video conferencing platform or "In person" for an event at a physical venue.'
+			<GroupSessionFormSection
+				title="Location"
+				description='Select "Online" to host your event virtually through a video conferencing platform or "In person" for an event at a physical venue.'
+			>
+				<ToggledInput
+					id="locationType-virtual"
+					label="Online"
+					checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
+					hideChildren={
+						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON
+					}
+					onChange={({ currentTarget }) => {
+						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
+					}}
 				>
-					<ToggledInput
-						id="locationType-virtual"
-						label="Online"
-						checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
-						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
+					<InputHelper
+						className="mb-2"
+						type="text"
+						label="Video Link URL (Bluejeans/Zoom, etc.)"
+						name="videoconferenceUrl"
+						required
+						disabled={isEdit && hasReservations}
+						value={formValues.videoconferenceUrl}
 						onChange={({ currentTarget }) => {
-							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
+							updateFormValue('videoconferenceUrl', currentTarget.value);
 						}}
-					>
-						<InputHelper
-							className="mb-2"
-							type="text"
-							label="Video Link URL (Bluejeans/Zoom, etc.)"
-							name="videoconferenceUrl"
-							required
-							disabled={isEdit && hasReservations}
-							value={formValues.videoconferenceUrl}
-							onChange={({ currentTarget }) => {
-								updateFormValue('videoconferenceUrl', currentTarget.value);
-							}}
-						/>
-						<p className="mb-0 text-muted">
-							Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
-						</p>
-					</ToggledInput>
+					/>
+					<p className="mb-0 text-muted">
+						Include the URL to the Bluejeans/Zoom/etc. address where the session will be hosted.
+					</p>
+				</ToggledInput>
 
-					<ToggledInput
-						id="locationType-inPerson"
-						className="mt-3"
-						label="In person"
-						hideChildren={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL}
+				<ToggledInput
+					id="locationType-inPerson"
+					className="mt-3"
+					label="In person"
+					hideChildren={
+						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL
+					}
+					onChange={({ currentTarget }) => {
+						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.IN_PERSON);
+					}}
+					checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
+				>
+					<InputHelper
+						type="text"
+						label="Location"
+						name="inPersonLocation"
+						required
+						value={formValues.inPersonLocation}
 						onChange={({ currentTarget }) => {
-							updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.IN_PERSON);
+							updateFormValue('inPersonLocation', currentTarget.value);
 						}}
-						checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}
-					>
-						<InputHelper
-							type="text"
-							label="Location"
-							name="inPersonLocation"
-							required
-							value={formValues.inPersonLocation}
-							onChange={({ currentTarget }) => {
-								updateFormValue('inPersonLocation', currentTarget.value);
-							}}
-						/>
-					</ToggledInput>
-				</GroupSessionFormSection>
-			)}
+					/>
+				</ToggledInput>
+			</GroupSessionFormSection>
 
 			<hr />
 

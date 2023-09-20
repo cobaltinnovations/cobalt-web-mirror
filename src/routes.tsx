@@ -535,7 +535,7 @@ export const routes: RouteObject[] = [
 								element: <GroupSessionsOg />,
 							},
 							{
-								path: ':action?/:groupSessionId?',
+								path: 'create/:action?/:groupSessionId?',
 								element: <UserSubmittedGroupSessionEnabled />,
 								children: [
 									{
