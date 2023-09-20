@@ -443,7 +443,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 	const wrappedMixpanel = useMemo(() => {
 		return {
-			track: (...args: Parameters<typeof mixpanel['track']>) => {
+			track: (...args: Parameters<(typeof mixpanel)['track']>) => {
 				try {
 					mixpanel.track(...args);
 				} catch (e) {

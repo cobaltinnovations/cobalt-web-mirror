@@ -1,0 +1,14 @@
+{
+	"message": "Message Text",
+	"messageAsHtml": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget nibh vitae sapien lacinia dignissim dignissim et nunc.</p>",
+	"actionLinks": [
+		{
+			"actionLinkTypeId": "EXTERNAL",
+			"link": "https://www.cobaltinnovations.org/",
+			"description": "External Link Description"
+		}
+	],
+	"modalButtonText": "Modal Button Text",
+	"modalMessage": "Modal Message Text",
+	"modalMessageAsHtml": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget nibh vitae sapien lacinia dignissim dignissim et nunc.</p>"
+}

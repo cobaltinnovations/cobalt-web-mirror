@@ -1,0 +1,59 @@
+{
+	"providerId": "provider-fixture-id-1",
+	"name": "Dr. Provider Fixture",
+	"supportRolesDescription": "Therapist",
+	"imageUrl": "http://via.placeholder.com/82x82",
+	"schedulingSystemId": "COBALT",
+	"paymentFundingDescriptions": [],
+	"fullyBooked": false,
+	"treatmentDescription": "* Treatment description fixture",
+	"intakeAssessmentRequired": false,
+	"intakeAssessmentIneligible": false,
+	"appointmentTypeIds": ["appointment-type-fixture-id-1"],
+	"times": [
+		{
+			"time": "09:00",
+			"timeDescription": "9:00 am",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "10:00",
+			"timeDescription": "10:00 am",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "11:00",
+			"timeDescription": "11:00 am",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "12:00",
+			"timeDescription": "12:00 pm",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "13:00",
+			"timeDescription": "1:00 pm",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "14:00",
+			"timeDescription": "2:00 pm",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		},
+		{
+			"time": "15:00",
+			"timeDescription": "3:00 pm",
+			"status": "AVAILABLE",
+			"appointmentTypeIds": ["appointment-type-fixture-id-1"]
+		}
+	],
+	"specialtyIds": [],
+	"displayPhoneNumberOnlyForBooking": false
+}
