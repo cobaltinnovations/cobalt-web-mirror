@@ -60,7 +60,7 @@ const SelectGroupSessionTypeModal: FC<Props> = ({ onContinue, ...props }) => {
 					type="radio"
 					name="group-session-location-type"
 					id={`group-session-location-type${GroupSessionLocationTypeId.VIRTUAL}`}
-					label="Virtual"
+					label="Online"
 					value={GroupSessionLocationTypeId.VIRTUAL}
 					checked={GroupSessionLocationTypeId.VIRTUAL === groupSessionLocationTypeId}
 					onChange={() => {
