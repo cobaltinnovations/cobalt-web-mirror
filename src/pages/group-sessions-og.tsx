@@ -146,7 +146,7 @@ const GroupSessionsOg = () => {
 					setShowSelectGroupSessionTypeModal(false);
 				}}
 				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
-					const destination = `/group-sessions/${
+					const destination = `/group-sessions/create/${
 						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
 							? 'add-external'
 							: 'add-internal'
