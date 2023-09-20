@@ -1,7 +1,12 @@
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles } from '@/jss/theme';
-import { GroupSessionLearnMoreMethodId, GroupSessionModel, GroupSessionReservationModel } from '@/lib/models';
+import {
+	GroupSessionLearnMoreMethodId,
+	GroupSessionLocationTypeId,
+	GroupSessionModel,
+	GroupSessionReservationModel,
+} from '@/lib/models';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 import React, { useCallback } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
@@ -15,6 +20,7 @@ import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg
 import { ReactComponent as ChairIcon } from '@/assets/icons/chair.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
+import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location.svg';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -223,13 +229,25 @@ const GroupSession = ({
 							)}
 							<Row className="mb-8">
 								<Col>
-									<div className="d-flex">
-										<DevicesIcon className="text-primary me-4" />
-										<div>
-											<p className="mb-1 fw-bold">Online Video Call</p>
-											<p className="mb-0">Attend this session virtually</p>
+									{groupSession.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL ? (
+										<div className="d-flex">
+											<DevicesIcon className="text-primary me-4" />
+											<div>
+												<p className="mb-1 fw-bold">Online Video Call</p>
+												<p className="mb-0">Attend this session virtually</p>
+											</div>
 										</div>
-									</div>
+									) : (
+										<div className="d-flex">
+											<LocationIcon className="text-primary me-4" />
+											<div>
+												<p className="mb-0 fw-bold">In person</p>
+												{groupSession.inPersonLocation && (
+													<p className="mt-1 mb-0">{groupSession.inPersonLocation}</p>
+												)}
+											</div>
+										</div>
+									)}
 								</Col>
 							</Row>
 							<Row>
