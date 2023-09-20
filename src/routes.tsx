@@ -385,7 +385,7 @@ export const routes: RouteObject[] = [
 								element: (
 									<ToggledOutlet
 										isEnabled={({ institution }) => {
-											return institution.epicFhirEnabled;
+											return institution?.epicFhirEnabled;
 										}}
 									/>
 								),
