@@ -546,68 +546,47 @@ const CreateOnYourTimeContent: FC = () => {
 																<Col>
 																	<div className="d-flex">
 																		<CircleIndicator>6</CircleIndicator>
-																		{values.contentTypeId ===
-																		ContentTypeId.InternalBlog ? (
-																			<div className="d-flex flex-column ms-6 flex-fill">
-																				<Form.Label
-																					className="mb-2"
-																					style={{ ...theme.fonts.default }}
-																				>
-																					Post Content{' '}
-																					{requiredFields.description && (
-																						<span>*</span>
-																					)}
-																				</Form.Label>
-																				<Field name="description">
-																					{({ field, meta }: FieldProps) => {
-																						return (
-																							<Wysiwyg
-																								readOnly={
-																									shouldDisabledInputs
-																								}
-																								initialValue={
-																									meta.initialValue
-																								}
-																								onChange={field.onChange(
-																									field.name
-																								)}
-																							/>
-																						);
-																					}}
-																				</Field>
 
-																				{touched.description &&
-																					errors.description && (
-																						<p
-																							className="text-danger"
-																							style={{
-																								...theme.fonts.small,
-																							}}
-																						>
-																							description is a required
-																							field
-																						</p>
-																					)}
-																			</div>
-																		) : (
-																			<InputHelper
-																				className="ms-6 flex-fill"
-																				label="Description"
-																				name="description"
-																				value={values.description}
-																				as="textarea"
-																				onBlur={handleBlur}
-																				onChange={handleChange}
-																				required={requiredFields.description}
-																				error={
-																					touched.description &&
-																					errors.description
-																						? errors.description
-																						: ''
-																				}
-																				disabled={shouldDisabledInputs}
-																			/>
-																		)}
+																		<div className="d-flex flex-column ms-6 flex-fill">
+																			<Form.Label
+																				className="mb-2"
+																				style={{ ...theme.fonts.default }}
+																			>
+																				Post Content{' '}
+																				{requiredFields.description && (
+																					<span>*</span>
+																				)}
+																			</Form.Label>
+																			<Field name="description">
+																				{({ field, meta }: FieldProps) => {
+																					return (
+																						<Wysiwyg
+																							readOnly={
+																								shouldDisabledInputs
+																							}
+																							initialValue={
+																								meta.initialValue
+																							}
+																							onChange={field.onChange(
+																								field.name
+																							)}
+																						/>
+																					);
+																				}}
+																			</Field>
+
+																			{touched.description &&
+																				errors.description && (
+																					<p
+																						className="text-danger"
+																						style={{
+																							...theme.fonts.small,
+																						}}
+																					>
+																						description is a required field
+																					</p>
+																				)}
+																		</div>
 																	</div>
 																</Col>
 															</Row>

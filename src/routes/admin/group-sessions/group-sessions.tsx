@@ -164,18 +164,14 @@ export const Component = () => {
 				onHide={() => {
 					setShowAddGroupSessionModal(false);
 				}}
-				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
+				onContinue={({ groupSessionSchedulingSystemId }) => {
 					const destination = `/admin/group-sessions/${
 						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
 							? 'add-external'
 							: 'add-internal'
 					}`;
 
-					navigate(destination, {
-						state: {
-							groupSessionLocationTypeId,
-						},
-					});
+					navigate(destination);
 				}}
 			/>
 
