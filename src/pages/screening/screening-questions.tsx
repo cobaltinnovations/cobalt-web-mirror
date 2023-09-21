@@ -482,7 +482,12 @@ const ScreeningQuestionsPage = () => {
 										/>
 									)}
 
-									<WysiwygDisplay className="my-6" html={confirmationPrompt.text} />
+									<div
+										className="my-6 wysiwyg-display"
+										dangerouslySetInnerHTML={{
+											__html: confirmationPrompt.text,
+										}}
+									/>
 
 									<div className="d-flex">
 										{(isSubmitPrompt ||
@@ -539,10 +544,12 @@ const ScreeningQuestionsPage = () => {
 									)}
 
 									<h3 className="mb-5">
-										<WysiwygDisplay
-											html={
-												screeningQuestionContextResponse?.screeningQuestion.questionText ?? ''
-											}
+										<div
+											className="wysiwyg-display"
+											dangerouslySetInnerHTML={{
+												__html: screeningQuestionContextResponse?.screeningQuestion
+													.questionText!,
+											}}
 										/>
 									</h3>
 
@@ -559,9 +566,12 @@ const ScreeningQuestionsPage = () => {
 										{renderedAnswerOptions}
 
 										{screeningQuestionContextResponse?.screeningQuestion.footerText && (
-											<WysiwygDisplay
-												className="mt-3 mb-5"
-												html={screeningQuestionContextResponse?.screeningQuestion.footerText}
+											<div
+												className="mt-3 mb-5 wysiwyg-display"
+												dangerouslySetInnerHTML={{
+													__html: screeningQuestionContextResponse?.screeningQuestion
+														.footerText,
+												}}
 											/>
 										)}
 
