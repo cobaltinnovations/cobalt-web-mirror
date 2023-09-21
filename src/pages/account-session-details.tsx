@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { accountService } from '@/lib/services';
 import { Helmet } from 'react-helmet';
+import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const AccountSessionDetails = () => {
 	const params = useParams<{ accountSessionId: string }>();
@@ -30,11 +31,7 @@ const AccountSessionDetails = () => {
 				<title>Cobalt | Session Details</title>
 			</Helmet>
 
-			<div
-				className="m-6 wysiwyg-display"
-				style={{ whiteSpace: 'pre-line' }}
-				dangerouslySetInnerHTML={{ __html: text }}
-			/>
+			<WysiwygDisplay className="m-6" html={text} />
 		</>
 	);
 };

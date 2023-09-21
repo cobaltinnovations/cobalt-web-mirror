@@ -384,10 +384,5 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				},
 			},
 		},
-		'.wysiwyg-display': {
-			'& p > br:first-child': {
-				display: 'none',
-			},
-		},
 	},
 }));

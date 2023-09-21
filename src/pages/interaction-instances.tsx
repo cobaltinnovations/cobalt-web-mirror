@@ -8,6 +8,7 @@ import { interactionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
+import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const InteractionInstances: FC = () => {
 	const handleError = useHandleError();
@@ -69,12 +70,7 @@ const InteractionInstances: FC = () => {
 					<Row className="pb-3">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<h3 className="mb-4 text-center">Interaction Data</h3>
-							<div
-								className="wysiwyg-display"
-								dangerouslySetInnerHTML={{
-									__html: interactionInstance?.metadata.endUserHtmlRepresentation || '',
-								}}
-							/>
+							<WysiwygDisplay html={interactionInstance?.metadata.endUserHtmlRepresentation ?? ''} />
 						</Col>
 					</Row>
 					{interactionOptionActions.length > 0 && (
@@ -85,12 +81,7 @@ const InteractionInstances: FC = () => {
 									{interactionOptionActions.map((interactionOptionAction) => {
 										return (
 											<li key={interactionOptionAction.interactionOptionActionId}>
-												<div
-													className="wysiwyg-display"
-													dangerouslySetInnerHTML={{
-														__html: interactionOptionAction.descriptionAsHtml,
-													}}
-												/>
+												<WysiwygDisplay html={interactionOptionAction.descriptionAsHtml} />
 											</li>
 										);
 									})}

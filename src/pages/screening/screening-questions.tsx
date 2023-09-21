@@ -23,6 +23,7 @@ import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
+import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -481,12 +482,7 @@ const ScreeningQuestionsPage = () => {
 										/>
 									)}
 
-									<div
-										className="my-6 wysiwyg-display"
-										dangerouslySetInnerHTML={{
-											__html: confirmationPrompt.text,
-										}}
-									/>
+									<WysiwygDisplay className="my-6" html={confirmationPrompt.text} />
 
 									<div className="d-flex">
 										{(isSubmitPrompt ||
@@ -543,12 +539,10 @@ const ScreeningQuestionsPage = () => {
 									)}
 
 									<h3 className="mb-5">
-										<div
-											className="wysiwyg-display"
-											dangerouslySetInnerHTML={{
-												__html: screeningQuestionContextResponse?.screeningQuestion
-													.questionText!,
-											}}
+										<WysiwygDisplay
+											html={
+												screeningQuestionContextResponse?.screeningQuestion.questionText ?? ''
+											}
 										/>
 									</h3>
 
@@ -565,12 +559,9 @@ const ScreeningQuestionsPage = () => {
 										{renderedAnswerOptions}
 
 										{screeningQuestionContextResponse?.screeningQuestion.footerText && (
-											<div
-												className="mt-3 mb-5 wysiwyg-display"
-												dangerouslySetInnerHTML={{
-													__html: screeningQuestionContextResponse?.screeningQuestion
-														.footerText,
-												}}
+											<WysiwygDisplay
+												className="mt-3 mb-5"
+												html={screeningQuestionContextResponse?.screeningQuestion.footerText}
 											/>
 										)}
 

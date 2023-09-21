@@ -9,6 +9,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-question-mark.svg';
+import { WysiwygDisplay } from './admin-cms/wysiwyg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	callToAction: {
@@ -19,9 +20,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		border: `1px solid ${theme.colors.p500}`,
 		[mediaQueries.lg]: {
 			padding: '40px 40px',
-		},
-		'& .wysiwyg-display a': {
-			...theme.fonts.bodyNormal,
 		},
 	},
 	infoIcon: {
@@ -122,11 +120,11 @@ const CallToAction = ({ callToAction, className }: Props) => {
 			</Modal>
 
 			<div className={classNames(classes.callToAction, className)}>
-				<div
-					className={classNames('wysiwyg-display', {
+				<WysiwygDisplay
+					className={classNames({
 						'mb-8': callToAction.actionLinks.length > 0 || callToAction.modalButtonText,
 					})}
-					dangerouslySetInnerHTML={{ __html: callToAction.messageAsHtml }}
+					html={callToAction.messageAsHtml}
 				/>
 				{callToAction.actionLinks.length > 0 && (
 					<div className={classes.actionLinksOuter}>
