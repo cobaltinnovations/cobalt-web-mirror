@@ -593,7 +593,7 @@ export const Component = () => {
 
 			<GroupSessionFormSection
 				title="Location"
-				description='Select "Online" to host your event virtually through a video conferencing platform or "In person" for an event at a physical venue.'
+				description='Select "Online" for events hosted virtually through a video conferencing platform or "In person" for an event at a physical venue.'
 			>
 				<ToggledInput
 					id="locationType-virtual"
