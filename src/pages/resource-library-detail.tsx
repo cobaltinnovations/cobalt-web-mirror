@@ -18,6 +18,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
+import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -177,10 +178,7 @@ const ResourceLibraryDetail: FC = () => {
 
 					<Row className="justify-content-center">
 						<Col md={10} lg={8} xl={6}>
-							<div
-								className="wysiwyg-display"
-								dangerouslySetInnerHTML={{ __html: item?.description || '' }}
-							/>
+							<WysiwygDisplay html={item?.description ?? ''} />
 
 							{!canEmbed && item?.url && (
 								<div className="mt-10 text-center">
