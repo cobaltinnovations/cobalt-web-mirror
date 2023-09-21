@@ -593,7 +593,7 @@ export const Component = () => {
 
 			<GroupSessionFormSection
 				title="Location"
-				description='Select "Online" to host your event virtually through a video conferencing platform or "In person" for an event at a physical venue.'
+				description='Select "Online" for events hosted virtually through a video conferencing platform or "In person" for an event at a physical venue.'
 			>
 				<ToggledInput
 					id="locationType-virtual"
@@ -1080,81 +1080,89 @@ export const Component = () => {
 
 			{!isExternal && (
 				<>
-					<hr />
-					<GroupSessionFormSection
-						title="Screening Questions"
-						description={
-							<>
-								<p className="mb-2">
-									You may restrict a group session to certain audiences by selecting a set of
-									pre-defined screening questions.
-								</p>
+					{loaderData?.screeningFlows.length > 1 && (
+						<>
+							<hr />
+							<GroupSessionFormSection
+								title="Screening Questions"
+								description={
+									<>
+										<p className="mb-2">
+											You may restrict a group session to certain audiences by selecting a set of
+											pre-defined screening questions.
+										</p>
 
-								<p>
-									Attendees must answer “Yes” to all screening questions in a set to reserve a seat.
-								</p>
-							</>
-						}
-					>
-						<ScreeningFlowQuestionsModal
-							show={!!selectedScreeningFlowForModal}
-							screeningFlow={selectedScreeningFlowForModal}
-							onHide={() => {
-								setSelectedScreeningFlowForModal(undefined);
-							}}
-						/>
+										<p>
+											Attendees must answer “Yes” to all screening questions in a set to reserve a
+											seat.
+										</p>
+									</>
+								}
+							>
+								<ScreeningFlowQuestionsModal
+									show={!!selectedScreeningFlowForModal}
+									screeningFlow={selectedScreeningFlowForModal}
+									onHide={() => {
+										setSelectedScreeningFlowForModal(undefined);
+									}}
+								/>
 
-						<ToggledInput
-							className="mb-3"
-							id="no-screening"
-							label="Do not screen"
-							hideChildren
-							checked={
-								formValues.screeningFlowId === institution.groupSessionDefaultIntakeScreeningFlowId
-							}
-							disabled={isEdit && hasReservations}
-							onChange={() => {
-								updateFormValue(
-									'screeningFlowId',
-									institution.groupSessionDefaultIntakeScreeningFlowId
-								);
-							}}
-						/>
+								<ToggledInput
+									className="mb-3"
+									id="no-screening"
+									label="Do not screen"
+									hideChildren
+									checked={
+										formValues.screeningFlowId ===
+										institution.groupSessionDefaultIntakeScreeningFlowId
+									}
+									disabled={isEdit && hasReservations}
+									onChange={() => {
+										updateFormValue(
+											'screeningFlowId',
+											institution.groupSessionDefaultIntakeScreeningFlowId
+										);
+									}}
+								/>
 
-						{(loaderData?.screeningFlows ?? [])
-							.filter(
-								(flow) => flow.screeningFlowId !== institution.groupSessionDefaultIntakeScreeningFlowId
-							)
-							.map((screeningFlow) => {
-								return (
-									<ToggledInput
-										key={screeningFlow.screeningFlowId}
-										id={screeningFlow.screeningFlowId}
-										label={screeningFlow.name}
-										className="mb-3"
-										hideChildren
-										disabled={isEdit && hasReservations}
-										detail={
-											<Button
-												size="sm"
-												variant="link"
-												className="p-0 text-decoration-none"
-												onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
-											>
-												View Questions
-											</Button>
-										}
-										checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
-										onChange={({ currentTarget }) => {
-											updateFormValue(
-												'screeningFlowId',
-												currentTarget.checked ? screeningFlow.screeningFlowId : ''
-											);
-										}}
-									/>
-								);
-							})}
-					</GroupSessionFormSection>
+								{(loaderData?.screeningFlows ?? [])
+									.filter(
+										(flow) =>
+											flow.screeningFlowId !==
+											institution.groupSessionDefaultIntakeScreeningFlowId
+									)
+									.map((screeningFlow) => {
+										return (
+											<ToggledInput
+												key={screeningFlow.screeningFlowId}
+												id={screeningFlow.screeningFlowId}
+												label={screeningFlow.name}
+												className="mb-3"
+												hideChildren
+												disabled={isEdit && hasReservations}
+												detail={
+													<Button
+														size="sm"
+														variant="link"
+														className="p-0 text-decoration-none"
+														onClick={() => setSelectedScreeningFlowForModal(screeningFlow)}
+													>
+														View Questions
+													</Button>
+												}
+												checked={formValues.screeningFlowId === screeningFlow.screeningFlowId}
+												onChange={({ currentTarget }) => {
+													updateFormValue(
+														'screeningFlowId',
+														currentTarget.checked ? screeningFlow.screeningFlowId : ''
+													);
+												}}
+											/>
+										);
+									})}
+							</GroupSessionFormSection>
+						</>
+					)}
 
 					<hr />
 
@@ -1323,9 +1331,9 @@ export const Component = () => {
 					<div>
 						<Button
 							variant="outline-primary"
-							type={isPreview || isNotDraft ? 'button' : 'submit'}
+							type={!loaderData.isAdminRoute || isPreview || isNotDraft ? 'button' : 'submit'}
 							value="exit"
-							onClick={() => {
+							onClick={(event) => {
 								if (loaderData.isAdminRoute) {
 									if (isPreview) {
 										navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
