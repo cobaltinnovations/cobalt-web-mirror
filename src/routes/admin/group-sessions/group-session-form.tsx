@@ -27,7 +27,6 @@ import {
 	LoaderFunctionArgs,
 	Navigate,
 	unstable_useBlocker as useBlocker,
-	useLocation,
 	useMatch,
 	useNavigate,
 	useParams,
@@ -181,16 +180,13 @@ function getInitialGroupSessionFormValues({
 	groupSession,
 	isDuplicate,
 	defaultScreeningFlowId,
-	initialGroupSessionLocationTypeId,
 }: {
 	groupSession?: GroupSessionModel | null;
 	isDuplicate?: boolean;
 	defaultScreeningFlowId: string;
-	initialGroupSessionLocationTypeId?: GroupSessionLocationTypeId;
 }): typeof initialGroupSessionFormValues {
 	const {
 		screeningFlowId = defaultScreeningFlowId,
-		groupSessionLocationTypeId = initialGroupSessionLocationTypeId,
 		startDateTime,
 		endDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
@@ -216,7 +212,6 @@ function getInitialGroupSessionFormValues({
 		{
 			...rest,
 			screeningFlowId,
-			groupSessionLocationTypeId,
 			// keep initial values when duplicating an existing session
 			...(isDuplicate
 				? {
@@ -246,7 +241,6 @@ export const Component = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const loaderData = useAdminGroupSessionFormLoaderData();
-	const location = useLocation();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; groupSessionId: string }>();
 	const handleError = useHandleError();
@@ -275,7 +269,6 @@ export const Component = () => {
 			isDuplicate,
 			groupSession: loaderData?.groupSession,
 			defaultScreeningFlowId: institution.groupSessionDefaultIntakeScreeningFlowId,
-			initialGroupSessionLocationTypeId: location.state?.groupSessionLocationTypeId,
 		})
 	);
 
@@ -1743,7 +1736,6 @@ function prepareGroupSessionSubmission(
 	).format(DateFormats.API.DateTime);
 
 	if (isExternal) {
-		groupSessionSubmission.groupSessionLocationTypeId = GroupSessionLocationTypeId.VIRTUAL;
 		delete groupSessionSubmission.videoconferenceUrl;
 		delete groupSessionSubmission.inPersonLocation;
 		delete groupSessionSubmission.screeningFlowId;

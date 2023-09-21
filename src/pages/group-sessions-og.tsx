@@ -145,18 +145,14 @@ const GroupSessionsOg = () => {
 				onHide={() => {
 					setShowSelectGroupSessionTypeModal(false);
 				}}
-				onContinue={({ groupSessionLocationTypeId, groupSessionSchedulingSystemId }) => {
+				onContinue={({ groupSessionSchedulingSystemId }) => {
 					const destination = `/group-sessions/create/${
 						groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL
 							? 'add-external'
 							: 'add-internal'
 					}`;
 
-					navigate(destination, {
-						state: {
-							groupSessionLocationTypeId,
-						},
-					});
+					navigate(destination);
 				}}
 			/>
 
