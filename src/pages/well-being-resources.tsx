@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import HeroContainer from '@/components/hero-container';
 
 import { WELL_BEING_RESOURCES } from '@/well-being-resources';
-import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const WellBeingResources: FC = () => {
 	return (
@@ -30,7 +29,10 @@ const WellBeingResources: FC = () => {
 											{resource.title}
 										</a>
 									</h4>
-									<WysiwygDisplay html={resource.description} />
+									<div
+										className="wysiwyg-display"
+										dangerouslySetInnerHTML={{ __html: resource.description }}
+									/>
 									{!isLast && <hr className="my-8" />}
 								</React.Fragment>
 							);
