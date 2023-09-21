@@ -1331,9 +1331,9 @@ export const Component = () => {
 					<div>
 						<Button
 							variant="outline-primary"
-							type={isPreview || isNotDraft ? 'button' : 'submit'}
+							type={!loaderData.isAdminRoute || isPreview || isNotDraft ? 'button' : 'submit'}
 							value="exit"
-							onClick={() => {
+							onClick={(event) => {
 								if (loaderData.isAdminRoute) {
 									if (isPreview) {
 										navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
