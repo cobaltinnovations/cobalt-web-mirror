@@ -13,7 +13,6 @@ import { BetaFeatureModal, BetaFeatureAlertModal } from './beta-features-modals'
 import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
-import { WysiwygDisplay } from './admin-cms/wysiwyg';
 
 const useCalendarAppointmentStyles = createUseThemedStyles((theme) => ({
 	calendarAppointment: {
@@ -136,7 +135,10 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 						/>
 
 						<div className={classes.informationCopyContainer}>
-							<WysiwygDisplay html={appointment.appointmentDescription} />
+							<div
+								className="wysiwyg-display"
+								dangerouslySetInnerHTML={{ __html: appointment.appointmentDescription }}
+							/>
 
 							<h6 className="mb-0">{appointment.name}</h6>
 
@@ -190,7 +192,10 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 					<div className={classes.informationContainer}>
 						<BackgroundImageContainer size={82} imageUrl={groupSession.imageUrl ?? placeholderImage} />
 						<div className={classes.informationCopyContainer}>
-							<WysiwygDisplay html={groupSession.description} />
+							<div
+								className="wysiwyg-display"
+								dangerouslySetInnerHTML={{ __html: groupSession.description }}
+							/>
 							<h6 className="mb-0">{groupSession.title}</h6>
 							<p className="mb-0">with {groupSession.facilitatorName}</p>
 							<p className="mb-0">{groupSession.startDateTimeDescription}</p>
