@@ -8,7 +8,7 @@ import BackgroundImageContainer from '@/components/background-image-container';
 
 import { AppointmentModel } from '@/lib/models/appointments';
 
-import { BetaFeatureId, BetaStatusId, GroupSessionModel } from '@/lib/models';
+import { BetaFeatureId, BetaStatusId, GroupSessionLocationTypeId, GroupSessionModel } from '@/lib/models';
 import { BetaFeatureModal, BetaFeatureAlertModal } from './beta-features-modals';
 import { accountService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
@@ -205,15 +205,17 @@ const CalendarAppointment = forwardRef<HTMLDivElement, CalendarAppointmentProps>
 						<Button variant="link" className="p-0" onClick={onCancel}>
 							Cancel Reservation
 						</Button>
-						<Button
-							as="a"
-							href={groupSession.videoconferenceUrl}
-							target="_blank"
-							variant="outline-primary"
-							size="sm"
-						>
-							Join Now
-						</Button>
+						{groupSession.groupSessionLocationTypeId !== GroupSessionLocationTypeId.IN_PERSON && (
+							<Button
+								as="a"
+								href={groupSession.videoconferenceUrl}
+								target="_blank"
+								variant="outline-primary"
+								size="sm"
+							>
+								Join Now
+							</Button>
+						)}
 					</div>
 				</div>
 			);
