@@ -23,7 +23,6 @@ import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
-import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
