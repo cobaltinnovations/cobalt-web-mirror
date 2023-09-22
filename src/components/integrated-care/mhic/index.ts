@@ -1,4 +1,3 @@
-export * from './mhic-account-header';
 export * from './mhic-assessment-complete';
 export * from './mhic-assessment-modal';
 export * from './mhic-assign-order-modal';
@@ -23,7 +22,6 @@ export * from './mhic-message-modal';
 export * from './mhic-navigation';
 export * from './mhic-next-steps-alerts';
 export * from './mhic-next-steps-appointment';
-export * from './mhic-next-steps-card';
 export * from './mhic-order-details';
 export * from './mhic-outreach-item';
 export * from './mhic-flag-order-for-safety-planning';
