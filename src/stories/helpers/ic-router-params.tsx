@@ -13,6 +13,7 @@ export const icMhicRouterParams = reactRouterParameters({
 				institutionResponse: {
 					institution: {
 						integratedCareEnabled: true,
+						myChartName: 'myChartName',
 					},
 				},
 			}),
