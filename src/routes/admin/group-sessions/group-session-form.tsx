@@ -190,6 +190,7 @@ function getInitialGroupSessionFormValues({
 		startDateTime,
 		endDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
+		tags = [],
 		...rest
 	} = groupSession ?? ({} as GroupSessionModel);
 
@@ -212,6 +213,7 @@ function getInitialGroupSessionFormValues({
 		{
 			...rest,
 			screeningFlowId,
+			tagIds: tags.map((tag) => tag.tagId),
 			// keep initial values when duplicating an existing session
 			...(isDuplicate
 				? {
