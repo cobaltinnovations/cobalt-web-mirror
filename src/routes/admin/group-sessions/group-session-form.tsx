@@ -506,7 +506,7 @@ export const Component = () => {
 				titleText={`Confirm Exit`}
 				bodyText={`You have changes that have not been ${
 					loaderData?.isAdminRoute ? 'saved or published' : 'submitted'
-				}, are your sure you want to exit?`}
+				}, are you sure you want to exit?`}
 				dismissText="Cancel"
 				confirmText="Exit"
 				onConfirm={() => {
