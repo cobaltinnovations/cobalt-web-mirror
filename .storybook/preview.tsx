@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/react';
 import React from 'react';
 import { reactRouterParameters, withRouter } from 'storybook-addon-react-router-v6';
+import { initialize, mswLoader } from 'msw-storybook-addon';
 import cobaltStorybookTheme from './storybook-theme';
 
 import { AppProviders } from '../src/app-providers';
@@ -10,6 +11,8 @@ import { BookingProvider } from '../src/contexts/booking-context';
 import { useCustomBootstrapStyles } from '../src/jss/hooks/use-custom-bootstrap-styles';
 import { useGlobalStyles } from '../src/jss/hooks/use-global-styles';
 import { CobaltThemeProvider } from '../src/jss/theme';
+
+initialize();
 
 const preview: Preview = {
 	parameters: {
@@ -57,6 +60,8 @@ const preview: Preview = {
 		),
 		withRouter,
 	],
+
+	loaders: [mswLoader],
 };
 
 const StoryWrapper = ({ children }) => {

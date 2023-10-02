@@ -63,7 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface Props {
+export interface SimpleFilterProps {
 	title: string;
 	show: boolean;
 	onHide(): void;
@@ -86,7 +86,7 @@ const SimpleFilter = ({
 	dialogWidth = 220,
 	className,
 	children,
-}: PropsWithChildren<Props>) => {
+}: PropsWithChildren<SimpleFilterProps>) => {
 	const classes = useStyles({ dialogWidth });
 
 	return (
