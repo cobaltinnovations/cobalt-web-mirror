@@ -1,24 +1,24 @@
-import { MhicHeader } from '@/components/integrated-care/mhic';
+import { MhicHeaderAutoComplete } from '@/components/integrated-care/mhic/mhic-header-autocomplete';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { icMhicRouterParams } from './helpers/ic-router-params';
 
-const meta: Meta<typeof MhicHeader> = {
-	title: 'MhicHeader',
-	component: MhicHeader,
+const meta: Meta<typeof MhicHeaderAutoComplete> = {
+	title: 'MhicHeaderAutoComplete',
+	component: MhicHeaderAutoComplete,
 	argTypes: {},
 	tags: ['autodocs'],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof MhicHeader>;
+type Story = StoryObj<typeof MhicHeaderAutoComplete>;
 
 export const Default: Story = {
 	render: (args) => {
 		return (
 			<div style={{ minHeight: 400 }}>
-				<MhicHeader {...args} />
+				<MhicHeaderAutoComplete {...args} />
 			</div>
 		);
 	},
