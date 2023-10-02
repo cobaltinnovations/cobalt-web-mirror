@@ -1,5 +1,4 @@
 import ConfirmDialog from '@/components/confirm-dialog';
-import { ScreeningFlowSkipTypeId } from '@/lib/models';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { ModalStoryWrapper } from './helpers/modal-wrapper';

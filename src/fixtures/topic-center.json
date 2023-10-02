@@ -1,0 +1,30 @@
+{
+	"topicCenterId": "topic-center-fixture-id-1",
+	"topicCenterDisplayStyleId": "DEFAULT",
+	"name": "Demo Topic Center",
+	"urlName": "demo-topic-center",
+	"topicCenterRows": [
+		{
+			"topicCenterRowId": "topic-center-row-fixture-id-1",
+			"title": "Topic Center Row",
+			"description": "Topic Center Row Description",
+			"groupSessions": [],
+			"groupSessionRequests": [],
+			"pinboardNotes": [
+				{
+					"pinboardNoteId": "pinboard-note-fixture-id-1",
+					"title": "Pinboard Note Title",
+					"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus maximus felis id felis scelerisque pretium. Maecenas congue egestas mattis. Quisque fringilla, ex in elementum dictum, nisl mauris bibendum ipsum, a ornare urna urna ut diam. Integer cursus fermentum sapien, in efficitur felis elementum ut.",
+					"url": "https://www.google.com"
+				},
+				{
+					"pinboardNoteId": "pinboard-note-fixture-id-2",
+					"title": "Pinboard Note Title",
+					"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus maximus felis id felis scelerisque pretium. Maecenas congue egestas mattis. Quisque fringilla, ex in elementum dictum, nisl mauris bibendum ipsum, a ornare urna urna ut diam. Integer cursus fermentum sapien, in efficitur felis elementum ut.",
+					"url": "https://www.google.com"
+				}
+			],
+			"contents": []
+		}
+	]
+}

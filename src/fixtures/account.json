@@ -1,5 +1,6 @@
 {
 	"accountId": "account-fixture-id-1",
+	"displayName": "Account Fixture",
 	"roleId": "PATIENT",
 	"institutionId": "COBALT",
 	"accountSourceId": "ANONYMOUS",

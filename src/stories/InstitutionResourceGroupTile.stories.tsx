@@ -1,5 +1,5 @@
 import InstitutionResourceGroupTile from '@/components/institution-resource-group-tile';
-import { Institution, InstitutionResourceGroup } from '@/lib/models';
+import { InstitutionResourceGroup } from '@/lib/models';
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';

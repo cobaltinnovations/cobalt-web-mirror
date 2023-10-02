@@ -1,0 +1,11 @@
+{
+	"patientOrderNoteId": "patient-order-note-fixture-id-1",
+	"patientOrderId": "patient-order-note-fixture-id-1",
+	"accountId": "account-fixture-id-1",
+	"note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl.",
+	"created": "2023-09-25T14:11:06.980749Z",
+	"createdDescription": "September 25, 2023, 10:11 AM",
+	"lastUpdated": "2023-09-25T14:11:06.980749Z",
+	"lastUpdatedDescription": "September 25, 2023, 10:11 AM",
+	"account": {}
+}
