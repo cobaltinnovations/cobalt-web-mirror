@@ -271,8 +271,13 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col>
+						<h3 className="mb-2">Email Templates</h3>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
 						<ButtonLink className="text-decoration-none" to="/admin/debug/email-templates">
-							Email Templates
+							Navigate to test form
 						</ButtonLink>
 					</Col>
 				</Row>
