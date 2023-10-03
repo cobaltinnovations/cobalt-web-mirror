@@ -90,7 +90,7 @@ const Footer: FC = () => {
 		<>
 			{institution.externalContactUsUrl && !routeHidesContactUs && (
 				<Container fluid className="bg-n75">
-					<Container className="py-10 py-lg-20">
+					<Container className="py-16 py-lg-24">
 						<Row>
 							<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
 								<h2 className="mb-6 text-center">Not seeing what you need?</h2>

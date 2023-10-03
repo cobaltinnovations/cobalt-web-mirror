@@ -8,6 +8,7 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import CircleIndicator from '@/components/admin-cms/circle-indicator';
 import useReactPlayerSettings from '@/hooks/use-react-player-settings';
+import { WysiwygDisplay } from './wysiwyg';
 
 const useOnYourTimePreviewStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -181,11 +182,7 @@ const OnYourTimePreview: FC<OnYourTimePreviewProps> = (props) => {
 									<CircleIndicator size={16} className={classes.circleSix}>
 										6
 									</CircleIndicator>
-									<div
-										className="wysiwyg-display"
-										style={{ ...fonts.small }}
-										dangerouslySetInnerHTML={{ __html: props.description || '' }}
-									/>
+									<WysiwygDisplay html={props.description} />
 								</div>
 							)}
 						</Col>

@@ -1,0 +1,2683 @@
+{
+	"regionsByCountryCode": {
+		"US": [
+			{
+				"abbreviation": "AL",
+				"name": "Alabama"
+			},
+			{
+				"abbreviation": "AK",
+				"name": "Alaska"
+			},
+			{
+				"abbreviation": "AZ",
+				"name": "Arizona"
+			},
+			{
+				"abbreviation": "AR",
+				"name": "Arkansas"
+			},
+			{
+				"abbreviation": "CA",
+				"name": "California"
+			},
+			{
+				"abbreviation": "CZ",
+				"name": "Canal Zone"
+			},
+			{
+				"abbreviation": "CO",
+				"name": "Colorado"
+			},
+			{
+				"abbreviation": "CT",
+				"name": "Connecticut"
+			},
+			{
+				"abbreviation": "DE",
+				"name": "Delaware"
+			},
+			{
+				"abbreviation": "DC",
+				"name": "District of Columbia"
+			},
+			{
+				"abbreviation": "FL",
+				"name": "Florida"
+			},
+			{
+				"abbreviation": "GA",
+				"name": "Georgia"
+			},
+			{
+				"abbreviation": "GU",
+				"name": "Guam"
+			},
+			{
+				"abbreviation": "HI",
+				"name": "Hawaii"
+			},
+			{
+				"abbreviation": "ID",
+				"name": "Idaho"
+			},
+			{
+				"abbreviation": "IL",
+				"name": "Illinois"
+			},
+			{
+				"abbreviation": "IN",
+				"name": "Indiana"
+			},
+			{
+				"abbreviation": "IA",
+				"name": "Iowa"
+			},
+			{
+				"abbreviation": "KS",
+				"name": "Kansas"
+			},
+			{
+				"abbreviation": "KY",
+				"name": "Kentucky"
+			},
+			{
+				"abbreviation": "LA",
+				"name": "Louisiana"
+			},
+			{
+				"abbreviation": "ME",
+				"name": "Maine"
+			},
+			{
+				"abbreviation": "MD",
+				"name": "Maryland"
+			},
+			{
+				"abbreviation": "MA",
+				"name": "Massachusetts"
+			},
+			{
+				"abbreviation": "MI",
+				"name": "Michigan"
+			},
+			{
+				"abbreviation": "MN",
+				"name": "Minnesota"
+			},
+			{
+				"abbreviation": "MS",
+				"name": "Mississippi"
+			},
+			{
+				"abbreviation": "MO",
+				"name": "Missouri"
+			},
+			{
+				"abbreviation": "MT",
+				"name": "Montana"
+			},
+			{
+				"abbreviation": "NE",
+				"name": "Nebraska"
+			},
+			{
+				"abbreviation": "NV",
+				"name": "Nevada"
+			},
+			{
+				"abbreviation": "NH",
+				"name": "New Hampshire"
+			},
+			{
+				"abbreviation": "NJ",
+				"name": "New Jersey"
+			},
+			{
+				"abbreviation": "NM",
+				"name": "New Mexico"
+			},
+			{
+				"abbreviation": "NY",
+				"name": "New York"
+			},
+			{
+				"abbreviation": "NC",
+				"name": "North Carolina"
+			},
+			{
+				"abbreviation": "ND",
+				"name": "North Dakota"
+			},
+			{
+				"abbreviation": "OH",
+				"name": "Ohio"
+			},
+			{
+				"abbreviation": "OK",
+				"name": "Oklahoma"
+			},
+			{
+				"abbreviation": "OR",
+				"name": "Oregon"
+			},
+			{
+				"abbreviation": "PA",
+				"name": "Pennsylvania"
+			},
+			{
+				"abbreviation": "PR",
+				"name": "Puerto Rico"
+			},
+			{
+				"abbreviation": "RI",
+				"name": "Rhode Island"
+			},
+			{
+				"abbreviation": "SC",
+				"name": "South Carolina"
+			},
+			{
+				"abbreviation": "SD",
+				"name": "South Dakota"
+			},
+			{
+				"abbreviation": "TN",
+				"name": "Tennessee"
+			},
+			{
+				"abbreviation": "TX",
+				"name": "Texas"
+			},
+			{
+				"abbreviation": "UT",
+				"name": "Utah"
+			},
+			{
+				"abbreviation": "VT",
+				"name": "Vermont"
+			},
+			{
+				"abbreviation": "VI",
+				"name": "Virgin Islands"
+			},
+			{
+				"abbreviation": "VA",
+				"name": "Virginia"
+			},
+			{
+				"abbreviation": "WA",
+				"name": "Washington"
+			},
+			{
+				"abbreviation": "WV",
+				"name": "West Virginia"
+			},
+			{
+				"abbreviation": "WI",
+				"name": "Wisconsin"
+			},
+			{
+				"abbreviation": "WY",
+				"name": "Wyoming"
+			}
+		]
+	},
+	"patientOrderCarePreferences": [
+		{
+			"patientOrderCarePreferenceId": "IN_PERSON",
+			"description": "In-Person"
+		},
+		{
+			"patientOrderCarePreferenceId": "TELEHEALTH",
+			"description": "Telehealth"
+		},
+		{
+			"patientOrderCarePreferenceId": "NO_PREFERENCE",
+			"description": "No Preference"
+		}
+	],
+	"languages": [
+		{
+			"languageCode": "ab",
+			"description": "Abkhazian"
+		},
+		{
+			"languageCode": "aa",
+			"description": "Afar"
+		},
+		{
+			"languageCode": "af",
+			"description": "Afrikaans"
+		},
+		{
+			"languageCode": "ak",
+			"description": "Akan"
+		},
+		{
+			"languageCode": "sq",
+			"description": "Albanian"
+		},
+		{
+			"languageCode": "am",
+			"description": "Amharic"
+		},
+		{
+			"languageCode": "ar",
+			"description": "Arabic"
+		},
+		{
+			"languageCode": "an",
+			"description": "Aragonese"
+		},
+		{
+			"languageCode": "hy",
+			"description": "Armenian"
+		},
+		{
+			"languageCode": "as",
+			"description": "Assamese"
+		},
+		{
+			"languageCode": "av",
+			"description": "Avaric"
+		},
+		{
+			"languageCode": "ae",
+			"description": "Avestan"
+		},
+		{
+			"languageCode": "ay",
+			"description": "Aymara"
+		},
+		{
+			"languageCode": "az",
+			"description": "Azerbaijani"
+		},
+		{
+			"languageCode": "bm",
+			"description": "Bambara"
+		},
+		{
+			"languageCode": "bn",
+			"description": "Bangla"
+		},
+		{
+			"languageCode": "ba",
+			"description": "Bashkir"
+		},
+		{
+			"languageCode": "eu",
+			"description": "Basque"
+		},
+		{
+			"languageCode": "be",
+			"description": "Belarusian"
+		},
+		{
+			"languageCode": "bh",
+			"description": "Bihari"
+		},
+		{
+			"languageCode": "bi",
+			"description": "Bislama"
+		},
+		{
+			"languageCode": "bs",
+			"description": "Bosnian"
+		},
+		{
+			"languageCode": "br",
+			"description": "Breton"
+		},
+		{
+			"languageCode": "bg",
+			"description": "Bulgarian"
+		},
+		{
+			"languageCode": "my",
+			"description": "Burmese"
+		},
+		{
+			"languageCode": "ca",
+			"description": "Catalan"
+		},
+		{
+			"languageCode": "ch",
+			"description": "Chamorro"
+		},
+		{
+			"languageCode": "ce",
+			"description": "Chechen"
+		},
+		{
+			"languageCode": "zh",
+			"description": "Chinese"
+		},
+		{
+			"languageCode": "cu",
+			"description": "Church Slavic"
+		},
+		{
+			"languageCode": "cv",
+			"description": "Chuvash"
+		},
+		{
+			"languageCode": "kw",
+			"description": "Cornish"
+		},
+		{
+			"languageCode": "co",
+			"description": "Corsican"
+		},
+		{
+			"languageCode": "cr",
+			"description": "Cree"
+		},
+		{
+			"languageCode": "hr",
+			"description": "Croatian"
+		},
+		{
+			"languageCode": "cs",
+			"description": "Czech"
+		},
+		{
+			"languageCode": "da",
+			"description": "Danish"
+		},
+		{
+			"languageCode": "dv",
+			"description": "Divehi"
+		},
+		{
+			"languageCode": "nl",
+			"description": "Dutch"
+		},
+		{
+			"languageCode": "dz",
+			"description": "Dzongkha"
+		},
+		{
+			"languageCode": "en",
+			"description": "English"
+		},
+		{
+			"languageCode": "eo",
+			"description": "Esperanto"
+		},
+		{
+			"languageCode": "et",
+			"description": "Estonian"
+		},
+		{
+			"languageCode": "ee",
+			"description": "Ewe"
+		},
+		{
+			"languageCode": "fo",
+			"description": "Faroese"
+		},
+		{
+			"languageCode": "fj",
+			"description": "Fijian"
+		},
+		{
+			"languageCode": "fi",
+			"description": "Finnish"
+		},
+		{
+			"languageCode": "fr",
+			"description": "French"
+		},
+		{
+			"languageCode": "ff",
+			"description": "Fula"
+		},
+		{
+			"languageCode": "gl",
+			"description": "Galician"
+		},
+		{
+			"languageCode": "lg",
+			"description": "Ganda"
+		},
+		{
+			"languageCode": "ka",
+			"description": "Georgian"
+		},
+		{
+			"languageCode": "de",
+			"description": "German"
+		},
+		{
+			"languageCode": "el",
+			"description": "Greek"
+		},
+		{
+			"languageCode": "gn",
+			"description": "Guarani"
+		},
+		{
+			"languageCode": "gu",
+			"description": "Gujarati"
+		},
+		{
+			"languageCode": "ht",
+			"description": "Haitian Creole"
+		},
+		{
+			"languageCode": "ha",
+			"description": "Hausa"
+		},
+		{
+			"languageCode": "he",
+			"description": "Hebrew"
+		},
+		{
+			"languageCode": "hz",
+			"description": "Herero"
+		},
+		{
+			"languageCode": "hi",
+			"description": "Hindi"
+		},
+		{
+			"languageCode": "ho",
+			"description": "Hiri Motu"
+		},
+		{
+			"languageCode": "hu",
+			"description": "Hungarian"
+		},
+		{
+			"languageCode": "is",
+			"description": "Icelandic"
+		},
+		{
+			"languageCode": "io",
+			"description": "Ido"
+		},
+		{
+			"languageCode": "ig",
+			"description": "Igbo"
+		},
+		{
+			"languageCode": "id",
+			"description": "Indonesian"
+		},
+		{
+			"languageCode": "ia",
+			"description": "Interlingua"
+		},
+		{
+			"languageCode": "ie",
+			"description": "Interlingue"
+		},
+		{
+			"languageCode": "iu",
+			"description": "Inuktitut"
+		},
+		{
+			"languageCode": "ik",
+			"description": "Inupiaq"
+		},
+		{
+			"languageCode": "ga",
+			"description": "Irish"
+		},
+		{
+			"languageCode": "it",
+			"description": "Italian"
+		},
+		{
+			"languageCode": "ja",
+			"description": "Japanese"
+		},
+		{
+			"languageCode": "jv",
+			"description": "Javanese"
+		},
+		{
+			"languageCode": "kl",
+			"description": "Kalaallisut"
+		},
+		{
+			"languageCode": "kn",
+			"description": "Kannada"
+		},
+		{
+			"languageCode": "kr",
+			"description": "Kanuri"
+		},
+		{
+			"languageCode": "ks",
+			"description": "Kashmiri"
+		},
+		{
+			"languageCode": "kk",
+			"description": "Kazakh"
+		},
+		{
+			"languageCode": "km",
+			"description": "Khmer"
+		},
+		{
+			"languageCode": "ki",
+			"description": "Kikuyu"
+		},
+		{
+			"languageCode": "rw",
+			"description": "Kinyarwanda"
+		},
+		{
+			"languageCode": "kv",
+			"description": "Komi"
+		},
+		{
+			"languageCode": "kg",
+			"description": "Kongo"
+		},
+		{
+			"languageCode": "ko",
+			"description": "Korean"
+		},
+		{
+			"languageCode": "kj",
+			"description": "Kuanyama"
+		},
+		{
+			"languageCode": "ku",
+			"description": "Kurdish"
+		},
+		{
+			"languageCode": "ky",
+			"description": "Kyrgyz"
+		},
+		{
+			"languageCode": "lo",
+			"description": "Lao"
+		},
+		{
+			"languageCode": "la",
+			"description": "Latin"
+		},
+		{
+			"languageCode": "lv",
+			"description": "Latvian"
+		},
+		{
+			"languageCode": "li",
+			"description": "Limburgish"
+		},
+		{
+			"languageCode": "ln",
+			"description": "Lingala"
+		},
+		{
+			"languageCode": "lt",
+			"description": "Lithuanian"
+		},
+		{
+			"languageCode": "lu",
+			"description": "Luba-Katanga"
+		},
+		{
+			"languageCode": "lb",
+			"description": "Luxembourgish"
+		},
+		{
+			"languageCode": "mk",
+			"description": "Macedonian"
+		},
+		{
+			"languageCode": "mg",
+			"description": "Malagasy"
+		},
+		{
+			"languageCode": "ms",
+			"description": "Malay"
+		},
+		{
+			"languageCode": "ml",
+			"description": "Malayalam"
+		},
+		{
+			"languageCode": "mt",
+			"description": "Maltese"
+		},
+		{
+			"languageCode": "gv",
+			"description": "Manx"
+		},
+		{
+			"languageCode": "mr",
+			"description": "Marathi"
+		},
+		{
+			"languageCode": "mh",
+			"description": "Marshallese"
+		},
+		{
+			"languageCode": "mo",
+			"description": "Moldavian"
+		},
+		{
+			"languageCode": "mn",
+			"description": "Mongolian"
+		},
+		{
+			"languageCode": "mi",
+			"description": "Māori"
+		},
+		{
+			"languageCode": "na",
+			"description": "Nauru"
+		},
+		{
+			"languageCode": "nv",
+			"description": "Navajo"
+		},
+		{
+			"languageCode": "ng",
+			"description": "Ndonga"
+		},
+		{
+			"languageCode": "ne",
+			"description": "Nepali"
+		},
+		{
+			"languageCode": "nd",
+			"description": "North Ndebele"
+		},
+		{
+			"languageCode": "se",
+			"description": "Northern Sami"
+		},
+		{
+			"languageCode": "no",
+			"description": "Norwegian"
+		},
+		{
+			"languageCode": "nb",
+			"description": "Norwegian Bokmål"
+		},
+		{
+			"languageCode": "nn",
+			"description": "Norwegian Nynorsk"
+		},
+		{
+			"languageCode": "ny",
+			"description": "Nyanja"
+		},
+		{
+			"languageCode": "oc",
+			"description": "Occitan"
+		},
+		{
+			"languageCode": "or",
+			"description": "Odia"
+		},
+		{
+			"languageCode": "oj",
+			"description": "Ojibwa"
+		},
+		{
+			"languageCode": "om",
+			"description": "Oromo"
+		},
+		{
+			"languageCode": "os",
+			"description": "Ossetic"
+		},
+		{
+			"languageCode": "pi",
+			"description": "Pali"
+		},
+		{
+			"languageCode": "ps",
+			"description": "Pashto"
+		},
+		{
+			"languageCode": "fa",
+			"description": "Persian"
+		},
+		{
+			"languageCode": "pl",
+			"description": "Polish"
+		},
+		{
+			"languageCode": "pt",
+			"description": "Portuguese"
+		},
+		{
+			"languageCode": "pa",
+			"description": "Punjabi"
+		},
+		{
+			"languageCode": "qu",
+			"description": "Quechua"
+		},
+		{
+			"languageCode": "ro",
+			"description": "Romanian"
+		},
+		{
+			"languageCode": "rm",
+			"description": "Romansh"
+		},
+		{
+			"languageCode": "rn",
+			"description": "Rundi"
+		},
+		{
+			"languageCode": "ru",
+			"description": "Russian"
+		},
+		{
+			"languageCode": "sm",
+			"description": "Samoan"
+		},
+		{
+			"languageCode": "sg",
+			"description": "Sango"
+		},
+		{
+			"languageCode": "sa",
+			"description": "Sanskrit"
+		},
+		{
+			"languageCode": "sc",
+			"description": "Sardinian"
+		},
+		{
+			"languageCode": "gd",
+			"description": "Scottish Gaelic"
+		},
+		{
+			"languageCode": "sr",
+			"description": "Serbian"
+		},
+		{
+			"languageCode": "sn",
+			"description": "Shona"
+		},
+		{
+			"languageCode": "ii",
+			"description": "Sichuan Yi"
+		},
+		{
+			"languageCode": "sd",
+			"description": "Sindhi"
+		},
+		{
+			"languageCode": "si",
+			"description": "Sinhala"
+		},
+		{
+			"languageCode": "sk",
+			"description": "Slovak"
+		},
+		{
+			"languageCode": "sl",
+			"description": "Slovenian"
+		},
+		{
+			"languageCode": "so",
+			"description": "Somali"
+		},
+		{
+			"languageCode": "nr",
+			"description": "South Ndebele"
+		},
+		{
+			"languageCode": "st",
+			"description": "Southern Sotho"
+		},
+		{
+			"languageCode": "es",
+			"description": "Spanish"
+		},
+		{
+			"languageCode": "su",
+			"description": "Sundanese"
+		},
+		{
+			"languageCode": "sw",
+			"description": "Swahili"
+		},
+		{
+			"languageCode": "ss",
+			"description": "Swati"
+		},
+		{
+			"languageCode": "sv",
+			"description": "Swedish"
+		},
+		{
+			"languageCode": "tl",
+			"description": "Tagalog"
+		},
+		{
+			"languageCode": "ty",
+			"description": "Tahitian"
+		},
+		{
+			"languageCode": "tg",
+			"description": "Tajik"
+		},
+		{
+			"languageCode": "ta",
+			"description": "Tamil"
+		},
+		{
+			"languageCode": "tt",
+			"description": "Tatar"
+		},
+		{
+			"languageCode": "te",
+			"description": "Telugu"
+		},
+		{
+			"languageCode": "th",
+			"description": "Thai"
+		},
+		{
+			"languageCode": "bo",
+			"description": "Tibetan"
+		},
+		{
+			"languageCode": "ti",
+			"description": "Tigrinya"
+		},
+		{
+			"languageCode": "to",
+			"description": "Tongan"
+		},
+		{
+			"languageCode": "ts",
+			"description": "Tsonga"
+		},
+		{
+			"languageCode": "tn",
+			"description": "Tswana"
+		},
+		{
+			"languageCode": "tr",
+			"description": "Turkish"
+		},
+		{
+			"languageCode": "tk",
+			"description": "Turkmen"
+		},
+		{
+			"languageCode": "tw",
+			"description": "Twi"
+		},
+		{
+			"languageCode": "uk",
+			"description": "Ukrainian"
+		},
+		{
+			"languageCode": "ur",
+			"description": "Urdu"
+		},
+		{
+			"languageCode": "ug",
+			"description": "Uyghur"
+		},
+		{
+			"languageCode": "uz",
+			"description": "Uzbek"
+		},
+		{
+			"languageCode": "ve",
+			"description": "Venda"
+		},
+		{
+			"languageCode": "vi",
+			"description": "Vietnamese"
+		},
+		{
+			"languageCode": "vo",
+			"description": "Volapük"
+		},
+		{
+			"languageCode": "wa",
+			"description": "Walloon"
+		},
+		{
+			"languageCode": "cy",
+			"description": "Welsh"
+		},
+		{
+			"languageCode": "fy",
+			"description": "Western Frisian"
+		},
+		{
+			"languageCode": "wo",
+			"description": "Wolof"
+		},
+		{
+			"languageCode": "xh",
+			"description": "Xhosa"
+		},
+		{
+			"languageCode": "yi",
+			"description": "Yiddish"
+		},
+		{
+			"languageCode": "yo",
+			"description": "Yoruba"
+		},
+		{
+			"languageCode": "za",
+			"description": "Zhuang"
+		},
+		{
+			"languageCode": "zu",
+			"description": "Zulu"
+		}
+	],
+	"patientOrderDispositions": [
+		{
+			"description": "Open",
+			"patientOrderDispositionId": "OPEN"
+		},
+		{
+			"description": "Closed",
+			"patientOrderDispositionId": "CLOSED"
+		},
+		{
+			"description": "Archived",
+			"patientOrderDispositionId": "ARCHIVED"
+		}
+	],
+	"patientOrderFocusTypes": [
+		{
+			"description": "ADHD",
+			"patientOrderFocusTypeId": "ADHD"
+		},
+		{
+			"description": "Alcohol Use Disorder",
+			"patientOrderFocusTypeId": "ALCOHOL_USE_DISORDER"
+		},
+		{
+			"description": "Crisis Care",
+			"patientOrderFocusTypeId": "CRISIS_CARE"
+		},
+		{
+			"description": "Eating Disorder",
+			"patientOrderFocusTypeId": "EATING_DISORDER"
+		},
+		{
+			"description": "Evaluation",
+			"patientOrderFocusTypeId": "EVALUATION"
+		},
+		{
+			"description": "General",
+			"patientOrderFocusTypeId": "GENERAL"
+		},
+		{
+			"description": "Grief",
+			"patientOrderFocusTypeId": "GRIEF"
+		},
+		{
+			"description": "Insomnia",
+			"patientOrderFocusTypeId": "INSOMNIA"
+		},
+		{
+			"description": "LCSW Capacity",
+			"patientOrderFocusTypeId": "LCSW_CAPACITY"
+		},
+		{
+			"description": "LGBTIA+ Competent Provider",
+			"patientOrderFocusTypeId": "LGBTIA"
+		},
+		{
+			"description": "Opioid Use Disorder",
+			"patientOrderFocusTypeId": "OPIOID_USE_DISORDER"
+		},
+		{
+			"description": "Psychiatry",
+			"patientOrderFocusTypeId": "PSYCHIATRY"
+		},
+		{
+			"description": "Psychosis",
+			"patientOrderFocusTypeId": "PSYCHOSIS"
+		},
+		{
+			"description": "Psychotherapy",
+			"patientOrderFocusTypeId": "PSYCHOTHERAPY"
+		},
+		{
+			"description": "Self-Directed",
+			"patientOrderFocusTypeId": "SELF_DIRECTED"
+		},
+		{
+			"description": "Substance Use Disorder",
+			"patientOrderFocusTypeId": "SUBSTANCE_USE_DISORDER"
+		},
+		{
+			"description": "Trauma",
+			"patientOrderFocusTypeId": "TRAUMA"
+		},
+		{
+			"description": "Unspecified",
+			"patientOrderFocusTypeId": "UNSPECIFIED"
+		}
+	],
+	"patientOrderCareTypes": [
+		{
+			"patientOrderCareTypeId": "COLLABORATIVE",
+			"description": "Collaborative"
+		},
+		{
+			"patientOrderCareTypeId": "SPECIALTY",
+			"description": "Specialty"
+		},
+		{
+			"patientOrderCareTypeId": "SUBCLINICAL",
+			"description": "Subclinical"
+		},
+		{
+			"patientOrderCareTypeId": "UNSPECIFIED",
+			"description": "Unspecified"
+		}
+	],
+	"screeningTypes": [
+		{
+			"screeningTypeId": "ASRM",
+			"description": "ASRM",
+			"overallScoreMaximum": 20,
+			"overallScoreMaximumDescription": "20"
+		},
+		{
+			"screeningTypeId": "AUDIT_C",
+			"description": "AUDIT-C",
+			"overallScoreMaximum": 12,
+			"overallScoreMaximumDescription": "12"
+		},
+		{
+			"screeningTypeId": "BPI",
+			"description": "BPI"
+		},
+		{
+			"screeningTypeId": "BPI_1",
+			"description": "BPI-1",
+			"overallScoreMaximum": 1,
+			"overallScoreMaximumDescription": "1"
+		},
+		{
+			"screeningTypeId": "CAGE_ALCOHOL",
+			"description": "CAGE (Alcohol)"
+		},
+		{
+			"screeningTypeId": "IC_INTRO_CONDITIONS",
+			"description": "Conditions",
+			"overallScoreMaximum": 10,
+			"overallScoreMaximumDescription": "10"
+		},
+		{
+			"screeningTypeId": "C_SSRS_3",
+			"description": "C-SSRS-3",
+			"overallScoreMaximum": 3,
+			"overallScoreMaximumDescription": "3"
+		},
+		{
+			"screeningTypeId": "C_SSRS_8",
+			"description": "C-SSRS-8",
+			"overallScoreMaximum": 8,
+			"overallScoreMaximumDescription": "8"
+		},
+		{
+			"screeningTypeId": "CUSTOM",
+			"description": "Custom"
+		},
+		{
+			"screeningTypeId": "DAST_10",
+			"description": "DAST-10",
+			"overallScoreMaximum": 10,
+			"overallScoreMaximumDescription": "10"
+		},
+		{
+			"screeningTypeId": "IC_DRUG_USE_FREQUENCY",
+			"description": "Drug Use - Frequency",
+			"overallScoreMaximum": 3,
+			"overallScoreMaximumDescription": "3"
+		},
+		{
+			"screeningTypeId": "IC_DRUG_USE_OPIOID",
+			"description": "Drug Use - Opioid",
+			"overallScoreMaximum": 1,
+			"overallScoreMaximumDescription": "1"
+		},
+		{
+			"screeningTypeId": "GAD_2",
+			"description": "GAD-2"
+		},
+		{
+			"screeningTypeId": "GAD_7",
+			"description": "GAD-7",
+			"overallScoreMaximum": 21,
+			"overallScoreMaximumDescription": "21"
+		},
+		{
+			"screeningTypeId": "IC_INTAKE",
+			"description": "Integrated Care Intake",
+			"overallScoreMaximum": 1,
+			"overallScoreMaximumDescription": "1"
+		},
+		{
+			"screeningTypeId": "IC_INTRO",
+			"description": "Intro",
+			"overallScoreMaximum": 1,
+			"overallScoreMaximumDescription": "1"
+		},
+		{
+			"screeningTypeId": "ISI",
+			"description": "ISI"
+		},
+		{
+			"screeningTypeId": "MBI_9",
+			"description": "MBI-9",
+			"overallScoreMaximum": 54,
+			"overallScoreMaximumDescription": "54"
+		},
+		{
+			"screeningTypeId": "IC_PATIENT_SELF_REPORTING",
+			"description": "Patient Self-Reporting",
+			"overallScoreMaximum": 16,
+			"overallScoreMaximumDescription": "16"
+		},
+		{
+			"screeningTypeId": "PC_PTSD_5",
+			"description": "PC-PTSD-5",
+			"overallScoreMaximum": 5,
+			"overallScoreMaximumDescription": "5"
+		},
+		{
+			"screeningTypeId": "PHQ_4",
+			"description": "PHQ-4"
+		},
+		{
+			"screeningTypeId": "PHQ_8",
+			"description": "PHQ-8",
+			"overallScoreMaximum": 24,
+			"overallScoreMaximumDescription": "24"
+		},
+		{
+			"screeningTypeId": "PHQ_9",
+			"description": "PHQ-9",
+			"overallScoreMaximum": 27,
+			"overallScoreMaximumDescription": "27"
+		},
+		{
+			"screeningTypeId": "PRIME_5",
+			"description": "PRIME-5",
+			"overallScoreMaximum": 30,
+			"overallScoreMaximumDescription": "30"
+		},
+		{
+			"screeningTypeId": "PSYCHOSIS",
+			"description": "Psychosis",
+			"overallScoreMaximum": 4,
+			"overallScoreMaximumDescription": "4"
+		},
+		{
+			"screeningTypeId": "IC_INTRO_SYMPTOMS",
+			"description": "Symptoms",
+			"overallScoreMaximum": 6,
+			"overallScoreMaximumDescription": "6"
+		},
+		{
+			"screeningTypeId": "TICS",
+			"description": "TICS (Drugs)"
+		},
+		{
+			"screeningTypeId": "WHO_5",
+			"description": "WHO-5",
+			"overallScoreMaximum": 25,
+			"overallScoreMaximumDescription": "25"
+		}
+	],
+	"countries": [
+		{
+			"countryCode": "AF",
+			"description": "Afghanistan"
+		},
+		{
+			"countryCode": "AL",
+			"description": "Albania"
+		},
+		{
+			"countryCode": "DZ",
+			"description": "Algeria"
+		},
+		{
+			"countryCode": "AS",
+			"description": "American Samoa"
+		},
+		{
+			"countryCode": "AD",
+			"description": "Andorra"
+		},
+		{
+			"countryCode": "AO",
+			"description": "Angola"
+		},
+		{
+			"countryCode": "AI",
+			"description": "Anguilla"
+		},
+		{
+			"countryCode": "AQ",
+			"description": "Antarctica"
+		},
+		{
+			"countryCode": "AG",
+			"description": "Antigua & Barbuda"
+		},
+		{
+			"countryCode": "AR",
+			"description": "Argentina"
+		},
+		{
+			"countryCode": "AM",
+			"description": "Armenia"
+		},
+		{
+			"countryCode": "AW",
+			"description": "Aruba"
+		},
+		{
+			"countryCode": "AU",
+			"description": "Australia"
+		},
+		{
+			"countryCode": "AT",
+			"description": "Austria"
+		},
+		{
+			"countryCode": "AZ",
+			"description": "Azerbaijan"
+		},
+		{
+			"countryCode": "BS",
+			"description": "Bahamas"
+		},
+		{
+			"countryCode": "BH",
+			"description": "Bahrain"
+		},
+		{
+			"countryCode": "BD",
+			"description": "Bangladesh"
+		},
+		{
+			"countryCode": "BB",
+			"description": "Barbados"
+		},
+		{
+			"countryCode": "BY",
+			"description": "Belarus"
+		},
+		{
+			"countryCode": "BE",
+			"description": "Belgium"
+		},
+		{
+			"countryCode": "BZ",
+			"description": "Belize"
+		},
+		{
+			"countryCode": "BJ",
+			"description": "Benin"
+		},
+		{
+			"countryCode": "BM",
+			"description": "Bermuda"
+		},
+		{
+			"countryCode": "BT",
+			"description": "Bhutan"
+		},
+		{
+			"countryCode": "BO",
+			"description": "Bolivia"
+		},
+		{
+			"countryCode": "BA",
+			"description": "Bosnia & Herzegovina"
+		},
+		{
+			"countryCode": "BW",
+			"description": "Botswana"
+		},
+		{
+			"countryCode": "BV",
+			"description": "Bouvet Island"
+		},
+		{
+			"countryCode": "BR",
+			"description": "Brazil"
+		},
+		{
+			"countryCode": "IO",
+			"description": "British Indian Ocean Territory"
+		},
+		{
+			"countryCode": "VG",
+			"description": "British Virgin Islands"
+		},
+		{
+			"countryCode": "BN",
+			"description": "Brunei"
+		},
+		{
+			"countryCode": "BG",
+			"description": "Bulgaria"
+		},
+		{
+			"countryCode": "BF",
+			"description": "Burkina Faso"
+		},
+		{
+			"countryCode": "BI",
+			"description": "Burundi"
+		},
+		{
+			"countryCode": "KH",
+			"description": "Cambodia"
+		},
+		{
+			"countryCode": "CM",
+			"description": "Cameroon"
+		},
+		{
+			"countryCode": "CA",
+			"description": "Canada"
+		},
+		{
+			"countryCode": "CV",
+			"description": "Cape Verde"
+		},
+		{
+			"countryCode": "BQ",
+			"description": "Caribbean Netherlands"
+		},
+		{
+			"countryCode": "KY",
+			"description": "Cayman Islands"
+		},
+		{
+			"countryCode": "CF",
+			"description": "Central African Republic"
+		},
+		{
+			"countryCode": "TD",
+			"description": "Chad"
+		},
+		{
+			"countryCode": "CL",
+			"description": "Chile"
+		},
+		{
+			"countryCode": "CN",
+			"description": "China"
+		},
+		{
+			"countryCode": "CX",
+			"description": "Christmas Island"
+		},
+		{
+			"countryCode": "CC",
+			"description": "Cocos (Keeling) Islands"
+		},
+		{
+			"countryCode": "CO",
+			"description": "Colombia"
+		},
+		{
+			"countryCode": "KM",
+			"description": "Comoros"
+		},
+		{
+			"countryCode": "CG",
+			"description": "Congo - Brazzaville"
+		},
+		{
+			"countryCode": "CD",
+			"description": "Congo - Kinshasa"
+		},
+		{
+			"countryCode": "CK",
+			"description": "Cook Islands"
+		},
+		{
+			"countryCode": "CR",
+			"description": "Costa Rica"
+		},
+		{
+			"countryCode": "HR",
+			"description": "Croatia"
+		},
+		{
+			"countryCode": "CU",
+			"description": "Cuba"
+		},
+		{
+			"countryCode": "CW",
+			"description": "Curaçao"
+		},
+		{
+			"countryCode": "CY",
+			"description": "Cyprus"
+		},
+		{
+			"countryCode": "CZ",
+			"description": "Czechia"
+		},
+		{
+			"countryCode": "CI",
+			"description": "Côte d’Ivoire"
+		},
+		{
+			"countryCode": "DK",
+			"description": "Denmark"
+		},
+		{
+			"countryCode": "DJ",
+			"description": "Djibouti"
+		},
+		{
+			"countryCode": "DM",
+			"description": "Dominica"
+		},
+		{
+			"countryCode": "DO",
+			"description": "Dominican Republic"
+		},
+		{
+			"countryCode": "EC",
+			"description": "Ecuador"
+		},
+		{
+			"countryCode": "EG",
+			"description": "Egypt"
+		},
+		{
+			"countryCode": "SV",
+			"description": "El Salvador"
+		},
+		{
+			"countryCode": "GQ",
+			"description": "Equatorial Guinea"
+		},
+		{
+			"countryCode": "ER",
+			"description": "Eritrea"
+		},
+		{
+			"countryCode": "EE",
+			"description": "Estonia"
+		},
+		{
+			"countryCode": "SZ",
+			"description": "Eswatini"
+		},
+		{
+			"countryCode": "ET",
+			"description": "Ethiopia"
+		},
+		{
+			"countryCode": "FK",
+			"description": "Falkland Islands"
+		},
+		{
+			"countryCode": "FO",
+			"description": "Faroe Islands"
+		},
+		{
+			"countryCode": "FJ",
+			"description": "Fiji"
+		},
+		{
+			"countryCode": "FI",
+			"description": "Finland"
+		},
+		{
+			"countryCode": "FR",
+			"description": "France"
+		},
+		{
+			"countryCode": "GF",
+			"description": "French Guiana"
+		},
+		{
+			"countryCode": "PF",
+			"description": "French Polynesia"
+		},
+		{
+			"countryCode": "TF",
+			"description": "French Southern Territories"
+		},
+		{
+			"countryCode": "GA",
+			"description": "Gabon"
+		},
+		{
+			"countryCode": "GM",
+			"description": "Gambia"
+		},
+		{
+			"countryCode": "GE",
+			"description": "Georgia"
+		},
+		{
+			"countryCode": "DE",
+			"description": "Germany"
+		},
+		{
+			"countryCode": "GH",
+			"description": "Ghana"
+		},
+		{
+			"countryCode": "GI",
+			"description": "Gibraltar"
+		},
+		{
+			"countryCode": "GR",
+			"description": "Greece"
+		},
+		{
+			"countryCode": "GL",
+			"description": "Greenland"
+		},
+		{
+			"countryCode": "GD",
+			"description": "Grenada"
+		},
+		{
+			"countryCode": "GP",
+			"description": "Guadeloupe"
+		},
+		{
+			"countryCode": "GU",
+			"description": "Guam"
+		},
+		{
+			"countryCode": "GT",
+			"description": "Guatemala"
+		},
+		{
+			"countryCode": "GG",
+			"description": "Guernsey"
+		},
+		{
+			"countryCode": "GN",
+			"description": "Guinea"
+		},
+		{
+			"countryCode": "GW",
+			"description": "Guinea-Bissau"
+		},
+		{
+			"countryCode": "GY",
+			"description": "Guyana"
+		},
+		{
+			"countryCode": "HT",
+			"description": "Haiti"
+		},
+		{
+			"countryCode": "HM",
+			"description": "Heard & McDonald Islands"
+		},
+		{
+			"countryCode": "HN",
+			"description": "Honduras"
+		},
+		{
+			"countryCode": "HK",
+			"description": "Hong Kong SAR China"
+		},
+		{
+			"countryCode": "HU",
+			"description": "Hungary"
+		},
+		{
+			"countryCode": "IS",
+			"description": "Iceland"
+		},
+		{
+			"countryCode": "IN",
+			"description": "India"
+		},
+		{
+			"countryCode": "ID",
+			"description": "Indonesia"
+		},
+		{
+			"countryCode": "IR",
+			"description": "Iran"
+		},
+		{
+			"countryCode": "IQ",
+			"description": "Iraq"
+		},
+		{
+			"countryCode": "IE",
+			"description": "Ireland"
+		},
+		{
+			"countryCode": "IM",
+			"description": "Isle of Man"
+		},
+		{
+			"countryCode": "IL",
+			"description": "Israel"
+		},
+		{
+			"countryCode": "IT",
+			"description": "Italy"
+		},
+		{
+			"countryCode": "JM",
+			"description": "Jamaica"
+		},
+		{
+			"countryCode": "JP",
+			"description": "Japan"
+		},
+		{
+			"countryCode": "JE",
+			"description": "Jersey"
+		},
+		{
+			"countryCode": "JO",
+			"description": "Jordan"
+		},
+		{
+			"countryCode": "KZ",
+			"description": "Kazakhstan"
+		},
+		{
+			"countryCode": "KE",
+			"description": "Kenya"
+		},
+		{
+			"countryCode": "KI",
+			"description": "Kiribati"
+		},
+		{
+			"countryCode": "KW",
+			"description": "Kuwait"
+		},
+		{
+			"countryCode": "KG",
+			"description": "Kyrgyzstan"
+		},
+		{
+			"countryCode": "LA",
+			"description": "Laos"
+		},
+		{
+			"countryCode": "LV",
+			"description": "Latvia"
+		},
+		{
+			"countryCode": "LB",
+			"description": "Lebanon"
+		},
+		{
+			"countryCode": "LS",
+			"description": "Lesotho"
+		},
+		{
+			"countryCode": "LR",
+			"description": "Liberia"
+		},
+		{
+			"countryCode": "LY",
+			"description": "Libya"
+		},
+		{
+			"countryCode": "LI",
+			"description": "Liechtenstein"
+		},
+		{
+			"countryCode": "LT",
+			"description": "Lithuania"
+		},
+		{
+			"countryCode": "LU",
+			"description": "Luxembourg"
+		},
+		{
+			"countryCode": "MO",
+			"description": "Macao SAR China"
+		},
+		{
+			"countryCode": "MG",
+			"description": "Madagascar"
+		},
+		{
+			"countryCode": "MW",
+			"description": "Malawi"
+		},
+		{
+			"countryCode": "MY",
+			"description": "Malaysia"
+		},
+		{
+			"countryCode": "MV",
+			"description": "Maldives"
+		},
+		{
+			"countryCode": "ML",
+			"description": "Mali"
+		},
+		{
+			"countryCode": "MT",
+			"description": "Malta"
+		},
+		{
+			"countryCode": "MH",
+			"description": "Marshall Islands"
+		},
+		{
+			"countryCode": "MQ",
+			"description": "Martinique"
+		},
+		{
+			"countryCode": "MR",
+			"description": "Mauritania"
+		},
+		{
+			"countryCode": "MU",
+			"description": "Mauritius"
+		},
+		{
+			"countryCode": "YT",
+			"description": "Mayotte"
+		},
+		{
+			"countryCode": "MX",
+			"description": "Mexico"
+		},
+		{
+			"countryCode": "FM",
+			"description": "Micronesia"
+		},
+		{
+			"countryCode": "MD",
+			"description": "Moldova"
+		},
+		{
+			"countryCode": "MC",
+			"description": "Monaco"
+		},
+		{
+			"countryCode": "MN",
+			"description": "Mongolia"
+		},
+		{
+			"countryCode": "ME",
+			"description": "Montenegro"
+		},
+		{
+			"countryCode": "MS",
+			"description": "Montserrat"
+		},
+		{
+			"countryCode": "MA",
+			"description": "Morocco"
+		},
+		{
+			"countryCode": "MZ",
+			"description": "Mozambique"
+		},
+		{
+			"countryCode": "MM",
+			"description": "Myanmar (Burma)"
+		},
+		{
+			"countryCode": "NA",
+			"description": "Namibia"
+		},
+		{
+			"countryCode": "NR",
+			"description": "Nauru"
+		},
+		{
+			"countryCode": "NP",
+			"description": "Nepal"
+		},
+		{
+			"countryCode": "NL",
+			"description": "Netherlands"
+		},
+		{
+			"countryCode": "NC",
+			"description": "New Caledonia"
+		},
+		{
+			"countryCode": "NZ",
+			"description": "New Zealand"
+		},
+		{
+			"countryCode": "NI",
+			"description": "Nicaragua"
+		},
+		{
+			"countryCode": "NE",
+			"description": "Niger"
+		},
+		{
+			"countryCode": "NG",
+			"description": "Nigeria"
+		},
+		{
+			"countryCode": "NU",
+			"description": "Niue"
+		},
+		{
+			"countryCode": "NF",
+			"description": "Norfolk Island"
+		},
+		{
+			"countryCode": "KP",
+			"description": "North Korea"
+		},
+		{
+			"countryCode": "MK",
+			"description": "North Macedonia"
+		},
+		{
+			"countryCode": "MP",
+			"description": "Northern Mariana Islands"
+		},
+		{
+			"countryCode": "NO",
+			"description": "Norway"
+		},
+		{
+			"countryCode": "OM",
+			"description": "Oman"
+		},
+		{
+			"countryCode": "PK",
+			"description": "Pakistan"
+		},
+		{
+			"countryCode": "PW",
+			"description": "Palau"
+		},
+		{
+			"countryCode": "PS",
+			"description": "Palestinian Territories"
+		},
+		{
+			"countryCode": "PA",
+			"description": "Panama"
+		},
+		{
+			"countryCode": "PG",
+			"description": "Papua New Guinea"
+		},
+		{
+			"countryCode": "PY",
+			"description": "Paraguay"
+		},
+		{
+			"countryCode": "PE",
+			"description": "Peru"
+		},
+		{
+			"countryCode": "PH",
+			"description": "Philippines"
+		},
+		{
+			"countryCode": "PN",
+			"description": "Pitcairn Islands"
+		},
+		{
+			"countryCode": "PL",
+			"description": "Poland"
+		},
+		{
+			"countryCode": "PT",
+			"description": "Portugal"
+		},
+		{
+			"countryCode": "PR",
+			"description": "Puerto Rico"
+		},
+		{
+			"countryCode": "QA",
+			"description": "Qatar"
+		},
+		{
+			"countryCode": "RO",
+			"description": "Romania"
+		},
+		{
+			"countryCode": "RU",
+			"description": "Russia"
+		},
+		{
+			"countryCode": "RW",
+			"description": "Rwanda"
+		},
+		{
+			"countryCode": "RE",
+			"description": "Réunion"
+		},
+		{
+			"countryCode": "WS",
+			"description": "Samoa"
+		},
+		{
+			"countryCode": "SM",
+			"description": "San Marino"
+		},
+		{
+			"countryCode": "SA",
+			"description": "Saudi Arabia"
+		},
+		{
+			"countryCode": "SN",
+			"description": "Senegal"
+		},
+		{
+			"countryCode": "RS",
+			"description": "Serbia"
+		},
+		{
+			"countryCode": "SC",
+			"description": "Seychelles"
+		},
+		{
+			"countryCode": "SL",
+			"description": "Sierra Leone"
+		},
+		{
+			"countryCode": "SG",
+			"description": "Singapore"
+		},
+		{
+			"countryCode": "SX",
+			"description": "Sint Maarten"
+		},
+		{
+			"countryCode": "SK",
+			"description": "Slovakia"
+		},
+		{
+			"countryCode": "SI",
+			"description": "Slovenia"
+		},
+		{
+			"countryCode": "SB",
+			"description": "Solomon Islands"
+		},
+		{
+			"countryCode": "SO",
+			"description": "Somalia"
+		},
+		{
+			"countryCode": "ZA",
+			"description": "South Africa"
+		},
+		{
+			"countryCode": "GS",
+			"description": "South Georgia & South Sandwich Islands"
+		},
+		{
+			"countryCode": "KR",
+			"description": "South Korea"
+		},
+		{
+			"countryCode": "SS",
+			"description": "South Sudan"
+		},
+		{
+			"countryCode": "ES",
+			"description": "Spain"
+		},
+		{
+			"countryCode": "LK",
+			"description": "Sri Lanka"
+		},
+		{
+			"countryCode": "BL",
+			"description": "St. Barthélemy"
+		},
+		{
+			"countryCode": "SH",
+			"description": "St. Helena"
+		},
+		{
+			"countryCode": "KN",
+			"description": "St. Kitts & Nevis"
+		},
+		{
+			"countryCode": "LC",
+			"description": "St. Lucia"
+		},
+		{
+			"countryCode": "MF",
+			"description": "St. Martin"
+		},
+		{
+			"countryCode": "PM",
+			"description": "St. Pierre & Miquelon"
+		},
+		{
+			"countryCode": "VC",
+			"description": "St. Vincent & Grenadines"
+		},
+		{
+			"countryCode": "SD",
+			"description": "Sudan"
+		},
+		{
+			"countryCode": "SR",
+			"description": "Suriname"
+		},
+		{
+			"countryCode": "SJ",
+			"description": "Svalbard & Jan Mayen"
+		},
+		{
+			"countryCode": "SE",
+			"description": "Sweden"
+		},
+		{
+			"countryCode": "CH",
+			"description": "Switzerland"
+		},
+		{
+			"countryCode": "SY",
+			"description": "Syria"
+		},
+		{
+			"countryCode": "ST",
+			"description": "São Tomé & Príncipe"
+		},
+		{
+			"countryCode": "TW",
+			"description": "Taiwan"
+		},
+		{
+			"countryCode": "TJ",
+			"description": "Tajikistan"
+		},
+		{
+			"countryCode": "TZ",
+			"description": "Tanzania"
+		},
+		{
+			"countryCode": "TH",
+			"description": "Thailand"
+		},
+		{
+			"countryCode": "TL",
+			"description": "Timor-Leste"
+		},
+		{
+			"countryCode": "TG",
+			"description": "Togo"
+		},
+		{
+			"countryCode": "TK",
+			"description": "Tokelau"
+		},
+		{
+			"countryCode": "TO",
+			"description": "Tonga"
+		},
+		{
+			"countryCode": "TT",
+			"description": "Trinidad & Tobago"
+		},
+		{
+			"countryCode": "TN",
+			"description": "Tunisia"
+		},
+		{
+			"countryCode": "TR",
+			"description": "Turkey"
+		},
+		{
+			"countryCode": "TM",
+			"description": "Turkmenistan"
+		},
+		{
+			"countryCode": "TC",
+			"description": "Turks & Caicos Islands"
+		},
+		{
+			"countryCode": "TV",
+			"description": "Tuvalu"
+		},
+		{
+			"countryCode": "UM",
+			"description": "U.S. Outlying Islands"
+		},
+		{
+			"countryCode": "VI",
+			"description": "U.S. Virgin Islands"
+		},
+		{
+			"countryCode": "UG",
+			"description": "Uganda"
+		},
+		{
+			"countryCode": "UA",
+			"description": "Ukraine"
+		},
+		{
+			"countryCode": "AE",
+			"description": "United Arab Emirates"
+		},
+		{
+			"countryCode": "GB",
+			"description": "United Kingdom"
+		},
+		{
+			"countryCode": "US",
+			"description": "United States"
+		},
+		{
+			"countryCode": "UY",
+			"description": "Uruguay"
+		},
+		{
+			"countryCode": "UZ",
+			"description": "Uzbekistan"
+		},
+		{
+			"countryCode": "VU",
+			"description": "Vanuatu"
+		},
+		{
+			"countryCode": "VA",
+			"description": "Vatican City"
+		},
+		{
+			"countryCode": "VE",
+			"description": "Venezuela"
+		},
+		{
+			"countryCode": "VN",
+			"description": "Vietnam"
+		},
+		{
+			"countryCode": "WF",
+			"description": "Wallis & Futuna"
+		},
+		{
+			"countryCode": "EH",
+			"description": "Western Sahara"
+		},
+		{
+			"countryCode": "YE",
+			"description": "Yemen"
+		},
+		{
+			"countryCode": "ZM",
+			"description": "Zambia"
+		},
+		{
+			"countryCode": "ZW",
+			"description": "Zimbabwe"
+		},
+		{
+			"countryCode": "AX",
+			"description": "Åland Islands"
+		}
+	],
+	"patientOrderOutreachResults": [
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "No Answer",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "f1884368-192d-4062-ab13-94f2283d0f37",
+			"patientOrderOutreachResultTypeId": "NO_ANSWER"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Busy",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "27bab444-57eb-4421-b94a-cec7fa74f759",
+			"patientOrderOutreachResultTypeId": "BUSY"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Left Voicemail",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "76c8c9b2-140a-423a-8d20-dd6fad5afb50",
+			"patientOrderOutreachResultTypeId": "LEFT_VOICEMAIL"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Left Message",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "e791c269-f306-4fb8-b0bc-47505ce0f4c1",
+			"patientOrderOutreachResultTypeId": "LEFT_MESSAGE"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Disconnected",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "56d5f7ce-3457-44d6-b04b-dd9444c5cf9a",
+			"patientOrderOutreachResultTypeId": "DISCONNECTED"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "NOT_CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Wrong Number",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Not Connected",
+			"patientOrderOutreachResultId": "fdd4fdcd-1597-4fd7-9c1c-dae582f80fea",
+			"patientOrderOutreachResultTypeId": "WRONG_NUMBER"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Discussed Appointment",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "471b2ed6-3c3a-4b8f-9f8c-49942b803850",
+			"patientOrderOutreachResultTypeId": "DISCUSSED_APPOINTMENT"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Discussed Digital Screening",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "9240e3e8-0e09-40de-b6f8-5718bdddb796",
+			"patientOrderOutreachResultTypeId": "DISCUSSED_DIGITAL_SCREENING"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Discussed Resources",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "a4dbba6e-6aba-4371-8a26-ce092c29ecf5",
+			"patientOrderOutreachResultTypeId": "DISCUSSED_RESOURCES"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Discussed Other",
+			"patientOrderOutreachTypeId": "PHONE_CALL",
+			"patientOrderOutreachTypeDescription": "Phone Call",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "1197dd93-80a8-4670-9b00-2f4612a8c123",
+			"patientOrderOutreachResultTypeId": "DISCUSSED_OTHER"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Sent Resources",
+			"patientOrderOutreachTypeId": "MYCHART_MESSAGE",
+			"patientOrderOutreachTypeDescription": "MyChart Message",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "6e7056a0-6415-4e3b-82a5-ea823757a304",
+			"patientOrderOutreachResultTypeId": "SENT_RESOURCES"
+		},
+		{
+			"patientOrderOutreachResultStatusId": "CONNECTED",
+			"patientOrderOutreachResultTypeDescription": "Sent Other",
+			"patientOrderOutreachTypeId": "MYCHART_MESSAGE",
+			"patientOrderOutreachTypeDescription": "MyChart Message",
+			"patientOrderOutreachResultStatusDescription": "Connected",
+			"patientOrderOutreachResultId": "1928c684-410b-41bf-873e-2ff02f032a45",
+			"patientOrderOutreachResultTypeId": "SENT_OTHER"
+		}
+	],
+	"patientOrderReferralReasons": [
+		{
+			"patientOrderReferralReasonId": "ADJUSTMENT_DISORDERS",
+			"description": "Adjustment disorders"
+		},
+		{
+			"patientOrderReferralReasonId": "FEEDING_OR_EATING_DISORDERS",
+			"description": "Feeding or eating disorders"
+		},
+		{
+			"patientOrderReferralReasonId": "IMPULSE_CONTROL_AND_CONDUCT_DISORDERS",
+			"description": "Impulse control and conduct disorders"
+		},
+		{
+			"patientOrderReferralReasonId": "NEURODEVELOPMENTAL_DISORDERS",
+			"description": "Neurodevelopmental disorders"
+		},
+		{
+			"patientOrderReferralReasonId": "PERSONALITY_DISORDERS",
+			"description": "Personality disorders"
+		},
+		{
+			"patientOrderReferralReasonId": "PSYCHOPHARMACOLOGY_MANAGEMENT",
+			"description": "Psychopharmacology management"
+		},
+		{
+			"patientOrderReferralReasonId": "SEXUAL_INTEREST_OR_DISFUNCTION_OR_GENDER_DYSPHORIA",
+			"description": "Sexual interest disorders / sexual dysfunction / gender dysphoria"
+		}
+	],
+	"primaryPayorNames": [
+		"ZZZAmerican General Life Insurance Company",
+		"ZZZAmerican Republic Insurance Company",
+		"ZZZDelta Dental Insurance Company",
+		"ZZZFriday Health Plans of Nevada, Inc.",
+		"ZZZTexHealth Central Texas",
+		"ZZZThe Ohio National Life Insurance Company",
+		"ZZZThe United States Life Ins. Co. in the City of New York",
+		"ZZZUnion Security Insurance Company",
+		"ZZZUnited Concordia Insurance Company"
+	],
+	"patientOrderScheduledMessageTypes": [
+		{
+			"description": "Welcome",
+			"patientOrderScheduledMessageTypeId": "WELCOME"
+		},
+		{
+			"description": "Resource Check-In",
+			"patientOrderScheduledMessageTypeId": "RESOURCE_CHECK_IN"
+		}
+	],
+	"ethnicities": [
+		{
+			"ethnicityId": "HISPANIC_OR_LATINO",
+			"description": "Hispanic or Latino"
+		},
+		{
+			"ethnicityId": "NOT_HISPANIC_OR_LATINO",
+			"description": "Not Hispanic or Latino"
+		},
+		{
+			"ethnicityId": "NOT_DISCLOSED",
+			"description": "Do not wish to disclose"
+		}
+	],
+	"patientOrderResourcingTypes": [
+		{
+			"description": "None",
+			"patientOrderResourcingTypeId": "NONE"
+		},
+		{
+			"description": "Phone Call",
+			"patientOrderResourcingTypeId": "PHONE_CALL"
+		},
+		{
+			"description": "MyChart Message",
+			"patientOrderResourcingTypeId": "MYCHART_MESSAGE"
+		},
+		{
+			"description": "Quartet Referral",
+			"patientOrderResourcingTypeId": "QUARTET_REFERRAL"
+		}
+	],
+	"birthSexes": [
+		{
+			"birthSexId": "MALE",
+			"description": "Male"
+		},
+		{
+			"birthSexId": "FEMALE",
+			"description": "Female"
+		},
+		{
+			"birthSexId": "OTHER",
+			"description": "Other"
+		},
+		{
+			"birthSexId": "UNKNOWN",
+			"description": "Unknown"
+		},
+		{
+			"birthSexId": "NOT_DISCLOSED",
+			"description": "Do not wish to disclose"
+		}
+	],
+	"patientOrderTriageOverrideReasons": [
+		{
+			"description": "Not Overridden",
+			"patientOrderTriageOverrideReasonId": "NOT_OVERRIDDEN"
+		},
+		{
+			"description": "Patient preference",
+			"patientOrderTriageOverrideReasonId": "PATIENT_PREFERENCE"
+		},
+		{
+			"description": "Patient's symptoms require higher level of care",
+			"patientOrderTriageOverrideReasonId": "HIGHER_LEVEL_OF_CARE_REQUIRED"
+		},
+		{
+			"description": "Patients who score low to no symptoms but patient requests mental health resources",
+			"patientOrderTriageOverrideReasonId": "PATIENT_REQUESTED_RESOURCES"
+		},
+		{
+			"description": "Clinical review with behavioral health specialist",
+			"patientOrderTriageOverrideReasonId": "CLINICAL_REVIEW_WITH_BHS"
+		},
+		{
+			"description": "Clinical review with psychiatrist",
+			"patientOrderTriageOverrideReasonId": "CLINICAL_REVIEW_WITH_PSYCHIATRIST"
+		},
+		{
+			"description": "Primary Care Provider request",
+			"patientOrderTriageOverrideReasonId": "PCP_REQUEST"
+		},
+		{
+			"description": "Other",
+			"patientOrderTriageOverrideReasonId": "OTHER"
+		}
+	],
+	"genderIdentities": [
+		{
+			"genderIdentityId": "MALE",
+			"description": "Male"
+		},
+		{
+			"genderIdentityId": "FEMALE",
+			"description": "Female"
+		},
+		{
+			"genderIdentityId": "TRANSGENDER_MTF",
+			"description": "Transgender male-to-female"
+		},
+		{
+			"genderIdentityId": "TRANSGENDER_FTM",
+			"description": "Transgender female-to-male"
+		},
+		{
+			"genderIdentityId": "NON_BINARY",
+			"description": "Non-binary"
+		},
+		{
+			"genderIdentityId": "OTHER",
+			"description": "Other gender identity"
+		},
+		{
+			"genderIdentityId": "NOT_DISCLOSED",
+			"description": "Do not wish to disclose"
+		}
+	],
+	"races": [
+		{
+			"raceId": "AMERICAN_INDIAN_OR_ALASKA_NATIVE",
+			"description": "American Indian or Alaska Native"
+		},
+		{
+			"raceId": "ASIAN",
+			"description": "Asian"
+		},
+		{
+			"raceId": "BLACK_OR_AFRICAN_AMERICAN",
+			"description": "Black or African American"
+		},
+		{
+			"raceId": "HAWAIIAN_OR_PACIFIC_ISLANDER",
+			"description": "Native Hawaiian or Other Pacific Islander"
+		},
+		{
+			"raceId": "OTHER",
+			"description": "Other"
+		},
+		{
+			"raceId": "WHITE",
+			"description": "White"
+		},
+		{
+			"raceId": "NOT_DISCLOSED",
+			"description": "Do not wish to disclose"
+		}
+	],
+	"patientOrderTriageStatuses": [
+		{
+			"NOT_TRIAGED": "Not Triaged"
+		},
+		{
+			"SPECIALTY_CARE": "Specialty Care"
+		},
+		{
+			"MHP": "MHP"
+		},
+		{
+			"SUBCLINICAL": "Subclinical"
+		}
+	],
+	"timeZones": [
+		{
+			"timeZone": "America/Anchorage",
+			"description": "Alaska Time (America/Anchorage)"
+		},
+		{
+			"timeZone": "America/Juneau",
+			"description": "Alaska Time (America/Juneau)"
+		},
+		{
+			"timeZone": "America/Metlakatla",
+			"description": "Alaska Time (America/Metlakatla)"
+		},
+		{
+			"timeZone": "America/Nome",
+			"description": "Alaska Time (America/Nome)"
+		},
+		{
+			"timeZone": "America/Sitka",
+			"description": "Alaska Time (America/Sitka)"
+		},
+		{
+			"timeZone": "America/Yakutat",
+			"description": "Alaska Time (America/Yakutat)"
+		},
+		{
+			"timeZone": "America/Puerto_Rico",
+			"description": "Atlantic Time (America/Puerto_Rico)"
+		},
+		{
+			"timeZone": "America/Chicago",
+			"description": "Central Time (America/Chicago)"
+		},
+		{
+			"timeZone": "America/Indiana/Knox",
+			"description": "Central Time (America/Indiana/Knox)"
+		},
+		{
+			"timeZone": "America/Indiana/Tell_City",
+			"description": "Central Time (America/Indiana/Tell_City)"
+		},
+		{
+			"timeZone": "America/Menominee",
+			"description": "Central Time (America/Menominee)"
+		},
+		{
+			"timeZone": "America/North_Dakota/Beulah",
+			"description": "Central Time (America/North_Dakota/Beulah)"
+		},
+		{
+			"timeZone": "America/North_Dakota/Center",
+			"description": "Central Time (America/North_Dakota/Center)"
+		},
+		{
+			"timeZone": "America/North_Dakota/New_Salem",
+			"description": "Central Time (America/North_Dakota/New_Salem)"
+		},
+		{
+			"timeZone": "America/Detroit",
+			"description": "Eastern Time (America/Detroit)"
+		},
+		{
+			"timeZone": "America/Fort_Wayne",
+			"description": "Eastern Time (America/Fort_Wayne)"
+		},
+		{
+			"timeZone": "America/Indiana/Indianapolis",
+			"description": "Eastern Time (America/Indiana/Indianapolis)"
+		},
+		{
+			"timeZone": "America/Kentucky/Louisville",
+			"description": "Eastern Time (America/Kentucky/Louisville)"
+		},
+		{
+			"timeZone": "America/Kentucky/Monticello",
+			"description": "Eastern Time (America/Kentucky/Monticello)"
+		},
+		{
+			"timeZone": "America/New_York",
+			"description": "Eastern Time (America/New_York)"
+		},
+		{
+			"timeZone": "America/Adak",
+			"description": "Hawaii-Aleutian Time (America/Adak)"
+		},
+		{
+			"timeZone": "America/Atka",
+			"description": "Hawaii-Aleutian Time (America/Atka)"
+		},
+		{
+			"timeZone": "America/Boise",
+			"description": "Mountain Time (America/Boise)"
+		},
+		{
+			"timeZone": "America/Denver",
+			"description": "Mountain Time (America/Denver)"
+		},
+		{
+			"timeZone": "America/Phoenix",
+			"description": "Mountain Time (America/Phoenix)"
+		},
+		{
+			"timeZone": "America/Shiprock",
+			"description": "Mountain Time (America/Shiprock)"
+		},
+		{
+			"timeZone": "America/Los_Angeles",
+			"description": "Pacific Time (America/Los_Angeles)"
+		}
+	],
+	"referringPracticeNames": [
+		"ZZZFamily Medicine",
+		"ZZZGeneral Internal Medicine",
+		"ZZZGeneral Pediatrics",
+		"ZZZGeriatrics (Gerontology)",
+		"ZZZInternal Medicine",
+		"ZZZLifestyle Medicine"
+	]
+}

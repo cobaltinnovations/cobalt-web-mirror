@@ -1,6 +1,6 @@
 import FileInputButton from '@/components/file-input-button';
 import type { Meta, StoryObj } from '@storybook/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Container } from 'react-bootstrap';
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 

@@ -22,6 +22,13 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The browser will hot reload on save.<br />
 You will see any lint errors in the console.
 
+### `npm run storybook`
+
+Runs storybook for UI components.<br />
+Open [http://localhost:6006](http://localhost:6006) to view it in the browser.
+
+Read more about the storybook integration [here](./src/stories/helpers/README.md)
+
 ### `npm run test`
 
 Launches jest in interactive watch mode.<br />

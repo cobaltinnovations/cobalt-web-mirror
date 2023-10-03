@@ -21,6 +21,7 @@ import { ReactComponent as ChairIcon } from '@/assets/icons/chair.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
 import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location.svg';
+import { WysiwygDisplay } from './admin-cms/wysiwyg';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -114,10 +115,7 @@ const GroupSession = ({
 							<Col>
 								<h2 className="mb-2 mb-lg-3">{groupSession.title}</h2>
 								<p className="mb-6 text-muted">with {groupSession.facilitatorName}</p>
-								<div
-									className="mb-6 mb-lg-10"
-									dangerouslySetInnerHTML={{ __html: groupSession.description ?? '' }}
-								/>
+								<WysiwygDisplay className="mb-6 mb-lg-10" html={groupSession.description ?? ''} />
 
 								{(groupSession.tags ?? []).length > 0 && (
 									<div className="d-flex flex-wrap">

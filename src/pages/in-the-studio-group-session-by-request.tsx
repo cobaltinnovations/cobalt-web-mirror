@@ -18,6 +18,7 @@ import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -136,10 +137,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 								<img src={session?.imageUrl} alt="" />
 							</div>
 							<Card className="mb-5 border-0 p-6">
-								<div
-									className="wysiwyg-display"
-									dangerouslySetInnerHTML={{ __html: session?.description || '' }}
-								></div>
+								<WysiwygDisplay html={session?.description ?? ''} />
 								<p className="mb-0 text-danger">required*</p>
 							</Card>
 							<Formik<RequestSessionFormData>

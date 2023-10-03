@@ -50,8 +50,8 @@ const theme: CobaltTheme = {
 		},
 		h1: {
 			default: {
-				fontSize: '3.5rem',
-				lineHeight: '4.0rem',
+				fontSize: '3.6rem',
+				lineHeight: '4.4rem',
 			},
 			mobile: {
 				fontSize: '2.9rem',
@@ -60,8 +60,8 @@ const theme: CobaltTheme = {
 		},
 		h2: {
 			default: {
-				fontSize: '2.9rem',
-				lineHeight: '3.2rem',
+				fontSize: '3.0rem',
+				lineHeight: '3.8rem',
 			},
 			mobile: {
 				fontSize: '2.4rem',
