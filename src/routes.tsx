@@ -176,6 +176,8 @@ const RedirectToAdminHome = () => {
 		return <Navigate to="group-sessions" />;
 	} else if (account?.accountCapabilityFlags.canViewProviderReports) {
 		return <Navigate to="reports" />;
+	} else if (account?.accountCapabilityFlags.canViewAnalytics) {
+		return <Navigate to="analytics" />;
 	} else {
 		return <NoMatch />;
 	}
