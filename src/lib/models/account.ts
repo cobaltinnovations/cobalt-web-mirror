@@ -31,7 +31,6 @@ export interface AccountModel {
 	birthSexId?: string;
 	birthdate?: string;
 	birthdateDescription?: string;
-	capabilities?: Record<string, AccountInstitutionCapabilities>;
 	consentFormAccepted: false;
 	consentFormAcceptedDate?: string;
 	consentFormAcceptedDateDescription?: string;
@@ -68,15 +67,15 @@ export interface AccountModel {
 		canEditIcTriages: boolean;
 		canImportIcPatientOrders: boolean;
 		canViewIcReports: boolean;
+		canAdministerContent: boolean; // My Content / Available Content admin tabs
+		canAdministerGroupSessions: boolean; // Group Session admin tab
+		canViewAnalytics: boolean; // Analytics admin tab
+		canViewProviderReports: boolean; // Reports admin tab
+		canViewProviderReportAppointments: boolean; // PROVIDER_APPOINTMENTS report option in dropdown
+		canViewProviderReportAppointmentsEap: boolean; // PROVIDER_APPOINTMENTS_EAP report option in dropdown
+		canViewProviderReportAppointmentCancelations: boolean; // `PROVIDER_APPOINTMENT_CANCELATIONS` report option in dropdown
+		canViewProviderReportUnusedAvailability: boolean; // `PROVIDER_UNUSED_AVAILABILITY` report option in dropdown
 	};
-}
-
-export interface AccountInstitutionCapabilities {
-	viewNavAdminAvailableContent: boolean;
-	viewNavAdminGroupSession: boolean;
-	viewNavAdminGroupSessionRequest: boolean;
-	viewNavAdminMyContent: boolean;
-	viewNavAdminReports: boolean;
 }
 
 export interface AccountQuestionModel {
