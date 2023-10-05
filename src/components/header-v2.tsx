@@ -302,7 +302,7 @@ const HeaderV2 = () => {
 	const classes = useHeaderV2Styles();
 	const revalidator = useRevalidator();
 
-	const { account, institution, hasAdminNavCapabilities, signOutAndClearContext } = useAccount();
+	const { account, institution, isAdmin, isProvider, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
@@ -510,7 +510,7 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	const adminNavigationConfig = useMemo(() => {
 		return [
-			...(account?.providerId
+			...(isProvider
 				? [
 						{
 							testId: 'menuLinkScheduling',
@@ -520,7 +520,7 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
-			...(hasAdminNavCapabilities
+			...(isAdmin
 				? [
 						{
 							testId: '',
@@ -531,7 +531,7 @@ const HeaderV2 = () => {
 				  ]
 				: []),
 		];
-	}, [account?.providerId, hasAdminNavCapabilities]);
+	}, [isAdmin, isProvider]);
 
 	const handleAlertDismiss = useCallback(
 		async (alertId: string) => {

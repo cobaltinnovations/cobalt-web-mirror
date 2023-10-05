@@ -75,6 +75,8 @@ export interface Institution {
 	epicFhirEnabled: boolean;
 	externalContactUsUrl: string;
 	privacyPolicyUrl?: string;
+	secureFilesharingPlatformName?: string;
+	secureFilesharingPlatformUrl?: string;
 }
 
 export interface InstitutionFeature {

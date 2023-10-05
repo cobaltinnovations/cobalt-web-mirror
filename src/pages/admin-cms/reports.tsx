@@ -1,16 +1,17 @@
 import moment from 'moment';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { reportingSerive, ReportType } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import HeroContainer from '@/components/hero-container';
 import DatePicker from '@/components/date-picker';
 import { buildBackendDownloadUrl } from '@/lib/utils';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 const Reports = () => {
+	const { institution, account } = useAccount();
 	const [reportingTypes, setReportingTypes] = useState<ReportType[]>([]);
 	const [formValues, setFormValues] = useState({
 		reportTypeId: '',
@@ -18,23 +19,30 @@ const Reports = () => {
 		endDate: '',
 	});
 
+	const enabledReportTypes = useMemo(() => {
+		return {
+			PROVIDER_UNUSED_AVAILABILITY: account?.accountCapabilityFlags.canViewProviderReportUnusedAvailability,
+			PROVIDER_APPOINTMENTS: true,
+			PROVIDER_APPOINTMENT_CANCELATIONS:
+				account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
+			PROVIDER_APPOINTMENTS_EAP: account?.accountCapabilityFlags.canViewProviderReportAppointmentsEap,
+		} as Record<string, boolean>;
+	}, [
+		account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
+		account?.accountCapabilityFlags.canViewProviderReportAppointmentsEap,
+		account?.accountCapabilityFlags.canViewProviderReportUnusedAvailability,
+	]);
+
 	const fetchData = useCallback(async () => {
 		const response = await reportingSerive.getReportTypes().fetch();
 
-		setReportingTypes(
-			response.reportTypes.filter((rt) => {
-				return (
-					rt.reportTypeId === 'PROVIDER_UNUSED_AVAILABILITY' ||
-					rt.reportTypeId === 'PROVIDER_APPOINTMENTS' ||
-					rt.reportTypeId === 'PROVIDER_APPOINTMENT_CANCELATIONS'
-				);
-			})
-		);
+		setReportingTypes(response.reportTypes.filter((rt) => enabledReportTypes[rt.reportTypeId]));
+
 		setFormValues((previousValues) => ({
 			...previousValues,
 			reportTypeId: response.reportTypes[0].reportTypeId,
 		}));
-	}, []);
+	}, [enabledReportTypes]);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -134,6 +142,32 @@ const Reports = () => {
 										}));
 									}}
 								/>
+								<p>
+									Patient privacy is our highest priority at Cobalt. If you chose to download reports,
+									the information is only to be used for internal analysis, reporting or
+									reconciliation.
+								</p>
+								<p>
+									Personally identifiable information should never be shared outside of the Cobalt
+									team and its partners, and never shared via email.
+								</p>
+
+								{institution.secureFilesharingPlatformName &&
+									institution.secureFilesharingPlatformUrl && (
+										<p>
+											Please always use{' '}
+											<a
+												href={institution.secureFilesharingPlatformUrl}
+												target="_blank"
+												rel="noreferrer noopener"
+											>
+												{institution.secureFilesharingPlatformName}
+											</a>{' '}
+											if and when you need to share PHI, and only under very limited
+											circumstances. Thank you.
+										</p>
+									)}
+
 								<div className="text-right">
 									<Button
 										type="submit"
