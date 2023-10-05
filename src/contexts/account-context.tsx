@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react';
 
-import { AccountInstitutionCapabilities, AccountModel, LoginDestinationId, ROLE_ID } from '@/lib/models';
+import { AccountModel, LoginDestinationId, ROLE_ID } from '@/lib/models';
 import { accountService } from '@/lib/services';
 
 import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/institution';
@@ -11,8 +11,8 @@ type AccountContextConfig = {
 	account: AccountModel | undefined;
 	institution: Institution;
 	accountSources: AccountSource[];
-	institutionCapabilities: AccountInstitutionCapabilities | undefined;
-	hasAdminNavCapabilities: boolean;
+	isAdmin: boolean;
+	isProvider: boolean;
 	isIntegratedCarePatient: boolean;
 	isIntegratedCareStaff: boolean;
 	signOutAndClearContext: () => void;
@@ -64,10 +64,6 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [accountId]);
 
-	const institutionCapabilities = useMemo(() => {
-		return accountResponse?.account.capabilities?.[institutionResponse.institution.institutionId];
-	}, [accountResponse?.account.capabilities, institutionResponse.institution.institutionId]);
-
 	const institution = useMemo(
 		() => accountResponse?.institution || institutionResponse.institution,
 		[accountResponse?.institution, institutionResponse.institution]
@@ -83,16 +79,20 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		[institution.integratedCareEnabled, institution.userExperienceTypeId]
 	);
 
-	const hasAdminNavCapabilities = useMemo(() => {
+	const isAdmin = useMemo(() => {
 		return accountResponse?.account.roleId === ROLE_ID.ADMINISTRATOR;
+	}, [accountResponse?.account.roleId]);
+
+	const isProvider = useMemo(() => {
+		return accountResponse?.account.roleId === ROLE_ID.PROVIDER;
 	}, [accountResponse?.account.roleId]);
 
 	const value = {
 		account: accountResponse?.account,
 		institution,
 		accountSources: institutionResponse.accountSources,
-		institutionCapabilities,
-		hasAdminNavCapabilities,
+		isAdmin,
+		isProvider,
 		isIntegratedCarePatient,
 		isIntegratedCareStaff,
 		signOutAndClearContext,
