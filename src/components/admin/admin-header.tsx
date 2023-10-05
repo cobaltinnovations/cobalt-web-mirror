@@ -107,7 +107,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export const AdminHeader = () => {
 	const classes = useStyles();
-	const { institutionCapabilities, signOutAndClearContext } = useAccount();
+	const { account, signOutAndClearContext } = useAccount();
 
 	const isGroupSessionPreview = useMatch({
 		path: '/admin/group-sessions/preview/*',
@@ -136,7 +136,7 @@ export const AdminHeader = () => {
 
 	const navigationLinks = useMemo(
 		() => [
-			...(institutionCapabilities?.viewNavAdminMyContent
+			...(account?.accountCapabilityFlags.canAdministerContent
 				? [
 						{
 							testId: '',
@@ -145,10 +145,6 @@ export const AdminHeader = () => {
 							title: 'My Content',
 							active: !!myContentMatch,
 						},
-				  ]
-				: []),
-			...(institutionCapabilities?.viewNavAdminAvailableContent
-				? [
 						{
 							testId: '',
 							navigationItemId: 'AVAILABLE_CONTENT',
@@ -158,7 +154,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(institutionCapabilities?.viewNavAdminGroupSession
+			...(account?.accountCapabilityFlags.canAdministerGroupSessions
 				? [
 						{
 							testId: '',
@@ -169,7 +165,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(institutionCapabilities?.viewNavAdminReports
+			...(account?.accountCapabilityFlags.canViewProviderReports
 				? [
 						{
 							testId: '',
@@ -207,14 +203,13 @@ export const AdminHeader = () => {
 				: []),
 		],
 		[
+			account?.accountCapabilityFlags.canAdministerContent,
+			account?.accountCapabilityFlags.canAdministerGroupSessions,
+			account?.accountCapabilityFlags.canViewProviderReports,
 			analyticsMatch,
 			availableContentMatch,
 			debugMatch,
 			groupSessionsMatch,
-			institutionCapabilities?.viewNavAdminAvailableContent,
-			institutionCapabilities?.viewNavAdminGroupSession,
-			institutionCapabilities?.viewNavAdminMyContent,
-			institutionCapabilities?.viewNavAdminReports,
 			myContentMatch,
 			reportsMatch,
 		]

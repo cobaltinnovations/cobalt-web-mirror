@@ -168,15 +168,13 @@ const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; 
 };
 
 const RedirectToAdminHome = () => {
-	const { institutionCapabilities } = useAccount();
+	const { account } = useAccount();
 
-	if (institutionCapabilities?.viewNavAdminMyContent) {
+	if (account?.accountCapabilityFlags.canAdministerContent) {
 		return <Navigate to="my-content" />;
-	} else if (institutionCapabilities?.viewNavAdminAvailableContent) {
-		return <Navigate to="availble-content" />;
-	} else if (institutionCapabilities?.viewNavAdminGroupSession) {
+	} else if (account?.accountCapabilityFlags.canAdministerGroupSessions) {
 		return <Navigate to="group-sessions" />;
-	} else if (institutionCapabilities?.viewNavAdminReports) {
+	} else if (account?.accountCapabilityFlags.canViewProviderReports) {
 		return <Navigate to="reports" />;
 	} else {
 		return <NoMatch />;
