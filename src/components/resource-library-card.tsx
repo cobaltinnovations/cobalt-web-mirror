@@ -73,6 +73,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'-webkit-box-orient': 'vertical',
 		'box-orient': 'vertical',
 		overflow: 'hidden',
+		'& p': {
+			marginBottom: 0,
+		},
 	},
 }));
 
@@ -131,7 +134,12 @@ const ResourceLibraryCard = ({
 						</p> */}
 						<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
 						<p className="mb-2 text-gray">by {author}</p>
-						<p className={classNames(classes.description, 'text-dark mb-0')}>{description}</p>
+						<div
+							className={classNames(classes.description, 'fs-default fw-normal text-dark mb-0')}
+							dangerouslySetInnerHTML={{
+								__html: description,
+							}}
+						/>
 					</div>
 				</div>
 			</Link>
