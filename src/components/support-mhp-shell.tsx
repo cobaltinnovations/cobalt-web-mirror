@@ -7,7 +7,7 @@ import InlineAlert from './inline-alert';
 import NoData, { NoDataAction } from './no-data';
 import { PsychiatristRecommendation } from './psychiatrist-recommendation';
 import useAccount from '@/hooks/use-account';
-import { FeatureId, InstitutionFeature } from '@/lib/models';
+import { AccountFeature, FeatureId, InstitutionFeature } from '@/lib/models';
 import { accountService, institutionService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useNavigate } from 'react-router-dom';
@@ -46,9 +46,8 @@ export const SupportMentalHealthProvidersShell = ({
 		[institution?.features]
 	);
 
-	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
-	const [hasScheduled, setHasScheduled] = useState(false);
-	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
+	const [appointmentScheduledByFeatureId, setAppointmentScheduledByFeatureId] = useState<Record<string, boolean>>({});
+	const [recommendedFeatures, setRecommendedFeatures] = useState<AccountFeature[]>([]);
 
 	const fetchData = useCallback(async () => {
 		if (!institution.providerTriageScreeningFlowId) {
@@ -70,25 +69,19 @@ export const SupportMentalHealthProvidersShell = ({
 		}
 
 		if (hasCompletedScreening) {
-			const { appointmentAlreadyScheduled, features } = await accountService
-				.getRecommendedFeatures(account.accountId)
-				.fetch();
-			setHasScheduled(appointmentAlreadyScheduled);
+			const response = await accountService.getRecommendedFeatures(account.accountId).fetch();
+			setAppointmentScheduledByFeatureId(response.appointmentScheduledByFeatureId);
 
-			const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
-			setShowPsychiatristRecommendation(psychiatristIndex > -1);
+			// sort response features so that psychiatrist is always last
+			const sortedFeatures = response.features.sort((f) => {
+				return f.featureId === FeatureId.PSYCHIATRIST ? 1 : -1;
+			});
 
-			const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
-			const matchingInstitutionFeature = institution.features.find(
-				(f) => f.featureId === firstRecommendation?.featureId
-			);
-
-			setRecommendedFeature(matchingInstitutionFeature);
+			setRecommendedFeatures(sortedFeatures);
 		}
 	}, [
 		account?.accountId,
 		hasCompletedScreening,
-		institution.features,
 		institution.institutionId,
 		institution.providerTriageScreeningFlowId,
 		setMyChartAuthUrl,
@@ -140,49 +133,60 @@ export const SupportMentalHealthProvidersShell = ({
 								/>
 							)}
 
-							{hasCompletedScreening && !hasScheduled && (
-								<InlineAlert
-									className="mb-4"
-									variant="success"
-									title="Assessment Complete"
-									description={`Based on the symptoms reported, we recommend ${recommendedFeature?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
-									action={{
-										title: 'Schedule with ' + recommendedFeature?.name,
-										onClick: () => {
-											navigate(recommendedFeature?.urlName ?? '');
-										},
-									}}
-								/>
-							)}
+							{hasCompletedScreening &&
+								recommendedFeatures.map((recommendedFeature) => {
+									const featureDetails = institution.features.find(
+										(f) => f.featureId === recommendedFeature.featureId
+									);
 
-							{hasCompletedScreening && hasScheduled && (
-								<InlineAlert
-									className="mb-4"
-									variant="success"
-									title="Appointment Scheduled"
-									description={`Your appointment with ${recommendedFeature?.name} has been scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
-									action={[
-										{
-											title: 'Go to ' + institution.myChartName,
-											onClick: () => {
-												window.open(
-													institution.myChartDefaultUrl,
-													'_blank',
-													'noopener, noreferrer'
-												);
-											},
-										},
-										{
-											title: 'View My Events',
-											onClick: () => {
-												navigate('/my-calendar');
-											},
-										},
-									]}
-								/>
-							)}
+									if (appointmentScheduledByFeatureId[recommendedFeature.featureId]) {
+										return (
+											<InlineAlert
+												className="mb-4"
+												variant="success"
+												title="Appointment Scheduled"
+												description={`Your ${recommendedFeature?.name} appointment is scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
+												action={[
+													{
+														title: 'Go to ' + institution.myChartName,
+														onClick: () => {
+															window.open(
+																institution.myChartDefaultUrl,
+																'_blank',
+																'noopener, noreferrer'
+															);
+														},
+													},
+													{
+														title: 'View My Events',
+														onClick: () => {
+															navigate('/my-calendar');
+														},
+													},
+												]}
+											/>
+										);
+									}
 
-							{showPsychiatristRecommendation && <PsychiatristRecommendation />}
+									if (recommendedFeature.featureId === FeatureId.PSYCHIATRIST) {
+										return <PsychiatristRecommendation />;
+									}
+
+									return (
+										<InlineAlert
+											className="mb-4"
+											variant="success"
+											title="Assessment Complete"
+											description={`Based on the symptoms reported, we recommend ${featureDetails?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
+											action={{
+												title: 'Schedule with ' + featureDetails?.name,
+												onClick: () => {
+													navigate(featureDetails?.urlName ?? '');
+												},
+											}}
+										/>
+									);
+								})}
 						</Col>
 					</Row>
 				</Container>
