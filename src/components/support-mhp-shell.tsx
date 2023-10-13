@@ -47,8 +47,12 @@ export const SupportMentalHealthProvidersShell = ({
 	);
 
 	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
-	const [hasScheduled, setHasScheduled] = useState(false);
+	const [appointmentScheduledByFeatureId, setAppointmentScheduledByFeatureId] = useState<Record<string, boolean>>({});
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
+
+	const hasScheduledRecommendation =
+		!!recommendedFeature?.featureId && !!appointmentScheduledByFeatureId[recommendedFeature.featureId];
+	const hasScehduledPsychiatrist = !!appointmentScheduledByFeatureId[FeatureId.PSYCHIATRIST];
 
 	const fetchData = useCallback(async () => {
 		if (!institution.providerTriageScreeningFlowId) {
@@ -70,15 +74,13 @@ export const SupportMentalHealthProvidersShell = ({
 		}
 
 		if (hasCompletedScreening) {
-			const { appointmentAlreadyScheduled, features } = await accountService
-				.getRecommendedFeatures(account.accountId)
-				.fetch();
-			setHasScheduled(appointmentAlreadyScheduled);
+			const response = await accountService.getRecommendedFeatures(account.accountId).fetch();
+			setAppointmentScheduledByFeatureId(response.appointmentScheduledByFeatureId);
 
-			const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+			const psychiatristIndex = response.features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
 			setShowPsychiatristRecommendation(psychiatristIndex > -1);
 
-			const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
+			const firstRecommendation = response.features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
 			const matchingInstitutionFeature = institution.features.find(
 				(f) => f.featureId === firstRecommendation?.featureId
 			);
@@ -140,7 +142,7 @@ export const SupportMentalHealthProvidersShell = ({
 								/>
 							)}
 
-							{hasCompletedScreening && !hasScheduled && (
+							{hasCompletedScreening && !hasScheduledRecommendation && (
 								<InlineAlert
 									className="mb-4"
 									variant="success"
@@ -155,12 +157,12 @@ export const SupportMentalHealthProvidersShell = ({
 								/>
 							)}
 
-							{hasCompletedScreening && hasScheduled && (
+							{hasCompletedScreening && hasScheduledRecommendation && (
 								<InlineAlert
 									className="mb-4"
 									variant="success"
 									title="Appointment Scheduled"
-									description={`Your appointment with ${recommendedFeature?.name} has been scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
+									description={`Your ${recommendedFeature?.name} appointment is scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
 									action={[
 										{
 											title: 'Go to ' + institution.myChartName,
@@ -182,7 +184,9 @@ export const SupportMentalHealthProvidersShell = ({
 								/>
 							)}
 
-							{showPsychiatristRecommendation && <PsychiatristRecommendation />}
+							{showPsychiatristRecommendation && !hasScehduledPsychiatrist && (
+								<PsychiatristRecommendation />
+							)}
 						</Col>
 					</Row>
 				</Container>
