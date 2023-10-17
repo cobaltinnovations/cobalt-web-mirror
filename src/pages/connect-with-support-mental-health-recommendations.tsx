@@ -16,7 +16,10 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	const { account, institution } = useAccount();
 	const [completedAtDescription, setCompletedAtDescription] = useState('N/A');
 	const [recommendedFeature, setRecommendedFeature] = useState<InstitutionFeature>();
+	const [appointmentScheduledByFeatureId, setAppointmentScheduledByFeatureId] = useState<Record<string, boolean>>({});
 	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
+
+	const hasScehduledPsychiatrist = !!appointmentScheduledByFeatureId[FeatureId.PSYCHIATRIST];
 
 	const fetchData = useCallback(async () => {
 		if (!account?.accountId) {
@@ -29,7 +32,7 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 
 		const [
 			{ sessionFullyCompleted, sessionFullyCompletedAtDescription },
-			{ features },
+			recommendationsResponse,
 			{ myChartConnectionRequired },
 		] = await Promise.all([
 			screeningService
@@ -46,10 +49,15 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 			return;
 		}
 
-		const psychiatristIndex = features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+		setAppointmentScheduledByFeatureId(recommendationsResponse.appointmentScheduledByFeatureId);
+		const psychiatristIndex = recommendationsResponse.features.findIndex(
+			(f) => f.featureId === FeatureId.PSYCHIATRIST
+		);
 		setShowPsychiatristRecommendation(psychiatristIndex > -1);
 
-		const firstRecommendation = features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST).pop();
+		const firstRecommendation = recommendationsResponse.features
+			.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST)
+			.pop();
 		const matchingInstitutionFeature = institution.features.find(
 			(f) => f.featureId === firstRecommendation?.featureId
 		);
@@ -92,7 +100,9 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 										</Button>
 									</div>
 
-									{showPsychiatristRecommendation && <PsychiatristRecommendation />}
+									{showPsychiatristRecommendation && !hasScehduledPsychiatrist && (
+										<PsychiatristRecommendation />
+									)}
 
 									<InlineAlert
 										variant="info"
