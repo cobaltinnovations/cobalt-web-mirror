@@ -1502,6 +1502,18 @@ export const Component = () => {
 	);
 
 	if (isView && !isExternal) {
+		let countLabel = '';
+		const showCounts = !!loaderData.groupSession;
+
+		if (showCounts) {
+			countLabel = `${loaderData?.groupSession?.seatsReserved ?? 0}`;
+			const showTotalSeatsCount = !!loaderData.groupSession && loaderData.groupSession.seats > 0;
+
+			if (showTotalSeatsCount) {
+				countLabel += `/${loaderData?.groupSession?.seats}`;
+			}
+		}
+
 		return (
 			<>
 				{pageTitle}
@@ -1519,9 +1531,7 @@ export const Component = () => {
 								},
 								{
 									value: 'registrants',
-									title: `Registrants (${loaderData?.groupSession?.seatsReserved ?? '0'}/${
-										loaderData?.groupSession?.seats ?? '0'
-									})`,
+									title: `Registrants${countLabel && ` (${countLabel})`}`,
 								},
 							]}
 							onTabClick={(value) => {
