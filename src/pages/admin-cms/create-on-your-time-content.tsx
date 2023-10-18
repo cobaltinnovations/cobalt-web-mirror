@@ -46,11 +46,7 @@ const onYourTimeContentSchema = yup
 		title: yup.string().required().default(''),
 		author: yup.string().required().default(''),
 		created: yup.string().default(undefined),
-		urlRequired: yup.boolean().default(undefined),
-		url: yup.string().default('').when('urlRequired', {
-			is: true,
-			then: yup.string().required(),
-		}),
+		url: yup.string().default(''),
 		duration: yup.string().default(''),
 		description: yup.string().required().default(''),
 		imageUrl: yup.string().default(''),
@@ -351,11 +347,6 @@ const CreateOnYourTimeContent: FC = () => {
 																				setFieldValue(
 																					'contentTypeId',
 																					event.target.value
-																				);
-																				setFieldValue(
-																					'urlRequired',
-																					event.target.value !==
-																						ContentTypeId.InternalBlog
 																				);
 																			}}
 																			required={requiredFields.contentTypeId}

@@ -36,11 +36,12 @@ const Reports = () => {
 	const fetchData = useCallback(async () => {
 		const response = await reportingSerive.getReportTypes().fetch();
 
-		setReportingTypes(response.reportTypes.filter((rt) => enabledReportTypes[rt.reportTypeId]));
+		const uiReportTypes = response.reportTypes.filter((rt) => enabledReportTypes[rt.reportTypeId]);
+		setReportingTypes(uiReportTypes);
 
 		setFormValues((previousValues) => ({
 			...previousValues,
-			reportTypeId: response.reportTypes[0].reportTypeId,
+			reportTypeId: uiReportTypes[0].reportTypeId,
 		}));
 	}, [enabledReportTypes]);
 

@@ -324,8 +324,10 @@ export const accountService = {
 	},
 	getRecommendedFeatures(accountId: string) {
 		return httpSingleton.orchestrateRequest<{
-			appointmentAlreadyScheduled: boolean;
 			features: AccountFeature[];
+			appointmentScheduledByFeatureId: {
+				[featureId: string]: boolean;
+			};
 		}>({
 			method: 'GET',
 			url: `/accounts/${accountId}/provider-triage-recommended-features`,
