@@ -17,7 +17,7 @@ import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detai
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import { useTopicCenterState } from '@/hooks/use-topic-center-state';
 
-const TopicCenter = () => {
+const CommunityPage = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -379,4 +379,4 @@ const TopicCenter = () => {
 	);
 };
 
-export default TopicCenter;
+export default CommunityPage;

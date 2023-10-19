@@ -23,7 +23,7 @@ export function useTopicCenterState(topicCenterId?: string) {
 		const response = await topicCenterService.getTopicCenterById(topicCenterId).fetch();
 
 		if (isFeaturedMatch && response.topicCenter.topicCenterDisplayStyleId !== TopicCenterDisplayStyleId.FEATURED) {
-			navigate(`/topic-centers/${response.topicCenter.urlName}`, { replace: true });
+			navigate(`/community/${response.topicCenter.urlName}`, { replace: true });
 		} else if (
 			!isFeaturedMatch &&
 			response.topicCenter.topicCenterDisplayStyleId === TopicCenterDisplayStyleId.FEATURED
