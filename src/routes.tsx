@@ -102,6 +102,7 @@ export const InteractionInstances = lazyLoadWithRefresh(() => import('@/pages/in
 export const InCrisis = lazyLoadWithRefresh(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = lazyLoadWithRefresh(() => import('@/pages/confirm-appointment'));
 export const TopicCenter = lazyLoadWithRefresh(() => import('@/pages/topic-center'));
+export const FeaturedTopic = lazyLoadWithRefresh(() => import('@/pages/featured-topic'));
 export const UserSettings = lazyLoadWithRefresh(() => import('@/pages/user-settings'));
 export const ResourceLibrary = lazyLoadWithRefresh(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/resource-library-topic'));
@@ -672,7 +673,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'featured-topics/:topicCenterId',
-						element: <TopicCenter />,
+						element: <FeaturedTopic />,
 					},
 					{
 						path: 'user-settings',
