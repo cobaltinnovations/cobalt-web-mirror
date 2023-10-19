@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavigateOptions, To } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -83,12 +83,15 @@ export interface ResourceLibraryCardProps {
 	// colorId: COLOR_IDS;
 	// subtopic: string;
 	// subtopicTo: string;
-	contentId: string;
+	linkTo: To;
+	linkToOptions?: NavigateOptions;
 	title: string;
+	subtitle?: string;
+	authorPrefix?: string;
 	author: string;
-	description: string;
+	description?: string;
 	tags: TagModel[];
-	contentTypeId: ContentTypeId;
+	contentTypeId?: ContentTypeId;
 	badgeTitle?: string;
 	imageUrl?: string;
 	duration?: string;
@@ -100,8 +103,11 @@ const ResourceLibraryCard = ({
 	// colorId,
 	// subtopic,
 	// subtopicTo,
-	contentId,
+	linkTo,
+	linkToOptions,
 	title,
+	subtitle,
+	authorPrefix = 'by',
 	author,
 	description,
 	tags,
@@ -117,7 +123,7 @@ const ResourceLibraryCard = ({
 
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
-			<Link to={`/resource-library/${contentId}`} className="text-decoration-none" onClick={trackEvent}>
+			<Link to={linkTo} {...linkToOptions} className="text-decoration-none" onClick={trackEvent}>
 				<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
 					{badgeTitle && (
 						<Badge as="div" bg="light" pill>
@@ -133,13 +139,18 @@ const ResourceLibraryCard = ({
 							</Link>
 						</p> */}
 						<h4 className={classNames(classes.title, 'text-dark mb-1')}>{title}</h4>
-						<p className="mb-2 text-gray">by {author}</p>
-						<div
-							className={classNames(classes.description, 'fs-default fw-normal text-dark mb-0')}
-							dangerouslySetInnerHTML={{
-								__html: description,
-							}}
-						/>
+						{subtitle && <p className="text-gray mb-1">{subtitle}</p>}
+						<p className="mb-2 text-gray">
+							{authorPrefix} {author}
+						</p>
+						{description && (
+							<div
+								className={classNames(classes.description, 'fs-default fw-normal text-dark mb-0')}
+								dangerouslySetInnerHTML={{
+									__html: description,
+								}}
+							/>
+						)}
 					</div>
 				</div>
 			</Link>
@@ -169,7 +180,14 @@ const ResourceLibraryCard = ({
 						})}
 					</div>
 					<div className="d-flex align-items-center flex-shrink-0">
-						<ContentTypeIcon contentTypeId={contentTypeId} width={16} height={16} className="text-gray" />
+						{contentTypeId && (
+							<ContentTypeIcon
+								contentTypeId={contentTypeId}
+								width={16}
+								height={16}
+								className="text-gray"
+							/>
+						)}
 						{duration && <span className="ms-1 fs-small fw-bold text-gray">{duration}</span>}
 					</div>
 				</div>

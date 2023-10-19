@@ -1,6 +1,6 @@
 import { COLOR_IDS } from '@/lib/models';
 
-export const getBackgroundClassForColorId = (colorId: COLOR_IDS) => {
+export const getBackgroundClassForColorId = (colorId?: COLOR_IDS) => {
 	switch (colorId) {
 		case COLOR_IDS.BRAND_PRIMARY:
 			return 'bg-p50';
@@ -14,8 +14,10 @@ export const getBackgroundClassForColorId = (colorId: COLOR_IDS) => {
 			return 'bg-s50';
 		case COLOR_IDS.SEMANTIC_INFO:
 			return 'bg-i50';
-		default:
+		case COLOR_IDS.NEUTRAL:
 			return 'bg-n50';
+		default:
+			return 'bg-n75';
 	}
 };
 
