@@ -71,7 +71,7 @@ const FeaturedTopic = () => {
 			>
 				<PageHeader
 					className="bg-n75"
-					title={topicCenter?.name!}
+					title={<h1>{topicCenter?.name}</h1>}
 					descriptionHtml={topicCenter?.description}
 					imageUrl={topicCenter?.imageUrl}
 					imageAlt={topicCenter?.name}
