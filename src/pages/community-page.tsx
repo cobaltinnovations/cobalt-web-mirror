@@ -18,6 +18,7 @@ import PageHeader from '@/components/page-header';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from './resource-library';
+import classNames from 'classnames';
 
 const CommunityPage = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -139,33 +140,33 @@ const CommunityPage = () => {
 				/>
 
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
-					const containerClassNames = 'pb-12 pt-lg-14 pb-lg-22 pt-10';
+					const containerClassNames = 'pt-10 pt-lg-16 pb-12 pb-lg-24';
 
 					const showScheduledGroupSessionSection = topicCenterRow.groupSessions.length > 0;
 					const showByRequestGroupSessionSection = topicCenterRow.groupSessionRequests.length > 0;
 					const showGroupSessionSection =
 						showScheduledGroupSessionSection || showByRequestGroupSessionSection;
 
+					const topicCenterRowHeader = (
+						<Row className="mb-6 mb-lg-12">
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
+								{topicCenterRow.description && (
+									<p className="lead mb-0 fs-large text-center">{topicCenterRow.description}</p>
+								)}
+							</Col>
+						</Row>
+					);
+
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
 							{showGroupSessionSection && (
 								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
 									<Container className={containerClassNames}>
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+										{topicCenterRowHeader}
 
 										{showScheduledGroupSessionSection && (
-											<Row className="mb-11 mb-lg-18">
+											<Row>
 												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 													<ResourceLibrarySubtopicCard
 														className="h-100"
@@ -232,7 +233,7 @@ const CommunityPage = () => {
 										)}
 
 										{showByRequestGroupSessionSection && (
-											<Row className="mb-11 mb-lg-18">
+											<Row className={classNames({ 'mt-8': showScheduledGroupSessionSection })}>
 												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 													<ResourceLibrarySubtopicCard
 														className="h-100"
@@ -297,19 +298,8 @@ const CommunityPage = () => {
 
 							{topicCenterRow.pinboardNotes.length > 0 && (
 								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
-									<Container fluid="lg" className={containerClassNames}>
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+									<Container className={containerClassNames}>
+										{topicCenterRowHeader}
 
 										<Row>
 											<Col>
@@ -321,7 +311,7 @@ const CommunityPage = () => {
 																topicCenter={topicCenter}
 																topicCenterRow={topicCenterRow}
 																pinboardNote={pinboardNote}
-																className="mb-lg-8"
+																className="mb-8"
 															/>
 														);
 													})}
@@ -335,18 +325,7 @@ const CommunityPage = () => {
 							{topicCenterRow.contents.length > 0 && (
 								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
 									<Container className={containerClassNames}>
-										<Row>
-											<Col
-												md={{ span: 10, offset: 1 }}
-												lg={{ span: 8, offset: 2 }}
-												xl={{ span: 6, offset: 3 }}
-											>
-												<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-												<p className="mb-6 mb-lg-12 fs-large text-center">
-													{topicCenterRow.description}
-												</p>
-											</Col>
-										</Row>
+										{topicCenterRowHeader}
 
 										<Row>
 											{topicCenterRow.contents.map((content) => {
