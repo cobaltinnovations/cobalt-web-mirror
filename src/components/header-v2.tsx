@@ -61,6 +61,10 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			padding: '0 20px',
 		},
 	},
+	communityNavImage: {
+		height: 80,
+		width: 144,
+	},
 	desktopNav: {
 		height: '100%',
 		'& ul': {
@@ -250,15 +254,24 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const AdditionalNavigationItemIcon = ({
+const AdditionalNavigationItemIconOrImage = ({
 	iconName,
+	imageUrl,
+	imageAlt,
 	svgProps,
 }: {
-	iconName: string;
+	iconName?: string;
+	imageUrl?: string;
+	imageAlt?: string;
 	svgProps?: React.SVGProps<SVGSVGElement> & {
 		title?: string | undefined;
 	};
 }) => {
+	const classes = useHeaderV2Styles();
+	if (imageUrl) {
+		return <img className={classes.communityNavImage} src={imageUrl} alt={imageAlt} />;
+	}
+
 	switch (iconName) {
 		case 'diversity_1':
 			return <SpacesOfColorIcon {...svgProps} />;
@@ -398,6 +411,7 @@ const HeaderV2 = () => {
 
 	const navigationConfig = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
+		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
 
 		return [
 			{
@@ -442,7 +456,6 @@ const HeaderV2 = () => {
 					...(institution?.features ?? [])
 						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
 						.map(({ urlName }) => urlName),
-					...(institution?.additionalNavigationItems ?? []).map(({ url }) => url),
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to + '/*', pathname)),
 				items: [
@@ -455,13 +468,6 @@ const HeaderV2 = () => {
 							description: navDescription,
 							to: urlName,
 						})),
-					...(institution?.additionalNavigationItems ?? []).map(({ iconName, name, url }, index) => ({
-						testId: `menuLink-additionalItem${index}`,
-						icon: <AdditionalNavigationItemIcon iconName={iconName} svgProps={{ width: 24, height: 24 }} />,
-						title: name,
-						description: '',
-						to: url,
-					})),
 					...exploreLinks.map(({ testId, icon, label, to }) => ({
 						testId,
 						icon,
@@ -471,6 +477,33 @@ const HeaderV2 = () => {
 					})),
 				],
 			},
+			...(showCommunityLinks
+				? [
+						{
+							navigationItemId: 'COMMUNITY',
+							title: 'Community',
+							active: (institution?.additionalNavigationItems ?? []).some(({ url }) =>
+								matchPath(url + '/*', pathname)
+							),
+							items: (institution?.additionalNavigationItems ?? []).map(
+								({ iconName, imageUrl, name, url }, index) => ({
+									testId: `menuLink-additionalItem${index}`,
+									icon: (
+										<AdditionalNavigationItemIconOrImage
+											iconName={iconName}
+											imageUrl={imageUrl}
+											imageAlt={name}
+											svgProps={{ width: 24, height: 24 }}
+										/>
+									),
+									title: name,
+									description: '',
+									to: url,
+								})
+							),
+						},
+				  ]
+				: []),
 		];
 	}, [
 		pathname,
