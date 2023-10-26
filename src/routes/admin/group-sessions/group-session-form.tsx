@@ -1015,7 +1015,7 @@ export const Component = () => {
 									key={groupSessionCollection.groupSessionCollectionId}
 									value={groupSessionCollection.groupSessionCollectionId}
 								>
-									{groupSessionCollection.description}
+									{groupSessionCollection.title}
 								</option>
 							);
 						})}
