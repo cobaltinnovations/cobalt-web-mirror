@@ -112,11 +112,8 @@ export const AdminHeader = () => {
 	const isGroupSessionPreview = useMatch({
 		path: '/admin/group-sessions/preview/*',
 	});
-	const myContentMatch = useMatch({
-		path: '/admin/my-content/*',
-	});
-	const availableContentMatch = useMatch({
-		path: '/admin/available-content/*',
+	const resourcesMatch = useMatch({
+		path: '/admin/resources/*',
 	});
 	const groupSessionsMatch = useMatch({
 		path: '/admin/group-sessions/*',
@@ -140,17 +137,10 @@ export const AdminHeader = () => {
 				? [
 						{
 							testId: '',
-							navigationItemId: 'MY_CONTENT',
-							to: '/admin/my-content',
-							title: 'My Content',
-							active: !!myContentMatch,
-						},
-						{
-							testId: '',
-							navigationItemId: 'AVAILABLE_CONTENT',
-							to: '/admin/available-content',
-							title: 'Available Content',
-							active: !!availableContentMatch,
+							navigationItemId: 'RESOURCES',
+							to: '/admin/resources',
+							title: 'Resources',
+							active: !!resourcesMatch,
 						},
 				  ]
 				: []),
@@ -206,11 +196,10 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canAdministerContent,
 			account?.accountCapabilityFlags.canAdministerGroupSessions,
 			account?.accountCapabilityFlags.canViewProviderReports,
-			availableContentMatch,
 			debugMatch,
 			groupSessionsMatch,
-			myContentMatch,
 			reportsMatch,
+			resourcesMatch,
 		]
 	);
 

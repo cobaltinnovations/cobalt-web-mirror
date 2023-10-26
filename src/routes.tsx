@@ -81,14 +81,9 @@ export const GroupSessionsRequest = lazyLoadWithRefresh(() => import('@/pages/gr
 // 	() => import('@/pages/group-sessions-by-request-create')
 // );
 export const RedirectToBackend = lazyLoadWithRefresh(() => import('@/pages/redirect-to-backend'));
-export const CmsOnYourTime = lazyLoadWithRefresh(() => import('@/pages/admin-cms/on-your-time'));
 export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-your-time-thanks'));
 // export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
-export const CmsAvailableContent = lazyLoadWithRefresh(() => import('@/pages/admin-cms/available-content'));
-export const CreateOnYourTimeContent = lazyLoadWithRefresh(
-	() => import('@/pages/admin-cms/create-on-your-time-content')
-);
 export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
 export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
 export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
@@ -584,22 +579,17 @@ export const routes: RouteObject[] = [
 					{
 						// legacy/backwards compatibility
 						path: 'cms/on-your-time',
-						element: <RedirectToAdminPathOrRender pathname="my-content" element={<NoMatch />} />,
+						element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
 					},
 					{
-						// legacy/backwards compatibility (redirect for admins, render old route otherwise)
+						// legacy/backwards compatibility
 						path: 'cms/on-your-time/create',
-						element: (
-							<RedirectToAdminPathOrRender
-								pathname="my-content/create"
-								element={<CreateOnYourTimeContent />}
-							/>
-						),
+						element: <RedirectToAdminPathOrRender pathname="resources/add" element={<NoMatch />} />,
 					},
 					{
 						// legacy/backwards compatibility
 						path: 'cms/available-content',
-						element: <RedirectToAdminPathOrRender pathname="available-content" element={<NoMatch />} />,
+						element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
 					},
 					{
 						path: 'stats-dashboard',
@@ -748,31 +738,31 @@ export const routes: RouteObject[] = [
 								element: <RedirectToAdminHome />,
 							},
 							{
-								id: 'admin-my-content',
 								path: 'my-content',
-								element: (
-									<div className="pb-4">
-										<CmsOnYourTime />
-									</div>
-								),
+								element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
 							},
 							{
-								id: 'admin-my-content-create',
 								path: 'my-content/create',
-								element: (
-									<div className="pb-4">
-										<CreateOnYourTimeContent />
-									</div>
-								),
+								element: <RedirectToAdminPathOrRender pathname="resources/add" element={<NoMatch />} />,
 							},
 							{
-								id: 'admin-available-content',
 								path: 'available-content',
-								element: (
-									<div className="pb-4">
-										<CmsAvailableContent />
-									</div>
-								),
+								element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
+							},
+							{
+								path: 'resources',
+								children: [
+									{
+										id: 'admin-resources',
+										index: true,
+										lazy: () => import('@/routes/admin/resources/resources'),
+									},
+									{
+										id: 'admin-resource-form',
+										path: ':action?/:contentId?',
+										lazy: () => import('@/routes/admin/resources/resource-form'),
+									},
+								],
 							},
 							{
 								path: 'group-sessions',
