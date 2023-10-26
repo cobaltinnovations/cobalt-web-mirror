@@ -139,8 +139,7 @@ export const adminService = {
 		});
 	},
 
-	updateContent(contentId: string | null, data: any) {
-		if (!contentId) return;
+	updateContent(contentId: string, data: any) {
 		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'put',
 			url: `/admin/content/${contentId}`,
