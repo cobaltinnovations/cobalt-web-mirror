@@ -1,3 +1,6 @@
+export * from './admin-form-footer';
+export * from './admin-form-image-input';
+export * from './admin-form-section';
 export * from './admin-group-session-filter-scheduling';
 export * from './admin-group-session-filter-status';
 export * from './admin-group-session-filter-visibility';
