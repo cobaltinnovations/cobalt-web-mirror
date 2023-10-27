@@ -62,8 +62,13 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		},
 	},
 	communityNavImage: {
+		borderRadius: 6,
 		height: 80,
 		width: 144,
+		[mediaQueries.lg]: {
+			height: 'auto',
+			width: '100%',
+		},
 	},
 	desktopNav: {
 		height: '100%',
@@ -618,12 +623,12 @@ const HeaderV2 = () => {
 											{(navigationItem.items ?? []).map((item, itemIndex) => (
 												<Link key={itemIndex} to={item.to ?? '/#'}>
 													<div
-														className={classNames('d-flex', {
+														className={classNames('d-flex flex-column flex-lg-row', {
 															'align-items-center': !item.description,
 														})}
 													>
 														{item.icon}
-														<div className="ps-4">
+														<div className="mt-4 mt-lg-0 ps-lg-4 w-100">
 															<p className="mb-0 fw-semibold">{item.title}</p>
 															{item.description && (
 																<p className="mb-0 text-gray">{item.description}</p>

@@ -212,8 +212,21 @@ const useCarouselStyles = createUseStyles({
 			: {}),
 	}),
 	carouselItem: {
+		maxWidth: 430,
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
+		[mediaQueries.xxl]: {
+			maxWidth: 364,
+		},
+		[mediaQueries.xl]: {
+			maxWidth: 316,
+		},
+		[mediaQueries.lg]: {
+			maxWidth: 355,
+		},
+		[mediaQueries.md]: {
+			maxWidth: 265,
+		},
 	},
 });
 
