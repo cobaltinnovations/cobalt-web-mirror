@@ -112,26 +112,30 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 			<div className={classes.informationOuter}>
 				<div className="d-flex align-items-start justify-content-between">
 					<h5 className="mb-2">
-						<a
-							href={pinboardNote.url}
-							target="_blank"
-							rel="noreferrer"
-							onClick={() => {
-								const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${pinboardNote.url}`;
+						{pinboardNote.url ? (
+							<a
+								href={pinboardNote.url}
+								target="_blank"
+								rel="noreferrer"
+								onClick={() => {
+									const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${pinboardNote.url}`;
 
-								trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));
+									trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));
 
-								mixpanel.track('Topic Center Pinboard Item Click', {
-									'Topic Center ID': topicCenter.topicCenterId,
-									'Topic Center Title': topicCenter.name,
-									'Section Title': topicCenterRow.title,
-									'Pinboard Item ID': pinboardNote.pinboardNoteId,
-									'Pinboard Item Title': pinboardNote.title,
-								});
-							}}
-						>
-							{pinboardNote.title}
-						</a>
+									mixpanel.track('Topic Center Pinboard Item Click', {
+										'Topic Center ID': topicCenter.topicCenterId,
+										'Topic Center Title': topicCenter.name,
+										'Section Title': topicCenterRow.title,
+										'Pinboard Item ID': pinboardNote.pinboardNoteId,
+										'Pinboard Item Title': pinboardNote.title,
+									});
+								}}
+							>
+								{pinboardNote.title}
+							</a>
+						) : (
+							pinboardNote.title
+						)}
 					</h5>
 				</div>
 

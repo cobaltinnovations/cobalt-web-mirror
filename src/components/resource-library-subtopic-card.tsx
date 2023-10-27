@@ -42,10 +42,11 @@ interface Props {
 	title: string;
 	description: string;
 	to?: string;
+	toLabel?: string;
 	className?: string;
 }
 
-const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, className }: Props) => {
+const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel, className }: Props) => {
 	const classes = useStyles({ clickable: !!to });
 	const navigate = useNavigate();
 
@@ -71,7 +72,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 
 			{to && (
 				<Link to={to} className="mb-0 text-decoration-none">
-					Explore all {title} resources
+					{toLabel || `Explore all ${title} resources`}
 				</Link>
 			)}
 		</div>
