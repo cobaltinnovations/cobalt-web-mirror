@@ -4,9 +4,9 @@ import { Helmet } from 'react-helmet';
 import { useParams } from 'react-router-dom';
 
 import AsyncPage from '@/components/async-page';
-import PageHeader from '@/components/page-header';
+import PageHeader, { PageHeaderSkeleton } from '@/components/page-header';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
+import { SkeletonText } from '@/components/skeleton-loaders';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 import useAnalytics from '@/hooks/use-analytics';
 import { useTopicCenterState } from '@/hooks/use-topic-center-state';
@@ -28,18 +28,7 @@ const FeaturedTopic = () => {
 				fetchData={fetchData}
 				loadingComponent={
 					<>
-						<Container fluid className="bg-n75 p-16">
-							<Row>
-								<Col xs={12} md={8}>
-									<SkeletonText type="h1" numberOfLines={1} />
-									<SkeletonText type="p" numberOfLines={3} />
-								</Col>
-
-								<Col xs={12} md={4}>
-									<SkeletonImage height={200} />
-								</Col>
-							</Row>
-						</Container>
+						<PageHeaderSkeleton className="bg-n75" />
 
 						<Container fluid className="bg-n50">
 							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">

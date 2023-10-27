@@ -10,11 +10,11 @@ import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item
 import useAnalytics from '@/hooks/use-analytics';
 import { TopicCenterAnalyticsEvent } from '@/contexts/analytics-context';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-import { SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
+import { SkeletonText } from '@/components/skeleton-loaders';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import { useTopicCenterState } from '@/hooks/use-topic-center-state';
-import PageHeader from '@/components/page-header';
+import PageHeader, { PageHeaderSkeleton } from '@/components/page-header';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from './resource-library';
@@ -38,18 +38,7 @@ const CommunityPage = () => {
 				fetchData={fetchData}
 				loadingComponent={
 					<>
-						<Container fluid className="bg-p700 p-16">
-							<Row>
-								<Col xs={12} md={8}>
-									<SkeletonText type="h1" numberOfLines={1} />
-									<SkeletonText type="p" numberOfLines={3} />
-								</Col>
-
-								<Col xs={12} md={4}>
-									<SkeletonImage height={200} />
-								</Col>
-							</Row>
-						</Container>
+						<PageHeaderSkeleton className="bg-p700 text-white" />
 
 						<Container fluid className="bg-n50">
 							<Container className="pt-10 pb-12 pt-lg-14 pb-lg-22">
