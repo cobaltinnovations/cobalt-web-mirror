@@ -86,6 +86,8 @@ const Footer: FC = () => {
 		return null;
 	}
 
+	const showCommunityLinks = institution?.additionalNavigationItems?.length > 0;
+
 	return (
 		<>
 			{institution.externalContactUsUrl && !routeHidesContactUs && (
@@ -127,7 +129,7 @@ const Footer: FC = () => {
 									<FooterContent />
 								</Col>
 								<Col xs={6} lg={2} className="mb-8">
-									<p className="mb-3 fs-large fw-semibold text-primary">Support</p>
+									<p className="mb-3 fs-large fw-semibold text-n500">Support</p>
 									<ul className="list-unstyled">
 										{(institution?.features ?? [])
 											.filter(
@@ -153,7 +155,7 @@ const Footer: FC = () => {
 									</ul>
 								</Col>
 								<Col xs={6} lg={2} className="mb-8">
-									<p className="mb-3 fs-large fw-semibold text-primary">Resources</p>
+									<p className="mb-3 fs-large fw-semibold text-n500">Resources</p>
 									<ul className="list-unstyled">
 										{(institution?.features ?? [])
 											.filter(
@@ -168,13 +170,6 @@ const Footer: FC = () => {
 													</Link>
 												</li>
 											))}
-										{(institution?.additionalNavigationItems ?? []).map(({ name, url }, index) => (
-											<li key={index} className="mb-3">
-												<Link className="fw-normal text-decoration-none" to={url}>
-													{name}
-												</Link>
-											</li>
-										))}
 										{exploreLinks.map(({ label, to }, index) => (
 											<li key={index} className="mb-3">
 												<Link className="fw-normal text-decoration-none" to={to()}>
@@ -183,9 +178,23 @@ const Footer: FC = () => {
 											</li>
 										))}
 									</ul>
+									{showCommunityLinks && (
+										<>
+											<p className="mt-5 mb-3 fs-large fw-semibold text-n500">Community</p>
+											<ul className="list-unstyled">
+												{institution.additionalNavigationItems.map(({ name, url }, index) => (
+													<li key={index} className="mb-3">
+														<Link className="fw-normal text-decoration-none" to={url}>
+															{name}
+														</Link>
+													</li>
+												))}
+											</ul>
+										</>
+									)}
 								</Col>
 								<Col xs={12} lg={2}>
-									<p className="mb-3 fs-large fw-semibold text-primary">Cobalt</p>
+									<p className="mb-3 fs-large fw-semibold text-n500">Cobalt</p>
 									<ul className="list-unstyled">
 										{institution.faqEnabled && (
 											<li className="mb-3">

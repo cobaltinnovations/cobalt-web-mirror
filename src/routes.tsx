@@ -101,7 +101,8 @@ export const Interaction = lazyLoadWithRefresh(() => import('@/pages/interaction
 export const InteractionInstances = lazyLoadWithRefresh(() => import('@/pages/interaction-instances'));
 export const InCrisis = lazyLoadWithRefresh(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = lazyLoadWithRefresh(() => import('@/pages/confirm-appointment'));
-export const TopicCenter = lazyLoadWithRefresh(() => import('@/pages/topic-center'));
+export const CommunityPage = lazyLoadWithRefresh(() => import('@/pages/community-page'));
+export const FeaturedTopic = lazyLoadWithRefresh(() => import('@/pages/featured-topic'));
 export const UserSettings = lazyLoadWithRefresh(() => import('@/pages/user-settings'));
 export const ResourceLibrary = lazyLoadWithRefresh(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/resource-library-topic'));
@@ -202,6 +203,16 @@ const RedirectToGroupSessionDetail = () => {
 	}
 
 	return <Navigate to="/group-sessions" replace />;
+};
+
+const RedirectToCommunityPage = () => {
+	const { topicCenterId } = useParams<{ topicCenterId: string }>();
+
+	if (topicCenterId) {
+		return <Navigate to={`/community/${topicCenterId}`} replace />;
+	}
+
+	return <Navigate to="/" replace />;
 };
 
 const ToggledOutlet = ({ isEnabled }: { isEnabled: (accountContext: ReturnType<typeof useAccount>) => boolean }) => {
@@ -668,11 +679,15 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'topic-centers/:topicCenterId',
-						element: <TopicCenter />,
+						element: <RedirectToCommunityPage />,
 					},
 					{
 						path: 'featured-topics/:topicCenterId',
-						element: <TopicCenter />,
+						element: <FeaturedTopic />,
+					},
+					{
+						path: 'community/:topicCenterId',
+						element: <CommunityPage />,
 					},
 					{
 						path: 'user-settings',

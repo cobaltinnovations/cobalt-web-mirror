@@ -66,7 +66,7 @@ const HeaderNavDropdown = ({
 									popper: { width: number };
 									reference: { width: number };
 								}) => {
-									if (!featuredItem) {
+									if (!featuredItem && title !== 'Community') {
 										return [0, 0];
 									}
 									const halfPopperWidth = popper.width / 2;

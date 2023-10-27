@@ -6,6 +6,7 @@
 	"topicCenterRows": [
 		{
 			"topicCenterRowId": "topic-center-row-fixture-id-1",
+			"topicCenterRowTags": [],
 			"title": "Topic Center Row",
 			"description": "Topic Center Row Description",
 			"groupSessions": [],

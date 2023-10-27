@@ -27,7 +27,7 @@ export const Masonry = ({ className, children, ...props }: React.PropsWithChildr
 	return (
 		<div className={classNames(classes.masonry, className)}>
 			<ReactMasonryCss
-				breakpointCols={{ default: 2, 992: 1 }}
+				breakpointCols={{ default: 3, 992: 2 }}
 				className="masonry"
 				columnClassName="masonry__column"
 				{...props}

@@ -37,6 +37,10 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			...theme.fonts.bodyBold,
 		},
 
+		'.lead': {
+			fontSize: '1.8rem',
+		},
+
 		'.text-p50': {
 			color: `${theme.colors.p50} !important`,
 		},

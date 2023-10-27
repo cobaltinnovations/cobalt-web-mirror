@@ -356,7 +356,7 @@ const Index: FC = () => {
 											return (
 												<ResourceLibraryCard
 													key={content.contentId}
-													contentId={content.contentId}
+													linkTo={`/resource-library/${content.contentId}`}
 													className="h-100"
 													imageUrl={content.imageUrl}
 													badgeTitle={content.newFlag ? 'New' : ''}

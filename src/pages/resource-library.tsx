@@ -350,7 +350,7 @@ const ResourceLibrary = () => {
 								return (
 									<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
 										<ResourceLibraryCard
-											contentId={content.contentId}
+											linkTo={`/resource-library/${content.contentId}`}
 											className="h-100"
 											imageUrl={content.imageUrl}
 											badgeTitle={content.newFlag ? 'New' : ''}
@@ -677,7 +677,7 @@ const ResourceLibrary = () => {
 													return (
 														<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
 															<ResourceLibraryCard
-																contentId={content.contentId}
+																linkTo={`/resource-library/${content.contentId}`}
 																className="h-100"
 																imageUrl={content.imageUrl}
 																badgeTitle={content.newFlag ? 'New' : ''}
@@ -727,7 +727,7 @@ const ResourceLibrary = () => {
 													return (
 														<ResourceLibraryCard
 															key={content.contentId}
-															contentId={content.contentId}
+															linkTo={`/resource-library/${content.contentId}`}
 															className="h-100"
 															imageUrl={content.imageUrl}
 															badgeTitle={content.newFlag ? 'New' : ''}

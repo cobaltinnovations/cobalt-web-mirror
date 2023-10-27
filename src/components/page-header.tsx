@@ -1,9 +1,9 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 
 interface PageHeaderProps {
-	title: string;
+	title: ReactNode;
 	descriptionHtml?: string;
 	imageUrl?: string;
 	imageAlt?: string;
@@ -16,7 +16,8 @@ const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className }: P
 			<Container>
 				<Row>
 					<Col>
-						<h1 className="mb-6">{title}</h1>
+						<div className="mb-6">{title}</div>
+
 						{descriptionHtml && (
 							<div
 								dangerouslySetInnerHTML={{
@@ -28,7 +29,7 @@ const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className }: P
 
 					{imageUrl && (
 						<Col xs={12} lg={{ offset: 1, span: 5 }} className="d-flex mt-12 mt-lg-0">
-							<img className="w-100 align-self-center" src={imageUrl} alt={imageAlt || title} />
+							<img className="w-100 align-self-center" src={imageUrl} alt={imageAlt} />
 						</Col>
 					)}
 				</Row>

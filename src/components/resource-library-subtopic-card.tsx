@@ -6,6 +6,10 @@ import { COLOR_IDS } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	clickable: boolean;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibrarySubtopicCard: {
 		display: 'flex',
@@ -18,30 +22,41 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		boxShadow: theme.elevation.e200,
-		'&:hover': {
-			cursor: 'pointer',
-			color: 'inherit',
-			transform: 'translateY(-16px)',
-			boxShadow: theme.elevation.e400,
+		'&:hover': ({ clickable }: UseStylesProps) => {
+			if (!clickable) {
+				return {};
+			}
+
+			return {
+				cursor: 'pointer',
+				color: 'inherit',
+				transform: 'translateY(-16px)',
+				boxShadow: theme.elevation.e400,
+			};
 		},
 	},
 }));
 
 interface Props {
-	colorId: COLOR_IDS;
+	colorId?: COLOR_IDS;
 	title: string;
 	description: string;
-	to: string;
+	to?: string;
+	toLabel?: string;
 	className?: string;
 }
 
-const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, className }: Props) => {
-	const classes = useStyles();
+const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel, className }: Props) => {
+	const classes = useStyles({ clickable: !!to });
 	const navigate = useNavigate();
 
 	return (
 		<div
 			onClick={() => {
+				if (!to) {
+					return;
+				}
+
 				navigate(to);
 			}}
 			className={classNames(
@@ -55,9 +70,11 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 				<p className="mb-0">{description}</p>
 			</div>
 
-			<Link to={to} className="mb-0 text-decoration-none">
-				Explore all {title} resources
-			</Link>
+			{to && (
+				<Link to={to} className="mb-0 text-decoration-none">
+					{toLabel || `Explore all ${title} resources`}
+				</Link>
+			)}
 		</div>
 	);
 };
