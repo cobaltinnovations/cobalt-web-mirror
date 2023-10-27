@@ -170,8 +170,8 @@ const CommunityPage = () => {
 												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 													<ResourceLibrarySubtopicCard
 														className="h-100"
-														title="Scheduled"
-														description="TODO: Description specific to Scheduled Group Sessions related to current Topic"
+														title={topicCenterRow.groupSessionsTitle!}
+														description={topicCenterRow.groupSessionsDescription!}
 													/>
 												</Col>
 
@@ -237,8 +237,8 @@ const CommunityPage = () => {
 												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 													<ResourceLibrarySubtopicCard
 														className="h-100"
-														title="By Request"
-														description="TODO: Description specific to By Request Group Sessions related to current Topic"
+														title={topicCenterRow.groupSessionRequestsTitle!}
+														description={topicCenterRow.groupSessionRequestsDescription!}
 													/>
 												</Col>
 
@@ -295,6 +295,65 @@ const CommunityPage = () => {
 									</Container>
 								</Container>
 							)}
+
+							{(topicCenterRow.topicCenterRowTags ?? []).map((topicCenterRowTag, index) => {
+								return (
+									<Container fluid className="bg-n50" key={'rt' + index}>
+										<Container className={containerClassNames}>
+											{topicCenterRowHeader}
+
+											<Row>
+												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+													<ResourceLibrarySubtopicCard
+														className="h-100"
+														title={topicCenterRowTag.title}
+														description={topicCenterRowTag.description}
+														toLabel={topicCenterRowTag.cta}
+														to={topicCenterRowTag.ctaUrl}
+													/>
+												</Col>
+
+												<Col lg={9}>
+													<Carousel
+														responsive={resourceLibraryCarouselConfig}
+														trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+														floatingButtonGroup
+													>
+														{topicCenterRowTag.contents.map((content) => {
+															return (
+																<ResourceLibraryCard
+																	key={content.contentId}
+																	linkTo={`/resource-library/${content.contentId}`}
+																	className="h-100"
+																	imageUrl={content.imageUrl}
+																	badgeTitle={content.newFlag ? 'New' : ''}
+																	title={content.title}
+																	author={content.author}
+																	description={content.description}
+																	tags={
+																		topicCenter.tagsByTagId
+																			? content.tagIds.map((tagId) => {
+																					return topicCenter.tagsByTagId[
+																						tagId
+																					];
+																			  })
+																			: []
+																	}
+																	contentTypeId={content.contentTypeId}
+																	duration={content.durationInMinutesDescription}
+																	trackEvent={() => {
+																		trackContentEvent(topicCenterRow, content);
+																	}}
+																/>
+															);
+														})}
+													</Carousel>
+												</Col>
+											</Row>
+										</Container>
+									</Container>
+								);
+							})}
 
 							{topicCenterRow.pinboardNotes.length > 0 && (
 								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
