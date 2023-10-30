@@ -1,6 +1,4 @@
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
 import DatePicker from '@/components/date-picker';
@@ -53,7 +51,7 @@ import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
+import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -1024,39 +1022,20 @@ export const Component = () => {
 			>
 				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
 					return (
-						<div key={tagGroup.tagGroupId} className="mb-4">
-							<h5 className="mb-2">{tagGroup.name}</h5>
-
-							<div className="d-flex flex-wrap">
-								{(tagGroup.tags ?? []).map((tag) => {
-									const isSelected = formValues.tagIds.includes(tag.tagId);
-
-									return (
-										<Button
-											key={tag.tagId}
-											size="sm"
-											variant={isSelected ? 'primary' : 'outline-primary'}
-											className="mb-2 me-2 fs-default text-nowrap"
-											onClick={() => {
-												updateFormValue(
-													'tagIds',
-													isSelected
-														? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-														: [...formValues.tagIds, tag.tagId]
-												);
-											}}
-										>
-											{isSelected ? (
-												<CheckIcon className="me-2" />
-											) : (
-												<PlusIcon className="me-2" />
-											)}
-											{tag.name}
-										</Button>
-									);
-								})}
-							</div>
-						</div>
+						<AdminTagGroupControl
+							key={tagGroup.tagGroupId}
+							tagGroup={tagGroup}
+							selectedTagIds={formValues.tagIds}
+							onTagClick={(tag) => {
+								const isSelected = formValues.tagIds.includes(tag.tagId);
+								updateFormValue(
+									'tagIds',
+									isSelected
+										? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
+										: [...formValues.tagIds, tag.tagId]
+								);
+							}}
+						/>
 					);
 				})}
 			</AdminFormSection>
