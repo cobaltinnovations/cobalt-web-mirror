@@ -19,7 +19,7 @@ export const Default: Story = {
 	},
 	args: {
 		topicCenter: topicCenterJSON as any,
-		topicCenterRow: topicCenterJSON.topicCenterRows[0],
+		topicCenterRow: topicCenterJSON.topicCenterRows[0] as any,
 		pinboardNote: topicCenterJSON.topicCenterRows[0].pinboardNotes[1],
 		className: '',
 	},
