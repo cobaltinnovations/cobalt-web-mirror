@@ -22,17 +22,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		boxShadow: theme.elevation.e200,
-		'&:hover': ({ clickable }: UseStylesProps) => {
-			if (!clickable) {
-				return {};
-			}
-
-			return {
-				cursor: 'pointer',
-				color: 'inherit',
-				transform: 'translateY(-16px)',
-				boxShadow: theme.elevation.e400,
-			};
+		'&:hover': {
+			cursor: ({ clickable }: UseStylesProps) => (clickable ? 'pointer' : 'initial'),
+			color: 'inherit',
+			transform: ({ clickable }: UseStylesProps) => (clickable ? 'translateY(-16px)' : ''),
+			boxShadow: ({ clickable }: UseStylesProps) => (clickable ? theme.elevation.e400 : ''),
 		},
 	},
 }));
@@ -67,7 +61,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel,
 		>
 			<div className="mb-15">
 				<h2 className="mb-4">{title}</h2>
-				<p className="mb-0">{description}</p>
+				<div dangerouslySetInnerHTML={{ __html: description }} />
 			</div>
 
 			{to && (
