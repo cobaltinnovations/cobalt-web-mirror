@@ -1,10 +1,11 @@
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
+import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
 import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
 import { ButtonLink } from '@/components/button-link';
 import ConfirmDialog from '@/components/confirm-dialog';
+import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
@@ -78,9 +79,18 @@ const initialResourceFormValues = {
 	author: '',
 	contentTypeId: '',
 	durationInMinutes: undefined as number | undefined,
+	resourceType: 'url' as 'url' | 'file',
+	resourceUrl: '',
+	resourceFileUrl: '',
 	isShared: true,
 	imageUrl: '',
 	description: '',
+	tagIds: [] as string[],
+	searchTerms: '',
+	publishDate: null as Date | null,
+	doesExpire: false,
+	expirationDate: null as Date | null,
+	isRecurring: false,
 };
 
 function getInitialResourceFormValues({
@@ -208,7 +218,7 @@ export const Component = () => {
 		return <Navigate to={`/admin/resources/view/${params.contentId}`} replace />;
 	}
 	const formFields = (
-		<Container>
+		<Container className="pb-10">
 			<ConfirmDialog
 				size="lg"
 				show={navigationBlocker.state === 'blocked'}
@@ -287,12 +297,55 @@ export const Component = () => {
 			<hr />
 
 			<AdminFormSection
+				title="Resource URL"
+				description="Provide the web address to where the content is hosted or upload a file to receive a new URL."
+			>
+				<ToggledInput
+					className="mb-3"
+					id="resource-url"
+					label="URL"
+					checked={formValues.resourceType === 'url'}
+					onChange={() => {
+						updateFormValue('resourceType', 'url');
+					}}
+				>
+					<InputHelper
+						type="text"
+						label="Web address to content"
+						name="resourceUrl"
+						value={formValues.resourceUrl}
+						onChange={({ currentTarget }) => {
+							updateFormValue('resourceUrl', currentTarget.value);
+						}}
+					/>
+				</ToggledInput>
+
+				<ToggledInput
+					id="resource-file"
+					label="File upload"
+					checked={formValues.resourceType === 'file'}
+					onChange={() => {
+						updateFormValue('resourceType', 'file');
+					}}
+				>
+					<AdminFormImageInput
+						imageSrc={formValues.resourceFileUrl}
+						onSrcChange={(nextSrc) => {
+							updateFormValue('resourceFileUrl', nextSrc);
+						}}
+					/>
+				</ToggledInput>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
 				title="Sharing"
 				description="Turn on sharing to allow other institutions to add this resource to their libraries."
 			>
 				<ToggledInput
 					type="switch"
-					id="contact-is-facilitator"
+					id="content-is-shared"
 					label="Allow other institutions to display this content?"
 					checked={formValues.isShared}
 					onChange={({ currentTarget }) => {
@@ -370,6 +423,103 @@ export const Component = () => {
 						updateFormValue('description', nextValue);
 					}}
 				/>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
+				title="Tags"
+				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
+			>
+				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
+					return (
+						<AdminTagGroupControl
+							key={tagGroup.tagGroupId}
+							tagGroup={tagGroup}
+							selectedTagIds={formValues.tagIds}
+							onTagClick={(tag) => {
+								const isSelected = formValues.tagIds.includes(tag.tagId);
+								updateFormValue(
+									'tagIds',
+									isSelected
+										? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
+										: [...formValues.tagIds, tag.tagId]
+								);
+							}}
+						/>
+					);
+				})}
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
+				title="Search Terms (optional)"
+				description="Include key words or phrases that will help surface this content in search results.  What you type here will not be visible to users."
+			>
+				<InputHelper
+					className="mb-3"
+					as="textarea"
+					label="Search Terms"
+					name="searchTerms"
+					value={formValues.searchTerms}
+					onChange={({ currentTarget }) => {
+						updateFormValue('searchTerms', currentTarget.value);
+					}}
+				/>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
+				title="Scheduling"
+				description="Set a date for your content to publish to Cobalt. If the date selected is today, then the resource will automatically be made live after you preview and confirm. If the date selected is in the future, then the resource will become live on the date selected."
+			>
+				<DatePicker
+					className="mb-4"
+					labelText="Date"
+					required
+					selected={formValues.publishDate || new Date()}
+					onChange={(date) => {
+						updateFormValue('publishDate', date);
+					}}
+				/>
+
+				<ToggledInput
+					type="switch"
+					id="content-does-expire"
+					label={
+						<>
+							Expiry
+							<span className="d-block text-muted">
+								Set a date for your content to be removed from the Resource Library
+							</span>
+						</>
+					}
+					checked={formValues.doesExpire}
+					onChange={({ currentTarget }) => {
+						updateFormValue('doesExpire', currentTarget.checked);
+					}}
+				>
+					<DatePicker
+						className="w-100 mb-2"
+						labelText="Expiration Date"
+						selected={formValues.expirationDate ?? undefined}
+						onChange={(date) => {
+							updateFormValue('expirationDate', date);
+						}}
+					/>
+
+					<Form.Check
+						type="checkbox"
+						id="content-is-recurring"
+						label="Recurring (re-publish and expire content every year on the same day)"
+						checked={formValues.isRecurring}
+						onChange={({ currentTarget }) => {
+							updateFormValue('isRecurring', currentTarget.checked);
+						}}
+					/>
+				</ToggledInput>
 			</AdminFormSection>
 		</Container>
 	);
