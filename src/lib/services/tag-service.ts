@@ -1,7 +1,7 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { TagGroup } from '../models';
 
-interface TagGroupsResponse {
+export interface TagGroupsResponse {
 	tagGroups: TagGroup[];
 }
 

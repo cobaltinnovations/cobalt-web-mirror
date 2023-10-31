@@ -18,6 +18,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		maxWidth: ({ width }: UseStylesProps) => width,
 	},
 	dropdownMenuBody: {
+		maxHeight: 400,
+		overflow: 'scroll',
 		padding: '16px 24px',
 		...theme.fonts.default,
 		'& .react-datepicker': {

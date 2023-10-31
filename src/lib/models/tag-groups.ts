@@ -15,6 +15,6 @@ export interface TagGroup {
 	description: string;
 	name: string;
 	tagGroupId: string;
-	tags: Tag[];
 	urlName: string;
+	tags?: Tag[];
 }

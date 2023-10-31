@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import React, { useCallback, useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
-import { WysiwygDisplay } from './admin-cms/wysiwyg';
+import { WysiwygDisplay } from './wysiwyg';
 import BackgroundImageContainer from './background-image-container';
 import { SkeletonButton, SkeletonImage, SkeletonText } from './skeleton-loaders';
 

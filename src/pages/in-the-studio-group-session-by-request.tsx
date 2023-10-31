@@ -18,7 +18,7 @@ import { getRequiredYupFields } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
-import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
+import { WysiwygDisplay } from '@/components/wysiwyg';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',

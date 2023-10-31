@@ -2,7 +2,7 @@ import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
-import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
+import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import { ButtonLink } from '@/components/button-link';
 import ConfirmDialog from '@/components/confirm-dialog';
 import DatePicker from '@/components/date-picker';
@@ -11,7 +11,7 @@ import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-import { AdminContentRow, ContentApprovalStatusId } from '@/lib/models';
+import { AdminContent } from '@/lib/models';
 import { adminService, resourceLibraryService, tagService } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -97,10 +97,10 @@ function getInitialResourceFormValues({
 	adminContent,
 	isDuplicate,
 }: {
-	adminContent?: AdminContentRow | null;
+	adminContent?: AdminContent | null;
 	isDuplicate?: boolean;
 }): typeof initialResourceFormValues {
-	const { ...rest } = adminContent ?? ({} as AdminContentRow);
+	const { ...rest } = adminContent ?? ({} as AdminContent);
 
 	return Object.assign(
 		{ ...initialResourceFormValues },
@@ -590,29 +590,28 @@ export const Component = () => {
 				if (isNotDraft) {
 					handleSaveForm();
 				} else {
-					adminService
-						.updateContentApprovalStatus(params.contentId!, ContentApprovalStatusId.Approved)
-						.fetch()
-						.then((response) => {
-							addFlag({
-								variant: 'success',
-								title: 'Resource published',
-								description: 'Your resource is now available on Cobalt',
-								actions: [
-									{
-										title: 'View Resource',
-										onClick: () => {
-											navigate(`/resource-library/${response.content?.contentId}`);
-										},
-									},
-								],
-							});
-
-							navigate('/admin/resources');
-						})
-						.catch((e) => {
-							handleError(e);
-						});
+					// adminService
+					// 	.updateContentApprovalStatus(params.contentId!, ContentApprovalStatusId.Approved)
+					// 	.fetch()
+					// 	.then((response) => {
+					// 		addFlag({
+					// 			variant: 'success',
+					// 			title: 'Resource published',
+					// 			description: 'Your resource is now available on Cobalt',
+					// 			actions: [
+					// 				{
+					// 					title: 'View Resource',
+					// 					onClick: () => {
+					// 						navigate(`/resource-library/${response.content?.contentId}`);
+					// 					},
+					// 				},
+					// 			],
+					// 		});
+					// 		navigate('/admin/resources');
+					// 	})
+					// 	.catch((e) => {
+					// 		handleError(e);
+					// 	});
 				}
 			}}
 		/>

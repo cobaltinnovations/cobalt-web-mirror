@@ -21,7 +21,7 @@ import { ReactComponent as ChairIcon } from '@/assets/icons/chair.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
 import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location.svg';
-import { WysiwygDisplay } from './admin-cms/wysiwyg';
+import { WysiwygDisplay } from './wysiwyg';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;

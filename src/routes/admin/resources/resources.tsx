@@ -1,8 +1,14 @@
 import FilterDropdown from '@/components/filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import useHandleError from '@/hooks/use-handle-error';
-import { ContentTypeId } from '@/lib/models';
-import { AdminContentListResponse, ContentFiltersResponse, adminService } from '@/lib/services';
+import { ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
+import {
+	AdminContentListResponse,
+	ContentFiltersResponse,
+	ContentStatusesResponse,
+	ContentTagsResponse,
+	adminService,
+} from '@/lib/services';
 import classNames from 'classnames';
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
@@ -12,7 +18,9 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 
 interface AdminResourcesLoaderData {
-	resourcesPromise: Promise<[ContentFiltersResponse, AdminContentListResponse]>;
+	resourcesPromise: Promise<
+		[ContentTagsResponse, ContentStatusesResponse, ContentFiltersResponse, AdminContentListResponse]
+	>;
 }
 
 export function useAdminResourcesLoaderData() {
@@ -21,27 +29,40 @@ export function useAdminResourcesLoaderData() {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
-	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
-	const contentTypeId = (url.searchParams.get('contentTypeId') ?? undefined) as ContentTypeId | undefined;
-	const approvalStatusId = url.searchParams.get('approvalStatusId') ?? undefined;
+	const page = parseInt(url.searchParams.get('page') ?? '0', 10);
 	const institutionId = url.searchParams.get('institutionId') ?? undefined;
+	const contentStatusId = (url.searchParams.get('contentStatusId') ?? undefined) as ContentStatusId | undefined;
+	const contentTypeId = (url.searchParams.get('contentTypeId') ?? undefined) as ContentTypeId | undefined;
+	const tagId = url.searchParams.get('tagId') ?? undefined;
+	const sharedFlag = url.searchParams.get('sharedFlag') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
 
+	const contentTagsResponse = adminService.fetchContentTags();
+	const contentStatusesRequest = adminService.fetchContentStatuses();
 	const contentFiltersRequest = adminService.fetchMyContentFilters();
-	const contentRequest = adminService.fetchMyContent({
-		page: pageNumber,
-		...(contentTypeId ? { contentTypeId } : {}),
-		...(approvalStatusId ? { myApprovalStatusId: approvalStatusId } : {}),
+	const contentRequest = adminService.fetchContent({
+		page,
 		...(institutionId ? { institutionId } : {}),
+		...(contentStatusId ? { contentStatusId } : {}),
+		...(contentTypeId ? { contentTypeId } : {}),
+		...(tagId ? { tagId } : {}),
+		...(sharedFlag ? { sharedFlag } : {}),
 		...(search ? { search } : {}),
 	});
 
 	request.signal.addEventListener('abort', () => {
+		contentTagsResponse.abort();
+		contentStatusesRequest.abort();
 		contentFiltersRequest.abort();
 		contentRequest.abort();
 	});
 
-	const resourcesPromise = Promise.all([contentFiltersRequest.fetch(), contentRequest.fetch()]);
+	const resourcesPromise = Promise.all([
+		contentTagsResponse.fetch(),
+		contentStatusesRequest.fetch(),
+		contentFiltersRequest.fetch(),
+		contentRequest.fetch(),
+	]);
 
 	return defer({
 		resourcesPromise,
@@ -54,9 +75,11 @@ export const Component = () => {
 	const handleError = useHandleError();
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const page = searchParams.get('page') ?? '0';
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [tags, setTags] = useState<Tag[]>([]);
+	const [contentStatuses, setContentStatuses] = useState<ContentStatus[]>([]);
 	const [contentFilters, setContentFilters] = useState<ContentFiltersResponse>();
 	const [nextFilters, setNextFilters] = useState<Record<string, string | null>>({});
 	const [content, setContent] = useState<AdminContentListResponse>();
@@ -94,8 +117,11 @@ export const Component = () => {
 		const loadResources = async () => {
 			try {
 				setIsLoading(true);
-				const [contentFiltersResponse, contentResponse] = await resourcesPromise;
+				const [tagsResponse, contentStatusesResposne, contentFiltersResponse, contentResponse] =
+					await resourcesPromise;
 
+				setTags(tagsResponse.tags);
+				setContentStatuses(contentStatusesResposne.contentStatuses);
 				setContentFilters(contentFiltersResponse);
 				setContent(contentResponse);
 			} catch (error) {
@@ -109,7 +135,7 @@ export const Component = () => {
 	}, [resourcesPromise, handleError]);
 
 	const handlePaginationClick = (pageIndex: number) => {
-		searchParams.set('pageNumber', String(pageIndex));
+		searchParams.set('page', String(pageIndex));
 		setSearchParams(searchParams);
 	};
 
@@ -127,13 +153,13 @@ export const Component = () => {
 		},
 		{
 			name: 'Status',
-			searchParam: 'approvalStatusId',
-			initialValue: searchParams.get('approvalStatusId'),
-			active: searchParams.get('approvalStatusId') !== null,
+			searchParam: 'contentStatusId',
+			initialValue: searchParams.get('contentStatusId'),
+			active: searchParams.get('contentStatusId') !== null,
 			options:
-				contentFilters?.myApprovalStatuses?.map((approvalStatusOption) => ({
-					label: approvalStatusOption.description,
-					value: approvalStatusOption.approvalStatusId,
+				contentStatuses.map((contentStatusOption) => ({
+					label: contentStatusOption.description,
+					value: contentStatusOption.contentStatusId,
 				})) ?? [],
 		},
 		{
@@ -152,14 +178,26 @@ export const Component = () => {
 			searchParam: 'tagId',
 			initialValue: searchParams.get('tagId'),
 			active: searchParams.get('tagId') !== null,
-			options: [],
+			options: tags.map((tag) => ({
+				label: tag.name,
+				value: tag.tagId,
+			})),
 		},
 		{
 			name: 'Sharing',
-			searchParam: 'sharingStatusId',
-			initialValue: searchParams.get('sharingStatusId'),
-			active: searchParams.get('sharingStatusId') !== null,
-			options: [],
+			searchParam: 'sharedFlag',
+			initialValue: searchParams.get('sharedFlag'),
+			active: searchParams.get('sharedFlag') !== null,
+			options: [
+				{
+					label: 'On',
+					value: 'true',
+				},
+				{
+					label: 'Off',
+					value: 'false',
+				},
+			],
 		},
 	];
 
@@ -221,7 +259,7 @@ export const Component = () => {
 										dismissText="Clear"
 										onDismiss={() => {
 											searchParams.delete(filterConfig.searchParam);
-											searchParams.delete('pageNumber');
+											searchParams.delete('page');
 											setSearchParams(searchParams);
 										}}
 										onHide={() => {
@@ -241,7 +279,7 @@ export const Component = () => {
 												);
 											}
 
-											searchParams.delete('pageNumber');
+											searchParams.delete('page');
 											setSearchParams(searchParams);
 										}}
 										width={240}
@@ -301,7 +339,7 @@ export const Component = () => {
 								<div className="d-flex justify-content-center align-items-center">
 									<TablePagination
 										total={contentTotalCount}
-										page={parseInt(pageNumber, 10)}
+										page={parseInt(page, 10)}
 										size={15}
 										onClick={handlePaginationClick}
 									/>

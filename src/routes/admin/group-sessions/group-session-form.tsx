@@ -1,6 +1,6 @@
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
+import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import TimeSlotInput from '@/components/time-slot-input';

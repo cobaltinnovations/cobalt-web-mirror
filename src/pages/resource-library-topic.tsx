@@ -5,13 +5,7 @@ import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import Color from 'color';
 import { Helmet } from 'react-helmet';
 
-import {
-	ContentDurationFilterModel,
-	ContentTypeFilterModel,
-	ResourceLibraryContentModel,
-	TagGroupModel,
-	TagModel,
-} from '@/lib/models';
+import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import { resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
@@ -90,9 +84,9 @@ const ResourceLibraryTopic = () => {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const [filtersResponse, setFiltersResponse] = useState<{
-		contentTypes: ContentTypeFilterModel[];
-		contentDurations: ContentDurationFilterModel[];
-		tags: TagModel[];
+		contentTypes: ContentType[];
+		contentDurations: ContentDuration[];
+		tags: Tag[];
 	}>();
 	const [filters, setFilters] = useState<Record<FILTER_IDS, SimpleFilterModel<FILTER_IDS>>>();
 	const [searchIsOpen, setSearchIsOpen] = useState(false);
@@ -100,9 +94,9 @@ const ResourceLibraryTopic = () => {
 
 	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
-	const [tagGroup, setTagGroup] = useState<TagGroupModel>();
-	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
-	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
+	const [tagGroup, setTagGroup] = useState<TagGroup>();
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
+	const [contents, setContents] = useState<Content[]>([]);
 
 	const fetchTagGroup = useCallback(async () => {
 		if (!tagGroupId) {

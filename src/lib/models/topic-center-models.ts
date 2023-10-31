@@ -1,4 +1,4 @@
-import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel, TagModel } from '@/lib/models';
+import { Content, GroupSessionModel, GroupSessionRequestModel, Tag } from '@/lib/models';
 
 export enum TopicCenterDisplayStyleId {
 	DEFAULT = 'DEFAULT',
@@ -11,7 +11,7 @@ export interface TopicCenterModel {
 	topicCenterId: string;
 	topicCenterRows: TopicCenterRowModel[];
 	urlName: string;
-	tagsByTagId: Record<string, TagModel>;
+	tagsByTagId: Record<string, Tag>;
 	topicCenterDisplayStyleId: TopicCenterDisplayStyleId;
 	featuredTitle?: string;
 	featuredDescription?: string;
@@ -20,7 +20,7 @@ export interface TopicCenterModel {
 }
 
 export interface TopicCenterRowModel {
-	contents: ResourceLibraryContentModel[];
+	contents: Content[];
 	description: string;
 	groupSessionRequests: GroupSessionRequestModel[];
 	groupSessionRequestsDescription?: string;
@@ -43,7 +43,7 @@ export interface PinboardNoteModel {
 }
 
 export interface TopicCenterRowTag {
-	contents: ResourceLibraryContentModel[];
+	contents: Content[];
 	cta: string;
 	ctaUrl: string;
 	description: string;
