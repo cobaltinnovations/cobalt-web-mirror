@@ -4,6 +4,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
 import {
 	AdminContentListResponse,
+	AdminContentSortOrder,
 	ContentFiltersResponse,
 	ContentStatusesResponse,
 	ContentTagsResponse,
@@ -16,6 +17,7 @@ import { Await, LoaderFunctionArgs, defer, useNavigate, useRouteLoaderData, useS
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
+import { AdminResourcesTableDropdown } from '@/components/admin';
 
 interface AdminResourcesLoaderData {
 	resourcesPromise: Promise<
@@ -82,6 +84,7 @@ export const Component = () => {
 	const [contentStatuses, setContentStatuses] = useState<ContentStatus[]>([]);
 	const [contentFilters, setContentFilters] = useState<ContentFiltersResponse>();
 	const [nextFilters, setNextFilters] = useState<Record<string, string | null>>({});
+	const [nextSort, setNextSort] = useState<string | null>(null);
 	const [content, setContent] = useState<AdminContentListResponse>();
 
 	const initialSearchValue = searchParams.get('search');
@@ -201,6 +204,44 @@ export const Component = () => {
 		},
 	];
 
+	const sortOptions = [
+		{
+			label: 'Date Added Descending',
+			value: AdminContentSortOrder.DATE_ADDED_DESCENDING,
+		},
+		{
+			label: 'Date Added Ascending',
+			value: AdminContentSortOrder.DATE_ADDED_ASCENDING,
+		},
+		{
+			label: 'Publish Date Descending',
+			value: AdminContentSortOrder.PUBLISH_DATE_DESCENDING,
+		},
+		{
+			label: 'Publish Date Ascending',
+			value: AdminContentSortOrder.PUBLISH_DATE_ASCENDING,
+		},
+		{
+			label: 'Exp Date Descending',
+			value: AdminContentSortOrder.EXP_DATE_DESCENDING,
+		},
+		{
+			label: 'Exp Date Ascending',
+			value: AdminContentSortOrder.EXP_DATE_ASCENDING,
+		},
+	];
+
+	const orderBy = searchParams.get('orderBy');
+	const selectedSort = sortOptions.find((o) => o.value === orderBy) ?? sortOptions[0];
+
+	const sortConfig = {
+		name: `Sort by: ${selectedSort.label}`,
+		searchParam: 'orderBy',
+		initialValue: orderBy,
+		active: searchParams.get('orderBy') !== null,
+		options: sortOptions,
+	};
+
 	const contentTotalCount = content?.totalCount ?? 0;
 
 	return (
@@ -252,6 +293,7 @@ export const Component = () => {
 
 								return (
 									<FilterDropdown
+										key={filterId}
 										className={classNames({ 'me-2': !isLast })}
 										active={filterConfig.active}
 										id={filterId}
@@ -307,7 +349,48 @@ export const Component = () => {
 						</div>
 					</Col>
 					<Col>
-						<div className="d-flex">{/* <AdminGroupSessionSort className="ms-auto" /> */}</div>
+						<div className="d-flex">
+							<FilterDropdown
+								showSortIcon
+								iconLeft
+								className="ms-auto"
+								active={sortConfig.active}
+								id="admin-resource-sort"
+								title={sortConfig.name}
+								dismissText="Clear"
+								onHide={() => {
+									setNextSort(orderBy);
+								}}
+								onDismiss={() => {
+									searchParams.delete('orderBy');
+									setNextSort(null);
+									setSearchParams(searchParams);
+								}}
+								confirmText="Apply"
+								onConfirm={() => {
+									if (nextSort) {
+										searchParams.set('orderBy', nextSort);
+										setSearchParams(searchParams);
+									}
+								}}
+								width={240}
+							>
+								{sortOptions.map((option) => (
+									<Form.Check
+										key={option.value}
+										type="radio"
+										name="admin-resource-sort"
+										id={`admin-resource-sort--${option.value}`}
+										label={option.label}
+										value={option.value}
+										checked={(nextSort ?? selectedSort.value) === option.value}
+										onChange={({ currentTarget }) => {
+											setNextSort(currentTarget.value);
+										}}
+									/>
+								))}
+							</FilterDropdown>
+						</div>
 					</Col>
 				</Row>
 				<Suspense>
@@ -317,13 +400,17 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Content</TableCell>
+											<TableCell header>Actions</TableCell>
+											<TableCell header>[WIP]</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
 										{content?.adminContent.map((content) => {
 											return (
 												<TableRow key={content.contentId}>
+													<TableCell>
+														<AdminResourcesTableDropdown content={content} />
+													</TableCell>
 													<TableCell>
 														<pre>{JSON.stringify(content, null, 2)}</pre>
 													</TableCell>

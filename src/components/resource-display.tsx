@@ -2,15 +2,17 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import useReactPlayerSettings from '@/hooks/use-react-player-settings';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AcivityTypeId, ActivityActionId, Content } from '@/lib/models';
+import { AcivityTypeId, ActivityActionId, AdminContent, Content } from '@/lib/models';
 import { activityTrackingService } from '@/lib/services';
 import classNames from 'classnames';
 import React, { useCallback, useEffect } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 import { WysiwygDisplay } from './wysiwyg';
 import BackgroundImageContainer from './background-image-container';
 import { SkeletonButton, SkeletonImage, SkeletonText } from './skeleton-loaders';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import ContentTypeIcon from './content-type-icon';
 
 const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -41,7 +43,7 @@ const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 
 interface ResourceDisplayProps {
 	trackView: boolean;
-	content?: Content;
+	content?: Content | AdminContent;
 }
 
 const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
@@ -81,14 +83,29 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 		}
 	}, [content, canEmbed, trackActivity]);
 
+	console.log({ content });
+
 	return (
-		<Container className="py-12">
+		<Container className="pt-18">
 			<Row className="justify-content-center">
-				<Col md={10} lg={8} xl={6}>
-					<h2 className="mb-6">{content?.title}</h2>
+				<Col md={10} lg={8}>
+					<h1 className="mb-4">{content?.title}</h1>
+
+					<p className="text-muted fw-bold mb-14">
+						{content?.contentTypeId && (
+							<ContentTypeIcon
+								contentTypeId={content?.contentTypeId}
+								width={16}
+								height={16}
+								className="me-1"
+							/>
+						)}
+						{/* @ts-expect-error TODO: contentyTypeLabel missing in AdminContent */}
+						{content?.contentTypeLabel} {content?.duration && <>&bull; {content?.duration}</>}
+					</p>
 
 					{canEmbed ? (
-						<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
+						<div className={classNames(classes.reactPlayerOuter, 'mb-14')}>
 							<ReactPlayer
 								width="100%"
 								height="100%"
@@ -102,27 +119,15 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 						</div>
 					) : (
 						<BackgroundImageContainer
-							className={classNames(classes.mediaContainer, 'mb-6')}
+							className={classNames(classes.mediaContainer, 'mb-14')}
 							imageUrl={content?.imageUrl || placeholderImage}
 						/>
 					)}
 
-					<p className="text-muted fw-bold mb-0">
-						{content?.contentTypeLabel} {content?.duration && <>&bull; {content?.duration}</>}
-					</p>
-
-					{content?.author && <p className="text-muted mb-6">By {content?.author}</p>}
-
-					<hr className="mb-6" />
-				</Col>
-			</Row>
-
-			<Row className="justify-content-center">
-				<Col md={10} lg={8} xl={6}>
 					<WysiwygDisplay html={content?.description ?? ''} />
 
 					{!canEmbed && content?.url && (
-						<div className="mt-10 text-center">
+						<div className="mt-8 text-center">
 							<Button
 								as="a"
 								className="d-inline-block text-decoration-none text-white"
@@ -133,9 +138,38 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 									trackActivity();
 								}}
 							>
-								{content.callToAction}
+								{/* @ts-expect-error TODO: callToAction missing in AdminContent */}
+								{content.callToAction} <ExternalIcon />
 							</Button>
 						</div>
+					)}
+
+					<hr className="mt-12 mb-10" />
+
+					{content?.author && (
+						<>
+							<p className="fw-semibold">Created by</p>
+							<p className="text-n700 mb-0">{content?.author}</p>
+						</>
+					)}
+
+					{content?.tagIds && content?.tagIds.length > 0 && (
+						<>
+							<p className={classNames({ 'mt-8': content?.author }, 'fw-semibold')}>Related Topics</p>
+							<div className="d-flex flex-wrap">
+								{content?.tagIds.map((tagId) => (
+									<Badge
+										key={tagId}
+										bg="outline-dark"
+										pill
+										as="div"
+										className="me-1 mt-1 fs-small text-capitalize fw-normal"
+									>
+										{tagId}
+									</Badge>
+								))}
+							</div>
+						</>
 					)}
 				</Col>
 			</Row>

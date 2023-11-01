@@ -109,6 +109,9 @@ export const AdminHeader = () => {
 	const classes = useStyles();
 	const { account, signOutAndClearContext } = useAccount();
 
+	const isResourcePreview = useMatch({
+		path: '/admin/resources/preview/*',
+	});
 	const isGroupSessionPreview = useMatch({
 		path: '/admin/group-sessions/preview/*',
 	});
@@ -203,6 +206,8 @@ export const AdminHeader = () => {
 		]
 	);
 
+	const showLinks = !isResourcePreview && !isGroupSessionPreview;
+
 	return (
 		<header className={classes.header}>
 			<div className={classes.brandingOuter}>
@@ -210,9 +215,11 @@ export const AdminHeader = () => {
 				<span className="d-block text-gray">Admin</span>
 			</div>
 			<div className={classes.navigationOuter}>
-				{isGroupSessionPreview ? (
-					<p className="mb-0 text-muted">Preview Group Session</p>
-				) : (
+				{isResourcePreview && <p className="mb-0 text-muted">Preview Resource</p>}
+
+				{isGroupSessionPreview && <p className="mb-0 text-muted">Preview Group Session</p>}
+
+				{showLinks && (
 					<>
 						<nav className="h-100">
 							<ul>

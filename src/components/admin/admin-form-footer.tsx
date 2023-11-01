@@ -23,6 +23,7 @@ interface AdminFormFooterProps {
 	nextButtonType: 'button' | 'submit';
 	onNext: () => void;
 	nextLabel: ReactNode;
+	nextVariant?: 'primary' | 'outline-primary';
 	extraAction?: ReactNode;
 }
 
@@ -34,6 +35,7 @@ export const AdminFormFooter = ({
 	nextButtonType,
 	onNext,
 	nextLabel,
+	nextVariant = 'primary',
 }: AdminFormFooterProps) => {
 	const classes = useStyles();
 
@@ -57,7 +59,7 @@ export const AdminFormFooter = ({
 					</div>
 
 					<Button
-						variant="primary"
+						variant={nextVariant}
 						type={nextButtonType}
 						onClick={() => {
 							onNext();

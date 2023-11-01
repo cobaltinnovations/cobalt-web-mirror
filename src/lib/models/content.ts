@@ -48,6 +48,7 @@ export enum AdminContentAction {
 export type Content = {
 	contentId: string;
 	contentTypeId: ContentTypeId;
+	contentStatusId: ContentStatusId;
 	title: string;
 	url: string;
 	imageUrl: string;

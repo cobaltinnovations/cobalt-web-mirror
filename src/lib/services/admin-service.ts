@@ -48,6 +48,15 @@ export interface ContentTypeFilters {
 	callToAction: string;
 }
 
+export enum AdminContentSortOrder {
+	DATE_ADDED_DESCENDING = 'DATE_ADDED_DESCENDING',
+	DATE_ADDED_ASCENDING = 'DATE_ADDED_ASCENDING',
+	PUBLISH_DATE_DESCENDING = 'PUBLISH_DATE_DESCENDING',
+	PUBLISH_DATE_ASCENDING = 'PUBLISH_DATE_ASCENDING',
+	EXP_DATE_DESCENDING = 'EXP_DATE_DESCENDING',
+	EXP_DATE_ASCENDING = 'EXP_DATE_ASCENDING',
+}
+
 interface AdminContentParams {
 	page?: number;
 	contentTypeId?: ContentTypeId;
