@@ -1,9 +1,15 @@
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import {
+	AdminFormFooter,
+	AdminFormImageInput,
+	AdminFormNonImageFileInput,
+	AdminFormSection,
+	AdminTagGroupControl,
+} from '@/components/admin';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
-import { ButtonLink } from '@/components/button-link';
 import ConfirmDialog from '@/components/confirm-dialog';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
@@ -11,8 +17,8 @@ import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-import { AdminContent } from '@/lib/models';
-import { adminService, resourceLibraryService, tagService } from '@/lib/services';
+import { AdminContent, ContentStatusId, ContentTypeId } from '@/lib/models';
+import { CreateContentRequest, adminService, resourceLibraryService, tagService } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
@@ -24,6 +30,8 @@ import {
 	useParams,
 	useRouteLoaderData,
 } from 'react-router-dom';
+import moment from 'moment';
+import { DateFormats } from '@/lib/utils';
 
 type AdminResourceFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -78,16 +86,17 @@ const initialResourceFormValues = {
 	title: '',
 	author: '',
 	contentTypeId: '',
-	durationInMinutes: undefined as number | undefined,
+	contentStatusId: ContentStatusId.DRAFT,
+	durationInMinutes: '',
 	resourceType: 'url' as 'url' | 'file',
 	resourceUrl: '',
 	resourceFileUrl: '',
-	isShared: true,
+	isShared: false,
 	imageUrl: '',
 	description: '',
 	tagIds: [] as string[],
 	searchTerms: '',
-	publishDate: null as Date | null,
+	publishDate: new Date(),
 	doesExpire: false,
 	expirationDate: null as Date | null,
 	isRecurring: false,
@@ -131,8 +140,10 @@ export const Component = () => {
 	const isDuplicate = params.action === 'duplicate';
 	const isView = params.action === 'view';
 
-	const isNotDraft = !isDuplicate && false;
-	const isContentEditable = false;
+	const isNotDraft =
+		!isDuplicate &&
+		loaderData?.contentResponse?.content?.contentStatusId &&
+		loaderData?.contentResponse?.content?.contentStatusId !== ContentStatusId.DRAFT;
 
 	const [formValues, setFormValues] = useState(
 		getInitialResourceFormValues({
@@ -186,7 +197,7 @@ export const Component = () => {
 									{
 										title: 'View Resource',
 										onClick: () => {
-											navigate(`/resource-library/${response.content?.contentId}`);
+											navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
 										},
 									},
 								],
@@ -195,7 +206,7 @@ export const Component = () => {
 
 						navigate('/admin/resources');
 					} else {
-						navigate('/admin/resources/preview/' + response.content?.contentId);
+						navigate('/admin/resources/preview/' + response.adminContent?.contentId);
 					}
 				})
 				.catch((e) => {
@@ -214,7 +225,7 @@ export const Component = () => {
 
 	if (loaderData === null) {
 		return <NoMatch />;
-	} else if ((isPreview && isNotDraft) || (isEdit && !isContentEditable)) {
+	} else if (isPreview && isNotDraft) {
 		return <Navigate to={`/admin/resources/view/${params.contentId}`} replace />;
 	}
 	const formFields = (
@@ -285,11 +296,9 @@ export const Component = () => {
 					type="number"
 					label="How many minutes will it take to read/listen/watch?"
 					name="durationInMinutes"
-					value={
-						typeof formValues.durationInMinutes === 'number' ? formValues.durationInMinutes.toString() : ''
-					}
+					value={formValues.durationInMinutes}
 					onChange={({ currentTarget }) => {
-						updateFormValue('durationInMinutes', parseInt(currentTarget.value));
+						updateFormValue('durationInMinutes', currentTarget.value);
 					}}
 				/>
 			</AdminFormSection>
@@ -328,9 +337,10 @@ export const Component = () => {
 						updateFormValue('resourceType', 'file');
 					}}
 				>
-					<AdminFormImageInput
-						imageSrc={formValues.resourceFileUrl}
-						onSrcChange={(nextSrc) => {
+					<AdminFormNonImageFileInput
+						previewSrc={formValues.resourceFileUrl}
+						uploadedFileSrc={formValues.resourceFileUrl}
+						onUploadedFileSrcChange={(nextSrc) => {
 							updateFormValue('resourceFileUrl', nextSrc);
 						}}
 					/>
@@ -355,7 +365,7 @@ export const Component = () => {
 				/>
 
 				<div className="d-flex  mt-2">
-					<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+					<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 					<p className="mb-0">
 						If your resource is a TED talk, you must have permission from the original creator to share
 						their video.
@@ -398,7 +408,7 @@ export const Component = () => {
 				/>
 
 				<div className="d-flex  mt-2">
-					<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+					<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 					<p className="mb-0">
 						If you choose not to upload an image, a generic placeholder image will be added to your post.
 						Free images can be found at{' '}
@@ -535,7 +545,9 @@ export const Component = () => {
 		<AdminFormFooter
 			exitButtonType={isPreview || isNotDraft ? 'button' : 'submit'}
 			onExit={() => {
-				if (isPreview) {
+				if (isView) {
+					navigate(`/admin/resources`);
+				} else if (isPreview) {
 					navigate(`/admin/resources/edit/${params.contentId}`);
 				} else if (isNotDraft) {
 					navigate(`/admin/resources`);
@@ -548,13 +560,20 @@ export const Component = () => {
 					</>
 				) : isNotDraft ? (
 					'Exit Editor'
+				) : isView ? (
+					<>
+						<LeftChevron /> Back
+					</>
 				) : (
 					'Save & Exit'
 				)
 			}
-			nextButtonType={isPreview ? 'button' : 'submit'}
+			nextButtonType={isPreview || isView ? 'button' : 'submit'}
 			onNext={() => {
-				if (!isPreview) {
+				if (isView) {
+					navigate(`/admin/resources/edit/${params.contentId}`);
+					return;
+				} else if (!isPreview) {
 					return;
 				}
 
@@ -562,13 +581,18 @@ export const Component = () => {
 			}}
 			nextLabel={
 				isPreview ? (
-					'Publish'
+					'Add Resource'
+				) : isView ? (
+					<>
+						<EditIcon /> Edit
+					</>
 				) : (
 					<>
 						{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
 					</>
 				)
 			}
+			nextVariant={isView ? 'outline-primary' : 'primary'}
 		/>
 	);
 
@@ -579,39 +603,49 @@ export const Component = () => {
 			onHide={() => {
 				setShowConfirmPublishDialog(false);
 			}}
-			titleText={`Publish ${isNotDraft ? 'Changes' : 'Resource'}`}
-			bodyText={`Are you ready to publish ${isNotDraft ? 'your changes' : 'your resource'}?`}
-			detailText={`Your ${isNotDraft ? 'changes' : 'resource'} will become available on Cobalt immediately`}
+			titleText={isNotDraft ? 'Publish Changes' : 'Add Resource'}
+			bodyText={
+				isNotDraft
+					? 'Are you ready to publish your changes'
+					: `Are you ready to add ${formValues.title} to Cobalt?`
+			}
+			detailText={
+				isNotDraft
+					? 'Your changes will be reflected on Cobalt immediately'
+					: `This resource will become live on the Cobalt Resource Library on ${formValues.publishDate.toDateString()}`
+			}
 			dismissText="Cancel"
-			confirmText="Publish"
+			confirmText={isNotDraft ? 'Update' : 'Add Resource'}
 			onConfirm={() => {
 				setShowConfirmPublishDialog(false);
 
 				if (isNotDraft) {
 					handleSaveForm();
 				} else {
-					// adminService
-					// 	.updateContentApprovalStatus(params.contentId!, ContentApprovalStatusId.Approved)
-					// 	.fetch()
-					// 	.then((response) => {
-					// 		addFlag({
-					// 			variant: 'success',
-					// 			title: 'Resource published',
-					// 			description: 'Your resource is now available on Cobalt',
-					// 			actions: [
-					// 				{
-					// 					title: 'View Resource',
-					// 					onClick: () => {
-					// 						navigate(`/resource-library/${response.content?.contentId}`);
-					// 					},
-					// 				},
-					// 			],
-					// 		});
-					// 		navigate('/admin/resources');
-					// 	})
-					// 	.catch((e) => {
-					// 		handleError(e);
-					// 	});
+					adminService
+						.updateContent(params.contentId!, {
+							contentStatusId: ContentStatusId.LIVE,
+						})
+						.fetch()
+						.then((response) => {
+							addFlag({
+								variant: 'success',
+								title: 'Resource published',
+								description: 'Your resource is now available on Cobalt',
+								actions: [
+									{
+										title: 'View Resource',
+										onClick: () => {
+											navigate(`/resource-library/${response.content?.contentId}`);
+										},
+									},
+								],
+							});
+							navigate('/admin/resources');
+						})
+						.catch((e) => {
+							handleError(e);
+						});
 				}
 			}}
 		/>
@@ -629,32 +663,18 @@ export const Component = () => {
 		);
 	}
 
-	const pageTitle = (
+	const pageTitle = isView ? null : (
 		<Container fluid className="border-bottom">
 			<Container className="py-10">
 				<Row>
 					<Col>
 						<div className="d-flex align-items-center justify-content-between">
-							{!isView && <h2 className="mb-1">{isEdit ? 'Edit' : 'Add'} Resource</h2>}
-							{isView && isContentEditable && (
-								<div>
-									<ButtonLink
-										variant="outline-primary"
-										to={{
-											pathname: `/admin/resources/edit/${params.contentId}`,
-										}}
-									>
-										Edit
-									</ButtonLink>
-								</div>
-							)}
+							<h2 className="mb-1">{isEdit ? 'Edit' : 'Add'} Resource</h2>
 						</div>
 
-						{!isView && (
-							<p className="mb-0 fs-large">
-								Complete all <span className="text-danger">*required fields</span> before publishing.
-							</p>
-						)}
+						<p className="mb-0 fs-large">
+							Complete all <span className="text-danger">*required fields</span> before publishing.
+						</p>
 					</Col>
 				</Row>
 			</Container>
@@ -667,6 +687,8 @@ export const Component = () => {
 				{pageTitle}
 
 				{details}
+
+				{footer}
 			</>
 		);
 	}
@@ -709,10 +731,28 @@ export const Component = () => {
 	);
 };
 
-function prepareResourceSubmission(formValues: Partial<typeof initialResourceFormValues>): any {
-	const { ...resourceSubmission } = formValues;
+function prepareResourceSubmission(formValues: Partial<typeof initialResourceFormValues>): CreateContentRequest {
+	const publishStartDate = moment(formValues.publishDate).format(DateFormats.API.Date);
+
+	const publishEndDate =
+		formValues.doesExpire && formValues.expirationDate
+			? moment(formValues.expirationDate).format(DateFormats.API.Date)
+			: undefined;
 
 	return {
-		...resourceSubmission,
+		contentTypeId: formValues.contentTypeId as ContentTypeId,
+		title: formValues.title,
+		author: formValues.author,
+		url: formValues.resourceUrl || formValues.resourceFileUrl,
+		imageUrl: formValues.imageUrl,
+		durationInMinutes: formValues.durationInMinutes,
+		description: formValues.description,
+		publishStartDate,
+		publishEndDate,
+		publishRecurring: formValues.isRecurring,
+		tagIds: formValues.tagIds,
+		searchTerms: formValues.searchTerms,
+		sharedFlag: formValues.isShared,
+		contentStatusId: formValues.contentStatusId,
 	};
 }

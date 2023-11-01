@@ -89,6 +89,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-gray': {
 			color: `${theme.colors.n500} !important`,
 		},
+		'.text-muted': {
+			color: `${theme.colors.n500} !important`,
+		},
 
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
