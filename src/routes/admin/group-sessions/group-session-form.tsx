@@ -561,7 +561,7 @@ export const Component = () => {
 
 				{!formValues.title || urlNameValidations[debouncedUrlNameQuery]?.available === false ? null : (
 					<div className="d-flex mt-2">
-						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+						<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 						<p className="mb-0">
 							URL will appear as https://{window.location.host}/group-sessions/
 							<span className="fw-bold">{formValues.urlName}</span>
@@ -831,7 +831,7 @@ export const Component = () => {
 				/>
 
 				<div className="d-flex  mt-2">
-					<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+					<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 					<p className="mb-0">
 						If you choose not to upload an image, a generic placeholder image will be added to your post.
 						Free images can be found at{' '}
