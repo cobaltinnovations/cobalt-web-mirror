@@ -94,8 +94,12 @@ export interface GroupSessionModel {
 	startTimeDescription: string;
 	endTime: string;
 	endTimeDescription: string;
+	startDate: string;
+	startDateDescription: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
+	endDate: string;
+	endDateDescription: string;
 	endDateTime: string;
 	endDateTimeDescription: string;
 	submitterAccountId: string;
