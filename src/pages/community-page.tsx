@@ -1,10 +1,10 @@
 import React from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import AsyncPage from '@/components/async-page';
-import { SkeletonTopicCenterGroupSession } from '@/components/topic-center-group-session';
+import { SkeletonTopicCenterGroupSession, TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
 import useAnalytics from '@/hooks/use-analytics';
@@ -22,6 +22,7 @@ import classNames from 'classnames';
 
 const CommunityPage = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const { fetchData, topicCenter, trackContentEvent } = useTopicCenterState(topicCenterId);
@@ -129,12 +130,13 @@ const CommunityPage = () => {
 				/>
 
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
+					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 					const containerClassNames = 'pt-10 pt-lg-16 pb-12 pb-lg-24';
 
-					const showScheduledGroupSessionSection = topicCenterRow.groupSessions.length > 0;
-					const showByRequestGroupSessionSection = topicCenterRow.groupSessionRequests.length > 0;
-					const showGroupSessionSection =
-						showScheduledGroupSessionSection || showByRequestGroupSessionSection;
+					// const showScheduledGroupSessionSection = topicCenterRow.groupSessions.length > 0;
+					// const showByRequestGroupSessionSection = topicCenterRow.groupSessionRequests.length > 0;
+					// const showGroupSessionSection =
+					// 	showScheduledGroupSessionSection || showByRequestGroupSessionSection;
 
 					const topicCenterRowHeader = (
 						<Row className="mb-6 mb-lg-12">
@@ -149,7 +151,8 @@ const CommunityPage = () => {
 
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
-							{showGroupSessionSection && (
+							{/* Group Sessions as 'One Section' with Carousels */}
+							{/* {showGroupSessionSection && (
 								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
@@ -283,11 +286,151 @@ const CommunityPage = () => {
 										)}
 									</Container>
 								</Container>
+							)} */}
+
+							{topicCenterRow.groupSessions.length > 0 && (
+								<Container
+									fluid
+									className={backgroundColorClass}
+									key={'groupSessions-' + topicCenterRow.topicCenterRowId}
+								>
+									<Container className={containerClassNames}>
+										{topicCenterRowHeader}
+
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												{topicCenterRow.groupSessions.map((groupSession, groupSessionIndex) => {
+													const isLast =
+														topicCenterRow.groupSessions.length - 1 === groupSessionIndex;
+
+													return (
+														<TopicCenterGroupSession
+															key={groupSession.groupSessionId}
+															className={classNames({
+																'mb-8': !isLast,
+															})}
+															title={groupSession.title}
+															titleSecondary={groupSession.appointmentTimeDescription}
+															titleTertiary={`Hosted by: ${groupSession.facilitatorName}`}
+															description={groupSession.description}
+															badgeTitle={
+																groupSession.seatsAvailable &&
+																groupSession.seatsAvailable <= 20
+																	? groupSession.seatsAvailableDescription
+																	: ''
+															}
+															buttonTitle="Reserve a Place"
+															onClick={() => {
+																trackEvent(
+																	TopicCenterAnalyticsEvent.clickGroupSession(
+																		topicCenter.name,
+																		topicCenterRow.title
+																	)
+																);
+
+																mixpanel.track('Topic Center Group Session Click', {
+																	'Topic Center ID': topicCenter.topicCenterId,
+																	'Topic Center Title': topicCenter.name,
+																	'Section Title': topicCenterRow.title,
+																	'Group Session ID': groupSession.groupSessionId,
+																	'Group Session Title': groupSession.title,
+																	'Group Session Start Time':
+																		groupSession.startDateTime,
+																});
+
+																navigate(`/group-sessions/${groupSession.urlName}`, {
+																	state: {
+																		navigationSource:
+																			GroupSessionDetailNavigationSource.TOPIC_CENTER,
+																		topicCenterPath: location.pathname,
+																	},
+																});
+															}}
+															imageUrl={groupSession.imageUrl}
+														/>
+													);
+												})}
+											</Col>
+										</Row>
+									</Container>
+								</Container>
+							)}
+
+							{topicCenterRow.groupSessionRequests.length > 0 && (
+								<Container
+									fluid
+									className={backgroundColorClass}
+									key={'groupSessionRequests-' + topicCenterRow.topicCenterRowId}
+								>
+									<Container className={containerClassNames}>
+										{topicCenterRowHeader}
+
+										<Row>
+											<Col
+												md={{ span: 10, offset: 1 }}
+												lg={{ span: 10, offset: 1 }}
+												xl={{ span: 8, offset: 2 }}
+											>
+												{topicCenterRow.groupSessionRequests.map(
+													(groupSessionRequest, groupSessionRequestIndex) => {
+														const isLast =
+															topicCenterRow.groupSessionRequests.length - 1 ===
+															groupSessionRequestIndex;
+
+														return (
+															<TopicCenterGroupSession
+																key={groupSessionRequest.groupSessionRequestId}
+																className={classNames({
+																	'mb-8': !isLast,
+																})}
+																title={groupSessionRequest.title}
+																titleSecondary="By Request"
+																description={groupSessionRequest.description}
+																buttonTitle="Submit a Request"
+																onClick={() => {
+																	trackEvent(
+																		TopicCenterAnalyticsEvent.clickGroupSessionByRequest(
+																			topicCenter.name,
+																			topicCenterRow.title
+																		)
+																	);
+
+																	mixpanel.track(
+																		'Topic Center Group Session By Request Click',
+																		{
+																			'Topic Center ID':
+																				topicCenter.topicCenterId,
+																			'Topic Center Title': topicCenter.name,
+																			'Section Title': topicCenterRow.title,
+																			'Group Session By Request ID':
+																				groupSessionRequest.groupSessionRequestId,
+																			'Group Session By Request Title':
+																				groupSessionRequest.title,
+																		}
+																	);
+
+																	navigate(
+																		`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`
+																	);
+																}}
+																imageUrl={groupSessionRequest.imageUrl}
+															/>
+														);
+													}
+												)}
+											</Col>
+										</Row>
+									</Container>
+								</Container>
 							)}
 
 							{(topicCenterRow.topicCenterRowTags ?? []).map((topicCenterRowTag, index) => {
 								return (
-									<Container fluid className="bg-n50" key={'rt' + index}>
+									<Container fluid className={backgroundColorClass} key={'rt' + index}>
 										<Container className={containerClassNames}>
 											{topicCenterRowHeader}
 
@@ -371,7 +514,7 @@ const CommunityPage = () => {
 							)}
 
 							{topicCenterRow.contents.length > 0 && (
-								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
+								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
 
