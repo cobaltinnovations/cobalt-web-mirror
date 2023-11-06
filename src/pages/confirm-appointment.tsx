@@ -14,6 +14,7 @@ import { CobaltError } from '@/lib/http-client';
 import Cookies from 'js-cookie';
 
 const ConfirmAppointment = () => {
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const promptForPhoneNumber = searchParams.get('promptForPhoneNumber') === 'true';
@@ -166,6 +167,8 @@ const ConfirmAppointment = () => {
 
 			if (response.appointment.patientOrderId) {
 				navigate(`/ic/patient`);
+			} else if (institution.epicFhirEnabled) {
+				navigate(`/connect-with-support/mental-health-providers`);
 			} else {
 				navigate(`/my-calendar?appointmentId=${response.appointment.appointmentId}`);
 			}
