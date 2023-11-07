@@ -1,7 +1,7 @@
 import FilterDropdown from '@/components/filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import useHandleError from '@/hooks/use-handle-error';
-import { ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
+import { AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
 import {
 	AdminContentListResponse,
 	AdminContentSortOrder,
@@ -12,12 +12,21 @@ import {
 } from '@/lib/services';
 import classNames from 'classnames';
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Await, LoaderFunctionArgs, defer, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import {
+	Await,
+	Link,
+	LoaderFunctionArgs,
+	defer,
+	useNavigate,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { AdminResourcesTableDropdown } from '@/components/admin';
+import ContentTypeIcon from '@/components/content-type-icon';
 
 interface AdminResourcesLoaderData {
 	resourcesPromise: Promise<
@@ -70,6 +79,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		resourcesPromise,
 	});
 }
+
+const contentStatusBadgeProps = {
+	[ContentStatusId.DRAFT]: {
+		bg: 'outline-gray',
+		children: 'Draft',
+	},
+	[ContentStatusId.EXPIRED]: {
+		bg: 'outline-danger',
+		children: 'Expired',
+	},
+	[ContentStatusId.LIVE]: {
+		bg: 'outline-success',
+		children: 'Live',
+	},
+	[ContentStatusId.SCHEDULED]: {
+		bg: 'outline-attention',
+		children: 'Scheduled',
+	},
+};
 
 export const Component = () => {
 	const { resourcesPromise } = useAdminResourcesLoaderData();
@@ -400,19 +428,107 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Actions</TableCell>
-											<TableCell header>[WIP]</TableCell>
+											<TableCell header>Date Added</TableCell>
+											<TableCell header>Resource Details</TableCell>
+											<TableCell header>Owner</TableCell>
+											<TableCell header>Status</TableCell>
+											<TableCell header>Publish Date</TableCell>
+											<TableCell header>Expiry Date</TableCell>
+											<TableCell header>In Use</TableCell>
+											<TableCell header />
 										</TableRow>
 									</TableHead>
 									<TableBody>
 										{content?.adminContent.map((content) => {
+											const isAvailable = content.actions.includes(AdminContentAction.ADD);
+
 											return (
 												<TableRow key={content.contentId}>
-													<TableCell>
-														<AdminResourcesTableDropdown content={content} />
+													<TableCell>{content.dateCreatedDescription}</TableCell>
+
+													<TableCell width={460}>
+														<div className="d-flex align-items-center">
+															<OverlayTrigger
+																placement="bottom"
+																overlay={<Tooltip>contentTypeIdDescription</Tooltip>}
+															>
+																<div className="text-muted me-2">
+																	<ContentTypeIcon
+																		contentTypeId={content.contentTypeId}
+																	/>
+																</div>
+															</OverlayTrigger>
+
+															<div
+																className={classNames('text-truncate', true && 'me-5')}
+															>
+																<Link
+																	className="text-decoration-none"
+																	to={{
+																		pathname: `/admin/resources/view/${content.contentId}`,
+																	}}
+																>
+																	{content.title}
+																</Link>
+
+																<p className={'mb-0'}>
+																	<small>{content.author}</small>
+																</p>
+															</div>
+
+															<div className="ms-auto">
+																<Badge pill>New</Badge>
+															</div>
+														</div>
 													</TableCell>
+
+													<TableCell>{content.ownerInstitution}</TableCell>
+
 													<TableCell>
-														<pre>{JSON.stringify(content, null, 2)}</pre>
+														<div>
+															<Badge
+																pill
+																{...contentStatusBadgeProps[content.contentStatusId]}
+																className="me-2"
+															/>
+
+															{isAvailable && (
+																<Badge pill bg="outline-primary">
+																	Available
+																</Badge>
+															)}
+														</div>
+													</TableCell>
+
+													<TableCell>{content.publishStartDateDescription}</TableCell>
+
+													<TableCell>
+														{content.publishEndDateDescription ?? 'No Expiry'}
+													</TableCell>
+
+													<TableCell>
+														<OverlayTrigger
+															placement="bottom"
+															overlay={
+																<Tooltip>
+																	InstitutionId 1, InstitutionId 2, InstitutionId 3
+																</Tooltip>
+															}
+														>
+															<div>TODO: Count</div>
+														</OverlayTrigger>
+													</TableCell>
+
+													<TableCell>
+														<div className="d-flex justify-content-end">
+															{isAvailable && (
+																<Button className="me-2" variant="outline-primary">
+																	Add
+																</Button>
+															)}
+
+															<AdminResourcesTableDropdown content={content} />
+														</div>
 													</TableCell>
 												</TableRow>
 											);
