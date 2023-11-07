@@ -183,11 +183,7 @@ const GroupSession = ({
 
 										{groupSession.singleSessionFlag ? (
 											<div>
-												<p className="mb-1 fw-bold">
-													{moment(groupSession.startDateTime, 'YYYY-MM-DD[T]HH:mm').format(
-														'MMM D[,] YYYY'
-													)}
-												</p>
+												<p className="mb-1 fw-bold">{groupSession.startDateDescription}</p>
 												<p className="mb-0">
 													{groupSession.startTimeDescription} -{' '}
 													{groupSession.endTimeDescription}
@@ -196,8 +192,8 @@ const GroupSession = ({
 										) : (
 											<div>
 												<p className="mb-1 fw-bold">
-													{groupSession.startTimeDescription} -{' '}
-													{groupSession.endTimeDescription}
+													{groupSession.startDateDescription} -{' '}
+													{groupSession.endDateDescription}
 												</p>
 												<p className="mb-0">{groupSession.dateTimeDescription}</p>
 											</div>
