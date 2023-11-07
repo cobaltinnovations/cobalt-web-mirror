@@ -235,6 +235,17 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 
+		'.tooltip': {
+			'& .tooltip-arrow': {
+				display: 'none',
+			},
+			'& .tooltip-inner': {
+				padding: '8px 12px',
+				color: theme.colors.n0,
+				...theme.fonts.small,
+			},
+		},
+
 		'.container': {
 			paddingLeft: 20,
 			paddingRight: 20,
