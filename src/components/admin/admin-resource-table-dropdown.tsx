@@ -1,16 +1,114 @@
-import React from 'react';
+import React, { ComponentType } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-import { AdminContent } from '@/lib/models';
+import { AdminContent, AdminContentAction } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
+import { ReactComponent as UnArchiveIcon } from '@/assets/icons/unarchive.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
+import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 
 interface AdminResourcesTableDropdownProps {
 	content: AdminContent;
 }
+
+interface ActionItemProps {
+	icon: ComponentType<React.SVGProps<SVGSVGElement>>;
+	label: string;
+	dividers: boolean;
+	action?(): void;
+	linkProps?(contentId: string): { as: typeof Link; to: string | { pathname: string; target?: string } };
+}
+
+const actionItemProps: Record<string, ActionItemProps> = {
+	[AdminContentAction.ADD]: {
+		icon: UnArchiveIcon,
+		label: '',
+		dividers: false,
+		action: () => {
+			alert('TODO: Add');
+		},
+	},
+	[AdminContentAction.ARCHIVE]: {
+		icon: ArchiveIcon,
+		label: 'Archive',
+		dividers: false,
+		action: () => {
+			alert('TODO: Archive');
+		},
+	},
+	[AdminContentAction.DELETE]: {
+		icon: TrashIcon,
+		label: 'Delete',
+		dividers: false,
+		action: () => {
+			alert('TODO: Delete');
+		},
+	},
+	[AdminContentAction.EDIT]: {
+		icon: EditIcon,
+		label: 'Edit',
+		dividers: false,
+		linkProps: (contentId: string) => {
+			return {
+				as: Link,
+				to: `/admin/resources/edit/${contentId}`,
+			};
+		},
+	},
+	[AdminContentAction.EXPIRE]: {
+		icon: EventIcon,
+		label: 'Force Expire',
+		dividers: false,
+		action: () => {
+			alert('TODO: Expire');
+		},
+	},
+	[AdminContentAction.REMOVE]: {
+		icon: XIcon,
+		label: 'Remove',
+		dividers: false,
+		action: () => {
+			alert('TODO: Remove');
+		},
+	},
+	[AdminContentAction.UNARCHIVE]: {
+		icon: UnArchiveIcon,
+		label: 'Unarchive',
+		dividers: false,
+		action: () => {
+			alert('TODO: Unarchive');
+		},
+	},
+	[AdminContentAction.UNEXPIRE]: {
+		icon: UnArchiveIcon,
+		label: 'Unexpire',
+		dividers: false,
+		action: () => {
+			alert('TODO: Unexpire');
+		},
+	},
+	[AdminContentAction.VIEW_ON_COBALT]: {
+		icon: ExternalIcon,
+		label: 'View on Cobalt',
+		dividers: true,
+		linkProps: (contentId: string) => {
+			return {
+				as: Link,
+				to: {
+					pathname: `/resource-library/${contentId}`,
+				},
+				target: '_blank',
+			};
+		},
+	},
+};
 
 export const AdminResourcesTableDropdown = ({ content }: AdminResourcesTableDropdownProps) => {
 	return (
@@ -18,28 +116,45 @@ export const AdminResourcesTableDropdown = ({ content }: AdminResourcesTableDrop
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				id={`admin-resources__dropdown-menu--${content.contentId}`}
-				className="p-2"
+				className="p-2 border-0"
 			>
 				<MoreIcon className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					as={Link}
-					to={`/admin/resources/view/${content.contentId}`}
-				>
-					<EditIcon className="me-2 text-n500" width={24} height={24} />
-					View
-				</Dropdown.Item>
+				{content.actions.map((action) => {
+					const actionProps = actionItemProps[action];
 
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					as={Link}
-					to={`/admin/resources/edit/${content.contentId}`}
-				>
-					<EditIcon className="me-2 text-n500" width={24} height={24} />
-					Edit
-				</Dropdown.Item>
+					if (!actionProps.label) {
+						return null;
+					}
+
+					let linkProps = actionProps.linkProps && actionProps.linkProps(content.contentId);
+
+					return (
+						<React.Fragment>
+							{actionProps.dividers && <Dropdown.Divider />}
+
+							{linkProps ? (
+								<Dropdown.Item className="d-flex align-items-center" {...linkProps}>
+									<actionProps.icon className="me-2 text-n500" width={24} height={24} />
+									{actionProps.label}
+								</Dropdown.Item>
+							) : (
+								<Dropdown.Item
+									className="d-flex align-items-center"
+									onClick={() => {
+										actionProps.action?.();
+									}}
+								>
+									<actionProps.icon className="me-2 text-n500" width={24} height={24} />
+									{actionProps.label}
+								</Dropdown.Item>
+							)}
+
+							{actionProps.dividers && <Dropdown.Divider />}
+						</React.Fragment>
+					);
+				})}
 			</Dropdown.Menu>
 		</Dropdown>
 	);
