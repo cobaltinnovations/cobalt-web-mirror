@@ -16,6 +16,7 @@ export interface TopicCenterModel {
 	featuredTitle?: string;
 	featuredDescription?: string;
 	featuredCallToAction?: string;
+	navDescription?: string;
 	imageUrl?: string;
 }
 
