@@ -170,4 +170,18 @@ export const adminService = {
 			data,
 		});
 	},
+
+	addContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
+			method: 'post',
+			url: `/admin/content/${contentId}/add`,
+		});
+	},
+
+	removeContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<ContentIdResponse>({
+			method: 'delete',
+			url: `/admin/content/${contentId}/remove`,
+		});
+	},
 };

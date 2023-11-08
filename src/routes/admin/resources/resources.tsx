@@ -27,6 +27,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { AdminResourcesTableDropdown } from '@/components/admin';
 import ContentTypeIcon from '@/components/content-type-icon';
+import LoadingButton from '@/components/loading-button';
 
 interface AdminResourcesLoaderData {
 	resourcesPromise: Promise<
@@ -108,6 +109,7 @@ export const Component = () => {
 	const page = searchParams.get('page') ?? '0';
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [isAdding, setIsAdding] = useState<Record<string, boolean>>({});
 	const [tags, setTags] = useState<Tag[]>([]);
 	const [contentStatuses, setContentStatuses] = useState<ContentStatus[]>([]);
 	const [contentFilters, setContentFilters] = useState<ContentFiltersResponse>();
@@ -522,9 +524,35 @@ export const Component = () => {
 													<TableCell>
 														<div className="d-flex justify-content-end">
 															{isAvailable && (
-																<Button className="me-2" variant="outline-primary">
+																<LoadingButton
+																	className="me-2"
+																	variant="outline-primary"
+																	isLoading={!!isAdding[content.contentId]}
+																	onClick={async () => {
+																		setIsAdding((curr) => ({
+																			...curr,
+																			[content.contentId]: true,
+																		}));
+																		try {
+																			const request = adminService.addContent(
+																				content.contentId
+																			);
+																			await request.fetch();
+																		} catch (e) {
+																			handleError(e);
+																		} finally {
+																			setIsAdding((curr) => {
+																				delete curr[content.contentId];
+
+																				return {
+																					...curr,
+																				};
+																			});
+																		}
+																	}}
+																>
 																	Add
-																</Button>
+																</LoadingButton>
 															)}
 
 															<AdminResourcesTableDropdown content={content} />

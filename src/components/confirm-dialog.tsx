@@ -13,7 +13,7 @@ const useStyles = createUseStyles({
 	},
 });
 
-interface Props extends ModalProps {
+export interface ConfirmDialogProps extends ModalProps {
 	titleText: string;
 	bodyText: string;
 	dismissText: string;
@@ -38,7 +38,7 @@ const ConfirmDialog = ({
 	size = 'sm',
 	displayButtonsBlock,
 	...props
-}: Props) => {
+}: ConfirmDialogProps) => {
 	const classes = useStyles();
 
 	return (
