@@ -593,7 +593,7 @@ const HeaderV2 = () => {
 		name: featuredTopicCenter.featuredTitle!,
 		imageAlt: featuredTopicCenter.name!,
 		imageUrl: featuredTopicCenter.imageUrl!,
-		descriptionHtml: featuredTopicCenter.featuredDescription!,
+		descriptionHtml: featuredTopicCenter.navDescription!,
 		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
 	};
 
