@@ -452,7 +452,9 @@ export const Component = () => {
 														<div className="d-flex align-items-center">
 															<OverlayTrigger
 																placement="bottom"
-																overlay={<Tooltip>contentTypeIdDescription</Tooltip>}
+																overlay={
+																	<Tooltip>{content.contentTypeDescription}</Tooltip>
+																}
 															>
 																<div className="text-muted me-2">
 																	<ContentTypeIcon
@@ -467,7 +469,12 @@ export const Component = () => {
 																<Link
 																	className="text-decoration-none"
 																	to={{
-																		pathname: `/admin/resources/view/${content.contentId}`,
+																		pathname: `/admin/resources/${
+																			content.contentStatusId ===
+																			ContentStatusId.DRAFT
+																				? 'preview'
+																				: 'view'
+																		}/${content.contentId}`,
 																	}}
 																>
 																	{content.title}
@@ -478,9 +485,11 @@ export const Component = () => {
 																</p>
 															</div>
 
-															<div className="ms-auto">
-																<Badge pill>New</Badge>
-															</div>
+															{content.newFlag && (
+																<div className="ms-auto">
+																	<Badge pill>New</Badge>
+																</div>
+															)}
 														</div>
 													</TableCell>
 
@@ -512,12 +521,10 @@ export const Component = () => {
 														<OverlayTrigger
 															placement="bottom"
 															overlay={
-																<Tooltip>
-																	InstitutionId 1, InstitutionId 2, InstitutionId 3
-																</Tooltip>
+																<Tooltip>{content.inUseInstitutionDescription}</Tooltip>
 															}
 														>
-															<div>TODO: Count</div>
+															<div>{content.inUseCount}</div>
 														</OverlayTrigger>
 													</TableCell>
 

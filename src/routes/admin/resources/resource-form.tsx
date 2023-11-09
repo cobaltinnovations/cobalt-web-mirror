@@ -32,6 +32,7 @@ import {
 } from 'react-router-dom';
 import moment from 'moment';
 import { DateFormats } from '@/lib/utils';
+import useAccount from '@/hooks/use-account';
 
 type AdminResourceFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -111,6 +112,7 @@ function getInitialResourceFormValues({
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
 
+	console.log({ rest });
 	return Object.assign(
 		{ ...initialResourceFormValues },
 		{
@@ -128,6 +130,7 @@ function getInitialResourceFormValues({
 
 export const Component = () => {
 	const loaderData = useAdminResourceFormLoaderData();
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; contentId: string }>();
 	const handleError = useHandleError();
@@ -145,10 +148,14 @@ export const Component = () => {
 		loaderData?.contentResponse?.content?.contentStatusId &&
 		loaderData?.contentResponse?.content?.contentStatusId !== ContentStatusId.DRAFT;
 
+	const isOwnedByAnotherInstitution =
+		!!loaderData?.contentResponse?.content &&
+		loaderData.contentResponse.content.ownerInstitution !== institution.name;
+
 	const [formValues, setFormValues] = useState(
 		getInitialResourceFormValues({
 			isDuplicate,
-			adminContent: loaderData?.contentResponse?.adminContent,
+			adminContent: loaderData?.contentResponse?.content,
 		})
 	);
 
@@ -159,7 +166,7 @@ export const Component = () => {
 
 		return navigatingAway && isDirty && !isPreview;
 	});
-	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
+	const [showConfirmPublishOrAddDialog, setShowConfirmPublishOrAddDialog] = useState(false);
 
 	const updateFormValue = useCallback((key: keyof typeof formValues, value: (typeof formValues)[typeof key]) => {
 		setIsDirty(true);
@@ -228,6 +235,7 @@ export const Component = () => {
 	} else if (isPreview && isNotDraft) {
 		return <Navigate to={`/admin/resources/view/${params.contentId}`} replace />;
 	}
+
 	const formFields = (
 		<Container className="pb-10">
 			<ConfirmDialog
@@ -428,7 +436,7 @@ export const Component = () => {
 				<Wysiwyg
 					ref={descriptionWysiwygRef}
 					className="bg-white"
-					initialValue={loaderData.contentResponse?.adminContent?.description ?? ''}
+					initialValue={loaderData.contentResponse?.content?.description ?? ''}
 					onChange={(nextValue) => {
 						updateFormValue('description', nextValue);
 					}}
@@ -570,18 +578,20 @@ export const Component = () => {
 			}
 			nextButtonType={isPreview || isView ? 'button' : 'submit'}
 			onNext={() => {
-				if (isView) {
+				if (isView && !isOwnedByAnotherInstitution) {
 					navigate(`/admin/resources/edit/${params.contentId}`);
 					return;
 				} else if (!isPreview) {
 					return;
 				}
 
-				setShowConfirmPublishDialog(true);
+				setShowConfirmPublishOrAddDialog(true);
 			}}
 			nextLabel={
 				isPreview ? (
-					'Add Resource'
+					'Publish Resource'
+				) : isView && isOwnedByAnotherInstitution ? (
+					'Add'
 				) : isView ? (
 					<>
 						<EditIcon /> Edit
@@ -596,28 +606,34 @@ export const Component = () => {
 		/>
 	);
 
-	const confirmPublishDialog = (
+	const confirmPublishOrAddDialog = (
 		<ConfirmDialog
 			size="lg"
-			show={showConfirmPublishDialog}
+			show={showConfirmPublishOrAddDialog}
 			onHide={() => {
-				setShowConfirmPublishDialog(false);
+				setShowConfirmPublishOrAddDialog(false);
 			}}
 			titleText={isNotDraft ? 'Publish Changes' : 'Add Resource'}
 			bodyText={
 				isNotDraft
 					? 'Are you ready to publish your changes'
-					: `Are you ready to add ${formValues.title} to Cobalt?`
+					: `Are you ready to add ${
+							isOwnedByAnotherInstitution ? 'this resource' : formValues.title
+					  } to Cobalt?`
 			}
 			detailText={
 				isNotDraft
 					? 'Your changes will be reflected on Cobalt immediately'
-					: `This resource will become live on the Cobalt Resource Library on ${formValues.publishDate.toDateString()}`
+					: isOwnedByAnotherInstitution
+					? 'The resource will be added to your Resource Library immediately.'
+					: `This resource will become live on the Cobalt Resource Library on ${moment(
+							formValues.publishDate
+					  ).format(DateFormats.API.Date)}`
 			}
 			dismissText="Cancel"
 			confirmText={isNotDraft ? 'Update' : 'Add Resource'}
 			onConfirm={() => {
-				setShowConfirmPublishDialog(false);
+				setShowConfirmPublishOrAddDialog(false);
 
 				if (isNotDraft) {
 					handleSaveForm();
@@ -628,18 +644,24 @@ export const Component = () => {
 						})
 						.fetch()
 						.then((response) => {
+							const isScheduled = response.adminContent?.contentStatusId === ContentStatusId.SCHEDULED;
+
 							addFlag({
 								variant: 'success',
 								title: 'Resource published',
-								description: 'Your resource is now available on Cobalt',
-								actions: [
-									{
-										title: 'View Resource',
-										onClick: () => {
-											navigate(`/resource-library/${response.content?.contentId}`);
-										},
-									},
-								],
+								description: isScheduled
+									? `Your resource will become live on ${response.adminContent?.publishStartDateDescription}`
+									: 'Your resource is now available on Cobalt',
+								actions: isScheduled
+									? []
+									: [
+											{
+												title: 'View Resource',
+												onClick: () => {
+													navigate(`/resource-library/${response.content?.contentId}`);
+												},
+											},
+									  ],
 							});
 							navigate('/admin/resources');
 						})
@@ -654,7 +676,7 @@ export const Component = () => {
 	if (isPreview) {
 		return (
 			<div className="pb-11">
-				{confirmPublishDialog}
+				{confirmPublishOrAddDialog}
 
 				{details}
 
@@ -717,11 +739,11 @@ export const Component = () => {
 					} else if (!isNotDraft) {
 						handleSaveForm();
 					} else {
-						setShowConfirmPublishDialog(true);
+						setShowConfirmPublishOrAddDialog(true);
 					}
 				}}
 			>
-				{confirmPublishDialog}
+				{confirmPublishOrAddDialog}
 
 				{details}
 

@@ -100,8 +100,7 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 								className="me-1"
 							/>
 						)}
-						{/* @ts-expect-error TODO: contentyTypeLabel missing in AdminContent */}
-						{content?.contentTypeLabel} {content?.duration && <>&bull; {content?.duration}</>}
+						{content?.contentTypeDescription} {content?.duration && <>&bull; {content?.duration}</>}
 					</p>
 
 					{canEmbed ? (

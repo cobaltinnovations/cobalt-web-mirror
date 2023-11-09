@@ -66,8 +66,7 @@ interface AdminContentParams {
 }
 
 interface AdminContentResponse {
-	networkInstitutions?: InstitutionFilters[];
-	content?: Content;
+	content?: AdminContent;
 	adminContent?: AdminContent;
 }
 

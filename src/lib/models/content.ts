@@ -48,7 +48,6 @@ export enum AdminContentAction {
 export type Content = {
 	contentId: string;
 	contentTypeId: ContentTypeId;
-	contentStatusId: ContentStatusId;
 	title: string;
 	url: string;
 	imageUrl: string;
@@ -57,7 +56,6 @@ export type Content = {
 	created: string;
 	createdDescription: string;
 	lastUpdated: string;
-	contentTypeLabel: string;
 	lastUpdatedDescription: string;
 	contentTypeDescription: string;
 	callToAction: string;
@@ -79,8 +77,8 @@ export type AdminContent = {
 	imageUrl: string;
 	ownerInstitution: string;
 	views: number;
-	duration?: '';
-	durationMinutes?: '';
+	duration?: string;
+	durationInMinutes?: number;
 	publishStartDate: string;
 	publishStartDateDescription: string;
 	publishEndDate: string;
@@ -94,4 +92,8 @@ export type AdminContent = {
 	contentStatusDescription: string;
 	actions: AdminContentAction[];
 	tagIds: string[];
+	contentTypeDescription: string;
+	inUseCount: number;
+	inUseInstitutionDescription: string;
+	newFlag: boolean;
 };
