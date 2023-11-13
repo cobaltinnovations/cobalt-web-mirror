@@ -237,6 +237,12 @@ export const routes: RouteObject[] = [
 			},
 
 			{
+				id: 'study-onboarding',
+				path: 'studies/:studyIdOrUrlName/onboarding',
+				lazy: () => import('@/routes/study-onboarding'),
+			},
+
+			{
 				path: 'mychart/authenticate',
 				lazy: () => import('@/routes/auth'),
 			},

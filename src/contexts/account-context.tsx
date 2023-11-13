@@ -43,6 +43,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('groupSessionCollectionId');
 		Cookies.remove('groupSessionCollectionUrlName');
 		Cookies.remove('groupSessionDetailFromTopicCenterPath');
+		Cookies.remove('permittedAccountSourceIds');
 		window.localStorage.clear();
 
 		try {
@@ -88,10 +89,26 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		return accountResponse?.account.roleId === ROLE_ID.PROVIDER;
 	}, [accountResponse?.account.roleId]);
 
+	const permittedAccountSourceIds = Cookies.get('permittedAccountSourceIds');
+	const accountSources = useMemo(() => {
+		if (!permittedAccountSourceIds) {
+			return institutionResponse.accountSources;
+		}
+
+		const parsedPermitted = (JSON.parse(permittedAccountSourceIds) as string[]).reduce((acc, cur) => {
+			acc[cur] = true;
+			return acc;
+		}, {} as Record<string, boolean>);
+
+		return institutionResponse.accountSources.filter(
+			(accountSource) => parsedPermitted[accountSource.accountSourceId]
+		);
+	}, [institutionResponse.accountSources, permittedAccountSourceIds]);
+
 	const value = {
 		account: accountResponse?.account,
 		institution,
-		accountSources: institutionResponse.accountSources,
+		accountSources,
 		isAdmin,
 		isProvider,
 		isIntegratedCarePatient,
