@@ -62,8 +62,8 @@ export const Component = () => {
 			if (navigationSource === GroupSessionDetailNavigationSource.TOPIC_CENTER && topicCenterPath) {
 				Cookies.set('groupSessionDetailFromTopicCenterPath', topicCenterPath);
 			}
-			groupSession.groupSessionCollectionId &&
-				Cookies.set('groupSessionCollectionId', groupSession.groupSessionCollectionId);
+			groupSession.groupSessionCollectionUrlName &&
+				Cookies.set('groupSessionCollectionUrlName', groupSession.groupSessionCollectionUrlName);
 			createScreeningSession();
 			return;
 		}
@@ -71,7 +71,7 @@ export const Component = () => {
 		setConfirmModalIsShowing(true);
 	}, [
 		createScreeningSession,
-		groupSession.groupSessionCollectionId,
+		groupSession.groupSessionCollectionUrlName,
 		groupSession.screeningFlowId,
 		navigationSource,
 		topicCenterPath,

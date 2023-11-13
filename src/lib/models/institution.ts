@@ -97,7 +97,8 @@ export interface InstitutionFeature {
 export interface AdditionalNavigationItem {
 	url: string;
 	name: string;
-	iconName: string;
+	iconName?: string;
+	imageUrl?: string;
 }
 
 export enum AccountSourceDisplayStyleId {

@@ -48,6 +48,7 @@ export const SupportMentalHealthProvidersShell = ({
 
 	const [appointmentScheduledByFeatureId, setAppointmentScheduledByFeatureId] = useState<Record<string, boolean>>({});
 	const [recommendedFeatures, setRecommendedFeatures] = useState<AccountFeature[]>([]);
+	const [showPsychiatristRecommendation, setShowPsychiatristRecommendation] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!institution.providerTriageScreeningFlowId) {
@@ -72,12 +73,11 @@ export const SupportMentalHealthProvidersShell = ({
 			const response = await accountService.getRecommendedFeatures(account.accountId).fetch();
 			setAppointmentScheduledByFeatureId(response.appointmentScheduledByFeatureId);
 
-			// sort response features so that psychiatrist is always last
-			const sortedFeatures = response.features.sort((f) => {
-				return f.featureId === FeatureId.PSYCHIATRIST ? 1 : -1;
-			});
+			const psychiatristIndex = response.features.findIndex((f) => f.featureId === FeatureId.PSYCHIATRIST);
+			setShowPsychiatristRecommendation(psychiatristIndex > -1);
 
-			setRecommendedFeatures(sortedFeatures);
+			// remove psychiatrist from recommended features as it is handled separately
+			setRecommendedFeatures(response.features.filter((f) => f.featureId !== FeatureId.PSYCHIATRIST));
 		}
 	}, [
 		account?.accountId,
@@ -133,60 +133,65 @@ export const SupportMentalHealthProvidersShell = ({
 								/>
 							)}
 
-							{hasCompletedScreening &&
-								recommendedFeatures.map((recommendedFeature) => {
-									const featureDetails = institution.features.find(
-										(f) => f.featureId === recommendedFeature.featureId
-									);
+							{hasCompletedScreening && (
+								<>
+									{recommendedFeatures.map((recommendedFeature) => {
+										const featureDetails = institution.features.find(
+											(f) => f.featureId === recommendedFeature.featureId
+										);
 
-									if (appointmentScheduledByFeatureId[recommendedFeature.featureId]) {
+										if (appointmentScheduledByFeatureId[recommendedFeature.featureId]) {
+											return (
+												<InlineAlert
+													className="mb-4"
+													variant="success"
+													title="Appointment Scheduled"
+													description={`Your ${recommendedFeature?.name} appointment is scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
+													action={[
+														{
+															title: 'Go to ' + institution.myChartName,
+															onClick: () => {
+																window.open(
+																	institution.myChartDefaultUrl,
+																	'_blank',
+																	'noopener, noreferrer'
+																);
+															},
+														},
+														{
+															title: 'View My Events',
+															onClick: () => {
+																navigate('/my-calendar');
+															},
+														},
+													]}
+												/>
+											);
+										}
+
 										return (
 											<InlineAlert
 												className="mb-4"
-												variant="success"
-												title="Appointment Scheduled"
-												description={`Your ${recommendedFeature?.name} appointment is scheduled. You can manage and access your appointment through ${institution.myChartName} or view the event on Cobalt.`}
-												action={[
-													{
-														title: 'Go to ' + institution.myChartName,
-														onClick: () => {
-															window.open(
-																institution.myChartDefaultUrl,
-																'_blank',
-																'noopener, noreferrer'
-															);
-														},
+												variant="info"
+												title={`${featureDetails?.treatmentDescription} Recommended`}
+												description={`Based on the symptoms reported, we recommend ${featureDetails?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
+												action={{
+													title: 'Schedule with ' + featureDetails?.name,
+													onClick: () => {
+														navigate(featureDetails?.urlName ?? '');
 													},
-													{
-														title: 'View My Events',
-														onClick: () => {
-															navigate('/my-calendar');
-														},
-													},
-												]}
+												}}
 											/>
 										);
-									}
+									})}
 
-									if (recommendedFeature.featureId === FeatureId.PSYCHIATRIST) {
-										return <PsychiatristRecommendation />;
-									}
-
-									return (
-										<InlineAlert
-											className="mb-4"
-											variant="success"
-											title="Assessment Complete"
-											description={`Based on the symptoms reported, we recommend ${featureDetails?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
-											action={{
-												title: 'Schedule with ' + featureDetails?.name,
-												onClick: () => {
-													navigate(featureDetails?.urlName ?? '');
-												},
-											}}
+									{showPsychiatristRecommendation && (
+										<PsychiatristRecommendation
+											showScheduled={!!appointmentScheduledByFeatureId[FeatureId.PSYCHIATRIST]}
 										/>
-									);
-								})}
+									)}
+								</>
+							)}
 						</Col>
 					</Row>
 				</Container>

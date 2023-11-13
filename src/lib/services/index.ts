@@ -20,5 +20,6 @@ export * from './reporting-service';
 export * from './resource-library-service';
 export * from './scheduling-service';
 export * from './screening-service';
+export * from './studies-service';
 export * from './tag-service';
 export * from './topic-center-service';

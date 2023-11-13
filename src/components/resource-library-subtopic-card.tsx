@@ -6,6 +6,10 @@ import { COLOR_IDS } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import { createUseThemedStyles } from '@/jss/theme';
 
+interface UseStylesProps {
+	clickable: boolean;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibrarySubtopicCard: {
 		display: 'flex',
@@ -19,29 +23,34 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		boxShadow: theme.elevation.e200,
 		'&:hover': {
-			cursor: 'pointer',
+			cursor: ({ clickable }: UseStylesProps) => (clickable ? 'pointer' : 'initial'),
 			color: 'inherit',
-			transform: 'translateY(-16px)',
-			boxShadow: theme.elevation.e400,
+			transform: ({ clickable }: UseStylesProps) => (clickable ? 'translateY(-16px)' : ''),
+			boxShadow: ({ clickable }: UseStylesProps) => (clickable ? theme.elevation.e400 : ''),
 		},
 	},
 }));
 
 interface Props {
-	colorId: COLOR_IDS;
+	colorId?: COLOR_IDS;
 	title: string;
 	description: string;
-	to: string;
+	to?: string;
+	toLabel?: string;
 	className?: string;
 }
 
-const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, className }: Props) => {
-	const classes = useStyles();
+const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel, className }: Props) => {
+	const classes = useStyles({ clickable: !!to });
 	const navigate = useNavigate();
 
 	return (
 		<div
 			onClick={() => {
+				if (!to) {
+					return;
+				}
+
 				navigate(to);
 			}}
 			className={classNames(
@@ -52,12 +61,14 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, classNam
 		>
 			<div className="mb-15">
 				<h2 className="mb-4">{title}</h2>
-				<p className="mb-0">{description}</p>
+				<div dangerouslySetInnerHTML={{ __html: description }} />
 			</div>
 
-			<Link to={to} className="mb-0 text-decoration-none">
-				Explore all {title} resources
-			</Link>
+			{to && (
+				<Link to={to} className="mb-0 text-decoration-none">
+					{toLabel || `Explore all ${title} resources`}
+				</Link>
+			)}
 		</div>
 	);
 };

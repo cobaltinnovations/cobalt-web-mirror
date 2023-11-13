@@ -80,35 +80,39 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 								<>
 									<h1 className="mb-1">Assessment Results</h1>
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
-									<hr className="mb-8" />
-									<p className="mb-6 fs-large">
-										Based on the symptoms reported we recommend{' '}
-										<strong>{recommendedFeature.treatmentDescription}</strong>.
-									</p>
-									<p className="mb-6 fs-large">
-										You can schedule a telehealth appointment with one of the providers listed.
-									</p>
-									<div className="mb-8 text-center">
-										<Button
-											variant="primary"
-											size="lg"
-											onClick={() => {
-												navigate(recommendedFeature.urlName);
-											}}
-										>
-											Schedule an Appointment
-										</Button>
-									</div>
-
-									{showPsychiatristRecommendation && !hasScehduledPsychiatrist && (
-										<PsychiatristRecommendation />
-									)}
+									<hr className="mb-4" />
 
 									<InlineAlert
 										variant="info"
-										title="Your responses are not reviewed"
-										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+										title={`${recommendedFeature.treatmentDescription} Recommended`}
+										description={
+											<>
+												Based on the symptoms reported we recommend{' '}
+												<strong>{recommendedFeature.treatmentDescription}</strong>. You can
+												schedule a telehealth appointment with one of the providers listed.
+											</>
+										}
+										action={{
+											title: `Schedule with ${recommendedFeature.name}`,
+											onClick: () => {
+												navigate(recommendedFeature.urlName);
+											},
+										}}
 									/>
+
+									{showPsychiatristRecommendation && (
+										<PsychiatristRecommendation
+											className="mt-4"
+											showScheduled={hasScehduledPsychiatrist}
+										/>
+									)}
+
+									<p className="mt-4 fs-small">
+										<strong>Your responses are not reviewed in real time.</strong> If you are in
+										crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you
+										have an urgent or life-threatening issue, call 911 or go to the nearest
+										emergency room.
+									</p>
 								</>
 							) : (
 								<NoData

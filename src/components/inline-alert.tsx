@@ -85,7 +85,7 @@ interface InlineAlertAction {
 interface InlineAlertProps {
 	variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'attention';
 	title: string;
-	description?: string;
+	description?: ReactNode;
 	action?: InlineAlertAction | InlineAlertAction[];
 	className?: string;
 }
@@ -135,14 +135,14 @@ export const InlineAlert = ({ title, description, action, variant = 'info', clas
 					{title}
 				</p>
 				{description && (
-					<p
+					<div
 						className={classNames({
 							'mb-2': !!action === true,
 							'mb-0': !!action === false,
 						})}
 					>
 						{description}
-					</p>
+					</div>
 				)}
 				{actionsToRender.length > 0 && (
 					<div>
