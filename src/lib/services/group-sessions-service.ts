@@ -76,6 +76,7 @@ export interface GetGroupSessionsQueryParameters {
 	urlName?: string;
 	searchQuery?: string;
 	groupSessionCollectionId?: string;
+	groupSessionCollectionUrlName?: string;
 	groupSessionSchedulingSystemId?: string;
 	visibleFlag?: string;
 }
