@@ -567,7 +567,7 @@ export const routes: RouteObject[] = [
 								),
 							},
 							{
-								path: 'collection/:groupSessionCollectionId',
+								path: 'collection/:groupSessionCollectionUrlName',
 								lazy: () => import('@/routes/group-session-collection-detail'),
 							},
 							{

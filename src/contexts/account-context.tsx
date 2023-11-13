@@ -41,6 +41,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('bookingExitUrl');
 		Cookies.remove('groupSessionDetailNavigationSource');
 		Cookies.remove('groupSessionCollectionId');
+		Cookies.remove('groupSessionCollectionUrlName');
 		Cookies.remove('groupSessionDetailFromTopicCenterPath');
 		window.localStorage.clear();
 
