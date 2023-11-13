@@ -82,13 +82,6 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-4" />
 
-									{showPsychiatristRecommendation && (
-										<PsychiatristRecommendation
-											className="mb-4"
-											showScheduled={hasScehduledPsychiatrist}
-										/>
-									)}
-
 									<InlineAlert
 										variant="info"
 										title={`${recommendedFeature.treatmentDescription} Recommended`}
@@ -106,6 +99,13 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 											},
 										}}
 									/>
+
+									{showPsychiatristRecommendation && (
+										<PsychiatristRecommendation
+											className="mt-4"
+											showScheduled={hasScehduledPsychiatrist}
+										/>
+									)}
 
 									<p className="mt-4 fs-small">
 										<strong>Your responses are not reviewed in real time.</strong> If you are in

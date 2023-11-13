@@ -232,6 +232,12 @@ export const routes: RouteObject[] = [
 			},
 
 			{
+				id: 'study-onboarding',
+				path: 'studies/:studyIdOrUrlName/onboarding',
+				lazy: () => import('@/routes/study-onboarding'),
+			},
+
+			{
 				path: 'mychart/authenticate',
 				lazy: () => import('@/routes/auth'),
 			},
@@ -562,7 +568,7 @@ export const routes: RouteObject[] = [
 								),
 							},
 							{
-								path: 'collection/:groupSessionCollectionId',
+								path: 'collection/:groupSessionCollectionUrlName',
 								lazy: () => import('@/routes/group-session-collection-detail'),
 							},
 							{
