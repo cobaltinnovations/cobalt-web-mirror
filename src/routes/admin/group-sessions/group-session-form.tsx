@@ -1015,7 +1015,7 @@ export const Component = () => {
 									key={groupSessionCollection.groupSessionCollectionId}
 									value={groupSessionCollection.groupSessionCollectionId}
 								>
-									{groupSessionCollection.description}
+									{groupSessionCollection.title}
 								</option>
 							);
 						})}
@@ -1503,15 +1503,10 @@ export const Component = () => {
 
 	if (isView && !isExternal) {
 		let countLabel = '';
-		const showCounts = !!loaderData.groupSession;
+		const showCount = !!loaderData.groupSession;
 
-		if (showCounts) {
-			countLabel = `${loaderData?.groupSession?.seatsReserved ?? 0}`;
-			const showTotalSeatsCount = !!loaderData.groupSession && loaderData.groupSession.seats > 0;
-
-			if (showTotalSeatsCount) {
-				countLabel += `/${loaderData?.groupSession?.seats}`;
-			}
+		if (showCount) {
+			countLabel = ` (${loaderData?.groupSession?.seatsReserved ?? 0})`;
 		}
 
 		return (
@@ -1531,7 +1526,7 @@ export const Component = () => {
 								},
 								{
 									value: 'registrants',
-									title: `Registrants${countLabel && ` (${countLabel})`}`,
+									title: `Registrants${countLabel}`,
 								},
 							]}
 							onTabClick={(value) => {

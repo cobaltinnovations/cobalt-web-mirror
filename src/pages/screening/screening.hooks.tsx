@@ -64,7 +64,7 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.GROUP_SESSION_LIST: {
-					const collectionId = Cookies.get('groupSessionCollectionId') ?? 'UPCOMING_SESSIONS';
+					const collectionUrlName = Cookies.get('groupSessionCollectionUrlName') ?? '';
 					const navigationSource =
 						(Cookies.get('groupSessionDetailNavigationSource') as GroupSessionDetailNavigationSource) ??
 						GroupSessionDetailNavigationSource.GROUP_SESSION_LIST;
@@ -74,7 +74,7 @@ export function useScreeningNavigation() {
 						[GroupSessionDetailNavigationSource.HOME_PAGE]: '/',
 						[GroupSessionDetailNavigationSource.GROUP_SESSION_LIST]: '/group-sessions',
 						[GroupSessionDetailNavigationSource.GROUP_SESSION_COLLECTION]:
-							'/group-sessions/collection/' + collectionId,
+							'/group-sessions/collection/' + collectionUrlName,
 						[GroupSessionDetailNavigationSource.TOPIC_CENTER]: topicCenterPath,
 						[GroupSessionDetailNavigationSource.ADMIN_LIST]: '/admin/group-sessions',
 					};
@@ -94,7 +94,7 @@ export function useScreeningNavigation() {
 
 					Cookies.remove('groupSessionDetailNavigationSource');
 					Cookies.remove('groupSessionDetailFromTopicCenterPath');
-					Cookies.remove('groupSessionCollectionId');
+					Cookies.remove('groupSessionCollectionUrlName');
 					return;
 				}
 				case ScreeningSessionDestinationId.GROUP_SESSION_DETAIL:

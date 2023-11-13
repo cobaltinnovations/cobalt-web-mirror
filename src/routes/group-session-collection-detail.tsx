@@ -15,7 +15,7 @@ import { GroupSessionDetailNavigationSource } from './group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const { groupSessionCollectionId } = params as { groupSessionCollectionId: string };
+	const { groupSessionCollectionUrlName } = params as { groupSessionCollectionUrlName: string };
 	const [{ groupSessionCollections }, { groupSessions }] = await Promise.all([
 		groupSessionsService.getGroupSessionCollections().fetch(),
 		groupSessionsService
@@ -23,7 +23,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				viewType: 'PATIENT',
 				groupSessionStatusId: GROUP_SESSION_STATUS_ID.ADDED,
 				orderBy: GROUP_SESSION_SORT_ORDER.START_TIME_ASCENDING,
-				...(groupSessionCollectionId === 'UPCOMING_SESSIONS' ? {} : { groupSessionCollectionId }),
+				groupSessionCollectionUrlName,
 				pageSize: 1000,
 				pageNumber: 0,
 			})
@@ -31,14 +31,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	]);
 
 	const groupSessionCollection = groupSessionCollections.find(
-		(collection) => collection.groupSessionCollectionId === groupSessionCollectionId
-	) ?? {
-		groupSessionCollectionId: 'UPCOMING_SESSIONS',
-		title: 'Upcoming Sessions',
-		description: 'Upcoming Sessions Description',
-		displayOrder: 0,
-		institutionId: '',
-	};
+		(collection) => collection.urlName === groupSessionCollectionUrlName
+	);
 
 	return { groupSessionCollection, groupSessions };
 };
@@ -57,7 +51,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - {groupSessionCollection?.title}</title>
+				<title>Cobalt | Group Sessions - {groupSessionCollection?.title ?? ''}</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

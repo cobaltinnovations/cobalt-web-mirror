@@ -93,21 +93,7 @@ const GroupSessions = () => {
 			]);
 
 			setGroupSessions([]);
-			setGroupSessionCollections(
-				[
-					...[
-						{
-							groupSessionCollectionId: 'UPCOMING_SESSIONS',
-							title: 'Upcoming Sessions',
-							description: 'Upcoming Sessions Description',
-							displayOrder: 0,
-							institutionId: '',
-							groupSessions,
-						},
-					],
-					...groupSessionCollections,
-				].filter((c) => c.groupSessions.length > 0)
-			);
+			setGroupSessionCollections(groupSessionCollections.filter((c) => c.groupSessions.length > 0));
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -294,7 +280,7 @@ const GroupSessions = () => {
 															calloutTitle="See All"
 															calloutOnClick={() => {
 																navigate(
-																	`/group-sessions/collection/${collection.groupSessionCollectionId}`
+																	`/group-sessions/collection/${collection.urlName}`
 																);
 															}}
 														>

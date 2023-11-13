@@ -51,6 +51,7 @@ export interface ScreeningQuestionV2 {
 export interface GroupSessionCollectionModel {
 	groupSessionCollectionId: string;
 	title: string;
+	urlName: string;
 	description: string;
 	displayOrder: number;
 	institutionId: string;
@@ -94,8 +95,12 @@ export interface GroupSessionModel {
 	startTimeDescription: string;
 	endTime: string;
 	endTimeDescription: string;
+	startDate: string;
+	startDateDescription: string;
 	startDateTime: string;
 	startDateTimeDescription: string;
+	endDate: string;
+	endDateDescription: string;
 	endDateTime: string;
 	endDateTimeDescription: string;
 	submitterAccountId: string;
@@ -123,6 +128,7 @@ export interface GroupSessionModel {
 	followupDayOffset?: string;
 	followupTimeOfDay?: string;
 	groupSessionCollectionId?: string;
+	groupSessionCollectionUrlName?: string;
 	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
 	learnMoreDescription?: string;
 	reminderEmailContent?: string;
