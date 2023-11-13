@@ -135,13 +135,6 @@ export const SupportMentalHealthProvidersShell = ({
 
 							{hasCompletedScreening && (
 								<>
-									{showPsychiatristRecommendation && (
-										<PsychiatristRecommendation
-											className="mb-4"
-											showScheduled={!!appointmentScheduledByFeatureId[FeatureId.PSYCHIATRIST]}
-										/>
-									)}
-
 									{recommendedFeatures.map((recommendedFeature) => {
 										const featureDetails = institution.features.find(
 											(f) => f.featureId === recommendedFeature.featureId
@@ -191,6 +184,12 @@ export const SupportMentalHealthProvidersShell = ({
 											/>
 										);
 									})}
+
+									{showPsychiatristRecommendation && (
+										<PsychiatristRecommendation
+											showScheduled={!!appointmentScheduledByFeatureId[FeatureId.PSYCHIATRIST]}
+										/>
+									)}
 								</>
 							)}
 						</Col>
