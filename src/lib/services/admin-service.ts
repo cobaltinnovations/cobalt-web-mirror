@@ -155,6 +155,13 @@ export const adminService = {
 		});
 	},
 
+	publishContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
+			method: 'put',
+			url: `/admin/content/${contentId}/publish`,
+		});
+	},
+
 	fetchContentTags() {
 		return httpSingleton.orchestrateRequest<ContentTagsResponse>({
 			method: 'get',

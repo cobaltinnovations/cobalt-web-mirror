@@ -1,27 +1,5 @@
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import {
-	AdminFormFooter,
-	AdminFormImageInput,
-	AdminFormNonImageFileInput,
-	AdminFormSection,
-	AdminTagGroupControl,
-} from '@/components/admin';
-import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
-import ConfirmDialog from '@/components/confirm-dialog';
-import DatePicker from '@/components/date-picker';
-import InputHelper from '@/components/input-helper';
-import ResourceDisplay from '@/components/resource-display';
-import ToggledInput from '@/components/toggled-input';
-import useFlags from '@/hooks/use-flags';
-import useHandleError from '@/hooks/use-handle-error';
-import { AdminContent, ContentStatusId, ContentTypeId } from '@/lib/models';
-import { CreateContentRequest, adminService, resourceLibraryService, tagService } from '@/lib/services';
-import NoMatch from '@/pages/no-match';
+import moment from 'moment';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Col, Container, Form, Row } from 'react-bootstrap';
 import {
 	LoaderFunctionArgs,
 	Navigate,
@@ -30,9 +8,48 @@ import {
 	useParams,
 	useRouteLoaderData,
 } from 'react-router-dom';
-import moment from 'moment';
+import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
+
+import { AdminContent, Content, ContentStatusId, ContentTypeId, Tag, TagGroup } from '@/lib/models';
+import { CreateContentRequest, adminService, resourceLibraryService, tagService } from '@/lib/services';
 import { DateFormats } from '@/lib/utils';
+
 import useAccount from '@/hooks/use-account';
+import useFlags from '@/hooks/use-flags';
+import useHandleError from '@/hooks/use-handle-error';
+
+import {
+	ADMIN_HEADER_HEIGHT,
+	ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION,
+	AdminFormImageInput,
+	AdminFormNonImageFileInput,
+	AdminFormSection,
+	AdminResourceFormFooter,
+	AdminTagGroupControl,
+} from '@/components/admin';
+import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
+import ConfirmDialog from '@/components/confirm-dialog';
+import DatePicker from '@/components/date-picker';
+import InputHelper from '@/components/input-helper';
+import ResourceDisplay from '@/components/resource-display';
+import ToggledInput from '@/components/toggled-input';
+
+import NoMatch from '@/pages/no-match';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	offCanvas: {
+		zIndex: '1 !important',
+		border: '0 !important',
+		boxShadow: theme.elevation.e400,
+		backgroundColor: theme.colors.background,
+		height: `calc(100vh - ${ADMIN_HEADER_HEIGHT}px) !important`,
+		'& .cobalt-modal__body': {
+			padding: 0,
+		},
+	},
+}));
 
 type AdminResourceFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -44,17 +61,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const contentId = params.contentId;
 
-	const supportedActions = ['add', 'edit', 'duplicate', 'preview', 'view'];
+	const supportedActions = ['add', 'edit', 'duplicate'];
 
-	// can add/preview/view edit/duplicate
+	// can add/edit/duplicate
 	// admins can also edit/duplicate them
 	const isSupportedAction = !!action && supportedActions.includes(action);
-
 	// add, must not have a content id.
 	const isValidNoId = isSupportedAction && ['add'].includes(action) && !contentId;
-
-	// edit/duplicate/preview/view, must have a content id.
-	const isValidWithId = isSupportedAction && ['edit', 'duplicate', 'preview', 'view'].includes(action) && !!contentId;
+	// edit/duplicate, must have a content id.
+	const isValidWithId = isSupportedAction && ['edit', 'duplicate'].includes(action) && !!contentId;
 
 	if (!isValidNoId && !isValidWithId) {
 		return null; // page renders a "404" in this case
@@ -129,6 +144,7 @@ function getInitialResourceFormValues({
 }
 
 export const Component = () => {
+	const classes = useStyles();
 	const loaderData = useAdminResourceFormLoaderData();
 	const { institution } = useAccount();
 	const navigate = useNavigate();
@@ -138,11 +154,13 @@ export const Component = () => {
 
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 
-	const isPreview = params.action === 'preview';
+	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
-	const isView = params.action === 'view';
 
+	const isDraft =
+		!loaderData?.contentResponse?.content?.contentStatusId ||
+		loaderData?.contentResponse?.content?.contentStatusId === ContentStatusId.DRAFT;
 	const isNotDraft =
 		!isDuplicate &&
 		loaderData?.contentResponse?.content?.contentStatusId &&
@@ -159,24 +177,81 @@ export const Component = () => {
 		})
 	);
 
+	const [showPreviewModal, setShowPreviewModal] = useState(false);
+	const [showConfirmPublishOrAddDialog, setShowConfirmPublishOrAddDialog] = useState(false);
+
 	const [isDirty, setIsDirty] = useState(false);
 	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
 		// ignore changes in `search`
 		const navigatingAway = currentLocation.pathname !== nextLocation.pathname;
-
-		return navigatingAway && isDirty && !isPreview;
+		return navigatingAway && isDirty;
 	});
-	const [showConfirmPublishOrAddDialog, setShowConfirmPublishOrAddDialog] = useState(false);
 
 	const updateFormValue = useCallback((key: keyof typeof formValues, value: (typeof formValues)[typeof key]) => {
 		setIsDirty(true);
-		setFormValues((currentValues) => {
+		setFormValues((previousValue) => {
 			return {
-				...currentValues,
+				...previousValue,
 				[key]: value,
 			};
 		});
 	}, []);
+
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			const { value } = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+			const submission = prepareResourceSubmission(formValues);
+
+			if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.PUBLISH) {
+				setShowConfirmPublishOrAddDialog(true);
+			} else {
+				try {
+					if (isEdit) {
+						if (!params.contentId) {
+							throw new Error('params.contentId is undefined.');
+						}
+
+						const response = await adminService.updateContent(params.contentId, submission).fetch();
+
+						addFlag({
+							variant: 'success',
+							title: 'Edits Saved',
+							description: 'TODO: Edits saved confirmation text',
+							actions: [
+								{
+									title: 'View Resource',
+									onClick: () => {
+										navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
+									},
+								},
+							],
+						});
+					} else {
+						const response = await adminService.createContent(submission).fetch();
+
+						addFlag({
+							variant: 'success',
+							title: 'Draft Created',
+							description: 'TODO: Draft Created confirmation text',
+							actions: [
+								{
+									title: 'View Resource',
+									onClick: () => {
+										navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
+									},
+								},
+							],
+						});
+					}
+				} catch (error) {
+					handleError(error);
+				}
+			}
+		},
+		[addFlag, formValues, handleError, isEdit, navigate, params.contentId]
+	);
 
 	const handleSaveForm = useCallback(
 		async (options?: { exitAfterSave?: boolean }) => {
@@ -224,16 +299,8 @@ export const Component = () => {
 		[addFlag, formValues, handleError, isEdit, isNotDraft, navigate, params.contentId]
 	);
 
-	useEffect(() => {
-		if (isPreview) {
-			window.scroll(0, 0);
-		}
-	}, [isPreview]);
-
 	if (loaderData === null) {
 		return <NoMatch />;
-	} else if (isPreview && isNotDraft) {
-		return <Navigate to={`/admin/resources/view/${params.contentId}`} replace />;
 	}
 
 	const formFields = (
@@ -542,69 +609,62 @@ export const Component = () => {
 		</Container>
 	);
 
-	const details =
-		isPreview || isView ? (
-			<ResourceDisplay trackView={false} content={loaderData?.contentResponse?.content!} />
-		) : (
-			formFields
-		);
+	// const footer = (
+	// 	<AdminResourceFormFooter
+	// 		exitButtonType={isPreview || isNotDraft ? 'button' : 'submit'}
+	// 		onExit={() => {
+	// 			if (isView) {
+	// 				navigate(`/admin/resources`);
+	// 			} else if (isPreview) {
+	// 				navigate(`/admin/resources/edit/${params.contentId}`);
+	// 			} else if (isNotDraft) {
+	// 				navigate(`/admin/resources`);
+	// 			}
+	// 		}}
+	// 		exitLabel={
+	// 			isPreview ? (
+	// 				<>
+	// 					<LeftChevron /> Back to Edit
+	// 				</>
+	// 			) : isNotDraft ? (
+	// 				'Exit Editor'
+	// 			) : isView ? (
+	// 				<>
+	// 					<LeftChevron /> Back
+	// 				</>
+	// 			) : (
+	// 				'Save & Exit'
+	// 			)
+	// 		}
+	// 		nextButtonType={isPreview || isView ? 'button' : 'submit'}
+	// 		onNext={() => {
+	// 			if (isView && !isOwnedByAnotherInstitution) {
+	// 				navigate(`/admin/resources/edit/${params.contentId}`);
+	// 				return;
+	// 			} else if (!isPreview) {
+	// 				return;
+	// 			}
 
-	const footer = (
-		<AdminFormFooter
-			exitButtonType={isPreview || isNotDraft ? 'button' : 'submit'}
-			onExit={() => {
-				if (isView) {
-					navigate(`/admin/resources`);
-				} else if (isPreview) {
-					navigate(`/admin/resources/edit/${params.contentId}`);
-				} else if (isNotDraft) {
-					navigate(`/admin/resources`);
-				}
-			}}
-			exitLabel={
-				isPreview ? (
-					<>
-						<LeftChevron /> Back to Edit
-					</>
-				) : isNotDraft ? (
-					'Exit Editor'
-				) : isView ? (
-					<>
-						<LeftChevron /> Back
-					</>
-				) : (
-					'Save & Exit'
-				)
-			}
-			nextButtonType={isPreview || isView ? 'button' : 'submit'}
-			onNext={() => {
-				if (isView && !isOwnedByAnotherInstitution) {
-					navigate(`/admin/resources/edit/${params.contentId}`);
-					return;
-				} else if (!isPreview) {
-					return;
-				}
-
-				setShowConfirmPublishOrAddDialog(true);
-			}}
-			nextLabel={
-				isPreview ? (
-					'Publish Resource'
-				) : isView && isOwnedByAnotherInstitution ? (
-					'Add'
-				) : isView ? (
-					<>
-						<EditIcon /> Edit
-					</>
-				) : (
-					<>
-						{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
-					</>
-				)
-			}
-			nextVariant={isView ? 'outline-primary' : 'primary'}
-		/>
-	);
+	// 			setShowConfirmPublishOrAddDialog(true);
+	// 		}}
+	// 		nextLabel={
+	// 			isPreview ? (
+	// 				'Publish Resource'
+	// 			) : isView && isOwnedByAnotherInstitution ? (
+	// 				'Add'
+	// 			) : isView ? (
+	// 				<>
+	// 					<EditIcon /> Edit
+	// 				</>
+	// 			) : (
+	// 				<>
+	// 					{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+	// 				</>
+	// 			)
+	// 		}
+	// 		nextVariant={isView ? 'outline-primary' : 'primary'}
+	// 	/>
+	// );
 
 	const confirmPublishOrAddDialog = (
 		<ConfirmDialog
@@ -673,52 +733,40 @@ export const Component = () => {
 		/>
 	);
 
-	if (isPreview) {
-		return (
-			<div className="pb-11">
-				{confirmPublishOrAddDialog}
-
-				{details}
-
-				{footer}
-			</div>
-		);
-	}
-
-	const pageTitle = isView ? null : (
-		<Container fluid className="border-bottom">
-			<Container className="py-10">
-				<Row>
-					<Col>
-						<div className="d-flex align-items-center justify-content-between">
-							<h2 className="mb-1">{isEdit ? 'Edit' : 'Add'} Resource</h2>
-						</div>
-
-						<p className="mb-0 fs-large">
-							Complete all <span className="text-danger">*required fields</span> before publishing.
-						</p>
-					</Col>
-				</Row>
-			</Container>
-		</Container>
-	);
-
-	if (isView) {
-		return (
-			<>
-				{pageTitle}
-
-				{details}
-
-				{footer}
-			</>
-		);
-	}
-
 	return (
 		<>
-			{pageTitle}
+			<Offcanvas
+				backdrop={false}
+				className={classes.offCanvas}
+				placement="bottom"
+				show={showPreviewModal}
+				onHide={() => {
+					setShowPreviewModal(false);
+				}}
+			>
+				<Modal.Body>
+					<ResourceDisplay
+						trackView={false}
+						content={mutateFormValuesToContentPreview(formValues, loaderData.tagGroups)}
+					/>
+				</Modal.Body>
+			</Offcanvas>
 
+			<Container fluid className="border-bottom">
+				<Container className="py-10">
+					<Row>
+						<Col>
+							<div className="d-flex align-items-center justify-content-between">
+								<h2 className="mb-1">{isEdit ? 'Edit' : 'Add'} Resource</h2>
+							</div>
+
+							<p className="mb-0 fs-large">
+								Complete all <span className="text-danger">*required fields</span> before publishing.
+							</p>
+						</Col>
+					</Row>
+				</Container>
+			</Container>
 			<Form
 				className="pb-11"
 				onSubmit={(event) => {
@@ -734,20 +782,29 @@ export const Component = () => {
 						return;
 					}
 
-					if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
-						handleSaveForm({ exitAfterSave: true });
-					} else if (!isNotDraft) {
-						handleSaveForm();
-					} else {
-						setShowConfirmPublishOrAddDialog(true);
-					}
+					handleFormSubmit(event);
+					// if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
+					// 	handleSaveForm({ exitAfterSave: true });
+					// } else if (!isNotDraft) {
+					// 	handleSaveForm();
+					// } else {
+					// 	setShowConfirmPublishOrAddDialog(true);
+					// }
 				}}
 			>
 				{confirmPublishOrAddDialog}
-
-				{details}
-
-				{footer}
+				{formFields}
+				<AdminResourceFormFooter
+					showDraftButton={isAdd}
+					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
+					mainActionText={isDraft ? 'Publish' : 'Update'}
+					onCancel={() => {
+						navigate(-1);
+					}}
+					onPreview={() => {
+						setShowPreviewModal(!showPreviewModal);
+					}}
+				/>
 			</Form>
 		</>
 	);
@@ -776,5 +833,36 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		searchTerms: formValues.searchTerms,
 		sharedFlag: formValues.isShared,
 		contentStatusId: formValues.contentStatusId,
+	};
+}
+
+function mutateFormValuesToContentPreview(
+	formValues: ReturnType<typeof getInitialResourceFormValues>,
+	tagGroups: TagGroup[]
+): Content {
+	const flattendTags = tagGroups.reduce((previousValue, currentValue) => {
+		return [...previousValue, ...(currentValue.tags ?? [])];
+	}, [] as Tag[]);
+
+	return {
+		contentId: '',
+		contentTypeId: formValues.contentTypeId as ContentTypeId,
+		title: formValues.title,
+		url: formValues.resourceUrl,
+		imageUrl: formValues.imageUrl,
+		description: formValues.description,
+		author: formValues.author,
+		created: '',
+		createdDescription: '',
+		lastUpdated: '',
+		lastUpdatedDescription: '',
+		contentTypeDescription: 'XXX',
+		callToAction: 'XXX',
+		newFlag: false,
+		duration: formValues.durationInMinutes,
+		durationInMinutes: parseInt(formValues.durationInMinutes, 10),
+		durationInMinutesDescription: formValues.durationInMinutes,
+		tagIds: formValues.tagIds,
+		tags: formValues.tagIds.map((tagId) => flattendTags.find((tag) => tag.tagId === tagId)!),
 	};
 }

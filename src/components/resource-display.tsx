@@ -86,7 +86,7 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 	console.log({ content });
 
 	return (
-		<Container className="pt-18">
+		<Container className="py-18">
 			<Row className="justify-content-center">
 				<Col md={10} lg={8}>
 					<h1 className="mb-4">{content?.title}</h1>
