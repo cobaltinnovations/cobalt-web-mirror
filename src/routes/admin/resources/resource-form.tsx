@@ -10,7 +10,13 @@ import {
 import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
 
 import { AdminContent, Content, ContentStatusId, ContentTypeId, Tag, TagGroup } from '@/lib/models';
-import { CreateContentRequest, adminService, resourceLibraryService, tagService } from '@/lib/services';
+import {
+	AdminContentResponse,
+	CreateContentRequest,
+	adminService,
+	resourceLibraryService,
+	tagService,
+} from '@/lib/services';
 import { DateFormats } from '@/lib/utils';
 
 import useFlags from '@/hooks/use-flags';
@@ -123,7 +129,6 @@ function getInitialResourceFormValues({
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
 
-	console.log({ rest });
 	return Object.assign(
 		{ ...initialResourceFormValues },
 		{
@@ -149,9 +154,6 @@ export const Component = () => {
 	const isDraft =
 		!loaderData?.contentResponse?.content?.contentStatusId ||
 		loaderData?.contentResponse?.content?.contentStatusId === ContentStatusId.DRAFT;
-	const isNotDraft =
-		loaderData?.contentResponse?.content?.contentStatusId &&
-		loaderData?.contentResponse?.content?.contentStatusId !== ContentStatusId.DRAFT;
 
 	const [formValues, setFormValues] = useState(
 		getInitialResourceFormValues({
@@ -179,107 +181,144 @@ export const Component = () => {
 		});
 	}, []);
 
-	const handleFormSubmit = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault();
-
-			const { value } = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+	const updateOrCreateContent = useCallback(
+		(showFlag?: boolean) => {
 			const submission = prepareResourceSubmission(formValues);
 
-			if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.PUBLISH) {
-				setShowConfirmPublishOrAddDialog(true);
-			} else {
-				try {
-					if (isEdit) {
+			return new Promise(async (resolve: (response: AdminContentResponse) => void, reject) => {
+				if (isEdit) {
+					try {
 						if (!params.contentId) {
 							throw new Error('params.contentId is undefined.');
 						}
 
 						const response = await adminService.updateContent(params.contentId, submission).fetch();
 
-						addFlag({
-							variant: 'success',
-							title: 'Edits Saved',
-							description: 'TODO: Edits saved confirmation text',
-							actions: [
-								{
-									title: 'View Resource',
-									onClick: () => {
-										navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
-									},
-								},
-							],
-						});
-					} else {
-						const response = await adminService.createContent(submission).fetch();
-
-						addFlag({
-							variant: 'success',
-							title: 'Draft Created',
-							description: 'TODO: Draft Created confirmation text',
-							actions: [
-								{
-									title: 'View Resource',
-									onClick: () => {
-										navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
-									},
-								},
-							],
-						});
-					}
-				} catch (error) {
-					handleError(error);
-				}
-			}
-		},
-		[addFlag, formValues, handleError, isEdit, navigate, params.contentId]
-	);
-
-	const handleSaveForm = useCallback(
-		async (options?: { exitAfterSave?: boolean }) => {
-			const submission = prepareResourceSubmission(formValues);
-
-			if (!isNotDraft) {
-				// set new status
-			}
-
-			const promise = isEdit
-				? adminService.updateContent(params.contentId!, submission).fetch()
-				: adminService.createContent(submission).fetch();
-
-			setIsDirty(false);
-
-			promise
-				.then((response) => {
-					if (isNotDraft || options?.exitAfterSave) {
-						if (isNotDraft) {
+						if (showFlag) {
 							addFlag({
 								variant: 'success',
-								title: 'Edits Saved',
-								description: 'TODO: Edits saved confirmation text',
+								title: 'Resource Updated',
+								description: 'TODO: Resource updated success description.',
 								actions: [
 									{
 										title: 'View Resource',
 										onClick: () => {
-											navigate(`/admin/resources/preview/${response.adminContent?.contentId}`);
+											window.alert('[TODO]: View Resource.');
 										},
 									},
 								],
 							});
 						}
 
-						navigate('/admin/resources');
-					} else {
-						navigate('/admin/resources/preview/' + response.adminContent?.contentId);
+						setIsDirty(false);
+						resolve(response);
+					} catch (error) {
+						reject(error);
 					}
-				})
-				.catch((e) => {
-					setIsDirty(true);
-					handleError(e);
-				});
+
+					return;
+				}
+
+				try {
+					const response = await adminService.createContent(submission).fetch();
+
+					if (showFlag) {
+						addFlag({
+							variant: 'success',
+							title: 'Resource Created',
+							description: 'TODO: Resource created success description.',
+							actions: [
+								{
+									title: 'View Resource',
+									onClick: () => {
+										window.alert('[TODO]: View Resource.');
+									},
+								},
+							],
+						});
+					}
+
+					setIsDirty(false);
+					resolve(response);
+				} catch (error) {
+					reject(error);
+				}
+			});
 		},
-		[addFlag, formValues, handleError, isEdit, isNotDraft, navigate, params.contentId]
+		[addFlag, formValues, isEdit, params.contentId]
 	);
+
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			// Validate wysiwyg/rich-text-editor
+			if (!formValues.description) {
+				descriptionWysiwygRef.current?.quill?.focus();
+				descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
+					behavior: 'auto',
+					block: 'center',
+				});
+				return;
+			}
+
+			const { value } = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+
+			if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.PUBLISH) {
+				setShowConfirmPublishOrAddDialog(true);
+			} else if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.DRAFT) {
+				try {
+					await updateOrCreateContent(true);
+					navigate(-1);
+				} catch (error) {
+					handleError(error);
+				}
+			} else {
+				return;
+			}
+		},
+		[formValues.description, handleError, navigate, updateOrCreateContent]
+	);
+
+	const handlePublishModalConfirm = useCallback(async () => {
+		try {
+			const { adminContent } = await updateOrCreateContent(false);
+
+			if (!adminContent) {
+				throw new Error('content is undefined.');
+			}
+
+			await adminService.publishContent(adminContent.contentId).fetch();
+			const isScheduled = moment(adminContent.publishStartDate).isAfter(moment());
+
+			if (isScheduled) {
+				addFlag({
+					variant: 'success',
+					title: 'Resource scheduled',
+					description: `Your resource will become live on ${adminContent.publishStartDateDescription}`,
+					actions: [],
+				});
+			} else {
+				addFlag({
+					variant: 'success',
+					title: 'Resource Published',
+					description: 'Your resource is now available on Cobalt',
+					actions: [
+						{
+							title: 'View Resource',
+							onClick: () => {
+								window.alert('[TODO]: View Resource.');
+							},
+						},
+					],
+				});
+			}
+
+			navigate(-1);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, navigate, updateOrCreateContent]);
 
 	if (loaderData === null) {
 		return <NoMatch />;
@@ -293,60 +332,14 @@ export const Component = () => {
 				onHide={() => {
 					setShowConfirmPublishOrAddDialog(false);
 				}}
-				titleText={isNotDraft ? 'Publish Changes' : 'Add Resource'}
-				bodyText={
-					isNotDraft
-						? 'Are you ready to publish your changes'
-						: `Are you ready to add ${formValues.title} to Cobalt?`
-				}
-				detailText={
-					isNotDraft
-						? 'Your changes will be reflected on Cobalt immediately'
-						: `This resource will become live on the Cobalt Resource Library on ${moment(
-								formValues.publishDate
-						  ).format(DateFormats.API.Date)}`
-				}
+				titleText="Publish Resource"
+				bodyText={`Are you ready to publish "${formValues.title}" to Cobalt?`}
+				detailText={`This resource will become live on the Cobalt Resource Library on ${moment(
+					formValues.publishDate
+				).format('MM/DD/YY')}.`}
 				dismissText="Cancel"
-				confirmText={isNotDraft ? 'Update' : 'Add Resource'}
-				onConfirm={() => {
-					setShowConfirmPublishOrAddDialog(false);
-
-					if (isNotDraft) {
-						handleSaveForm();
-					} else {
-						adminService
-							.updateContent(params.contentId!, {
-								contentStatusId: ContentStatusId.LIVE,
-							})
-							.fetch()
-							.then((response) => {
-								const isScheduled =
-									response.adminContent?.contentStatusId === ContentStatusId.SCHEDULED;
-
-								addFlag({
-									variant: 'success',
-									title: 'Resource published',
-									description: isScheduled
-										? `Your resource will become live on ${response.adminContent?.publishStartDateDescription}`
-										: 'Your resource is now available on Cobalt',
-									actions: isScheduled
-										? []
-										: [
-												{
-													title: 'View Resource',
-													onClick: () => {
-														navigate(`/resource-library/${response.content?.contentId}`);
-													},
-												},
-										  ],
-								});
-								navigate('/admin/resources');
-							})
-							.catch((e) => {
-								handleError(e);
-							});
-					}
-				}}
+				confirmText="Publish Resource"
+				onConfirm={handlePublishModalConfirm}
 			/>
 
 			<Offcanvas
@@ -373,7 +366,6 @@ export const Component = () => {
 							<div className="d-flex align-items-center justify-content-between">
 								<h2 className="mb-1">{isEdit ? 'Edit' : 'Add'} Resource</h2>
 							</div>
-
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 							</p>
@@ -381,31 +373,8 @@ export const Component = () => {
 					</Row>
 				</Container>
 			</Container>
-			<Form
-				className="pb-11"
-				onSubmit={(event) => {
-					event.preventDefault();
 
-					// validate description wysiwyg
-					if (!formValues.description) {
-						descriptionWysiwygRef.current?.quill?.focus();
-						descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
-							behavior: 'auto',
-							block: 'center',
-						});
-						return;
-					}
-
-					handleFormSubmit(event);
-					// if (((event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement).value === 'exit') {
-					// 	handleSaveForm({ exitAfterSave: true });
-					// } else if (!isNotDraft) {
-					// 	handleSaveForm();
-					// } else {
-					// 	setShowConfirmPublishOrAddDialog(true);
-					// }
-				}}
-			>
+			<Form className="pb-11" onSubmit={handleFormSubmit}>
 				<Container className="pb-10">
 					<ConfirmDialog
 						size="lg"

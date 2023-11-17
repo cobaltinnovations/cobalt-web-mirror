@@ -65,7 +65,7 @@ interface AdminContentParams {
 	search?: string;
 }
 
-interface AdminContentResponse {
+export interface AdminContentResponse {
 	content?: AdminContent;
 	adminContent?: AdminContent;
 }

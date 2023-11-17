@@ -83,8 +83,6 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 		}
 	}, [content, canEmbed, trackActivity]);
 
-	console.log({ content });
-
 	return (
 		<Container className="py-18">
 			<Row className="justify-content-center">

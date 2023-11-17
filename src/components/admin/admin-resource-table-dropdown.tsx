@@ -186,7 +186,7 @@ export const AdminResourcesTableDropdown = ({ content }: AdminResourcesTableDrop
 						let linkProps = actionProps.linkProps && actionProps.linkProps(content);
 
 						return (
-							<React.Fragment>
+							<React.Fragment key={actionProps.label}>
 								{actionProps.dividers && <Dropdown.Divider />}
 
 								{linkProps ? (
