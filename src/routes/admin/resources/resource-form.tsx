@@ -134,14 +134,15 @@ function getInitialResourceFormValues({
 	return Object.assign(
 		{
 			...initialResourceFormValues,
+		},
+		{
+			...rest,
+			resourceUrl: rest.url,
+			isShared: rest.sharedFlag,
 			publishDate: moment(rest.publishStartDate).toDate(),
 			doesExpire: !!rest.publishEndDate,
 			expirationDate: moment(rest.publishEndDate).toDate(),
 			isRecurring: rest.publishRecurring,
-		},
-		{
-			...rest,
-			tagIds: [],
 		}
 	);
 }
