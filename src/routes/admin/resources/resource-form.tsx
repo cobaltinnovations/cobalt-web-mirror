@@ -129,8 +129,16 @@ function getInitialResourceFormValues({
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
 
+	console.log({ rest });
+
 	return Object.assign(
-		{ ...initialResourceFormValues },
+		{
+			...initialResourceFormValues,
+			publishDate: moment(rest.publishStartDate).toDate(),
+			doesExpire: !!rest.publishEndDate,
+			expirationDate: moment(rest.publishEndDate).toDate(),
+			isRecurring: rest.publishRecurring,
+		},
 		{
 			...rest,
 			tagIds: [],
@@ -683,7 +691,7 @@ export const Component = () => {
 					</AdminFormSection>
 				</Container>
 				<AdminResourceFormFooter
-					showDraftButton={isAdd}
+					showDraftButton={isDraft}
 					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
 					mainActionText={isDraft ? 'Publish' : 'Update'}
 					onCancel={() => {
