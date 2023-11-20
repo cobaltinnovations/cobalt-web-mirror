@@ -51,6 +51,8 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 	const placeholderImage = useRandomPlaceholderImage();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(content?.url);
 
+	console.log('content', content);
+
 	const trackActivity = useCallback(async () => {
 		if (!content || !trackView) {
 			return;
@@ -151,19 +153,19 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 						</>
 					)}
 
-					{content?.tagIds && content?.tagIds.length > 0 && (
+					{content?.tags && content?.tags.length > 0 && (
 						<>
 							<p className={classNames({ 'mt-8': content?.author }, 'fw-semibold')}>Related Topics</p>
 							<div className="d-flex flex-wrap">
-								{content?.tagIds.map((tagId) => (
+								{(content?.tags ?? []).map((tag) => (
 									<Badge
-										key={tagId}
+										key={tag.tagId}
 										bg="outline-dark"
 										pill
 										as="div"
 										className="me-1 mt-1 fs-small text-capitalize fw-normal"
 									>
-										{tagId}
+										{tag.name}
 									</Badge>
 								))}
 							</div>

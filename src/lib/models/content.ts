@@ -94,6 +94,7 @@ export type AdminContent = {
 	contentStatusDescription: string;
 	actions: AdminContentAction[];
 	tagIds: string[];
+	tags?: Tag[];
 	contentTypeDescription: string;
 	inUseCount: number;
 	inUseInstitutionDescription: string;
