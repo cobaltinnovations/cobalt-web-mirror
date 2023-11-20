@@ -36,22 +36,28 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface FileUploadCardProps {
+	fileName?: string;
+	fileSize?: number;
 	imagePreview?: string;
 	isUploading: boolean;
-	onChange(file: any): void;
+	onChange(file: File): void;
 	onRemove(): void;
 	progress?: number;
 	className?: string;
 	disabled?: boolean;
+	accept?: string;
 }
 
 const FileUploadCard: FC<FileUploadCardProps> = ({
+	fileName,
+	fileSize,
 	imagePreview,
 	isUploading,
 	progress,
 	onChange,
 	onRemove,
 	disabled = false,
+	accept,
 }) => {
 	const classes = useStyles({
 		percentage: progress || 0,
@@ -64,8 +70,8 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 					<div className="d-flex">
 						<img src={imagePreview} height={40} width={40} className="" alt="" />
 						<div className="ps-3 flex-grow-1">
-							<p className="mb-0">TODO: file preview image & name</p>
-							<p className="mb-0 text-muted">TODO: filesize MB</p>
+							<p className="mb-0">{fileName}</p>
+							<p className="mb-0 text-muted">{fileSize ? `${fileSize / 1000} MB` : 0}</p>
 						</div>
 
 						{imagePreview && (
@@ -96,7 +102,11 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 
 				<div className="text-center">
 					{!imagePreview && (
-						<FileInputButton accept="image/*" onChange={onChange} disabled={isUploading || disabled}>
+						<FileInputButton
+							accept={accept ?? 'image/*'}
+							onChange={onChange}
+							disabled={isUploading || disabled}
+						>
 							<Button
 								as="div"
 								className={classNames(classes.uploadIcon, 'mx-auto mb-2 p-0')}

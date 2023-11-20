@@ -33,13 +33,13 @@ export enum GROUP_SESSION_SORT_ORDER {
 }
 
 export interface PresignedUploadModel {
-	httpMethod: Method;
-	url: string;
 	accessUrl: string;
 	contentType: string;
 	expirationTimestamp: string;
 	expirationTimestampDescription: string;
 	httpHeaders: Record<string, string>;
+	httpMethod: Method;
+	url: string;
 }
 
 export interface ScreeningQuestionV2 {

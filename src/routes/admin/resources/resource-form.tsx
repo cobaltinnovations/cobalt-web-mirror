@@ -129,8 +129,6 @@ function getInitialResourceFormValues({
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
 
-	console.log({ rest });
-
 	return Object.assign(
 		{
 			...initialResourceFormValues,
@@ -724,7 +722,7 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		contentTypeId: formValues.contentTypeId as ContentTypeId,
 		title: formValues.title,
 		author: formValues.author,
-		url: formValues.resourceUrl || formValues.resourceFileUrl,
+		url: formValues.resourceType === 'url' ? formValues.resourceUrl : formValues.resourceFileUrl,
 		imageUrl: formValues.imageUrl,
 		durationInMinutes: formValues.durationInMinutes,
 		description: formValues.description,

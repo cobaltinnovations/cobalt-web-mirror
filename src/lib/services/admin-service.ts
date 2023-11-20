@@ -89,10 +89,6 @@ interface GetPreSignedUploadUrlRequestBody {
 	filename: string;
 }
 
-interface GetPreSignedUploadUrlResponseBody {
-	presignedUpload: PresignedUploadModel;
-}
-
 interface InstitutionsResponse {
 	institutions: InstitutionFilters[];
 }
@@ -170,9 +166,21 @@ export const adminService = {
 	},
 
 	getPreSignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<GetPreSignedUploadUrlResponseBody>({
+		return httpSingleton.orchestrateRequest<{
+			presignedUpload: PresignedUploadModel;
+		}>({
 			method: 'post',
 			url: 'admin/content/image-presigned-upload',
+			data,
+		});
+	},
+
+	getFilePresignedUpload(data: GetPreSignedUploadUrlRequestBody) {
+		return httpSingleton.orchestrateRequest<{
+			presignedUpload: PresignedUploadModel;
+		}>({
+			method: 'post',
+			url: '/admin/content/file-presigned-upload',
 			data,
 		});
 	},

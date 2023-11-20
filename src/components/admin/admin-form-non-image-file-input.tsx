@@ -2,7 +2,6 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { adminService, imageUploader } from '@/lib/services';
 import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import FileUploadCard from '../file-upload-card';
 import InputHelper from '../input-helper';
 
@@ -18,43 +17,41 @@ export const AdminFormNonImageFileInput = ({
 	onUploadedFileSrcChange,
 }: AdminFormNonImageFileInputProps) => {
 	const handleError = useHandleError();
-	const [imagePreviewSrc, setImagePreviewSrc] = useState(previewSrc);
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
+	const [fileInformation, setFileInformation] = useState<File>();
 
 	return (
 		<>
 			<FileUploadCard
-				imagePreview={imagePreviewSrc}
+				accept="application/pdf, .pdf, application/vnd.ms-powerpoint, .ppt, application/vnd.openxmlformats-officedocument.presentationml.presentation, .pptx,"
+				fileName={fileInformation?.name}
+				fileSize={fileInformation?.size}
+				imagePreview={previewSrc}
 				isUploading={isUploading}
 				progress={progress}
 				onChange={(file) => {
+					setFileInformation(file);
+
 					imageUploader(
 						file,
-						adminService.getPreSignedUploadUrl({
+						adminService.getFilePresignedUpload({
 							contentType: file.type,
-							filename: `${uuidv4()}.jpg`,
+							filename: file.name,
 						}).fetch
 					)
-						.onBeforeUpload((previewImageUrl) => {
-							// TODO: Preview state
-						})
 						.onPresignedUploadObtained((accessUrl) => {
 							setIsUploading(true);
-
 							onUploadedFileSrcChange(accessUrl);
 						})
 						.onProgress((percentage) => {
 							setProgress(percentage);
 						})
-						.onComplete((accessUrl) => {
+						.onComplete(() => {
 							setIsUploading(false);
-							// TODO: Preview state
-							setImagePreviewSrc(accessUrl);
 						})
 						.onError((error: any) => {
 							handleError(error);
-
 							setIsUploading(false);
 						})
 						.start();
@@ -69,11 +66,6 @@ export const AdminFormNonImageFileInput = ({
 			<div className="d-flex  mt-2">
 				<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 				<p className="mb-0">Only one file may be uploaded</p>
-			</div>
-
-			<div className="d-flex  mt-2">
-				<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
-				<p className="mb-0">TODO: This currently uploads images</p>
 			</div>
 		</>
 	);
