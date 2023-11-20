@@ -156,6 +156,7 @@ export const Component = () => {
 	const { addFlag } = useFlags();
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 
+	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
 
 	const isDraft =
@@ -696,6 +697,7 @@ export const Component = () => {
 				</Container>
 				<AdminResourceFormFooter
 					showDraftButton={isDraft}
+					draftButtonText={isAdd ? 'Save as Draft' : 'Update Draft'}
 					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
 					mainActionText={isDraft ? 'Publish' : 'Update'}
 					onCancel={() => {
@@ -731,7 +733,7 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		publishRecurring: formValues.isRecurring,
 		tagIds: formValues.tagIds,
 		searchTerms: formValues.searchTerms,
-		sharedFlag: formValues.isShared,
+		sharedFlag: formValues.isShared ?? false,
 		contentStatusId: formValues.contentStatusId,
 	};
 }

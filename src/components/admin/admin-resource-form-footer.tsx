@@ -23,6 +23,7 @@ export enum ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION {
 
 interface AdminResourceFormFooterProps {
 	showDraftButton: boolean;
+	draftButtonText: string;
 	previewActionText: string;
 	mainActionText: string;
 	onCancel(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -31,6 +32,7 @@ interface AdminResourceFormFooterProps {
 
 export const AdminResourceFormFooter = ({
 	showDraftButton,
+	draftButtonText,
 	previewActionText,
 	mainActionText,
 	onCancel,
@@ -54,7 +56,7 @@ export const AdminResourceFormFooter = ({
 										type="submit"
 										value={ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.DRAFT}
 									>
-										Save as Draft
+										{draftButtonText}
 									</Button>
 								)}
 							</div>
