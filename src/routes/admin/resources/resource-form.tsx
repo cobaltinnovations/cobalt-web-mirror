@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom';
 import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
 
-import { AdminContent, Content, ContentStatusId, ContentTypeId, Tag, TagGroup } from '@/lib/models';
+import { AdminContent, Content, ContentStatusId, ContentType, ContentTypeId, Tag, TagGroup } from '@/lib/models';
 import {
 	AdminContentResponse,
 	CreateContentRequest,
@@ -154,10 +154,8 @@ export const Component = () => {
 	const params = useParams<{ action: string; contentId: string }>();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-
 	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
 
-	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
 
 	const isDraft =
@@ -363,7 +361,12 @@ export const Component = () => {
 				<Modal.Body>
 					<ResourceDisplay
 						trackView={false}
-						content={mutateFormValuesToContentPreview(formValues, loaderData.tagGroups)}
+						content={mutateFormValuesToContentPreview(
+							formValues,
+							loaderData.contentTypes,
+							loaderData.tagGroups,
+							loaderData.contentResponse
+						)}
 					/>
 				</Modal.Body>
 			</Offcanvas>
@@ -735,11 +738,15 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 
 function mutateFormValuesToContentPreview(
 	formValues: ReturnType<typeof getInitialResourceFormValues>,
-	tagGroups: TagGroup[]
+	contentTypes: ContentType[],
+	tagGroups: TagGroup[],
+	contentResponse?: AdminContentResponse
 ): Content {
 	const flattendTags = tagGroups.reduce((previousValue, currentValue) => {
 		return [...previousValue, ...(currentValue.tags ?? [])];
 	}, [] as Tag[]);
+
+	const contentType = contentTypes.find((ct) => ct.contentTypeId === formValues.contentTypeId);
 
 	return {
 		contentId: '',
@@ -749,16 +756,17 @@ function mutateFormValuesToContentPreview(
 		imageUrl: formValues.imageUrl,
 		description: formValues.description,
 		author: formValues.author,
-		created: '',
-		createdDescription: '',
+		created: contentResponse?.adminContent?.dateCreated ?? moment(new Date()).format('YYYY-MM-DD'),
+		createdDescription:
+			contentResponse?.adminContent?.dateCreatedDescription ?? moment(new Date()).format('MM/DD/YY'),
 		lastUpdated: '',
 		lastUpdatedDescription: '',
-		contentTypeDescription: 'XXX',
-		callToAction: 'XXX',
+		contentTypeDescription: contentType?.description ?? '',
+		callToAction: contentType?.callToAction ?? '',
 		newFlag: false,
 		duration: formValues.durationInMinutes,
 		durationInMinutes: parseInt(formValues.durationInMinutes, 10),
-		durationInMinutesDescription: formValues.durationInMinutes,
+		durationInMinutesDescription: `${formValues.durationInMinutes} min`,
 		tagIds: formValues.tagIds,
 		tags: formValues.tagIds.map((tagId) => flattendTags.find((tag) => tag.tagId === tagId)!),
 	};

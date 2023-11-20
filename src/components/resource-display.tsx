@@ -98,7 +98,8 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 								className="me-1"
 							/>
 						)}
-						{content?.contentTypeDescription} {content?.duration && <>&bull; {content?.duration}</>}
+						{content?.contentTypeDescription}{' '}
+						{content?.duration && <>&bull; {content?.durationInMinutesDescription}</>}
 					</p>
 
 					{canEmbed ? (

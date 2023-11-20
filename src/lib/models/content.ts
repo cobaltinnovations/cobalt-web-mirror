@@ -24,6 +24,7 @@ export interface ContentStatus {
 }
 
 export interface ContentType {
+	callToAction: string;
 	contentTypeId: ContentTypeId;
 	description: string;
 }
@@ -79,6 +80,7 @@ export type AdminContent = {
 	views: number;
 	duration?: string;
 	durationInMinutes?: number;
+	durationInMinutesDescription?: string;
 	publishStartDate: string;
 	publishStartDateDescription: string;
 	publishEndDate: string;

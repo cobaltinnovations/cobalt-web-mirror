@@ -469,12 +469,7 @@ export const Component = () => {
 																<Link
 																	className="text-decoration-none"
 																	to={{
-																		pathname: `/admin/resources/${
-																			content.contentStatusId ===
-																			ContentStatusId.DRAFT
-																				? 'preview'
-																				: 'view'
-																		}/${content.contentId}`,
+																		pathname: `/admin/resources/edit/${content.contentId}`,
 																	}}
 																>
 																	{content.title}
