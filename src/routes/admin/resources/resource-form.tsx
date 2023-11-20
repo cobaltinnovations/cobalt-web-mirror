@@ -752,7 +752,7 @@ function mutateFormValuesToContentPreview(
 		contentId: '',
 		contentTypeId: formValues.contentTypeId as ContentTypeId,
 		title: formValues.title,
-		url: formValues.resourceUrl,
+		url: formValues.resourceType === 'url' ? formValues.resourceUrl : formValues.resourceFileUrl,
 		imageUrl: formValues.imageUrl,
 		description: formValues.description,
 		author: formValues.author,
