@@ -16,6 +16,7 @@ export enum ContentStatusId {
 	SCHEDULED = 'SCHEDULED',
 	LIVE = 'LIVE',
 	EXPIRED = 'EXPIRED',
+	AVAILABLE = 'AVAILABLE',
 }
 
 export interface ContentStatus {

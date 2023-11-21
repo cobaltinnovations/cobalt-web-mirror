@@ -99,6 +99,10 @@ const contentStatusBadgeProps = {
 		bg: 'outline-attention',
 		children: 'Scheduled',
 	},
+	[ContentStatusId.AVAILABLE]: {
+		bg: 'outline-primary',
+		children: 'Available',
+	},
 };
 
 export const Component = () => {
@@ -517,12 +521,6 @@ export const Component = () => {
 																{...contentStatusBadgeProps[content.contentStatusId]}
 																className="me-2"
 															/>
-
-															{isAvailable && (
-																<Badge pill bg="outline-primary">
-																	Available
-																</Badge>
-															)}
 														</div>
 													</TableCell>
 
