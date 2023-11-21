@@ -1,7 +1,7 @@
 import FilterDropdown from '@/components/filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import useHandleError from '@/hooks/use-handle-error';
-import { AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
+import { AdminContent, AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
 import {
 	AdminContentListResponse,
 	AdminContentSortOrder,
@@ -11,7 +11,7 @@ import {
 	adminService,
 } from '@/lib/services';
 import classNames from 'classnames';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
 	Await,
@@ -28,6 +28,7 @@ import useDebouncedState from '@/hooks/use-debounced-state';
 import { AdminResourcesTableDropdown } from '@/components/admin';
 import ContentTypeIcon from '@/components/content-type-icon';
 import LoadingButton from '@/components/loading-button';
+import { cloneDeep } from 'lodash';
 
 interface AdminResourcesLoaderData {
 	resourcesPromise: Promise<
@@ -273,6 +274,25 @@ export const Component = () => {
 	};
 
 	const contentTotalCount = content?.totalCount ?? 0;
+
+	const handleDropdownRefresh = useCallback(
+		(newContent?: AdminContent) => {
+			if (!newContent) {
+				return;
+			}
+
+			const contentClone = cloneDeep(content);
+			const contentIndexToReplace =
+				content?.adminContent.findIndex((ac) => ac.contentId === newContent.contentId) ?? -1;
+
+			if (contentClone && contentIndexToReplace > -1) {
+				contentClone.adminContent[contentIndexToReplace] = newContent;
+			}
+
+			setContent(contentClone);
+		},
+		[content]
+	);
 
 	return (
 		<>
@@ -559,9 +579,7 @@ export const Component = () => {
 
 															<AdminResourcesTableDropdown
 																content={content}
-																onRefresh={() => {
-																	window.alert('Handle on Refresh');
-																}}
+																onRefresh={handleDropdownRefresh}
 															/>
 														</div>
 													</TableCell>

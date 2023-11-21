@@ -15,18 +15,18 @@ import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import ConfirmDialog, { ConfirmDialogProps } from '../confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
-import { adminService } from '@/lib/services';
+import { AdminContentResponse, ContentIdResponse, adminService } from '@/lib/services';
 
 interface AdminResourcesTableDropdownProps {
 	content: AdminContent;
-	onRefresh: () => void;
+	onRefresh: (content?: AdminContent) => void;
 }
 
 interface ActionItemProps {
 	icon: ComponentType<React.SVGProps<SVGSVGElement>>;
 	label: string;
 	dividers: boolean;
-	action?(content: AdminContent): Promise<void>;
+	action?(content: AdminContent): Promise<AdminContentResponse | ContentIdResponse | void>;
 	linkProps?(content: AdminContent): { as: typeof Link; to: string | { pathname: string; target?: string } };
 	requiresRefresh?: boolean;
 }
@@ -74,6 +74,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		dividers: false,
 		action: async (content) => {
 			alert('TODO: Archive');
+			return {};
 		},
 		requiresRefresh: true,
 	},
@@ -83,7 +84,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		dividers: false,
 		action: async (content) => {
 			const request = adminService.deleteAdminContent(content.contentId);
-			await request.fetch();
+			return await request.fetch();
 		},
 		requiresRefresh: true,
 	},
@@ -104,7 +105,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		dividers: false,
 		action: async (content) => {
 			const request = adminService.forceExpireContent(content.contentId);
-			await request.fetch();
+			return await request.fetch();
 		},
 		requiresRefresh: true,
 	},
@@ -114,7 +115,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		dividers: false,
 		action: async (content) => {
 			const request = adminService.removeContent(content.contentId);
-			await request.fetch();
+			return await request.fetch();
 		},
 		requiresRefresh: true,
 	},
@@ -124,6 +125,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		dividers: false,
 		action: async () => {
 			alert('TODO: Unarchive');
+			return {};
 		},
 		requiresRefresh: true,
 	},
@@ -135,7 +137,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 			const request = adminService.updateContent(content.contentId, {
 				contentStatusId: ContentStatusId.DRAFT,
 			});
-			await request.fetch();
+			return await request.fetch();
 		},
 		requiresRefresh: true,
 	},
@@ -208,9 +210,14 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 												setIsConfirming(true);
 
 												try {
-													await actionProps.action?.(content);
+													const response = await actionProps.action?.(content);
+
 													if (actionProps.requiresRefresh) {
-														onRefresh();
+														if (response && 'content' in response) {
+															onRefresh(response.content);
+														} else {
+															onRefresh();
+														}
 													}
 
 													hideCurrentConfirmDialog();

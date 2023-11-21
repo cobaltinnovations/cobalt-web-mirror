@@ -1,7 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
 	AdminContent,
-	Content,
 	ContentStatusId,
 	ContentStatus,
 	ContentTypeId,
@@ -80,7 +79,7 @@ export interface AdminContentListResponse {
 	totalCount: number;
 }
 
-interface ContentIdResponse {
+export interface ContentIdResponse {
 	contentId: string;
 }
 
@@ -200,7 +199,7 @@ export const adminService = {
 	},
 
 	forceExpireContent(contentId: string) {
-		return httpSingleton.orchestrateRequest<ContentIdResponse>({
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'PUT',
 			url: `/admin/content/${contentId}/force-expire`,
 		});
