@@ -557,7 +557,12 @@ export const Component = () => {
 																</LoadingButton>
 															)}
 
-															<AdminResourcesTableDropdown content={content} />
+															<AdminResourcesTableDropdown
+																content={content}
+																onRefresh={() => {
+																	window.alert('Handle on Refresh');
+																}}
+															/>
 														</div>
 													</TableCell>
 												</TableRow>

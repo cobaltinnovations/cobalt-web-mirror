@@ -19,6 +19,7 @@ import { adminService } from '@/lib/services';
 
 interface AdminResourcesTableDropdownProps {
 	content: AdminContent;
+	onRefresh: () => void;
 }
 
 interface ActionItemProps {
@@ -27,6 +28,7 @@ interface ActionItemProps {
 	dividers: boolean;
 	action?(content: AdminContent): Promise<void>;
 	linkProps?(content: AdminContent): { as: typeof Link; to: string | { pathname: string; target?: string } };
+	requiresRefresh?: boolean;
 }
 
 const adminActionConfirmDialogPropsMap: Record<
@@ -73,6 +75,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		action: async (content) => {
 			alert('TODO: Archive');
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.DELETE]: {
 		icon: TrashIcon,
@@ -82,6 +85,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 			const request = adminService.deleteAdminContent(content.contentId);
 			await request.fetch();
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.EDIT]: {
 		icon: EditIcon,
@@ -102,6 +106,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 			const request = adminService.forceExpireContent(content.contentId);
 			await request.fetch();
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.REMOVE]: {
 		icon: XIcon,
@@ -111,6 +116,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 			const request = adminService.removeContent(content.contentId);
 			await request.fetch();
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.UNARCHIVE]: {
 		icon: UnArchiveIcon,
@@ -119,6 +125,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		action: async () => {
 			alert('TODO: Unarchive');
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.UNEXPIRE]: {
 		icon: UnArchiveIcon,
@@ -130,6 +137,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 			});
 			await request.fetch();
 		},
+		requiresRefresh: true,
 	},
 	[AdminContentAction.VIEW_ON_COBALT]: {
 		icon: ExternalIcon,
@@ -147,7 +155,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 };
 
-export const AdminResourcesTableDropdown = ({ content }: AdminResourcesTableDropdownProps) => {
+export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourcesTableDropdownProps) => {
 	const handleError = useHandleError();
 	const [confirmDialogProps, setConfirmDialogProps] = useState<ConfirmDialogProps>({} as ConfirmDialogProps);
 	const [isConfirming, setIsConfirming] = useState(false);
@@ -201,6 +209,10 @@ export const AdminResourcesTableDropdown = ({ content }: AdminResourcesTableDrop
 
 												try {
 													await actionProps.action?.(content);
+													if (actionProps.requiresRefresh) {
+														onRefresh();
+													}
+
 													hideCurrentConfirmDialog();
 												} catch (e) {
 													handleError(e);
