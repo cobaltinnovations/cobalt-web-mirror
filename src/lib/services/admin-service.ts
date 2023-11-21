@@ -198,4 +198,11 @@ export const adminService = {
 			url: `/admin/content/${contentId}/remove`,
 		});
 	},
+
+	forceExpireContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<ContentIdResponse>({
+			method: 'PUT',
+			url: `/admin/content/${contentId}/force-expire`,
+		});
+	},
 };

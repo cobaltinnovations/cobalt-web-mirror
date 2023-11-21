@@ -99,9 +99,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		label: 'Force Expire',
 		dividers: false,
 		action: async (content) => {
-			const request = adminService.updateContent(content.contentId, {
-				contentStatusId: ContentStatusId.EXPIRED,
-			});
+			const request = adminService.forceExpireContent(content.contentId);
 			await request.fetch();
 		},
 	},
