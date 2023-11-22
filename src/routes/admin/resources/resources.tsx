@@ -545,7 +545,7 @@ export const Component = () => {
 
 													<TableCell>
 														<div className="d-flex justify-content-end">
-															{isAvailable && (
+															{isAvailable ? (
 																<LoadingButton
 																	className="me-2"
 																	variant="outline-primary"
@@ -575,12 +575,12 @@ export const Component = () => {
 																>
 																	Add
 																</LoadingButton>
+															) : (
+																<AdminResourcesTableDropdown
+																	content={content}
+																	onRefresh={handleDropdownRefresh}
+																/>
 															)}
-
-															<AdminResourcesTableDropdown
-																content={content}
-																onRefresh={handleDropdownRefresh}
-															/>
 														</div>
 													</TableCell>
 												</TableRow>
