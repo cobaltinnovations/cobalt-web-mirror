@@ -281,7 +281,7 @@ export const Component = () => {
 
 	const contentTotalCount = content?.totalCount ?? 0;
 
-	const handleDropdownRefresh = useCallback(
+	const replaceContent = useCallback(
 		(newContent?: AdminContent) => {
 			if (!newContent) {
 				return;
@@ -557,11 +557,13 @@ export const Component = () => {
 																			...curr,
 																			[content.contentId]: true,
 																		}));
+
 																		try {
-																			const request = adminService.addContent(
-																				content.contentId
-																			);
-																			await request.fetch();
+																			const response = await adminService
+																				.addContent(content.contentId)
+																				.fetch();
+
+																			replaceContent(response.content);
 																		} catch (e) {
 																			handleError(e);
 																		} finally {
@@ -580,7 +582,7 @@ export const Component = () => {
 															) : (
 																<AdminResourcesTableDropdown
 																	content={content}
-																	onRefresh={handleDropdownRefresh}
+																	onRefresh={replaceContent}
 																/>
 															)}
 														</div>
