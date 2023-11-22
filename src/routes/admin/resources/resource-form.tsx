@@ -65,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const contentId = params.contentId;
 
-	const supportedActions = ['add', 'edit'];
+	const supportedActions = ['add', 'edit', 'preview'];
 
 	// can add/edit
 	// admins can also edit them
@@ -73,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	// add, must not have a content id.
 	const isValidNoId = isSupportedAction && ['add'].includes(action) && !contentId;
 	// edit, must have a content id.
-	const isValidWithId = isSupportedAction && ['edit'].includes(action) && !!contentId;
+	const isValidWithId = isSupportedAction && ['edit', 'preview'].includes(action) && !!contentId;
 
 	if (!isValidNoId && !isValidWithId) {
 		return null; // page renders a "404" in this case
@@ -156,6 +156,7 @@ export const Component = () => {
 
 	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
+	const isPreview = params.action === 'preview';
 
 	const isDraft =
 		!loaderData?.contentResponse?.content?.contentStatusId ||
@@ -326,10 +327,33 @@ export const Component = () => {
 		}
 	}, [addFlag, handleError, navigate, updateOrCreateContent]);
 
+	/* --------------------------------------------------------*/
+	/* If loader failed */
+	/* --------------------------------------------------------*/
 	if (loaderData === null) {
 		return <NoMatch />;
 	}
 
+	/* --------------------------------------------------------*/
+	/* Preview view for content from external institutions */
+	/* --------------------------------------------------------*/
+	if (isPreview) {
+		return (
+			<ResourceDisplay
+				trackView={false}
+				content={mutateFormValuesToContentPreview(
+					formValues,
+					loaderData.contentTypes,
+					loaderData.tagGroups,
+					loaderData.contentResponse
+				)}
+			/>
+		);
+	}
+
+	/* --------------------------------------------------------*/
+	/* Edit view for content from internal institutions */
+	/* --------------------------------------------------------*/
 	return (
 		<>
 			<ConfirmDialog

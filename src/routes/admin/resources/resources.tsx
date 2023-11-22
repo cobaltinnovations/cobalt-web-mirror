@@ -495,7 +495,9 @@ export const Component = () => {
 																<Link
 																	className="text-decoration-none"
 																	to={{
-																		pathname: `/admin/resources/edit/${content.contentId}`,
+																		pathname: `/admin/resources/${
+																			isAvailable ? 'preview' : 'edit'
+																		}/${content.contentId}`,
 																	}}
 																>
 																	{content.title}
