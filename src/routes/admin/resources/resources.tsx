@@ -47,7 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const contentStatusId = (url.searchParams.get('contentStatusId') ?? undefined) as ContentStatusId | undefined;
 	const contentTypeId = (url.searchParams.get('contentTypeId') ?? undefined) as ContentTypeId | undefined;
 	const tagId = url.searchParams.get('tagId') ?? undefined;
-	const sharedFlag = url.searchParams.get('sharedFlag') ?? undefined;
+	const sharingOn = url.searchParams.get('sharingOn') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
 	const orderBy = url.searchParams.get('orderBy') ?? undefined;
 
@@ -60,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		...(contentStatusId ? { contentStatusId } : {}),
 		...(contentTypeId ? { contentTypeId } : {}),
 		...(tagId ? { tagId } : {}),
-		...(sharedFlag ? { sharedFlag } : {}),
+		...(sharingOn ? { sharingOn } : {}),
 		...(search ? { search } : {}),
 		...(orderBy && { orderBy }),
 	});
@@ -225,9 +225,9 @@ export const Component = () => {
 		},
 		{
 			name: 'Sharing',
-			searchParam: 'sharedFlag',
-			initialValue: searchParams.get('sharedFlag'),
-			active: searchParams.get('sharedFlag') !== null,
+			searchParam: 'sharingOn',
+			initialValue: searchParams.get('sharingOn'),
+			active: searchParams.get('sharingOn') !== null,
 			options: [
 				{
 					label: 'On',
