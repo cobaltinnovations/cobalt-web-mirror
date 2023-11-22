@@ -192,7 +192,7 @@ export const adminService = {
 	},
 
 	removeContent(contentId: string) {
-		return httpSingleton.orchestrateRequest<ContentIdResponse>({
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'delete',
 			url: `/admin/content/${contentId}/remove`,
 		});

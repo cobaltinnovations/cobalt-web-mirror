@@ -59,7 +59,7 @@ const adminActionConfirmDialogPropsMap: Record<
 		titleText: 'Remove Resource',
 		bodyText: `Are you sure you want to remove ${content.title}?`,
 		detailText: 'This resource will be removed from your Resource Library.',
-		confirmText: 'Delete',
+		confirmText: 'Remove',
 		dismissText: 'Cancel',
 		destructive: true,
 		size: 'lg',

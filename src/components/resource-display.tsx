@@ -138,7 +138,6 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 									trackActivity();
 								}}
 							>
-								{/* @ts-expect-error TODO: callToAction missing in AdminContent */}
 								{content.callToAction} <ExternalIcon />
 							</Button>
 						</div>
