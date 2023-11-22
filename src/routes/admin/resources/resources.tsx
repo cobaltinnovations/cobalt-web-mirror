@@ -49,6 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const tagId = url.searchParams.get('tagId') ?? undefined;
 	const sharedFlag = url.searchParams.get('sharedFlag') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
+	const orderBy = url.searchParams.get('orderBy') ?? undefined;
 
 	const contentTagsResponse = adminService.fetchContentTags();
 	const contentStatusesRequest = adminService.fetchContentStatuses();
@@ -61,6 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		...(tagId ? { tagId } : {}),
 		...(sharedFlag ? { sharedFlag } : {}),
 		...(search ? { search } : {}),
+		...(orderBy && { orderBy }),
 	});
 
 	request.signal.addEventListener('abort', () => {
@@ -242,27 +244,27 @@ export const Component = () => {
 	const sortOptions = [
 		{
 			label: 'Date Added Descending',
-			value: AdminContentSortOrder.DATE_ADDED_DESCENDING,
+			value: AdminContentSortOrder.DATE_ADDED_DESC,
 		},
 		{
 			label: 'Date Added Ascending',
-			value: AdminContentSortOrder.DATE_ADDED_ASCENDING,
+			value: AdminContentSortOrder.DATE_ADDED_ASC,
 		},
 		{
 			label: 'Publish Date Descending',
-			value: AdminContentSortOrder.PUBLISH_DATE_DESCENDING,
+			value: AdminContentSortOrder.PUBLISH_DATE_DESC,
 		},
 		{
 			label: 'Publish Date Ascending',
-			value: AdminContentSortOrder.PUBLISH_DATE_ASCENDING,
+			value: AdminContentSortOrder.PUBLISH_DATE_ASC,
 		},
 		{
 			label: 'Exp Date Descending',
-			value: AdminContentSortOrder.EXP_DATE_DESCENDING,
+			value: AdminContentSortOrder.EXPIRY_DATE_DESC,
 		},
 		{
 			label: 'Exp Date Ascending',
-			value: AdminContentSortOrder.EXP_DATE_ASCENDING,
+			value: AdminContentSortOrder.EXPIRY_DATE_ASC,
 		},
 	];
 
