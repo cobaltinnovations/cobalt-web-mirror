@@ -17,10 +17,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface AdminResourceFormFooterExternalProps {
+	showRemove: boolean;
 	onAdd(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onRemove(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
-export const AdminResourceFormFooterExternal = ({ onAdd }: AdminResourceFormFooterExternalProps) => {
+export const AdminResourceFormFooterExternal = ({
+	showRemove,
+	onAdd,
+	onRemove,
+}: AdminResourceFormFooterExternalProps) => {
 	const classes = useStyles();
 
 	return (
@@ -31,9 +37,15 @@ export const AdminResourceFormFooterExternal = ({ onAdd }: AdminResourceFormFoot
 						<div className="d-flex justify-content-between">
 							<div></div>
 							<div>
-								<Button variant="primary" onClick={onAdd}>
-									Add Resource
-								</Button>
+								{showRemove ? (
+									<Button variant="danger" onClick={onRemove}>
+										Remove Resource
+									</Button>
+								) : (
+									<Button variant="primary" onClick={onAdd}>
+										Add Resource
+									</Button>
+								)}
 							</div>
 						</div>
 					</Col>

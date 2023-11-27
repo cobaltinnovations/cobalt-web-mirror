@@ -9,7 +9,16 @@ import {
 } from 'react-router-dom';
 import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
 
-import { AdminContent, Content, ContentStatusId, ContentType, ContentTypeId, Tag, TagGroup } from '@/lib/models';
+import {
+	AdminContent,
+	AdminContentAction,
+	Content,
+	ContentStatusId,
+	ContentType,
+	ContentTypeId,
+	Tag,
+	TagGroup,
+} from '@/lib/models';
 import {
 	AdminContentResponse,
 	CreateContentRequest,
@@ -172,6 +181,7 @@ export const Component = () => {
 	const [showPreviewModal, setShowPreviewModal] = useState(false);
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showAddDialog, setShowAddDialog] = useState(false);
+	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
 	const [isDirty, setIsDirty] = useState(false);
 	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
@@ -331,23 +341,39 @@ export const Component = () => {
 
 	const handleAdd = useCallback(async () => {
 		try {
-			if (!loaderData) {
-				throw new Error('loaderData is undefined.');
+			const contentId = loaderData?.contentResponse?.content?.contentId;
+
+			if (!contentId) {
+				throw new Error('contentId is undefined.');
 			}
 
-			if (!loaderData.contentResponse) {
-				throw new Error('loaderData.contentResponse is undefined.');
-			}
-
-			if (!loaderData.contentResponse.content) {
-				throw new Error('loaderData.contentResponse.content is undefined.');
-			}
-
-			const response = await adminService.addContent(loaderData.contentResponse.content.contentId).fetch();
+			const response = await adminService.addContent(contentId).fetch();
 			addFlag({
 				variant: 'success',
 				title: 'Resource added',
 				description: `${response.content?.title} is now available on Cobalt`,
+				actions: [],
+			});
+
+			navigate(-1);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, loaderData, navigate]);
+
+	const handleRemove = useCallback(async () => {
+		try {
+			const contentId = loaderData?.contentResponse?.content?.contentId;
+
+			if (!contentId) {
+				throw new Error('contentId is undefined.');
+			}
+
+			const response = await adminService.removeContent(contentId).fetch();
+			addFlag({
+				variant: 'success',
+				title: 'Resource removed',
+				description: `${response.content?.title} is no longer available on Cobalt`,
 				actions: [],
 			});
 
@@ -368,6 +394,8 @@ export const Component = () => {
 	/* Preview view for content from external institutions */
 	/* --------------------------------------------------------*/
 	if (isPreview) {
+		const canRemove = !!loaderData.contentResponse?.content?.actions.includes(AdminContentAction.REMOVE);
+
 		return (
 			<>
 				<ConfirmDialog
@@ -384,6 +412,21 @@ export const Component = () => {
 					onConfirm={handleAdd}
 				/>
 
+				<ConfirmDialog
+					size="lg"
+					show={showRemoveDialog}
+					onHide={() => {
+						setShowRemoveDialog(false);
+					}}
+					titleText="Remove Resource"
+					bodyText={`Are you sure you want to remove ${loaderData?.contentResponse?.content?.title}?`}
+					detailText="This resource will be removed from your Resource Library."
+					dismissText="Cancel"
+					confirmText="Remove"
+					onConfirm={handleRemove}
+					destructive
+				/>
+
 				<ResourceDisplay
 					trackView={false}
 					content={mutateFormValuesToContentPreview(
@@ -394,6 +437,10 @@ export const Component = () => {
 					)}
 				/>
 				<AdminResourceFormFooterExternal
+					showRemove={canRemove}
+					onRemove={() => {
+						setShowRemoveDialog(true);
+					}}
 					onAdd={() => {
 						setShowAddDialog(true);
 					}}

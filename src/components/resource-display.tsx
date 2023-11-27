@@ -51,8 +51,6 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 	const placeholderImage = useRandomPlaceholderImage();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(content?.url);
 
-	console.log('content', content);
-
 	const trackActivity = useCallback(async () => {
 		if (!content || !trackView) {
 			return;
