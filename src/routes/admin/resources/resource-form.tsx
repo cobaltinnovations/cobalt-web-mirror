@@ -170,7 +170,8 @@ export const Component = () => {
 	);
 
 	const [showPreviewModal, setShowPreviewModal] = useState(false);
-	const [showConfirmPublishOrAddDialog, setShowConfirmPublishOrAddDialog] = useState(false);
+	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
+	const [showAddDialog, setShowAddDialog] = useState(false);
 
 	const [isDirty, setIsDirty] = useState(false);
 	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
@@ -273,7 +274,7 @@ export const Component = () => {
 			const { value } = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
 
 			if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.PUBLISH) {
-				setShowConfirmPublishOrAddDialog(true);
+				setShowConfirmPublishDialog(true);
 			} else if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.DRAFT) {
 				try {
 					await updateOrCreateContent(true);
@@ -328,6 +329,34 @@ export const Component = () => {
 		}
 	}, [addFlag, handleError, navigate, updateOrCreateContent]);
 
+	const handleAdd = useCallback(async () => {
+		try {
+			if (!loaderData) {
+				throw new Error('loaderData is undefined.');
+			}
+
+			if (!loaderData.contentResponse) {
+				throw new Error('loaderData.contentResponse is undefined.');
+			}
+
+			if (!loaderData.contentResponse.content) {
+				throw new Error('loaderData.contentResponse.content is undefined.');
+			}
+
+			const response = await adminService.addContent(loaderData.contentResponse.content.contentId).fetch();
+			addFlag({
+				variant: 'success',
+				title: 'Resource added',
+				description: `${response.content?.title} is now available on Cobalt`,
+				actions: [],
+			});
+
+			navigate(-1);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, loaderData, navigate]);
+
 	/* --------------------------------------------------------*/
 	/* If loader failed */
 	/* --------------------------------------------------------*/
@@ -341,6 +370,20 @@ export const Component = () => {
 	if (isPreview) {
 		return (
 			<>
+				<ConfirmDialog
+					size="lg"
+					show={showAddDialog}
+					onHide={() => {
+						setShowAddDialog(false);
+					}}
+					titleText="Add Resource"
+					bodyText="Are you ready to add this resource to Cobalt?"
+					detailText="The resource will be added to your Resource Library immediately."
+					dismissText="Cancel"
+					confirmText="Add"
+					onConfirm={handleAdd}
+				/>
+
 				<ResourceDisplay
 					trackView={false}
 					content={mutateFormValuesToContentPreview(
@@ -352,7 +395,7 @@ export const Component = () => {
 				/>
 				<AdminResourceFormFooterExternal
 					onAdd={() => {
-						return;
+						setShowAddDialog(true);
 					}}
 				/>
 			</>
@@ -366,9 +409,9 @@ export const Component = () => {
 		<>
 			<ConfirmDialog
 				size="lg"
-				show={showConfirmPublishOrAddDialog}
+				show={showConfirmPublishDialog}
 				onHide={() => {
-					setShowConfirmPublishOrAddDialog(false);
+					setShowConfirmPublishDialog(false);
 				}}
 				titleText="Publish Resource"
 				bodyText={`Are you ready to publish "${formValues.title}" to Cobalt?`}
