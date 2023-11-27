@@ -7,6 +7,7 @@ export * from './admin-group-session-filter-status';
 export * from './admin-group-session-filter-visibility';
 export * from './admin-group-session-sort';
 export * from './admin-header';
+export * from './admin-resource-form-footer-external';
 export * from './admin-resource-form-footer';
 export * from './admin-resource-table-dropdown';
 export * from './admin-tag-group-control';

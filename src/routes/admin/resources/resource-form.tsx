@@ -29,6 +29,7 @@ import {
 	AdminFormNonImageFileInput,
 	AdminFormSection,
 	AdminResourceFormFooter,
+	AdminResourceFormFooterExternal,
 	AdminTagGroupControl,
 } from '@/components/admin';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
@@ -339,15 +340,22 @@ export const Component = () => {
 	/* --------------------------------------------------------*/
 	if (isPreview) {
 		return (
-			<ResourceDisplay
-				trackView={false}
-				content={mutateFormValuesToContentPreview(
-					formValues,
-					loaderData.contentTypes,
-					loaderData.tagGroups,
-					loaderData.contentResponse
-				)}
-			/>
+			<>
+				<ResourceDisplay
+					trackView={false}
+					content={mutateFormValuesToContentPreview(
+						formValues,
+						loaderData.contentTypes,
+						loaderData.tagGroups,
+						loaderData.contentResponse
+					)}
+				/>
+				<AdminResourceFormFooterExternal
+					onAdd={() => {
+						return;
+					}}
+				/>
+			</>
 		);
 	}
 
@@ -720,6 +728,7 @@ export const Component = () => {
 				<AdminResourceFormFooter
 					showDraftButton={isDraft}
 					draftButtonText={isAdd ? 'Save as Draft' : 'Update Draft'}
+					showPreviewButton={true}
 					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
 					mainActionText={isDraft ? 'Publish' : 'Update'}
 					onCancel={() => {

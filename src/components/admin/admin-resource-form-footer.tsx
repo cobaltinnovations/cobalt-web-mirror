@@ -24,6 +24,7 @@ export enum ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION {
 interface AdminResourceFormFooterProps {
 	showDraftButton: boolean;
 	draftButtonText: string;
+	showPreviewButton: boolean;
 	previewActionText: string;
 	mainActionText: string;
 	onCancel(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -33,6 +34,7 @@ interface AdminResourceFormFooterProps {
 export const AdminResourceFormFooter = ({
 	showDraftButton,
 	draftButtonText,
+	showPreviewButton,
 	previewActionText,
 	mainActionText,
 	onCancel,
@@ -61,9 +63,11 @@ export const AdminResourceFormFooter = ({
 								)}
 							</div>
 							<div>
-								<Button variant="outline-primary" className="me-2" onClick={onPreview}>
-									{previewActionText}
-								</Button>
+								{showPreviewButton && (
+									<Button variant="outline-primary" className="me-2" onClick={onPreview}>
+										{previewActionText}
+									</Button>
+								)}
 								<Button
 									variant="primary"
 									type="submit"
