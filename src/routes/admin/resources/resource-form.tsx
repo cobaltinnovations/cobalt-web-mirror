@@ -220,15 +220,7 @@ export const Component = () => {
 							addFlag({
 								variant: 'success',
 								title: 'Resource Updated',
-								description: 'TODO: Resource updated success description.',
-								actions: [
-									{
-										title: 'View Resource',
-										onClick: () => {
-											window.alert('[TODO]: View Resource.');
-										},
-									},
-								],
+								actions: [],
 							});
 						}
 
@@ -248,15 +240,7 @@ export const Component = () => {
 						addFlag({
 							variant: 'success',
 							title: 'Resource Created',
-							description: 'TODO: Resource created success description.',
-							actions: [
-								{
-									title: 'View Resource',
-									onClick: () => {
-										window.alert('[TODO]: View Resource.');
-									},
-								},
-							],
+							actions: [],
 						});
 					}
 
