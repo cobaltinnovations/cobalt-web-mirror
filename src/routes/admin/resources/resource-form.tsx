@@ -74,6 +74,8 @@ export function useAdminResourceFormLoaderData() {
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const action = params.action;
 	const contentId = params.contentId;
+	const url = new URL(request.url);
+	const startOnPreview = (url.searchParams.get('startOnPreview') ?? '') === 'true';
 
 	const supportedActions = ['add', 'edit', 'preview'];
 
@@ -109,6 +111,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		contentResponse,
 		tagGroups: tagGroupsResponse.tagGroups,
 		contentTypes: contentTypesResponse.contentTypes,
+		startOnPreview,
 	};
 }
 
@@ -138,8 +141,6 @@ function getInitialResourceFormValues({
 	adminContent?: AdminContent | null;
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
-
-	console.log(rest.sharedFlag);
 
 	return Object.assign(
 		{
@@ -180,7 +181,7 @@ export const Component = () => {
 		})
 	);
 
-	const [showPreviewModal, setShowPreviewModal] = useState(false);
+	const [showPreviewModal, setShowPreviewModal] = useState(loaderData?.startOnPreview ?? false);
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
@@ -821,7 +822,7 @@ export const Component = () => {
 					showDraftButton={isDraft}
 					draftButtonText={isAdd ? 'Save as Draft' : 'Update Draft'}
 					showPreviewButton={true}
-					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
+					previewActionText={showPreviewModal ? 'Edit' : 'Preview'}
 					mainActionText={isDraft ? 'Publish' : 'Update'}
 					onCancel={() => {
 						navigate(-1);
