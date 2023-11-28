@@ -121,7 +121,7 @@ const initialResourceFormValues = {
 	resourceType: 'url' as 'url' | 'file',
 	resourceUrl: '',
 	resourceFileUrl: '',
-	isShared: false,
+	isShared: true,
 	imageUrl: '',
 	description: '',
 	tagIds: [] as string[],
@@ -139,6 +139,8 @@ function getInitialResourceFormValues({
 }): typeof initialResourceFormValues {
 	const { ...rest } = adminContent ?? ({} as AdminContent);
 
+	console.log(rest.sharedFlag);
+
 	return Object.assign(
 		{
 			...initialResourceFormValues,
@@ -146,7 +148,7 @@ function getInitialResourceFormValues({
 		{
 			...rest,
 			resourceUrl: rest.url,
-			isShared: rest.sharedFlag,
+			isShared: rest.sharedFlag ? rest.sharedFlag : true,
 			publishDate: moment(rest.publishStartDate).toDate(),
 			doesExpire: !!rest.publishEndDate,
 			expirationDate: moment(rest.publishEndDate).toDate(),
@@ -526,7 +528,7 @@ export const Component = () => {
 
 					<AdminFormSection
 						title="Basic Info"
-						description="Lorem ipsum dolor sit amet consectetur. Senectus faucibus morbi elementum viverra urna molestie. Fermentum lacinia fames eu integer. Massa nisi at ut gravida. Purus tempor risus et adipiscing purus tortor eget sapien consectetur. In id scelerisque augue sit nec odio quam vulputate sed."
+						description="These details are required for making your resource accessible and reader-friendly."
 					>
 						<InputHelper
 							className="mb-3"
@@ -706,7 +708,7 @@ export const Component = () => {
 
 					<AdminFormSection
 						title="Description"
-						description="Lorem ipsum dolor sit amet consectetur. Senectus faucibus morbi elementum viverra urna molestie. Fermentum lacinia fames eu integer. Massa nisi at ut gravida. Purus tempor risus et adipiscing purus tortor eget sapien consectetur. In id scelerisque augue sit nec odio quam vulputate sed."
+						description="Provide a concise and engaging description to introduce the resource and convey the benefits of interacting with the full content."
 					>
 						<Wysiwyg
 							ref={descriptionWysiwygRef}

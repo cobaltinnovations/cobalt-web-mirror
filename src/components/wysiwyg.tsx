@@ -15,6 +15,7 @@ interface WysiwygProps {
 
 const modules = {
 	toolbar: [
+		//	[{ size: ['small', false, 'large', 'huge'] }],
 		['bold', 'italic', 'underline', 'strike'],
 		[{ list: 'ordered' }, { list: 'bullet' }],
 		['link', 'clean'],
@@ -45,6 +46,8 @@ export const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 					if (!didInit) {
 						return;
 					}
+
+					console.log(quill.root.innerHTML);
 
 					onChange(quill.root.innerHTML);
 				};
