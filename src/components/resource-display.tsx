@@ -44,9 +44,10 @@ const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 interface ResourceDisplayProps {
 	trackView: boolean;
 	content?: Content | AdminContent;
+	className?: string;
 }
 
-const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
+const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps) => {
 	const classes = useResourceDisplayStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(content?.url);
@@ -84,7 +85,7 @@ const ResourceDisplay = ({ trackView, content }: ResourceDisplayProps) => {
 	}, [content, canEmbed, trackActivity]);
 
 	return (
-		<Container className="py-18">
+		<Container className={classNames('py-18', className)}>
 			<Row className="justify-content-center">
 				<Col md={10} lg={8}>
 					<h1 className="mb-4">{content?.title}</h1>

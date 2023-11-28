@@ -422,6 +422,7 @@ export const Component = () => {
 						loaderData.tagGroups,
 						loaderData.contentResponse
 					)}
+					className="pb-40"
 				/>
 				<AdminResourceFormFooterExternal
 					showRemove={canRemove}
@@ -475,6 +476,7 @@ export const Component = () => {
 							loaderData.tagGroups,
 							loaderData.contentResponse
 						)}
+						className="pb-40"
 					/>
 				</Modal.Body>
 			</Offcanvas>
