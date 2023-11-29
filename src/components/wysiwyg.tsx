@@ -15,14 +15,14 @@ interface WysiwygProps {
 
 const modules = {
 	toolbar: [
-		//	[{ size: ['small', false, 'large', 'huge'] }],
+		[{ size: ['small', false, 'large', 'huge'] }],
 		['bold', 'italic', 'underline', 'strike'],
 		[{ list: 'ordered' }, { list: 'bullet' }],
 		['link', 'clean'],
 	],
 };
 
-const formats = ['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
+const formats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
 
 export type WysiwygRef = { quill: Quill | undefined; quillRef: React.RefObject<HTMLDivElement> };
 
@@ -105,6 +105,15 @@ const useWysiwygDisplayStyles = createUseThemedStyles((theme) => ({
 		},
 		'& a': {
 			...theme.fonts.bodyNormal,
+		},
+		'& .ql-size-small': {
+			fontSize: '0.9rem',
+		},
+		'& .ql-size-large': {
+			fontSize: '2.2rem',
+		},
+		'& .ql-size-huge': {
+			fontSize: '3.5rem',
 		},
 	},
 }));
