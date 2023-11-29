@@ -10,7 +10,7 @@
 #
 # docker stop $(docker ps -q --filter ancestor=cobalt-web)
 
-FROM public.ecr.aws/bitnami/node:16.13.2-prod
+FROM public.ecr.aws/bitnami/node:18.18.2
 
 EXPOSE 3000
 
