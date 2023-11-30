@@ -742,6 +742,11 @@ export const routes: RouteObject[] = [
 						],
 					},
 					{
+						id: 'provider-detail',
+						path: 'provider-detail/:urlName',
+						lazy: () => import('@/routes/provider-detail'),
+					},
+					{
 						path: '*',
 						loader: redirectCheckLoader,
 						element: <NoMatch />,

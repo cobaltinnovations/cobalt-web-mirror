@@ -213,7 +213,8 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 	// reset booking context when accountId changes
 	const accountId = account?.accountId;
 	useEffect(() => {
-		setAppointmentTypes([]);
+		// Comment this out, it breaks the provider-detail booking process
+		// setAppointmentTypes([]);
 		setSpecialties([]);
 		setEpicDepartments([]);
 		setAvailableSections([]);
