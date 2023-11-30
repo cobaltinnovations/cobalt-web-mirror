@@ -45,7 +45,11 @@ const loadProviderDetails = async (urlName: string) => {
 };
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-	return defer({ deferredData: loadProviderDetails(params.urlName as string) });
+	if (!params.urlName) {
+		throw new Error('params.urlName is undefined');
+	}
+
+	return defer({ deferredData: loadProviderDetails(params.urlName) });
 };
 
 const useProviderDetailLoaderData = () => {
