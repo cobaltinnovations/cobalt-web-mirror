@@ -9,10 +9,24 @@ import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import HeroContainer from '@/components/hero-container';
 import { Loader } from 'react-bootstrap-typeahead';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	imageOuter: {
+		width: 88,
+		height: 88,
+		flexShrink: 0,
+		marginRight: 24,
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		backgroundRepeat: 'no-repeat',
+		backgroundColor: theme.colors.n500,
+	},
+}));
 
 const loadProviderDetails = async (urlName: string) => {
 	try {
-		const { provider } = await await providerService.getProviderById(urlName).fetch();
+		const { provider } = await providerService.getProviderById(urlName).fetch();
 		const { appointmentTypes, epicDepartments, sections } = await providerService
 			.findProviders({
 				providerId: provider.providerId,
@@ -30,19 +44,16 @@ const loadProviderDetails = async (urlName: string) => {
 	}
 };
 
-interface RouterLoaderData {
-	deferredData: ReturnType<typeof loadProviderDetails>;
-}
-
-const useProviderDetailLoaderData = () => {
-	return useRouteLoaderData('provider-detail') as RouterLoaderData;
-};
-
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	return defer({ deferredData: loadProviderDetails(params.urlName as string) });
 };
 
+const useProviderDetailLoaderData = () => {
+	return useRouteLoaderData('provider-detail') as { deferredData: ReturnType<typeof loadProviderDetails> };
+};
+
 export const Component = () => {
+	const classes = useStyles();
 	const { pathname, search } = useLocation();
 	const [searchParams] = useSearchParams();
 	const { deferredData } = useProviderDetailLoaderData();
@@ -74,17 +85,21 @@ export const Component = () => {
 				<Await resolve={deferredData}>
 					{({ provider, sections }: Awaited<typeof deferredData>) => (
 						<>
-							<HeroContainer className="bg-n75">
-								<div className="d-flex">
-									<div className="flex-shrink-0">IMG</div>
+							<HeroContainer className="bg-n75 py-8 py-lg-17">
+								<div className="d-flex align-items-center">
+									<div
+										className={classes.imageOuter}
+										style={{ backgroundImage: `url(${provider.imageUrl})` }}
+									/>
 									<div>
-										<h2>{provider.name}</h2>
-										<p>{provider.title}</p>
-										<p>{provider.emailAddress}</p>
+										<h2 className="mb-2">{provider.name}</h2>
+										{provider.supportRolesDescription && (
+											<p className="mb-0">{provider.supportRolesDescription}</p>
+										)}
 									</div>
 								</div>
 							</HeroContainer>
-							<Container className="py-10">
+							<Container className="py-8 py-lg-10">
 								<Row className="mb-10">
 									<Col
 										md={{ span: 10, offset: 1 }}
