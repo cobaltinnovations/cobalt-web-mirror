@@ -1868,7 +1868,7 @@ function prepareGroupSessionSubmission(
 		...(registrationEndDateFlag &&
 			registrationEndDate && {
 				registrationEndDateTime: moment(
-					`${registrationEndDate.toISOString().split('T')[0]} 11:59:00`,
+					`${registrationEndDate.toISOString().split('T')[0]} 23:59:00`,
 					`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
 				).format(DateFormats.API.DateTime),
 			}),
