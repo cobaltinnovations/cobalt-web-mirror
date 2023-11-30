@@ -61,6 +61,7 @@ export interface CreateGroupSessionRequestBody {
 	groupSessionLearnMoreMethodId?: GroupSessionLearnMoreMethodId;
 	learnMoreDescription?: string;
 	tagIds?: string[];
+	registrationEndDateTime?: string;
 }
 
 interface CreateGroupSessionResponseBody {
