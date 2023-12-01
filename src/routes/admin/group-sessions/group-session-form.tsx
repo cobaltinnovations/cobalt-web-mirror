@@ -158,6 +158,8 @@ const initialGroupSessionFormValues = {
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
 	visibleFlag: true,
+	registrationEndDateFlag: false,
+	registrationEndDate: null as Date | null,
 	tagIds: [] as string[],
 	screeningFlowId: '',
 	confirmationEmailContent: '',
@@ -183,6 +185,7 @@ function getInitialGroupSessionFormValues({
 		screeningFlowId = defaultScreeningFlowId,
 		startDateTime,
 		endDateTime,
+		registrationEndDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
 		tags = [],
 		...rest
@@ -193,6 +196,7 @@ function getInitialGroupSessionFormValues({
 	const followupTimeOfDay = formattedFollowupTimeOfDay
 		? moment(formattedFollowupTimeOfDay, DateFormats.API.Time).format(DateFormats.UI.TimeSlotInput)
 		: '';
+	const registrationEndDateTimeMoment = registrationEndDateTime ? moment(registrationEndDateTime) : undefined;
 
 	const mergedDateInputValues = {
 		startDate: startDateTime ? startDate.toDate() : initialGroupSessionFormValues.startDate,
@@ -200,6 +204,8 @@ function getInitialGroupSessionFormValues({
 		endTime: endDateTime ? endDate.format(DateFormats.UI.TimeSlotInput) : '',
 		endDate: endDateTime ? endDate.toDate() : initialGroupSessionFormValues.endDate,
 		followupTimeOfDay: followupTimeOfDay,
+		registrationEndDateFlag: !!registrationEndDateTimeMoment,
+		registrationEndDate: registrationEndDateTimeMoment ? registrationEndDateTimeMoment.toDate() : undefined,
 	};
 
 	return Object.assign(
@@ -1017,6 +1023,34 @@ export const Component = () => {
 			<hr />
 
 			<AdminFormSection
+				title="Registration End Date (optional)"
+				description="Set an end date for registration. Users will not be able to register for the event after this date."
+			>
+				<ToggledInput
+					type="switch"
+					id="registration-end-date"
+					label="Set registration end date"
+					checked={formValues.registrationEndDateFlag}
+					onChange={({ currentTarget }) => {
+						updateFormValue('registrationEndDateFlag', currentTarget.checked);
+					}}
+				>
+					<DatePicker
+						className="w-100 mb-2"
+						labelText="Expiration Date"
+						selected={formValues.registrationEndDate ?? undefined}
+						onChange={(date) => {
+							updateFormValue('registrationEndDate', date);
+						}}
+						minDate={new Date()}
+					/>
+					<p className="mb-0 text-muted">Registration will end at 11:59pm on the date selected.</p>
+				</ToggledInput>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
 				title="Tags"
 				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 			>
@@ -1590,7 +1624,15 @@ function prepareGroupSessionSubmission(
 	formValues: Partial<typeof initialGroupSessionFormValues>,
 	isExternal: boolean
 ): CreateGroupSessionRequestBody {
-	const { startDate, endDate, startTime, endTime, ...groupSessionSubmission } = formValues;
+	const {
+		startDate,
+		endDate,
+		startTime,
+		endTime,
+		registrationEndDateFlag,
+		registrationEndDate,
+		...groupSessionSubmission
+	} = formValues;
 
 	let startDateTime = moment(
 		`${startDate?.toISOString().split('T')[0]} ${startTime}`,
@@ -1675,6 +1717,13 @@ function prepareGroupSessionSubmission(
 		groupSessionSchedulingSystemId: isExternal
 			? GroupSessionSchedulingSystemId.EXTERNAL
 			: GroupSessionSchedulingSystemId.COBALT,
+		...(registrationEndDateFlag &&
+			registrationEndDate && {
+				registrationEndDateTime: moment(
+					`${registrationEndDate.toISOString().split('T')[0]} 23:59:00`,
+					`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
+				).format(DateFormats.API.DateTime),
+			}),
 		...groupSessionSubmission,
 	};
 }

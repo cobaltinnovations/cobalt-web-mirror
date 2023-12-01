@@ -133,6 +133,10 @@ export interface GroupSessionModel {
 	learnMoreDescription?: string;
 	reminderEmailContent?: string;
 	screeningFlowId: string;
+
+	registrationEndDateTime?: string;
+	registrationEndDateTimeDescription?: string;
+	registrationEndDateTimeHasPassed?: boolean;
 }
 
 export interface GroupSessionUrlNameValidationResult {

@@ -244,9 +244,30 @@ const GroupSession = ({
 									)}
 								</Col>
 							</Row>
+							{!groupSessionReservation && groupSession.registrationEndDateTime && (
+								<Row className="mb-8">
+									<Col>
+										<InlineAlert
+											title={
+												groupSession.registrationEndDateTimeHasPassed
+													? 'Registration has ended'
+													: `Registration ends ${groupSession.registrationEndDateTimeDescription}`
+											}
+											variant={
+												groupSession.registrationEndDateTimeHasPassed ? 'danger' : 'warning'
+											}
+											description={
+												groupSession.registrationEndDateTimeHasPassed &&
+												`Registration ended on ${groupSession.registrationEndDateTimeDescription}`
+											}
+										/>
+									</Col>
+								</Row>
+							)}
 							<Row>
 								<Col>
-									{isPastEndDateTime ? null : groupSessionReservation ? (
+									{isPastEndDateTime ||
+									groupSession.registrationEndDateTimeHasPassed ? null : groupSessionReservation ? (
 										<Button
 											variant="danger"
 											className="mb-3 d-block w-100"

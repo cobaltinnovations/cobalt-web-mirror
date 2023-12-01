@@ -613,9 +613,9 @@ export const routes: RouteObject[] = [
 						element: <StatsDashboard />,
 					},
 					{
-						// legacy/backwards compatibility
-						path: 'providers/:providerId',
-						element: <Navigate to="/" replace />,
+						id: 'provider-detail',
+						path: 'providers/:urlName',
+						lazy: () => import('@/routes/provider-detail'),
 					},
 					...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
 						? [

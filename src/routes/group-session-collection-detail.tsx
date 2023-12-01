@@ -10,7 +10,6 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import HeroContainer from '@/components/hero-container';
 import StudioEvent from '@/components/studio-event';
 import NoData from '@/components/no-data';
-import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 import { GroupSessionDetailNavigationSource } from './group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 
@@ -57,7 +56,10 @@ export const Component = () => {
 			<HeroContainer className="bg-n75">
 				<p className="mb-5 text-gray fs-large text-center">Group Sessions</p>
 				<h1 className="mb-6 text-center">{groupSessionCollection?.title}</h1>
-				<p className="fs-large text-center">{groupSessionCollection?.description}</p>
+				<p
+					className="fs-large text-center"
+					dangerouslySetInnerHTML={{ __html: groupSessionCollection?.description ?? '' }}
+				/>
 			</HeroContainer>
 
 			<IneligibleBookingModal uiType="group-session" />
@@ -94,8 +96,6 @@ export const Component = () => {
 					</Row>
 				)}
 			</Container>
-
-			<GroupSessionsRequestFooter />
 		</>
 	);
 };
