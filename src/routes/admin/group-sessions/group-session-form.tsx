@@ -225,6 +225,10 @@ function getInitialGroupSessionFormValues({
 				? {
 						title: '',
 						urlName: '',
+						startDate: initialGroupSessionFormValues.startDate,
+						startTime: '',
+						endDate: initialGroupSessionFormValues.endDate,
+						endTime: '',
 				  }
 				: mergedDateInputValues),
 		}
