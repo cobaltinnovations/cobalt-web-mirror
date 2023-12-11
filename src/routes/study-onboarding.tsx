@@ -29,7 +29,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			})
 			.fetch();
 
-		Cookies.set('authRedirectUrl', onboardingResponse.onboardingDestinationUrl);
+		const onboardingUrl = new URL(onboardingResponse.onboardingDestinationUrl);
+		Cookies.set('authRedirectUrl', onboardingUrl.pathname);
 		return redirect(`/auth?accessToken=${accessToken}`);
 	}
 
