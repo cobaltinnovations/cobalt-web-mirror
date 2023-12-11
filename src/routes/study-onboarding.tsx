@@ -24,13 +24,18 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	request.signal.addEventListener('abort', onboardingRequest.abort);
 	const onboardingResponse = await onboardingRequest.fetch();
 
+	// Logic for if the immediate seach param is true
 	if (immediate) {
 		const onboardingUrl = new URL(onboardingResponse.onboardingDestinationUrl);
 
+		// If the user is already authenticated, immediately redirect them to the onboarding url,
+		// skipping the sign-out and permitted account id logic.
 		if (Cookies.get('accessToken')) {
 			return redirect(onboardingUrl.pathname);
 		}
 
+		// If the user is not authenticated, create an anonymous account for them,
+		// set the redirect url to the onboarding url, and direct them to the auth route.
 		const accountRequest = accountService.createAnonymousAccount({ subdomain });
 		request.signal.addEventListener('abort', accountRequest.abort);
 		const { accessToken } = await accountRequest.fetch();
