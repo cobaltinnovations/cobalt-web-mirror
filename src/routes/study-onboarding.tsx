@@ -20,7 +20,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		throw new Error('urlName is undefined.');
 	}
 
-	const onboardingResponse = await studyService.fetchStudyOnboarding(urlName).fetch();
+	const onboardingRequest = studyService.fetchStudyOnboarding(urlName);
+	request.signal.addEventListener('abort', onboardingRequest.abort);
+	const onboardingResponse = await onboardingRequest.fetch();
 
 	if (immediate) {
 		const onboardingUrl = new URL(onboardingResponse.onboardingDestinationUrl);
@@ -29,11 +31,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			return redirect(onboardingUrl.pathname);
 		}
 
-		const { accessToken } = await accountService
-			.createAnonymousAccount({
-				subdomain,
-			})
-			.fetch();
+		const accountRequest = accountService.createAnonymousAccount({ subdomain });
+		request.signal.addEventListener('abort', accountRequest.abort);
+		const { accessToken } = await accountRequest.fetch();
+
 		Cookies.set('authRedirectUrl', onboardingUrl.pathname);
 		return redirect(`/auth?accessToken=${accessToken}`);
 	}
