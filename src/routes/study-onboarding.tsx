@@ -23,13 +23,17 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const onboardingResponse = await studyService.fetchStudyOnboarding(urlName).fetch();
 
 	if (immediate) {
+		const onboardingUrl = new URL(onboardingResponse.onboardingDestinationUrl);
+
+		if (Cookies.get('accessToken')) {
+			return redirect(onboardingUrl.pathname);
+		}
+
 		const { accessToken } = await accountService
 			.createAnonymousAccount({
 				subdomain,
 			})
 			.fetch();
-
-		const onboardingUrl = new URL(onboardingResponse.onboardingDestinationUrl);
 		Cookies.set('authRedirectUrl', onboardingUrl.pathname);
 		return redirect(`/auth?accessToken=${accessToken}`);
 	}
