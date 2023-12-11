@@ -16,6 +16,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const immediate = url.searchParams.get('immediate') === 'true' ? true : false;
 	const subdomain = getSubdomain(url);
 
+	if (!urlName) {
+		throw new Error('urlName is undefined.');
+	}
+
+	const onboardingResponse = await studyService.fetchStudyOnboarding(urlName).fetch();
+
 	if (immediate) {
 		const { accessToken } = await accountService
 			.createAnonymousAccount({
@@ -23,23 +29,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			})
 			.fetch();
 
-		Cookies.set('authRedirectUrl', url.pathname);
+		Cookies.set('authRedirectUrl', onboardingResponse.onboardingDestinationUrl);
 		return redirect(`/auth?accessToken=${accessToken}`);
 	}
 
-	if (!urlName) {
-		throw new Error('urlName is undefined.');
-	}
-
-	const onboardingRequest = studyService.fetchStudyOnboarding(urlName);
-
-	request.signal.addEventListener('abort', () => {
-		onboardingRequest.abort();
-	});
-
-	const response = await onboardingRequest.fetch();
-
-	return response;
+	return onboardingResponse;
 };
 
 export const Component = () => {
