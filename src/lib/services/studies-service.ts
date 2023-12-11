@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 
-interface StudyOnboardingResponse {
+export interface StudyOnboardingResponse {
 	onboardingDestinationUrl: string;
 	permittedAccountSourceIds: string[];
 }
