@@ -8,13 +8,13 @@ import InputHelper from '../input-helper';
 export interface AdminFormNonImageFileInputProps {
 	previewSrc?: string;
 	uploadedFileSrc: string;
-	onUploadedFileSrcChange: (newFileSrc: string) => void;
+	onUploadedFileChange: (newfileUploadId: string, newFileSrc: string) => void;
 }
 
 export const AdminFormNonImageFileInput = ({
 	previewSrc,
 	uploadedFileSrc,
-	onUploadedFileSrcChange,
+	onUploadedFileChange,
 }: AdminFormNonImageFileInputProps) => {
 	const handleError = useHandleError();
 	const [isUploading, setIsUploading] = useState(false);
@@ -40,9 +40,12 @@ export const AdminFormNonImageFileInput = ({
 							filename: file.name,
 						}).fetch
 					)
-						.onPresignedUploadObtained((accessUrl) => {
+						.onPresignedUploadObtained(({ fileUploadResult }) => {
 							setIsUploading(true);
-							onUploadedFileSrcChange(accessUrl);
+							onUploadedFileChange(
+								fileUploadResult.fileUploadId,
+								fileUploadResult.presignedUpload.accessUrl
+							);
 						})
 						.onProgress((percentage) => {
 							setProgress(percentage);
@@ -57,7 +60,7 @@ export const AdminFormNonImageFileInput = ({
 						.start();
 				}}
 				onRemove={() => {
-					onUploadedFileSrcChange('');
+					onUploadedFileChange('', '');
 				}}
 			/>
 

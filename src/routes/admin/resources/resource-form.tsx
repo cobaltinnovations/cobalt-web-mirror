@@ -115,16 +115,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	};
 }
 
+enum RESOURCE_TYPE {
+	URL = 'URL',
+	FILE = 'FILE',
+}
+
 const initialResourceFormValues = {
 	title: '',
 	author: '',
 	contentTypeId: '',
 	contentStatusId: ContentStatusId.DRAFT,
 	durationInMinutes: '',
-	resourceType: 'url' as 'url' | 'file',
+	resourceType: RESOURCE_TYPE.URL as RESOURCE_TYPE,
 	resourceUrl: '',
+	resourceFileUploadId: '',
 	resourceFileUrl: '',
 	isShared: true,
+	imageFileId: '',
 	imageUrl: '',
 	description: '',
 	tagIds: [] as string[],
@@ -581,9 +588,9 @@ export const Component = () => {
 							className="mb-3"
 							id="resource-url"
 							label="URL"
-							checked={formValues.resourceType === 'url'}
+							checked={formValues.resourceType === RESOURCE_TYPE.URL}
 							onChange={() => {
-								updateFormValue('resourceType', 'url');
+								updateFormValue('resourceType', RESOURCE_TYPE.URL);
 							}}
 						>
 							<InputHelper
@@ -600,15 +607,16 @@ export const Component = () => {
 						<ToggledInput
 							id="resource-file"
 							label="File upload"
-							checked={formValues.resourceType === 'file'}
+							checked={formValues.resourceType === RESOURCE_TYPE.FILE}
 							onChange={() => {
-								updateFormValue('resourceType', 'file');
+								updateFormValue('resourceType', RESOURCE_TYPE.FILE);
 							}}
 						>
 							<AdminFormNonImageFileInput
 								previewSrc={formValues.resourceFileUrl}
 								uploadedFileSrc={formValues.resourceFileUrl}
-								onUploadedFileSrcChange={(nextSrc) => {
+								onUploadedFileChange={(nextId, nextSrc) => {
+									updateFormValue('resourceFileUploadId', nextId);
 									updateFormValue('resourceFileUrl', nextSrc);
 								}}
 							/>
@@ -674,7 +682,8 @@ export const Component = () => {
 					>
 						<AdminFormImageInput
 							imageSrc={formValues.imageUrl}
-							onSrcChange={(nextSrc) => {
+							onSrcChange={(nextId, nextSrc) => {
+								updateFormValue('imageFileId', nextId);
 								updateFormValue('imageUrl', nextSrc);
 							}}
 						/>
@@ -834,8 +843,9 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		contentTypeId: formValues.contentTypeId as ContentTypeId,
 		title: formValues.title,
 		author: formValues.author,
-		url: formValues.resourceType === 'url' ? formValues.resourceUrl : formValues.resourceFileUrl,
-		imageUrl: formValues.imageUrl,
+		url: formValues.resourceType === RESOURCE_TYPE.URL ? formValues.resourceUrl : undefined,
+		fileUploadId: formValues.resourceType === RESOURCE_TYPE.FILE ? formValues.resourceFileUploadId : undefined,
+		imageFileUploadId: formValues.imageFileId,
 		durationInMinutes: formValues.durationInMinutes,
 		description: formValues.description,
 		publishStartDate,
@@ -864,7 +874,7 @@ function mutateFormValuesToContentPreview(
 		contentId: '',
 		contentTypeId: formValues.contentTypeId as ContentTypeId,
 		title: formValues.title,
-		url: formValues.resourceType === 'url' ? formValues.resourceUrl : formValues.resourceFileUrl,
+		url: formValues.resourceType === RESOURCE_TYPE.URL ? formValues.resourceUrl : formValues.resourceFileUrl,
 		imageUrl: formValues.imageUrl,
 		description: formValues.description,
 		author: formValues.author,

@@ -3,7 +3,7 @@ import { PresignedUploadResponse } from '@/lib/models';
 interface ImageUploadShape {
 	start: () => this;
 	onBeforeUpload: (callback: (previewImageUrl: string) => void) => this;
-	onPresignedUploadObtained: (callback: (accessUrl: string) => void) => this;
+	onPresignedUploadObtained: (callback: (presignedUpload: PresignedUploadResponse) => void) => this;
 	onProgress: (callback: (percentage: number) => void) => this;
 	onComplete: (callback: (finalImageUrl: string) => void) => this;
 	onError: (callback: (error: any) => void) => this;
@@ -12,7 +12,7 @@ interface ImageUploadShape {
 const maxFileSizeInBytes = 3000000; // 3mb;
 
 export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<PresignedUploadResponse>) => {
-	let onPresignedUploadObtainedCallback: (accessUrl: string) => void;
+	let onPresignedUploadObtainedCallback: (presignedUpload: PresignedUploadResponse) => void;
 	let onProgressCallback: (percentage: number) => void;
 	let onCompleteCallback: (finalImageUrl: string) => void;
 	let onErrorCallback: (error: any) => void;
@@ -52,8 +52,8 @@ export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<P
 				.then(() => {
 					return presignedUploadGetter();
 				})
-				.then(({ fileUploadResult }) => {
-					onPresignedUploadObtainedCallback(fileUploadResult.presignedUpload.accessUrl);
+				.then((presignedUpload) => {
+					onPresignedUploadObtainedCallback(presignedUpload);
 
 					return new Promise((resolve: (accessUrl: string) => void, reject) => {
 						const xhr = new XMLHttpRequest();
@@ -66,7 +66,7 @@ export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<P
 						});
 
 						xhr.addEventListener('load', () => {
-							resolve(fileUploadResult.presignedUpload.accessUrl);
+							resolve(presignedUpload.fileUploadResult.presignedUpload.accessUrl);
 						});
 
 						xhr.addEventListener('error', () => {
@@ -84,15 +84,15 @@ export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<P
 						});
 
 						xhr.open(
-							fileUploadResult.presignedUpload.httpMethod,
-							fileUploadResult.presignedUpload.url,
+							presignedUpload.fileUploadResult.presignedUpload.httpMethod,
+							presignedUpload.fileUploadResult.presignedUpload.url,
 							true
 						);
 
-						for (let httpHeaderName in fileUploadResult.presignedUpload.httpHeaders) {
+						for (let httpHeaderName in presignedUpload.fileUploadResult.presignedUpload.httpHeaders) {
 							xhr.setRequestHeader(
 								httpHeaderName,
-								fileUploadResult.presignedUpload.httpHeaders[httpHeaderName]
+								presignedUpload.fileUploadResult.presignedUpload.httpHeaders[httpHeaderName]
 							);
 						}
 

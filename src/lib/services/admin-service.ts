@@ -15,7 +15,8 @@ export interface CreateContentRequest {
 	title?: string;
 	author?: string;
 	url?: string;
-	imageUrl?: string;
+	fileUploadId?: string;
+	imageFileUploadId?: string;
 	durationInMinutes?: string;
 	description?: string;
 	publishStartDate?: string;

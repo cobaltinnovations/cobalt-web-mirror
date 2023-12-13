@@ -7,7 +7,7 @@ import SessionCropModal from '../session-crop-modal';
 
 export interface AdminFormImageInputProps {
 	imageSrc: string;
-	onSrcChange: (newSrc: string) => void;
+	onSrcChange: (newId: string, newSrc: string) => void;
 }
 
 export const AdminFormImageInput = ({ imageSrc, onSrcChange }: AdminFormImageInputProps) => {
@@ -39,10 +39,9 @@ export const AdminFormImageInput = ({ imageSrc, onSrcChange }: AdminFormImageInp
 						.onBeforeUpload((previewImageUrl) => {
 							setImagePreviewSrc(previewImageUrl);
 						})
-						.onPresignedUploadObtained((accessUrl) => {
+						.onPresignedUploadObtained(({ fileUploadResult }) => {
 							setIsUploading(true);
-
-							onSrcChange(accessUrl);
+							onSrcChange(fileUploadResult.fileUploadId, fileUploadResult.presignedUpload.accessUrl);
 						})
 						.onProgress((percentage) => {
 							setProgress(percentage);
@@ -73,7 +72,7 @@ export const AdminFormImageInput = ({ imageSrc, onSrcChange }: AdminFormImageInp
 					setIsCropModalOpen(true);
 				}}
 				onRemove={() => {
-					onSrcChange('');
+					onSrcChange('', '');
 					setImagePreviewSrc('');
 				}}
 			/>
