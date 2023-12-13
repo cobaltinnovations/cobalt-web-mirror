@@ -155,7 +155,10 @@ function getInitialResourceFormValues({
 		},
 		{
 			...rest,
-			resourceUrl: rest.url,
+			resourceUrl: !rest.fileUploadId ? rest.url : '',
+			resourceType: rest.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
+			resourceFileUploadId: rest.fileUploadId ?? '',
+			resourceFileUrl: rest.fileUploadId ? rest.url : '',
 			isShared: rest.sharedFlag ? rest.sharedFlag : true,
 			publishDate: moment(rest.publishStartDate).toDate(),
 			doesExpire: !!rest.publishEndDate,

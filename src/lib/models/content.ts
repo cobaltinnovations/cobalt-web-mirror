@@ -98,6 +98,7 @@ export type AdminContent = {
 	tags: Tag[];
 	title: string;
 	url: string;
+	fileUploadId: string;
 	views: number;
 
 	// Not seeing in response, but don't remove yet
