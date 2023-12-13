@@ -4,9 +4,9 @@ import {
 	ContentStatusId,
 	ContentStatus,
 	ContentTypeId,
-	PresignedUploadModel,
 	TagGroup,
 	Tag,
+	PresignedUploadResponse,
 } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
@@ -165,9 +165,7 @@ export const adminService = {
 	},
 
 	getPreSignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<{
-			presignedUpload: PresignedUploadModel;
-		}>({
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: 'admin/content/image-presigned-upload',
 			data,
@@ -175,9 +173,7 @@ export const adminService = {
 	},
 
 	getFilePresignedUpload(data: GetPreSignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<{
-			presignedUpload: PresignedUploadModel;
-		}>({
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: '/admin/content/file-presigned-upload',
 			data,

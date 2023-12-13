@@ -1,4 +1,4 @@
-import { PresignedUploadModel } from '@/lib/models';
+import { PresignedUploadResponse } from '@/lib/models';
 
 interface ImageUploadShape {
 	start: () => this;
@@ -11,10 +11,7 @@ interface ImageUploadShape {
 
 const maxFileSizeInBytes = 3000000; // 3mb;
 
-export const imageUploader = (
-	blob: Blob,
-	presignedUploadGetter: () => Promise<{ presignedUpload: PresignedUploadModel }>
-) => {
+export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<PresignedUploadResponse>) => {
 	let onPresignedUploadObtainedCallback: (accessUrl: string) => void;
 	let onProgressCallback: (percentage: number) => void;
 	let onCompleteCallback: (finalImageUrl: string) => void;
@@ -55,8 +52,8 @@ export const imageUploader = (
 				.then(() => {
 					return presignedUploadGetter();
 				})
-				.then(({ presignedUpload }) => {
-					onPresignedUploadObtainedCallback(presignedUpload.accessUrl);
+				.then(({ fileUploadResult }) => {
+					onPresignedUploadObtainedCallback(fileUploadResult.presignedUpload.accessUrl);
 
 					return new Promise((resolve: (accessUrl: string) => void, reject) => {
 						const xhr = new XMLHttpRequest();
@@ -69,7 +66,7 @@ export const imageUploader = (
 						});
 
 						xhr.addEventListener('load', () => {
-							resolve(presignedUpload.accessUrl);
+							resolve(fileUploadResult.presignedUpload.accessUrl);
 						});
 
 						xhr.addEventListener('error', () => {
@@ -86,10 +83,17 @@ export const imageUploader = (
 							});
 						});
 
-						xhr.open(presignedUpload.httpMethod, presignedUpload.url, true);
+						xhr.open(
+							fileUploadResult.presignedUpload.httpMethod,
+							fileUploadResult.presignedUpload.url,
+							true
+						);
 
-						for (let httpHeaderName in presignedUpload.httpHeaders) {
-							xhr.setRequestHeader(httpHeaderName, presignedUpload.httpHeaders[httpHeaderName]);
+						for (let httpHeaderName in fileUploadResult.presignedUpload.httpHeaders) {
+							xhr.setRequestHeader(
+								httpHeaderName,
+								fileUploadResult.presignedUpload.httpHeaders[httpHeaderName]
+							);
 						}
 
 						xhr.send(blob);

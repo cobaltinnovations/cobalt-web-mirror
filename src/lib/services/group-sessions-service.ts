@@ -1,6 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
-	PresignedUploadModel,
 	GroupSessionModel,
 	GroupSessionRequestModel,
 	GroupSessionReservationModel,
@@ -13,16 +12,13 @@ import {
 	GroupSessionLearnMoreMethodId,
 	GroupSessionUrlNameValidationResult,
 	GroupSessionCollectionWithSessionsIncludedModel,
+	PresignedUploadResponse,
 } from '@/lib/models';
 
 // Scheduled
 interface GetPresignedUploadUrlRequestBody {
 	contentType: string;
 	filename: string;
-}
-
-interface GetPresignedUploadUrlResponseBody {
-	presignedUpload: PresignedUploadModel;
 }
 
 export enum GroupSessionSchedulingSystemId {
@@ -202,7 +198,7 @@ export const groupSessionsService = {
 
 	// Scheduled
 	getPresignedUploadUrl(data: GetPresignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<GetPresignedUploadUrlResponseBody>({
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: '/group-sessions/image-presigned-upload',
 			data,
@@ -299,7 +295,7 @@ export const groupSessionsService = {
 
 	// By-request
 	getPresignedUploadUrlForRequest(data: GetPresignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<GetPresignedUploadUrlResponseBody>({
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: '/group-session-requests/image-presigned-upload',
 			data,

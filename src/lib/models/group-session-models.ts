@@ -1,4 +1,3 @@
-import { Method } from 'axios';
 import { GroupSessionSchedulingSystemId } from '../services';
 import { Tag } from './tag-groups';
 
@@ -30,16 +29,6 @@ export enum GROUP_SESSION_SORT_ORDER {
 	REGISTERED_ASCENDING = 'REGISTERED_ASCENDING',
 	CAPACITY_DESCENDING = 'CAPACITY_DESCENDING',
 	CAPACITY_ASCENDING = 'CAPACITY_ASCENDING',
-}
-
-export interface PresignedUploadModel {
-	accessUrl: string;
-	contentType: string;
-	expirationTimestamp: string;
-	expirationTimestampDescription: string;
-	httpHeaders: Record<string, string>;
-	httpMethod: Method;
-	url: string;
 }
 
 export interface ScreeningQuestionV2 {
