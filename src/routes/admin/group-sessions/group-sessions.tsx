@@ -23,10 +23,10 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 import {
 	AdminGroupSessionFilterScheduling,
 	AdminGroupSessionFilterStatus,
+	AdminGroupSessionFilterVisibility,
+	AdminGroupSessionSort,
 	GroupSessionTableDropdown,
 } from '@/components/admin';
-import { AdminGroupSessionSort } from '@/components/admin/admin-group-session-sort';
-import { AdminGroupSessionFilterVisibility } from '@/components/admin/admin-group-session-filter-visibility';
 import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
 
 interface AdminGroupSessionsLoaderData {

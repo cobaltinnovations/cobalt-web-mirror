@@ -378,7 +378,7 @@ const CmsOnYourTime: FC = () => {
 									</TableCell>
 									<TableCell header>My Institution</TableCell>
 									<TableCell header>Other Institutions</TableCell>
-									<TableCell />
+									<TableCell header />
 								</TableRow>
 							</TableHead>
 							<TableBody>

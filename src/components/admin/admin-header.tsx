@@ -183,13 +183,17 @@ export const AdminHeader = () => {
 			// 	title: 'Scheduling',
 			// 	active: !!schedulingMatch,
 			// },
-			// {
-			// 	testId: '',
-			// 	navigationItemId: 'ANALYTICS',
-			// 	to: '/admin/analytics',
-			// 	title: 'Analytics',
-			// 	active: !!analyticsMatch,
-			// },
+			...(account?.accountCapabilityFlags.canViewAnalytics
+				? [
+						{
+							testId: '',
+							navigationItemId: 'ANALYTICS',
+							to: '/admin/analytics',
+							title: 'Analytics',
+							active: !!analyticsMatch,
+						},
+				  ]
+				: []),
 			...(config.COBALT_WEB_SHOW_DEBUG === 'true'
 				? [
 						{
@@ -205,7 +209,9 @@ export const AdminHeader = () => {
 		[
 			account?.accountCapabilityFlags.canAdministerContent,
 			account?.accountCapabilityFlags.canAdministerGroupSessions,
+			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
+			analyticsMatch,
 			availableContentMatch,
 			debugMatch,
 			groupSessionsMatch,

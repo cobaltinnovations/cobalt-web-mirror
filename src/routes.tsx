@@ -92,7 +92,6 @@ export const CreateOnYourTimeContent = lazyLoadWithRefresh(
 export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
 export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
 export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
-export const StatsDashboard = lazyLoadWithRefresh(() => import('@/pages/stats-dashboard'));
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
 
@@ -178,6 +177,8 @@ const RedirectToAdminHome = () => {
 		return <Navigate to="group-sessions" />;
 	} else if (account?.accountCapabilityFlags.canViewProviderReports) {
 		return <Navigate to="reports" />;
+	} else if (account?.accountCapabilityFlags.canViewAnalytics) {
+		return <Navigate to="analytics" />;
 	} else {
 		return <NoMatch />;
 	}
@@ -620,7 +621,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'stats-dashboard',
-						element: <StatsDashboard />,
+						element: <RedirectToAdminPathOrRender pathname="analytics" element={<NoMatch />} />,
 					},
 					{
 						id: 'provider-detail',
@@ -821,9 +822,20 @@ export const routes: RouteObject[] = [
 								element: <>TODO: Scheduling</>,
 							},
 							{
-								id: 'admin-analytics',
+								id: 'admin-analytics-layout',
 								path: 'analytics',
-								element: <>TODO: Analytics</>,
+								lazy: () => import('@/routes/admin/analytics/layout'),
+								children: [
+									{
+										index: true,
+										element: <Navigate to="overview" />,
+									},
+									{
+										id: 'admin-analytics-dashboard-tab',
+										path: ':dashboardTab',
+										lazy: () => import('@/routes/admin/analytics/dashboard-tab'),
+									},
+								],
 							},
 							{
 								id: 'admin-debug',
