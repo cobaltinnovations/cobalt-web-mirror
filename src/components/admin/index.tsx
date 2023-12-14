@@ -2,6 +2,8 @@ export * from './admin-form-footer';
 export * from './admin-form-image-input';
 export * from './admin-form-non-image-file-input';
 export * from './admin-form-section';
+export * from './admin-analytics-widget-card';
+export * from './admin-analytics-widget-group';
 export * from './admin-group-session-filter-scheduling';
 export * from './admin-group-session-filter-status';
 export * from './admin-group-session-filter-visibility';

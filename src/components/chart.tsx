@@ -1,230 +1,159 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Card } from 'react-bootstrap';
-import { Bar, Line } from 'react-chartjs-2';
+import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
+import { AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
+import { ChartDataset, LinearScaleOptions } from 'chart.js';
 import Color from 'color';
+import React, { useMemo } from 'react';
+import { Bar, Pie } from 'react-chartjs-2';
+import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
+import { DeepPartial } from 'chart.js/dist/types/utils';
 
-import { Chart as ChartModel } from '@/lib/models';
-
-import { useCobaltTheme } from '@/jss/theme';
-
-interface Dataset {
-	id: string;
+interface ChartProps {
 	label: string;
-	data: number[];
-	backgroundColor?: string;
-	borderColor?: string;
-	pointBackgroundColor?: string;
+	data: AdminAnalyticsWidgetChartData[];
 }
 
-interface Props {
-	configuration: ChartModel;
-}
+const useChartStyles = createUseThemedStyles((theme) => ({
+	labelCell: {
+		borderRight: `1px solid ${theme.colors.n100}`,
+	},
+}));
 
-enum CHART_TYPE_ID {
-	BAR = 'BAR',
-	LINE = 'LINE',
-}
+const defaultScaleOptions: DeepPartial<LinearScaleOptions> = {
+	border: {
+		dash: [4, 4],
+	},
+	grid: {
+		color: '#bdbdbd',
+		lineWidth: 1,
+		tickWidth: 0,
+	},
+};
 
-interface Dataset {
-	id: string;
-	label: string;
-	data: number[];
-	backgroundColor?: string;
-	borderColor?: string;
-	pointBackgroundColor?: string;
-}
+const BarChart = ({ label, data }: ChartProps) => {
+	const theme = useCobaltTheme();
+	const classes = useChartStyles();
 
-export const Chart: FC<Props> = ({ configuration }) => {
-	const { colors, fonts } = useCobaltTheme();
-	const [labels, setLabels] = useState<string[]>([]);
-	const [datasets, setDatasets] = useState<Dataset[]>([]);
+	const chartData = useMemo(() => {
+		const labels: string[] = [];
 
-	useEffect(() => {
-		const formattedDatasets: Dataset[] = [];
-		const formattedLabels = configuration.elements.flatMap((element) => element.description);
+		const dataset = data.reduce<ChartDataset<'bar', number[]>>(
+			(acc, point, index, arr) => {
+				labels.push(point.label);
+				acc.data.push(point.count);
 
-		configuration.elements.forEach((element) => {
-			element.metrics.forEach((metric) => {
-				const existingDataset = formattedDatasets.find((fd) => fd.id === metric.metricTypeId);
+				const legendColor =
+					point.color ||
+					Color(theme.colors.p500)
+						.lighten(index * (1 / arr.length))
+						.hex();
 
-				if (existingDataset) {
-					existingDataset.data.push(metric.count);
-				} else {
-					formattedDatasets.push({
-						id: metric.metricTypeId,
-						label: metric.description,
-						data: [metric.count],
-						backgroundColor: metric.color,
-						borderColor: metric.color,
-						pointBackgroundColor: metric.color,
-					});
-				}
-			});
-		});
-
-		setDatasets(formattedDatasets);
-		setLabels(formattedLabels);
-	}, [configuration.elements]);
-
-	const chartOptions = {
-		layout: {
-			padding: {
-				top: 50, // Extra on the top to make some room for the tooltip
+				Array.isArray(acc.backgroundColor) && acc.backgroundColor.push(legendColor);
+				return acc;
 			},
-		},
-		plugins: {
-			legend: {
-				position: 'bottom',
-				labels: {
-					boxWidth: 6,
-					boxHeight: 6,
-					color: colors.n900,
-					font: {
-						family: fonts.bodyNormal.fontFamily,
-						weight: fonts.bodyNormal.fontWeight,
-						size: 11,
-						lineHeight: '14px',
-					},
-					padding: 15,
-					usePointStyle: true,
-				},
-			},
-			tooltip: {
-				backgroundColor: colors.n900,
-				bodyFontColor: colors.n0,
-				titleFont: {
-					family: fonts.bodyNormal.fontFamily,
-					weight: fonts.bodyNormal.fontWeight,
-					size: 12,
-				},
-				bodyFont: {
-					family: fonts.bodyNormal.fontFamily,
-					weight: fonts.bodyNormal.fontWeight,
-					size: 12,
-				},
-				callbacks: {
-					label: (context: any) => {
-						return `${context.dataset.label}: ${context.formattedValue}`;
-					},
-				},
-				caretPadding: 8,
-				caretSize: 6,
-				displayColors: false,
-				yAlign: 'bottom',
-				xAlign: 'center',
-				padding: {
-					x: 15,
-					y: 8,
-				},
-				cornerRadius: 0,
-			},
-		},
-		elements: {
-			point: {
-				radius: 0,
-				borderWidth: 0,
-				hitRadius: 15,
-				hoverRadius: 5,
-				hoverBorderWidth: 2,
-				hoverBackgroundColor: colors.n0,
-			},
-			line: {
-				tension: 0,
-				borderWidth: 2,
-			},
-		},
-		responsive: true,
-		maintainAspectRatio: false,
-		scales: {
-			x: {
-				stacked: true,
-				grid: {
-					display: false,
-					tickLength: 0,
-					borderColor: colors.border,
-				},
-				ticks: {
-					color: colors.n900,
-					padding: 5,
-					font: {
-						family: fonts.bodyNormal.fontFamily,
-						weight: fonts.bodyNormal.fontWeight,
-						size: 11,
-						lineHeight: '14px',
-					},
-				},
-			},
-			y: {
-				stacked: true,
-				beginAtZero: true,
-				grid: {
-					borderDash: [3, 2],
-					color: (context: any) => {
-						if (context.tick.value > 0) {
-							return colors.border;
-						}
+			{
+				label,
+				data: [],
+				backgroundColor: [],
+				barPercentage: 0.25,
+			}
+		);
 
-						return 'transparent';
-					},
-					drawBorder: false,
-					tickLength: 0,
-				},
-				ticks: {
-					padding: 20,
-					color: colors.n900,
-					font: {
-						family: fonts.bodyNormal.fontFamily,
-						weight: fonts.bodyNormal.fontWeight,
-						size: 11,
-						lineHeight: '14px',
-					},
-				},
-			},
-		},
-	};
-
-	const chartData = useCallback(
-		(canvas: HTMLCanvasElement) => {
-			const ctx = canvas.getContext('2d');
-			let gradient: string | CanvasGradient = 'transparent';
-
-			return {
-				labels,
-				datasets: datasets.map((ds) => {
-					if (ctx) {
-						gradient = ctx.createLinearGradient(0, 0, 0, 250);
-						gradient.addColorStop(0, Color(ds.backgroundColor).alpha(1).string());
-						gradient.addColorStop(1, Color(ds.backgroundColor).alpha(0).string());
-					}
-
-					return {
-						...ds,
-						fill: true,
-						backgroundColor:
-							configuration.displayPreferenceId === CHART_TYPE_ID.LINE ? gradient : ds.backgroundColor,
-					};
-				}),
-			};
-		},
-		[configuration.displayPreferenceId, datasets, labels]
-	);
+		return {
+			labels,
+			datasets: [dataset],
+		};
+	}, [data, label, theme.colors.p500]);
 
 	return (
-		<Card>
-			<Card.Header>
-				<Card.Title>{configuration.title}</Card.Title>
-				<Card.Subtitle>{configuration.detail}</Card.Subtitle>
-			</Card.Header>
-			<Card.Body>
-				{configuration.displayPreferenceId === CHART_TYPE_ID.LINE && (
-					// @ts-ignore
-					<Line height={340} data={chartData} options={chartOptions} />
-				)}
-				{configuration.displayPreferenceId === CHART_TYPE_ID.BAR && (
-					// @ts-ignore
-					<Bar height={340} data={chartData} options={chartOptions} />
-				)}
-			</Card.Body>
-		</Card>
+		<>
+			<Bar
+				options={{
+					scales: {
+						x: defaultScaleOptions,
+						y: defaultScaleOptions,
+					},
+					plugins: {
+						legend: {
+							display: false,
+						},
+					},
+				}}
+				data={chartData}
+			/>
+
+			<Table className="mt-10">
+				<TableHead>
+					<TableRow>
+						<TableCell header />
+						<TableCell header className="text-right">
+							{label}
+						</TableCell>
+					</TableRow>
+				</TableHead>
+
+				<TableBody>
+					{data.map((bar, rowIdx) => {
+						return (
+							<TableRow key={rowIdx}>
+								<TableCell header className={classes.labelCell}>
+									{bar.label}
+								</TableCell>
+								<TableCell className="text-right">{bar.count}</TableCell>
+							</TableRow>
+						);
+					})}
+				</TableBody>
+			</Table>
+		</>
 	);
 };
+
+const PieChart = ({ label, data }: ChartProps) => {
+	const theme = useCobaltTheme();
+
+	const chartData = useMemo(() => {
+		const labels: string[] = [];
+
+		const dataset = data.reduce<ChartDataset<'pie', number[]>>(
+			(acc, point, index, arr) => {
+				labels.push(point.label);
+				acc.data.push(point.count);
+
+				const legendColor = Color(theme.colors.p500)
+					.lighten(index * (1 / arr.length))
+					.hex();
+
+				Array.isArray(acc.backgroundColor) && acc.backgroundColor.push(legendColor);
+				return acc;
+			},
+			{
+				label,
+				data: [],
+				backgroundColor: [],
+			}
+		);
+
+		return {
+			labels,
+			datasets: [dataset],
+		};
+	}, [data, label, theme.colors.p500]);
+
+	return (
+		<Pie
+			options={{
+				plugins: {
+					legend: {
+						position: 'right',
+					},
+				},
+			}}
+			data={chartData}
+		/>
+	);
+};
+
+export const Chart = {
+	Bar: BarChart,
+	Pie: PieChart,
+} as const;

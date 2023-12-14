@@ -201,7 +201,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 								{recentOrders.length !== 0 && <Menu.Header>Recent</Menu.Header>}
 
 								{resultOptions.map((item, index) => {
-									const result = item as typeof resultOptions[number];
+									const result = item as (typeof resultOptions)[number];
 									if (!result.isRecent) {
 										return null;
 									}
@@ -231,7 +231,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 						)}
 
 						{resultOptions.map((item, index) => {
-							const result = item as typeof resultOptions[number];
+							const result = item as (typeof resultOptions)[number];
 							if (!result.isSearchResult) {
 								return null;
 							}

@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
+import { Link, To } from 'react-router-dom';
 
 interface UseStylesProps {
 	vertical: boolean;
@@ -23,7 +24,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 			flexDirection: ({ vertical }: UseStylesProps) => (vertical ? 'column' : 'row'),
 			'& li': {
 				position: 'relative',
-				'& button': {
+				'& button, a': {
+					display: 'block',
+					textDecoration: 'none',
 					border: 0,
 					fontWeight: 500,
 					padding: ({ vertical }: UseStylesProps) => (vertical ? '10px 16px' : '18px 12px'),
@@ -39,7 +42,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 					paddingLeft: 16,
 				},
 				'&.active': {
-					'& button': {
+					'& button, a': {
 						color: theme.colors.p700,
 					},
 					'&:after': {
@@ -54,7 +57,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 					},
 				},
 				'&:first-child': {
-					'& button': {
+					'& button, a': {
 						paddingLeft: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
 					},
 					'&.active:after': {
@@ -62,7 +65,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 					},
 				},
 				'&:last-child': {
-					'& button': {
+					'& button, a': {
 						paddingRight: ({ vertical }: UseStylesProps) => (vertical ? undefined : 0),
 					},
 					'&.active:after': {
@@ -77,14 +80,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface TabBarProps {
 	orientation?: 'horizontal' | 'vertical';
 	value: string;
-	tabs: { value: string; title: string; level?: number }[];
-	onTabClick(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	tabs: { value: string; title: string; level?: number; to?: To }[];
+	onTabClick?(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	renderAsLinks?: boolean;
 	hideBorder?: boolean;
 	className?: string;
 	style?: React.CSSProperties;
 }
 
-const TabBar = ({ orientation = 'horizontal', value, tabs, onTabClick, hideBorder, className, style }: TabBarProps) => {
+const TabBar = ({
+	orientation = 'horizontal',
+	value,
+	tabs,
+	onTabClick,
+	renderAsLinks = false,
+	hideBorder,
+	className,
+	style,
+}: TabBarProps) => {
 	const classes = useStyles({
 		vertical: orientation === 'vertical',
 		hideBorder: !!hideBorder,
@@ -102,14 +115,18 @@ const TabBar = ({ orientation = 'horizontal', value, tabs, onTabClick, hideBorde
 								[`level-${tab.level}`]: tab.level ?? 0,
 							})}
 						>
-							<button
-								type="button"
-								onClick={(event) => {
-									onTabClick(tab.value, event);
-								}}
-							>
-								{tab.title}
-							</button>
+							{!!tab.to ? (
+								<Link to={tab.to}>{tab.title}</Link>
+							) : (
+								<button
+									type="button"
+									onClick={(event) => {
+										onTabClick?.(tab.value, event);
+									}}
+								>
+									{tab.title}
+								</button>
+							)}
 						</li>
 					);
 				})}
