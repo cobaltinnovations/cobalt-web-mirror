@@ -153,6 +153,7 @@ const initialGroupSessionFormValues = {
 	endTime: '',
 	endDate: moment().add(2, 'd').toDate() as Date | null,
 	imageUrl: '',
+	imageFileUploadId: '',
 	description: '',
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
@@ -835,7 +836,8 @@ export const Component = () => {
 			>
 				<AdminFormImageInput
 					imageSrc={formValues.imageUrl}
-					onSrcChange={(nextSrc) => {
+					onSrcChange={(nextId, nextSrc) => {
+						updateFormValue('imageFileUploadId', nextId);
 						updateFormValue('imageUrl', nextSrc);
 					}}
 				/>
@@ -1707,6 +1709,9 @@ function prepareGroupSessionSubmission(
 
 	if (!groupSessionSubmission.imageUrl) {
 		delete groupSessionSubmission.imageUrl;
+	}
+	if (!groupSessionSubmission.imageFileUploadId) {
+		delete groupSessionSubmission.imageFileUploadId;
 	}
 
 	if (groupSessionSubmission.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL) {

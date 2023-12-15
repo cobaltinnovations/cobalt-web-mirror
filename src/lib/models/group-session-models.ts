@@ -109,6 +109,7 @@ export interface GroupSessionModel {
 	facilitatorAccountId?: string;
 	scheduleUrl?: string;
 	imageUrl?: string;
+	imageFileUploadId?: string;
 	groupSessionLocationTypeId: GroupSessionLocationTypeId;
 	videoconferenceUrl?: string;
 	inPersonLocation?: string;
