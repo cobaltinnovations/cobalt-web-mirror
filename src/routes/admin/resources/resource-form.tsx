@@ -147,25 +147,27 @@ function getInitialResourceFormValues({
 }: {
 	adminContent?: AdminContent | null;
 }): typeof initialResourceFormValues {
-	const { ...rest } = adminContent ?? ({} as AdminContent);
-
-	return Object.assign(
-		{
-			...initialResourceFormValues,
-		},
-		{
-			...rest,
-			resourceUrl: !rest.fileUploadId ? rest.url : '',
-			resourceType: rest.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
-			resourceFileUploadId: rest.fileUploadId ?? '',
-			resourceFileUrl: rest.fileUploadId ? rest.url : '',
-			isShared: rest.sharedFlag ? rest.sharedFlag : true,
-			publishDate: moment(rest.publishStartDate).toDate(),
-			doesExpire: !!rest.publishEndDate,
-			expirationDate: moment(rest.publishEndDate).toDate(),
-			isRecurring: rest.publishRecurring,
-		}
-	);
+	return {
+		title: adminContent?.title ?? '',
+		author: adminContent?.author ?? '',
+		contentTypeId: adminContent?.contentTypeId ?? '',
+		contentStatusId: adminContent?.contentStatusId ?? ContentStatusId.DRAFT,
+		durationInMinutes: String(adminContent?.durationInMinutes) ?? '',
+		resourceType: adminContent?.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
+		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
+		resourceFileUploadId: adminContent?.fileUploadId ?? '',
+		resourceFileUrl: adminContent?.fileUploadId ? adminContent?.url : '',
+		isShared: adminContent?.sharedFlag ? adminContent?.sharedFlag : true,
+		imageFileId: adminContent?.imageFileUploadId ?? '',
+		imageUrl: adminContent?.imageUrl ?? '',
+		description: adminContent?.description ?? '',
+		tagIds: adminContent?.tagIds ?? [],
+		searchTerms: adminContent?.searchTerms ?? '',
+		publishDate: adminContent?.publishStartDate ? moment(adminContent.publishStartDate).toDate() : new Date(),
+		doesExpire: !!adminContent?.publishEndDate,
+		expirationDate: adminContent?.publishEndDate ? moment(adminContent.publishEndDate).toDate() : null,
+		isRecurring: adminContent?.publishRecurring ?? false,
+	};
 }
 
 export const Component = () => {

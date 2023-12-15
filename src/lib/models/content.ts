@@ -84,6 +84,7 @@ export type AdminContent = {
 	durationInMinutes?: number;
 	durationInMinutesDescription?: string;
 	imageUrl: string;
+	imageFileUploadId: string;
 	inUseCount: number;
 	inUseInstitutionDescription: string;
 	isEditable: boolean;
