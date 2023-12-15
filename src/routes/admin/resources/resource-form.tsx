@@ -849,7 +849,10 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		title: formValues.title,
 		author: formValues.author,
 		url: formValues.resourceType === RESOURCE_TYPE.URL ? formValues.resourceUrl : undefined,
-		fileUploadId: formValues.resourceType === RESOURCE_TYPE.FILE ? formValues.resourceFileUploadId : undefined,
+		...(formValues.resourceType === RESOURCE_TYPE.FILE &&
+			formValues.resourceFileUploadId && {
+				fileUploadId: formValues.resourceFileUploadId,
+			}),
 		...(formValues.imageFileId && { imageFileUploadId: formValues.imageFileId }),
 		durationInMinutes: formValues.durationInMinutes,
 		description: formValues.description,
