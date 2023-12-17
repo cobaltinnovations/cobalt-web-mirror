@@ -57,7 +57,7 @@ export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps)
 				<div className="d-flex align-items-center justify-content-between">
 					<div>
 						<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
-						<p className={classNames('my-4', classes.cardTotal)}>{widget.widgetTotal}</p>
+						<p className={classNames('my-4', classes.cardTotal)}>{widget.widgetTotalDescription}</p>
 						{widget.widgetSubtitle && <p className="mb-0">{widget.widgetSubtitle}</p>}
 					</div>
 
