@@ -6,6 +6,7 @@ import { buildQueryParamUrl } from '@/lib/utils';
 export interface AdminAnalyticsWidgetChartData {
 	label: string;
 	count: number;
+	countDescription: string;
 	color: string;
 }
 
@@ -26,34 +27,36 @@ interface BaseAdminAnalyticsWidget {
 }
 
 export interface AdminAnalyticsCounterWidget extends BaseAdminAnalyticsWidget {
-	widgetTypeId: 'counter';
-	widgetTotal: string;
+	widgetTypeId: 'COUNTER';
+	widgetTotal: number;
+	widgetTotalDescription: string;
 }
 
 export interface AdminAnalyticsChartWidget extends BaseAdminAnalyticsWidget {
-	widgetTypeId: 'bar-chart' | 'pie-chart';
-	widgetTotal: string;
+	widgetTypeId: 'BAR_CHART' | 'PIE_CHART';
+	widgetTotal: number;
+	widgetTotalDescription: string;
 	widgetChartLabel: string;
 	widgetData: AdminAnalyticsWidgetChartData[];
 }
 
 export interface AdminAnalyticsTableWidget extends BaseAdminAnalyticsWidget {
-	widgetTypeId: 'table';
+	widgetTypeId: 'TABLE';
 	widgetData: AdminAnalyticsWidgetTableData;
 }
 
 export type AdminAnalyticsWidget = AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsTableWidget;
 
 export function isCounterWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsCounterWidget {
-	return widget.widgetTypeId === 'counter';
+	return widget.widgetTypeId === 'COUNTER';
 }
 
 export function isChartWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsChartWidget {
-	return widget.widgetTypeId === 'bar-chart' || widget.widgetTypeId === 'pie-chart';
+	return widget.widgetTypeId === 'BAR_CHART' || widget.widgetTypeId === 'PIE_CHART';
 }
 
 export function isTableWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsTableWidget {
-	return widget.widgetTypeId === 'table';
+	return widget.widgetTypeId === 'TABLE';
 }
 
 export interface AdminAnalyticsWidgetsRequestParams {

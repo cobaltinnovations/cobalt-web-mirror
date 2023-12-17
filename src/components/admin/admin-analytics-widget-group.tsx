@@ -30,9 +30,9 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 							<AnalyticsWidgetCard
 								widget={widget}
 								chart={
-									widget.widgetTypeId === 'pie-chart' ? (
+									widget.widgetTypeId === 'PIE_CHART' ? (
 										<Chart.Pie label={widget.widgetChartLabel} data={widget.widgetData} />
-									) : widget.widgetTypeId === 'bar-chart' ? (
+									) : widget.widgetTypeId === 'BAR_CHART' ? (
 										<Chart.Bar label={widget.widgetChartLabel} data={widget.widgetData} />
 									) : null
 								}
