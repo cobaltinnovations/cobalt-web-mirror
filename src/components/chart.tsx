@@ -98,7 +98,7 @@ const BarChart = ({ label, data }: ChartProps) => {
 								<TableCell header className={classes.labelCell}>
 									{bar.label}
 								</TableCell>
-								<TableCell className="text-right">{bar.count}</TableCell>
+								<TableCell className="text-right">{bar.countDescription}</TableCell>
 							</TableRow>
 						);
 					})}
