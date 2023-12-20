@@ -512,7 +512,7 @@ export const Component = () => {
 															</div>
 
 															{content.newFlag && (
-																<div className="ms-auto">
+																<div>
 																	<Badge pill>New</Badge>
 																</div>
 															)}
