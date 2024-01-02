@@ -67,6 +67,7 @@ export type Content = {
 	durationInMinutesDescription: string;
 	tagIds: string[];
 	tags?: Tag[];
+	preventEmbedding: boolean;
 };
 
 export type AdminContent = {
@@ -101,6 +102,7 @@ export type AdminContent = {
 	url: string;
 	fileUploadId: string;
 	views: number;
+	preventEmbedding: boolean;
 
 	// Not seeing in response, but don't remove yet
 	publishRecurring: boolean;

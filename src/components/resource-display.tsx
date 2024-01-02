@@ -103,7 +103,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 						{content?.duration && <>&bull; {content?.durationInMinutesDescription}</>}
 					</p>
 
-					{canEmbed ? (
+					{!content?.preventEmbedding && canEmbed ? (
 						<div className={classNames(classes.reactPlayerOuter, 'mb-14')}>
 							<ReactPlayer
 								width="100%"

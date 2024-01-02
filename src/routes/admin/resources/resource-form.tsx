@@ -140,6 +140,7 @@ const initialResourceFormValues = {
 	doesExpire: false,
 	expirationDate: null as Date | null,
 	isRecurring: false,
+	preventEmbedding: false,
 };
 
 function getInitialResourceFormValues({
@@ -167,6 +168,7 @@ function getInitialResourceFormValues({
 		doesExpire: !!adminContent?.publishEndDate,
 		expirationDate: adminContent?.publishEndDate ? moment(adminContent.publishEndDate).toDate() : null,
 		isRecurring: adminContent?.publishRecurring ?? false,
+		preventEmbedding: adminContent?.preventEmbedding ?? false,
 	};
 }
 
@@ -899,5 +901,6 @@ function mutateFormValuesToContentPreview(
 		durationInMinutesDescription: `${formValues.durationInMinutes} min`,
 		tagIds: formValues.tagIds,
 		tags: formValues.tagIds.map((tagId) => flattendTags.find((tag) => tag.tagId === tagId)!),
+		preventEmbedding: formValues.preventEmbedding,
 	};
 }
