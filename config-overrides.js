@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const { aliasJest, aliasWebpack } = require('react-app-alias');
 const path = require('path');
+const { resolve } = require('path');
 const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 const aliasOptions = {};
@@ -63,6 +64,7 @@ module.exports.webpack = function (config, env) {
 	config = extendSvgLoader(config, fileReplaceLoader);
 	config = extendInternalBabelLoader(config, fileReplaceLoader);
 	config = addJsonLoader(config, fileReplaceLoader);
+	config = addEnvironmentLoader(config, env);
 
 	return config;
 };
@@ -145,4 +147,26 @@ function extendIncludedPaths(initialInclude) {
 			return tokenized.join('/');
 		}),
 	];
+}
+
+function addEnvironmentLoader(config, env) {
+	const environmentOverridePath = path.join(
+		__dirname,
+		'src',
+		'environments',
+		`environment.env${env === 'production' ? '.prod' : '.dev'}.ts`
+	);
+
+	config.module.rules.push({
+		test: /\.env\.ts$/,
+		loader: 'file-replace-loader',
+		include: [path.resolve(__dirname, 'src', 'environments')],
+		options: {
+			condition: 'if-replacement-exists',
+			replacement: resolve(environmentOverridePath),
+			async: true,
+		},
+	});
+
+	return config;
 }
