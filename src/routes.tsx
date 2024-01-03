@@ -1,4 +1,4 @@
-import config from '@/lib/config';
+import config from '@/config/config';
 
 import {
 	ProviderManagementBasics,
@@ -628,7 +628,7 @@ export const routes: RouteObject[] = [
 						path: 'providers/:urlName',
 						lazy: () => import('@/routes/provider-detail'),
 					},
-					...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
+					...(config.providerManagementFeature
 						? [
 								{
 									path: 'providers/:providerId/profile',
@@ -840,7 +840,7 @@ export const routes: RouteObject[] = [
 							{
 								id: 'admin-debug',
 								path: 'debug',
-								element: <ToggledOutlet isEnabled={() => config.COBALT_WEB_SHOW_DEBUG === 'true'} />,
+								element: <ToggledOutlet isEnabled={() => config.showDebug} />,
 								children: [
 									{
 										index: true,

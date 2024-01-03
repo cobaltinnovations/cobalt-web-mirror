@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const { aliasJest, aliasWebpack } = require('react-app-alias');
 const path = require('path');
-const { resolve } = require('path');
 const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 const aliasOptions = {};
@@ -64,7 +63,7 @@ module.exports.webpack = function (config, env) {
 	config = extendSvgLoader(config, fileReplaceLoader);
 	config = extendInternalBabelLoader(config, fileReplaceLoader);
 	config = addJsonLoader(config, fileReplaceLoader);
-	config = addEnvironmentLoader(config, env);
+	config = addConfigLoader(config);
 
 	return config;
 };
@@ -149,21 +148,18 @@ function extendIncludedPaths(initialInclude) {
 	];
 }
 
-function addEnvironmentLoader(config, env) {
-	const environmentOverridePath = path.join(
-		__dirname,
-		'src',
-		'environments',
-		`environment.env${env === 'production' ? '.prod' : '.dev'}.ts`
-	);
+function addConfigLoader(config) {
+	const configPath = path.join(__dirname, 'src', 'config', `config.${process.env.COBALT_WEB_CONFIG}.ts`);
+
+	console.log('configPath:', configPath);
 
 	config.module.rules.push({
-		test: /\.env\.ts$/,
+		test: /config\.ts$/,
 		loader: 'file-replace-loader',
-		include: [path.resolve(__dirname, 'src', 'environments')],
+		include: [path.resolve(__dirname, 'src', 'config')],
 		options: {
 			condition: 'if-replacement-exists',
-			replacement: resolve(environmentOverridePath),
+			replacement: path.resolve(configPath),
 			async: true,
 		},
 	});

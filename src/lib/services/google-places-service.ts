@@ -1,4 +1,4 @@
-import config from '@/lib/config';
+import config from '@/config/config';
 import { EpicPatientData } from './account-service';
 
 type AddressSelectCallback = (address: { formatted: string; extracted: EpicPatientData['address'] }) => void;
@@ -23,7 +23,7 @@ export const googlePlacesService = {
 				resolve();
 			};
 
-			script.src = `https://maps.googleapis.com/maps/api/js?key=${config.COBALT_WEB_GOOGLE_MAPS_API_KEY}&libraries=places`; // load by url
+			script.src = `https://maps.googleapis.com/maps/api/js?key=${config.googleMapsApiKey}&libraries=places`; // load by url
 			document.getElementsByTagName('head')[0].appendChild(script); // append to head
 		});
 	},

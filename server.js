@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const cheerio = require('cheerio');
 const yn = require('yn');
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
@@ -47,63 +46,6 @@ const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
-const INSTITUTION_BUILDS = fs
-	.readdirSync(BUILD_DIR, { withFileTypes: true })
-	.filter((file) => file.isDirectory())
-	.map((dir) => dir.name);
-
-function configureReactApp() {
-	const fe_envVars = [
-		'COBALT_WEB_API_BASE_URL',
-		'COBALT_WEB_GA_TRACKING_ID',
-		'COBALT_WEB_GA4_MEASUREMENT_ID',
-		'COBALT_WEB_MIXPANEL_ID',
-		'COBALT_WEB_SHOW_DEBUG',
-		'COBALT_WEB_SENTRY_SHOW_DEBUG',
-		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
-		'COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE',
-		'COBALT_WEB_DOWN_FOR_MAINTENANCE',
-	];
-
-	const reactAppConfig = Object.entries(process.env)
-		.filter(([envVar]) => fe_envVars.includes(envVar))
-		.reduce(
-			(env, [envVar, value]) => {
-				env[envVar] = value;
-				return env;
-			},
-			// starts with settings from file -- allows env to override
-			{
-				COBALT_WEB_API_BASE_URL: settings.reactApp.apiBaseUrl,
-				COBALT_WEB_GA_TRACKING_ID: settings.reactApp.gaTrackingId,
-				COBALT_WEB_GA4_MEASUREMENT_ID: settings.reactApp.ga4MeasurementId,
-				COBALT_WEB_MIXPANEL_ID: settings.reactApp.mixpanelId,
-				COBALT_WEB_SHOW_DEBUG: settings.reactApp.showDebug,
-				COBALT_WEB_SENTRY_SHOW_DEBUG: settings.sentry.showDebug,
-				COBALT_WEB_GOOGLE_MAPS_API_KEY: settings.reactApp.googleMapsApiKey,
-				COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE: settings.reactApp.providerManagementFeatureEnabled,
-				COBALT_WEB_DOWN_FOR_MAINTENANCE: settings.reactApp.downForMaintenance,
-			}
-		);
-
-	for (const institutionBuild of INSTITUTION_BUILDS) {
-		const INDEX_FILE_PATH = path.join(BUILD_DIR, institutionBuild, 'index.html');
-		const indexFile = fs.readFileSync(INDEX_FILE_PATH, 'utf8');
-		const $ = cheerio.load(indexFile);
-		const appConfigScript = $('script#react-app-env-config');
-
-		// clear config from previous start, if any
-		if (appConfigScript.length > 0) {
-			appConfigScript.remove();
-		}
-
-		$('head').append(
-			`<script id="react-app-env-config" type="application/json">${JSON.stringify(reactAppConfig)}</script>`
-		);
-
-		fs.writeFileSync(INDEX_FILE_PATH, $.html());
-	}
-}
 
 function extractCookieValueFromRequest(_req, cookieName) {
 	const {
@@ -121,8 +63,6 @@ function extractCookieValueFromRequest(_req, cookieName) {
 
 	return undefined;
 }
-
-configureReactApp();
 
 const app = express();
 

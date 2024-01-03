@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import config from '@/lib/config';
+import config from '@/config/config';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useRenderJsonStyles = createUseThemedStyles((theme) => ({
@@ -21,7 +21,7 @@ interface RenderJsonProps {
 const RenderJson: FC<RenderJsonProps> = (props) => {
 	const classes = useRenderJsonStyles();
 
-	if (config.COBALT_WEB_SHOW_DEBUG === 'true') {
+	if (config.showDebug) {
 		return <pre className={classes.renderJson}>{JSON.stringify(props.json, null, 4)}</pre>;
 	}
 

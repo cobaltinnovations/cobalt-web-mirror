@@ -10,7 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import config from '@/lib/config';
+import config from '@/config/config';
 
 export const ADMIN_HEADER_HEIGHT = 56;
 
@@ -194,7 +194,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(config.COBALT_WEB_SHOW_DEBUG === 'true'
+			...(config.showDebug
 				? [
 						{
 							testId: '',
