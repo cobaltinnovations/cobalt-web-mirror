@@ -165,7 +165,7 @@ export const adminService = {
 		});
 	},
 
-	getPreSignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
+	getPresignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
 		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: 'admin/content/image-presigned-upload',

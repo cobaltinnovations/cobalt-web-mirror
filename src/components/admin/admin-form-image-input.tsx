@@ -1,16 +1,17 @@
-import { v4 as uuidv4 } from 'uuid';
 import useHandleError from '@/hooks/use-handle-error';
-import { groupSessionsService, imageUploader } from '@/lib/services';
+import { imageUploader } from '@/lib/services';
 import React, { useState } from 'react';
 import ImageUploadCard from '../image-upload-card';
 import SessionCropModal from '../session-crop-modal';
+import { PresignedUploadResponse } from '@/lib/models';
 
 export interface AdminFormImageInputProps {
 	imageSrc: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
+	presignedUploadGetter: (blob: Blob) => () => Promise<PresignedUploadResponse>;
 }
 
-export const AdminFormImageInput = ({ imageSrc, onSrcChange }: AdminFormImageInputProps) => {
+export const AdminFormImageInput = ({ imageSrc, onSrcChange, presignedUploadGetter }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 	const [cropModalImageSrc, setCropModalImageSrc] = useState(imageSrc);
@@ -29,13 +30,7 @@ export const AdminFormImageInput = ({ imageSrc, onSrcChange }: AdminFormImageInp
 				onSave={async (blob) => {
 					setIsCropModalOpen(false);
 
-					imageUploader(
-						blob,
-						groupSessionsService.getPresignedUploadUrl({
-							contentType: blob.type,
-							filename: `${uuidv4()}.jpg`,
-						}).fetch
-					)
+					imageUploader(blob, presignedUploadGetter(blob))
 						.onBeforeUpload((previewImageUrl) => {
 							setImagePreviewSrc(previewImageUrl);
 						})

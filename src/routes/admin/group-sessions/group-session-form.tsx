@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
@@ -839,6 +840,12 @@ export const Component = () => {
 					onSrcChange={(nextId, nextSrc) => {
 						updateFormValue('imageFileUploadId', nextId);
 						updateFormValue('imageUrl', nextSrc);
+					}}
+					presignedUploadGetter={(blob) => {
+						return groupSessionsService.getPresignedUploadUrl({
+							contentType: blob.type,
+							filename: `${uuidv4()}.jpg`,
+						}).fetch;
 					}}
 				/>
 
