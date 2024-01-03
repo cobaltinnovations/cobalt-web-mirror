@@ -51,9 +51,7 @@ yarn-error.log*
 /config/local/dev/*
 !config/local/dev/settings.js
 
-/src/config/config.demo.ts
-/src/config/config.dev.ts
-/src/config/config.local.ts
-/src/config/config.penn-dev.ts
-/src/config/config.penn-prod.ts
-/src/config/config.prod.ts
+!/src/config/
+/src/config/*
+!/src/config/config-models.ts
+!/src/config/config.ts
