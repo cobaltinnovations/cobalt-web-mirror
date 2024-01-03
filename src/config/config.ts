@@ -1,31 +1,17 @@
-const config = {
-	apiBaseUrl: 'xxx',
-	picApiBaseUrl: 'xxx',
+import { iConfig } from '@/config/config-models';
+
+const config: iConfig = {
+	apiBaseUrl: 'http://localhost:8080/',
 	providerManagementFeature: false,
 	downForMaintenance: false,
-
-	ssoUrl: 'xxx',
-	disableSignIn: false,
 
 	gaTrackingId: 'xxx',
 	ga4MeasurementId: 'xxx',
 	mixPanelId: 'xxx',
-	googleMapsApiKey: 'xxx',
-
-	fingerprintingEnabled: false,
-	fingerprintingToken: 'xxx',
-	fingerprintingEndpoint: 'xxx',
 
 	showDebug: false,
 
-	localhostSubdomain: 'xxx',
-	targetInstitution: 'xxx',
-
-	picClientId: 'xxx',
-	picPatientScopes: 'xxx',
-	picOpServer: 'xxx',
-	picRedirectUrl: 'xxx',
-	picResponseType: 'xxx',
+	localhostSubdomain: undefined,
 
 	authRedirectUrls: [],
 	storageKeys: {

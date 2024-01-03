@@ -24,16 +24,6 @@ let settings = {
 		},
 		subdomainMapping: process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt',
 	},
-	reactApp: {
-		apiBaseUrl: '',
-		gaTrackingId: '',
-		ga4MeasurementId: '',
-		mixpanelId: '',
-		showDebug: false,
-		googleMapsApiKey: '',
-		providerManagementFeatureEnabled: false,
-		downForMaintenance: false,
-	},
 };
 
 try {

@@ -69,7 +69,7 @@ export const ConnectWithSupportMentalHealthProviders = lazyLoadWithRefresh(
 export const ConnectWithSupportMentalHealthRecommendations = lazyLoadWithRefresh(
 	() => import('@/pages/connect-with-support-mental-health-recommendations')
 );
-export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
+
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
 export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
@@ -420,10 +420,6 @@ export const routes: RouteObject[] = [
 							{
 								path: 'connect-with-support/:urlName',
 								element: <ConnectWithSupportV2 />,
-							},
-							{
-								path: 'ehr-lookup',
-								element: <EhrLookup />,
 							},
 						],
 					},
