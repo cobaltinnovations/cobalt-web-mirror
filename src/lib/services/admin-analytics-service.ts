@@ -83,14 +83,45 @@ export const adminAnalyticsService = {
 		const startOf7DaysAgoFormatted = startOf7DaysAgo.format('MMM DD, YYYY');
 		const startOf30DaysAgo = moment().subtract(30, 'days').startOf('day');
 		const startOf30DaysAgoFormatted = startOf30DaysAgo.format('MMM DD, YYYY');
-		const startOf90DaysAgo = moment().subtract(90, 'days').startOf('day');
-		const startOf90DaysAgoFormatted = startOf90DaysAgo.format('MMM DD, YYYY');
-		const startOf12MonthsAgo = moment().subtract(12, 'months').startOf('day');
-		const startOf12MonthsAgoFormatted = startOf12MonthsAgo.format('MMM DD, YYYY');
-		const startOfThisYear = moment().startOf('year').startOf('day');
-		const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
+		//const startOf90DaysAgo = moment().subtract(90, 'days').startOf('day');
+		//const startOf90DaysAgoFormatted = startOf90DaysAgo.format('MMM DD, YYYY');
+		//const startOf12MonthsAgo = moment().subtract(12, 'months').startOf('day');
+		//const startOf12MonthsAgoFormatted = startOf12MonthsAgo.format('MMM DD, YYYY');
+
+		const startOfYesterday = moment().subtract(1, 'days').startOf('day');
+		const endOfYesterday = moment().subtract(1, 'days').endOf('day');
+
+		const startOfWeek = moment().startOf('week').startOf('day');
+		const startOfWeekDescription = startOfWeek.format('MMM DD, YYYY');
+
+		const startOfMonth = moment().startOf('month').startOf('day');
+		const startOfMonthDescription = startOfMonth.format('MMM DD, YYYY');
+
+		//const startOfThisYear = moment().startOf('year').startOf('day');
+		//const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
 
 		return [
+			{
+				label: 'Yesterday',
+				startDate: startOfYesterday.format('YYYY-MM-DD'),
+				startDateDescription: startOfYesterday.format('MMM DD, YYYY'),
+				endDate: endOfYesterday.format('YYYY-MM-DD'),
+				endDateDescription: endOfYesterday.format('MMM DD, YYYY'),
+			},
+			{
+				label: 'Last week',
+				startDate: startOfWeek.format('YYYY-MM-DD'),
+				startDateDescription: startOfWeekDescription,
+				endDate: today.format('YYYY-MM-DD'),
+				endDateDescription: todayFormatted,
+			},
+			{
+				label: 'Last month',
+				startDate: startOfMonth.format('YYYY-MM-DD'),
+				startDateDescription: startOfMonthDescription,
+				endDate: today.format('YYYY-MM-DD'),
+				endDateDescription: todayFormatted,
+			},
 			{
 				label: 'Last 7 days',
 				startDate: startOf7DaysAgo.format('YYYY-MM-DD'),
@@ -105,27 +136,27 @@ export const adminAnalyticsService = {
 				endDate: today.format('YYYY-MM-DD'),
 				endDateDescription: todayFormatted,
 			},
-			{
-				label: 'Last 90 days',
-				startDate: startOf90DaysAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf90DaysAgoFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
-			{
-				label: 'Last 12 months',
-				startDate: startOf12MonthsAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf12MonthsAgoFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
-			{
-				label: 'This year',
-				startDate: startOfThisYear.format('YYYY-MM-DD'),
-				startDateDescription: startOfThisYearFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
+			// {
+			// 	label: 'Last 90 days',
+			// 	startDate: startOf90DaysAgo.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOf90DaysAgoFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
+			// {
+			// 	label: 'Last 12 months',
+			// 	startDate: startOf12MonthsAgo.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOf12MonthsAgoFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
+			// {
+			// 	label: 'This year',
+			// 	startDate: startOfThisYear.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOfThisYearFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
 		];
 	},
 
