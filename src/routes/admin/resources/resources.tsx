@@ -179,67 +179,70 @@ export const Component = () => {
 		setSearchParams(searchParams);
 	};
 
-	const filters = [
-		{
-			name: 'Owner',
-			searchParam: 'institutionId',
-			initialValue: searchParams.get('institutionId'),
-			active: searchParams.get('institutionId') !== null,
-			options:
-				contentFilters?.institutions?.map((institutionOption) => ({
-					label: institutionOption.name,
-					value: institutionOption.institutionId,
-				})) ?? [],
-		},
-		{
-			name: 'Status',
-			searchParam: 'contentStatusId',
-			initialValue: searchParams.get('contentStatusId'),
-			active: searchParams.get('contentStatusId') !== null,
-			options:
-				contentStatuses.map((contentStatusOption) => ({
-					label: contentStatusOption.description,
-					value: contentStatusOption.contentStatusId,
-				})) ?? [],
-		},
-		{
-			name: 'Type',
-			searchParam: 'contentTypeId',
-			initialValue: searchParams.get('contentTypeId'),
-			active: searchParams.get('contentTypeId') !== null,
-			options:
-				contentFilters?.contentTypes?.map((contentTypeOption) => ({
-					label: contentTypeOption.description,
-					value: contentTypeOption.contentTypeId,
-				})) ?? [],
-		},
-		{
-			name: 'Tag',
-			searchParam: 'tagId',
-			initialValue: searchParams.get('tagId'),
-			active: searchParams.get('tagId') !== null,
-			options: tags.map((tag) => ({
-				label: tag.name,
-				value: tag.tagId,
-			})),
-		},
-		{
-			name: 'Sharing',
-			searchParam: 'sharingOn',
-			initialValue: searchParams.get('sharingOn'),
-			active: searchParams.get('sharingOn') !== null,
-			options: [
-				{
-					label: 'On',
-					value: 'true',
-				},
-				{
-					label: 'Off',
-					value: 'false',
-				},
-			],
-		},
-	];
+	const filters = useMemo(
+		() => [
+			{
+				name: 'Owner',
+				searchParam: 'institutionId',
+				initialValue: searchParams.get('institutionId'),
+				active: searchParams.get('institutionId') !== null,
+				options:
+					contentFilters?.institutions?.map((institutionOption) => ({
+						label: institutionOption.name,
+						value: institutionOption.institutionId,
+					})) ?? [],
+			},
+			{
+				name: 'Status',
+				searchParam: 'contentStatusId',
+				initialValue: searchParams.get('contentStatusId'),
+				active: searchParams.get('contentStatusId') !== null,
+				options:
+					contentStatuses.map((contentStatusOption) => ({
+						label: contentStatusOption.description,
+						value: contentStatusOption.contentStatusId,
+					})) ?? [],
+			},
+			{
+				name: 'Type',
+				searchParam: 'contentTypeId',
+				initialValue: searchParams.get('contentTypeId'),
+				active: searchParams.get('contentTypeId') !== null,
+				options:
+					contentFilters?.contentTypes?.map((contentTypeOption) => ({
+						label: contentTypeOption.description,
+						value: contentTypeOption.contentTypeId,
+					})) ?? [],
+			},
+			{
+				name: 'Tag',
+				searchParam: 'tagId',
+				initialValue: searchParams.get('tagId'),
+				active: searchParams.get('tagId') !== null,
+				options: tags.map((tag) => ({
+					label: tag.name,
+					value: tag.tagId,
+				})),
+			},
+			{
+				name: 'Sharing',
+				searchParam: 'sharingOn',
+				initialValue: searchParams.get('sharingOn'),
+				active: searchParams.get('sharingOn') !== null,
+				options: [
+					{
+						label: 'On',
+						value: 'true',
+					},
+					{
+						label: 'Off',
+						value: 'false',
+					},
+				],
+			},
+		],
+		[contentFilters?.contentTypes, contentFilters?.institutions, contentStatuses, searchParams, tags]
+	);
 
 	const sortOptions = [
 		{
@@ -300,6 +303,17 @@ export const Component = () => {
 		[content]
 	);
 
+	useEffect(() => {
+		const initialNextFilters = filters.reduce((accumulator, currentValue) => {
+			return {
+				...accumulator,
+				[currentValue.searchParam]: searchParams.get(currentValue.searchParam),
+			};
+		}, {} as typeof nextFilters);
+
+		setNextFilters(initialNextFilters);
+	}, [filters, searchParams]);
+
 	return (
 		<>
 			<Container fluid className="px-8 py-8">
@@ -359,12 +373,6 @@ export const Component = () => {
 											searchParams.delete(filterConfig.searchParam);
 											searchParams.delete('page');
 											setSearchParams(searchParams);
-										}}
-										onHide={() => {
-											setNextFilters({
-												...nextFilters,
-												[filterConfig.searchParam]: searchParams.get(filterConfig.searchParam),
-											});
 										}}
 										confirmText="Apply"
 										onConfirm={() => {
