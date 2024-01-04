@@ -1,4 +1,5 @@
 import { AdminAnalyticsWidgetGroup } from '@/components/admin';
+import InlineAlert from '@/components/inline-alert';
 import {
 	AdminAnalyticsWidgetsRequestParams,
 	AdminAnalyticsWidgetsResponse,
@@ -62,9 +63,27 @@ export const Component = () => {
 	return (
 		<Await resolve={analyticsWidgetsResponsePromise}>
 			{(data: AdminAnalyticsWidgetsResponse) => {
-				return data.analyticsWidgetGroups.map((group, index) => {
-					return <AdminAnalyticsWidgetGroup key={index} widgets={group.widgets} className="mb-10" />;
-				});
+				return (
+					<>
+						{(data.alerts ?? []).length > 0 && (
+							<div className="mb-8">
+								{(data.alerts ?? []).map((alert) => {
+									return (
+										<InlineAlert
+											variant="warning"
+											className="mb-2"
+											title={alert.title}
+											description={alert.message}
+										/>
+									);
+								})}
+							</div>
+						)}
+						{data.analyticsWidgetGroups.map((group, index) => {
+							return <AdminAnalyticsWidgetGroup key={index} widgets={group.widgets} className="mb-10" />;
+						})}
+					</>
+				);
 			}}
 		</Await>
 	);

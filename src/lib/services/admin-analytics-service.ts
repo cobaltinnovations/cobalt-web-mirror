@@ -2,6 +2,7 @@ import moment from 'moment';
 
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
+import { InstitutionAlert } from '@/lib/models';
 
 export interface AdminAnalyticsWidgetChartData {
 	label: string;
@@ -70,6 +71,7 @@ export interface AdminAnalyticsWidgetGroup {
 
 export interface AdminAnalyticsWidgetsResponse {
 	analyticsWidgetGroups: AdminAnalyticsWidgetGroup[];
+	alerts: InstitutionAlert[];
 }
 
 export const adminAnalyticsService = {
