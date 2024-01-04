@@ -19,7 +19,7 @@ import { AdminContentResponse, ContentIdResponse, adminService } from '@/lib/ser
 
 interface AdminResourcesTableDropdownProps {
 	content: AdminContent;
-	onRefresh: (content?: AdminContent) => void;
+	onRefresh: (action: AdminContentAction, content?: AdminContent) => void;
 }
 
 interface ActionItemProps {
@@ -214,9 +214,9 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 
 													if (actionProps.requiresRefresh) {
 														if (response && 'content' in response) {
-															onRefresh(response.content);
+															onRefresh(action, response.content);
 														} else {
-															onRefresh();
+															onRefresh(action);
 														}
 													}
 

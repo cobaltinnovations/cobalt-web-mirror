@@ -285,7 +285,7 @@ export const Component = () => {
 	const contentTotalCount = content?.totalCount ?? 0;
 
 	const replaceContent = useCallback(
-		(newContent?: AdminContent) => {
+		(_action: AdminContentAction, newContent?: AdminContent) => {
 			if (!newContent) {
 				return;
 			}
@@ -574,7 +574,10 @@ export const Component = () => {
 																				.addContent(content.contentId)
 																				.fetch();
 
-																			replaceContent(response.content);
+																			replaceContent(
+																				AdminContentAction.ADD,
+																				response.content
+																			);
 																		} catch (e) {
 																			handleError(e);
 																		} finally {
