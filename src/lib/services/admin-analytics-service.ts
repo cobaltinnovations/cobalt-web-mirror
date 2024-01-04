@@ -2,6 +2,7 @@ import moment from 'moment';
 
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
+import { InstitutionAlert } from '@/lib/models';
 
 export interface AdminAnalyticsWidgetChartData {
 	label: string;
@@ -70,6 +71,7 @@ export interface AdminAnalyticsWidgetGroup {
 
 export interface AdminAnalyticsWidgetsResponse {
 	analyticsWidgetGroups: AdminAnalyticsWidgetGroup[];
+	alerts: InstitutionAlert[];
 }
 
 export const adminAnalyticsService = {
@@ -81,14 +83,45 @@ export const adminAnalyticsService = {
 		const startOf7DaysAgoFormatted = startOf7DaysAgo.format('MMM DD, YYYY');
 		const startOf30DaysAgo = moment().subtract(30, 'days').startOf('day');
 		const startOf30DaysAgoFormatted = startOf30DaysAgo.format('MMM DD, YYYY');
-		const startOf90DaysAgo = moment().subtract(90, 'days').startOf('day');
-		const startOf90DaysAgoFormatted = startOf90DaysAgo.format('MMM DD, YYYY');
-		const startOf12MonthsAgo = moment().subtract(12, 'months').startOf('day');
-		const startOf12MonthsAgoFormatted = startOf12MonthsAgo.format('MMM DD, YYYY');
-		const startOfThisYear = moment().startOf('year').startOf('day');
-		const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
+		//const startOf90DaysAgo = moment().subtract(90, 'days').startOf('day');
+		//const startOf90DaysAgoFormatted = startOf90DaysAgo.format('MMM DD, YYYY');
+		//const startOf12MonthsAgo = moment().subtract(12, 'months').startOf('day');
+		//const startOf12MonthsAgoFormatted = startOf12MonthsAgo.format('MMM DD, YYYY');
+
+		const startOfYesterday = moment().subtract(1, 'days').startOf('day');
+		const endOfYesterday = moment().subtract(1, 'days').endOf('day');
+
+		const startOfLastWeek = moment().subtract(1, 'week').startOf('week').startOf('day');
+		const endOfLastWeek = moment().subtract(1, 'week').endOf('week').endOf('day');
+
+		const startOfLastMonth = moment().subtract(1, 'month').startOf('month').startOf('day');
+		const endOfLastMonth = moment().subtract(1, 'month').endOf('month').endOf('day');
+
+		//const startOfThisYear = moment().startOf('year').startOf('day');
+		//const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
 
 		return [
+			{
+				label: 'Yesterday',
+				startDate: startOfYesterday.format('YYYY-MM-DD'),
+				startDateDescription: startOfYesterday.format('MMM DD, YYYY'),
+				endDate: endOfYesterday.format('YYYY-MM-DD'),
+				endDateDescription: endOfYesterday.format('MMM DD, YYYY'),
+			},
+			{
+				label: 'Last week',
+				startDate: startOfLastWeek.format('YYYY-MM-DD'),
+				startDateDescription: startOfLastWeek.format('MMM DD, YYYY'),
+				endDate: endOfLastWeek.format('YYYY-MM-DD'),
+				endDateDescription: endOfLastWeek.format('MMM DD, YYYY'),
+			},
+			{
+				label: 'Last month',
+				startDate: startOfLastMonth.format('YYYY-MM-DD'),
+				startDateDescription: startOfLastMonth.format('MMM DD, YYYY'),
+				endDate: endOfLastMonth.format('YYYY-MM-DD'),
+				endDateDescription: endOfLastMonth.format('MMM DD, YYYY'),
+			},
 			{
 				label: 'Last 7 days',
 				startDate: startOf7DaysAgo.format('YYYY-MM-DD'),
@@ -103,27 +136,27 @@ export const adminAnalyticsService = {
 				endDate: today.format('YYYY-MM-DD'),
 				endDateDescription: todayFormatted,
 			},
-			{
-				label: 'Last 90 days',
-				startDate: startOf90DaysAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf90DaysAgoFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
-			{
-				label: 'Last 12 months',
-				startDate: startOf12MonthsAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf12MonthsAgoFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
-			{
-				label: 'This year',
-				startDate: startOfThisYear.format('YYYY-MM-DD'),
-				startDateDescription: startOfThisYearFormatted,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
-			},
+			// {
+			// 	label: 'Last 90 days',
+			// 	startDate: startOf90DaysAgo.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOf90DaysAgoFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
+			// {
+			// 	label: 'Last 12 months',
+			// 	startDate: startOf12MonthsAgo.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOf12MonthsAgoFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
+			// {
+			// 	label: 'This year',
+			// 	startDate: startOfThisYear.format('YYYY-MM-DD'),
+			// 	startDateDescription: startOfThisYearFormatted,
+			// 	endDate: today.format('YYYY-MM-DD'),
+			// 	endDateDescription: todayFormatted,
+			// },
 		];
 	},
 
