@@ -91,11 +91,11 @@ export const adminAnalyticsService = {
 		const startOfYesterday = moment().subtract(1, 'days').startOf('day');
 		const endOfYesterday = moment().subtract(1, 'days').endOf('day');
 
-		const startOfWeek = moment().startOf('week').startOf('day');
-		const startOfWeekDescription = startOfWeek.format('MMM DD, YYYY');
+		const startOfLastWeek = moment().subtract(1, 'week').startOf('week').startOf('day');
+		const endOfLastWeek = moment().subtract(1, 'week').endOf('week').endOf('day');
 
-		const startOfMonth = moment().startOf('month').startOf('day');
-		const startOfMonthDescription = startOfMonth.format('MMM DD, YYYY');
+		const startOfLastMonth = moment().subtract(1, 'month').startOf('month').startOf('day');
+		const endOfLastMonth = moment().subtract(1, 'month').endOf('month').endOf('day');
 
 		//const startOfThisYear = moment().startOf('year').startOf('day');
 		//const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
@@ -110,17 +110,17 @@ export const adminAnalyticsService = {
 			},
 			{
 				label: 'Last week',
-				startDate: startOfWeek.format('YYYY-MM-DD'),
-				startDateDescription: startOfWeekDescription,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
+				startDate: startOfLastWeek.format('YYYY-MM-DD'),
+				startDateDescription: startOfLastWeek.format('MMM DD, YYYY'),
+				endDate: endOfLastWeek.format('YYYY-MM-DD'),
+				endDateDescription: endOfLastWeek.format('MMM DD, YYYY'),
 			},
 			{
 				label: 'Last month',
-				startDate: startOfMonth.format('YYYY-MM-DD'),
-				startDateDescription: startOfMonthDescription,
-				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
+				startDate: startOfLastMonth.format('YYYY-MM-DD'),
+				startDateDescription: startOfLastMonth.format('MMM DD, YYYY'),
+				endDate: endOfLastMonth.format('YYYY-MM-DD'),
+				endDateDescription: endOfLastMonth.format('MMM DD, YYYY'),
 			},
 			{
 				label: 'Last 7 days',
