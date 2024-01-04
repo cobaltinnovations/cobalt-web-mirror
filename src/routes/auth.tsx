@@ -56,7 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	try {
 		const parsedRedirectUrl = new URL(window.location.origin + authRedirectUrl);
-		authRedirectUrl = parsedRedirectUrl.pathname;
+		authRedirectUrl = parsedRedirectUrl.pathname + parsedRedirectUrl.search;
 	} catch (e) {
 		// bad authRedirectUrl from queryParam/cookie
 		authRedirectUrl = '/';
