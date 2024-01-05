@@ -285,7 +285,7 @@ export const Component = () => {
 	const contentTotalCount = content?.totalCount ?? 0;
 
 	const replaceContent = useCallback(
-		(_action: AdminContentAction, newContent?: AdminContent) => {
+		(action: AdminContentAction, newContent?: AdminContent) => {
 			if (!newContent) {
 				return;
 			}
@@ -295,7 +295,11 @@ export const Component = () => {
 				content?.adminContent.findIndex((ac) => ac.contentId === newContent.contentId) ?? -1;
 
 			if (contentClone && contentIndexToReplace > -1) {
-				contentClone.adminContent[contentIndexToReplace] = newContent;
+				if (action === AdminContentAction.DELETE) {
+					contentClone.adminContent.splice(contentIndexToReplace, 1);
+				} else {
+					contentClone.adminContent[contentIndexToReplace] = newContent;
+				}
 			}
 
 			setContent(contentClone);
