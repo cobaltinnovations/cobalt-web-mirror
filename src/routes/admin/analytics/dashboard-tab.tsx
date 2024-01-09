@@ -2,7 +2,11 @@ import { AdminAnalyticsWidgetGroup } from '@/components/admin';
 import InlineAlert from '@/components/inline-alert';
 import Loader from '@/components/loader';
 import useHandleError from '@/hooks/use-handle-error';
-import { AdminAnalyticsWidgetsResponse, adminAnalyticsService } from '@/lib/services/admin-analytics-service';
+import {
+	AdminAnalyticsWidgetsResponse,
+	DATE_OPTION_KEYS,
+	adminAnalyticsService,
+} from '@/lib/services/admin-analytics-service';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -13,10 +17,13 @@ export const Component = () => {
 	const { dashboardTab } = useParams<{ dashboardTab: string }>();
 	const [searchParams] = useSearchParams();
 	const startDate = useMemo(
-		() => searchParams.get('startDate') ?? dateOptions[0].startDate,
+		() => searchParams.get('startDate') ?? dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].startDate,
 		[dateOptions, searchParams]
 	);
-	const endDate = useMemo(() => searchParams.get('endDate') ?? dateOptions[0].endDate, [dateOptions, searchParams]);
+	const endDate = useMemo(
+		() => searchParams.get('endDate') ?? dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].endDate,
+		[dateOptions, searchParams]
+	);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [data, setData] = useState<AdminAnalyticsWidgetsResponse>();
