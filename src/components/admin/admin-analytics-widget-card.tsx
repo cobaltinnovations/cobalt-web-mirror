@@ -150,7 +150,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 															key={nestedCellIdx}
 															className={getCellClasses(nestedCellIdx)}
 														>
-															{nestedCell}
+															<div dangerouslySetInnerHTML={{ __html: nestedCell }} />
 														</TableCell>
 													);
 												})}
@@ -168,7 +168,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									{row.data.map((cell, cellIdx) => {
 										return (
 											<TableCell key={cellIdx} className={getCellClasses(cellIdx)}>
-												{cell}
+												<div dangerouslySetInnerHTML={{ __html: cell }} />
 											</TableCell>
 										);
 									})}
