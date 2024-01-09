@@ -74,90 +74,77 @@ export interface AdminAnalyticsWidgetsResponse {
 	alerts: InstitutionAlert[];
 }
 
+export enum DATE_OPTION_KEYS {
+	YESTERDAY = 'YESTERDAY',
+	LAST_WEEK = 'LAST_WEEK',
+	LAST_MONTH = 'LAST_MONTH',
+	LAST_7_DAYS = 'LAST_7_DAYS',
+	LAST_30_DAYS = 'LAST_30_DAYS',
+}
+
+interface DateOption {
+	dateOptionId: DATE_OPTION_KEYS;
+	label: string;
+	startDate: string;
+	startDateDescription: string;
+	endDate: string;
+	endDateDescription: string;
+}
+
 export const adminAnalyticsService = {
-	getDateOptions() {
+	getDateOptions(): Record<DATE_OPTION_KEYS, DateOption> {
 		const today = moment();
-		const todayFormatted = today.format('MMM DD, YYYY');
-
 		const startOf7DaysAgo = moment().subtract(7, 'days').startOf('day');
-		const startOf7DaysAgoFormatted = startOf7DaysAgo.format('MMM DD, YYYY');
 		const startOf30DaysAgo = moment().subtract(30, 'days').startOf('day');
-		const startOf30DaysAgoFormatted = startOf30DaysAgo.format('MMM DD, YYYY');
-		//const startOf90DaysAgo = moment().subtract(90, 'days').startOf('day');
-		//const startOf90DaysAgoFormatted = startOf90DaysAgo.format('MMM DD, YYYY');
-		//const startOf12MonthsAgo = moment().subtract(12, 'months').startOf('day');
-		//const startOf12MonthsAgoFormatted = startOf12MonthsAgo.format('MMM DD, YYYY');
-
 		const startOfYesterday = moment().subtract(1, 'days').startOf('day');
 		const endOfYesterday = moment().subtract(1, 'days').endOf('day');
-
 		const startOfLastWeek = moment().subtract(1, 'week').startOf('week').startOf('day');
 		const endOfLastWeek = moment().subtract(1, 'week').endOf('week').endOf('day');
-
 		const startOfLastMonth = moment().subtract(1, 'month').startOf('month').startOf('day');
 		const endOfLastMonth = moment().subtract(1, 'month').endOf('month').endOf('day');
 
-		//const startOfThisYear = moment().startOf('year').startOf('day');
-		//const startOfThisYearFormatted = startOfThisYear.format('MMM DD, YYYY');
-
-		return [
-			{
+		return {
+			[DATE_OPTION_KEYS.YESTERDAY]: {
+				dateOptionId: DATE_OPTION_KEYS.YESTERDAY,
 				label: 'Yesterday',
 				startDate: startOfYesterday.format('YYYY-MM-DD'),
 				startDateDescription: startOfYesterday.format('MMM DD, YYYY'),
 				endDate: endOfYesterday.format('YYYY-MM-DD'),
 				endDateDescription: endOfYesterday.format('MMM DD, YYYY'),
 			},
-			{
+			[DATE_OPTION_KEYS.LAST_WEEK]: {
+				dateOptionId: DATE_OPTION_KEYS.LAST_WEEK,
 				label: 'Last week',
 				startDate: startOfLastWeek.format('YYYY-MM-DD'),
 				startDateDescription: startOfLastWeek.format('MMM DD, YYYY'),
 				endDate: endOfLastWeek.format('YYYY-MM-DD'),
 				endDateDescription: endOfLastWeek.format('MMM DD, YYYY'),
 			},
-			{
+			[DATE_OPTION_KEYS.LAST_MONTH]: {
+				dateOptionId: DATE_OPTION_KEYS.LAST_MONTH,
 				label: 'Last month',
 				startDate: startOfLastMonth.format('YYYY-MM-DD'),
 				startDateDescription: startOfLastMonth.format('MMM DD, YYYY'),
 				endDate: endOfLastMonth.format('YYYY-MM-DD'),
 				endDateDescription: endOfLastMonth.format('MMM DD, YYYY'),
 			},
-			{
+			[DATE_OPTION_KEYS.LAST_7_DAYS]: {
+				dateOptionId: DATE_OPTION_KEYS.LAST_7_DAYS,
 				label: 'Last 7 days',
 				startDate: startOf7DaysAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf7DaysAgoFormatted,
+				startDateDescription: startOf7DaysAgo.format('MMM DD, YYYY'),
 				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
+				endDateDescription: today.format('MMM DD, YYYY'),
 			},
-			{
+			[DATE_OPTION_KEYS.LAST_30_DAYS]: {
+				dateOptionId: DATE_OPTION_KEYS.LAST_30_DAYS,
 				label: 'Last 30 days',
 				startDate: startOf30DaysAgo.format('YYYY-MM-DD'),
-				startDateDescription: startOf30DaysAgoFormatted,
+				startDateDescription: startOf30DaysAgo.format('MMM DD, YYYY'),
 				endDate: today.format('YYYY-MM-DD'),
-				endDateDescription: todayFormatted,
+				endDateDescription: today.format('MMM DD, YYYY'),
 			},
-			// {
-			// 	label: 'Last 90 days',
-			// 	startDate: startOf90DaysAgo.format('YYYY-MM-DD'),
-			// 	startDateDescription: startOf90DaysAgoFormatted,
-			// 	endDate: today.format('YYYY-MM-DD'),
-			// 	endDateDescription: todayFormatted,
-			// },
-			// {
-			// 	label: 'Last 12 months',
-			// 	startDate: startOf12MonthsAgo.format('YYYY-MM-DD'),
-			// 	startDateDescription: startOf12MonthsAgoFormatted,
-			// 	endDate: today.format('YYYY-MM-DD'),
-			// 	endDateDescription: todayFormatted,
-			// },
-			// {
-			// 	label: 'This year',
-			// 	startDate: startOfThisYear.format('YYYY-MM-DD'),
-			// 	startDateDescription: startOfThisYearFormatted,
-			// 	endDate: today.format('YYYY-MM-DD'),
-			// 	endDateDescription: todayFormatted,
-			// },
-		];
+		};
 	},
 
 	getOverview(params: AdminAnalyticsWidgetsRequestParams): {
