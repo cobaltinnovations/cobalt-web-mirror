@@ -517,10 +517,9 @@ export const Component = () => {
 																>
 																	{content.title}
 																</Link>
-
-																<p className={'mb-0'}>
-																	<small>{content.author}</small>
-																</p>
+																<small className="text-truncate">
+																	{content.author}
+																</small>
 															</div>
 
 															{content.newFlag && (
