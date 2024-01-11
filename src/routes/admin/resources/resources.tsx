@@ -484,7 +484,7 @@ export const Component = () => {
 
 											return (
 												<TableRow key={content.contentId}>
-													<TableCell>{content.dateCreatedDescription}</TableCell>
+													<TableCell>{content.dateAddedToInstitutionDescription}</TableCell>
 
 													<TableCell width={460}>
 														<div className="d-flex align-items-center">

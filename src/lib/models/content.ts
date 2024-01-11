@@ -108,4 +108,5 @@ export type AdminContent = {
 	publishRecurring: boolean;
 	searchTerms: string;
 	contentStatusDescription: string;
+	dateAddedToInstitutionDescription: string;
 };
