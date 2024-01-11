@@ -159,7 +159,7 @@ function getInitialResourceFormValues({
 		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
 		resourceFileUploadId: adminContent?.fileUploadId ?? '',
 		resourceFileUrl: adminContent?.fileUploadId ? adminContent?.url : '',
-		isShared: adminContent?.sharedFlag ? adminContent?.sharedFlag : true,
+		isShared: adminContent?.sharedFlag !== undefined ? adminContent?.sharedFlag : true,
 		imageFileId: adminContent?.imageFileUploadId ?? '',
 		imageUrl: adminContent?.imageUrl ?? '',
 		description: adminContent?.description ?? '',
