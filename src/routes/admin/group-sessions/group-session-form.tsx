@@ -1230,7 +1230,7 @@ export const Component = () => {
 								<div>
 									<p className="mb-0">Send Reminder Email</p>
 									<p className="fs-small text-muted mb-0">
-										Sent 24 hours before the start of the session
+										Sent shortly before the start of the session
 									</p>
 								</div>
 							}
