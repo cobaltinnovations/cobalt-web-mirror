@@ -145,6 +145,9 @@ const PieChart = ({ label, data }: ChartProps) => {
 				plugins: {
 					legend: {
 						position: 'right',
+						onClick: (e) => {
+							e.native?.preventDefault();
+						},
 					},
 				},
 			}}
