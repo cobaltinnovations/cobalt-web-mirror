@@ -134,6 +134,7 @@ export const Component = () => {
 		return initialSearchValue;
 	}, [initialSearchValue, searchInputValue]);
 	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchQuery);
+	const [showClearButton, setShowClearButton] = useState(false);
 
 	useEffect(() => {
 		if (initialSearchValue === debouncedSearchQuery) {
@@ -318,6 +319,27 @@ export const Component = () => {
 		setNextFilters(initialNextFilters);
 	}, [filters, searchParams]);
 
+	const activeFilters = useMemo(() => {
+		let params: Record<string, string | undefined> = {};
+
+		filters.forEach((filter) => {
+			const valueFromUrl = searchParams.get(filter.searchParam);
+
+			if (!valueFromUrl) {
+				return;
+			}
+
+			params[filter.searchParam] = valueFromUrl;
+		});
+
+		return params;
+	}, [filters, searchParams]);
+
+	useEffect(() => {
+		const filtersAreActive = Object.values(activeFilters).length > 0;
+		setShowClearButton(filtersAreActive);
+	}, [activeFilters]);
+
 	return (
 		<>
 			<Container fluid className="px-8 py-8">
@@ -414,6 +436,21 @@ export const Component = () => {
 									</FilterDropdown>
 								);
 							})}
+
+							{showClearButton && (
+								<Button
+									variant="link"
+									onClick={() => {
+										filters.forEach((filter) => {
+											searchParams.delete(filter.searchParam);
+										});
+
+										setSearchParams(searchParams);
+									}}
+								>
+									Clear
+								</Button>
+							)}
 						</div>
 					</Col>
 					<Col>
