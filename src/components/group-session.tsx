@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
-import { ReactComponent as ChairIcon } from '@/assets/icons/chair.svg';
+import { ReactComponent as ChairIcon } from '@/assets/icons/chair-fill.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
 import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location.svg';
