@@ -16,5 +16,6 @@ module.exports = {
 		// - serve the `xyz` bundle to requests originating from xyz-dev.domain.com
 		// - serve the `cobalt` bundle to all other requests
 		subdomainMapping: '*:cobalt',
+		webApiBaseUrl: 'http://localhost:8080/',
 	},
 };

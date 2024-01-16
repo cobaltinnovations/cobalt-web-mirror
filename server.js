@@ -17,19 +17,20 @@ let settings = {
 	},
 	nodeApp: {
 		basicAuth: {
-			enabled: process.env.WEBAPP_ENABLE_BASIC_AUTH,
-			username: process.env.WEBAPP_BASIC_AUTH_USERNAME || 'dev_admin',
-			password: process.env.WEBAPP_BASIC_AUTH_PASSWORD || 'dev_password',
+			enabled: false,
+			username: 'dev_admin',
+			password: 'dev_password',
 			secret: '',
 		},
-		subdomainMapping: process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt',
+		subdomainMapping: '*:cobalt',
+		webApiBaseUrl: 'http://localhost:8080/',
 	},
 };
 
 try {
 	settings = require(path.resolve(__dirname, 'config', configNamespace, configEnv, 'settings'));
 } catch (e) {
-	console.warn(`settings not available for Namesapce: ${configNamespace}, Env: ${configEnv}`);
+	throw new Error(`settings not available for Namesapce: ${configNamespace}, Env: ${configEnv}`);
 }
 
 const port = process.env.COBALT_WEB_PORT || 3000;
@@ -71,7 +72,7 @@ if (settings.sentry.dsn) {
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing
 app.get('/reporting/run-report', (req, res, next) => {
-	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
 	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
 	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
 
@@ -84,7 +85,7 @@ app.get('/reporting/run-report', (req, res, next) => {
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing
 app.get('/ic/patient-order-csv-generator', (req, res, next) => {
-	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
 	const orderCount = req.query.orderCount;
 	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
 	const proxyUrl = `${baseUrl}/patient-order-csv-generator?orderCount=${orderCount ?? ''}&X-Cobalt-Access-Token=${
