@@ -1,7 +1,10 @@
+import moment from 'moment';
+import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import Loader from '@/components/loader';
 import TabBar from '@/components/tab-bar';
-import { adminAnalyticsService } from '@/lib/services/admin-analytics-service';
+import { DATE_OPTION_KEYS, adminAnalyticsService } from '@/lib/services/admin-analytics-service';
+import { DateFormats } from '@/lib/utils';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from 'chart.js';
 import React, { Suspense, useMemo } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
@@ -25,14 +28,14 @@ export const Component = () => {
 	const { dateOptions } = useAdminAnalyticsLayoutLoaderData();
 	const match = useMatch('/admin/analytics/:dashboardTab');
 	const [searchParams, setSearchParams] = useSearchParams({
-		startDate: dateOptions[0].startDate,
-		endDate: dateOptions[0].endDate,
+		startDate: dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].startDate,
+		endDate: dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].endDate,
 	});
 
 	const startDate = searchParams.get('startDate');
 	const endDate = searchParams.get('endDate');
 	const selectedOption = useMemo(() => {
-		return dateOptions.find((dateOption) => {
+		return Object.values(dateOptions).find((dateOption) => {
 			return dateOption.startDate === startDate && dateOption.endDate === endDate;
 		});
 	}, [dateOptions, endDate, startDate]);
@@ -44,38 +47,82 @@ export const Component = () => {
 			<Row>
 				<Col xs={12} className="d-flex flex-wrap align-items-center justify-content-between">
 					<h1>Analytics</h1>
+					<div className="d-flex">
+						<InputHelper
+							style={{ width: 200 }}
+							className="me-2"
+							as="select"
+							label="Date Range"
+							value={selectedOption ? selectedOption?.label : 'CUSTOM'}
+							onChange={({ currentTarget }) => {
+								const desiredOption = Object.values(dateOptions).find((dateOption) => {
+									return dateOption.label === currentTarget.value;
+								});
 
-					<InputHelper
-						as="select"
-						label={selectedOption?.label ?? 'Select'}
-						value={selectedOption?.label ?? ''}
-						onChange={({ currentTarget }) => {
-							const nextOption = dateOptions.find((dateOption) => {
-								return dateOption.label === currentTarget.value;
-							});
+								if (!desiredOption) {
+									setSearchParams({
+										startDate: moment().format(DateFormats.API.Date),
+										endDate: moment().add(1, 'day').format(DateFormats.API.Date),
+									});
 
-							if (!nextOption) {
-								return;
-							}
+									return;
+								}
 
-							setSearchParams({
-								startDate: nextOption.startDate,
-								endDate: nextOption.endDate,
-							});
-						}}
-					>
-						<option value="" disabled>
-							Set Date Range
-						</option>
+								setSearchParams({
+									startDate: desiredOption.startDate,
+									endDate: desiredOption.endDate,
+								});
+							}}
+						>
+							{Object.values(dateOptions).map((dateOption) => {
+								return (
+									<option key={dateOption.label} value={dateOption.label}>
+										{dateOption.label}
+									</option>
+								);
+							})}
 
-						{dateOptions.map((dateOption) => {
-							return (
-								<option key={dateOption.label} value={dateOption.label}>
-									{dateOption.startDateDescription} - {dateOption.endDateDescription}
-								</option>
-							);
-						})}
-					</InputHelper>
+							<option value="CUSTOM">Custom</option>
+						</InputHelper>
+						<div style={{ width: 160 }} className="me-2">
+							<DatePicker
+								labelText="Start"
+								dropdownMode="select"
+								maxDate={moment(endDate).toDate()}
+								selected={moment(startDate).toDate() ?? undefined}
+								onChange={(date) => {
+									if (!date) {
+										return;
+									}
+
+									setSearchParams({
+										startDate: moment(date).format(DateFormats.API.Date),
+										endDate: moment(endDate).format(DateFormats.API.Date),
+									});
+								}}
+								disabled={!!selectedOption}
+							/>
+						</div>
+						<div style={{ width: 160 }}>
+							<DatePicker
+								labelText="End"
+								dropdownMode="select"
+								minDate={moment(startDate).toDate()}
+								selected={moment(endDate).toDate() ?? undefined}
+								onChange={(date) => {
+									if (!date) {
+										return;
+									}
+
+									setSearchParams({
+										startDate: moment(startDate).format(DateFormats.API.Date),
+										endDate: moment(date).format(DateFormats.API.Date),
+									});
+								}}
+								disabled={!!selectedOption}
+							/>
+						</div>
+					</div>
 				</Col>
 
 				<Col>
