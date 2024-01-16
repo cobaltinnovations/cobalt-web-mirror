@@ -1,5 +1,5 @@
 import useAccount from '@/hooks/use-account';
-import config from '@/lib/config';
+import config from '@/config/config';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import React, { FC, PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import ReactGA from 'react-ga';
@@ -14,7 +14,6 @@ import {
 	TopicCenterEventActions,
 } from '@/lib/models/ga-events';
 import { useLocation } from 'react-router-dom';
-import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
 import useUrlViewTracking from '@/hooks/use-url-view-tracking';
 
 /**
@@ -267,7 +266,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	);
 
 	useEffect(() => {
-		const mixpanelId = config.COBALT_WEB_MIXPANEL_ID;
+		const mixpanelId = config.mixPanelId;
 		if (!mixpanelId) {
 			return;
 		}
@@ -276,7 +275,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		mixpanel.init(mixpanelId);
 	}, []);
 
-	const initialMeasurementId = config.COBALT_WEB_GA4_MEASUREMENT_ID || institution?.ga4MeasurementId;
+	const initialMeasurementId = config.ga4MeasurementId || institution?.ga4MeasurementId;
 	useEffect(() => {
 		if (!initialMeasurementId) {
 			return;
@@ -313,13 +312,13 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 	}, [isGA4Enabled, configureMeasurementId, institution?.ga4MeasurementId]);
 
 	useEffect(() => {
-		if (!config.COBALT_WEB_GA_TRACKING_ID) {
+		if (!config.gaTrackingId) {
 			return;
 		}
 
 		enabledVersionsRef.current.reactGa = true;
 
-		ReactGA.initialize(config.COBALT_WEB_GA_TRACKING_ID, {
+		ReactGA.initialize(config.gaTrackingId, {
 			testMode: __DEV__,
 		});
 
@@ -360,7 +359,7 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 	// track pageviews on navigation
 	// discard any search information on auth urls, as it may be sensitive (access token redirect)
-	const page = AUTH_REDIRECT_URLS.some((url) => location.pathname === url)
+	const page = config.authRedirectUrls.some((url) => location.pathname === url)
 		? location.pathname
 		: location.pathname + location.search;
 

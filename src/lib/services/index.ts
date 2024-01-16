@@ -8,7 +8,6 @@ export * from './call-to-action-service';
 export * from './content-service';
 export * from './faqs-service';
 export * from './feedback-service';
-export * from './google-places-service';
 export * from './group-sessions-service';
 export * from './image-upload-service';
 export * from './institution-service';

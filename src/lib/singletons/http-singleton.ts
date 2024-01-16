@@ -2,10 +2,10 @@ import Cookies from 'js-cookie';
 // import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 
 import { HttpClient } from '@/lib/http-client';
-import config from '@/lib/config';
+import config from '@/config/config';
 
 export const httpSingleton = new HttpClient({
-	baseUrl: config.COBALT_WEB_API_BASE_URL,
+	baseUrl: config.apiBaseUrl,
 	defaultHeaders: {
 		'Content-Type': 'application/json',
 		'X-Cobalt-Webapp-Base-Url': window.location.origin,
