@@ -149,7 +149,7 @@ function extendIncludedPaths(initialInclude) {
 }
 
 function addConfigLoader(config) {
-	const configPath = path.join(__dirname, 'src', 'config', `config.${process.env.COBALT_WEB_CONFIG}.ts`);
+	const configPath = path.join(__dirname, 'src', 'config', `config.${process.env.COBALT_WEB_ENV}.ts`);
 
 	console.log('configPath:', configPath);
 
