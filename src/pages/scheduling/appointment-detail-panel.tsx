@@ -19,7 +19,7 @@ import { CopyToClipboardButton } from './copy-to-clipboard-button';
 
 import { useSchedulingStyles } from './use-scheduling-styles';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';

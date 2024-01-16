@@ -9,7 +9,7 @@ import { AppointmentTypeFormModal } from './appointment-type-form-modal';
 import { AppointmentTypeItem } from './appointment-type-item';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { Link } from 'react-router-dom';
 import { useSchedulingStyles } from './use-scheduling-styles';
