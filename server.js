@@ -16,12 +16,6 @@ let settings = {
 		showDebug: false,
 	},
 	nodeApp: {
-		basicAuth: {
-			enabled: false,
-			username: 'dev_admin',
-			password: 'dev_password',
-			secret: '',
-		},
 		subdomainMapping: '*:cobalt',
 		webApiBaseUrl: 'http://localhost:8080/',
 	},
@@ -113,61 +107,6 @@ app.get('/configuration', (_req, res) => {
 		launchDate: launchDate,
 	});
 });
-
-/* ----------------------------------------- */
-/* Basic HTTP Auth */
-/* ----------------------------------------- */
-
-const basicAuthEnabled = yn(settings.nodeApp.basicAuth.enabled, { default: false });
-
-if (basicAuthEnabled) {
-	const USERNAME = settings.nodeApp.basicAuth.username;
-	const PASSWORD = settings.nodeApp.basicAuth.password;
-
-	if (USERNAME === 'dev_admin' && PASSWORD === 'dev_password') {
-		setInterval(() => {
-			console.warn('WARNING: Server using dev/hardcoded basic auth credentials');
-		}, 5000);
-	}
-
-	app.use((req, res, next) => {
-		// quick workaround for passing manifest file through Basic Auth
-		// `.json` files are not handled by the `static` middleware
-		if (req.path.toLowerCase() === '/manifest.json') {
-			next();
-			return;
-		}
-
-		function challengeAuth() {
-			res.setHeader('WWW-Authenticate', 'Basic');
-			res.status(401).send('Not Authenticated');
-		}
-
-		if (!req.session.user) {
-			const { authorization } = req.headers;
-			if (!authorization) {
-				challengeAuth();
-				return;
-			}
-
-			const [username, password] = Buffer.from(authorization.split(' ')[1], 'base64').toString().split(':');
-
-			if (username !== USERNAME || password !== PASSWORD) {
-				challengeAuth();
-				return;
-			}
-
-			req.session.user = USERNAME;
-			next();
-			return;
-		} else if (req.session.user !== USERNAME) {
-			challengeAuth();
-			return;
-		}
-
-		next();
-	});
-}
 
 /* ----------------------------------------- */
 /* Serve SPA */

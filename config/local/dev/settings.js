@@ -6,11 +6,6 @@ module.exports = {
 		showDebug: false,
 	},
 	nodeApp: {
-		basicAuth: {
-			enabled: false,
-			username: 'anotheruser',
-			password: 'somepassword',
-		},
 		// mapping of subdomain to target bundle
 		// for example: 'xyz-dev:xyz,*:cobalt' will:
 		// - serve the `xyz` bundle to requests originating from xyz-dev.domain.com
