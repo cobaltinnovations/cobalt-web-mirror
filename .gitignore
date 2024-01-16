@@ -43,10 +43,3 @@ yarn-error.log*
 !/config/
 /config/*
 !/config/README.md
-
-# Local dev configuration
-!/config/local/
-/config/local/*
-!/config/local/dev/
-/config/local/dev/*
-!config/local/dev/settings.js
