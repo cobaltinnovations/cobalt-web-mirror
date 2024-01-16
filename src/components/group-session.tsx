@@ -18,9 +18,9 @@ import moment from 'moment';
 
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
 import { ReactComponent as ChairIcon } from '@/assets/icons/chair-fill.svg';
-import { ReactComponent as ClockIcon } from '@/assets/icons/clock.svg';
+import { ReactComponent as ClockIcon } from '@/assets/icons/schedule.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
-import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location.svg';
+import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location-on.svg';
 import { WysiwygDisplay } from './admin-cms/wysiwyg';
 
 const baseSpacerSize = 4;
