@@ -7,9 +7,6 @@ const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
 const proxy = require('express-http-proxy');
 
-const configNamespace = process.env.COBALT_WEB_NAMESPACE;
-const configEnv = process.env.COBALT_WEB_ENV;
-
 let settings = {
 	sentry: {
 		dsn: '',
@@ -22,9 +19,9 @@ let settings = {
 };
 
 try {
-	settings = require(path.resolve(__dirname, 'config', configNamespace, configEnv, 'settings'));
+	settings = require(path.resolve(__dirname, 'config', process.env.COBALT_WEB_ENV, 'settings'));
 } catch (e) {
-	throw new Error(`settings not available for Namesapce: ${configNamespace}, Env: ${configEnv}`);
+	throw new Error(`Settings not available.`);
 }
 
 const port = process.env.COBALT_WEB_PORT || 3000;
