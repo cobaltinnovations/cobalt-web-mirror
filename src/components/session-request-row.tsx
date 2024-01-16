@@ -7,7 +7,7 @@ import SessionDropdown from '@/components/session-dropdown';
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
+import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';

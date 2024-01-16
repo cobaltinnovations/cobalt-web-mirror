@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
