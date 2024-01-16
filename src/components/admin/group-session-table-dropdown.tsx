@@ -9,7 +9,7 @@ import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
-import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-x-close.svg';
+import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import { ReactComponent as XCircleIcon } from '@/assets/icons/icon-x-circle.svg';
+import { ReactComponent as XCircleIcon } from '@/assets/icons/icon-cancel-fill.svg';
 
 const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 	inputHelper: {
