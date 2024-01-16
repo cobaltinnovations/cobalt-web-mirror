@@ -30,7 +30,7 @@ import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
 import { useAppRootLoaderData } from '@/routes/root';
 
-export const HEADER_HEIGHT = 56;
+export const HEADER_HEIGHT = 60;
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
@@ -41,7 +41,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 	},
 	header: {
-		height: 56,
+		height: HEADER_HEIGHT,
 		display: 'flex',
 		padding: '0 40px',
 		alignItems: 'center',
