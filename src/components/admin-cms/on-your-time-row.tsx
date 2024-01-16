@@ -10,7 +10,7 @@ import { ReactComponent as Podcast } from '@/assets/icons/podcast.svg';
 import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
@@ -186,7 +186,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 					};
 				case AdminContentActions.DELETE:
 					return {
-						icon: <TrashIcon className={classes.icon} />,
+						icon: <DeleteIcon className={classes.icon} />,
 						title: 'Delete',
 						onClick: () => onDeleteClick(content.contentId),
 					};

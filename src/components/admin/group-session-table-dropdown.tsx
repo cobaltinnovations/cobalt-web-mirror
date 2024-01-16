@@ -10,7 +10,7 @@ import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-s
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
@@ -138,7 +138,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onDelete(groupSession.groupSessionId);
 						}}
 					>
-						<TrashIcon className="me-2 text-n500" width={24} height={24} />
+						<DeleteIcon className="me-2 text-n500" width={24} height={24} />
 						Delete
 					</Dropdown.Item>
 				)}
