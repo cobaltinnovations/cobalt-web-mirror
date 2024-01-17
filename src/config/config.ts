@@ -5,9 +5,9 @@ const config: iConfig = {
 	providerManagementFeature: false,
 	downForMaintenance: false,
 
-	gaTrackingId: 'xxx',
-	ga4MeasurementId: 'xxx',
-	mixPanelId: 'xxx',
+	gaTrackingId: undefined,
+	ga4MeasurementId: undefined,
+	mixPanelId: undefined,
 
 	showDebug: false,
 
