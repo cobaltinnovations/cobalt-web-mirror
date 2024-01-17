@@ -18,7 +18,7 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
