@@ -14,6 +14,11 @@ const argv = yargs(hideBin(process.argv))
 		type: 'string',
 		description: 'Commit hash. Used for tagging Sentry releases.',
 	})
+	.option('cobaltWebEnv', {
+		alias: ['cobalt-web-env'],
+		type: 'string',
+		description: 'Target deployment environment.',
+	})
 	.option('target', {
 		array: true,
 		type: 'string',
@@ -96,6 +101,8 @@ async function buildInstitutionTarget(institution) {
 			`PUBLIC_URL=${institution}`, // referenced in public/index.html & config-overrides
 			`BUILD_PATH=build/${institution}`, // modifies build ouputs
 		];
+
+		buildEnvArgs.push(`COBALT_WEB_ENV=${argv.cobaltWebEnv}`);
 
 		if (argv.sentryDsnReact) {
 			// react-app variables
