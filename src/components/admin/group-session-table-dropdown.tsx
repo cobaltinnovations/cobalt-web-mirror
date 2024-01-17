@@ -6,7 +6,7 @@ import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group-sessions.svg';
+import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
