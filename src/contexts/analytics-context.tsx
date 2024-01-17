@@ -1,5 +1,5 @@
 import useAccount from '@/hooks/use-account';
-import config from '@/config/config';
+import { config } from '@/config';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import React, { FC, PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
 import ReactGA from 'react-ga';

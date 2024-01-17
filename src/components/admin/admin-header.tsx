@@ -10,7 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import config from '@/config/config';
+import { config } from '@/config';
 
 export const ADMIN_HEADER_HEIGHT = 60;
 

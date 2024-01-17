@@ -6,7 +6,7 @@ import { SignInPatient } from '@/components/auth/sign-in-patient';
 import { SignInStaff } from '@/components/auth/sign-in-staff';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import config from '@/config/config';
+import { config } from '@/config';
 import { AccountSource, AccountSourceId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import { useAppRootLoaderData } from '@/routes/root';

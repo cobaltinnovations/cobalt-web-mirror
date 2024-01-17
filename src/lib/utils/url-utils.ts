@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import config from '@/config/config';
+import { config } from '@/config';
 
 export function buildQueryParamUrl(url: string, queryParams?: Record<string, any>): string {
 	let queryString;

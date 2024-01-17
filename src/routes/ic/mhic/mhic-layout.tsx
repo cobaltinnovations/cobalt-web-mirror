@@ -1,5 +1,5 @@
 import { MHIC_HEADER_HEIGHT, MhicHeader } from '@/components/integrated-care/mhic';
-import config from '@/config/config';
+import { config } from '@/config';
 import { PatientOrderAutocompleteResult } from '@/lib/models';
 import React, { Suspense, useEffect, useState } from 'react';
 import { Outlet, useRouteError, useRouteLoaderData } from 'react-router-dom';

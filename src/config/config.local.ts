@@ -1,6 +1,6 @@
 import { iConfig } from '@/config/config-models';
 
-const config: iConfig = {
+export const config: iConfig = {
 	apiBaseUrl: 'http://localhost:8080/',
 	providerManagementFeature: false,
 	downForMaintenance: false,
@@ -15,7 +15,7 @@ const config: iConfig = {
 
 	authRedirectUrls: [],
 	storageKeys: {
-		mhicRecentOrdersStorageKey: 'xxx',
+		mhicRecentOrdersStorageKey: 'mhicRecentOrders',
 	},
 };
 
