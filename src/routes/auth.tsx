@@ -5,7 +5,7 @@ import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator }
 
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
-import config from '@/config/config';
+import { config } from '@/config';
 import { accountService, institutionService } from '@/lib/services';
 import Loader from '@/components/loader';
 import { getSubdomain } from '@/lib/utils';

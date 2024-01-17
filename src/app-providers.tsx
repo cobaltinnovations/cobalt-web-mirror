@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import config from '@/config/config';
+import { config } from '@/config';
 import { addMaximumScaleToViewportMetaTag, isIos } from '@/lib/utils/device-utils';
 
 import { useCustomBootstrapStyles } from '@/jss/hooks/use-custom-bootstrap-styles';

@@ -154,7 +154,7 @@ function addConfigLoader(config) {
 	console.log('configPath:', configPath);
 
 	config.module.rules.push({
-		test: /config\.ts$/,
+		test: /config\.local\.ts$/,
 		loader: 'file-replace-loader',
 		include: [path.resolve(__dirname, 'src', 'config')],
 		options: {

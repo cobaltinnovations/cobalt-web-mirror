@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import config from '@/config/config';
+import { config } from '@/config';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useRenderJsonStyles = createUseThemedStyles((theme) => ({

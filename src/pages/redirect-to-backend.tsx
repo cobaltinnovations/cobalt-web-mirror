@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import config from '@/config/config';
+import { config } from '@/config';
 import Cookies from 'js-cookie';
 
 const RedirectToBackend: FC = () => {

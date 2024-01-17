@@ -24,7 +24,7 @@ import {
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-import config from '@/config/config';
+import { config } from '@/config';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';

@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 // import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 
 import { HttpClient } from '@/lib/http-client';
-import config from '@/config/config';
+import { config } from '@/config';
 
 export const httpSingleton = new HttpClient({
 	baseUrl: config.apiBaseUrl,
