@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
@@ -35,7 +35,6 @@ import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
-import NoData from '@/components/no-data';
 import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
@@ -43,6 +42,9 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import CallToActionBlock from '@/components/call-to-action-block';
 import { useAppRootLoaderData } from '@/routes/root';
 import FeatureScreeningCta from '@/components/feature-screening-cta';
+import CarouselV2 from '@/components/carousel-v2';
+
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -293,17 +295,28 @@ const Index: FC = () => {
 					<>
 						<IneligibleBookingModal uiType="group-session" />
 
-						<Container className="pt-20">
+						<Container>
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center justify-content-between">
+										<h3>Group Sessions</h3>
+										<Button
+											variant="light"
+											size="sm"
+											className="d-flex align-items-center"
+											onClick={() => {
+												navigate('/group-sessions');
+											}}
+										>
+											Explore All
+											<RightChevron />
+										</Button>
+									</div>
+								</Col>
+							</Row>
 							<Row>
 								<Col>
-									<Carousel
-										responsive={responsiveDefaults}
-										description="Group Sessions"
-										calloutTitle="Explore all"
-										calloutOnClick={() => {
-											navigate('/group-sessions');
-										}}
-									>
+									<CarouselV2>
 										{inTheStudioEvents.map((groupSession) => {
 											let renderKey = '';
 											let detailUrl = '';
@@ -332,7 +345,7 @@ const Index: FC = () => {
 												</Link>
 											);
 										})}
-									</Carousel>
+									</CarouselV2>
 								</Col>
 							</Row>
 						</Container>
