@@ -3,7 +3,7 @@ import { Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 
 export enum PastScheduledMessageGroupsOrOutreachType {
 	SCHEDULED_MESSAGE = 'SCHEDULED_MESSAGE',
