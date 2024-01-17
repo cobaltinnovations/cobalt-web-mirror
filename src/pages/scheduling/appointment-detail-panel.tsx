@@ -22,7 +22,7 @@ import { useSchedulingStyles } from './use-scheduling-styles';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
+import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';

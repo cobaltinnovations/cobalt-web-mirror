@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import { ReactComponent as XCircleIcon } from '@/assets/icons/icon-cancel-fill.svg';
+import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel-fill.svg';
 
 const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 	inputHelper: {
@@ -87,7 +87,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 					/>
 					{props.value && (
 						<Button variant="link" className={classes.clearButton} onClick={onClear}>
-							<XCircleIcon width={24} height={24} />
+							<CancelIcon width={22} height={22} />
 						</Button>
 					)}
 				</Form.Group>
