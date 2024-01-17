@@ -7,11 +7,11 @@ import { AdminContentActions, AdminContentRow, ContentAvailableStatusId, Content
 import { TableCell, TableRow } from '@/components/table';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as Article } from '@/assets/icons/article.svg';
+import { ReactComponent as Article } from '@/assets/icons/icon-article.svg';
 import { ReactComponent as BlogPost } from '@/assets/icons/blog-post.svg';
-import { ReactComponent as Video } from '@/assets/icons/video.svg';
-import { ReactComponent as Audio, ReactComponent as Podcast } from '@/assets/icons/audio.svg';
-import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
+import { ReactComponent as Video } from '@/assets/icons/icon-video.svg';
+import { ReactComponent as Audio, ReactComponent as Podcast } from '@/assets/icons/icon-audio.svg';
+import { ReactComponent as Worksheet } from '@/assets/icons/icon-worksheet.svg';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
