@@ -81,6 +81,8 @@ const useCarouselStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 	},
 	carouselContainer: {
+		overflow: 'visible',
+		overflowX: 'clip',
 		margin: `0 -${gutterWidth / 2}px`,
 	},
 	carouselItem: {

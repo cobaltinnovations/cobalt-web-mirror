@@ -294,8 +294,7 @@ const Index: FC = () => {
 				{inTheStudioEvents.length > 0 && (
 					<>
 						<IneligibleBookingModal uiType="group-session" />
-
-						<Container>
+						<Container className="py-20">
 							<Row className="mb-4">
 								<Col>
 									<div className="d-flex align-items-center justify-content-between">
