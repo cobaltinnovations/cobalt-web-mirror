@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderScheduledMessageGroup } from '@/lib/models';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 
 interface MhicScheduledMessageGroupProps {
 	message: PatientOrderScheduledMessageGroup;

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, { PropsWithChildren, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 

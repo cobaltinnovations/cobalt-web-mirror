@@ -29,7 +29,7 @@ import {
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';

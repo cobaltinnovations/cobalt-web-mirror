@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	outreachAttempt: {

@@ -11,7 +11,7 @@ import { HEADER_HEIGHT } from '@/components/header-v2';
 import HeroContainer from '@/components/hero-container';
 import TabBar from '@/components/tab-bar';
 
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
