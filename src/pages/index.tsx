@@ -8,7 +8,6 @@ import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
 import HomeHero from '@/components/home-hero';
-import Carousel, { responsiveDefaults } from '@/components/carousel';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import CallToAction from '@/components/call-to-action';
 
@@ -45,29 +44,6 @@ import FeatureScreeningCta from '@/components/feature-screening-cta';
 import CarouselV2 from '@/components/carousel-v2';
 
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-
-const resourceLibraryCarouselConfig = {
-	externalMonitor: {
-		...responsiveDefaults.externalMonitor,
-		items: 4,
-	},
-	desktopExtraLarge: {
-		...responsiveDefaults.desktopExtraLarge,
-		items: 4,
-	},
-	desktop: {
-		...responsiveDefaults.desktop,
-		items: 3,
-	},
-	tablet: {
-		...responsiveDefaults.tablet,
-		items: 2,
-	},
-	mobile: {
-		...responsiveDefaults.mobile,
-		items: 1,
-	},
-};
 
 const Index: FC = () => {
 	const { featuredTopicCenter } = useAppRootLoaderData();
@@ -354,16 +330,27 @@ const Index: FC = () => {
 				{content.length > 0 && (
 					<>
 						<Container className="py-20 pb-20">
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center justify-content-between">
+										<h3>Resource Library</h3>
+										<Button
+											variant="light"
+											size="sm"
+											className="d-flex align-items-center"
+											onClick={() => {
+												navigate('/resource-library');
+											}}
+										>
+											Explore All
+											<RightChevron />
+										</Button>
+									</div>
+								</Col>
+							</Row>
 							<Row>
 								<Col>
-									<Carousel
-										responsive={resourceLibraryCarouselConfig}
-										description="Resource Library"
-										calloutTitle="Explore all"
-										calloutOnClick={() => {
-											navigate('/resource-library');
-										}}
-									>
+									<CarouselV2>
 										{content.map((content) => {
 											return (
 												<ResourceLibraryCard
@@ -387,7 +374,7 @@ const Index: FC = () => {
 												/>
 											);
 										})}
-									</Carousel>
+									</CarouselV2>
 								</Col>
 							</Row>
 						</Container>
