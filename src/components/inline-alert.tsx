@@ -3,11 +3,11 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-question-mark.svg';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	inlineAlert: {

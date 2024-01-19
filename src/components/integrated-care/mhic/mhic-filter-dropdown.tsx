@@ -12,7 +12,7 @@ import DatePicker from '@/components/date-picker';
 
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,

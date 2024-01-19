@@ -2,15 +2,15 @@ import React, { FC, ReactElement } from 'react';
 
 import { TableCell, TableRow } from '@/components/table';
 
-import { ReactComponent as Article } from '@/assets/icons/article.svg';
+import { ReactComponent as Article } from '@/assets/icons/icon-article.svg';
 import { ReactComponent as BlogPost } from '@/assets/icons/blog-post.svg';
-import { ReactComponent as Video } from '@/assets/icons/video.svg';
-import { ReactComponent as Audio } from '@/assets/icons/audio.svg';
-import { ReactComponent as Podcast } from '@/assets/icons/podcast.svg';
-import { ReactComponent as Worksheet } from '@/assets/icons/worksheet.svg';
+import { ReactComponent as Video } from '@/assets/icons/icon-video.svg';
+import { ReactComponent as Audio } from '@/assets/icons/icon-audio.svg';
+import { ReactComponent as Podcast } from '@/assets/icons/icon-podcast.svg';
+import { ReactComponent as Worksheet } from '@/assets/icons/icon-worksheet.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as CheckIcon } from '@/assets/icons/check.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnarchiveIcon } from '@/assets/icons/unarchive.svg';
@@ -186,7 +186,7 @@ const OnYourTimeContentRow: FC<AvailableContentRowProps> = React.memo(
 					};
 				case AdminContentActions.DELETE:
 					return {
-						icon: <TrashIcon className={classes.icon} />,
+						icon: <DeleteIcon className={classes.icon} />,
 						title: 'Delete',
 						onClick: () => onDeleteClick(content.contentId),
 					};

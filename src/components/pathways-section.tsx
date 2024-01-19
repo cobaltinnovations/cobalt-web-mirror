@@ -9,7 +9,7 @@ import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import useAnalytics from '@/hooks/use-analytics';
 import { FeatureId } from '@/lib/models';
 
