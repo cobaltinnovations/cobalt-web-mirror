@@ -4,6 +4,9 @@ import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import Carousel, { ButtonGroupProps } from 'react-multi-carousel';
 
+import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+
 const gutterWidth = 30;
 const responsiveConfig = {
 	superLargeDesktop: {
@@ -25,9 +28,10 @@ const responsiveConfig = {
 	},
 };
 
-const useButtonStyles = createUseThemedStyles((theme) => ({
+const useButtonStyles = createUseThemedStyles(() => ({
 	button: {
 		top: '50%',
+		padding: 8,
 		position: 'absolute',
 		transform: 'translate(-50%, -50%)',
 	},
@@ -64,19 +68,19 @@ const ButtonGroup = ({ next, previous, carouselState }: ButtonGroupProps) => {
 					className={classNames(classes.button, classes.previousButton)}
 					onClick={previous}
 				>
-					Previous
+					<LeftChevron />
 				</Button>
 			)}
 			{showNextButton && (
 				<Button variant="light" className={classNames(classes.button, classes.nextButton)} onClick={next}>
-					Next
+					<RightChevron />
 				</Button>
 			)}
 		</>
 	);
 };
 
-const useCarouselStyles = createUseThemedStyles((theme) => ({
+const useCarouselStyles = createUseThemedStyles(() => ({
 	carousel: {
 		position: 'relative',
 	},
@@ -90,10 +94,14 @@ const useCarouselStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const CarouselV2: FC<PropsWithChildren> = ({ children }) => {
+interface CarouselV2Props {
+	className?: string;
+}
+
+const CarouselV2: FC<PropsWithChildren<CarouselV2Props>> = ({ className, children }) => {
 	const classes = useCarouselStyles();
 	return (
-		<div className={classes.carousel}>
+		<div className={classNames(classes.carousel, className)}>
 			<Carousel
 				responsive={responsiveConfig}
 				arrows={false}
