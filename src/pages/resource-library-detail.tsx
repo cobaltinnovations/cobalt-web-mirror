@@ -194,7 +194,7 @@ const ResourceLibraryDetail: FC = () => {
 							<WysiwygDisplay html={item?.description ?? ''} />
 
 							{!canEmbed && item?.url && (
-								<div className="mb-12 mt-10 text-center">
+								<div className="mt-10 text-center">
 									<Button
 										as="a"
 										className="d-inline-block text-decoration-none text-white"
@@ -210,7 +210,13 @@ const ResourceLibraryDetail: FC = () => {
 								</div>
 							)}
 
-							<Helpful className="mb-10" title="Was this resource helpful?" />
+							{item?.contentId && (
+								<Helpful
+									contentId={item.contentId}
+									className="my-10"
+									title="Was this resource helpful?"
+								/>
+							)}
 
 							{(item?.tagIds ?? []).length > 0 && (
 								<>

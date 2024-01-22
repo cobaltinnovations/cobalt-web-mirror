@@ -6,6 +6,7 @@ export * from './calendar-event-models';
 export * from './call-to-action-models';
 export * from './chart-models';
 export * from './color-ids';
+export * from './content-feedback-models';
 export * from './content';
 export * from './group-session-models';
 export * from './institution';

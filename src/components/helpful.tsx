@@ -1,11 +1,13 @@
-import { createUseThemedStyles } from '@/jss/theme';
 import React, { useCallback, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
+import { CONTENT_FEEDBACK_TYPE_ID, ContentFeedback } from '@/lib/models';
+import { contentFeedbackService } from '@/lib/services/content-feedback-service';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import InlineAlert from '@/components/inline-alert';
 import LoadingButton from '@/components/loading-button';
+import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as ThumpUpIcon } from '@/assets/icons/thumb-up.svg';
 import { ReactComponent as ThumpDownIcon } from '@/assets/icons/thumb-down.svg';
@@ -37,6 +39,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 export interface HelpfulProps {
+	contentId: string;
 	title: string;
 	className?: string;
 }
@@ -48,50 +51,77 @@ enum DISPLAY_STATES {
 	FEEDBACK_NO = 'FEEDBACK_NO',
 }
 
-const Helpful = ({ title, className }: HelpfulProps) => {
+const Helpful = ({ contentId, title, className }: HelpfulProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [displayState, setDisplayState] = useState(DISPLAY_STATES.BUTTONS);
 	const [textareaValue, setTextareaValue] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const handlePositiveFormSubmit = useCallback(() => {
-		try {
-			setIsSubmitting(true);
-			setTimeout(() => {
-				setDisplayState(DISPLAY_STATES.FEEDBACK_YES);
-			}, 2000);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setTimeout(() => {
-				setIsSubmitting(false);
-			}, 2000);
-		}
-	}, [handleError]);
+	const [contentFeedback, setContentFeedback] = useState<ContentFeedback>();
 
-	const handleNegativeFormSubmit = useCallback(
-		(event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+	const handleThumbFormSubmit = useCallback(
+		async (event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
 			event.preventDefault();
 			const { value } = event.nativeEvent.submitter as HTMLButtonElement;
 
-			console.log(textareaValue);
-			console.log(value);
-
 			try {
 				setIsSubmitting(true);
-				setTimeout(() => {
-					setDisplayState(DISPLAY_STATES.FEEDBACK_NO);
-				}, 2000);
+
+				const response = await contentFeedbackService
+					.createContentFeedback({
+						contentId,
+						contentFeedbackTypeId: value as CONTENT_FEEDBACK_TYPE_ID,
+					})
+					.fetch();
+
+				setContentFeedback(response.contentFeedback);
+				if (response.contentFeedback.contentFeedbackTypeId === CONTENT_FEEDBACK_TYPE_ID.THUMBS_UP) {
+					setDisplayState(DISPLAY_STATES.FEEDBACK_YES);
+				} else if (response.contentFeedback.contentFeedbackTypeId === CONTENT_FEEDBACK_TYPE_ID.THUMBS_DOWN) {
+					setDisplayState(DISPLAY_STATES.FORM);
+				}
 			} catch (error) {
 				handleError(error);
 			} finally {
-				setTimeout(() => {
-					setIsSubmitting(false);
-				}, 2000);
+				setIsSubmitting(false);
 			}
 		},
-		[handleError, textareaValue]
+		[contentId, handleError]
+	);
+
+	const handleNegativeFormSubmit = useCallback(
+		async (event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+			event.preventDefault();
+			const { value } = event.nativeEvent.submitter as HTMLButtonElement;
+
+			if (value === 'NO_THANKS') {
+				setDisplayState(DISPLAY_STATES.FEEDBACK_NO);
+				return;
+			}
+
+			try {
+				if (!contentFeedback) {
+					throw new Error('contentFeedback is undefined.');
+				}
+
+				setIsSubmitting(true);
+
+				await contentFeedbackService
+					.updateContentFeedback(contentFeedback.contentFeedbackId, {
+						contentFeedbackTypeId: CONTENT_FEEDBACK_TYPE_ID.THUMBS_DOWN,
+						message: textareaValue,
+					})
+					.fetch();
+
+				setDisplayState(DISPLAY_STATES.FEEDBACK_NO);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSubmitting(false);
+			}
+		},
+		[contentFeedback, handleError, textareaValue]
 	);
 
 	return (
@@ -100,26 +130,26 @@ const Helpful = ({ title, className }: HelpfulProps) => {
 				<div className={classes.helpful}>
 					<div className={classes.helpfulInner}>
 						<h4 className="mb-0 text-center">{title}</h4>
-						<div className={classes.buttonsOuter}>
+						<Form onSubmit={handleThumbFormSubmit} className={classes.buttonsOuter}>
 							<LoadingButton
+								type="submit"
 								variant="primary"
 								className="me-1 p-3"
-								onClick={handlePositiveFormSubmit}
+								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_UP}
 								isLoading={isSubmitting}
 							>
 								<ThumpUpIcon />
 							</LoadingButton>
 							<LoadingButton
+								type="submit"
 								variant="danger"
 								className="ms-1 p-3"
-								onClick={() => {
-									setDisplayState(DISPLAY_STATES.FORM);
-								}}
+								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_DOWN}
 								isLoading={isSubmitting}
 							>
 								<ThumpDownIcon />
 							</LoadingButton>
-						</div>
+						</Form>
 					</div>
 				</div>
 			)}
