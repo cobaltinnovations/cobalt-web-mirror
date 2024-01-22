@@ -115,6 +115,7 @@ export type Content = {
 	tagIds: string[];
 	visibilityId: ContentVisibilityTypeId;
 	visibleToOtherInstitutions?: boolean;
+	neverEmbed?: boolean;
 } & (InternalBlog | Article | Video | Podcast);
 
 export type AdminContentRow = {

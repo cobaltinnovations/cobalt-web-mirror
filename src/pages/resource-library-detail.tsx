@@ -167,24 +167,28 @@ const ResourceLibraryDetail: FC = () => {
 								{item?.author}
 							</p>
 
-							{canEmbed ? (
-								<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
-									<ReactPlayer
-										width="100%"
-										height="100%"
-										controls
-										url={embedUrl}
-										config={playerConfig}
-										onPlay={() => {
-											trackActivity();
-										}}
-									/>
-								</div>
-							) : (
-								<BackgroundImageContainer
-									className={classNames(classes.mediaContainer, 'mb-6')}
-									imageUrl={item?.imageUrl || placeholderImage}
-								/>
+							{!item?.neverEmbed && (
+								<>
+									{canEmbed ? (
+										<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
+											<ReactPlayer
+												width="100%"
+												height="100%"
+												controls
+												url={embedUrl}
+												config={playerConfig}
+												onPlay={() => {
+													trackActivity();
+												}}
+											/>
+										</div>
+									) : (
+										<BackgroundImageContainer
+											className={classNames(classes.mediaContainer, 'mb-6')}
+											imageUrl={item?.imageUrl || placeholderImage}
+										/>
+									)}
+								</>
 							)}
 						</Col>
 					</Row>
@@ -193,7 +197,7 @@ const ResourceLibraryDetail: FC = () => {
 						<Col md={10} lg={8} xl={8}>
 							<WysiwygDisplay html={item?.description ?? ''} />
 
-							{!canEmbed && item?.url && (
+							{(item?.neverEmbed || !canEmbed) && item?.url && (
 								<div className="mt-10 text-center">
 									<Button
 										as="a"
