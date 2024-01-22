@@ -547,9 +547,6 @@ export const Component = () => {
 																		pathname: `/admin/resources/${
 																			content.isEditable ? 'edit' : 'preview'
 																		}/${content.contentId}`,
-																		search: content.isEditable
-																			? '?startOnPreview=true'
-																			: '',
 																	}}
 																>
 																	{content.title}
