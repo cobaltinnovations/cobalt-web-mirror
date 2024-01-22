@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Link, useParams } from 'react-router-dom';
+import { Container, Row, Col, Button, Badge } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
@@ -12,13 +12,14 @@ import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import BackgroundImageContainer from '@/components/background-image-container';
 
-import { contentService, activityTrackingService } from '@/lib/services';
-import { Content, ActivityActionId, AcivityTypeId } from '@/lib/models';
+import { contentService, activityTrackingService, tagService } from '@/lib/services';
+import { Content, ActivityActionId, AcivityTypeId, Tag } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { SkeletonButton, SkeletonImage, SkeletonText } from '@/components/skeleton-loaders';
 import { WysiwygDisplay } from '@/components/admin-cms/wysiwyg';
+import Helpful from '@/components/helpful';
 
 const useResourceLibraryDetailStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -55,6 +56,7 @@ const ResourceLibraryDetail: FC = () => {
 	const placeholderImage = useRandomPlaceholderImage();
 
 	const [item, setItem] = useState<Content>();
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(item?.url);
 
 	const fetchData = useCallback(async () => {
@@ -62,8 +64,23 @@ const ResourceLibraryDetail: FC = () => {
 			return;
 		}
 
-		const response = await contentService.fetchContent(contentId).fetch();
-		setItem(response.content);
+		const [contentResponse, tagsRespose] = await Promise.all([
+			contentService.fetchContent(contentId).fetch(),
+			tagService.getTagGroups().fetch(),
+		]);
+
+		const tags = tagsRespose.tagGroups
+			.reduce((accumulator, currentValue) => [...accumulator, ...currentValue.tags], [] as Tag[])
+			.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[currentValue.tagId]: currentValue,
+				}),
+				{} as Record<string, Tag>
+			);
+
+		setItem(contentResponse.content);
+		setTagsByTagId(tags);
 	}, [contentId]);
 
 	const trackActivity = useCallback(async () => {
@@ -143,44 +160,44 @@ const ResourceLibraryDetail: FC = () => {
 			>
 				<Container className="py-12">
 					<Row className="justify-content-center">
-						<Col md={10} lg={8} xl={6}>
-							<h2 className="mb-6">{item?.title}</h2>
-
-							{canEmbed ? (
-								<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
-									<ReactPlayer
-										width="100%"
-										height="100%"
-										controls
-										url={embedUrl}
-										config={playerConfig}
-										onPlay={() => {
-											trackActivity();
-										}}
-									/>
-								</div>
-							) : (
-								<BackgroundImageContainer
-									className={classNames(classes.mediaContainer, 'mb-6')}
-									imageUrl={item?.imageUrl || placeholderImage}
-								/>
-							)}
-
-							<p className="text-muted fw-bold mb-0">
-								{item?.contentTypeLabel} {item?.duration && <>&bull; {item?.duration}</>}
+						<Col md={10} lg={8} xl={8}>
+							<h2 className="mb-4">{item?.title}</h2>
+							<p className="mb-12 text-muted mb-0">
+								{item?.duration ?? <>{item?.duration}</>} {item?.contentTypeDescription} &bull; By{' '}
+								{item?.author}
 							</p>
 
-							{item?.author && <p className="text-muted mb-6">By {item?.author}</p>}
-
-							<hr className="mb-6" />
+							{!item?.neverEmbed && (
+								<>
+									{canEmbed ? (
+										<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
+											<ReactPlayer
+												width="100%"
+												height="100%"
+												controls
+												url={embedUrl}
+												config={playerConfig}
+												onPlay={() => {
+													trackActivity();
+												}}
+											/>
+										</div>
+									) : (
+										<BackgroundImageContainer
+											className={classNames(classes.mediaContainer, 'mb-6')}
+											imageUrl={item?.imageUrl || placeholderImage}
+										/>
+									)}
+								</>
+							)}
 						</Col>
 					</Row>
 
 					<Row className="justify-content-center">
-						<Col md={10} lg={8} xl={6}>
+						<Col md={10} lg={8} xl={8}>
 							<WysiwygDisplay html={item?.description ?? ''} />
 
-							{!canEmbed && item?.url && (
+							{(item?.neverEmbed || !canEmbed) && item?.url && (
 								<div className="mt-10 text-center">
 									<Button
 										as="a"
@@ -195,6 +212,41 @@ const ResourceLibraryDetail: FC = () => {
 										{item.callToAction}
 									</Button>
 								</div>
+							)}
+
+							{item?.contentId && (
+								<Helpful
+									contentId={item.contentId}
+									className="my-10"
+									title="Was this resource helpful?"
+								/>
+							)}
+
+							{(item?.tagIds ?? []).length > 0 && (
+								<>
+									<hr className="mb-6" />
+									<div className="d-none d-lg-flex flex-wrap">
+										{item?.tagIds.map((tagId) => (
+											<Link
+												key={tagId}
+												to={`/resource-library/tags/${tagsByTagId?.[tagId]?.urlName}`}
+												className="text-decoration-none"
+												onClick={(event) => {
+													event.stopPropagation();
+												}}
+											>
+												<Badge
+													bg="outline-dark"
+													pill
+													as="div"
+													className="me-1 mt-1 fs-small text-capitalize fw-normal"
+												>
+													{tagsByTagId?.[tagId]?.name}
+												</Badge>
+											</Link>
+										))}
+									</div>
+								</>
 							)}
 						</Col>
 					</Row>
