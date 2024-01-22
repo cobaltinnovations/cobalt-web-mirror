@@ -14,7 +14,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		right: 0,
 		zIndex: 4,
-		height: 56,
+		height: 60,
 		display: 'flex',
 		padding: '0 40px',
 		position: 'fixed',

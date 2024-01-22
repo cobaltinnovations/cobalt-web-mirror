@@ -62,6 +62,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		} finally {
 			const url = new URL(window.location.href);
 			url.pathname = '/sign-in';
+			url.search = '';
 			window.location.href = url.toString();
 		}
 	}, [accountId]);

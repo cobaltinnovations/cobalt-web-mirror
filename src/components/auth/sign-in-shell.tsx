@@ -6,7 +6,7 @@ import { SignInPatient } from '@/components/auth/sign-in-patient';
 import { SignInStaff } from '@/components/auth/sign-in-staff';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import config from '@/lib/config';
+import { config } from '@/config';
 import { AccountSource, AccountSourceId } from '@/lib/models';
 import { accountService } from '@/lib/services';
 import { useAppRootLoaderData } from '@/routes/root';
@@ -46,7 +46,7 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 			} else if (accountSource.accountSourceId === AccountSourceId.EMAIL_PASSWORD) {
 				navigate('/sign-in/email');
 			} else if (accountSource.accountSourceId === AccountSourceId.MYCHART) {
-				const mychartUrl = new URL(config.COBALT_WEB_API_BASE_URL);
+				const mychartUrl = new URL(config.apiBaseUrl);
 				mychartUrl.pathname = `/institutions/${institution?.institutionId}/mychart-authentication-url`;
 				mychartUrl.search = `redirectImmediately=true`;
 

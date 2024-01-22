@@ -5,7 +5,7 @@ import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator }
 
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
-import { AUTH_REDIRECT_URLS } from '@/lib/config/constants';
+import { config } from '@/config';
 import { accountService, institutionService } from '@/lib/services';
 import Loader from '@/components/loader';
 import { getSubdomain } from '@/lib/utils';
@@ -50,13 +50,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	let authRedirectUrl = Cookies.get('authRedirectUrl') || '/';
 
-	if (AUTH_REDIRECT_URLS.some((url) => authRedirectUrl.startsWith(url))) {
+	if (config.authRedirectUrls.some((url) => authRedirectUrl.startsWith(url))) {
 		authRedirectUrl = '/';
 	}
 
 	try {
 		const parsedRedirectUrl = new URL(window.location.origin + authRedirectUrl);
-		authRedirectUrl = parsedRedirectUrl.pathname;
+		authRedirectUrl = parsedRedirectUrl.pathname + parsedRedirectUrl.search;
 	} catch (e) {
 		// bad authRedirectUrl from queryParam/cookie
 		authRedirectUrl = '/';

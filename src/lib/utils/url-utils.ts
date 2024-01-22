@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import config from '../config';
+import { config } from '@/config';
 
 export function buildQueryParamUrl(url: string, queryParams?: Record<string, any>): string {
 	let queryString;
@@ -33,7 +33,7 @@ export function buildBackendDownloadUrl(proxiedPath: string, queryParams: Record
 	// otherwise, nodeapp server.js is used to proxy these requests to backend
 	if (__DEV__) {
 		// remove trailing slash from base url
-		proxiedPath = config.COBALT_WEB_API_BASE_URL.replace(/\/$/, '') + proxiedPath;
+		proxiedPath = config.apiBaseUrl.replace(/\/$/, '') + proxiedPath;
 		queryParams['X-Cobalt-Access-Token'] = Cookies.get('accessToken');
 	}
 
@@ -45,8 +45,8 @@ export function getSubdomain(url: URL) {
 
 	const hostSplit = url.host.split('.');
 
-	if (__DEV__ && url.host.startsWith('localhost') && config.COBALT_WEB_LOCALHOST_SUBDOMAIN) {
-		subdomain = config.COBALT_WEB_LOCALHOST_SUBDOMAIN.toLowerCase();
+	if (__DEV__ && url.host.startsWith('localhost') && config.localhostSubdomain) {
+		subdomain = config.localhostSubdomain.toLowerCase();
 		// only support `subdomain.host.tld` for now
 	} else if (hostSplit.length >= 3) {
 		subdomain = hostSplit[0].toLowerCase();

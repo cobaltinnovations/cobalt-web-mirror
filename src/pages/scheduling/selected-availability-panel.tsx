@@ -1,7 +1,7 @@
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import React, { useEffect, useState } from 'react';

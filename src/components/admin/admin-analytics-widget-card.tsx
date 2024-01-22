@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '../table';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
@@ -150,7 +150,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 															key={nestedCellIdx}
 															className={getCellClasses(nestedCellIdx)}
 														>
-															{nestedCell}
+															<div dangerouslySetInnerHTML={{ __html: nestedCell }} />
 														</TableCell>
 													);
 												})}
@@ -168,7 +168,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									{row.data.map((cell, cellIdx) => {
 										return (
 											<TableCell key={cellIdx} className={getCellClasses(cellIdx)}>
-												{cell}
+												<div dangerouslySetInnerHTML={{ __html: cell }} />
 											</TableCell>
 										);
 									})}

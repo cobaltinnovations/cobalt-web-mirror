@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import DatePicker from '@/components/date-picker';
@@ -1199,7 +1199,7 @@ export const Component = () => {
 								<div>
 									<p className="mb-0">Send Reminder Email</p>
 									<p className="fs-small text-muted mb-0">
-										Sent 24 hours before the start of the session
+										Sent shortly before the start of the session
 									</p>
 								</div>
 							}

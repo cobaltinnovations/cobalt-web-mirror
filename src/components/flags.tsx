@@ -12,7 +12,7 @@ import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as FlagWarning } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 
 interface UseStylesProps {
 	removalDurationInMs: number;

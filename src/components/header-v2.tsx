@@ -18,7 +18,7 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down-v2.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
@@ -30,7 +30,7 @@ import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
 import { useAppRootLoaderData } from '@/routes/root';
 
-export const HEADER_HEIGHT = 56;
+export const HEADER_HEIGHT = 60;
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	headerOuter: {
@@ -41,7 +41,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		position: 'fixed',
 	},
 	header: {
-		height: 56,
+		height: HEADER_HEIGHT,
 		display: 'flex',
 		padding: '0 40px',
 		alignItems: 'center',

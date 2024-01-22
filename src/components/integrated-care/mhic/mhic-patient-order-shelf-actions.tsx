@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { MhicAssignOrderModal } from './mhic-assign-order-modal';

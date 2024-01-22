@@ -1,4 +1,4 @@
-import config from '@/lib/config';
+import { config } from '@/config';
 
 import {
 	ProviderManagementBasics,
@@ -69,7 +69,7 @@ export const ConnectWithSupportMentalHealthProviders = lazyLoadWithRefresh(
 export const ConnectWithSupportMentalHealthRecommendations = lazyLoadWithRefresh(
 	() => import('@/pages/connect-with-support-mental-health-recommendations')
 );
-export const EhrLookup = lazyLoadWithRefresh(() => import('@/pages/ehr-lookup'));
+
 export const AppointmentDetails = lazyLoadWithRefresh(() => import('@/pages/appointment-details'));
 export const Feedback = lazyLoadWithRefresh(() => import('@/pages/feedback'));
 export const AccountSessionDetails = lazyLoadWithRefresh(() => import('@/pages/account-session-details'));
@@ -416,10 +416,6 @@ export const routes: RouteObject[] = [
 								path: 'connect-with-support/:urlName',
 								element: <ConnectWithSupportV2 />,
 							},
-							{
-								path: 'ehr-lookup',
-								element: <EhrLookup />,
-							},
 						],
 					},
 					{
@@ -618,7 +614,7 @@ export const routes: RouteObject[] = [
 						path: 'providers/:urlName',
 						lazy: () => import('@/routes/provider-detail'),
 					},
-					...(config.COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE === 'true'
+					...(config.providerManagementFeature
 						? [
 								{
 									path: 'providers/:providerId/profile',
@@ -830,7 +826,7 @@ export const routes: RouteObject[] = [
 							{
 								id: 'admin-debug',
 								path: 'debug',
-								element: <ToggledOutlet isEnabled={() => config.COBALT_WEB_SHOW_DEBUG === 'true'} />,
+								element: <ToggledOutlet isEnabled={() => config.showDebug} />,
 								children: [
 									{
 										index: true,

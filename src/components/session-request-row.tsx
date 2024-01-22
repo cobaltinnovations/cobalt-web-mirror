@@ -6,11 +6,11 @@ import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/trash.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -130,7 +130,7 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 											},
 										},
 										{
-											icon: <TrashIcon className={classes.iconTrash} />,
+											icon: <DeleteIcon className={classes.iconTrash} />,
 											title: 'Delete',
 											onClick: () => {
 												onDeleteClick(session.groupSessionRequestId);
