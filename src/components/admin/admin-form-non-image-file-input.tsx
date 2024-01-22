@@ -1,4 +1,4 @@
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { adminService, imageUploader } from '@/lib/services';
 import React, { useState } from 'react';

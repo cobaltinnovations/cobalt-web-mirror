@@ -6,13 +6,13 @@ import { AdminContent, AdminContentAction, ContentStatusId } from '@/lib/models'
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnArchiveIcon } from '@/assets/icons/unarchive.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-trash.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import ConfirmDialog, { ConfirmDialogProps } from '../confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
 import { AdminContentResponse, ContentIdResponse, adminService } from '@/lib/services';
@@ -79,7 +79,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.DELETE]: {
-		icon: TrashIcon,
+		icon: DeleteIcon,
 		label: 'Delete',
 		dividers: false,
 		action: async (content) => {
@@ -110,7 +110,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.REMOVE]: {
-		icon: XIcon,
+		icon: CloseIcon,
 		label: 'Remove',
 		dividers: false,
 		action: async (content) => {

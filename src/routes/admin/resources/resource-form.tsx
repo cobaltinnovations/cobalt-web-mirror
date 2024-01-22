@@ -50,7 +50,7 @@ import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
 
 import NoMatch from '@/pages/no-match';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
