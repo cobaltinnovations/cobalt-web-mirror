@@ -3,7 +3,7 @@ import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import Loader from '@/components/loader';
 import TabBar from '@/components/tab-bar';
-import { adminAnalyticsService } from '@/lib/services/admin-analytics-service';
+import { DATE_OPTION_KEYS, adminAnalyticsService } from '@/lib/services/admin-analytics-service';
 import { DateFormats } from '@/lib/utils';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from 'chart.js';
 import React, { Suspense, useMemo } from 'react';
@@ -28,14 +28,14 @@ export const Component = () => {
 	const { dateOptions } = useAdminAnalyticsLayoutLoaderData();
 	const match = useMatch('/admin/analytics/:dashboardTab');
 	const [searchParams, setSearchParams] = useSearchParams({
-		startDate: dateOptions[0].startDate,
-		endDate: dateOptions[0].endDate,
+		startDate: dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].startDate,
+		endDate: dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].endDate,
 	});
 
 	const startDate = searchParams.get('startDate');
 	const endDate = searchParams.get('endDate');
 	const selectedOption = useMemo(() => {
-		return dateOptions.find((dateOption) => {
+		return Object.values(dateOptions).find((dateOption) => {
 			return dateOption.startDate === startDate && dateOption.endDate === endDate;
 		});
 	}, [dateOptions, endDate, startDate]);
@@ -55,7 +55,7 @@ export const Component = () => {
 							label="Date Range"
 							value={selectedOption ? selectedOption?.label : 'CUSTOM'}
 							onChange={({ currentTarget }) => {
-								const desiredOption = dateOptions.find((dateOption) => {
+								const desiredOption = Object.values(dateOptions).find((dateOption) => {
 									return dateOption.label === currentTarget.value;
 								});
 
@@ -74,7 +74,7 @@ export const Component = () => {
 								});
 							}}
 						>
-							{dateOptions.map((dateOption) => {
+							{Object.values(dateOptions).map((dateOption) => {
 								return (
 									<option key={dateOption.label} value={dateOption.label}>
 										{dateOption.label}

@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useFilterPillStyles = createUseThemedStyles((theme) => ({

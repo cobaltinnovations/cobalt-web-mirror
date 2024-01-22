@@ -3,7 +3,7 @@ import { Button, Modal } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-down.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 
 interface UseStylesProps {
 	dialogWidth: number;

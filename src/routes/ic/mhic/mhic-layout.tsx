@@ -1,5 +1,5 @@
 import { MHIC_HEADER_HEIGHT, MhicHeader } from '@/components/integrated-care/mhic';
-import { STORAGE_KEYS } from '@/lib/config/constants';
+import { config } from '@/config';
 import { PatientOrderAutocompleteResult } from '@/lib/models';
 import React, { Suspense, useEffect, useState } from 'react';
 import { Outlet, useRouteError, useRouteLoaderData } from 'react-router-dom';
@@ -24,7 +24,7 @@ export async function loader() {
 }
 
 function getRecentOrdersFromStorage() {
-	return JSON.parse(window.localStorage.getItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY) ?? '[]');
+	return JSON.parse(window.localStorage.getItem(config.storageKeys.mhicRecentOrdersStorageKey) ?? '[]');
 }
 
 export const Component = () => {
@@ -61,7 +61,10 @@ export const Component = () => {
 					}
 
 					newOrders.unshift(result);
-					window.localStorage.setItem(STORAGE_KEYS.MHIC_RECENT_ORDERS_STORAGE_KEY, JSON.stringify(newOrders));
+					window.localStorage.setItem(
+						config.storageKeys.mhicRecentOrdersStorageKey,
+						JSON.stringify(newOrders)
+					);
 					return newOrders;
 				});
 			})

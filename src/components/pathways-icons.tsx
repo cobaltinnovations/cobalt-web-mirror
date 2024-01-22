@@ -5,7 +5,7 @@ import { ReactComponent as MedicationIcon } from '@/assets/icons/icon-medication
 import { ReactComponent as CoachingIcon } from '@/assets/icons/icon-coaching.svg';
 import { ReactComponent as SpiritualIcon } from '@/assets/icons/icon-spiritual.svg';
 import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
-import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group.svg';
+import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group-sessions.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as InstitutionResourcesIcon } from '@/assets/icons/icon-institution-resources.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';

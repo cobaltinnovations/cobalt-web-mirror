@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 import { Button, ButtonProps } from 'react-bootstrap';
-import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 
 interface CopyToClipboardButtonProps extends ButtonProps {
 	text?: string;

@@ -2,14 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const cheerio = require('cheerio');
 const yn = require('yn');
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
 const proxy = require('express-http-proxy');
-
-const configNamespace = process.env.COBALT_WEB_NAMESPACE;
-const configEnv = process.env.COBALT_WEB_ENV;
 
 let settings = {
 	sentry: {
@@ -17,93 +13,21 @@ let settings = {
 		showDebug: false,
 	},
 	nodeApp: {
-		basicAuth: {
-			enabled: process.env.WEBAPP_ENABLE_BASIC_AUTH,
-			username: process.env.WEBAPP_BASIC_AUTH_USERNAME || 'dev_admin',
-			password: process.env.WEBAPP_BASIC_AUTH_PASSWORD || 'dev_password',
-			secret: '',
-		},
-		subdomainMapping: process.env.WEBAPP_SUBDOMAIN_MAPPING || '*:cobalt',
-	},
-	reactApp: {
-		apiBaseUrl: '',
-		gaTrackingId: '',
-		ga4MeasurementId: '',
-		mixpanelId: '',
-		showDebug: false,
-		googleMapsApiKey: '',
-		providerManagementFeatureEnabled: false,
-		downForMaintenance: false,
+		subdomainMapping: '*:cobalt',
+		webApiBaseUrl: 'http://localhost:8080/',
 	},
 };
 
 try {
-	settings = require(path.resolve(__dirname, 'config', configNamespace, configEnv, 'settings'));
+	settings = require(path.resolve(__dirname, 'config', process.env.COBALT_WEB_ENV, 'settings'));
 } catch (e) {
-	console.warn(`settings not available for Namesapce: ${configNamespace}, Env: ${configEnv}`);
+	throw new Error(`Settings not available.`);
 }
 
 const port = process.env.COBALT_WEB_PORT || 3000;
 const launchDate = new Date();
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
-const INSTITUTION_BUILDS = fs
-	.readdirSync(BUILD_DIR, { withFileTypes: true })
-	.filter((file) => file.isDirectory())
-	.map((dir) => dir.name);
-
-function configureReactApp() {
-	const fe_envVars = [
-		'COBALT_WEB_API_BASE_URL',
-		'COBALT_WEB_GA_TRACKING_ID',
-		'COBALT_WEB_GA4_MEASUREMENT_ID',
-		'COBALT_WEB_MIXPANEL_ID',
-		'COBALT_WEB_SHOW_DEBUG',
-		'COBALT_WEB_SENTRY_SHOW_DEBUG',
-		'COBALT_WEB_GOOGLE_MAPS_API_KEY',
-		'COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE',
-		'COBALT_WEB_DOWN_FOR_MAINTENANCE',
-	];
-
-	const reactAppConfig = Object.entries(process.env)
-		.filter(([envVar]) => fe_envVars.includes(envVar))
-		.reduce(
-			(env, [envVar, value]) => {
-				env[envVar] = value;
-				return env;
-			},
-			// starts with settings from file -- allows env to override
-			{
-				COBALT_WEB_API_BASE_URL: settings.reactApp.apiBaseUrl,
-				COBALT_WEB_GA_TRACKING_ID: settings.reactApp.gaTrackingId,
-				COBALT_WEB_GA4_MEASUREMENT_ID: settings.reactApp.ga4MeasurementId,
-				COBALT_WEB_MIXPANEL_ID: settings.reactApp.mixpanelId,
-				COBALT_WEB_SHOW_DEBUG: settings.reactApp.showDebug,
-				COBALT_WEB_SENTRY_SHOW_DEBUG: settings.sentry.showDebug,
-				COBALT_WEB_GOOGLE_MAPS_API_KEY: settings.reactApp.googleMapsApiKey,
-				COBALT_WEB_PROVIDER_MANAGEMENT_FEATURE: settings.reactApp.providerManagementFeatureEnabled,
-				COBALT_WEB_DOWN_FOR_MAINTENANCE: settings.reactApp.downForMaintenance,
-			}
-		);
-
-	for (const institutionBuild of INSTITUTION_BUILDS) {
-		const INDEX_FILE_PATH = path.join(BUILD_DIR, institutionBuild, 'index.html');
-		const indexFile = fs.readFileSync(INDEX_FILE_PATH, 'utf8');
-		const $ = cheerio.load(indexFile);
-		const appConfigScript = $('script#react-app-env-config');
-
-		// clear config from previous start, if any
-		if (appConfigScript.length > 0) {
-			appConfigScript.remove();
-		}
-
-		$('head').append(
-			`<script id="react-app-env-config" type="application/json">${JSON.stringify(reactAppConfig)}</script>`
-		);
-
-		fs.writeFileSync(INDEX_FILE_PATH, $.html());
-	}
-}
 
 function extractCookieValueFromRequest(_req, cookieName) {
 	const {
@@ -122,8 +46,6 @@ function extractCookieValueFromRequest(_req, cookieName) {
 	return undefined;
 }
 
-configureReactApp();
-
 const app = express();
 
 if (settings.sentry.dsn) {
@@ -141,7 +63,7 @@ if (settings.sentry.dsn) {
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing
 app.get('/reporting/run-report', (req, res, next) => {
-	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
 	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
 	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
 
@@ -154,7 +76,7 @@ app.get('/reporting/run-report', (req, res, next) => {
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing
 app.get('/ic/patient-order-csv-generator', (req, res, next) => {
-	const baseUrl = process.env.COBALT_WEB_API_BASE_URL;
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
 	const orderCount = req.query.orderCount;
 	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
 	const proxyUrl = `${baseUrl}/patient-order-csv-generator?orderCount=${orderCount ?? ''}&X-Cobalt-Access-Token=${
@@ -182,61 +104,6 @@ app.get('/configuration', (_req, res) => {
 		launchDate: launchDate,
 	});
 });
-
-/* ----------------------------------------- */
-/* Basic HTTP Auth */
-/* ----------------------------------------- */
-
-const basicAuthEnabled = yn(settings.nodeApp.basicAuth.enabled, { default: false });
-
-if (basicAuthEnabled) {
-	const USERNAME = settings.nodeApp.basicAuth.username;
-	const PASSWORD = settings.nodeApp.basicAuth.password;
-
-	if (USERNAME === 'dev_admin' && PASSWORD === 'dev_password') {
-		setInterval(() => {
-			console.warn('WARNING: Server using dev/hardcoded basic auth credentials');
-		}, 5000);
-	}
-
-	app.use((req, res, next) => {
-		// quick workaround for passing manifest file through Basic Auth
-		// `.json` files are not handled by the `static` middleware
-		if (req.path.toLowerCase() === '/manifest.json') {
-			next();
-			return;
-		}
-
-		function challengeAuth() {
-			res.setHeader('WWW-Authenticate', 'Basic');
-			res.status(401).send('Not Authenticated');
-		}
-
-		if (!req.session.user) {
-			const { authorization } = req.headers;
-			if (!authorization) {
-				challengeAuth();
-				return;
-			}
-
-			const [username, password] = Buffer.from(authorization.split(' ')[1], 'base64').toString().split(':');
-
-			if (username !== USERNAME || password !== PASSWORD) {
-				challengeAuth();
-				return;
-			}
-
-			req.session.user = USERNAME;
-			next();
-			return;
-		} else if (req.session.user !== USERNAME) {
-			challengeAuth();
-			return;
-		}
-
-		next();
-	});
-}
 
 /* ----------------------------------------- */
 /* Serve SPA */

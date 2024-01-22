@@ -63,6 +63,7 @@ module.exports.webpack = function (config, env) {
 	config = extendSvgLoader(config, fileReplaceLoader);
 	config = extendInternalBabelLoader(config, fileReplaceLoader);
 	config = addJsonLoader(config, fileReplaceLoader);
+	config = addConfigLoader(config);
 
 	return config;
 };
@@ -145,4 +146,23 @@ function extendIncludedPaths(initialInclude) {
 			return tokenized.join('/');
 		}),
 	];
+}
+
+function addConfigLoader(config) {
+	const configPath = path.join(__dirname, 'src', 'config', `config.${process.env.COBALT_WEB_ENV}.ts`);
+
+	console.log('configPath:', configPath);
+
+	config.module.rules.push({
+		test: /config\.local\.ts$/,
+		loader: 'file-replace-loader',
+		include: [path.resolve(__dirname, 'src', 'config')],
+		options: {
+			condition: 'if-replacement-exists',
+			replacement: path.resolve(configPath),
+			async: true,
+		},
+	});
+
+	return config;
 }

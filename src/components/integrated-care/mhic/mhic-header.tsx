@@ -15,7 +15,7 @@ interface MhicHeaderProps {
 	patientOrder?: PatientOrderModel;
 }
 
-export const MHIC_HEADER_HEIGHT = 56;
+export const MHIC_HEADER_HEIGHT = 60;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {

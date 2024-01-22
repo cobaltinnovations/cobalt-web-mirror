@@ -22,7 +22,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 
 import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import { ReactComponent as XIcon } from '@/assets/icons/icon-x.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonText } from '@/components/skeleton-loaders';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
@@ -419,7 +419,7 @@ const ResourceLibraryTopic = () => {
 										}}
 									>
 										{searchIsOpen ? (
-											<XIcon width={24} height={24} />
+											<CloseIcon width={24} height={24} />
 										) : (
 											<SearchIcon width={24} height={24} />
 										)}

@@ -8,7 +8,7 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-question-mark.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	callToAction: {

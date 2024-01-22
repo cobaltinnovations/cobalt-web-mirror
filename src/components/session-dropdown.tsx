@@ -1,7 +1,7 @@
 import React, { FC, ReactElement, PropsWithChildren } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more.svg';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({

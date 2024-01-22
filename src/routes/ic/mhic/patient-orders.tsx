@@ -24,7 +24,7 @@ import {
 } from '@/components/integrated-care/mhic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-import config from '@/lib/config';
+import { config } from '@/config';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
@@ -231,7 +231,7 @@ export const Component = () => {
 							description={headerDescription || <Spinner as="span" animation="border" size="sm" />}
 						>
 							<div className="d-flex align-items-center">
-								{config.COBALT_WEB_SHOW_DEBUG === 'true' && (
+								{config.showDebug && (
 									<Button
 										className="me-2"
 										variant="outline-primary"
