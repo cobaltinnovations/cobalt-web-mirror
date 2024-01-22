@@ -18,11 +18,12 @@ const ResourceLibraryDetail: FC = () => {
 
 	const fetchData = useCallback(async () => {
 		if (!contentId) {
-			return;
+			throw new Error('contentId is undefined.');
 		}
 
-		const response = await contentService.fetchContent(contentId).fetch();
-		setItem(response.content);
+		const contentResponse = await contentService.fetchContent(contentId).fetch();
+
+		setItem(contentResponse.content);
 	}, [contentId]);
 
 	return (

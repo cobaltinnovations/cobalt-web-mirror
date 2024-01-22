@@ -2,17 +2,17 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import useReactPlayerSettings from '@/hooks/use-react-player-settings';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AcivityTypeId, ActivityActionId, AdminContent, Content } from '@/lib/models';
-import { activityTrackingService } from '@/lib/services';
+import { AcivityTypeId, ActivityActionId, AdminContent, Content, Tag } from '@/lib/models';
+import { activityTrackingService, tagService } from '@/lib/services';
 import classNames from 'classnames';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
 import { WysiwygDisplay } from './wysiwyg';
 import BackgroundImageContainer from './background-image-container';
 import { SkeletonButton, SkeletonImage, SkeletonText } from './skeleton-loaders';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import ContentTypeIcon from './content-type-icon';
+import Helpful from '@/components/helpful';
+import { Link } from 'react-router-dom';
 
 const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -50,6 +50,7 @@ interface ResourceDisplayProps {
 const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps) => {
 	const classes = useResourceDisplayStyles();
 	const placeholderImage = useRandomPlaceholderImage();
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	const { canEmbed, embedUrl, playerConfig } = useReactPlayerSettings(content?.url);
 
 	const trackActivity = useCallback(async () => {
@@ -71,6 +72,26 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 			});
 	}, [content, trackView]);
 
+	const fetchData = useCallback(async () => {
+		const tagsRespose = await tagService.getTagGroups().fetch();
+
+		const tags = tagsRespose.tagGroups
+			.reduce((accumulator, currentValue) => [...accumulator, ...(currentValue.tags ?? [])], [] as Tag[])
+			.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[currentValue.tagId]: currentValue,
+				}),
+				{} as Record<string, Tag>
+			);
+
+		setTagsByTagId(tags);
+	}, []);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
 	// Activity Tracking
 	useEffect(() => {
 		if (!content || canEmbed) {
@@ -87,46 +108,45 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 	return (
 		<Container className={classNames('py-18', className)}>
 			<Row className="justify-content-center">
-				<Col md={10} lg={8}>
-					<h1 className="mb-4">{content?.title}</h1>
-
-					<p className="text-muted fw-bold mb-14">
-						{content?.contentTypeId && (
-							<ContentTypeIcon
-								contentTypeId={content?.contentTypeId}
-								width={16}
-								height={16}
-								className="me-1"
-							/>
-						)}
-						{content?.contentTypeDescription}{' '}
-						{content?.duration && <>&bull; {content?.durationInMinutesDescription}</>}
+				<Col md={10} lg={8} xl={8}>
+					<h2 className="mb-4">{content?.title}</h2>
+					<p className="mb-12 text-muted mb-0">
+						{content?.duration ?? <>{content?.duration}</>} {content?.contentTypeDescription} &bull; By{' '}
+						{content?.author}
 					</p>
 
-					{!content?.preventEmbedding && canEmbed ? (
-						<div className={classNames(classes.reactPlayerOuter, 'mb-14')}>
-							<ReactPlayer
-								width="100%"
-								height="100%"
-								controls
-								url={embedUrl}
-								config={playerConfig}
-								onPlay={() => {
-									trackActivity();
-								}}
-							/>
-						</div>
-					) : (
-						<BackgroundImageContainer
-							className={classNames(classes.mediaContainer, 'mb-14')}
-							imageUrl={content?.imageUrl || placeholderImage}
-						/>
+					{!content?.neverEmbed && (
+						<>
+							{canEmbed ? (
+								<div className={classNames(classes.reactPlayerOuter, 'mb-6')}>
+									<ReactPlayer
+										width="100%"
+										height="100%"
+										controls
+										url={embedUrl}
+										config={playerConfig}
+										onPlay={() => {
+											trackActivity();
+										}}
+									/>
+								</div>
+							) : (
+								<BackgroundImageContainer
+									className={classNames(classes.mediaContainer, 'mb-6')}
+									imageUrl={content?.imageUrl || placeholderImage}
+								/>
+							)}
+						</>
 					)}
+				</Col>
+			</Row>
 
+			<Row className="justify-content-center">
+				<Col md={10} lg={8} xl={8}>
 					<WysiwygDisplay html={content?.description ?? ''} />
 
-					{!canEmbed && content?.url && (
-						<div className="mt-8 text-center">
+					{(content?.neverEmbed || !canEmbed) && content?.url && (
+						<div className="mt-10 text-center">
 							<Button
 								as="a"
 								className="d-inline-block text-decoration-none text-white"
@@ -137,34 +157,37 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 									trackActivity();
 								}}
 							>
-								{content.callToAction} <ExternalIcon />
+								{content.callToAction}
 							</Button>
 						</div>
 					)}
 
-					<hr className="mt-12 mb-10" />
-
-					{content?.author && (
-						<>
-							<p className="fw-semibold">Created by</p>
-							<p className="text-n700 mb-0">{content?.author}</p>
-						</>
+					{content?.contentId && (
+						<Helpful contentId={content.contentId} className="my-10" title="Was this resource helpful?" />
 					)}
 
-					{content?.tags && content?.tags.length > 0 && (
+					{(content?.tagIds ?? []).length > 0 && (
 						<>
-							<p className={classNames({ 'mt-8': content?.author }, 'fw-semibold')}>Related Topics</p>
-							<div className="d-flex flex-wrap">
-								{(content?.tags ?? []).map((tag) => (
-									<Badge
-										key={tag.tagId}
-										bg="outline-dark"
-										pill
-										as="div"
-										className="me-1 mt-1 fs-small text-capitalize fw-normal"
+							<hr className="mb-6" />
+							<div className="d-none d-lg-flex flex-wrap">
+								{content?.tagIds.map((tagId) => (
+									<Link
+										key={tagId}
+										to={`/resource-library/tags/${tagsByTagId?.[tagId]?.urlName}`}
+										className="text-decoration-none"
+										onClick={(event) => {
+											event.stopPropagation();
+										}}
 									>
-										{tag.name}
-									</Badge>
+										<Badge
+											bg="outline-dark"
+											pill
+											as="div"
+											className="me-1 mt-1 fs-small text-capitalize fw-normal"
+										>
+											{tagsByTagId?.[tagId]?.name}
+										</Badge>
+									</Link>
 								))}
 							</div>
 						</>
