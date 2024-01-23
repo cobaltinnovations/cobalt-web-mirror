@@ -18,12 +18,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface AdminResourceFormFooterExternalProps {
 	showRemove: boolean;
+	onClosePreview(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onAdd(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onRemove(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 export const AdminResourceFormFooterExternal = ({
 	showRemove,
+	onClosePreview,
 	onAdd,
 	onRemove,
 }: AdminResourceFormFooterExternalProps) => {
@@ -34,9 +36,12 @@ export const AdminResourceFormFooterExternal = ({
 			<Container>
 				<Row>
 					<Col>
-						<div className="d-flex justify-content-between">
+						<div className="d-flex align-items-center justify-content-between">
 							<div></div>
-							<div>
+							<div className="d-flex align-items-center">
+								<Button className="me-2" variant="outline-primary" onClick={onClosePreview}>
+									Close Preview
+								</Button>
 								{showRemove ? (
 									<Button variant="danger" onClick={onRemove}>
 										Remove Resource

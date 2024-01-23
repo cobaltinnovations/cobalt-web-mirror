@@ -436,6 +436,9 @@ export const Component = () => {
 					className="pb-40"
 				/>
 				<AdminResourceFormFooterExternal
+					onClosePreview={() => {
+						navigate(-1);
+					}}
 					showRemove={canRemove}
 					onRemove={() => {
 						setShowRemoveDialog(true);
