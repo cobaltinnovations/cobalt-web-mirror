@@ -37,8 +37,8 @@ const adminActionConfirmDialogPropsMap: Record<
 > = {
 	[AdminContentAction.EXPIRE]: (content, onConfirm) => ({
 		titleText: 'Force Expire Resource',
-		bodyText: `Are you sure you want to force expire ${content.title}?`,
-		detailText: `This resource will be removed from the Resource Library. TODO: ${2} institutions are currently using this resource.`,
+		bodyText: `Are you sure you want to force expire this resource?`,
+		detailText: `Expired resources are hidden from your Resource Library AND removed from the Resource Library of any institution currently using it.`,
 		confirmText: 'Force Expire',
 		dismissText: 'Cancel',
 		destructive: true,
@@ -47,8 +47,8 @@ const adminActionConfirmDialogPropsMap: Record<
 	}),
 	[AdminContentAction.DELETE]: (content, onConfirm) => ({
 		titleText: 'Delete Resource',
-		bodyText: `Are you sure you want to delete ${content.title}?`,
-		detailText: 'This action is permanent. The content will be removed from Cobalt immediately.',
+		bodyText: `Are you sure you want to delete this resource?`,
+		detailText: `This action is permanent. "${content.title}" will be removed from Cobalt.`,
 		confirmText: 'Delete',
 		dismissText: 'Cancel',
 		destructive: true,
@@ -57,8 +57,8 @@ const adminActionConfirmDialogPropsMap: Record<
 	}),
 	[AdminContentAction.REMOVE]: (content, onConfirm) => ({
 		titleText: 'Remove Resource',
-		bodyText: `Are you sure you want to remove ${content.title}?`,
-		detailText: 'This resource will be removed from your Resource Library.',
+		bodyText: `Are you sure you want to remove this resource?`,
+		detailText: `"${content.title}" will be removed from your Resource Library immediately.`,
 		confirmText: 'Remove',
 		dismissText: 'Cancel',
 		destructive: true,
