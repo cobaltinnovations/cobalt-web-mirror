@@ -192,7 +192,7 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		/* React-datepicker styleoverrides */
 		/* ----------------------------------------------------------- */
 		'.react-datepicker-popper': {
-			zIndex: 2,
+			zIndex: 3,
 		},
 		'.react-datepicker': {
 			border: 0,
