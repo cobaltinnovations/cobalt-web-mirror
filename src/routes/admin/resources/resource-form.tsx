@@ -870,7 +870,7 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 				fileUploadId: formValues.resourceFileUploadId,
 			}),
 		...(formValues.imageFileId && { imageFileUploadId: formValues.imageFileId }),
-		durationInMinutes: formValues.durationInMinutes,
+		...(formValues.durationInMinutes && { durationInMinutes: formValues.durationInMinutes }),
 		description: formValues.description,
 		publishStartDate,
 		publishEndDate,
