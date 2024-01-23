@@ -105,22 +105,21 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 
 	return (
 		<Modal {...props} dialogClassName={classes.sessionCropModal} centered>
-			<Modal.Header closeButton bsPrefix="cobalt-modal__header--admin">
-				<Modal.Title bsPrefix="cobalt-modal__title--admin">crop image</Modal.Title>
+			<Modal.Header closeButton>
+				<Modal.Title>crop image</Modal.Title>
 			</Modal.Header>
-			<Modal.Body bsPrefix="cobalt-modal__body--admin--small">
+			<Modal.Body>
 				<ReactCrop src={imageSource} onImageLoaded={onLoad} crop={crop} onChange={handleCropChange} />
 				<div className="d-flex mt-5 align-items-center">
 					<InfoIcon className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
 				</div>
 			</Modal.Body>
-
-			<Modal.Footer bsPrefix="cobalt-modal__footer--admin">
+			<Modal.Footer className="d-flex justify-content-end">
 				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
 					Cancel
 				</Button>
-				<Button variant="primary" size="sm" className="ms-3" onClick={handleOnSaveButtonClick}>
+				<Button variant="primary" size="sm" className="ms-2" onClick={handleOnSaveButtonClick}>
 					Save
 				</Button>
 			</Modal.Footer>

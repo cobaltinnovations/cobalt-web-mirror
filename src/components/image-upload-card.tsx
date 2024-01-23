@@ -74,7 +74,6 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 							</Button>
 
 							<p className="mb-2">
-								Drop an image here or{' '}
 								<Button
 									className="d-inline p-0 text-decoration-none"
 									as="span"
