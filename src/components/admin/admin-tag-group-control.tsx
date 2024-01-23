@@ -29,7 +29,11 @@ export const AdminTagGroupControl = ({ tagGroup, selectedTagIds, onTagClick }: A
 								onTagClick(tag);
 							}}
 						>
-							{isSelected ? <CheckIcon className="me-2" /> : <PlusIcon className="me-2" />}
+							{isSelected ? (
+								<CheckIcon width={20} height={20} className="me-2" />
+							) : (
+								<PlusIcon width={20} height={20} className="me-2" />
+							)}
 							{tag.name}
 						</Button>
 					);
