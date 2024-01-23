@@ -8,7 +8,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 0,
 		bottom: 0,
 		zIndex: 2,
-		padding: '24px 0',
+		padding: '16px 0',
 		position: 'fixed',
 		textAlign: 'center',
 		backgroundColor: theme.colors.n0,

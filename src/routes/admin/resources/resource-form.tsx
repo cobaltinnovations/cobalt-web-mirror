@@ -284,9 +284,15 @@ export const Component = () => {
 			}
 
 			const { value } = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+			const isScheduled = moment(formValues.publishDate).isAfter(moment());
 
 			if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.PUBLISH) {
-				setShowConfirmPublishDialog(true);
+				if (isScheduled) {
+					await updateOrCreateContent(true);
+					navigate(-1);
+				} else {
+					setShowConfirmPublishDialog(true);
+				}
 			} else if (value === ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION.DRAFT) {
 				try {
 					await updateOrCreateContent(true);
@@ -298,7 +304,7 @@ export const Component = () => {
 				return;
 			}
 		},
-		[formValues.description, handleError, navigate, updateOrCreateContent]
+		[formValues.description, formValues.publishDate, handleError, navigate, updateOrCreateContent]
 	);
 
 	const handlePublishModalConfirm = useCallback(async () => {
@@ -310,30 +316,20 @@ export const Component = () => {
 			}
 
 			await adminService.publishContent(adminContent.contentId).fetch();
-			const isScheduled = moment(adminContent.publishStartDate).isAfter(moment());
 
-			if (isScheduled) {
-				addFlag({
-					variant: 'success',
-					title: 'Resource scheduled',
-					description: `Your resource will become live on ${adminContent.publishStartDateDescription}`,
-					actions: [],
-				});
-			} else {
-				addFlag({
-					variant: 'success',
-					title: 'Resource Published',
-					description: 'Your resource is now available on Cobalt',
-					actions: [
-						{
-							title: 'View Resource',
-							onClick: () => {
-								window.alert('[TODO]: View Resource.');
-							},
+			addFlag({
+				variant: 'success',
+				title: 'Resource Published',
+				description: 'Your resource is now available on Cobalt',
+				actions: [
+					{
+						title: 'View Resource',
+						onClick: () => {
+							window.alert('[TODO]: View Resource.');
 						},
-					],
-				});
-			}
+					},
+				],
+			});
 
 			navigate(-1);
 		} catch (error) {
@@ -829,10 +825,10 @@ export const Component = () => {
 				</Container>
 				<AdminResourceFormFooter
 					showDraftButton={isDraft}
-					draftButtonText={isAdd ? 'Save as Draft' : 'Update Draft'}
+					draftButtonText={isAdd ? 'Save as Draft' : 'Save Draft'}
 					showPreviewButton={true}
-					previewActionText={showPreviewModal ? 'Edit' : 'Preview'}
-					mainActionText={isDraft ? 'Publish' : 'Update'}
+					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
+					mainActionText={isDraft ? 'Publish' : 'Save Updates'}
 					onCancel={() => {
 						navigate(-1);
 					}}
