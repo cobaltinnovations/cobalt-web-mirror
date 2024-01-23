@@ -519,7 +519,9 @@ export const Component = () => {
 											<TableCell header>Status</TableCell>
 											<TableCell header>Publish Date</TableCell>
 											<TableCell header>Expiry Date</TableCell>
-											<TableCell header>In Use</TableCell>
+											<TableCell header className="align-items-end">
+												In Use
+											</TableCell>
 											<TableCell header />
 										</TableRow>
 									</TableHead>
@@ -593,15 +595,21 @@ export const Component = () => {
 														{content.publishEndDateDescription ?? 'No Expiry'}
 													</TableCell>
 
-													<TableCell>
-														<OverlayTrigger
-															placement="bottom"
-															overlay={
-																<Tooltip>{content.inUseInstitutionDescription}</Tooltip>
-															}
-														>
-															<div>{content.inUseCount}</div>
-														</OverlayTrigger>
+													<TableCell className="align-items-end">
+														{content.inUseCount > 0 ? (
+															<OverlayTrigger
+																placement="bottom"
+																overlay={
+																	<Tooltip>
+																		{content.inUseInstitutionDescription}
+																	</Tooltip>
+																}
+															>
+																<div>{content.inUseCount}</div>
+															</OverlayTrigger>
+														) : (
+															<>{content.inUseCount}</>
+														)}
 													</TableCell>
 
 													<TableCell>
