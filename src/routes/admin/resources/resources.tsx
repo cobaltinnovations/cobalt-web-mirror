@@ -1,18 +1,5 @@
-import FilterDropdown from '@/components/filter-dropdown';
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import useHandleError from '@/hooks/use-handle-error';
-import { AdminContent, AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
-import {
-	AdminContentListResponse,
-	AdminContentSortOrder,
-	ContentFiltersResponse,
-	ContentStatusesResponse,
-	ContentTagsResponse,
-	adminService,
-} from '@/lib/services';
-import classNames from 'classnames';
+import { cloneDeep } from 'lodash';
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
 	Await,
 	Link,
@@ -22,13 +9,32 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import InputHelperSearch from '@/components/input-helper-search';
+import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+
+import classNames from 'classnames';
+
+import { AdminContent, AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
+import {
+	AdminContentListResponse,
+	AdminContentSortOrder,
+	ContentFiltersResponse,
+	ContentStatusesResponse,
+	ContentTagsResponse,
+	adminService,
+} from '@/lib/services';
+
 import useDebouncedState from '@/hooks/use-debounced-state';
+import useHandleError from '@/hooks/use-handle-error';
+
+import FilterDropdown from '@/components/filter-dropdown';
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
+import InputHelperSearch from '@/components/input-helper-search';
 import { AdminResourcesTableDropdown } from '@/components/admin';
 import ContentTypeIcon from '@/components/content-type-icon';
 import LoadingButton from '@/components/loading-button';
-import { cloneDeep } from 'lodash';
+
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
 
 interface AdminResourcesLoaderData {
 	resourcesPromise: Promise<
@@ -439,6 +445,7 @@ export const Component = () => {
 
 							{showClearButton && (
 								<Button
+									className="d-flex align-items-center text-decoration-none"
 									variant="link"
 									onClick={() => {
 										filters.forEach((filter) => {
@@ -448,7 +455,8 @@ export const Component = () => {
 										setSearchParams(searchParams);
 									}}
 								>
-									Clear
+									<CancelIcon className="me-2" />
+									Clear Filters
 								</Button>
 							)}
 						</div>
@@ -521,7 +529,16 @@ export const Component = () => {
 
 											return (
 												<TableRow key={content.contentId}>
-													<TableCell>{content.dateAddedToInstitutionDescription}</TableCell>
+													<TableCell>
+														<div className="d-flex align-items-center">
+															{content.dateAddedToInstitutionDescription}{' '}
+															{content.newFlag && (
+																<div className="ms-4">
+																	<Badge pill>New</Badge>
+																</div>
+															)}
+														</div>
+													</TableCell>
 
 													<TableCell width={460}>
 														<div className="d-flex align-items-center">
@@ -531,7 +548,7 @@ export const Component = () => {
 																	<Tooltip>{content.contentTypeDescription}</Tooltip>
 																}
 															>
-																<div className="text-muted me-2">
+																<div className="text-muted me-4">
 																	<ContentTypeIcon
 																		contentTypeId={content.contentTypeId}
 																	/>
@@ -555,12 +572,6 @@ export const Component = () => {
 																	{content.author}
 																</small>
 															</div>
-
-															{content.newFlag && (
-																<div>
-																	<Badge pill>New</Badge>
-																</div>
-															)}
 														</div>
 													</TableCell>
 
