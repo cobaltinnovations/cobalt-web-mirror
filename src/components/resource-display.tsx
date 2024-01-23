@@ -111,8 +111,8 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 				<Col md={10} lg={8} xl={8}>
 					<h2 className="mb-4">{content?.title}</h2>
 					<p className="mb-12 text-muted mb-0">
-						{content?.duration ?? <>{content?.duration}</>} {content?.contentTypeDescription} &bull; By{' '}
-						{content?.author}
+						{content?.duration && <>{content?.durationInMinutesDescription} </>}
+						{content?.contentTypeDescription} &bull; By {content?.author}
 					</p>
 
 					{!content?.neverEmbed && (
