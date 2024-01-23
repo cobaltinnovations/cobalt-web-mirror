@@ -13,6 +13,7 @@ import BackgroundImageContainer from './background-image-container';
 import { SkeletonButton, SkeletonImage, SkeletonText } from './skeleton-loaders';
 import Helpful from '@/components/helpful';
 import { Link } from 'react-router-dom';
+import ContentTypeIcon from './content-type-icon';
 
 const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
@@ -110,10 +111,15 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 			<Row className="justify-content-center">
 				<Col md={10} lg={8} xl={8}>
 					<h2 className="mb-4">{content?.title}</h2>
-					<p className="mb-12 text-muted mb-0">
-						{content?.duration && <>{content?.durationInMinutesDescription} </>}
-						{content?.contentTypeDescription} &bull; By {content?.author}
-					</p>
+					<div className="mb-12 d-flex align-items-center">
+						{content?.contentTypeId && (
+							<ContentTypeIcon className="me-2 text-muted" contentTypeId={content?.contentTypeId} />
+						)}
+						<p className="text-muted mb-0">
+							{content?.duration && <>{content?.durationInMinutesDescription} </>}
+							{content?.contentTypeDescription} &bull; By {content?.author}
+						</p>
+					</div>
 
 					{!content?.neverEmbed && (
 						<>
