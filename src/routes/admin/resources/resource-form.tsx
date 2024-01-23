@@ -185,10 +185,10 @@ export const Component = () => {
 	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
 	const isPreview = params.action === 'preview';
-
 	const isDraft =
 		!loaderData?.contentResponse?.content?.contentStatusId ||
 		loaderData?.contentResponse?.content?.contentStatusId === ContentStatusId.DRAFT;
+	const isExpired = loaderData?.contentResponse?.content?.contentStatusId === ContentStatusId.EXPIRED;
 
 	const [formValues, setFormValues] = useState(
 		getInitialResourceFormValues({
@@ -459,13 +459,21 @@ export const Component = () => {
 				onHide={() => {
 					setShowConfirmPublishDialog(false);
 				}}
-				titleText="Publish Resource"
-				bodyText={`Are you ready to publish "${formValues.title}" to Cobalt?`}
-				detailText={`This resource will become live on the Cobalt Resource Library on ${moment(
-					formValues.publishDate
-				).format('MM/DD/YY')}.`}
+				titleText={isEdit ? 'Update Resource' : 'Publish Resource'}
+				bodyText={
+					isEdit
+						? `Do you want to update "${formValues.title}" on Cobalt?`
+						: `Are you ready to publish "${formValues.title}" to Cobalt?`
+				}
+				detailText={
+					isEdit
+						? 'Any changes will be published immediately'
+						: `This resource will become live on the Cobalt Resource Library on ${moment(
+								formValues.publishDate
+						  ).format('MM/DD/YY')}.`
+				}
 				dismissText="Cancel"
-				confirmText="Publish Resource"
+				confirmText={isEdit ? 'Update' : 'Publish Resource'}
 				onConfirm={handlePublishModalConfirm}
 			/>
 
@@ -828,7 +836,7 @@ export const Component = () => {
 					draftButtonText={isAdd ? 'Save as Draft' : 'Save Draft'}
 					showPreviewButton={true}
 					previewActionText={showPreviewModal ? 'Close Preview' : 'Preview'}
-					mainActionText={isDraft ? 'Publish' : 'Save Updates'}
+					mainActionText={isDraft || (isEdit && isExpired) ? 'Publish' : 'Save Updates'}
 					onCancel={() => {
 						navigate(-1);
 					}}
