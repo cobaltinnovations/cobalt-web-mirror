@@ -445,7 +445,7 @@ export const Component = () => {
 
 							{showClearButton && (
 								<Button
-									className="d-flex align-items-center text-decoration-none"
+									className="d-flex align-items-center text-decoration-none text-nowrap"
 									variant="link"
 									onClick={() => {
 										filters.forEach((filter) => {
