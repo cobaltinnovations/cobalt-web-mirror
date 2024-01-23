@@ -160,6 +160,7 @@ const initialGroupSessionFormValues = {
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
 	visibleFlag: true,
+	collectionFlag: false,
 	registrationEndDateFlag: false,
 	registrationEndDate: null as Date | null,
 	tagIds: [] as string[],
@@ -190,6 +191,7 @@ function getInitialGroupSessionFormValues({
 		registrationEndDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
 		tags = [],
+		groupSessionCollectionId,
 		...rest
 	} = groupSession ?? ({} as GroupSessionModel);
 
@@ -216,6 +218,8 @@ function getInitialGroupSessionFormValues({
 			...rest,
 			screeningFlowId,
 			tagIds: tags.map((tag) => tag.tagId),
+			groupSessionCollectionId,
+			collectionFlag: groupSessionCollectionId ? true : false,
 			// keep initial values when duplicating an existing session
 			...(isDuplicate
 				? {
@@ -811,6 +815,34 @@ export const Component = () => {
 			<hr />
 
 			<AdminFormSection
+				title="Registration End Date (optional)"
+				description="Set an end date for registration. Users will not be able to register for the event after this date."
+			>
+				<ToggledInput
+					type="switch"
+					id="registration-end-date"
+					label="Set registration end date"
+					checked={formValues.registrationEndDateFlag}
+					onChange={({ currentTarget }) => {
+						updateFormValue('registrationEndDateFlag', currentTarget.checked);
+					}}
+				>
+					<DatePicker
+						className="w-100 mb-2"
+						labelText="Expiration Date"
+						selected={formValues.registrationEndDate ?? undefined}
+						onChange={(date) => {
+							updateFormValue('registrationEndDate', date);
+						}}
+						minDate={new Date()}
+					/>
+					<p className="mb-0 text-muted">Registration will end at 11:59pm on the date selected.</p>
+				</ToggledInput>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
 				title="Image"
 				description={
 					<>
@@ -970,100 +1002,6 @@ export const Component = () => {
 			<hr />
 
 			<AdminFormSection
-				title="Visibility"
-				description={
-					<>
-						<p className="mb-2">
-							Visible sessions can be displayed in a collection with other similar group sessions. If no
-							collection is selected, then the session will only be displayed in the Upcoming Sessions
-							section.
-						</p>
-
-						<p>
-							A hidden session will still be available on Cobalt, but users will need a direct link to
-							access it.
-						</p>
-					</>
-				}
-			>
-				<ToggledInput
-					type="radio"
-					id="visibility-on"
-					label="Visible"
-					className="mb-3"
-					required
-					checked={formValues.visibleFlag}
-					onChange={({ currentTarget }) => {
-						updateFormValue('visibleFlag', true);
-					}}
-				>
-					<InputHelper
-						as="select"
-						label="Collection"
-						name="groupSessionCollectionId"
-						value={formValues.groupSessionCollectionId}
-						onChange={({ currentTarget }) => {
-							updateFormValue('groupSessionCollectionId', currentTarget.value);
-						}}
-					>
-						<option value="">Select a collection</option>
-						{loaderData.groupSessionCollections.map((groupSessionCollection) => {
-							return (
-								<option
-									key={groupSessionCollection.groupSessionCollectionId}
-									value={groupSessionCollection.groupSessionCollectionId}
-								>
-									{groupSessionCollection.title}
-								</option>
-							);
-						})}
-					</InputHelper>
-				</ToggledInput>
-
-				<ToggledInput
-					type="radio"
-					id="visibility-off"
-					name="visibility"
-					label="Hidden"
-					hideChildren
-					checked={!formValues.visibleFlag}
-					onChange={({ currentTarget }) => {
-						updateFormValue('visibleFlag', false);
-					}}
-				/>
-			</AdminFormSection>
-
-			<hr />
-
-			<AdminFormSection
-				title="Registration End Date (optional)"
-				description="Set an end date for registration. Users will not be able to register for the event after this date."
-			>
-				<ToggledInput
-					type="switch"
-					id="registration-end-date"
-					label="Set registration end date"
-					checked={formValues.registrationEndDateFlag}
-					onChange={({ currentTarget }) => {
-						updateFormValue('registrationEndDateFlag', currentTarget.checked);
-					}}
-				>
-					<DatePicker
-						className="w-100 mb-2"
-						labelText="Expiration Date"
-						selected={formValues.registrationEndDate ?? undefined}
-						onChange={(date) => {
-							updateFormValue('registrationEndDate', date);
-						}}
-						minDate={new Date()}
-					/>
-					<p className="mb-0 text-muted">Registration will end at 11:59pm on the date selected.</p>
-				</ToggledInput>
-			</AdminFormSection>
-
-			<hr />
-
-			<AdminFormSection
 				title="Tags"
 				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 			>
@@ -1085,6 +1023,88 @@ export const Component = () => {
 						/>
 					);
 				})}
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
+				title="Visibility"
+				description={
+					<>
+						<p className="mb-2">
+							Visible sessions appear across Cobalt in multiple areas. This is the recommended setting for
+							most group sessions.
+						</p>
+						<p className="mb-0">
+							Hidden sessions are still available on Cobalt, but users can only view a hidden session by
+							accessing it directly through the group session URL, collection URL, or topic page URL.
+						</p>
+					</>
+				}
+			>
+				<ToggledInput
+					type="radio"
+					id="visibility-on"
+					label="Visible"
+					hideChildren
+					className="mb-3"
+					checked={formValues.visibleFlag}
+					onChange={() => {
+						updateFormValue('visibleFlag', true);
+					}}
+				/>
+				<ToggledInput
+					type="radio"
+					id="visibility-off"
+					name="visibility"
+					label="Hidden"
+					hideChildren
+					checked={!formValues.visibleFlag}
+					onChange={() => {
+						updateFormValue('visibleFlag', false);
+					}}
+				/>
+			</AdminFormSection>
+
+			<hr />
+
+			<AdminFormSection
+				title="Collection (optional)"
+				description={
+					<p className="mb-0">Select a collection to group this session with other similar sessions.</p>
+				}
+			>
+				<ToggledInput
+					type="switch"
+					id="collection"
+					label="Add to collection"
+					checked={formValues.collectionFlag}
+					onChange={({ currentTarget }) => {
+						updateFormValue('collectionFlag', currentTarget.checked);
+					}}
+				>
+					<InputHelper
+						as="select"
+						label="Collection"
+						name="groupSessionCollectionId"
+						value={formValues.groupSessionCollectionId}
+						onChange={({ currentTarget }) => {
+							updateFormValue('groupSessionCollectionId', currentTarget.value);
+						}}
+					>
+						<option value="">Select collection</option>
+						{loaderData.groupSessionCollections.map((groupSessionCollection) => {
+							return (
+								<option
+									key={groupSessionCollection.groupSessionCollectionId}
+									value={groupSessionCollection.groupSessionCollectionId}
+								>
+									{groupSessionCollection.title}
+								</option>
+							);
+						})}
+					</InputHelper>
+				</ToggledInput>
 			</AdminFormSection>
 
 			{!isExternal && (
