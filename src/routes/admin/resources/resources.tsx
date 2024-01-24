@@ -542,7 +542,7 @@ export const Component = () => {
 														</div>
 													</TableCell>
 
-													<TableCell width={460}>
+													<TableCell width={480}>
 														<div className="d-flex align-items-center">
 															<OverlayTrigger
 																placement="bottom"
@@ -579,7 +579,7 @@ export const Component = () => {
 
 													<TableCell>{content.ownerInstitution}</TableCell>
 
-													<TableCell>
+													<TableCell width={120}>
 														<div>
 															<Badge
 																pill
