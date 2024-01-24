@@ -1869,6 +1869,10 @@ function prepareGroupSessionSubmission(
 		}
 	}
 
+	if (!groupSessionSubmission.collectionFlag) {
+		delete groupSessionSubmission.groupSessionCollectionId;
+	}
+
 	if (!groupSessionSubmission.groupSessionCollectionId) {
 		delete groupSessionSubmission.groupSessionCollectionId;
 	}
