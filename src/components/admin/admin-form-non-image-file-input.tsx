@@ -6,12 +6,16 @@ import FileUploadCard from '../file-upload-card';
 import InputHelper from '../input-helper';
 
 export interface AdminFormNonImageFileInputProps {
+	defaultFileName?: string;
+	defaultFileSize?: number;
 	previewSrc?: string;
 	uploadedFileSrc: string;
 	onUploadedFileChange: (newfileUploadId: string, newFileSrc: string) => void;
 }
 
 export const AdminFormNonImageFileInput = ({
+	defaultFileName,
+	defaultFileSize,
 	previewSrc,
 	uploadedFileSrc,
 	onUploadedFileChange,
@@ -25,8 +29,8 @@ export const AdminFormNonImageFileInput = ({
 		<>
 			<FileUploadCard
 				accept="application/pdf, .pdf, application/vnd.ms-powerpoint, .ppt, application/vnd.openxmlformats-officedocument.presentationml.presentation, .pptx,"
-				fileName={fileInformation?.name}
-				fileSize={fileInformation?.size}
+				fileName={fileInformation?.name ?? defaultFileName}
+				fileSize={fileInformation?.size ?? defaultFileSize}
 				imagePreview={previewSrc}
 				isUploading={isUploading}
 				progress={progress}
