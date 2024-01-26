@@ -3,7 +3,7 @@ import { Link, NavigateOptions, To } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ContentTypeId, TagModel } from '@/lib/models';
+import { ContentTypeId, Tag } from '@/lib/models';
 // import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
@@ -90,7 +90,7 @@ export interface ResourceLibraryCardProps {
 	authorPrefix?: string;
 	author: string;
 	description?: string;
-	tags: TagModel[];
+	tags: Tag[];
 	contentTypeId?: ContentTypeId;
 	badgeTitle?: string;
 	imageUrl?: string;

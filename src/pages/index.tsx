@@ -25,17 +25,16 @@ import {
 	GroupSessionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
 	CallToActionModel,
-	ResourceLibraryContentModel,
-	TagModel,
 	INSTITUTION_BLURB_TYPE_ID,
 	InstitutionBlurb,
+	Content,
+	Tag,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
-import NoData from '@/components/no-data';
 import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
@@ -74,8 +73,8 @@ const Index: FC = () => {
 	const { trackEvent } = useAnalytics();
 
 	const [inTheStudioEvents, setInTheStudioEvents] = useState<(GroupSessionRequestModel | GroupSessionModel)[]>([]);
-	const [content, setContent] = useState<ResourceLibraryContentModel[]>([]);
-	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
+	const [content, setContent] = useState<Content[]>([]);
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();

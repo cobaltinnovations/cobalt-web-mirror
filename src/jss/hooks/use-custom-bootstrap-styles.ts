@@ -89,6 +89,9 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 		'.text-gray': {
 			color: `${theme.colors.n500} !important`,
 		},
+		'.text-muted': {
+			color: `${theme.colors.n500} !important`,
+		},
 
 		'.text-decoration-underline': {
 			textDecoration: 'underline !important',
@@ -229,6 +232,17 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: theme.colors.background,
 			'&.active': {
 				backgroundColor: theme.colors.a300,
+			},
+		},
+
+		'.tooltip': {
+			'& .tooltip-arrow': {
+				display: 'none',
+			},
+			'& .tooltip-inner': {
+				padding: '8px 12px',
+				color: theme.colors.n0,
+				...theme.fonts.small,
 			},
 		},
 

@@ -1,16 +1,16 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { GroupSessionModel, GroupSessionRequestModel, ResourceLibraryContentModel, TagModel } from '@/lib/models';
+import { Content, GroupSessionModel, GroupSessionRequestModel, Tag } from '@/lib/models';
 
-interface getRecommendationsResponse {
+interface GetRecommendationsResponse {
 	groupSessions: GroupSessionModel[];
 	groupSessionRequests: GroupSessionRequestModel[];
-	contents: ResourceLibraryContentModel[];
-	tagsByTagId: Record<string, TagModel>;
+	contents: Content[];
+	tagsByTagId: Record<string, Tag>;
 }
 
 export const recommendationsService = {
 	getRecommendations(accountId: string) {
-		return httpSingleton.orchestrateRequest<getRecommendationsResponse>({
+		return httpSingleton.orchestrateRequest<GetRecommendationsResponse>({
 			method: 'get',
 			url: `/accounts/${accountId}/recommendations`,
 		});

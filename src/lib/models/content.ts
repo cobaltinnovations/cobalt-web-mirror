@@ -1,104 +1,57 @@
-// https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/ContentType.java
-import { InstitutionFilters } from '@/lib/services';
+import { Tag } from './tag-groups';
 
 export enum ContentTypeId {
-	InternalBlog = 'INT_BLOG',
-	ExternalBlog = 'EXT_BLOG',
-	Video = 'VIDEO',
-	Audio = 'AUDIO',
-	Article = 'ARTICLE',
-	Worksheet = 'WORKSHEET',
-	Podcast = 'PODCAST',
-	App = 'APP',
+	INT_BLOG = 'INT_BLOG',
+	EXT_BLOG = 'EXT_BLOG',
+	VIDEO = 'VIDEO',
+	AUDIO = 'AUDIO',
+	ARTICLE = 'ARTICLE',
+	WORKSHEET = 'WORKSHEET',
+	PODCAST = 'PODCAST',
+	APP = 'APP',
 }
 
-export enum ContentTypeIdLabel {
-	INT_BLOG = 'Internal Blog',
-	EXT_BLOG = 'External Blog',
-	VIDEO = 'Video',
-	AUDIO = 'Audio',
-	ARTICLE = 'Article',
-	WORKSHEET = 'Worksheet',
-	PODCAST = 'Podcast',
-	APP = 'App',
+export enum ContentStatusId {
+	DRAFT = 'DRAFT',
+	SCHEDULED = 'SCHEDULED',
+	LIVE = 'LIVE',
+	EXPIRED = 'EXPIRED',
+	AVAILABLE = 'AVAILABLE',
 }
 
-export enum ContentApprovalStatusId {
-	Pending = 'PENDING',
-	Approved = 'APPROVED',
-	Rejected = 'REJECTED',
-	Archived = 'ARCHIVED',
-}
-
-export enum ContentAvailableStatusId {
-	Available = 'AVAILABLE',
-	Added = 'ADDED',
-}
-
-export enum ContentVisibilityTypeId {
-	Private = 'PRIVATE',
-	Network = 'NETWORK',
-	Public = 'PUBLIC',
-}
-
-interface InternalBlog {
-	contentTypeId: ContentTypeId.InternalBlog;
-	url?: never;
-	dateCreated?: never;
-	duration?: never;
-}
-
-interface Article {
-	contentTypeId: ContentTypeId.Article;
-	url: string;
-	dateCreated: string;
-	dateCreatedDescription: string;
-	duration: string;
-}
-
-interface Video {
-	contentTypeId: ContentTypeId.Video;
-	url: string;
-	dateCreated: string;
-	dateCreatedDescription: string;
-	duration: string;
-}
-
-interface Podcast {
-	contentTypeId: ContentTypeId.Podcast;
-	url: string;
-	dateCreated?: never;
-	dateCreatedDescription?: never;
-	duration: string;
-}
-
-export interface ContentVisibility {
-	contentVisibilityId: string;
-	contentId: string;
-	visibilityId: ContentVisibilityTypeId;
-	approvalStatusId: ContentApprovalStatusId;
+export interface ContentStatus {
+	contentStatusId: ContentStatusId;
 	description: string;
 }
 
-export enum AdminContentActions {
-	VIEW = 'VIEW',
+export interface ContentType {
+	callToAction: string;
+	contentTypeId: ContentTypeId;
+	description: string;
+}
+
+export interface ContentDuration {
+	contentDurationId: string;
+	description: string;
+}
+
+export enum AdminContentAction {
 	EDIT = 'EDIT',
-	APPROVE = 'APPROVE',
-	REJECT = 'REJECT',
 	DELETE = 'DELETE',
-	ADD = 'ADD',
-	REMOVE = 'REMOVE',
 	ARCHIVE = 'ARCHIVE',
 	UNARCHIVE = 'UNARCHIVE',
+	REMOVE = 'REMOVE',
+	ADD = 'ADD',
+	VIEW_ON_COBALT = 'VIEW_ON_COBALT',
+	EXPIRE = 'EXPIRE',
+	UNEXPIRE = 'UNEXPIRE',
 }
 
 export type Content = {
 	contentId: string;
 	contentTypeId: ContentTypeId;
-	contentTypeDescription: string;
-	contentTypeLabelId: string;
-	contentTypeLabel: string;
 	title: string;
+	url: string;
 	imageUrl: string;
 	description: string;
 	author: string;
@@ -106,42 +59,54 @@ export type Content = {
 	createdDescription: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
+	contentTypeDescription: string;
 	callToAction: string;
 	newFlag: boolean;
-	contentApprovalStatusId?: ContentApprovalStatusId;
-	url: string;
-	selectedNetworkInstitutions?: InstitutionFilters[];
-	contentTagIds?: string[];
+	duration: string;
+	durationInMinutes: number;
+	durationInMinutesDescription: string;
 	tagIds: string[];
-	visibilityId: ContentVisibilityTypeId;
-	visibleToOtherInstitutions?: boolean;
+	tags?: Tag[];
 	neverEmbed?: boolean;
-} & (InternalBlog | Article | Video | Podcast);
+};
 
-export type AdminContentRow = {
-	actions: AdminContentActions[];
+export type AdminContent = {
+	actions: AdminContentAction[];
 	author: string;
+	callToAction: string;
 	contentId: string;
+	contentStatusId: ContentStatusId;
+	contentTypeDescription: string;
 	contentTypeId: ContentTypeId;
 	dateCreated: string;
 	dateCreatedDescription: string;
 	description: string;
+	duration?: string;
+	durationInMinutes?: number;
+	durationInMinutesDescription?: string;
 	imageUrl: string;
-	otherInstitutionApprovalStatus: {
-		approvalStatusId: ContentApprovalStatusId;
-		description: string;
-	};
+	imageFileUploadId: string;
+	inUseCount: number;
+	inUseInstitutionDescription: string;
+	isEditable: boolean;
+	newFlag: boolean;
 	ownerInstitution: string;
-	ownerInstitutionApprovalStatus: {
-		approvalStatusId: ContentApprovalStatusId;
-		description: string;
-	};
+	publishEndDate: string;
+	publishEndDateDescription: string;
+	publishStartDate: string;
+	publishStartDateDescription: string;
+	sharedFlag: boolean;
+	tagIds: string[];
+	tags: Tag[];
 	title: string;
 	url: string;
-	views?: number;
-	visibilityId?: ContentVisibility[];
-	visibleToOtherInstitutions: false;
-	availableStatusId?: ContentAvailableStatusId;
-	approvalStatusId?: ContentApprovalStatusId;
-	durationMinutes?: '';
-} & Content;
+	fileUploadId: string;
+	views: number;
+	neverEmbed?: boolean;
+
+	// Not seeing in response, but don't remove yet
+	publishRecurring: boolean;
+	searchTerms: string;
+	contentStatusDescription: string;
+	dateAddedToInstitutionDescription: string;
+};

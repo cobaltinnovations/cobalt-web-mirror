@@ -7,11 +7,11 @@ import { Helmet } from 'react-helmet';
 import {
 	CallToActionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
-	ContentDurationFilterModel,
-	ContentTypeFilterModel,
-	ResourceLibraryContentModel,
-	TagGroupModel,
-	TagModel,
+	ContentDuration,
+	ContentType,
+	TagGroup,
+	Content,
+	Tag,
 } from '@/lib/models';
 import { callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
@@ -76,23 +76,23 @@ const ResourceLibrary = () => {
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
-	const [tagGroups, setTagGroups] = useState<TagGroupModel[]>([]);
-	const [contents, setContents] = useState<ResourceLibraryContentModel[]>([]);
+	const [tagGroups, setTagGroups] = useState<TagGroup[]>([]);
+	const [contents, setContents] = useState<Content[]>([]);
 	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
-	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, ResourceLibraryContentModel[]>>();
-	const [tagsByTagId, setTagsByTagId] = useState<Record<string, TagModel>>();
+	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
+	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	// Topic Filter
-	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroupModel[]>([]);
-	const [tagFilters, setTagFilters] = useState<Record<string, TagModel[]>>();
+	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroup[]>([]);
+	const [tagFilters, setTagFilters] = useState<Record<string, Tag[]>>();
 	const [tagFilterIsShowing, setTagFilterIsShowing] = useState(false);
 	const [tagFilterValue, setTagFilterValue] = useState<string[]>([]);
 	// Content Type Filter
-	const [contentTypeFilters, setContentTypeFilters] = useState<ContentTypeFilterModel[]>([]);
+	const [contentTypeFilters, setContentTypeFilters] = useState<ContentType[]>([]);
 	const [contentTypeFilterIsShowing, setContentTypeFilterIsShowing] = useState(false);
 	const [contentTypeFilterValue, setContentTypeFilterValue] = useState<string[]>([]);
 	// Content Duration Filter
-	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDurationFilterModel[]>([]);
+	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDuration[]>([]);
 	const [contentDurationFilterIsShowing, setContentDurationFilterIsShowing] = useState(false);
 	const [contentDurationFilterValue, setContentDurationFilterValue] = useState<string[]>([]);
 	const hasFilterQueryParms = useMemo(
@@ -119,7 +119,7 @@ const ResourceLibrary = () => {
 			.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 0 })
 			.fetch();
 
-		const tagsByTagGroupId: Record<string, TagModel[]> = {};
+		const tagsByTagGroupId: Record<string, Tag[]> = {};
 		Object.values(response.tagsByTagId).forEach((tag) => {
 			if (tagsByTagGroupId[tag.tagGroupId]) {
 				tagsByTagGroupId[tag.tagGroupId].push(tag);

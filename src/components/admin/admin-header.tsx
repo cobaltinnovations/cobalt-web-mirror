@@ -109,14 +109,14 @@ export const AdminHeader = () => {
 	const classes = useStyles();
 	const { account, signOutAndClearContext } = useAccount();
 
+	const isResourcePreview = useMatch({
+		path: '/admin/resources/preview/*',
+	});
 	const isGroupSessionPreview = useMatch({
 		path: '/admin/group-sessions/preview/*',
 	});
-	const myContentMatch = useMatch({
-		path: '/admin/my-content/*',
-	});
-	const availableContentMatch = useMatch({
-		path: '/admin/available-content/*',
+	const resourcesMatch = useMatch({
+		path: '/admin/resources/*',
 	});
 	const groupSessionsMatch = useMatch({
 		path: '/admin/group-sessions/*',
@@ -140,17 +140,10 @@ export const AdminHeader = () => {
 				? [
 						{
 							testId: '',
-							navigationItemId: 'MY_CONTENT',
-							to: '/admin/my-content',
-							title: 'My Content',
-							active: !!myContentMatch,
-						},
-						{
-							testId: '',
-							navigationItemId: 'AVAILABLE_CONTENT',
-							to: '/admin/available-content',
-							title: 'Available Content',
-							active: !!availableContentMatch,
+							navigationItemId: 'RESOURCES',
+							to: '/admin/resources',
+							title: 'Resources',
+							active: !!resourcesMatch,
 						},
 				  ]
 				: []),
@@ -212,13 +205,14 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
 			analyticsMatch,
-			availableContentMatch,
 			debugMatch,
 			groupSessionsMatch,
-			myContentMatch,
 			reportsMatch,
+			resourcesMatch,
 		]
 	);
+
+	const showLinks = !isResourcePreview && !isGroupSessionPreview;
 
 	return (
 		<header className={classes.header}>
@@ -227,9 +221,11 @@ export const AdminHeader = () => {
 				<span className="d-block text-gray">Admin</span>
 			</div>
 			<div className={classes.navigationOuter}>
-				{isGroupSessionPreview ? (
-					<p className="mb-0 text-muted">Preview Group Session</p>
-				) : (
+				{isResourcePreview && <p className="mb-0 text-muted">Preview Resource</p>}
+
+				{isGroupSessionPreview && <p className="mb-0 text-muted">Preview Group Session</p>}
+
+				{showLinks && (
 					<>
 						<nav className="h-100">
 							<ul>

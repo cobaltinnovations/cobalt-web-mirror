@@ -15,19 +15,19 @@ interface Props extends React.SVGProps<SVGSVGElement> {
 
 const ContentTypeIcon = ({ contentTypeId, ...props }: Props) => {
 	switch (contentTypeId) {
-		case ContentTypeId.App:
+		case ContentTypeId.APP:
 			return <AppIcon {...props} />;
-		case ContentTypeId.Article:
-		case ContentTypeId.ExternalBlog:
-		case ContentTypeId.InternalBlog:
+		case ContentTypeId.ARTICLE:
+		case ContentTypeId.EXT_BLOG:
+		case ContentTypeId.INT_BLOG:
 			return <ArticleIcon {...props} />;
-		case ContentTypeId.Audio:
+		case ContentTypeId.AUDIO:
 			return <AudioIcon {...props} />;
-		case ContentTypeId.Podcast:
+		case ContentTypeId.PODCAST:
 			return <PodcastIcon {...props} />;
-		case ContentTypeId.Video:
+		case ContentTypeId.VIDEO:
 			return <VideoIcon {...props} />;
-		case ContentTypeId.Worksheet:
+		case ContentTypeId.WORKSHEET:
 			return <WorksheetIcon {...props} />;
 		default:
 			return null;

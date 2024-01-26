@@ -1,71 +1,86 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
-	AdminContentRow,
-	Content,
-	ContentApprovalStatusId,
-	ContentAvailableStatusId,
+	AdminContent,
+	ContentStatusId,
+	ContentStatus,
 	ContentTypeId,
-	ContentVisibilityTypeId,
-	PresignedUploadModel,
-	TagGroupModel,
-	TagModel,
+	TagGroup,
+	Tag,
+	PresignedUploadResponse,
 } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
+export interface CreateContentRequest {
+	contentTypeId?: ContentTypeId;
+	title?: string;
+	author?: string;
+	url?: string;
+	fileUploadId?: string;
+	imageFileUploadId?: string;
+	durationInMinutes?: string;
+	description?: string;
+	publishStartDate?: string;
+	publishEndDate?: string;
+	publishRecurring?: boolean;
+	tagIds?: string[];
+	searchTerms?: string;
+	sharedFlag?: boolean;
+	contentStatusId?: ContentStatusId;
+}
+
 export interface ContentFiltersResponse {
 	institutions?: InstitutionFilters[];
-	visibilities?: VisibilityFilters[];
 	contentTypes?: ContentTypeFilters[];
-	approvalStatuses?: ApprovalStatusFilters[];
-	availableStatuses?: AvailableStatusFilters[];
-	myApprovalStatuses?: ApprovalStatusFilters[];
-	otherApprovalStatuses?: ApprovalStatusFilters[];
+}
+
+export interface ContentStatusesResponse {
+	contentStatuses: ContentStatus[];
 }
 
 export interface InstitutionFilters {
 	institutionId: string;
 	name: string;
 }
-interface VisibilityFilters {
-	visibilityId: ContentVisibilityTypeId;
-	description: string;
-}
-interface ContentTypeFilters {
+
+export interface ContentTypeFilters {
 	contentTypeId: ContentTypeId;
 	description: string;
 	callToAction: string;
 }
-interface ApprovalStatusFilters {
-	approvalStatusId: ContentApprovalStatusId;
-	description: string;
+
+export enum AdminContentSortOrder {
+	DATE_ADDED_DESC = 'DATE_ADDED_DESC',
+	DATE_ADDED_ASC = 'DATE_ADDED_ASC',
+	PUBLISH_DATE_DESC = 'PUBLISH_DATE_DESC',
+	PUBLISH_DATE_ASC = 'PUBLISH_DATE_ASC',
+	EXPIRY_DATE_DESC = 'EXPIRY_DATE_DESC',
+	EXPIRY_DATE_ASC = 'EXPIRY_DATE_ASC',
 }
 
-interface AvailableStatusFilters {
-	availableStatusId?: ContentAvailableStatusId;
-	description: string;
-}
-
-interface adminContentParams {
+interface AdminContentParams {
 	page?: number;
 	contentTypeId?: ContentTypeId;
 	institutionId?: string;
-	visibilityId?: ContentVisibilityTypeId;
-	approvalStatusId?: ContentApprovalStatusId;
+	contentStatusId?: ContentStatusId;
 	search?: string;
 }
 
-interface AdminContentResponse {
-	networkInstitutions?: InstitutionFilters[];
-	content?: Content;
-	adminContent?: AdminContentRow;
+export interface AdminContentResponse {
+	content?: AdminContent;
+	adminContent?: AdminContent;
+}
+
+export interface ContentTagsResponse {
+	tagGroups: TagGroup[];
+	tags: Tag[];
 }
 
 export interface AdminContentListResponse {
-	adminContent: AdminContentRow[];
+	adminContent: AdminContent[];
 	totalCount: number;
 }
 
-interface ContentIdResponse {
+export interface ContentIdResponse {
 	contentId: string;
 }
 
@@ -74,21 +89,8 @@ interface GetPreSignedUploadUrlRequestBody {
 	filename: string;
 }
 
-interface GetPreSignedUploadUrlResponseBody {
-	presignedUpload: PresignedUploadModel;
-}
-
 interface InstitutionsResponse {
 	institutions: InstitutionFilters[];
-}
-
-export interface ContentTypeLabel {
-	contentTypeLabelId: string;
-	description: string;
-}
-
-interface ContentTypeLabelsResponse {
-	contentTypeLabels: ContentTypeLabel[];
 }
 
 export const adminService = {
@@ -98,29 +100,24 @@ export const adminService = {
 			url: '/admin/content-institutions',
 		});
 	},
-	fetchContentTypeLabels() {
-		return httpSingleton.orchestrateRequest<ContentTypeLabelsResponse>({
-			method: 'get',
-			url: '/admin/content-type-labels',
-		});
-	},
 	fetchMyContentFilters() {
 		return httpSingleton.orchestrateRequest<ContentFiltersResponse>({
 			method: 'get',
 			url: '/admin/my-content/filter',
 		});
 	},
-	fetchAvailableContentFilters() {
-		return httpSingleton.orchestrateRequest<ContentFiltersResponse>({
+
+	fetchContentStatuses() {
+		return httpSingleton.orchestrateRequest<ContentStatusesResponse>({
 			method: 'get',
-			url: '/admin/available-content/filter',
+			url: '/admin/content-statuses',
 		});
 	},
 
-	fetchMyContent(queryParameters?: adminContentParams) {
+	fetchContent(queryParameters?: AdminContentParams) {
 		return httpSingleton.orchestrateRequest<AdminContentListResponse>({
 			method: 'get',
-			url: buildQueryParamUrl('/admin/my-content', queryParameters),
+			url: buildQueryParamUrl('/admin/content', queryParameters),
 		});
 	},
 
@@ -131,7 +128,7 @@ export const adminService = {
 		});
 	},
 
-	createContent(data: any) {
+	createContent(data: CreateContentRequest) {
 		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'post',
 			url: '/admin/content',
@@ -139,27 +136,11 @@ export const adminService = {
 		});
 	},
 
-	updateContent(contentId: string | null, data: any) {
-		if (!contentId) return;
+	updateContent(contentId: string, data: any) {
 		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'put',
 			url: `/admin/content/${contentId}`,
 			data,
-		});
-	},
-
-	fetchAvailableContent(queryParameters?: adminContentParams) {
-		return httpSingleton.orchestrateRequest<AdminContentListResponse>({
-			method: 'get',
-			url: buildQueryParamUrl('/admin/available-content', queryParameters),
-		});
-	},
-
-	updateContentApprovalStatus(contentId: string, approvalStatusId: ContentApprovalStatusId) {
-		return httpSingleton.orchestrateRequest<AdminContentResponse>({
-			method: 'put',
-			url: `/admin/content/${contentId}/approval-status`,
-			data: { approvalStatusId },
 		});
 	},
 
@@ -170,31 +151,54 @@ export const adminService = {
 		});
 	},
 
-	updateArchiveFlag(contentId: string, archivedFlag: boolean) {
+	publishContent(contentId: string) {
 		return httpSingleton.orchestrateRequest<AdminContentResponse>({
 			method: 'put',
-			url: `/admin/content/${contentId}/archive`,
-			data: {
-				archivedFlag,
-			},
+			url: `/admin/content/${contentId}/publish`,
 		});
 	},
 
 	fetchContentTags() {
-		return httpSingleton.orchestrateRequest<{
-			tagGroups: TagGroupModel[];
-			tags: TagModel[];
-		}>({
+		return httpSingleton.orchestrateRequest<ContentTagsResponse>({
 			method: 'get',
 			url: '/admin/content-tags',
 		});
 	},
 
-	getPreSignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
-		return httpSingleton.orchestrateRequest<GetPreSignedUploadUrlResponseBody>({
+	getPresignedUploadUrl(data: GetPreSignedUploadUrlRequestBody) {
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'post',
 			url: 'admin/content/image-presigned-upload',
 			data,
+		});
+	},
+
+	getFilePresignedUpload(data: GetPreSignedUploadUrlRequestBody) {
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
+			method: 'post',
+			url: '/admin/content/file-presigned-upload',
+			data,
+		});
+	},
+
+	addContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
+			method: 'post',
+			url: `/admin/content/${contentId}/add`,
+		});
+	},
+
+	removeContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
+			method: 'delete',
+			url: `/admin/content/${contentId}/remove`,
+		});
+	},
+
+	forceExpireContent(contentId: string) {
+		return httpSingleton.orchestrateRequest<AdminContentResponse>({
+			method: 'PUT',
+			url: `/admin/content/${contentId}/force-expire`,
 		});
 	},
 };

@@ -1,19 +1,13 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import {
-	ContentDurationFilterModel,
-	ContentTypeFilterModel,
-	ResourceLibraryContentModel,
-	TagGroupModel,
-	TagModel,
-} from '@/lib/models';
+import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
 export const resourceLibraryService = {
 	getResourceLibrary() {
 		return httpSingleton.orchestrateRequest<{
-			contentsByTagGroupId: Record<string, ResourceLibraryContentModel[]>;
-			tagGroups: TagGroupModel[];
-			tagsByTagId: Record<string, TagModel>;
+			contentsByTagGroupId: Record<string, Content[]>;
+			tagGroups: TagGroup[];
+			tagsByTagId: Record<string, Tag>;
 		}>({
 			method: 'GET',
 			url: '/resource-library',
@@ -22,11 +16,11 @@ export const resourceLibraryService = {
 	searchResourceLibrary(queryParameters?: { searchQuery?: string; pageNumber?: number; pageSize?: number }) {
 		return httpSingleton.orchestrateRequest<{
 			findResult: {
-				contents: ResourceLibraryContentModel[];
+				contents: Content[];
 				totalCount: number;
 				totalCountDescription: string;
 			};
-			tagsByTagId: Record<string, TagModel>;
+			tagsByTagId: Record<string, Tag>;
 		}>({
 			method: 'GET',
 			url: buildQueryParamUrl('/resource-library/search', queryParameters),
@@ -45,12 +39,12 @@ export const resourceLibraryService = {
 	) {
 		return httpSingleton.orchestrateRequest<{
 			findResult: {
-				contents: ResourceLibraryContentModel[];
+				contents: Content[];
 				totalCount: number;
 				totalCountDescription: string;
 			};
-			tagGroup: TagGroupModel;
-			tagsByTagId: Record<string, TagModel>;
+			tagGroup: TagGroup;
+			tagsByTagId: Record<string, Tag>;
 		}>({
 			method: 'GET',
 			url: buildQueryParamUrl(`/resource-library/tag-groups/${tagGroupId}`, queryParameters),
@@ -68,13 +62,13 @@ export const resourceLibraryService = {
 	) {
 		return httpSingleton.orchestrateRequest<{
 			findResult: {
-				contents: ResourceLibraryContentModel[];
+				contents: Content[];
 				totalCount: number;
 				totalCountDescription: string;
 			};
-			tag: TagModel;
-			tagGroup: TagGroupModel;
-			tagsByTagId: Record<string, TagModel>;
+			tag: Tag;
+			tagGroup: TagGroup;
+			tagsByTagId: Record<string, Tag>;
 		}>({
 			method: 'GET',
 			url: buildQueryParamUrl(`/resource-library/tags/${tagId}`, queryParameters),
@@ -82,9 +76,9 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryFiltersByTagGroupId(tagGroupId: string) {
 		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentTypeFilterModel[];
-			contentDurations: ContentDurationFilterModel[];
-			tags: TagModel[];
+			contentTypes: ContentType[];
+			contentDurations: ContentDuration[];
+			tags: Tag[];
 		}>({
 			method: 'GET',
 			url: `/resource-library/tag-group-filters/${tagGroupId}`,
@@ -92,8 +86,8 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryFiltersByTagId(tagId: string) {
 		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentTypeFilterModel[];
-			contentDurations: ContentDurationFilterModel[];
+			contentTypes: ContentType[];
+			contentDurations: ContentDuration[];
 		}>({
 			method: 'GET',
 			url: `/resource-library/tag-filters/${tagId}`,
@@ -101,7 +95,7 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryContentTypes() {
 		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentTypeFilterModel[];
+			contentTypes: ContentType[];
 		}>({
 			method: 'GET',
 			url: `/resource-library/content-types`,
@@ -115,12 +109,12 @@ export const resourceLibraryService = {
 		pageSize?: number;
 	}) {
 		return httpSingleton.orchestrateRequest<{
-			tagsByTagId: Record<string, TagModel>;
-			contentDurations: ContentDurationFilterModel[];
-			contentTypes: ContentTypeFilterModel[];
-			tagGroups: TagGroupModel[];
+			tagsByTagId: Record<string, Tag>;
+			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
+			tagGroups: TagGroup[];
 			findResult: {
-				contents: ResourceLibraryContentModel[];
+				contents: Content[];
 				totalCount: number;
 				totalCountDescription: string;
 			};

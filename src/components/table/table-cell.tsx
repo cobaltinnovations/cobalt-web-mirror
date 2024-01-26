@@ -26,7 +26,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 	tableCellContent: {
 		height: '100%',
 		padding: '14px 20px',
-		width: '100%',
+		width: ({ width }: UseStylesProps) => width ?? '100%',
 		display: 'inline-flex',
 		flexDirection: 'column',
 		justifyContent: 'center',

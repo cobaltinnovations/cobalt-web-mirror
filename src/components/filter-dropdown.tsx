@@ -18,6 +18,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		maxWidth: ({ width }: UseStylesProps) => width,
 	},
 	dropdownMenuBody: {
+		maxHeight: 400,
+		overflow: 'scroll',
 		padding: '16px 24px',
 		...theme.fonts.default,
 		'& .react-datepicker': {
@@ -62,6 +64,8 @@ interface FilterDropdownProps {
 	confirmText?: string;
 	onDismiss(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onConfirm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onShow?(): void;
+	onHide?(): void;
 	className?: string;
 	showSortIcon?: boolean;
 	iconLeft?: boolean;
@@ -76,6 +80,8 @@ const FilterDropdown = ({
 	confirmText = 'Apply',
 	onDismiss,
 	onConfirm,
+	onShow,
+	onHide,
 	className,
 	showSortIcon = false,
 	iconLeft = false,
@@ -91,7 +97,15 @@ const FilterDropdown = ({
 			className={classNames('d-flex align-items-center', className)}
 			autoClose="outside"
 			show={show}
-			onToggle={setShow}
+			onToggle={(nextShow) => {
+				if (!nextShow) {
+					onHide?.();
+				} else {
+					onShow?.();
+				}
+
+				setShow(nextShow);
+			}}
 		>
 			<Dropdown.Toggle
 				variant={active ? 'primary' : 'light'}

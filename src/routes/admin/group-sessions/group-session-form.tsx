@@ -1,12 +1,9 @@
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
+import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import Wysiwyg, { WysiwygRef } from '@/components/admin-cms/wysiwyg';
+import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import DatePicker from '@/components/date-picker';
-import ImageUploadCard from '@/components/image-upload-card';
 import InputHelper from '@/components/input-helper';
-import SessionCropModal from '@/components/session-crop-modal';
 import TimeSlotInput from '@/components/time-slot-input';
 import ToggledInput from '@/components/toggled-input';
 import useHandleError from '@/hooks/use-handle-error';
@@ -15,12 +12,11 @@ import {
 	GroupSessionSchedulingSystemId,
 	ReportTypeId,
 	groupSessionsService,
-	imageUploader,
 	screeningService,
 	tagService,
 } from '@/lib/services';
 import NoMatch from '@/pages/no-match';
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import {
 	Link,
@@ -33,7 +29,6 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import GroupSession from '@/components/group-session';
@@ -50,7 +45,6 @@ import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { ScreeningFlowQuestionsModal } from '@/components/screening-flow-questions-modal';
-import { createUseThemedStyles } from '@/jss/theme';
 import TabBar from '@/components/tab-bar';
 import ConfirmDialog from '@/components/confirm-dialog';
 import useFlags from '@/hooks/use-flags';
@@ -58,6 +52,7 @@ import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
+import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -159,6 +154,7 @@ const initialGroupSessionFormValues = {
 	endTime: '',
 	endDate: moment().add(2, 'd').toDate() as Date | null,
 	imageUrl: '',
+	imageFileUploadId: '',
 	description: '',
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
@@ -239,22 +235,7 @@ function getInitialGroupSessionFormValues({
 	);
 }
 
-const useStyles = createUseThemedStyles((theme) => ({
-	formFooter: {
-		left: 0,
-		right: 0,
-		bottom: 0,
-		zIndex: 1,
-		padding: '20px 0',
-		position: 'fixed',
-		textAlign: 'center',
-		backgroundColor: theme.colors.n0,
-		borderTop: `1px solid ${theme.colors.border}`,
-	},
-}));
-
 export const Component = () => {
-	const classes = useStyles();
 	const { institution } = useAccount();
 	const loaderData = useAdminGroupSessionFormLoaderData();
 	const navigate = useNavigate();
@@ -528,7 +509,7 @@ export const Component = () => {
 				}}
 			/>
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Basic Info"
 				description={
 					<>
@@ -596,18 +577,18 @@ export const Component = () => {
 
 				{!formValues.title || urlNameValidations[debouncedUrlNameQuery]?.available === false ? null : (
 					<div className="d-flex mt-2">
-						<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+						<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 						<p className="mb-0">
 							URL will appear as https://{window.location.host}/group-sessions/
 							<span className="fw-bold">{formValues.urlName}</span>
 						</p>
 					</div>
 				)}
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Location"
 				description='Select "Online" for events hosted virtually through a video conferencing platform or "In person" for an event at a physical venue.'
 			>
@@ -662,11 +643,11 @@ export const Component = () => {
 						}}
 					/>
 				</ToggledInput>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Capacity (optional)"
 				description="Enter a number to set a limit on how many people are allowed to attend."
 			>
@@ -679,11 +660,11 @@ export const Component = () => {
 						updateFormValue('seats', parseInt(currentTarget.value));
 					}}
 				/>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title={isExternal ? 'Facilitator' : 'Facilitator & Contact'}
 				description={
 					<>
@@ -756,11 +737,11 @@ export const Component = () => {
 						/>
 					</ToggledInput>
 				)}
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title={isExternal ? 'Duration' : 'Scheduling'}
 				description={
 					isExternal
@@ -829,11 +810,11 @@ export const Component = () => {
 				) : (
 					startAndEndTimeInputs
 				)}
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Registration End Date (optional)"
 				description="Set an end date for registration. Users will not be able to register for the event after this date."
 			>
@@ -857,11 +838,11 @@ export const Component = () => {
 					/>
 					<p className="mb-0 text-muted">Registration will end at 11:59pm on the date selected.</p>
 				</ToggledInput>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Image"
 				description={
 					<>
@@ -886,15 +867,22 @@ export const Component = () => {
 					</>
 				}
 			>
-				<GroupSessionImageInput
+				<AdminFormImageInput
 					imageSrc={formValues.imageUrl}
-					onSrcChange={(nextSrc) => {
+					onSrcChange={(nextId, nextSrc) => {
+						updateFormValue('imageFileUploadId', nextId);
 						updateFormValue('imageUrl', nextSrc);
+					}}
+					presignedUploadGetter={(blob) => {
+						return groupSessionsService.getPresignedUploadUrl({
+							contentType: blob.type,
+							filename: `${uuidv4()}.jpg`,
+						}).fetch;
 					}}
 				/>
 
 				<div className="d-flex  mt-2">
-					<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+					<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
 					<p className="mb-0">
 						If you choose not to upload an image, a generic placeholder image will be added to your post.
 						Free images can be found at{' '}
@@ -903,11 +891,11 @@ export const Component = () => {
 						</a>
 					</p>
 				</div>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Description"
 				description="Describe what your group session is about, who it is for, and any special requirements for participating. Your description should tell potential attendees everything they need to know to make a decision about joining."
 			>
@@ -919,13 +907,13 @@ export const Component = () => {
 						updateFormValue('description', nextValue);
 					}}
 				/>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			{isExternal && (
 				<>
 					<hr />
 
-					<GroupSessionFormSection
+					<AdminFormSection
 						title="Learn More"
 						description="How will participants learn more or sign up for this session?"
 					>
@@ -1007,58 +995,39 @@ export const Component = () => {
 								helperText="The external URL may be a link that participants use to register for the session or a link to a webpage with more information."
 							/>
 						</ToggledInput>
-					</GroupSessionFormSection>
+					</AdminFormSection>
 				</>
 			)}
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Tags"
 				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 			>
 				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
 					return (
-						<div key={tagGroup.tagGroupId} className="mb-4">
-							<h5 className="mb-2">{tagGroup.name}</h5>
-
-							<div className="d-flex flex-wrap">
-								{(tagGroup.tags ?? []).map((tag) => {
-									const isSelected = formValues.tagIds.includes(tag.tagId);
-
-									return (
-										<Button
-											key={tag.tagId}
-											size="sm"
-											variant={isSelected ? 'primary' : 'outline-primary'}
-											className="mb-2 me-2 fs-default text-nowrap"
-											onClick={() => {
-												updateFormValue(
-													'tagIds',
-													isSelected
-														? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-														: [...formValues.tagIds, tag.tagId]
-												);
-											}}
-										>
-											{isSelected ? (
-												<CheckIcon className="me-2" />
-											) : (
-												<PlusIcon className="me-2" />
-											)}
-											{tag.name}
-										</Button>
-									);
-								})}
-							</div>
-						</div>
+						<AdminTagGroupControl
+							key={tagGroup.tagGroupId}
+							tagGroup={tagGroup}
+							selectedTagIds={formValues.tagIds}
+							onTagClick={(tag) => {
+								const isSelected = formValues.tagIds.includes(tag.tagId);
+								updateFormValue(
+									'tagIds',
+									isSelected
+										? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
+										: [...formValues.tagIds, tag.tagId]
+								);
+							}}
+						/>
 					);
 				})}
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Visibility"
 				description={
 					<>
@@ -1095,11 +1064,11 @@ export const Component = () => {
 						updateFormValue('visibleFlag', false);
 					}}
 				/>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			<hr />
 
-			<GroupSessionFormSection
+			<AdminFormSection
 				title="Collection (optional)"
 				description={
 					<p className="mb-0">Select a collection to group this session with other similar sessions.</p>
@@ -1136,14 +1105,14 @@ export const Component = () => {
 						})}
 					</InputHelper>
 				</ToggledInput>
-			</GroupSessionFormSection>
+			</AdminFormSection>
 
 			{!isExternal && (
 				<>
 					{loaderData?.screeningFlows.length > 1 && (
 						<>
 							<hr />
-							<GroupSessionFormSection
+							<AdminFormSection
 								title="Screening Questions"
 								description={
 									<>
@@ -1220,13 +1189,13 @@ export const Component = () => {
 											/>
 										);
 									})}
-							</GroupSessionFormSection>
+							</AdminFormSection>
 						</>
 					)}
 
 					<hr />
 
-					<GroupSessionFormSection
+					<AdminFormSection
 						title="Confirmation Email (optional)"
 						description="This text will be added to the default confirmation email we send to anyone who reserves a seat for this group session."
 					>
@@ -1237,11 +1206,11 @@ export const Component = () => {
 								updateFormValue('confirmationEmailContent', nextValue);
 							}}
 						/>
-					</GroupSessionFormSection>
+					</AdminFormSection>
 
 					<hr />
 
-					<GroupSessionFormSection title="Other Emails (Optional)">
+					<AdminFormSection title="Other Emails (Optional)">
 						<ToggledInput
 							type="switch"
 							id="send-reminder-email"
@@ -1348,7 +1317,7 @@ export const Component = () => {
 								}}
 							/>
 						</ToggledInput>
-					</GroupSessionFormSection>
+					</AdminFormSection>
 				</>
 			)}
 		</Container>
@@ -1357,7 +1326,7 @@ export const Component = () => {
 	const details = isPreview || isView ? <GroupSession groupSession={loaderData?.groupSession!} /> : formFields;
 
 	const footer = (
-		<div className={classes.formFooter}>
+		<>
 			<ConfirmDialog
 				size="lg"
 				show={showConfirmCancelDialog}
@@ -1386,73 +1355,63 @@ export const Component = () => {
 						});
 				}}
 			/>
-			<Container>
-				<div className="d-flex justify-content-between">
-					<div>
-						<Button
-							variant="outline-primary"
-							type={!loaderData.isAdminRoute || isPreview || isNotDraft ? 'button' : 'submit'}
-							value="exit"
-							onClick={(event) => {
-								if (loaderData.isAdminRoute) {
-									if (isPreview) {
-										navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
-									} else if (isNotDraft) {
-										navigate(`/admin/group-sessions`);
-									}
-								} else {
-									navigate('/group-sessions');
-								}
-							}}
-						>
-							{loaderData.isAdminRoute ? (
+
+			<AdminFormFooter
+				exitButtonType={!loaderData.isAdminRoute || isPreview || isNotDraft ? 'button' : 'submit'}
+				onExit={() => {
+					if (loaderData.isAdminRoute) {
+						if (isPreview) {
+							navigate(`/admin/group-sessions/edit/${params.groupSessionId}`);
+						} else if (isNotDraft) {
+							navigate(`/admin/group-sessions`);
+						}
+					} else {
+						navigate('/group-sessions');
+					}
+				}}
+				exitLabel={
+					loaderData.isAdminRoute ? (
+						<>
+							{isPreview ? (
 								<>
-									{isPreview ? (
-										<>
-											<LeftChevron /> Back to Edit
-										</>
-									) : isNotDraft ? (
-										'Exit Editor'
-									) : (
-										'Save & Exit'
-									)}
+									<LeftChevron /> Back to Edit
 								</>
+							) : isNotDraft ? (
+								'Exit Editor'
 							) : (
-								'Exit'
+								'Save & Exit'
 							)}
-						</Button>
+						</>
+					) : (
+						'Exit'
+					)
+				}
+				extraAction={cancelSessionButton}
+				nextButtonType={isPreview ? 'button' : 'submit'}
+				onNext={() => {
+					if (!isPreview) {
+						return;
+					}
 
-						{cancelSessionButton}
-					</div>
-
-					<Button
-						variant="primary"
-						type={isPreview ? 'button' : 'submit'}
-						onClick={() => {
-							if (!isPreview) {
-								return;
-							}
-
-							setShowConfirmPublishDialog(true);
-						}}
-					>
-						{loaderData.isAdminRoute ? (
-							<>
-								{isPreview ? (
-									'Publish'
-								) : (
-									<>
-										{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
-									</>
-								)}
-							</>
-						) : (
-							'Submit'
-						)}
-					</Button>
-				</div>
-			</Container>
-		</div>
+					setShowConfirmPublishDialog(true);
+				}}
+				nextLabel={
+					loaderData.isAdminRoute ? (
+						<>
+							{isPreview ? (
+								'Publish'
+							) : (
+								<>
+									{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+								</>
+							)}
+						</>
+					) : (
+						'Submit'
+					)
+				}
+			/>
+		</>
 	);
 
 	const confirmPublishDialog = (
@@ -1694,104 +1653,6 @@ export const Component = () => {
 	);
 };
 
-interface GroupSessionFormSectionProps {
-	title: string | ReactNode;
-	description?: string | ReactNode;
-	children: ReactNode;
-}
-
-const GroupSessionFormSection = ({ title, description, children }: GroupSessionFormSectionProps) => {
-	return (
-		<Row className="py-10">
-			<Col xs={12} lg={6}>
-				{typeof title === 'string' ? <h4 className="mb-4">{title}</h4> : title}
-
-				{typeof description === 'string' ? <p>{description}</p> : description}
-			</Col>
-
-			<Col xs={12} lg={6}>
-				{children}
-			</Col>
-		</Row>
-	);
-};
-
-interface GroupSessionImageInputProps {
-	imageSrc: string;
-	onSrcChange: (newSrc: string) => void;
-}
-
-const GroupSessionImageInput = ({ imageSrc, onSrcChange }: GroupSessionImageInputProps) => {
-	const handleError = useHandleError();
-	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-	const [cropModalImageSrc, setCropModalImageSrc] = useState(imageSrc);
-	const [imagePreviewSrc, setImagePreviewSrc] = useState(imageSrc);
-	const [isUploading, setIsUploading] = useState(false);
-	const [progress, setProgress] = useState(0);
-
-	return (
-		<>
-			<SessionCropModal
-				imageSource={cropModalImageSrc}
-				show={isCropModalOpen}
-				onHide={() => {
-					setIsCropModalOpen(false);
-				}}
-				onSave={async (blob) => {
-					setIsCropModalOpen(false);
-
-					imageUploader(
-						blob,
-						groupSessionsService.getPresignedUploadUrl({
-							contentType: blob.type,
-							filename: `${uuidv4()}.jpg`,
-						}).fetch
-					)
-						.onBeforeUpload((previewImageUrl) => {
-							setImagePreviewSrc(previewImageUrl);
-						})
-						.onPresignedUploadObtained((accessUrl) => {
-							setIsUploading(true);
-
-							onSrcChange(accessUrl);
-						})
-						.onProgress((percentage) => {
-							setProgress(percentage);
-						})
-						.onComplete((accessUrl) => {
-							setIsUploading(false);
-							setImagePreviewSrc(accessUrl);
-						})
-						.onError((error: any) => {
-							handleError(error);
-
-							setIsUploading(false);
-
-							setImagePreviewSrc('');
-						})
-						.start();
-				}}
-			/>
-
-			<ImageUploadCard
-				imagePreview={imagePreviewSrc}
-				isUploading={isUploading}
-				progress={progress}
-				onChange={(file) => {
-					const sourceUrl = URL.createObjectURL(file);
-
-					setCropModalImageSrc(sourceUrl);
-					setIsCropModalOpen(true);
-				}}
-				onRemove={() => {
-					onSrcChange('');
-					setImagePreviewSrc('');
-				}}
-			/>
-		</>
-	);
-};
-
 function prepareGroupSessionSubmission(
 	formValues: Partial<typeof initialGroupSessionFormValues>,
 	isExternal: boolean
@@ -1879,6 +1740,9 @@ function prepareGroupSessionSubmission(
 
 	if (!groupSessionSubmission.imageUrl) {
 		delete groupSessionSubmission.imageUrl;
+	}
+	if (!groupSessionSubmission.imageFileUploadId) {
+		delete groupSessionSubmission.imageFileUploadId;
 	}
 
 	if (groupSessionSubmission.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL) {

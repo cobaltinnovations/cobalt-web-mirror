@@ -17,7 +17,7 @@ import useAccount from '@/hooks/use-account';
 import { ROLE_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
-import Wysiwyg from '@/components/admin-cms/wysiwyg';
+import Wysiwyg from '@/components/wysiwyg';
 import AsyncPage from '@/components/async-page';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
