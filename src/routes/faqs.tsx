@@ -33,8 +33,6 @@ export const Component = () => {
 	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
 
-	console.log(hash);
-
 	return (
 		<>
 			<Helmet>

@@ -155,7 +155,7 @@ function getInitialResourceFormValues({
 		author: adminContent?.author ?? '',
 		contentTypeId: adminContent?.contentTypeId ?? '',
 		contentStatusId: adminContent?.contentStatusId ?? ContentStatusId.DRAFT,
-		durationInMinutes: String(adminContent?.durationInMinutes) ?? '',
+		durationInMinutes: adminContent?.durationInMinutes ? String(adminContent?.durationInMinutes) : '',
 		resourceType: adminContent?.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
 		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
 		resourceFileName: adminContent?.filename ?? '',

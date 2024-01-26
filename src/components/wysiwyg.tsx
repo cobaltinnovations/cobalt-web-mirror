@@ -47,8 +47,6 @@ export const Wysiwyg = forwardRef<WysiwygRef, WysiwygProps>(
 						return;
 					}
 
-					console.log(quill.root.innerHTML);
-
 					onChange(quill.root.innerHTML);
 				};
 
