@@ -70,7 +70,7 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 					<div className="d-flex">
 						<div className="flex-grow-1">
 							<p className="mb-0">{fileName}</p>
-							<p className="mb-0 text-muted">{fileSize ? `${fileSize / 1000} MB` : 0}</p>
+							<p className="mb-0 text-muted">{fileSize ? `${fileSize / 1000} MB` : `0 MB`}</p>
 						</div>
 
 						{imagePreview && (
@@ -116,7 +116,6 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 							</Button>
 
 							<p className="mb-2">
-								Drop a file here or{' '}
 								<Button
 									className="d-inline p-0 text-decoration-none"
 									as="span"

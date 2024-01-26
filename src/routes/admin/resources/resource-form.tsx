@@ -129,6 +129,7 @@ const initialResourceFormValues = {
 	durationInMinutes: '',
 	resourceType: RESOURCE_TYPE.URL as RESOURCE_TYPE,
 	resourceUrl: '',
+	resourceFileName: '',
 	resourceFileUploadId: '',
 	resourceFileUrl: '',
 	isShared: true,
@@ -157,6 +158,7 @@ function getInitialResourceFormValues({
 		durationInMinutes: String(adminContent?.durationInMinutes) ?? '',
 		resourceType: adminContent?.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
 		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
+		resourceFileName: adminContent?.filename ?? '',
 		resourceFileUploadId: adminContent?.fileUploadId ?? '',
 		resourceFileUrl: adminContent?.fileUploadId ? adminContent?.url : '',
 		isShared: adminContent?.sharedFlag !== undefined ? adminContent?.sharedFlag : true,
@@ -315,7 +317,7 @@ export const Component = () => {
 				throw new Error('content is undefined.');
 			}
 
-			await adminService.publishContent(adminContent.contentId).fetch();
+			const response = await adminService.publishContent(adminContent.contentId).fetch();
 
 			addFlag({
 				variant: 'success',
@@ -325,7 +327,15 @@ export const Component = () => {
 					{
 						title: 'View Resource',
 						onClick: () => {
-							window.alert('[TODO]: View Resource.');
+							if (!response.content) {
+								return;
+							}
+
+							window.open(
+								`/resource-library/${response.content?.contentId}`,
+								'_blank',
+								'noopener, noreferrer'
+							);
 						},
 					},
 				],
@@ -628,6 +638,8 @@ export const Component = () => {
 							}}
 						>
 							<AdminFormNonImageFileInput
+								defaultFileName={formValues.resourceFileName}
+								defaultFileSize={0}
 								previewSrc={formValues.resourceFileUrl}
 								uploadedFileSrc={formValues.resourceFileUrl}
 								onUploadedFileChange={(nextId, nextSrc) => {
