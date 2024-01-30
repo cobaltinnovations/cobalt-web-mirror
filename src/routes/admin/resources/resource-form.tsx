@@ -130,6 +130,7 @@ const initialResourceFormValues = {
 	resourceType: RESOURCE_TYPE.URL as RESOURCE_TYPE,
 	resourceUrl: '',
 	resourceFileName: '',
+	resourceFileSize: 0,
 	resourceFileUploadId: '',
 	resourceFileUrl: '',
 	isShared: true,
@@ -159,6 +160,7 @@ function getInitialResourceFormValues({
 		resourceType: adminContent?.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
 		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
 		resourceFileName: adminContent?.filename ?? '',
+		resourceFileSize: adminContent?.filesize ?? 0,
 		resourceFileUploadId: adminContent?.fileUploadId ?? '',
 		resourceFileUrl: adminContent?.fileUploadId ? adminContent?.url : '',
 		isShared: adminContent?.sharedFlag !== undefined ? adminContent?.sharedFlag : true,
@@ -639,7 +641,7 @@ export const Component = () => {
 						>
 							<AdminFormNonImageFileInput
 								defaultFileName={formValues.resourceFileName}
-								defaultFileSize={0}
+								defaultFileSize={formValues.resourceFileSize}
 								previewSrc={formValues.resourceFileUrl}
 								uploadedFileSrc={formValues.resourceFileUrl}
 								onUploadedFileChange={(nextId, nextSrc) => {
@@ -717,6 +719,7 @@ export const Component = () => {
 								return adminService.getPresignedUploadUrl({
 									contentType: blob.type,
 									filename: `${uuidv4()}.jpg`,
+									filesize: blob.size,
 								}).fetch;
 							}}
 						/>
