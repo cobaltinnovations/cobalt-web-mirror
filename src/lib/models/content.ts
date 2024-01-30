@@ -104,6 +104,7 @@ export type AdminContent = {
 	views: number;
 	neverEmbed?: boolean;
 	filename?: string;
+	filesize?: number;
 
 	// Not seeing in response, but don't remove yet
 	publishRecurring: boolean;

@@ -42,6 +42,7 @@ export const AdminFormNonImageFileInput = ({
 						adminService.getFilePresignedUpload({
 							contentType: file.type,
 							filename: file.name,
+							filesize: file.size,
 						}).fetch
 					)
 						.onPresignedUploadObtained(({ fileUploadResult }) => {
