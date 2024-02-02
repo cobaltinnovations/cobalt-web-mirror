@@ -4,9 +4,9 @@ import ReactCrop from 'react-image-crop';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import 'react-image-crop/dist/ReactCrop.css';
-import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import useFlags from '@/hooks/use-flags';
 
 function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
 	const canvas = document.createElement('canvas');
@@ -38,7 +38,10 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 		canvas.toBlob(
 			(blob) => {
 				if (!blob) {
-					return reject({ code: 400, message: 'Error converting crop to blob.' });
+					return reject({
+						code: 400,
+						message: 'Error cropping image, please recrop your image and try again.',
+					});
 				}
 
 				resolve(blob);
@@ -68,7 +71,7 @@ interface SessionCropModalProps extends ModalProps {
 
 const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
-	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
 	const [crop, setCrop] = useState({
@@ -100,7 +103,12 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 
 			onSave(blob);
 		} catch (error) {
-			handleError(error);
+			addFlag({
+				variant: 'danger',
+				title: 'Error',
+				description: (error as any).message,
+				actions: [],
+			});
 		}
 	}
 
