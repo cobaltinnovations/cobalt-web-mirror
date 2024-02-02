@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useCallback, useEffect } from 'react';
+import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 
@@ -114,6 +114,14 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 		}, 0);
 	}, []);
 
+	const handleEntered = useCallback(() => {
+		setCrop({
+			width: 90,
+			aspect: 16 / 9,
+			unit: '%' as '%',
+		});
+	}, []);
+
 	const handleHide = useCallback(() => {
 		if (isDragging) {
 			return;
@@ -125,7 +133,13 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 	}, [isDragging, onHide]);
 
 	return (
-		<Modal {...props} onHide={handleHide} dialogClassName={classes.sessionCropModal} centered>
+		<Modal
+			{...props}
+			onEntered={handleEntered}
+			onHide={handleHide}
+			dialogClassName={classes.sessionCropModal}
+			centered
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>crop image</Modal.Title>
 			</Modal.Header>
@@ -144,7 +158,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 				</div>
 			</Modal.Body>
 			<Modal.Footer className="d-flex justify-content-end">
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
+				<Button variant="outline-primary" size="sm" onClick={handleHide}>
 					Cancel
 				</Button>
 				<Button variant="primary" size="sm" className="ms-2" onClick={handleOnSaveButtonClick}>
