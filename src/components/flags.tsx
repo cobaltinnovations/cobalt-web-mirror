@@ -22,8 +22,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 	flagsOuter: {
 		left: 48,
 		bottom: 48,
-		// ridiculous number to be above bootstrap offCanvas element
-		zIndex: 1041,
+		// ridiculous number to be above bootstrap offCanvas element and modal
+		zIndex: 1056,
 		width: 400,
 		position: 'fixed',
 		'& .flag': {

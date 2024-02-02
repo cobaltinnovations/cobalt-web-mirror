@@ -4,9 +4,9 @@ import ReactCrop from 'react-image-crop';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import 'react-image-crop/dist/ReactCrop.css';
-import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import useFlags from '@/hooks/use-flags';
 
 function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
 	const canvas = document.createElement('canvas');
@@ -38,7 +38,10 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 		canvas.toBlob(
 			(blob) => {
 				if (!blob) {
-					return reject({ code: 400, message: 'Error converting crop to blob.' });
+					return reject({
+						code: 400,
+						message: 'Error cropping image, please recrop your image and try again.',
+					});
 				}
 
 				resolve(blob);
@@ -66,9 +69,9 @@ interface SessionCropModalProps extends ModalProps {
 	onSave(blob: Blob): void;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
-	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
 	const [crop, setCrop] = useState({
@@ -76,6 +79,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 		aspect: 16 / 9,
 		unit: '%' as '%',
 	});
+	const [isDragging, setIsDragging] = useState(false);
 
 	const onLoad = useCallback((htmlImageElement: HTMLImageElement) => {
 		imageRef.current = htmlImageElement;
@@ -99,24 +103,70 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 
 			onSave(blob);
 		} catch (error) {
-			handleError(error);
+			addFlag({
+				variant: 'danger',
+				title: 'Error',
+				description: (error as any).message,
+				actions: [],
+			});
 		}
 	}
 
+	const handleDragStart = useCallback(() => {
+		setIsDragging(true);
+	}, []);
+
+	const handleDragEnd = useCallback(() => {
+		setTimeout(() => {
+			setIsDragging(false);
+		}, 0);
+	}, []);
+
+	const handleEntered = useCallback(() => {
+		setCrop({
+			width: 90,
+			aspect: 16 / 9,
+			unit: '%' as '%',
+		});
+	}, []);
+
+	const handleHide = useCallback(() => {
+		if (isDragging) {
+			return;
+		}
+
+		if (onHide) {
+			onHide();
+		}
+	}, [isDragging, onHide]);
+
 	return (
-		<Modal {...props} dialogClassName={classes.sessionCropModal} centered>
+		<Modal
+			{...props}
+			onEntered={handleEntered}
+			onHide={handleHide}
+			dialogClassName={classes.sessionCropModal}
+			centered
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>crop image</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<ReactCrop src={imageSource} onImageLoaded={onLoad} crop={crop} onChange={handleCropChange} />
+				<ReactCrop
+					src={imageSource}
+					onImageLoaded={onLoad}
+					crop={crop}
+					onChange={handleCropChange}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
+				/>
 				<div className="d-flex mt-5 align-items-center">
 					<InfoIcon className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
 				</div>
 			</Modal.Body>
 			<Modal.Footer className="d-flex justify-content-end">
-				<Button variant="outline-primary" size="sm" onClick={props.onHide}>
+				<Button variant="outline-primary" size="sm" onClick={handleHide}>
 					Cancel
 				</Button>
 				<Button variant="primary" size="sm" className="ms-2" onClick={handleOnSaveButtonClick}>
