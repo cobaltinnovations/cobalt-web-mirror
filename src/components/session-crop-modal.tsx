@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useCallback } from 'react';
+import React, { FC, useRef, useState, useCallback, useEffect } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 
@@ -66,7 +66,7 @@ interface SessionCropModalProps extends ModalProps {
 	onSave(blob: Blob): void;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const handleError = useHandleError();
 	const imageRef = useRef<HTMLImageElement>();
@@ -76,6 +76,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 		aspect: 16 / 9,
 		unit: '%' as '%',
 	});
+	const [isDragging, setIsDragging] = useState(false);
 
 	const onLoad = useCallback((htmlImageElement: HTMLImageElement) => {
 		imageRef.current = htmlImageElement;
@@ -103,13 +104,40 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, ...p
 		}
 	}
 
+	const handleDragStart = useCallback(() => {
+		setIsDragging(true);
+	}, []);
+
+	const handleDragEnd = useCallback(() => {
+		setTimeout(() => {
+			setIsDragging(false);
+		}, 0);
+	}, []);
+
+	const handleHide = useCallback(() => {
+		if (isDragging) {
+			return;
+		}
+
+		if (onHide) {
+			onHide();
+		}
+	}, [isDragging, onHide]);
+
 	return (
-		<Modal {...props} dialogClassName={classes.sessionCropModal} centered>
+		<Modal {...props} onHide={handleHide} dialogClassName={classes.sessionCropModal} centered>
 			<Modal.Header closeButton>
 				<Modal.Title>crop image</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<ReactCrop src={imageSource} onImageLoaded={onLoad} crop={crop} onChange={handleCropChange} />
+				<ReactCrop
+					src={imageSource}
+					onImageLoaded={onLoad}
+					crop={crop}
+					onChange={handleCropChange}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
+				/>
 				<div className="d-flex mt-5 align-items-center">
 					<InfoIcon className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
