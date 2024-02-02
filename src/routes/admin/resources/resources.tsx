@@ -520,6 +520,9 @@ export const Component = () => {
 											<TableCell header>Publish Date</TableCell>
 											<TableCell header>Expiry Date</TableCell>
 											<TableCell header className="align-items-end">
+												Views
+											</TableCell>
+											<TableCell header className="align-items-end">
 												In Use
 											</TableCell>
 											<TableCell header />
@@ -594,6 +597,8 @@ export const Component = () => {
 													<TableCell>
 														{content.publishEndDateDescription ?? 'No Expiry'}
 													</TableCell>
+
+													<TableCell className="align-items-end">{content.views}</TableCell>
 
 													<TableCell className="align-items-end">
 														{content.inUseCount > 0 ? (
