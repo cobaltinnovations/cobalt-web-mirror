@@ -67,7 +67,7 @@ const resourceLibraryCarouselConfig = {
 };
 
 const Index: FC = () => {
-	const { featuredTopicCenter } = useAppRootLoaderData();
+	const { featuredTopicCenter, secondaryFeaturedTopicCenter } = useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
@@ -244,7 +244,31 @@ const Index: FC = () => {
 						imageUrl={featuredTopicCenter.imageUrl!}
 						primaryActionText={featuredTopicCenter.featuredCallToAction!}
 						onPrimaryActionClick={() => {
-							navigate('/featured-topics/' + featuredTopicCenter.urlName);
+							if (featuredTopicCenter.urlOverride) {
+								window.location.href = featuredTopicCenter.urlOverride;
+							} else {
+								navigate('/featured-topics/' + featuredTopicCenter.urlName);
+							}
+						}}
+						className="mb-4"
+					/>
+				</Container>
+			)}
+
+			{secondaryFeaturedTopicCenter && (
+				<Container className="pt-4 pt-lg-8">
+					<CallToActionBlock
+						variant="light"
+						heading={secondaryFeaturedTopicCenter.featuredTitle ?? ''}
+						descriptionHtml={secondaryFeaturedTopicCenter.featuredDescription ?? ''}
+						imageUrl={secondaryFeaturedTopicCenter.imageUrl ?? ''}
+						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
+						onPrimaryActionClick={() => {
+							if (secondaryFeaturedTopicCenter.urlOverride) {
+								window.location.href = secondaryFeaturedTopicCenter.urlOverride;
+							} else {
+								navigate('/featured-topics/' + secondaryFeaturedTopicCenter.urlName);
+							}
 						}}
 						className="mb-4"
 					/>

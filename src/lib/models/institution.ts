@@ -55,6 +55,7 @@ export interface Institution {
 	featuresEnabled: boolean;
 	featureScreeningFlowId?: string;
 	featuredTopicCenterId?: string;
+	featuredSecondaryTopicCenterId?: string;
 	hasTakenFeatureScreening: boolean;
 	takeFeatureScreening: boolean;
 	userExperienceTypeId: UserExperienceTypeId;

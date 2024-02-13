@@ -3,17 +3,57 @@ import classNames from 'classnames';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 
+type variant = 'primary' | 'light';
+
+interface UseStylesProps {
+	variant?: variant;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	container: {
 		borderRadius: 24,
-	},
-	htmlContent: {
-		'& p:last-of-type': {
-			marginBottom: 0,
+		boxShadow: theme.elevation.e400,
+		backgroundColor: ({ variant }: UseStylesProps) => {
+			switch (variant) {
+				case 'light':
+					return theme.colors.n75;
+				default:
+					return theme.colors.p500;
+			}
+		},
+		'& h1': {
+			color: ({ variant }: UseStylesProps) => {
+				switch (variant) {
+					case 'light':
+						return theme.colors.n900;
+					default:
+						return theme.colors.n0;
+				}
+			},
 		},
 	},
 	subheading: {
-		color: theme.colors.p100,
+		color: ({ variant }: UseStylesProps) => {
+			switch (variant) {
+				case 'light':
+					return theme.colors.n500;
+				default:
+					return theme.colors.p100;
+			}
+		},
+	},
+	htmlContent: {
+		color: ({ variant }: UseStylesProps) => {
+			switch (variant) {
+				case 'light':
+					return theme.colors.n700;
+				default:
+					return theme.colors.n0;
+			}
+		},
+		'& p:last-of-type': {
+			marginBottom: 0,
+		},
 	},
 }));
 
@@ -27,6 +67,7 @@ interface CallToActionBlockProps {
 	secondaryActionText?: string;
 	onSecondaryActionClick?: () => void;
 	className?: string;
+	variant?: variant;
 }
 
 const CallToActionBlock = ({
@@ -39,32 +80,40 @@ const CallToActionBlock = ({
 	onPrimaryActionClick,
 	onSecondaryActionClick,
 	className,
+	variant,
 }: CallToActionBlockProps) => {
-	const classes = useStyles();
+	const classes = useStyles({
+		variant,
+	});
 
 	return (
-		<div className={classNames(className, classes.container, 'bg-primary px-6 py-10 px-lg-16 py-lg-16')}>
+		<div className={classNames(className, classes.container, 'px-6 py-10 px-lg-16 py-lg-16')}>
 			<Row>
 				<Col xs={12} md={8} lg={7} className="d-flex flex-column">
 					{subheading && <p className={classes.subheading}>{subheading}</p>}
 
-					<h1 className="text-white my-4">{heading}</h1>
+					<h1 className="my-4">{heading}</h1>
 
 					<div
-						className={classNames(classes.htmlContent, 'text-white mb-10')}
+						className={classNames(classes.htmlContent, 'mb-10')}
 						dangerouslySetInnerHTML={{
 							__html: descriptionHtml,
 						}}
 					/>
 
 					<div className="d-flex flex-column d-lg-block mt-auto">
-						<Button className="align-self-lg-start" variant="light" onClick={onPrimaryActionClick}>
+						<Button
+							className="align-self-lg-start"
+							variant={variant === 'light' ? 'primary' : 'light'}
+							onClick={onPrimaryActionClick}
+						>
 							{primaryActionText}
 						</Button>
 
 						{secondaryActionText && (
 							<Button
 								className="mt-4 mt-lg-0 ms-lg-2 align-self-lg-start"
+								variant={variant === 'light' ? 'outline-primary' : 'primary'}
 								onClick={onSecondaryActionClick}
 							>
 								{secondaryActionText}

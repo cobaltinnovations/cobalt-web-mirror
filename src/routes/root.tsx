@@ -90,6 +90,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		featuredTopicCenter = response.topicCenter;
 	}
 
+	let secondaryFeaturedTopicCenter: TopicCenterModel | undefined;
+	if (accessToken && institutionResponse.institution.featuredSecondaryTopicCenterId) {
+		const response = await topicCenterService
+			.getTopicCenterById(institutionResponse.institution.featuredSecondaryTopicCenterId)
+			.fetch();
+
+		secondaryFeaturedTopicCenter = response.topicCenter;
+	}
+
 	return {
 		subdomain,
 		accountSourceId,
@@ -98,6 +107,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		institutionResponse,
 		accountResponse,
 		featuredTopicCenter,
+		secondaryFeaturedTopicCenter,
 	};
 }
 

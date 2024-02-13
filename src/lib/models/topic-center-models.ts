@@ -11,6 +11,7 @@ export interface TopicCenterModel {
 	topicCenterId: string;
 	topicCenterRows: TopicCenterRowModel[];
 	urlName: string;
+	urlOverride?: string;
 	tagsByTagId: Record<string, Tag>;
 	topicCenterDisplayStyleId: TopicCenterDisplayStyleId;
 	featuredTitle?: string;
