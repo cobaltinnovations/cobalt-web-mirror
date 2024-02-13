@@ -244,7 +244,11 @@ const Index: FC = () => {
 						imageUrl={featuredTopicCenter.imageUrl!}
 						primaryActionText={featuredTopicCenter.featuredCallToAction!}
 						onPrimaryActionClick={() => {
-							navigate('/featured-topics/' + featuredTopicCenter.urlName);
+							if (featuredTopicCenter.urlOverride) {
+								window.location.href = featuredTopicCenter.urlOverride;
+							} else {
+								navigate('/featured-topics/' + featuredTopicCenter.urlName);
+							}
 						}}
 						className="mb-4"
 					/>
@@ -260,7 +264,11 @@ const Index: FC = () => {
 						imageUrl={secondaryFeaturedTopicCenter.imageUrl ?? ''}
 						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
 						onPrimaryActionClick={() => {
-							navigate('/featured-topics/' + secondaryFeaturedTopicCenter.urlName);
+							if (secondaryFeaturedTopicCenter.urlOverride) {
+								window.location.href = secondaryFeaturedTopicCenter.urlOverride;
+							} else {
+								navigate('/featured-topics/' + secondaryFeaturedTopicCenter.urlName);
+							}
 						}}
 						className="mb-4"
 					/>
