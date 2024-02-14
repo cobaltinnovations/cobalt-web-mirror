@@ -265,7 +265,17 @@ const Index: FC = () => {
 						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
 						onPrimaryActionClick={() => {
 							if (secondaryFeaturedTopicCenter.urlOverride) {
-								window.location.href = secondaryFeaturedTopicCenter.urlOverride;
+								try {
+									const url = new URL(secondaryFeaturedTopicCenter.urlOverride);
+									const isExternal = url.origin !== window.location.origin;
+									if (isExternal) {
+										window.location.href = secondaryFeaturedTopicCenter.urlOverride;
+									} else {
+										navigate(secondaryFeaturedTopicCenter.urlOverride);
+									}
+								} catch (error) {
+									navigate(secondaryFeaturedTopicCenter.urlOverride);
+								}
 							} else {
 								navigate('/featured-topics/' + secondaryFeaturedTopicCenter.urlName);
 							}
