@@ -14,6 +14,7 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
+	PatientOrderEncounterDocumentationStatusId,
 } from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
@@ -181,6 +182,12 @@ export const MhicPatientOrderTable = ({
 			count++;
 		}
 		if (patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned) {
+			count++;
+		}
+		if (
+			patientOrder.patientOrderEncounterDocumentationStatusId ===
+			PatientOrderEncounterDocumentationStatusId.NEEDS_DOCUMENTATION
+		) {
 			count++;
 		}
 
