@@ -215,6 +215,14 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionAppearsAbandoned?: boolean;
 	mostRecentIntakeScreeningSessionAppearsAbandoned?: boolean;
 	mostRecentIntakeAndClinicalScreeningsSatisfied?: boolean;
+
+	epicDepartmentId: string;
+	epicDepartmentName: string;
+	epicDepartmentDepartmentId: string;
+	encounterCsn?: string;
+	episodeSyncedAt?: string;
+	episodeSyncedAtDescription?: string;
+	patientOrderEncounterDocumentationStatusId?: PatientOrderEncounterDocumentationStatusId;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
@@ -351,6 +359,12 @@ export enum PatientOrderResourcingStatusId {
 	NONE_NEEDED = 'NONE_NEEDED',
 	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
 	SENT_RESOURCES = 'SENT_RESOURCES',
+}
+
+export enum PatientOrderEncounterDocumentationStatusId {
+	NOT_DOCUMENTED = 'NOT_DOCUMENTED',
+	NEEDS_DOCUMENTATION = 'NEEDS_DOCUMENTATION',
+	DOCUMENTED = 'DOCUMENTED',
 }
 
 export enum PatientOrderResourcingTypeId {

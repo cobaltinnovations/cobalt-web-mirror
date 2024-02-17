@@ -5,6 +5,7 @@ import {
 	PatientOrderModel,
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
+	PatientOrderEncounterDocumentationStatusId,
 	ReferenceDataResponse,
 } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
@@ -87,6 +88,22 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 							title: 'Mark as sent',
 							onClick: () => {
 								setShowResourcesModal(true);
+							},
+							disabled,
+						}}
+					/>
+				)}
+
+				{patientOrder.patientOrderEncounterDocumentationStatusId ===
+					PatientOrderEncounterDocumentationStatusId.NEEDS_DOCUMENTATION && (
+					<InlineAlert
+						className="mb-6"
+						variant="warning"
+						title="Encounter sync needed"
+						action={{
+							title: 'Sync to Epic',
+							onClick: () => {
+								alert('TODO');
 							},
 							disabled,
 						}}
