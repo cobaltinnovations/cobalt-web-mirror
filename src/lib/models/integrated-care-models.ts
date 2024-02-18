@@ -604,3 +604,8 @@ export interface PatientOrderVoicemailTask {
 	patientOrderId: string;
 	patientOrderVoicemailTaskId: string;
 }
+
+export interface ReferringPracticeModel {
+	referringPracticeId: string;
+	referringPracticeName: string;
+}

@@ -4,6 +4,7 @@ import {
 	PatientOrderResourcingTypeId,
 	PatientOrderTriageOverrideReasonId,
 	PatientOrderTriageStatusId,
+	ReferringPracticeModel,
 } from './integrated-care-models';
 
 interface BirthSex {
@@ -142,7 +143,7 @@ export interface ReferenceDataResponse {
 	patientOrderTriageOverrideReasons: PatientOrderTriageOverrideReason[];
 	races: Race[];
 	patientOrderReferralReasons: string[];
-	referringPracticeNames: string[];
+	referringPractices: ReferringPracticeModel[];
 	regionsByCountryCode: Record<string, Region[]>;
 	screeningTypes: ScreeningType[];
 	timeZones: TimeZone[];

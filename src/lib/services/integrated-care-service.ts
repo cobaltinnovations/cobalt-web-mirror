@@ -112,7 +112,7 @@ export interface PatientOrderApiQueryParameters {
 	pageNumber?: string;
 	pageSize?: string;
 	patientOrderFilterFlagTypeId?: PatientOrderFilterFlagTypeId;
-	referringPracticeNames?: string | string[];
+	referringPracticeIds?: string | string[];
 	reasonsForReferral?: string | string[];
 	patientOrderScreeningStatusId?: PatientOrderScreeningStatusId | PatientOrderScreeningStatusId[];
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId | PatientOrderResourcingStatusId[];

@@ -3,7 +3,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { AccountModel, GenderIdentity, Race } from '@/lib/models';
+import { AccountModel, GenderIdentity, Race, ReferringPracticeModel } from '@/lib/models';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
 import DatePicker from '@/components/date-picker';
@@ -46,7 +46,7 @@ export const Component = () => {
 		reportTypeId: '',
 
 		// PIPELINE specific
-		referringPracticeNames: [] as string[],
+		referringPractices: [] as ReferringPracticeModel[],
 		patientOrderInsurancePayors: [] as string[],
 		race: [] as Race[],
 		genderIdentity: [] as GenderIdentity[],
@@ -62,7 +62,7 @@ export const Component = () => {
 		setFormValues((previousValue) => ({
 			...previousValue,
 			reportTypeId: currentTarget.value,
-			referringPracticeNames: [],
+			referringPractices: [],
 			patientOrderInsurancePayors: [],
 			race: [],
 			genderIdentity: [],
@@ -87,7 +87,7 @@ export const Component = () => {
 				reportTypeId: formValues.reportTypeId,
 
 				// PIPELINE specific
-				referringPracticeNames: formValues.referringPracticeNames,
+				referringPracticeIds: formValues.referringPractices.map((rp) => rp.referringPracticeId),
 				patientOrderInsurancePayorId: formValues.patientOrderInsurancePayors,
 				patientRaceId: formValues.race.map((r) => r.raceId),
 				patientGenderIdentityId: formValues.genderIdentity.map((g) => g.genderIdentityId),
@@ -192,12 +192,12 @@ export const Component = () => {
 											label="Practice"
 											multiple
 											labelKey=""
-											options={referenceDataResponse.referringPracticeNames}
-											selected={formValues.referringPracticeNames}
+											options={referenceDataResponse.referringPractices}
+											selected={formValues.referringPractices}
 											onChange={(selected) => {
 												setFormValues((previousValues) => ({
 													...previousValues,
-													referringPracticeNames: selected as string[],
+													referringPractices: selected as ReferringPracticeModel[],
 												}));
 											}}
 										/>
