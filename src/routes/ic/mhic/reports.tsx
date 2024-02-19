@@ -191,7 +191,7 @@ export const Component = () => {
 											id="typeahead--practice"
 											label="Practice"
 											multiple
-											labelKey=""
+											labelKey="referringPracticeName"
 											options={referenceDataResponse.referringPractices}
 											selected={formValues.referringPractices}
 											onChange={(selected) => {
