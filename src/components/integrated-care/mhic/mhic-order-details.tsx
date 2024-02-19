@@ -854,7 +854,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row>
 											<Col>
-												<p className="mb-0">{patientOrder.comments}</p>
+												<div
+													dangerouslySetInnerHTML={{
+														__html: `<p class="mb-0">${patientOrder.comments?.replace(
+															/\n/g,
+															'<br/><br/>'
+														)}</p>`,
+													}}
+												/>
 											</Col>
 										</Row>
 									</Container>
