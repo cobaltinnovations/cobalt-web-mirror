@@ -67,7 +67,7 @@ export interface AccountModel {
 		canEditIcTriages: boolean;
 		canImportIcPatientOrders: boolean;
 		canViewIcReports: boolean;
-		canAdministerIcDepartmentAvailability: boolean;
+		canAdministerIcDepartments: boolean;
 		canAdministerContent: boolean; // My Content / Available Content admin tabs
 		canAdministerGroupSessions: boolean; // Group Session admin tab
 		canViewAnalytics: boolean; // Analytics admin tab

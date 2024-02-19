@@ -157,7 +157,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Patient Orders',
 				active: patientOrdersMatch,
 			},
-			...(account?.accountCapabilityFlags.canAdministerIcDepartmentAvailability
+			...(account?.accountCapabilityFlags.canAdministerIcDepartments
 				? [
 						{
 							testId: '',
@@ -184,7 +184,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			overviewMatch,
 			myPatientsMatch,
 			patientOrdersMatch,
-			account?.accountCapabilityFlags.canAdministerIcDepartmentAvailability,
+			account?.accountCapabilityFlags.canAdministerIcDepartments,
 			account?.accountCapabilityFlags.canViewIcReports,
 			departmentAvailabilityMatch,
 			reportsMatch,
