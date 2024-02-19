@@ -565,7 +565,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.lastOutreach && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.mostRecentTotalOutreachDateTimeDescription ?? '-'}
 													</span>
@@ -591,7 +591,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.assessmentScheduled && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.patientOrderScheduledScreeningScheduledDateTimeDescription ??
 															'-'}
