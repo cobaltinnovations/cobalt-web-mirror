@@ -8,21 +8,27 @@ import { useLoaderData } from 'react-router-dom';
 import classNames from 'classnames';
 import { DepartmentAvailabilityStatusId, EpicDepartmentModel } from '@/lib/models';
 import useDebouncedState from '@/hooks/use-debounced-state';
+import { MhicDepartmentAvailabilityStatusModal } from '@/components/integrated-care/mhic';
+import { cloneDeep } from 'lodash';
 
 export const loader = async () => {
 	const { epicDepartments } = await integratedCareService.getEpicDepartments().fetch();
 
 	return {
-		epicDepartments,
+		epicDepartmentsResponse: epicDepartments,
 	};
 };
 
 export const Component = () => {
-	const { epicDepartments } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { epicDepartmentsResponse } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const [epicDepartments, setEpicDepartments] = useState(epicDepartmentsResponse);
 
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [debouncedSearchQuery] = useDebouncedState(searchInputValue);
 	const [epicDepartmentsToDisplay, setEpicDepartmentsToDisplay] = useState<EpicDepartmentModel[]>([]);
+
+	const [epicDepartmentToUpdate, setEpicDepartmentToUpdate] = useState<EpicDepartmentModel>();
+	const [showModal, setShowModal] = useState(false);
 
 	useEffect(() => {
 		const tokens = debouncedSearchQuery
@@ -44,15 +50,52 @@ export const Component = () => {
 		setSearchInputValue('');
 	}, []);
 
-	const handleChangeStatusButtonClick = useCallback((epicDepartmentId: string) => {
-		console.log(epicDepartmentId);
-	}, []);
+	const handleChangeStatusButtonClick = useCallback(
+		(epicDepartmentId: string) => {
+			const epicDeparment = epicDepartments.find((ed) => ed.epicDepartmentId === epicDepartmentId);
+
+			if (epicDeparment) {
+				setEpicDepartmentToUpdate(epicDeparment);
+				setShowModal(true);
+			}
+		},
+		[epicDepartments]
+	);
+
+	const handleAvailabilityStatusModalOnSave = useCallback(
+		(updatedEpicDepartment: EpicDepartmentModel) => {
+			const epicDeparmentsClone = cloneDeep(epicDepartments);
+			const indexToReplace = epicDeparmentsClone.findIndex(
+				(ed) => ed.epicDepartmentId === updatedEpicDepartment.epicDepartmentId
+			);
+
+			if (indexToReplace > -1) {
+				epicDeparmentsClone[indexToReplace] = updatedEpicDepartment;
+				setEpicDepartments(epicDeparmentsClone);
+			}
+
+			setShowModal(false);
+		},
+		[epicDepartments]
+	);
 
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Integrated Care - Department Availability</title>
 			</Helmet>
+
+			{epicDepartmentToUpdate && (
+				<MhicDepartmentAvailabilityStatusModal
+					show={showModal}
+					onHide={() => {
+						setShowModal(false);
+					}}
+					epicDepartmentId={epicDepartmentToUpdate.epicDepartmentId}
+					departmentAvailabilityStatusId={epicDepartmentToUpdate.departmentAvailabilityStatusId}
+					onSave={handleAvailabilityStatusModalOnSave}
+				/>
+			)}
 
 			<Container className="py-16">
 				<Row className="mb-8">

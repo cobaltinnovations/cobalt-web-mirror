@@ -48,6 +48,7 @@ export const MhicCloseEpisodeModal: FC<Props> = ({ onSave, ...props }) => {
 				)}
 				{patientOrderClosureReasons.map((closureReason) => (
 					<Form.Check
+						key={closureReason.patientOrderClosureReasonId}
 						type="radio"
 						name="reason-for-closure"
 						id={`reason-for-closure__${closureReason.patientOrderClosureReasonId}`}

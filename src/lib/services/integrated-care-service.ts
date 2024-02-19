@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
+	DepartmentAvailabilityStatusId,
 	EpicDepartmentModel,
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
@@ -497,6 +498,18 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: '/integrated-care/epic-departments',
+		});
+	},
+	setEpicDepartmentAvailabilityStatus(
+		epicDepartmentId: string,
+		data: { departmentAvailabilityStatusId: DepartmentAvailabilityStatusId }
+	) {
+		return httpSingleton.orchestrateRequest<{
+			epicDepartment: EpicDepartmentModel;
+		}>({
+			method: 'PUT',
+			url: `/integrated-care/epic-departments/${epicDepartmentId}`,
+			data,
 		});
 	},
 };
