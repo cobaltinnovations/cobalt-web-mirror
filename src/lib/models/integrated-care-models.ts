@@ -609,3 +609,18 @@ export interface ReferringPracticeModel {
 	referringPracticeId: string;
 	referringPracticeName: string;
 }
+
+export enum DepartmentAvailabilityStatusId {
+	AVAILABLE = 'AVAILABLE',
+	UNAVAILABLE = 'UNAVAILABLE',
+	BUSY = 'BUSY',
+}
+
+export interface EpicDepartmentModel {
+	departmentAvailabilityStatusId: DepartmentAvailabilityStatusId;
+	departmentId: string;
+	departmentIdType: string;
+	epicDepartmentId: string;
+	institutionId: string;
+	name: string;
+}

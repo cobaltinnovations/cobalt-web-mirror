@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
+	EpicDepartmentModel,
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
 	PatientOrderCareTypeId,
@@ -488,6 +489,14 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: `/patient-orders/${patientOrderId}/clinical-report`,
+		});
+	},
+	getEpicDepartments() {
+		return httpSingleton.orchestrateRequest<{
+			epicDepartments: EpicDepartmentModel[];
+		}>({
+			method: 'GET',
+			url: '/integrated-care/epic-departments',
 		});
 	},
 };
