@@ -354,7 +354,6 @@ export const MhicPatientOrderTable = ({
 										>
 											{columnConfig.checkbox && (
 												<TableCell
-													header
 													width={56}
 													sticky
 													stickyBorder={
