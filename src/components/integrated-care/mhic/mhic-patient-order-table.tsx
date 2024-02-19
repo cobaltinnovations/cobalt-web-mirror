@@ -572,7 +572,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.assessmentCompleted && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
 													</span>
@@ -630,7 +630,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.checkInScheduled && (
-												<TableCell width={180}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.resourceCheckInScheduledAtDateTimeDescription}
 													</span>
