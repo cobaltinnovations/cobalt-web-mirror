@@ -9,7 +9,7 @@ import {
 	ReferenceDataResponse,
 } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
-import { MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
+import { MhicEncounterModal, MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
 interface Props {
@@ -23,6 +23,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 	const { account } = useAccount();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
+	const [showEncounterModal, setShowEncounterModal] = useState(false);
 	const revalidator = useRevalidator();
 
 	const handleSafetyPlanningModalSave = useCallback(
@@ -36,6 +37,14 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 	const handleResourcesModalSave = useCallback(
 		(_updatedPatientOrder: PatientOrderModel) => {
 			setShowResourcesModal(false);
+			revalidator.revalidate();
+		},
+		[revalidator]
+	);
+
+	const handleEncounterModalSave = useCallback(
+		(_updatedPatientOrder: PatientOrderModel) => {
+			setShowEncounterModal(false);
 			revalidator.revalidate();
 		},
 		[revalidator]
@@ -60,6 +69,15 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 					setShowResourcesModal(false);
 				}}
 				onSave={handleResourcesModalSave}
+			/>
+
+			<MhicEncounterModal
+				patientOrder={patientOrder}
+				show={showEncounterModal}
+				onHide={() => {
+					setShowEncounterModal(false);
+				}}
+				onSave={handleEncounterModalSave}
 			/>
 
 			<div className={className}>
@@ -103,7 +121,7 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 						action={{
 							title: 'Sync to Epic',
 							onClick: () => {
-								alert('TODO');
+								setShowEncounterModal(true);
 							},
 							disabled,
 						}}

@@ -3,6 +3,7 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
 	DepartmentAvailabilityStatusId,
+	EncounterModel,
 	EpicDepartmentModel,
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
@@ -509,6 +510,23 @@ export const integratedCareService = {
 		}>({
 			method: 'PUT',
 			url: `/integrated-care/epic-departments/${epicDepartmentId}`,
+			data,
+		});
+	},
+	getEcounters(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			encounters: EncounterModel[];
+		}>({
+			method: 'GET',
+			url: `/patient-orders/${patientOrderId}/encounters`,
+		});
+	},
+	setEncounterCsn(patientOrderId: string, data: { encounterCsn: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/encounter-csn`,
 			data,
 		});
 	},

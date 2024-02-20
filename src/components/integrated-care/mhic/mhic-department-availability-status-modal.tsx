@@ -79,7 +79,7 @@ export const MhicDepartmentAvailabilityStatusModal: FC<Props> = ({
 					<InputHelper
 						as="select"
 						className="mb-4"
-						label="Race"
+						label="Availability Status"
 						value={formValues.departmentAvailabilityStatusId}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValue) => ({

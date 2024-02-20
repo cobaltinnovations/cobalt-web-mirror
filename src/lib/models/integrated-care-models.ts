@@ -624,3 +624,16 @@ export interface EpicDepartmentModel {
 	institutionId: string;
 	name: string;
 }
+
+export interface EncounterModel {
+	csn: string;
+	status: string;
+	subjectDisplay: string;
+	classDisplay: string;
+	serviceTypeText: string;
+	periodStart: string;
+	periodStartDescription: string;
+	periodEnd: string;
+	periodEndDescription: string;
+	description: string;
+}

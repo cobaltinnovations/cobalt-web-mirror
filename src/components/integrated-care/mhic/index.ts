@@ -11,6 +11,7 @@ export * from './mhic-customize-table-modal';
 export * from './mhic-demographics-modal';
 export * from './mhic-department-availability-status-modal';
 export * from './mhic-edit-comment-modal';
+export * from './mhic-encounter-modal';
 export * from './mhic-episode-card';
 export * from './mhic-filter-assignment';
 export * from './mhic-filter-dropdown';
