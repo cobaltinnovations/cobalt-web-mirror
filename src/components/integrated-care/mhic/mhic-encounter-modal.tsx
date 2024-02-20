@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState } from 'react';
-import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
+import { Modal, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import { EncounterModel, PatientOrderModel } from '@/lib/models';
