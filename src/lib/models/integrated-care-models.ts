@@ -215,6 +215,14 @@ export interface PatientOrderModel {
 	mostRecentScreeningSessionAppearsAbandoned?: boolean;
 	mostRecentIntakeScreeningSessionAppearsAbandoned?: boolean;
 	mostRecentIntakeAndClinicalScreeningsSatisfied?: boolean;
+
+	epicDepartmentId: string;
+	epicDepartmentName: string;
+	epicDepartmentDepartmentId: string;
+	encounterCsn?: string;
+	episodeSyncedAt?: string;
+	episodeSyncedAtDescription?: string;
+	patientOrderEncounterDocumentationStatusId?: PatientOrderEncounterDocumentationStatusId;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
@@ -226,6 +234,7 @@ export enum PatientOrderIntakeScreeningStatusId {
 export enum PatientOrderViewTypeId {
 	NEED_ASSESSMENT = 'NEED_ASSESSMENT',
 	SCHEDULED = 'SCHEDULED',
+	NEED_DOCUMENTATION = 'NEED_DOCUMENTATION',
 	SUBCLINICAL = 'SUBCLINICAL',
 	MHP = 'MHP',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
@@ -344,6 +353,7 @@ export enum PatientOrderFilterFlagTypeId {
 	NEEDS_SAFETY_PLANNING = 'NEEDS_SAFETY_PLANNING',
 	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
 	SESSION_ABANDONED = 'SESSION_ABANDONED',
+	NEEDS_DOCUMENTATION = 'NEEDS_DOCUMENTATION',
 }
 
 export enum PatientOrderResourcingStatusId {
@@ -351,6 +361,12 @@ export enum PatientOrderResourcingStatusId {
 	NONE_NEEDED = 'NONE_NEEDED',
 	NEEDS_RESOURCES = 'NEEDS_RESOURCES',
 	SENT_RESOURCES = 'SENT_RESOURCES',
+}
+
+export enum PatientOrderEncounterDocumentationStatusId {
+	NOT_DOCUMENTED = 'NOT_DOCUMENTED',
+	NEEDS_DOCUMENTATION = 'NEEDS_DOCUMENTATION',
+	DOCUMENTED = 'DOCUMENTED',
 }
 
 export enum PatientOrderResourcingTypeId {
@@ -587,4 +603,37 @@ export interface PatientOrderVoicemailTask {
 	message: string;
 	patientOrderId: string;
 	patientOrderVoicemailTaskId: string;
+}
+
+export interface ReferringPracticeModel {
+	referringPracticeId: string;
+	referringPracticeName: string;
+}
+
+export enum DepartmentAvailabilityStatusId {
+	AVAILABLE = 'AVAILABLE',
+	UNAVAILABLE = 'UNAVAILABLE',
+	BUSY = 'BUSY',
+}
+
+export interface EpicDepartmentModel {
+	departmentAvailabilityStatusId: DepartmentAvailabilityStatusId;
+	departmentId: string;
+	departmentIdType: string;
+	epicDepartmentId: string;
+	institutionId: string;
+	name: string;
+}
+
+export interface EncounterModel {
+	csn: string;
+	status: string;
+	subjectDisplay: string;
+	classDisplay: string;
+	serviceTypeText: string;
+	periodStart: string;
+	periodStartDescription: string;
+	periodEnd: string;
+	periodEndDescription: string;
+	description: string;
 }

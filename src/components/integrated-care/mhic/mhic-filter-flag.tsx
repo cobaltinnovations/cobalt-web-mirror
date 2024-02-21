@@ -78,6 +78,13 @@ const options = [
 			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.SESSION_ABANDONED,
 		},
 	},
+	{
+		optionId: 'NEEDS_DOCUMENTATION',
+		title: 'Needs Documentation',
+		queryParameters: {
+			patientOrderFilterFlagTypeId: PatientOrderFilterFlagTypeId.NEEDS_DOCUMENTATION,
+		},
+	},
 ];
 
 export function MhicFilterFlagGetParsedQueryParams(searchParams: URLSearchParams) {

@@ -2,6 +2,9 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
+	DepartmentAvailabilityStatusId,
+	EncounterModel,
+	EpicDepartmentModel,
 	OpenPatientOrderCountModel,
 	PatientOrderAutocompleteResult,
 	PatientOrderCareTypeId,
@@ -112,7 +115,7 @@ export interface PatientOrderApiQueryParameters {
 	pageNumber?: string;
 	pageSize?: string;
 	patientOrderFilterFlagTypeId?: PatientOrderFilterFlagTypeId;
-	referringPracticeNames?: string | string[];
+	referringPracticeIds?: string | string[];
 	reasonsForReferral?: string | string[];
 	patientOrderScreeningStatusId?: PatientOrderScreeningStatusId | PatientOrderScreeningStatusId[];
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId | PatientOrderResourcingStatusId[];
@@ -488,6 +491,43 @@ export const integratedCareService = {
 		}>({
 			method: 'GET',
 			url: `/patient-orders/${patientOrderId}/clinical-report`,
+		});
+	},
+	getEpicDepartments() {
+		return httpSingleton.orchestrateRequest<{
+			epicDepartments: EpicDepartmentModel[];
+		}>({
+			method: 'GET',
+			url: '/integrated-care/epic-departments',
+		});
+	},
+	setEpicDepartmentAvailabilityStatus(
+		epicDepartmentId: string,
+		data: { departmentAvailabilityStatusId: DepartmentAvailabilityStatusId }
+	) {
+		return httpSingleton.orchestrateRequest<{
+			epicDepartment: EpicDepartmentModel;
+		}>({
+			method: 'PUT',
+			url: `/integrated-care/epic-departments/${epicDepartmentId}`,
+			data,
+		});
+	},
+	getEcounters(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{
+			encounters: EncounterModel[];
+		}>({
+			method: 'GET',
+			url: `/patient-orders/${patientOrderId}/encounters`,
+		});
+	},
+	setEncounterCsn(patientOrderId: string, data: { encounterCsn: string }) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrder: PatientOrderModel;
+		}>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/encounter-csn`,
+			data,
 		});
 	},
 };

@@ -86,7 +86,7 @@ export const NextStepsAssessmentComplete = ({
 					) : (
 						<NextStepsItem
 							title="Step 3: Schedule appointment with Mental Health Provider"
-							description="Find an appointment by browsing the list of providers and choosing an available appointment time."
+							description={`Find an appointment by browsing the list of providers and choosing an available appointment time or call us at ${institution.integratedCarePhoneNumber}.`}
 							button={{
 								variant: 'primary',
 								title: 'Find Appointment',

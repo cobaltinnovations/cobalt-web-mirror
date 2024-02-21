@@ -14,6 +14,7 @@ import {
 	PatientOrderResourcingStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
+	PatientOrderEncounterDocumentationStatusId,
 } from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
@@ -183,6 +184,12 @@ export const MhicPatientOrderTable = ({
 		if (patientOrder.mostRecentIntakeScreeningSessionAppearsAbandoned) {
 			count++;
 		}
+		if (
+			patientOrder.patientOrderEncounterDocumentationStatusId ===
+			PatientOrderEncounterDocumentationStatusId.NEEDS_DOCUMENTATION
+		) {
+			count++;
+		}
 
 		return count;
 	}, []);
@@ -347,7 +354,6 @@ export const MhicPatientOrderTable = ({
 										>
 											{columnConfig.checkbox && (
 												<TableCell
-													header
 													width={56}
 													sticky
 													stickyBorder={
@@ -558,14 +564,14 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.lastOutreach && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.mostRecentTotalOutreachDateTimeDescription ?? '-'}
 													</span>
 												</TableCell>
 											)}
 											{columnConfig.assessmentCompleted && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.mostRecentScreeningSessionCompletedAtDescription ?? '-'}
 													</span>
@@ -584,7 +590,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.assessmentScheduled && (
-												<TableCell width={170}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.patientOrderScheduledScreeningScheduledDateTimeDescription ??
 															'-'}
@@ -623,7 +629,7 @@ export const MhicPatientOrderTable = ({
 												</TableCell>
 											)}
 											{columnConfig.checkInScheduled && (
-												<TableCell width={180}>
+												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
 														{po.resourceCheckInScheduledAtDateTimeDescription}
 													</span>

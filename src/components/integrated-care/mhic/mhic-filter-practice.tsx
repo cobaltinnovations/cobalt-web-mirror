@@ -6,7 +6,7 @@ import { Form } from 'react-bootstrap';
 import { ReferenceDataResponse } from '@/lib/models';
 import FilterDropdown from '@/components/filter-dropdown';
 
-const queryParamName = 'referringPracticeNames';
+const queryParamName = 'referringPracticeIds';
 
 export const mhicFilterPracticeGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
@@ -58,15 +58,15 @@ export const MhicFilterPractice = ({ referenceData, className }: MhicFilterPract
 			onConfirm={handleConfirm}
 			width={320}
 		>
-			{referenceData.referringPracticeNames.map((practiceName) => (
+			{referenceData.referringPractices.map((practice) => (
 				<Form.Check
-					key={practiceName.replaceAll(' ', '-').toLowerCase()}
+					key={practice.referringPracticeId}
 					type="checkbox"
 					name={queryParamName}
-					id={`${queryParamName}--${practiceName.replaceAll(' ', '-').toLowerCase()}`}
-					label={practiceName}
-					value={practiceName}
-					checked={selectedValues.includes(practiceName)}
+					id={`${queryParamName}--${practice.referringPracticeId}`}
+					label={`${practice.referringPracticeName} (${practice.referringPracticeId})`}
+					value={practice.referringPracticeId}
+					checked={selectedValues.includes(practice.referringPracticeId)}
 					onChange={({ currentTarget }) => {
 						const selectedValuesClone = cloneDeep(selectedValues);
 						const indexToUpdate = selectedValuesClone.findIndex(
