@@ -38,7 +38,7 @@ export const Component = () => {
 		const epicDepartmentMatches = tokens
 			.map((token) => {
 				return epicDepartments.filter((ed) => {
-					return ed.name.toLowerCase().includes(token);
+					return ed.name.toLowerCase().includes(token) || ed.departmentId.toLowerCase().includes(token);
 				});
 			})
 			.flat();
@@ -140,7 +140,9 @@ export const Component = () => {
 											}
 										)}
 									>
-										<h5 className="mb-0 fw-normal">{epicDepartment.name}</h5>
+										<h5 className="mb-0 fw-normal">
+											{epicDepartment.name} ({epicDepartment.departmentId})
+										</h5>
 										<div className="d-flex align-items-center">
 											{epicDepartment.departmentAvailabilityStatusId ===
 												DepartmentAvailabilityStatusId.AVAILABLE && (

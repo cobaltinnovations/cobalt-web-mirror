@@ -50,14 +50,24 @@ export const MhicDepartmentAvailabilityStatusModal: FC<Props> = ({
 					})
 					.fetch();
 
+				let flagDescription = '';
+
+				if (
+					response.epicDepartment.departmentAvailabilityStatusId === DepartmentAvailabilityStatusId.AVAILABLE
+				) {
+					flagDescription = `BHS providers are available at ${response.epicDepartment.name}`;
+				} else if (
+					response.epicDepartment.departmentAvailabilityStatusId === DepartmentAvailabilityStatusId.BUSY
+				) {
+					flagDescription = `BHS providers are busy at ${response.epicDepartment.name}`;
+				} else {
+					flagDescription = `BHS providers are unavailable at ${response.epicDepartment.name}`;
+				}
+
 				addFlag({
 					variant: 'success',
 					title: 'BHS Availability Updated',
-					description:
-						response.epicDepartment.departmentAvailabilityStatusId ===
-						DepartmentAvailabilityStatusId.AVAILABLE
-							? `BHS providers are available at ${response.epicDepartment.name}`
-							: `BHS providers are unavailable at ${response.epicDepartment.name}`,
+					description: flagDescription,
 					actions: [],
 				});
 
