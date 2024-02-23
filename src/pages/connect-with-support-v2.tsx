@@ -484,7 +484,7 @@ const ConnectWithSupportV2 = () => {
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								<NoData
 									title="No Available Providers"
-									description={`Please call the ${institution.name} at ${institution.integratedCarePhoneNumberDescription} (${institution.integratedCareAvailabilityDescription}) for assistance.`}
+									description={`Please call ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription} (${institution.integratedCareAvailabilityDescription}) for assistance.`}
 									actions={[]}
 								/>
 							</Col>
