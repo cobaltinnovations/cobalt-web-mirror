@@ -57,40 +57,6 @@ export const PatientInsuranceStatementModal: FC<Props> = ({ onContinue, ...props
 						</p>
 					</li>
 				</ul>
-				<p className="mb-5 fw-semibold">Penn Integrated Care accepts the following insurers:</p>
-				<p>
-					No fee
-					<br />
-					Penn Care PPO
-					<br />
-					Keystone Health Plan East
-					<br />
-					Blue Shield
-					<br />
-					Aetna
-					<br />
-					Aetna Student Health
-					<br />
-					Medicare
-					<br />
-					Medicaid
-					<br />
-					Horizon Blue Cross
-					<br />
-					Independent Blue Cross
-					<br />
-					United Health Care
-					<br />
-					Cigna
-					<br />
-					Community Behavioral Health
-					<br />
-					Penn Behavioral Health EAP
-					<br />
-					Other insurance
-					<br />
-					Self-pay
-				</p>
 			</Modal.Body>
 			<Modal.Footer className="py-5 bg-white">
 				<p className="mb-4 fs-small text-gray text-center">
