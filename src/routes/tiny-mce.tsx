@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
+import { Editor } from '@tinymce/tinymce-react';
+import useAccount from '@/hooks/use-account';
 
 export const Component = () => {
+	const { institution } = useAccount();
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 
 	const log = () => {
-		if (editorRef.current) {
-			console.log(editorRef.current.getContent());
-		}
+		console.log(editorRef.current?.getContent());
 	};
 
 	return (
@@ -19,10 +19,10 @@ export const Component = () => {
 					<h1>Tiny MCE</h1>
 				</Col>
 			</Row>
-			<Row>
+			<Row className="mb-5">
 				<Col>
 					<Editor
-						apiKey="xxx"
+						apiKey={institution.tinymceApiKey}
 						onInit={(_evt, editor) => (editorRef.current = editor)}
 						initialValue="<p>This is the initial content of the editor.</p>"
 						init={{

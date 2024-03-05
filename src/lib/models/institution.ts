@@ -78,6 +78,7 @@ export interface Institution {
 	privacyPolicyUrl?: string;
 	secureFilesharingPlatformName?: string;
 	secureFilesharingPlatformUrl?: string;
+	tinymceApiKey?: string;
 }
 
 export interface InstitutionFeature {
