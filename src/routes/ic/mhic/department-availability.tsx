@@ -10,6 +10,7 @@ import { DepartmentAvailabilityStatusId, EpicDepartmentModel } from '@/lib/model
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { MhicDepartmentAvailabilityStatusModal } from '@/components/integrated-care/mhic';
 import { cloneDeep } from 'lodash';
+import NoData from '@/components/no-data';
 
 export const loader = async () => {
 	const { epicDepartments } = await integratedCareService.getEpicDepartments().fetch();
@@ -43,7 +44,7 @@ export const Component = () => {
 			})
 			.flat();
 
-		setEpicDepartmentsToDisplay(epicDepartmentMatches.length > 0 ? epicDepartmentMatches : epicDepartments);
+		setEpicDepartmentsToDisplay(debouncedSearchQuery ? epicDepartmentMatches : epicDepartments);
 	}, [epicDepartments, debouncedSearchQuery]);
 
 	const handleOnSearchClear = useCallback(() => {
@@ -127,56 +128,71 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 8, offset: 2 }}>
-						<ul className="m-0 p-0">
-							{epicDepartmentsToDisplay.map((epicDepartment, epicDepartmentIndex) => {
-								const isLast = epicDepartmentIndex === epicDepartments.length - 1;
-								return (
-									<li
-										key={epicDepartment.epicDepartmentId}
-										className={classNames(
-											'py-2 d-flex align-items-center justify-content-between',
-											{
-												'border-bottom': !isLast,
-											}
-										)}
-									>
-										<h5 className="mb-0 fw-normal">
-											{epicDepartment.name} ({epicDepartment.departmentId})
-										</h5>
-										<div className="d-flex align-items-center">
-											{epicDepartment.departmentAvailabilityStatusId ===
-												DepartmentAvailabilityStatusId.AVAILABLE && (
-												<Badge pill bg="outline-success">
-													Available
-												</Badge>
+						{epicDepartmentsToDisplay.length <= 0 ? (
+							<NoData
+								title={`No Results For "${searchInputValue}"`}
+								actions={[
+									{
+										variant: 'primary',
+										title: 'Clear Search',
+										onClick: () => {
+											setSearchInputValue('');
+										},
+									},
+								]}
+							/>
+						) : (
+							<ul className="m-0 p-0">
+								{epicDepartmentsToDisplay.map((epicDepartment, epicDepartmentIndex) => {
+									const isLast = epicDepartmentIndex === epicDepartments.length - 1;
+									return (
+										<li
+											key={epicDepartment.epicDepartmentId}
+											className={classNames(
+												'py-2 d-flex align-items-center justify-content-between',
+												{
+													'border-bottom': !isLast,
+												}
 											)}
-											{epicDepartment.departmentAvailabilityStatusId ===
-												DepartmentAvailabilityStatusId.BUSY && (
-												<Badge pill bg="outline-warning">
-													Busy
-												</Badge>
-											)}
-											{epicDepartment.departmentAvailabilityStatusId ===
-												DepartmentAvailabilityStatusId.UNAVAILABLE && (
-												<Badge pill bg="outline-danger">
-													Unavailable
-												</Badge>
-											)}
+										>
+											<h5 className="mb-0 fw-normal">
+												{epicDepartment.name} ({epicDepartment.departmentId})
+											</h5>
+											<div className="d-flex align-items-center">
+												{epicDepartment.departmentAvailabilityStatusId ===
+													DepartmentAvailabilityStatusId.AVAILABLE && (
+													<Badge pill bg="outline-success">
+														Available
+													</Badge>
+												)}
+												{epicDepartment.departmentAvailabilityStatusId ===
+													DepartmentAvailabilityStatusId.BUSY && (
+													<Badge pill bg="outline-warning">
+														Busy
+													</Badge>
+												)}
+												{epicDepartment.departmentAvailabilityStatusId ===
+													DepartmentAvailabilityStatusId.UNAVAILABLE && (
+													<Badge pill bg="outline-danger">
+														Unavailable
+													</Badge>
+												)}
 
-											<Button
-												variant="link"
-												className="fw-normal fs-small"
-												onClick={() => {
-													handleChangeStatusButtonClick(epicDepartment.epicDepartmentId);
-												}}
-											>
-												Change Status
-											</Button>
-										</div>
-									</li>
-								);
-							})}
-						</ul>
+												<Button
+													variant="link"
+													className="fw-normal fs-small"
+													onClick={() => {
+														handleChangeStatusButtonClick(epicDepartment.epicDepartmentId);
+													}}
+												>
+													Change Status
+												</Button>
+											</div>
+										</li>
+									);
+								})}
+							</ul>
+						)}
 					</Col>
 				</Row>
 			</Container>
