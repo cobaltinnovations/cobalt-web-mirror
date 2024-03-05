@@ -216,37 +216,45 @@ export function useScreeningFlow({
 
 	const hasIncompleteScreening = incompleteSessions.length > 0;
 
-	const createScreeningSession = useCallback(() => {
-		if (disabled) {
-			throw new Error('Screening Flow is disabled');
-		}
+	const createScreeningSession = useCallback(
+		(modifiedAssessment?: boolean) => {
+			if (disabled) {
+				throw new Error('Screening Flow is disabled');
+			}
 
-		setIsCreatingScreeningSession(true);
+			setIsCreatingScreeningSession(true);
 
-		return screeningService
-			.createScreeningSession({
-				screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
-				groupSessionId,
-				patientOrderId,
-			})
-			.fetch()
-			.then((sessionResponse) => {
-				navigateToNext(sessionResponse.screeningSession);
-			})
-			.catch((e) => {
-				handleError(e);
-			})
-			.finally(() => {
-				setIsCreatingScreeningSession(false);
-			});
-	}, [
-		activeFlowVersion?.screeningFlowVersionId,
-		disabled,
-		groupSessionId,
-		handleError,
-		navigateToNext,
-		patientOrderId,
-	]);
+			return screeningService
+				.createScreeningSession({
+					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
+					groupSessionId,
+					patientOrderId,
+					...(modifiedAssessment && {
+						metadata: {
+							modifiedAssessment,
+						},
+					}),
+				})
+				.fetch()
+				.then((sessionResponse) => {
+					navigateToNext(sessionResponse.screeningSession);
+				})
+				.catch((e) => {
+					handleError(e);
+				})
+				.finally(() => {
+					setIsCreatingScreeningSession(false);
+				});
+		},
+		[
+			activeFlowVersion?.screeningFlowVersionId,
+			disabled,
+			groupSessionId,
+			handleError,
+			navigateToNext,
+			patientOrderId,
+		]
+	);
 
 	const resumeScreeningSession = useCallback(
 		(screeningSessionId?: string | null) => {

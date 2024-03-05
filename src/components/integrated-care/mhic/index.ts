@@ -36,6 +36,7 @@ export * from './mhic-resources-modal';
 export * from './mhic-safety-planning-modal';
 export * from './mhic-schedule-assessment-modal';
 export * from './mhic-scheduled-message-group';
+export * from './mhic-select-assessment-type-modal';
 export * from './mhic-shelf-outlet';
 export * from './mhic-sort-dropdown';
 export * from './mhic-triage-card';
