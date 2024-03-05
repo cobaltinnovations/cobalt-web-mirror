@@ -18,6 +18,9 @@ type ScreeningFlowParams = {
 	screeningFlowVersionId?: string;
 	patientOrderId?: string;
 	groupSessionId?: string;
+	metadata?: {
+		modifiedAssessment?: boolean;
+	};
 };
 
 export const screeningService = {
