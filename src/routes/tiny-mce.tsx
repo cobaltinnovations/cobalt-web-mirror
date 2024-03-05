@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import { Editor } from '@tinymce/tinymce-react';
@@ -7,9 +7,10 @@ import useAccount from '@/hooks/use-account';
 export const Component = () => {
 	const { institution } = useAccount();
 	const editorRef = useRef<TinyMCEEditor | null>(null);
+	const [editorContent, setEditorContent] = useState('');
 
 	const log = () => {
-		console.log(editorRef.current?.getContent());
+		setEditorContent(editorRef.current?.getContent() ?? '');
 	};
 
 	return (
@@ -46,7 +47,7 @@ export const Component = () => {
 								'media',
 								'table',
 								'code',
-								'help',
+								// 'help',
 								'wordcount',
 							],
 							toolbar:
@@ -107,9 +108,14 @@ export const Component = () => {
 					/>
 				</Col>
 			</Row>
+			<Row className="mb-5">
+				<Col>
+					<Button onClick={log}>Render editor content</Button>
+				</Col>
+			</Row>
 			<Row>
 				<Col>
-					<Button onClick={log}>Log editor content</Button>
+					<pre>{editorContent}</pre>
 				</Col>
 			</Row>
 		</Container>
