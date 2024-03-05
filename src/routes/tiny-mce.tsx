@@ -29,6 +29,7 @@ export const Component = () => {
 							height: 500,
 							menubar: false,
 							plugins: [
+								'image',
 								'advlist',
 								'autolink',
 								'lists',
@@ -50,10 +51,58 @@ export const Component = () => {
 							],
 							toolbar:
 								'undo redo | blocks | ' +
-								'bold italic forecolor | alignleft aligncenter ' +
-								'alignright alignjustify | bullist numlist outdent indent | ' +
-								'removeformat | help',
-							content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+								'bold italic underline | ' +
+								'alignleft aligncenter alignright | ' +
+								'bullist numlist | ' +
+								'removeformat | ' +
+								'link image',
+							content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px }',
+							automatic_uploads: true,
+							images_file_types: 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp',
+							file_picker_types: 'image',
+							block_unsupported_drop: true,
+							file_picker_callback: (callback) => {
+								const input = document.createElement('input');
+								input.setAttribute('type', 'file');
+								input.setAttribute('accept', 'image/*');
+								input.addEventListener('change', (event) => {
+									const file = (event.target as HTMLInputElement)?.files?.[0];
+
+									if (!file) {
+										return;
+									}
+
+									const reader = new FileReader();
+
+									reader.addEventListener('load', () => {
+										if (!editorRef.current) {
+											return;
+										}
+
+										const id = `blobid${new Date().getTime()}`;
+										const blobCache = editorRef.current.editorUpload.blobCache;
+										const base64 = String(reader.result).split(',')[1];
+										const blobInfo = blobCache.create(id, file, base64);
+
+										blobCache.add(blobInfo);
+
+										callback(blobInfo.blobUri(), {
+											title: file.name,
+										});
+									});
+
+									reader.readAsDataURL(file);
+								});
+
+								input.click();
+							},
+							images_upload_handler: async (blobInfo, progressFn) => {
+								console.log('custom XHR stuff goes here...');
+								console.log('images_upload_handler blobInfo', blobInfo);
+								console.log('images_upload_handler progressFn', progressFn);
+								return '';
+							},
+							images_reuse_filename: true,
 						}}
 					/>
 				</Col>
