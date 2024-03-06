@@ -13,6 +13,7 @@ import {
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
+	MhicSelectAssessmentTypeModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
@@ -61,6 +62,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showContactInformationModal, setShowContactInformationModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
+	const [showSelectAssessmentTypeModal, setShowSelectAssessmentTypeModal] = useState(false);
+
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
 	// const [showConsentModal, setShowConsentModal] = useState(false);
@@ -104,12 +107,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	}, [patientOrder.patientOrderVoicemailTasks]);
 
 	const navigateToAssessment = useCallback(
-		(options: { createNew?: boolean; resumeRecent?: boolean }) => {
+		(options: { createNew?: boolean; resumeRecent?: boolean; modifiedAssessment?: boolean }) => {
 			// if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 			// 	setShowConsentModal(true);
 			// } else {
 			if (options.createNew) {
-				intakeScreeningFlow.createScreeningSession();
+				intakeScreeningFlow.createScreeningSession(options.modifiedAssessment);
 			} else if (options.resumeRecent) {
 				if (!hasCompletedIntakeScreening) {
 					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
@@ -249,6 +252,20 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onSave={() => {
 					revalidator.revalidate();
 					setShowAddVoicemailTaskModal(false);
+				}}
+			/>
+
+			<MhicSelectAssessmentTypeModal
+				show={showSelectAssessmentTypeModal}
+				onHide={() => {
+					setShowSelectAssessmentTypeModal(false);
+				}}
+				onSave={(modifiedAssessment) => {
+					setShowSelectAssessmentTypeModal(false);
+					navigateToAssessment({
+						createNew: true,
+						modifiedAssessment,
+					});
 				}}
 			/>
 
@@ -400,9 +417,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigateToAssessment({
-														createNew: true,
-													});
+													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -451,9 +466,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'primary',
 												title: 'Start Assessment',
 												onClick: () => {
-													navigateToAssessment({
-														createNew: true,
-													});
+													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===
@@ -512,9 +525,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'outline-primary',
 												title: 'Retake Assessment',
 												onClick: () => {
-													navigateToAssessment({
-														createNew: true,
-													});
+													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId ===

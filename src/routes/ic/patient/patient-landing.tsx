@@ -397,20 +397,24 @@ export const Component = () => {
 						</Row>
 						<Row>
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-								{patientOrder?.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING ? (
-									<InlineAlert
-										className="mt-8"
-										variant="warning"
-										title="A clinician will reach out"
-										description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
-									/>
-								) : (
-									<InlineAlert
-										variant="info"
-										title="Your responses are not reviewed in real time"
-										description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
-									/>
+								{homescreenState !== PAGE_STATES.TERMINAL && (
+									<>
+										{patientOrder?.patientOrderSafetyPlanningStatusId ===
+										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING ? (
+											<InlineAlert
+												className="mt-8"
+												variant="warning"
+												title="A clinician will reach out"
+												description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
+											/>
+										) : (
+											<InlineAlert
+												variant="info"
+												title="Your responses are not reviewed in real time"
+												description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
+											/>
+										)}
+									</>
 								)}
 							</Col>
 						</Row>
