@@ -1,17 +1,54 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import { Editor } from '@tinymce/tinymce-react';
 import useAccount from '@/hooks/use-account';
+import { adminService, imageUploader } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 
 export const Component = () => {
 	const { institution } = useAccount();
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 	const [editorContent, setEditorContent] = useState('');
 
+	const handleError = useHandleError();
+	const [isUploading, setIsUploading] = useState(false);
+
 	const log = () => {
 		setEditorContent(editorRef.current?.getContent() ?? '');
 	};
+
+	const handleImageUpload = useCallback(
+		(file: Blob, filename: string, progressFn: (percent: number) => void) => {
+			return new Promise((resolve: (accessUrl: string) => void, reject) => {
+				imageUploader(
+					file,
+					adminService.getPresignedUploadUrl({
+						contentType: file.type,
+						filename: filename,
+						filesize: file.size,
+					}).fetch
+				)
+					.onPresignedUploadObtained(({ fileUploadResult }) => {
+						setIsUploading(true);
+						resolve(fileUploadResult.presignedUpload.accessUrl);
+					})
+					.onProgress((percentage) => {
+						progressFn(percentage);
+					})
+					.onComplete(() => {
+						setIsUploading(false);
+					})
+					.onError((error) => {
+						handleError(error);
+						setIsUploading(false);
+						reject(error);
+					})
+					.start();
+			});
+		},
+		[handleError]
+	);
 
 	return (
 		<Container>
@@ -98,10 +135,13 @@ export const Component = () => {
 								input.click();
 							},
 							images_upload_handler: async (blobInfo, progressFn) => {
-								console.log('custom XHR stuff goes here...');
-								console.log('images_upload_handler blobInfo', blobInfo);
-								console.log('images_upload_handler progressFn', progressFn);
-								return '';
+								const locationUrl = await handleImageUpload(
+									blobInfo.blob(),
+									blobInfo.filename(),
+									progressFn
+								);
+
+								return locationUrl;
 							},
 							images_reuse_filename: true,
 						}}
