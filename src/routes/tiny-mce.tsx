@@ -7,12 +7,10 @@ import { adminService, imageUploader } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 
 export const Component = () => {
+	const handleError = useHandleError();
 	const { institution } = useAccount();
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 	const [editorContent, setEditorContent] = useState('');
-
-	const handleError = useHandleError();
-	const [isUploading, setIsUploading] = useState(false);
 
 	const log = () => {
 		setEditorContent(editorRef.current?.getContent() ?? '');
@@ -29,19 +27,15 @@ export const Component = () => {
 						filesize: file.size,
 					}).fetch
 				)
-					.onPresignedUploadObtained(({ fileUploadResult }) => {
-						setIsUploading(true);
-						resolve(fileUploadResult.presignedUpload.accessUrl);
-					})
+					.onPresignedUploadObtained(() => {})
 					.onProgress((percentage) => {
 						progressFn(percentage);
 					})
-					.onComplete(() => {
-						setIsUploading(false);
+					.onComplete((finalImageUrl) => {
+						resolve(finalImageUrl);
 					})
 					.onError((error) => {
 						handleError(error);
-						setIsUploading(false);
 						reject(error);
 					})
 					.start();
