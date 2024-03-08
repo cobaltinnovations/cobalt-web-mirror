@@ -729,11 +729,6 @@ export const routes: RouteObject[] = [
 						],
 					},
 					{
-						id: 'tiny-mce',
-						path: 'tiny-mce',
-						lazy: () => import('@/routes/tiny-mce'),
-					},
-					{
 						path: '*',
 						loader: redirectCheckLoader,
 						element: <NoMatch />,

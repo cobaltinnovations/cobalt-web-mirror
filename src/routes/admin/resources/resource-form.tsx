@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
 	LoaderFunctionArgs,
 	unstable_useBlocker as useBlocker,
@@ -9,7 +9,6 @@ import {
 	useRouteLoaderData,
 } from 'react-router-dom';
 import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
-
 import {
 	AdminContent,
 	AdminContentAction,
@@ -42,7 +41,7 @@ import {
 	AdminResourceFormFooterExternal,
 	AdminTagGroupControl,
 } from '@/components/admin';
-import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
+// import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
@@ -52,6 +51,7 @@ import ToggledInput from '@/components/toggled-input';
 import NoMatch from '@/pages/no-match';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import Editor from '@/components/editor';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -184,8 +184,6 @@ export const Component = () => {
 	const params = useParams<{ action: string; contentId: string }>();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
-
 	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
 	const isPreview = params.action === 'preview';
@@ -277,13 +275,13 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			// Validate wysiwyg/rich-text-editor
+			// Validate tinyMce editor
 			if (!formValues.description) {
-				descriptionWysiwygRef.current?.quill?.focus();
-				descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
+				document.getElementById('description-editor-outer')?.scrollIntoView({
 					behavior: 'auto',
 					block: 'center',
 				});
+
 				return;
 			}
 
@@ -742,14 +740,16 @@ export const Component = () => {
 						title="Description"
 						description="Provide a concise and engaging description to introduce the resource and convey the benefits of interacting with the full content."
 					>
-						<Wysiwyg
-							ref={descriptionWysiwygRef}
-							className="bg-white"
-							initialValue={loaderData.contentResponse?.content?.description ?? ''}
-							onChange={(nextValue) => {
-								updateFormValue('description', nextValue);
-							}}
-						/>
+						<div id="description-editor-outer">
+							<Editor
+								initialValue={loaderData.contentResponse?.content?.description ?? ''}
+								value={formValues.description}
+								onChange={(nextValue) => {
+									updateFormValue('description', nextValue);
+								}}
+								presignedUrlEndpoint={adminService.getPresignedUploadUrl}
+							/>
+						</div>
 					</AdminFormSection>
 
 					<hr />

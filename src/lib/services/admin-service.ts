@@ -84,7 +84,7 @@ export interface ContentIdResponse {
 	contentId: string;
 }
 
-interface GetPreSignedUploadUrlRequestBody {
+export interface GetPreSignedUploadUrlRequestBody {
 	contentType: string;
 	filename: string;
 	filesize: number;
