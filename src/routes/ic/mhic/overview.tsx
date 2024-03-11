@@ -169,7 +169,7 @@ export const Component = () => {
 								tabs={[
 									{
 										value: TAB_KEYS.OUTREACH_REVIEW,
-										title: `Outreach Review (${countsByStatus.OUTREACH_REVIEW})`,
+										title: `New Order Review (${countsByStatus.OUTREACH_REVIEW})`,
 									},
 									{
 										value: TAB_KEYS.VOICEMAILS,
