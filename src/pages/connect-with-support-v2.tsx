@@ -122,6 +122,7 @@ const ConnectWithSupportV2 = () => {
 				visitTypeIds: findOptions.defaultVisitTypeIds,
 				...(institutionLocationId && { institutionLocationId }),
 				...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
+				...(patientOrderId && { patientOrderId }),
 			})
 			.fetch();
 
@@ -133,6 +134,7 @@ const ConnectWithSupportV2 = () => {
 		featureDetails,
 		findOptions,
 		institutionLocationId,
+		patientOrderId,
 		setAppointmentTypes,
 		setEpicDepartments,
 		startDate,
