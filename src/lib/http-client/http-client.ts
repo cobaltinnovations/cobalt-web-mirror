@@ -81,7 +81,7 @@ export class HttpClient {
 			return response;
 		} catch (error) {
 			if (axios.isCancel(error)) {
-				throw CobaltError.fromCancelledRequest(error as Cancel);
+				throw CobaltError.fromCancelledRequest();
 			} else if (axios.isAxiosError(error)) {
 				throw CobaltError.fromAxiosError(error);
 			} else {

@@ -1,6 +1,6 @@
 import { useCallback, useContext } from 'react';
 
-import { CobaltError, isApiError } from '@/lib/http-client';
+import { CobaltError, isApiError, isDeferredDataError } from '@/lib/http-client';
 
 import { ErrorModalContext } from '@/contexts/error-modal-context';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
@@ -22,6 +22,10 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 				handled = CobaltError.fromAxiosError(error);
 			} else if (isApiError(error)) {
 				handled = CobaltError.fromApiError(error);
+			} else if (isDeferredDataError(error)) {
+				handled = CobaltError.fromDeferredDataAbort();
+			} else if (axios.isCancel(error)) {
+				handled = CobaltError.fromCancelledRequest();
 			} else {
 				handled = CobaltError.fromUnknownError(error);
 			}

@@ -27,6 +27,7 @@ import { Await } from 'react-router-dom';
 import Loader from '@/components/loader';
 import { MhicPatientOrderShelfActions } from '@/components/integrated-care/mhic/mhic-patient-order-shelf-actions';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import useHandleError from '@/hooks/use-handle-error';
 
 export const mhicShelfRouteObject: RouteObject = {
 	path: ':patientOrderId',
@@ -46,15 +47,18 @@ export function useMhicPatientOrdereShelfLoaderData() {
 interface MhicPatientOrderShelfLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
 	patientOrderPromise: Promise<PatientOrderResponse>;
+	patientOrderAbort(): void;
 }
 
 function loadShelfData(patientOrderId: string, isPolling = false) {
 	const request = integratedCareService.getPatientOrder(patientOrderId);
 	const patientOrderPromise = request.fetch({ isPolling });
+	const patientOrderAbort = request.abort;
 
 	return {
 		getResponseChecksum: () => patientOrderPromise.then(() => request.cobaltResponseChecksum),
 		patientOrderPromise,
+		patientOrderAbort,
 	};
 }
 
@@ -75,12 +79,14 @@ enum TAB_KEYS {
 }
 
 export const Component = () => {
+	const handleError = useHandleError();
 	const matches = useMatches();
 	const patientOrderId = useMemo(() => {
 		const id = matches[matches.length - 1].params.patientOrderId;
 		if (!id) {
-			throw new Error('Unknonw patient order');
+			throw new Error('Unknown patient order');
 		}
+
 		return id;
 	}, [matches]);
 
@@ -94,11 +100,26 @@ export const Component = () => {
 		pollingFn,
 	});
 	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
-	const [patientOrderResponse, setPatientORderResponse] = useState<PatientOrderResponse | null>(null);
+	const [patientOrderResponse, setPatientOrderResponse] = useState<PatientOrderResponse | null>(null);
 
 	useEffect(() => {
-		shelfData?.patientOrderPromise.then((response) => setPatientORderResponse(response));
-	}, [shelfData?.patientOrderPromise]);
+		const fetchPatientOrder = async () => {
+			try {
+				const response = await shelfData?.patientOrderPromise;
+				setPatientOrderResponse(response);
+			} catch (error) {
+				handleError(error);
+			}
+		};
+
+		fetchPatientOrder();
+	}, [handleError, shelfData?.patientOrderPromise]);
+
+	useEffect(() => {
+		return () => {
+			shelfData?.patientOrderAbort();
+		};
+	}, [shelfData]);
 
 	return (
 		<Suspense fallback={<Loader />}>
