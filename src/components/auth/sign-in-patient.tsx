@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
@@ -11,6 +11,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { AccountSourceDisplayStyleId } from '@/lib/models';
 
 import { SignInCobaltProps } from './sign-in-cobalt';
+import { useSearchParams } from 'react-router-dom';
 
 const useSignInPatientStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -53,6 +54,9 @@ const accountSourceVariantMap = {
 };
 
 export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
+	const [searchParams] = useSearchParams();
+	const myChartError = useMemo(() => searchParams.get('myChartError') ?? '', [searchParams]);
+
 	const { institution, accountSources } = useAccount();
 	const classes = useSignInPatientStyles();
 
@@ -102,6 +106,14 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										);
 									})}
 								</div>
+								{myChartError && (
+									<InlineAlert
+										className="mb-4"
+										variant="flag-danger"
+										title="MPM Permissions"
+										description={`You must accept all ${institution.myChartName} permissions to sign in.`}
+									/>
+								)}
 								<InlineAlert
 									variant="info"
 									title="If you are in crisis"
