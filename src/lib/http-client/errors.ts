@@ -46,7 +46,7 @@ export class CobaltError extends Error {
 		return instance;
 	}
 
-	static fromDeferredDataAbortion() {
+	static fromDeferredDataAbort() {
 		const instance = new CobaltError('Request was cancelled');
 		instance.code = ERROR_CODES.REQUEST_ABORTED;
 

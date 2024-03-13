@@ -23,7 +23,7 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 			} else if (isApiError(error)) {
 				handled = CobaltError.fromApiError(error);
 			} else if (isDeferredDataError(error)) {
-				handled = CobaltError.fromDeferredDataAbortion();
+				handled = CobaltError.fromDeferredDataAbort();
 			} else if (axios.isCancel(error)) {
 				handled = CobaltError.fromCancelledRequest();
 			} else {
