@@ -110,7 +110,7 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									<InlineAlert
 										className="mb-4"
 										variant="flag-danger"
-										title="MPM Permissions"
+										title="Permissions needed"
 										description={`You must accept all ${institution.myChartName} permissions to sign in.`}
 									/>
 								)}
