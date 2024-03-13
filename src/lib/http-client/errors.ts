@@ -39,7 +39,14 @@ export class CobaltError extends Error {
 		return instance;
 	}
 
-	static fromCancelledRequest(error: Cancel) {
+	static fromCancelledRequest() {
+		const instance = new CobaltError('Request was cancelled');
+		instance.code = ERROR_CODES.REQUEST_ABORTED;
+
+		return instance;
+	}
+
+	static fromDeferredDataAbortion() {
 		const instance = new CobaltError('Request was cancelled');
 		instance.code = ERROR_CODES.REQUEST_ABORTED;
 
@@ -83,5 +90,20 @@ type FieldError = {
 export function isApiError(error: unknown): error is ApiError {
 	return (
 		typeof error === 'object' && error !== null && Object.hasOwn(error, 'code') && Object.hasOwn(error, 'message')
+	);
+}
+
+type DeferredDataError = {
+	stack: string;
+	message: 'Deferred data aborted';
+};
+
+export function isDeferredDataError(error: unknown): error is DeferredDataError {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		Object.hasOwn(error, 'stack') &&
+		Object.hasOwn(error, 'message') &&
+		(error as any).message === 'Deferred data aborted'
 	);
 }
