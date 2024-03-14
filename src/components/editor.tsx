@@ -144,6 +144,13 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 						return locationUrl;
 					},
 					images_reuse_filename: true,
+					setup: (editor) => {
+						editor.on('focus', () => {
+							editor.dom.setAttrib(editor.dom.select('img'), 'height', 'auto');
+							editor.dom.setAttrib(editor.dom.select('img'), 'width', '100%');
+						});
+					},
+					object_resizing: false,
 				}}
 			/>
 		</div>
