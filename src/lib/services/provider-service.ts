@@ -85,6 +85,7 @@ export interface FindFilters {
 	specialtyIds?: string[];
 	institutionLocationId?: string;
 	appointmentTimeIds?: string[];
+	patientOrderId?: string;
 }
 
 export interface FindProvidersResponse {

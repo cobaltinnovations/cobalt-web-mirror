@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, ButtonProps, Modal } from 'react-bootstrap';
 import Color from 'color';
 
@@ -6,6 +6,7 @@ import { AvailabilityTimeSlot, Provider } from '@/lib/models';
 import { ProviderSection, providerService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import { useSearchParams } from 'react-router-dom';
 
 interface UseStylesProps {
 	showLeftGradient: boolean;
@@ -133,6 +134,9 @@ const ConnectWithSupportItem = ({
 	const [providerDetails, setProviderDetails] = useState<Provider>();
 	const [providerAvailability, setProviderAvailability] = useState<ProviderSection[]>([]);
 
+	const [searchParams] = useSearchParams();
+	const patientOrderId = useMemo(() => searchParams.get('patientOrderId') ?? undefined, [searchParams]);
+
 	const classes = useStyles({
 		showLeftGradient,
 		showRightGradient,
@@ -173,7 +177,7 @@ const ConnectWithSupportItem = ({
 		try {
 			const [providerDetailResponse, findProvidersResponse] = await Promise.all([
 				providerService.getProviderById(providerId).fetch(),
-				providerService.findProviders({ providerId }).fetch(),
+				providerService.findProviders({ providerId, ...(patientOrderId && { patientOrderId }) }).fetch(),
 			]);
 
 			setProviderDetails(providerDetailResponse.provider);
@@ -181,7 +185,7 @@ const ConnectWithSupportItem = ({
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, providerId]);
+	}, [handleError, patientOrderId, providerId]);
 
 	const handleModalExited = useCallback(() => {
 		setProviderDetails(undefined);

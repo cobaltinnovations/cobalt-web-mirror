@@ -1,6 +1,7 @@
 export const DateFormats = {
 	UI: {
 		TimeSlotInput: 'h:mm A',
+		Date: 'MMMM Do YYYY',
 	},
 
 	API: {

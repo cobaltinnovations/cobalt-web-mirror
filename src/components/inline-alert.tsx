@@ -8,6 +8,7 @@ import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
 import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
+import { ReactComponent as FlagDangerIcon } from '@/assets/icons/flag-danger.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	inlineAlert: {
@@ -44,7 +45,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				color: theme.colors.w500,
 			},
 		},
-		'&--danger': {
+		'&--danger, &--flag-danger': {
 			backgroundColor: theme.colors.d50,
 			borderColor: theme.colors.d500,
 			'& svg': {
@@ -83,7 +84,7 @@ interface InlineAlertAction {
 }
 
 interface InlineAlertProps {
-	variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'attention';
+	variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'attention' | 'flag-danger';
 	title: string;
 	description?: ReactNode;
 	action?: InlineAlertAction | InlineAlertAction[];
@@ -101,6 +102,7 @@ export const InlineAlert = ({ title, description, action, variant = 'info', clas
 			danger: <DangerIcon width={24} height={24} />,
 			info: <InfoIcon width={24} height={24} />,
 			attention: <QuestionMarkIcon width={24} height={24} />,
+			'flag-danger': <FlagDangerIcon width={24} height={24} />,
 		};
 	}, []);
 
