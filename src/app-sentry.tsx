@@ -29,5 +29,8 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 				),
 			}),
 		],
+		// These errors are coming from Office 365 scanning safe-links
+		// https://github.com/getsentry/sentry-javascript/issues/3440#issuecomment-865857552
+		ignoreErrors: ['Non-Error promise rejection captured'],
 	});
 }
