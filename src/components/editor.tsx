@@ -71,23 +71,22 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 					height: 500,
 					menubar: false,
 					plugins: [
-						'image',
-						'advlist',
+						// 'advlist',
+						'anchor',
 						'autolink',
 						'lists',
 						'link',
 						'image',
-						'charmap',
-						'preview',
-						'anchor',
-						'searchreplace',
-						'visualblocks',
-						'code',
-						'fullscreen',
-						'insertdatetime',
-						'media',
-						'table',
-						'code',
+						// 'charmap',
+						// 'preview',
+						// 'searchreplace',
+						// 'visualblocks',
+						// 'code',
+						// 'fullscreen',
+						// 'insertdatetime',
+						// 'media',
+						// 'table',
+						// 'code',
 						// 'help',
 						'wordcount',
 					],
@@ -98,7 +97,7 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 						'bullist numlist | ' +
 						'removeformat | ' +
 						'link image',
-					content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px }',
+					content_style: 'img { width: 100%; height: auto; }',
 					automatic_uploads: true,
 					images_file_types: 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp',
 					file_picker_types: 'image',
@@ -140,7 +139,6 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 					},
 					images_upload_handler: async (blobInfo, progressFn) => {
 						const locationUrl = await handleImageUpload(blobInfo.blob(), blobInfo.filename(), progressFn);
-
 						return locationUrl;
 					},
 					images_reuse_filename: true,
@@ -149,8 +147,14 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 							editor.dom.setAttrib(editor.dom.select('img'), 'height', 'auto');
 							editor.dom.setAttrib(editor.dom.select('img'), 'width', '100%');
 						});
+						editor.on('blur', () => {
+							editor.dom.setAttrib(editor.dom.select('img'), 'height', 'auto');
+							editor.dom.setAttrib(editor.dom.select('img'), 'width', '100%');
+						});
 					},
 					object_resizing: false,
+					image_dimensions: false,
+					resize: false,
 				}}
 			/>
 		</div>
