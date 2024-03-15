@@ -71,12 +71,13 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 					height: 500,
 					menubar: false,
 					plugins: [
-						// 'advlist',
 						'anchor',
 						'autolink',
 						'lists',
 						'link',
 						'image',
+						'wordcount',
+						// 'advlist',
 						// 'charmap',
 						// 'preview',
 						// 'searchreplace',
@@ -88,7 +89,6 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 						// 'table',
 						// 'code',
 						// 'help',
-						'wordcount',
 					],
 					toolbar:
 						'undo redo | blocks | ' +
@@ -99,9 +99,13 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 						'link image',
 					content_style: 'img { width: 100%; height: auto; }',
 					automatic_uploads: true,
-					images_file_types: 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp',
+					images_file_types: 'jpeg, jpg, jpe, jfi, jif, jfif, png, gif, bmp, webp',
 					file_picker_types: 'image',
 					block_unsupported_drop: true,
+					object_resizing: false,
+					image_dimensions: false,
+					resize: false,
+					images_reuse_filename: true,
 					file_picker_callback: (callback) => {
 						const input = document.createElement('input');
 						input.setAttribute('type', 'file');
@@ -141,7 +145,6 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 						const locationUrl = await handleImageUpload(blobInfo.blob(), blobInfo.filename(), progressFn);
 						return locationUrl;
 					},
-					images_reuse_filename: true,
 					setup: (editor) => {
 						editor.on('focus', () => {
 							editor.dom.setAttrib(editor.dom.select('img'), 'height', 'auto');
@@ -152,9 +155,6 @@ const Editor = ({ initialValue, value, onChange, presignedUrlEndpoint }: EditorP
 							editor.dom.setAttrib(editor.dom.select('img'), 'width', '100%');
 						});
 					},
-					object_resizing: false,
-					image_dimensions: false,
-					resize: false,
 				}}
 			/>
 		</div>
