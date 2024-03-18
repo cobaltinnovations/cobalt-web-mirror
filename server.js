@@ -48,6 +48,11 @@ function extractCookieValueFromRequest(_req, cookieName) {
 
 const app = express();
 
+app.use((_req, res, next) => {
+	res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+	next();
+});
+
 if (settings.sentry.dsn) {
 	Sentry.init({
 		dsn: settings.sentry.dsn,
