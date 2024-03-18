@@ -9,6 +9,7 @@ export const httpSingleton = new HttpClient({
 	defaultHeaders: {
 		'Content-Type': 'application/json',
 		'X-Cobalt-Webapp-Base-Url': window.location.origin,
+		'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 	},
 	tokenHeaderKey: 'X-Cobalt-Access-Token',
 	getToken: () => {
