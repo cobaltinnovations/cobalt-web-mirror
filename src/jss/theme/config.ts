@@ -2,10 +2,10 @@ import colors from './colors.json';
 import { CobaltFontFamily, CobaltTheme } from './theme';
 
 const headingFontFamily: CobaltFontFamily = {
-	fontFamily: '"Clarika Pro Geometric", sans-serif',
+	fontFamily: '"Lexend", sans-serif',
 	weights: {
 		regular: 400,
-		bold: 700,
+		bold: 600,
 	},
 };
 
