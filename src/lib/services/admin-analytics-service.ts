@@ -91,6 +91,16 @@ interface DateOption {
 	endDateDescription: string;
 }
 
+export interface TableauResponse {
+	tableauApiBaseUrl: string;
+	tableauViewName: string;
+	tableauClientId: string;
+	tableauEmailAddress: string;
+	tableauJwt: string;
+	tableauContentUrl: string;
+	tableauReportName: string;
+}
+
 export const adminAnalyticsService = {
 	getDateOptions(): Record<DATE_OPTION_KEYS, DateOption> {
 		const today = moment();
@@ -180,6 +190,13 @@ export const adminAnalyticsService = {
 		return httpSingleton.orchestrateRequest<AdminAnalyticsWidgetsResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/analytics/resources-topics', params),
+		});
+	},
+
+	getTableau() {
+		return httpSingleton.orchestrateRequest<TableauResponse>({
+			method: 'GET',
+			url: '/analytics/tableau',
 		});
 	},
 };
