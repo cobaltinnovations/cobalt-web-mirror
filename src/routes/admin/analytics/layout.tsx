@@ -9,6 +9,7 @@ import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, Linear
 import React, { Suspense, useMemo } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import { Outlet, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import useAccount from '@/hooks/use-account';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -25,6 +26,7 @@ export async function loader() {
 }
 
 export const Component = () => {
+	const { institution } = useAccount();
 	const { dateOptions } = useAdminAnalyticsLayoutLoaderData();
 	const match = useMatch('/admin/analytics/:dashboardTab');
 	const [searchParams, setSearchParams] = useSearchParams({
@@ -164,6 +166,18 @@ export const Component = () => {
 										search: '?' + searchParams.toString(),
 									},
 								},
+								...(institution.tableauEnabled
+									? [
+											{
+												value: 'tableau',
+												title: 'Tableau',
+												to: {
+													pathname: '/admin/analytics/tableau',
+													search: '?' + searchParams.toString(),
+												},
+											},
+									  ]
+									: []),
 							]}
 						/>
 						<Tab.Content>
