@@ -44,6 +44,8 @@ export const Component = () => {
 			setIsLoading(true);
 			let response = undefined;
 
+			document.getElementById('tableau-script')?.remove();
+
 			try {
 				switch (dashboardTab) {
 					case 'assessments-and-appointments':
