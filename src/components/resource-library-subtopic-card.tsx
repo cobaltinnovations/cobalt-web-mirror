@@ -60,7 +60,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel,
 			)}
 		>
 			<div className="mb-15">
-				<h2 className="mb-4">{title}</h2>
+				<h3 className="mb-4">{title}</h3>
 				<div dangerouslySetInnerHTML={{ __html: description }} />
 			</div>
 

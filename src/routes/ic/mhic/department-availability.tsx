@@ -155,9 +155,9 @@ export const Component = () => {
 												}
 											)}
 										>
-											<h5 className="mb-0 fw-normal">
+											<h6 className="mb-0 fw-normal">
 												{epicDepartment.name} ({epicDepartment.departmentId})
-											</h5>
+											</h6>
 											<div className="d-flex align-items-center">
 												{epicDepartment.departmentAvailabilityStatusId ===
 													DepartmentAvailabilityStatusId.AVAILABLE && (

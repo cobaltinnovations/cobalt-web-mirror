@@ -206,7 +206,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 											<div className={classes.iconOuter}>
 												<PathwaysIcon className={classes.icon} featureId={featureId} />
 											</div>
-											<h5 className="text-center">{name}</h5>
+											<h6 className="text-center">{name}</h6>
 											{recommended && <div className={classes.recommended}>Recommended</div>}
 										</Link>
 									</div>
