@@ -120,7 +120,7 @@ const PatientConsent = () => {
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<p className="mb-6 fs-large">Hello {patientOrder?.patientFirstName ?? 'patient'},</p>
 							<p className="mb-6 fs-large">
-								This is a follow up from a conversation with your primary care provider who referred you
+								This is a follow-up from a conversation with your primary care provider who referred you
 								to the Penn Integrated Care program for further assessment. There are a couple of
 								options for us to connect.
 							</p>

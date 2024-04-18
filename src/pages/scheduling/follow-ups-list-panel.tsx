@@ -9,7 +9,7 @@ export const FollowUpsListPanel = ({ onClose }: FollowUpsListPanelProps) => {
 	return (
 		<div>
 			<div className="d-flex align-items-center justify-content-between py-4">
-				<h4>2 / 3 follow ups</h4>
+				<h4>2 / 3 follow-ups</h4>
 
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
 					<CloseIcon />

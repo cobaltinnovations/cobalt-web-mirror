@@ -4,7 +4,7 @@ import { Outlet, defer, useMatch, useNavigate, useRouteLoaderData } from 'react-
 import { MhicNavigation, MhicNavigationItemModel } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
-import { ReactComponent as DashboardIcon } from '@/assets/icons/icon-dashboard.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 import { PatientOrderPanelCountsResponse, integratedCareService } from '@/lib/services';
 import { MhicMyPatientView } from './my-patients';
@@ -55,15 +55,15 @@ export const Component = () => {
 	useEffect(() => {
 		const itemsWithoutCounts = [
 			{
-				title: 'To Do',
-				icon: () => <DashboardIcon width={24} height={24} className="text-p300" />,
+				title: 'Priorities',
+				icon: () => <EventIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic');
 				},
 				isActive: isTodayActive,
 			},
 			{
-				title: 'My Patient Orders',
+				title: 'Assigned Orders',
 				icon: () => <ClipboardIcon width={24} height={24} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);

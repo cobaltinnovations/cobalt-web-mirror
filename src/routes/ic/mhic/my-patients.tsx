@@ -53,7 +53,7 @@ type ViewConfig = Record<
 
 const viewConfig: ViewConfig = {
 	[MhicMyPatientView.All]: {
-		pageTitle: 'My Patient Orders',
+		pageTitle: 'Assigned Orders',
 		pageDescription: '',
 		apiParameters: {},
 		columnConfig: {

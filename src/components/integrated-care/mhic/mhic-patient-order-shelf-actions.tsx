@@ -130,7 +130,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 			/>
 
 			<Dropdown className={classNames(classes.shelfMoreButton, 'position-absolute')}>
-				<Dropdown.Toggle as={DropdownToggle} id={`mhic-shelf__dropdown-menu`} className="p-2">
+				<Dropdown.Toggle as={DropdownToggle} id={`mhic-shelf__dropdown-menu`} className="p-2 border-0">
 					<MoreIcon className="d-flex" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
@@ -139,7 +139,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowAssignOrderModal(true);
 						}}
 					>
-						<SwapIcon className="text-gray" /> Assign to MHIC
+						<SwapIcon className="text-gray" /> Assign MHIC
 					</Dropdown.Item>
 					<Dropdown.Item
 						onClick={() => {
