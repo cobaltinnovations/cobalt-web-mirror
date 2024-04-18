@@ -107,7 +107,7 @@ export const Component = () => {
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.NEED_DOCUMENTATION.patientOrderCountDescription ?? '0',
-								icon: () => <DotIcon width={24} height={24} className="text-secondary" />,
+								icon: () => <DotIcon width={24} height={24} className="text-warning" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedDocumentation);
 								},
