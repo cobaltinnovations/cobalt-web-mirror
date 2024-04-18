@@ -121,7 +121,7 @@ export const Component = () => {
 						<Form onSubmit={handleFormSubmit}>
 							<Row className="mb-2">
 								<Col>
-									<h5>Date Range</h5>
+									<h6>Date Range</h6>
 								</Col>
 							</Row>
 							<Row className="mb-4">
