@@ -106,8 +106,8 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.NeedDocumentation]: {
 		viewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
-		pageTitle: 'Missing Encounter',
-		pageDescription: 'Orders for which assessment results must be synced to an encounter',
+		pageTitle: 'Missing Documentation',
+		pageDescription: 'Orders that need attention in Epic',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
 		},
