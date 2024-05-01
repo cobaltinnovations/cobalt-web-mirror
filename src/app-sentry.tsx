@@ -54,6 +54,8 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 			'EBCallBackMessageReceived',
 			// See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
 			'conduitPage',
+			// Chrome synced credentials injection, See https://github.com/getsentry/sentry/issues/61469
+			/^__gCrWeb\./,
 		],
 		denyUrls: [
 			// Facebook flakiness
