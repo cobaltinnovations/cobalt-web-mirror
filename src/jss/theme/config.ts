@@ -54,7 +54,7 @@ const theme: CobaltTheme = {
 				lineHeight: '4.4rem',
 			},
 			mobile: {
-				fontSize: '2.8rem',
+				fontSize: '2.9rem',
 				lineHeight: '3.2rem',
 			},
 		},
@@ -84,28 +84,29 @@ const theme: CobaltTheme = {
 				lineHeight: '2.4rem',
 			},
 			mobile: {
-				fontSize: '1.8rem',
-				lineHeight: '2.2rem',
+				fontSize: '1.6rem',
+				lineHeight: '2.0rem',
 			},
 		},
 		h5: {
 			default: {
-				fontSize: '1.8rem',
-				lineHeight: '2.2rem',
+				fontSize: '1.6rem',
+				lineHeight: '2.0rem',
 			},
 			mobile: {
-				fontSize: '1.6rem',
-				lineHeight: '2.4rem',
+				fontSize: '1.4rem',
+				lineHeight: '1.6rem',
 			},
 		},
 		h6: {
 			default: {
-				fontSize: '1.6rem',
-				lineHeight: '2.4rem',
+				fontSize: '1.4rem',
+				lineHeight: '2.0rem',
+				letterSpacing: '-0.02em',
 			},
 			mobile: {
-				fontSize: '1.4rem',
-				lineHeight: '2rem',
+				fontSize: '1.2rem',
+				lineHeight: '1.6rem',
 			},
 		},
 		default: {
