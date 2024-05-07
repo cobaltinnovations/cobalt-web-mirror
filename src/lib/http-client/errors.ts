@@ -1,4 +1,4 @@
-import { AxiosError, Cancel } from 'axios';
+import { AxiosError } from 'axios';
 
 export enum ERROR_CODES {
 	GENERIC = 'GENERIC',
