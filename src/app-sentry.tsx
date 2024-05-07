@@ -1,6 +1,5 @@
 import React from 'react';
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 import {
 	createBrowserRouter,
 	createRoutesFromChildren,
@@ -19,14 +18,12 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 		release: __SENTRY_RELEASE__, //'local-data-router',
 		tracesSampleRate: __DEV__ ? 1.0 : 0.2,
 		integrations: [
-			new BrowserTracing({
-				routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-					React.useEffect,
-					useLocation,
-					useNavigationType,
-					createRoutesFromChildren,
-					matchRoutes
-				),
+			Sentry.reactRouterV6BrowserTracingIntegration({
+				useEffect: React.useEffect,
+				useLocation,
+				useNavigationType,
+				createRoutesFromChildren,
+				matchRoutes,
 			}),
 		],
 		ignoreErrors: [
