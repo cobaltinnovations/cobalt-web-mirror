@@ -267,7 +267,7 @@ const ConnectWithSupportItem = ({
 				<div className={classes.informationOuter}>
 					<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl})` }} />
 					<div className={classes.information}>
-						<h6>{title}</h6>
+						<h5>{title}</h5>
 						{subtitle && <p>{subtitle}</p>}
 					</div>
 				</div>

@@ -81,7 +81,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 
 				<AsyncPage fetchData={fetchData}>
 					<div className="mb-1 d-flex align-items-center justify-content-between">
-						<h6>appointment types</h6>
+						<h5>appointment types</h5>
 						<Button
 							data-testid="manageAvailabilityAddAppointmentTypeButton"
 							variant="link"
@@ -108,7 +108,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 					</div>
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
-						<h6>regular hours</h6>
+						<h5>regular hours</h5>
 						<Link to={'new-availability'}>
 							<Button
 								data-testid="manageAvailabilityAddButton"
@@ -132,7 +132,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 					</div>
 
 					<div className="mb-1 d-flex align-items-center justify-content-between">
-						<h6>unavailable time block</h6>
+						<h5>unavailable time block</h5>
 						<Link to={'new-blocked-time'}>
 							<Button
 								data-testid="manageAvailabilitBlockTimeButton"

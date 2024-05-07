@@ -7,10 +7,10 @@ export const button = (theme: CobaltTheme) => {
 			border: 0,
 			borderRadius: 500,
 			appearance: 'none',
-			padding: '8px 20px',
+			padding: '10px 20px',
 			...theme.fonts.bodyBold,
 			fontSize: '1.4rem',
-			lineHeight: '2.4rem',
+			lineHeight: '2rem',
 			position: 'relative',
 			textTransform: 'none',
 			'&:focus-visible': {
