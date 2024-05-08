@@ -91,7 +91,7 @@ const theme: CobaltTheme = {
 		h5: {
 			default: {
 				fontSize: '1.6rem',
-				lineHeight: '2.0rem',
+				lineHeight: '2.4rem',
 			},
 			mobile: {
 				fontSize: '1.6rem',
