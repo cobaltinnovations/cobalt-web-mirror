@@ -177,7 +177,7 @@ export const Component = () => {
 									},
 									{
 										value: TAB_KEYS.FOLLOW_UPS,
-										title: `Follow Up (${countsByStatus.FOLLOW_UPS})`,
+										title: `Follow-Up (${countsByStatus.FOLLOW_UPS})`,
 									},
 									{
 										value: TAB_KEYS.ASSESSMENTS,

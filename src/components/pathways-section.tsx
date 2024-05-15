@@ -123,7 +123,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			borderRadius: '50%',
 			position: 'absolute',
 			pointerEvents: 'none',
-			border: `2px solid ${theme.colors.a500}`,
+			border: `2px solid ${theme.colors.a300}`,
 		},
 		[mediaQueries.lg]: {
 			width: 48,

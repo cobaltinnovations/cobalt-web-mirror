@@ -279,7 +279,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 												PatientOrderDispositionId.CLOSED
 											}
 										>
-											Log Contact Attempt
+											Log Contact
 										</Dropdown.Toggle>
 										<Dropdown.Menu
 											as={DropdownMenu}
@@ -322,7 +322,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
 										}
 									>
-										Send Message
+										Schedule Message
 									</Button>
 								</div>
 							</div>

@@ -14,7 +14,7 @@ const bodyFontFamily: CobaltFontFamily = {
 		'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 	weights: {
 		regular: 400,
-		bold: 700,
+		bold: 600,
 	},
 };
 
@@ -54,14 +54,14 @@ const theme: CobaltTheme = {
 				lineHeight: '4.4rem',
 			},
 			mobile: {
-				fontSize: '2.9rem',
+				fontSize: '2.8rem',
 				lineHeight: '3.2rem',
 			},
 		},
 		h2: {
 			default: {
-				fontSize: '3.0rem',
-				lineHeight: '3.8rem',
+				fontSize: '2.8rem',
+				lineHeight: '3.2rem',
 			},
 			mobile: {
 				fontSize: '2.4rem',
@@ -84,29 +84,28 @@ const theme: CobaltTheme = {
 				lineHeight: '2.4rem',
 			},
 			mobile: {
-				fontSize: '1.6rem',
-				lineHeight: '2.0rem',
+				fontSize: '1.8rem',
+				lineHeight: '2.4rem',
 			},
 		},
 		h5: {
 			default: {
 				fontSize: '1.6rem',
-				lineHeight: '2.0rem',
+				lineHeight: '2.4rem',
 			},
 			mobile: {
-				fontSize: '1.4rem',
-				lineHeight: '1.6rem',
+				fontSize: '1.6rem',
+				lineHeight: '2.4rem',
 			},
 		},
 		h6: {
 			default: {
 				fontSize: '1.4rem',
 				lineHeight: '2.0rem',
-				letterSpacing: '-0.02em',
 			},
 			mobile: {
-				fontSize: '1.2rem',
-				lineHeight: '1.6rem',
+				fontSize: '1.4rem',
+				lineHeight: '2.0rem',
 			},
 		},
 		default: {

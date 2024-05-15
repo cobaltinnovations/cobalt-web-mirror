@@ -53,7 +53,7 @@ type ViewConfig = Record<
 
 const viewConfig: ViewConfig = {
 	[MhicMyPatientView.All]: {
-		pageTitle: 'My Patient Orders',
+		pageTitle: 'Assigned Orders',
 		pageDescription: '',
 		apiParameters: {},
 		columnConfig: {
@@ -106,8 +106,8 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.NeedDocumentation]: {
 		viewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
-		pageTitle: 'Need Documentation',
-		pageDescription: 'Orders for which assessment results must be synced to an encounter',
+		pageTitle: 'Missing Documentation',
+		pageDescription: 'Orders that need attention in Epic',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
 		},

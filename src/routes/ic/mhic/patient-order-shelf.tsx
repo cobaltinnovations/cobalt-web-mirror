@@ -203,7 +203,7 @@ const ShelfContent = ({
 
 				<Button
 					variant="light"
-					className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
+					className={classNames(classes.shelfCloseButton, 'p-2 border-0 position-absolute')}
 					onClick={() => {
 						navigate({
 							pathname: '..',

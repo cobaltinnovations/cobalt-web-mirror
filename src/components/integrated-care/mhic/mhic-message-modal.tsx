@@ -235,7 +235,7 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEntering={handleOnEnter}>
 			<Modal.Header closeButton>
-				<Modal.Title>{messageToEdit ? 'Edit Scheduled Message' : 'Send Message'}</Modal.Title>
+				<Modal.Title>{messageToEdit ? 'Edit Scheduled Message' : 'Schedule Message'}</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
