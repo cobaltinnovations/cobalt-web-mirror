@@ -26,6 +26,7 @@ import {
 	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
 	PatientOrderOutreachTypeId,
+	PatientOrderScheduledOutreach,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
@@ -66,6 +67,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [showSelectAssessmentTypeModal, setShowSelectAssessmentTypeModal] = useState(false);
 	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
+	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -272,10 +274,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
-			{patientOrder.nextScheduledOutreachId && (
+			{scheduledOutreachToEdit && (
 				<MhicScheduleCallCompleteModal
 					show={showScheduleCallCompleteModal}
-					patientOrderScheduledOutreachId={patientOrder.nextScheduledOutreachId}
+					patientOrderScheduledOutreachId={scheduledOutreachToEdit.patientOrderScheduledOutreachId}
 					patientOrder={patientOrder}
 					onHide={() => {
 						setShowScheduleCallCompleteModal(false);
@@ -304,6 +306,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													variant="light"
 													size="sm"
 													onClick={() => {
+														setScheduledOutreachToEdit(scheduledOutreach);
 														setShowScheduleCallCompleteModal(true);
 													}}
 												>
@@ -313,6 +316,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													variant="light"
 													className="ms-2 p-2"
 													onClick={() => {
+														setScheduledOutreachToEdit(scheduledOutreach);
 														window.alert('TODO: OPEN EDIT MODAL');
 													}}
 												>
