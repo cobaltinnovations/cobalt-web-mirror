@@ -246,6 +246,7 @@ export const MhicScheduleCallCompleteModal = ({
 							}));
 						}}
 						disabled={isSaving}
+						required
 					/>
 				</Modal.Body>
 				<Modal.Footer className="text-right">
