@@ -55,7 +55,7 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 
 				let sceduledOutreachResponse = undefined;
 
-				if (!!patientOrderScheduledOutreach?.patientOrderScheduledOutreachId) {
+				if (patientOrderScheduledOutreach) {
 					sceduledOutreachResponse = await integratedCareService
 						.updateScheduledOutreach(patientOrderScheduledOutreach.patientOrderScheduledOutreachId, {
 							patientOrderScheduledOutreachReasonId:
@@ -117,12 +117,23 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 			handleError,
 			onSave,
 			patientOrder,
-			patientOrderScheduledOutreach?.patientOrderScheduledOutreachId,
+			patientOrderScheduledOutreach,
 		]
 	);
 
 	useEffect(() => {
-		if (props.show) {
+		if (!props.show) {
+			return;
+		}
+
+		if (patientOrderScheduledOutreach) {
+			setFormValues({
+				date: moment(patientOrderScheduledOutreach.scheduledAtDateTime).toDate(),
+				time: moment(patientOrderScheduledOutreach.scheduledAtDateTime).format(DateFormats.UI.TimeSlotInput),
+				contactType: PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP,
+				notes: patientOrderScheduledOutreach.message,
+			});
+		} else {
 			setFormValues({
 				date: undefined,
 				time: '',
@@ -130,7 +141,7 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 				notes: '',
 			});
 		}
-	}, [props.show]);
+	}, [patientOrderScheduledOutreach, props.show]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>

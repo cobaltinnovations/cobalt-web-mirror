@@ -14,6 +14,7 @@ import {
 	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
 	MhicScheduleCallCompleteModal,
+	MhicScheduleCallModal,
 	MhicSelectAssessmentTypeModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
@@ -66,6 +67,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [showSelectAssessmentTypeModal, setShowSelectAssessmentTypeModal] = useState(false);
+	const [showScheduleCallEditModal, setShowScheduleCallEditModal] = useState(false);
 	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
 	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 
@@ -275,6 +277,21 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			/>
 
 			{scheduledOutreachToEdit && (
+				<MhicScheduleCallModal
+					show={showScheduleCallEditModal}
+					patientOrderScheduledOutreach={scheduledOutreachToEdit}
+					patientOrder={patientOrder}
+					onHide={() => {
+						setShowScheduleCallEditModal(false);
+					}}
+					onSave={() => {
+						revalidator.revalidate();
+						setShowScheduleCallEditModal(false);
+					}}
+				/>
+			)}
+
+			{scheduledOutreachToEdit && (
 				<MhicScheduleCallCompleteModal
 					show={showScheduleCallCompleteModal}
 					patientOrderScheduledOutreachId={scheduledOutreachToEdit.patientOrderScheduledOutreachId}
@@ -317,7 +334,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													className="ms-2 p-2"
 													onClick={() => {
 														setScheduledOutreachToEdit(scheduledOutreach);
-														window.alert('TODO: OPEN EDIT MODAL');
+														setShowScheduleCallEditModal(true);
 													}}
 												>
 													<EditIcon className="d-flex" />
