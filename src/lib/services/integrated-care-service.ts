@@ -572,12 +572,21 @@ export const integratedCareService = {
 			url: `/patient-order-scheduled-outreaches/${patientOrderScheduledOutreachId}/cancel`,
 		});
 	},
-	completeScheduledOutreaach(patientOrderScheduledOutreachId: string) {
+	completeScheduledOutreaach(
+		patientOrderScheduledOutreachId: string,
+		data: {
+			patientOrderOutreachResultId: string;
+			completedAtDate: string;
+			completedAtTime: string;
+			message: string;
+		}
+	) {
 		return httpSingleton.orchestrateRequest<{
 			patientOrderScheduledOutreach: PatientOrderScheduledOutreach;
 		}>({
 			method: 'POST',
 			url: `/patient-order-scheduled-outreaches/${patientOrderScheduledOutreachId}/complete`,
+			data,
 		});
 	},
 };

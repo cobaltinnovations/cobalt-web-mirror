@@ -21,6 +21,7 @@ import { MhicScheduleAssessmentModal } from './mhic-schedule-assessment-modal';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicCloseEpisodeModal } from './mhic-close-episode-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import { MhicScheduleCallModal } from './mhic-schedule-call-modal';
 
 const useStyles = createUseThemedStyles(() => ({
 	shelfMoreButton: {
@@ -45,6 +46,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
+	const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 
 	const handleAssignOrdersSave = useCallback(
@@ -105,6 +107,18 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 				}}
 			/>
 
+			<MhicScheduleCallModal
+				patientOrder={patientOrder}
+				show={showScheduleCallModal}
+				onHide={() => {
+					setShowScheduleCallModal(false);
+				}}
+				onSave={() => {
+					revalidator.revalidate();
+					setShowScheduleCallModal(false);
+				}}
+			/>
+
 			<MhicCloseEpisodeModal
 				show={showCloseEpisodeModal}
 				onHide={() => {
@@ -147,6 +161,13 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 						}}
 					>
 						<CallMsgIcon className="text-gray" /> Add Voicemail Task
+					</Dropdown.Item>
+					<Dropdown.Item
+						onClick={() => {
+							setShowScheduleCallModal(true);
+						}}
+					>
+						<CallMsgIcon className="text-gray" /> Schedule Call
 					</Dropdown.Item>
 
 					{!assessmentInProgress && !assessmentCompleted && (
