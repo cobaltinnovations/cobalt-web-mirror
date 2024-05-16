@@ -272,17 +272,20 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
-			<MhicScheduleCallCompleteModal
-				show={showScheduleCallCompleteModal}
-				patientOrder={patientOrder}
-				onHide={() => {
-					setShowScheduleCallCompleteModal(false);
-				}}
-				onSave={() => {
-					revalidator.revalidate();
-					setShowScheduleCallCompleteModal(false);
-				}}
-			/>
+			{patientOrder.nextScheduledOutreachId && (
+				<MhicScheduleCallCompleteModal
+					show={showScheduleCallCompleteModal}
+					patientOrderScheduledOutreachId={patientOrder.nextScheduledOutreachId}
+					patientOrder={patientOrder}
+					onHide={() => {
+						setShowScheduleCallCompleteModal(false);
+					}}
+					onSave={() => {
+						revalidator.revalidate();
+						setShowScheduleCallCompleteModal(false);
+					}}
+				/>
+			)}
 
 			{patientOrder?.nextScheduledOutreachId && (
 				<section>
