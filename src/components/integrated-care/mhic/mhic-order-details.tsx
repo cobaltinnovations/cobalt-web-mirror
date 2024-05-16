@@ -13,6 +13,7 @@ import {
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
+	MhicScheduleCallCompleteModal,
 	MhicSelectAssessmentTypeModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
@@ -64,6 +65,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [showSelectAssessmentTypeModal, setShowSelectAssessmentTypeModal] = useState(false);
+	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -270,6 +272,18 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
+			<MhicScheduleCallCompleteModal
+				show={showScheduleCallCompleteModal}
+				patientOrder={patientOrder}
+				onHide={() => {
+					setShowScheduleCallCompleteModal(false);
+				}}
+				onSave={() => {
+					revalidator.revalidate();
+					setShowScheduleCallCompleteModal(false);
+				}}
+			/>
+
 			{patientOrder?.nextScheduledOutreachId && (
 				<section>
 					<Container fluid>
@@ -284,8 +298,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											<Button
 												variant="light"
 												size="sm"
-												onClick={async () => {
-													window.alert('TODO: OPEN COMPLETE MODAL');
+												onClick={() => {
+													setShowScheduleCallCompleteModal(true);
 												}}
 											>
 												Mark Complete

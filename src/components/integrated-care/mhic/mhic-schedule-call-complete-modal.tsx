@@ -3,12 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import {
-	PatientOrderModel,
-	PatientOrderResourcingTypeId,
-	PatientOrderScheduledOutreach,
-	PatientOrderScheduledOutreachReasonId,
-} from '@/lib/models';
+import { PatientOrderModel, PatientOrderScheduledOutreach } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
@@ -29,7 +24,12 @@ interface Props extends ModalProps {
 	onSave(updatedPatientOrder: PatientOrderModel): void;
 }
 
-export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOrder, onSave, ...props }: Props) => {
+export const MhicScheduleCallCompleteModal = ({
+	patientOrderScheduledOutreach,
+	patientOrder,
+	onSave,
+	...props
+}: Props) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
@@ -37,8 +37,8 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 	const [formValues, setFormValues] = useState({
 		date: undefined as Date | undefined,
 		time: '',
-		contactType: PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP,
-		notes: '',
+		callResult: '',
+		comment: '',
 	});
 	const [isSaving, setIsSaving] = useState(false);
 
@@ -51,38 +51,22 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 					throw new Error('patientOrder is undefined.');
 				}
 
+				if (!patientOrderScheduledOutreach) {
+					throw new Error('patientOrderScheduledOutreach is undefined.');
+				}
+
 				setIsSaving(true);
 
-				let sceduledOutreachResponse = undefined;
-
-				if (!!patientOrderScheduledOutreach?.patientOrderScheduledOutreachId) {
-					sceduledOutreachResponse = await integratedCareService
-						.updateScheduledOutreach(patientOrderScheduledOutreach.patientOrderScheduledOutreachId, {
-							patientOrderScheduledOutreachReasonId:
-								formValues.contactType as PatientOrderScheduledOutreachReasonId,
-							patientOrderOutreachTypeId: PatientOrderResourcingTypeId.PHONE_CALL,
-							scheduledAtDate: moment(formValues.date).format(DateFormats.API.Date),
-							scheduledAtTime: moment(formValues.time, DateFormats.UI.TimeSlotInput).format(
-								DateFormats.API.Time
-							),
-							message: formValues.notes,
-						})
-						.fetch();
-				} else {
-					sceduledOutreachResponse = await integratedCareService
-						.createScheduledOutreach({
-							patientOrderScheduledOutreachReasonId:
-								formValues.contactType as PatientOrderScheduledOutreachReasonId,
-							patientOrderOutreachTypeId: PatientOrderResourcingTypeId.PHONE_CALL,
-							scheduledAtDate: moment(formValues.date).format(DateFormats.API.Date),
-							scheduledAtTime: moment(formValues.time, DateFormats.UI.TimeSlotInput).format(
-								DateFormats.API.Time
-							),
-							message: formValues.notes,
-							patientOrderId: patientOrder.patientOrderId,
-						})
-						.fetch();
-				}
+				await integratedCareService
+					.completeScheduledOutreaach(patientOrderScheduledOutreach.patientOrderScheduledOutreachId, {
+						patientOrderOutreachResultId: formValues.callResult,
+						completedAtDate: moment(formValues.date).format(DateFormats.API.Date),
+						completedAtTime: moment(formValues.time, DateFormats.UI.TimeSlotInput).format(
+							DateFormats.API.Time
+						),
+						message: formValues.comment,
+					})
+					.fetch();
 
 				const patientOrderResponse = await integratedCareService
 					.getPatientOrder(patientOrder.patientOrderId)
@@ -90,14 +74,8 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 
 				addFlag({
 					variant: 'success',
-					title: 'Voicemail task assigned',
-					description: `${
-						patientOrderResponse.patientOrder.panelAccountDisplayName
-					} is scheduled for a phone call with ${
-						patientOrderResponse.patientOrder.patientDisplayName ?? 'the patient'
-					} on ${sceduledOutreachResponse.patientOrderScheduledOutreach.scheduledAtDateDescription} as ${
-						sceduledOutreachResponse.patientOrderScheduledOutreach.scheduledAtTimeDescription
-					}`,
+					title: 'Phone call completed',
+					description: "This call was completed and logged in the patient's contact history.",
 					actions: [],
 				});
 
@@ -110,24 +88,24 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 		},
 		[
 			addFlag,
-			formValues.contactType,
+			formValues.callResult,
+			formValues.comment,
 			formValues.date,
-			formValues.notes,
 			formValues.time,
 			handleError,
 			onSave,
 			patientOrder,
-			patientOrderScheduledOutreach?.patientOrderScheduledOutreachId,
+			patientOrderScheduledOutreach,
 		]
 	);
 
 	useEffect(() => {
 		if (props.show) {
 			setFormValues({
-				date: undefined,
+				date: undefined as Date | undefined,
 				time: '',
-				contactType: PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP,
-				notes: '',
+				callResult: '',
+				comment: '',
 			});
 		}
 	}, [props.show]);
@@ -135,10 +113,14 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered>
 			<Modal.Header closeButton>
-				<Modal.Title>{patientOrderScheduledOutreach ? 'Edit Scheduled' : 'Schedule'} Phone Call</Modal.Title>
+				<Modal.Title>Complete Phone Call</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
+					<p className="mb-0">
+						<strong>Enter the details of your call to confirm it was completed</strong>
+					</p>
+					<p className="mb-4">The call details will be logged in the patient's contact history.</p>
 					<Row className="mb-4">
 						<Col>
 							<DatePicker
@@ -174,33 +156,29 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 					<InputHelper
 						className="mb-4"
 						as="select"
-						label="Contact Type"
-						value={formValues.contactType}
+						label="Select Call Result"
+						value={formValues.callResult}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValues) => ({
 								...previousValues,
-								contactType: currentTarget.value as PatientOrderScheduledOutreachReasonId,
+								callResult: currentTarget.value,
 							}));
 						}}
 						required
 					>
-						<option value={PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP}>
-							Resource Follow-up
-						</option>
-						<option value={PatientOrderScheduledOutreachReasonId.OTHER}>Other</option>
+						<option value="">TODO: Options</option>
 					</InputHelper>
 					<InputHelper
 						as="textarea"
-						label="Notes"
-						value={formValues.notes}
+						label="Comment"
+						value={formValues.comment}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValues) => ({
 								...previousValues,
-								notes: currentTarget.value,
+								comment: currentTarget.value,
 							}));
 						}}
 						disabled={isSaving}
-						required
 					/>
 				</Modal.Body>
 				<Modal.Footer className="text-right">
@@ -208,7 +186,7 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 						Cancel
 					</Button>
 					<Button type="submit" variant="primary" disabled={isSaving}>
-						Save
+						Confirm
 					</Button>
 				</Modal.Footer>
 			</Form>
