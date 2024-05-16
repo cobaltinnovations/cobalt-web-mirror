@@ -309,7 +309,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			{patientOrder.patientOrderScheduledOutreaches.length > 0 && (
 				<section>
 					{patientOrder.patientOrderScheduledOutreaches.map((scheduledOutreach) => (
-						<Container fluid>
+						<Container fluid key={scheduledOutreach.patientOrderScheduledOutreachId}>
 							<Row>
 								<Col>
 									<Card bsPrefix="ic-card">

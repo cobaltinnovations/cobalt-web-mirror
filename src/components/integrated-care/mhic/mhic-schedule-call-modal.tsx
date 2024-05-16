@@ -121,6 +121,33 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 		]
 	);
 
+	const handleDeleteButtonClick = useCallback(
+		async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			event.preventDefault();
+			try {
+				if (!patientOrderScheduledOutreach) {
+					throw new Error('patientOrderScheduledOutreach is undefined.');
+				}
+
+				setIsSaving(true);
+
+				await integratedCareService
+					.cancelScheduledOutreaach(patientOrderScheduledOutreach.patientOrderScheduledOutreachId)
+					.fetch();
+				const patientOrderResponse = await integratedCareService
+					.getPatientOrder(patientOrder.patientOrderId)
+					.fetch();
+
+				onSave(patientOrderResponse.patientOrder);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSaving(false);
+			}
+		},
+		[handleError, onSave, patientOrder.patientOrderId, patientOrderScheduledOutreach]
+	);
+
 	useEffect(() => {
 		if (!props.show) {
 			return;
@@ -214,13 +241,22 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 						required
 					/>
 				</Modal.Body>
-				<Modal.Footer className="text-right">
-					<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
-						Cancel
-					</Button>
-					<Button type="submit" variant="primary" disabled={isSaving}>
-						Save
-					</Button>
+				<Modal.Footer className="d-flex align-items-center justify-content-between">
+					<div>
+						{patientOrderScheduledOutreach && (
+							<Button variant="danger" onClick={handleDeleteButtonClick} disabled={isSaving}>
+								Delete
+							</Button>
+						)}
+					</div>
+					<div className="d-flex">
+						<Button variant="outline-primary" className="me-2" onClick={props.onHide} disabled={isSaving}>
+							Cancel
+						</Button>
+						<Button type="submit" variant="primary" disabled={isSaving}>
+							Save
+						</Button>
+					</div>
 				</Modal.Footer>
 			</Form>
 		</Modal>
