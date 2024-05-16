@@ -1,9 +1,8 @@
+import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
-import InputHelper from '@/components/input-helper';
-import useHandleError from '@/hooks/use-handle-error';
 import {
 	PatientOrderModel,
 	PatientOrderResourcingTypeId,
@@ -12,9 +11,11 @@ import {
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
+import useHandleError from '@/hooks/use-handle-error';
+import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 import TimeInputV2 from '@/components/time-input-v2';
-import moment from 'moment';
+import { DateFormats } from '@/lib/utils';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -60,8 +61,10 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 							patientOrderScheduledOutreachReasonId:
 								formValues.contactType as PatientOrderScheduledOutreachReasonId,
 							patientOrderOutreachTypeId: PatientOrderResourcingTypeId.PHONE_CALL,
-							scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
-							scheduledAtTime: formValues.time,
+							scheduledAtDate: moment(formValues.date).format(DateFormats.API.Date),
+							scheduledAtTime: moment(formValues.time, DateFormats.UI.TimeSlotInput).format(
+								DateFormats.API.Time
+							),
 							message: formValues.notes,
 						})
 						.fetch();
@@ -71,8 +74,10 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 							patientOrderScheduledOutreachReasonId:
 								formValues.contactType as PatientOrderScheduledOutreachReasonId,
 							patientOrderOutreachTypeId: PatientOrderResourcingTypeId.PHONE_CALL,
-							scheduledAtDate: moment(formValues.date).format('YYYY-MM-DD'),
-							scheduledAtTime: formValues.time,
+							scheduledAtDate: moment(formValues.date).format(DateFormats.API.Date),
+							scheduledAtTime: moment(formValues.time, DateFormats.UI.TimeSlotInput).format(
+								DateFormats.API.Time
+							),
 							message: formValues.notes,
 							patientOrderId: patientOrder.patientOrderId,
 						})
