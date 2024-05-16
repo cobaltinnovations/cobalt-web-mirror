@@ -250,6 +250,8 @@ export interface PatientOrderModel {
 	nextContactScheduledAtDateDescription?: string;
 	nextContactScheduledAtTime?: string;
 	nextContactScheduledAtTimeDescription?: string;
+
+	patientOrderScheduledOutreaches: PatientOrderScheduledOutreach[];
 }
 
 export enum PatientOrderIntakeScreeningStatusId {

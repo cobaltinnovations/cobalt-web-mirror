@@ -287,79 +287,80 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				/>
 			)}
 
-			{patientOrder?.nextScheduledOutreachId && (
+			{patientOrder.patientOrderScheduledOutreaches.length > 0 && (
 				<section>
-					<Container fluid>
-						<Row>
-							<Col>
-								<Card bsPrefix="ic-card">
-									<Card.Header className="border-0">
-										<Card.Title>
-											Phone call scheduled with {patientOrder.panelAccountDisplayName}
-										</Card.Title>
-										<div className="button-container">
-											<Button
-												variant="light"
-												size="sm"
-												onClick={() => {
-													setShowScheduleCallCompleteModal(true);
-												}}
-											>
-												Mark Complete
-											</Button>
-											<Button
-												variant="light"
-												className="ms-2 p-2"
-												onClick={() => {
-													window.alert('TODO: OPEN EDIT MODAL');
-												}}
-											>
-												<EditIcon className="d-flex" />
-											</Button>
-										</div>
-									</Card.Header>
-									<Card.Body>
-										<Container fluid>
-											<Row className="mb-4">
-												<Col xs={3}>
-													<p className="m-0 text-gray">Date &amp; Time</p>
-												</Col>
-												<Col xs={9}>
-													<p className="m-0">
-														{
-															patientOrder.nextScheduledOutreachScheduledAtDateTimeDescription
-														}
-													</p>
-												</Col>
-											</Row>
-											<Row className="mb-4">
-												<Col xs={3}>
-													<p className="m-0 text-gray">Contact Type</p>
-												</Col>
-												<Col xs={9}>
-													<p className="m-0">
-														{patientOrder.nextScheduledOutreachTypeId ===
-															PatientOrderOutreachTypeId.MYCHART_MESSAGE &&
-															'Mychart Message'}
-														{patientOrder.nextScheduledOutreachTypeId ===
-															PatientOrderOutreachTypeId.PHONE_CALL && 'Phone Call'}
-													</p>
-												</Col>
-											</Row>
-											<Row>
-												<Col xs={3}>
-													<p className="m-0 text-gray">Notes</p>
-												</Col>
-												<Col xs={9}>
-													<p className="m-0">TODO: nextScheduledOutreachNotes</p>
-												</Col>
-											</Row>
-										</Container>
-									</Card.Body>
-								</Card>
-							</Col>
-						</Row>
-					</Container>
+					{patientOrder.patientOrderScheduledOutreaches.map((scheduledOutreach) => (
+						<Container fluid>
+							<Row>
+								<Col>
+									<Card bsPrefix="ic-card">
+										<Card.Header className="border-0">
+											<Card.Title>
+												Phone call scheduled with{' '}
+												{scheduledOutreach.createdByAccountDisplayName}
+											</Card.Title>
+											<div className="button-container">
+												<Button
+													variant="light"
+													size="sm"
+													onClick={() => {
+														setShowScheduleCallCompleteModal(true);
+													}}
+												>
+													Mark Complete
+												</Button>
+												<Button
+													variant="light"
+													className="ms-2 p-2"
+													onClick={() => {
+														window.alert('TODO: OPEN EDIT MODAL');
+													}}
+												>
+													<EditIcon className="d-flex" />
+												</Button>
+											</div>
+										</Card.Header>
+										<Card.Body>
+											<Container fluid>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Date &amp; Time</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															{scheduledOutreach.scheduledAtDateTimeDescription}
+														</p>
+													</Col>
+												</Row>
+												<Row className="mb-4">
+													<Col xs={3}>
+														<p className="m-0 text-gray">Contact Type</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">
+															{scheduledOutreach.patientOrderOutreachTypeId ===
+																PatientOrderOutreachTypeId.MYCHART_MESSAGE &&
+																'Mychart Message'}
+															{scheduledOutreach.patientOrderOutreachTypeId ===
+																PatientOrderOutreachTypeId.PHONE_CALL && 'Phone Call'}
+														</p>
+													</Col>
+												</Row>
+												<Row>
+													<Col xs={3}>
+														<p className="m-0 text-gray">Notes</p>
+													</Col>
+													<Col xs={9}>
+														<p className="m-0">{scheduledOutreach.message}</p>
+													</Col>
+												</Row>
+											</Container>
+										</Card.Body>
+									</Card>
+								</Col>
+							</Row>
+						</Container>
+					))}
 				</section>
 			)}
 
