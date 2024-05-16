@@ -14,6 +14,7 @@ import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
 import { ReactComponent as CallMsgIcon } from '@/assets/icons/icon-call-msg.svg';
 import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AddNotesIcon } from '@/assets/icons/icon-add-notes.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { useNavigate, useRevalidator } from 'react-router-dom';
@@ -167,7 +168,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowScheduleCallModal(true);
 						}}
 					>
-						<CallMsgIcon className="text-gray" /> Schedule Call
+						<EventIcon className="text-gray" /> Schedule Call
 					</Dropdown.Item>
 
 					{!assessmentInProgress && !assessmentCompleted && (
