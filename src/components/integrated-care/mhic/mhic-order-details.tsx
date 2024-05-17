@@ -314,10 +314,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 								<Col>
 									<Card bsPrefix="ic-card">
 										<Card.Header className="border-0">
-											<Card.Title>
-												Phone call scheduled with{' '}
-												{scheduledOutreach.createdByAccountDisplayName}
-											</Card.Title>
+											<Card.Title>Phone call scheduled</Card.Title>
 											<div className="button-container">
 												<Button
 													variant="light"

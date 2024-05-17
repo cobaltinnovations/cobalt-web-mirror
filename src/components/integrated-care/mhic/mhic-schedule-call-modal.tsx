@@ -177,6 +177,9 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
+					<p className="mb-4">
+						<strong>This phone call will be scheduled for whichever MHIC is assigned the order.</strong>
+					</p>
 					<Row className="mb-4">
 						<Col>
 							<DatePicker
@@ -212,7 +215,7 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 					<InputHelper
 						className="mb-4"
 						as="select"
-						label="Contact Type"
+						label="Call Type"
 						value={formValues.contactType}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValues) => ({
