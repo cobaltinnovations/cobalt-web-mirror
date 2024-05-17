@@ -47,6 +47,7 @@ export const Component = () => {
 	const isNeedsAssessmentActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedAssessment;
 	const isScheduledActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Scheduled;
 	const isNeedDocumentationActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.NeedDocumentation;
+	const isFollowUpCallsActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.FollowUpCalls;
 	const isSubclinicalActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.Subclinical;
 	const isMhpActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.MHP;
 	const isSpecialtyCareActive = myPatientsMatch?.params.mhicView === MhicMyPatientView.SpecialtyCare;
@@ -114,6 +115,17 @@ export const Component = () => {
 								isActive: isNeedDocumentationActive,
 							},
 							{
+								title: 'Follow-up Calls',
+								description:
+									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
+										.NEED_DOCUMENTATION.patientOrderCountDescription ?? '0',
+								icon: () => <DotIcon width={24} height={24} className="text-warning" />,
+								onClick: () => {
+									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.FollowUpCalls);
+								},
+								isActive: isFollowUpCallsActive,
+							},
+							{
 								title: 'Subclinical',
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
@@ -176,6 +188,7 @@ export const Component = () => {
 		isTodayActive,
 		navigate,
 		patientOrderPanelCountsPromise,
+		isFollowUpCallsActive,
 	]);
 
 	return (
