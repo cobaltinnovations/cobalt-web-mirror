@@ -236,7 +236,6 @@ export interface PatientOrderModel {
 	nextScheduledOutreachTypeId?: PatientOrderOutreachTypeId;
 	nextScheduledOutreachReasonId?: PatientOrderScheduledOutreachReasonId;
 
-	lastContactTypeId?: PatientOrderContactTypeId;
 	lastContactedAt?: string;
 	lastContactedAtDescription?: string;
 	lastContactedAtDate?: string;
@@ -674,14 +673,13 @@ export enum PatientOrderScheduledOutreachReasonId {
 }
 
 export enum PatientOrderScheduledOutreachStatusId {
-	SCHEDULED = 'RESOURCE_FOLLOWUP',
+	SCHEDULED = 'SCHEDULED',
 	COMPLETED = 'COMPLETED',
 	CANCELED = 'CANCELED',
 }
 
 export enum PatientOrderContactTypeId {
-	WELCOME_MESSAGE = 'WELCOME_MESSAGE',
-	OUTREACH = 'OUTREACH',
+	ASSESSMENT_OUTREACH = 'ASSESSMENT_OUTREACH',
 	ASSESSMENT = 'ASSESSMENT',
 	RESOURCE_FOLLOWUP = 'RESOURCE_FOLLOWUP',
 	RESOURCE_CHECK_IN = 'RESOURCE_CHECK_IN',

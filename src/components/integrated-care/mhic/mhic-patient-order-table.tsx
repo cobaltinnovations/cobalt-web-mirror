@@ -50,8 +50,8 @@ const nextContextTypeMap: Record<
 		title: 'Other',
 		icon: () => <PhoneIcon className="me-2 text-gray" />,
 	},
-	[PatientOrderContactTypeId.OUTREACH]: {
-		title: 'Outreach',
+	[PatientOrderContactTypeId.ASSESSMENT_OUTREACH]: {
+		title: 'Assessment Outreach',
 		icon: () => <PhoneIcon className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.RESOURCE_CHECK_IN]: {
@@ -61,10 +61,6 @@ const nextContextTypeMap: Record<
 	[PatientOrderContactTypeId.RESOURCE_FOLLOWUP]: {
 		title: 'Resource Followup',
 		icon: () => <PhoneIcon className="me-2 text-gray" />,
-	},
-	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
-		title: 'Welcome Message',
-		icon: () => <MailIcon className="me-2 text-gray" />,
 	},
 };
 

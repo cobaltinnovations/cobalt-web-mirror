@@ -26,7 +26,7 @@ import {
 	PatientOrderDispositionId,
 	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
-	PatientOrderOutreachTypeId,
+	PatientOrderScheduledOutreachReasonId,
 	PatientOrderScheduledOutreach,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
@@ -352,15 +352,15 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												</Row>
 												<Row className="mb-4">
 													<Col xs={3}>
-														<p className="m-0 text-gray">Contact Type</p>
+														<p className="m-0 text-gray">Call Type</p>
 													</Col>
 													<Col xs={9}>
 														<p className="m-0">
-															{scheduledOutreach.patientOrderOutreachTypeId ===
-																PatientOrderOutreachTypeId.MYCHART_MESSAGE &&
-																'Mychart Message'}
-															{scheduledOutreach.patientOrderOutreachTypeId ===
-																PatientOrderOutreachTypeId.PHONE_CALL && 'Phone Call'}
+															{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP &&
+																'Resource Followup'}
+															{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																PatientOrderScheduledOutreachReasonId.OTHER && 'Other'}
 														</p>
 													</Col>
 												</Row>
