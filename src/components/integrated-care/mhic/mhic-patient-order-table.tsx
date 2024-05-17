@@ -66,7 +66,9 @@ export type MhicPatientOrderTableColumnConfig = {
 	insurance?: boolean;
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
-	lastOutreach?: boolean;
+	lastContact?: boolean;
+	nextContact?: boolean;
+	nextContactType?: boolean;
 	assessmentCompleted?: boolean;
 	consent?: boolean;
 	assessmentScheduled?: boolean;
@@ -302,7 +304,9 @@ export const MhicPatientOrderTable = ({
 									Outreach #
 								</TableCell>
 							)}
-							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
+							{columnConfig.lastContact && <TableCell header>Last Contact</TableCell>}
+							{columnConfig.nextContact && <TableCell header>Next Contact</TableCell>}
+							{columnConfig.nextContactType && <TableCell header>Next Contact Type</TableCell>}
 							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.consent && <TableCell header>Consent</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
@@ -563,10 +567,24 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
-											{columnConfig.lastOutreach && (
+											{columnConfig.lastContact && (
 												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
-														{po.mostRecentTotalOutreachDateTimeDescription ?? '-'}
+														{po.lastContactedAtDateDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.nextContact && (
+												<TableCell width={200}>
+													<span className="text-nowrap text-truncate">
+														{po.nextScheduledOutreachScheduledAtDateDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.nextContactType && (
+												<TableCell width={220}>
+													<span className="text-nowrap text-truncate">
+														{po.nextScheduledOutreachTypeId ?? '-'}
 													</span>
 												</TableCell>
 											)}
