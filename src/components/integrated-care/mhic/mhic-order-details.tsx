@@ -308,77 +308,88 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 
 			{patientOrder.patientOrderScheduledOutreaches.length > 0 && (
 				<section>
-					{patientOrder.patientOrderScheduledOutreaches.map((scheduledOutreach) => (
-						<Container fluid key={scheduledOutreach.patientOrderScheduledOutreachId}>
-							<Row>
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header className="border-0">
-											<Card.Title>Phone call scheduled</Card.Title>
-											<div className="button-container">
-												<Button
-													variant="light"
-													size="sm"
-													onClick={() => {
-														setScheduledOutreachToEdit(scheduledOutreach);
-														setShowScheduleCallCompleteModal(true);
-													}}
-												>
-													Mark Complete
-												</Button>
-												<Button
-													variant="light"
-													className="ms-2 p-2"
-													onClick={() => {
-														setScheduledOutreachToEdit(scheduledOutreach);
-														setShowScheduleCallEditModal(true);
-													}}
-												>
-													<EditIcon className="d-flex" />
-												</Button>
-											</div>
-										</Card.Header>
-										<Card.Body>
-											<Container fluid>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Date &amp; Time</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															{scheduledOutreach.scheduledAtDateTimeDescription}
-														</p>
-													</Col>
-												</Row>
-												<Row className="mb-4">
-													<Col xs={3}>
-														<p className="m-0 text-gray">Call Type</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">
-															{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
-																PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP &&
-																'Resource Followup'}
-															{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
-																PatientOrderScheduledOutreachReasonId.OTHER && 'Other'}
-														</p>
-													</Col>
-												</Row>
-												<Row>
-													<Col xs={3}>
-														<p className="m-0 text-gray">Notes</p>
-													</Col>
-													<Col xs={9}>
-														<p className="m-0">{scheduledOutreach.message}</p>
-													</Col>
-												</Row>
-											</Container>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-						</Container>
-					))}
+					<Container fluid>
+						{patientOrder.patientOrderScheduledOutreaches.map(
+							(scheduledOutreach, scheduledOutreachIndex) => {
+								const isLast =
+									patientOrder.patientOrderScheduledOutreaches.length - 1 === scheduledOutreachIndex;
+
+								return (
+									<Row
+										key={scheduledOutreach.patientOrderScheduledOutreachId}
+										className={classNames({ 'mb-6': !isLast })}
+									>
+										<Col>
+											<Card bsPrefix="ic-card">
+												<Card.Header className="border-0">
+													<Card.Title>Phone call scheduled</Card.Title>
+													<div className="button-container">
+														<Button
+															variant="light"
+															size="sm"
+															onClick={() => {
+																setScheduledOutreachToEdit(scheduledOutreach);
+																setShowScheduleCallCompleteModal(true);
+															}}
+														>
+															Mark Complete
+														</Button>
+														<Button
+															variant="light"
+															className="ms-2 p-2"
+															onClick={() => {
+																setScheduledOutreachToEdit(scheduledOutreach);
+																setShowScheduleCallEditModal(true);
+															}}
+														>
+															<EditIcon className="d-flex" />
+														</Button>
+													</div>
+												</Card.Header>
+												<Card.Body>
+													<Container fluid>
+														<Row className="mb-4">
+															<Col xs={3}>
+																<p className="m-0 text-gray">Date &amp; Time</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">
+																	{scheduledOutreach.scheduledAtDateTimeDescription}
+																</p>
+															</Col>
+														</Row>
+														<Row className="mb-4">
+															<Col xs={3}>
+																<p className="m-0 text-gray">Call Type</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">
+																	{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																		PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP &&
+																		'Resource Followup'}
+																	{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																		PatientOrderScheduledOutreachReasonId.OTHER &&
+																		'Other'}
+																</p>
+															</Col>
+														</Row>
+														<Row>
+															<Col xs={3}>
+																<p className="m-0 text-gray">Notes</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">{scheduledOutreach.message}</p>
+															</Col>
+														</Row>
+													</Container>
+												</Card.Body>
+											</Card>
+										</Col>
+									</Row>
+								);
+							}
+						)}
+					</Container>
 				</section>
 			)}
 
