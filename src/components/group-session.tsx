@@ -296,7 +296,10 @@ const GroupSession = ({
 													: false
 											}
 										>
-											Reserve My Seat
+											{groupSession.groupSessionLocationTypeId ===
+											GroupSessionLocationTypeId.VIRTUAL
+												? 'Reserve My Virtual Seat'
+												: 'Reserve My Seat'}
 										</Button>
 									)}
 
