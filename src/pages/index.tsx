@@ -150,7 +150,8 @@ const Index: FC = () => {
 	}
 
 	const hasLandingPageFeatures = institution?.features.filter((f) => f.landingPageVisible).length > 0;
-	const showFeatureScreeningCta = institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
+	const showFeatureScreeningCta =
+		!institution.epicFhirEnabled && institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
 
 	return (
 		<>

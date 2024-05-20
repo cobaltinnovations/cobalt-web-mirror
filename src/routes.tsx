@@ -25,7 +25,6 @@ import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
 import PatientDemographics from './routes/ic/patient/patient-demographics';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
-import PatientConsent from './routes/ic/patient/patient-consent';
 import { RoutedAppointmentDetailPanel } from './pages/scheduling/routed-appointment-detail-panel';
 import { RoutedEditAppointmentPanel } from './pages/scheduling/routed-edit-appointment-panel';
 import { RoutedEditAvailabilityPanel } from './pages/scheduling/routed-edit-availability-panel';
@@ -361,7 +360,6 @@ export const routes: RouteObject[] = [
 						path: 'my-calendar',
 						lazy: () => import('@/routes/my-calendar'),
 					},
-
 					{
 						element: (
 							<ToggledOutlet
@@ -422,7 +420,6 @@ export const routes: RouteObject[] = [
 						path: 'confirm-appointment',
 						element: <ConfirmAppointment />,
 					},
-
 					{
 						element: (
 							<ToggledOutlet
@@ -727,6 +724,14 @@ export const routes: RouteObject[] = [
 								lazy: () => import('@/routes/institution-resource-group-detail'),
 							},
 						],
+					},
+					{
+						id: 'resource-navigator',
+						path: 'resource-navigator',
+						lazy: () => import('@/routes/resource-navigator'),
+						handle: {
+							hideFooterContactUs: true,
+						} as RouteHandle,
 					},
 					{
 						path: '*',
