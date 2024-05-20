@@ -152,8 +152,8 @@ export const MhicScheduleCallCompleteModal = ({
 	useEffect(() => {
 		if (props.show) {
 			setFormValues({
-				date: undefined as Date | undefined,
-				time: '',
+				date: new Date(),
+				time: moment().format(DateFormats.UI.TimeSlotInput),
 				callResult: '',
 				comment: '',
 			});

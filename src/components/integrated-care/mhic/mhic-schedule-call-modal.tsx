@@ -157,7 +157,7 @@ export const MhicScheduleCallModal = ({ patientOrderScheduledOutreach, patientOr
 			setFormValues({
 				date: moment(patientOrderScheduledOutreach.scheduledAtDateTime).toDate(),
 				time: moment(patientOrderScheduledOutreach.scheduledAtDateTime).format(DateFormats.UI.TimeSlotInput),
-				contactType: PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP,
+				contactType: patientOrderScheduledOutreach.patientOrderScheduledOutreachReasonId,
 				notes: patientOrderScheduledOutreach.message,
 			});
 		} else {
