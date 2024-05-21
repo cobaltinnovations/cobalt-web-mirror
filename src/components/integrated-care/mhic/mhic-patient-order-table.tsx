@@ -42,6 +42,10 @@ const nextContextTypeMap: Record<
 		icon: () => JSX.Element;
 	}
 > = {
+	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
+		title: 'Welcome Message',
+		icon: () => <MailIcon className="me-2 text-gray" />,
+	},
 	[PatientOrderContactTypeId.ASSESSMENT]: {
 		title: 'Assessment',
 		icon: () => <PhoneIcon className="me-2 text-gray" />,

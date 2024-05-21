@@ -679,6 +679,7 @@ export enum PatientOrderScheduledOutreachStatusId {
 }
 
 export enum PatientOrderContactTypeId {
+	WELCOME_MESSAGE = 'WELCOME_MESSAGE',
 	ASSESSMENT_OUTREACH = 'ASSESSMENT_OUTREACH',
 	ASSESSMENT = 'ASSESSMENT',
 	RESOURCE_FOLLOWUP = 'RESOURCE_FOLLOWUP',
