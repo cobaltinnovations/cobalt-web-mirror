@@ -245,7 +245,7 @@ export interface PatientOrderModel {
 	nextContactTypeId?: PatientOrderContactTypeId;
 	nextContactScheduledAt?: string;
 	nextContactScheduledAtDescription?: string;
-	nextContactSchduledAtDate?: string;
+	nextContactScheduledAtDate?: string;
 	nextContactScheduledAtDateDescription?: string;
 	nextContactScheduledAtTime?: string;
 	nextContactScheduledAtTimeDescription?: string;
