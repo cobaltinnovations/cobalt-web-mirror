@@ -37,9 +37,15 @@ interface MhicSortDropdownProps {
 
 export const mhicSortDropdownGetParsedQueryParams = (searchParams: URLSearchParams) => {
 	return {
-		patientOrderSortColumnId: searchParams.get('patientOrderSortColumnId') ?? '',
-		sortDirectionId: searchParams.get('sortDirectionId') ?? '',
-		sortNullsId: searchParams.get('sortNullsId') ?? '',
+		...(searchParams.get('patientOrderSortColumnId') && {
+			patientOrderSortColumnId: searchParams.get('patientOrderSortColumnId') ?? undefined,
+		}),
+		...(searchParams.get('sortDirectionId') && {
+			sortDirectionId: searchParams.get('sortDirectionId') ?? undefined,
+		}),
+		...(searchParams.get('sortNullsId') && {
+			sortNullsId: searchParams.get('sortNullsId') ?? undefined,
+		}),
 	};
 };
 
