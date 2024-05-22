@@ -234,7 +234,9 @@ export const Component = () => {
 											patient: true,
 											referralDate: true,
 											outreachNumber: true,
-											lastOutreach: true,
+											lastContact: true,
+											nextContact: true,
+											nextContactType: true,
 											episode: true,
 										}}
 									/>
@@ -255,7 +257,9 @@ export const Component = () => {
 											patient: true,
 											referralDate: true,
 											outreachNumber: true,
-											lastOutreach: true,
+											lastContact: true,
+											nextContact: true,
+											nextContactType: true,
 											episode: true,
 										}}
 									/>

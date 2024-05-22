@@ -42,7 +42,9 @@ export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, p
 
 				setIsSaving(true);
 
-				if (!!patientOrderVoicemailTask?.patientOrderVoicemailTaskId) {
+				const update = !!patientOrderVoicemailTask?.patientOrderVoicemailTaskId;
+
+				if (update) {
 					await integratedCareService
 						.updateVoicemailTask(patientOrderVoicemailTask.patientOrderVoicemailTaskId, {
 							panelAccountId,
@@ -60,10 +62,10 @@ export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, p
 				const assignedMhic = panelAccounts.find((pA) => pA.accountId === panelAccountId);
 				addFlag({
 					variant: 'success',
-					title: 'Voicemail task assigned',
-					description: `A task for ${patientOrder.patientDisplayName} was assigned to ${
-						assignedMhic?.displayName ?? 'the selected MHIC'
-					}`,
+					title: `Voicemail task ${update ? 'updated' : 'created'}`,
+					description: `A task for ${patientOrder.patientDisplayName} was  ${
+						update ? 'updated' : 'created'
+					}.`,
 					actions: [],
 				});
 
@@ -100,26 +102,6 @@ export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, p
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
-					<InputHelper
-						as="select"
-						required
-						className="mb-4"
-						label="MHIC Assigned"
-						value={panelAccountId}
-						onChange={({ currentTarget }) => {
-							setPanelAccountId(currentTarget.value);
-						}}
-						disabled={isSaving}
-					>
-						<option value="">Unassigned</option>
-						{panelAccounts.map((panelAccount) => {
-							return (
-								<option key={panelAccount.accountId} value={panelAccount.accountId}>
-									{panelAccount.displayName}
-								</option>
-							);
-						})}
-					</InputHelper>
 					<InputHelper
 						as="textarea"
 						required

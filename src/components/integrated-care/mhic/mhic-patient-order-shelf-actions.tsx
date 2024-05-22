@@ -14,6 +14,7 @@ import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
 import { ReactComponent as CallMsgIcon } from '@/assets/icons/icon-call-msg.svg';
 import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
+import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AddNotesIcon } from '@/assets/icons/icon-add-notes.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { useNavigate, useRevalidator } from 'react-router-dom';
@@ -21,6 +22,7 @@ import { MhicScheduleAssessmentModal } from './mhic-schedule-assessment-modal';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicCloseEpisodeModal } from './mhic-close-episode-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import { MhicScheduleCallModal } from './mhic-schedule-call-modal';
 
 const useStyles = createUseThemedStyles(() => ({
 	shelfMoreButton: {
@@ -45,6 +47,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 	const [showAssignOrderModal, setShowAssignOrderModal] = useState(false);
 	const [showScheduleAssessmentModal, setShowScheduleAssessmentModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
+	const [showScheduleCallModal, setShowScheduleCallModal] = useState(false);
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 
 	const handleAssignOrdersSave = useCallback(
@@ -105,6 +108,18 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 				}}
 			/>
 
+			<MhicScheduleCallModal
+				patientOrder={patientOrder}
+				show={showScheduleCallModal}
+				onHide={() => {
+					setShowScheduleCallModal(false);
+				}}
+				onSave={() => {
+					revalidator.revalidate();
+					setShowScheduleCallModal(false);
+				}}
+			/>
+
 			<MhicCloseEpisodeModal
 				show={showCloseEpisodeModal}
 				onHide={() => {
@@ -147,6 +162,13 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 						}}
 					>
 						<CallMsgIcon className="text-gray" /> Add Voicemail Task
+					</Dropdown.Item>
+					<Dropdown.Item
+						onClick={() => {
+							setShowScheduleCallModal(true);
+						}}
+					>
+						<EventIcon className="text-gray" /> Schedule Call
 					</Dropdown.Item>
 
 					{!assessmentInProgress && !assessmentCompleted && (

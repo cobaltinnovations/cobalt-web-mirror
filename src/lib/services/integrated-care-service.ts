@@ -20,6 +20,8 @@ import {
 	PatientOrderResourcingTypeId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScheduledMessageGroup,
+	PatientOrderScheduledOutreach,
+	PatientOrderScheduledOutreachReasonId,
 	PatientOrderScheduledScreening,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
@@ -527,6 +529,63 @@ export const integratedCareService = {
 		}>({
 			method: 'PUT',
 			url: `/patient-orders/${patientOrderId}/encounter-csn`,
+			data,
+		});
+	},
+	createScheduledOutreach(data: {
+		patientOrderId: string;
+		patientOrderScheduledOutreachReasonId: PatientOrderScheduledOutreachReasonId;
+		patientOrderOutreachTypeId: PatientOrderResourcingTypeId;
+		scheduledAtDate: string;
+		scheduledAtTime: string;
+		message: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledOutreach: PatientOrderScheduledOutreach;
+		}>({
+			method: 'POST',
+			url: '/patient-order-scheduled-outreaches',
+			data,
+		});
+	},
+	updateScheduledOutreach(
+		patientOrderScheduledOutreachId: string,
+		data: {
+			patientOrderScheduledOutreachReasonId: PatientOrderScheduledOutreachReasonId;
+			patientOrderOutreachTypeId: PatientOrderResourcingTypeId;
+			scheduledAtDate: string;
+			scheduledAtTime: string;
+			message: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledOutreach: PatientOrderScheduledOutreach;
+		}>({
+			method: 'PUT',
+			url: `/patient-order-scheduled-outreaches/${patientOrderScheduledOutreachId}`,
+			data,
+		});
+	},
+	cancelScheduledOutreaach(patientOrderScheduledOutreachId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'POST',
+			url: `/patient-order-scheduled-outreaches/${patientOrderScheduledOutreachId}/cancel`,
+		});
+	},
+	completeScheduledOutreaach(
+		patientOrderScheduledOutreachId: string,
+		data: {
+			patientOrderOutreachResultId: string;
+			completedAtDate: string;
+			completedAtTime: string;
+			message: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			patientOrderScheduledOutreach: PatientOrderScheduledOutreach;
+		}>({
+			method: 'POST',
+			url: `/patient-order-scheduled-outreaches/${patientOrderScheduledOutreachId}/complete`,
 			data,
 		});
 	},

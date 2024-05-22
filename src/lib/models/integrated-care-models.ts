@@ -1,4 +1,5 @@
 import { AccountModel } from './account';
+import { PatientOrderOutreachTypeId } from './reference-data';
 import { ROLE_ID } from './roles';
 import { ScreeningSession, ScreeningSessionResult } from './screening-models';
 
@@ -223,6 +224,33 @@ export interface PatientOrderModel {
 	episodeSyncedAt?: string;
 	episodeSyncedAtDescription?: string;
 	patientOrderEncounterDocumentationStatusId?: PatientOrderEncounterDocumentationStatusId;
+
+	// new for ContactType stuff
+	nextScheduledOutreachId?: string;
+	nextScheduledOutreachScheduledAtDate?: string;
+	nextScheduledOutreachScheduledAtDateDescription?: string;
+	nextScheduledOutreachScheduledAtTime?: string;
+	nextScheduledOutreachScheduledAtTimeDescription?: string;
+	nextScheduledOutreachScheduledAtDateTime?: string;
+	nextScheduledOutreachScheduledAtDateTimeDescription?: string;
+	nextScheduledOutreachTypeId?: PatientOrderOutreachTypeId;
+	nextScheduledOutreachReasonId?: PatientOrderScheduledOutreachReasonId;
+
+	lastContactedAt?: string;
+	lastContactedAtDescription?: string;
+	lastContactedAtDate?: string;
+	lastContactedAtDateDescription?: string;
+	lastContactedAtTime?: string;
+	lastContactedAtTimeDescription?: string;
+	nextContactTypeId?: PatientOrderContactTypeId;
+	nextContactScheduledAt?: string;
+	nextContactScheduledAtDescription?: string;
+	nextContactScheduledAtDate?: string;
+	nextContactScheduledAtDateDescription?: string;
+	nextContactScheduledAtTime?: string;
+	nextContactScheduledAtTimeDescription?: string;
+
+	patientOrderScheduledOutreaches: PatientOrderScheduledOutreach[];
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
@@ -239,6 +267,7 @@ export enum PatientOrderViewTypeId {
 	MHP = 'MHP',
 	SPECIALTY_CARE = 'SPECIALTY_CARE',
 	CLOSED = 'CLOSED',
+	SCHEDULED_OUTREACH = 'SCHEDULED_OUTREACH',
 }
 
 export enum PatientOrderCareTypeId {
@@ -636,4 +665,55 @@ export interface EncounterModel {
 	periodEnd: string;
 	periodEndDescription: string;
 	description: string;
+}
+
+export enum PatientOrderScheduledOutreachReasonId {
+	RESOURCE_FOLLOWUP = 'RESOURCE_FOLLOWUP',
+	OTHER = 'OTHER',
+}
+
+export enum PatientOrderScheduledOutreachStatusId {
+	SCHEDULED = 'SCHEDULED',
+	COMPLETED = 'COMPLETED',
+	CANCELED = 'CANCELED',
+}
+
+export enum PatientOrderContactTypeId {
+	WELCOME_MESSAGE = 'WELCOME_MESSAGE',
+	ASSESSMENT_OUTREACH = 'ASSESSMENT_OUTREACH',
+	ASSESSMENT = 'ASSESSMENT',
+	RESOURCE_FOLLOWUP = 'RESOURCE_FOLLOWUP',
+	RESOURCE_CHECK_IN = 'RESOURCE_CHECK_IN',
+	OTHER = 'OTHER',
+}
+
+export interface PatientOrderScheduledOutreach {
+	patientOrderScheduledOutreachId: string;
+	patientOrderId: string;
+	patientOrderOutreachTypeId: PatientOrderOutreachTypeId;
+	patientOrderScheduledOutreachReasonId: PatientOrderScheduledOutreachReasonId;
+	patientOrderScheduledOutreachStatusId: PatientOrderScheduledOutreachStatusId;
+	createdByAccountId: string;
+	completedByAccountId?: string;
+	message: string;
+	scheduledAtDate: string;
+	scheduledAtDateDescription: string;
+	scheduledAtTime: string;
+	scheduledAtTimeDescription: string;
+	scheduledAtDateTime: string;
+	scheduledAtDateTimeDescription: string;
+	completedAt?: string;
+	completedAtDescription?: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	createdByAccountFirstName: string;
+	createdByAccountLastName: string;
+	createdByAccountDisplayName: string;
+	createdByAccountDisplayNameWithLastFirst: string;
+	completedByAccountFirstName: string;
+	completedByAccountLastName: string;
+	completedByAccountDisplayName: string;
+	completedByAccountDisplayNameWithLastFirst: string;
 }

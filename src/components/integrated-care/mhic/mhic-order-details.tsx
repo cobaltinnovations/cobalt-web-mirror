@@ -13,6 +13,8 @@ import {
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
 	MhicScheduleAssessmentModal,
+	MhicScheduleCallCompleteModal,
+	MhicScheduleCallModal,
 	MhicSelectAssessmentTypeModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
@@ -24,6 +26,8 @@ import {
 	PatientOrderDispositionId,
 	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
+	PatientOrderScheduledOutreachReasonId,
+	PatientOrderScheduledOutreach,
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
@@ -63,6 +67,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showCloseEpisodeModal, setShowCloseEpisodeModal] = useState(false);
 	const [showAddVoicemailTaskModal, setShowAddVoicemailTaskModal] = useState(false);
 	const [showSelectAssessmentTypeModal, setShowSelectAssessmentTypeModal] = useState(false);
+	const [showScheduleCallEditModal, setShowScheduleCallEditModal] = useState(false);
+	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
+	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -269,6 +276,123 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				}}
 			/>
 
+			{scheduledOutreachToEdit && (
+				<MhicScheduleCallModal
+					show={showScheduleCallEditModal}
+					patientOrderScheduledOutreach={scheduledOutreachToEdit}
+					patientOrder={patientOrder}
+					onHide={() => {
+						setShowScheduleCallEditModal(false);
+					}}
+					onSave={() => {
+						revalidator.revalidate();
+						setShowScheduleCallEditModal(false);
+					}}
+				/>
+			)}
+
+			{scheduledOutreachToEdit && (
+				<MhicScheduleCallCompleteModal
+					show={showScheduleCallCompleteModal}
+					patientOrderScheduledOutreachId={scheduledOutreachToEdit.patientOrderScheduledOutreachId}
+					patientOrder={patientOrder}
+					onHide={() => {
+						setShowScheduleCallCompleteModal(false);
+					}}
+					onSave={() => {
+						revalidator.revalidate();
+						setShowScheduleCallCompleteModal(false);
+					}}
+				/>
+			)}
+
+			{patientOrder.patientOrderScheduledOutreaches.length > 0 && (
+				<section>
+					<Container fluid>
+						{patientOrder.patientOrderScheduledOutreaches.map(
+							(scheduledOutreach, scheduledOutreachIndex) => {
+								const isLast =
+									patientOrder.patientOrderScheduledOutreaches.length - 1 === scheduledOutreachIndex;
+
+								return (
+									<Row
+										key={scheduledOutreach.patientOrderScheduledOutreachId}
+										className={classNames({ 'mb-6': !isLast })}
+									>
+										<Col>
+											<Card bsPrefix="ic-card">
+												<Card.Header className="border-0">
+													<Card.Title>Phone call scheduled</Card.Title>
+													<div className="button-container">
+														<Button
+															variant="light"
+															size="sm"
+															onClick={() => {
+																setScheduledOutreachToEdit(scheduledOutreach);
+																setShowScheduleCallCompleteModal(true);
+															}}
+														>
+															Mark Complete
+														</Button>
+														<Button
+															variant="light"
+															className="ms-2 p-2"
+															onClick={() => {
+																setScheduledOutreachToEdit(scheduledOutreach);
+																setShowScheduleCallEditModal(true);
+															}}
+														>
+															<EditIcon className="d-flex" />
+														</Button>
+													</div>
+												</Card.Header>
+												<Card.Body>
+													<Container fluid>
+														<Row className="mb-4">
+															<Col xs={3}>
+																<p className="m-0 text-gray">Date &amp; Time</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">
+																	{scheduledOutreach.scheduledAtDateTimeDescription}
+																</p>
+															</Col>
+														</Row>
+														<Row className="mb-4">
+															<Col xs={3}>
+																<p className="m-0 text-gray">Call Type</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">
+																	{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																		PatientOrderScheduledOutreachReasonId.RESOURCE_FOLLOWUP &&
+																		'Resource Followup'}
+																	{scheduledOutreach.patientOrderScheduledOutreachReasonId ===
+																		PatientOrderScheduledOutreachReasonId.OTHER &&
+																		'Other'}
+																</p>
+															</Col>
+														</Row>
+														<Row>
+															<Col xs={3}>
+																<p className="m-0 text-gray">Notes</p>
+															</Col>
+															<Col xs={9}>
+																<p className="m-0">{scheduledOutreach.message}</p>
+															</Col>
+														</Row>
+													</Container>
+												</Card.Body>
+											</Card>
+										</Col>
+									</Row>
+								);
+							}
+						)}
+					</Container>
+				</section>
+			)}
+
 			{incompleteVoicemailTask && (
 				<section>
 					<Container fluid>
@@ -308,16 +432,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										<Container fluid>
 											<Row className="mb-4">
 												<Col xs={3}>
-													<p className="m-0 text-gray">
-														{incompleteVoicemailTask.createdByAccountDisplayName}
-													</p>
+													<p className="m-0 text-gray">Created At</p>
 												</Col>
 												<Col xs={9}>
 													<p className="m-0">{incompleteVoicemailTask.createdDescription}</p>
 												</Col>
 											</Row>
 											<Row>
-												<Col>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Notes</p>
+												</Col>
+												<Col xs={9}>
 													<p className="m-0">{incompleteVoicemailTask.message}</p>
 												</Col>
 											</Row>

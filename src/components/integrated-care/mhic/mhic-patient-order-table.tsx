@@ -15,20 +15,57 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
 	PatientOrderEncounterDocumentationStatusId,
+	PatientOrderContactTypeId,
 } from '@/lib/models';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
-import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
-import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import { PatientOrdersListResponse } from '@/lib/services';
 import NoData from '@/components/no-data';
 
+import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
+import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
+import { ReactComponent as MailIcon } from '@/assets/icons/icon-mail.svg';
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
 	[PatientOrderDispositionId.CLOSED]: 'light',
 	[PatientOrderDispositionId.ARCHIVED]: 'dark',
+};
+
+const nextContextTypeMap: Record<
+	PatientOrderContactTypeId,
+	{
+		title: string;
+		icon: () => JSX.Element;
+	}
+> = {
+	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
+		title: 'Welcome Message',
+		icon: () => <MailIcon className="me-2 text-gray" />,
+	},
+	[PatientOrderContactTypeId.ASSESSMENT]: {
+		title: 'Assessment',
+		icon: () => <PhoneIcon className="me-2 text-gray" />,
+	},
+	[PatientOrderContactTypeId.OTHER]: {
+		title: 'Other',
+		icon: () => <PhoneIcon className="me-2 text-gray" />,
+	},
+	[PatientOrderContactTypeId.ASSESSMENT_OUTREACH]: {
+		title: 'Assessment Outreach',
+		icon: () => <PhoneIcon className="me-2 text-gray" />,
+	},
+	[PatientOrderContactTypeId.RESOURCE_CHECK_IN]: {
+		title: 'Resource Check In',
+		icon: () => <MailIcon className="me-2 text-gray" />,
+	},
+	[PatientOrderContactTypeId.RESOURCE_FOLLOWUP]: {
+		title: 'Resource Followup',
+		icon: () => <PhoneIcon className="me-2 text-gray" />,
+	},
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -66,7 +103,9 @@ export type MhicPatientOrderTableColumnConfig = {
 	insurance?: boolean;
 	assessmentStatus?: boolean;
 	outreachNumber?: boolean;
-	lastOutreach?: boolean;
+	lastContact?: boolean;
+	nextContact?: boolean;
+	nextContactType?: boolean;
 	assessmentCompleted?: boolean;
 	consent?: boolean;
 	assessmentScheduled?: boolean;
@@ -302,7 +341,9 @@ export const MhicPatientOrderTable = ({
 									Outreach #
 								</TableCell>
 							)}
-							{columnConfig.lastOutreach && <TableCell header>Last Outreach</TableCell>}
+							{columnConfig.lastContact && <TableCell header>Last Contact</TableCell>}
+							{columnConfig.nextContact && <TableCell header>Next Contact</TableCell>}
+							{columnConfig.nextContactType && <TableCell header>Next Contact Type</TableCell>}
 							{columnConfig.assessmentCompleted && <TableCell header>Assess. Completed</TableCell>}
 							{columnConfig.consent && <TableCell header>Consent</TableCell>}
 							{columnConfig.assessmentScheduled && <TableCell header>Assess. Scheduled</TableCell>}
@@ -563,11 +604,31 @@ export const MhicPatientOrderTable = ({
 													</span>
 												</TableCell>
 											)}
-											{columnConfig.lastOutreach && (
+											{columnConfig.lastContact && (
 												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
-														{po.mostRecentTotalOutreachDateTimeDescription ?? '-'}
+														{po.lastContactedAtDateDescription ?? '-'}
 													</span>
+												</TableCell>
+											)}
+											{columnConfig.nextContact && (
+												<TableCell width={200}>
+													<span className="text-nowrap text-truncate">
+														{po.nextContactScheduledAtDateDescription ?? '-'}
+													</span>
+												</TableCell>
+											)}
+											{columnConfig.nextContactType && (
+												<TableCell width={220}>
+													{po.nextContactTypeId && (
+														<span className="text-nowrap text-truncate">
+															{nextContextTypeMap[po.nextContactTypeId].icon()}
+															{nextContextTypeMap[po.nextContactTypeId].title}
+														</span>
+													)}
+													{!po.nextContactTypeId && (
+														<span className="text-nowrap text-truncate">-</span>
+													)}
 												</TableCell>
 											)}
 											{columnConfig.assessmentCompleted && (

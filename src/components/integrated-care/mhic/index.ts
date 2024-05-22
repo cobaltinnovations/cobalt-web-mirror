@@ -35,6 +35,8 @@ export * from './mhic-patient-order-table';
 export * from './mhic-resources-modal';
 export * from './mhic-safety-planning-modal';
 export * from './mhic-schedule-assessment-modal';
+export * from './mhic-schedule-call-complete-modal';
+export * from './mhic-schedule-call-modal';
 export * from './mhic-scheduled-message-group';
 export * from './mhic-select-assessment-type-modal';
 export * from './mhic-shelf-outlet';
