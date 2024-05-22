@@ -4,7 +4,7 @@ import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useS
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { PatientOrderViewTypeId } from '@/lib/models';
+import { PatientOrderSortColumnId, PatientOrderViewTypeId, SortDirectionId } from '@/lib/models';
 import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
 import {
 	MhicCustomizeTableModal,
@@ -94,10 +94,12 @@ const viewConfig: ViewConfig = {
 	},
 	[MhicMyPatientView.FollowUpCalls]: {
 		viewTypeId: PatientOrderViewTypeId.SCHEDULED_OUTREACH,
-		pageTitle: 'Follow-up Calls',
+		pageTitle: 'Scheduled Calls',
 		pageDescription: 'Patients that you are scheduled to call',
 		apiParameters: {
 			patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED_OUTREACH,
+			patientOrderSortColumnId: PatientOrderSortColumnId.NEXT_CONTACT_SCHEDULED_AT,
+			sortDirectionId: SortDirectionId.ASCENDING,
 		},
 		columnConfig: {
 			patient: true,

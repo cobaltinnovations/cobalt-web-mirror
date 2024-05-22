@@ -87,6 +87,10 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 				value: PatientOrderSortColumnId.EPISODE_LENGTH,
 				title: 'Episode Length',
 			},
+			{
+				value: PatientOrderSortColumnId.NEXT_CONTACT_SCHEDULED_AT,
+				title: 'Next Contact',
+			},
 		],
 		[]
 	);
