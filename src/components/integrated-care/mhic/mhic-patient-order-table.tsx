@@ -614,7 +614,12 @@ export const MhicPatientOrderTable = ({
 											{columnConfig.nextContact && (
 												<TableCell width={200}>
 													<span className="text-nowrap text-truncate">
-														{po.nextContactScheduledAtDateDescription ?? '-'}
+														{po.nextContactScheduledAtDate &&
+															(po.nextContactScheduledAtDateDescription ?? '-')}
+														{po.nextContactTypeId &&
+															!po.nextContactScheduledAtDate &&
+															'ASAP'}
+														{!po.nextContactTypeId && '-'}
 													</span>
 												</TableCell>
 											)}
