@@ -432,16 +432,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										<Container fluid>
 											<Row className="mb-4">
 												<Col xs={3}>
-													<p className="m-0 text-gray">
-														{incompleteVoicemailTask.createdByAccountDisplayName}
-													</p>
+													<p className="m-0 text-gray">Created At</p>
 												</Col>
 												<Col xs={9}>
 													<p className="m-0">{incompleteVoicemailTask.createdDescription}</p>
 												</Col>
 											</Row>
 											<Row>
-												<Col>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Notes</p>
+												</Col>
+												<Col xs={9}>
 													<p className="m-0">{incompleteVoicemailTask.message}</p>
 												</Col>
 											</Row>

@@ -626,6 +626,9 @@ export const MhicPatientOrderTable = ({
 															{nextContextTypeMap[po.nextContactTypeId].title}
 														</span>
 													)}
+													{!po.nextContactTypeId && (
+														<span className="text-nowrap text-truncate">-</span>
+													)}
 												</TableCell>
 											)}
 											{columnConfig.assessmentCompleted && (
