@@ -185,7 +185,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 						<div className={classes.pathways}>
 							{(institution?.features ?? [])
 								.filter((feature) => feature.landingPageVisible)
-								.map(({ featureId, urlName, name, recommended }) => (
+								.map(({ featureId, urlName, name, recommended, subtitle }) => (
 									<div key={featureId} className="pathway-outer">
 										<Link
 											to={
@@ -207,6 +207,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 												<PathwaysIcon className={classes.icon} featureId={featureId} />
 											</div>
 											<h5 className="text-center">{name}</h5>
+											{subtitle && <p className="mt-2 mb-0 text-muted text-center">{subtitle}</p>}
 											{recommended && <div className={classes.recommended}>Recommended</div>}
 										</Link>
 									</div>
