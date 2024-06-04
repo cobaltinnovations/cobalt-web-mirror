@@ -1,9 +1,19 @@
 import React from 'react';
-import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { faqsService } from '@/lib/services';
+import TabBar from '@/components/tab-bar';
+import { HEADER_HEIGHT } from '@/components/header-v2';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles({
+	scrollAnchor: {
+		top: -88,
+		position: 'relative',
+	},
+});
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { faqUrlName } = params;
@@ -13,7 +23,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
+	const classes = useStyles();
 	const { faq } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { pathname, hash } = useLocation();
+	const navigate = useNavigate();
 
 	return (
 		<>
@@ -29,8 +42,37 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col lg={{ offset: 1, span: 6 }}>
-						<div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+						<div className="mb-8" dangerouslySetInnerHTML={{ __html: faq.answer }} />
+						{faq.faqSubtopics.map((subtopic) => (
+							<div className="mb-8" key={subtopic.faqId}>
+								<div className={classes.scrollAnchor} id={subtopic.urlName} />
+								<h3 className="mb-4">{subtopic.name}</h3>
+								<div dangerouslySetInnerHTML={{ __html: subtopic.description }} />
+							</div>
+						))}
 					</Col>
+					{faq.faqSubtopics.length > 0 && (
+						<Col lg={{ offset: 1, span: 3 }} className="d-none d-lg-block">
+							<TabBar
+								key="faq-tabbar"
+								className="position-sticky"
+								style={{ top: HEADER_HEIGHT + 56 }}
+								orientation="vertical"
+								value={hash}
+								tabs={faq.faqSubtopics.map((subtopic) => {
+									return {
+										title: subtopic.name,
+										value: `#${subtopic.urlName}`,
+									};
+								})}
+								onTabClick={(value) => {
+									navigate(`${pathname}${value}`);
+								}}
+							>
+								<p className="text-uppercase fw-bold text-muted">On This Page</p>
+							</TabBar>
+						</Col>
+					)}
 				</Row>
 			</Container>
 		</>

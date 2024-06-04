@@ -94,6 +94,7 @@ export interface InstitutionFeature {
 	urlName: string;
 	locationPromptRequired: boolean;
 	treatmentDescription?: string;
+	subtitle?: string;
 }
 
 export interface AdditionalNavigationItem {
