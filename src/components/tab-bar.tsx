@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Link, To } from 'react-router-dom';
@@ -11,12 +11,11 @@ interface UseStylesProps {
 const useStyles = createUseThemedStyles((theme) => ({
 	tabBar: {
 		overflowX: ({ vertical }: UseStylesProps) => (vertical ? 'visible' : 'auto'),
-		borderLeft: ({ vertical, hideBorder }: UseStylesProps) =>
-			vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
-		borderBottom: ({ vertical, hideBorder }: UseStylesProps) =>
-			!vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
-
 		'& ul': {
+			borderLeft: ({ vertical, hideBorder }: UseStylesProps) =>
+				vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
+			borderBottom: ({ vertical, hideBorder }: UseStylesProps) =>
+				!vertical && !hideBorder ? `1px solid ${theme.colors.border}` : '',
 			margin: 0,
 			padding: 0,
 			display: 'flex',
@@ -82,7 +81,6 @@ interface TabBarProps {
 	value: string;
 	tabs: { value: string; title: string; level?: number; to?: To }[];
 	onTabClick?(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-	renderAsLinks?: boolean;
 	hideBorder?: boolean;
 	className?: string;
 	style?: React.CSSProperties;
@@ -93,11 +91,11 @@ const TabBar = ({
 	value,
 	tabs,
 	onTabClick,
-	renderAsLinks = false,
 	hideBorder,
 	className,
 	style,
-}: TabBarProps) => {
+	children,
+}: PropsWithChildren<TabBarProps>) => {
 	const classes = useStyles({
 		vertical: orientation === 'vertical',
 		hideBorder: !!hideBorder,
@@ -105,6 +103,7 @@ const TabBar = ({
 
 	return (
 		<div className={classNames(classes.tabBar, className)} style={style}>
+			{children}
 			<ul>
 				{tabs.map((tab) => {
 					return (

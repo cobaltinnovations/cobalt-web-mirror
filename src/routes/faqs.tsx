@@ -68,7 +68,20 @@ export const Component = () => {
 															{faq.question}
 														</Link>
 													</h5>
-													<ResponsiveEllipsis unsafeHTML={faq.answer} maxLine={2} />
+													{faq.shortAnswer ? (
+														<div dangerouslySetInnerHTML={{ __html: faq.shortAnswer }} />
+													) : (
+														<>
+															{faq.permitEllipsizing ? (
+																<ResponsiveEllipsis
+																	unsafeHTML={faq.answer}
+																	maxLine={2}
+																/>
+															) : (
+																<div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+															)}
+														</>
+													)}
 												</div>
 											</div>
 										);
