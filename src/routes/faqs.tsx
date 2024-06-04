@@ -42,7 +42,7 @@ export const Component = () => {
 			<HeroContainer className="bg-n75">
 				<h1 className="mb-6 text-center">Frequently Asked Questions</h1>
 				<p className="mb-0 fs-large text-center">
-					Learn everything about Cobalt and the most frequently asked questions.
+					Learn more about Cobalt and browse answers to the most frequently asked questions.
 				</p>
 			</HeroContainer>
 
