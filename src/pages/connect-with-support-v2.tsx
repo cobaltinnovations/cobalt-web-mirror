@@ -272,7 +272,10 @@ const ConnectWithSupportV2 = () => {
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
-					<p className="mb-0 text-center fs-large">{featureDetails.description}</p>
+					<p
+						className="mb-0 text-center fs-large"
+						dangerouslySetInnerHTML={{ __html: featureDetails.description ?? '' }}
+					/>
 				</HeroContainer>
 			)}
 

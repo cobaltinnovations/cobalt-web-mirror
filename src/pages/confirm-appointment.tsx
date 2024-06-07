@@ -14,6 +14,7 @@ import { CobaltError } from '@/lib/http-client';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { DateFormats } from '@/lib/utils';
+import ConfirmAppointmentDisclaimer from '@/components/confirm-appointment-disclaimer';
 
 const ConfirmAppointment = () => {
 	const { institution } = useAccount();
@@ -283,6 +284,8 @@ const ConfirmAppointment = () => {
 												? 'Provide an email address and phone number to finish booking your appointment'
 												: 'Provide an email address to finish booking your appointment'}
 										</h2>
+
+										<ConfirmAppointmentDisclaimer />
 
 										<p className="mb-6">
 											We need your contact information to send appointment details and will also
