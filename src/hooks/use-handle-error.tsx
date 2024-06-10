@@ -52,10 +52,6 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 			if (handled.reportableToUser) {
 				displayModalForError(handled);
 			}
-
-			if (!handled.reportableToSentry) {
-				return;
-			}
 		},
 		[displayModalForError, handler, setShowReauthModal, setSignOnUrl, signOutAndClearContext]
 	);

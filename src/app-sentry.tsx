@@ -7,6 +7,7 @@ import {
 	useLocation,
 	useNavigationType,
 } from 'react-router-dom';
+import { CobaltError } from './lib/http-client';
 
 export let appCreateBrowserRouter = createBrowserRouter;
 
@@ -71,5 +72,12 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 			/webappstoolbarba\.texthelp\.com\//i,
 			/metrics\.itunes\.apple\.com\.edgesuite\.net\//i,
 		],
+		beforeSend(event, hint) {
+			if ((hint.originalException as CobaltError)?.reportableToSentry) {
+				return event;
+			}
+
+			return null;
+		},
 	});
 }
