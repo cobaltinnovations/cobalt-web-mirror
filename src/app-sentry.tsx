@@ -73,11 +73,20 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 			/metrics\.itunes\.apple\.com\.edgesuite\.net\//i,
 		],
 		beforeSend(event, hint) {
-			if ((hint.originalException as CobaltError)?.reportableToSentry) {
+			if (
+				typeof hint.originalException === 'object' &&
+				!Array.isArray(hint.originalException) &&
+				hint.originalException !== null &&
+				Object.hasOwn(hint.originalException, 'reportableToSentry')
+			) {
+				if ((hint.originalException as CobaltError).reportableToSentry) {
+					return event;
+				} else {
+					return null;
+				}
+			} else {
 				return event;
 			}
-
-			return null;
 		},
 	});
 }
