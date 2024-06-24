@@ -20,6 +20,10 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 				handled = error;
 			} else if (axios.isAxiosError(error)) {
 				handled = CobaltError.fromAxiosError(error);
+
+				if (handled.axiosError?.code === 'ECONNABORTED') {
+					handled = CobaltError.fromEConnAborted(error);
+				}
 			} else if (isApiError(error)) {
 				handled = CobaltError.fromApiError(error);
 			} else if (isDeferredDataError(error)) {
