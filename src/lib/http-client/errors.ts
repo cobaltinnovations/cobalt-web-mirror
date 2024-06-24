@@ -31,6 +31,13 @@ export class CobaltError extends Error {
 		return instance;
 	}
 
+	static fromEConnAborted(error: AxiosError) {
+		const instance = new CobaltError('Connection to server was lost.');
+		instance.code = ERROR_CODES.REQUEST_ABORTED;
+
+		return instance;
+	}
+
 	static fromUnknownError(error: unknown) {
 		const instance = new CobaltError('Sorry, an error occurred.');
 
