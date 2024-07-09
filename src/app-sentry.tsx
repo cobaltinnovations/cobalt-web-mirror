@@ -78,20 +78,13 @@ if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
 			const originalEventIsNotNull = hint.originalException !== null;
 
 			if (originalEventIsObject && originalEventIsNotArray && originalEventIsNotNull) {
-				if ((hint.originalException as CobaltError).reportableToSentry) {
+				const oe = hint.originalException as CobaltError;
+				if (oe.reportableToSentry) {
 					event.breadcrumbs?.push({
 						type: 'debug',
 						level: 'info',
 						category: 'cobalt.error',
-						data: {
-							apiError: (hint.originalException as CobaltError).apiError,
-							axiosError: (hint.originalException as CobaltError).axiosError,
-							code: (hint.originalException as CobaltError).code,
-							message: (hint.originalException as CobaltError).message,
-							reportableToSentry: (hint.originalException as CobaltError).reportableToSentry,
-							reportableToUser: (hint.originalException as CobaltError).reportableToUser,
-							unknownError: (hint.originalException as CobaltError).unknownError,
-						},
+						data: { ...oe },
 						timestamp: Math.floor(new Date().getTime() / 1000),
 					});
 
