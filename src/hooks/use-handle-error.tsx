@@ -23,6 +23,8 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 
 				if (handled.axiosError?.code === 'ECONNABORTED') {
 					handled = CobaltError.fromEConnAborted(error);
+				} else if (handled.axiosError?.response?.status === 0) {
+					handled = CobaltError.fromStatusCode0(error);
 				}
 			} else if (isApiError(error)) {
 				handled = CobaltError.fromApiError(error);
