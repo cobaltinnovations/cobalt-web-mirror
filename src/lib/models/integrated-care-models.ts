@@ -15,6 +15,8 @@ export interface OpenPatientOrderCountModel {
 
 export interface PatientOrderModel {
 	patientOrderId: string;
+	referenceNumber: number;
+	referenceNumberDescription: string;
 	patientOrderTriageStatusId: PatientOrderTriageStatusId;
 	patientOrderIntakeWantsServicesStatusId: PatientOrderIntakeWantsServicesStatusId;
 	patientOrderIntakeLocationStatusId: PatientOrderIntakeLocationStatusId;
