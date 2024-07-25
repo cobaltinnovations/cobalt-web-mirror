@@ -244,6 +244,14 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 						)}
 						<Row className="mb-4">
 							<Col xs={3}>
+								<p className="m-0 text-gray">Cobalt Reference No.</p>
+							</Col>
+							<Col xs={9}>
+								<p className="m-0">{patientOrder.referenceNumberDescription}</p>
+							</Col>
+						</Row>
+						<Row className="mb-4">
+							<Col xs={3}>
 								<p className="m-0 text-gray">Date Referred</p>
 							</Col>
 							<Col xs={9}>
