@@ -500,7 +500,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							<MhicNextStepsAlerts
 								patientOrder={patientOrder}
 								referenceData={referenceDataResponse}
-								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
 							/>
 
 							<MhicTriageCard
@@ -508,12 +508,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									'mb-6': patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP,
 								})}
 								patientOrder={patientOrder}
-								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
 							/>
 
 							<MhicNextStepsAppointment
 								patientOrder={patientOrder}
-								disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
 							/>
 						</>
 					)}
@@ -530,7 +530,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<NoData
@@ -545,8 +545,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
+													patientOrder.patientOrderDispositionId !==
+														PatientOrderDispositionId.OPEN || isCreatingScreeningSession,
 											},
 											{
 												variant: 'outline-primary',
@@ -555,8 +555,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowScheduleAssessmentModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+													patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN,
 											},
 										]}
 									/>
@@ -577,7 +577,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<NoData
@@ -594,8 +594,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
+													patientOrder.patientOrderDispositionId !==
+														PatientOrderDispositionId.OPEN || isCreatingScreeningSession,
 											},
 											{
 												variant: 'outline-primary',
@@ -604,8 +604,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowScheduleAssessmentModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+													patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN,
 											},
 										]}
 									/>
@@ -626,7 +626,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<NoData
@@ -643,8 +643,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													});
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+													patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN,
 											},
 											{
 												variant: 'outline-primary',
@@ -653,8 +653,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowSelectAssessmentTypeModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-														PatientOrderDispositionId.CLOSED || isCreatingScreeningSession,
+													patientOrder.patientOrderDispositionId !==
+														PatientOrderDispositionId.OPEN || isCreatingScreeningSession,
 											},
 										]}
 									/>
@@ -684,8 +684,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												setShowContactInformationModal(true);
 											}}
 											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
 											}
 										>
 											<EditIcon className="d-flex" />
@@ -829,8 +829,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												setShowDemographicsModal(true);
 											}}
 											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
 											}
 										>
 											<EditIcon className="d-flex" />

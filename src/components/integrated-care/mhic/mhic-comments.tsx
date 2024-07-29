@@ -154,8 +154,8 @@ export const MhicComments = ({ patientOrder }: Props) => {
 												handleDeleteComment(note.patientOrderNoteId);
 											}}
 											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
 											}
 										/>
 									);
@@ -175,14 +175,14 @@ export const MhicComments = ({ patientOrder }: Props) => {
 							onChange={({ currentTarget }) => {
 								setCommentInputValue(currentTarget.value);
 							}}
-							disabled={patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED}
+							disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
 						/>
 						<div className="text-right">
 							<Button
 								type="submit"
 								disabled={
 									!commentInputValue ||
-									patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+									patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 								}
 							>
 								Add Comment

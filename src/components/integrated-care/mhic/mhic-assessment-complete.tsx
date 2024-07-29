@@ -144,8 +144,8 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												variant="outline-primary"
 												onClick={onStartNewAssessment}
 												disabled={
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED
+													patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN
 												}
 											>
 												Retake Assessment
@@ -191,21 +191,21 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										patientOrder={patientOrder}
 										referenceData={referenceDataResponse}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<MhicTriageCard
 										className="mb-6"
 										patientOrder={patientOrder}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<MhicNextStepsAppointment
 										className="mb-6"
 										patientOrder={patientOrder}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 									<hr className="mb-8" />
