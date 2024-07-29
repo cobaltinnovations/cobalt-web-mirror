@@ -478,7 +478,7 @@ export const MhicPatientOrderTable = ({
 																{po.patientDisplayName}
 															</span>
 															<span className="d-block text-nowrap text-gray">
-																{po.patientMrn} (Ref {po.referenceNumberDescription})
+																{po.patientMrn}
 															</span>
 														</div>
 														<div>
