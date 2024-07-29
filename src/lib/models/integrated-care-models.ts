@@ -543,6 +543,8 @@ export interface PatientOrderClosureReasonModel {
 }
 
 export interface PatientOrderAutocompleteResult {
+	referenceNumber: number;
+	referenceNumberDescription: string;
 	patientMrn: string;
 	patientUniqueId: string;
 	patientUniqueIdType: string;

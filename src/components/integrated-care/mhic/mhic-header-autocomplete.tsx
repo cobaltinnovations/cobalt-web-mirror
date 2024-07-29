@@ -303,7 +303,9 @@ const PatientSearchResult = ({ option, openShelf, onClick, ...itemProps }: Patie
 		>
 			<div>
 				<p className="mb-0">{option.patientDisplayName}</p>
-				<p className="mb-0 text-gray">{option.patientMrn}</p>
+				<p className="mb-0 text-gray">
+					{option.patientMrn} (Ref {option.referenceNumberDescription})
+				</p>
 			</div>
 
 			<div className="ml-auto">
