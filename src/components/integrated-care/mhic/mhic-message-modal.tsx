@@ -24,6 +24,7 @@ const useStyles = createUseStyles({
 enum PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS {
 	WELCOME = 'WELCOME',
 	WELCOME_REMINDER = 'WELCOME_REMINDER',
+	APPOINTMENT_BOOKING_REMINDER = 'APPOINTMENT_BOOKING_REMINDER',
 	RESOURCE_CHECK_IN = 'RESOURCE_CHECK_IN',
 }
 
@@ -80,6 +81,18 @@ export const MhicMessageModal: FC<Props> = ({ patientOrder, messageToEdit, onSav
 							!mg.scheduledAtDateTimeHasPassed &&
 							mg.patientOrderScheduledMessageTypeId ===
 								PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.WELCOME_REMINDER
+					).length > 0,
+			},
+			{
+				patientOrderScheduledMessageTypeId:
+					PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.APPOINTMENT_BOOKING_REMINDER,
+				title: 'Appointment Booking Reminder',
+				disabled:
+					patientOrder.patientOrderScheduledMessageGroups.filter(
+						(mg) =>
+							!mg.scheduledAtDateTimeHasPassed &&
+							mg.patientOrderScheduledMessageTypeId ===
+								PATIENT_ORDER_SCHEDULED_MESSAGE_TYPE_IDS.APPOINTMENT_BOOKING_REMINDER
 					).length > 0,
 			},
 			{
