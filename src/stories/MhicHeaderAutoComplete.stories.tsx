@@ -28,6 +28,8 @@ export const Default: Story = {
 	args: {
 		recentOrders: [
 			{
+				referenceNumber: 0,
+				referenceNumberDescription: '0',
 				patientMrn: 'PatientMRN',
 				patientUniqueId: 'patient-fixture-unique-id0',
 				patientUniqueIdType: 'patient-fixture-unique-id-type',
@@ -39,6 +41,8 @@ export const Default: Story = {
 				patientPhoneNumberDescription: '(555) 555-5555',
 			},
 			{
+				referenceNumber: 1,
+				referenceNumberDescription: '1',
 				patientMrn: 'PatientMRN',
 				patientUniqueId: 'patient-fixture-unique-id1',
 				patientUniqueIdType: 'patient-fixture-unique-id-type',
@@ -50,6 +54,8 @@ export const Default: Story = {
 				patientPhoneNumberDescription: '(555) 555-5555',
 			},
 			{
+				referenceNumber: 2,
+				referenceNumberDescription: '2',
 				patientMrn: 'PatientMRN',
 				patientUniqueId: 'patient-fixture-unique-id2',
 				patientUniqueIdType: 'patient-fixture-unique-id-type',

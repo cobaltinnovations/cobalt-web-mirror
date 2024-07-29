@@ -15,6 +15,8 @@ export interface OpenPatientOrderCountModel {
 
 export interface PatientOrderModel {
 	patientOrderId: string;
+	referenceNumber: number;
+	referenceNumberDescription: string;
 	patientOrderTriageStatusId: PatientOrderTriageStatusId;
 	patientOrderIntakeWantsServicesStatusId: PatientOrderIntakeWantsServicesStatusId;
 	patientOrderIntakeLocationStatusId: PatientOrderIntakeLocationStatusId;
@@ -541,6 +543,8 @@ export interface PatientOrderClosureReasonModel {
 }
 
 export interface PatientOrderAutocompleteResult {
+	referenceNumber: number;
+	referenceNumberDescription: string;
 	patientMrn: string;
 	patientUniqueId: string;
 	patientUniqueIdType: string;

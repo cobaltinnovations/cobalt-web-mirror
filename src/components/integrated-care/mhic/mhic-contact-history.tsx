@@ -275,8 +275,8 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 											className="me-2"
 											id="mhic-contact-history__dropdown-menu"
 											disabled={
-												patientOrder.patientOrderDispositionId ===
-												PatientOrderDispositionId.CLOSED
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
 											}
 										>
 											Log Contact
@@ -319,7 +319,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 											setShowMessageModal(true);
 										}}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									>
 										Schedule Message
@@ -343,8 +343,8 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 													setShowMessageModal(true);
 												},
 												disabled:
-													patientOrder.patientOrderDispositionId ===
-													PatientOrderDispositionId.CLOSED,
+													patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN,
 											},
 										]}
 									/>
@@ -360,7 +360,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 											setShowMessageModal(true);
 										}}
 										disabled={
-											patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
 										}
 									/>
 								);

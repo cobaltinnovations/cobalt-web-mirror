@@ -42,6 +42,8 @@ export const Component = () => {
 			.then((patientOrderResponse) => {
 				const result = {
 					patientOrderId: patientOrderResponse.patientOrder.patientOrderId,
+					referenceNumber: patientOrderResponse.patientOrder.referenceNumber,
+					referenceNumberDescription: patientOrderResponse.patientOrder.referenceNumberDescription,
 					patientMrn: patientOrderResponse.patientOrder.patientMrn,
 					patientUniqueId: patientOrderResponse.patientOrder.patientUniqueId,
 					patientUniqueIdType: patientOrderResponse.patientOrder.patientUniqueIdType,
