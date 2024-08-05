@@ -190,7 +190,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.viewNavAdminStudyInsights
+			...(account?.accountCapabilityFlags.canViewStudyInsights
 				? [
 						{
 							testId: '',
@@ -218,7 +218,7 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canAdministerGroupSessions,
 			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
-			account?.accountCapabilityFlags.viewNavAdminStudyInsights,
+			account?.accountCapabilityFlags.canViewStudyInsights,
 			analyticsMatch,
 			debugMatch,
 			groupSessionsMatch,
