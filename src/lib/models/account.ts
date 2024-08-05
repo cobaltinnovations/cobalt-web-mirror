@@ -72,6 +72,7 @@ export interface AccountModel {
 		canAdministerGroupSessions: boolean; // Group Session admin tab
 		canViewAnalytics: boolean; // Analytics admin tab
 		canViewProviderReports: boolean; // Reports admin tab
+		viewNavAdminStudyInsights: boolean;
 		canViewProviderReportAppointments: boolean; // PROVIDER_APPOINTMENTS report option in dropdown
 		canViewProviderReportAppointmentsEap: boolean; // PROVIDER_APPOINTMENTS_EAP report option in dropdown
 		canViewProviderReportAppointmentCancelations: boolean; // `PROVIDER_APPOINTMENT_CANCELATIONS` report option in dropdown

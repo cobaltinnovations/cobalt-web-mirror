@@ -844,6 +844,11 @@ export const routes: RouteObject[] = [
 									},
 								],
 							},
+							{
+								id: 'admin-study-insights',
+								path: 'study-insights',
+								lazy: () => import('@/routes/admin/study-insights'),
+							},
 						],
 					},
 				],

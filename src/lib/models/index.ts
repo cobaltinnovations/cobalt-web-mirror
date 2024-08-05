@@ -18,5 +18,6 @@ export * from './reference-data';
 export * from './roles';
 export * from './scheduling-models';
 export * from './screening-models';
+export * from './studies-models';
 export * from './tag-groups';
 export * from './topic-center-models';
