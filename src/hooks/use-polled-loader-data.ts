@@ -9,7 +9,7 @@ interface LoaderDataWithResponseChecksum {
 export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	useLoaderHook,
 	pollingFn,
-	intervalSeconds = 5,
+	intervalSeconds = 15,
 	immediateUpdate = false,
 	enabled = true,
 }: {
