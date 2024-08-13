@@ -62,7 +62,7 @@ export const Component = () => {
 						break;
 					case 'tableau':
 						const tableauResponse = await adminAnalyticsService.getTableau().fetch();
-						const vizTag = `<tableau-viz id="tableau-viz" token="${tableauResponse.tableauJwt}" src="${tableauResponse.tableauApiBaseUrl}/t/${tableauResponse.tableauContentUrl}/views/${tableauResponse.tableauViewName}/${tableauResponse.tableauReportName}" toolbar="hidden"></tableau-viz>`;
+						const vizTag = `<tableau-viz id="tableau-viz" token="${tableauResponse.tableauJwt}" src="${tableauResponse.tableauApiBaseUrl}/t/${tableauResponse.tableauContentUrl}/views/${tableauResponse.tableauViewName}/${tableauResponse.tableauReportName}"></tableau-viz>`;
 						const scriptTag = document.createElement('script');
 						scriptTag.id = 'tableau-script';
 						scriptTag.type = 'module';
