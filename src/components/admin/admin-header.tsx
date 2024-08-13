@@ -130,6 +130,9 @@ export const AdminHeader = () => {
 	const analyticsMatch = useMatch({
 		path: '/admin/analytics/*',
 	});
+	const studyInsightsMatch = useMatch({
+		path: '/admin/study-insights/*',
+	});
 	const debugMatch = useMatch({
 		path: '/admin/debug/*',
 	});
@@ -187,6 +190,17 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
+			...(account?.accountCapabilityFlags.canViewStudyInsights
+				? [
+						{
+							testId: '',
+							navigationItemId: 'STUDY_INSIGHTS',
+							to: '/admin/study-insights',
+							title: 'Study Insights',
+							active: !!studyInsightsMatch,
+						},
+				  ]
+				: []),
 			...(config.showDebug
 				? [
 						{
@@ -204,11 +218,13 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canAdministerGroupSessions,
 			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
+			account?.accountCapabilityFlags.canViewStudyInsights,
 			analyticsMatch,
 			debugMatch,
 			groupSessionsMatch,
 			reportsMatch,
 			resourcesMatch,
+			studyInsightsMatch,
 		]
 	);
 
