@@ -51,9 +51,22 @@ export const PsychiatristRecommendation = ({ showScheduled, className }: Psychia
 			className={className}
 			variant="attention"
 			title="Interested in Medication?"
-			description="Based on the symptoms reported, you may be eligible for medication. If you are interested in a medication evaluation or medication management you must schedule with our psychiatrist."
+			description={
+				<>
+					<p>
+						Based on the symptoms reported, you may be eligible for medication. If you are interested in a
+						medication evaluation or medication management you must schedule with our medication provider.
+					</p>
+					<p>
+						<strong>
+							(Services billed to insurance. The patient is responsible for any co-pays or remaining
+							balance.)
+						</strong>
+					</p>
+				</>
+			}
 			action={{
-				title: 'Schedule with Psychiatrist',
+				title: 'Schedule with Medication Provider',
 				onClick: () => {
 					navigate(feature.urlName);
 				},
