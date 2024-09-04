@@ -127,16 +127,29 @@ const FeaturedTopic = () => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 					const containerClassNames = 'pt-10 pt-lg-16 pb-12 pb-lg-24';
 
-					const topicCenterRowHeader = (
-						<Row className="mb-6 mb-lg-12">
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								<h2 className="mb-2 mb-lg-4 text-center">{topicCenterRow.title}</h2>
-								{topicCenterRow.description && (
-									<p className="lead mb-0 fs-large text-center">{topicCenterRow.description}</p>
-								)}
-							</Col>
-						</Row>
-					);
+					const topicCenterRowHeader =
+						topicCenterRow.title || topicCenterRow.description ? (
+							<Row className="mb-6 mb-lg-12">
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									{topicCenterRow.title && (
+										<h2
+											className={classNames('mb-lg-4 text-center', {
+												'mb-2': topicCenterRow.description,
+											})}
+										>
+											{topicCenterRow.title}
+										</h2>
+									)}
+									{topicCenterRow.description && (
+										<p className="lead mb-0 fs-large text-center">{topicCenterRow.description}</p>
+									)}
+								</Col>
+							</Row>
+						) : null;
 
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
