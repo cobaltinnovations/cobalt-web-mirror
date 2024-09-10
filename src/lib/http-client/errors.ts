@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 export enum ERROR_CODES {
 	GENERIC = 'GENERIC',
 	REQUEST_ABORTED = 'REQUEST_ABORTED',
+	CONNECTION_LOST = 'CONNECTION_LOST',
 }
 
 export class CobaltError extends Error {
@@ -32,16 +33,16 @@ export class CobaltError extends Error {
 	}
 
 	static fromStatusCode0(error: AxiosError) {
-		const instance = new CobaltError('Connection to server was lost.');
-		instance.code = ERROR_CODES.REQUEST_ABORTED;
+		const instance = new CobaltError('Connection to the server was lost.');
+		instance.code = ERROR_CODES.CONNECTION_LOST;
 		instance.axiosError = error;
 
 		return instance;
 	}
 
 	static fromEConnAborted(error: AxiosError) {
-		const instance = new CobaltError('Connection to server was lost.');
-		instance.code = ERROR_CODES.REQUEST_ABORTED;
+		const instance = new CobaltError('Connection to the server was lost.');
+		instance.code = ERROR_CODES.CONNECTION_LOST;
 		instance.axiosError = error;
 
 		return instance;
@@ -74,7 +75,15 @@ export class CobaltError extends Error {
 	}
 
 	get reportableToSentry() {
-		return this.code !== ERROR_CODES.REQUEST_ABORTED && this.apiError?.code !== 'VALIDATION_FAILED';
+		if (this.code === ERROR_CODES.REQUEST_ABORTED) {
+			return false;
+		}
+
+		if (this.code === ERROR_CODES.CONNECTION_LOST) {
+			return false;
+		}
+
+		return this.apiError?.code !== 'VALIDATION_FAILED';
 	}
 
 	code?: string = ERROR_CODES.GENERIC;
