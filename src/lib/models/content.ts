@@ -1,3 +1,4 @@
+import { CONTENT_VISIBILITY_TYPE_ID } from './content-visibility-type-id-models';
 import { Tag } from './tag-groups';
 
 export enum ContentTypeId {
@@ -105,6 +106,7 @@ export type AdminContent = {
 	neverEmbed?: boolean;
 	filename?: string;
 	filesize?: number;
+	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID;
 
 	// Not seeing in response, but don't remove yet
 	publishRecurring: boolean;

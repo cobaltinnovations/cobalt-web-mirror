@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import FilterDropdown from '@/components/filter-dropdown';
+import { CONTENT_VISIBILITY_TYPE_ID } from '@/lib/models';
 
 interface Props {
 	className?: string;
@@ -10,30 +11,30 @@ interface Props {
 
 const options = [
 	{
-		visibleFlag: 'true',
-		title: 'Visible',
+		visibleFlag: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
+		title: 'Public',
 	},
 	{
-		visibleFlag: 'false',
-		title: 'Hidden',
+		visibleFlag: CONTENT_VISIBILITY_TYPE_ID.UNLISTED,
+		title: 'Unlisted',
 	},
 ];
 
 export const AdminGroupSessionFilterVisibility = ({ className }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const currentVisibleFlag = searchParams.get('visibleFlag');
+	const currentVisibleFlag = searchParams.get('contentVisibilityTypeId');
 	const [selectedValue, setSelectedValue] = useState(currentVisibleFlag ?? '');
 	const isActive = !!currentVisibleFlag;
 
 	const handleDismiss = useCallback(() => {
-		searchParams.delete('visibleFlag');
+		searchParams.delete('contentVisibilityTypeId');
 		searchParams.set('pageNumber', '0');
 		setSelectedValue('');
 		setSearchParams(searchParams);
 	}, [searchParams, setSearchParams]);
 
 	const handleConfirm = useCallback(() => {
-		searchParams.set('visibleFlag', selectedValue);
+		searchParams.set('contentVisibilityTypeId', selectedValue);
 		searchParams.set('pageNumber', '0');
 		setSearchParams(searchParams);
 	}, [searchParams, selectedValue, setSearchParams]);

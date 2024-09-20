@@ -14,6 +14,7 @@ import {
 	AdminContent,
 	AdminContentAction,
 	Content,
+	CONTENT_VISIBILITY_TYPE_ID,
 	ContentStatusId,
 	ContentType,
 	ContentTypeId,
@@ -144,6 +145,7 @@ const initialResourceFormValues = {
 	expirationDate: null as Date | null,
 	isRecurring: false,
 	neverEmbed: false,
+	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 };
 
 function getInitialResourceFormValues({
@@ -174,6 +176,7 @@ function getInitialResourceFormValues({
 		expirationDate: adminContent?.publishEndDate ? moment(adminContent.publishEndDate).toDate() : null,
 		isRecurring: adminContent?.publishRecurring ?? false,
 		neverEmbed: adminContent?.neverEmbed ?? false,
+		contentVisibilityTypeId: adminContent?.contentVisibilityTypeId ?? CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 	};
 }
 
@@ -799,6 +802,48 @@ export const Component = () => {
 					<hr />
 
 					<AdminFormSection
+						title="Visibility"
+						description={
+							<>
+								<p className="mb-2">
+									Public content is visible everywhere on Cobalt once it is published (resource
+									library, homepage, etc.)
+								</p>
+								<p className="mb-0">
+									Unlisted content is only accessible to users who have a direct link (e.g. from a
+									community page or their personal recommendations)
+								</p>
+							</>
+						}
+					>
+						<ToggledInput
+							type="radio"
+							id="visibility-on"
+							name="visibility"
+							label="Public"
+							hideChildren
+							className="mb-3"
+							checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
+							onChange={() => {
+								updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
+							}}
+						/>
+						<ToggledInput
+							type="radio"
+							id="visibility-off"
+							name="visibility"
+							label="Unlisted"
+							hideChildren
+							checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
+							onChange={() => {
+								updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
+							}}
+						/>
+					</AdminFormSection>
+
+					<hr />
+
+					<AdminFormSection
 						title="Scheduling"
 						description="Set a date for your content to publish to Cobalt. If the date selected is today, then the resource will automatically be made live after you preview and confirm. If the date selected is in the future, then the resource will become live on the date selected."
 					>
@@ -894,6 +939,7 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		searchTerms: formValues.searchTerms,
 		sharedFlag: formValues.isShared ?? false,
 		contentStatusId: formValues.contentStatusId,
+		contentVisibilityTypeId: formValues.contentVisibilityTypeId,
 	};
 }
 

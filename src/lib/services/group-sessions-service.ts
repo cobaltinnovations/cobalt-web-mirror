@@ -13,6 +13,7 @@ import {
 	GroupSessionUrlNameValidationResult,
 	GroupSessionCollectionWithSessionsIncludedModel,
 	PresignedUploadResponse,
+	CONTENT_VISIBILITY_TYPE_ID,
 } from '@/lib/models';
 
 // Scheduled
@@ -46,7 +47,7 @@ export interface CreateGroupSessionRequestBody {
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;
 	groupSessionCollectionId?: string;
-	visibleFlag?: boolean;
+	contentVisibilityTypeId?: CONTENT_VISIBILITY_TYPE_ID;
 	screeningFlowId?: string;
 	sendReminderEmail?: boolean;
 	reminderEmailContent?: string;
@@ -75,7 +76,7 @@ export interface GetGroupSessionsQueryParameters {
 	groupSessionCollectionId?: string;
 	groupSessionCollectionUrlName?: string;
 	groupSessionSchedulingSystemId?: string;
-	visibleFlag?: string;
+	contentVisibilityTypeId?: CONTENT_VISIBILITY_TYPE_ID;
 }
 
 export interface GetGroupSessionsResponseBody {

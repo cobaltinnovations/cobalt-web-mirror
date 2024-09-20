@@ -7,6 +7,7 @@ import {
 	TagGroup,
 	Tag,
 	PresignedUploadResponse,
+	CONTENT_VISIBILITY_TYPE_ID,
 } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
@@ -26,6 +27,7 @@ export interface CreateContentRequest {
 	searchTerms?: string;
 	sharedFlag?: boolean;
 	contentStatusId?: ContentStatusId;
+	contentVisibilityTypeId?: CONTENT_VISIBILITY_TYPE_ID;
 }
 
 export interface ContentFiltersResponse {

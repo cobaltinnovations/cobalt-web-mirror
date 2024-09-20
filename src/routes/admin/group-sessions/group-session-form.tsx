@@ -33,6 +33,7 @@ import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-righ
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import GroupSession from '@/components/group-session';
 import {
+	CONTENT_VISIBILITY_TYPE_ID,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionLearnMoreMethodId,
 	GroupSessionLocationTypeId,
@@ -159,7 +160,7 @@ const initialGroupSessionFormValues = {
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
-	visibleFlag: true,
+	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 	collectionFlag: false,
 	registrationEndDateFlag: false,
 	registrationEndDate: null as Date | null,
@@ -1032,12 +1033,12 @@ export const Component = () => {
 				description={
 					<>
 						<p className="mb-2">
-							Visible sessions appear across Cobalt in multiple areas. This is the recommended setting for
-							most group sessions.
+							Public group sessions are visible in multiple areas on Cobalt. This is the recommended
+							setting for most group sessions.
 						</p>
 						<p className="mb-0">
-							Hidden sessions are still available on Cobalt, but users can only view a hidden session by
-							accessing it directly through the group session URL, collection URL, or topic page URL.
+							Unlisted group sessions are not visible on Cobalt and are only accessible to users who have
+							a direct link.
 						</p>
 					</>
 				}
@@ -1045,23 +1046,24 @@ export const Component = () => {
 				<ToggledInput
 					type="radio"
 					id="visibility-on"
-					label="Visible"
+					name="visibility"
+					label="Public"
 					hideChildren
 					className="mb-3"
-					checked={formValues.visibleFlag}
+					checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
 					onChange={() => {
-						updateFormValue('visibleFlag', true);
+						updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
 					}}
 				/>
 				<ToggledInput
 					type="radio"
 					id="visibility-off"
 					name="visibility"
-					label="Hidden"
+					label="Unlisted"
 					hideChildren
-					checked={!formValues.visibleFlag}
+					checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
 					onChange={() => {
-						updateFormValue('visibleFlag', false);
+						updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
 					}}
 				/>
 			</AdminFormSection>
