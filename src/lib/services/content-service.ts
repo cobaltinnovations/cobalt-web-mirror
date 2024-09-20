@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { Content, PresignedUploadModel } from '@/lib/models';
+import { Content, ContentAudienceType, ContentAudienceTypeGroup, PresignedUploadModel } from '@/lib/models';
 
 export interface ContentListFormat {
 	contentTypeLabelId: string;
@@ -66,6 +66,15 @@ export const contentService = {
 			method: 'post',
 			url: '/content/image-presigned-upload',
 			data,
+		});
+	},
+	fetchContentAudienceTypes() {
+		return httpSingleton.orchestrateRequest<{
+			contentAudienceTypeGroups: ContentAudienceTypeGroup[];
+			contentAudienceTypes: ContentAudienceType[];
+		}>({
+			method: 'get',
+			url: '/content-audience-types',
 		});
 	},
 };

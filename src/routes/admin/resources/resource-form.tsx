@@ -15,6 +15,7 @@ import {
 	AdminContentAction,
 	Content,
 	CONTENT_VISIBILITY_TYPE_ID,
+	ContentAudienceType,
 	ContentStatusId,
 	ContentType,
 	ContentTypeId,
@@ -25,6 +26,7 @@ import {
 	AdminContentResponse,
 	CreateContentRequest,
 	adminService,
+	contentService,
 	resourceLibraryService,
 	tagService,
 } from '@/lib/services';
@@ -96,23 +98,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const contentRequest = contentId ? adminService.fetchAdminContent(contentId) : null;
 	const tagGroupsRequest = tagService.getTagGroups();
 	const contentTypesRequest = resourceLibraryService.getResourceLibraryContentTypes();
+	const contentAudienceTypesRequest = contentService.fetchContentAudienceTypes();
 
 	request.signal.addEventListener('abort', () => {
 		contentRequest?.abort();
 		tagGroupsRequest.abort();
 		contentTypesRequest.abort();
+		contentAudienceTypesRequest.abort();
 	});
 
-	const [contentResponse, tagGroupsResponse, contentTypesResponse] = await Promise.all([
+	const [contentResponse, tagGroupsResponse, contentTypesResponse, contentAudienceTypesResponse] = await Promise.all([
 		contentRequest?.fetch(),
 		tagGroupsRequest.fetch(),
 		contentTypesRequest.fetch(),
+		contentAudienceTypesRequest.fetch(),
 	]);
 
 	return {
 		contentResponse,
 		tagGroups: tagGroupsResponse.tagGroups,
 		contentTypes: contentTypesResponse.contentTypes,
+		contentAudienceTypeGroups: contentAudienceTypesResponse.contentAudienceTypeGroups,
+		contentAudienceTypes: contentAudienceTypesResponse.contentAudienceTypes,
 		startOnPreview,
 	};
 }
@@ -138,6 +145,8 @@ const initialResourceFormValues = {
 	imageFileId: '',
 	imageUrl: '',
 	description: '',
+	contentAudienceTypeGroupIds: [] as string[],
+	contentAudienceTypes: [] as ContentAudienceType[],
 	tagIds: [] as string[],
 	searchTerms: '',
 	publishDate: new Date(),
@@ -169,6 +178,11 @@ function getInitialResourceFormValues({
 		imageFileId: adminContent?.imageFileUploadId ?? '',
 		imageUrl: adminContent?.imageUrl ?? '',
 		description: adminContent?.description ?? '',
+		contentAudienceTypeGroupIds:
+			adminContent?.contentAudienceTypes
+				.map((cat) => cat.contentAudienceTypeGroupId)
+				.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+		contentAudienceTypes: adminContent?.contentAudienceTypes ?? [],
 		tagIds: adminContent?.tagIds ?? [],
 		searchTerms: adminContent?.searchTerms ?? '',
 		publishDate: adminContent?.publishStartDate ? moment(adminContent.publishStartDate).toDate() : new Date(),
@@ -757,6 +771,79 @@ export const Component = () => {
 
 					<hr />
 
+					<AdminFormSection title="Target" description="Specify who this resource will help.">
+						{(loaderData.contentAudienceTypeGroups ?? []).map((catg) => (
+							<ToggledInput
+								key={catg.contentAudienceTypeGroupId}
+								type="checkbox"
+								name="target-group"
+								id={`target-group-${catg.contentAudienceTypeGroupId}`}
+								value={catg.contentAudienceTypeGroupId}
+								label={catg.description}
+								checked={formValues.contentAudienceTypeGroupIds.includes(
+									catg.contentAudienceTypeGroupId
+								)}
+								onChange={() => {
+									if (
+										formValues.contentAudienceTypeGroupIds.includes(catg.contentAudienceTypeGroupId)
+									) {
+										updateFormValue(
+											'contentAudienceTypeGroupIds',
+											formValues.contentAudienceTypeGroupIds.filter(
+												(v) => v !== catg.contentAudienceTypeGroupId
+											)
+										);
+									} else {
+										updateFormValue('contentAudienceTypeGroupIds', [
+											...formValues.contentAudienceTypeGroupIds,
+											catg.contentAudienceTypeGroupId,
+										]);
+									}
+								}}
+								className="mb-3"
+							>
+								{(loaderData.contentAudienceTypes ?? [])
+									.filter((cat) => cat.contentAudienceTypeGroupId === catg.contentAudienceTypeGroupId)
+									.map((cat: ContentAudienceType) => (
+										<Form.Check
+											key={cat.contentAudienceTypeId}
+											type="checkbox"
+											name="target"
+											id={`target-${cat.contentAudienceTypeId}`}
+											value={cat.contentAudienceTypeId}
+											label={cat.description}
+											checked={
+												!!formValues.contentAudienceTypes.find(
+													(v) => v.contentAudienceTypeId === cat.contentAudienceTypeId
+												)
+											}
+											onChange={() => {
+												if (
+													!!formValues.contentAudienceTypes.find(
+														(v) => v.contentAudienceTypeId === cat.contentAudienceTypeId
+													)
+												) {
+													updateFormValue(
+														'contentAudienceTypes',
+														formValues.contentAudienceTypes.filter(
+															(v) => v.contentAudienceTypeId !== cat.contentAudienceTypeId
+														)
+													);
+												} else {
+													updateFormValue('contentAudienceTypes', [
+														...formValues.contentAudienceTypes,
+														cat,
+													]);
+												}
+											}}
+										/>
+									))}
+							</ToggledInput>
+						))}
+					</AdminFormSection>
+
+					<hr />
+
 					<AdminFormSection
 						title="Tags"
 						description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
@@ -940,6 +1027,12 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		sharedFlag: formValues.isShared ?? false,
 		contentStatusId: formValues.contentStatusId,
 		contentVisibilityTypeId: formValues.contentVisibilityTypeId,
+		contentAudienceTypeIds:
+			(formValues.contentAudienceTypes ?? [])
+				.filter((cat) =>
+					(formValues.contentAudienceTypeGroupIds ?? []).includes(cat.contentAudienceTypeGroupId)
+				)
+				.map((cat) => cat.contentAudienceTypeId) ?? [],
 	};
 }
 

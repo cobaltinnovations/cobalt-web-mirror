@@ -28,6 +28,7 @@ export interface CreateContentRequest {
 	sharedFlag?: boolean;
 	contentStatusId?: ContentStatusId;
 	contentVisibilityTypeId?: CONTENT_VISIBILITY_TYPE_ID;
+	contentAudienceTypeIds?: string[];
 }
 
 export interface ContentFiltersResponse {
