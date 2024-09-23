@@ -11,11 +11,13 @@ import {
 	ProviderManagementProfile,
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
+import { FeatureId, ROLE_ID, TopicCenterModel } from './lib/models';
+import { topicCenterService } from './lib/services';
 import useAccount from './hooks/use-account';
 
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
@@ -35,7 +37,8 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
-import { FeatureId, ROLE_ID } from './lib/models';
+
+import AsyncWrapper from './components/async-page';
 
 export interface RouteHandle {
 	hideFooter?: boolean;
@@ -205,6 +208,31 @@ const RedirectToCommunityPage = () => {
 
 	if (topicCenterId) {
 		return <Navigate to={`/community/${topicCenterId}`} replace />;
+	}
+
+	return <Navigate to="/" replace />;
+};
+
+const RedirectToCurrentFeaturedTopic = () => {
+	const { institution } = useAccount();
+	const [featuredTopicCenter, setFeaturdTopicCenter] = useState<TopicCenterModel>();
+
+	const fetchTopicCepter = useCallback(async () => {
+		if (!institution.featuredTopicCenterId) {
+			throw new Error('institution.featuredTopicCenterId is undefined.');
+		}
+
+		const { topicCenter } = await topicCenterService.getTopicCenterById(institution.featuredTopicCenterId).fetch();
+
+		setFeaturdTopicCenter(topicCenter);
+	}, [institution.featuredTopicCenterId]);
+
+	if (institution.featuredTopicCenterId) {
+		return (
+			<AsyncWrapper fetchData={fetchTopicCepter}>
+				<Navigate to={`/featured-topics/${featuredTopicCenter?.urlName}`} replace />
+			</AsyncWrapper>
+		);
 	}
 
 	return <Navigate to="/" replace />;
@@ -732,6 +760,10 @@ export const routes: RouteObject[] = [
 						handle: {
 							hideFooterContactUs: true,
 						} as RouteHandle,
+					},
+					{
+						path: '/featured-topics/current',
+						element: <RedirectToCurrentFeaturedTopic />,
 					},
 					{
 						path: '*',
