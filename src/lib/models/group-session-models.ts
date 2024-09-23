@@ -102,7 +102,7 @@ export interface GroupSessionModel {
 	timeZone: string;
 	title: string;
 	urlName: string;
-	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID;
+	groupSessionVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID;
 
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;

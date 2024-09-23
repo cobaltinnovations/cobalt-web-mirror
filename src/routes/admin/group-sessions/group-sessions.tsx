@@ -310,7 +310,7 @@ export const Component = () => {
 														)}
 													</TableCell>
 													<TableCell>
-														{groupSession.contentVisibilityTypeId ===
+														{groupSession.groupSessionVisibilityTypeId ===
 														CONTENT_VISIBILITY_TYPE_ID.PUBLIC ? (
 															<span className="text-success">Public</span>
 														) : (

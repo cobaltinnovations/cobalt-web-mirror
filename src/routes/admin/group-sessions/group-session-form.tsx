@@ -55,6 +55,8 @@ import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detai
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
 import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
+import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
+import { CobaltError } from '@/lib/http-client';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -161,7 +163,7 @@ const initialGroupSessionFormValues = {
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
-	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
+	groupSessionVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 	collectionFlag: false,
 	registrationEndDateFlag: false,
 	registrationEndDate: null as Date | null,
@@ -332,57 +334,64 @@ export const Component = () => {
 				submission.groupSessionStatusId = GROUP_SESSION_STATUS_ID.NEW;
 			}
 
-			const promise = isEdit
-				? groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch()
-				: groupSessionsService.createGroupSession(submission).fetch();
-
 			setIsDirty(false);
 
-			promise
-				.then((response) => {
-					if (!loaderData?.isAdminRoute) {
+			try {
+				const tagGroupErrorMessage = getTagGroupErrorMessage(
+					formValues.tagGroupIds,
+					formValues.tags,
+					loaderData?.tagGroups ?? []
+				);
+				if (tagGroupErrorMessage) {
+					throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+				}
+
+				const response = isEdit
+					? await groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch()
+					: await groupSessionsService.createGroupSession(submission).fetch();
+
+				if (!loaderData?.isAdminRoute) {
+					addFlag({
+						variant: 'success',
+						title: 'Submission Accepted',
+						description: 'Your group session has been submitted for review.',
+						actions: [],
+					});
+
+					navigate('/group-sessions');
+
+					return;
+				}
+
+				if (isNotDraft || options?.exitAfterSave) {
+					if (isNotDraft) {
 						addFlag({
 							variant: 'success',
-							title: 'Submission Accepted',
-							description: 'Your group session has been submitted for review.',
-							actions: [],
-						});
-
-						navigate('/group-sessions');
-
-						return;
-					}
-
-					if (isNotDraft || options?.exitAfterSave) {
-						if (isNotDraft) {
-							addFlag({
-								variant: 'success',
-								title: 'Changes published',
-								description: 'Your changes are now available on Cobalt',
-								actions: [
-									{
-										title: 'View Session',
-										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.urlName}`, {
-												state: {
-													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
-												},
-											});
-										},
+							title: 'Changes published',
+							description: 'Your changes are now available on Cobalt',
+							actions: [
+								{
+									title: 'View Session',
+									onClick: () => {
+										navigate(`/group-sessions/${response.groupSession.urlName}`, {
+											state: {
+												navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
+											},
+										});
 									},
-								],
-							});
-						}
-
-						navigate('/admin/group-sessions');
-					} else {
-						navigate('/admin/group-sessions/preview/' + response.groupSession.groupSessionId);
+								},
+							],
+						});
 					}
-				})
-				.catch((e) => {
-					setIsDirty(true);
-					handleError(e);
-				});
+
+					navigate('/admin/group-sessions');
+				} else {
+					navigate('/admin/group-sessions/preview/' + response.groupSession.groupSessionId);
+				}
+			} catch (error) {
+				setIsDirty(true);
+				handleError(error);
+			}
 		},
 		[
 			addFlag,
@@ -392,6 +401,7 @@ export const Component = () => {
 			isExternal,
 			isNotDraft,
 			loaderData?.isAdminRoute,
+			loaderData?.tagGroups,
 			navigate,
 			params.groupSessionId,
 		]
@@ -1090,9 +1100,9 @@ export const Component = () => {
 					label="Public"
 					hideChildren
 					className="mb-3"
-					checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
+					checked={formValues.groupSessionVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
 					onChange={() => {
-						updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
+						updateFormValue('groupSessionVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
 					}}
 				/>
 				<ToggledInput
@@ -1101,9 +1111,9 @@ export const Component = () => {
 					name="visibility"
 					label="Unlisted"
 					hideChildren
-					checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
+					checked={formValues.groupSessionVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
 					onChange={() => {
-						updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
+						updateFormValue('groupSessionVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
 					}}
 				/>
 			</AdminFormSection>

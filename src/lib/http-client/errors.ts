@@ -70,6 +70,12 @@ export class CobaltError extends Error {
 		return instance;
 	}
 
+	static fromValidationFailed(message: string) {
+		const instance = new CobaltError(message);
+		instance.code = 'VALIDATION_FAILED';
+		return instance;
+	}
+
 	get reportableToUser() {
 		return this.code !== ERROR_CODES.REQUEST_ABORTED;
 	}

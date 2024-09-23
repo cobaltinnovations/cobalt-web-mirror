@@ -53,6 +53,8 @@ import ToggledInput from '@/components/toggled-input';
 import NoMatch from '@/pages/no-match';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
+import { CobaltError } from '@/lib/http-client';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -246,9 +248,19 @@ export const Component = () => {
 		(showFlag?: boolean) => {
 			const submission = prepareResourceSubmission(formValues);
 
+			const tagGroupErrorMessage = getTagGroupErrorMessage(
+				formValues.tagGroupIds,
+				formValues.tags,
+				loaderData?.tagGroups ?? []
+			);
+
 			return new Promise(async (resolve: (response: AdminContentResponse) => void, reject) => {
 				if (isEdit) {
 					try {
+						if (tagGroupErrorMessage) {
+							throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+						}
+
 						if (!params.contentId) {
 							throw new Error('params.contentId is undefined.');
 						}
@@ -273,6 +285,10 @@ export const Component = () => {
 				}
 
 				try {
+					if (tagGroupErrorMessage) {
+						throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+					}
+
 					const response = await adminService.createContent(submission).fetch();
 
 					if (showFlag) {
@@ -290,7 +306,7 @@ export const Component = () => {
 				}
 			});
 		},
-		[addFlag, formValues, isEdit, params.contentId]
+		[addFlag, formValues, isEdit, loaderData?.tagGroups, params.contentId]
 	);
 
 	const handleFormSubmit = useCallback(
