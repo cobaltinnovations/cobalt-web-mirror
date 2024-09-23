@@ -12,5 +12,4 @@ export * from './admin-header';
 export * from './admin-resource-form-footer-external';
 export * from './admin-resource-form-footer';
 export * from './admin-resource-table-dropdown';
-export * from './admin-tag-group-control';
 export * from './group-session-table-dropdown';

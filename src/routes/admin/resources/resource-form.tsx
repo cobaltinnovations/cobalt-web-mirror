@@ -20,7 +20,6 @@ import {
 	ContentType,
 	ContentTypeId,
 	Tag,
-	TagGroup,
 } from '@/lib/models';
 import {
 	AdminContentResponse,
@@ -43,7 +42,6 @@ import {
 	AdminFormSection,
 	AdminResourceFormFooter,
 	AdminResourceFormFooterExternal,
-	AdminTagGroupControl,
 } from '@/components/admin';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import ConfirmDialog from '@/components/confirm-dialog';
@@ -147,7 +145,8 @@ const initialResourceFormValues = {
 	description: '',
 	contentAudienceTypeGroupIds: [] as string[],
 	contentAudienceTypes: [] as ContentAudienceType[],
-	tagIds: [] as string[],
+	tagGroupIds: [] as string[],
+	tags: [] as Tag[],
 	searchTerms: '',
 	publishDate: new Date(),
 	doesExpire: false,
@@ -183,7 +182,11 @@ function getInitialResourceFormValues({
 				.map((cat) => cat.contentAudienceTypeGroupId)
 				.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
 		contentAudienceTypes: adminContent?.contentAudienceTypes ?? [],
-		tagIds: adminContent?.tagIds ?? [],
+		tagGroupIds:
+			adminContent?.tags
+				.map((tag) => tag.tagGroupId)
+				.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+		tags: adminContent?.tags ?? [],
 		searchTerms: adminContent?.searchTerms ?? '',
 		publishDate: adminContent?.publishStartDate ? moment(adminContent.publishStartDate).toDate() : new Date(),
 		doesExpire: !!adminContent?.publishEndDate,
@@ -459,7 +462,6 @@ export const Component = () => {
 					content={mutateFormValuesToContentPreview(
 						formValues,
 						loaderData.contentTypes,
-						loaderData.tagGroups,
 						loaderData.contentResponse
 					)}
 					className="pb-40"
@@ -524,7 +526,6 @@ export const Component = () => {
 						content={mutateFormValuesToContentPreview(
 							formValues,
 							loaderData.contentTypes,
-							loaderData.tagGroups,
 							loaderData.contentResponse
 						)}
 						className="pb-40"
@@ -848,24 +849,59 @@ export const Component = () => {
 						title="Tags"
 						description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 					>
-						{(loaderData?.tagGroups ?? []).map((tagGroup) => {
-							return (
-								<AdminTagGroupControl
-									key={tagGroup.tagGroupId}
-									tagGroup={tagGroup}
-									selectedTagIds={formValues.tagIds}
-									onTagClick={(tag) => {
-										const isSelected = formValues.tagIds.includes(tag.tagId);
-										updateFormValue(
-											'tagIds',
-											isSelected
-												? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-												: [...formValues.tagIds, tag.tagId]
-										);
-									}}
-								/>
-							);
-						})}
+						{(loaderData?.tagGroups ?? [])
+							.filter((tagGroup) => !tagGroup.deprecated)
+							.map((tagGroup) => {
+								return (
+									<ToggledInput
+										key={tagGroup.tagGroupId}
+										type="checkbox"
+										name="tag-group"
+										id={`tag-group-${tagGroup.tagGroupId}`}
+										value={tagGroup.tagGroupId}
+										label={tagGroup.name}
+										checked={formValues.tagGroupIds.includes(tagGroup.tagGroupId)}
+										onChange={() => {
+											if (formValues.tagGroupIds.includes(tagGroup.tagGroupId)) {
+												updateFormValue(
+													'tagGroupIds',
+													formValues.tagGroupIds.filter((v) => v !== tagGroup.tagGroupId)
+												);
+											} else {
+												updateFormValue('tagGroupIds', [
+													...formValues.tagGroupIds,
+													tagGroup.tagGroupId,
+												]);
+											}
+										}}
+										className="mb-3"
+									>
+										{(tagGroup.tags ?? [])
+											.filter((tag) => !tag.deprecated)
+											.map((tag) => (
+												<Form.Check
+													key={tag.tagId}
+													type="checkbox"
+													name="tag"
+													id={`tag-${tag.tagId}`}
+													value={tag.tagId}
+													label={tag.name}
+													checked={!!formValues.tags.find((t) => t.tagId === tag.tagId)}
+													onChange={() => {
+														if (!!formValues.tags.find((t) => t.tagId === tag.tagId)) {
+															updateFormValue(
+																'tags',
+																formValues.tags.filter((t) => t.tagId !== tag.tagId)
+															);
+														} else {
+															updateFormValue('tags', [...formValues.tags, tag]);
+														}
+													}}
+												/>
+											))}
+									</ToggledInput>
+								);
+							})}
 					</AdminFormSection>
 
 					<hr />
@@ -1022,7 +1058,10 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		publishStartDate,
 		publishEndDate,
 		publishRecurring: formValues.isRecurring,
-		tagIds: formValues.tagIds,
+		tagIds:
+			(formValues.tags ?? [])
+				.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId))
+				.map((tag) => tag.tagId) ?? [],
 		searchTerms: formValues.searchTerms,
 		sharedFlag: formValues.isShared ?? false,
 		contentStatusId: formValues.contentStatusId,
@@ -1039,13 +1078,8 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 function mutateFormValuesToContentPreview(
 	formValues: ReturnType<typeof getInitialResourceFormValues>,
 	contentTypes: ContentType[],
-	tagGroups: TagGroup[],
 	contentResponse?: AdminContentResponse
 ): Content {
-	const flattendTags = tagGroups.reduce((previousValue, currentValue) => {
-		return [...previousValue, ...(currentValue.tags ?? [])];
-	}, [] as Tag[]);
-
 	const contentType = contentTypes.find((ct) => ct.contentTypeId === formValues.contentTypeId);
 
 	return {
@@ -1067,8 +1101,11 @@ function mutateFormValuesToContentPreview(
 		duration: formValues.durationInMinutes,
 		durationInMinutes: parseInt(formValues.durationInMinutes, 10),
 		durationInMinutesDescription: `${formValues.durationInMinutes} min`,
-		tagIds: formValues.tagIds,
-		tags: formValues.tagIds.map((tagId) => flattendTags.find((tag) => tag.tagId === tagId)!),
+		tagIds:
+			formValues.tags
+				.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId))
+				.map((tag) => tag.tagId) ?? [],
+		tags: formValues.tags.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId)),
 		neverEmbed: formValues.neverEmbed,
 	};
 }

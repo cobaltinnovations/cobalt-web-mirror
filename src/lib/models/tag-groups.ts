@@ -8,6 +8,7 @@ export interface Tag {
 	tagGroupId: string;
 	tagId: string;
 	urlName: string;
+	deprecated: boolean;
 }
 
 export interface TagGroup {
@@ -17,4 +18,5 @@ export interface TagGroup {
 	tagGroupId: string;
 	urlName: string;
 	tags?: Tag[];
+	deprecated: boolean;
 }

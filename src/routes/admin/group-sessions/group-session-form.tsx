@@ -41,6 +41,7 @@ import {
 	GroupSessionUrlNameValidationResult,
 	ScreeningFlow,
 	ScreeningFlowTypeId,
+	Tag,
 } from '@/lib/models';
 import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
@@ -53,7 +54,7 @@ import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
+import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -164,7 +165,8 @@ const initialGroupSessionFormValues = {
 	collectionFlag: false,
 	registrationEndDateFlag: false,
 	registrationEndDate: null as Date | null,
-	tagIds: [] as string[],
+	tagGroupIds: [] as string[],
+	tags: [] as Tag[],
 	screeningFlowId: '',
 	confirmationEmailContent: '',
 	sendReminderEmail: false,
@@ -191,7 +193,6 @@ function getInitialGroupSessionFormValues({
 		endDateTime,
 		registrationEndDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
-		tags = [],
 		groupSessionCollectionId,
 		...rest
 	} = groupSession ?? ({} as GroupSessionModel);
@@ -218,7 +219,11 @@ function getInitialGroupSessionFormValues({
 		{
 			...rest,
 			screeningFlowId,
-			tagIds: tags.map((tag) => tag.tagId),
+			tagGroupIds:
+				groupSession?.tags
+					.map((tag) => tag.tagGroupId)
+					.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+			tags: groupSession?.tags ?? [],
 			groupSessionCollectionId,
 			collectionFlag: groupSessionCollectionId ? true : false,
 			// keep initial values when duplicating an existing session
@@ -1006,24 +1011,59 @@ export const Component = () => {
 				title="Tags"
 				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 			>
-				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
-					return (
-						<AdminTagGroupControl
-							key={tagGroup.tagGroupId}
-							tagGroup={tagGroup}
-							selectedTagIds={formValues.tagIds}
-							onTagClick={(tag) => {
-								const isSelected = formValues.tagIds.includes(tag.tagId);
-								updateFormValue(
-									'tagIds',
-									isSelected
-										? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-										: [...formValues.tagIds, tag.tagId]
-								);
-							}}
-						/>
-					);
-				})}
+				{(loaderData?.tagGroups ?? [])
+					.filter((tagGroup) => !tagGroup.deprecated)
+					.map((tagGroup) => {
+						return (
+							<ToggledInput
+								key={tagGroup.tagGroupId}
+								type="checkbox"
+								name="tag-group"
+								id={`tag-group-${tagGroup.tagGroupId}`}
+								value={tagGroup.tagGroupId}
+								label={tagGroup.name}
+								checked={formValues.tagGroupIds.includes(tagGroup.tagGroupId)}
+								onChange={() => {
+									if (formValues.tagGroupIds.includes(tagGroup.tagGroupId)) {
+										updateFormValue(
+											'tagGroupIds',
+											formValues.tagGroupIds.filter((v) => v !== tagGroup.tagGroupId)
+										);
+									} else {
+										updateFormValue('tagGroupIds', [
+											...formValues.tagGroupIds,
+											tagGroup.tagGroupId,
+										]);
+									}
+								}}
+								className="mb-3"
+							>
+								{(tagGroup.tags ?? [])
+									.filter((tag) => !tag.deprecated)
+									.map((tag) => (
+										<Form.Check
+											key={tag.tagId}
+											type="checkbox"
+											name="tag"
+											id={`tag-${tag.tagId}`}
+											value={tag.tagId}
+											label={tag.name}
+											checked={!!formValues.tags.find((t) => t.tagId === tag.tagId)}
+											onChange={() => {
+												if (!!formValues.tags.find((t) => t.tagId === tag.tagId)) {
+													updateFormValue(
+														'tags',
+														formValues.tags.filter((t) => t.tagId !== tag.tagId)
+													);
+												} else {
+													updateFormValue('tags', [...formValues.tags, tag]);
+												}
+											}}
+										/>
+									))}
+							</ToggledInput>
+						);
+					})}
 			</AdminFormSection>
 
 			<hr />
@@ -1666,6 +1706,8 @@ function prepareGroupSessionSubmission(
 		endTime,
 		registrationEndDateFlag,
 		registrationEndDate,
+		tagGroupIds,
+		tags,
 		...groupSessionSubmission
 	} = formValues;
 
@@ -1766,6 +1808,8 @@ function prepareGroupSessionSubmission(
 					`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
 				).format(DateFormats.API.DateTime),
 			}),
+		tagIds:
+			(tags ?? []).filter((tag) => (tagGroupIds ?? []).includes(tag.tagGroupId)).map((tag) => tag.tagId) ?? [],
 		...groupSessionSubmission,
 	};
 }
