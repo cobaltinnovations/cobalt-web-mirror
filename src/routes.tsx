@@ -215,7 +215,7 @@ const RedirectToCommunityPage = () => {
 
 const RedirectToCurrentFeaturedTopic = () => {
 	const { institution } = useAccount();
-	const [featuredTopicCenter, setFeaturdTopicCenter] = useState<TopicCenterModel>();
+	const [featuredTopicCenter, setFeaturedTopicCenter] = useState<TopicCenterModel>();
 
 	const fetchTopicCepter = useCallback(async () => {
 		if (!institution.featuredTopicCenterId) {
@@ -224,7 +224,7 @@ const RedirectToCurrentFeaturedTopic = () => {
 
 		const { topicCenter } = await topicCenterService.getTopicCenterById(institution.featuredTopicCenterId).fetch();
 
-		setFeaturdTopicCenter(topicCenter);
+		setFeaturedTopicCenter(topicCenter);
 	}, [institution.featuredTopicCenterId]);
 
 	if (institution.featuredTopicCenterId) {
