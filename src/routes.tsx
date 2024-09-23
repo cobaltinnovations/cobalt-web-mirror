@@ -217,7 +217,7 @@ const RedirectToCurrentFeaturedTopic = () => {
 	const { institution } = useAccount();
 	const [featuredTopicCenter, setFeaturedTopicCenter] = useState<TopicCenterModel>();
 
-	const fetchTopicCepter = useCallback(async () => {
+	const fetchTopicCenter = useCallback(async () => {
 		if (!institution.featuredTopicCenterId) {
 			throw new Error('institution.featuredTopicCenterId is undefined.');
 		}
@@ -229,7 +229,7 @@ const RedirectToCurrentFeaturedTopic = () => {
 
 	if (institution.featuredTopicCenterId) {
 		return (
-			<AsyncWrapper fetchData={fetchTopicCepter}>
+			<AsyncWrapper fetchData={fetchTopicCenter}>
 				<Navigate to={`/featured-topics/${featuredTopicCenter?.urlName}`} replace />
 			</AsyncWrapper>
 		);
