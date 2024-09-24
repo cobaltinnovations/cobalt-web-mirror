@@ -10,7 +10,12 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import { GROUP_SESSION_SORT_ORDER, GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
+import {
+	CONTENT_VISIBILITY_TYPE_ID,
+	GROUP_SESSION_SORT_ORDER,
+	GROUP_SESSION_STATUS_ID,
+	GroupSessionModel,
+} from '@/lib/models';
 import {
 	GetGroupSessionCountsResponseBody,
 	GetGroupSessionsQueryParameters,
@@ -42,7 +47,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
 	const groupSessionStatusId = url.searchParams.get('groupSessionStatusId');
 	const groupSessionSchedulingSystemId = url.searchParams.get('groupSessionSchedulingSystemId');
-	const visibleFlag = url.searchParams.get('visibleFlag');
+	const contentVisibilityTypeId = url.searchParams.get('contentVisibilityTypeId')
+		? (url.searchParams.get('contentVisibilityTypeId') as CONTENT_VISIBILITY_TYPE_ID)
+		: null;
 	const orderBy = url.searchParams.get('orderBy') ?? GROUP_SESSION_SORT_ORDER.DATE_ADDED_DESCENDING;
 	const queryParams: GetGroupSessionsQueryParameters = {
 		orderBy,
@@ -56,8 +63,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		queryParams.groupSessionSchedulingSystemId = groupSessionSchedulingSystemId;
 	}
 
-	if (visibleFlag) {
-		queryParams.visibleFlag = visibleFlag;
+	if (contentVisibilityTypeId) {
+		queryParams.contentVisibilityTypeId = contentVisibilityTypeId;
 	}
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
@@ -219,7 +226,7 @@ export const Component = () => {
 											<TableCell header>Registrations</TableCell>
 											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
-											<TableCell header>Visible</TableCell>
+											<TableCell header>Visibility</TableCell>
 											<TableCell header colSpan={2}>
 												Date Added
 											</TableCell>
@@ -303,10 +310,11 @@ export const Component = () => {
 														)}
 													</TableCell>
 													<TableCell>
-														{groupSession.visibleFlag ? (
-															<span className="text-success">Yes</span>
+														{groupSession.groupSessionVisibilityTypeId ===
+														CONTENT_VISIBILITY_TYPE_ID.PUBLIC ? (
+															<span className="text-success">Public</span>
 														) : (
-															<span className="text-danger">No</span>
+															<span className="text-danger">Unlisted</span>
 														)}
 													</TableCell>
 													<TableCell>{groupSession.createdDateDescription}</TableCell>

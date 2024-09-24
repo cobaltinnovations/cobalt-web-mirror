@@ -37,7 +37,7 @@
 	"groupSessionLocationTypeId": "VIRTUAL",
 	"videoconferenceUrl": "https://www.google.com",
 	"sendFollowupEmail": false,
-	"visibleFlag": true,
+	"groupSessionVisibilityTypeId": "PUBLIC",
 	"screeningFlowId": "6fb3d82c-8512-46c8-bdcc-369d7e3e9d11",
 	"sendReminderEmail": false,
 	"singleSessionFlag": true,

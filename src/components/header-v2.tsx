@@ -65,6 +65,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		borderRadius: 6,
 		height: 80,
 		width: 144,
+		flexShrink: 0,
 		[mediaQueries.lg]: {
 			height: 'auto',
 			width: '100%',

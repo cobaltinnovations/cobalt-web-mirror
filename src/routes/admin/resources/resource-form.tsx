@@ -14,16 +14,18 @@ import {
 	AdminContent,
 	AdminContentAction,
 	Content,
+	CONTENT_VISIBILITY_TYPE_ID,
+	ContentAudienceType,
 	ContentStatusId,
 	ContentType,
 	ContentTypeId,
 	Tag,
-	TagGroup,
 } from '@/lib/models';
 import {
 	AdminContentResponse,
 	CreateContentRequest,
 	adminService,
+	contentService,
 	resourceLibraryService,
 	tagService,
 } from '@/lib/services';
@@ -40,7 +42,6 @@ import {
 	AdminFormSection,
 	AdminResourceFormFooter,
 	AdminResourceFormFooterExternal,
-	AdminTagGroupControl,
 } from '@/components/admin';
 import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import ConfirmDialog from '@/components/confirm-dialog';
@@ -52,6 +53,8 @@ import ToggledInput from '@/components/toggled-input';
 import NoMatch from '@/pages/no-match';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
+import { CobaltError } from '@/lib/http-client';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -95,23 +98,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const contentRequest = contentId ? adminService.fetchAdminContent(contentId) : null;
 	const tagGroupsRequest = tagService.getTagGroups();
 	const contentTypesRequest = resourceLibraryService.getResourceLibraryContentTypes();
+	const contentAudienceTypesRequest = contentService.fetchContentAudienceTypes();
 
 	request.signal.addEventListener('abort', () => {
 		contentRequest?.abort();
 		tagGroupsRequest.abort();
 		contentTypesRequest.abort();
+		contentAudienceTypesRequest.abort();
 	});
 
-	const [contentResponse, tagGroupsResponse, contentTypesResponse] = await Promise.all([
+	const [contentResponse, tagGroupsResponse, contentTypesResponse, contentAudienceTypesResponse] = await Promise.all([
 		contentRequest?.fetch(),
 		tagGroupsRequest.fetch(),
 		contentTypesRequest.fetch(),
+		contentAudienceTypesRequest.fetch(),
 	]);
 
 	return {
 		contentResponse,
 		tagGroups: tagGroupsResponse.tagGroups,
 		contentTypes: contentTypesResponse.contentTypes,
+		contentAudienceTypeGroups: contentAudienceTypesResponse.contentAudienceTypeGroups,
+		contentAudienceTypes: contentAudienceTypesResponse.contentAudienceTypes,
 		startOnPreview,
 	};
 }
@@ -137,13 +145,17 @@ const initialResourceFormValues = {
 	imageFileId: '',
 	imageUrl: '',
 	description: '',
-	tagIds: [] as string[],
+	contentAudienceTypeGroupIds: [] as string[],
+	contentAudienceTypes: [] as ContentAudienceType[],
+	tagGroupIds: [] as string[],
+	tags: [] as Tag[],
 	searchTerms: '',
 	publishDate: new Date(),
 	doesExpire: false,
 	expirationDate: null as Date | null,
 	isRecurring: false,
 	neverEmbed: false,
+	contentVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 };
 
 function getInitialResourceFormValues({
@@ -167,13 +179,23 @@ function getInitialResourceFormValues({
 		imageFileId: adminContent?.imageFileUploadId ?? '',
 		imageUrl: adminContent?.imageUrl ?? '',
 		description: adminContent?.description ?? '',
-		tagIds: adminContent?.tagIds ?? [],
+		contentAudienceTypeGroupIds:
+			adminContent?.contentAudienceTypes
+				.map((cat) => cat.contentAudienceTypeGroupId)
+				.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+		contentAudienceTypes: adminContent?.contentAudienceTypes ?? [],
+		tagGroupIds:
+			adminContent?.tags
+				.map((tag) => tag.tagGroupId)
+				.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+		tags: adminContent?.tags ?? [],
 		searchTerms: adminContent?.searchTerms ?? '',
 		publishDate: adminContent?.publishStartDate ? moment(adminContent.publishStartDate).toDate() : new Date(),
 		doesExpire: !!adminContent?.publishEndDate,
 		expirationDate: adminContent?.publishEndDate ? moment(adminContent.publishEndDate).toDate() : null,
 		isRecurring: adminContent?.publishRecurring ?? false,
 		neverEmbed: adminContent?.neverEmbed ?? false,
+		contentVisibilityTypeId: adminContent?.contentVisibilityTypeId ?? CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 	};
 }
 
@@ -226,9 +248,19 @@ export const Component = () => {
 		(showFlag?: boolean) => {
 			const submission = prepareResourceSubmission(formValues);
 
+			const tagGroupErrorMessage = getTagGroupErrorMessage(
+				formValues.tagGroupIds,
+				formValues.tags,
+				loaderData?.tagGroups ?? []
+			);
+
 			return new Promise(async (resolve: (response: AdminContentResponse) => void, reject) => {
 				if (isEdit) {
 					try {
+						if (tagGroupErrorMessage) {
+							throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+						}
+
 						if (!params.contentId) {
 							throw new Error('params.contentId is undefined.');
 						}
@@ -253,6 +285,10 @@ export const Component = () => {
 				}
 
 				try {
+					if (tagGroupErrorMessage) {
+						throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+					}
+
 					const response = await adminService.createContent(submission).fetch();
 
 					if (showFlag) {
@@ -270,7 +306,7 @@ export const Component = () => {
 				}
 			});
 		},
-		[addFlag, formValues, isEdit, params.contentId]
+		[addFlag, formValues, isEdit, loaderData?.tagGroups, params.contentId]
 	);
 
 	const handleFormSubmit = useCallback(
@@ -442,7 +478,6 @@ export const Component = () => {
 					content={mutateFormValuesToContentPreview(
 						formValues,
 						loaderData.contentTypes,
-						loaderData.tagGroups,
 						loaderData.contentResponse
 					)}
 					className="pb-40"
@@ -507,7 +542,6 @@ export const Component = () => {
 						content={mutateFormValuesToContentPreview(
 							formValues,
 							loaderData.contentTypes,
-							loaderData.tagGroups,
 							loaderData.contentResponse
 						)}
 						className="pb-40"
@@ -754,28 +788,136 @@ export const Component = () => {
 
 					<hr />
 
+					<AdminFormSection title="Target" description="Specify who this resource will help.">
+						{(loaderData.contentAudienceTypeGroups ?? []).map((catg) => (
+							<ToggledInput
+								key={catg.contentAudienceTypeGroupId}
+								type="checkbox"
+								name="target-group"
+								id={`target-group-${catg.contentAudienceTypeGroupId}`}
+								value={catg.contentAudienceTypeGroupId}
+								label={catg.description}
+								checked={formValues.contentAudienceTypeGroupIds.includes(
+									catg.contentAudienceTypeGroupId
+								)}
+								onChange={() => {
+									if (
+										formValues.contentAudienceTypeGroupIds.includes(catg.contentAudienceTypeGroupId)
+									) {
+										updateFormValue(
+											'contentAudienceTypeGroupIds',
+											formValues.contentAudienceTypeGroupIds.filter(
+												(v) => v !== catg.contentAudienceTypeGroupId
+											)
+										);
+									} else {
+										updateFormValue('contentAudienceTypeGroupIds', [
+											...formValues.contentAudienceTypeGroupIds,
+											catg.contentAudienceTypeGroupId,
+										]);
+									}
+								}}
+								className="mb-3"
+							>
+								{(loaderData.contentAudienceTypes ?? [])
+									.filter((cat) => cat.contentAudienceTypeGroupId === catg.contentAudienceTypeGroupId)
+									.map((cat: ContentAudienceType) => (
+										<Form.Check
+											key={cat.contentAudienceTypeId}
+											type="checkbox"
+											name="target"
+											id={`target-${cat.contentAudienceTypeId}`}
+											value={cat.contentAudienceTypeId}
+											label={cat.description}
+											checked={
+												!!formValues.contentAudienceTypes.find(
+													(v) => v.contentAudienceTypeId === cat.contentAudienceTypeId
+												)
+											}
+											onChange={() => {
+												if (
+													!!formValues.contentAudienceTypes.find(
+														(v) => v.contentAudienceTypeId === cat.contentAudienceTypeId
+													)
+												) {
+													updateFormValue(
+														'contentAudienceTypes',
+														formValues.contentAudienceTypes.filter(
+															(v) => v.contentAudienceTypeId !== cat.contentAudienceTypeId
+														)
+													);
+												} else {
+													updateFormValue('contentAudienceTypes', [
+														...formValues.contentAudienceTypes,
+														cat,
+													]);
+												}
+											}}
+										/>
+									))}
+							</ToggledInput>
+						))}
+					</AdminFormSection>
+
+					<hr />
+
 					<AdminFormSection
 						title="Tags"
 						description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 					>
-						{(loaderData?.tagGroups ?? []).map((tagGroup) => {
-							return (
-								<AdminTagGroupControl
-									key={tagGroup.tagGroupId}
-									tagGroup={tagGroup}
-									selectedTagIds={formValues.tagIds}
-									onTagClick={(tag) => {
-										const isSelected = formValues.tagIds.includes(tag.tagId);
-										updateFormValue(
-											'tagIds',
-											isSelected
-												? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-												: [...formValues.tagIds, tag.tagId]
-										);
-									}}
-								/>
-							);
-						})}
+						{(loaderData?.tagGroups ?? [])
+							.filter((tagGroup) => !tagGroup.deprecated)
+							.map((tagGroup) => {
+								return (
+									<ToggledInput
+										key={tagGroup.tagGroupId}
+										type="checkbox"
+										name="tag-group"
+										id={`tag-group-${tagGroup.tagGroupId}`}
+										value={tagGroup.tagGroupId}
+										label={tagGroup.name}
+										checked={formValues.tagGroupIds.includes(tagGroup.tagGroupId)}
+										onChange={() => {
+											if (formValues.tagGroupIds.includes(tagGroup.tagGroupId)) {
+												updateFormValue(
+													'tagGroupIds',
+													formValues.tagGroupIds.filter((v) => v !== tagGroup.tagGroupId)
+												);
+											} else {
+												updateFormValue('tagGroupIds', [
+													...formValues.tagGroupIds,
+													tagGroup.tagGroupId,
+												]);
+											}
+										}}
+										className="mb-3"
+									>
+										{(tagGroup.tags ?? [])
+											.filter((tag) => !tag.deprecated)
+											.map((tag) => (
+												<Form.Check
+													key={tag.tagId}
+													type="checkbox"
+													name="tag"
+													id={`tag-${tag.tagId}`}
+													value={tag.tagId}
+													label={tag.name}
+													checked={!!formValues.tags.find((t) => t.tagId === tag.tagId)}
+													onChange={() => {
+														if (!!formValues.tags.find((t) => t.tagId === tag.tagId)) {
+															updateFormValue(
+																'tags',
+																formValues.tags.filter((t) => t.tagId !== tag.tagId)
+															);
+														} else {
+															updateFormValue('tags', [...formValues.tags, tag]);
+														}
+													}}
+												/>
+											))}
+									</ToggledInput>
+								);
+							})}
 					</AdminFormSection>
 
 					<hr />
@@ -792,6 +934,48 @@ export const Component = () => {
 							value={formValues.searchTerms}
 							onChange={({ currentTarget }) => {
 								updateFormValue('searchTerms', currentTarget.value);
+							}}
+						/>
+					</AdminFormSection>
+
+					<hr />
+
+					<AdminFormSection
+						title="Visibility"
+						description={
+							<>
+								<p className="mb-2">
+									Public content is visible everywhere on Cobalt once it is published (resource
+									library, homepage, etc.)
+								</p>
+								<p className="mb-0">
+									Unlisted content is only accessible to users who have a direct link (e.g. from a
+									community page or their personal recommendations)
+								</p>
+							</>
+						}
+					>
+						<ToggledInput
+							type="radio"
+							id="visibility-on"
+							name="visibility"
+							label="Public"
+							hideChildren
+							className="mb-3"
+							checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
+							onChange={() => {
+								updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
+							}}
+						/>
+						<ToggledInput
+							type="radio"
+							id="visibility-off"
+							name="visibility"
+							label="Unlisted"
+							hideChildren
+							checked={formValues.contentVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
+							onChange={() => {
+								updateFormValue('contentVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
 							}}
 						/>
 					</AdminFormSection>
@@ -890,23 +1074,28 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 		publishStartDate,
 		publishEndDate,
 		publishRecurring: formValues.isRecurring,
-		tagIds: formValues.tagIds,
+		tagIds:
+			(formValues.tags ?? [])
+				.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId))
+				.map((tag) => tag.tagId) ?? [],
 		searchTerms: formValues.searchTerms,
 		sharedFlag: formValues.isShared ?? false,
 		contentStatusId: formValues.contentStatusId,
+		contentVisibilityTypeId: formValues.contentVisibilityTypeId,
+		contentAudienceTypeIds:
+			(formValues.contentAudienceTypes ?? [])
+				.filter((cat) =>
+					(formValues.contentAudienceTypeGroupIds ?? []).includes(cat.contentAudienceTypeGroupId)
+				)
+				.map((cat) => cat.contentAudienceTypeId) ?? [],
 	};
 }
 
 function mutateFormValuesToContentPreview(
 	formValues: ReturnType<typeof getInitialResourceFormValues>,
 	contentTypes: ContentType[],
-	tagGroups: TagGroup[],
 	contentResponse?: AdminContentResponse
 ): Content {
-	const flattendTags = tagGroups.reduce((previousValue, currentValue) => {
-		return [...previousValue, ...(currentValue.tags ?? [])];
-	}, [] as Tag[]);
-
 	const contentType = contentTypes.find((ct) => ct.contentTypeId === formValues.contentTypeId);
 
 	return {
@@ -928,8 +1117,11 @@ function mutateFormValuesToContentPreview(
 		duration: formValues.durationInMinutes,
 		durationInMinutes: parseInt(formValues.durationInMinutes, 10),
 		durationInMinutesDescription: `${formValues.durationInMinutes} min`,
-		tagIds: formValues.tagIds,
-		tags: formValues.tagIds.map((tagId) => flattendTags.find((tag) => tag.tagId === tagId)!),
+		tagIds:
+			formValues.tags
+				.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId))
+				.map((tag) => tag.tagId) ?? [],
+		tags: formValues.tags.filter((tag) => (formValues.tagGroupIds ?? []).includes(tag.tagGroupId)),
 		neverEmbed: formValues.neverEmbed,
 	};
 }

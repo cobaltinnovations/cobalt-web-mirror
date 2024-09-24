@@ -33,6 +33,7 @@ import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-righ
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import GroupSession from '@/components/group-session';
 import {
+	CONTENT_VISIBILITY_TYPE_ID,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionLearnMoreMethodId,
 	GroupSessionLocationTypeId,
@@ -40,6 +41,7 @@ import {
 	GroupSessionUrlNameValidationResult,
 	ScreeningFlow,
 	ScreeningFlowTypeId,
+	Tag,
 } from '@/lib/models';
 import moment from 'moment';
 import { SESSION_STATUS } from '@/components/session-status';
@@ -52,7 +54,9 @@ import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection, AdminTagGroupControl } from '@/components/admin';
+import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
+import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
+import { CobaltError } from '@/lib/http-client';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -159,11 +163,12 @@ const initialGroupSessionFormValues = {
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
 	groupSessionCollectionId: '',
-	visibleFlag: true,
+	groupSessionVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID.PUBLIC,
 	collectionFlag: false,
 	registrationEndDateFlag: false,
 	registrationEndDate: null as Date | null,
-	tagIds: [] as string[],
+	tagGroupIds: [] as string[],
+	tags: [] as Tag[],
 	screeningFlowId: '',
 	confirmationEmailContent: '',
 	sendReminderEmail: false,
@@ -190,7 +195,6 @@ function getInitialGroupSessionFormValues({
 		endDateTime,
 		registrationEndDateTime,
 		followupTimeOfDay: formattedFollowupTimeOfDay,
-		tags = [],
 		groupSessionCollectionId,
 		...rest
 	} = groupSession ?? ({} as GroupSessionModel);
@@ -217,7 +221,11 @@ function getInitialGroupSessionFormValues({
 		{
 			...rest,
 			screeningFlowId,
-			tagIds: tags.map((tag) => tag.tagId),
+			tagGroupIds:
+				groupSession?.tags
+					.map((tag) => tag.tagGroupId)
+					.filter((currentValue, index, arr) => arr.indexOf(currentValue) === index) ?? [],
+			tags: groupSession?.tags ?? [],
 			groupSessionCollectionId,
 			collectionFlag: groupSessionCollectionId ? true : false,
 			// keep initial values when duplicating an existing session
@@ -326,57 +334,64 @@ export const Component = () => {
 				submission.groupSessionStatusId = GROUP_SESSION_STATUS_ID.NEW;
 			}
 
-			const promise = isEdit
-				? groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch()
-				: groupSessionsService.createGroupSession(submission).fetch();
-
 			setIsDirty(false);
 
-			promise
-				.then((response) => {
-					if (!loaderData?.isAdminRoute) {
+			try {
+				const tagGroupErrorMessage = getTagGroupErrorMessage(
+					formValues.tagGroupIds,
+					formValues.tags,
+					loaderData?.tagGroups ?? []
+				);
+				if (tagGroupErrorMessage) {
+					throw CobaltError.fromValidationFailed(tagGroupErrorMessage);
+				}
+
+				const response = isEdit
+					? await groupSessionsService.updateGroupsession(params.groupSessionId!, submission).fetch()
+					: await groupSessionsService.createGroupSession(submission).fetch();
+
+				if (!loaderData?.isAdminRoute) {
+					addFlag({
+						variant: 'success',
+						title: 'Submission Accepted',
+						description: 'Your group session has been submitted for review.',
+						actions: [],
+					});
+
+					navigate('/group-sessions');
+
+					return;
+				}
+
+				if (isNotDraft || options?.exitAfterSave) {
+					if (isNotDraft) {
 						addFlag({
 							variant: 'success',
-							title: 'Submission Accepted',
-							description: 'Your group session has been submitted for review.',
-							actions: [],
-						});
-
-						navigate('/group-sessions');
-
-						return;
-					}
-
-					if (isNotDraft || options?.exitAfterSave) {
-						if (isNotDraft) {
-							addFlag({
-								variant: 'success',
-								title: 'Changes published',
-								description: 'Your changes are now available on Cobalt',
-								actions: [
-									{
-										title: 'View Session',
-										onClick: () => {
-											navigate(`/group-sessions/${response.groupSession.urlName}`, {
-												state: {
-													navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
-												},
-											});
-										},
+							title: 'Changes published',
+							description: 'Your changes are now available on Cobalt',
+							actions: [
+								{
+									title: 'View Session',
+									onClick: () => {
+										navigate(`/group-sessions/${response.groupSession.urlName}`, {
+											state: {
+												navigationSource: GroupSessionDetailNavigationSource.ADMIN_LIST,
+											},
+										});
 									},
-								],
-							});
-						}
-
-						navigate('/admin/group-sessions');
-					} else {
-						navigate('/admin/group-sessions/preview/' + response.groupSession.groupSessionId);
+								},
+							],
+						});
 					}
-				})
-				.catch((e) => {
-					setIsDirty(true);
-					handleError(e);
-				});
+
+					navigate('/admin/group-sessions');
+				} else {
+					navigate('/admin/group-sessions/preview/' + response.groupSession.groupSessionId);
+				}
+			} catch (error) {
+				setIsDirty(true);
+				handleError(error);
+			}
 		},
 		[
 			addFlag,
@@ -386,6 +401,7 @@ export const Component = () => {
 			isExternal,
 			isNotDraft,
 			loaderData?.isAdminRoute,
+			loaderData?.tagGroups,
 			navigate,
 			params.groupSessionId,
 		]
@@ -1005,24 +1021,59 @@ export const Component = () => {
 				title="Tags"
 				description="Tags are used to determine which resources are shown first to a user depending on how they answered the initial assessment questions. If no tags are selected, then the resource will be de-prioritized and appear lower in a user’s list of resources."
 			>
-				{(loaderData?.tagGroups ?? []).map((tagGroup) => {
-					return (
-						<AdminTagGroupControl
-							key={tagGroup.tagGroupId}
-							tagGroup={tagGroup}
-							selectedTagIds={formValues.tagIds}
-							onTagClick={(tag) => {
-								const isSelected = formValues.tagIds.includes(tag.tagId);
-								updateFormValue(
-									'tagIds',
-									isSelected
-										? formValues.tagIds.filter((tagId) => tagId !== tag.tagId)
-										: [...formValues.tagIds, tag.tagId]
-								);
-							}}
-						/>
-					);
-				})}
+				{(loaderData?.tagGroups ?? [])
+					.filter((tagGroup) => !tagGroup.deprecated)
+					.map((tagGroup) => {
+						return (
+							<ToggledInput
+								key={tagGroup.tagGroupId}
+								type="checkbox"
+								name="tag-group"
+								id={`tag-group-${tagGroup.tagGroupId}`}
+								value={tagGroup.tagGroupId}
+								label={tagGroup.name}
+								checked={formValues.tagGroupIds.includes(tagGroup.tagGroupId)}
+								onChange={() => {
+									if (formValues.tagGroupIds.includes(tagGroup.tagGroupId)) {
+										updateFormValue(
+											'tagGroupIds',
+											formValues.tagGroupIds.filter((v) => v !== tagGroup.tagGroupId)
+										);
+									} else {
+										updateFormValue('tagGroupIds', [
+											...formValues.tagGroupIds,
+											tagGroup.tagGroupId,
+										]);
+									}
+								}}
+								className="mb-3"
+							>
+								{(tagGroup.tags ?? [])
+									.filter((tag) => !tag.deprecated)
+									.map((tag) => (
+										<Form.Check
+											key={tag.tagId}
+											type="checkbox"
+											name="tag"
+											id={`tag-${tag.tagId}`}
+											value={tag.tagId}
+											label={tag.name}
+											checked={!!formValues.tags.find((t) => t.tagId === tag.tagId)}
+											onChange={() => {
+												if (!!formValues.tags.find((t) => t.tagId === tag.tagId)) {
+													updateFormValue(
+														'tags',
+														formValues.tags.filter((t) => t.tagId !== tag.tagId)
+													);
+												} else {
+													updateFormValue('tags', [...formValues.tags, tag]);
+												}
+											}}
+										/>
+									))}
+							</ToggledInput>
+						);
+					})}
 			</AdminFormSection>
 
 			<hr />
@@ -1032,12 +1083,12 @@ export const Component = () => {
 				description={
 					<>
 						<p className="mb-2">
-							Visible sessions appear across Cobalt in multiple areas. This is the recommended setting for
-							most group sessions.
+							Public group sessions are visible in multiple areas on Cobalt. This is the recommended
+							setting for most group sessions.
 						</p>
 						<p className="mb-0">
-							Hidden sessions are still available on Cobalt, but users can only view a hidden session by
-							accessing it directly through the group session URL, collection URL, or topic page URL.
+							Unlisted group sessions are not visible on Cobalt and are only accessible to users who have
+							a direct link.
 						</p>
 					</>
 				}
@@ -1045,23 +1096,24 @@ export const Component = () => {
 				<ToggledInput
 					type="radio"
 					id="visibility-on"
-					label="Visible"
+					name="visibility"
+					label="Public"
 					hideChildren
 					className="mb-3"
-					checked={formValues.visibleFlag}
+					checked={formValues.groupSessionVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.PUBLIC}
 					onChange={() => {
-						updateFormValue('visibleFlag', true);
+						updateFormValue('groupSessionVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.PUBLIC);
 					}}
 				/>
 				<ToggledInput
 					type="radio"
 					id="visibility-off"
 					name="visibility"
-					label="Hidden"
+					label="Unlisted"
 					hideChildren
-					checked={!formValues.visibleFlag}
+					checked={formValues.groupSessionVisibilityTypeId === CONTENT_VISIBILITY_TYPE_ID.UNLISTED}
 					onChange={() => {
-						updateFormValue('visibleFlag', false);
+						updateFormValue('groupSessionVisibilityTypeId', CONTENT_VISIBILITY_TYPE_ID.UNLISTED);
 					}}
 				/>
 			</AdminFormSection>
@@ -1664,6 +1716,8 @@ function prepareGroupSessionSubmission(
 		endTime,
 		registrationEndDateFlag,
 		registrationEndDate,
+		tagGroupIds,
+		tags,
 		...groupSessionSubmission
 	} = formValues;
 
@@ -1764,6 +1818,8 @@ function prepareGroupSessionSubmission(
 					`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
 				).format(DateFormats.API.DateTime),
 			}),
+		tagIds:
+			(tags ?? []).filter((tag) => (tagGroupIds ?? []).includes(tag.tagGroupId)).map((tag) => tag.tagId) ?? [],
 		...groupSessionSubmission,
 	};
 }

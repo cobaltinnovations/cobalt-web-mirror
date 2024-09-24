@@ -1,4 +1,5 @@
 import { GroupSessionSchedulingSystemId } from '../services';
+import { CONTENT_VISIBILITY_TYPE_ID } from './content-visibility-type-id-models';
 import { Tag } from './tag-groups';
 
 export enum GROUP_SESSION_STATUS_ID {
@@ -101,7 +102,7 @@ export interface GroupSessionModel {
 	timeZone: string;
 	title: string;
 	urlName: string;
-	visibleFlag: boolean;
+	groupSessionVisibilityTypeId: CONTENT_VISIBILITY_TYPE_ID;
 
 	followupEmailContent?: string;
 	followupEmailSurveyUrl?: string;

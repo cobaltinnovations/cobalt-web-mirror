@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { Tag, TagGroup } from '../models';
 
 const chunkloadRefreshKey = 'ChunkLoadError-refresh';
 
@@ -34,3 +35,31 @@ export function lazyLoadWithRefresh(componentImport: Parameters<typeof lazy>[0])
 		}
 	});
 }
+
+export const getTagGroupErrorMessage = (
+	selectedTagGroupIds: string[],
+	selectedTags: Tag[],
+	tagGroupOptions: TagGroup[]
+) => {
+	const tagGroupMessages: string[] = [];
+	selectedTagGroupIds.forEach((tgid) => {
+		const currentTagGroup = tagGroupOptions.find((tg) => tg.tagGroupId === tgid);
+
+		if (!currentTagGroup) {
+			return;
+		}
+
+		const currentTagGroupHasSelections = selectedTags.some((t) => t.tagGroupId === tgid);
+		if (!currentTagGroupHasSelections) {
+			tagGroupMessages.push(
+				`The tag category "${currentTagGroup.name}" is selected, but no tags in that category were chosen. Please unselect "${currentTagGroup.name}" or choose appropriate tags in that category.`
+			);
+		}
+	});
+
+	if (tagGroupMessages.length > 0) {
+		return tagGroupMessages.join('\n');
+	}
+
+	return '';
+};
