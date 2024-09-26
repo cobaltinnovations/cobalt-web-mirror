@@ -4,6 +4,7 @@ export enum ERROR_CODES {
 	GENERIC = 'GENERIC',
 	REQUEST_ABORTED = 'REQUEST_ABORTED',
 	CONNECTION_LOST = 'CONNECTION_LOST',
+	VALIDATION_FAILED = 'VALIDATION_FAILED',
 }
 
 export class CobaltError extends Error {
@@ -72,7 +73,7 @@ export class CobaltError extends Error {
 
 	static fromValidationFailed(message: string) {
 		const instance = new CobaltError(message);
-		instance.code = 'VALIDATION_FAILED';
+		instance.code = ERROR_CODES.VALIDATION_FAILED;
 		return instance;
 	}
 
@@ -85,11 +86,15 @@ export class CobaltError extends Error {
 			return false;
 		}
 
+		if (this.code === ERROR_CODES.VALIDATION_FAILED) {
+			return false;
+		}
+
 		if (this.code === ERROR_CODES.CONNECTION_LOST) {
 			return false;
 		}
 
-		return this.apiError?.code !== 'VALIDATION_FAILED';
+		return this.apiError?.code !== ERROR_CODES.VALIDATION_FAILED;
 	}
 
 	code?: string = ERROR_CODES.GENERIC;
