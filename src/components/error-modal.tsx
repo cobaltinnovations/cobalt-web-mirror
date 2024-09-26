@@ -9,6 +9,7 @@ import useTrackModalView from '@/hooks/use-track-modal-view';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import useAccount from '@/hooks/use-account';
+import { ERROR_CODES } from '@/lib/http-client';
 
 const useStyles = createUseStyles({
 	modalWrapper: {
@@ -29,7 +30,7 @@ const ErrorModal: FC = () => {
 	const { trackEvent } = useAnalytics();
 
 	const ErrorBody = useCallback(() => {
-		if (error?.code === 'VALIDATION_FAILED' || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
+		if (error?.code === ERROR_CODES.VALIDATION_FAILED || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
 			return <p className="mb-0 fw-bold">{error?.message}</p>;
 		}
 
@@ -147,7 +148,7 @@ const ErrorModal: FC = () => {
 		>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					{error?.code === 'VALIDATION_FAILED' ? 'Oops!' : 'Oh no! Something went wrong'}
+					{error?.code === ERROR_CODES.VALIDATION_FAILED ? 'Oops!' : 'Oh no! Something went wrong'}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
