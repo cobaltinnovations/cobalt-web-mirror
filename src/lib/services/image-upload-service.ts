@@ -1,4 +1,5 @@
 import { PresignedUploadResponse } from '@/lib/models';
+import { CobaltError } from '../http-client';
 
 interface ImageUploadShape {
 	start: () => this;
@@ -41,10 +42,7 @@ export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<P
 		start: () => {
 			new Promise((resolve, reject) => {
 				if (blob.size > maxFileSizeInBytes) {
-					reject({
-						code: 'FILE_SIZE_LIMIT_EXCEEDED',
-						message: 'File size exceeds limit of 3mb.',
-					});
+					reject(CobaltError.fromValidationFailed('File size exceeds limit of 3mb.'));
 				}
 
 				resolve(true);

@@ -30,7 +30,7 @@ const ErrorModal: FC = () => {
 	const { trackEvent } = useAnalytics();
 
 	const ErrorBody = useCallback(() => {
-		if (error?.code === ERROR_CODES.VALIDATION_FAILED || error?.code === 'FILE_SIZE_LIMIT_EXCEEDED') {
+		if (error?.code === ERROR_CODES.VALIDATION_FAILED) {
 			return <p className="mb-0 fw-bold">{error?.message}</p>;
 		}
 
