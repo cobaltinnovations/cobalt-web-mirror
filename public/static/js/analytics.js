@@ -17,13 +17,16 @@
 		// * API base URL
 		// * Logging enabled/disabled
 		// * Namespace for local/session storage keys
-		const fingerprint = _getFingerprint();
 
+		// Generate and store fingerprint if one doesn't already exist
+		const fingerprint = _getFingerprint();
 		if (!_getFingerprint()) _setFingerprint(window.crypto.randomUUID());
 
+		// Generate and store a session identifier
 		_setSessionId(window.crypto.randomUUID());
 
-		_persistEvent('URL_CHANGED', { url: window.location.href });
+		// Let backend know this is a fresh session
+		_persistEvent('SESSION_STARTED');
 
 		// TODO: have internal event types like these that clients cannot use
 		document.addEventListener('visibilitychange', (event) => {
@@ -34,9 +37,13 @@
 			}
 		});
 
-		window.navigation.addEventListener('navigate', (event) => {
-			_persistEvent('URL_CHANGED', { url: event.destination.url });
-		});
+		// Let router handle URL changes instead of tracking them here
+
+		// window.navigation.addEventListener('navigate', (event) => {
+		// 	_persistEvent('URL_CHANGED', { url: event.destination.url });
+		// });
+
+		//_persistEvent('URL_CHANGED', { url: window.location.href });
 	}
 
 	function _persistEvent(type, data) {
@@ -44,13 +51,22 @@
 		const timestamp = window.performance.timeOrigin + window.performance.now();
 		const event = {
 			type: type,
-			data: data,
+			data: data ? data : {},
 			accountId: _getAccountId(),
 			fingerprint: _getFingerprint(),
 			sessionId: _getSessionId(),
 			sessionStartedTimestamp: timestampOrigin,
 			timestamp: timestamp,
 			url: window.location.href,
+			userAgent: window.navigator.userAgent,
+			// See https://developer.mozilla.org/en-US/docs/Web/API/Screen
+			screen: {
+				colorDepth: window.screen.colorDepth,
+				pixelDepth: window.screen.pixelDepth,
+				width: window.screen.width,
+				height: window.screen.height,
+				orientation: window.screen.orientation ? window.screen.orientation.type : undefined,
+			},
 		};
 
 		_log('TODO: persist event', event);
