@@ -21,12 +21,13 @@
 		const fingerprint = _getFingerprint();
 		if (!fingerprint) _setFingerprint(window.crypto.randomUUID());
 
-		// Generate and store a session identifier
+		// Generate and store a session identifier if one doesn't already exist
 		const sessionId = _getSessionId();
-		if (!sessionId) _setSessionId(window.crypto.randomUUID());
-
-		// Let backend know this is a fresh session
-		_persistEvent('SESSION_STARTED');
+		if (!sessionId) {
+			_setSessionId(window.crypto.randomUUID());
+			// Let backend know this is a fresh session
+			_persistEvent('SESSION_STARTED');
+		}
 
 		// TODO: have internal event types like these that clients cannot use
 		document.addEventListener('visibilitychange', (event) => {
