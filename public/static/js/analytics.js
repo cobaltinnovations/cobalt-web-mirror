@@ -17,12 +17,6 @@
 		if (!analyticsConfig.storageNamespace) throw new Error('Missing storage namespace in analytics config');
 		if (!analyticsConfig.apiBaseUrl) throw new Error('Missing API base URL in analytics config');
 
-		// TODO: enable access to data attributes via document.currentScript.dataset
-		// Examples are:
-		// * API base URL
-		// * Logging enabled/disabled
-		// * Namespace for local/session storage keys
-
 		// Generate and store fingerprint if one doesn't already exist
 		const fingerprint = _getFingerprint();
 		if (!fingerprint) _setFingerprint(window.crypto.randomUUID());
