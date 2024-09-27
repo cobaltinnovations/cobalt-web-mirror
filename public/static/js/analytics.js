@@ -1,17 +1,23 @@
-(function (context, analyticsName) {
+(function (analyticsConfig) {
 	// TODO: use data- attribute to prefix/namespace
 	const ACCOUNT_ID_STORAGE_KEY = 'ACCOUNT_ID';
 	const SESSION_ID_STORAGE_KEY = 'SESSION_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
-	// TODO: use data- attribute to disable logging
 	function _log() {
+		if (analyticsConfig.debuggingEnabled !== 'true') return;
+
 		const logArguments = ['[ANALYTICS]'];
 		logArguments.push(...arguments);
 		console.log.apply(this, logArguments);
 	}
 
 	function _initialize() {
+		if (!analyticsConfig.context) throw new Error('Missing context in analytics config');
+		if (!analyticsConfig.objectName) throw new Error('Missing object name in analytics config');
+		if (!analyticsConfig.storageNamespace) throw new Error('Missing storage namespace in analytics config');
+		if (!analyticsConfig.apiBaseUrl) throw new Error('Missing API base URL in analytics config');
+
 		// TODO: enable access to data attributes via document.currentScript.dataset
 		// Examples are:
 		// * API base URL
@@ -20,10 +26,11 @@
 
 		// Generate and store fingerprint if one doesn't already exist
 		const fingerprint = _getFingerprint();
-		if (!_getFingerprint()) _setFingerprint(window.crypto.randomUUID());
+		if (!fingerprint) _setFingerprint(window.crypto.randomUUID());
 
 		// Generate and store a session identifier
-		_setSessionId(window.crypto.randomUUID());
+		const sessionId = _getSessionId();
+		if (!sessionId) _setSessionId(window.crypto.randomUUID());
 
 		// Let backend know this is a fresh session
 		_persistEvent('SESSION_STARTED');
@@ -96,49 +103,53 @@
 	}
 
 	function _getAccountId() {
-		return window.localStorage.getItem(ACCOUNT_ID_STORAGE_KEY);
+		return window.localStorage.getItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY));
 	}
 
 	function _setAccountId(accountId) {
 		if (accountId) {
 			_log(`Setting account ID ${accountId}`);
-			window.localStorage.setItem(ACCOUNT_ID_STORAGE_KEY, accountId);
+			window.localStorage.setItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY), accountId);
 		} else {
 			_log('Clearing account ID');
-			window.localStorage.removeItem(ACCOUNT_ID_STORAGE_KEY);
+			window.localStorage.removeItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY));
 		}
 	}
 
 	function _getFingerprint() {
-		return window.localStorage.getItem(FINGERPRINT_STORAGE_KEY);
+		return window.localStorage.getItem(_namespacedKeyValue(FINGERPRINT_STORAGE_KEY));
 	}
 
 	function _setFingerprint(fingerprint) {
 		if (fingerprint) {
 			_log(`Setting fingerprint ${fingerprint}`);
-			window.localStorage.setItem(FINGERPRINT_STORAGE_KEY, fingerprint);
+			window.localStorage.setItem(_namespacedKeyValue(FINGERPRINT_STORAGE_KEY), fingerprint);
 		} else {
 			_log('Clearing fingerprint');
-			window.localStorage.removeItem(FINGERPRINT_STORAGE_KEY);
+			window.localStorage.removeItem(_namespacedKeyValue(FINGERPRINT_STORAGE_KEY));
 		}
 	}
 
 	function _getSessionId() {
-		return window.sessionStorage.getItem(SESSION_ID_STORAGE_KEY);
+		return window.sessionStorage.getItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
 	}
 
 	function _setSessionId(sessionId) {
 		if (sessionId) {
 			_log(`Setting session ID ${sessionId}`);
-			window.sessionStorage.setItem(SESSION_ID_STORAGE_KEY, sessionId);
+			window.sessionStorage.setItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY), sessionId);
 		} else {
 			_log('Clearing session ID');
-			window.sessionStorage.removeItem(SESSION_ID_STORAGE_KEY);
+			window.sessionStorage.removeItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
 		}
 	}
 
+	function _namespacedKeyValue(nonNamespacedKeyValue) {
+		return `${analyticsConfig.storageNamespace}.${nonNamespacedKeyValue}`;
+	}
+
 	// Public interface
-	context[analyticsName] = {
+	analyticsConfig.context[analyticsConfig.analyticsObjectName] = {
 		// Sends a log event to the backend
 		persistEvent: _persistEvent,
 		// Sets/clears the account identifier to be included in events.
@@ -153,4 +164,10 @@
 	};
 
 	_initialize();
-})(window, '__analytics');
+})({
+	context: window,
+	objectName: document.currentScript.dataset.objectname,
+	storageNamespace: document.currentScript.dataset.storagenamespace,
+	apiBaseUrl: document.currentScript.dataset.apibaseurl,
+	debuggingEnabled: document.currentScript.dataset.debuggingenabled,
+});
