@@ -31,9 +31,9 @@
 		// TODO: have internal event types like these that clients cannot use
 		document.addEventListener('visibilitychange', (event) => {
 			if (document.visibilityState === 'visible') {
-				_persistEvent('BROWSER_VISIBLE');
+				_persistEvent('WEBPAGE_VISIBLE');
 			} else if (document.visibilityState === 'hidden') {
-				_persistEvent('BROWSER_HIDDEN');
+				_persistEvent('WEBPAGE_HIDDEN');
 			}
 		});
 
@@ -48,7 +48,10 @@
 
 	function _persistEvent(type, data) {
 		const timestampOrigin = window.performance.timeOrigin;
-		const timestamp = window.performance.timeOrigin + window.performance.now();
+		// Special handling for SESSION_STARTED event: use the origin timestamp as the event timestamp.
+		// Suppose we did not do this - then the event timestamp would be very slightly (and not meaningfully) different than the origin timestamp, and might create confusion during analysis ("which timestamp is the right one to use for the start of the session?")
+		const timestamp = type === 'SESSION_STARTED' ? timestampOrigin : timestampOrigin + window.performance.now();
+
 		const event = {
 			type: type,
 			data: data ? data : {},
@@ -66,6 +69,11 @@
 				width: window.screen.width,
 				height: window.screen.height,
 				orientation: window.screen.orientation ? window.screen.orientation.type : undefined,
+			},
+			window: {
+				width: window.innerWidth,
+				height: window.innerHeight,
+				devicePixelRatio: window.devicePixelRatio,
 			},
 		};
 
