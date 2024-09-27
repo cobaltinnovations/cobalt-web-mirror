@@ -1,5 +1,4 @@
 (function (analyticsConfig) {
-	// TODO: use data- attribute to prefix/namespace
 	const ACCOUNT_ID_STORAGE_KEY = 'ACCOUNT_ID';
 	const SESSION_ID_STORAGE_KEY = 'SESSION_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
