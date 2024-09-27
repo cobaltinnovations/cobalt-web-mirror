@@ -81,10 +81,11 @@
 
 		// const apiBaseUrl = "http://localhost:9999";
 
-		// window.fetch(`${apiBaseUrl}/event`, {
+		// window.fetch(`${apiBaseUrl}/analytics-native-events`, {
 		//     method: "POST",
 		//     headers: {
 		//         "Content-Type": "application/json",
+		//          "X-Cobalt-Analytics": "true"
 		//     },
 		//     body: JSON.stringify(event),
 		//     keepalive: true,
