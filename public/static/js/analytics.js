@@ -1,5 +1,5 @@
 (function (analyticsConfig) {
-	const ACCOUNT_ID_STORAGE_KEY = 'ACCOUNT_ID';
+	const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
 	const SESSION_ID_STORAGE_KEY = 'SESSION_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
@@ -32,9 +32,9 @@
 		// TODO: have internal event types like these that clients cannot use
 		document.addEventListener('visibilitychange', (event) => {
 			if (document.visibilityState === 'visible') {
-				_persistEvent('WEBPAGE_VISIBLE');
+				_persistEvent('BROUGHT_TO_FOREGROUND');
 			} else if (document.visibilityState === 'hidden') {
-				_persistEvent('WEBPAGE_HIDDEN');
+				_persistEvent('SENT_TO_BACKGROUND');
 			}
 		});
 
@@ -47,67 +47,52 @@
 		//_persistEvent('URL_CHANGED', { url: window.location.href });
 	}
 
-	function _persistEvent(type, data) {
-		const timestampOrigin = window.performance.timeOrigin;
-		// Special handling for SESSION_STARTED event: use the origin timestamp as the event timestamp.
-		// Suppose we did not do this - then the event timestamp would be very slightly (and not meaningfully) different than the origin timestamp, and might create confusion during analysis ("which timestamp is the right one to use for the start of the session?")
-		const timestamp = type === 'SESSION_STARTED' ? timestampOrigin : timestampOrigin + window.performance.now();
+	function _persistEvent(analyticsNativeEventTypeId, data) {
+		const timestamp = window.performance.timeOrigin + window.performance.now();
+		const accessToken = _getAccessToken();
+		console.log('accessToken', accessToken);
 
 		const event = {
-			type: type,
+			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
 			data: data ? data : {},
-			accountId: _getAccountId(),
 			fingerprint: _getFingerprint(),
 			sessionId: _getSessionId(),
-			sessionStartedTimestamp: timestampOrigin,
 			timestamp: timestamp,
 			url: window.location.href,
 			userAgent: window.navigator.userAgent,
-			// See https://developer.mozilla.org/en-US/docs/Web/API/Screen
-			screen: {
-				colorDepth: window.screen.colorDepth,
-				pixelDepth: window.screen.pixelDepth,
-				width: window.screen.width,
-				height: window.screen.height,
-				orientation: window.screen.orientation ? window.screen.orientation.type : undefined,
-			},
-			window: {
-				width: window.innerWidth,
-				height: window.innerHeight,
-				devicePixelRatio: window.devicePixelRatio,
-			},
+			screenColorDepth: window.screen.colorDepth,
+			screenPixelDepth: window.screen.pixelDepth,
+			screenWidth: window.screen.width,
+			screenHeight: window.screen.height,
+			screenOrientation: window.screen.orientation ? window.screen.orientation.type : undefined,
+			windowWidth: window.innerWidth,
+			windowHeight: window.innerHeight,
+			windowDevicePixelRatio: window.devicePixelRatio,
 		};
 
 		_log('TODO: persist event', event);
 
 		// const apiBaseUrl = "http://localhost:9999";
 
-		// window.fetch(`${apiBaseUrl}/analytics-native-events`, {
-		//     method: "POST",
-		//     headers: {
-		//         "Content-Type": "application/json",
-		//          "X-Cobalt-Analytics": "true"
-		//     },
-		//     body: JSON.stringify(event),
-		//     keepalive: true,
-		// })
-		// .catch((error) => {
-		//     _log("*** ERROR PERSISTING EVENT ***", event, error);
-		// });
+		window
+			.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-events`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Cobalt-Access-Token': accessToken ? accessToken : '',
+					'X-Cobalt-Webapp-Current-Url': window.location.href,
+					'X-Cobalt-Analytics': 'true',
+				},
+				body: JSON.stringify(event),
+				keepalive: true,
+			})
+			.catch((error) => {
+				_log('*** ERROR PERSISTING EVENT ***', event, error);
+			});
 	}
 
-	function _getAccountId() {
-		return window.localStorage.getItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY));
-	}
-
-	function _setAccountId(accountId) {
-		if (accountId) {
-			_log(`Setting account ID ${accountId}`);
-			window.localStorage.setItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY), accountId);
-		} else {
-			_log('Clearing account ID');
-			window.localStorage.removeItem(_namespacedKeyValue(ACCOUNT_ID_STORAGE_KEY));
-		}
+	function _getAccessToken() {
+		return _getCookie(ACCESS_TOKEN_COOKIE_NAME);
 	}
 
 	function _getFingerprint() {
@@ -142,18 +127,20 @@
 		return `${analyticsConfig.storageNamespace}.${nonNamespacedKeyValue}`;
 	}
 
+	// Thanks to https://stackoverflow.com/a/52235935
+	function _getCookie(name) {
+		return (document.cookie.match('(?:^|;)\\s*' + name.trim() + '\\s*=\\s*([^;]*?)\\s*(?:;|$)') || [])[1];
+	}
+
 	// Public interface
 	analyticsConfig.context[analyticsConfig.analyticsObjectName] = {
 		// Sends a log event to the backend
 		persistEvent: _persistEvent,
-		// Sets/clears the account identifier to be included in events.
-		// This identifier persists when the browser is closed.
-		setAccountId: _setAccountId,
-		getAccountId: _getAccountId,
-		// Sets/clears the session identifier to be included in events.
+		// Gets the session identifier to be included in events.
 		// This identifier is cleared when the browser is closed.
-		setSessionId: _setSessionId,
 		getSessionId: _getSessionId,
+		// Gets the fingerprint to be included in events.
+		// The fingerprint persists until the user clears localstorage.
 		getFingerprint: _getFingerprint,
 	};
 
