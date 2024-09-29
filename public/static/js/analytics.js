@@ -49,9 +49,15 @@
 
 		// Persist events when SPA URL changes occur
 		window.navigation.addEventListener('navigate', (event) => {
+			const url = event.destination.url;
+			const previousUrl = window.location.href;
+
+			// Ignore spurious events
+			if (url === previousUrl) return;
+
 			_persistEvent('URL_CHANGED', {
-				url: event.destination.url,
-				previousUrl: window.location.href,
+				url: url,
+				previousUrl: previousUrl,
 			});
 		});
 
