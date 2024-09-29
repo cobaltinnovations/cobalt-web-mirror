@@ -29,7 +29,7 @@
 			_persistEvent('SESSION_STARTED');
 		}
 
-		// TODO: have internal event types like these that clients cannot use
+		// Persist events when browser tab is backgrounded/foregrounded
 		document.addEventListener('visibilitychange', (event) => {
 			if (document.visibilityState === 'visible') {
 				_persistEvent('BROUGHT_TO_FOREGROUND');
@@ -38,13 +38,19 @@
 			}
 		});
 
-		// Let router handle URL changes instead of tracking them here
+		// Persist events when SPA URL changes occur
+		window.navigation.addEventListener('navigate', (event) => {
+			_persistEvent('URL_CHANGED', {
+				url: event.destination.url,
+				previousUrl: window.location.href,
+			});
+		});
 
-		// window.navigation.addEventListener('navigate', (event) => {
-		// 	_persistEvent('URL_CHANGED', { url: event.destination.url });
-		// });
-
-		//_persistEvent('URL_CHANGED', { url: window.location.href });
+		// Persist this initial load as special URL change
+		_persistEvent('URL_CHANGED', {
+			url: window.location.href,
+			previousUrl: null,
+		});
 	}
 
 	function _generateUUID() {
@@ -84,7 +90,7 @@
 			windowDevicePixelRatio: window.devicePixelRatio,
 		};
 
-		const hasData = data && Object.keys(data) > 0;
+		const hasData = data && Object.keys(data).length > 0;
 
 		if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
 		else _log(`Persisting event ${analyticsNativeEventTypeId}`);
