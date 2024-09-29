@@ -19,12 +19,12 @@
 
 		// Generate and store fingerprint if one doesn't already exist
 		const fingerprint = _getFingerprint();
-		if (!fingerprint) _setFingerprint(window.crypto.randomUUID());
+		if (!fingerprint) _setFingerprint(_generateUUID());
 
 		// Generate and store a session identifier if one doesn't already exist
 		const sessionId = _getSessionId();
 		if (!sessionId) {
-			_setSessionId(window.crypto.randomUUID());
+			_setSessionId(_generateUUID());
 			// Let backend know this is a fresh session
 			_persistEvent('SESSION_STARTED');
 		}
@@ -47,10 +47,24 @@
 		//_persistEvent('URL_CHANGED', { url: window.location.href });
 	}
 
+	function _generateUUID() {
+		// The window.crypto.randomUUID() method fails unless
+		// used on 'localhost' or HTTPS.
+		// Fall back to a "good enough" UUID generator for local environments
+		// that do not use localhost (e.g. non-default institutions)
+		try {
+			return window.crypto.randomUUID();
+		} catch (ignored) {
+			// Thanks to https://stackoverflow.com/a/2117523
+			return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
+				(+c ^ (window.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
+			);
+		}
+	}
+
 	function _persistEvent(analyticsNativeEventTypeId, data) {
 		const timestamp = window.performance.timeOrigin + window.performance.now();
 		const accessToken = _getAccessToken();
-		console.log('accessToken', accessToken);
 
 		const event = {
 			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
@@ -70,9 +84,10 @@
 			windowDevicePixelRatio: window.devicePixelRatio,
 		};
 
-		_log('TODO: persist event', event);
+		const hasData = data && Object.keys(data) > 0;
 
-		// const apiBaseUrl = "http://localhost:9999";
+		if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
+		else _log(`Persisting event ${analyticsNativeEventTypeId}`);
 
 		window
 			.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-events`, {
@@ -80,6 +95,7 @@
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Cobalt-Access-Token': accessToken ? accessToken : '',
+					'X-Cobalt-Webapp-Base-Url': window.location.origin,
 					'X-Cobalt-Webapp-Current-Url': window.location.href,
 					'X-Cobalt-Analytics': 'true',
 				},
