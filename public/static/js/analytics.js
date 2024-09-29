@@ -17,6 +17,15 @@
 		if (!analyticsConfig.storageNamespace) throw new Error('Missing storage namespace in analytics config');
 		if (!analyticsConfig.apiBaseUrl) throw new Error('Missing API base URL in analytics config');
 
+		// In local environments, use a hardcoded default.
+		// This avoids a lengthy React build process.
+		if (analyticsConfig.apiBaseUrl === '%ANALYTICS_API_BASE_URL%') {
+			analyticsConfig.apiBaseUrl = 'http://localhost:8080';
+		}
+
+		// Normalize API base URL by removing trailing slash, if present
+		analyticsConfig.apiBaseUrl = analyticsConfig.apiBaseUrl.replace(/\/$/, '');
+
 		// Generate and store fingerprint if one doesn't already exist
 		const fingerprint = _getFingerprint();
 		if (!fingerprint) _setFingerprint(_generateUUID());
