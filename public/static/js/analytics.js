@@ -38,19 +38,74 @@
 			_persistEvent('SESSION_STARTED');
 		}
 
-		// Persist events when browser tab is backgrounded/foregrounded
-		document.addEventListener('visibilitychange', (event) => {
-			if (document.visibilityState === 'visible') {
-				_persistEvent('BROUGHT_TO_FOREGROUND');
-			} else if (document.visibilityState === 'hidden') {
-				_persistEvent('SENT_TO_BACKGROUND');
-			}
+		_registerVisibilityChangeListener();
+		_registerUrlChangedListenerUsingMutationObserver();
+
+		// Persist this initial load as special URL change
+		_persistEvent('URL_CHANGED', {
+			url: window.location.href,
+			previousUrl: null,
+		});
+	}
+
+	// Persist events when browser tab is backgrounded/foregrounded.
+	function _registerVisibilityChangeListener() {
+		let justReceivedPageHide = false;
+
+		window.addEventListener('pagehide', (event) => {
+			justReceivedPageHide = true;
 		});
 
-		// Persist events when SPA URL changes occur
+		// On hard reloads, Safari will trigger a spurious SENT_TO_BACKGROUND.
+		// We detect and ignore this by listening for pagehide events and setting a flag here.
+		document.addEventListener('visibilitychange', (event) => {
+			if (justReceivedPageHide) {
+				justReceivedPageHide = false;
+			} else {
+				if (document.visibilityState === 'visible') {
+					_persistEvent('BROUGHT_TO_FOREGROUND');
+				} else if (document.visibilityState === 'hidden') {
+					_persistEvent('SENT_TO_BACKGROUND');
+				}
+			}
+		});
+	}
+
+	// Detect URL changes without having to use experimental navigate API (see _registerUrlChangedListenerUsingNavigateApi()).
+	// Thanks to https://stackoverflow.com/a/46428962
+	function _registerUrlChangedListenerUsingMutationObserver() {
+		const observeUrlChange = () => {
+			let oldHref = document.location.href;
+			const body = document.querySelector('body');
+			const observer = new MutationObserver((mutations) => {
+				if (oldHref !== document.location.href) {
+					const url = document.location.href;
+					const previousUrl = oldHref;
+					oldHref = document.location.href;
+
+					_persistEvent('URL_CHANGED', {
+						url: url,
+						previousUrl: previousUrl,
+					});
+				}
+			});
+
+			observer.observe(body, {
+				childList: true,
+				subtree: true,
+			});
+		};
+
+		observeUrlChange();
+	}
+
+	// This API is not supported in Firefox/Safari as of October 2024.
+	// Prefer _registerUrlChangedListenerUsingMutationObserver() instead.
+	function _registerUrlChangedListenerUsingNavigateApi() {
 		window.navigation.addEventListener('navigate', (event) => {
 			const url = event.destination.url;
 			const previousUrl = window.location.href;
+			// const performanceNavigationTiming =_extractPerformanceNavigationTiming();
 
 			// Ignore spurious events
 			if (url === previousUrl) return;
@@ -60,12 +115,15 @@
 				previousUrl: previousUrl,
 			});
 		});
+	}
 
-		// Persist this initial load as special URL change
-		_persistEvent('URL_CHANGED', {
-			url: window.location.href,
-			previousUrl: null,
-		});
+	// This API is not supported in Safari as of October 2024.
+	// Don't use it for now.
+	function _extractPerformanceNavigationTiming() {
+		const navigationEntries = window.performance ? window.performance.getEntriesByType('navigation') : [];
+		if (!navigationEntries || navigationEntries.length === 0) return undefined;
+
+		return navigationEntries[0];
 	}
 
 	function _generateUUID() {
