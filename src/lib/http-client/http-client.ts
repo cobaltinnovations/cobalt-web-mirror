@@ -48,7 +48,12 @@ export class HttpClient {
 						headers[httpConfig.tokenHeaderKey] = accessToken;
 					}
 
+					const clientDeviceFingerprint = window.localStorage.getItem('cobaltAnalytics.FINGERPRINT');
+
 					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
+					headers['X-Client-Device-Fingerprint'] = clientDeviceFingerprint;
+					headers['X-Client-Device-Type-Id'] = 'WEB_BROWSER';
+					headers['X-Client-Device-App-Name'] = 'Cobalt Webapp';
 
 					return data;
 				},
