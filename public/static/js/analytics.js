@@ -148,7 +148,6 @@
 		const event = {
 			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
 			data: data ? data : {},
-			sessionId: _getSessionId(),
 			timestamp: timestamp,
 			url: window.location.href,
 			userAgent: window.navigator.userAgent,
@@ -178,6 +177,7 @@
 					'X-Client-Device-Fingerprint': _getFingerprint(),
 					'X-Client-Device-Type-Id': 'WEB_BROWSER',
 					'X-Client-Device-App-Name': 'Cobalt Webapp',
+					'X-Client-Device-Session-Id': _getSessionId(),
 					'X-Cobalt-Analytics': 'true',
 				},
 				body: JSON.stringify(event),
