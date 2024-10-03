@@ -31,6 +31,12 @@
 		// Normalize API base URL by removing trailing slash, if present
 		analyticsConfig.apiBaseUrl = analyticsConfig.apiBaseUrl.replace(/\/$/, '');
 
+		const queryParameters = _extractQueryParametersForCurrentUrl();
+		const referringMessageId = queryParameters['a.m'];
+		const referringSourceId = queryParameters['a.s'];
+
+		// TODO: store off referring message/source in session storage if present, and include in new request headers
+
 		// Generate and store fingerprint if one doesn't already exist
 		const fingerprint = _getFingerprint();
 		if (!fingerprint) _setFingerprint(_generateUUID());
@@ -143,6 +149,21 @@
 			return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
 				(+c ^ (window.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
 			);
+		}
+	}
+
+	function _extractQueryParametersForCurrentUrl() {
+		try {
+			const urlSearchParameters = new URLSearchParams(window.location.search);
+			const queryParameters = {};
+
+			for (let key of urlSearchParameters.keys()) {
+				queryParameters[key] = urlSearchParameters.get(key);
+			}
+
+			return queryParameters;
+		} catch (ignored) {
+			return {};
 		}
 	}
 
