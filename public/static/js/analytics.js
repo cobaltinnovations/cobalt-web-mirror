@@ -15,12 +15,17 @@
 		if (!analyticsConfig.context) throw new Error('Missing context in analytics config');
 		if (!analyticsConfig.objectName) throw new Error('Missing object name in analytics config');
 		if (!analyticsConfig.storageNamespace) throw new Error('Missing storage namespace in analytics config');
+		if (!analyticsConfig.appVersion) throw new Error('Missing app version in analytics config');
 		if (!analyticsConfig.apiBaseUrl) throw new Error('Missing API base URL in analytics config');
 
 		// In local environments, use a hardcoded default.
 		// This avoids a lengthy React build process.
 		if (analyticsConfig.apiBaseUrl === '%ANALYTICS_API_BASE_URL%') {
 			analyticsConfig.apiBaseUrl = 'http://localhost:8080';
+		}
+
+		if (analyticsConfig.appVersion === '%ANALYTICS_APP_VERSION%') {
+			analyticsConfig.appVersion = 'local';
 		}
 
 		// Normalize API base URL by removing trailing slash, if present
@@ -149,8 +154,6 @@
 			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
 			data: data ? data : {},
 			timestamp: timestamp,
-			url: window.location.href,
-			userAgent: window.navigator.userAgent,
 			screenColorDepth: window.screen.colorDepth,
 			screenPixelDepth: window.screen.pixelDepth,
 			screenWidth: window.screen.width,
@@ -177,6 +180,7 @@
 					'X-Client-Device-Fingerprint': _getFingerprint(),
 					'X-Client-Device-Type-Id': 'WEB_BROWSER',
 					'X-Client-Device-App-Name': 'Cobalt Webapp',
+					'X-Client-Device-App-Version': analyticsConfig.appVersion,
 					'X-Client-Device-Session-Id': _getSessionId(),
 					'X-Cobalt-Analytics': 'true',
 				},
@@ -247,5 +251,6 @@
 	objectName: document.currentScript.dataset.objectname,
 	storageNamespace: document.currentScript.dataset.storagenamespace,
 	apiBaseUrl: document.currentScript.dataset.apibaseurl,
+	appVersion: document.currentScript.dataset.appversion,
 	debuggingEnabled: document.currentScript.dataset.debuggingenabled,
 });

@@ -139,6 +139,7 @@ function indexFileContentsForPath(indexFilePath) {
 
 		indexFileContents = fs.readFileSync(indexFilePath, { encoding: 'utf8', flag: 'r' });
 		indexFileContents = indexFileContents.replace('%ANALYTICS_API_BASE_URL%', settings.nodeApp.webApiBaseUrl);
+		indexFileContents = indexFileContents.replace('%ANALYTICS_APP_VERSION%', 'TODO');
 		indexFileContentsInMemoryCache[indexFilePath] = indexFileContents;
 	}
 
