@@ -25,6 +25,7 @@ try {
 }
 
 const port = process.env.COBALT_WEB_PORT || 3000;
+const gitCommitHash = process.env.GIT_COMMIT_HASH;
 const launchDate = new Date();
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
@@ -139,7 +140,10 @@ function indexFileContentsForPath(indexFilePath) {
 
 		indexFileContents = fs.readFileSync(indexFilePath, { encoding: 'utf8', flag: 'r' });
 		indexFileContents = indexFileContents.replace('%ANALYTICS_API_BASE_URL%', settings.nodeApp.webApiBaseUrl);
-		indexFileContents = indexFileContents.replace('%ANALYTICS_APP_VERSION%', 'TODO');
+		indexFileContents = indexFileContents.replace(
+			'%ANALYTICS_APP_VERSION%',
+			gitCommitHash ? gitCommitHash : 'unknown'
+		);
 		indexFileContentsInMemoryCache[indexFilePath] = indexFileContents;
 	}
 
