@@ -7,6 +7,8 @@ import { accountService } from '@/lib/services';
 import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/institution';
 import { useAppRootLoaderData } from '@/routes/root';
 
+import { config } from '@/config';
+
 type AccountContextConfig = {
 	account: AccountModel | undefined;
 	institution: Institution;
@@ -44,7 +46,9 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		Cookies.remove('groupSessionCollectionUrlName');
 		Cookies.remove('groupSessionDetailFromTopicCenterPath');
 		Cookies.remove('permittedAccountSourceIds');
-		window.localStorage.clear();
+
+		window.localStorage.removeItem(config.storageKeys.mhicRecentOrdersStorageKey);
+		window.localStorage.removeItem(config.storageKeys.chunkloadRefreshKey);
 
 		try {
 			if (!accountId) {
