@@ -184,10 +184,6 @@
 	}
 
 	function _persistEvent(analyticsNativeEventTypeId, data) {
-		// If the browser tries to pre-fetch (e.g. if you have a URL typed in the address bar but haven't hit enter)
-		// then don't send any events
-		if (document.visibilityState === 'prerender') return false;
-
 		_ensureFingerprintAndSessionExist();
 
 		const timestamp = window.performance.timeOrigin + window.performance.now();
@@ -207,6 +203,7 @@
 			windowWidth: window.innerWidth,
 			windowHeight: window.innerHeight,
 			windowDevicePixelRatio: window.devicePixelRatio,
+			documentVisibilityState: document.visibilityState,
 		};
 
 		const hasData = data && Object.keys(data).length > 0;
