@@ -1,6 +1,8 @@
 (function (analyticsConfig) {
 	const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
 	const SESSION_ID_STORAGE_KEY = 'SESSION_ID';
+	const REFERRING_MESSAGE_ID_STORAGE_KEY = 'REFERRING_MESSAGE_ID';
+	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
 	function _log() {
@@ -33,22 +35,12 @@
 
 		const queryParameters = _extractQueryParametersForCurrentUrl();
 		const referringMessageId = queryParameters['a.m'];
-		const referringSourceId = queryParameters['a.s'];
+		const referringCampaignId = queryParameters['a.c'];
 
-		// TODO: store off referring message/source in session storage if present, and include in new request headers
+		if (referringMessageId) _setReferringMessageId(referringMessageId);
+		if (referringCampaignId) _setReferringCampaignId(referringCampaignId);
 
-		// Generate and store fingerprint if one doesn't already exist
-		const fingerprint = _getFingerprint();
-		if (!fingerprint) _setFingerprint(_generateUUID());
-
-		// Generate and store a session identifier if one doesn't already exist
-		const sessionId = _getSessionId();
-		if (!sessionId) {
-			_setSessionId(_generateUUID());
-			// Let backend know this is a fresh session
-			_persistEvent('SESSION_STARTED');
-		}
-
+		_ensureFingerprintAndSessionExist();
 		_registerVisibilityChangeListener();
 		_registerUrlChangedListenerUsingMutationObserver();
 
@@ -167,9 +159,27 @@
 		}
 	}
 
+	function _ensureFingerprintAndSessionExist() {
+		// Generate and store fingerprint if one doesn't already exist
+		const fingerprint = _getFingerprint();
+		if (!fingerprint) _setFingerprint(_generateUUID());
+
+		// Generate and store a session identifier if one doesn't already exist
+		const sessionId = _getSessionId();
+		if (!sessionId) {
+			_setSessionId(_generateUUID());
+			// Let backend know this is a fresh session
+			_persistEvent('SESSION_STARTED');
+		}
+	}
+
 	function _persistEvent(analyticsNativeEventTypeId, data) {
+		_ensureFingerprintAndSessionExist();
+
 		const timestamp = window.performance.timeOrigin + window.performance.now();
 		const accessToken = _getAccessToken();
+		const referringMessageId = _getReferringMessageId();
+		const referringCampaignId = _getReferringCampaignId();
 
 		const event = {
 			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
@@ -203,6 +213,8 @@
 					'X-Client-Device-App-Name': 'Cobalt Webapp',
 					'X-Client-Device-App-Version': analyticsConfig.appVersion,
 					'X-Client-Device-Session-Id': _getSessionId(),
+					'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
+					'X-Cobalt-Referring-Campaign-Id': referringCampaignId ? referringCampaignId : '',
 					'X-Cobalt-Analytics': 'true',
 				},
 				body: JSON.stringify(event),
@@ -242,6 +254,34 @@
 		} else {
 			_log('Clearing session ID');
 			window.sessionStorage.removeItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
+		}
+	}
+
+	function _getReferringMessageId() {
+		return window.sessionStorage.getItem(_namespacedKeyValue(REFERRING_MESSAGE_ID_STORAGE_KEY));
+	}
+
+	function _setReferringMessageId(referringMessageId) {
+		if (referringMessageId) {
+			_log(`Setting referring message ID ${referringMessageId}`);
+			window.sessionStorage.setItem(_namespacedKeyValue(REFERRING_MESSAGE_ID_STORAGE_KEY), referringMessageId);
+		} else {
+			_log('Clearing referring message ID');
+			window.sessionStorage.removeItem(_namespacedKeyValue(REFERRING_MESSAGE_ID_STORAGE_KEY));
+		}
+	}
+
+	function _getReferringCampaignId() {
+		return window.sessionStorage.getItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY));
+	}
+
+	function _setReferringCampaignId(referringCampaignId) {
+		if (referringCampaignId) {
+			_log(`Setting referring campaign ID ${referringCampaignId}`);
+			window.sessionStorage.setItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY), referringCampaignId);
+		} else {
+			_log('Clearing referring campaign ID');
+			window.sessionStorage.removeItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY));
 		}
 	}
 
