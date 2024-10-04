@@ -5,6 +5,15 @@
 	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
+	// Some browsers will intermittently "forget" session storage during same-tab redirect flows.
+	// This has the undesirable effect of causing new sessions to be created even though the user has not closed the tab.
+	// To work around, we keep "last used" session storage data in more durable localstorage
+	// and then if the "last used" time is within a threshold, we can assume a redirect occurred that wiped the session data.
+	// This isn't perfect but generally what we want - e.g. it's possible to break this by having multiple browser tabs open
+	// and simultaneously redirecting in both, but that is an unlikely scenario.
+	// See https://stackoverflow.com/a/77454640
+	const MOST_RECENT_SESSION_STORAGE_KEY = 'MOST_RECENT_SESSION';
+
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
 
