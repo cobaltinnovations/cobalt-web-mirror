@@ -6,7 +6,8 @@
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
 	// Some browsers will intermittently "forget" session storage during same-tab redirect flows.
-	// This has the undesirable effect of causing new sessions to be created even though the user has not closed the tab.
+	// This appears to be a race condition related to prefetching.
+	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab.
 	// To work around, we keep "last used" session storage data in more durable localstorage
 	// and then if the "last used" time is within a threshold, we can assume a redirect occurred that wiped the session data.
 	// This isn't perfect but generally what we want - e.g. it's possible to break this by having multiple browser tabs open
@@ -183,6 +184,10 @@
 	}
 
 	function _persistEvent(analyticsNativeEventTypeId, data) {
+		// If the browser tries to pre-fetch (e.g. if you have a URL typed in the address bar but haven't hit enter)
+		// then don't send any events
+		if (document.visibilityState === 'prerender') return false;
+
 		_ensureFingerprintAndSessionExist();
 
 		const timestamp = window.performance.timeOrigin + window.performance.now();
