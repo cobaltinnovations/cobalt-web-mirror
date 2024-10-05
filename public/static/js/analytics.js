@@ -15,7 +15,7 @@
 	// See https://stackoverflow.com/a/77454640
 	// const MOST_RECENT_SESSION_STORAGE_KEY = 'MOST_RECENT_SESSION';
 
-	let hasPersistedSessionStartedEvent = false;
+	// let hasPersistedSessionStartedEvent = false;
 
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
@@ -188,9 +188,8 @@
 	function _persistEvent(analyticsNativeEventTypeId, data) {
 		// Ignore any events until `SESSION_STARTED` happens and we are visible.
 		// This is to ignore spurious events caused by browser prefetching, e.g. when typing in the URL but before hitting 'enter'
-		if (!hasPersistedSessionStartedEvent && document.visibilityState === 'hidden') return;
-
-		if (analyticsNativeEventTypeId === 'SESSION_STARTED') hasPersistedSessionStartedEvent = true;
+		// if (!hasPersistedSessionStartedEvent && document.visibilityState === 'hidden') return;
+		// if (analyticsNativeEventTypeId === 'SESSION_STARTED') hasPersistedSessionStartedEvent = true;
 
 		_ensureFingerprintAndSessionExist();
 
