@@ -12,8 +12,9 @@ import {
 	TagGroup,
 	Content,
 	Tag,
+	AnalyticsNativeEventTypeId,
 } from '@/lib/models';
-import { callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
+import { analyticsService, callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
@@ -176,6 +177,13 @@ const ResourceLibrary = () => {
 			setTagGroups([]);
 			setContentsByTagGroupId(undefined);
 			setTagsByTagId(searchResponse.tagsByTagId);
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+				mode: 'SEARCH',
+				searchQuery: searchQuery,
+				totalCount: searchResponse.findResult.totalCount,
+			});
+
 			return;
 		}
 
@@ -196,6 +204,12 @@ const ResourceLibrary = () => {
 			setTagGroups([]);
 			setContentsByTagGroupId(undefined);
 			setTagsByTagId(recommendedResponse.tagsByTagId);
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+				mode: 'RECOMMENDED',
+				totalCount: recommendedResponse.findResult.totalCount,
+			});
+
 			return;
 		}
 
@@ -207,6 +221,10 @@ const ResourceLibrary = () => {
 		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
 		setTagsByTagId(response.tagsByTagId);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+			mode: 'DEFAULT',
+		});
 	}, [contentDurationIdQuery, contentTypeIdQuery, recommendedContent, searchQuery, tagIdQuery]);
 
 	const applyRecommendedFilterValuesToSearchParam = (values: string[], searchParam: string) => {
