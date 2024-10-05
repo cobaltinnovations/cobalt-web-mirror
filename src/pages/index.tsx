@@ -19,6 +19,7 @@ import {
 	callToActionService,
 	screeningService,
 	institutionService,
+	analyticsService,
 } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
@@ -29,6 +30,7 @@ import {
 	InstitutionBlurb,
 	Content,
 	Tag,
+	AnalyticsNativeEventTypeId,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -131,6 +133,8 @@ const Index: FC = () => {
 				// dont throw
 			}
 		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_HOME);
 	}, [account?.accountId]);
 
 	const fetchCallsToAction = useCallback(async () => {
