@@ -5,8 +5,8 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
-import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
-import { resourceLibraryService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
+import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
@@ -114,6 +114,13 @@ const ResourceLibraryTags = () => {
 		setFindResultTotalCount(findResult.totalCount);
 		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContent(findResult.contents);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG, {
+			tagId: tagId,
+			contentTypeIds: contentTypeIdQuery,
+			contentDurationIds: contentDurationIdQuery,
+			totalCount: findResult.totalCount,
+		});
 	}, [contentDurationIdQuery, contentTypeIdQuery, tagId]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
