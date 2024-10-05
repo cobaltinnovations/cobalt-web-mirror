@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { LoaderFunctionArgs, redirect, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import { getSubdomain } from '@/lib/utils';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 function useStudyOnboardingLoaderData() {
 	return useRouteLoaderData('study-onboarding') as Awaited<ReturnType<typeof loader>>;
@@ -68,7 +69,7 @@ export const Component = () => {
 		if (isLoggedInAndPermitted) {
 			redirectToOnboardingDestination();
 		} else {
-			signOutAndClearContext();
+			signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.STUDY_ONBOARDING);
 			Cookies.set('permittedAccountSourceIds', JSON.stringify(permittedAccountSourceIds));
 
 			redirectToOnboardingDestination();

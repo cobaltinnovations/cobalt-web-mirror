@@ -314,7 +314,7 @@
 	}
 
 	// Public interface
-	analyticsConfig.context[analyticsConfig.analyticsObjectName] = {
+	analyticsConfig.context[analyticsConfig.objectName] = {
 		// Sends a log event to the backend
 		persistEvent: _persistEvent,
 		// Gets the session identifier to be included in events.

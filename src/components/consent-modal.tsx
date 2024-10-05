@@ -9,6 +9,7 @@ import { Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import { useRevalidator } from 'react-router-dom';
 import LoadingButton from './loading-button';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -65,7 +66,7 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 									.rejectConsent(account.accountId)
 									.fetch()
 									.then((response) => {
-										signOutAndClearContext();
+										signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM);
 									})
 									.catch((e) => {
 										handleError(e);

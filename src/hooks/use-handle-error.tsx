@@ -6,6 +6,7 @@ import { ErrorModalContext } from '@/contexts/error-modal-context';
 import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 import useAccount from './use-account';
 import axios from 'axios';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 function useHandleError(handler?: (error: CobaltError) => boolean | Promise<boolean>): (error: unknown) => void {
 	const { signOutAndClearContext } = useAccount();
@@ -41,7 +42,7 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 					setSignOnUrl(handled.apiError.signOnUrl);
 					setShowReauthModal(true);
 				} else {
-					signOutAndClearContext();
+					signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.ACCESS_TOKEN_EXPIRED);
 				}
 
 				return;

@@ -30,6 +30,8 @@ import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
 import { useAppRootLoaderData } from '@/routes/root';
 
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+
 export const HEADER_HEIGHT = 60;
 
 const useHeaderV2Styles = createUseThemedStyles((theme) => ({
@@ -685,7 +687,11 @@ const HeaderV2 = () => {
 								<Button
 									variant="light"
 									className="mx-2 fw-semibold text-gray"
-									onClick={signOutAndClearContext}
+									onClick={() => {
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER
+										);
+									}}
 								>
 									Log Out
 								</Button>
@@ -847,7 +853,13 @@ const HeaderV2 = () => {
 									</>
 								)}
 								<Dropdown.Divider />
-								<Dropdown.Item onClick={signOutAndClearContext}>
+								<Dropdown.Item
+									onClick={() => {
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER
+										);
+									}}
+								>
 									<p className="mb-0 text-gray">Log Out</p>
 								</Dropdown.Item>
 							</Dropdown.Menu>

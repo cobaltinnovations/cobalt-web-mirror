@@ -1,8 +1,14 @@
 import Cookies from 'js-cookie';
 import React, { FC, PropsWithChildren, createContext, useCallback, useMemo } from 'react';
 
-import { AccountModel, LoginDestinationId, ROLE_ID } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import {
+	AccountModel,
+	LoginDestinationId,
+	ROLE_ID,
+	AnalyticsNativeEventTypeId,
+	AnalyticsNativeEventAccountSignedOutSource,
+} from '@/lib/models';
+import { accountService, analyticsService } from '@/lib/services';
 
 import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/institution';
 import { useAppRootLoaderData } from '@/routes/root';
@@ -17,7 +23,7 @@ type AccountContextConfig = {
 	isProvider: boolean;
 	isIntegratedCarePatient: boolean;
 	isIntegratedCareStaff: boolean;
-	signOutAndClearContext: () => void;
+	signOutAndClearContext: (source: AnalyticsNativeEventAccountSignedOutSource) => void;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
@@ -31,45 +37,53 @@ export const LoginDestinationIdRouteMap = {
 const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const { accountId, institutionResponse, accountResponse } = useAppRootLoaderData();
 
-	const signOutAndClearContext = useCallback(async () => {
-		Cookies.remove('accessToken');
-		Cookies.remove('accountId');
-		Cookies.remove('roleId');
-		Cookies.remove('authRedirectUrl');
-		Cookies.remove('immediateAccess');
-		Cookies.remove('seenWaivedCopay');
-		Cookies.remove('track');
-		Cookies.remove('bookingSource');
-		Cookies.remove('bookingExitUrl');
-		Cookies.remove('groupSessionDetailNavigationSource');
-		Cookies.remove('groupSessionCollectionId');
-		Cookies.remove('groupSessionCollectionUrlName');
-		Cookies.remove('groupSessionDetailFromTopicCenterPath');
-		Cookies.remove('permittedAccountSourceIds');
+	const signOutAndClearContext = useCallback(
+		async (source: AnalyticsNativeEventAccountSignedOutSource) => {
+			Cookies.remove('accessToken');
+			Cookies.remove('accountId');
+			Cookies.remove('roleId');
+			Cookies.remove('authRedirectUrl');
+			Cookies.remove('immediateAccess');
+			Cookies.remove('seenWaivedCopay');
+			Cookies.remove('track');
+			Cookies.remove('bookingSource');
+			Cookies.remove('bookingExitUrl');
+			Cookies.remove('groupSessionDetailNavigationSource');
+			Cookies.remove('groupSessionCollectionId');
+			Cookies.remove('groupSessionCollectionUrlName');
+			Cookies.remove('groupSessionDetailFromTopicCenterPath');
+			Cookies.remove('permittedAccountSourceIds');
 
-		window.localStorage.removeItem(config.storageKeys.mhicRecentOrdersStorageKey);
-		window.localStorage.removeItem(config.storageKeys.chunkloadRefreshKey);
+			window.localStorage.removeItem(config.storageKeys.mhicRecentOrdersStorageKey);
+			window.localStorage.removeItem(config.storageKeys.chunkloadRefreshKey);
 
-		try {
-			if (!accountId) {
-				throw new Error('account is required.');
+			try {
+				if (!accountId) {
+					throw new Error('account is required.');
+				}
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_OUT, {
+					accountId: accountId,
+					source: source,
+				});
+
+				const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(accountId).fetch();
+
+				if (federatedLogoutUrl) {
+					window.location.href = federatedLogoutUrl;
+					return;
+				}
+			} catch (error) {
+				// Fail silently and just log the user out normally
+			} finally {
+				const url = new URL(window.location.href);
+				url.pathname = '/sign-in';
+				url.search = '';
+				window.location.href = url.toString();
 			}
-
-			const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(accountId).fetch();
-
-			if (federatedLogoutUrl) {
-				window.location.href = federatedLogoutUrl;
-				return;
-			}
-		} catch (error) {
-			// Fail silently and just log the user out normally
-		} finally {
-			const url = new URL(window.location.href);
-			url.pathname = '/sign-in';
-			url.search = '';
-			window.location.href = url.toString();
-		}
-	}, [accountId]);
+		},
+		[accountId]
+	);
 
 	const institution = useMemo(
 		() => accountResponse?.institution || institutionResponse.institution,

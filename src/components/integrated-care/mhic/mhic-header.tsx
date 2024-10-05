@@ -9,6 +9,7 @@ import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
@@ -251,7 +252,9 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 								>
 									<Dropdown.Item
 										onClick={() => {
-											signOutAndClearContext();
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.MHIC_HEADER
+											);
 										}}
 									>
 										<span className="text-danger">Sign Out</span>

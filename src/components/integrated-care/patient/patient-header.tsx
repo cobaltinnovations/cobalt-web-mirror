@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import InCrisisHeaderButton from '@/components/in-crisis-header-button';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -76,7 +77,7 @@ export const PatientHeader = () => {
 					>
 						<Dropdown.Item
 							onClick={() => {
-								signOutAndClearContext();
+								signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER);
 							}}
 						>
 							<span className="text-danger">Sign Out</span>
