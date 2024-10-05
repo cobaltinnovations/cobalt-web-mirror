@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { SignInCobaltProps } from '@/components/auth/sign-in-cobalt';
@@ -7,8 +7,8 @@ import { SignInStaff } from '@/components/auth/sign-in-staff';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { config } from '@/config';
-import { AccountSource, AccountSourceId } from '@/lib/models';
-import { accountService } from '@/lib/services';
+import { AccountSource, AccountSourceId, AnalyticsNativeEventTypeId } from '@/lib/models';
+import { accountService, analyticsService } from '@/lib/services';
 import { useAppRootLoaderData } from '@/routes/root';
 
 interface SignInShellProps {
@@ -21,6 +21,10 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 	const handleError = useHandleError();
 	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_SIGN_IN);
+	}, []);
 
 	const handleEnterAnonymouslyButtonClick = useCallback(async () => {
 		try {

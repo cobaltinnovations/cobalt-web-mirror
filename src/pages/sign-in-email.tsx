@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { accountService } from '@/lib/services';
+import { accountService, analyticsService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
 	signInOuter: {
@@ -59,6 +60,8 @@ const SignInEmail = () => {
 		}
 
 		autofocusCheckComplete.current = true;
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_SIGN_IN_EMAIL);
 	}, [signInForm.emailAddress, signInForm.password]);
 
 	async function handleSignInFormSubmit(event: React.FormEvent<HTMLFormElement>) {
