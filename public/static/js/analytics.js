@@ -58,7 +58,7 @@
 
 		// Persist this initial load as special URL change
 		_persistEvent('URL_CHANGED', {
-			url: window.location.href,
+			url: _relativeUrl(window.location.href),
 			previousUrl: null,
 		});
 	}
@@ -86,7 +86,7 @@
 		});
 	}
 
-	// Detect URL changes without having to use experimental navigate API (see _registerUrlChangedListenerUsingNavigateApi()).
+	// Detect URL changes without having to use experimental navigate API, which is not universally supported.
 	// Thanks to https://stackoverflow.com/a/46428962
 	function _registerUrlChangedListenerUsingMutationObserver() {
 		const observeUrlChange = () => {
@@ -94,8 +94,8 @@
 			const body = document.querySelector('body');
 			const observer = new MutationObserver((mutations) => {
 				if (oldHref !== document.location.href) {
-					const url = document.location.href;
-					const previousUrl = oldHref;
+					const url = _relativeUrl(document.location.href);
+					const previousUrl = _relativeUrl(oldHref);
 					oldHref = document.location.href;
 
 					_persistEvent('URL_CHANGED', {
@@ -114,31 +114,28 @@
 		observeUrlChange();
 	}
 
-	// This API is not supported in Firefox/Safari as of October 2024.
-	// Prefer _registerUrlChangedListenerUsingMutationObserver() instead.
-	function _registerUrlChangedListenerUsingNavigateApi() {
-		window.navigation.addEventListener('navigate', (event) => {
-			const url = event.destination.url;
-			const previousUrl = window.location.href;
-			// const performanceNavigationTiming =_extractPerformanceNavigationTiming();
+	// Turns an absolute URL like 'https://www.cobaltplatform.com/test?a=c' into a relative '/test?a=c'.
+	// Relative URL will always start with a '/'
+	function _relativeUrl(url) {
+		if (!url || url.trim().length === 0) return url;
 
-			// Ignore spurious events
-			if (url === previousUrl) return;
+		const lowercaseUrl = url.toLowerCase();
+		let protocolLength = -1;
 
-			_persistEvent('URL_CHANGED', {
-				url: url,
-				previousUrl: previousUrl,
-			});
-		});
-	}
+		if (lowercaseUrl.startsWith('https://')) protocolLength = 'https://'.length;
+		else if (lowercaseUrl.startsWith('http://')) protocolLength = 'http://'.length;
 
-	// This API is not supported in Safari as of October 2024.
-	// Don't use it for now.
-	function _extractPerformanceNavigationTiming() {
-		const navigationEntries = window.performance ? window.performance.getEntriesByType('navigation') : [];
-		if (!navigationEntries || navigationEntries.length === 0) return undefined;
+		if (protocolLength === -1) return url;
 
-		return navigationEntries[0];
+		// 1. Remove protocol
+		// 2. Remove everything before the '/'
+		let relativeUrl = url.substring(protocolLength);
+		let firstIndexOfSlash = relativeUrl.indexOf('/');
+
+		if (firstIndexOfSlash === -1) relativeUrl = '/';
+		else relativeUrl = relativeUrl.substring(firstIndexOfSlash);
+
+		return relativeUrl;
 	}
 
 	function _generateUUID() {
