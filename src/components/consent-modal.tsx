@@ -66,7 +66,10 @@ const ConsentModal: FC<ConsentModalProps> = ({ readOnly = false, ...modalProps }
 									.rejectConsent(account.accountId)
 									.fetch()
 									.then((response) => {
-										signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM);
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM,
+											{}
+										);
 									})
 									.catch((e) => {
 										handleError(e);

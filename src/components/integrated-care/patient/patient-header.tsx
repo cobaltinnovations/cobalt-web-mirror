@@ -77,7 +77,7 @@ export const PatientHeader = () => {
 					>
 						<Dropdown.Item
 							onClick={() => {
-								signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER);
+								signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER, {});
 							}}
 						>
 							<span className="text-danger">Sign Out</span>

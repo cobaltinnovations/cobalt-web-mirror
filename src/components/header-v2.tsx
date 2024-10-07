@@ -689,7 +689,8 @@ const HeaderV2 = () => {
 									className="mx-2 fw-semibold text-gray"
 									onClick={() => {
 										signOutAndClearContext(
-											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+											{}
 										);
 									}}
 								>
@@ -856,7 +857,8 @@ const HeaderV2 = () => {
 								<Dropdown.Item
 									onClick={() => {
 										signOutAndClearContext(
-											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+											{}
 										);
 									}}
 								>

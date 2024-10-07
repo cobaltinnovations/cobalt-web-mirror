@@ -75,7 +75,8 @@ const Consent = () => {
 										variant="outline-primary"
 										onClick={() => {
 											signOutAndClearContext(
-												AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM
+												AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM,
+												{}
 											);
 										}}
 									>

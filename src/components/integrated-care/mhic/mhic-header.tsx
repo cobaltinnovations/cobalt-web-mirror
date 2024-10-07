@@ -253,7 +253,8 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									<Dropdown.Item
 										onClick={() => {
 											signOutAndClearContext(
-												AnalyticsNativeEventAccountSignedOutSource.MHIC_HEADER
+												AnalyticsNativeEventAccountSignedOutSource.MHIC_HEADER,
+												{}
 											);
 										}}
 									>

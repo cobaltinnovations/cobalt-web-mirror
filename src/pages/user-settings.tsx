@@ -93,7 +93,10 @@ const UserSettings: FC = () => {
 									.rejectConsent(account.accountId)
 									.fetch()
 									.then((response) => {
-										signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM);
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM,
+											{}
+										);
 									})
 									.catch((e) => {
 										handleError(e);

@@ -23,7 +23,10 @@ type AccountContextConfig = {
 	isProvider: boolean;
 	isIntegratedCarePatient: boolean;
 	isIntegratedCareStaff: boolean;
-	signOutAndClearContext: (source: AnalyticsNativeEventAccountSignedOutSource) => void;
+	signOutAndClearContext: (
+		source: AnalyticsNativeEventAccountSignedOutSource,
+		supplementalData: Record<string, any>
+	) => void;
 };
 
 const AccountContext = createContext({} as AccountContextConfig);
@@ -38,7 +41,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const { accountId, institutionResponse, accountResponse } = useAppRootLoaderData();
 
 	const signOutAndClearContext = useCallback(
-		async (source: AnalyticsNativeEventAccountSignedOutSource) => {
+		async (source: AnalyticsNativeEventAccountSignedOutSource, supplementalData: Record<string, any> = {}) => {
 			Cookies.remove('accessToken');
 			Cookies.remove('accountId');
 			Cookies.remove('roleId');
@@ -62,10 +65,15 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 					throw new Error('account is required.');
 				}
 
-				analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_OUT, {
+				let data = {
 					accountId: accountId,
 					source: source,
-				});
+				};
+
+				// Overlay the supplemental data onto data in case callers would like to add additional context
+				Object.assign(data, supplementalData);
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_OUT, data);
 
 				const { federatedLogoutUrl } = await accountService.getFederatedLogoutUrl(accountId).fetch();
 
@@ -75,6 +83,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 				}
 			} catch (error) {
 				// Fail silently and just log the user out normally
+				console.warn('Encountered issue during sign-out', error);
 			} finally {
 				const url = new URL(window.location.href);
 				url.pathname = '/sign-in';

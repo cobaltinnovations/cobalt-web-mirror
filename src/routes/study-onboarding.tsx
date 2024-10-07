@@ -69,7 +69,7 @@ export const Component = () => {
 		if (isLoggedInAndPermitted) {
 			redirectToOnboardingDestination();
 		} else {
-			signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.STUDY_ONBOARDING);
+			signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.STUDY_ONBOARDING, {});
 			Cookies.set('permittedAccountSourceIds', JSON.stringify(permittedAccountSourceIds));
 
 			redirectToOnboardingDestination();

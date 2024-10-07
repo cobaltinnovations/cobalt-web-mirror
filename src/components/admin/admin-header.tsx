@@ -282,7 +282,8 @@ export const AdminHeader = () => {
 									<Dropdown.Item
 										onClick={() => {
 											signOutAndClearContext(
-												AnalyticsNativeEventAccountSignedOutSource.ADMIN_HEADER
+												AnalyticsNativeEventAccountSignedOutSource.ADMIN_HEADER,
+												{}
 											);
 										}}
 									>
