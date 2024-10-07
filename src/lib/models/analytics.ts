@@ -23,7 +23,8 @@ export enum AnalyticsNativeEventTypeId {
 	PAGE_VIEW_CONTACT_US = 'PAGE_VIEW_CONTACT_US',
 	PAGE_VIEW_IN_CRISIS = 'PAGE_VIEW_IN_CRISIS',
 	OVERLAY_VIEW_IN_CRISIS = 'OVERLAY_VIEW_IN_CRISIS', // See AnalyticsNativeEventOverlayViewInCrisisSource below
-	CONTENT_VIEWED = 'CONTENT_VIEWED',
+	CLICKTHROUGH_TOPIC_CENTER = 'CLICKTHROUGH_TOPIC_CENTER', // See AnalyticsNativeEventClickthroughTopicCenterSource below
+	CLICKTHROUGH_CONTENT = 'CLICKTHROUGH_CONTENT',
 }
 
 export enum AnalyticsNativeEventAccountSignedOutSource {
@@ -42,4 +43,9 @@ export enum AnalyticsNativeEventOverlayViewInCrisisSource {
 	PATIENT_HEADER = 'PATIENT_HEADER',
 	TRIAGE_RESULTS = 'TRIAGE_RESULTS',
 	SCREENING_SESSION = 'SCREENING_SESSION',
+}
+
+export enum AnalyticsNativeEventClickthroughTopicCenterSource {
+	HOME_FEATURE = 'HOME_FEATURE',
+	HOME_SECONDARY_FEATURE = 'HOME_SECONDARY_FEATURE',
 }

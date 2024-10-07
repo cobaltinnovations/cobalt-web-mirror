@@ -59,7 +59,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 			return;
 		}
 
-		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CONTENT_VIEWED, {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_CONTENT, {
 			contentId: content.contentId,
 		});
 

@@ -31,6 +31,7 @@ import {
 	Content,
 	Tag,
 	AnalyticsNativeEventTypeId,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -249,6 +250,11 @@ const Index: FC = () => {
 						imageUrl={featuredTopicCenter.imageUrl!}
 						primaryActionText={featuredTopicCenter.featuredCallToAction!}
 						onPrimaryActionClick={() => {
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
+								topicCenterId: featuredTopicCenter.topicCenterId,
+								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+							});
+
 							if (featuredTopicCenter.urlOverride) {
 								window.location.href = featuredTopicCenter.urlOverride;
 							} else {
@@ -269,6 +275,11 @@ const Index: FC = () => {
 						imageUrl={secondaryFeaturedTopicCenter.imageUrl ?? ''}
 						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
 						onPrimaryActionClick={() => {
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
+								topicCenterId: secondaryFeaturedTopicCenter.topicCenterId,
+								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
+							});
+
 							if (secondaryFeaturedTopicCenter.urlOverride) {
 								try {
 									const url = new URL(secondaryFeaturedTopicCenter.urlOverride);
