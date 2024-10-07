@@ -25,6 +25,7 @@ export enum AnalyticsNativeEventTypeId {
 	OVERLAY_VIEW_IN_CRISIS = 'OVERLAY_VIEW_IN_CRISIS', // See AnalyticsNativeEventOverlayViewInCrisisSource below
 	CLICKTHROUGH_TOPIC_CENTER = 'CLICKTHROUGH_TOPIC_CENTER', // See AnalyticsNativeEventClickthroughTopicCenterSource below
 	CLICKTHROUGH_CONTENT = 'CLICKTHROUGH_CONTENT',
+	CLICKTHROUGH_FEATURE = 'CLICKTHROUGH_FEATURE', // See AnalyticsNativeEventClickthroughFeatureSource below
 }
 
 export enum AnalyticsNativeEventAccountSignedOutSource {
@@ -48,4 +49,11 @@ export enum AnalyticsNativeEventOverlayViewInCrisisSource {
 export enum AnalyticsNativeEventClickthroughTopicCenterSource {
 	HOME_FEATURE = 'HOME_FEATURE',
 	HOME_SECONDARY_FEATURE = 'HOME_SECONDARY_FEATURE',
+	NAV_FEATURE = 'NAV_FEATURE',
+	NAV = 'NAV',
+}
+
+export enum AnalyticsNativeEventClickthroughFeatureSource {
+	HOME = 'HOME',
+	NAV = 'NAV',
 }
