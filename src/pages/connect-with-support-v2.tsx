@@ -6,7 +6,7 @@ import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { FeatureId, InstitutionLocation } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, FeatureId, InstitutionLocation } from '@/lib/models';
 import {
 	accountService,
 	FindOptionsResponse,
@@ -14,6 +14,7 @@ import {
 	institutionService,
 	ProviderSection,
 	providerService,
+	analyticsService,
 } from '@/lib/services';
 import { BookingContext, BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
@@ -129,6 +130,17 @@ const ConnectWithSupportV2 = () => {
 		setAppointmentTypes(response.appointmentTypes);
 		setEpicDepartments(response.epicDepartments);
 		setProviderSections(response.sections);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDERS, {
+			featureId: featureDetails.featureId,
+			supportRoleIds: featureDetails.supportRoleIds,
+			startDate: startDate ?? findOptions.defaultStartDate,
+			endDate: findOptions.defaultEndDate,
+			...(institutionLocationId && { institutionLocationId }),
+			...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
+			...(patientOrderId && { patientOrderId }),
+			availabilitySections: response.sections,
+		});
 	}, [
 		appointmentTimeIds,
 		featureDetails,
