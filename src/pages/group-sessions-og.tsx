@@ -1,8 +1,13 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
-import { GroupSessionSchedulingSystemId, groupSessionsService } from '@/lib/services';
-import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER, GroupSessionModel } from '@/lib/models';
+import { analyticsService, GroupSessionSchedulingSystemId, groupSessionsService } from '@/lib/services';
+import {
+	GROUP_SESSION_STATUS_ID,
+	GROUP_SESSION_SORT_ORDER,
+	GroupSessionModel,
+	AnalyticsNativeEventTypeId,
+} from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { useScreeningFlow } from './screening/screening.hooks';
@@ -66,6 +71,13 @@ const GroupSessionsOg = () => {
 				.fetch();
 
 			setGroupSessions(groupSessions);
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_GROUP_SESSIONS, {
+				searchQuery:
+					groupSessionSearchQuery && groupSessionSearchQuery.trim().length > 0
+						? groupSessionSearchQuery.trim()
+						: undefined,
+			});
 		} catch (error) {
 			handleError(error);
 		} finally {
