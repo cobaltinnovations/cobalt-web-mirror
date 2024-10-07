@@ -70,7 +70,7 @@ const ConfirmAppointment = () => {
 			epicAppointmentFhirId:
 				epicAppointmentFhirId && epicAppointmentFhirId.trim().length > 0 ? epicAppointmentFhirId : undefined,
 		});
-	}, []);
+	}, [providerId, appointmentTypeId, date, time, intakeAssessmentId, patientOrderId, epicAppointmentFhirId]);
 
 	const fetchData = useCallback(async () => {
 		if (!account) {
