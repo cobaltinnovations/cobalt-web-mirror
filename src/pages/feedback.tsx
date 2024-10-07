@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -11,6 +11,8 @@ import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
+import { analyticsService } from '@/lib/services';
+import { AnalyticsNativeEventOverlayViewInCrisisSource, AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const Feedback: FC = () => {
 	const handleError = useHandleError();
@@ -21,6 +23,10 @@ const Feedback: FC = () => {
 
 	const [feedbackEmailValue, setFeedbackEmailValue] = useState('');
 	const [feedbackTextareaValue, setFeedbackTextareaValue] = useState<string>('');
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_CONTACT_US);
+	}, []);
 
 	async function handleSubmitFeedbackButtonClick() {
 		try {
@@ -55,6 +61,11 @@ const Feedback: FC = () => {
 								tabIndex={0}
 								onClick={() => {
 									trackEvent(CrisisAnalyticsEvent.clickCrisisFeedback());
+
+									analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+										source: AnalyticsNativeEventOverlayViewInCrisisSource.CONTACT_US,
+									});
+
 									openInCrisisModal();
 								}}
 							>

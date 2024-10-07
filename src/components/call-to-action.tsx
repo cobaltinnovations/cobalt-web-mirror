@@ -2,13 +2,20 @@ import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ActionLinkModel, ACTION_LINK_TYPE_ID, CallToActionModel } from '@/lib/models';
+import {
+	ActionLinkModel,
+	ACTION_LINK_TYPE_ID,
+	CallToActionModel,
+	AnalyticsNativeEventTypeId,
+	AnalyticsNativeEventOverlayViewInCrisisSource,
+} from '@/lib/models';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-help-fill.svg';
+import { analyticsService } from '@/lib/services';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	callToAction: {
@@ -82,6 +89,10 @@ const CallToAction = ({ callToAction, className }: Props) => {
 				window.location.href = actionLink.link;
 				break;
 			case ACTION_LINK_TYPE_ID.CRISIS:
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+					source: AnalyticsNativeEventOverlayViewInCrisisSource.CALL_TO_ACTION,
+				});
+
 				openInCrisisModal();
 				break;
 			default:
