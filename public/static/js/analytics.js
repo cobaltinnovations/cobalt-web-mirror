@@ -132,7 +132,7 @@
 		let relativeUrl = url.substring(protocolLength);
 		let firstIndexOfSlash = relativeUrl.indexOf('/');
 
-		if (firstIndexOfSlash === -1) relativeUrl = '/';
+		if (firstIndexOfSlash === -1) relativeUrl = '/' + relativeUrl;
 		else relativeUrl = relativeUrl.substring(firstIndexOfSlash);
 
 		return relativeUrl;
