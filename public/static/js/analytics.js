@@ -186,61 +186,69 @@
 	}
 
 	function _persistEvent(analyticsNativeEventTypeId, data) {
-		// Ignore any events until `SESSION_STARTED` happens and we are visible.
-		// This is to ignore spurious events caused by browser prefetching, e.g. when typing in the URL but before hitting 'enter'
-		// if (!hasPersistedSessionStartedEvent && document.visibilityState === 'hidden') return;
-		// if (analyticsNativeEventTypeId === 'SESSION_STARTED') hasPersistedSessionStartedEvent = true;
+		try {
+			// Ignore any events until `SESSION_STARTED` happens and we are visible.
+			// This is to ignore spurious events caused by browser prefetching, e.g. when typing in the URL but before hitting 'enter'
+			// if (!hasPersistedSessionStartedEvent && document.visibilityState === 'hidden') return;
+			// if (analyticsNativeEventTypeId === 'SESSION_STARTED') hasPersistedSessionStartedEvent = true;
 
-		_ensureFingerprintAndSessionExist();
+			_ensureFingerprintAndSessionExist();
 
-		const timestamp = window.performance.timeOrigin + window.performance.now();
-		const accessToken = _getAccessToken();
-		const referringMessageId = _getReferringMessageId();
-		const referringCampaignId = _getReferringCampaignId();
+			const timestamp = window.performance.timeOrigin + window.performance.now();
+			const accessToken = _getAccessToken();
+			const referringMessageId = _getReferringMessageId();
+			const referringCampaignId = _getReferringCampaignId();
 
-		const event = {
-			analyticsNativeEventTypeId: analyticsNativeEventTypeId,
-			data: data ? data : {},
-			timestamp: timestamp,
-			screenColorDepth: window.screen.colorDepth,
-			screenPixelDepth: window.screen.pixelDepth,
-			screenWidth: window.screen.width,
-			screenHeight: window.screen.height,
-			screenOrientation: window.screen.orientation ? window.screen.orientation.type : undefined,
-			windowWidth: window.innerWidth,
-			windowHeight: window.innerHeight,
-			windowDevicePixelRatio: window.devicePixelRatio,
-			documentVisibilityState: document.visibilityState,
-		};
+			const event = {
+				analyticsNativeEventTypeId: analyticsNativeEventTypeId,
+				data: data ? data : {},
+				timestamp: timestamp,
+				screenColorDepth: window.screen.colorDepth,
+				screenPixelDepth: window.screen.pixelDepth,
+				screenWidth: window.screen.width,
+				screenHeight: window.screen.height,
+				screenOrientation: window.screen.orientation ? window.screen.orientation.type : undefined,
+				windowWidth: window.innerWidth,
+				windowHeight: window.innerHeight,
+				windowDevicePixelRatio: window.devicePixelRatio,
+				documentVisibilityState: document.visibilityState,
+			};
 
-		const hasData = data && Object.keys(data).length > 0;
+			const hasData = data && Object.keys(data).length > 0;
 
-		if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
-		else _log(`Persisting event ${analyticsNativeEventTypeId}`);
+			if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
+			else _log(`Persisting event ${analyticsNativeEventTypeId}`);
 
-		window
-			.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-events`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Cobalt-Access-Token': accessToken ? accessToken : '',
-					'X-Cobalt-Webapp-Base-Url': window.location.origin,
-					'X-Cobalt-Webapp-Current-Url': window.location.href,
-					'X-Client-Device-Fingerprint': _getFingerprint(),
-					'X-Client-Device-Type-Id': 'WEB_BROWSER',
-					'X-Client-Device-App-Name': 'Cobalt Webapp',
-					'X-Client-Device-App-Version': analyticsConfig.appVersion,
-					'X-Client-Device-Session-Id': _getSessionId(),
-					'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
-					'X-Cobalt-Referring-Campaign-Id': referringCampaignId ? referringCampaignId : '',
-					'X-Cobalt-Analytics': 'true',
-				},
-				body: JSON.stringify(event),
-				keepalive: true,
-			})
-			.catch((error) => {
-				_log('*** ERROR PERSISTING EVENT ***', event, error);
-			});
+			window
+				.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-events`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Cobalt-Access-Token': accessToken ? accessToken : '',
+						'X-Cobalt-Webapp-Base-Url': window.location.origin,
+						'X-Cobalt-Webapp-Current-Url': window.location.href,
+						'X-Client-Device-Fingerprint': _getFingerprint(),
+						'X-Client-Device-Type-Id': 'WEB_BROWSER',
+						'X-Client-Device-App-Name': 'Cobalt Webapp',
+						'X-Client-Device-App-Version': analyticsConfig.appVersion,
+						'X-Client-Device-Session-Id': _getSessionId(),
+						'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
+						'X-Cobalt-Referring-Campaign-Id': referringCampaignId ? referringCampaignId : '',
+						'X-Cobalt-Analytics': 'true',
+					},
+					body: JSON.stringify(event),
+					keepalive: true,
+				})
+				.catch((error) => {
+					_log('*** ERROR PERSISTING EVENT TO BACKEND ***', event, error);
+					return false;
+				});
+
+			return true;
+		} catch (error) {
+			_log('*** ERROR PERSISTING EVENT ***', error, analyticsNativeEventTypeId, data);
+			return false;
+		}
 	}
 
 	function _getAccessToken() {
