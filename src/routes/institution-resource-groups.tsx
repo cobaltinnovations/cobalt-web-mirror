@@ -1,12 +1,13 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import InstitutionResourceGroupTile from '@/components/institution-resource-group-tile';
 import Loader from '@/components/loader';
-import { GetInstitutionResourceGroupsResponse, institutionService } from '@/lib/services';
+import { analyticsService, GetInstitutionResourceGroupsResponse, institutionService } from '@/lib/services';
 import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 interface InstitutionResourceGroupsLoaderData {
 	institutionResourceGroupsResponse: Promise<GetInstitutionResourceGroupsResponse[]>;
@@ -30,6 +31,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { institutionResourceGroupsResponse } = useInstitutionResourceGroupsLoaderData();
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_INSTITUTION_RESOURCES);
+	}, []);
 
 	return (
 		<>

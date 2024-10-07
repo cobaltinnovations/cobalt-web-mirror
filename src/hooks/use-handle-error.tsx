@@ -47,7 +47,7 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 					setShowReauthModal(true);
 				} else {
 					signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.ACCESS_TOKEN_EXPIRED, {
-						// TODO: expose details about the request here? (HTTP Method, URL, body)
+						// TODO: expose details about the request here - (HTTP Method, URL, body)
 					});
 				}
 
