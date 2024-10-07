@@ -219,6 +219,12 @@
 			if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
 			else _log(`Persisting event ${analyticsNativeEventTypeId}`);
 
+			// Enable keepalive only when payload is relatively small.
+			// For larger payloads, some browsers can choose to have fetch operations fail if keepalive is set.
+			// Unclear if limits are formally documented/consistent, so we pick a "small enough" value for keepalive.
+			const body = JSON.stringify(event);
+			const keepalive = body.length < 10000;
+
 			window
 				.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-events`, {
 					method: 'POST',
@@ -236,8 +242,8 @@
 						'X-Cobalt-Referring-Campaign-Id': referringCampaignId ? referringCampaignId : '',
 						'X-Cobalt-Analytics': 'true',
 					},
-					body: JSON.stringify(event),
-					keepalive: true,
+					body: body,
+					keepalive: keepalive,
 				})
 				.catch((error) => {
 					_log('*** ERROR PERSISTING EVENT TO BACKEND ***', event, error);
