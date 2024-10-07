@@ -93,7 +93,9 @@ export class HttpClient {
 			const response: AxiosResponse = await this._axiosInstance(config);
 			return response;
 		} catch (error) {
-			// Persist the error
+			// See https://axios-http.com/docs/handling_errors for details
+
+			// Store analytics for the error
 			try {
 				let serializableErrorContext = undefined;
 
@@ -115,6 +117,7 @@ export class HttpClient {
 				// We tried and failed to send error analytics.
 			}
 
+			// Surface error to users (if necessary)
 			if (axios.isCancel(error)) {
 				throw CobaltError.fromCancelledRequest();
 			} else if (axios.isAxiosError(error)) {
