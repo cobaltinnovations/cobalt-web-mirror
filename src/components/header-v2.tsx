@@ -521,7 +521,7 @@ const HeaderV2 = () => {
 								matchPath(url + '/*', pathname)
 							),
 							items: (institution?.additionalNavigationItems ?? []).map(
-								({ iconName, imageUrl, name, url }, index) => ({
+								({ iconName, imageUrl, name, url, topicCenterId }, index) => ({
 									testId: `menuLink-additionalItem${index}`,
 									icon: (
 										<AdditionalNavigationItemIconOrImage
@@ -538,7 +538,7 @@ const HeaderV2 = () => {
 										analyticsService.persistEvent(
 											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
 											{
-												topicCenterId: '',
+												topicCenterId: topicCenterId,
 												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
 											}
 										);
