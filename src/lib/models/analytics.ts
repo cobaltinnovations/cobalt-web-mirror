@@ -31,6 +31,7 @@ export enum AnalyticsNativeEventTypeId {
 	CLICKTHROUGH_TOPIC_CENTER = 'CLICKTHROUGH_TOPIC_CENTER', // See AnalyticsNativeEventClickthroughTopicCenterSource below
 	CLICKTHROUGH_CONTENT = 'CLICKTHROUGH_CONTENT',
 	CLICKTHROUGH_FEATURE = 'CLICKTHROUGH_FEATURE', // See AnalyticsNativeEventClickthroughFeatureSource below
+	CLICKTHROUGH_ACCOUNT_SOURCE = 'CLICKTHROUGH_ACCOUNT_SOURCE',
 }
 
 export enum AnalyticsNativeEventAccountSignedOutSource {

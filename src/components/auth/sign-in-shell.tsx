@@ -46,8 +46,16 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 	const handleAccountSourceClick = useCallback(
 		async (accountSource: AccountSource) => {
 			if (accountSource.accountSourceId === AccountSourceId.ANONYMOUS) {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_ACCOUNT_SOURCE, {
+					accountSourceId: accountSource.accountSourceId,
+				});
+
 				handleEnterAnonymouslyButtonClick();
 			} else if (accountSource.accountSourceId === AccountSourceId.EMAIL_PASSWORD) {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_ACCOUNT_SOURCE, {
+					accountSourceId: accountSource.accountSourceId,
+				});
+
 				navigate('/sign-in/email');
 			} else if (accountSource.accountSourceId === AccountSourceId.MYCHART) {
 				// Construct a query string that preserves analytics information
@@ -74,8 +82,16 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 				mychartUrl.pathname = `/institutions/${institution?.institutionId}/mychart-authentication-url`;
 				mychartUrl.search = redirectSearchComponents.join('&');
 
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_ACCOUNT_SOURCE, {
+					accountSourceId: accountSource.accountSourceId,
+				});
+
 				window.location.href = mychartUrl.toString();
 			} else if (accountSource.ssoUrl) {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_ACCOUNT_SOURCE, {
+					accountSourceId: accountSource.accountSourceId,
+				});
+
 				window.location.href = accountSource.ssoUrl;
 			}
 		},
