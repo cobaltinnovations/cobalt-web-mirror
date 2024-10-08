@@ -56,7 +56,7 @@
 
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
-		if (referringCampaignId && _isValidUuid(referringCampaignId)) _setReferringCampaignId(referringCampaignId);
+		if (referringCampaignId) _setReferringCampaignId(referringCampaignId); // Not a UUID
 
 		_ensureFingerprintAndSessionExist();
 		_registerVisibilityChangeListener();
@@ -369,7 +369,7 @@
 		},
 		// Name of the query parameter that can be used to initialize the referring campaign ID if needed.
 		// Generally 'a.c'
-		// Referring Campaign ID must be a valid UUIDv4 value.
+		// Referring Campaign ID can be any string value.
 		getReferringCampaignIdQueryParameterName: function () {
 			return REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME;
 		},
