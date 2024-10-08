@@ -201,7 +201,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 												analyticsService.persistEvent(
 													AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE,
 													{
-														data: featureId,
+														featureId: featureId,
 														source: AnalyticsNativeEventClickthroughFeatureSource.HOME,
 													}
 												);

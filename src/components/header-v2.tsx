@@ -475,7 +475,7 @@ const HeaderV2 = () => {
 											: urlName,
 									onClick: () => {
 										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
-											data: featureId,
+											featureId: featureId,
 											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
 										});
 									},
