@@ -56,11 +56,19 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 				const analyticsReferringMessageId = analyticsService.getReferringMessageId();
 
 				let redirectSearchComponents = ['redirectImmediately=true'];
-				redirectSearchComponents.push(`a.s=${analyticsSessionId}`);
+				redirectSearchComponents.push(
+					`${analyticsService.getSessionIdQueryParameterName()}=${analyticsSessionId}`
+				);
 
-				if (analyticsReferringCampaignId) redirectSearchComponents.push(`a.c=${analyticsReferringCampaignId}`);
+				if (analyticsReferringCampaignId)
+					redirectSearchComponents.push(
+						`${analyticsService.getReferringCampaignIdQueryParameterName()}=${analyticsReferringCampaignId}`
+					);
 
-				if (analyticsReferringMessageId) redirectSearchComponents.push(`a.m=${analyticsReferringMessageId}`);
+				if (analyticsReferringMessageId)
+					redirectSearchComponents.push(
+						`${analyticsService.getReferringMessageIdQueryParameterName()}=${analyticsReferringMessageId}`
+					);
 
 				const mychartUrl = new URL(config.apiBaseUrl);
 				mychartUrl.pathname = `/institutions/${institution?.institutionId}/mychart-authentication-url`;

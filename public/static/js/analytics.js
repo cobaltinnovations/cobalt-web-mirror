@@ -1,8 +1,11 @@
 (function (analyticsConfig) {
 	const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
 	const SESSION_ID_STORAGE_KEY = 'SESSION_ID';
+	const SESSION_ID_QUERY_PARAMETER_NAME = 'a.s';
 	const REFERRING_MESSAGE_ID_STORAGE_KEY = 'REFERRING_MESSAGE_ID';
+	const REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME = 'a.m';
 	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
+	const REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME = 'a.c';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
 	// TODO: Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
@@ -44,12 +47,16 @@
 		// Normalize API base URL by removing trailing slash, if present
 		analyticsConfig.apiBaseUrl = analyticsConfig.apiBaseUrl.replace(/\/$/, '');
 
+		// Query parameters can optionally be used to initialize session and referral IDs.
+		// We ensure UUIDs are valid here to prevent copy-paste (or malicious) errors
 		const queryParameters = _extractQueryParametersForCurrentUrl();
-		const referringMessageId = queryParameters['a.m'];
-		const referringCampaignId = queryParameters['a.c'];
+		const sessionId = queryParameters[SESSION_ID_QUERY_PARAMETER_NAME];
+		const referringMessageId = queryParameters[REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME];
+		const referringCampaignId = queryParameters[REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME];
 
-		if (referringMessageId) _setReferringMessageId(referringMessageId);
-		if (referringCampaignId) _setReferringCampaignId(referringCampaignId);
+		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
+		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
+		if (referringCampaignId && _isValidUuid(referringCampaignId)) _setReferringCampaignId(referringCampaignId);
 
 		_ensureFingerprintAndSessionExist();
 		_registerVisibilityChangeListener();
@@ -150,6 +157,21 @@
 				(+c ^ (window.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
 			);
 		}
+	}
+
+	// Is the input a valid UUID V1-V5?
+	function _isValidUuid(potentialUuid) {
+		if (!potentialUuid) return false;
+
+		potentialUuid = potentialUuid.trim();
+
+		if (potentialUuid.length !== 36) return false;
+
+		// Thanks to https://stackoverflow.com/a/13653180
+		const result = potentialUuid.match(
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+		);
+		return result ? true : false;
 	}
 
 	function _extractQueryParametersForCurrentUrl() {
@@ -333,6 +355,24 @@
 		// Gets the fingerprint to be included in events.
 		// The fingerprint persists until the user clears localstorage.
 		getFingerprint: _getFingerprint,
+		// Name of the query parameter that can be used to initialize session ID if needed.
+		// Generally 'a.s'
+		// Session ID must be a valid UUIDv4 value.
+		getSessionIdQueryParameterName: function () {
+			return SESSION_ID_QUERY_PARAMETER_NAME;
+		},
+		// Name of the query parameter that can be used to initialize the referring message ID if needed.
+		// Generally 'a.m'
+		// Referring Message ID must be a valid UUIDv4 value.
+		getReferringMessageIdQueryParameterName: function () {
+			return REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME;
+		},
+		// Name of the query parameter that can be used to initialize the referring campaign ID if needed.
+		// Generally 'a.c'
+		// Referring Campaign ID must be a valid UUIDv4 value.
+		getReferringCampaignIdQueryParameterName: function () {
+			return REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME;
+		},
 	};
 
 	_initialize();

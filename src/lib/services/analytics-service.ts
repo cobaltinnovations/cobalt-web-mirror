@@ -16,11 +16,23 @@ export const analyticsService = {
 		return (window as any).cobaltAnalytics.getSessionId();
 	},
 
+	getSessionIdQueryParameterName(): String {
+		return (window as any).cobaltAnalytics.getSessionIdQueryParameterName();
+	},
+
 	getReferringMessageId(): String | undefined {
 		return (window as any).cobaltAnalytics.getReferringMessageId();
 	},
 
+	getReferringMessageIdQueryParameterName(): String {
+		return (window as any).cobaltAnalytics.getReferringMessageIdQueryParameterName();
+	},
+
 	getReferringCampaignId(): String | undefined {
 		return (window as any).cobaltAnalytics.getReferringCampaignId();
+	},
+
+	getReferringCampaignIdQueryParameterName(): String {
+		return (window as any).cobaltAnalytics.getReferringCampaignIdQueryParameterName();
 	},
 };
