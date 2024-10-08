@@ -190,7 +190,7 @@ const ResourceLibraryTopic = () => {
 	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
 
 	useEffect(() => {
-		if (!tagGroup || !findResultTotalCount) {
+		if (!tagGroup && !findResultTotalCount) {
 			return;
 		}
 
