@@ -4,8 +4,13 @@ import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { AlertTypeId, FeatureId } from '@/lib/models';
-import { institutionService } from '@/lib/services';
+import {
+	AlertTypeId,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
+	AnalyticsNativeEventTypeId,
+	FeatureId,
+} from '@/lib/models';
+import { analyticsService, institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
@@ -625,7 +630,13 @@ const HeaderV2 = () => {
 												<p className="text-n500 px-5 mb-3 mt-6">{navigationItem.subtitle}</p>
 											)}
 											{(navigationItem.items ?? []).map((item, itemIndex) => (
-												<Link key={itemIndex} to={item.to ?? '/#'}>
+												<Link
+													key={itemIndex}
+													to={item.to ?? '/#'}
+													onClick={() => {
+														console.log('LINK MOBILE');
+													}}
+												>
 													<div
 														className={classNames('d-flex flex-column flex-lg-row', {
 															'align-items-center': !item.description,
@@ -646,6 +657,15 @@ const HeaderV2 = () => {
 													mobileNav
 													className="bg-n50 mt-6 px-4 py-6"
 													featuredItem={featuredTopicCenterItem}
+													onImageClick={() => {
+														analyticsService.persistEvent(
+															AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+															{
+																topicCenterId: featuredTopicCenterItem.topicCenterId,
+																source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+															}
+														);
+													}}
 												/>
 											)}
 										</MobileAccordianItem>
@@ -787,6 +807,7 @@ const HeaderV2 = () => {
 																	link_text: navigationItem.title,
 																	link_detail: item.title,
 																});
+																console.log('LINK CLICK DESKTOP');
 															}}
 														>
 															<div
