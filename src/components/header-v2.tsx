@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation, useRevalidator } from 'react-router-dom';
+import { Link, matchPath, PathMatch, To, useLocation, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
 import {
 	AlertTypeId,
+	AnalyticsNativeEventClickthroughFeatureSource,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
@@ -421,8 +422,23 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
 	/* ----------------------------------------------------------- */
-
-	const navigationConfig = useMemo(() => {
+	const navigationConfig: {
+		testId?: string;
+		navigationItemId?: string;
+		title: string;
+		subtitle?: string;
+		to?: To;
+		active: PathMatch<string> | boolean | null;
+		items?: {
+			testId?: string;
+			navigationItemId?: string;
+			title: string;
+			to: To;
+			icon: JSX.Element;
+			description: string;
+			onClick?(): void;
+		}[];
+	}[] = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
 		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
 
@@ -457,6 +473,12 @@ const HeaderV2 = () => {
 										account?.institutionLocationId
 											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 											: urlName,
+									onClick: () => {
+										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
+											data: featureId,
+											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
+										});
+									},
 								})),
 						},
 				  ]
@@ -512,6 +534,15 @@ const HeaderV2 = () => {
 									title: name,
 									description: '',
 									to: url,
+									onClick: () => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+											{
+												topicCenterId: '',
+												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+											}
+										);
+									},
 								})
 							),
 						},
@@ -634,7 +665,7 @@ const HeaderV2 = () => {
 													key={itemIndex}
 													to={item.to ?? '/#'}
 													onClick={() => {
-														console.log('LINK MOBILE');
+														item.onClick?.();
 													}}
 												>
 													<div
@@ -807,7 +838,7 @@ const HeaderV2 = () => {
 																	link_text: navigationItem.title,
 																	link_detail: item.title,
 																});
-																console.log('LINK CLICK DESKTOP');
+																item.onClick?.();
 															}}
 														>
 															<div
