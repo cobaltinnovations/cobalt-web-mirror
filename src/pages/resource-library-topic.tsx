@@ -103,6 +103,8 @@ const ResourceLibraryTopic = () => {
 			throw new Error('tagGroupId is undefined.');
 		}
 
+		console.log('fetchingTags');
+
 		const response = await resourceLibraryService
 			.getResourceLibraryContentByTagGroupId(tagGroupId, { pageNumber: 0, pageSize: 0 })
 			.fetch();
@@ -115,6 +117,8 @@ const ResourceLibraryTopic = () => {
 		if (!tagGroupId) {
 			throw new Error('tagGroupId is undefined.');
 		}
+
+		console.log('fetchingFilters');
 
 		const response = await resourceLibraryService.getResourceLibraryFiltersByTagGroupId(tagGroupId).fetch();
 		setFiltersResponse(response);
@@ -173,6 +177,8 @@ const ResourceLibraryTopic = () => {
 			throw new Error('tagGroupId is undefined.');
 		}
 
+		console.log('fetchingContent');
+
 		const { findResult } = await resourceLibraryService
 			.getResourceLibraryContentByTagGroupId(tagGroupId, {
 				pageNumber: 0,
@@ -194,6 +200,8 @@ const ResourceLibraryTopic = () => {
 			return;
 		}
 
+		console.log('fire');
+
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
 			tagGroupId: tagGroup?.tagGroupId,
 			tagIds: tagIdQuery,
@@ -202,7 +210,8 @@ const ResourceLibraryTopic = () => {
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
 			totalCount: findResultTotalCount,
 		});
-	}, [contentDurationIdQuery, contentTypeIdQuery, findResultTotalCount, searchQuery, tagGroup, tagIdQuery]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [findResultTotalCount, tagGroup]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
