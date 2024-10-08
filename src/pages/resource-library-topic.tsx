@@ -187,16 +187,22 @@ const ResourceLibraryTopic = () => {
 		setFindResultTotalCount(findResult.totalCount);
 		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContents(findResult.contents);
+	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
+
+	useEffect(() => {
+		if (!tagGroup || !findResultTotalCount) {
+			return;
+		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
-			tagGroupId: tagGroupId,
+			tagGroupId: tagGroup?.tagGroupId,
 			tagIds: tagIdQuery,
 			contentTypeIds: contentTypeIdQuery,
 			contentDurationIds: contentDurationIdQuery,
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
-			totalCount: findResult.totalCount,
+			totalCount: findResultTotalCount,
 		});
-	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
+	}, [contentDurationIdQuery, contentTypeIdQuery, findResultTotalCount, searchQuery, tagGroup, tagIdQuery]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
