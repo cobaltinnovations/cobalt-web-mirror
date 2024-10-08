@@ -598,6 +598,7 @@ const HeaderV2 = () => {
 		imageUrl: featuredTopicCenter.imageUrl!,
 		descriptionHtml: featuredTopicCenter.navDescription!,
 		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
+		topicCenterId: featuredTopicCenter.topicCenterId,
 	};
 
 	return (
