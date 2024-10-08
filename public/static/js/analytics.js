@@ -5,17 +5,16 @@
 	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 
-	// Some browsers will intermittently "forget" session storage during same-tab redirect flows.
-	// This appears to be a race condition related to prefetching.
+	// TODO: Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
+	// This appears to be a race condition related to prefetching - see https://issues.chromium.org/issues/40940701.
 	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab.
-	// To work around, we keep "last used" session storage data in more durable localstorage
-	// and then if the "last used" time is within a threshold, we can assume a redirect occurred that wiped the session data.
-	// This isn't perfect but generally what we want - e.g. it's possible to break this by having multiple browser tabs open
-	// and simultaneously redirecting in both, but that is an unlikely scenario.
-	// See https://stackoverflow.com/a/77454640
-	// const MOST_RECENT_SESSION_STORAGE_KEY = 'MOST_RECENT_SESSION';
-
-	// let hasPersistedSessionStartedEvent = false;
+	// One idea is to use localStorage to hold "recent enough" sessionStorage data and then if we detect a redirect into us
+	// from an external site, reconstitute our session ID, referring message/campaign, etc. from that.
+	// Or if there is some way to express "never prerender our site" then that would be a nice solution.
+	// See https://issues.chromium.org/issues/40584112
+	//
+	// TODO: Should we block initialization if it looks like we are executing in "prefetch" mode to avoid possible spurious events?
+	// See https://github.com/nickhsharp/prefetchNightmare for a possible approach
 
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
@@ -184,11 +183,6 @@
 
 	function _persistEvent(analyticsNativeEventTypeId, data) {
 		try {
-			// Ignore any events until `SESSION_STARTED` happens and we are visible.
-			// This is to ignore spurious events caused by browser prefetching, e.g. when typing in the URL but before hitting 'enter'
-			// if (!hasPersistedSessionStartedEvent && document.visibilityState === 'hidden') return;
-			// if (analyticsNativeEventTypeId === 'SESSION_STARTED') hasPersistedSessionStartedEvent = true;
-
 			_ensureFingerprintAndSessionExist();
 
 			const timestamp = window.performance.timeOrigin + window.performance.now();
@@ -330,6 +324,12 @@
 		// Gets the session identifier to be included in events.
 		// This identifier is cleared when the browser is closed.
 		getSessionId: _getSessionId,
+		// Gets the referring message identifier to be included in events.
+		// This identifier is cleared when the browser is closed.
+		getReferringMessageId: _getReferringMessageId,
+		// Gets the referring campaign identifier to be included in events.
+		// This identifier is cleared when the browser is closed.
+		getReferringCampaignId: _getReferringCampaignId,
 		// Gets the fingerprint to be included in events.
 		// The fingerprint persists until the user clears localstorage.
 		getFingerprint: _getFingerprint,

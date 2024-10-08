@@ -50,9 +50,21 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 			} else if (accountSource.accountSourceId === AccountSourceId.EMAIL_PASSWORD) {
 				navigate('/sign-in/email');
 			} else if (accountSource.accountSourceId === AccountSourceId.MYCHART) {
+				// Construct a query string that preserves analytics information
+				const analyticsSessionId = analyticsService.getSessionId();
+				const analyticsReferringCampaignId = analyticsService.getReferringCampaignId();
+				const analyticsReferringMessageId = analyticsService.getReferringMessageId();
+
+				let redirectSearchComponents = ['redirectImmediately=true'];
+				redirectSearchComponents.push(`a.s=${analyticsSessionId}`);
+
+				if (analyticsReferringCampaignId) redirectSearchComponents.push(`a.c=${analyticsReferringCampaignId}`);
+
+				if (analyticsReferringMessageId) redirectSearchComponents.push(`a.m=${analyticsReferringMessageId}`);
+
 				const mychartUrl = new URL(config.apiBaseUrl);
 				mychartUrl.pathname = `/institutions/${institution?.institutionId}/mychart-authentication-url`;
-				mychartUrl.search = `redirectImmediately=true`;
+				mychartUrl.search = redirectSearchComponents.join('&');
 
 				window.location.href = mychartUrl.toString();
 			} else if (accountSource.ssoUrl) {

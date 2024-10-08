@@ -1,13 +1,26 @@
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 export const analyticsService = {
-	persistEvent(analyticsNativeEventTypeId: AnalyticsNativeEventTypeId, data: Record<string, any> = {}) {
+	persistEvent(analyticsNativeEventTypeId: AnalyticsNativeEventTypeId, data: Record<string, any> = {}): boolean {
 		// Delegate to object configured on the window.
 		// See public/static/js/analytics.js for implementation and public/index.html for initialization.
 		try {
-			(window as any).cobaltAnalytics.persistEvent(analyticsNativeEventTypeId, data);
+			return (window as any).cobaltAnalytics.persistEvent(analyticsNativeEventTypeId, data);
 		} catch (e) {
 			console.warn('Unable to persist native analytics event', e);
+			return false;
 		}
+	},
+
+	getSessionId(): String {
+		return (window as any).cobaltAnalytics.getSessionId();
+	},
+
+	getReferringMessageId(): String | undefined {
+		return (window as any).cobaltAnalytics.getReferringMessageId();
+	},
+
+	getReferringCampaignId(): String | undefined {
+		return (window as any).cobaltAnalytics.getReferringCampaignId();
 	},
 };
