@@ -103,8 +103,6 @@ const ResourceLibraryTopic = () => {
 			throw new Error('tagGroupId is undefined.');
 		}
 
-		console.log('fetchingTags');
-
 		const response = await resourceLibraryService
 			.getResourceLibraryContentByTagGroupId(tagGroupId, { pageNumber: 0, pageSize: 0 })
 			.fetch();
@@ -117,8 +115,6 @@ const ResourceLibraryTopic = () => {
 		if (!tagGroupId) {
 			throw new Error('tagGroupId is undefined.');
 		}
-
-		console.log('fetchingFilters');
 
 		const response = await resourceLibraryService.getResourceLibraryFiltersByTagGroupId(tagGroupId).fetch();
 		setFiltersResponse(response);
@@ -177,8 +173,6 @@ const ResourceLibraryTopic = () => {
 			throw new Error('tagGroupId is undefined.');
 		}
 
-		console.log('fetchingContent');
-
 		const { findResult } = await resourceLibraryService
 			.getResourceLibraryContentByTagGroupId(tagGroupId, {
 				pageNumber: 0,
@@ -199,8 +193,6 @@ const ResourceLibraryTopic = () => {
 		if (!tagGroup && !findResultTotalCount) {
 			return;
 		}
-
-		console.log('fire');
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
 			tagGroupId: tagGroup?.tagGroupId,
