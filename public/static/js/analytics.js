@@ -56,12 +56,15 @@
 		const referringMessageId = queryParameters[REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME];
 		const referringCampaignId = queryParameters[REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME];
 
-		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
+		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
 		if (referringCampaignId) _setReferringCampaignId(referringCampaignId); // Not a UUID
 
-		_ensureFingerprintAndSessionExist();
+		// Ensures that fingerprint and session ID are created if they are not already
+		_getFingerprint();
+		_getSessionId();
+
 		_registerVisibilityChangeListener();
 		_registerUrlChangedListenerUsingMutationObserver();
 
@@ -192,24 +195,8 @@
 		}
 	}
 
-	function _ensureFingerprintAndSessionExist() {
-		// Generate and store fingerprint if one doesn't already exist
-		const fingerprint = _getFingerprint();
-		if (!fingerprint) _setFingerprint(_generateUUID());
-
-		// Generate and store a session identifier if one doesn't already exist
-		const sessionId = _getSessionId();
-		if (!sessionId) {
-			_setSessionId(_generateUUID());
-			// Let backend know this is a fresh session
-			_persistEvent('SESSION_STARTED');
-		}
-	}
-
 	function _persistEvent(analyticsNativeEventTypeId, data) {
 		try {
-			_ensureFingerprintAndSessionExist();
-
 			const timestamp = window.performance.timeOrigin + window.performance.now();
 			const accessToken = _getAccessToken();
 			const referringMessageId = _getReferringMessageId();
@@ -277,8 +264,16 @@
 		return _getCookie(ACCESS_TOKEN_COOKIE_NAME);
 	}
 
+	// Will create a fingerprint if one does not already exist
 	function _getFingerprint() {
-		return window.localStorage.getItem(_namespacedKeyValue(FINGERPRINT_STORAGE_KEY));
+		let fingerprint = window.localStorage.getItem(_namespacedKeyValue(FINGERPRINT_STORAGE_KEY));
+
+		if (!fingerprint) {
+			fingerprint = _generateUUID();
+			_setFingerprint(fingerprint);
+		}
+
+		return fingerprint;
 	}
 
 	function _setFingerprint(fingerprint) {
@@ -291,8 +286,18 @@
 		}
 	}
 
+	// Will create a session ID if one does not already exist
 	function _getSessionId() {
-		return window.sessionStorage.getItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
+		let sessionId = window.sessionStorage.getItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
+
+		if (!sessionId) {
+			sessionId = _generateUUID();
+			_setSessionId(sessionId);
+			// Let backend know this is a fresh session
+			_persistEvent('SESSION_STARTED');
+		}
+
+		return sessionId;
 	}
 
 	function _setSessionId(sessionId) {
