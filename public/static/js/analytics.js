@@ -7,6 +7,7 @@
 	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
 	const REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME = 'a.c';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
+	const FINGERPRINT_QUERY_PARAMETER_NAME = 'a.f';
 
 	// TODO: Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
 	// This appears to be a race condition related to prefetching - see https://issues.chromium.org/issues/40940701.
@@ -50,11 +51,13 @@
 		// Query parameters can optionally be used to initialize session and referral IDs.
 		// We ensure UUIDs are valid here to prevent copy-paste (or malicious) errors
 		const queryParameters = _extractQueryParametersForCurrentUrl();
+		const fingerprint = queryParameters[FINGERPRINT_QUERY_PARAMETER_NAME];
 		const sessionId = queryParameters[SESSION_ID_QUERY_PARAMETER_NAME];
 		const referringMessageId = queryParameters[REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME];
 		const referringCampaignId = queryParameters[REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME];
 
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
+		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
 		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
 		if (referringCampaignId) _setReferringCampaignId(referringCampaignId); // Not a UUID
 
@@ -372,6 +375,12 @@
 		// Referring Campaign ID can be any string value.
 		getReferringCampaignIdQueryParameterName: function () {
 			return REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME;
+		},
+		// Name of the query parameter that can be used to initialize fingerprint if needed.
+		// Generally 'a.f'
+		// Fingerprint must be a valid UUIDv4 value.
+		getFingerprintQueryParameterName: function () {
+			return FINGERPRINT_QUERY_PARAMETER_NAME;
 		},
 	};
 

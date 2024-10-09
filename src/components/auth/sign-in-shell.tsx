@@ -59,11 +59,17 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 				navigate('/sign-in/email');
 			} else if (accountSource.accountSourceId === AccountSourceId.MYCHART) {
 				// Construct a query string that preserves analytics information
+				const analyticsFingerprint = analyticsService.getFingerprint();
 				const analyticsSessionId = analyticsService.getSessionId();
 				const analyticsReferringCampaignId = analyticsService.getReferringCampaignId();
 				const analyticsReferringMessageId = analyticsService.getReferringMessageId();
 
 				let redirectSearchComponents = ['redirectImmediately=true'];
+
+				redirectSearchComponents.push(
+					`${analyticsService.getFingerprintQueryParameterName()}=${analyticsFingerprint}`
+				);
+
 				redirectSearchComponents.push(
 					`${analyticsService.getSessionIdQueryParameterName()}=${analyticsSessionId}`
 				);

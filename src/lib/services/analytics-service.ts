@@ -12,6 +12,14 @@ export const analyticsService = {
 		}
 	},
 
+	getFingerprint(): String {
+		return (window as any).cobaltAnalytics.getFingerprint();
+	},
+
+	getFingerprintQueryParameterName(): String {
+		return (window as any).cobaltAnalytics.getFingerprintQueryParameterName();
+	},
+
 	getSessionId(): String {
 		return (window as any).cobaltAnalytics.getSessionId();
 	},
