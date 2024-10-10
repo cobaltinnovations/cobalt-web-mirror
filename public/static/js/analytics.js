@@ -32,11 +32,18 @@
 	// URL_CHANGED           |          2 |          | 2024-10-10 13:40:05.706+00 | /sign-in            | visible
 	// PAGE_VIEW_SIGN_IN     |          2 |          | 2024-10-10 13:40:05.733+00 | /sign-in            | visible
 	//
-	// The workaround is to keep session data (session ID, referring message ID, referring campaign ID, timestamp) temporarily cached in durable localStorage.
+	// The workaround is to keep session data (session ID, referring message ID, referring campaign, timestamp) temporarily cached in durable localStorage.
 	// When a new session is about to be created, check to see if the temporary cache exists and has a timestamp that's within tolerance
 	// (the threshold below).
 	const TEMPORARY_SESSION_CACHE_STORAGE_KEY = 'TEMPORARY_SESSION_CACHE';
 	const TEMPORARY_SESSION_TIME_THRESHOLD_MILLIS = 5000; // Keep it short to minimize the chances of temporary localstorage "bleeding" into other tabs' sessions
+
+	// Sometimes the workaround above is not sufficient.
+	// For example, it can be possible to enter the site and sit for a few seconds, and then click on something to navigate.
+	// The act of clicking can trigger the browser to discard its session storage for reasons that are not clear.
+	// If the temporary localStorage cache is not applicable, we can fall back to this variable - an object that holds the
+	// 3 pieces of session storage data: sessionId, referringMessageId, and referringCampaign.
+	let mostRecentSession = undefined;
 
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
@@ -81,7 +88,14 @@
 
 		// Ensures that fingerprint and session ID are created if they are not already
 		_getFingerprint();
-		_getSessionId();
+		const initializedSessionId = _getSessionId();
+
+		// Store off session data so we can use it later to restore the session if needed to work around a browser bug
+		mostRecentSession = {
+			sessionId: initializedSessionId,
+			referringMessageId: referringMessageId,
+			referringCampaign: referringCampaign,
+		};
 
 		_registerVisibilityChangeListener();
 		_registerUrlChangedListenerUsingMutationObserver();
@@ -365,6 +379,20 @@
 							_setReferringCampaign(temporarySessionCache.referringCampaign.trim());
 
 						restoredFromTemporarySessionCache = true;
+
+						// Also store off the session data in a fallback variable
+						mostRecentSession = {
+							sessionId: sessionId,
+							referringMessageId: _getReferringMessageId(),
+							referringCampaign: _getReferringCampaign(),
+						};
+
+						// Remove the cached value because we no longer need it
+						try {
+							window.localStorage.removeItem(_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY));
+						} catch (e) {
+							_log('Unable to remove temporary session cache from localStorage', e);
+						}
 					} else {
 						_log('Removing temporary session cache.');
 
@@ -387,6 +415,20 @@
 					}
 				}
 			}
+
+			// Didn't work?  Fall back to our variable storage, if present.
+			if (!restoredFromTemporarySessionCache && mostRecentSession) {
+				sessionId = mostRecentSession.sessionId;
+				_setSessionId(sessionId);
+
+				if (_isValidUuid(mostRecentSession.referringMessageId))
+					_setReferringMessageId(mostRecentSession.referringMessageId);
+
+				if (mostRecentSession.referringCampaign && mostRecentSession.referringCampaign.trim().length > 0)
+					_setReferringCampaign(mostRecentSession.referringCampaign.trim());
+
+				restoredFromTemporarySessionCache = true;
+			}
 		}
 
 		// Send a special event to track the fact that we had to manually restore this session to work around the browser bug
@@ -407,7 +449,7 @@
 			// Let backend know this is a fresh session
 			_persistEvent('SESSION_STARTED');
 
-			// Store off the
+			// Store off the session data in temporary cache
 			window.localStorage.setItem(
 				_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY),
 				JSON.stringify({
@@ -417,6 +459,13 @@
 					timestamp: new Date().getTime(),
 				})
 			);
+
+			// Also store off the session data in a fallback variable
+			mostRecentSession = {
+				sessionId: sessionId,
+				referringMessageId: _getReferringMessageId(),
+				referringCampaign: _getReferringCampaign(),
+			};
 		}
 
 		return sessionId;
