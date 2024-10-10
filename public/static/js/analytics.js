@@ -9,11 +9,34 @@
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 	const FINGERPRINT_QUERY_PARAMETER_NAME = 'a.f';
 
-	// Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
+	// Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows when the browser prefetches the page.
 	// This appears to be a race condition related to prefetching - see https://issues.chromium.org/issues/40940701.
-	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab.
-	// The approach is to keep session data (session ID, referring message ID, referring campaign ID)
-	// const LOCALSTORAGE_SESSION_CACHE_STORAGE_KEY = 'SESSION_CACHE';
+	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab -
+	// data in sessionStorage is supposed to be durable for the lifetime of the browser tab, but it can be destroyed in this case.
+	//
+	// Example of the issue:
+	//
+	// 1. Open a new browser tab (Chrome OS X) and paste this into the URL bar: http://localhost:3000/?a.c=test and hit enter
+	//    (do not open the inspector/console first)
+	// 2. Observe data which shows browser behavior - sessionStorage session ID and campaign are unexpectedly lost while the browser
+	//    transitions from "prefetch" mode to "normal" mode.
+	//
+	//     event_type_id     | session_id | campaign |         timestamp          |         url         | document_visibility_state
+	// ----------------------+------------+----------+----------------------------+---------------------+---------------------------
+	// SESSION_STARTED       |          1 | test     | 2024-10-10 13:39:10.596+00 | /?a.c=test-campaign | hidden
+	// URL_CHANGED           |          1 | test     | 2024-10-10 13:39:10.597+00 | /?a.c=test-campaign | hidden
+	// BROUGHT_TO_FOREGROUND |          1 | test     | 2024-10-10 13:39:10.804+00 | /?a.c=test-campaign | visible
+	// URL_CHANGED           |          2 |          | 2024-10-10 13:39:10.859+00 | /sign-in            | visible
+	// SESSION_STARTED       |          2 |          | 2024-10-10 13:39:10.86+00  | /sign-in            | visible
+	// PAGE_VIEW_SIGN_IN     |          2 |          | 2024-10-10 13:39:10.868+00 | /sign-in            | visible
+	// URL_CHANGED           |          2 |          | 2024-10-10 13:40:05.706+00 | /sign-in            | visible
+	// PAGE_VIEW_SIGN_IN     |          2 |          | 2024-10-10 13:40:05.733+00 | /sign-in            | visible
+	//
+	// The workaround is to keep session data (session ID, referring message ID, referring campaign ID, timestamp) temporarily cached in durable localStorage.
+	// When a new session is about to be created, check to see if the temporary cache exists and has a timestamp that's within tolerance
+	// (the threshold below).
+	const TEMPORARY_SESSION_CACHE_STORAGE_KEY = 'TEMPORARY_SESSION_CACHE';
+	const TEMPORARY_SESSION_TIME_THRESHOLD_MILLIS = 5000; // Keep it short to minimize the chances of temporary localstorage "bleeding" into other tabs' sessions
 
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
@@ -54,7 +77,7 @@
 		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
-		if (referringCampaign && referringCampaign.trim().length > 0) _setReferringCampaign(referringCampaign); // Might not be a UUID
+		if (referringCampaign && referringCampaign.trim().length > 0) _setReferringCampaign(referringCampaign.trim()); // Might not be a UUID
 
 		// Ensures that fingerprint and session ID are created if they are not already
 		_getFingerprint();
@@ -192,6 +215,8 @@
 
 	function _persistEvent(analyticsNativeEventTypeId, data) {
 		try {
+			const fingerprint = _getFingerprint();
+			const sessionId = _getSessionId();
 			const timestamp = window.performance.timeOrigin + window.performance.now();
 			const accessToken = _getAccessToken();
 			const referringMessageId = _getReferringMessageId();
@@ -231,11 +256,11 @@
 						'X-Cobalt-Access-Token': accessToken ? accessToken : '',
 						'X-Cobalt-Webapp-Base-Url': window.location.origin,
 						'X-Cobalt-Webapp-Current-Url': window.location.href,
-						'X-Client-Device-Fingerprint': _getFingerprint(),
+						'X-Client-Device-Fingerprint': fingerprint,
 						'X-Client-Device-Type-Id': 'WEB_BROWSER',
 						'X-Client-Device-App-Name': 'Cobalt Webapp',
 						'X-Client-Device-App-Version': analyticsConfig.appVersion,
-						'X-Client-Device-Session-Id': _getSessionId(),
+						'X-Client-Device-Session-Id': sessionId,
 						'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
 						'X-Cobalt-Referring-Campaign': referringCampaign ? referringCampaign : '',
 						'X-Cobalt-Analytics': 'true',
@@ -284,12 +309,114 @@
 	// Will create a session ID if one does not already exist
 	function _getSessionId() {
 		let sessionId = window.sessionStorage.getItem(_namespacedKeyValue(SESSION_ID_STORAGE_KEY));
+		let restoredFromTemporarySessionCache = false;
+
+		// If there is no session ID in session storage, first check to see if we have session data that was cached off to work around
+		// a prefetch browser bug documented at the top of this file.  If the cached data exists, apply it to the current session.
+		if (!sessionId) {
+			// 1. Pull temporary session cache JSON from local storage (if present) and turn it back into a JS object
+			const temporarySessionCacheAsString = window.localStorage.getItem(
+				_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY)
+			);
+			let temporarySessionCache = undefined;
+
+			if (temporarySessionCacheAsString) {
+				try {
+					temporarySessionCache = JSON.parse(temporarySessionCacheAsString);
+				} catch (e1) {
+					_log('Unable to re-hydrate temporary session cache from localStorage', e1);
+					temporarySessionCache = undefined;
+
+					// Remove the cached value because it has invalid content
+					try {
+						window.localStorage.removeItem(_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY));
+					} catch (e2) {
+						_log('Unable to remove temporary session cache from localStorage', e2);
+					}
+				}
+			}
+
+			// 2. If we were able to re-hydrate our temporary session cache from local storage, use its data to populate session storage.
+			// Delete the cache when we're done.
+			if (temporarySessionCache) {
+				try {
+					if (typeof temporarySessionCache.timestamp !== 'number')
+						throw new Error(
+							`Invalid value for temporary session cache timestamp: ${temporarySessionCache.timestamp}`
+						);
+
+					const ageOfTemporarySessionCacheInMillis = new Date().getTime() - temporarySessionCache.timestamp;
+
+					// If we're within threshold and the cached data looks valid, restore it.
+					if (
+						ageOfTemporarySessionCacheInMillis < TEMPORARY_SESSION_TIME_THRESHOLD_MILLIS &&
+						_isValidUuid(temporarySessionCache.sessionId)
+					) {
+						sessionId = temporarySessionCache.sessionId;
+						_setSessionId(sessionId);
+
+						if (_isValidUuid(temporarySessionCache.referringMessageId))
+							_setReferringMessageId(temporarySessionCache.referringMessageId);
+
+						if (
+							temporarySessionCache.referringCampaign &&
+							temporarySessionCache.referringCampaign.trim().length > 0
+						)
+							_setReferringCampaign(temporarySessionCache.referringCampaign.trim());
+
+						restoredFromTemporarySessionCache = true;
+					} else {
+						_log('Removing temporary session cache.');
+
+						// If we're out of threshold or the data looks invalid, remove the cached value
+						try {
+							window.localStorage.removeItem(_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY));
+						} catch (e) {
+							_log('Unable to remove temporary session cache from localStorage', e);
+						}
+					}
+				} catch (e1) {
+					_log('Unable to apply temporary session cache', e1);
+					temporarySessionCache = undefined;
+
+					// Remove the cached value because it has invalid content
+					try {
+						window.localStorage.removeItem(_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY));
+					} catch (e2) {
+						_log('Unable to remove temporary session cache from localStorage', e2);
+					}
+				}
+			}
+		}
+
+		// Send a special event to track the fact that we had to manually restore this session to work around the browser bug
+		if (restoredFromTemporarySessionCache) {
+			try {
+				window.localStorage.removeItem(_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY));
+			} catch (e) {
+				_log('Unable to remove temporary session cache from localStorage', e);
+			}
+
+			_persistEvent('SESSION_RESTORED');
+		}
 
 		if (!sessionId) {
 			sessionId = _generateUUID();
 			_setSessionId(sessionId);
+
 			// Let backend know this is a fresh session
 			_persistEvent('SESSION_STARTED');
+
+			// Store off the
+			window.localStorage.setItem(
+				_namespacedKeyValue(TEMPORARY_SESSION_CACHE_STORAGE_KEY),
+				JSON.stringify({
+					sessionId: sessionId,
+					referringMessageId: _getReferringMessageId(),
+					referringCampaign: _getReferringCampaign(),
+					timestamp: new Date().getTime(),
+				})
+			);
 		}
 
 		return sessionId;
@@ -324,9 +451,12 @@
 	}
 
 	function _setReferringCampaign(referringCampaign) {
-		if (referringCampaign) {
+		if (referringCampaign && referringCampaign.trim().length > 0) {
 			_log(`Setting referring campaign '${referringCampaign}'`);
-			window.sessionStorage.setItem(_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY), referringCampaign);
+			window.sessionStorage.setItem(
+				_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY),
+				referringCampaign.trim()
+			);
 		} else {
 			_log('Clearing referring campaign');
 			window.sessionStorage.removeItem(_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY));
