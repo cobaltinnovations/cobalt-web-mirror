@@ -4,21 +4,16 @@
 	const SESSION_ID_QUERY_PARAMETER_NAME = 'a.s';
 	const REFERRING_MESSAGE_ID_STORAGE_KEY = 'REFERRING_MESSAGE_ID';
 	const REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME = 'a.m';
-	const REFERRING_CAMPAIGN_ID_STORAGE_KEY = 'REFERRING_CAMPAIGN_ID';
-	const REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME = 'a.c';
+	const REFERRING_CAMPAIGN_STORAGE_KEY = 'REFERRING_CAMPAIGN';
+	const REFERRING_CAMPAIGN_QUERY_PARAMETER_NAME = 'a.c';
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 	const FINGERPRINT_QUERY_PARAMETER_NAME = 'a.f';
 
-	// TODO: Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
+	// Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows.
 	// This appears to be a race condition related to prefetching - see https://issues.chromium.org/issues/40940701.
 	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab.
-	// One idea is to use localStorage to hold "recent enough" sessionStorage data and then if we detect a redirect into us
-	// from an external site, reconstitute our session ID, referring message/campaign, etc. from that.
-	// Or if there is some way to express "never prerender our site" then that would be a nice solution.
-	// See https://issues.chromium.org/issues/40584112
-	//
-	// TODO: Should we block initialization if it looks like we are executing in "prefetch" mode to avoid possible spurious events?
-	// See https://github.com/nickhsharp/prefetchNightmare for a possible approach
+	// The approach is to keep session data (session ID, referring message ID, referring campaign ID)
+	// const LOCALSTORAGE_SESSION_CACHE_STORAGE_KEY = 'SESSION_CACHE';
 
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
@@ -54,12 +49,12 @@
 		const fingerprint = queryParameters[FINGERPRINT_QUERY_PARAMETER_NAME];
 		const sessionId = queryParameters[SESSION_ID_QUERY_PARAMETER_NAME];
 		const referringMessageId = queryParameters[REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME];
-		const referringCampaignId = queryParameters[REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME];
+		const referringCampaign = queryParameters[REFERRING_CAMPAIGN_QUERY_PARAMETER_NAME];
 
 		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
-		if (referringCampaignId) _setReferringCampaignId(referringCampaignId); // Not a UUID
+		if (referringCampaign && referringCampaign.trim().length > 0) _setReferringCampaign(referringCampaign); // Might not be a UUID
 
 		// Ensures that fingerprint and session ID are created if they are not already
 		_getFingerprint();
@@ -200,7 +195,7 @@
 			const timestamp = window.performance.timeOrigin + window.performance.now();
 			const accessToken = _getAccessToken();
 			const referringMessageId = _getReferringMessageId();
-			const referringCampaignId = _getReferringCampaignId();
+			const referringCampaign = _getReferringCampaign();
 
 			const event = {
 				analyticsNativeEventTypeId: analyticsNativeEventTypeId,
@@ -242,7 +237,7 @@
 						'X-Client-Device-App-Version': analyticsConfig.appVersion,
 						'X-Client-Device-Session-Id': _getSessionId(),
 						'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
-						'X-Cobalt-Referring-Campaign-Id': referringCampaignId ? referringCampaignId : '',
+						'X-Cobalt-Referring-Campaign': referringCampaign ? referringCampaign : '',
 						'X-Cobalt-Analytics': 'true',
 					},
 					body: body,
@@ -324,17 +319,17 @@
 		}
 	}
 
-	function _getReferringCampaignId() {
-		return window.sessionStorage.getItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY));
+	function _getReferringCampaign() {
+		return window.sessionStorage.getItem(_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY));
 	}
 
-	function _setReferringCampaignId(referringCampaignId) {
-		if (referringCampaignId) {
-			_log(`Setting referring campaign ID ${referringCampaignId}`);
-			window.sessionStorage.setItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY), referringCampaignId);
+	function _setReferringCampaign(referringCampaign) {
+		if (referringCampaign) {
+			_log(`Setting referring campaign '${referringCampaign}'`);
+			window.sessionStorage.setItem(_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY), referringCampaign);
 		} else {
-			_log('Clearing referring campaign ID');
-			window.sessionStorage.removeItem(_namespacedKeyValue(REFERRING_CAMPAIGN_ID_STORAGE_KEY));
+			_log('Clearing referring campaign');
+			window.sessionStorage.removeItem(_namespacedKeyValue(REFERRING_CAMPAIGN_STORAGE_KEY));
 		}
 	}
 
@@ -359,7 +354,7 @@
 		getReferringMessageId: _getReferringMessageId,
 		// Gets the referring campaign identifier to be included in events.
 		// This identifier is cleared when the browser is closed.
-		getReferringCampaignId: _getReferringCampaignId,
+		getReferringCampaign: _getReferringCampaign,
 		// Gets the fingerprint to be included in events.
 		// The fingerprint persists until the user clears localstorage.
 		getFingerprint: _getFingerprint,
@@ -378,8 +373,8 @@
 		// Name of the query parameter that can be used to initialize the referring campaign ID if needed.
 		// Generally 'a.c'
 		// Referring Campaign ID can be any string value.
-		getReferringCampaignIdQueryParameterName: function () {
-			return REFERRING_CAMPAIGN_ID_QUERY_PARAMETER_NAME;
+		getReferringCampaignQueryParameterName: function () {
+			return REFERRING_CAMPAIGN_QUERY_PARAMETER_NAME;
 		},
 		// Name of the query parameter that can be used to initialize fingerprint if needed.
 		// Generally 'a.f'

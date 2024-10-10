@@ -61,7 +61,7 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 				// Construct a query string that preserves analytics information
 				const analyticsFingerprint = analyticsService.getFingerprint();
 				const analyticsSessionId = analyticsService.getSessionId();
-				const analyticsReferringCampaignId = analyticsService.getReferringCampaignId();
+				const analyticsReferringCampaign = analyticsService.getReferringCampaign();
 				const analyticsReferringMessageId = analyticsService.getReferringMessageId();
 
 				let redirectSearchComponents = ['redirectImmediately=true'];
@@ -74,9 +74,9 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 					`${analyticsService.getSessionIdQueryParameterName()}=${analyticsSessionId}`
 				);
 
-				if (analyticsReferringCampaignId)
+				if (analyticsReferringCampaign)
 					redirectSearchComponents.push(
-						`${analyticsService.getReferringCampaignIdQueryParameterName()}=${analyticsReferringCampaignId}`
+						`${analyticsService.getReferringCampaignQueryParameterName()}=${analyticsReferringCampaign}`
 					);
 
 				if (analyticsReferringMessageId)

@@ -36,11 +36,11 @@ export const analyticsService = {
 		return (window as any).cobaltAnalytics.getReferringMessageIdQueryParameterName();
 	},
 
-	getReferringCampaignId(): String | undefined {
-		return (window as any).cobaltAnalytics.getReferringCampaignId();
+	getReferringCampaign(): String | undefined {
+		return (window as any).cobaltAnalytics.getReferringCampaign();
 	},
 
-	getReferringCampaignIdQueryParameterName(): String {
-		return (window as any).cobaltAnalytics.getReferringCampaignIdQueryParameterName();
+	getReferringCampaignQueryParameterName(): String {
+		return (window as any).cobaltAnalytics.getReferringCampaignQueryParameterName();
 	},
 };

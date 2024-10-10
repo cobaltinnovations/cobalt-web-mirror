@@ -53,7 +53,7 @@ export class HttpClient {
 					const clientDeviceFingerprint = window.localStorage.getItem('cobaltAnalytics.FINGERPRINT');
 					const clientDeviceSessionId = window.sessionStorage.getItem('cobaltAnalytics.SESSION_ID');
 					const referringMessageId = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_MESSAGE_ID');
-					const referringCampaignId = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_CAMPAIGN_ID');
+					const referringCampaign = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_CAMPAIGN');
 
 					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
 					headers['X-Client-Device-Fingerprint'] = clientDeviceFingerprint ? clientDeviceFingerprint : '';
@@ -61,7 +61,7 @@ export class HttpClient {
 					headers['X-Client-Device-App-Name'] = 'Cobalt Webapp';
 					headers['X-Client-Device-Session-Id'] = clientDeviceSessionId ? clientDeviceSessionId : '';
 					headers['X-Cobalt-Referring-Message-Id'] = referringMessageId ? referringMessageId : '';
-					headers['X-Cobalt-Referring-Campaign-Id'] = referringCampaignId ? referringCampaignId : '';
+					headers['X-Cobalt-Referring-Campaign'] = referringCampaign ? referringCampaign : '';
 
 					return data;
 				},
