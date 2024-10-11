@@ -37,6 +37,8 @@ enum SEARCH_PARAMS {
 }
 
 const ConnectWithSupportV2 = () => {
+	const filtersFetched = useRef(false);
+
 	const handleError = useHandleError();
 	const { pathname, search } = useLocation();
 	const { account, institution } = useAccount();
@@ -89,6 +91,14 @@ const ConnectWithSupportV2 = () => {
 			return;
 		}
 
+		// For some reason, the institution keeps getting fetched and set into state whenever a searchParam changes.
+		// This is causing this fetchFilters function to double fire, which in return causes the fetchProviders to double fire.
+		// And at the very end of this chain that causes analytics to be reported twice.
+		// For now, save of if the filters have already been fetched and return if so.
+		if (filtersFetched.current) {
+			return;
+		}
+
 		const [findOptionsResponse, institutionLocationsResponse] = await Promise.all([
 			providerService
 				.fetchFindOptions({
@@ -101,6 +111,8 @@ const ConnectWithSupportV2 = () => {
 
 		setFindOptions(findOptionsResponse);
 		setInstitutionLocations(institutionLocationsResponse.locations);
+
+		filtersFetched.current = true;
 	}, [featureDetails, institution]);
 
 	/* --------------------------------------------------- */
