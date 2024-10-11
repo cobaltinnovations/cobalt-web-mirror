@@ -20,7 +20,7 @@ enum FILTER_IDS {
 }
 
 const ResourceLibraryTags = () => {
-	const { tagId } = useParams<{ tagId: string }>();
+	const { urlName } = useParams<{ urlName: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
@@ -34,7 +34,7 @@ const ResourceLibraryTags = () => {
 		contentDurations: ContentDuration[];
 	}>();
 	const [filters, setFilters] = useState<Record<FILTER_IDS, SimpleFilterModel<FILTER_IDS>>>();
-	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
+	const [findResultTotalCount, setFindResultTotalCount] = useState<number>();
 	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
 	const [tagGroup, setTagGroup] = useState<TagGroup>();
 	const [tag, setTag] = useState<Tag>();
@@ -42,27 +42,45 @@ const ResourceLibraryTags = () => {
 	const [content, setContent] = useState<Content[]>([]);
 
 	const fetchTag = useCallback(async () => {
-		if (!tagId) {
-			throw new Error('tagId is undefined.');
+		if (!urlName) {
+			throw new Error('urlName is undefined.');
 		}
 
-		const response = await resourceLibraryService
-			.getResourceLibraryContentByTagId(tagId, { pageNumber: 0, pageSize: 0 })
-			.fetch();
+		setTag(undefined);
+		setTagGroup(undefined);
+		setTagsByTagId(undefined);
+		setFiltersResponse(undefined);
+
+		const response = await resourceLibraryService.getResourceLibraryTagByTagIdentifier(urlName).fetch();
 
 		setTag(response.tag);
 		setTagGroup(response.tagGroup);
 		setTagsByTagId(response.tagsByTagId);
-	}, [tagId]);
+		setFiltersResponse({ contentTypes: response.contentTypes, contentDurations: response.contentDurations });
+	}, [urlName]);
 
-	const fetchFilters = useCallback(async () => {
-		if (!tagId) {
-			throw new Error('tagGroupId is undefined.');
+	const fetchContent = useCallback(async () => {
+		if (!urlName) {
+			throw new Error('tagId is undefined.');
 		}
 
-		const response = await resourceLibraryService.getResourceLibraryFiltersByTagId(tagId).fetch();
-		setFiltersResponse(response);
-	}, [tagId]);
+		setFindResultTotalCount(undefined);
+		setFindResultTotalCountDescription('');
+		setContent([]);
+
+		const { findResult } = await resourceLibraryService
+			.getResourceLibraryContentByUrlName(urlName, {
+				pageNumber: 0,
+				pageSize: 200,
+				contentTypeId: contentTypeIdQuery,
+				contentDurationId: contentDurationIdQuery,
+			})
+			.fetch();
+
+		setFindResultTotalCount(findResult.totalCount);
+		setFindResultTotalCountDescription(findResult.totalCountDescription);
+		setContent(findResult.contents);
+	}, [contentDurationIdQuery, contentTypeIdQuery, urlName]);
 
 	useEffect(() => {
 		if (!filtersResponse) {
@@ -97,31 +115,21 @@ const ResourceLibraryTags = () => {
 		setFilters(formattedFilters);
 	}, [contentDurationIdQuery, contentTypeIdQuery, filtersResponse]);
 
-	const fetchContent = useCallback(async () => {
-		if (!tagId) {
-			throw new Error('tagId is undefined.');
+	useEffect(() => {
+		if (tag === undefined || findResultTotalCount === undefined) {
+			return;
 		}
 
-		const { findResult } = await resourceLibraryService
-			.getResourceLibraryContentByTagId(tagId, {
-				pageNumber: 0,
-				pageSize: 200,
-				contentTypeId: contentTypeIdQuery,
-				contentDurationId: contentDurationIdQuery,
-			})
-			.fetch();
-
-		setFindResultTotalCount(findResult.totalCount);
-		setFindResultTotalCountDescription(findResult.totalCountDescription);
-		setContent(findResult.contents);
-
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG, {
-			tagId: tagId,
+			tagId: tag.tagId,
 			contentTypeIds: contentTypeIdQuery,
 			contentDurationIds: contentDurationIdQuery,
-			totalCount: findResult.totalCount,
+			totalCount: findResultTotalCount,
 		});
-	}, [contentDurationIdQuery, contentTypeIdQuery, tagId]);
+
+		// Only fire analytics event when API calls have resolved, ignore searchParam change
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [findResultTotalCount, tag]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
@@ -134,11 +142,8 @@ const ResourceLibraryTags = () => {
 	};
 
 	const handleClearButtonClick = useCallback(() => {
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
-
-		setSearchParams(searchParams, { replace: true });
-	}, [searchParams, setSearchParams]);
+		setSearchParams(new URLSearchParams(), { replace: true });
+	}, [setSearchParams]);
 
 	return (
 		<>
@@ -197,8 +202,6 @@ const ResourceLibraryTags = () => {
 						</HeroContainer>
 					</>
 				)}
-			</AsyncPage>
-			<AsyncPage fetchData={fetchFilters}>
 				<Container className="pt-8">
 					<Row className="mb-8">
 						<Col>

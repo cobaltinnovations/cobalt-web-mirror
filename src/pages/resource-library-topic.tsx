@@ -202,6 +202,8 @@ const ResourceLibraryTopic = () => {
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
 			totalCount: findResultTotalCount,
 		});
+
+		// Only fire analytics event when api calls resolve, not on queryParam change
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [findResultTotalCount, tagGroup]);
 
