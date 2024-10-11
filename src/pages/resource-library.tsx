@@ -420,6 +420,7 @@ const ResourceLibrary = () => {
 											searchParams.set('recommended', 'true');
 										}
 
+										setHasCompletedScreening(false);
 										setSearchParams(searchParams, { replace: true });
 									}}
 								/>
@@ -475,7 +476,7 @@ const ResourceLibrary = () => {
 																})}
 															>
 																<h5 className="mb-4">{tagGroup.name}</h5>
-																{tagFilters?.[tagGroup.tagGroupId].map(
+																{tagFilters?.[tagGroup.tagGroupId]?.map(
 																	(tag, tagIndex) => {
 																		const isLastTag =
 																			tagFilters[tagGroup.tagGroupId].length -
