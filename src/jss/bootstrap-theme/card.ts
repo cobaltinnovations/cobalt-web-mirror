@@ -55,7 +55,7 @@ export const card = (theme: CobaltTheme) => {
 					textTransform: 'none',
 				},
 				'&__body': {
-					borderTop: `1px solid ${theme.colors.n100}`,
+					borderTop: `0px solid ${theme.colors.n100}`,
 					padding: '20px 16px',
 					borderBottomLeftRadius: 4,
 					borderBottomRightRadius: 4,

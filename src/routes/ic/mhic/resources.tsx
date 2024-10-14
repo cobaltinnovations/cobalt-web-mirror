@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { Outlet, useLocation, useMatches, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useMatches, useNavigate } from 'react-router-dom';
 import { Badge, Button, Col, Container, Dropdown, Offcanvas, Row } from 'react-bootstrap';
 import { MhicPageHeader } from '@/components/integrated-care/mhic';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
@@ -86,15 +86,10 @@ export const Component = () => {
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								<TableRow
-									onClick={() => {
-										navigate({
-											pathname: `${location.pathname}/${'xxx'}`,
-											search: location.search,
-										});
-									}}
-								>
-									<TableCell>Resource Name</TableCell>
+								<TableRow>
+									<TableCell>
+										<Link to={`${location.pathname}/${'xxx'}`}>Resource Name</Link>
+									</TableCell>
 									<TableCell>Psychiatry</TableCell>
 									<TableCell>19444, 19428</TableCell>
 									<TableCell className="flex-row align-items-center justify-content-start">
@@ -103,58 +98,19 @@ export const Component = () => {
 										</Badge>
 									</TableCell>
 									<TableCell className="flex-row align-items-center justify-content-end">
-										<Button variant="light" className="p-2 me-2">
+										<Button
+											variant="light"
+											className="p-2 me-2"
+											onClick={(event) => {
+												event.stopPropagation();
+											}}
+										>
 											<CopyIcon className="d-flex" width={20} height={20} />
 										</Button>
 										<Dropdown>
 											<Dropdown.Toggle
 												as={DropdownToggle}
 												id={`mhic-resources__dropdown-menu--${'resource-0'}`}
-												className="p-2"
-											>
-												<MoreIcon className="d-flex" />
-											</Dropdown.Toggle>
-											<Dropdown.Menu
-												as={DropdownMenu}
-												align="end"
-												popperConfig={{ strategy: 'fixed' }}
-												renderOnMount
-											>
-												<Dropdown.Item
-													onClick={() => {
-														return;
-													}}
-												>
-													Action 1
-												</Dropdown.Item>
-												<Dropdown.Item
-													onClick={() => {
-														return;
-													}}
-												>
-													Action 2
-												</Dropdown.Item>
-											</Dropdown.Menu>
-										</Dropdown>
-									</TableCell>
-								</TableRow>
-								<TableRow>
-									<TableCell>Resource Name</TableCell>
-									<TableCell>Psychiatry, Psychotherapy</TableCell>
-									<TableCell>19444, 19428</TableCell>
-									<TableCell className="flex-row align-items-center justify-content-start">
-										<Badge pill bg="outline-danger">
-											Unavailable
-										</Badge>
-									</TableCell>
-									<TableCell className="flex-row align-items-center justify-content-end">
-										<Button variant="light" className="p-2 me-2">
-											<CopyIcon className="d-flex" width={20} height={20} />
-										</Button>
-										<Dropdown>
-											<Dropdown.Toggle
-												as={DropdownToggle}
-												id={`mhic-resources__dropdown-menu--${'resource-1'}`}
 												className="p-2"
 											>
 												<MoreIcon className="d-flex" />
