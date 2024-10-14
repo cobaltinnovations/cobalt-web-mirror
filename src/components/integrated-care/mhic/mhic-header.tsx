@@ -127,6 +127,9 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const patientOrdersMatch = useMatch({
 		path: '/ic/mhic/patient-orders/*',
 	});
+	const resourcesMatch = useMatch({
+		path: '/ic/mhic/resources/*',
+	});
 	const reportsMatch = useMatch({
 		path: '/ic/mhic/reports',
 	});
@@ -157,6 +160,13 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Patient Orders',
 				active: patientOrdersMatch,
 			},
+			{
+				testId: '',
+				navigationItemId: 'RESOURCES',
+				to: '/ic/mhic/resources',
+				title: 'Resources',
+				active: resourcesMatch,
+			},
 			...(account?.accountCapabilityFlags.canAdministerIcDepartments
 				? [
 						{
@@ -184,6 +194,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			overviewMatch,
 			myPatientsMatch,
 			patientOrdersMatch,
+			resourcesMatch,
 			account?.accountCapabilityFlags.canAdministerIcDepartments,
 			account?.accountCapabilityFlags.canViewIcReports,
 			departmentAvailabilityMatch,

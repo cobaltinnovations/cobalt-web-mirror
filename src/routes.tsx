@@ -972,6 +972,11 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
+										id: 'resources',
+										path: 'resources',
+										lazy: () => import('@/routes/ic/mhic/resources'),
+									},
+									{
 										id: 'department-availability',
 										path: 'department-availability',
 										lazy: () => import('@/routes/ic/mhic/department-availability'),
