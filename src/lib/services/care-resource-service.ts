@@ -1,6 +1,14 @@
 import { CareResourceModel, PayorModel, SupportRoleModel } from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons';
 
+export interface GetCareResourcesResponseModel {
+	careResources: {
+		totalCountDescription: string;
+		totalCount: number;
+		careResources: CareResourceModel[];
+	};
+}
+
 export const careResourceService = {
 	getSupportRoles() {
 		return httpSingleton.orchestrateRequest<{ supportRoles: SupportRoleModel[] }>({
@@ -9,13 +17,7 @@ export const careResourceService = {
 		});
 	},
 	getCareResources(params?: { pageNumber?: string; pageSize?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			careResources: {
-				totalCountDescription: string;
-				totalCount: number;
-				careResources: CareResourceModel[];
-			};
-		}>({
+		return httpSingleton.orchestrateRequest<GetCareResourcesResponseModel>({
 			method: 'GET',
 			url: '/care-resources',
 			params,
