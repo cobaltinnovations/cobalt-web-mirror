@@ -975,6 +975,15 @@ export const routes: RouteObject[] = [
 										id: 'resources',
 										path: 'resources',
 										lazy: () => import('@/routes/ic/mhic/resources'),
+										children: [
+											{
+												path: ':resourceId',
+												lazy: () => import('@/routes/ic/mhic/resources-shelf'),
+												handle: {
+													isMhicResourcesShelf: true,
+												},
+											},
+										],
 									},
 									{
 										id: 'department-availability',

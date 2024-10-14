@@ -1,23 +1,42 @@
+import React from 'react';
+import { Helmet } from 'react-helmet';
+import { Outlet, useLocation, useMatches, useNavigate } from 'react-router-dom';
+import { Badge, Button, Col, Container, Dropdown, Offcanvas, Row } from 'react-bootstrap';
 import { MhicPageHeader } from '@/components/integrated-care/mhic';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import React from 'react';
-import { Badge, Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	shelf: {
+		width: '95% !important',
+		maxWidth: '800px !important',
+		'& section': {
+			padding: 32,
+			borderBottom: `1px solid ${theme.colors.border}`,
+		},
+	},
+}));
 
 export const loader = async () => {
 	return null;
 };
 
 export const Component = () => {
+	const classes = useStyles();
+	const location = useLocation();
+	const navigate = useNavigate();
+	const matches = useMatches();
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Integrated Care - Resources</title>
 			</Helmet>
+
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
@@ -67,7 +86,14 @@ export const Component = () => {
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								<TableRow>
+								<TableRow
+									onClick={() => {
+										navigate({
+											pathname: `${location.pathname}/${'xxx'}`,
+											search: location.search,
+										});
+									}}
+								>
 									<TableCell>Resource Name</TableCell>
 									<TableCell>Psychiatry</TableCell>
 									<TableCell>19444, 19428</TableCell>
@@ -162,6 +188,24 @@ export const Component = () => {
 					</Col>
 				</Row>
 			</Container>
+
+			<Offcanvas
+				className={classes.shelf}
+				show={
+					!!matches.find((m) =>
+						Object.hasOwn((m.handle as Record<string, any>) ?? {}, 'isMhicResourcesShelf')
+					)
+				}
+				placement="end"
+				onHide={() => {
+					navigate({
+						pathname: '.',
+						search: location.search,
+					});
+				}}
+			>
+				<Outlet />
+			</Offcanvas>
 		</>
 	);
 };
