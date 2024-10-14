@@ -124,9 +124,6 @@ export const AdminHeader = () => {
 	const reportsMatch = useMatch({
 		path: '/admin/reports/*',
 	});
-	const schedulingMatch = useMatch({
-		path: '/admin/scheduling/*',
-	});
 	const analyticsMatch = useMatch({
 		path: '/admin/analytics/*',
 	});
