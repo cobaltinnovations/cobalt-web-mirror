@@ -1,17 +1,27 @@
 import React, { useCallback, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { AdminBadgeSelectControl, AdminFormFooter, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { careResourceService } from '@/lib/services';
 
 export const loader = async () => {
-	return null;
+	const [{ payors }, { supportRoles }] = await Promise.all([
+		careResourceService.getPayors().fetch(),
+		careResourceService.getSupportRoles().fetch(),
+	]);
+
+	return {
+		payors,
+		supportRoles,
+	};
 };
 
 export const Component = () => {
+	const { payors, supportRoles } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const [formValues, setFormValues] = useState({
 		availability: '',
@@ -151,7 +161,14 @@ export const Component = () => {
 							}}
 							required
 						>
-							<option value="">TODO: Insurance Options</option>
+							<option value="" disabled>
+								Select...
+							</option>
+							{payors.map((payor) => (
+								<option key={payor.payorId} value={payor.payorId}>
+									{payor.name}
+								</option>
+							))}
 						</InputHelper>
 					</AdminFormSection>
 					<hr />
@@ -173,24 +190,11 @@ export const Component = () => {
 						</InputHelper>
 					</AdminFormSection>
 					<hr />
-					<AdminFormSection
-						title="Therapy Types"
-						description="Select therapy types offered."
-						alignHorizontally
-					>
+					<AdminFormSection title="Therapy Types" description="Select therapy types offered.">
 						<AdminBadgeSelectControl
-							idKey="therapyTypeId"
-							labelKey="title"
-							options={[
-								{
-									therapyTypeId: 'PSYCHIATRY',
-									title: 'Psychiatry',
-								},
-								{
-									therapyTypeId: 'PSYCHOTHERAPY',
-									title: 'Psychotherapy',
-								},
-							]}
+							idKey="supportRoleId"
+							labelKey="description"
+							options={supportRoles}
 							selections={formValues.therapyTypes}
 							onChange={(selections) => {
 								setFormValues((previousValue) => ({
