@@ -55,7 +55,10 @@ export const Component = () => {
 									className="d-flex align-items-center"
 									variant="primary"
 									onClick={() => {
-										return;
+										navigate({
+											pathname: `${location.pathname}/add`,
+											search: location.search,
+										});
 									}}
 								>
 									<PlusIcon className="me-2" /> Add
