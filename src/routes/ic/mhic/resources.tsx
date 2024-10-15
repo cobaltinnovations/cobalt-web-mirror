@@ -6,7 +6,7 @@ import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicPageHeader } from '@/components/integrated-care/mhic';
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
+import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
@@ -32,6 +32,8 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
 	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '', [searchParams]);
+	const sortBy = useMemo(() => searchParams.get('sortBy') ?? '', [searchParams]);
+	const sortDirection = useMemo(() => searchParams.get('sortDirection') ?? '', [searchParams]);
 
 	const classes = useStyles();
 	const location = useLocation();
@@ -53,6 +55,8 @@ export const Component = () => {
 					.getCareResources({
 						...(pageNumber && { pageNumber }),
 						...(pageSize && { pageSize }),
+						...(sortBy && { sortBy }),
+						...(sortDirection && { sortDirection }),
 					})
 					.fetch();
 
@@ -67,7 +71,7 @@ export const Component = () => {
 		};
 
 		fetchData();
-	}, [handleError, pageNumber, pageSize]);
+	}, [handleError, pageNumber, pageSize, sortBy, sortDirection]);
 
 	return (
 		<>
@@ -115,7 +119,19 @@ export const Component = () => {
 						<Table isLoading={isLoading}>
 							<TableHead>
 								<TableRow>
-									<TableCell header>Name</TableCell>
+									<TableCell
+										className="flex-row align-items-center justify-content-start"
+										header
+										sortable
+										sortDirection={sortDirection as SORT_DIRECTION}
+										onSort={(sortDirection) => {
+											searchParams.set('sortBy', 'NAME');
+											searchParams.set('sortDirection', sortDirection);
+											setSearchParams(searchParams);
+										}}
+									>
+										Name
+									</TableCell>
 									<TableCell header>Therapy Type</TableCell>
 									<TableCell header>ZIP</TableCell>
 									<TableCell header>Availability</TableCell>
