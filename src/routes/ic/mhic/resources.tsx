@@ -24,7 +24,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-// TODO: Use this page blocking loader to fetch the filters
 export const loader = async () => {
 	return null;
 };
@@ -79,7 +78,7 @@ export const Component = () => {
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
-						<MhicPageHeader className="mb-6" title="Resources">
+						<MhicPageHeader title="Resources">
 							<div className="d-flex align-items-center">
 								<Button
 									className="me-2"
@@ -104,18 +103,13 @@ export const Component = () => {
 								</Button>
 							</div>
 						</MhicPageHeader>
-						<hr className="mb-6" />
-						<div className="d-flex justify-content-between align-items-center">
-							<div className="d-flex align-items-center">
-								<span>TODO: Filters</span>
-							</div>
-							<div>
-								<span>TODO: Sort</span>
-							</div>
-						</div>
 					</Col>
 				</Row>
-
+				<Row className="mb-8">
+					<Col>
+						<hr />
+					</Col>
+				</Row>
 				<Row className="mb-8">
 					<Col>
 						<Table isLoading={isLoading}>
@@ -136,27 +130,27 @@ export const Component = () => {
 												{careResource.name}
 											</Link>
 										</TableCell>
-										<TableCell>Psychiatry</TableCell>
-										<TableCell>19444, 19428</TableCell>
+										<TableCell>
+											{careResource.supportRoles.map((sr) => sr.description).join(', ')}
+										</TableCell>
+										<TableCell>
+											{careResource.careResourceLocations
+												.map((crl) => crl.address.postalCode)
+												.join(', ')}
+										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-start">
 											<Badge pill bg="outline-success">
-												Available
+												TODO: Available
 											</Badge>
 										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
-											<Button
-												variant="light"
-												className="p-2 me-2"
-												onClick={(event) => {
-													event.stopPropagation();
-												}}
-											>
+											<Button variant="light" className="p-2 me-2">
 												<CopyIcon className="d-flex" width={20} height={20} />
 											</Button>
 											<Dropdown>
 												<Dropdown.Toggle
 													as={DropdownToggle}
-													id={`mhic-resources__dropdown-menu--${'resource-0'}`}
+													id={`mhic-resources__dropdown-menu--${careResource.carResourceId}`}
 													className="p-2"
 												>
 													<MoreIcon className="d-flex" />
