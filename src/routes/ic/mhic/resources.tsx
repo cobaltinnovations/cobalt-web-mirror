@@ -31,7 +31,7 @@ export const loader = async () => {
 export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
-	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '', [searchParams]);
+	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '15', [searchParams]);
 	const sortBy = useMemo(() => searchParams.get('sortBy') ?? '', [searchParams]);
 	const sortDirection = useMemo(() => searchParams.get('sortDirection') ?? '', [searchParams]);
 
@@ -125,6 +125,7 @@ export const Component = () => {
 										sortable
 										sortDirection={sortDirection as SORT_DIRECTION}
 										onSort={(sortDirection) => {
+											searchParams.set('pageNumber', '0');
 											searchParams.set('sortBy', 'NAME');
 											searchParams.set('sortDirection', sortDirection);
 											setSearchParams(searchParams);
