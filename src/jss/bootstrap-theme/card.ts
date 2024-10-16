@@ -30,6 +30,17 @@ export const card = (theme: CobaltTheme) => {
 		'.ic-card': {
 			borderRadius: 4,
 			border: `1px solid ${theme.colors.border}`,
+			'&--care-resource-location': {
+				border: 0,
+				'& .cobalt-card': {
+					'&__body': {
+						padding: 24,
+						borderRadius: 8,
+						backgroundColor: theme.colors.n75,
+						border: `1px solid ${theme.colors.border}`,
+					},
+				},
+			},
 			'& .cobalt-card': {
 				'&__header': {
 					padding: '14px 16px',

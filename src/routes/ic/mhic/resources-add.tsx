@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useState } from 'react';
 import { Link, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
@@ -11,6 +12,7 @@ import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { MhicCareResourceLocationCard } from '@/components/integrated-care/mhic';
 
 export const loader = async () => {
 	const [{ payors }, { supportRoles }] = await Promise.all([
@@ -34,12 +36,37 @@ export const Component = () => {
 		clinicName: '',
 		phoneNumber: '',
 		website: '',
-		locations: [] as string[],
+		locations: [] as {
+			id: string;
+			location: string;
+			wheelchairAccessible: boolean;
+			languages: string[];
+			uniquePhoneNumber: boolean;
+			phoneNumber: string;
+			notes: string;
+		}[],
 		insurance: '',
 		specialties: [] as CareResourceSpecialtyModel[],
 		therapyTypes: [] as string[],
 		notes: '',
 	});
+
+	const handleAddLocationButtonClick = useCallback(() => {
+		const tempLocation = {
+			id: uuidv4(),
+			location: '',
+			wheelchairAccessible: false,
+			languages: [],
+			uniquePhoneNumber: false,
+			phoneNumber: '',
+			notes: '',
+		};
+
+		setFormValues((previousValue) => ({
+			...previousValue,
+			locations: [...previousValue.locations, tempLocation],
+		}));
+	}, []);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
@@ -184,9 +211,24 @@ export const Component = () => {
 					<AdminFormSection
 						title="Location"
 						description="Enter the location(s) where this resource is located."
-						alignHorizontally
 					>
-						<Button>Add Location</Button>
+						{formValues.locations.map((location) => (
+							<MhicCareResourceLocationCard
+								className="mb-5"
+								id={location.id}
+								location={location.location}
+								wheelchairAccessible={location.wheelchairAccessible}
+								languages={location.languages}
+								uniquePhoneNumber={location.uniquePhoneNumber}
+								notes={location.notes}
+								onChange={() => {
+									return;
+								}}
+							/>
+						))}
+						<Button type="button" className="d-block w-100" onClick={handleAddLocationButtonClick}>
+							Add Location
+						</Button>
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection
