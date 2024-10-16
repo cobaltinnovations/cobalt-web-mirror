@@ -11,8 +11,9 @@ import { AdminBadgeSelectControl, AdminFormFooter, AdminFormSection } from '@/co
 import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import { CareResourceLocationCardValueModel, MhicCareResourceLocationCard } from '@/components/integrated-care/mhic';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { MhicCareResourceLocationCard } from '@/components/integrated-care/mhic';
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
 export const loader = async () => {
 	const [{ payors }, { supportRoles }] = await Promise.all([
@@ -36,15 +37,7 @@ export const Component = () => {
 		clinicName: '',
 		phoneNumber: '',
 		website: '',
-		locations: [] as {
-			id: string;
-			location: string;
-			wheelchairAccessible: boolean;
-			languages: string[];
-			uniquePhoneNumber: boolean;
-			phoneNumber: string;
-			notes: string;
-		}[],
+		locations: [] as CareResourceLocationCardValueModel[],
 		insurance: '',
 		specialties: [] as CareResourceSpecialtyModel[],
 		therapyTypes: [] as string[],
@@ -225,10 +218,21 @@ export const Component = () => {
 										),
 									}));
 								}}
+								onDelete={() => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										locations: previousValue.locations.filter((l) => l.id !== location.id),
+									}));
+								}}
 							/>
 						))}
-						<Button type="button" className="d-block w-100" onClick={handleAddLocationButtonClick}>
-							Add Location
+						<Button
+							type="button"
+							className="d-flex align-items-center justify-content-center w-100"
+							onClick={handleAddLocationButtonClick}
+						>
+							<PlusIcon className="me-2" />
+							Add {formValues.locations.length > 0 ? 'Another ' : ''}Location
 						</Button>
 					</AdminFormSection>
 					<hr />

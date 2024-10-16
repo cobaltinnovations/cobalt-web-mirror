@@ -1,9 +1,10 @@
+import React from 'react';
+import { Button, Card, Form } from 'react-bootstrap';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
-import React from 'react';
-import { Card, Form } from 'react-bootstrap';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 
-interface MhicLocationCardValueModel {
+export interface CareResourceLocationCardValueModel {
 	id: string;
 	location: string;
 	wheelchairAccessible: boolean;
@@ -14,12 +15,13 @@ interface MhicLocationCardValueModel {
 }
 
 interface MhicLocationCardProps {
+	value: CareResourceLocationCardValueModel;
 	className?: string;
-	value: MhicLocationCardValueModel;
-	onChange(value: MhicLocationCardValueModel): void;
+	onChange(value: CareResourceLocationCardValueModel): void;
+	onDelete(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
-export const MhicCareResourceLocationCard = ({ value, onChange, className }: MhicLocationCardProps) => {
+export const MhicCareResourceLocationCard = ({ value, className, onChange, onDelete }: MhicLocationCardProps) => {
 	return (
 		<Card bsPrefix="ic-card ic-card--care-resource-location" className={className}>
 			<Card.Body>
@@ -51,6 +53,34 @@ export const MhicCareResourceLocationCard = ({ value, onChange, className }: Mhi
 						})
 					}
 				/>
+				<Form.Check
+					className="mb-3"
+					type="checkbox"
+					id={`mhic-location-card__unique-phone-number--${value.id}`}
+					value="UNIQUE_PHONE_NUMBER"
+					label="Phone number different than main"
+					checked={value.uniquePhoneNumber ?? false}
+					onChange={({ currentTarget }) =>
+						onChange({
+							...value,
+							uniquePhoneNumber: currentTarget.checked,
+						})
+					}
+				/>
+				{value.uniquePhoneNumber && (
+					<InputHelper
+						className="mb-3"
+						type="tel"
+						label="Phone Number"
+						value={value.phoneNumber}
+						onChange={({ currentTarget }) => {
+							onChange({
+								...value,
+								phoneNumber: currentTarget.value,
+							});
+						}}
+					/>
+				)}
 				<TypeaheadHelper
 					className="mb-3"
 					id={`mhic-location-card__languages--${value.id}`}
@@ -66,21 +96,8 @@ export const MhicCareResourceLocationCard = ({ value, onChange, className }: Mhi
 						})
 					}
 				/>
-				<Form.Check
-					className="mb-3"
-					type="checkbox"
-					id={`mhic-location-card__unique-phone-number--${value.id}`}
-					value="UNIQUE_PHONE_NUMBER"
-					label="Phone number different than main"
-					checked={value.uniquePhoneNumber ?? false}
-					onChange={({ currentTarget }) =>
-						onChange({
-							...value,
-							uniquePhoneNumber: currentTarget.checked,
-						})
-					}
-				/>
 				<InputHelper
+					className="mb-3"
 					as="textarea"
 					label="Location Notes"
 					value={value.notes}
@@ -91,6 +108,12 @@ export const MhicCareResourceLocationCard = ({ value, onChange, className }: Mhi
 						})
 					}
 				/>
+				<div className="d-flex justify-content-end">
+					<Button type="button" variant="light" className="d-flex align-items-center" onClick={onDelete}>
+						<DeleteIcon className="me-2" width={20} height={20} />
+						Delete
+					</Button>
+				</div>
 			</Card.Body>
 		</Card>
 	);
