@@ -34,7 +34,7 @@ export const careResourceService = {
 		notes: string;
 		phoneNumber: string;
 		websiteUrl: string;
-		resourceAvailable: string;
+		resourceAvailable: boolean;
 		specialtyIds: string[];
 		supportRoleIds: string[];
 		payorIds: string[];

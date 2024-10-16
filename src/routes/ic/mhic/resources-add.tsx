@@ -2,11 +2,15 @@ import React, { useCallback, useState } from 'react';
 import { Link, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import { CareResourceSpecialtyModel } from '@/lib/models';
+import { careResourceService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import { AdminBadgeSelectControl, AdminFormFooter, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
+import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { careResourceService } from '@/lib/services';
 
 export const loader = async () => {
 	const [{ payors }, { supportRoles }] = await Promise.all([
@@ -23,21 +27,64 @@ export const loader = async () => {
 export const Component = () => {
 	const { payors, supportRoles } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
+	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
-		availability: '',
+		availability: 'AVAILABLE',
 		clinicName: '',
 		phoneNumber: '',
 		website: '',
 		locations: [] as string[],
 		insurance: '',
-		specialties: '',
+		specialties: [] as CareResourceSpecialtyModel[],
 		therapyTypes: [] as string[],
 		notes: '',
 	});
 
-	const handleFormSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-	}, []);
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			try {
+				await careResourceService
+					.createCareResource({
+						name: formValues.clinicName,
+						notes: formValues.notes,
+						phoneNumber: formValues.phoneNumber,
+						websiteUrl: formValues.website,
+						resourceAvailable: formValues.availability === 'AVAILABLE',
+						specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
+						supportRoleIds: formValues.therapyTypes,
+						payorIds: [formValues.insurance],
+					})
+					.fetch();
+
+				addFlag({
+					variant: 'success',
+					title: 'Resource Created!',
+					description: 'This resource can now be used to create Resource Packets.',
+					actions: [],
+				});
+
+				navigate('/ic/mhic/resources');
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[
+			addFlag,
+			formValues.availability,
+			formValues.clinicName,
+			formValues.insurance,
+			formValues.notes,
+			formValues.phoneNumber,
+			formValues.specialties,
+			formValues.therapyTypes,
+			formValues.website,
+			handleError,
+			navigate,
+		]
+	);
 
 	return (
 		<>
@@ -86,7 +133,8 @@ export const Component = () => {
 							}}
 							required
 						>
-							<option value="">TODO: Availability Options</option>
+							<option value="AVAILABLE">Available</option>
+							<option value="UNAVAILABLE">Unavailable</option>
 						</InputHelper>
 					</AdminFormSection>
 					<hr />
@@ -118,7 +166,6 @@ export const Component = () => {
 								}));
 							}}
 							helperText="Primary phone number for patient inquiries and appointments"
-							required
 						/>
 						<InputHelper
 							type="url"
@@ -131,7 +178,6 @@ export const Component = () => {
 									website: currentTarget.value,
 								}));
 							}}
-							required
 						/>
 					</AdminFormSection>
 					<hr />
@@ -159,7 +205,6 @@ export const Component = () => {
 									insurance: currentTarget.value,
 								}));
 							}}
-							required
 						>
 							<option value="" disabled>
 								Select...
@@ -173,21 +218,20 @@ export const Component = () => {
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection title="Specialties" description="Select all issues treated." alignHorizontally>
-						<InputHelper
-							as="select"
+						<TypeaheadHelper
+							id="typeahead--specialties"
 							label="Specialties"
-							name="specialties"
-							value={formValues.specialties}
-							onChange={({ currentTarget }) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									specialties: currentTarget.value,
+							multiple
+							labelKey="name"
+							options={[]}
+							selected={formValues.specialties}
+							onChange={(selected) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									specialties: selected as CareResourceSpecialtyModel[],
 								}));
 							}}
-							required
-						>
-							<option value="">TODO: Specialties Options</option>
-						</InputHelper>
+						/>
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection title="Therapy Types" description="Select therapy types offered.">

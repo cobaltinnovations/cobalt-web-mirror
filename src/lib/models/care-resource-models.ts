@@ -6,7 +6,7 @@ export interface CareResourceModel {
 	createdByAccountId: string;
 	careResourceLocations: CareResourceLocationModel[];
 	payors: CareResourcePayorModel[];
-	specialties: CareResourceSpecialyModel[];
+	specialties: CareResourceSpecialtyModel[];
 	supportRoles: SupportRoleModel[];
 }
 
@@ -43,7 +43,7 @@ export interface CareResourcePayorModel extends PayorModel {
 	lastUpdated: string;
 }
 
-export interface CareResourceSpecialyModel {
+export interface CareResourceSpecialtyModel {
 	careResourceSpecialtyId: string;
 	name: string;
 	created: string;
