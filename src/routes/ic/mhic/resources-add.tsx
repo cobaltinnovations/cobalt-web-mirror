@@ -214,15 +214,16 @@ export const Component = () => {
 					>
 						{formValues.locations.map((location) => (
 							<MhicCareResourceLocationCard
+								key={location.id}
 								className="mb-5"
-								id={location.id}
-								location={location.location}
-								wheelchairAccessible={location.wheelchairAccessible}
-								languages={location.languages}
-								uniquePhoneNumber={location.uniquePhoneNumber}
-								notes={location.notes}
-								onChange={() => {
-									return;
+								value={location}
+								onChange={(newLocation) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										locations: previousValue.locations.map((l) =>
+											l.id === newLocation.id ? newLocation : l
+										),
+									}));
 								}}
 							/>
 						))}
