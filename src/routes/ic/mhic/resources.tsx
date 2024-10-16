@@ -5,15 +5,17 @@ import { Badge, Button, Col, Container, Dropdown, Form, Offcanvas, Row } from 'r
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { MhicPageHeader } from '@/components/integrated-care/mhic';
+import InputHelperSearch from '@/components/input-helper-search';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import InputHelperSearch from '@/components/input-helper-search';
-import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	shelf: {
@@ -252,18 +254,22 @@ export const Component = () => {
 													renderOnMount
 												>
 													<Dropdown.Item
+														className="d-flex align-items-center"
 														onClick={() => {
 															return;
 														}}
 													>
-														Action 1
+														<EditIcon className="me-2 text-n500" />
+														Edit
 													</Dropdown.Item>
 													<Dropdown.Item
+														className="d-flex align-items-center"
 														onClick={() => {
 															return;
 														}}
 													>
-														Action 2
+														<DeleteIcon className="me-2 text-n500" />
+														Delete
 													</Dropdown.Item>
 												</Dropdown.Menu>
 											</Dropdown>
