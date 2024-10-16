@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, Outlet, useLocation, useMatches, useNavigate, useSearchParams } from 'react-router-dom';
-import { Badge, Button, Col, Container, Dropdown, Offcanvas, Row } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Dropdown, Form, Offcanvas, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -12,6 +12,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
+import InputHelperSearch from '@/components/input-helper-search';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	shelf: {
@@ -29,22 +31,27 @@ export const loader = async () => {
 };
 
 export const Component = () => {
-	const [searchParams, setSearchParams] = useSearchParams();
-	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
-	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '15', [searchParams]);
-	const sortBy = useMemo(() => searchParams.get('sortBy') ?? '', [searchParams]);
-	const sortDirection = useMemo(() => searchParams.get('sortDirection') ?? '', [searchParams]);
-
 	const classes = useStyles();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const matches = useMatches();
+
+	const [searchParams, setSearchParams] = useSearchParams();
+	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '15', [searchParams]);
+	const sortBy = useMemo(() => searchParams.get('sortBy') ?? '', [searchParams]);
+	const sortDirection = useMemo(() => searchParams.get('sortDirection') ?? '', [searchParams]);
 
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [careResources, setCareResources] = useState<CareResourceModel[]>([]);
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
 	const [careResourcesTotalCountDescription, setCareResourcesTotalCountDescription] = useState('0');
+
+	const { hasTouchScreen } = useTouchScreenCheck();
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const [searchInputValue, setSearchInputValue] = useState('');
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -53,6 +60,7 @@ export const Component = () => {
 
 				const response = await careResourceService
 					.getCareResources({
+						...(searchQuery && { searchQuery }),
 						...(pageNumber && { pageNumber }),
 						...(pageSize && { pageSize }),
 						...(sortBy && { sortBy }),
@@ -71,7 +79,61 @@ export const Component = () => {
 		};
 
 		fetchData();
-	}, [handleError, pageNumber, pageSize, sortBy, sortDirection]);
+	}, [handleError, pageNumber, pageSize, searchQuery, sortBy, sortDirection]);
+
+	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		searchParams.delete('pageNumber');
+		searchParams.delete('sortBy');
+		searchParams.delete('sortDirection');
+
+		if (searchInputValue) {
+			searchParams.set('searchQuery', searchInputValue);
+		} else {
+			searchParams.delete('searchQuery');
+		}
+
+		setSearchParams(searchParams, { replace: true });
+
+		if (hasTouchScreen) {
+			searchInputRef.current?.blur();
+		}
+	};
+
+	const clearSearch = useCallback(() => {
+		setSearchInputValue('');
+
+		searchParams.delete('pageNumber');
+		searchParams.delete('sortBy');
+		searchParams.delete('sortDirection');
+		searchParams.delete('searchQuery');
+
+		setSearchParams(searchParams, { replace: true });
+
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus();
+		}
+	}, [hasTouchScreen, searchParams, setSearchParams]);
+
+	const handleKeydown = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key !== 'Escape') {
+				return;
+			}
+
+			clearSearch();
+		},
+		[clearSearch]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleKeydown, false);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeydown, false);
+		};
+	}, [handleKeydown]);
 
 	return (
 		<>
@@ -94,7 +156,7 @@ export const Component = () => {
 									Create Packet
 								</Button>
 								<Button
-									className="d-flex align-items-center"
+									className="me-2 d-flex align-items-center"
 									variant="primary"
 									onClick={() => {
 										navigate({
@@ -105,6 +167,17 @@ export const Component = () => {
 								>
 									<PlusIcon className="me-2" /> Add
 								</Button>
+								<Form onSubmit={handleSearchFormSubmit}>
+									<InputHelperSearch
+										ref={searchInputRef}
+										placeholder="Search"
+										value={searchInputValue}
+										onChange={({ currentTarget }) => {
+											setSearchInputValue(currentTarget.value);
+										}}
+										onClear={clearSearch}
+									/>
+								</Form>
 							</div>
 						</MhicPageHeader>
 					</Col>
