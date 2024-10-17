@@ -18,7 +18,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
 
-	const [{ payors }, { supportRoles }, { careResource }] = await Promise.all([
+	const [{ payors }, { supportRoles }, careResourceResponse] = await Promise.all([
 		careResourceService.getPayors().fetch(),
 		careResourceService.getSupportRoles().fetch(),
 		...(careResourceId ? [careResourceService.getCareResource(careResourceId).fetch()] : []),
@@ -27,7 +27,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	return {
 		payors,
 		supportRoles,
-		careResource,
+		...(careResourceResponse && { careResource: careResourceResponse.careResource }),
 	};
 };
 

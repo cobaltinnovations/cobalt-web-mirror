@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import TabBar from '@/components/tab-bar';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { careResourceService } from '@/lib/services';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -36,13 +37,14 @@ enum TAB_KEYS {
 }
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const resourceId = params.resourceId;
+	const { careResourceId } = params;
 
-	if (!resourceId) {
+	if (!careResourceId) {
 		throw new Error('resourceId is undefined.');
 	}
 
-	return null;
+	const { careResource } = await careResourceService.getCareResource(careResourceId).fetch();
+	return { careResource };
 };
 
 export const Component = () => {
