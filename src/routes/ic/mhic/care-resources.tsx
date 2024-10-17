@@ -200,7 +200,7 @@ export const Component = () => {
 											searchParams.set('pageNumber', '0');
 											searchParams.set('sortBy', 'NAME');
 											searchParams.set('sortDirection', sortDirection);
-											setSearchParams(searchParams);
+											setSearchParams(searchParams, { replace: true });
 										}}
 									>
 										Name
@@ -288,7 +288,7 @@ export const Component = () => {
 								size={parseInt(pageSize, 10)}
 								onClick={(pageIndex) => {
 									searchParams.set('pageNumber', String(pageIndex));
-									setSearchParams(searchParams);
+									setSearchParams(searchParams, { replace: true });
 								}}
 							/>
 						</div>
