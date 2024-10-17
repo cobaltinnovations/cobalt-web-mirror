@@ -1,5 +1,5 @@
 export interface CareResourceModel {
-	carResourceId: string;
+	careResourceId: string;
 	name: string;
 	phoneNumber: string;
 	formattedPhoneNumber: string;

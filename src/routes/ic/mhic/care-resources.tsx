@@ -161,10 +161,7 @@ export const Component = () => {
 									className="me-2 d-flex align-items-center"
 									variant="primary"
 									onClick={() => {
-										navigate({
-											pathname: `${location.pathname}/add`,
-											search: location.search,
-										});
+										navigate({ pathname: `${location.pathname}/add` });
 									}}
 								>
 									<PlusIcon className="me-2" /> Add
@@ -216,9 +213,9 @@ export const Component = () => {
 							</TableHead>
 							<TableBody>
 								{careResources.map((careResource) => (
-									<TableRow key={careResource.carResourceId}>
+									<TableRow key={careResource.careResourceId}>
 										<TableCell>
-											<Link to={`${location.pathname}/${careResource.carResourceId}`}>
+											<Link to={`${location.pathname}/${careResource.careResourceId}`}>
 												{careResource.name}
 											</Link>
 										</TableCell>
@@ -242,7 +239,7 @@ export const Component = () => {
 											<Dropdown>
 												<Dropdown.Toggle
 													as={DropdownToggle}
-													id={`mhic-resources__dropdown-menu--${careResource.carResourceId}`}
+													id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
 													className="p-2"
 												>
 													<MoreIcon className="d-flex" />
@@ -256,7 +253,9 @@ export const Component = () => {
 													<Dropdown.Item
 														className="d-flex align-items-center"
 														onClick={() => {
-															return;
+															navigate({
+																pathname: `${location.pathname}/${careResource.careResourceId}/edit`,
+															});
 														}}
 													>
 														<EditIcon className="me-2 text-n500" />

@@ -974,11 +974,11 @@ export const routes: RouteObject[] = [
 									{
 										id: 'care-resources',
 										path: 'resources',
-										lazy: () => import('@/routes/ic/mhic/resources'),
+										lazy: () => import('@/routes/ic/mhic/care-resources'),
 										children: [
 											{
 												path: ':resourceId',
-												lazy: () => import('@/routes/ic/mhic/resources-shelf'),
+												lazy: () => import('@/routes/ic/mhic/care-resources-shelf'),
 												handle: {
 													isMhicResourcesShelf: true,
 												},
@@ -986,9 +986,14 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
-										id: 'resources-add',
+										id: 'care-resources-add',
 										path: 'resources/add',
-										lazy: () => import('@/routes/ic/mhic/resources-add'),
+										lazy: () => import('@/routes/ic/mhic/care-resources-form'),
+									},
+									{
+										id: 'care-resources-edit',
+										path: 'resources/:resourceId/edit',
+										lazy: () => import('@/routes/ic/mhic/care-resources-form'),
 									},
 									{
 										id: 'department-availability',
