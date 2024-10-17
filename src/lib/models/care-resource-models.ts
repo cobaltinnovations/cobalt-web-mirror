@@ -1,13 +1,14 @@
 export interface CareResourceModel {
 	careResourceId: string;
-	name: string;
-	phoneNumber: string;
-	formattedPhoneNumber: string;
-	createdByAccountId: string;
 	careResourceLocations: CareResourceLocationModel[];
+	createdByAccountId: string;
+	formattedPhoneNumber: string;
+	name: string;
 	payors: CareResourcePayorModel[];
+	phoneNumber: string;
 	specialties: CareResourceSpecialtyModel[];
 	supportRoles: SupportRoleModel[];
+	websiteUrl: string;
 }
 
 export interface CareResourceLocationModel {
@@ -34,8 +35,8 @@ export interface CareResourceLocationModel {
 }
 
 export interface PayorModel {
-	payorId: string;
 	name: string;
+	payorId: string;
 }
 
 export interface CareResourcePayorModel extends PayorModel {

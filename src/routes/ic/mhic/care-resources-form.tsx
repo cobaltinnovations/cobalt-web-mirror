@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useState } from 'react';
-import { Link, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link, LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { CareResourceSpecialtyModel } from '@/lib/models';
@@ -15,33 +15,37 @@ import { CareResourceLocationCardValueModel, MhicCareResourceLocationCard } from
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
-export const loader = async () => {
-	const [{ payors }, { supportRoles }] = await Promise.all([
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+	const { careResourceId } = params;
+
+	const [{ payors }, { supportRoles }, { careResource }] = await Promise.all([
 		careResourceService.getPayors().fetch(),
 		careResourceService.getSupportRoles().fetch(),
+		...(careResourceId ? [careResourceService.getCareResource(careResourceId).fetch()] : []),
 	]);
 
 	return {
 		payors,
 		supportRoles,
+		careResource,
 	};
 };
 
 export const Component = () => {
-	const { payors, supportRoles } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { payors, supportRoles, careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
-		availability: 'AVAILABLE',
-		clinicName: '',
-		phoneNumber: '',
-		website: '',
-		locations: [] as CareResourceLocationCardValueModel[],
-		insurance: '',
-		specialties: [] as CareResourceSpecialtyModel[],
-		therapyTypes: [] as string[],
-		notes: '',
+		availability: careResource ? 'AVAILABLE' : 'AVAILABLE',
+		clinicName: careResource ? careResource.name : '',
+		phoneNumber: careResource ? careResource.phoneNumber : '',
+		website: careResource ? careResource.websiteUrl : '',
+		locations: (careResource ? [] : []) as CareResourceLocationCardValueModel[],
+		insurance: careResource ? careResource.payors[0].payorId : '',
+		specialties: careResource ? careResource.specialties : [],
+		therapyTypes: careResource ? careResource.supportRoles.map((sr) => sr.supportRoleId) : [],
+		notes: careResource ? '' : '',
 	});
 
 	const handleAddLocationButtonClick = useCallback(() => {

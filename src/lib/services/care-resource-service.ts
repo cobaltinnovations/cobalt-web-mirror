@@ -21,6 +21,12 @@ export const careResourceService = {
 			params,
 		});
 	},
+	getCareResource(careResourceId: string) {
+		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
+			method: 'GET',
+			url: `/care-resources/${careResourceId}`,
+		});
+	},
 	getPayors() {
 		return httpSingleton.orchestrateRequest<{ payors: PayorModel[] }>({
 			method: 'GET',
