@@ -33,7 +33,7 @@ export enum AnalyticsNativeEventTypeId {
 	PAGE_VIEW_MHIC_ASSIGNED_ORDERS = 'PAGE_VIEW_MHIC_ASSIGNED_ORDERS',
 	PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW = 'PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW',
 	PAGE_VIEW_MHIC_ALL_ORDERS = 'PAGE_VIEW_MHIC_ALL_ORDERS',
-	PAGE_VIEW_MHIC_ORDER_DETAIL = 'PAGE_VIEW_MHIC_ORDER_DETAIL', // See AnalyticsNativeEventMhicPatientOrderDetailSectionId below
+	PAGE_VIEW_MHIC_ORDER_DETAIL = 'PAGE_VIEW_MHIC_ORDER_DETAIL', // See AnalyticsNativeEventMhicOrderDetailSectionId below
 	MHIC_ORDER_AUTOCOMPLETE = 'MHIC_ORDER_AUTOCOMPLETE',
 	OVERLAY_VIEW_IN_CRISIS = 'OVERLAY_VIEW_IN_CRISIS', // See AnalyticsNativeEventOverlayViewInCrisisSource below
 	CLICKTHROUGH_TOPIC_CENTER = 'CLICKTHROUGH_TOPIC_CENTER', // See AnalyticsNativeEventClickthroughTopicCenterSource below
@@ -81,7 +81,7 @@ export enum AnalyticsNativeEventMhicPriorityGroupId {
 	SAFETY_PLANNING,
 }
 
-export enum AnalyticsNativeEventMhicPatientOrderDetailSectionId {
+export enum AnalyticsNativeEventMhicOrderDetailSectionId {
 	ORDER_DETAILS,
 	CONTACT_HISTORY,
 	COMMENTS,
