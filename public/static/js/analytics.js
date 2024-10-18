@@ -99,12 +99,28 @@
 
 		_registerVisibilityChangeListener();
 		_registerUrlChangedListenerUsingMutationObserver();
+		_registerRecurringHeartbeats();
+
+		// Persist initial heartbeat
+		_persistEvent('HEARTBEAT');
 
 		// Persist this initial load as special URL change
 		_persistEvent('URL_CHANGED', {
 			url: _relativeUrl(window.location.href),
 			previousUrl: null,
 		});
+	}
+
+	function _registerRecurringHeartbeats() {
+		const HEARTBEAT_INTERVAL_IN_MILLISECONDS = 5000;
+
+		setInterval(function () {
+			if (document.visibilityState === 'visible') {
+				_persistEvent('HEARTBEAT', {
+					intervalInMilliseconds: HEARTBEAT_INTERVAL_IN_MILLISECONDS,
+				});
+			}
+		}, HEARTBEAT_INTERVAL_IN_MILLISECONDS);
 	}
 
 	// Persist events when browser tab is backgrounded/foregrounded.
