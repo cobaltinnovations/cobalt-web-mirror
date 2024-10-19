@@ -252,6 +252,28 @@
 			const referringMessageId = _getReferringMessageId();
 			const referringCampaign = _getReferringCampaign();
 
+			let supportedLocales = undefined;
+			let locale = undefined;
+			let timeZone = undefined;
+
+			try {
+				supportedLocales = navigator.languages ? JSON.stringify(navigator.languages) : undefined;
+			} catch (ignored) {
+				// Don't worry about it
+			}
+
+			try {
+				locale = new Intl.NumberFormat().resolvedOptions().locale;
+			} catch (ignored) {
+				// Don't worry about it
+			}
+
+			try {
+				timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+			} catch (ignored) {
+				// Don't worry about it
+			}
+
 			const event = {
 				analyticsNativeEventTypeId: analyticsNativeEventTypeId,
 				data: data ? data : {},
@@ -264,6 +286,7 @@
 				windowWidth: window.innerWidth,
 				windowHeight: window.innerHeight,
 				windowDevicePixelRatio: window.devicePixelRatio,
+				navigatorMaxTouchPoints: navigator.maxTouchPoints,
 				documentVisibilityState: document.visibilityState,
 			};
 
@@ -291,6 +314,9 @@
 						'X-Client-Device-App-Name': 'Cobalt Webapp',
 						'X-Client-Device-App-Version': analyticsConfig.appVersion,
 						'X-Client-Device-Session-Id': sessionId,
+						'X-Client-Device-Supported-Locales': supportedLocales ? supportedLocales : '',
+						'X-Client-Device-Locale': locale ? locale : '',
+						'X-Client-Device-Time-Zone': timeZone ? timeZone : '',
 						'X-Cobalt-Referring-Message-Id': referringMessageId ? referringMessageId : '',
 						'X-Cobalt-Referring-Campaign': referringCampaign ? referringCampaign : '',
 						'X-Cobalt-Analytics': 'true',
@@ -463,7 +489,7 @@
 			_setSessionId(sessionId);
 
 			// Let backend know this is a fresh session
-			_persistEvent('SESSION_STARTED');
+			_persistEvent('SESSION_STARTED', document.referrer ? { referringUrl: document.referrer } : undefined);
 
 			// Store off the session data in temporary cache
 			window.localStorage.setItem(

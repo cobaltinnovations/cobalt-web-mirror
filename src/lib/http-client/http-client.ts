@@ -55,11 +55,36 @@ export class HttpClient {
 					const referringMessageId = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_MESSAGE_ID');
 					const referringCampaign = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_CAMPAIGN');
 
+					let supportedLocales = undefined;
+					let locale = undefined;
+					let timeZone = undefined;
+
+					try {
+						supportedLocales = navigator.languages ? JSON.stringify(navigator.languages) : undefined;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
+					try {
+						locale = new Intl.NumberFormat().resolvedOptions().locale;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
+					try {
+						timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
 					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
 					headers['X-Client-Device-Fingerprint'] = clientDeviceFingerprint ? clientDeviceFingerprint : '';
 					headers['X-Client-Device-Type-Id'] = 'WEB_BROWSER';
 					headers['X-Client-Device-App-Name'] = 'Cobalt Webapp';
 					headers['X-Client-Device-Session-Id'] = clientDeviceSessionId ? clientDeviceSessionId : '';
+					headers['X-Client-Device-Supported-Locales'] = supportedLocales ? supportedLocales : '';
+					headers['X-Client-Device-Locale'] = locale ? locale : '';
+					headers['X-Client-Device-Time-Zone'] = timeZone ? timeZone : '';
 					headers['X-Cobalt-Referring-Message-Id'] = referringMessageId ? referringMessageId : '';
 					headers['X-Cobalt-Referring-Campaign'] = referringCampaign ? referringCampaign : '';
 
