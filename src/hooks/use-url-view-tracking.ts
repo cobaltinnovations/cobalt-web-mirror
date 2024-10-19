@@ -36,13 +36,6 @@ export default function useUrlViewTracking(): void {
 			}
 
 			if (!accountId) {
-				activityTrackingService
-					.trackUnauthenticated({
-						activityActionId: ActivityActionId.View,
-						activityTypeId: AcivityTypeId.Url,
-						context,
-					})
-					.fetch();
 				return;
 			}
 
