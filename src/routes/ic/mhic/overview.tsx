@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { defer, useRouteLoaderData } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { MhicPanelTodayResponse, PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import {
+	MhicPanelTodayResponse,
+	PatientOrdersListResponse,
+	analyticsService,
+	integratedCareService,
+} from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import TabBar from '@/components/tab-bar';
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { AnalyticsNativeEventMhicPriorityGroupId, AnalyticsNativeEventTypeId } from '@/lib/models';
 
 enum TAB_KEYS {
 	OUTREACH_REVIEW = 'OUTREACH_REVIEW',
@@ -118,13 +124,13 @@ export const Component = () => {
 	} = data;
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.OUTREACH_REVIEW);
-
 	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({ ...INITIAL_COUNTS });
+	const countHaveLoaded = useRef(false);
 
 	useEffect(() => {
-		// TODO: Perhaps better moving resolution behind <Await />
-		overviewResponsePromise
-			.then((res) => {
+		const fetchCounts = async () => {
+			try {
+				const res = await overviewResponsePromise;
 				setCountsByStatus({
 					[TAB_KEYS.ASSESSMENTS]: res.scheduledAssessmentPatientOrders.length,
 					[TAB_KEYS.FOLLOW_UPS]: res.outreachFollowupNeededPatientOrders.length,
@@ -133,11 +139,72 @@ export const Component = () => {
 					[TAB_KEYS.VOICEMAILS]: res.voicemailTaskPatientOrders.length,
 					[TAB_KEYS.SAFETY_PLANNING]: res.safetyPlanningPatientOrders.length,
 				});
-			})
-			.catch((e) => {
+			} catch (e) {
 				setCountsByStatus({ ...INITIAL_COUNTS });
-			});
+			} finally {
+				countHaveLoaded.current = true;
+			}
+		};
+
+		fetchCounts();
 	}, [overviewResponsePromise]);
+
+	const tabKeyAnalyticsEvents: Record<TAB_KEYS, () => void> = useMemo(
+		() => ({
+			[TAB_KEYS.ASSESSMENTS]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.SCHEDULED_ASSESSMENT,
+					totalCount: countsByStatus.ASSESSMENTS,
+				});
+			},
+			[TAB_KEYS.FOLLOW_UPS]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.OUTREACH_FOLLOWUP_NEEDED,
+					totalCount: countsByStatus.FOLLOW_UPS,
+				});
+			},
+			[TAB_KEYS.OUTREACH_REVIEW]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.OUTREACH_REVIEW,
+					totalCount: countsByStatus.OUTREACH_REVIEW,
+				});
+			},
+			[TAB_KEYS.RESOURCES]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.NEED_RESOURCES,
+					totalCount: countsByStatus.RESOURCES,
+				});
+			},
+			[TAB_KEYS.SAFETY_PLANNING]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.SAFETY_PLANNING,
+					totalCount: countsByStatus.SAFETY_PLANNING,
+				});
+			},
+			[TAB_KEYS.VOICEMAILS]: () => {
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_PRIORITIES, {
+					priorityGroupId: AnalyticsNativeEventMhicPriorityGroupId.VOICEMAIL_TASK,
+					totalCount: countsByStatus.VOICEMAILS,
+				});
+			},
+		}),
+		[
+			countsByStatus.ASSESSMENTS,
+			countsByStatus.FOLLOW_UPS,
+			countsByStatus.OUTREACH_REVIEW,
+			countsByStatus.RESOURCES,
+			countsByStatus.SAFETY_PLANNING,
+			countsByStatus.VOICEMAILS,
+		]
+	);
+
+	useEffect(() => {
+		if (!countHaveLoaded.current) {
+			return;
+		}
+
+		tabKeyAnalyticsEvents[tabKey]();
+	}, [tabKey, tabKeyAnalyticsEvents]);
 
 	return (
 		<>
