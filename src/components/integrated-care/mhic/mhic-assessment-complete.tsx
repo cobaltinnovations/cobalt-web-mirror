@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
 import {
+	AnalyticsNativeEventTypeId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderSafetyPlanningStatusId,
@@ -26,7 +27,7 @@ import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dis
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { integratedCareService, screeningService } from '@/lib/services';
+import { analyticsService, integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
@@ -86,7 +87,12 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 				return !takenScreeningTypeIds.includes(st.screeningTypeId);
 			})
 		);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_ASSESSMENT_RESULTS, {
+			patientOrderId: patientOrder.patientOrderId,
+		});
 	}, [
+		patientOrder?.patientOrderId,
 		patientOrder?.screeningSession?.screeningFlowVersionId,
 		patientOrder?.screeningSessionResult?.screeningSessionScreeningResults,
 	]);
