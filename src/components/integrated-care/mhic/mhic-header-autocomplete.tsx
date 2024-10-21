@@ -93,9 +93,10 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 
 				analyticsService.persistEvent(AnalyticsNativeEventTypeId.MHIC_ORDER_AUTOCOMPLETE, {
 					searchQuery: debouncedSearchQuery,
-					...(response.patientOrderAutocompleteResults.length > 0 && {
-						patientOrderIds: response.patientOrderAutocompleteResults.map((order) => order.patientOrderId),
-					}),
+					patientOrderIds:
+						response.patientOrderAutocompleteResults.length === 0
+							? []
+							: response.patientOrderAutocompleteResults.map((order) => order.patientOrderId),
 				});
 			})
 			.catch((e) => {
