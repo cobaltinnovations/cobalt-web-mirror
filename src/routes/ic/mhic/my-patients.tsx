@@ -1,11 +1,16 @@
 import Cookies from 'js-cookie';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { PatientOrderSortColumnId, PatientOrderViewTypeId, SortDirectionId } from '@/lib/models';
-import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import {
+	AnalyticsNativeEventTypeId,
+	PatientOrderSortColumnId,
+	PatientOrderViewTypeId,
+	SortDirectionId,
+} from '@/lib/models';
+import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
 import {
 	MhicCustomizeTableModal,
 	MhicPageHeader,
@@ -314,6 +319,139 @@ export const Component = () => {
 		[searchParams, setSearchParams]
 	);
 
+	const analyticsEvents: Record<MhicMyPatientView, (response: PatientOrdersListResponse['findResult']) => void> =
+		useMemo(() => {
+			// pageSize is hard coded to 15 on this page, see <MhicPatientOrderTable/> component below.
+			const pageSize = searchParams.get('pageSize') ?? '15';
+			const sortDirectionId = searchParams.get('sortDirectionId') ?? '';
+			const patientOrderSortColumnId = searchParams.get('patientOrderSortColumnId') ?? '';
+
+			return {
+				[MhicMyPatientView.All]: (response) => {
+					const patientOrderOutreachStatusId = searchParams.get('patientOrderOutreachStatusId') ?? '';
+					const patientOrderScreeningStatusId = searchParams.get('patientOrderScreeningStatusId') ?? '';
+					const patientOrderScheduledScreeningScheduledDate =
+						searchParams.get('patientOrderScheduledScreeningScheduledDate') ?? '';
+					const patientOrderResourcingStatusId = searchParams.get('patientOrderResourcingStatusId') ?? '';
+					const patientOrderResourceCheckInResponseStatusId =
+						searchParams.get('patientOrderResourceCheckInResponseStatusId') ?? '';
+					const patientOrderAssignmentStatusId = searchParams.get('patientOrderAssignmentStatusId') ?? '';
+					const patientOrderDispositionId = searchParams.get('patientOrderDispositionId') ?? '';
+					const referringPracticeIds = searchParams.getAll('referringPracticeIds') ?? [];
+					const patientOrderFilterFlagTypeIds = searchParams.getAll('flag') ?? [];
+
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS, {
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						...(patientOrderOutreachStatusId && { patientOrderOutreachStatusId }),
+						...(patientOrderScreeningStatusId && { patientOrderScreeningStatusId }),
+						...(patientOrderScheduledScreeningScheduledDate && {
+							patientOrderScheduledScreeningScheduledDate,
+						}),
+						...(patientOrderResourcingStatusId && { patientOrderResourcingStatusId }),
+						...(patientOrderResourceCheckInResponseStatusId && {
+							patientOrderResourceCheckInResponseStatusId,
+						}),
+						...(patientOrderAssignmentStatusId && { patientOrderAssignmentStatusId }),
+						...(patientOrderDispositionId && { patientOrderDispositionId }),
+						...(referringPracticeIds.length > 0 && { referringPracticeIds }),
+						...(patientOrderFilterFlagTypeIds.length > 0 && { patientOrderFilterFlagTypeIds }),
+						pageNumber,
+						pageSize,
+						totalCount: response.totalCount,
+					});
+				},
+				[MhicMyPatientView.Closed]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.CLOSED,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.FollowUpCalls]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED_OUTREACH,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.MHP]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.MHP,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.NeedAssessment]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.NEED_ASSESSMENT,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.NeedDocumentation]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.Scheduled]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.SpecialtyCare]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.SPECIALTY_CARE,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+				[MhicMyPatientView.Subclinical]: ({ totalCount }) => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ASSIGNED_ORDERS_VIEW, {
+						patientOrderViewTypeId: PatientOrderViewTypeId.SUBCLINICAL,
+						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+						...(sortDirectionId && { sortDirectionId }),
+						pageNumber,
+						pageSize,
+						totalCount,
+					});
+				},
+			};
+		}, [pageNumber, searchParams]);
+
+	const handleTableHasLoaded = useCallback(
+		(response: PatientOrdersListResponse['findResult']) => {
+			const mhicView = match?.params.mhicView;
+			analyticsEvents[mhicView as MhicMyPatientView](response);
+		},
+		[analyticsEvents, match?.params.mhicView]
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -368,6 +506,7 @@ export const Component = () => {
 							pageSize={15}
 							onPaginationClick={handlePaginationClick}
 							columnConfig={columnConfig}
+							hasLoadedCallback={handleTableHasLoaded}
 						/>
 					</Col>
 				</Row>
