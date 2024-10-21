@@ -98,6 +98,15 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	]);
 
 	const handleExportResultsClick = useCallback(async () => {
+		if (patientOrder) {
+			analyticsService.persistEvent(
+				AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_EXPORT_ORDER_ASSESSMENT_RESULTS,
+				{
+					patientOrderId: patientOrder.patientOrderId,
+				}
+			);
+		}
+
 		try {
 			if (!patientOrder) {
 				throw new Error('patientOrder is undefined');
