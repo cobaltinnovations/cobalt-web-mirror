@@ -207,6 +207,7 @@ export const Component = () => {
 			const patientOrderDispositionId = searchParams.get('patientOrderDispositionId') ?? '';
 			const referringPracticeIds = searchParams.getAll('referringPracticeIds') ?? [];
 			const patientOrderFilterFlagTypeIds = searchParams.getAll('flag') ?? [];
+			const panelAccountIds = searchParams.getAll('panelAccountId') ?? [];
 
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ALL_ORDERS, {
 				...(patientOrderSortColumnId && { patientOrderSortColumnId }),
@@ -224,6 +225,7 @@ export const Component = () => {
 				...(patientOrderDispositionId && { patientOrderDispositionId }),
 				...(referringPracticeIds.length > 0 && { referringPracticeIds }),
 				...(patientOrderFilterFlagTypeIds.length > 0 && { patientOrderFilterFlagTypeIds }),
+				...(panelAccountIds.length > 0 && { panelAccountIds }),
 				pageSize: 15,
 				pageNumber,
 				totalCount,
