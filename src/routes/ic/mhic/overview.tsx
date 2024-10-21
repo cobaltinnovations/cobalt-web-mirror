@@ -125,7 +125,7 @@ export const Component = () => {
 
 	const [tabKey, setTabKey] = useState(TAB_KEYS.OUTREACH_REVIEW);
 	const [countsByStatus, setCountsByStatus] = useState<Record<TAB_KEYS, number>>({ ...INITIAL_COUNTS });
-	const countHaveLoaded = useRef(false);
+	const [countsHaveLoaded, setCountsHaveLoaded] = useState(false);
 
 	useEffect(() => {
 		const fetchCounts = async () => {
@@ -142,7 +142,7 @@ export const Component = () => {
 			} catch (e) {
 				setCountsByStatus({ ...INITIAL_COUNTS });
 			} finally {
-				countHaveLoaded.current = true;
+				setCountsHaveLoaded(true);
 			}
 		};
 
@@ -199,12 +199,12 @@ export const Component = () => {
 	);
 
 	useEffect(() => {
-		if (!countHaveLoaded.current) {
+		if (!countsHaveLoaded) {
 			return;
 		}
 
 		tabKeyAnalyticsEvents[tabKey]();
-	}, [tabKey, tabKeyAnalyticsEvents]);
+	}, [countsHaveLoaded, tabKey, tabKeyAnalyticsEvents]);
 
 	return (
 		<>
