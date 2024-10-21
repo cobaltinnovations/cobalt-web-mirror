@@ -41,3 +41,12 @@ export const AddOrRemoveValueFromArray = (value: string, array: string[]) => {
 
 	return arrayClone;
 };
+
+export const safeIntegerValue = (input: string): Number | undefined => {
+	try {
+		const numberValue = parseInt(input, 10);
+		return Number.isInteger(numberValue) ? numberValue : undefined;
+	} catch (ignored) {
+		return undefined;
+	}
+};

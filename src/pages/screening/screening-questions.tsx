@@ -10,8 +10,10 @@ import {
 	ScreeningConfirmationPrompt,
 	UserExperienceTypeId,
 	ScreeningAnswerContentHintId,
+	AnalyticsNativeEventTypeId,
+	AnalyticsNativeEventOverlayViewInCrisisSource,
 } from '@/lib/models';
-import { screeningService } from '@/lib/services';
+import { analyticsService, screeningService } from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useLocation, useParams } from 'react-router-dom';
@@ -120,6 +122,10 @@ const ScreeningQuestionsPage = () => {
 					) {
 						setNavigateNext(() => goToNext);
 						setShowCrisisModal(true);
+
+						analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+							source: AnalyticsNativeEventOverlayViewInCrisisSource.SCREENING_SESSION,
+						});
 					} else {
 						goToNext();
 					}

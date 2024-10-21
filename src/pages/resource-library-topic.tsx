@@ -5,9 +5,9 @@ import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
 import Color from 'color';
 import { Helmet } from 'react-helmet';
 
-import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
-import { resourceLibraryService } from '@/lib/services';
+import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
@@ -188,6 +188,24 @@ const ResourceLibraryTopic = () => {
 		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContents(findResult.contents);
 	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
+
+	useEffect(() => {
+		if (!tagGroup && !findResultTotalCount) {
+			return;
+		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
+			tagGroupId: tagGroup?.tagGroupId,
+			tagIds: tagIdQuery,
+			contentTypeIds: contentTypeIdQuery,
+			contentDurationIds: contentDurationIdQuery,
+			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
+			totalCount: findResultTotalCount,
+		});
+
+		// Only fire analytics event when api calls resolve, not on queryParam change
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [findResultTotalCount, tagGroup]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);

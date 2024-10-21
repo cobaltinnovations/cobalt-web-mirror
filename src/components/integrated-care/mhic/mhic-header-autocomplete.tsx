@@ -3,8 +3,8 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { PatientOrderAutocompleteResult } from '@/lib/models';
-import { integratedCareService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, PatientOrderAutocompleteResult } from '@/lib/models';
+import { analyticsService, integratedCareService } from '@/lib/services';
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
@@ -90,6 +90,14 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 				setSearchResults(response.patientOrderAutocompleteResults);
 				setDisplayedSearchCount(5);
 				setIsSearching(false);
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.MHIC_ORDER_AUTOCOMPLETE, {
+					searchQuery: debouncedSearchQuery,
+					patientOrderIds:
+						response.patientOrderAutocompleteResults.length === 0
+							? []
+							: response.patientOrderAutocompleteResults.map((order) => order.patientOrderId),
+				});
 			})
 			.catch((e) => {
 				handleError(e);

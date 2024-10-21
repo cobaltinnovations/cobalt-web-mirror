@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
 import {
+	AnalyticsNativeEventTypeId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderSafetyPlanningStatusId,
@@ -26,7 +27,7 @@ import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dis
 import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
-import { integratedCareService, screeningService } from '@/lib/services';
+import { analyticsService, integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
@@ -86,12 +87,26 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 				return !takenScreeningTypeIds.includes(st.screeningTypeId);
 			})
 		);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_ASSESSMENT_RESULTS, {
+			patientOrderId: patientOrder.patientOrderId,
+		});
 	}, [
+		patientOrder?.patientOrderId,
 		patientOrder?.screeningSession?.screeningFlowVersionId,
 		patientOrder?.screeningSessionResult?.screeningSessionScreeningResults,
 	]);
 
 	const handleExportResultsClick = useCallback(async () => {
+		if (patientOrder) {
+			analyticsService.persistEvent(
+				AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_EXPORT_ORDER_ASSESSMENT_RESULTS,
+				{
+					patientOrderId: patientOrder.patientOrderId,
+				}
+			);
+		}
+
 		try {
 			if (!patientOrder) {
 				throw new Error('patientOrder is undefined');
@@ -142,7 +157,16 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											<Button
 												className="me-2"
 												variant="outline-primary"
-												onClick={onStartNewAssessment}
+												onClick={() => {
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT,
+														{
+															patientOrderId: patientOrder.patientOrderId,
+														}
+													);
+
+													onStartNewAssessment();
+												}}
 												disabled={
 													patientOrder.patientOrderDispositionId !==
 													PatientOrderDispositionId.OPEN
@@ -292,7 +316,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...eligilityResults.map((result) => ({
 												title: result.screeningName ?? '',
-												value: `#${result.screeningId}` ?? '#',
+												value: result.screeningId ? `#${result.screeningId}` : '#',
 												level: 1,
 											})),
 											...(completedAssessmentsResults.length > 0
@@ -305,7 +329,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...completedAssessmentsResults.map((result) => ({
 												title: result.screeningName ?? '',
-												value: `#${result.screeningId}` ?? '#',
+												value: result.screeningId ? `#${result.screeningId}` : '#',
 												level: 1,
 											})),
 											...(notTakenScreeningTypes.length > 0
@@ -318,7 +342,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...notTakenScreeningTypes.map((result) => ({
 												title: result.description ?? '',
-												value: `#${result.screeningTypeId}` ?? '#',
+												value: result.screeningTypeId ? `#${result.screeningTypeId}` : '#',
 												level: 1,
 											})),
 										]}

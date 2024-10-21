@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation, useRevalidator } from 'react-router-dom';
+import { Link, matchPath, PathMatch, To, useLocation, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { AlertTypeId, FeatureId } from '@/lib/models';
-import { institutionService } from '@/lib/services';
+import {
+	AlertTypeId,
+	AnalyticsNativeEventClickthroughFeatureSource,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
+	AnalyticsNativeEventTypeId,
+	FeatureId,
+} from '@/lib/models';
+import { analyticsService, institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
@@ -29,6 +35,8 @@ import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
 import { useAppRootLoaderData } from '@/routes/root';
+
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 export const HEADER_HEIGHT = 60;
 
@@ -414,8 +422,23 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
 	/* ----------------------------------------------------------- */
-
-	const navigationConfig = useMemo(() => {
+	const navigationConfig: {
+		testId?: string;
+		navigationItemId?: string;
+		title: string;
+		subtitle?: string;
+		to?: To;
+		active: PathMatch<string> | boolean | null;
+		items?: {
+			testId?: string;
+			navigationItemId?: string;
+			title: string;
+			to: To;
+			icon: JSX.Element;
+			description: string;
+			onClick?(): void;
+		}[];
+	}[] = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
 		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
 
@@ -450,6 +473,12 @@ const HeaderV2 = () => {
 										account?.institutionLocationId
 											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 											: urlName,
+									onClick: () => {
+										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
+											featureId: featureId,
+											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
+										});
+									},
 								})),
 						},
 				  ]
@@ -492,7 +521,7 @@ const HeaderV2 = () => {
 								matchPath(url + '/*', pathname)
 							),
 							items: (institution?.additionalNavigationItems ?? []).map(
-								({ iconName, imageUrl, name, url }, index) => ({
+								({ iconName, imageUrl, name, url, topicCenterId }, index) => ({
 									testId: `menuLink-additionalItem${index}`,
 									icon: (
 										<AdditionalNavigationItemIconOrImage
@@ -505,6 +534,15 @@ const HeaderV2 = () => {
 									title: name,
 									description: '',
 									to: url,
+									onClick: () => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+											{
+												topicCenterId: topicCenterId,
+												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+											}
+										);
+									},
 								})
 							),
 						},
@@ -596,6 +634,7 @@ const HeaderV2 = () => {
 		imageUrl: featuredTopicCenter.imageUrl!,
 		descriptionHtml: featuredTopicCenter.navDescription!,
 		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
+		topicCenterId: featuredTopicCenter.topicCenterId,
 	};
 
 	return (
@@ -622,7 +661,13 @@ const HeaderV2 = () => {
 												<p className="text-n500 px-5 mb-3 mt-6">{navigationItem.subtitle}</p>
 											)}
 											{(navigationItem.items ?? []).map((item, itemIndex) => (
-												<Link key={itemIndex} to={item.to ?? '/#'}>
+												<Link
+													key={itemIndex}
+													to={item.to ?? '/#'}
+													onClick={() => {
+														item.onClick?.();
+													}}
+												>
 													<div
 														className={classNames('d-flex flex-column flex-lg-row', {
 															'align-items-center': !item.description,
@@ -643,6 +688,15 @@ const HeaderV2 = () => {
 													mobileNav
 													className="bg-n50 mt-6 px-4 py-6"
 													featuredItem={featuredTopicCenterItem}
+													onImageClick={() => {
+														analyticsService.persistEvent(
+															AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+															{
+																topicCenterId: featuredTopicCenterItem.topicCenterId,
+																source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+															}
+														);
+													}}
 												/>
 											)}
 										</MobileAccordianItem>
@@ -685,7 +739,12 @@ const HeaderV2 = () => {
 								<Button
 									variant="light"
 									className="mx-2 fw-semibold text-gray"
-									onClick={signOutAndClearContext}
+									onClick={() => {
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+											{}
+										);
+									}}
 								>
 									Log Out
 								</Button>
@@ -779,6 +838,7 @@ const HeaderV2 = () => {
 																	link_text: navigationItem.title,
 																	link_detail: item.title,
 																});
+																item.onClick?.();
 															}}
 														>
 															<div
@@ -847,7 +907,14 @@ const HeaderV2 = () => {
 									</>
 								)}
 								<Dropdown.Divider />
-								<Dropdown.Item onClick={signOutAndClearContext}>
+								<Dropdown.Item
+									onClick={() => {
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+											{}
+										);
+									}}
+								>
 									<p className="mb-0 text-gray">Log Out</p>
 								</Dropdown.Item>
 							</Dropdown.Menu>

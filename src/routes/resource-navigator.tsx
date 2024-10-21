@@ -1,6 +1,8 @@
 import HeroContainer from '@/components/hero-container';
 import useAccount from '@/hooks/use-account';
-import React, { useMemo } from 'react';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
+import React, { useEffect, useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -14,6 +16,10 @@ export const Component = () => {
 		() => institution.features.find((f) => f.featureId === 'RESOURCE_NAVIGATOR'),
 		[institution.features]
 	);
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_NAVIGATOR);
+	}, []);
 
 	return (
 		<>

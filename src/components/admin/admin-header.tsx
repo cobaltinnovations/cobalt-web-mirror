@@ -12,6 +12,8 @@ import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+
 export const ADMIN_HEADER_HEIGHT = 60;
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -279,7 +281,10 @@ export const AdminHeader = () => {
 
 									<Dropdown.Item
 										onClick={() => {
-											signOutAndClearContext();
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.ADMIN_HEADER,
+												{}
+											);
 										}}
 									>
 										<span className="text-danger">Sign Out</span>

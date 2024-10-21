@@ -130,6 +130,7 @@ interface MhicPatientOrderTableProps {
 	isLoading?: boolean;
 	coloredRows?: boolean;
 	showPagination?: boolean;
+	hasLoadedCallback?(response: PatientOrdersListResponse['findResult']): void;
 }
 
 export const MhicPatientOrderTable = ({
@@ -145,6 +146,7 @@ export const MhicPatientOrderTable = ({
 	isLoading = false,
 	coloredRows = false,
 	showPagination = true,
+	hasLoadedCallback,
 }: MhicPatientOrderTableProps) => {
 	const classes = useStyles();
 	const location = useLocation();
@@ -248,6 +250,8 @@ export const MhicPatientOrderTable = ({
 				setPatientOrders(response.patientOrders);
 				setTotalPatientOrdersCount(response.totalCount);
 				setTotalPatientOrdersDescription(response.totalCountDescription);
+
+				hasLoadedCallback?.(response);
 			})
 			.catch((e) => {
 				setPatientOrders([]);
@@ -257,7 +261,7 @@ export const MhicPatientOrderTable = ({
 			.finally(() => {
 				setDidLoad(true);
 			});
-	}, [patientOrderFindResultPromise]);
+	}, [hasLoadedCallback, patientOrderFindResultPromise]);
 
 	return (
 		<>

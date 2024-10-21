@@ -6,7 +6,7 @@ import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { FeatureId, InstitutionLocation } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, FeatureId, InstitutionLocation } from '@/lib/models';
 import {
 	accountService,
 	FindOptionsResponse,
@@ -14,6 +14,7 @@ import {
 	institutionService,
 	ProviderSection,
 	providerService,
+	analyticsService,
 } from '@/lib/services';
 import { BookingContext, BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
@@ -36,6 +37,8 @@ enum SEARCH_PARAMS {
 }
 
 const ConnectWithSupportV2 = () => {
+	const filtersFetched = useRef(false);
+
 	const handleError = useHandleError();
 	const { pathname, search } = useLocation();
 	const { account, institution } = useAccount();
@@ -88,6 +91,14 @@ const ConnectWithSupportV2 = () => {
 			return;
 		}
 
+		// For some reason, the institution keeps getting fetched and set into state whenever a searchParam changes.
+		// This is causing this fetchFilters function to double fire, which in return causes the fetchProviders to double fire.
+		// And at the very end of this chain that causes analytics to be reported twice.
+		// For now, save of if the filters have already been fetched and return if so.
+		if (filtersFetched.current) {
+			return;
+		}
+
 		const [findOptionsResponse, institutionLocationsResponse] = await Promise.all([
 			providerService
 				.fetchFindOptions({
@@ -100,6 +111,8 @@ const ConnectWithSupportV2 = () => {
 
 		setFindOptions(findOptionsResponse);
 		setInstitutionLocations(institutionLocationsResponse.locations);
+
+		filtersFetched.current = true;
 	}, [featureDetails, institution]);
 
 	/* --------------------------------------------------- */
@@ -129,6 +142,17 @@ const ConnectWithSupportV2 = () => {
 		setAppointmentTypes(response.appointmentTypes);
 		setEpicDepartments(response.epicDepartments);
 		setProviderSections(response.sections);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDERS, {
+			featureId: featureDetails.featureId,
+			supportRoleIds: featureDetails.supportRoleIds,
+			startDate: startDate ?? findOptions.defaultStartDate,
+			endDate: findOptions.defaultEndDate,
+			...(institutionLocationId && { institutionLocationId }),
+			...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
+			...(patientOrderId && { patientOrderId }),
+			availabilitySections: response.sections,
+		});
 	}, [
 		appointmentTimeIds,
 		featureDetails,

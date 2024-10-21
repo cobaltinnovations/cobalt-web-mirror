@@ -102,6 +102,7 @@ export interface AdditionalNavigationItem {
 	name: string;
 	iconName?: string;
 	imageUrl?: string;
+	topicCenterId?: string;
 }
 
 export enum AccountSourceDisplayStyleId {

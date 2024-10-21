@@ -4,6 +4,8 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Cancel, Cancel
 // https://github.com/axios/axios/blob/master/index.d.ts
 
 import { CobaltError } from '@/lib/http-client/errors';
+import { analyticsService } from '../services';
+import { AnalyticsNativeEventTypeId } from '../models';
 
 export type HttpConfig = {
 	baseUrl?: string;
@@ -48,7 +50,43 @@ export class HttpClient {
 						headers[httpConfig.tokenHeaderKey] = accessToken;
 					}
 
+					const clientDeviceFingerprint = window.localStorage.getItem('cobaltAnalytics.FINGERPRINT');
+					const clientDeviceSessionId = window.sessionStorage.getItem('cobaltAnalytics.SESSION_ID');
+					const referringMessageId = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_MESSAGE_ID');
+					const referringCampaign = window.sessionStorage.getItem('cobaltAnalytics.REFERRING_CAMPAIGN');
+
+					let supportedLocales = undefined;
+					let locale = undefined;
+					let timeZone = undefined;
+
+					try {
+						supportedLocales = navigator.languages ? JSON.stringify(navigator.languages) : undefined;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
+					try {
+						locale = new Intl.NumberFormat().resolvedOptions().locale;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
+					try {
+						timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
 					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
+					headers['X-Client-Device-Fingerprint'] = clientDeviceFingerprint ? clientDeviceFingerprint : '';
+					headers['X-Client-Device-Type-Id'] = 'WEB_BROWSER';
+					headers['X-Client-Device-App-Name'] = 'Cobalt Webapp';
+					headers['X-Client-Device-Session-Id'] = clientDeviceSessionId ? clientDeviceSessionId : '';
+					headers['X-Client-Device-Supported-Locales'] = supportedLocales ? supportedLocales : '';
+					headers['X-Client-Device-Locale'] = locale ? locale : '';
+					headers['X-Client-Device-Time-Zone'] = timeZone ? timeZone : '';
+					headers['X-Cobalt-Referring-Message-Id'] = referringMessageId ? referringMessageId : '';
+					headers['X-Cobalt-Referring-Campaign'] = referringCampaign ? referringCampaign : '';
 
 					return data;
 				},
@@ -80,6 +118,31 @@ export class HttpClient {
 			const response: AxiosResponse = await this._axiosInstance(config);
 			return response;
 		} catch (error) {
+			// See https://axios-http.com/docs/handling_errors for details
+
+			// Store analytics for the error
+			try {
+				let serializableErrorContext = undefined;
+
+				if ((error as any).response)
+					serializableErrorContext = JSON.parse(JSON.stringify((error as any).response, null, 2));
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.API_CALL_ERROR, {
+					request: {
+						method: config.method?.toUpperCase(),
+						url: config.url?.startsWith('/') ? config.url : `/${config.url}`,
+						body: config.data ? JSON.parse(config.data) : undefined,
+					},
+					response: {
+						status: serializableErrorContext ? serializableErrorContext.status : undefined,
+						body: serializableErrorContext ? serializableErrorContext.data : undefined,
+					},
+				});
+			} catch (ignored) {
+				// We tried and failed to send error analytics.
+			}
+
+			// Surface error to users (if necessary)
 			if (axios.isCancel(error)) {
 				throw CobaltError.fromCancelledRequest();
 			} else if (axios.isAxiosError(error)) {

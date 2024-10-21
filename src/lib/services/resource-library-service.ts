@@ -50,8 +50,20 @@ export const resourceLibraryService = {
 			url: buildQueryParamUrl(`/resource-library/tag-groups/${tagGroupId}`, queryParameters),
 		});
 	},
-	getResourceLibraryContentByTagId(
-		tagId: string,
+	getResourceLibraryTagByTagIdentifier(tagIdentifier: string) {
+		return httpSingleton.orchestrateRequest<{
+			tag: Tag;
+			tagGroup: TagGroup;
+			tagsByTagId: Record<string, Tag>;
+			contentTypes: ContentType[];
+			contentDurations: ContentDuration[];
+		}>({
+			method: 'GET',
+			url: `/resource-library/tag-filters/${tagIdentifier}`,
+		});
+	},
+	getResourceLibraryContentByUrlName(
+		urlName: string,
 		queryParameters?: {
 			pageNumber?: number;
 			pageSize?: number;
@@ -71,7 +83,7 @@ export const resourceLibraryService = {
 			tagsByTagId: Record<string, Tag>;
 		}>({
 			method: 'GET',
-			url: buildQueryParamUrl(`/resource-library/tags/${tagId}`, queryParameters),
+			url: buildQueryParamUrl(`/resource-library/tags/${urlName}`, queryParameters),
 		});
 	},
 	getResourceLibraryFiltersByTagGroupId(tagGroupId: string) {
@@ -82,15 +94,6 @@ export const resourceLibraryService = {
 		}>({
 			method: 'GET',
 			url: `/resource-library/tag-group-filters/${tagGroupId}`,
-		});
-	},
-	getResourceLibraryFiltersByTagId(tagId: string) {
-		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentType[];
-			contentDurations: ContentDuration[];
-		}>({
-			method: 'GET',
-			url: `/resource-library/tag-filters/${tagId}`,
 		});
 	},
 	getResourceLibraryContentTypes() {

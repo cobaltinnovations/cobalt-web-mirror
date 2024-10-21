@@ -31,8 +31,9 @@ import {
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
+	AnalyticsNativeEventTypeId,
 } from '@/lib/models';
-import { integratedCareService } from '@/lib/services';
+import { analyticsService, integratedCareService } from '@/lib/services';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
@@ -476,6 +477,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											variant="primary"
 											className="d-flex align-items-center"
 											onClick={() => {
+												analyticsService.persistEvent(
+													AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_ORDER_ASSESSMENT_RESULTS,
+													{
+														patientOrderId: patientOrder.patientOrderId,
+													}
+												);
+
 												navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 											}}
 										>

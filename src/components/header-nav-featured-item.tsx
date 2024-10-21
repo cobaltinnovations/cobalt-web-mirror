@@ -10,6 +10,7 @@ export interface NavFeaturedItem {
 	name: string;
 	descriptionHtml: string;
 	linkTo: To;
+	topicCenterId: string;
 }
 
 interface HeaderNavFeaturedItemProps {

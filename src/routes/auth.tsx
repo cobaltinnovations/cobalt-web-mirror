@@ -6,10 +6,10 @@ import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator }
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import { config } from '@/config';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService, analyticsService, institutionService } from '@/lib/services';
 import Loader from '@/components/loader';
 import { getSubdomain } from '@/lib/utils';
-import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, AnonymousAccountExpirationStrategyId } from '@/lib/models';
 
 type AuthLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
@@ -42,6 +42,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		return redirect('/sign-in');
 	}
 
+	const accessTokenAlreadyOnFile = Cookies.get('accessToken') === accessToken;
+
 	const accountId = updateTokenCookies(
 		accessToken,
 		institutionResponse.institution.anonymousAccountExpirationStrategyId ===
@@ -63,6 +65,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	}
 
 	Cookies.remove('authRedirectUrl');
+
+	// We can run through this auth code path multiple times (redundantly).
+	// Only send an analytics event if this is a non-redundant invocation.
+	// Suppose we did not do this: there would then be duplicate analytics events fired for sign-in
+	if (!accessTokenAlreadyOnFile) {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_IN, {
+			accountId: accountId,
+			redirectUrl: authRedirectUrl && authRedirectUrl !== '/' ? authRedirectUrl : undefined,
+		});
+	}
 
 	return {
 		authRedirectUrl,

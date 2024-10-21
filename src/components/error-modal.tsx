@@ -10,6 +10,8 @@ import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import useAccount from '@/hooks/use-account';
 import { ERROR_CODES } from '@/lib/http-client';
+import { analyticsService } from '@/lib/services';
+import { AnalyticsNativeEventOverlayViewInCrisisSource, AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modalWrapper: {
@@ -52,6 +54,11 @@ const ErrorModal: FC = () => {
 						onClick={() => {
 							dismissErrorModal();
 							trackEvent(CrisisAnalyticsEvent.clickCrisisError());
+
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+								source: AnalyticsNativeEventOverlayViewInCrisisSource.ERROR_OVERLAY,
+							});
+
 							openInCrisisModal(true);
 						}}
 					>
@@ -105,6 +112,11 @@ const ErrorModal: FC = () => {
 					onClick={() => {
 						dismissErrorModal();
 						trackEvent(CrisisAnalyticsEvent.clickCrisisError());
+
+						analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+							source: AnalyticsNativeEventOverlayViewInCrisisSource.ERROR_OVERLAY,
+						});
+
 						openInCrisisModal(true);
 					}}
 				>

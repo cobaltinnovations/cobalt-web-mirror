@@ -11,7 +11,8 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import useAnalytics from '@/hooks/use-analytics';
-import { FeatureId } from '@/lib/models';
+import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
 
 interface UseStylesProps {
 	featuresLength: number;
@@ -197,6 +198,14 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 												recommended: recommended,
 											})}
 											onClick={() => {
+												analyticsService.persistEvent(
+													AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE,
+													{
+														featureId: featureId,
+														source: AnalyticsNativeEventClickthroughFeatureSource.HOME,
+													}
+												);
+
 												trackEvent({
 													action: 'HP Nav',
 													link_text: name,

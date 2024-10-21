@@ -22,3 +22,4 @@ export * from './screening-service';
 export * from './studies-service';
 export * from './tag-service';
 export * from './topic-center-service';
+export * from './analytics-service';

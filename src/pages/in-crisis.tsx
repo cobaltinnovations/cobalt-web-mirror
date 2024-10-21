@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import InCrisisTemplate from '@/components/in-crisis-template';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
 
 const InCrisis = () => {
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_IN_CRISIS);
+	}, []);
+
 	return (
 		<>
 			<Helmet>
