@@ -148,7 +148,16 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											<Button
 												className="me-2"
 												variant="outline-primary"
-												onClick={onStartNewAssessment}
+												onClick={() => {
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT,
+														{
+															patientOrderId: patientOrder.patientOrderId,
+														}
+													);
+
+													onStartNewAssessment();
+												}}
 												disabled={
 													patientOrder.patientOrderDispositionId !==
 													PatientOrderDispositionId.OPEN
