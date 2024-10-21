@@ -13,7 +13,7 @@ import { Badge, Button, Tab } from 'react-bootstrap';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
-import { PatientOrderResponse, integratedCareService } from '@/lib/services';
+import { PatientOrderResponse, analyticsService, integratedCareService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 
 import TabBar from '@/components/tab-bar';
@@ -28,6 +28,7 @@ import Loader from '@/components/loader';
 import { MhicPatientOrderShelfActions } from '@/components/integrated-care/mhic/mhic-patient-order-shelf-actions';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import useHandleError from '@/hooks/use-handle-error';
+import { AnalyticsNativeEventMhicOrderDetailSectionId, AnalyticsNativeEventTypeId } from '@/lib/models';
 
 export const mhicShelfRouteObject: RouteObject = {
 	path: ':patientOrderId',
@@ -72,12 +73,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 	return defer(loadShelfData(patientOrderId));
 }
 
-enum TAB_KEYS {
-	ORDER_DETAILS = 'ORDER_DETAILS',
-	CONTACT_HISOTRY = 'CONTACT_HISOTRY',
-	COMMENTS = 'COMMENTS',
-}
-
 export const Component = () => {
 	const handleError = useHandleError();
 	const matches = useMatches();
@@ -99,7 +94,7 @@ export const Component = () => {
 		immediateUpdate: true,
 		pollingFn,
 	});
-	const [tabKey, setTabKey] = useState(TAB_KEYS.ORDER_DETAILS);
+	const [tabKey, setTabKey] = useState(AnalyticsNativeEventMhicOrderDetailSectionId.ORDER_DETAILS);
 	const [patientOrderResponse, setPatientOrderResponse] = useState<PatientOrderResponse | null>(null);
 
 	useEffect(() => {
@@ -107,6 +102,11 @@ export const Component = () => {
 			try {
 				const response = await shelfData?.patientOrderPromise;
 				setPatientOrderResponse(response);
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_DETAIL, {
+					patientOrderId: response.patientOrder.patientOrderId,
+					sectionId: AnalyticsNativeEventMhicOrderDetailSectionId.ORDER_DETAILS,
+				});
 			} catch (error) {
 				handleError(error);
 			}
@@ -126,7 +126,7 @@ export const Component = () => {
 			<Await resolve={!!patientOrderResponse || shelfData?.patientOrderPromise}>
 				<Tab.Container
 					id="shelf-tabs"
-					defaultActiveKey={TAB_KEYS.ORDER_DETAILS}
+					defaultActiveKey={AnalyticsNativeEventMhicOrderDetailSectionId.ORDER_DETAILS}
 					activeKey={tabKey}
 					mountOnEnter
 					unmountOnExit
@@ -139,12 +139,30 @@ export const Component = () => {
 								hideBorder
 								value={tabKey}
 								tabs={[
-									{ value: TAB_KEYS.ORDER_DETAILS, title: 'Order Details' },
-									{ value: TAB_KEYS.CONTACT_HISOTRY, title: 'Contact History' },
-									{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
+									{
+										value: AnalyticsNativeEventMhicOrderDetailSectionId.ORDER_DETAILS,
+										title: 'Order Details',
+									},
+									{
+										value: AnalyticsNativeEventMhicOrderDetailSectionId.CONTACT_HISTORY,
+										title: 'Contact History',
+									},
+									{ value: AnalyticsNativeEventMhicOrderDetailSectionId.COMMENTS, title: 'Comments' },
 								]}
 								onTabClick={(value) => {
-									setTabKey(value as TAB_KEYS);
+									setTabKey(value as AnalyticsNativeEventMhicOrderDetailSectionId);
+
+									if (!patientOrderResponse) {
+										return;
+									}
+
+									analyticsService.persistEvent(
+										AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_DETAIL,
+										{
+											patientOrderId: patientOrderResponse?.patientOrder.patientOrderId,
+											sectionId: value as AnalyticsNativeEventMhicOrderDetailSectionId,
+										}
+									);
 								}}
 							/>
 						}
@@ -259,16 +277,25 @@ const ShelfContent = ({
 				<div>{tabBar}</div>
 			</div>
 			<Tab.Content className={classes.tabContent}>
-				<Tab.Pane eventKey={TAB_KEYS.ORDER_DETAILS} className={classes.tabPane}>
+				<Tab.Pane
+					eventKey={AnalyticsNativeEventMhicOrderDetailSectionId.ORDER_DETAILS}
+					className={classes.tabPane}
+				>
 					<MhicOrderDetails
 						patientOrder={patientOrderResponse.patientOrder}
 						pastPatientOrders={patientOrderResponse.associatedPatientOrders}
 					/>
 				</Tab.Pane>
-				<Tab.Pane eventKey={TAB_KEYS.CONTACT_HISOTRY} className={classes.tabPane}>
+				<Tab.Pane
+					eventKey={AnalyticsNativeEventMhicOrderDetailSectionId.CONTACT_HISTORY}
+					className={classes.tabPane}
+				>
 					<MhicContactHistory patientOrder={patientOrderResponse.patientOrder} />
 				</Tab.Pane>
-				<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
+				<Tab.Pane
+					eventKey={AnalyticsNativeEventMhicOrderDetailSectionId.COMMENTS}
+					className={classes.commentsPane}
+				>
 					<MhicComments patientOrder={patientOrderResponse.patientOrder} />
 				</Tab.Pane>
 			</Tab.Content>
