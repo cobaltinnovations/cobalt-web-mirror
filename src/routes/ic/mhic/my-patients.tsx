@@ -322,7 +322,7 @@ export const Component = () => {
 	const analyticsEvents: Record<MhicMyPatientView, (response: PatientOrdersListResponse['findResult']) => void> =
 		useMemo(() => {
 			// pageSize is hard coded to 15 on this page, see <MhicPatientOrderTable/> component below.
-			const pageSize = searchParams.get('pageSize') ?? '15';
+			const pageSize = 15;
 			const sortDirectionId = searchParams.get('sortDirectionId') ?? '';
 			const patientOrderSortColumnId = searchParams.get('patientOrderSortColumnId') ?? '';
 
