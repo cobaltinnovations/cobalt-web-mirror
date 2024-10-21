@@ -8,6 +8,7 @@ import { AnalyticsNativeEventTypeId, PatientOrderDispositionId } from '@/lib/mod
 import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 interface MhicSearchResultsLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -92,7 +93,7 @@ export const Component = () => {
 				searchQuery,
 				...(patientMrn && { patientMrn }),
 				pageSize: 15,
-				pageNumber,
+				pageNumber: safeIntegerValue(pageNumber),
 				totalCount: response.totalCount,
 			});
 		},

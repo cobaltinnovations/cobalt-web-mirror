@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 import {
 	AnalyticsNativeEventTypeId,
@@ -356,7 +357,7 @@ export const Component = () => {
 						...(patientOrderDispositionId && { patientOrderDispositionId }),
 						...(referringPracticeIds.length > 0 && { referringPracticeIds }),
 						...(patientOrderFilterFlagTypeIds.length > 0 && { patientOrderFilterFlagTypeIds }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount: response.totalCount,
 					});
@@ -366,7 +367,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.CLOSED,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -376,7 +377,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED_OUTREACH,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -386,7 +387,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.MHP,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -396,7 +397,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.NEED_ASSESSMENT,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -406,7 +407,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.NEED_DOCUMENTATION,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -416,7 +417,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.SCHEDULED,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -426,7 +427,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.SPECIALTY_CARE,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});
@@ -436,7 +437,7 @@ export const Component = () => {
 						patientOrderViewTypeId: PatientOrderViewTypeId.SUBCLINICAL,
 						...(patientOrderSortColumnId && { patientOrderSortColumnId }),
 						...(sortDirectionId && { sortDirectionId }),
-						pageNumber,
+						pageNumber: safeIntegerValue(pageNumber),
 						pageSize,
 						totalCount,
 					});

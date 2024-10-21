@@ -35,6 +35,7 @@ import useAccount from '@/hooks/use-account';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 interface MhicOrdersLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -227,7 +228,7 @@ export const Component = () => {
 				...(patientOrderFilterFlagTypeIds.length > 0 && { patientOrderFilterFlagTypeIds }),
 				...(panelAccountIds.length > 0 && { panelAccountIds }),
 				pageSize: 15,
-				pageNumber,
+				pageNumber: safeIntegerValue(pageNumber),
 				totalCount,
 			});
 		},
