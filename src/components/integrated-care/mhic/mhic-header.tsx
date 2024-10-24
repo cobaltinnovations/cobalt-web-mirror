@@ -9,6 +9,7 @@ import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
+import HeaderNavDropdown from '@/components/header-nav-dropdown';
 
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
@@ -55,13 +56,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 			height: '100%',
 			position: 'relative',
 			'& a:not(.dropdown-item), & .dropdown button': {
+				border: 0,
 				height: '100%',
 				display: 'flex',
 				padding: '0 12px',
 				alignItems: 'center',
 				textDecoration: 'none',
 				...theme.fonts.default,
-				color: theme.colors.n500,
+				color: theme.colors.n900,
 				...theme.fonts.bodyNormal,
 				'&:hover': {
 					color: theme.colors.p700,
@@ -127,14 +129,11 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const patientOrdersMatch = useMatch({
 		path: '/ic/mhic/patient-orders/*',
 	});
-	const resourcesMatch = useMatch({
-		path: '/ic/mhic/resources/*',
+	const resourceLocationsMatch = useMatch({
+		path: '/ic/mhic/resource-locations/*',
 	});
-	const reportsMatch = useMatch({
-		path: '/ic/mhic/reports',
-	});
-	const departmentAvailabilityMatch = useMatch({
-		path: '/ic/mhic/department-availability',
+	const adminMatch = useMatch({
+		path: '/ic/mhic/admin/*',
 	});
 	const assessmentMatch = useMatch({
 		path: '/ic/mhic/order-assessment/:patientOrderId/*',
@@ -162,43 +161,57 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			},
 			{
 				testId: '',
-				navigationItemId: 'RESOURCES',
-				to: '/ic/mhic/resources',
-				title: 'Resources',
-				active: resourcesMatch,
+				navigationItemId: 'RESOURCE_LOCATIONS',
+				to: '/ic/mhic/resource-locations',
+				title: 'Resource Locations',
+				active: resourceLocationsMatch,
 			},
-			...(account?.accountCapabilityFlags.canAdministerIcDepartments
-				? [
-						{
-							testId: '',
-							navigationItemId: 'REPORTS',
-							to: '/ic/mhic/department-availability',
-							title: 'Department Availability',
-							active: !!departmentAvailabilityMatch,
-						},
-				  ]
-				: []),
-			...(account?.accountCapabilityFlags.canViewIcReports
-				? [
-						{
-							testId: '',
-							navigationItemId: 'REPORTS',
-							to: '/ic/mhic/reports',
-							title: 'Reports',
-							active: !!reportsMatch,
-						},
-				  ]
-				: []),
+			{
+				testId: '',
+				navigationItemId: 'ADMIN',
+				title: 'Admin',
+				active: adminMatch,
+				items: [
+					{
+						testId: '',
+						navigationItemId: 'RESOURCES',
+						to: '/ic/mhic/admin/resources',
+						title: 'Resources',
+						active: false,
+					},
+					...(account?.accountCapabilityFlags.canAdministerIcDepartments
+						? [
+								{
+									testId: '',
+									navigationItemId: 'DEPARTMENT_AVAILABILITY',
+									to: '/ic/mhic/admin/department-availability',
+									title: 'Department Availability',
+									active: false,
+								},
+						  ]
+						: []),
+					...(account?.accountCapabilityFlags.canViewIcReports
+						? [
+								{
+									testId: '',
+									navigationItemId: 'REPORTS',
+									to: '/ic/mhic/admin/reports',
+									title: 'Reports',
+									active: false,
+								},
+						  ]
+						: []),
+				],
+			},
 		],
 		[
-			overviewMatch,
-			myPatientsMatch,
-			patientOrdersMatch,
-			resourcesMatch,
 			account?.accountCapabilityFlags.canAdministerIcDepartments,
 			account?.accountCapabilityFlags.canViewIcReports,
-			departmentAvailabilityMatch,
-			reportsMatch,
+			adminMatch,
+			myPatientsMatch,
+			overviewMatch,
+			patientOrdersMatch,
+			resourceLocationsMatch,
 		]
 	);
 
@@ -219,11 +232,27 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				) : (
 					<nav className="h-100">
 						<ul>
-							{navigationLinks.map((link, index) => (
-								<li key={index} className={classNames({ active: link.active })}>
-									{link.to && <Link to={link.to}>{link.title}</Link>}
-								</li>
-							))}
+							{navigationLinks.map((link, index) => {
+								if (link.items) {
+									return (
+										<li key={index} className={classNames({ active: link.active })}>
+											<HeaderNavDropdown title={link.title} featuredItem={null}>
+												{link.items.map((item, itemIndex) => (
+													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
+														{item.title}
+													</Dropdown.Item>
+												))}
+											</HeaderNavDropdown>
+										</li>
+									);
+								}
+
+								return (
+									<li key={index} className={classNames({ active: link.active })}>
+										{link.to && <Link to={link.to}>{link.title}</Link>}
+									</li>
+								);
+							})}
 						</ul>
 					</nav>
 				)}
