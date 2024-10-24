@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
@@ -30,30 +30,30 @@ export const Component = () => {
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
 	const [showFormModal, setShowFormModal] = useState(false);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setIsLoading(true);
+	const fetchData = useCallback(async () => {
+		try {
+			setIsLoading(true);
 
-				const response = await careResourceService
-					.getCareResources({
-						pageSize: '15',
-						...(pageNumber && { pageNumber }),
-						...(orderBy && { orderBy: orderBy as 'NAME_ASC' }),
-					})
-					.fetch();
+			const response = await careResourceService
+				.getCareResources({
+					pageSize: '15',
+					...(pageNumber && { pageNumber }),
+					...(orderBy && { orderBy: orderBy as 'NAME_ASC' }),
+				})
+				.fetch();
 
-				setCareResources(response.careResources);
-				setCareResourcesTotalCount(response.totalCount);
-			} catch (error) {
-				handleError(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchData();
+			setCareResources(response.careResources);
+			setCareResourcesTotalCount(response.totalCount);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
 	}, [handleError, orderBy, pageNumber]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
 
 	return (
 		<>
@@ -68,6 +68,7 @@ export const Component = () => {
 				}}
 				onSave={() => {
 					setShowFormModal(false);
+					fetchData();
 				}}
 			/>
 

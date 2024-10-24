@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Row, Col, Form } from 'react-bootstrap';
 import InputHelper from '@/components/input-helper';
 import { createUseStyles } from 'react-jss';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceSpecialtyModel, CareResourceTag, PayorModel } from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceModel, CareResourceTag } from '@/lib/models';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -14,7 +14,7 @@ const useStyles = createUseStyles({
 });
 
 interface MhicCareResourceFormModalProps extends ModalProps {
-	onSave(): void;
+	onSave(careResource: CareResourceModel): void;
 }
 
 export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ onSave, ...props }) => {
@@ -28,15 +28,11 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 		phoneNumber: '',
 		emailAddress: '',
 		website: '',
-		insurance: [] as PayorModel[],
+		insurance: [] as CareResourceTag[],
 		insuranceNotes: '',
-		specialties: [] as CareResourceSpecialtyModel[],
+		specialties: [] as CareResourceTag[],
 		notes: '',
 	});
-
-	const handleFormSubmit = useCallback(async () => {
-		onSave();
-	}, [onSave]);
 
 	const handleOnEnter = useCallback(async () => {
 		try {
@@ -77,6 +73,30 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 			notes: '',
 		});
 	}, []);
+
+	const handleFormSubmit = useCallback(async () => {
+		try {
+			setIsLoading(true);
+			const response = await careResourceService
+				.createCareResource({
+					name: formValues.resourceName,
+					phoneNumber: formValues.phoneNumber,
+					emailAddress: formValues.emailAddress,
+					websiteUrl: formValues.website,
+					notes: formValues.notes,
+					insuranceNotes: formValues.insuranceNotes,
+					payors: formValues.insurance.map((i) => i.careResourceTagId),
+					specialties: formValues.specialties.map((i) => i.careResourceTagId),
+				})
+				.fetch();
+
+			onSave(response.careResource);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [formValues, handleError, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter} onExited={handleOnExited}>
@@ -155,7 +175,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 							onChange={(selected) => {
 								setFormValues((previousValues) => ({
 									...previousValues,
-									insurance: selected as PayorModel[],
+									insurance: selected as CareResourceTag[],
 								}));
 							}}
 							helperText="You can override the insurance at the location level if needed."
@@ -184,7 +204,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 							onChange={(selected) => {
 								setFormValues((previousValues) => ({
 									...previousValues,
-									specialties: selected as CareResourceSpecialtyModel[],
+									specialties: selected as CareResourceTag[],
 								}));
 							}}
 						/>

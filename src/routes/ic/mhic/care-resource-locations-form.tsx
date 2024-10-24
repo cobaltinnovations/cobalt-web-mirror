@@ -78,18 +78,18 @@ export const Component = () => {
 			event.preventDefault();
 
 			try {
-				await careResourceService
-					.createCareResource({
-						name: formValues.clinicName,
-						notes: formValues.notes,
-						phoneNumber: formValues.phoneNumber,
-						websiteUrl: formValues.website,
-						resourceAvailable: formValues.availability === 'AVAILABLE',
-						specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
-						supportRoleIds: formValues.therapyTypes,
-						payorIds: [formValues.insurance],
-					})
-					.fetch();
+				// await careResourceService
+				// 	.createCareResource({
+				// 		name: formValues.clinicName,
+				// 		notes: formValues.notes,
+				// 		phoneNumber: formValues.phoneNumber,
+				// 		websiteUrl: formValues.website,
+				// 		resourceAvailable: formValues.availability === 'AVAILABLE',
+				// 		specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
+				// 		supportRoleIds: formValues.therapyTypes,
+				// 		payorIds: [formValues.insurance],
+				// 	})
+				// 	.fetch();
 
 				addFlag({
 					variant: 'success',
@@ -103,19 +103,7 @@ export const Component = () => {
 				handleError(error);
 			}
 		},
-		[
-			addFlag,
-			formValues.availability,
-			formValues.clinicName,
-			formValues.insurance,
-			formValues.notes,
-			formValues.phoneNumber,
-			formValues.specialties,
-			formValues.therapyTypes,
-			formValues.website,
-			handleError,
-			navigate,
-		]
+		[addFlag, handleError, navigate]
 	);
 
 	return (

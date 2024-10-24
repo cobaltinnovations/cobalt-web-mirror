@@ -44,13 +44,13 @@ export const careResourceService = {
 	},
 	createCareResource(data: {
 		name: string;
-		notes: string;
 		phoneNumber: string;
+		emailAddress: string;
 		websiteUrl: string;
-		resourceAvailable: boolean;
-		specialtyIds: string[];
-		supportRoleIds: string[];
-		payorIds: string[];
+		notes: string;
+		insuranceNotes: string;
+		payors: string[];
+		specialties: string[];
 	}) {
 		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
 			method: 'POST',
