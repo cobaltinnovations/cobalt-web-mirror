@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { Badge, Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
+import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -22,8 +22,7 @@ export const Component = () => {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
-	const sortBy = useMemo(() => searchParams.get('sortBy') ?? '', [searchParams]);
-	const sortDirection = useMemo(() => searchParams.get('sortDirection') ?? '', [searchParams]);
+	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
 
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +39,7 @@ export const Component = () => {
 					.getCareResources({
 						pageSize: '15',
 						...(pageNumber && { pageNumber }),
-						...(sortBy && { sortBy }),
-						...(sortDirection && { sortDirection }),
+						...(orderBy && { orderBy: orderBy as 'NAME_ASC' }),
 					})
 					.fetch();
 
@@ -55,7 +53,7 @@ export const Component = () => {
 		};
 
 		fetchData();
-	}, [handleError, pageNumber, sortBy, sortDirection]);
+	}, [handleError, orderBy, pageNumber]);
 
 	return (
 		<>
@@ -98,11 +96,10 @@ export const Component = () => {
 										className="flex-row align-items-center justify-content-start"
 										header
 										sortable
-										sortDirection={sortDirection as SORT_DIRECTION}
+										sortDirection={orderBy.split('_')[1] as SORT_DIRECTION}
 										onSort={(sortDirection) => {
 											searchParams.set('pageNumber', '0');
-											searchParams.set('sortBy', 'NAME');
-											searchParams.set('sortDirection', sortDirection);
+											searchParams.set('orderBy', `NAME_${sortDirection}`);
 											setSearchParams(searchParams, { replace: true });
 										}}
 									>
@@ -129,19 +126,9 @@ export const Component = () => {
 												{careResource.name}
 											</Link>
 										</TableCell>
-										<TableCell>
-											{careResource.supportRoles.map((sr) => sr.description).join(', ')}
-										</TableCell>
-										<TableCell>
-											{careResource.careResourceLocations
-												.map((crl) => crl.address.postalCode)
-												.join(', ')}
-										</TableCell>
-										<TableCell className="flex-row align-items-center justify-content-start">
-											<Badge pill bg="outline-success">
-												TODO: Available
-											</Badge>
-										</TableCell>
+										<TableCell>N/A</TableCell>
+										<TableCell>N/A</TableCell>
+										<TableCell>N/A</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
 											<Dropdown>
 												<Dropdown.Toggle

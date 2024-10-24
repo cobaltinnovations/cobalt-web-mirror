@@ -1,5 +1,14 @@
 export interface CareResourceModel {
 	careResourceId: string;
+	name: string;
+	createdByAccountId: string;
+	specialties: CareResourceTag[];
+	payors: CareResourceTag[];
+	careResourceLocations: CareResourceLocationModel[];
+}
+
+export interface CareResourceLocationModel {
+	careResourceId: string;
 	careResourceLocations: CareResourceLocationModel[];
 	createdByAccountId: string;
 	formattedPhoneNumber: string;

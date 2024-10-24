@@ -140,13 +140,13 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Resource Locations</title>
+				<title>Cobalt | Integrated Care - Resources</title>
 			</Helmet>
 
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
-						<MhicPageHeader title="Resource Locations">
+						<MhicPageHeader title="Resources">
 							<div className="d-flex align-items-center">
 								<Button
 									className="me-2"
@@ -219,9 +219,7 @@ export const Component = () => {
 												{careResource.name}
 											</Link>
 										</TableCell>
-										<TableCell>
-											{careResource.supportRoles.map((sr) => sr.description).join(', ')}
-										</TableCell>
+										<TableCell>N/A</TableCell>
 										<TableCell>
 											{careResource.careResourceLocations
 												.map((crl) => crl.address.postalCode)

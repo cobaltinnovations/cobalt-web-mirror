@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Link, LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CareResourceSpecialtyModel } from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceSpecialtyModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -18,16 +18,24 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
 
-	const [{ payors }, { supportRoles }, careResourceResponse] = await Promise.all([
-		careResourceService.getPayors().fetch(),
-		careResourceService.getSupportRoles().fetch(),
-		...(careResourceId ? [careResourceService.getCareResource(careResourceId).fetch()] : []),
+	const [payorsResponse, specialtiesResponse, careResourceLocationResponse] = await Promise.all([
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
+			})
+			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.SPECIALTIES,
+			})
+			.fetch(),
+		...(careResourceId ? [careResourceService.getCareResourceLocation(careResourceId).fetch()] : []),
 	]);
 
 	return {
-		payors,
-		supportRoles,
-		...(careResourceResponse && { careResource: careResourceResponse.careResource }),
+		payors: payorsResponse.careResourceTags,
+		supportRoles: specialtiesResponse.careResourceTags,
+		...(careResourceLocationResponse && { careResource: careResourceLocationResponse.careResourceLocation }),
 	};
 };
 
@@ -261,7 +269,7 @@ export const Component = () => {
 								Select...
 							</option>
 							{payors.map((payor) => (
-								<option key={payor.payorId} value={payor.payorId}>
+								<option key={payor.careResourceTagId} value={payor.careResourceTagId}>
 									{payor.name}
 								</option>
 							))}
@@ -287,8 +295,8 @@ export const Component = () => {
 					<hr />
 					<AdminFormSection title="Therapy Types" description="Select therapy types offered.">
 						<AdminBadgeSelectControl
-							idKey="supportRoleId"
-							labelKey="description"
+							idKey="careResourceTagId"
+							labelKey="name"
 							options={supportRoles}
 							selections={formValues.therapyTypes}
 							onChange={(selections) => {

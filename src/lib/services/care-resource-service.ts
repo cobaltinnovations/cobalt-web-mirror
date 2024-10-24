@@ -1,9 +1,8 @@
 import {
 	CARE_RESOURCE_TAG_GROUP_ID,
+	CareResourceLocationModel,
 	CareResourceModel,
 	CareResourceTag,
-	PayorModel,
-	SupportRoleModel,
 } from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons';
 import { buildQueryParamUrl } from '../utils';
@@ -15,13 +14,12 @@ export const careResourceService = {
 			url: buildQueryParamUrl('/care-resource-tags', queryParams),
 		});
 	},
-	getSupportRoles() {
-		return httpSingleton.orchestrateRequest<{ supportRoles: SupportRoleModel[] }>({
-			method: 'GET',
-			url: '/support-roles',
-		});
-	},
-	getCareResources(params?: { pageNumber?: string; pageSize?: string }) {
+	getCareResources(params?: {
+		pageNumber?: string;
+		pageSize?: string;
+		searchQuery?: string;
+		orderBy?: 'NAME_ASC' | 'NAME_DESC';
+	}) {
 		return httpSingleton.orchestrateRequest<{
 			totalCountDescription: string;
 			totalCount: number;
@@ -38,10 +36,10 @@ export const careResourceService = {
 			url: `/care-resources/${careResourceId}`,
 		});
 	},
-	getPayors() {
-		return httpSingleton.orchestrateRequest<{ payors: PayorModel[] }>({
+	getCareResourceLocation(careResourceLocationId: string) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
 			method: 'GET',
-			url: '/payors',
+			url: `/care-resource-location/${careResourceLocationId}`,
 		});
 	},
 	createCareResource(data: {
