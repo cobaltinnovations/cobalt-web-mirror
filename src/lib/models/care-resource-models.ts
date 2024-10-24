@@ -55,3 +55,20 @@ export interface SupportRoleModel {
 	supportRoleId: string;
 	description: string;
 }
+
+export enum CARE_RESOURCE_TAG_GROUP_ID {
+	PAYORS = 'PAYORS',
+	FOCUS_TYPES = 'FOCUS_TYPES',
+	SPECIALTIES = 'SPECIALTIES',
+	THERAPY_TYPES = 'THERAPY_TYPES',
+	PATIENT_FOCUSES = 'PATIENT_FOCUSES',
+	GENDERS = 'GENDERS',
+	ETHNICITIES = 'ETHNICITIES',
+	LANGUAGES = 'LANGUAGES',
+}
+
+export interface CareResourceTag {
+	careResourceTagId: string;
+	name: string;
+	careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID;
+}

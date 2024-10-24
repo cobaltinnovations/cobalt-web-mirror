@@ -1,7 +1,20 @@
-import { CareResourceModel, PayorModel, SupportRoleModel } from '@/lib/models';
+import {
+	CARE_RESOURCE_TAG_GROUP_ID,
+	CareResourceModel,
+	CareResourceTag,
+	PayorModel,
+	SupportRoleModel,
+} from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons';
+import { buildQueryParamUrl } from '../utils';
 
 export const careResourceService = {
+	getCareResourceTags(queryParams: { careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID }) {
+		return httpSingleton.orchestrateRequest<{ careResourceTags: CareResourceTag[] }>({
+			method: 'GET',
+			url: buildQueryParamUrl('/care-resource-tags', queryParams),
+		});
+	},
 	getSupportRoles() {
 		return httpSingleton.orchestrateRequest<{ supportRoles: SupportRoleModel[] }>({
 			method: 'GET',
