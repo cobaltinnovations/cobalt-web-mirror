@@ -29,20 +29,46 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		})
 		.fetch();
 
+	const accessTokenAlreadyOnFile = !!Cookies.get('accessToken');
+
+	// Keep some transient session data around to avoid making double-calls to POST /accounts/mychart
+	// because this auth flow runs twice in rapid succession.
+	// TODO: rework the auth flow more generally here on the FE so we don't execute it twice.
+	let myChartAccessTokenFromSessionStorage = sessionStorage.getItem('cobalt.myChartAccessToken');
+	let myChartCobaltAccessTokenFromSessionStorage = sessionStorage.getItem('cobalt.myChartCobaltAccessToken');
+
 	if (myChartAccessToken) {
-		const myChartAccountRequest = accountService.getMyChartAccount(myChartAccessToken);
-		request.signal.onabort = () => {
-			myChartAccountRequest.abort();
-		};
-		const myChartAccountResponse = await myChartAccountRequest.fetch();
-		accessToken = myChartAccountResponse.accessToken;
+		if (myChartAccessTokenFromSessionStorage === myChartAccessToken && myChartCobaltAccessTokenFromSessionStorage) {
+			// We have saved-off data from previous go-round: use it instead of calling POST /accounts/mychart again.
+			accessToken = myChartCobaltAccessTokenFromSessionStorage;
+
+			try {
+				sessionStorage.removeItem('cobalt.myChartAccessToken');
+				sessionStorage.removeItem('cobalt.myChartCobaltAccessToken');
+			} catch (ignored) {
+				// Nothing to do
+			}
+		} else {
+			const myChartAccountRequest = accountService.getMyChartAccount(myChartAccessToken);
+			request.signal.onabort = () => {
+				myChartAccountRequest.abort();
+			};
+			const myChartAccountResponse = await myChartAccountRequest.fetch();
+			accessToken = myChartAccountResponse.accessToken;
+
+			// Save off for next go-round
+			try {
+				sessionStorage.setItem('cobalt.myChartAccessToken', myChartAccessToken);
+				sessionStorage.setItem('cobalt.myChartCobaltAccessToken', accessToken);
+			} catch (ignored) {
+				// Nothing to do
+			}
+		}
 	}
 
 	if (!accessToken) {
 		return redirect('/sign-in');
 	}
-
-	const accessTokenAlreadyOnFile = Cookies.get('accessToken') === accessToken;
 
 	const accountId = updateTokenCookies(
 		accessToken,
