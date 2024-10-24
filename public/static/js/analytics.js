@@ -83,7 +83,7 @@
 
 		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
-		if (referringMessageId && _isValidUuid(referringMessageId)) _setReferringMessageId(referringMessageId);
+		if (referringMessageId && referringMessageId.trim().length > 0) _setReferringMessageId(referringMessageId); // Might not be a UUID
 		if (referringCampaign && referringCampaign.trim().length > 0) _setReferringCampaign(referringCampaign.trim()); // Might not be a UUID
 
 		// Ensures that fingerprint and session ID are created if they are not already
