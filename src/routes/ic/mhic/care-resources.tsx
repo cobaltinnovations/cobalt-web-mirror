@@ -129,8 +129,8 @@ export const Component = () => {
 												{careResource.name}
 											</Link>
 										</TableCell>
-										<TableCell>N/A</TableCell>
-										<TableCell>N/A</TableCell>
+										<TableCell>{careResource.formattedPhoneNumber ?? 'Not provided'}</TableCell>
+										<TableCell>{careResource.websiteUrl ?? 'Not provided'}</TableCell>
 										<TableCell className="text-right">
 											{careResource.careResourceLocations.length}
 										</TableCell>
