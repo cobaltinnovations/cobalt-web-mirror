@@ -108,7 +108,9 @@ export const Component = () => {
 									</TableCell>
 									<TableCell header>Phone Number</TableCell>
 									<TableCell header>Website</TableCell>
-									<TableCell header>Locations</TableCell>
+									<TableCell header className="text-right">
+										Locations
+									</TableCell>
 									<TableCell></TableCell>
 								</TableRow>
 							</TableHead>
@@ -129,7 +131,9 @@ export const Component = () => {
 										</TableCell>
 										<TableCell>N/A</TableCell>
 										<TableCell>N/A</TableCell>
-										<TableCell>N/A</TableCell>
+										<TableCell className="text-right">
+											{careResource.careResourceLocations.length}
+										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
 											<Dropdown>
 												<Dropdown.Toggle
