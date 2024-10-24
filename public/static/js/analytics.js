@@ -9,6 +9,15 @@
 	const FINGERPRINT_STORAGE_KEY = 'FINGERPRINT';
 	const FINGERPRINT_QUERY_PARAMETER_NAME = 'a.f';
 
+	// Legacy support for GA (UTM) users.
+	// See https://ga-dev-tools.google/ga4/campaign-url-builder/
+	const UTM_ID_QUERY_PARAMETER_NAME = 'utm_id';
+	const UTM_SOURCE_QUERY_PARAMETER_NAME = 'utm_source';
+	const UTM_MEDIUM_QUERY_PARAMETER_NAME = 'utm_medium';
+	const UTM_CAMPAIGN_QUERY_PARAMETER_NAME = 'utm_campaign';
+	const UTM_TERM_QUERY_PARAMETER_NAME = 'utm_term';
+	const UTM_CONTENT_QUERY_PARAMETER_NAME = 'utm_content';
+
 	// Address issue where some browsers will intermittently "forget" session storage during same-tab redirect flows when the browser prefetches the page.
 	// This appears to be a race condition related to prefetching - see https://issues.chromium.org/issues/40940701.
 	// This has the undesirable effect of sometimes causing new sessions to be created even though the user has not closed the tab -
@@ -81,11 +90,50 @@
 		const referringMessageId = queryParameters[REFERRING_MESSAGE_ID_QUERY_PARAMETER_NAME];
 		const referringCampaign = queryParameters[REFERRING_CAMPAIGN_QUERY_PARAMETER_NAME];
 
+		// Legacy support for GA (UTM) users.
+		// If one or more of these are specified and there is no referring campaign, these will be used as the campaign.
+		// See https://ga-dev-tools.google/ga4/campaign-url-builder/
+		const utmId = queryParameters[UTM_ID_QUERY_PARAMETER_NAME];
+		const utmSource = queryParameters[UTM_SOURCE_QUERY_PARAMETER_NAME];
+		const utmMedium = queryParameters[UTM_MEDIUM_QUERY_PARAMETER_NAME];
+		const utmCampaign = queryParameters[UTM_CAMPAIGN_QUERY_PARAMETER_NAME];
+		const utmTerm = queryParameters[UTM_TERM_QUERY_PARAMETER_NAME];
+		const utmContent = queryParameters[UTM_CONTENT_QUERY_PARAMETER_NAME];
+
 		if (fingerprint && _isValidUuid(fingerprint)) _setFingerprint(fingerprint);
 		if (sessionId && _isValidUuid(sessionId)) _setSessionId(sessionId);
 		if (referringMessageId && referringMessageId.trim().length > 0)
 			_setReferringMessageId(referringMessageId.trim()); // Might not be a UUID
-		if (referringCampaign && referringCampaign.trim().length > 0) _setReferringCampaign(referringCampaign.trim()); // Might not be a UUID
+
+		// Special handling for referring campaigns.
+		// We first see if a native analytics referring campaign exists, and if not we check for a GA campaign.
+		let finalReferringCampaign = undefined;
+
+		if (referringCampaign && referringCampaign.trim().length > 0) {
+			// OK, native campaign exists
+			finalReferringCampaign = referringCampaign.trim();
+		} else {
+			// Let's see if there is a GA (UTM) campaign
+			const utmData = {};
+
+			if (utmId && utmId.trim().length > 0) utmData[UTM_ID_QUERY_PARAMETER_NAME] = utmId.trim();
+			if (utmSource && utmSource.trim().length > 0) utmData[UTM_SOURCE_QUERY_PARAMETER_NAME] = utmSource.trim();
+			if (utmMedium && utmMedium.trim().length > 0) utmData[UTM_MEDIUM_QUERY_PARAMETER_NAME] = utmMedium.trim();
+			if (utmCampaign && utmCampaign.trim().length > 0)
+				utmData[UTM_CAMPAIGN_QUERY_PARAMETER_NAME] = utmCampaign.trim();
+			if (utmTerm && utmTerm.trim().length > 0) utmData[UTM_TERM_QUERY_PARAMETER_NAME] = utmTerm.trim();
+			if (utmContent && utmContent.trim().length > 0)
+				utmData[UTM_CONTENT_QUERY_PARAMETER_NAME] = utmContent.trim();
+
+			if (Object.keys(utmData).length > 0) {
+				finalReferringCampaign = JSON.stringify({
+					type: 'utm',
+					data: utmData,
+				});
+			}
+		}
+
+		if (finalReferringCampaign) _setReferringCampaign(finalReferringCampaign);
 
 		// Ensures that fingerprint and session ID are created if they are not already
 		_getFingerprint();
@@ -95,7 +143,7 @@
 		mostRecentSession = {
 			sessionId: initializedSessionId,
 			referringMessageId: referringMessageId,
-			referringCampaign: referringCampaign,
+			referringCampaign: finalReferringCampaign,
 		};
 
 		_registerVisibilityChangeListener();
