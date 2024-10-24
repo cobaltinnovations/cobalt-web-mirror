@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
@@ -9,10 +9,9 @@ import { MhicPageHeader } from '@/components/integrated-care/mhic';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
+import NoData from '@/components/no-data';
 
 export const loader = async () => {
 	return null;
@@ -20,7 +19,6 @@ export const loader = async () => {
 
 export const Component = () => {
 	const location = useLocation();
-	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
@@ -72,7 +70,7 @@ export const Component = () => {
 								className="me-2 d-flex align-items-center"
 								variant="primary"
 								onClick={() => {
-									navigate({ pathname: `${location.pathname}/add` });
+									//TODO: open modal
 								}}
 							>
 								<PlusIcon className="me-2" /> Add Resource
@@ -106,6 +104,13 @@ export const Component = () => {
 								</TableRow>
 							</TableHead>
 							<TableBody>
+								{!isLoading && careResources.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={5}>
+											<NoData className="bg-white border-0" title="No Resources" actions={[]} />
+										</TableCell>
+									</TableRow>
+								)}
 								{careResources.map((careResource) => (
 									<TableRow key={careResource.careResourceId}>
 										<TableCell>
@@ -127,9 +132,6 @@ export const Component = () => {
 											</Badge>
 										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
-											<Button variant="light" className="p-2 me-2">
-												<CopyIcon className="d-flex" width={20} height={20} />
-											</Button>
 											<Dropdown>
 												<Dropdown.Toggle
 													as={DropdownToggle}
@@ -144,17 +146,6 @@ export const Component = () => {
 													popperConfig={{ strategy: 'fixed' }}
 													renderOnMount
 												>
-													<Dropdown.Item
-														className="d-flex align-items-center"
-														onClick={() => {
-															navigate({
-																pathname: `${location.pathname}/${careResource.careResourceId}/edit`,
-															});
-														}}
-													>
-														<EditIcon className="me-2 text-n500" />
-														Edit
-													</Dropdown.Item>
 													<Dropdown.Item
 														className="d-flex align-items-center"
 														onClick={() => {

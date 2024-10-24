@@ -113,7 +113,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Add Resource</title>
+				<title>Cobalt | Integrated Care - Add Resource Location</title>
 			</Helmet>
 
 			<Container fluid className="border-bottom">
@@ -122,8 +122,8 @@ export const Component = () => {
 						<Col>
 							<div className="d-flex align-items-center justify-content-between">
 								<h2 className="mb-1">
-									<Link to="/ic/mhic/resources" className="text-decoration-none">
-										Resources
+									<Link to="/ic/mhic/resource-locations" className="text-decoration-none">
+										Resource Locations
 									</Link>
 									<RightChevron className="text-gray" />
 									Add Resource
@@ -315,7 +315,7 @@ export const Component = () => {
 					<AdminFormFooter
 						exitButtonType="button"
 						onExit={() => {
-							navigate('/ic/mhic/resources');
+							navigate('/ic/mhic/resource-locations');
 						}}
 						exitLabel="Exit"
 						nextButtonType="submit"
