@@ -5,7 +5,7 @@ import { Badge, Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { MhicPageHeader } from '@/components/integrated-care/mhic';
+import { MhicCareResourceFormModal, MhicPageHeader } from '@/components/integrated-care/mhic';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
@@ -29,6 +29,7 @@ export const Component = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [careResources, setCareResources] = useState<CareResourceModel[]>([]);
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
+	const [showFormModal, setShowFormModal] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -62,6 +63,16 @@ export const Component = () => {
 				<title>Cobalt | Integrated Care - Resources</title>
 			</Helmet>
 
+			<MhicCareResourceFormModal
+				show={showFormModal}
+				onHide={() => {
+					setShowFormModal(false);
+				}}
+				onSave={() => {
+					setShowFormModal(false);
+				}}
+			/>
+
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
@@ -70,7 +81,7 @@ export const Component = () => {
 								className="me-2 d-flex align-items-center"
 								variant="primary"
 								onClick={() => {
-									//TODO: open modal
+									setShowFormModal(true);
 								}}
 							>
 								<PlusIcon className="me-2" /> Add Resource

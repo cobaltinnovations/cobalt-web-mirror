@@ -1,6 +1,7 @@
 export * from './mhic-assessment-complete';
 export * from './mhic-assessment-modal';
 export * from './mhic-assign-order-modal';
+export * from './mhic-care-resource-form-modal';
 export * from './mhic-change-triage-modal';
 export * from './mhic-close-episode-modal';
 export * from './mhic-comments';
