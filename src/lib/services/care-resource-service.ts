@@ -10,11 +10,9 @@ export const careResourceService = {
 	},
 	getCareResources(params?: { pageNumber?: string; pageSize?: string }) {
 		return httpSingleton.orchestrateRequest<{
-			careResources: {
-				totalCountDescription: string;
-				totalCount: number;
-				careResources: CareResourceModel[];
-			};
+			totalCountDescription: string;
+			totalCount: number;
+			careResources: CareResourceModel[];
 		}>({
 			method: 'GET',
 			url: '/care-resources',

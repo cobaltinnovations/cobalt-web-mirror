@@ -70,9 +70,9 @@ export const Component = () => {
 					})
 					.fetch();
 
-				setCareResources(response.careResources.careResources);
-				setCareResourcesTotalCount(response.careResources.totalCount);
-				setCareResourcesTotalCountDescription(response.careResources.totalCountDescription);
+				setCareResources(response.careResources);
+				setCareResourcesTotalCount(response.totalCount);
+				setCareResourcesTotalCountDescription(response.totalCountDescription);
 			} catch (error) {
 				handleError(error);
 			} finally {
