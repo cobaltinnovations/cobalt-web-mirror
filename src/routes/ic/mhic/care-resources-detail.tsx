@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/t
 import { MhicCareResourceFormModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import NoData from '@/components/no-data';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -148,17 +149,32 @@ export const Component = () => {
 										</TableRow>
 									</TableHead>
 									<TableBody>
+										{careResource.careResourceLocations.length === 0 && (
+											<TableRow>
+												<TableCell colSpan={5}>
+													<NoData
+														className="bg-white border-0"
+														title="No Care Resource Locations"
+														actions={[]}
+													/>
+												</TableCell>
+											</TableRow>
+										)}
 										{careResource.careResourceLocations.map((crl) => (
 											<TableRow>
 												<TableCell>
-													<span className="d-block">{crl.name}</span>
-													<span className="d-block">{crl.address.streetAddress1}</span>
-													<span className="d-block">
+													<span className="d-block text-nowrap">{crl.name}</span>
+													<span className="d-block text-nowrap">
+														{crl.address.streetAddress1}
+													</span>
+													<span className="d-block text-nowrap">
 														{crl.address.locality}, {crl.address.region}{' '}
 														{crl.address.postalCode}
 													</span>
 													{crl.address.streetAddress2 ?? (
-														<span className="d-block">{crl.address.streetAddress2}</span>
+														<span className="d-block text-nowrap">
+															{crl.address.streetAddress2}
+														</span>
 													)}
 												</TableCell>
 												<TableCell>{crl.payors.map((p) => p.name).join(', ')}</TableCell>

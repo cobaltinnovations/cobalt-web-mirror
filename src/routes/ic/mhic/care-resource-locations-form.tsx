@@ -16,6 +16,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId, careResourceLocationId } = params;
 
 	const [
+		associationsResponse,
 		payorsResponse,
 		specialtiesResponse,
 		therapyTypesResponse,
@@ -25,6 +26,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		languagesResponse,
 		careResourceLocationResponse,
 	] = await Promise.all([
+		careResourceService.getCareResourcesAssociationList().fetch(),
 		careResourceService
 			.getCareResourceTags({
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
@@ -67,6 +69,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 	return {
 		careResourceId,
+		careResourceAssociations: associationsResponse.careResources,
 		payors: payorsResponse.careResourceTags,
 		specialties: specialtiesResponse.careResourceTags,
 		therapyTypes: therapyTypesResponse.careResourceTags,
@@ -83,6 +86,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const Component = () => {
 	const {
 		careResourceId,
+		careResourceAssociations,
 		payors,
 		specialties,
 		therapyTypes,
@@ -196,7 +200,14 @@ export const Component = () => {
 							disabled={!!careResourceId}
 							required
 						>
-							<option value="">TODO</option>
+							<option value="" disabled>
+								Select...
+							</option>
+							{careResourceAssociations.map((cra) => (
+								<option key={cra.careResourceId} value={cra.careResourceId}>
+									{cra.name}
+								</option>
+							))}
 						</InputHelper>
 					</AdminFormSection>
 					<hr />

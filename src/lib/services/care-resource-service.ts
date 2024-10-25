@@ -79,6 +79,17 @@ export const careResourceService = {
 			url: `/care-resources/${careResourceId}`,
 		});
 	},
+	getCareResourcesAssociationList() {
+		return httpSingleton.orchestrateRequest<{
+			careResources: {
+				careResourceId: string;
+				name: string;
+			}[];
+		}>({
+			method: 'GET',
+			url: '/care-resources/association-list',
+		});
+	},
 
 	/* ----------------------------------------------------------- */
 	/* Care Resource Locations */
