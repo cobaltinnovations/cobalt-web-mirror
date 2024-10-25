@@ -19,6 +19,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		payorsResponse,
 		specialtiesResponse,
 		therapyTypesResponse,
+		populationServedResponse,
 		gendersResponse,
 		ethnicitiesResponse,
 		languagesResponse,
@@ -37,6 +38,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		careResourceService
 			.getCareResourceTags({
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.THERAPY_TYPES,
+			})
+			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.POPULATION_SERVED,
 			})
 			.fetch(),
 		careResourceService
@@ -64,6 +70,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		payors: payorsResponse.careResourceTags,
 		specialties: specialtiesResponse.careResourceTags,
 		therapyTypes: therapyTypesResponse.careResourceTags,
+		populationsServed: populationServedResponse.careResourceTags,
 		genders: gendersResponse.careResourceTags,
 		ethnicities: ethnicitiesResponse.careResourceTags,
 		languages: languagesResponse.careResourceTags,
@@ -74,8 +81,16 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
-	const { payors, specialties, therapyTypes, genders, ethnicities, languages, careResourceLocation } =
-		useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const {
+		payors,
+		specialties,
+		therapyTypes,
+		populationsServed,
+		genders,
+		ethnicities,
+		languages,
+		careResourceLocation,
+	} = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
@@ -261,6 +276,7 @@ export const Component = () => {
 					<hr />
 					<AdminFormSection title="Address">
 						<TypeaheadHelper
+							className="mb-3"
 							id="typeahead--address"
 							label="Address"
 							labelKey="text"
@@ -280,6 +296,19 @@ export const Component = () => {
 									address: selected as PlaceModel,
 								}));
 							}}
+						/>
+						<InputHelper
+							type="text"
+							label="Address 2"
+							name="address-2"
+							value={formValues.address2}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									address2: currentTarget.value,
+								}));
+							}}
+							helperText="Use address 2 to specify a suite or floor #"
 						/>
 					</AdminFormSection>
 					<hr />
@@ -347,11 +376,11 @@ export const Component = () => {
 						description="What type of patients does this location serve?"
 					>
 						<Form.Group className="mb-0">
-							<Form.Label>TODO: Age Tags</Form.Label>
+							<Form.Label>Age</Form.Label>
 							<AdminBadgeSelectControl
 								idKey="careResourceTagId"
 								labelKey="name"
-								options={genders}
+								options={populationsServed}
 								selections={formValues.ages}
 								onChange={(selections) => {
 									setFormValues((previousValue) => ({
