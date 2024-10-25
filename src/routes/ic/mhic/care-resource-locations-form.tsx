@@ -97,7 +97,7 @@ export const Component = () => {
 	const { addFlag } = useFlags();
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [formValues, setFormValues] = useState({
-		careResourceId: careResourceLocation?.careResourceId ?? '',
+		careResourceId: careResourceId ?? careResourceLocation?.careResourceId ?? '',
 		locationName: careResourceLocation?.name ?? '',
 		status: careResourceLocation?.acceptingNewPatients ? 'AVAILABLE' : 'UNAVAILABLE',
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',

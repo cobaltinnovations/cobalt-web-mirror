@@ -148,39 +148,30 @@ export const Component = () => {
 										</TableRow>
 									</TableHead>
 									<TableBody>
-										<TableRow>
-											<TableCell>
-												<span className="d-block">Location Name</span>
-												<span className="d-block">1930 S. Broad Street</span>
-												<span className="d-block">Philadelphia, PA 00000</span>
-											</TableCell>
-											<TableCell>Aetna</TableCell>
-											<TableCell>xxx, xxx, xxx</TableCell>
-											<TableCell>
-												<div className="d-flex align-items-center justify-content-between">
-													<Badge pill bg="outline-success">
-														Available
-													</Badge>
-												</div>
-											</TableCell>
-										</TableRow>
-										<TableRow>
-											<TableCell>
-												<span className="d-block">Location Name</span>
-												<span className="d-block">1930 S. Broad Street</span>
-												<span className="d-block">Philadelphia, PA 00000</span>
-											</TableCell>
-											<TableCell>Aetna</TableCell>
-											<TableCell>xxx, xxx, xxx</TableCell>
-											<TableCell>
-												<div className="d-flex align-items-center justify-content-between">
-													<Badge pill bg="outline-danger">
-														Unavailable
-													</Badge>
-												</div>
-											</TableCell>
-											<TableCell></TableCell>
-										</TableRow>
+										{careResource.careResourceLocations.map((crl) => (
+											<TableRow>
+												<TableCell>
+													<span className="d-block">{crl.name}</span>
+													<span className="d-block">{crl.address.streetAddress1}</span>
+													<span className="d-block">city, state postalCode</span>
+												</TableCell>
+												<TableCell>{crl.payors.map((p) => p.name).join(', ')}</TableCell>
+												<TableCell>{crl.specialties.map((s) => s.name).join(', ')}</TableCell>
+												<TableCell>
+													<div className="d-flex align-items-center justify-content-between">
+														{crl.acceptingNewPatients ? (
+															<Badge pill bg="outline-success">
+																Available
+															</Badge>
+														) : (
+															<Badge pill bg="outline-danger">
+																Unavailable
+															</Badge>
+														)}
+													</div>
+												</TableCell>
+											</TableRow>
+										))}
 									</TableBody>
 								</Table>
 							</Card.Body>
