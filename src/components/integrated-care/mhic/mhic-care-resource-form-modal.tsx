@@ -14,10 +14,11 @@ const useStyles = createUseStyles({
 });
 
 interface MhicCareResourceFormModalProps extends ModalProps {
+	careResourceId?: string;
 	onSave(careResource: CareResourceModel): void;
 }
 
-export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ onSave, ...props }) => {
+export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ careResourceId, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 	const handleOnEnter = useCallback(async () => {
 		try {
 			setIsLoading(true);
-			const [payorsResponse, specialtiesResponse] = await Promise.all([
+			const [payorsResponse, specialtiesResponse, careResourceResponse] = await Promise.all([
 				careResourceService
 					.getCareResourceTags({
 						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
@@ -48,16 +49,30 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.SPECIALTIES,
 					})
 					.fetch(),
+				...(careResourceId ? [careResourceService.getCareResource(careResourceId).fetch()] : []),
 			]);
 
 			setPayorOptions(payorsResponse.careResourceTags);
 			setSpecialtyOptions(specialtiesResponse.careResourceTags);
+
+			if (careResourceResponse) {
+				setFormValues({
+					resourceName: careResourceResponse.careResource.name,
+					phoneNumber: careResourceResponse.careResource.phoneNumber ?? '',
+					emailAddress: '',
+					website: careResourceResponse.careResource.websiteUrl ?? '',
+					insurance: careResourceResponse.careResource.payors,
+					insuranceNotes: '',
+					specialties: careResourceResponse.careResource.specialties,
+					notes: '',
+				});
+			}
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError]);
+	}, [careResourceId, handleError]);
 
 	const handleOnExited = useCallback(() => {
 		setPayorOptions([]);
@@ -101,7 +116,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter} onExited={handleOnExited}>
 			<Modal.Header closeButton>
-				<Modal.Title>Create Resource</Modal.Title>
+				<Modal.Title>{careResourceId ? 'Edit' : 'Create'} Resource</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className="py-8">
 				<Form>

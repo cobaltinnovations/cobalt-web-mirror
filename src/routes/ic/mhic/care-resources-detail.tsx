@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { careResourceService } from '@/lib/services';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { MhicCareResourceFormModal } from '@/components/integrated-care/mhic';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
@@ -24,12 +25,24 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const [showFormModal, setShowFormModal] = useState(false);
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Add Resource</title>
+				<title>Cobalt | Integrated Care - Resource - {careResource.name}</title>
 			</Helmet>
+
+			<MhicCareResourceFormModal
+				careResourceId={careResource.careResourceId}
+				show={showFormModal}
+				onHide={() => {
+					setShowFormModal(false);
+				}}
+				onSave={() => {
+					setShowFormModal(false);
+				}}
+			/>
 
 			<Container>
 				<Row className="py-10">
@@ -45,7 +58,13 @@ export const Component = () => {
 						<Card bsPrefix="ic-card">
 							<Card.Body className="cobalt-card__body--top d-flex align-items-center justify-content-between">
 								<h4>Details</h4>
-								<Button variant="outline-primary" className="d-flex align-items-center">
+								<Button
+									variant="outline-primary"
+									className="d-flex align-items-center"
+									onClick={() => {
+										setShowFormModal(true);
+									}}
+								>
 									<EditIcon width={20} height={20} className="d-flex me-2" />
 									Edit
 								</Button>
@@ -60,7 +79,7 @@ export const Component = () => {
 											<p className="m-0 text-gray">Phone</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">{careResource.formattedPhoneNumber}</p>
+											<p className="m-0">{careResource.formattedPhoneNumber ?? 'Not provided'}</p>
 										</Col>
 									</Row>
 									<Row className="mb-4">
@@ -76,7 +95,7 @@ export const Component = () => {
 											<p className="m-0 text-gray">Website</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">{careResource.websiteUrl}</p>
+											<p className="m-0">{careResource.websiteUrl ?? 'Not provided'}</p>
 										</Col>
 									</Row>
 								</Container>
@@ -85,7 +104,11 @@ export const Component = () => {
 								<Card.Title>Accepted Insurance</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<p className="m-0">{careResource.payors.map((p) => p.name).join(', ')}</p>
+								<p className="m-0">
+									{careResource.payors.length > 0
+										? careResource.payors.map((p) => p.name).join(', ')
+										: 'Not provided'}
+								</p>
 							</Card.Body>
 							<Card.Header className="cobalt-card__header--mid">
 								<Card.Title>Resource Notes</Card.Title>

@@ -1,9 +1,9 @@
 export interface CareResourceModel {
 	careResourceId: string;
 	name: string;
-	phoneNumber: string;
-	formattedPhoneNumber: string;
-	websiteUrl: string;
+	phoneNumber?: string;
+	formattedPhoneNumber?: string;
+	websiteUrl?: string;
 	createdByAccountId: string;
 	specialties: CareResourceTag[];
 	payors: CareResourceTag[];
