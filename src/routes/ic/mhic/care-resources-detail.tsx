@@ -1,16 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { careResourceService } from '@/lib/services';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 
-export const loader = async () => {
-	return null;
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+	const { careResourceId } = params;
+	if (!careResourceId) {
+		throw new Error('careResourceId is undefined.');
+	}
+
+	const networkCall = careResourceService.getCareResource(careResourceId);
+	request.signal.addEventListener('abort', () => {
+		networkCall.abort();
+	});
+
+	const { careResource } = await networkCall.fetch();
+	return { careResource };
 };
 
 export const Component = () => {
+	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+
 	return (
 		<>
 			<Helmet>
@@ -23,7 +37,7 @@ export const Component = () => {
 						<Link to="/ic/mhic/admin/resources" className="d-block mb-6">
 							Resources
 						</Link>
-						<h2 className="mb-0">Resource Name</h2>
+						<h2 className="mb-0">{careResource.name}</h2>
 					</Col>
 				</Row>
 				<Row>
@@ -46,7 +60,7 @@ export const Component = () => {
 											<p className="m-0 text-gray">Phone</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">xxx</p>
+											<p className="m-0">{careResource.formattedPhoneNumber}</p>
 										</Col>
 									</Row>
 									<Row className="mb-4">
@@ -62,7 +76,7 @@ export const Component = () => {
 											<p className="m-0 text-gray">Website</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">xxx</p>
+											<p className="m-0">{careResource.websiteUrl}</p>
 										</Col>
 									</Row>
 								</Container>
@@ -71,13 +85,13 @@ export const Component = () => {
 								<Card.Title>Accepted Insurance</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<p className="m-0">xxx, xxx, xxx</p>
+								<p className="m-0">{careResource.payors.map((p) => p.name).join(', ')}</p>
 							</Card.Body>
 							<Card.Header className="cobalt-card__header--mid">
 								<Card.Title>Resource Notes</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<p className="m-0">xxx, xxx, xxx</p>
+								<p className="m-0">xxx</p>
 							</Card.Body>
 						</Card>
 					</Col>
