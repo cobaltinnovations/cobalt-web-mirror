@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
@@ -18,8 +18,6 @@ export const loader = async () => {
 };
 
 export const Component = () => {
-	const location = useLocation();
-
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
@@ -125,9 +123,7 @@ export const Component = () => {
 								{careResources.map((careResource) => (
 									<TableRow key={careResource.careResourceId}>
 										<TableCell>
-											<Link to={`${location.pathname}/${careResource.careResourceId}`}>
-												{careResource.name}
-											</Link>
+											<Link to={`./${careResource.careResourceId}`}>{careResource.name}</Link>
 										</TableCell>
 										<TableCell>{careResource.formattedPhoneNumber ?? 'Not provided'}</TableCell>
 										<TableCell>{careResource.websiteUrl ?? 'Not provided'}</TableCell>

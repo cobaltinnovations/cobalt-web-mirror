@@ -1,22 +1,25 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useState } from 'react';
-import { Link, LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceSpecialtyModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { AdminBadgeSelectControl, AdminFormFooter, AdminFormSection } from '@/components/admin';
+import { AdminBadgeSelectControl, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
-import { CareResourceLocationCardValueModel, MhicCareResourceLocationCard } from '@/components/integrated-care/mhic';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import {
+	CareResourceLocationCardValueModel,
+	MhicCareResourceFormHeader,
+	MhicCareResourceLocationCard,
+} from '@/components/integrated-care/mhic';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const { careResourceId } = params;
+	const { careResourceId, careResourceLocationId } = params;
 
 	const [payorsResponse, specialtiesResponse, careResourceLocationResponse] = await Promise.all([
 		careResourceService
@@ -29,31 +32,36 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.SPECIALTIES,
 			})
 			.fetch(),
-		...(careResourceId ? [careResourceService.getCareResourceLocation(careResourceId).fetch()] : []),
+		...(careResourceLocationId
+			? [careResourceService.getCareResourceLocation(careResourceLocationId).fetch()]
+			: []),
 	]);
 
 	return {
+		careResourceId,
 		payors: payorsResponse.careResourceTags,
 		supportRoles: specialtiesResponse.careResourceTags,
-		...(careResourceLocationResponse && { careResource: careResourceLocationResponse.careResourceLocation }),
+		...(careResourceLocationResponse && {
+			careResourceLocation: careResourceLocationResponse.careResourceLocation,
+		}),
 	};
 };
 
 export const Component = () => {
-	const { payors, supportRoles, careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { payors, supportRoles, careResourceLocation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
-		availability: careResource ? 'AVAILABLE' : 'AVAILABLE',
-		clinicName: careResource ? careResource.name : '',
-		phoneNumber: careResource ? careResource.phoneNumber : '',
-		website: careResource ? careResource.websiteUrl : '',
-		locations: (careResource ? [] : []) as CareResourceLocationCardValueModel[],
-		insurance: careResource ? careResource.payors[0].payorId : '',
-		specialties: careResource ? careResource.specialties : [],
-		therapyTypes: careResource ? careResource.supportRoles.map((sr) => sr.supportRoleId) : [],
-		notes: careResource ? '' : '',
+		availability: careResourceLocation ? 'AVAILABLE' : 'AVAILABLE',
+		clinicName: careResourceLocation ? careResourceLocation.name : '',
+		phoneNumber: careResourceLocation ? careResourceLocation.phoneNumber : '',
+		website: careResourceLocation ? careResourceLocation.websiteUrl : '',
+		locations: (careResourceLocation ? [] : []) as CareResourceLocationCardValueModel[],
+		insurance: careResourceLocation ? careResourceLocation.payors[0].payorId : '',
+		specialties: careResourceLocation ? careResourceLocation.specialties : [],
+		therapyTypes: careResourceLocation ? careResourceLocation.supportRoles.map((sr) => sr.supportRoleId) : [],
+		notes: careResourceLocation ? '' : '',
 	});
 
 	const handleAddLocationButtonClick = useCallback(() => {
@@ -73,38 +81,33 @@ export const Component = () => {
 		}));
 	}, []);
 
-	const handleFormSubmit = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault();
+	const handleFormSubmit = useCallback(async () => {
+		try {
+			// await careResourceService
+			// 	.createCareResource({
+			// 		name: formValues.clinicName,
+			// 		notes: formValues.notes,
+			// 		phoneNumber: formValues.phoneNumber,
+			// 		websiteUrl: formValues.website,
+			// 		resourceAvailable: formValues.availability === 'AVAILABLE',
+			// 		specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
+			// 		supportRoleIds: formValues.therapyTypes,
+			// 		payorIds: [formValues.insurance],
+			// 	})
+			// 	.fetch();
 
-			try {
-				// await careResourceService
-				// 	.createCareResource({
-				// 		name: formValues.clinicName,
-				// 		notes: formValues.notes,
-				// 		phoneNumber: formValues.phoneNumber,
-				// 		websiteUrl: formValues.website,
-				// 		resourceAvailable: formValues.availability === 'AVAILABLE',
-				// 		specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
-				// 		supportRoleIds: formValues.therapyTypes,
-				// 		payorIds: [formValues.insurance],
-				// 	})
-				// 	.fetch();
+			addFlag({
+				variant: 'success',
+				title: 'Resource Location Created',
+				description: 'This resource location can now be used to create Resource Packets.',
+				actions: [],
+			});
 
-				addFlag({
-					variant: 'success',
-					title: 'Resource Created!',
-					description: 'This resource can now be used to create Resource Packets.',
-					actions: [],
-				});
-
-				navigate('/ic/mhic/resources');
-			} catch (error) {
-				handleError(error);
-			}
-		},
-		[addFlag, handleError, navigate]
-	);
+			navigate(-1);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, navigate]);
 
 	return (
 		<>
@@ -112,19 +115,14 @@ export const Component = () => {
 				<title>Cobalt | Integrated Care - Add Resource Location</title>
 			</Helmet>
 
+			{/* path matching logic in mhic-header.tsx hides the default header */}
+			<MhicCareResourceFormHeader onAddLocationButtonClick={handleFormSubmit} />
+
 			<Container fluid className="border-bottom">
 				<Container className="py-10">
 					<Row>
 						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<h2 className="mb-1">
-									<Link to="/ic/mhic/resource-locations" className="text-decoration-none">
-										Resource Locations
-									</Link>
-									<RightChevron className="text-gray" />
-									Add Resource
-								</h2>
-							</div>
+							<h2 className="mb-2">Add Resource Location</h2>
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 							</p>
@@ -133,7 +131,7 @@ export const Component = () => {
 				</Container>
 			</Container>
 
-			<Form className="pb-11" onSubmit={handleFormSubmit}>
+			<Form className="pb-11">
 				<Container className="pb-10">
 					<AdminFormSection
 						title="Availability"
@@ -308,18 +306,6 @@ export const Component = () => {
 							}}
 						/>
 					</AdminFormSection>
-					<AdminFormFooter
-						exitButtonType="button"
-						onExit={() => {
-							navigate('/ic/mhic/resource-locations');
-						}}
-						exitLabel="Exit"
-						nextButtonType="submit"
-						onNext={() => {
-							return;
-						}}
-						nextLabel="Add Resource"
-					/>
 				</Container>
 			</Form>
 		</>

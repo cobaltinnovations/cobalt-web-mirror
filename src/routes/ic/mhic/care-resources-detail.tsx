@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router-dom';
+import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { careResourceService } from '@/lib/services';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
@@ -25,6 +25,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const navigate = useNavigate();
 	const revalidator = useRevalidator();
 	const [showFormModal, setShowFormModal] = useState(false);
 
@@ -124,7 +125,13 @@ export const Component = () => {
 						<Card bsPrefix="ic-card">
 							<Card.Body className="cobalt-card__body--top d-flex align-items-center justify-content-between">
 								<h4>Locations</h4>
-								<Button variant="primary" className="d-flex align-items-center">
+								<Button
+									variant="primary"
+									className="d-flex align-items-center"
+									onClick={() => {
+										navigate(`./add-location`);
+									}}
+								>
 									<PlusIcon width={20} height={20} className="d-flex me-2" />
 									Add
 								</Button>

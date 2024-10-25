@@ -7,7 +7,7 @@ import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models'
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
-import { Link, useMatch, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 import HeaderNavDropdown from '@/components/header-nav-dropdown';
 
@@ -119,6 +119,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
 	const { account } = useAccount();
+	const location = useLocation();
 
 	const overviewMatch = useMatch({
 		path: '/ic/mhic/overview/*',
@@ -135,6 +136,13 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const adminMatch = useMatch({
 		path: '/ic/mhic/admin/*',
 	});
+
+	const careResourcesLocationFormMatch = [
+		'/ic/mhic/resource-locations/add',
+		'/ic/mhic/resource-locations/:careResourceLocationId/edit',
+		'/ic/mhic/admin/resources/:careResourceId/add-location',
+	].some((path) => matchPath(path, location.pathname));
+
 	const assessmentMatch = useMatch({
 		path: '/ic/mhic/order-assessment/:patientOrderId/*',
 	});
@@ -214,6 +222,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			resourceLocationsMatch,
 		]
 	);
+
+	if (careResourcesLocationFormMatch) {
+		return null;
+	}
 
 	return (
 		<header className={classes.header}>

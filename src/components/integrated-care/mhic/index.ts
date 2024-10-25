@@ -34,6 +34,7 @@ export * from './mhic-outreach-modal';
 export * from './mhic-page-header';
 export * from './mhic-patient-order-shelf-actions';
 export * from './mhic-patient-order-table';
+export * from './mhic-care-resource-form-header';
 export * from './mhic-resources-modal';
 export * from './mhic-safety-planning-modal';
 export * from './mhic-schedule-assessment-modal';

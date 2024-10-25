@@ -1010,6 +1010,11 @@ export const routes: RouteObject[] = [
 												lazy: () => import('@/routes/ic/mhic/care-resources-detail'),
 											},
 											{
+												id: 'mhic-admin-care-resources-detail-location',
+												path: 'resources/:careResourceId/add-location',
+												lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
+											},
+											{
 												id: 'department-availability',
 												path: 'department-availability',
 												lazy: () => import('@/routes/ic/mhic/department-availability'),
