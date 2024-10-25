@@ -153,7 +153,13 @@ export const Component = () => {
 												<TableCell>
 													<span className="d-block">{crl.name}</span>
 													<span className="d-block">{crl.address.streetAddress1}</span>
-													<span className="d-block">city, state postalCode</span>
+													<span className="d-block">
+														{crl.address.locality}, {crl.address.region}{' '}
+														{crl.address.postalCode}
+													</span>
+													{crl.address.streetAddress2 ?? (
+														<span className="d-block">{crl.address.streetAddress2}</span>
+													)}
 												</TableCell>
 												<TableCell>{crl.payors.map((p) => p.name).join(', ')}</TableCell>
 												<TableCell>{crl.specialties.map((s) => s.name).join(', ')}</TableCell>
