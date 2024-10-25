@@ -114,7 +114,7 @@ export const Component = () => {
 								<Card.Title>Resource Notes</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<p className="m-0">xxx</p>
+								<p className="m-0">{careResource.notes ?? 'Not provided'}</p>
 							</Card.Body>
 						</Card>
 					</Col>

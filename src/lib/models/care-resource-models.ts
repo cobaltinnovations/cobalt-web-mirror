@@ -1,6 +1,8 @@
 export interface CareResourceModel {
 	careResourceId: string;
 	name: string;
+	notes?: string;
+	insuranceNotes?: string;
 	phoneNumber?: string;
 	formattedPhoneNumber?: string;
 	websiteUrl?: string;

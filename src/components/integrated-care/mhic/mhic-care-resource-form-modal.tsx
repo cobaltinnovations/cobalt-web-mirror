@@ -63,9 +63,9 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 					emailAddress: careResourceResponse.careResource.emailAddress ?? '',
 					website: careResourceResponse.careResource.websiteUrl ?? '',
 					insurance: careResourceResponse.careResource.payors,
-					insuranceNotes: '',
+					insuranceNotes: careResourceResponse.careResource.insuranceNotes ?? '',
 					specialties: careResourceResponse.careResource.specialties,
-					notes: '',
+					notes: careResourceResponse.careResource.notes ?? '',
 				});
 			}
 		} catch (error) {
