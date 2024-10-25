@@ -11,8 +11,8 @@ export interface AdminTagGroupControlProps<T extends OptionModel> {
 	idKey: keyof T;
 	labelKey: keyof T;
 	options: T[];
-	selections: string[];
-	onChange: (value: string[]) => void;
+	selections: T[];
+	onChange: (value: T[]) => void;
 }
 
 export function AdminBadgeSelectControl<T extends OptionModel>({
@@ -25,7 +25,7 @@ export function AdminBadgeSelectControl<T extends OptionModel>({
 	return (
 		<div className="d-flex flex-wrap">
 			{options.map((option) => {
-				const isSelected = selections.includes(option[idKey]);
+				const isSelected = !!selections.find((s) => s[idKey] === option[idKey]);
 
 				return (
 					<Button
@@ -35,9 +35,9 @@ export function AdminBadgeSelectControl<T extends OptionModel>({
 						className="mb-2 me-2 fs-default text-nowrap"
 						onClick={() => {
 							onChange(
-								selections.includes(option[idKey])
-									? selections.filter((s) => s !== option[idKey])
-									: [...selections, option[idKey]]
+								isSelected
+									? selections.filter((s) => s[idKey] !== option[idKey])
+									: [...selections, option]
 							);
 						}}
 					>

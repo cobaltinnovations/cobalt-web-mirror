@@ -1,27 +1,29 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useState } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceSpecialtyModel } from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceTag } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
+import { MhicCareResourceFormHeader } from '@/components/integrated-care/mhic';
 import { AdminBadgeSelectControl, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import Wysiwyg from '@/components/wysiwyg';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
-import {
-	CareResourceLocationCardValueModel,
-	MhicCareResourceFormHeader,
-	MhicCareResourceLocationCard,
-} from '@/components/integrated-care/mhic';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId, careResourceLocationId } = params;
 
-	const [payorsResponse, specialtiesResponse, careResourceLocationResponse] = await Promise.all([
+	const [
+		payorsResponse,
+		specialtiesResponse,
+		therapyTypesResponse,
+		gendersResponse,
+		ethnicitiesResponse,
+		languagesResponse,
+		careResourceLocationResponse,
+	] = await Promise.all([
 		careResourceService
 			.getCareResourceTags({
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
@@ -32,6 +34,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.SPECIALTIES,
 			})
 			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.THERAPY_TYPES,
+			})
+			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.GENDERS,
+			})
+			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.ETHNICITIES,
+			})
+			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.LANGUAGES,
+			})
+			.fetch(),
 		...(careResourceLocationId
 			? [careResourceService.getCareResourceLocation(careResourceLocationId).fetch()]
 			: []),
@@ -40,7 +62,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	return {
 		careResourceId,
 		payors: payorsResponse.careResourceTags,
-		supportRoles: specialtiesResponse.careResourceTags,
+		specialties: specialtiesResponse.careResourceTags,
+		therapyTypes: therapyTypesResponse.careResourceTags,
+		genders: gendersResponse.careResourceTags,
+		ethnicities: ethnicitiesResponse.careResourceTags,
+		languages: languagesResponse.careResourceTags,
 		...(careResourceLocationResponse && {
 			careResourceLocation: careResourceLocationResponse.careResourceLocation,
 		}),
@@ -48,38 +74,29 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const Component = () => {
-	const { payors, supportRoles, careResourceLocation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { payors, specialties, therapyTypes, genders, ethnicities, languages, careResourceLocation } =
+		useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [formValues, setFormValues] = useState({
-		availability: careResourceLocation ? 'AVAILABLE' : 'AVAILABLE',
-		clinicName: careResourceLocation ? careResourceLocation.name : '',
+		careResourceId: '',
+		locationName: careResourceLocation ? careResourceLocation.name : '',
+		status: careResourceLocation ? 'AVAILABLE' : 'AVAILABLE',
 		phoneNumber: careResourceLocation ? careResourceLocation.phoneNumber : '',
+		emailAddress: '',
 		website: careResourceLocation ? careResourceLocation.websiteUrl : '',
-		locations: (careResourceLocation ? [] : []) as CareResourceLocationCardValueModel[],
-		insurance: careResourceLocation ? careResourceLocation.payors[0].payorId : '',
+		address: '',
+		address2: '',
+		insurance: careResourceLocation ? careResourceLocation.payors : [],
 		specialties: careResourceLocation ? careResourceLocation.specialties : [],
-		therapyTypes: careResourceLocation ? careResourceLocation.supportRoles.map((sr) => sr.supportRoleId) : [],
+		therapyTypes: careResourceLocation ? careResourceLocation.supportRoles : [],
+		ages: [] as CareResourceTag[],
+		genders: [] as CareResourceTag[],
+		ethnicities: [] as CareResourceTag[],
+		languages: [] as CareResourceTag[],
 		notes: careResourceLocation ? '' : '',
 	});
-
-	const handleAddLocationButtonClick = useCallback(() => {
-		const tempLocation = {
-			id: uuidv4(),
-			location: '',
-			wheelchairAccessible: false,
-			languages: [],
-			uniquePhoneNumber: false,
-			phoneNumber: '',
-			notes: '',
-		};
-
-		setFormValues((previousValue) => ({
-			...previousValue,
-			locations: [...previousValue.locations, tempLocation],
-		}));
-	}, []);
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
@@ -134,19 +151,61 @@ export const Component = () => {
 			<Form className="pb-11">
 				<Container className="pb-10">
 					<AdminFormSection
-						title="Availability"
-						description="Available resources are those currently accepting patients."
+						title="Associated Resource"
+						description="If there is no relevant resource, then contact an Admin."
 						alignHorizontally
 					>
 						<InputHelper
 							as="select"
-							label="Availability"
-							name="availability"
-							value={formValues.availability}
+							label="Resource"
+							name="resource"
+							value={formValues.careResourceId}
 							onChange={({ currentTarget }) => {
 								setFormValues((previousValue) => ({
 									...previousValue,
-									availability: currentTarget.value,
+									careResourceId: currentTarget.value,
+								}));
+							}}
+							required
+						>
+							<option value="">TODO</option>
+						</InputHelper>
+					</AdminFormSection>
+					<hr />
+					<AdminFormSection
+						title="Location Name (optional)"
+						description="Add a secondary name to distinguish this location in the list."
+						alignHorizontally
+					>
+						<InputHelper
+							className="mb-3"
+							type="text"
+							label="Location Name"
+							name="location-name"
+							value={formValues.locationName}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									locationName: currentTarget.value,
+								}));
+							}}
+						/>
+					</AdminFormSection>
+					<hr />
+					<AdminFormSection
+						title="Status"
+						description="Is this location accepting new patients?"
+						alignHorizontally
+					>
+						<InputHelper
+							as="select"
+							label="Status"
+							name="status"
+							value={formValues.status}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									status: currentTarget.value,
 								}));
 							}}
 							required
@@ -159,20 +218,6 @@ export const Component = () => {
 					<AdminFormSection title="Contact" description="Provide contact information for this resource.">
 						<InputHelper
 							className="mb-3"
-							type="text"
-							label="Clinic Name"
-							name="clinic-name"
-							value={formValues.clinicName}
-							onChange={({ currentTarget }) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									clinicName: currentTarget.value,
-								}));
-							}}
-							required
-						/>
-						<InputHelper
-							className="mb-3"
 							type="tel"
 							label="Phone Number"
 							name="phone-number"
@@ -183,7 +228,20 @@ export const Component = () => {
 									phoneNumber: currentTarget.value,
 								}));
 							}}
-							helperText="Primary phone number for patient inquiries and appointments"
+							required
+						/>
+						<InputHelper
+							className="mb-3"
+							type="email"
+							label="Email"
+							name="email"
+							value={formValues.emailAddress}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									emailAddress: currentTarget.value,
+								}));
+							}}
 						/>
 						<InputHelper
 							type="url"
@@ -200,66 +258,24 @@ export const Component = () => {
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection
-						title="Location"
-						description="Enter the location(s) where this resource is located."
-					>
-						{formValues.locations.map((location) => (
-							<MhicCareResourceLocationCard
-								key={location.id}
-								className="mb-5"
-								value={location}
-								onChange={(newLocation) => {
-									setFormValues((previousValue) => ({
-										...previousValue,
-										locations: previousValue.locations.map((l) =>
-											l.id === newLocation.id ? newLocation : l
-										),
-									}));
-								}}
-								onDelete={() => {
-									setFormValues((previousValue) => ({
-										...previousValue,
-										locations: previousValue.locations.filter((l) => l.id !== location.id),
-									}));
-								}}
-							/>
-						))}
-						<Button
-							type="button"
-							className="d-flex align-items-center justify-content-center w-100"
-							onClick={handleAddLocationButtonClick}
-						>
-							<PlusIcon className="me-2" />
-							Add {formValues.locations.length > 0 ? 'Another ' : ''}Location
-						</Button>
-					</AdminFormSection>
-					<hr />
-					<AdminFormSection
 						title="Insurance"
 						description="Add insurance carriers that are accepted."
 						alignHorizontally
 					>
-						<InputHelper
-							as="select"
+						<TypeaheadHelper
+							id="typeahead--insurance"
 							label="Insurance"
-							name="insurance"
-							value={formValues.insurance}
-							onChange={({ currentTarget }) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									insurance: currentTarget.value,
+							multiple
+							labelKey="name"
+							options={payors}
+							selected={formValues.insurance}
+							onChange={(selected) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									insurance: selected as CareResourceTag[],
 								}));
 							}}
-						>
-							<option value="" disabled>
-								Select...
-							</option>
-							{payors.map((payor) => (
-								<option key={payor.careResourceTagId} value={payor.careResourceTagId}>
-									{payor.name}
-								</option>
-							))}
-						</InputHelper>
+						/>
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection title="Specialties" description="Select all issues treated." alignHorizontally>
@@ -268,33 +284,114 @@ export const Component = () => {
 							label="Specialties"
 							multiple
 							labelKey="name"
-							options={[]}
+							options={specialties}
 							selected={formValues.specialties}
 							onChange={(selected) => {
 								setFormValues((previousValues) => ({
 									...previousValues,
-									specialties: selected as CareResourceSpecialtyModel[],
+									specialties: selected as CareResourceTag[],
 								}));
 							}}
 						/>
 					</AdminFormSection>
 					<hr />
-					<AdminFormSection title="Therapy Types" description="Select therapy types offered.">
-						<AdminBadgeSelectControl
-							idKey="careResourceTagId"
+					<AdminFormSection
+						title="Therapy Types"
+						description="Select therapy types offered."
+						alignHorizontally
+					>
+						<TypeaheadHelper
+							id="typeahead--therapy-types"
+							label="Therapy Types"
+							multiple
 							labelKey="name"
-							options={supportRoles}
-							selections={formValues.therapyTypes}
-							onChange={(selections) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									therapyTypes: selections,
+							options={therapyTypes}
+							selected={formValues.therapyTypes}
+							onChange={(selected) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									therapyTypes: selected as CareResourceTag[],
 								}));
 							}}
 						/>
 					</AdminFormSection>
 					<hr />
-					<AdminFormSection title="Notes" description="Select therapy types offered.">
+					<AdminFormSection
+						title="Population Served"
+						description="What type of patients does this location serve?"
+					>
+						<Form.Group className="mb-0">
+							<Form.Label>TODO: Age Tags</Form.Label>
+							<AdminBadgeSelectControl
+								idKey="careResourceTagId"
+								labelKey="name"
+								options={genders}
+								selections={formValues.ages}
+								onChange={(selections) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										ages: selections,
+									}));
+								}}
+							/>
+						</Form.Group>
+					</AdminFormSection>
+					<hr />
+					<AdminFormSection
+						title="Provider Details"
+						description="Enter details about providers at this location"
+					>
+						<Form.Group className="mb-6">
+							<Form.Label className="mb-2">Gender</Form.Label>
+							<AdminBadgeSelectControl
+								idKey="careResourceTagId"
+								labelKey="name"
+								options={genders}
+								selections={formValues.genders}
+								onChange={(selections) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										genders: selections,
+									}));
+								}}
+							/>
+						</Form.Group>
+						<Form.Group className="mb-6">
+							<Form.Label className="mb-2">Ethnicity</Form.Label>
+							<AdminBadgeSelectControl
+								idKey="careResourceTagId"
+								labelKey="name"
+								options={ethnicities}
+								selections={formValues.ethnicities}
+								onChange={(selections) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										ethnicities: selections,
+									}));
+								}}
+							/>
+						</Form.Group>
+						<Form.Group className="mb-0">
+							<Form.Label className="mb-2">Languages Spoken</Form.Label>
+							<AdminBadgeSelectControl
+								idKey="careResourceTagId"
+								labelKey="name"
+								options={languages}
+								selections={formValues.languages}
+								onChange={(selections) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										languages: selections,
+									}));
+								}}
+							/>
+						</Form.Group>
+					</AdminFormSection>
+					<hr />
+					<AdminFormSection
+						title="Location Notes"
+						description="Add more details about this location and include what patients can expect when they schedule or attend an appointment here."
+					>
 						<Wysiwyg
 							className="bg-white"
 							initialValue={formValues.notes}

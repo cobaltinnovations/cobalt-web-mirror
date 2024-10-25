@@ -17,13 +17,13 @@ export interface CareResourceLocationModel {
 	careResourceId: string;
 	careResourceLocation: CareResourceGooglePlaceModel;
 	createdByAccountId: string;
+	phoneNumber: string;
 	formattedPhoneNumber: string;
 	name: string;
-	payors: CareResourcePayorModel[];
-	phoneNumber: string;
-	specialties: CareResourceSpecialtyModel[];
-	supportRoles: SupportRoleModel[];
 	websiteUrl: string;
+	payors: CareResourceTag[];
+	specialties: CareResourceTag[];
+	supportRoles: CareResourceTag[];
 }
 
 export interface CareResourceGooglePlaceModel {

@@ -21,7 +21,6 @@ export * from './mhic-filter-practice';
 export * from './mhic-filter-state';
 export * from './mhic-generate-orders-modal';
 export * from './mhic-header';
-export * from './mhic-care-resource-location-card';
 export * from './mhic-message-modal';
 export * from './mhic-navigation';
 export * from './mhic-next-steps-alerts';
