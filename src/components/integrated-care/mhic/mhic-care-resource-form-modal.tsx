@@ -18,20 +18,31 @@ interface MhicCareResourceFormModalProps extends ModalProps {
 	onSave(careResource: CareResourceModel): void;
 }
 
+interface FormValues {
+	resourceName: string;
+	phoneNumber: string;
+	emailAddress: string;
+	website: string;
+	insurance: CareResourceTag[];
+	insuranceNotes: string;
+	specialties: CareResourceTag[];
+	notes: string;
+}
+
 export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ careResourceId, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [payorOptions, setPayorOptions] = useState<CareResourceTag[]>([]);
 	const [specialtyOptions, setSpecialtyOptions] = useState<CareResourceTag[]>([]);
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<FormValues>({
 		resourceName: '',
 		phoneNumber: '',
 		emailAddress: '',
 		website: '',
-		insurance: [] as CareResourceTag[],
+		insurance: [],
 		insuranceNotes: '',
-		specialties: [] as CareResourceTag[],
+		specialties: [],
 		notes: '',
 	});
 

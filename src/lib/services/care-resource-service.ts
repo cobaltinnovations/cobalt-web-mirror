@@ -19,10 +19,31 @@ interface CareResourceCreateAndUpdateRequestBody {
 }
 
 export const careResourceService = {
+	/* ----------------------------------------------------------- */
+	/* Care Resource Tags */
+	/* ----------------------------------------------------------- */
 	getCareResourceTags(queryParams: { careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID }) {
 		return httpSingleton.orchestrateRequest<{ careResourceTags: CareResourceTag[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/care-resource-tags', queryParams),
+		});
+	},
+
+	/* ----------------------------------------------------------- */
+	/* Care Resources */
+	/* ----------------------------------------------------------- */
+	createCareResource(data: CareResourceCreateAndUpdateRequestBody) {
+		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
+			method: 'POST',
+			url: '/care-resources',
+			data,
+		});
+	},
+	updateCareResource(careResourceId: string, data: CareResourceCreateAndUpdateRequestBody) {
+		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
+			method: 'PUT',
+			url: `/care-resources/${careResourceId}`,
+			data,
 		});
 	},
 	getCareResources(params?: {
@@ -47,24 +68,30 @@ export const careResourceService = {
 			url: `/care-resources/${careResourceId}`,
 		});
 	},
+
+	/* ----------------------------------------------------------- */
+	/* Care Resource Locations */
+	/* ----------------------------------------------------------- */
+	getCareResourceLocations(params?: {
+		pageNumber?: string;
+		pageSize?: string;
+		searchQuery?: string;
+		orderBy?: 'NAME_ASC' | 'NAME_DESC';
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			totalCountDescription: string;
+			totalCount: number;
+			careResourceLocations: CareResourceLocationModel[];
+		}>({
+			method: 'GET',
+			url: '/care-resource-locations',
+			params,
+		});
+	},
 	getCareResourceLocation(careResourceLocationId: string) {
 		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
 			method: 'GET',
-			url: `/care-resource-location/${careResourceLocationId}`,
-		});
-	},
-	createCareResource(data: CareResourceCreateAndUpdateRequestBody) {
-		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
-			method: 'POST',
-			url: '/care-resources',
-			data,
-		});
-	},
-	updateCareResource(careResourceId: string, data: CareResourceCreateAndUpdateRequestBody) {
-		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
-			method: 'PUT',
-			url: `/care-resources/${careResourceId}`,
-			data,
+			url: `/care-resource-locations/${careResourceLocationId}`,
 		});
 	},
 };

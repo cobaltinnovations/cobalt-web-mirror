@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { Link, LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { careResourceService } from '@/lib/services';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
@@ -25,6 +25,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const revalidator = useRevalidator();
 	const [showFormModal, setShowFormModal] = useState(false);
 
 	return (
@@ -40,6 +41,7 @@ export const Component = () => {
 					setShowFormModal(false);
 				}}
 				onSave={() => {
+					revalidator.revalidate();
 					setShowFormModal(false);
 				}}
 			/>
