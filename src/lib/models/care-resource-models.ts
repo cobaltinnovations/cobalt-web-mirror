@@ -15,18 +15,7 @@ export interface CareResourceModel {
 
 export interface CareResourceLocationModel {
 	careResourceId: string;
-	careResourceLocation: CareResourceGooglePlaceModel;
-	createdByAccountId: string;
-	phoneNumber: string;
-	formattedPhoneNumber: string;
 	name: string;
-	websiteUrl: string;
-	payors: CareResourceTag[];
-	specialties: CareResourceTag[];
-	supportRoles: CareResourceTag[];
-}
-
-export interface CareResourceGooglePlaceModel {
 	careResourceLocationId: string;
 	address: {
 		addressId: string;
@@ -37,16 +26,25 @@ export interface CareResourceGooglePlaceModel {
 		region: string;
 		postalCode: string;
 		countryCode: string;
-		googleMapsUrl: string;
 		googlePlaceId: string;
 		latitude: number;
 		longitude: number;
-		subpremise: string;
-		regionSubdivision: string;
 		formattedAddress: string;
-		phoneNumber: string;
-		formattedPhoneNumber: string;
 	};
+	phoneNumber: string;
+	websiteUrl: string;
+	insuranceNotes: string;
+	formattedPhoneNumber: string;
+	notes: string;
+	wheelchairAccess: boolean;
+	acceptingNewPatients: boolean;
+	languages: CareResourceTag[];
+	specialties: CareResourceTag[];
+	payors: CareResourceTag[];
+	therapyTypes: CareResourceTag[];
+	populationServed: CareResourceTag[];
+	genders: CareResourceTag[];
+	ethnicities: CareResourceTag[];
 }
 
 export interface PayorModel {

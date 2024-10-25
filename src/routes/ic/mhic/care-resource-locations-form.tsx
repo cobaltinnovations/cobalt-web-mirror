@@ -82,6 +82,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const {
+		careResourceId,
 		payors,
 		specialties,
 		therapyTypes,
@@ -95,24 +96,23 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
-
 	const [formValues, setFormValues] = useState({
-		careResourceId: '',
-		locationName: careResourceLocation ? careResourceLocation.name : '',
-		status: careResourceLocation ? 'AVAILABLE' : 'AVAILABLE',
-		phoneNumber: careResourceLocation ? careResourceLocation.phoneNumber : '',
+		careResourceId: careResourceLocation.careResourceId ?? '',
+		locationName: careResourceLocation?.name ?? '',
+		status: careResourceLocation?.acceptingNewPatients ? 'AVAILABLE' : 'UNAVAILABLE',
+		phoneNumber: careResourceLocation?.phoneNumber ?? '',
 		emailAddress: '',
-		website: careResourceLocation ? careResourceLocation.websiteUrl : '',
+		website: careResourceLocation?.websiteUrl ?? '',
 		address: undefined as undefined | PlaceModel,
 		address2: '',
 		insurance: careResourceLocation ? careResourceLocation.payors : [],
 		specialties: careResourceLocation ? careResourceLocation.specialties : [],
-		therapyTypes: careResourceLocation ? careResourceLocation.supportRoles : [],
-		ages: [] as CareResourceTag[],
-		genders: [] as CareResourceTag[],
-		ethnicities: [] as CareResourceTag[],
-		languages: [] as CareResourceTag[],
-		notes: careResourceLocation ? '' : '',
+		therapyTypes: careResourceLocation ? careResourceLocation.therapyTypes : [],
+		ages: careResourceLocation ? careResourceLocation.populationServed : [],
+		genders: careResourceLocation ? careResourceLocation.genders : [],
+		ethnicities: careResourceLocation ? careResourceLocation.ethnicities : [],
+		languages: careResourceLocation ? careResourceLocation.languages : [],
+		notes: careResourceLocation?.notes ?? '',
 	});
 
 	const handleFormSubmit = useCallback(async () => {
@@ -183,6 +183,7 @@ export const Component = () => {
 									careResourceId: currentTarget.value,
 								}));
 							}}
+							disabled={!!careResourceId}
 							required
 						>
 							<option value="">TODO</option>

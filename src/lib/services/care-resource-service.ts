@@ -83,6 +83,32 @@ export const careResourceService = {
 	/* ----------------------------------------------------------- */
 	/* Care Resource Locations */
 	/* ----------------------------------------------------------- */
+	createCareResourceLocation(data: {
+		careResourceId: string;
+		googlePlaceId: string;
+		name: string;
+		notes: string;
+		emailAddress: string;
+		streetAddress2: string;
+		insuranceNotes: string;
+		phoneNumber: string;
+		websiteUrl: string;
+		acceptingNewPatients: boolean;
+		wheelchairAccess: boolean;
+		payorIds: string[];
+		specialtyIds: string[];
+		therapyTypeIds: string[];
+		populationServedIds: string[];
+		genderIds: string[];
+		ethnicityIds: string[];
+		languageIds: string[];
+	}) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
+			method: 'POST',
+			url: '/care-resource/location',
+			data,
+		});
+	},
 	getCareResourceLocations(params?: {
 		pageNumber?: string;
 		pageSize?: string;

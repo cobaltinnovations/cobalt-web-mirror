@@ -220,7 +220,7 @@ export const Component = () => {
 											</Link>
 										</TableCell>
 										<TableCell>N/A</TableCell>
-										<TableCell>{careResource.careResourceLocation.address.postalCode}</TableCell>
+										<TableCell>{careResource.address.postalCode}</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-start">
 											<Badge pill bg="outline-success">
 												TODO: Available
