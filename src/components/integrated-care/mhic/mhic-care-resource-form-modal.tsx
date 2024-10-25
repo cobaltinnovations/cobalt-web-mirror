@@ -101,8 +101,8 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 				websiteUrl: formValues.website,
 				notes: formValues.notes,
 				insuranceNotes: formValues.insuranceNotes,
-				payors: formValues.insurance.map((i) => i.careResourceTagId),
-				specialties: formValues.specialties.map((i) => i.careResourceTagId),
+				payorIds: formValues.insurance.map((i) => i.careResourceTagId),
+				specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
 			};
 
 			const response = careResourceId
@@ -253,7 +253,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 					Cancel
 				</Button>
 				<Button type="submit" variant="primary" onClick={handleFormSubmit}>
-					Create
+					{careResourceId ? 'Update' : 'Create'}
 				</Button>
 			</Modal.Footer>
 		</Modal>

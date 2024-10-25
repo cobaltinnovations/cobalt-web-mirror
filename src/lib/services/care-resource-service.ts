@@ -14,8 +14,8 @@ interface CareResourceCreateAndUpdateRequestBody {
 	websiteUrl: string;
 	notes: string;
 	insuranceNotes: string;
-	payors: string[];
-	specialties: string[];
+	payorIds: string[];
+	specialtyIds: string[];
 }
 
 export const careResourceService = {
