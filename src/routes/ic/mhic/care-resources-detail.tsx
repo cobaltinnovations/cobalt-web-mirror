@@ -87,7 +87,7 @@ export const Component = () => {
 											<p className="m-0 text-gray">Email</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">xxx</p>
+											<p className="m-0">{careResource.emailAddress ?? 'Not provided'}</p>
 										</Col>
 									</Row>
 									<Row>

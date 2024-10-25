@@ -7,6 +7,17 @@ import {
 import { httpSingleton } from '@/lib/singletons';
 import { buildQueryParamUrl } from '../utils';
 
+interface CareResourceCreateAndUpdateRequestBody {
+	name: string;
+	phoneNumber: string;
+	emailAddress: string;
+	websiteUrl: string;
+	notes: string;
+	insuranceNotes: string;
+	payors: string[];
+	specialties: string[];
+}
+
 export const careResourceService = {
 	getCareResourceTags(queryParams: { careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID }) {
 		return httpSingleton.orchestrateRequest<{ careResourceTags: CareResourceTag[] }>({
@@ -42,19 +53,17 @@ export const careResourceService = {
 			url: `/care-resource-location/${careResourceLocationId}`,
 		});
 	},
-	createCareResource(data: {
-		name: string;
-		phoneNumber: string;
-		emailAddress: string;
-		websiteUrl: string;
-		notes: string;
-		insuranceNotes: string;
-		payors: string[];
-		specialties: string[];
-	}) {
+	createCareResource(data: CareResourceCreateAndUpdateRequestBody) {
 		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
 			method: 'POST',
 			url: '/care-resources',
+			data,
+		});
+	},
+	updateCareResource(careResourceId: string, data: CareResourceCreateAndUpdateRequestBody) {
+		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
+			method: 'PUT',
+			url: `/care-resources/${careResourceId}`,
 			data,
 		});
 	},

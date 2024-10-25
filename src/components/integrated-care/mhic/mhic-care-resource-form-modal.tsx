@@ -38,6 +38,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 	const handleOnEnter = useCallback(async () => {
 		try {
 			setIsLoading(true);
+
 			const [payorsResponse, specialtiesResponse, careResourceResponse] = await Promise.all([
 				careResourceService
 					.getCareResourceTags({
@@ -59,7 +60,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 				setFormValues({
 					resourceName: careResourceResponse.careResource.name,
 					phoneNumber: careResourceResponse.careResource.phoneNumber ?? '',
-					emailAddress: '',
+					emailAddress: careResourceResponse.careResource.emailAddress ?? '',
 					website: careResourceResponse.careResource.websiteUrl ?? '',
 					insurance: careResourceResponse.careResource.payors,
 					insuranceNotes: '',
@@ -92,18 +93,21 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 	const handleFormSubmit = useCallback(async () => {
 		try {
 			setIsLoading(true);
-			const response = await careResourceService
-				.createCareResource({
-					name: formValues.resourceName,
-					phoneNumber: formValues.phoneNumber,
-					emailAddress: formValues.emailAddress,
-					websiteUrl: formValues.website,
-					notes: formValues.notes,
-					insuranceNotes: formValues.insuranceNotes,
-					payors: formValues.insurance.map((i) => i.careResourceTagId),
-					specialties: formValues.specialties.map((i) => i.careResourceTagId),
-				})
-				.fetch();
+
+			const requestBody = {
+				name: formValues.resourceName,
+				phoneNumber: formValues.phoneNumber,
+				emailAddress: formValues.emailAddress,
+				websiteUrl: formValues.website,
+				notes: formValues.notes,
+				insuranceNotes: formValues.insuranceNotes,
+				payors: formValues.insurance.map((i) => i.careResourceTagId),
+				specialties: formValues.specialties.map((i) => i.careResourceTagId),
+			};
+
+			const response = careResourceId
+				? await careResourceService.updateCareResource(careResourceId, requestBody).fetch()
+				: await careResourceService.createCareResource(requestBody).fetch();
 
 			onSave(response.careResource);
 		} catch (error) {
@@ -111,7 +115,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 		} finally {
 			setIsLoading(false);
 		}
-	}, [formValues, handleError, onSave]);
+	}, [careResourceId, formValues, handleError, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter} onExited={handleOnExited}>
