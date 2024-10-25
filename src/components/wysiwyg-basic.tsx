@@ -4,6 +4,23 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import 'react-quill/dist/quill.snow.css';
 
+const useWysiwygStyles = createUseThemedStyles((theme) => ({
+	quill: {
+		'& .ql-toolbar': {
+			borderTopLeftRadius: 8,
+			borderTopRightRadius: 8,
+			borderColor: theme.colors.n100,
+			backgroundColor: theme.colors.n75,
+		},
+		'& .ql-container': {
+			borderBottomLeftRadius: 8,
+			borderBottomRightRadius: 8,
+			borderColor: theme.colors.n100,
+			backgroundColor: theme.colors.n0,
+		},
+	},
+}));
+
 interface WysiwygProps {
 	value: string;
 	onChange(value: string, delta: unknown, source: unknown, editor: ReactQuill.UnprivilegedEditor): void;
@@ -18,6 +35,7 @@ const WysiwygBasic = React.forwardRef(
 		{ value, onChange, disabled, className }: WysiwygProps,
 		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
 	) => {
+		const classes = useWysiwygStyles();
 		const quillModules = useMemo(
 			() => ({
 				toolbar: [
@@ -32,7 +50,7 @@ const WysiwygBasic = React.forwardRef(
 
 		return (
 			<ReactQuill
-				className={className}
+				className={classNames(classes.quill, className)}
 				ref={ref}
 				theme="snow"
 				value={value}
