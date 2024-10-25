@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceTag } from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceTag, PlaceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -79,6 +79,8 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
+	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
+
 	const [formValues, setFormValues] = useState({
 		careResourceId: '',
 		locationName: careResourceLocation ? careResourceLocation.name : '',
@@ -86,7 +88,7 @@ export const Component = () => {
 		phoneNumber: careResourceLocation ? careResourceLocation.phoneNumber : '',
 		emailAddress: '',
 		website: careResourceLocation ? careResourceLocation.websiteUrl : '',
-		address: '',
+		address: undefined as undefined | PlaceModel,
 		address2: '',
 		insurance: careResourceLocation ? careResourceLocation.payors : [],
 		specialties: careResourceLocation ? careResourceLocation.specialties : [],
@@ -252,6 +254,30 @@ export const Component = () => {
 								setFormValues((previousValue) => ({
 									...previousValue,
 									website: currentTarget.value,
+								}));
+							}}
+						/>
+					</AdminFormSection>
+					<hr />
+					<AdminFormSection title="Address">
+						<TypeaheadHelper
+							id="typeahead--address"
+							label="Address"
+							labelKey="text"
+							fetchData={(query) =>
+								careResourceService
+									.getPlaces({
+										searchText: query,
+									})
+									.fetch()
+							}
+							onFetchResolve={({ places }) => setPlacesOptions(places)}
+							options={placesOptions}
+							selected={formValues.address ? [formValues.address] : []}
+							onChange={([selected]) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									address: selected as PlaceModel,
 								}));
 							}}
 						/>

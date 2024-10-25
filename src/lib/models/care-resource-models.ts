@@ -87,3 +87,8 @@ export interface CareResourceTag {
 	name: string;
 	careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID;
 }
+
+export interface PlaceModel {
+	placeId: string;
+	text: string;
+}

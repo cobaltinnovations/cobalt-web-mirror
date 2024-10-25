@@ -3,6 +3,7 @@ import {
 	CareResourceLocationModel,
 	CareResourceModel,
 	CareResourceTag,
+	PlaceModel,
 } from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons';
 import { buildQueryParamUrl } from '../utils';
@@ -26,6 +27,16 @@ export const careResourceService = {
 		return httpSingleton.orchestrateRequest<{ careResourceTags: CareResourceTag[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/care-resource-tags', queryParams),
+		});
+	},
+
+	/* ----------------------------------------------------------- */
+	/* Places */
+	/* ----------------------------------------------------------- */
+	getPlaces(queryParams: { searchText: string }) {
+		return httpSingleton.orchestrateRequest<{ places: PlaceModel[] }>({
+			method: 'GET',
+			url: buildQueryParamUrl('/places/autocomplete', queryParams),
 		});
 	},
 
