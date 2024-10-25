@@ -111,7 +111,7 @@ export const Component = () => {
 									<TableCell header className="text-right">
 										Locations
 									</TableCell>
-									<TableCell></TableCell>
+									<TableCell />
 								</TableRow>
 							</TableHead>
 							<TableBody>

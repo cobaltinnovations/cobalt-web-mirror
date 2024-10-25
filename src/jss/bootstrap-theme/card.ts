@@ -49,6 +49,10 @@ export const card = (theme: CobaltTheme) => {
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n75,
 					borderBottom: `1px solid ${theme.colors.border}`,
+					'&--mid': {
+						borderRadius: 0,
+						borderTop: `1px solid ${theme.colors.border}`,
+					},
 					'& .button-container': {
 						right: 16,
 						top: '50%',
@@ -71,6 +75,10 @@ export const card = (theme: CobaltTheme) => {
 					borderBottomLeftRadius: 4,
 					borderBottomRightRadius: 4,
 					backgroundColor: theme.colors.n0,
+					'&--top': {
+						borderTopLeftRadius: 4,
+						borderTopRightRadius: 4,
+					},
 				},
 			},
 		},
