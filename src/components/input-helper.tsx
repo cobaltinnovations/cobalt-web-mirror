@@ -16,7 +16,7 @@ interface UseStylesProps {
 
 const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	inputHelper: {
-		borderRadius: 5,
+		borderRadius: 8,
 		overflow: 'hidden',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,

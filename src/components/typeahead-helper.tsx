@@ -16,7 +16,7 @@ interface UseStylesProps {
 const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: {
 		minHeight: 54,
-		borderRadius: 5,
+		borderRadius: 8,
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
 		border: ({ isHovered, isFocused, hasError }: UseStylesProps) =>
