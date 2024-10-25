@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet';
 import { Link, Outlet, useLocation, useMatches, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Dropdown, Form, Offcanvas, Row } from 'react-bootstrap';
-import { CareResourceModel } from '@/lib/models';
+import { CareResourceLocationModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
@@ -47,7 +47,7 @@ export const Component = () => {
 
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
-	const [careResources, setCareResources] = useState<CareResourceModel[]>([]);
+	const [careResources, setCareResources] = useState<CareResourceLocationModel[]>([]);
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
 	const [careResourcesTotalCountDescription, setCareResourcesTotalCountDescription] = useState('0');
 
@@ -61,7 +61,7 @@ export const Component = () => {
 				setIsLoading(true);
 
 				const response = await careResourceService
-					.getCareResources({
+					.getCareResourceLocations({
 						...(searchQuery && { searchQuery }),
 						...(pageNumber && { pageNumber }),
 						...(pageSize && { pageSize }),
@@ -70,7 +70,7 @@ export const Component = () => {
 					})
 					.fetch();
 
-				setCareResources(response.careResources);
+				setCareResources(response.careResourceLocations);
 				setCareResourcesTotalCount(response.totalCount);
 				setCareResourcesTotalCountDescription(response.totalCountDescription);
 			} catch (error) {
@@ -220,11 +220,7 @@ export const Component = () => {
 											</Link>
 										</TableCell>
 										<TableCell>N/A</TableCell>
-										<TableCell>
-											{careResource.careResourceLocations
-												.map((crl) => crl.address.postalCode)
-												.join(', ')}
-										</TableCell>
+										<TableCell>{careResource.careResourceLocation.address.postalCode}</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-start">
 											<Badge pill bg="outline-success">
 												TODO: Available

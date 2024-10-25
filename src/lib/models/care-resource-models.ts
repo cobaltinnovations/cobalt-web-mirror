@@ -15,7 +15,7 @@ export interface CareResourceModel {
 
 export interface CareResourceLocationModel {
 	careResourceId: string;
-	careResourceLocations: CareResourceLocationModel[];
+	careResourceLocation: CareResourceGooglePlaceModel;
 	createdByAccountId: string;
 	formattedPhoneNumber: string;
 	name: string;
@@ -26,7 +26,7 @@ export interface CareResourceLocationModel {
 	websiteUrl: string;
 }
 
-export interface CareResourceLocationModel {
+export interface CareResourceGooglePlaceModel {
 	careResourceLocationId: string;
 	address: {
 		addressId: string;
