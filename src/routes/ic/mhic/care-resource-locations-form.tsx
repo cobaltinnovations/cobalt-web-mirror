@@ -97,7 +97,7 @@ export const Component = () => {
 	const { addFlag } = useFlags();
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [formValues, setFormValues] = useState({
-		careResourceId: careResourceLocation.careResourceId ?? '',
+		careResourceId: careResourceLocation?.careResourceId ?? '',
 		locationName: careResourceLocation?.name ?? '',
 		status: careResourceLocation?.acceptingNewPatients ? 'AVAILABLE' : 'UNAVAILABLE',
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
@@ -117,18 +117,28 @@ export const Component = () => {
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			// await careResourceService
-			// 	.createCareResource({
-			// 		name: formValues.clinicName,
-			// 		notes: formValues.notes,
-			// 		phoneNumber: formValues.phoneNumber,
-			// 		websiteUrl: formValues.website,
-			// 		resourceAvailable: formValues.availability === 'AVAILABLE',
-			// 		specialtyIds: formValues.specialties.map((s) => s.careResourceSpecialtyId),
-			// 		supportRoleIds: formValues.therapyTypes,
-			// 		payorIds: [formValues.insurance],
-			// 	})
-			// 	.fetch();
+			await careResourceService
+				.createCareResourceLocation({
+					careResourceId: formValues.careResourceId,
+					googlePlaceId: formValues.address?.placeId ?? '',
+					name: formValues.locationName,
+					notes: formValues.notes,
+					emailAddress: formValues.emailAddress,
+					streetAddress2: formValues.address2,
+					insuranceNotes: '',
+					phoneNumber: formValues.phoneNumber,
+					websiteUrl: formValues.website,
+					acceptingNewPatients: formValues.status === 'AVAILABLE',
+					wheelchairAccess: false,
+					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
+					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
+					therapyTypeIds: formValues.therapyTypes.map((i) => i.careResourceTagId),
+					populationServedIds: formValues.ages.map((i) => i.careResourceTagId),
+					genderIds: formValues.genders.map((i) => i.careResourceTagId),
+					ethnicityIds: formValues.ethnicities.map((i) => i.careResourceTagId),
+					languageIds: formValues.languages.map((i) => i.careResourceTagId),
+				})
+				.fetch();
 
 			addFlag({
 				variant: 'success',
@@ -141,7 +151,7 @@ export const Component = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, handleError, navigate]);
+	}, [addFlag, formValues, handleError, navigate]);
 
 	return (
 		<>
