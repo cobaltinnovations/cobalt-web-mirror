@@ -79,6 +79,10 @@
 			analyticsConfig.appVersion = 'local';
 		}
 
+		if (analyticsConfig.debuggingEnabled === '%ANALYTICS_DEBUGGING_ENABLED%') {
+			analyticsConfig.debuggingEnabled = 'true';
+		}
+
 		// Normalize API base URL by removing trailing slash, if present
 		analyticsConfig.apiBaseUrl = analyticsConfig.apiBaseUrl.replace(/\/$/, '');
 
