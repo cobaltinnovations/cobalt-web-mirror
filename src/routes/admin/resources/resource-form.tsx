@@ -43,7 +43,6 @@ import {
 	AdminResourceFormFooter,
 	AdminResourceFormFooterExternal,
 } from '@/components/admin';
-import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
@@ -55,6 +54,8 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
+import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
+import ReactQuill from 'react-quill';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -206,7 +207,7 @@ export const Component = () => {
 	const params = useParams<{ action: string; contentId: string }>();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
+	const descriptionWysiwygRef = useRef<ReactQuill>(null);
 
 	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
@@ -313,13 +314,7 @@ export const Component = () => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			// Validate wysiwyg/rich-text-editor
-			if (!formValues.description) {
-				descriptionWysiwygRef.current?.quill?.focus();
-				descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
-					behavior: 'auto',
-					block: 'center',
-				});
+			if (!wysiwygIsValid(descriptionWysiwygRef, { shouldFocus: true, shouldScroll: true })) {
 				return;
 			}
 
@@ -344,7 +339,7 @@ export const Component = () => {
 				return;
 			}
 		},
-		[formValues.description, formValues.publishDate, handleError, navigate, updateOrCreateContent]
+		[formValues.publishDate, handleError, navigate, updateOrCreateContent]
 	);
 
 	const handlePublishModalConfirm = useCallback(async () => {
@@ -776,10 +771,10 @@ export const Component = () => {
 						title="Description"
 						description="Provide a concise and engaging description to introduce the resource and convey the benefits of interacting with the full content."
 					>
-						<Wysiwyg
+						<WysiwygBasic
 							ref={descriptionWysiwygRef}
 							className="bg-white"
-							initialValue={loaderData.contentResponse?.content?.description ?? ''}
+							value={formValues.description}
 							onChange={(nextValue) => {
 								updateFormValue('description', nextValue);
 							}}

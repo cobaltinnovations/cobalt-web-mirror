@@ -16,11 +16,11 @@ import InlineAlert from './inline-alert';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
+import { WysiwygDisplay } from './wysiwyg-basic';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
 import { ReactComponent as ChairIcon } from '@/assets/icons/chair-fill.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/schedule.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
-import { WysiwygDisplay } from './wysiwyg';
 import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location-on.svg';
 
 const baseSpacerSize = 4;

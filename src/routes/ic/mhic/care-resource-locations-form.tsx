@@ -9,8 +9,8 @@ import useFlags from '@/hooks/use-flags';
 import { MhicCareResourceFormHeader } from '@/components/integrated-care/mhic';
 import { AdminBadgeSelectControl, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
-import Wysiwyg from '@/components/wysiwyg';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import WysiwygBasic from '@/components/wysiwyg-basic';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId, careResourceLocationId } = params;
@@ -392,9 +392,8 @@ export const Component = () => {
 						title="Location Notes"
 						description="Add more details about this location and include what patients can expect when they schedule or attend an appointment here."
 					>
-						<Wysiwyg
-							className="bg-white"
-							initialValue={formValues.notes}
+						<WysiwygBasic
+							value={formValues.notes}
 							onChange={(htmlContent) => {
 								setFormValues((previousValue) => ({
 									...previousValue,

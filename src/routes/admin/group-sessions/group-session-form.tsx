@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import Wysiwyg, { WysiwygRef } from '@/components/wysiwyg';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import TimeSlotInput from '@/components/time-slot-input';
@@ -57,6 +56,8 @@ import { ButtonLink } from '@/components/button-link';
 import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
+import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
+import ReactQuill from 'react-quill';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -253,9 +254,9 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedTab = searchParams.get('tab') ?? 'details';
 
-	const descriptionWysiwygRef = useRef<WysiwygRef>(null);
-	const reminderWysiwygRef = useRef<WysiwygRef>(null);
-	const followupWysiwygRef = useRef<WysiwygRef>(null);
+	const descriptionWysiwygRef = useRef<ReactQuill>(null);
+	const reminderWysiwygRef = useRef<ReactQuill>(null);
+	const followupWysiwygRef = useRef<ReactQuill>(null);
 	const isPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
@@ -915,10 +916,10 @@ export const Component = () => {
 				title="Description"
 				description="Describe what your group session is about, who it is for, and any special requirements for participating. Your description should tell potential attendees everything they need to know to make a decision about joining."
 			>
-				<Wysiwyg
+				<WysiwygBasic
 					ref={descriptionWysiwygRef}
 					className="bg-white"
-					initialValue={loaderData.groupSession?.description ?? ''}
+					value={formValues.description}
 					onChange={(nextValue) => {
 						updateFormValue('description', nextValue);
 					}}
@@ -1251,9 +1252,9 @@ export const Component = () => {
 						title="Confirmation Email (optional)"
 						description="This text will be added to the default confirmation email we send to anyone who reserves a seat for this group session."
 					>
-						<Wysiwyg
+						<WysiwygBasic
 							className="bg-white"
-							initialValue={loaderData.groupSession?.confirmationEmailContent ?? ''}
+							value={formValues.confirmationEmailContent}
 							onChange={(nextValue) => {
 								updateFormValue('confirmationEmailContent', nextValue);
 							}}
@@ -1280,10 +1281,10 @@ export const Component = () => {
 								updateFormValue('sendReminderEmail', currentTarget.checked);
 							}}
 						>
-							<Wysiwyg
+							<WysiwygBasic
 								ref={reminderWysiwygRef}
 								className="bg-white"
-								initialValue={loaderData.groupSession?.reminderEmailContent ?? ''}
+								value={formValues.reminderEmailContent}
 								onChange={(nextValue) => {
 									updateFormValue('reminderEmailContent', nextValue);
 								}}
@@ -1351,10 +1352,10 @@ export const Component = () => {
 								</span>
 							</p>
 
-							<Wysiwyg
+							<WysiwygBasic
 								ref={followupWysiwygRef}
 								className="mb-3 bg-white"
-								initialValue={loaderData.groupSession?.followupEmailContent ?? ''}
+								value={formValues.followupEmailContent}
 								onChange={(nextValue) => {
 									updateFormValue('followupEmailContent', nextValue);
 								}}
@@ -1657,32 +1658,23 @@ export const Component = () => {
 					event.preventDefault();
 
 					// validate description wysiwyg
-					if (!formValues.description) {
-						descriptionWysiwygRef.current?.quill?.focus();
-						descriptionWysiwygRef.current?.quillRef.current?.scrollIntoView({
-							behavior: 'auto',
-							block: 'center',
-						});
+					if (!wysiwygIsValid(descriptionWysiwygRef, { shouldFocus: true, shouldScroll: true })) {
 						return;
 					}
 
 					// validate reminder email wysiwyg
-					if (formValues.sendReminderEmail && !formValues.reminderEmailContent) {
-						reminderWysiwygRef.current?.quill?.focus();
-						reminderWysiwygRef.current?.quillRef.current?.scrollIntoView({
-							behavior: 'auto',
-							block: 'center',
-						});
+					if (
+						formValues.sendReminderEmail &&
+						!wysiwygIsValid(reminderWysiwygRef, { shouldFocus: true, shouldScroll: true })
+					) {
 						return;
 					}
 
 					// validate followup email wysiwyg
-					if (formValues.sendFollowupEmail && !formValues.followupEmailContent) {
-						followupWysiwygRef.current?.quill?.focus();
-						followupWysiwygRef.current?.quillRef.current?.scrollIntoView({
-							behavior: 'auto',
-							block: 'center',
-						});
+					if (
+						formValues.sendFollowupEmail &&
+						!wysiwygIsValid(followupWysiwygRef, { shouldFocus: true, shouldScroll: true })
+					) {
 						return;
 					}
 

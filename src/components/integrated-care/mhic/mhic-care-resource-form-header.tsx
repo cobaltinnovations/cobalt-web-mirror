@@ -48,6 +48,7 @@ export const MhicCareResourceFormHeader = ({ onAddLocationButtonClick }: MhicCar
 		<header className={classes.header}>
 			<div className={classes.brandingOuter}>
 				<Button
+					type="button"
 					variant="link"
 					className="text-decoration-none text-gray fw-normal"
 					onClick={() => {

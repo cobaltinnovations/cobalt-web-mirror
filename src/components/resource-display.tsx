@@ -8,12 +8,12 @@ import classNames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import ReactPlayer from 'react-player';
-import { WysiwygDisplay } from './wysiwyg';
 import BackgroundImageContainer from './background-image-container';
 import { SkeletonButton, SkeletonImage, SkeletonText } from './skeleton-loaders';
 import Helpful from '@/components/helpful';
 import { Link } from 'react-router-dom';
 import ContentTypeIcon from './content-type-icon';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {

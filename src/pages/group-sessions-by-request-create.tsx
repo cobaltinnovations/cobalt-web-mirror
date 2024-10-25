@@ -17,11 +17,11 @@ import useAccount from '@/hooks/use-account';
 import { ROLE_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { getRequiredYupFields } from '@/lib/utils';
-import Wysiwyg from '@/components/wysiwyg';
 import AsyncPage from '@/components/async-page';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
 import useFlags from '@/hooks/use-flags';
+import WysiwygBasic from '@/components/wysiwyg-basic';
 
 const groupSessionByRequestSchema = yup
 	.object()
@@ -350,14 +350,16 @@ const GroupSessionsByRequestCreate: FC = () => {
 														and should highlight the benefit for participants).
 													</p>
 													<Field name="description">
-														{({ field, meta }: FieldProps) => {
+														{({ meta }: FieldProps) => {
 															return (
-																<Wysiwyg
+																<WysiwygBasic
 																	className={
 																		meta.touched && meta.error ? 'mb-2' : 'mb-5'
 																	}
-																	initialValue={meta.initialValue}
-																	onChange={field.onChange(field.name)}
+																	value={values.description}
+																	onChange={(nextValue) => {
+																		setFieldValue('description', nextValue);
+																	}}
 																/>
 															);
 														}}
