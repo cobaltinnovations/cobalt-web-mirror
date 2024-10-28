@@ -11,6 +11,7 @@ import { AdminBadgeSelectControl, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
+import ToggledInput from '@/components/toggled-input';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId, careResourceLocationId } = params;
@@ -109,7 +110,9 @@ export const Component = () => {
 		website: careResourceLocation?.websiteUrl ?? '',
 		address: undefined as undefined | PlaceModel,
 		address2: '',
+		insuranceUseDefaults: true,
 		insurance: careResourceLocation ? careResourceLocation.payors : [],
+		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
 		specialties: careResourceLocation ? careResourceLocation.specialties : [],
 		therapyTypes: careResourceLocation ? careResourceLocation.therapyTypes : [],
 		ages: careResourceLocation ? careResourceLocation.populationServed : [],
@@ -129,7 +132,7 @@ export const Component = () => {
 					notes: formValues.notes,
 					emailAddress: formValues.emailAddress,
 					streetAddress2: formValues.address2,
-					insuranceNotes: '',
+					insuranceNotes: formValues.insuranceNotes,
 					phoneNumber: formValues.phoneNumber,
 					websiteUrl: formValues.website,
 					acceptingNewPatients: formValues.status === 'AVAILABLE',
@@ -339,20 +342,61 @@ export const Component = () => {
 						description="Add insurance carriers that are accepted."
 						alignHorizontally
 					>
-						<TypeaheadHelper
-							id="typeahead--insurance"
-							label="Insurance"
-							multiple
-							labelKey="name"
-							options={payors}
-							selected={formValues.insurance}
-							onChange={(selected) => {
-								setFormValues((previousValues) => ({
-									...previousValues,
-									insurance: selected as CareResourceTag[],
+						<ToggledInput
+							className="mb-3"
+							id="insurance-defaults"
+							label={`Use ${
+								careResourceAssociations.find((cra) => cra.careResourceId === formValues.careResourceId)
+									?.name
+							} defaults`}
+							checked={formValues.insuranceUseDefaults}
+							onChange={() => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									insuranceUseDefaults: true,
 								}));
 							}}
-						/>
+						>
+							<p className="mb-0">Resource Default Insurance List Goes Here</p>
+						</ToggledInput>
+						<ToggledInput
+							id="insurance-override"
+							label="Override defaults"
+							checked={!formValues.insuranceUseDefaults}
+							onChange={() => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									insuranceUseDefaults: false,
+								}));
+							}}
+						>
+							<TypeaheadHelper
+								className="mb-3"
+								id="typeahead--insurance"
+								label="Insurance"
+								multiple
+								labelKey="name"
+								options={payors}
+								selected={formValues.insurance}
+								onChange={(selected) => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										insurance: selected as CareResourceTag[],
+									}));
+								}}
+							/>
+							<InputHelper
+								as="textarea"
+								label="Insurance Notes"
+								value={formValues.insuranceNotes}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										insuranceNotes: currentTarget.value,
+									}));
+								}}
+							/>
+						</ToggledInput>
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection title="Specialties" description="Select all issues treated." alignHorizontally>

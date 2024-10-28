@@ -83,29 +83,29 @@ export const card = (theme: CobaltTheme) => {
 			},
 		},
 		'.form-card': {
-			borderRadius: 4,
+			borderRadius: 8,
 			border: `1px solid ${theme.colors.border}`,
 			'& .cobalt-card': {
 				'&__header': {
 					padding: 16,
 					position: 'relative',
-					borderTopLeftRadius: 4,
-					borderTopRightRadius: 4,
+					borderTopLeftRadius: 8,
+					borderTopRightRadius: 8,
 					backgroundColor: theme.colors.n0,
 					borderBottom: `1px solid ${theme.colors.border}`,
 					'&.collapsed': {
-						borderRadius: 4,
+						borderRadius: 8,
 						borderBottom: 'none',
 					},
 				},
 				'&__body': {
 					borderTop: `1px solid ${theme.colors.n100}`,
 					padding: 16,
-					borderBottomLeftRadius: 4,
-					borderBottomRightRadius: 4,
+					borderBottomLeftRadius: 8,
+					borderBottomRightRadius: 8,
 					backgroundColor: theme.colors.n0,
 					'&.no-header': {
-						borderRadius: 4,
+						borderRadius: 8,
 					},
 				},
 			},
