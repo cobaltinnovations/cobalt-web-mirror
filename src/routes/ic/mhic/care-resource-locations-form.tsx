@@ -113,6 +113,7 @@ export const Component = () => {
 		insuranceUseDefaults: true,
 		insurance: careResourceLocation ? careResourceLocation.payors : [],
 		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
+		specialtiesUseDefaults: true,
 		specialties: careResourceLocation ? careResourceLocation.specialties : [],
 		therapyTypes: careResourceLocation ? careResourceLocation.therapyTypes : [],
 		ages: careResourceLocation ? careResourceLocation.populationServed : [],
@@ -337,11 +338,7 @@ export const Component = () => {
 						/>
 					</AdminFormSection>
 					<hr />
-					<AdminFormSection
-						title="Insurance"
-						description="Add insurance carriers that are accepted."
-						alignHorizontally
-					>
+					<AdminFormSection title="Insurance" description="Add insurance carriers that are accepted.">
 						<ToggledInput
 							className="mb-3"
 							id="insurance-defaults"
@@ -357,7 +354,7 @@ export const Component = () => {
 								}));
 							}}
 						>
-							<p className="mb-0">Resource Default Insurance List Goes Here</p>
+							<p className="mb-0">TODO: Resource Default Insurance List Goes Here</p>
 						</ToggledInput>
 						<ToggledInput
 							id="insurance-override"
@@ -399,21 +396,50 @@ export const Component = () => {
 						</ToggledInput>
 					</AdminFormSection>
 					<hr />
-					<AdminFormSection title="Specialties" description="Select all issues treated." alignHorizontally>
-						<TypeaheadHelper
-							id="typeahead--specialties"
-							label="Specialties"
-							multiple
-							labelKey="name"
-							options={specialties}
-							selected={formValues.specialties}
-							onChange={(selected) => {
-								setFormValues((previousValues) => ({
-									...previousValues,
-									specialties: selected as CareResourceTag[],
+					<AdminFormSection title="Specialties" description="Select all issues treated.">
+						<ToggledInput
+							className="mb-3"
+							id="specialties-defaults"
+							label={`Use ${
+								careResourceAssociations.find((cra) => cra.careResourceId === formValues.careResourceId)
+									?.name
+							} defaults`}
+							checked={formValues.specialtiesUseDefaults}
+							onChange={() => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									specialtiesUseDefaults: true,
 								}));
 							}}
-						/>
+						>
+							<p className="mb-0">TODO: Resource Default Insurance List Goes Here</p>
+						</ToggledInput>
+						<ToggledInput
+							id="specialties-override"
+							label="Override defaults"
+							checked={!formValues.specialtiesUseDefaults}
+							onChange={() => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									specialtiesUseDefaults: false,
+								}));
+							}}
+						>
+							<TypeaheadHelper
+								id="typeahead--specialties"
+								label="Specialties"
+								multiple
+								labelKey="name"
+								options={specialties}
+								selected={formValues.specialties}
+								onChange={(selected) => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										specialties: selected as CareResourceTag[],
+									}));
+								}}
+							/>
+						</ToggledInput>
 					</AdminFormSection>
 					<hr />
 					<AdminFormSection
