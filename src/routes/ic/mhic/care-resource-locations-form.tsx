@@ -110,20 +110,25 @@ export const Component = () => {
 		locationName: careResourceLocation?.name ?? '',
 		status: careResourceLocation?.acceptingNewPatients ? 'AVAILABLE' : 'UNAVAILABLE',
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
+		// TODO: set from response
 		emailAddress: '',
 		website: careResourceLocation?.websiteUrl ?? '',
+		// TODO: set from response
 		address: undefined as undefined | PlaceModel,
-		address2: '',
+		address2: careResourceLocation?.address.streetAddress2 ?? '',
+		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
+		// TODO: set from response
 		insuranceUseDefaults: true,
-		insurance: careResourceLocation ? careResourceLocation.payors : [],
+		insurance: careResourceLocation?.payors ?? [],
 		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
+		// TODO: set from response
 		specialtiesUseDefaults: true,
-		specialties: careResourceLocation ? careResourceLocation.specialties : [],
-		therapyTypes: careResourceLocation ? careResourceLocation.therapyTypes : [],
-		ages: careResourceLocation ? careResourceLocation.populationServed : [],
-		genders: careResourceLocation ? careResourceLocation.genders : [],
-		ethnicities: careResourceLocation ? careResourceLocation.ethnicities : [],
-		languages: careResourceLocation ? careResourceLocation.languages : [],
+		specialties: careResourceLocation?.specialties ?? [],
+		therapyTypes: careResourceLocation?.therapyTypes ?? [],
+		ages: careResourceLocation?.populationServed ?? [],
+		genders: careResourceLocation?.genders ?? [],
+		ethnicities: careResourceLocation?.ethnicities ?? [],
+		languages: careResourceLocation?.languages ?? [],
 		notes: careResourceLocation?.notes ?? '',
 	});
 
@@ -157,7 +162,7 @@ export const Component = () => {
 					phoneNumber: formValues.phoneNumber,
 					websiteUrl: formValues.website,
 					acceptingNewPatients: formValues.status === 'AVAILABLE',
-					wheelchairAccess: false,
+					wheelchairAccess: formValues.wheelchairAccessible,
 					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
 					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
 					therapyTypeIds: formValues.therapyTypes.map((i) => i.careResourceTagId),
@@ -345,6 +350,7 @@ export const Component = () => {
 								}}
 							/>
 							<InputHelper
+								className="mb-3"
 								type="text"
 								label="Address 2"
 								name="address-2"
@@ -356,6 +362,20 @@ export const Component = () => {
 									}));
 								}}
 								helperText="Use address 2 to specify a suite or floor #"
+							/>
+							<Form.Check
+								type="checkbox"
+								name="wheelchair-accessible"
+								id="checkbox--wheelchair-accesible"
+								label="Address is wheelchair accessible"
+								value="WHEELCHAIR_ACCESSIBLE"
+								checked={formValues.wheelchairAccessible}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										wheelchairAccessible: currentTarget.checked,
+									}));
+								}}
 							/>
 						</AdminFormSection>
 						<hr />
