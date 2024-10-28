@@ -117,7 +117,7 @@ export const MhicCareResourceFormModal: FC<MhicCareResourceFormModalProps> = ({ 
 			};
 
 			const response = careResourceId
-				? await careResourceService.updateCareResource(careResourceId, requestBody).fetch()
+				? await careResourceService.updateCareResource({ careResourceId, ...requestBody }).fetch()
 				: await careResourceService.createCareResource(requestBody).fetch();
 
 			onSave(response.careResource);
