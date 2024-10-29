@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceModel, CareResourceTag, PlaceModel } from '@/lib/models';
+import {
+	CARE_RESOURCE_TAG_GROUP_ID,
+	CareResourceLocationModel,
+	CareResourceModel,
+	CareResourceTag,
+	PlaceModel,
+} from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -25,7 +31,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		gendersResponse,
 		ethnicitiesResponse,
 		languagesResponse,
-		careResourceLocationResponse,
 	] = await Promise.all([
 		careResourceService.getCareResourcesAssociationList().fetch(),
 		careResourceService
@@ -63,10 +68,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.LANGUAGES,
 			})
 			.fetch(),
-		...(careResourceLocationId
-			? [careResourceService.getCareResourceLocation(careResourceLocationId).fetch()]
-			: []),
 	]);
+
+	let careResourceLocation: undefined | CareResourceLocationModel = undefined;
+	if (careResourceLocationId) {
+		const careResourceLocationResponse = await careResourceService
+			.getCareResourceLocation(careResourceLocationId)
+			.fetch();
+		careResourceLocation = careResourceLocationResponse.careResourceLocation;
+	}
 
 	return {
 		careResourceId,
@@ -78,8 +88,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		genders: gendersResponse.careResourceTags,
 		ethnicities: ethnicitiesResponse.careResourceTags,
 		languages: languagesResponse.careResourceTags,
-		...(careResourceLocationResponse && {
-			careResourceLocation: careResourceLocationResponse.careResourceLocation,
+		...(careResourceLocation && {
+			careResourceLocation,
 		}),
 	};
 };
@@ -106,7 +116,7 @@ export const Component = () => {
 	const [careResource, setCareResource] = useState<CareResourceModel>();
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [formValues, setFormValues] = useState({
-		careResourceId: careResourceId ?? careResourceLocation?.careResourceId ?? '',
+		careResourceId: careResourceLocation?.careResourceId ?? careResourceId ?? '',
 		locationName: careResourceLocation?.name ?? '',
 		status:
 			typeof careResourceLocation?.acceptingNewPatients === 'boolean'
@@ -115,19 +125,15 @@ export const Component = () => {
 					: 'UNAVAILABLE'
 				: 'AVAILABLE',
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
-		// TODO: set from response
-		emailAddress: '',
+		emailAddress: '', // TODO: set from response
 		website: careResourceLocation?.websiteUrl ?? '',
-		// TODO: set from response
-		address: undefined as undefined | PlaceModel,
+		address: undefined as undefined | PlaceModel, // TODO: set from response
 		address2: careResourceLocation?.address.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
-		// TODO: set from response
-		insuranceUseDefaults: true,
+		insuranceUseDefaults: (careResourceLocation?.payors ?? []).length <= 0,
 		insurance: careResourceLocation?.payors ?? [],
 		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
-		// TODO: set from response
-		specialtiesUseDefaults: true,
+		specialtiesUseDefaults: (careResourceLocation?.specialties ?? []).length <= 0,
 		specialties: careResourceLocation?.specialties ?? [],
 		therapyTypes: careResourceLocation?.therapyTypes ?? [],
 		ages: careResourceLocation?.populationServed ?? [],
@@ -139,10 +145,22 @@ export const Component = () => {
 
 	useEffect(() => {
 		const fetchCareResource = async () => {
+			if (!formValues.careResourceId) {
+				return;
+			}
+
 			try {
 				setIsLoading(true);
+
 				const response = await careResourceService.getCareResource(formValues.careResourceId).fetch();
+
 				setCareResource(response.careResource);
+				setFormValues((previousValue) => ({
+					...previousValue,
+					...(!previousValue.phoneNumber && { phoneNumber: response.careResource.phoneNumber ?? '' }),
+					...(!previousValue.emailAddress && { emailAddress: response.careResource.emailAddress ?? '' }),
+					...(!previousValue.website && { website: response.careResource.websiteUrl ?? '' }),
+				}));
 			} catch (error) {
 				handleError(error);
 			} finally {
@@ -171,8 +189,12 @@ export const Component = () => {
 				websiteUrl: formValues.website,
 				acceptingNewPatients: formValues.status === 'AVAILABLE',
 				wheelchairAccess: formValues.wheelchairAccessible,
-				payorIds: formValues.insurance.map((i) => i.careResourceTagId),
-				specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
+				...(!formValues.insuranceUseDefaults && {
+					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
+				}),
+				...(!formValues.specialtiesUseDefaults && {
+					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
+				}),
 				therapyTypeIds: formValues.therapyTypes.map((i) => i.careResourceTagId),
 				populationServedIds: formValues.ages.map((i) => i.careResourceTagId),
 				genderIds: formValues.genders.map((i) => i.careResourceTagId),
@@ -194,7 +216,7 @@ export const Component = () => {
 				title: `Resource Location ${response.careResourceLocation.name} ${
 					careResourceLocation ? 'Updated' : 'Created'
 				}`,
-				description: 'This resource location can now be used to create resource packets.',
+				description: 'This resource location is ready to be used in resource packet creation.',
 				actions: [],
 			});
 

@@ -31,8 +31,8 @@ type CareResourceLocationRequestBody = {
 	websiteUrl: string;
 	acceptingNewPatients: boolean;
 	wheelchairAccess: boolean;
-	payorIds: string[];
-	specialtyIds: string[];
+	payorIds?: string[];
+	specialtyIds?: string[];
 	therapyTypeIds: string[];
 	populationServedIds: string[];
 	genderIds: string[];
