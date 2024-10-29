@@ -1010,8 +1010,13 @@ export const routes: RouteObject[] = [
 												lazy: () => import('@/routes/ic/mhic/care-resources-detail'),
 											},
 											{
-												id: 'mhic-admin-care-resources-detail-location',
+												id: 'mhic-admin-care-resources-add-location',
 												path: 'resources/:careResourceId/add-location',
+												lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
+											},
+											{
+												id: 'mhic-admin-care-resources-location-detail',
+												path: 'resources/:careResourceId/location/:careResourceLocationId',
 												lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
 											},
 											{

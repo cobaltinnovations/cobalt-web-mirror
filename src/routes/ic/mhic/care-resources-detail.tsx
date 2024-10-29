@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
-import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { careResourceService } from '@/lib/services';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import { MhicCareResourceFormModal } from '@/components/integrated-care/mhic';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import NoData from '@/components/no-data';
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import NoData from '@/components/no-data';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -161,7 +164,7 @@ export const Component = () => {
 											</TableRow>
 										)}
 										{careResource.careResourceLocations.map((crl) => (
-											<TableRow>
+											<TableRow key={crl.careResourceLocationId}>
 												<TableCell>
 													<span className="d-block text-nowrap">{crl.name}</span>
 													<span className="d-block text-nowrap">
@@ -191,6 +194,44 @@ export const Component = () => {
 															</Badge>
 														)}
 													</div>
+												</TableCell>
+												<TableCell className="text-right">
+													<Dropdown>
+														<Dropdown.Toggle
+															as={DropdownToggle}
+															id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
+															className="p-2"
+														>
+															<MoreIcon className="d-flex" />
+														</Dropdown.Toggle>
+														<Dropdown.Menu
+															as={DropdownMenu}
+															align="end"
+															popperConfig={{ strategy: 'fixed' }}
+															renderOnMount
+														>
+															<Dropdown.Item
+																className="d-flex align-items-center"
+																onClick={() => {
+																	navigate(
+																		`./location/${crl.careResourceLocationId}`
+																	);
+																}}
+															>
+																<EditIcon className="me-2 text-n500" />
+																Edit
+															</Dropdown.Item>
+															<Dropdown.Item
+																className="d-flex align-items-center"
+																onClick={() => {
+																	return;
+																}}
+															>
+																<DeleteIcon className="me-2 text-n500" />
+																Delete
+															</Dropdown.Item>
+														</Dropdown.Menu>
+													</Dropdown>
 												</TableCell>
 											</TableRow>
 										))}
