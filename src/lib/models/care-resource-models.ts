@@ -32,6 +32,7 @@ export interface CareResourceLocationModel {
 		formattedAddress: string;
 	};
 	phoneNumber: string;
+	emailAddress: string;
 	websiteUrl: string;
 	insuranceNotes: string;
 	formattedPhoneNumber: string;

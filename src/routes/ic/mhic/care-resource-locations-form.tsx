@@ -153,7 +153,7 @@ export const Component = () => {
 					: CARE_RESOURCE_LOCATION_STATUS.UNAVAILABLE
 				: CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
-		emailAddress: '', // TODO: set from response
+		emailAddress: careResourceLocation?.emailAddress ?? '',
 		website: careResourceLocation?.websiteUrl ?? '',
 		address: careResourceLocation?.address
 			? {
@@ -220,7 +220,7 @@ export const Component = () => {
 				insuranceNotes: formValues.insuranceNotes,
 				phoneNumber: formValues.phoneNumber,
 				websiteUrl: formValues.website,
-				acceptingNewPatients: formValues.status === 'AVAILABLE',
+				acceptingNewPatients: formValues.status === CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
 				wheelchairAccess: formValues.wheelchairAccessible,
 				...(!formValues.insuranceUseDefaults && {
 					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
