@@ -98,6 +98,11 @@ export const Component = () => {
 				}}
 				titleText={'Delete Care Resource'}
 				bodyText={`Are you sure you want to delete ${careResourceToDelete?.name}?`}
+				detailText={`There ${careResourceToDelete?.careResourceLocations.length === 1 ? 'is' : 'are'} ${
+					careResourceToDelete?.careResourceLocations.length
+				} location${
+					careResourceToDelete?.careResourceLocations.length === 1 ? '' : 's'
+				} associated this resource.`}
 				dismissText="No"
 				confirmText="Yes"
 				onConfirm={handleDeleteConfirm}
