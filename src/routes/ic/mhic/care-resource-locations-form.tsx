@@ -19,6 +19,34 @@ import { TypeaheadHelper } from '@/components/typeahead-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import ToggledInput from '@/components/toggled-input';
 
+interface FormValues {
+	careResourceId: string;
+	locationName: string;
+	status: CARE_RESOURCE_LOCATION_STATUS;
+	phoneNumber: string;
+	emailAddress: string;
+	website: string;
+	address: PlaceModel | undefined;
+	address2: string;
+	wheelchairAccessible: boolean;
+	insuranceUseDefaults: boolean;
+	insurance: CareResourceTag[];
+	insuranceNotes: string;
+	specialtiesUseDefaults: boolean;
+	specialties: CareResourceTag[];
+	therapyTypes: CareResourceTag[];
+	ages: CareResourceTag[];
+	genders: CareResourceTag[];
+	ethnicities: CareResourceTag[];
+	languages: CareResourceTag[];
+	notes: string;
+}
+
+enum CARE_RESOURCE_LOCATION_STATUS {
+	AVAILABLE = 'AVAILABLE',
+	UNAVAILABLE = 'UNAVAILABLE',
+}
+
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { careResourceId, careResourceLocationId } = params;
 
@@ -115,19 +143,24 @@ export const Component = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [careResource, setCareResource] = useState<CareResourceModel>();
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<FormValues>({
 		careResourceId: careResourceLocation?.careResourceId ?? careResourceId ?? '',
 		locationName: careResourceLocation?.name ?? '',
 		status:
 			typeof careResourceLocation?.acceptingNewPatients === 'boolean'
 				? careResourceLocation?.acceptingNewPatients
-					? 'AVAILABLE'
-					: 'UNAVAILABLE'
-				: 'AVAILABLE',
+					? CARE_RESOURCE_LOCATION_STATUS.AVAILABLE
+					: CARE_RESOURCE_LOCATION_STATUS.UNAVAILABLE
+				: CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
 		emailAddress: '', // TODO: set from response
 		website: careResourceLocation?.websiteUrl ?? '',
-		address: undefined as undefined | PlaceModel, // TODO: set from response
+		address: careResourceLocation?.address
+			? {
+					placeId: careResourceLocation.address.googlePlaceId,
+					text: careResourceLocation.address.formattedAddress,
+			  }
+			: undefined,
 		address2: careResourceLocation?.address.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
 		insuranceUseDefaults: (careResourceLocation?.payors ?? []).length <= 0,
@@ -314,13 +347,13 @@ export const Component = () => {
 								onChange={({ currentTarget }) => {
 									setFormValues((previousValue) => ({
 										...previousValue,
-										status: currentTarget.value,
+										status: currentTarget.value as CARE_RESOURCE_LOCATION_STATUS,
 									}));
 								}}
 								required
 							>
-								<option value="AVAILABLE">Available</option>
-								<option value="UNAVAILABLE">Unavailable</option>
+								<option value={CARE_RESOURCE_LOCATION_STATUS.AVAILABLE}>Available</option>
+								<option value={CARE_RESOURCE_LOCATION_STATUS.UNAVAILABLE}>Unavailable</option>
 							</InputHelper>
 						</AdminFormSection>
 						<hr />
