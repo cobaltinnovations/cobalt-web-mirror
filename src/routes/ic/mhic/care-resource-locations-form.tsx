@@ -155,33 +155,46 @@ export const Component = () => {
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			await careResourceService
-				.createCareResourceLocation({
-					careResourceId: formValues.careResourceId,
-					googlePlaceId: formValues.address?.placeId ?? '',
-					name: formValues.locationName,
-					notes: formValues.notes,
-					emailAddress: formValues.emailAddress,
-					streetAddress2: formValues.address2,
-					insuranceNotes: formValues.insuranceNotes,
-					phoneNumber: formValues.phoneNumber,
-					websiteUrl: formValues.website,
-					acceptingNewPatients: formValues.status === 'AVAILABLE',
-					wheelchairAccess: formValues.wheelchairAccessible,
-					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
-					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
-					therapyTypeIds: formValues.therapyTypes.map((i) => i.careResourceTagId),
-					populationServedIds: formValues.ages.map((i) => i.careResourceTagId),
-					genderIds: formValues.genders.map((i) => i.careResourceTagId),
-					ethnicityIds: formValues.ethnicities.map((i) => i.careResourceTagId),
-					languageIds: formValues.languages.map((i) => i.careResourceTagId),
-				})
-				.fetch();
+			if (!formValues.address) {
+				throw new Error('address is undefined.');
+			}
+
+			const requestBody = {
+				careResourceId: formValues.careResourceId,
+				googlePlaceId: formValues.address.placeId,
+				name: formValues.locationName,
+				notes: formValues.notes,
+				emailAddress: formValues.emailAddress,
+				streetAddress2: formValues.address2,
+				insuranceNotes: formValues.insuranceNotes,
+				phoneNumber: formValues.phoneNumber,
+				websiteUrl: formValues.website,
+				acceptingNewPatients: formValues.status === 'AVAILABLE',
+				wheelchairAccess: formValues.wheelchairAccessible,
+				payorIds: formValues.insurance.map((i) => i.careResourceTagId),
+				specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
+				therapyTypeIds: formValues.therapyTypes.map((i) => i.careResourceTagId),
+				populationServedIds: formValues.ages.map((i) => i.careResourceTagId),
+				genderIds: formValues.genders.map((i) => i.careResourceTagId),
+				ethnicityIds: formValues.ethnicities.map((i) => i.careResourceTagId),
+				languageIds: formValues.languages.map((i) => i.careResourceTagId),
+			};
+
+			const response = careResourceLocation
+				? await careResourceService
+						.updateCareResourceLocation({
+							careResourceLocationId: careResourceLocation.careResourceLocationId,
+							...requestBody,
+						})
+						.fetch()
+				: await careResourceService.createCareResourceLocation(requestBody).fetch();
 
 			addFlag({
 				variant: 'success',
-				title: 'Resource Location Created',
-				description: 'This resource location can now be used to create Resource Packets.',
+				title: `Resource Location ${response.careResourceLocation.name} ${
+					careResourceLocation ? 'Updated' : 'Created'
+				}`,
+				description: 'This resource location can now be used to create resource packets.',
 				actions: [],
 			});
 
@@ -189,7 +202,7 @@ export const Component = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [addFlag, formValues, handleError, navigate]);
+	}, [addFlag, careResourceLocation, formValues, handleError, navigate]);
 
 	return (
 		<>
