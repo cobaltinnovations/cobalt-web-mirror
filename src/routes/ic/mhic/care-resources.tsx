@@ -12,6 +12,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import NoData from '@/components/no-data';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 export const loader = async () => {
 	return null;
@@ -27,6 +28,7 @@ export const Component = () => {
 	const [careResources, setCareResources] = useState<CareResourceModel[]>([]);
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
 	const [showFormModal, setShowFormModal] = useState(false);
+	const [careResourceToDelete, setCareResourceToDelete] = useState<CareResourceModel>();
 
 	const fetchData = useCallback(async () => {
 		try {
@@ -53,6 +55,24 @@ export const Component = () => {
 		fetchData();
 	}, [fetchData]);
 
+	const handleDeleteConfirm = useCallback(async () => {
+		try {
+			if (!careResourceToDelete) {
+				throw new Error('careResourceToDelete is undefined.');
+			}
+
+			setIsLoading(true);
+			await careResourceService.deleteCareResource(careResourceToDelete.careResourceId).fetch();
+			setCareResourceToDelete(undefined);
+
+			fetchData();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [careResourceToDelete, fetchData, handleError]);
+
 	return (
 		<>
 			<Helmet>
@@ -68,6 +88,19 @@ export const Component = () => {
 					setShowFormModal(false);
 					fetchData();
 				}}
+			/>
+
+			<ConfirmDialog
+				size="lg"
+				show={!!careResourceToDelete}
+				onHide={() => {
+					setCareResourceToDelete(undefined);
+				}}
+				titleText={'Delete Care Resource'}
+				bodyText={`Are you sure you want to delete ${careResourceToDelete?.name}?`}
+				dismissText="No"
+				confirmText="Yes"
+				onConfirm={handleDeleteConfirm}
 			/>
 
 			<Container fluid className="px-8 py-8">
@@ -148,7 +181,7 @@ export const Component = () => {
 													<Dropdown.Item
 														className="d-flex align-items-center"
 														onClick={() => {
-															return;
+															setCareResourceToDelete(careResource);
 														}}
 													>
 														<DeleteIcon className="me-2 text-n500" />

@@ -190,6 +190,10 @@ export const Component = () => {
 				setCareResource(response.careResource);
 				setFormValues((previousValue) => ({
 					...previousValue,
+					...(previousValue.insurance.length <= 0 &&
+						response.careResource.payors.length <= 0 && { insuranceUseDefaults: false }),
+					...(previousValue.specialties.length <= 0 &&
+						response.careResource.specialties.length <= 0 && { specialtiesUseDefaults: false }),
 					...(!previousValue.phoneNumber && { phoneNumber: response.careResource.phoneNumber ?? '' }),
 					...(!previousValue.emailAddress && { emailAddress: response.careResource.emailAddress ?? '' }),
 					...(!previousValue.website && { website: response.careResource.websiteUrl ?? '' }),
@@ -470,6 +474,7 @@ export const Component = () => {
 										insuranceUseDefaults: true,
 									}));
 								}}
+								disabled={(careResource?.payors ?? []).length <= 0}
 							>
 								<p className="mb-0">
 									{careResource?.payors
@@ -529,6 +534,7 @@ export const Component = () => {
 										specialtiesUseDefaults: true,
 									}));
 								}}
+								disabled={(careResource?.specialties ?? []).length <= 0}
 							>
 								<p className="mb-0">
 									{careResource?.specialties

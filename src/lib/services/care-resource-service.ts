@@ -100,6 +100,12 @@ export const careResourceService = {
 			url: `/care-resources/${careResourceId}`,
 		});
 	},
+	deleteCareResource(careResourceId: string) {
+		return httpSingleton.orchestrateRequest<{ careResource: CareResourceModel }>({
+			method: 'DELETE',
+			url: `/care-resources/${careResourceId}`,
+		});
+	},
 	getCareResourcesAssociationList() {
 		return httpSingleton.orchestrateRequest<{
 			careResources: {
@@ -148,6 +154,12 @@ export const careResourceService = {
 	getCareResourceLocation(careResourceLocationId: string) {
 		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
 			method: 'GET',
+			url: `/care-resources/location/${careResourceLocationId}`,
+		});
+	},
+	deleteCareResourceLocation(careResourceLocationId: string) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
+			method: 'DELETE',
 			url: `/care-resources/location/${careResourceLocationId}`,
 		});
 	},
