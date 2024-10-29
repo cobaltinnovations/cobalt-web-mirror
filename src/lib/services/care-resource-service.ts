@@ -116,7 +116,7 @@ export const careResourceService = {
 	}) {
 		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
 			method: 'POST',
-			url: '/care-resource/location',
+			url: '/care-resources/location',
 			data,
 		});
 	},
@@ -132,14 +132,14 @@ export const careResourceService = {
 			careResourceLocations: CareResourceLocationModel[];
 		}>({
 			method: 'GET',
-			url: '/care-resource/location',
+			url: '/care-resources/location',
 			params,
 		});
 	},
 	getCareResourceLocation(careResourceLocationId: string) {
 		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
 			method: 'GET',
-			url: `/care-resource-locations/${careResourceLocationId}`,
+			url: `/care-resources/location/${careResourceLocationId}`,
 		});
 	},
 };

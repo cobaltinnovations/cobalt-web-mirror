@@ -108,7 +108,12 @@ export const Component = () => {
 	const [formValues, setFormValues] = useState({
 		careResourceId: careResourceId ?? careResourceLocation?.careResourceId ?? '',
 		locationName: careResourceLocation?.name ?? '',
-		status: careResourceLocation?.acceptingNewPatients ? 'AVAILABLE' : 'UNAVAILABLE',
+		status:
+			typeof careResourceLocation?.acceptingNewPatients === 'boolean'
+				? careResourceLocation?.acceptingNewPatients
+					? 'AVAILABLE'
+					: 'UNAVAILABLE'
+				: 'AVAILABLE',
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
 		// TODO: set from response
 		emailAddress: '',
