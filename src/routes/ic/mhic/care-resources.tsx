@@ -161,7 +161,12 @@ export const Component = () => {
 								{careResources.map((careResource) => (
 									<TableRow key={careResource.careResourceId}>
 										<TableCell>
-											<Link to={`./${careResource.careResourceId}`}>{careResource.name}</Link>
+											<Link
+												to={`./${careResource.careResourceId}`}
+												className="text-decoration-none"
+											>
+												{careResource.name}
+											</Link>
 										</TableCell>
 										<TableCell>{careResource.formattedPhoneNumber ?? 'Not provided'}</TableCell>
 										<TableCell>{careResource.websiteUrl ?? 'Not provided'}</TableCell>
@@ -173,7 +178,7 @@ export const Component = () => {
 												<Dropdown.Toggle
 													as={DropdownToggle}
 													id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
-													className="p-2"
+													className="p-2 border-0"
 												>
 													<MoreIcon className="d-flex" />
 												</Dropdown.Toggle>
