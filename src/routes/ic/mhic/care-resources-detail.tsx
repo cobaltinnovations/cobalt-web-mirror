@@ -232,7 +232,7 @@ export const Component = () => {
 														<Dropdown.Toggle
 															as={DropdownToggle}
 															id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
-															className="p-2"
+															className="p-2 border-0"
 														>
 															<MoreIcon className="d-flex" />
 														</Dropdown.Toggle>
