@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
@@ -11,6 +11,9 @@ import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
+import ConfirmDialog from '@/components/confirm-dialog';
+import { CareResourceLocationModel } from '@/lib/models';
+import useHandleError from '@/hooks/use-handle-error';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -31,7 +34,23 @@ export const Component = () => {
 	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const revalidator = useRevalidator();
+	const handleError = useHandleError();
 	const [showFormModal, setShowFormModal] = useState(false);
+	const [careResourceLocationToDelete, setCareResourceLocationToDelete] = useState<CareResourceLocationModel>();
+
+	const handleDeleteConfirm = useCallback(async () => {
+		try {
+			if (!careResourceLocationToDelete) {
+				throw new Error('careResourceLocationToDelete is undefined.');
+			}
+
+			await careResourceService.deleteCareResourceLocation(careResourceLocationToDelete.careResourceId).fetch();
+			setCareResourceLocationToDelete(undefined);
+			revalidator.revalidate();
+		} catch (error) {
+			handleError(error);
+		}
+	}, [careResourceLocationToDelete, handleError, revalidator]);
 
 	return (
 		<>
@@ -49,6 +68,19 @@ export const Component = () => {
 					revalidator.revalidate();
 					setShowFormModal(false);
 				}}
+			/>
+
+			<ConfirmDialog
+				size="lg"
+				show={!!careResourceLocationToDelete}
+				onHide={() => {
+					setCareResourceLocationToDelete(undefined);
+				}}
+				titleText={'Delete Care Resource Location'}
+				bodyText={`Are you sure you want to delete ${careResourceLocationToDelete?.name}?`}
+				dismissText="No"
+				confirmText="Yes"
+				onConfirm={handleDeleteConfirm}
 			/>
 
 			<Container>
@@ -224,7 +256,7 @@ export const Component = () => {
 															<Dropdown.Item
 																className="d-flex align-items-center"
 																onClick={() => {
-																	return;
+																	setCareResourceLocationToDelete(crl);
 																}}
 															>
 																<DeleteIcon className="me-2 text-n500" />
