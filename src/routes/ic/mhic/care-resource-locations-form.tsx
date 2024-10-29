@@ -266,13 +266,19 @@ export const Component = () => {
 			</Helmet>
 
 			{/* path matching logic in mhic-header.tsx hides the default header */}
-			<MhicCareResourceFormHeader onAddLocationButtonClick={handleFormSubmit} />
+			<MhicCareResourceFormHeader
+				title={careResourceLocation ? 'Update Resource Location' : 'Add Resource Location'}
+				submitButtonTitle={careResourceLocation ? 'Update Location' : 'Add Location'}
+				onSubmitButtonClick={handleFormSubmit}
+			/>
 
 			<Container fluid className="border-bottom">
 				<Container className="py-10">
 					<Row>
 						<Col>
-							<h2 className="mb-2">Add Resource Location</h2>
+							<h2 className="mb-2">
+								{careResourceLocation ? 'Update Resource Location' : 'Add Resource Location'}
+							</h2>
 							<p className="mb-0 fs-large">
 								Complete all <span className="text-danger">*required fields</span> before publishing.
 							</p>

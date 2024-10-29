@@ -37,10 +37,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface MhicCareResourceFormHeaderProps {
-	onAddLocationButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	title: string;
+	submitButtonTitle: string;
+	onSubmitButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
-export const MhicCareResourceFormHeader = ({ onAddLocationButtonClick }: MhicCareResourceFormHeaderProps) => {
+export const MhicCareResourceFormHeader = ({
+	title,
+	submitButtonTitle,
+	onSubmitButtonClick,
+}: MhicCareResourceFormHeaderProps) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 
@@ -59,9 +65,9 @@ export const MhicCareResourceFormHeader = ({ onAddLocationButtonClick }: MhicCar
 				</Button>
 			</div>
 			<div className={classes.navigationOuter}>
-				<h5 className="mb-0 fw-semibold">Add Resource Location</h5>
-				<Button variant="primary" size="sm" onClick={onAddLocationButtonClick}>
-					Add Location
+				<h5 className="mb-0 fw-semibold">{title}</h5>
+				<Button variant="primary" size="sm" onClick={onSubmitButtonClick}>
+					{submitButtonTitle}
 				</Button>
 			</div>
 		</header>
