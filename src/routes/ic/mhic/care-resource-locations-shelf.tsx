@@ -56,7 +56,7 @@ export const Component = () => {
 					<CloseIcon width={20} height={20} className="d-block" />
 				</Button>
 				<div className="mb-2 d-flex align-items-center">
-					<h4 className="mb-0 me-2">{careResourceLocation.name}</h4>
+					<h4 className="mb-0 me-2 text-danger">[TODO]: Resource Name</h4>
 					{careResourceLocation.acceptingNewPatients ? (
 						<Badge pill bg="outline-success">
 							Available
@@ -69,8 +69,8 @@ export const Component = () => {
 				</div>
 				<div className="d-flex align-items-center">
 					<p className="mb-0">
-						Phone: <span className="fw-bold">{careResourceLocation.formattedPhoneNumber}</span> | Website:{' '}
-						<span className="fw-bold">{careResourceLocation.websiteUrl}</span>
+						<span className="fw-bold">{careResourceLocation.name}</span> | Phone:{' '}
+						<span className="fw-bold">{careResourceLocation.formattedPhoneNumber}</span>
 					</p>
 				</div>
 			</div>
