@@ -241,8 +241,16 @@ export const Component = () => {
 														</span>
 													)}
 												</TableCell>
-												<TableCell>{crl.payors.map((p) => p.name).join(', ')}</TableCell>
-												<TableCell>{crl.specialties.map((s) => s.name).join(', ')}</TableCell>
+												<TableCell>
+													{crl.payors.length > 0
+														? crl.payors.map((s) => s.name).join(', ')
+														: 'Not provided'}
+												</TableCell>
+												<TableCell>
+													{crl.specialties.length > 0
+														? crl.specialties.map((s) => s.name).join(', ')
+														: 'Not provided'}
+												</TableCell>
 												<TableCell>
 													<div className="d-flex align-items-center justify-content-between">
 														{crl.acceptingNewPatients ? (
