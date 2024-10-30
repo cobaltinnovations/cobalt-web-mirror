@@ -56,6 +56,8 @@ const accountSourceVariantMap = {
 export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 	const [searchParams] = useSearchParams();
 	const myChartError = useMemo(() => searchParams.get('myChartError') ?? '', [searchParams]);
+	const myChartErrorAccessDenied = myChartError === 'access_denied';
+	const myChartErrorOther = myChartError && !myChartErrorAccessDenied;
 
 	const { institution, accountSources } = useAccount();
 	const classes = useSignInPatientStyles();
@@ -106,12 +108,20 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										);
 									})}
 								</div>
-								{myChartError && (
+								{myChartErrorAccessDenied && (
 									<InlineAlert
 										className="mb-4"
 										variant="flag-danger"
 										title="Permissions needed"
 										description={`You must accept all ${institution.myChartName} permissions to sign in.`}
+									/>
+								)}
+								{myChartErrorOther && (
+									<InlineAlert
+										className="mb-4"
+										variant="warning"
+										title="Attention"
+										description={`You must sign in with ${institution.myChartName} to connect to care.`}
 									/>
 								)}
 								<InlineAlert
