@@ -1,66 +1,47 @@
-import React, { useState } from 'react';
-import { LoaderFunctionArgs, useLocation, useNavigate } from 'react-router-dom';
-import { Badge, Button, Card, Col, Container, Row, Tab } from 'react-bootstrap';
+import React from 'react';
+import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
-import TabBar from '@/components/tab-bar';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { careResourceService } from '@/lib/services';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
-		padding: '28px 32px 0',
+		padding: '28px 32px',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.border}`,
+	},
+	body: {
+		overflowY: 'auto',
+		backgroundColor: theme.colors.n50,
 	},
 	shelfCloseButton: {
 		top: 20,
 		right: 24,
 	},
-	tabContent: {
-		flex: 1,
-		overflow: 'hidden',
-	},
-	tabPane: {
-		height: '100%',
-		overflowY: 'auto',
-	},
-	commentsPane: {
-		height: '100%',
-	},
 }));
 
-enum TAB_KEYS {
-	RESOURCES_DETAILS = 'RESOURCES_DETAILS',
-	COMMENTS = 'COMMENTS',
-}
-
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const { careResourceId } = params;
+	const { careResourceLocationId } = params;
 
-	if (!careResourceId) {
-		throw new Error('resourceId is undefined.');
+	if (!careResourceLocationId) {
+		throw new Error('careResourceLocationId is undefined.');
 	}
 
-	const { careResource } = await careResourceService.getCareResource(careResourceId).fetch();
-	return { careResource };
+	const { careResourceLocation } = await careResourceService.getCareResourceLocation(careResourceLocationId).fetch();
+	return { careResourceLocation };
 };
 
 export const Component = () => {
+	const { careResourceLocation } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const classes = useStyles();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const [tabKey, setTabKey] = useState(TAB_KEYS.RESOURCES_DETAILS);
 
 	return (
-		<Tab.Container
-			id="resources-shelf-tabs"
-			defaultActiveKey={TAB_KEYS.RESOURCES_DETAILS}
-			activeKey={tabKey}
-			mountOnEnter
-			unmountOnExit
-		>
+		<>
 			<div className={classes.header}>
 				<Button
 					variant="light"
@@ -75,113 +56,302 @@ export const Component = () => {
 					<CloseIcon width={20} height={20} className="d-block" />
 				</Button>
 				<div className="mb-2 d-flex align-items-center">
-					<h4 className="mb-0 me-2">Resource Name</h4>
-					<Badge pill bg="outline-success">
-						Available
-					</Badge>
+					<h4 className="mb-0 me-2">{careResourceLocation.name}</h4>
+					{careResourceLocation.acceptingNewPatients ? (
+						<Badge pill bg="outline-success">
+							Available
+						</Badge>
+					) : (
+						<Badge pill bg="outline-danger">
+							Unavailable
+						</Badge>
+					)}
 				</div>
 				<div className="d-flex align-items-center">
 					<p className="mb-0">
-						Phone: <span className="fw-bold">+1 000-000-0000</span> | Website:{' '}
-						<span className="fw-bold">www.website.com</span>
+						Phone: <span className="fw-bold">{careResourceLocation.formattedPhoneNumber}</span> | Website:{' '}
+						<span className="fw-bold">{careResourceLocation.websiteUrl}</span>
 					</p>
 				</div>
-				<TabBar
-					key="resources-shelf-tabbar"
-					hideBorder
-					value={tabKey}
-					tabs={[
-						{ value: TAB_KEYS.RESOURCES_DETAILS, title: 'Resources Details' },
-						{ value: TAB_KEYS.COMMENTS, title: 'Comments' },
-					]}
-					onTabClick={(value) => {
-						setTabKey(value as TAB_KEYS);
-					}}
-				/>
 			</div>
-			<Tab.Content className={classes.tabContent}>
-				<Tab.Pane eventKey={TAB_KEYS.RESOURCES_DETAILS} className={classes.tabPane}>
-					<section>
-						<Container fluid>
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Insurance</Card.Title>
-										</Card.Header>
-										<Card.Body>
-											<p className="m-0">
-												Highmark, BCBS, Quest, Anthem, Compsych, Horizon, Aetna, Magellan,
-												United Behavioral, Optum, KHPE, IBC
-											</p>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Specialties</Card.Title>
-										</Card.Header>
-										<Card.Body>
-											<p className="m-0">
-												Individual, Family, Group, Couples Therapy, Stress, Caregiver Stress,
-												Addiction and Recovery Support, Relationship Issues, Depression,
-												Anxiety, Eating Disorder
-											</p>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-							<Row className="mb-6">
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Therapy Types</Card.Title>
-										</Card.Header>
-										<Card.Body>
-											<p className="m-0">Psychiatry, Psychotherapy</p>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-							<Row>
-								<Col>
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Additional Information</Card.Title>
-										</Card.Header>
-										<Card.Body>
-											<p className="m-0">
-												There is a mandatory $99 enrollment + $39 monthly fee for the online
-												system including same day appointments, 24-hour Q&A, etc. The fee for
-												the online system is not covered by insurance and needs to be payed in
-												addition to co-pay.
-											</p>
-										</Card.Body>
-									</Card>
-								</Col>
-							</Row>
-						</Container>
-					</section>
-					<section>
-						<Container fluid>
-							<Row>
-								<Col>
-									<h4 className="mb-0">
-										Locations <span className="text-gray">(5)</span>
-									</h4>
-									<p>TODO: LOCATIONS</p>
-								</Col>
-							</Row>
-						</Container>
-					</section>
-				</Tab.Pane>
-				<Tab.Pane eventKey={TAB_KEYS.COMMENTS} className={classes.commentsPane}>
-					TODO: Comments
-				</Tab.Pane>
-			</Tab.Content>
-		</Tab.Container>
+			<div className={classes.body}>
+				<section>
+					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Internal Notes</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Resource Notes</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+					</Container>
+				</section>
+				<section>
+					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Contact</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Phone</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.formattedPhoneNumber ?? 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Email</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.emailAddress ?? 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Website</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.websiteUrl ?? 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Address</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Address</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														<span className="d-block text-nowrap">
+															{careResourceLocation.address.streetAddress1}
+														</span>
+														<span className="d-block text-nowrap">
+															{careResourceLocation.address.locality},{' '}
+															{careResourceLocation.address.region}{' '}
+															{careResourceLocation.address.postalCode}
+														</span>
+														{careResourceLocation.address.streetAddress2 ?? (
+															<span className="d-block text-nowrap">
+																{careResourceLocation.address.streetAddress2}
+															</span>
+														)}
+													</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Accessibility</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.wheelchairAccess
+															? 'Wheelchair accessible'
+															: 'Not Wheelchair accessible'}
+													</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Facility Type</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Insurance</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0">
+											{careResourceLocation.payors.length > 0
+												? careResourceLocation.payors.map((p) => p.name).join(', ')
+												: 'Not provided'}
+										</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Specialties</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0">
+											{careResourceLocation.specialties.length > 0
+												? careResourceLocation.specialties.map((p) => p.name).join(', ')
+												: 'Not provided'}
+										</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Therapy Types</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0">
+											{careResourceLocation.therapyTypes.length > 0
+												? careResourceLocation.therapyTypes.map((p) => p.name).join(', ')
+												: 'Not provided'}
+										</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Provider Details</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Genders</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.genders.length > 0
+															? careResourceLocation.genders.map((p) => p.name).join(', ')
+															: 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+											<Row className="mb-4">
+												<Col xs={3}>
+													<p className="m-0 text-gray">Ethnicities</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.ethnicities.length > 0
+															? careResourceLocation.ethnicities
+																	.map((p) => p.name)
+																	.join(', ')
+															: 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Languages</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.languages.length > 0
+															? careResourceLocation.languages
+																	.map((p) => p.name)
+																	.join(', ')
+															: 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Population Servced</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<Container fluid>
+											<Row>
+												<Col xs={3}>
+													<p className="m-0 text-gray">Ages</p>
+												</Col>
+												<Col xs={9}>
+													<p className="m-0">
+														{careResourceLocation.populationServed.length > 0
+															? careResourceLocation.populationServed
+																	.map((p) => p.name)
+																	.join(', ')
+															: 'Not provided'}
+													</p>
+												</Col>
+											</Row>
+										</Container>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Location Notes</Card.Title>
+									</Card.Header>
+									<Card.Body>
+										<div
+											className="mb-0"
+											dangerouslySetInnerHTML={{
+												__html:
+													careResourceLocation.notes ?? '<p class="mb-0">Not provided</p>',
+											}}
+										/>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
+					</Container>
+				</section>
+			</div>
+		</>
 	);
 };

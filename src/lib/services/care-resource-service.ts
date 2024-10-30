@@ -135,6 +135,18 @@ export const careResourceService = {
 			data,
 		});
 	},
+	deleteCareResourceLocation(careResourceLocationId: string) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
+			method: 'DELETE',
+			url: `/care-resources/location/${careResourceLocationId}`,
+		});
+	},
+	getCareResourceLocation(careResourceLocationId: string) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
+			method: 'GET',
+			url: `/care-resources/location/${careResourceLocationId}`,
+		});
+	},
 	getCareResourceLocations(params?: {
 		pageNumber?: string;
 		pageSize?: string;
@@ -147,20 +159,8 @@ export const careResourceService = {
 			careResourceLocations: CareResourceLocationModel[];
 		}>({
 			method: 'GET',
-			url: '/care-resources/location',
+			url: '/care-resources/locations',
 			params,
-		});
-	},
-	getCareResourceLocation(careResourceLocationId: string) {
-		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
-			method: 'GET',
-			url: `/care-resources/location/${careResourceLocationId}`,
-		});
-	},
-	deleteCareResourceLocation(careResourceLocationId: string) {
-		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
-			method: 'DELETE',
-			url: `/care-resources/location/${careResourceLocationId}`,
 		});
 	},
 };
