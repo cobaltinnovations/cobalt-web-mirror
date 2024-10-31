@@ -1,10 +1,12 @@
-import React from 'react';
-import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate, useRevalidator } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
+import { careResourceService } from '@/lib/services';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { careResourceService } from '@/lib/services';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { MhicInternalNotesModal } from '@/components/integrated-care/mhic';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -39,9 +41,23 @@ export const Component = () => {
 	const classes = useStyles();
 	const location = useLocation();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
+	const [showInternalNotesModal, setShowInternalNotesModal] = useState(false);
 
 	return (
 		<>
+			<MhicInternalNotesModal
+				show={showInternalNotesModal}
+				careResourceLocationId={careResourceLocation.careResourceId}
+				onHide={() => {
+					setShowInternalNotesModal(false);
+				}}
+				onSave={() => {
+					setShowInternalNotesModal(false);
+					revalidator.revalidate();
+				}}
+			/>
+
 			<div className={classes.header}>
 				<Button
 					variant="light"
@@ -77,18 +93,6 @@ export const Component = () => {
 			<div className={classes.body}>
 				<section>
 					<Container fluid>
-						<Row className="mb-6">
-							<Col>
-								<Card bsPrefix="ic-card">
-									<Card.Header>
-										<Card.Title>Internal Notes</Card.Title>
-									</Card.Header>
-									<Card.Body>
-										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
-									</Card.Body>
-								</Card>
-							</Col>
-						</Row>
 						<Row>
 							<Col>
 								<Card bsPrefix="ic-card">
@@ -105,6 +109,29 @@ export const Component = () => {
 				</section>
 				<section>
 					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<Card bsPrefix="ic-card">
+									<Card.Header>
+										<Card.Title>Internal Notes</Card.Title>
+										<div className="button-container">
+											<Button
+												variant="link"
+												className="ms-2 p-2 border-0"
+												onClick={() => {
+													setShowInternalNotesModal(true);
+												}}
+											>
+												<EditIcon className="d-flex" width={20} height={20} />
+											</Button>
+										</div>
+									</Card.Header>
+									<Card.Body>
+										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+									</Card.Body>
+								</Card>
+							</Col>
+						</Row>
 						<Row className="mb-6">
 							<Col>
 								<Card bsPrefix="ic-card">

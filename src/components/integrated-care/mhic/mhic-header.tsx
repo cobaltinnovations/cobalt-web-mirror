@@ -130,9 +130,6 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const patientOrdersMatch = useMatch({
 		path: '/ic/mhic/patient-orders/*',
 	});
-	const resourceLocationsMatch = useMatch({
-		path: '/ic/mhic/resource-locations/*',
-	});
 	const adminMatch = useMatch({
 		path: '/ic/mhic/admin/*',
 	});
@@ -166,13 +163,6 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				to: '/ic/mhic/patient-orders',
 				title: 'Patient Orders',
 				active: patientOrdersMatch,
-			},
-			{
-				testId: '',
-				navigationItemId: 'RESOURCE_LOCATIONS',
-				to: '/ic/mhic/resource-locations',
-				title: 'Resource Locations',
-				active: resourceLocationsMatch,
 			},
 			{
 				testId: '',
@@ -219,7 +209,6 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			myPatientsMatch,
 			overviewMatch,
 			patientOrdersMatch,
-			resourceLocationsMatch,
 		]
 	);
 

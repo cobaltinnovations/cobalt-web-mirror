@@ -972,30 +972,6 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
-										id: 'care-resource-locations',
-										path: 'resource-locations',
-										lazy: () => import('@/routes/ic/mhic/care-resource-locations'),
-										children: [
-											{
-												path: ':careResourceId',
-												lazy: () => import('@/routes/ic/mhic/care-resource-locations-shelf'),
-												handle: {
-													isMhicResourcesShelf: true,
-												},
-											},
-										],
-									},
-									{
-										id: 'care-resource-locations-add',
-										path: 'resource-locations/add',
-										lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
-									},
-									{
-										id: 'care-resource-locations-edit',
-										path: 'resource-locations/:careResourceId/edit',
-										lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
-									},
-									{
 										id: 'mhic-admin',
 										path: 'admin',
 										children: [
