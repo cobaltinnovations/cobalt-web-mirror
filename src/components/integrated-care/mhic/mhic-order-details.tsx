@@ -32,7 +32,6 @@ import {
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
-	PatientOrderResourcingStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 
@@ -42,7 +41,6 @@ import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
-import InlineAlert from '@/components/inline-alert';
 
 interface Props {
 	patientOrder: PatientOrderModel;
