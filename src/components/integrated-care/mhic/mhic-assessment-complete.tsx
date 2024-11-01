@@ -19,6 +19,7 @@ import {
 	MhicFlagOrderForSafetyPlanning,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
+	MhicNextStepsResources,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 
@@ -210,6 +211,18 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 									/>
 									<hr className="mb-8" />
 
+									<div className="mb-8">
+										<h3 className="mb-0">Resources</h3>
+									</div>
+									<MhicNextStepsResources
+										patientOrder={patientOrder}
+										referenceData={referenceDataResponse}
+										disabled={
+											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
+										}
+									/>
+									<hr className="mb-8" />
+
 									{eligilityResults.length > 0 && (
 										<>
 											<div className={classes.scrollAnchor} id="eligibility" />
@@ -292,7 +305,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...eligilityResults.map((result) => ({
 												title: result.screeningName ?? '',
-												value: `#${result.screeningId}` ?? '#',
+												value: result.screeningId ? `#${result.screeningId}` : '#',
 												level: 1,
 											})),
 											...(completedAssessmentsResults.length > 0
@@ -305,7 +318,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...completedAssessmentsResults.map((result) => ({
 												title: result.screeningName ?? '',
-												value: `#${result.screeningId}` ?? '#',
+												value: result.screeningId ? `#${result.screeningId}` : '#',
 												level: 1,
 											})),
 											...(notTakenScreeningTypes.length > 0
@@ -318,7 +331,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												: []),
 											...notTakenScreeningTypes.map((result) => ({
 												title: result.description ?? '',
-												value: `#${result.screeningTypeId}` ?? '#',
+												value: result.screeningTypeId ? `#${result.screeningTypeId}` : '#',
 												level: 1,
 											})),
 										]}

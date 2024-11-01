@@ -9,7 +9,7 @@ import {
 	ReferenceDataResponse,
 } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
-import { MhicEncounterModal, MhicResourcesModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
+import { MhicEncounterModal, MhicSafetyPlanningModal } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
 interface Props {
@@ -22,21 +22,12 @@ interface Props {
 export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, className }: Props) => {
 	const { account } = useAccount();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
-	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const [showEncounterModal, setShowEncounterModal] = useState(false);
 	const revalidator = useRevalidator();
 
 	const handleSafetyPlanningModalSave = useCallback(
 		(_updatedPatientOrder: PatientOrderModel) => {
 			setShowSafetyPlanningModal(false);
-			revalidator.revalidate();
-		},
-		[revalidator]
-	);
-
-	const handleResourcesModalSave = useCallback(
-		(_updatedPatientOrder: PatientOrderModel) => {
-			setShowResourcesModal(false);
 			revalidator.revalidate();
 		},
 		[revalidator]
@@ -61,16 +52,6 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 				onSave={handleSafetyPlanningModalSave}
 			/>
 
-			<MhicResourcesModal
-				patientOrder={patientOrder}
-				referenceData={referenceData}
-				show={showResourcesModal}
-				onHide={() => {
-					setShowResourcesModal(false);
-				}}
-				onSave={handleResourcesModalSave}
-			/>
-
 			<MhicEncounterModal
 				patientOrder={patientOrder}
 				show={showEncounterModal}
@@ -93,21 +74,6 @@ export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, cla
 								setShowSafetyPlanningModal(true);
 							},
 							disabled: disabled || !account?.accountCapabilityFlags.canEditIcSafetyPlanning,
-						}}
-					/>
-				)}
-
-				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-					<InlineAlert
-						className="mb-6"
-						variant="warning"
-						title="Patient needs resources"
-						action={{
-							title: 'Mark as sent',
-							onClick: () => {
-								setShowResourcesModal(true);
-							},
-							disabled,
 						}}
 					/>
 				)}

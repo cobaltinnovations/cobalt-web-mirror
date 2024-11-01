@@ -12,6 +12,7 @@ import {
 	MhicEpisodeCard,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
+	MhicNextStepsResources,
 	MhicScheduleAssessmentModal,
 	MhicScheduleCallCompleteModal,
 	MhicScheduleCallModal,
@@ -31,6 +32,7 @@ import {
 	PatientOrderScreeningStatusId,
 	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
+	PatientOrderResourcingStatusId,
 } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 
@@ -40,6 +42,7 @@ import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
+import InlineAlert from '@/components/inline-alert';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -664,6 +667,22 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					)}
 				</Container>
 			</section>
+			{assessmentStatus === ASSESSMENT_STATUS.COMPLETE && (
+				<section>
+					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<h4 className="mb-0">Resources</h4>
+							</Col>
+						</Row>
+						<MhicNextStepsResources
+							patientOrder={patientOrder}
+							referenceData={referenceDataResponse}
+							disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+						/>
+					</Container>
+				</section>
+			)}
 			<section>
 				<Container fluid>
 					<Row className="mb-6">
