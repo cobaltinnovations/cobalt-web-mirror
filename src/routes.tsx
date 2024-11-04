@@ -972,11 +972,6 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
-										id: 'mhic-care-resource-search',
-										path: 'resource-search/:patientOrderId',
-										lazy: () => import('@/routes/ic/mhic/care-resource-search'),
-									},
-									{
 										id: 'mhic-admin',
 										path: 'admin',
 										children: [

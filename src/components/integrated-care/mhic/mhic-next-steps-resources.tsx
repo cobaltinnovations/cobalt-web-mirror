@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
-import { MhicResourcesModal } from '@/components/integrated-care/mhic';
+import { MhicCareResourceSearchModal, MhicResourcesModal } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, className }: Props) => {
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
+	const [showCareResourceSearchModal, setShowCareResourceSearchModal] = useState(false);
 	const revalidator = useRevalidator();
 
 	const handleResourcesModalSave = useCallback(
@@ -34,6 +36,13 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					setShowResourcesModal(false);
 				}}
 				onSave={handleResourcesModalSave}
+			/>
+
+			<MhicCareResourceSearchModal
+				show={showCareResourceSearchModal}
+				onHide={() => {
+					setShowCareResourceSearchModal(false);
+				}}
 			/>
 
 			<div className={className}>
@@ -59,6 +68,14 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 						title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
 					/>
 				)}
+
+				<Button
+					onClick={() => {
+						setShowCareResourceSearchModal(true);
+					}}
+				>
+					[Temp Button] Open Resource Search
+				</Button>
 			</div>
 		</>
 	);
