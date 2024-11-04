@@ -745,6 +745,7 @@ export const MhicPatientOrderTable = ({
 										page={pageNumber}
 										size={pageSize}
 										onClick={onPaginationClick}
+										disabled={isLoading}
 									/>
 								</div>
 							</Col>
