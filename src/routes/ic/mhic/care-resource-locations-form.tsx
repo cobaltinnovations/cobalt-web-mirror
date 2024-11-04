@@ -12,7 +12,7 @@ import {
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
-import { MhicCareResourceFormHeader } from '@/components/integrated-care/mhic';
+import { MhicFullscreenBar } from '@/components/integrated-care/mhic';
 import { AdminBadgeSelectControl, AdminFormSection } from '@/components/admin';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
@@ -270,10 +270,13 @@ export const Component = () => {
 			</Helmet>
 
 			{/* path matching logic in mhic-header.tsx hides the default header */}
-			<MhicCareResourceFormHeader
+			<MhicFullscreenBar
+				showExitButton
 				title={careResourceLocation ? 'Update Resource Location' : 'Add Resource Location'}
-				submitButtonTitle={careResourceLocation ? 'Update Location' : 'Add Location'}
-				onSubmitButtonClick={handleFormSubmit}
+				primaryAction={{
+					title: careResourceLocation ? 'Update Location' : 'Add Location',
+					onClick: handleFormSubmit,
+				}}
 			/>
 
 			<Container fluid className="border-bottom">

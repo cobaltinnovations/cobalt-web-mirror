@@ -134,10 +134,11 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		path: '/ic/mhic/admin/*',
 	});
 
-	const careResourcesLocationFormMatch = [
+	const hideDefaultHeaderRoutes = [
 		'/ic/mhic/resource-locations/add',
 		'/ic/mhic/resource-locations/:careResourceLocationId/edit',
 		'/ic/mhic/admin/resources/:careResourceId/add-location',
+		'/ic/mhic/resource-search/:patientOrderId',
 	].some((path) => matchPath(path, location.pathname));
 
 	const assessmentMatch = useMatch({
@@ -212,7 +213,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		]
 	);
 
-	if (careResourcesLocationFormMatch) {
+	if (hideDefaultHeaderRoutes) {
 		return null;
 	}
 
