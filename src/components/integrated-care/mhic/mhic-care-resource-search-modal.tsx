@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Button, ModalProps, Form, Row, Col } from 'react-bootstrap';
-import { createUseStyles } from 'react-jss';
+import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 
 import useHandleError from '@/hooks/use-handle-error';
 import { MhicPageHeader } from './mhic-page-header';
@@ -9,15 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/t
 import { CareResourceLocationModel } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { Link } from 'react-router-dom';
+import FilterDropdownV2 from '@/components/filter-dropdown-v2';
+import InputHelper from '@/components/input-helper';
+import { PreviewCanvas } from '@/components/preview-canvas';
 
-const useStyles = createUseStyles({
-	modal: {
-		maxWidth: '90%',
-	},
-});
-
-export const MhicCareResourceSearchModal: FC<ModalProps> = ({ ...props }) => {
-	const classes = useStyles();
+export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
 	const handleError = useHandleError();
 
 	const [isLoading] = useState(false);
@@ -25,6 +20,13 @@ export const MhicCareResourceSearchModal: FC<ModalProps> = ({ ...props }) => {
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState('');
+
+	const [formValues, setFormValues] = useState({
+		searchName: '',
+		zipCode: '',
+		distance: 5,
+		insurance: [],
+	});
 
 	const handleOnEnter = useCallback(() => {
 		console.log('Enter', handleError);
@@ -85,84 +87,108 @@ export const MhicCareResourceSearchModal: FC<ModalProps> = ({ ...props }) => {
 	}, [handleKeydown]);
 
 	return (
-		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
-			<Modal.Header closeButton>
-				<Modal.Title>Available Resources</Modal.Title>
-			</Modal.Header>
-			<Modal.Body>
-				<Row className="mb-6">
-					<Col>
-						<MhicPageHeader title="Available Resources">
-							<Form onSubmit={handleSearchFormSubmit}>
-								<InputHelperSearch
-									ref={searchInputRef}
-									placeholder="Search name"
-									value={searchInputValue}
-									onChange={({ currentTarget }) => {
-										setSearchInputValue(currentTarget.value);
-									}}
-									onClear={clearSearch}
-								/>
-							</Form>
-						</MhicPageHeader>
-					</Col>
-				</Row>
-				<Row className="mb-8">
-					<Col>
-						<hr />
-					</Col>
-				</Row>
-				<Row className="mb-8">
-					<Col>
-						<Table isLoading={isLoading}>
-							<TableHead>
-								<TableRow>
-									<TableCell
-										className="flex-row align-items-center justify-content-start"
-										header
-										sortable
-										// sortDirection={orderBy.split('_')[1] as SORT_DIRECTION}
-										// onSort={(sortDirection) => {
-										// 	searchParams.set('pageNumber', '0');
-										// 	searchParams.set('orderBy', `NAME_${sortDirection}`);
-										// 	setSearchParams(searchParams, { replace: true });
-										// }}
-									>
-										Resource Name
+		<PreviewCanvas title="Available Resources" onEnter={handleOnEnter} {...props}>
+			<Row className="mb-6">
+				<Col>
+					<MhicPageHeader title="Available Resources">
+						<Form onSubmit={handleSearchFormSubmit}>
+							<InputHelperSearch
+								ref={searchInputRef}
+								placeholder="Search name"
+								value={searchInputValue}
+								onChange={({ currentTarget }) => {
+									setSearchInputValue(currentTarget.value);
+								}}
+								onClear={clearSearch}
+							/>
+						</Form>
+					</MhicPageHeader>
+				</Col>
+			</Row>
+			<Row className="mb-8">
+				<Col>
+					<hr />
+				</Col>
+			</Row>
+			<Row className="mb-8">
+				<Col>
+					<div className="d-flex align-items-center">
+						<Form.Label className="m-0">Location: </Form.Label>
+						<InputHelper
+							type="number"
+							label="Zip Code"
+							value={formValues.zipCode}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									zipCode: currentTarget.value,
+								}));
+							}}
+						/>
+						<FilterDropdownV2
+							id="distance-filter"
+							title="Distance"
+							searchParamKey="DISTANCE"
+							options={[
+								{
+									distanceId: '5_MILES',
+									title: '5 miles',
+								},
+							]}
+							optionIdKey="distanceId"
+							optionLabelKey="title"
+						/>
+					</div>
+				</Col>
+			</Row>
+			<Row className="mb-8">
+				<Col>
+					<Table isLoading={isLoading}>
+						<TableHead>
+							<TableRow>
+								<TableCell
+									className="flex-row align-items-center justify-content-start"
+									header
+									sortable
+									// sortDirection={orderBy.split('_')[1] as SORT_DIRECTION}
+									// onSort={(sortDirection) => {
+									// 	searchParams.set('pageNumber', '0');
+									// 	searchParams.set('orderBy', `NAME_${sortDirection}`);
+									// 	setSearchParams(searchParams, { replace: true });
+									// }}
+								>
+									Resource Name
+								</TableCell>
+								<TableCell header>Insurance</TableCell>
+								<TableCell header>Specialties</TableCell>
+								<TableCell header>Distance from zip</TableCell>
+								<TableCell></TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{careResourceLocations.map((careResourceLocation) => (
+								<TableRow key={careResourceLocation.careResourceLocationId}>
+									<TableCell>
+										<Link to="/#">{careResourceLocation.name}</Link>
 									</TableCell>
-									<TableCell header>Insurance</TableCell>
-									<TableCell header>Specialties</TableCell>
-									<TableCell header>Distance from zip</TableCell>
-									<TableCell></TableCell>
+									<TableCell>{careResourceLocation.payors.map((p) => p.name).join(', ')}</TableCell>
+									<TableCell>
+										{careResourceLocation.specialties.map((p) => p.name).join(', ')}
+									</TableCell>
+									<TableCell className="flex-row align-items-center justify-content-start">
+										5 miles
+									</TableCell>
+									<TableCell className="flex-row align-items-center justify-content-end">
+										<Button variant="outline-primary" className="p-2 me-2">
+											Add
+										</Button>
+									</TableCell>
 								</TableRow>
-							</TableHead>
-							<TableBody>
-								{careResourceLocations.map((careResourceLocation) => (
-									<TableRow key={careResourceLocation.careResourceLocationId}>
-										<TableCell>
-											<Link to="/#">{careResourceLocation.name}</Link>
-										</TableCell>
-										<TableCell>
-											{careResourceLocation.payors.map((p) => p.name).join(', ')}
-										</TableCell>
-										<TableCell>
-											{careResourceLocation.specialties.map((p) => p.name).join(', ')}
-										</TableCell>
-										<TableCell className="flex-row align-items-center justify-content-start">
-											5 miles
-										</TableCell>
-										<TableCell className="flex-row align-items-center justify-content-end">
-											<Button variant="outline-primary" className="p-2 me-2">
-												Add
-											</Button>
-										</TableCell>
-									</TableRow>
-								))}
-							</TableBody>
-						</Table>
-					</Col>
-				</Row>
-			</Modal.Body>
-		</Modal>
+							))}
+						</TableBody>
+					</Table>
+				</Col>
+			</Row>
+		</PreviewCanvas>
 	);
 };
