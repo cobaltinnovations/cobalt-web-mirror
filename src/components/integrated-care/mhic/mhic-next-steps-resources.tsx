@@ -127,7 +127,10 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					</Card.Header>
 					<Card.Body className="p-0">
 						<div className="p-4">
-							<p className="m-0">2 resources are currently available for the patient (drag to reorder)</p>
+							<p className="m-0">
+								{items.length} resource{items.length === 1 ? ' is' : 's are'} currently available for
+								the patient (drag to reorder)
+							</p>
 						</div>
 						<DragDropContext onDragEnd={handleDragEnd}>
 							<Droppable droppableId="care-resources-droppable">
@@ -164,7 +167,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 															<span className="d-block">
 																{item.resourceName} ({item.locationName})
 															</span>
-															<span className="d-block">
+															<span className="d-block text-gray">
 																Add {item.date} by {item.createdBy}
 															</span>
 														</div>
