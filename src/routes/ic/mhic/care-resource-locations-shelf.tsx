@@ -48,7 +48,7 @@ export const Component = () => {
 		<>
 			<MhicInternalNotesModal
 				show={showInternalNotesModal}
-				careResourceLocationId={careResourceLocation.careResourceId}
+				careResourceLocationId={careResourceLocation.careResourceLocationId}
 				onHide={() => {
 					setShowInternalNotesModal(false);
 				}}
