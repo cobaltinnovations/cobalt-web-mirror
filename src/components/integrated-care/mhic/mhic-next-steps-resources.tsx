@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
 import { MhicCareResourceSearchModal, MhicResourcesModal } from '@/components/integrated-care/mhic';
@@ -25,6 +26,30 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		},
 		[revalidator]
 	);
+
+	const [items, setItems] = useState([
+		{
+			itemId: '0',
+			resourceName: 'Merakay',
+			locationName: 'Malvern',
+			date: '1-1-24',
+			createdBy: 'MHIC',
+		},
+		{
+			itemId: '1',
+			resourceName: 'Merakay',
+			locationName: 'Brookhaven',
+			date: '1-1-24',
+			createdBy: 'MHIC',
+		},
+		{
+			itemId: '2',
+			resourceName: 'Merakay',
+			locationName: 'Havertown',
+			date: '1-1-24',
+			createdBy: 'MHIC',
+		},
+	]);
 
 	return (
 		<>
@@ -88,32 +113,54 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 						<div className="p-4">
 							<p className="m-0">2 resources are currently available for the patient (drag to reorder)</p>
 						</div>
-						<ul className="list-unstyled m-0">
-							<li className="border-top d-flex align-items-center">
-								<div className="p-4 flex-shrink-0">Handle</div>
-								<div className="py-4 flex-fill">
-									<span className="d-block">[Resource Name] ([LocationName])</span>
-									<span className="d-block">Add [date] by [Person who created]</span>
-								</div>
-								<div className="p-4 flex-shrink-0">Remove</div>
-							</li>
-							<li className="border-top d-flex align-items-center">
-								<div className="p-4 flex-shrink-0">Handle</div>
-								<div className="py-4 flex-fill">
-									<span className="d-block">[Resource Name] ([LocationName])</span>
-									<span className="d-block">Add [date] by [Person who created]</span>
-								</div>
-								<div className="p-4 flex-shrink-0">Remove</div>
-							</li>
-							<li className="border-top d-flex align-items-center">
-								<div className="p-4 flex-shrink-0">Handle</div>
-								<div className="py-4 flex-fill">
-									<span className="d-block">[Resource Name] ([LocationName])</span>
-									<span className="d-block">Add [date] by [Person who created]</span>
-								</div>
-								<div className="p-4 flex-shrink-0">Remove</div>
-							</li>
-						</ul>
+						<DragDropContext
+							onDragEnd={(result, provided) => {
+								console.log('drag end');
+							}}
+						>
+							<Droppable droppableId="care-resources-droppable">
+								{(droppableProvided) => (
+									<ul
+										ref={droppableProvided.innerRef}
+										className="list-unstyled m-0"
+										{...droppableProvided.droppableProps}
+									>
+										{items.map((item, itemIndex) => (
+											<Draggable
+												key={item.itemId}
+												draggableId={`care-resources-draggable-${item.itemId}`}
+												index={itemIndex}
+											>
+												{(draggableProvided) => (
+													<li
+														ref={draggableProvided.innerRef}
+														className="bg-white border-top d-flex align-items-center"
+														{...draggableProvided.draggableProps}
+													>
+														<div
+															className="p-4 flex-shrink-0"
+															{...draggableProvided.dragHandleProps}
+														>
+															Handle
+														</div>
+														<div className="py-4 flex-fill">
+															<span className="d-block">
+																{item.resourceName} ({item.locationName})
+															</span>
+															<span className="d-block">
+																Add {item.date} by {item.createdBy}
+															</span>
+														</div>
+														<div className="p-4 flex-shrink-0">Remove</div>
+													</li>
+												)}
+											</Draggable>
+										))}
+										{droppableProvided.placeholder}
+									</ul>
+								)}
+							</Droppable>
+						</DragDropContext>
 					</Card.Body>
 				</Card>
 			</div>
