@@ -72,7 +72,7 @@ export const Component = () => {
 					<CloseIcon width={20} height={20} className="d-block" />
 				</Button>
 				<div className="mb-2 d-flex align-items-center">
-					<h4 className="mb-0 me-2 text-danger">[TODO]: Resource Name</h4>
+					<h4 className="mb-0 me-2">{careResourceLocation.resourceName}</h4>
 					{careResourceLocation.acceptingNewPatients ? (
 						<Badge pill bg="outline-success">
 							Available
@@ -100,7 +100,7 @@ export const Component = () => {
 										<Card.Title>Resource Notes</Card.Title>
 									</Card.Header>
 									<Card.Body>
-										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+										<p className="m-0">{careResourceLocation.resourceNotes ?? 'Not provided.'}</p>
 									</Card.Body>
 								</Card>
 							</Col>
@@ -127,7 +127,7 @@ export const Component = () => {
 										</div>
 									</Card.Header>
 									<Card.Body>
-										<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+										<p className="m-0">{careResourceLocation.internalNotes ?? 'Not provided.'}</p>
 									</Card.Body>
 								</Card>
 							</Col>
@@ -222,7 +222,13 @@ export const Component = () => {
 													<p className="m-0 text-gray">Facility Type</p>
 												</Col>
 												<Col xs={9}>
-													<p className="m-0 text-danger">[TODO]: Currently not in response</p>
+													<p className="m-0">
+														{careResourceLocation.facilityTypes.length > 0
+															? careResourceLocation.facilityTypes
+																	.map((p) => p.name)
+																	.join(', ')
+															: 'Not provided'}
+													</p>
 												</Col>
 											</Row>
 										</Container>

@@ -15,6 +15,8 @@ export interface CareResourceModel {
 
 export interface CareResourceLocationModel {
 	careResourceId: string;
+	resourceName: string;
+	resourceNotes: string;
 	name: string;
 	careResourceLocationId: string;
 	address: {
@@ -37,6 +39,7 @@ export interface CareResourceLocationModel {
 	insuranceNotes: string;
 	formattedPhoneNumber: string;
 	notes: string;
+	internalNotes: string;
 	wheelchairAccess: boolean;
 	acceptingNewPatients: boolean;
 	languages: CareResourceTag[];
@@ -46,6 +49,7 @@ export interface CareResourceLocationModel {
 	populationServed: CareResourceTag[];
 	genders: CareResourceTag[];
 	ethnicities: CareResourceTag[];
+	facilityTypes: CareResourceTag[];
 }
 
 export interface PayorModel {
