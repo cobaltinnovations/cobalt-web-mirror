@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
 import { MhicCareResourceSearchModal, MhicResourcesModal } from '@/components/integrated-care/mhic';
@@ -69,13 +69,53 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					/>
 				)}
 
-				<Button
-					onClick={() => {
-						setShowCareResourceSearchModal(true);
-					}}
-				>
-					[Temp Button] Open Resource Search
-				</Button>
+				<Card bsPrefix="ic-card">
+					<Card.Header>
+						<Card.Title>Patient Resources</Card.Title>
+						<div className="button-container">
+							<Button
+								variant="primary"
+								size="sm"
+								onClick={() => {
+									setShowCareResourceSearchModal(true);
+								}}
+							>
+								Find Resources
+							</Button>
+						</div>
+					</Card.Header>
+					<Card.Body className="p-0">
+						<div className="p-4">
+							<p className="m-0">2 resources are currently available for the patient (drag to reorder)</p>
+						</div>
+						<ul className="list-unstyled m-0">
+							<li className="border-top d-flex align-items-center">
+								<div className="p-4 flex-shrink-0">Handle</div>
+								<div className="py-4 flex-fill">
+									<span className="d-block">[Resource Name] ([LocationName])</span>
+									<span className="d-block">Add [date] by [Person who created]</span>
+								</div>
+								<div className="p-4 flex-shrink-0">Remove</div>
+							</li>
+							<li className="border-top d-flex align-items-center">
+								<div className="p-4 flex-shrink-0">Handle</div>
+								<div className="py-4 flex-fill">
+									<span className="d-block">[Resource Name] ([LocationName])</span>
+									<span className="d-block">Add [date] by [Person who created]</span>
+								</div>
+								<div className="p-4 flex-shrink-0">Remove</div>
+							</li>
+							<li className="border-top d-flex align-items-center">
+								<div className="p-4 flex-shrink-0">Handle</div>
+								<div className="py-4 flex-fill">
+									<span className="d-block">[Resource Name] ([LocationName])</span>
+									<span className="d-block">Add [date] by [Person who created]</span>
+								</div>
+								<div className="p-4 flex-shrink-0">Remove</div>
+							</li>
+						</ul>
+					</Card.Body>
+				</Card>
 			</div>
 		</>
 	);
