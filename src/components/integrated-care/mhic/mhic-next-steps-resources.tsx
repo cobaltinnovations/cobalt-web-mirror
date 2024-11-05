@@ -1,11 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
+import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
 import { MhicCareResourceSearchModal, MhicResourcesModal } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
+
+import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
+import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -50,6 +54,18 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 			createdBy: 'MHIC',
 		},
 	]);
+
+	const handleDragEnd = ({ source, destination, type }: DropResult) => {
+		if (!destination) {
+			return;
+		}
+
+		const itemsClone = window.structuredClone(items);
+		const [removed] = (itemsClone ?? []).splice(source.index, 1);
+		(itemsClone ?? []).splice(destination.index, 0, removed);
+
+		setItems(itemsClone);
+	};
 
 	return (
 		<>
@@ -113,11 +129,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 						<div className="p-4">
 							<p className="m-0">2 resources are currently available for the patient (drag to reorder)</p>
 						</div>
-						<DragDropContext
-							onDragEnd={(result, provided) => {
-								console.log('drag end');
-							}}
-						>
+						<DragDropContext onDragEnd={handleDragEnd}>
 							<Droppable droppableId="care-resources-droppable">
 								{(droppableProvided) => (
 									<ul
@@ -131,17 +143,22 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 												draggableId={`care-resources-draggable-${item.itemId}`}
 												index={itemIndex}
 											>
-												{(draggableProvided) => (
+												{(draggableProvided, itemDraggableSnapshot) => (
 													<li
 														ref={draggableProvided.innerRef}
-														className="bg-white border-top d-flex align-items-center"
+														className={classNames('bg-white d-flex align-items-center', {
+															'border-top': !itemDraggableSnapshot.isDragging,
+															border: itemDraggableSnapshot.isDragging,
+															'shadow-lg': itemDraggableSnapshot.isDragging,
+															rounded: itemDraggableSnapshot.isDragging,
+														})}
 														{...draggableProvided.draggableProps}
 													>
 														<div
 															className="p-4 flex-shrink-0"
 															{...draggableProvided.dragHandleProps}
 														>
-															Handle
+															<DragIndicator className="text-gray" />
 														</div>
 														<div className="py-4 flex-fill">
 															<span className="d-block">
@@ -151,7 +168,11 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																Add {item.date} by {item.createdBy}
 															</span>
 														</div>
-														<div className="p-4 flex-shrink-0">Remove</div>
+														<div className="p-4 flex-shrink-0">
+															<Button variant="danger" className="p-2">
+																<MinusIcon className="d-flex" />
+															</Button>
+														</div>
 													</li>
 												)}
 											</Draggable>

@@ -100,6 +100,7 @@ export interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	error?: ReactNode;
 	required?: boolean;
 	autoFocus?: boolean;
+	placeholder?: string;
 }
 
 const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
