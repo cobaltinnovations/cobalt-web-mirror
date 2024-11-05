@@ -163,4 +163,11 @@ export const careResourceService = {
 			params,
 		});
 	},
+	addInternalNotes(data: { careResourceLocationId: string; internalNotes: string }) {
+		return httpSingleton.orchestrateRequest<{ careResourceLocation: CareResourceLocationModel }>({
+			method: 'PUT',
+			url: '/care-resources/location/internal-notes',
+			data,
+		});
+	},
 };

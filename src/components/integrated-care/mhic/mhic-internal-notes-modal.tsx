@@ -3,6 +3,7 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
+import { careResourceService } from '@/lib/services';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -29,14 +30,14 @@ export const MhicInternalNotesModal: FC<Props> = ({ careResourceLocationId, onSa
 	const handleSaveButtonClick = useCallback(async () => {
 		try {
 			setIsSaving(true);
-			console.log('formValue: ', formValue);
+			await careResourceService.addInternalNotes({ careResourceLocationId, internalNotes: formValue }).fetch();
 			onSave();
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsSaving(false);
 		}
-	}, [formValue, handleError, onSave]);
+	}, [careResourceLocationId, formValue, handleError, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
