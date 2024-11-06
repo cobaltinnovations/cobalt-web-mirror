@@ -1,11 +1,10 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 
-import useHandleError from '@/hooks/use-handle-error';
 import { MhicPageHeader } from './mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { CareResourceLocationModel, CareResourceTag } from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, CareResourceTag } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { Link } from 'react-router-dom';
 import FilterDropdownV2 from '@/components/filter-dropdown-v2';
@@ -23,8 +22,6 @@ interface FormValues {
 }
 
 export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
-	const handleError = useHandleError();
-
 	const [isLoading] = useState(false);
 	const [careResourceLocations] = useState<CareResourceLocationModel[]>([]);
 	const { hasTouchScreen } = useTouchScreenCheck();
@@ -34,31 +31,33 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		zipCode: '',
-		distance: {
-			distanceId: '5_MILES',
-			title: '5 miles',
-		},
+		distance: undefined,
 		insurance: [],
 	});
 
 	const handleOnEnter = useCallback(() => {
-		console.log('Enter', handleError);
-	}, [handleError]);
+		setFormValues({
+			searchName: '',
+			zipCode: '',
+			distance: undefined,
+			insurance: [],
+		});
+	}, []);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		// searchParams.delete('pageNumber');
-		// searchParams.delete('sortBy');
-		// searchParams.delete('sortDirection');
-
 		if (searchInputValue) {
-			// searchParams.set('searchQuery', searchInputValue);
+			setFormValues((previousValue) => ({
+				...previousValue,
+				searchName: searchInputValue,
+			}));
 		} else {
-			// searchParams.delete('searchQuery');
+			setFormValues((previousValue) => ({
+				...previousValue,
+				searchName: '',
+			}));
 		}
-
-		// setSearchParams(searchParams, { replace: true });
 
 		if (hasTouchScreen) {
 			searchInputRef.current?.blur();
@@ -68,12 +67,10 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	const clearSearch = useCallback(() => {
 		setSearchInputValue('');
 
-		// searchParams.delete('pageNumber');
-		// searchParams.delete('sortBy');
-		// searchParams.delete('sortDirection');
-		// searchParams.delete('searchQuery');
-
-		// setSearchParams(searchParams, { replace: true });
+		setFormValues((previousValue) => ({
+			...previousValue,
+			searchName: '',
+		}));
 
 		if (!hasTouchScreen) {
 			searchInputRef.current?.focus();
@@ -126,8 +123,9 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 			<Row className="mb-8">
 				<Col>
 					<div className="d-flex align-items-center">
-						<Form.Label className="m-0">Location: </Form.Label>
+						<Form.Label className="m-0 me-2">Location: </Form.Label>
 						<InputHelper
+							className="me-2"
 							type="number"
 							label="Zip Code"
 							value={formValues.zipCode}
@@ -154,6 +152,27 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 								setFormValues((previousValue) => ({
 									...previousValue,
 									distance: newValue,
+								}));
+							}}
+						/>
+
+						<FilterDropdownV2
+							id="insurance-filter"
+							title="Insurance"
+							optionIdKey="careResourceTagId"
+							optionLabelKey="name"
+							options={[
+								{
+									careResourceTagId: 'AETNA',
+									name: 'Aetna',
+									careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
+								},
+							]}
+							value={formValues.insurance[0]}
+							onChange={(newValue) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									insurance: newValue ? [newValue] : [],
 								}));
 							}}
 						/>
