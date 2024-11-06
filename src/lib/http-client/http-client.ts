@@ -58,6 +58,7 @@ export class HttpClient {
 					let supportedLocales = undefined;
 					let locale = undefined;
 					let timeZone = undefined;
+					let capabilities: string[] = [];
 
 					try {
 						supportedLocales = navigator.languages ? JSON.stringify(navigator.languages) : undefined;
@@ -77,6 +78,24 @@ export class HttpClient {
 						// Don't worry about it
 					}
 
+					// See if we support local storage
+					try {
+						window.localStorage.setItem('_test', 'test');
+						window.localStorage.removeItem('_test');
+						capabilities.push('ls');
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
+					// See if we support session storage
+					try {
+						window.sessionStorage.setItem('_test', 'test');
+						window.sessionStorage.removeItem('_test');
+						capabilities.push('ss');
+					} catch (ignored) {
+						// Don't worry about it
+					}
+
 					headers['X-Cobalt-Webapp-Current-Url'] = window.location.href;
 					headers['X-Client-Device-Fingerprint'] = clientDeviceFingerprint ? clientDeviceFingerprint : '';
 					headers['X-Client-Device-Type-Id'] = 'WEB_BROWSER';
@@ -85,6 +104,7 @@ export class HttpClient {
 					headers['X-Client-Device-Supported-Locales'] = supportedLocales ? supportedLocales : '';
 					headers['X-Client-Device-Locale'] = locale ? locale : '';
 					headers['X-Client-Device-Time-Zone'] = timeZone ? timeZone : '';
+					headers['X-Client-Device-Capabilities'] = JSON.stringify(capabilities);
 					headers['X-Cobalt-Referring-Message-Id'] = referringMessageId ? referringMessageId : '';
 					headers['X-Cobalt-Referring-Campaign'] = referringCampaign ? referringCampaign : '';
 
