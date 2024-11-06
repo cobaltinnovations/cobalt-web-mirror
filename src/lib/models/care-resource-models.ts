@@ -50,6 +50,8 @@ export interface CareResourceLocationModel {
 	genders: CareResourceTag[];
 	ethnicities: CareResourceTag[];
 	facilityTypes: CareResourceTag[];
+	overridePayors: boolean;
+	overrideSpecialties: boolean;
 }
 
 export interface PayorModel {

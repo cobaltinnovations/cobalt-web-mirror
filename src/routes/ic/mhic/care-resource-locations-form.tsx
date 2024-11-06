@@ -163,10 +163,10 @@ export const Component = () => {
 			: undefined,
 		address2: careResourceLocation?.address.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
-		insuranceUseDefaults: (careResourceLocation?.payors ?? []).length <= 0,
+		insuranceUseDefaults: !careResourceLocation?.overridePayors,
 		insurance: careResourceLocation?.payors ?? [],
 		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
-		specialtiesUseDefaults: (careResourceLocation?.specialties ?? []).length <= 0,
+		specialtiesUseDefaults: !careResourceLocation?.overrideSpecialties,
 		specialties: careResourceLocation?.specialties ?? [],
 		therapyTypes: careResourceLocation?.therapyTypes ?? [],
 		ages: careResourceLocation?.populationServed ?? [],
@@ -190,10 +190,6 @@ export const Component = () => {
 				setCareResource(response.careResource);
 				setFormValues((previousValue) => ({
 					...previousValue,
-					...(previousValue.insurance.length <= 0 &&
-						response.careResource.payors.length <= 0 && { insuranceUseDefaults: false }),
-					...(previousValue.specialties.length <= 0 &&
-						response.careResource.specialties.length <= 0 && { specialtiesUseDefaults: false }),
 					...(!previousValue.phoneNumber && { phoneNumber: response.careResource.phoneNumber ?? '' }),
 					...(!previousValue.emailAddress && { emailAddress: response.careResource.emailAddress ?? '' }),
 					...(!previousValue.website && { website: response.careResource.websiteUrl ?? '' }),
@@ -230,7 +226,7 @@ export const Component = () => {
 				...(!formValues.insuranceUseDefaults && {
 					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
 				}),
-				overrideSpecialties: !formValues.insuranceUseDefaults,
+				overrideSpecialties: !formValues.specialtiesUseDefaults,
 				...(!formValues.specialtiesUseDefaults && {
 					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
 				}),
