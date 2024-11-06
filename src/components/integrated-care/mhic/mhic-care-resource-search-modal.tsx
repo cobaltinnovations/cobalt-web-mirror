@@ -5,12 +5,22 @@ import useHandleError from '@/hooks/use-handle-error';
 import { MhicPageHeader } from './mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { CareResourceLocationModel } from '@/lib/models';
+import { CareResourceLocationModel, CareResourceTag } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { Link } from 'react-router-dom';
 import FilterDropdownV2 from '@/components/filter-dropdown-v2';
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
+
+interface FormValues {
+	searchName: string;
+	zipCode: string;
+	distance?: {
+		distanceId: string;
+		title: string;
+	};
+	insurance: CareResourceTag[];
+}
 
 export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
 	const handleError = useHandleError();
@@ -21,10 +31,13 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState('');
 
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		zipCode: '',
-		distance: 5,
+		distance: {
+			distanceId: '5_MILES',
+			title: '5 miles',
+		},
 		insurance: [],
 	});
 
@@ -128,15 +141,21 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 						<FilterDropdownV2
 							id="distance-filter"
 							title="Distance"
-							searchParamKey="DISTANCE"
+							optionIdKey="distanceId"
+							optionLabelKey="title"
 							options={[
 								{
 									distanceId: '5_MILES',
 									title: '5 miles',
 								},
 							]}
-							optionIdKey="distanceId"
-							optionLabelKey="title"
+							value={formValues.distance}
+							onChange={(newValue) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									distance: newValue,
+								}));
+							}}
 						/>
 					</div>
 				</Col>

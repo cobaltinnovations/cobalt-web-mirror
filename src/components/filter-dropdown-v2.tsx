@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -6,7 +6,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
-import { useSearchParams } from 'react-router-dom';
 
 interface UseStylesProps {
 	width: number;
@@ -63,37 +62,31 @@ interface Option {
 interface FilterDropdownProps<T extends Option> {
 	id: string;
 	title: string;
-	searchParamKey: string;
 	options: T[];
 	optionIdKey: keyof T;
 	optionLabelKey: keyof T;
 	width?: number;
-	dismissText?: string;
-	confirmText?: string;
 	className?: string;
 	isSortFilter?: boolean;
+	onChange(value?: T): void;
+	value?: T;
 }
 
 function FilterDropdownV2<T extends Option>({
 	id,
 	title,
-	searchParamKey,
 	options,
 	optionIdKey,
 	optionLabelKey,
 	width = 400,
-	dismissText = 'Clear',
-	confirmText = 'Apply',
 	className,
 	isSortFilter,
+	onChange,
+	value,
 }: FilterDropdownProps<T>) {
-	const [searchParams, setSearchParams] = useSearchParams();
-	const searchParamValue = useMemo(() => searchParams.get(searchParamKey) ?? '', [searchParamKey, searchParams]);
-
 	const classes = useStyles({ width });
 	const [show, setShow] = useState(false);
-	const [selectedValue, setSelectedValue] = useState('');
-
+	const [selectedValue, setSelectedValue] = useState<T>();
 	const icon = isSortFilter ? <SortIcon /> : <ArrowDown />;
 
 	return (
@@ -102,15 +95,12 @@ function FilterDropdownV2<T extends Option>({
 			autoClose="outside"
 			show={show}
 			onToggle={(nextShow) => {
-				if (nextShow && searchParamValue) {
-					setSelectedValue(searchParamValue);
-				}
-
+				setSelectedValue(value);
 				setShow(nextShow);
 			}}
 		>
 			<Dropdown.Toggle
-				variant={!!searchParamValue ? 'primary' : 'light'}
+				variant={value ? 'primary' : 'light'}
 				as={DropdownToggle}
 				className={classNames('d-inline-flex align-items-center pe-3')}
 				id={id}
@@ -130,13 +120,13 @@ function FilterDropdownV2<T extends Option>({
 						<Form.Check
 							key={option[optionIdKey]}
 							type="radio"
-							name={`filter-dropdown--${searchParamKey}`}
+							name={`filter-dropdown--${id}`}
 							id={`filter-dropdown--${option[optionIdKey]}`}
 							value={option[optionIdKey]}
 							label={option[optionLabelKey]}
-							checked={selectedValue === option[optionIdKey]}
-							onChange={({ currentTarget }) => {
-								setSelectedValue(currentTarget.value);
+							checked={selectedValue?.[optionIdKey] === option[optionIdKey]}
+							onChange={() => {
+								setSelectedValue(option);
 							}}
 						/>
 					))}
@@ -147,24 +137,21 @@ function FilterDropdownV2<T extends Option>({
 						size="sm"
 						className="me-2"
 						onClick={() => {
-							searchParams.delete(searchParamKey);
-							setSearchParams(searchParams);
-							setSelectedValue('');
+							onChange();
 							setShow(false);
 						}}
 					>
-						{dismissText}
+						Clear
 					</Button>
 					<Button
 						variant="primary"
 						size="sm"
 						onClick={() => {
-							searchParams.set(searchParamKey, selectedValue);
-							setSearchParams(searchParams);
+							onChange(selectedValue);
 							setShow(false);
 						}}
 					>
-						{confirmText}
+						Apply
 					</Button>
 				</div>
 			</Dropdown.Menu>

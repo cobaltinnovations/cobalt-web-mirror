@@ -170,6 +170,9 @@ export const Component = () => {
 										? careResource.payors.map((p) => p.name).join(', ')
 										: 'Not provided'}
 								</p>
+								{careResource.insuranceNotes && (
+									<p className="mb-0 mt-4">{careResource.insuranceNotes}</p>
+								)}
 							</Card.Body>
 							<Card.Header className="cobalt-card__header--mid">
 								<Card.Title>Resource Notes</Card.Title>

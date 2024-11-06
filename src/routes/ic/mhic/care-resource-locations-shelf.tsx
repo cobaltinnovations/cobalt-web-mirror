@@ -249,6 +249,9 @@ export const Component = () => {
 												? careResourceLocation.payors.map((p) => p.name).join(', ')
 												: 'Not provided'}
 										</p>
+										{careResourceLocation.insuranceNotes && (
+											<p className="mb-0 mt-4">{careResourceLocation.insuranceNotes}</p>
+										)}
 									</Card.Body>
 								</Card>
 							</Col>
