@@ -40,6 +40,7 @@ type CareResourceLocationRequestBody = {
 	genderIds: string[];
 	ethnicityIds: string[];
 	languageIds: string[];
+	facilityTypes: string[];
 };
 
 export const careResourceService = {

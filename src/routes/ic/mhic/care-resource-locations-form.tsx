@@ -29,6 +29,7 @@ interface FormValues {
 	address: PlaceModel | undefined;
 	address2: string;
 	wheelchairAccessible: boolean;
+	facilityTypes: CareResourceTag[];
 	insuranceUseDefaults: boolean;
 	insurance: CareResourceTag[];
 	insuranceNotes: string;
@@ -59,6 +60,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		gendersResponse,
 		ethnicitiesResponse,
 		languagesResponse,
+		facilityTypesResponse,
 	] = await Promise.all([
 		careResourceService.getCareResourcesAssociationList().fetch(),
 		careResourceService
@@ -96,6 +98,11 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.LANGUAGES,
 			})
 			.fetch(),
+		careResourceService
+			.getCareResourceTags({
+				careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.FACILITY_TYPES,
+			})
+			.fetch(),
 	]);
 
 	let careResourceLocation: undefined | CareResourceLocationModel = undefined;
@@ -116,6 +123,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		genders: gendersResponse.careResourceTags,
 		ethnicities: ethnicitiesResponse.careResourceTags,
 		languages: languagesResponse.careResourceTags,
+		facilityTypes: facilityTypesResponse.careResourceTags,
 		...(careResourceLocation && {
 			careResourceLocation,
 		}),
@@ -133,6 +141,7 @@ export const Component = () => {
 		genders,
 		ethnicities,
 		languages,
+		facilityTypes,
 		careResourceLocation,
 	} = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 
@@ -163,6 +172,7 @@ export const Component = () => {
 			: undefined,
 		address2: careResourceLocation?.address.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
+		facilityTypes: careResourceLocation?.facilityTypes ?? [],
 		insuranceUseDefaults: !careResourceLocation?.overridePayors,
 		insurance: careResourceLocation?.payors ?? [],
 		insuranceNotes: careResourceLocation?.insuranceNotes ?? '',
@@ -235,6 +245,7 @@ export const Component = () => {
 				genderIds: formValues.genders.map((i) => i.careResourceTagId),
 				ethnicityIds: formValues.ethnicities.map((i) => i.careResourceTagId),
 				languageIds: formValues.languages.map((i) => i.careResourceTagId),
+				facilityTypes: formValues.facilityTypes.map((i) => i.careResourceTagId),
 			};
 
 			const response = careResourceLocation
@@ -448,6 +459,7 @@ export const Component = () => {
 								helperText="Use address 2 to specify a suite or floor #"
 							/>
 							<Form.Check
+								className="mb-3"
 								type="checkbox"
 								name="wheelchair-accessible"
 								id="checkbox--wheelchair-accesible"
@@ -458,6 +470,20 @@ export const Component = () => {
 									setFormValues((previousValue) => ({
 										...previousValue,
 										wheelchairAccessible: currentTarget.checked,
+									}));
+								}}
+							/>
+							<TypeaheadHelper
+								id="typeahead--facility-type"
+								label="Facility Type"
+								multiple
+								labelKey="name"
+								options={facilityTypes}
+								selected={formValues.facilityTypes}
+								onChange={(selected) => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										facilityType: selected as CareResourceTag[],
 									}));
 								}}
 							/>
