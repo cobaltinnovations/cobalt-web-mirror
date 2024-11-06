@@ -226,9 +226,11 @@ export const Component = () => {
 				websiteUrl: formValues.website,
 				acceptingNewPatients: formValues.status === CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
 				wheelchairAccess: formValues.wheelchairAccessible,
+				overridePayors: !formValues.insuranceUseDefaults,
 				...(!formValues.insuranceUseDefaults && {
 					payorIds: formValues.insurance.map((i) => i.careResourceTagId),
 				}),
+				overrideSpecialties: !formValues.insuranceUseDefaults,
 				...(!formValues.specialtiesUseDefaults && {
 					specialtyIds: formValues.specialties.map((i) => i.careResourceTagId),
 				}),
