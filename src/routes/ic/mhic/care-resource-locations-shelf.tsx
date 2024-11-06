@@ -47,6 +47,7 @@ export const Component = () => {
 	return (
 		<>
 			<MhicInternalNotesModal
+				defaultValue={careResourceLocation.internalNotes}
 				show={showInternalNotesModal}
 				careResourceLocationId={careResourceLocation.careResourceLocationId}
 				onHide={() => {

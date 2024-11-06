@@ -12,20 +12,21 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
+	defaultValue?: string;
 	careResourceLocationId: string;
 	onSave(): void;
 }
 
-export const MhicInternalNotesModal: FC<Props> = ({ careResourceLocationId, onSave, ...props }) => {
+export const MhicInternalNotesModal: FC<Props> = ({ defaultValue, careResourceLocationId, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [formValue, setFormValue] = useState('');
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleOnEnter = useCallback(() => {
-		setFormValue('');
+		setFormValue(defaultValue ?? '');
 		setIsSaving(false);
-	}, []);
+	}, [defaultValue]);
 
 	const handleSaveButtonClick = useCallback(async () => {
 		try {
