@@ -157,6 +157,16 @@ export const careResourceService = {
 		pageSize?: string;
 		searchQuery?: string;
 		orderBy?: 'NAME_ASC' | 'NAME_DESC';
+		wheelchairAccess?: boolean;
+		searchRadiusMiles?: number;
+		payorIds?: string[];
+		specialtyIds?: string[];
+		therapyTypeIds?: string[];
+		populationServedIds?: string[];
+		genderIds?: string[];
+		ethnicityIds?: string[];
+		languageIds?: string[];
+		facilityType?: string[];
 	}) {
 		return httpSingleton.orchestrateRequest<{
 			totalCountDescription: string;

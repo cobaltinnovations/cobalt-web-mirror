@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom';
 import FilterDropdownV2 from '@/components/filter-dropdown-v2';
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
+import { careResourceService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface FormValues {
 	searchName: string;
@@ -22,12 +24,12 @@ interface FormValues {
 }
 
 export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
+	const handleError = useHandleError();
 	const [isLoading] = useState(false);
-	const [careResourceLocations] = useState<CareResourceLocationModel[]>([]);
+	const [careResourceLocations, setCareResourceLocations] = useState<CareResourceLocationModel[]>([]);
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState('');
-
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		zipCode: '',
@@ -43,6 +45,19 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 			insurance: [],
 		});
 	}, []);
+
+	const fetchData = useCallback(async () => {
+		try {
+			const response = await careResourceService.getCareResourceLocations().fetch();
+			setCareResourceLocations(response.careResourceLocations);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
