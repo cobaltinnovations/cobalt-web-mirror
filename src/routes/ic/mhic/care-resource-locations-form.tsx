@@ -147,8 +147,6 @@ export const Component = () => {
 		careResourceLocation,
 	} = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 
-	console.log('careResourceLocation', careResourceLocation);
-
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
