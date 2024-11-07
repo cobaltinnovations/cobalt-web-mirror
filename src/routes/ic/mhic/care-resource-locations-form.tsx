@@ -601,14 +601,21 @@ export const Component = () => {
 										specialtiesUseDefaults: true,
 									}));
 								}}
-								hideChildren={(careResource?.specialties ?? []).length <= 0}
-								disabled={(careResource?.specialties ?? []).length <= 0}
 							>
-								<p className="mb-0">
-									{careResource?.specialties
-										? careResource?.specialties.map((s) => s.name).join(', ')
-										: 'Select an associated resource to see defaults.'}
-								</p>
+								{!careResource && (
+									<p className="mb-0">Select an associated resource to see defaults.</p>
+								)}
+								{careResource && (
+									<>
+										{careResource.specialties.length > 0 ? (
+											<p className="mb-0">
+												{careResource.specialties.map((s) => s.name).join(', ')}
+											</p>
+										) : (
+											<p className="mb-0">None provided.</p>
+										)}
+									</>
+								)}
 							</ToggledInput>
 							<ToggledInput
 								id="specialties-override"
