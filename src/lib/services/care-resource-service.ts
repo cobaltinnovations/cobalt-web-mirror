@@ -20,27 +20,29 @@ type CareResourceRequestBody = {
 };
 
 type CareResourceLocationRequestBody = {
+	acceptingNewPatients: boolean;
+	appointmentTypeInPerson: boolean;
+	appointmentTypeOnline: boolean;
 	careResourceId: string;
+	emailAddress: string;
+	ethnicityIds: string[];
+	facilityTypes: string[];
+	genderIds: string[];
 	googlePlaceId: string;
+	insuranceNotes: string;
+	languageIds: string[];
 	name: string;
 	notes: string;
-	emailAddress: string;
-	streetAddress2: string;
-	insuranceNotes: string;
-	phoneNumber: string;
-	websiteUrl: string;
-	acceptingNewPatients: boolean;
-	wheelchairAccess: boolean;
 	overridePayors: boolean;
-	payorIds?: string[];
 	overrideSpecialties: boolean;
-	specialtyIds?: string[];
-	therapyTypeIds: string[];
+	payorIds?: string[];
+	phoneNumber: string;
 	populationServedIds: string[];
-	genderIds: string[];
-	ethnicityIds: string[];
-	languageIds: string[];
-	facilityTypes: string[];
+	specialtyIds?: string[];
+	streetAddress2: string;
+	therapyTypeIds: string[];
+	websiteUrl: string;
+	wheelchairAccess: boolean;
 };
 
 export const careResourceService = {

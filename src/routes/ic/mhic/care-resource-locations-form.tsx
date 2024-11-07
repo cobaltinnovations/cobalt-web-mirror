@@ -166,8 +166,8 @@ export const Component = () => {
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
 		emailAddress: careResourceLocation?.emailAddress ?? '',
 		website: careResourceLocation?.websiteUrl ?? '',
-		appointmentTypeInPerson: false,
-		appointmentTypeOnline: false,
+		appointmentTypeInPerson: careResourceLocation?.appointmentTypeInPerson ?? false,
+		appointmentTypeOnline: careResourceLocation?.appointmentTypeOnline ?? false,
 		address: careResourceLocation?.address
 			? {
 					placeId: careResourceLocation.address.googlePlaceId,
@@ -230,6 +230,8 @@ export const Component = () => {
 				name: formValues.locationName,
 				notes: formValues.notes,
 				emailAddress: formValues.emailAddress,
+				appointmentTypeInPerson: formValues.appointmentTypeInPerson,
+				appointmentTypeOnline: formValues.appointmentTypeOnline,
 				streetAddress2: formValues.address2,
 				insuranceNotes: formValues.insuranceNotes,
 				phoneNumber: formValues.phoneNumber,

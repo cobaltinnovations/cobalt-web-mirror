@@ -19,6 +19,8 @@ export interface CareResourceLocationModel {
 	resourceNotes: string;
 	name: string;
 	careResourceLocationId: string;
+	appointmentTypeInPerson: boolean;
+	appointmentTypeOnline: boolean;
 	address: {
 		addressId: string;
 		postalName: string;
