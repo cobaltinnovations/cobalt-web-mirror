@@ -3,7 +3,7 @@ import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 
 import { MhicPageHeader } from './mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, CareResourceTag } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { Link } from 'react-router-dom';
@@ -16,16 +16,18 @@ import useHandleError from '@/hooks/use-handle-error';
 interface FormValues {
 	searchName: string;
 	zipCode: string;
+	orderBy: string;
 	distance?: {
 		distanceId: string;
 		title: string;
+		value: number;
 	};
 	insurance: CareResourceTag[];
 }
 
 export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
 	const handleError = useHandleError();
-	const [isLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const [careResourceLocations, setCareResourceLocations] = useState<CareResourceLocationModel[]>([]);
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -33,31 +35,65 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		zipCode: '',
+		orderBy: '',
 		distance: undefined,
 		insurance: [],
 	});
+	const [insuranceOptions, setInsuranceOptions] = useState<CareResourceTag[]>([]);
 
-	const handleOnEnter = useCallback(() => {
-		setFormValues({
-			searchName: '',
-			zipCode: '',
-			distance: undefined,
-			insurance: [],
-		});
-	}, []);
-
-	const fetchData = useCallback(async () => {
+	const fetchFilterData = useCallback(async () => {
 		try {
-			const response = await careResourceService.getCareResourceLocations().fetch();
-			setCareResourceLocations(response.careResourceLocations);
+			const response = await careResourceService
+				.getCareResourceTags({
+					careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
+				})
+				.fetch();
+
+			setInsuranceOptions(response.careResourceTags);
 		} catch (error) {
 			handleError(error);
 		}
 	}, [handleError]);
 
+	const fetchData = useCallback(async () => {
+		try {
+			setIsLoading(true);
+
+			const distanceValue = formValues.distance?.value ?? 0;
+			const response = await careResourceService
+				.getCareResourceLocations({
+					...(formValues.orderBy && { orderBy: formValues.orderBy as 'NAME_ASC' }),
+					...(formValues.searchName && { searchQuery: formValues.searchName }),
+					...(distanceValue > 0 && { searchRadiusMiles: distanceValue }),
+					...(formValues.insurance.length > 0 && {
+						payorIds: formValues.insurance.map((i) => i.careResourceTagId),
+					}),
+				})
+				.fetch();
+
+			setCareResourceLocations(response.careResourceLocations);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [formValues, handleError]);
+
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
+
+	const handleOnEnter = useCallback(() => {
+		setFormValues({
+			searchName: '',
+			zipCode: '',
+			orderBy: '',
+			distance: undefined,
+			insurance: [],
+		});
+
+		fetchFilterData();
+	}, [fetchFilterData]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -152,6 +188,7 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 							}}
 						/>
 						<FilterDropdownV2
+							className="me-2"
 							id="distance-filter"
 							title="Distance"
 							optionIdKey="distanceId"
@@ -160,6 +197,7 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 								{
 									distanceId: '5_MILES',
 									title: '5 miles',
+									value: 5,
 								},
 							]}
 							value={formValues.distance}
@@ -170,19 +208,12 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 								}));
 							}}
 						/>
-
 						<FilterDropdownV2
 							id="insurance-filter"
 							title="Insurance"
 							optionIdKey="careResourceTagId"
 							optionLabelKey="name"
-							options={[
-								{
-									careResourceTagId: 'AETNA',
-									name: 'Aetna',
-									careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
-								},
-							]}
+							options={insuranceOptions}
 							value={formValues.insurance[0]}
 							onChange={(newValue) => {
 								setFormValues((previousValue) => ({
@@ -203,12 +234,13 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 									className="flex-row align-items-center justify-content-start"
 									header
 									sortable
-									// sortDirection={orderBy.split('_')[1] as SORT_DIRECTION}
-									// onSort={(sortDirection) => {
-									// 	searchParams.set('pageNumber', '0');
-									// 	searchParams.set('orderBy', `NAME_${sortDirection}`);
-									// 	setSearchParams(searchParams, { replace: true });
-									// }}
+									sortDirection={formValues.orderBy.split('_')[1] as SORT_DIRECTION}
+									onSort={(sortDirection) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											orderBy: `NAME_${sortDirection}`,
+										}));
+									}}
 								>
 									Resource Name
 								</TableCell>
@@ -224,17 +256,21 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 									<TableCell>
 										<Link to="/#">{careResourceLocation.name}</Link>
 									</TableCell>
-									<TableCell>{careResourceLocation.payors.map((p) => p.name).join(', ')}</TableCell>
 									<TableCell>
-										{careResourceLocation.specialties.map((p) => p.name).join(', ')}
+										{careResourceLocation.payors.length > 0
+											? careResourceLocation.payors.map((p) => p.name).join(', ')
+											: 'Not provided'}
+									</TableCell>
+									<TableCell>
+										{careResourceLocation.specialties.length > 0
+											? careResourceLocation.specialties.map((p) => p.name).join(', ')
+											: 'Not provided'}
 									</TableCell>
 									<TableCell className="flex-row align-items-center justify-content-start">
-										5 miles
+										[TODO]
 									</TableCell>
 									<TableCell className="flex-row align-items-center justify-content-end">
-										<Button variant="outline-primary" className="p-2 me-2">
-											Add
-										</Button>
+										<Button variant="outline-primary">Add</Button>
 									</TableCell>
 								</TableRow>
 							))}
