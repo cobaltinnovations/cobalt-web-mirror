@@ -67,21 +67,25 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 				let redirectSearchComponents = ['redirectImmediately=true'];
 
 				redirectSearchComponents.push(
-					`${analyticsService.getFingerprintQueryParameterName()}=${analyticsFingerprint}`
+					`${analyticsService.getFingerprintQueryParameterName()}=${encodeURIComponent(analyticsFingerprint)}`
 				);
 
 				redirectSearchComponents.push(
-					`${analyticsService.getSessionIdQueryParameterName()}=${analyticsSessionId}`
+					`${analyticsService.getSessionIdQueryParameterName()}=${encodeURIComponent(analyticsSessionId)}`
 				);
 
 				if (analyticsReferringCampaign)
 					redirectSearchComponents.push(
-						`${analyticsService.getReferringCampaignQueryParameterName()}=${analyticsReferringCampaign}`
+						`${analyticsService.getReferringCampaignQueryParameterName()}=${encodeURIComponent(
+							analyticsReferringCampaign
+						)}`
 					);
 
 				if (analyticsReferringMessageId)
 					redirectSearchComponents.push(
-						`${analyticsService.getReferringMessageIdQueryParameterName()}=${analyticsReferringMessageId}`
+						`${analyticsService.getReferringMessageIdQueryParameterName()}=${encodeURIComponent(
+							analyticsReferringMessageId
+						)}`
 					);
 
 				const mychartUrl = new URL(config.apiBaseUrl);

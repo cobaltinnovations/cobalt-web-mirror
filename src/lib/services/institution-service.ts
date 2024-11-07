@@ -8,6 +8,7 @@ import {
 } from '@/lib/models/institution';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
 
 interface GetAccountSourcesResponse {
 	accountSources: AccountSource[];
@@ -73,9 +74,39 @@ export const institutionService = {
 		});
 	},
 	getMyChartAuthenticationUrl(institutionId: string) {
+		// Construct a query string that preserves analytics information
+		const analyticsFingerprint = analyticsService.getFingerprint();
+		const analyticsSessionId = analyticsService.getSessionId();
+		const analyticsReferringCampaign = analyticsService.getReferringCampaign();
+		const analyticsReferringMessageId = analyticsService.getReferringMessageId();
+
+		let redirectSearchComponents = [];
+
+		redirectSearchComponents.push(
+			`${analyticsService.getFingerprintQueryParameterName()}=${encodeURIComponent(analyticsFingerprint)}`
+		);
+
+		redirectSearchComponents.push(
+			`${analyticsService.getSessionIdQueryParameterName()}=${encodeURIComponent(analyticsSessionId)}`
+		);
+
+		if (analyticsReferringCampaign)
+			redirectSearchComponents.push(
+				`${analyticsService.getReferringCampaignQueryParameterName()}=${encodeURIComponent(
+					analyticsReferringCampaign
+				)}`
+			);
+
+		if (analyticsReferringMessageId)
+			redirectSearchComponents.push(
+				`${analyticsService.getReferringMessageIdQueryParameterName()}=${encodeURIComponent(
+					analyticsReferringMessageId
+				)}`
+			);
+
 		return httpSingleton.orchestrateRequest<{ authenticationUrl: string }>({
 			method: 'GET',
-			url: `/institutions/${institutionId}/mychart-authentication-url`,
+			url: `/institutions/${institutionId}/mychart-authentication-url?${redirectSearchComponents.join('&')}`,
 		});
 	},
 	getResourceGroups() {

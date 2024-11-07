@@ -12,35 +12,35 @@ export const analyticsService = {
 		}
 	},
 
-	getFingerprint(): String {
+	getFingerprint(): string {
 		return (window as any).cobaltAnalytics.getFingerprint();
 	},
 
-	getFingerprintQueryParameterName(): String {
+	getFingerprintQueryParameterName(): string {
 		return (window as any).cobaltAnalytics.getFingerprintQueryParameterName();
 	},
 
-	getSessionId(): String {
+	getSessionId(): string {
 		return (window as any).cobaltAnalytics.getSessionId();
 	},
 
-	getSessionIdQueryParameterName(): String {
+	getSessionIdQueryParameterName(): string {
 		return (window as any).cobaltAnalytics.getSessionIdQueryParameterName();
 	},
 
-	getReferringMessageId(): String | undefined {
+	getReferringMessageId(): string | undefined {
 		return (window as any).cobaltAnalytics.getReferringMessageId();
 	},
 
-	getReferringMessageIdQueryParameterName(): String {
+	getReferringMessageIdQueryParameterName(): string {
 		return (window as any).cobaltAnalytics.getReferringMessageIdQueryParameterName();
 	},
 
-	getReferringCampaign(): String | undefined {
+	getReferringCampaign(): string | undefined {
 		return (window as any).cobaltAnalytics.getReferringCampaign();
 	},
 
-	getReferringCampaignQueryParameterName(): String {
+	getReferringCampaignQueryParameterName(): string {
 		return (window as any).cobaltAnalytics.getReferringCampaignQueryParameterName();
 	},
 };
