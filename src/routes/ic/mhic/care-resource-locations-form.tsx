@@ -26,6 +26,8 @@ interface FormValues {
 	phoneNumber: string;
 	emailAddress: string;
 	website: string;
+	appointmentTypeInPerson: boolean;
+	appointmentTypeOnline: boolean;
 	address: PlaceModel | undefined;
 	address2: string;
 	wheelchairAccessible: boolean;
@@ -164,6 +166,8 @@ export const Component = () => {
 		phoneNumber: careResourceLocation?.phoneNumber ?? '',
 		emailAddress: careResourceLocation?.emailAddress ?? '',
 		website: careResourceLocation?.websiteUrl ?? '',
+		appointmentTypeInPerson: false,
+		appointmentTypeOnline: false,
 		address: careResourceLocation?.address
 			? {
 					placeId: careResourceLocation.address.googlePlaceId,
@@ -421,71 +425,104 @@ export const Component = () => {
 							/>
 						</AdminFormSection>
 						<hr />
-						<AdminFormSection title="Address">
-							<TypeaheadHelper
-								className="mb-3"
-								id="typeahead--address"
-								label="Address"
-								labelKey="text"
-								fetchData={(query) =>
-									careResourceService
-										.getPlaces({
-											searchText: query,
-										})
-										.fetch()
-								}
-								onFetchResolve={({ places }) => setPlacesOptions(places)}
-								options={placesOptions}
-								selected={formValues.address ? [formValues.address] : []}
-								onChange={([selected]) => {
-									setFormValues((previousValues) => ({
-										...previousValues,
-										address: selected as PlaceModel,
-									}));
-								}}
-							/>
-							<InputHelper
-								className="mb-3"
-								type="text"
-								label="Address 2"
-								name="address-2"
-								value={formValues.address2}
-								onChange={({ currentTarget }) => {
-									setFormValues((previousValue) => ({
-										...previousValue,
-										address2: currentTarget.value,
-									}));
-								}}
-								helperText="Use address 2 to specify a suite or floor #"
-							/>
-							<Form.Check
-								className="mb-3"
+						<AdminFormSection
+							title="Appointment Types"
+							description="Select all appointment types that are offered."
+						>
+							<ToggledInput
 								type="checkbox"
-								name="wheelchair-accessible"
-								id="checkbox--wheelchair-accesible"
-								label="Address is wheelchair accessible"
-								value="WHEELCHAIR_ACCESSIBLE"
-								checked={formValues.wheelchairAccessible}
+								name="appointment-type"
+								className="mb-3"
+								id="appointment-type-in-person"
+								label="In person"
+								checked={formValues.appointmentTypeInPerson}
 								onChange={({ currentTarget }) => {
 									setFormValues((previousValue) => ({
 										...previousValue,
-										wheelchairAccessible: currentTarget.checked,
+										appointmentTypeInPerson: currentTarget.checked,
 									}));
 								}}
-							/>
-							<TypeaheadHelper
-								id="typeahead--facility-type"
-								label="Facility Type"
-								multiple
-								labelKey="name"
-								options={facilityTypes}
-								selected={formValues.facilityTypes}
-								onChange={(selected) => {
-									setFormValues((previousValues) => ({
-										...previousValues,
-										facilityType: selected as CareResourceTag[],
+							>
+								<TypeaheadHelper
+									className="mb-3"
+									id="typeahead--address"
+									label="Address"
+									labelKey="text"
+									fetchData={(query) =>
+										careResourceService
+											.getPlaces({
+												searchText: query,
+											})
+											.fetch()
+									}
+									onFetchResolve={({ places }) => setPlacesOptions(places)}
+									options={placesOptions}
+									selected={formValues.address ? [formValues.address] : []}
+									onChange={([selected]) => {
+										setFormValues((previousValues) => ({
+											...previousValues,
+											address: selected as PlaceModel,
+										}));
+									}}
+								/>
+								<InputHelper
+									className="mb-3"
+									type="text"
+									label="Address 2"
+									name="address-2"
+									value={formValues.address2}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											address2: currentTarget.value,
+										}));
+									}}
+									helperText="Use address 2 to specify a suite or floor #"
+								/>
+								<Form.Check
+									className="mb-3"
+									type="checkbox"
+									name="wheelchair-accessible"
+									id="checkbox--wheelchair-accesible"
+									label="Address is wheelchair accessible"
+									value="WHEELCHAIR_ACCESSIBLE"
+									checked={formValues.wheelchairAccessible}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											wheelchairAccessible: currentTarget.checked,
+										}));
+									}}
+								/>
+								<TypeaheadHelper
+									id="typeahead--facility-type"
+									label="Facility Type"
+									multiple
+									labelKey="name"
+									options={facilityTypes}
+									selected={formValues.facilityTypes}
+									onChange={(selected) => {
+										setFormValues((previousValues) => ({
+											...previousValues,
+											facilityType: selected as CareResourceTag[],
+										}));
+									}}
+								/>
+							</ToggledInput>
+							<ToggledInput
+								type="checkbox"
+								name="appointment-type"
+								className="mb-3"
+								id="appointment-type-online"
+								label="Online"
+								checked={formValues.appointmentTypeOnline}
+								onChange={({ currentTarget }) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										appointmentTypeOnline: currentTarget.checked,
 									}));
 								}}
+								hideChildren
 							/>
 						</AdminFormSection>
 						<hr />
