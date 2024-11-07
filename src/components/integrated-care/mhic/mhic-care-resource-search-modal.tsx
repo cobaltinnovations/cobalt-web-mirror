@@ -4,28 +4,68 @@ import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 import { MhicPageHeader } from './mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, CareResourceTag } from '@/lib/models';
+import {
+	CARE_RESOURCE_TAG_GROUP_ID,
+	CareResourceLocationModel,
+	CareResourceTag,
+	PatientOrderModel,
+	PlaceModel,
+} from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { Link } from 'react-router-dom';
 import FilterDropdownV2 from '@/components/filter-dropdown-v2';
-import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import { TypeaheadHelper } from '@/components/typeahead-helper';
+
+interface Props extends OffcanvasProps {
+	patientOrder: PatientOrderModel;
+}
 
 interface FormValues {
 	searchName: string;
-	zipCode: string;
+	address?: PlaceModel;
 	orderBy: string;
-	distance?: {
-		distanceId: string;
-		title: string;
-		value: number;
-	};
+	distance?: DistanceOption;
 	insurance: CareResourceTag[];
 }
 
-export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) => {
+interface DistanceOption {
+	distanceId: string;
+	title: string;
+	value: number;
+}
+
+const distanceOptions: DistanceOption[] = [
+	{
+		distanceId: '5',
+		title: '5 miles',
+		value: 5,
+	},
+	{
+		distanceId: '10',
+		title: '10 miles',
+		value: 10,
+	},
+	{
+		distanceId: '15',
+		title: '15 miles',
+		value: 15,
+	},
+	{
+		distanceId: '20',
+		title: '20 miles',
+		value: 20,
+	},
+	{
+		distanceId: '25',
+		title: '25 miles',
+		value: 25,
+	},
+];
+
+export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props }) => {
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [careResourceLocations, setCareResourceLocations] = useState<CareResourceLocationModel[]>([]);
@@ -34,11 +74,12 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
-		zipCode: '',
+		address: undefined,
 		orderBy: '',
 		distance: undefined,
 		insurance: [],
 	});
+	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [insuranceOptions, setInsuranceOptions] = useState<CareResourceTag[]>([]);
 
 	const fetchFilterData = useCallback(async () => {
@@ -84,16 +125,23 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 	}, [fetchData]);
 
 	const handleOnEnter = useCallback(() => {
+		const targetDistanceOption = distanceOptions.find((d) => d.value === patientOrder.inPersonCareRadius);
+
 		setFormValues({
 			searchName: '',
-			zipCode: '',
+			address: patientOrder.patientAddress
+				? {
+						placeId: patientOrder.patientAddress.addressId,
+						text: `${patientOrder.patientAddress.streetAddress1}, ${patientOrder.patientAddress.locality}, ${patientOrder.patientAddress.region}`,
+				  }
+				: undefined,
 			orderBy: '',
-			distance: undefined,
+			distance: targetDistanceOption ? targetDistanceOption : undefined,
 			insurance: [],
 		});
 
 		fetchFilterData();
-	}, [fetchFilterData]);
+	}, [fetchFilterData, patientOrder.inPersonCareRadius, patientOrder.patientAddress]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -175,15 +223,26 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 				<Col>
 					<div className="d-flex align-items-center">
 						<Form.Label className="m-0 me-2">Location: </Form.Label>
-						<InputHelper
+						<TypeaheadHelper
+							style={{ width: 350 }}
 							className="me-2"
-							type="number"
-							label="Zip Code"
-							value={formValues.zipCode}
-							onChange={({ currentTarget }) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									zipCode: currentTarget.value,
+							id="typeahead--address"
+							label="Address"
+							labelKey="text"
+							fetchData={(query) =>
+								careResourceService
+									.getPlaces({
+										searchText: query,
+									})
+									.fetch()
+							}
+							onFetchResolve={({ places }) => setPlacesOptions(places)}
+							options={placesOptions}
+							selected={formValues.address ? [formValues.address] : []}
+							onChange={([selected]) => {
+								setFormValues((previousValues) => ({
+									...previousValues,
+									address: selected as PlaceModel,
 								}));
 							}}
 						/>
@@ -193,13 +252,7 @@ export const MhicCareResourceSearchModal: FC<OffcanvasProps> = ({ ...props }) =>
 							title="Distance"
 							optionIdKey="distanceId"
 							optionLabelKey="title"
-							options={[
-								{
-									distanceId: '5_MILES',
-									title: '5 miles',
-									value: 5,
-								},
-							]}
+							options={distanceOptions}
 							value={formValues.distance}
 							onChange={(newValue) => {
 								setFormValues((previousValue) => ({

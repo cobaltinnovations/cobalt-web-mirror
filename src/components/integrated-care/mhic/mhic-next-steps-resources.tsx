@@ -80,6 +80,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 			/>
 
 			<MhicCareResourceSearchModal
+				patientOrder={patientOrder}
 				show={showCareResourceSearchModal}
 				onHide={() => {
 					setShowCareResourceSearchModal(false);
