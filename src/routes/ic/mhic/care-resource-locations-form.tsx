@@ -540,14 +540,19 @@ export const Component = () => {
 										insuranceUseDefaults: true,
 									}));
 								}}
-								hideChildren={(careResource?.payors ?? []).length <= 0}
-								disabled={(careResource?.payors ?? []).length <= 0}
 							>
-								<p className="mb-0">
-									{careResource?.payors
-										? careResource?.payors.map((p) => p.name).join(', ')
-										: 'Select an associated resource to see defaults.'}
-								</p>
+								{!careResource && (
+									<p className="mb-0">Select an associated resource to see defaults.</p>
+								)}
+								{careResource && (
+									<>
+										{careResource.payors.length > 0 ? (
+											<p className="mb-0">{careResource.payors.map((s) => s.name).join(', ')}</p>
+										) : (
+											<p className="mb-0">None provided.</p>
+										)}
+									</>
+								)}
 							</ToggledInput>
 							<ToggledInput
 								id="insurance-override"
