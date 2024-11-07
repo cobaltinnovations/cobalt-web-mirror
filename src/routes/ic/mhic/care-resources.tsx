@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Form, Link, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
@@ -13,6 +13,8 @@ import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
+import InputHelperSearch from '@/components/input-helper-search';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 
 export const loader = async () => {
 	return null;
@@ -22,6 +24,7 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
+	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +32,10 @@ export const Component = () => {
 	const [careResourcesTotalCount, setCareResourcesTotalCount] = useState(0);
 	const [showFormModal, setShowFormModal] = useState(false);
 	const [careResourceToDelete, setCareResourceToDelete] = useState<CareResourceModel>();
+
+	const { hasTouchScreen } = useTouchScreenCheck();
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const [searchInputValue, setSearchInputValue] = useState('');
 
 	const fetchData = useCallback(async () => {
 		try {
@@ -39,6 +46,7 @@ export const Component = () => {
 					pageSize: '15',
 					...(pageNumber && { pageNumber }),
 					...(orderBy && { orderBy: orderBy as 'NAME_ASC' }),
+					...(searchQuery && { searchQuery }),
 				})
 				.fetch();
 
@@ -49,7 +57,7 @@ export const Component = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, orderBy, pageNumber]);
+	}, [handleError, orderBy, pageNumber, searchQuery]);
 
 	useEffect(() => {
 		fetchData();
@@ -72,6 +80,52 @@ export const Component = () => {
 			setIsLoading(false);
 		}
 	}, [careResourceToDelete, fetchData, handleError]);
+
+	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (searchInputValue) {
+			searchParams.set('searchQuery', searchInputValue);
+		} else {
+			searchParams.delete('searchQuery');
+		}
+
+		setSearchParams(searchParams, { replace: true });
+
+		if (hasTouchScreen) {
+			searchInputRef.current?.blur();
+		}
+	};
+
+	const clearSearch = useCallback(() => {
+		setSearchInputValue('');
+
+		searchParams.delete('searchQuery');
+		setSearchParams(searchParams, { replace: true });
+
+		if (!hasTouchScreen) {
+			searchInputRef.current?.focus({ preventScroll: true });
+		}
+	}, [hasTouchScreen, searchParams, setSearchParams]);
+
+	const handleKeydown = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key !== 'Escape') {
+				return;
+			}
+
+			clearSearch();
+		},
+		[clearSearch]
+	);
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleKeydown, false);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeydown, false);
+		};
+	}, [handleKeydown]);
 
 	return (
 		<>
@@ -112,15 +166,28 @@ export const Component = () => {
 				<Row className="mb-6">
 					<Col>
 						<MhicPageHeader title="Resources">
-							<Button
-								className="me-2 d-flex align-items-center"
-								variant="primary"
-								onClick={() => {
-									setShowFormModal(true);
-								}}
-							>
-								<PlusIcon className="me-2" /> Add Resource
-							</Button>
+							<div className="d-flex align-content-end">
+								<Form onSubmit={handleSearchFormSubmit} className="me-3">
+									<InputHelperSearch
+										ref={searchInputRef}
+										placeholder="Search by Name"
+										value={searchInputValue}
+										onChange={({ currentTarget }) => {
+											setSearchInputValue(currentTarget.value);
+										}}
+										onClear={clearSearch}
+									/>
+								</Form>
+								<Button
+									className="me-2 d-flex align-items-center"
+									variant="primary"
+									onClick={() => {
+										setShowFormModal(true);
+									}}
+								>
+									<PlusIcon className="me-2" /> Add Resource
+								</Button>
+							</div>
 						</MhicPageHeader>
 					</Col>
 				</Row>
