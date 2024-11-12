@@ -379,13 +379,66 @@
 				})
 				.catch((error) => {
 					_log('*** ERROR PERSISTING EVENT TO BACKEND ***', event, error);
+					_reportErrorToBackend('PERSISTING_TO_BACKEND', error, analyticsNativeEventTypeId, data);
 					return false;
 				});
 
 			return true;
 		} catch (error) {
 			_log('*** ERROR PERSISTING EVENT ***', error, analyticsNativeEventTypeId, data);
+			_reportErrorToBackend('PERSISTING', error, analyticsNativeEventTypeId, data);
 			return false;
+		}
+	}
+
+	// Safely report analtics errors to backend
+	function _reportErrorToBackend(context, error, analyticsNativeEventTypeId, data) {
+		try {
+			const normalizedContext = context || 'UNKNOWN';
+
+			// Because JSON.stringify() does not work for Error types, we use Object.getOwnPropertyNames to pull data
+			let normalizedError;
+
+			if (error) {
+				try {
+					normalizedError = JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+				} catch (ignored) {
+					// Nothing to do
+				}
+			}
+
+			if (!normalizedError) {
+				normalizedError = {
+					type: 'UNKNOWN',
+					message: 'Error information is either missing or unprocessable.',
+				};
+			}
+
+			window
+				.fetch(`${analyticsConfig.apiBaseUrl}/analytics-native-event-errors`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Cobalt-Webapp-Base-Url': window.location.origin,
+						'X-Cobalt-Webapp-Current-Url': window.location.href,
+						'X-Client-Device-Type-Id': 'WEB_BROWSER',
+						'X-Client-Device-App-Name': 'Cobalt Webapp',
+						'X-Client-Device-App-Version': analyticsConfig.appVersion,
+					},
+					body: JSON.stringify({
+						context: normalizedContext,
+						analyticsNativeEventTypeId: analyticsNativeEventTypeId,
+						data: data,
+						error: normalizedError,
+					}),
+					keepalive: true,
+				})
+				.catch((reportingError) => {
+					_log('*** ERROR REPORTING ERROR TO BACKEND ***', reportingError);
+				});
+		} catch (unexpectedError) {
+			// Nothing we can realistically do here
+			_log('*** ERROR WHILE REPORTING ERROR TO BACKEND ***', unexpectedError);
 		}
 	}
 
