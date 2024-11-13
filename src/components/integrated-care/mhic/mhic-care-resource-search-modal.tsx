@@ -314,7 +314,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 										<TableCell>
 											<Button
 												variant="link"
-												className="text-left text-decoration-none"
+												className="p-0 text-left text-decoration-none"
 												onClick={() => {
 													setShowResourceLocation(
 														careResourceLocation.careResourceLocationId

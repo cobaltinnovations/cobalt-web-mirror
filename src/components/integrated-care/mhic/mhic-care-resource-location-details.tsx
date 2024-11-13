@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { useRevalidator } from 'react-router-dom';
 import { Badge, Button, Card, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -34,7 +33,6 @@ interface Props {
 
 export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClose }: Props) => {
 	const classes = useStyles();
-	const revalidator = useRevalidator();
 	const [careResourceLocation, setCareResourceLocation] = useState<CareResourceLocationModel>();
 	const [showInternalNotesModal, setShowInternalNotesModal] = useState(false);
 
@@ -59,9 +57,9 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 						onHide={() => {
 							setShowInternalNotesModal(false);
 						}}
-						onSave={() => {
+						onSave={(updatedCareResourceLocation) => {
+							setCareResourceLocation(updatedCareResourceLocation);
 							setShowInternalNotesModal(false);
-							revalidator.revalidate();
 						}}
 					/>
 

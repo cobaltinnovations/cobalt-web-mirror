@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { careResourceService } from '@/lib/services';
+import { CareResourceLocationModel } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -14,7 +15,7 @@ const useStyles = createUseStyles({
 interface Props extends ModalProps {
 	defaultValue?: string;
 	careResourceLocationId: string;
-	onSave(): void;
+	onSave(careResourceLocation: CareResourceLocationModel): void;
 }
 
 export const MhicInternalNotesModal: FC<Props> = ({ defaultValue, careResourceLocationId, onSave, ...props }) => {
@@ -31,8 +32,10 @@ export const MhicInternalNotesModal: FC<Props> = ({ defaultValue, careResourceLo
 	const handleSaveButtonClick = useCallback(async () => {
 		try {
 			setIsSaving(true);
-			await careResourceService.addInternalNotes({ careResourceLocationId, internalNotes: formValue }).fetch();
-			onSave();
+			const response = await careResourceService
+				.addInternalNotes({ careResourceLocationId, internalNotes: formValue })
+				.fetch();
+			onSave(response.careResourceLocation);
 		} catch (error) {
 			handleError(error);
 		} finally {
