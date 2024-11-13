@@ -54,10 +54,15 @@
 	// 3 pieces of session storage data: sessionId, referringMessageId, and referringCampaign.
 	let mostRecentSession = undefined;
 
+	// Heartbeat state
+	let _heartbeatActive = false;
+	let _heartbeatRetryCount = 0;
+	let _heartbeatTimeout;
+
 	function _log() {
 		if (analyticsConfig.debuggingEnabled !== 'true') return;
 
-		const logArguments = ['[ANALYTICS]'];
+		const logArguments = [`[ANALYTICS ${new Date().toISOString()}]`];
 		logArguments.push(...arguments);
 		console.log.apply(this, logArguments);
 	}
@@ -152,10 +157,9 @@
 
 		_registerVisibilityChangeListener();
 		_registerUrlChangedListenerUsingMutationObserver();
-		_registerRecurringHeartbeats();
 
-		// Persist initial heartbeat
-		_persistEvent('HEARTBEAT');
+		// Perform initial heartbeat
+		_startHeartbeat();
 
 		// Persist this initial load as special URL change
 		_persistEvent('URL_CHANGED', {
@@ -164,16 +168,65 @@
 		});
 	}
 
-	function _registerRecurringHeartbeats() {
-		const HEARTBEAT_INTERVAL_IN_MILLISECONDS = 5000;
+	function _startHeartbeat() {
+		if (_heartbeatActive) return;
 
-		setInterval(function () {
-			if (document.visibilityState === 'visible') {
-				_persistEvent('HEARTBEAT', {
-					intervalInMilliseconds: HEARTBEAT_INTERVAL_IN_MILLISECONDS,
-				});
+		_log('Starting heartbeat');
+		_heartbeatActive = true;
+		_heartbeatRetryCount = 0;
+
+		if (_heartbeatTimeout) {
+			clearTimeout(_heartbeatTimeout);
+			_heartbeatTimeout = undefined;
+		}
+
+		_performHeartbeat();
+	}
+
+	function _endHeartbeat() {
+		if (!_heartbeatActive) return;
+
+		_log('Ending heartbeat');
+		_heartbeatActive = false;
+		_heartbeatRetryCount = 0;
+
+		if (_heartbeatTimeout) {
+			clearTimeout(_heartbeatTimeout);
+			_heartbeatTimeout = undefined;
+		}
+	}
+
+	function _performHeartbeat() {
+		const HEARTBEAT_INTERVAL_IN_MILLISECONDS = 5000; // 5 seconds
+		const EXPONENTIAL_BACKOFF_LIMIT_IN_MILLISECONDS = 60000; // 1 minute
+
+		let succeeded = false;
+
+		try {
+			succeeded = _persistEvent('HEARTBEAT', {
+				intervalInMilliseconds: HEARTBEAT_INTERVAL_IN_MILLISECONDS,
+			});
+		} catch (ignored) {
+			// Not much we can do here
+			_log('Heartbeat failed', ignored);
+		} finally {
+			if (succeeded) {
+				_heartbeatRetryCount = 0;
+			} else {
+				++_heartbeatRetryCount;
 			}
-		}, HEARTBEAT_INTERVAL_IN_MILLISECONDS);
+			// Use exponential back-off on error, capped at 1 minute
+			const delay =
+				_heartbeatRetryCount > 0
+					? Math.min(
+							HEARTBEAT_INTERVAL_IN_MILLISECONDS * 2 ** _heartbeatRetryCount,
+							EXPONENTIAL_BACKOFF_LIMIT_IN_MILLISECONDS
+					  )
+					: HEARTBEAT_INTERVAL_IN_MILLISECONDS;
+
+			// Schedule the next heartbeat
+			_heartbeatTimeout = setTimeout(_performHeartbeat, delay);
+		}
 	}
 
 	// Persist events when browser tab is backgrounded/foregrounded.
@@ -192,8 +245,10 @@
 			} else {
 				if (document.visibilityState === 'visible') {
 					_persistEvent('BROUGHT_TO_FOREGROUND');
+					_startHeartbeat();
 				} else if (document.visibilityState === 'hidden') {
 					_persistEvent('SENT_TO_BACKGROUND');
+					_endHeartbeat();
 				}
 			}
 		});
@@ -377,6 +432,16 @@
 					body: body,
 					keepalive: keepalive,
 				})
+				.then((response) => {
+					try {
+						// Explicitly read the response body (even though we don't need it)
+						// so Chrome and other browsers know the request is fully "done"
+						response.text();
+					} catch (responseError) {
+						// Nothing to do other than log out
+						_log('*** ERROR PARSING EVENT PERSISTENCE RESPONSE ***', event, responseError);
+					}
+				})
 				.catch((error) => {
 					_log('*** ERROR PERSISTING EVENT TO BACKEND ***', event, error);
 					_reportErrorToBackend('PERSISTING_TO_BACKEND', error, analyticsNativeEventTypeId, data);
@@ -432,6 +497,16 @@
 						error: normalizedError,
 					}),
 					keepalive: true,
+				})
+				.then((response) => {
+					try {
+						// Explicitly read the response body (even though we don't need it)
+						// so Chrome and other browsers know the request is fully "done"
+						response.text();
+					} catch (responseError) {
+						// Nothing to do other than log out
+						_log('*** ERROR PARSING ERROR REPORT RESPONSE ***', responseError);
+					}
 				})
 				.catch((reportingError) => {
 					_log('*** ERROR REPORTING ERROR TO BACKEND ***', reportingError);
