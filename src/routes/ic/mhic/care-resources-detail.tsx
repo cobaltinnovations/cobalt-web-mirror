@@ -1,18 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import {
-	Link,
-	LoaderFunctionArgs,
-	Outlet,
-	useLoaderData,
-	useMatches,
-	useNavigate,
-	useRevalidator,
-} from 'react-router-dom';
-import { Badge, Button, Card, Col, Container, Dropdown, Offcanvas, Row } from 'react-bootstrap';
+import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
+import { Badge, Button, Card, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { careResourceService } from '@/lib/services';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { MhicCareResourceFormModal } from '@/components/integrated-care/mhic';
+import { MhicCareResourceFormModal, MhicCareResourceLocationDetails } from '@/components/integrated-care/mhic';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import NoData from '@/components/no-data';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
@@ -22,18 +14,7 @@ import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { CareResourceLocationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
-import { createUseThemedStyles } from '@/jss/theme';
-
-const useStyles = createUseThemedStyles((theme) => ({
-	shelf: {
-		width: '95% !important',
-		maxWidth: '800px !important',
-		'& section': {
-			padding: 32,
-			borderBottom: `1px solid ${theme.colors.border}`,
-		},
-	},
-}));
+import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -52,13 +33,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { careResource } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-	const classes = useStyles();
 	const navigate = useNavigate();
-	const matches = useMatches();
 	const revalidator = useRevalidator();
 	const handleError = useHandleError();
 	const [showFormModal, setShowFormModal] = useState(false);
 	const [careResourceLocationToDelete, setCareResourceLocationToDelete] = useState<CareResourceLocationModel>();
+	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
 
 	const handleDeleteConfirm = useCallback(async () => {
 		try {
@@ -224,12 +204,15 @@ export const Component = () => {
 											<TableRow key={crl.careResourceLocationId}>
 												<TableCell>
 													<span className="d-block text-nowrap">
-														<Link
-															to={`./location/${crl.careResourceLocationId}`}
-															className="text-decoration-none"
+														<Button
+															variant="link"
+															className="p-0 text-left text-decoration-none"
+															onClick={() => {
+																setShowResourceLocation(crl.careResourceLocationId);
+															}}
 														>
 															{crl.name}
-														</Link>
+														</Button>
 													</span>
 													<span className="d-block text-nowrap">
 														{crl.address.streetAddress1}
@@ -315,20 +298,20 @@ export const Component = () => {
 				</Row>
 			</Container>
 
-			<Offcanvas
-				className={classes.shelf}
-				show={
-					!!matches.find((m) =>
-						Object.hasOwn((m.handle as Record<string, any>) ?? {}, 'isMhicResourcesShelf')
-					)
-				}
+			<PreviewCanvasInternalShelf
+				show={showResourceLocation}
 				placement="end"
 				onHide={() => {
-					navigate('.');
+					setShowResourceLocation(undefined);
 				}}
 			>
-				<Outlet />
-			</Offcanvas>
+				<MhicCareResourceLocationDetails
+					careResourceLocationId={showResourceLocation ?? ''}
+					onClose={() => {
+						setShowResourceLocation(undefined);
+					}}
+				/>
+			</PreviewCanvasInternalShelf>
 		</>
 	);
 };

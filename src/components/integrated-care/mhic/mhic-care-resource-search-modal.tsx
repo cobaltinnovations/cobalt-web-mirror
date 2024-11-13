@@ -12,12 +12,13 @@ import {
 	PlaceModel,
 } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
-import { Link } from 'react-router-dom';
 import FilterDropdownV2 from '@/components/filter-dropdown-v2';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
+import { MhicCareResourceLocationDetails } from './mhic-care-resource-location-details';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -82,6 +83,8 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [insuranceOptions, setInsuranceOptions] = useState<CareResourceTag[]>([]);
 
+	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
+
 	const fetchFilterData = useCallback(async () => {
 		try {
 			const response = await careResourceService
@@ -115,6 +118,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 			setCareResourceLocations(response.careResourceLocations);
 		} catch (error) {
 			handleError(error);
+			setCareResourceLocations([]);
 		} finally {
 			setIsLoading(false);
 		}
@@ -196,141 +200,168 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	}, [handleKeydown]);
 
 	return (
-		<PreviewCanvas title="Available Resources" onEnter={handleOnEnter} {...props}>
-			<Row className="mb-6">
-				<Col>
-					<MhicPageHeader title="Available Resources">
-						<Form onSubmit={handleSearchFormSubmit}>
-							<InputHelperSearch
-								ref={searchInputRef}
-								placeholder="Search name"
-								value={searchInputValue}
-								onChange={({ currentTarget }) => {
-									setSearchInputValue(currentTarget.value);
-								}}
-								onClear={clearSearch}
-							/>
-						</Form>
-					</MhicPageHeader>
-				</Col>
-			</Row>
-			<Row className="mb-8">
-				<Col>
-					<hr />
-				</Col>
-			</Row>
-			<Row className="mb-8">
-				<Col>
-					<div className="d-flex align-items-center">
-						<Form.Label className="m-0 me-2">Location: </Form.Label>
-						<TypeaheadHelper
-							style={{ width: 350 }}
-							className="me-2"
-							id="typeahead--address"
-							label="Address"
-							labelKey="text"
-							fetchData={(query) =>
-								careResourceService
-									.getPlaces({
-										searchText: query,
-									})
-									.fetch()
-							}
-							onFetchResolve={({ places }) => setPlacesOptions(places)}
-							options={placesOptions}
-							selected={formValues.address ? [formValues.address] : []}
-							onChange={([selected]) => {
-								setFormValues((previousValues) => ({
-									...previousValues,
-									address: selected as PlaceModel,
-								}));
-							}}
-						/>
-						<FilterDropdownV2
-							className="me-2"
-							id="distance-filter"
-							title="Distance"
-							optionIdKey="distanceId"
-							optionLabelKey="title"
-							options={distanceOptions}
-							value={formValues.distance}
-							onChange={(newValue) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									distance: newValue,
-								}));
-							}}
-						/>
-						<FilterDropdownV2
-							id="insurance-filter"
-							title="Insurance"
-							optionIdKey="careResourceTagId"
-							optionLabelKey="name"
-							options={insuranceOptions}
-							value={formValues.insurance[0]}
-							onChange={(newValue) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									insurance: newValue ? [newValue] : [],
-								}));
-							}}
-						/>
-					</div>
-				</Col>
-			</Row>
-			<Row className="mb-8">
-				<Col>
-					<Table isLoading={isLoading}>
-						<TableHead>
-							<TableRow>
-								<TableCell
-									className="flex-row align-items-center justify-content-start"
-									header
-									sortable
-									sortDirection={formValues.orderBy.split('_')[1] as SORT_DIRECTION}
-									onSort={(sortDirection) => {
-										setFormValues((previousValue) => ({
-											...previousValue,
-											orderBy: `NAME_${sortDirection}`,
-										}));
+		<>
+			<PreviewCanvas title="Available Resources" onEnter={handleOnEnter} {...props}>
+				<Row className="mb-6">
+					<Col>
+						<MhicPageHeader title="Available Resources">
+							<Form onSubmit={handleSearchFormSubmit}>
+								<InputHelperSearch
+									ref={searchInputRef}
+									placeholder="Search name"
+									value={searchInputValue}
+									onChange={({ currentTarget }) => {
+										setSearchInputValue(currentTarget.value);
 									}}
-								>
-									Resource Name
-								</TableCell>
-								<TableCell header>Insurance</TableCell>
-								<TableCell header>Specialties</TableCell>
-								<TableCell header>Distance from zip</TableCell>
-								<TableCell></TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{careResourceLocations.map((careResourceLocation) => (
-								<TableRow key={careResourceLocation.careResourceLocationId}>
-									<TableCell>
-										<Link to="/#">{careResourceLocation.name}</Link>
+									onClear={clearSearch}
+								/>
+							</Form>
+						</MhicPageHeader>
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col>
+						<hr />
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col>
+						<div className="d-flex align-items-center">
+							<Form.Label className="m-0 me-2">Location: </Form.Label>
+							<TypeaheadHelper
+								style={{ width: 350 }}
+								className="me-2"
+								id="typeahead--address"
+								label="Address"
+								labelKey="text"
+								fetchData={(query) =>
+									careResourceService
+										.getPlaces({
+											searchText: query,
+										})
+										.fetch()
+								}
+								onFetchResolve={({ places }) => setPlacesOptions(places)}
+								options={placesOptions}
+								selected={formValues.address ? [formValues.address] : []}
+								onChange={([selected]) => {
+									setFormValues((previousValues) => ({
+										...previousValues,
+										address: selected as PlaceModel,
+									}));
+								}}
+							/>
+							<FilterDropdownV2
+								className="me-2"
+								id="distance-filter"
+								title="Distance"
+								optionIdKey="distanceId"
+								optionLabelKey="title"
+								options={distanceOptions}
+								value={formValues.distance}
+								onChange={(newValue) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										distance: newValue,
+									}));
+								}}
+							/>
+							<FilterDropdownV2
+								id="insurance-filter"
+								title="Insurance"
+								optionIdKey="careResourceTagId"
+								optionLabelKey="name"
+								options={insuranceOptions}
+								value={formValues.insurance[0]}
+								onChange={(newValue) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										insurance: newValue ? [newValue] : [],
+									}));
+								}}
+							/>
+						</div>
+					</Col>
+				</Row>
+				<Row className="mb-8">
+					<Col>
+						<Table isLoading={isLoading}>
+							<TableHead>
+								<TableRow>
+									<TableCell
+										className="flex-row align-items-center justify-content-start"
+										header
+										sortable
+										sortDirection={formValues.orderBy.split('_')[1] as SORT_DIRECTION}
+										onSort={(sortDirection) => {
+											setFormValues((previousValue) => ({
+												...previousValue,
+												orderBy: `NAME_${sortDirection}`,
+											}));
+										}}
+									>
+										Resource Name
 									</TableCell>
-									<TableCell>
-										{careResourceLocation.payors.length > 0
-											? careResourceLocation.payors.map((p) => p.name).join(', ')
-											: 'Not provided'}
-									</TableCell>
-									<TableCell>
-										{careResourceLocation.specialties.length > 0
-											? careResourceLocation.specialties.map((p) => p.name).join(', ')
-											: 'Not provided'}
-									</TableCell>
-									<TableCell className="flex-row align-items-center justify-content-start">
-										[TODO]
-									</TableCell>
-									<TableCell className="flex-row align-items-center justify-content-end">
-										<Button variant="outline-primary">Add</Button>
-									</TableCell>
+									<TableCell header>Insurance</TableCell>
+									<TableCell header>Specialties</TableCell>
+									<TableCell header>Distance from zip</TableCell>
+									<TableCell></TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</Col>
-			</Row>
-		</PreviewCanvas>
+							</TableHead>
+							<TableBody>
+								{careResourceLocations.map((careResourceLocation) => (
+									<TableRow key={careResourceLocation.careResourceLocationId}>
+										<TableCell>
+											<Button
+												variant="link"
+												className="text-left text-decoration-none"
+												onClick={() => {
+													setShowResourceLocation(
+														careResourceLocation.careResourceLocationId
+													);
+												}}
+											>
+												{careResourceLocation.name}
+											</Button>
+										</TableCell>
+										<TableCell>
+											{careResourceLocation.payors.length > 0
+												? careResourceLocation.payors.map((p) => p.name).join(', ')
+												: 'Not provided'}
+										</TableCell>
+										<TableCell>
+											{careResourceLocation.specialties.length > 0
+												? careResourceLocation.specialties.map((p) => p.name).join(', ')
+												: 'Not provided'}
+										</TableCell>
+										<TableCell className="flex-row align-items-center justify-content-start">
+											[TODO]
+										</TableCell>
+										<TableCell className="flex-row align-items-center justify-content-end">
+											<Button variant="outline-primary">Add</Button>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+			</PreviewCanvas>
+
+			<PreviewCanvasInternalShelf
+				show={showResourceLocation}
+				placement="end"
+				onHide={() => {
+					setShowResourceLocation(undefined);
+				}}
+			>
+				<MhicCareResourceLocationDetails
+					careResourceLocationId={showResourceLocation ?? ''}
+					onClose={() => {
+						setShowResourceLocation(undefined);
+					}}
+				/>
+			</PreviewCanvasInternalShelf>
+		</>
 	);
 };
