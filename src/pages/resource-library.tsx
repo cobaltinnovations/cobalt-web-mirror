@@ -30,6 +30,7 @@ import TabBar from '@/components/tab-bar';
 import SimpleFilter from '@/components/simple-filter';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
+import MegaFilter, { FILTER_TYPE } from '@/components/mega-filter';
 
 export const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -354,6 +355,59 @@ const ResourceLibrary = () => {
 					}}
 				/>
 			)}
+
+			<Row className="mb-6">
+				<Col>
+					<MegaFilter
+						title="Topics"
+						value={[
+							{
+								id: 'show-resources-for',
+								filterType: FILTER_TYPE.RADIO,
+								title: 'Show resources for...',
+								value: '',
+								options: [
+									{
+										value: 'ANYONE',
+										title: 'Anyone',
+									},
+									{
+										value: 'MYSELF',
+										title: 'Myself',
+									},
+									{
+										value: 'MY_CHILD',
+										title: 'My child',
+									},
+								],
+							},
+							{
+								id: 'symptoms',
+								filterType: FILTER_TYPE.CHECKBOX,
+								title: 'Symptoms',
+								value: [''],
+								options: [
+									{
+										value: 'ANXIETY',
+										title: 'Anxiety',
+									},
+									{
+										value: 'MOOD',
+										title: 'Mood',
+									},
+									{
+										value: 'SUBSTANCE_USE',
+										title: 'Substance Use',
+									},
+								],
+							},
+						]}
+						onChange={(newValues) => {
+							console.log(newValues);
+						}}
+					></MegaFilter>
+				</Col>
+			</Row>
 
 			{searchQuery ? (
 				<AsyncPage fetchData={fetchData}>
