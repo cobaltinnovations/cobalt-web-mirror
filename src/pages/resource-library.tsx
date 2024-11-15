@@ -359,7 +359,55 @@ const ResourceLibrary = () => {
 			<Row className="mb-6">
 				<Col>
 					<MegaFilter
-						title="Topics"
+						allowCollapse={false}
+						displayFooter={false}
+						buttonTitle="Anyone"
+						modalTitle="Show resources for..."
+						value={[
+							{
+								id: 'show-resources-for',
+								filterType: FILTER_TYPE.RADIO,
+								title: 'Show resources for...',
+								value: '',
+								options: [
+									{
+										value: 'ANYONE',
+										title: 'Anyone',
+									},
+									{
+										value: 'MYSELF',
+										title: 'Myself',
+									},
+									{
+										value: 'MY_CHILD',
+										title: 'My child',
+									},
+									{
+										value: 'MY_PRETEEN_TEEN',
+										title: 'My preteen/teen',
+									},
+									{
+										value: 'MY_ADULT_CHILD',
+										title: 'My adult child',
+									},
+									{
+										value: 'MY_SPOUSE',
+										title: 'My spouse',
+									},
+									{
+										value: 'AN_AGING_PARENT',
+										title: 'An aging parent',
+									},
+								],
+							},
+						]}
+						onChange={(newValues) => {
+							console.log(newValues);
+						}}
+					/>
+					<MegaFilter
+						buttonTitle="Topics"
+						modalTitle="Topics"
 						value={[
 							{
 								id: 'show-resources-for',
@@ -405,7 +453,7 @@ const ResourceLibrary = () => {
 						onChange={(newValues) => {
 							console.log(newValues);
 						}}
-					></MegaFilter>
+					/>
 				</Col>
 			</Row>
 

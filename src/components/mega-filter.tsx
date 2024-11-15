@@ -83,14 +83,26 @@ export interface FilterOption {
 }
 
 export interface MegaFilterProps {
-	title: string;
+	buttonTitle: string;
+	modalTitle: string;
 	value: Filter[];
 	onChange(value: Filter[]): void;
 	activeLength?: number;
+	allowCollapse?: boolean;
+	displayFooter?: boolean;
 	className?: string;
 }
 
-function MegaFilter({ title, value, onChange, activeLength, className }: MegaFilterProps) {
+function MegaFilter({
+	buttonTitle,
+	modalTitle,
+	value,
+	onChange,
+	activeLength,
+	allowCollapse = true,
+	displayFooter = true,
+	className,
+}: MegaFilterProps) {
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
 	const [internalValue, setInternalValue] = useState<Filter[]>([]);
@@ -111,15 +123,17 @@ function MegaFilter({ title, value, onChange, activeLength, className }: MegaFil
 				onEnter={handleOnEnter}
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>{title}</Modal.Title>
+					<Modal.Title>{modalTitle}</Modal.Title>
 				</Modal.Header>
-				<Modal.Body>
+				<Modal.Body className="pb-0">
 					{internalValue.map((filter, filterIndex) => {
 						const isLast = filterIndex === internalValue.length - 1;
+
 						return (
 							<React.Fragment key={filter.id}>
 								<MegaFilterCollapse
 									filter={filter}
+									allowCollapse={allowCollapse}
 									onChange={({ currentTarget }) => {
 										setInternalValue((previousValue) =>
 											previousValue.map((v) =>
@@ -143,32 +157,34 @@ function MegaFilter({ title, value, onChange, activeLength, className }: MegaFil
 						);
 					})}
 				</Modal.Body>
-				<Modal.Footer className="text-right">
-					{!!activeLength && (
+				{displayFooter && (
+					<Modal.Footer className="text-right">
+						{!!activeLength && (
+							<Button
+								size="sm"
+								variant="outline-primary"
+								onClick={() => {
+									setShow(false);
+									onChange(internalValue);
+								}}
+							>
+								Clear
+							</Button>
+						)}
+
 						<Button
 							size="sm"
-							variant="outline-primary"
+							className="ms-2"
+							variant="primary"
 							onClick={() => {
 								setShow(false);
 								onChange(internalValue);
 							}}
 						>
-							Clear
+							Apply
 						</Button>
-					)}
-
-					<Button
-						size="sm"
-						className="ms-2"
-						variant="primary"
-						onClick={() => {
-							setShow(false);
-							onChange(internalValue);
-						}}
-					>
-						Apply
-					</Button>
-				</Modal.Footer>
+					</Modal.Footer>
+				)}
 			</Modal>
 
 			<button
@@ -183,7 +199,7 @@ function MegaFilter({ title, value, onChange, activeLength, className }: MegaFil
 					setShow(true);
 				}}
 			>
-				<span>{title}</span>
+				<span>{buttonTitle}</span>
 				{activeLength && activeLength > 0 ? (
 					<span>&nbsp;&bull; {activeLength}</span>
 				) : (
@@ -216,9 +232,11 @@ const useMegaFilterCollapseStyles = createUseThemedStyles((theme) => ({
 
 const MegaFilterCollapse = ({
 	filter,
+	allowCollapse,
 	onChange,
 }: {
 	filter: Filter;
+	allowCollapse: boolean;
 	onChange(event: React.ChangeEvent<HTMLInputElement>): void;
 }) => {
 	const classes = useMegaFilterCollapseStyles();
@@ -226,15 +244,17 @@ const MegaFilterCollapse = ({
 
 	return (
 		<>
-			<Button
-				className={classes.megaFilterCollapseButton}
-				bsPrefix="mega-filter-accordion-button"
-				onClick={() => {
-					setShow(!show);
-				}}
-			>
-				{filter.title}
-			</Button>
+			{allowCollapse && (
+				<Button
+					className={classes.megaFilterCollapseButton}
+					bsPrefix="mega-filter-accordion-button"
+					onClick={() => {
+						setShow(!show);
+					}}
+				>
+					{filter.title}
+				</Button>
+			)}
 			<Collapse in={show}>
 				<div>
 					<div className={classes.megaFilterCollapseInner}>
