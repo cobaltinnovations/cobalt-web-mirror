@@ -5,7 +5,11 @@ import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea
 import classNames from 'classnames';
 
 import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
-import { MhicCareResourceSearchModal, MhicResourcesModal } from '@/components/integrated-care/mhic';
+import {
+	MhicCareResourcePreviewModal,
+	MhicCareResourceSearchModal,
+	MhicResourcesModal,
+} from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
 import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
@@ -21,6 +25,7 @@ interface Props {
 export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, className }: Props) => {
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const [showCareResourceSearchModal, setShowCareResourceSearchModal] = useState(false);
+	const [showCareResourcePreviewModal, setShowCareResourcePreviewModal] = useState(false);
 	const revalidator = useRevalidator();
 
 	const handleResourcesModalSave = useCallback(
@@ -87,6 +92,14 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 				}}
 			/>
 
+			<MhicCareResourcePreviewModal
+				patientOrder={patientOrder}
+				show={showCareResourcePreviewModal}
+				onHide={() => {
+					setShowCareResourcePreviewModal(false);
+				}}
+			/>
+
 			<div className={className}>
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
 					<InlineAlert
@@ -115,6 +128,16 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					<Card.Header>
 						<Card.Title>Patient Resources</Card.Title>
 						<div className="button-container">
+							<Button
+								variant="link"
+								className="text-decoration-none"
+								size="sm"
+								onClick={() => {
+									setShowCareResourcePreviewModal(true);
+								}}
+							>
+								Preview
+							</Button>
 							<Button
 								variant="primary"
 								size="sm"
