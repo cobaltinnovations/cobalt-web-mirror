@@ -172,6 +172,10 @@ const ResourceLibrary = () => {
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
 			mode: 'SEARCH',
 			searchQuery: searchQuery,
+			tagIds: tagIdQuery,
+			contentAudienceTypeIds: contentAudienceTypeIdQuery,
+			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
 			totalCount: searchResponse.findResult.totalCount,
 		});
 	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagIdQuery]);
