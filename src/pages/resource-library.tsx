@@ -13,7 +13,6 @@ import {
 	ContentAudienceType,
 	ContentDuration,
 	ContentType,
-	ResourceLibrarySortColumnId,
 } from '@/lib/models';
 import { analyticsService, callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
@@ -72,10 +71,6 @@ const ResourceLibrary = () => {
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
-	const resourceLibrarySortColumnIdQuery = useMemo(
-		() => searchParams.get('resourceLibrarySortColumnId') ?? '',
-		[searchParams]
-	);
 
 	const { hasTouchScreen } = useTouchScreenCheck();
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +82,6 @@ const ResourceLibrary = () => {
 	const [contentAudienceTypes, setContentAudienceTypes] = useState<ContentAudienceType[]>([]);
 	const [contentDurations, setContentDurations] = useState<ContentDuration[]>([]);
 	const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-	const [resourceLibrarySortColumnIds, setResourceLibrarySortColumnIds] = useState<ResourceLibrarySortColumnId[]>([]);
 	const [tagGroups, setTagGroups] = useState<TagGroup[]>([]);
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 
@@ -100,13 +94,11 @@ const ResourceLibrary = () => {
 			!!contentAudienceTypeIdQuery ||
 			tagIdQuery.length > 0 ||
 			contentTypeIdQuery.length > 0 ||
-			contentDurationIdQuery.length > 0 ||
-			!!resourceLibrarySortColumnIdQuery,
+			contentDurationIdQuery.length > 0,
 		[
 			contentAudienceTypeIdQuery,
 			contentDurationIdQuery.length,
 			contentTypeIdQuery.length,
-			resourceLibrarySortColumnIdQuery,
 			searchQuery,
 			tagIdQuery.length,
 		]
@@ -132,7 +124,6 @@ const ResourceLibrary = () => {
 		setContentAudienceTypes(response.contentAudienceTypes);
 		setContentDurations(response.contentDurations);
 		setContentTypes(response.contentTypes);
-		setResourceLibrarySortColumnIds(response.resourceLibrarySortColumnIds);
 		setTagGroups(response.tagGroups);
 		setTagsByTagId(
 			response.tagGroups
@@ -170,7 +161,6 @@ const ResourceLibrary = () => {
 				contentTypeId: contentTypeIdQuery,
 				pageNumber: 0,
 				pageSize: 100,
-				resourceLibrarySortColumnId: resourceLibrarySortColumnIdQuery,
 				searchQuery,
 				tagId: tagIdQuery,
 			})
@@ -184,14 +174,7 @@ const ResourceLibrary = () => {
 			searchQuery: searchQuery,
 			totalCount: searchResponse.findResult.totalCount,
 		});
-	}, [
-		contentAudienceTypeIdQuery,
-		contentDurationIdQuery,
-		contentTypeIdQuery,
-		resourceLibrarySortColumnIdQuery,
-		searchQuery,
-		tagIdQuery,
-	]);
+	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagIdQuery]);
 
 	const fetchRecommendedContent = useCallback(async () => {
 		const recommendedResponse = await resourceLibraryService
@@ -232,7 +215,6 @@ const ResourceLibrary = () => {
 		searchParams.delete('searchQuery');
 		searchParams.delete('contentAudienceTypeId');
 		searchParams.delete('tagId');
-		searchParams.delete('resourceLibrarySortColumnId');
 		searchParams.delete('contentTypeId');
 		searchParams.delete('contentDurationId');
 		searchParams.delete('contentAudienceTypeId');
@@ -361,7 +343,6 @@ const ResourceLibrary = () => {
 									searchParams.delete('searchQuery');
 									searchParams.delete('contentAudienceTypeId');
 									searchParams.delete('tagId');
-									searchParams.delete('resourceLibrarySortColumnId');
 									searchParams.delete('contentTypeId');
 									searchParams.delete('contentDurationId');
 									searchParams.delete('contentAudienceTypeId');
@@ -532,16 +513,6 @@ const ResourceLibrary = () => {
 											buttonTitle="More filters"
 											modalTitle="More filters"
 											value={[
-												{
-													id: 'resourceLibrarySortColumnId',
-													filterType: FILTER_TYPE.RADIO,
-													title: 'Sort By',
-													value: searchParams.getAll('resourceLibrarySortColumnId'),
-													options: resourceLibrarySortColumnIds.map((rlscid) => ({
-														value: rlscid.resourceLibrarySortColumnId,
-														title: rlscid.description,
-													})),
-												},
 												{
 													id: 'contentTypeId',
 													filterType: FILTER_TYPE.CHECKBOX,
