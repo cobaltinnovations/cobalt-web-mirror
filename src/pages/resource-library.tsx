@@ -488,9 +488,11 @@ const ResourceLibrary = () => {
 												description={content.description}
 												tags={
 													tagsByTagId
-														? content.tagIds.map((tagId) => {
-																return tagsByTagId[tagId];
-														  })
+														? content.tagIds
+																.map((tagId) => {
+																	return tagsByTagId?.[tagId] ?? null;
+																})
+																.filter(Boolean)
 														: []
 												}
 												contentTypeId={content.contentTypeId}
@@ -623,9 +625,11 @@ const ResourceLibrary = () => {
 															description={content.description}
 															tags={
 																tagsByTagId
-																	? content.tagIds.map((tagId) => {
-																			return tagsByTagId[tagId];
-																	  })
+																	? content.tagIds
+																			.map((tagId) => {
+																				return tagsByTagId?.[tagId] ?? null;
+																			})
+																			.filter(Boolean)
 																	: []
 															}
 															contentTypeId={content.contentTypeId}
