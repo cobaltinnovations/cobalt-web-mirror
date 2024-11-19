@@ -161,21 +161,21 @@ const ResourceLibrary = () => {
 	}, [institution?.contentScreeningFlowId]);
 
 	const fetchData = useCallback(async () => {
-		const queryParams = {
-			contentAudienceTypeId: contentAudienceTypeIdQuery,
-			contentDurationId: contentDurationIdQuery,
-			contentTypeId: contentTypeIdQuery,
-			pageNumber: 0,
-			pageSize: 100,
-			resourceLibrarySortColumnId: resourceLibrarySortColumnIdQuery,
-			searchQuery,
-			tagId: tagIdQuery,
-		};
-
-		if (searchQuery) {
+		if (hasFilterQueryParms) {
 			setSearchInputValue(searchQuery);
 
-			const searchResponse = await resourceLibraryService.searchResourceLibrary(queryParams).fetch();
+			const searchResponse = await resourceLibraryService
+				.searchResourceLibrary({
+					contentAudienceTypeId: contentAudienceTypeIdQuery,
+					contentDurationId: contentDurationIdQuery,
+					contentTypeId: contentTypeIdQuery,
+					pageNumber: 0,
+					pageSize: 100,
+					resourceLibrarySortColumnId: resourceLibrarySortColumnIdQuery,
+					searchQuery,
+					tagId: tagIdQuery,
+				})
+				.fetch();
 
 			setContents(searchResponse.findResult.contents);
 			setContentsByTagGroupId(undefined);
@@ -191,7 +191,7 @@ const ResourceLibrary = () => {
 
 		if (recommendedContent) {
 			const recommendedResponse = await resourceLibraryService
-				.getResourceLibraryRecommendedContent(queryParams)
+				.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 100 })
 				.fetch();
 
 			setContents(recommendedResponse.findResult.contents);
@@ -217,6 +217,7 @@ const ResourceLibrary = () => {
 		contentAudienceTypeIdQuery,
 		contentDurationIdQuery,
 		contentTypeIdQuery,
+		hasFilterQueryParms,
 		recommendedContent,
 		resourceLibrarySortColumnIdQuery,
 		searchQuery,
@@ -267,7 +268,9 @@ const ResourceLibrary = () => {
 	const clearSearch = useCallback(() => {
 		setSearchInputValue('');
 
+		searchParams.delete('recommended');
 		searchParams.delete('searchQuery');
+
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
@@ -349,362 +352,381 @@ const ResourceLibrary = () => {
 				/>
 			)}
 
-			<AsyncPage fetchData={fetchFilters}>
-				<Container className="pt-9 pb-5">
+			{institution?.recommendedContentEnabled && (
+				<Container>
 					<Row>
 						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<div></div>
-								<div className="d-flex align-items-center justify-content-center">
-									<div className="d-flex align-items-center">
-										<span className="me-2">Show resources for</span>
-										<MegaFilter
-											className="me-2"
-											allowCollapse={false}
-											displayFooter={false}
-											displayCount={false}
-											applyOnChange
-											buttonTitle={
-												contentAudienceTypes.find(
-													(cat) =>
-														cat.contentAudienceTypeId ===
-														searchParams.get('contentAudienceTypeId')
-												)?.description ?? 'Anyone'
-											}
-											modalTitle="Show resources for..."
-											value={[
-												{
-													id: 'contentAudienceTypeId',
-													filterType: FILTER_TYPE.RADIO,
-													title: 'Show resources for...',
-													value: searchParams.getAll('contentAudienceTypeId'),
-													options: contentAudienceTypes.map((cat) => ({
-														value: cat.contentAudienceTypeId,
-														title: cat.description,
-													})),
-												},
-											]}
-											onChange={(filters) => {
-												filters.forEach((filter) => {
-													applyValuesToSearchParam(filter.value, filter.id);
-												});
-											}}
-										/>
-									</div>
-									<div className="d-flex align-items-center">
-										<span className="me-2">related to</span>
-										<MegaFilter
-											buttonTitle="Topics"
-											modalTitle="Topics"
-											value={tagGroups.map((tagGroup) => ({
-												id: tagGroup.tagGroupId,
-												filterType: FILTER_TYPE.CHECKBOX,
-												title: tagGroup.name,
-												value: searchParams
-													.getAll('tagId')
-													.filter((v) => (tagGroup.tags ?? []).find((t) => t.tagId === v)),
-												options: (tagGroup.tags ?? []).map((tag) => ({
-													value: tag.tagId,
-													title: tag.name,
-												})),
-											}))}
-											onChange={(filters) => {
-												applyValuesToSearchParam(filters.map((f) => f.value).flat(), 'tagId');
-											}}
-										/>
-									</div>
-								</div>
-								<div>
-									<MegaFilter
-										buttonTitle="More filters"
-										modalTitle="More filters"
-										value={[
-											{
-												id: 'resourceLibrarySortColumnId',
-												filterType: FILTER_TYPE.RADIO,
-												title: 'Sort By',
-												value: searchParams.getAll('resourceLibrarySortColumnId'),
-												options: resourceLibrarySortColumnIds.map((rlscid) => ({
-													value: rlscid.resourceLibrarySortColumnId,
-													title: rlscid.description,
-												})),
-											},
-											{
-												id: 'contentTypeId',
-												filterType: FILTER_TYPE.CHECKBOX,
-												title: 'Type',
-												value: searchParams.getAll('contentTypeId'),
-												options: contentTypes.map((ct) => ({
-													value: ct.contentTypeId,
-													title: ct.description,
-												})),
-											},
-											{
-												id: 'contentDurationId',
-												filterType: FILTER_TYPE.CHECKBOX,
-												title: 'Duration',
-												value: searchParams.getAll('contentDurationId'),
-												options: contentDurations.map((cd) => ({
-													value: cd.contentDurationId,
-													title: cd.description,
-												})),
-											},
-										]}
-										onChange={(filters) => {
-											filters.forEach((filter) => {
-												applyValuesToSearchParam(filter.value, filter.id);
-											});
-										}}
-									/>
-								</div>
-							</div>
+							<TabBar
+								key="resource-library-tabbar"
+								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
+								tabs={[
+									{ value: 'ALL', title: 'All' },
+									{ value: 'FOR_YOU', title: 'For You' },
+								]}
+								onTabClick={(value) => {
+									searchParams.delete('searchQuery');
+									searchParams.delete('contentAudienceTypeId');
+									searchParams.delete('tagId');
+									searchParams.delete('resourceLibrarySortColumnId');
+									searchParams.delete('contentTypeId');
+									searchParams.delete('contentDurationId');
+									searchParams.delete('contentAudienceTypeId');
+
+									if (value === 'ALL') {
+										searchParams.delete('recommended');
+									} else {
+										searchParams.set('recommended', 'true');
+									}
+
+									setSearchInputValue('');
+									setHasCompletedScreening(false);
+									setSearchParams(searchParams, { replace: true });
+								}}
+							/>
 						</Col>
 					</Row>
 				</Container>
-			</AsyncPage>
+			)}
 
-			{hasFilterQueryParms ? (
-				<AsyncPage fetchData={fetchData}>
-					<Container className="pb-6 pb-lg-32">
-						{contents.length <= 0 ? (
+			{recommendedContent ? (
+				<AsyncPage fetchData={checkScreenFlowStatus}>
+					<Container>
+						{!hasCompletedScreening ? (
 							<Row className="pt-12 pb-24">
 								<Col>
-									<NoData
-										title="No Results"
-										description="Try adjusting your filters to see available content"
-										actions={[
-											{
-												variant: 'outline-primary',
-												title: 'Clear Filters',
-												onClick: handleClearFiltersButtonClick,
-											},
-										]}
-									/>
+									<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
 								</Col>
 							</Row>
 						) : (
-							<Row>
-								{contents.map((content, resourceIndex) => {
-									return (
-										<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-											<ResourceLibraryCard
-												linkTo={`/resource-library/${content.contentId}`}
-												className="h-100"
-												imageUrl={content.imageUrl}
-												badgeTitle={content.newFlag ? 'New' : ''}
-												title={content.title}
-												author={content.author}
-												description={content.description}
-												tags={
-													tagsByTagId
-														? content.tagIds
-																.map((tagId) => {
-																	return tagsByTagId?.[tagId] ?? null;
-																})
-																.filter(Boolean)
-														: []
-												}
-												contentTypeId={content.contentTypeId}
-												duration={content.durationInMinutesDescription}
-											/>
-										</Col>
-									);
-								})}
-							</Row>
+							<AsyncPage fetchData={fetchData}>
+								{contents.length <= 0 ? (
+									<>
+										{hasFilterQueryParms ? (
+											<Row className="pt-12 pb-24">
+												<Col>
+													<h2 className="mb-6 text-muted text-center">No Results</h2>
+													<p className="mb-6 fs-large text-muted text-center">
+														Try adjusting your filters to see available content
+													</p>
+													<div className="text-center">
+														<Button
+															size="lg"
+															variant="outline-primary"
+															onClick={handleClearFiltersButtonClick}
+														>
+															Clear Filters
+														</Button>
+													</div>
+												</Col>
+											</Row>
+										) : (
+											<Row className="pt-12 pb-24">
+												<Col>
+													<div className="bg-n75 rounded p-12">
+														<Row>
+															<Col lg={{ span: 6, offset: 3 }}>
+																<h2 className="mb-6 text-muted text-center">
+																	No recommendations at this time
+																</h2>
+																<p className="mb-0 fs-large text-muted text-center">
+																	We are continually adding more resources to the
+																	library. In the meantime, you can browse resources
+																	related to{' '}
+																	<Link to="/resource-library/tag-groups/symptoms">
+																		Symptoms
+																	</Link>
+																	,{' '}
+																	<Link to="/resource-library/tag-groups/work-life">
+																		Work Life
+																	</Link>
+																	,{' '}
+																	<Link to="/resource-library/tag-groups/personal-life">
+																		Personal Life
+																	</Link>
+																	,{' '}
+																	<Link to="/resource-library/tag-groups/identity">
+																		Identity
+																	</Link>
+																	,{' '}
+																	<Link to="/resource-library/tag-groups/caretaking">
+																		Caretaking
+																	</Link>
+																	, and{' '}
+																	<Link to="/resource-library/tag-groups/world-events">
+																		World Events
+																	</Link>
+																</p>
+															</Col>
+														</Row>
+													</div>
+												</Col>
+											</Row>
+										)}
+									</>
+								) : (
+									<Row className="pt-12 pb-24">
+										{contents.map((content, resourceIndex) => {
+											return (
+												<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+													<ResourceLibraryCard
+														linkTo={`/resource-library/${content.contentId}`}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={
+															tagsByTagId
+																? content.tagIds
+																		.map((tagId) => {
+																			return tagsByTagId?.[tagId] ?? null;
+																		})
+																		.filter(Boolean)
+																: []
+														}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+													/>
+												</Col>
+											);
+										})}
+									</Row>
+								)}
+							</AsyncPage>
 						)}
 					</Container>
 				</AsyncPage>
 			) : (
-				<Container>
-					{institution?.recommendedContentEnabled && (
-						<Row className="mb-6">
-							<Col>
-								<TabBar
-									key="resource-library-tabbar"
-									value={recommendedContent ? 'FOR_YOU' : 'ALL'}
-									tabs={[
-										{ value: 'ALL', title: 'All' },
-										{ value: 'FOR_YOU', title: 'For You' },
-									]}
-									onTabClick={(value) => {
-										searchParams.delete('searchQuery');
-										searchParams.delete('tagId');
-										searchParams.delete('contentTypeId');
-										searchParams.delete('contentDurationId');
-
-										if (value === 'ALL') {
-											searchParams.delete('recommended');
-										} else {
-											searchParams.set('recommended', 'true');
-										}
-
-										setHasCompletedScreening(false);
-										setSearchParams(searchParams, { replace: true });
-									}}
-								/>
-							</Col>
-						</Row>
-					)}
-					{recommendedContent ? (
-						<AsyncPage fetchData={checkScreenFlowStatus}>
-							{!hasCompletedScreening ? (
-								<Row>
-									<Col>
-										<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
-									</Col>
-								</Row>
-							) : (
-								<AsyncPage fetchData={fetchData}>
-									{contents.length <= 0 ? (
-										<>
-											{hasFilterQueryParms ? (
-												<Row className="pt-12 pb-24">
-													<Col>
-														<h2 className="mb-6 text-muted text-center">No Results</h2>
-														<p className="mb-6 fs-large text-muted text-center">
-															Try adjusting your filters to see available content
-														</p>
-														<div className="text-center">
-															<Button
-																size="lg"
-																variant="outline-primary"
-																onClick={handleClearFiltersButtonClick}
-															>
-																Clear Filters
-															</Button>
-														</div>
-													</Col>
-												</Row>
-											) : (
-												<Row className="mb-24">
-													<Col>
-														<div className="bg-n75 rounded p-12">
-															<Row>
-																<Col lg={{ span: 6, offset: 3 }}>
-																	<h2 className="mb-6 text-muted text-center">
-																		No recommendations at this time
-																	</h2>
-																	<p className="mb-0 fs-large text-muted text-center">
-																		We are continually adding more resources to the
-																		library. In the meantime, you can browse
-																		resources related to{' '}
-																		<Link to="/resource-library/tag-groups/symptoms">
-																			Symptoms
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/work-life">
-																			Work Life
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/personal-life">
-																			Personal Life
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/identity">
-																			Identity
-																		</Link>
-																		,{' '}
-																		<Link to="/resource-library/tag-groups/caretaking">
-																			Caretaking
-																		</Link>
-																		, and{' '}
-																		<Link to="/resource-library/tag-groups/world-events">
-																			World Events
-																		</Link>
-																	</p>
-																</Col>
-															</Row>
-														</div>
-													</Col>
-												</Row>
-											)}
-										</>
-									) : (
-										<Row>
-											{contents.map((content, resourceIndex) => {
-												return (
-													<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-														<ResourceLibraryCard
-															linkTo={`/resource-library/${content.contentId}`}
-															className="h-100"
-															imageUrl={content.imageUrl}
-															badgeTitle={content.newFlag ? 'New' : ''}
-															title={content.title}
-															author={content.author}
-															description={content.description}
-															tags={
-																tagsByTagId
-																	? content.tagIds
-																			.map((tagId) => {
-																				return tagsByTagId?.[tagId] ?? null;
-																			})
-																			.filter(Boolean)
-																	: []
-															}
-															contentTypeId={content.contentTypeId}
-															duration={content.durationInMinutesDescription}
-														/>
-													</Col>
-												);
-											})}
-										</Row>
-									)}
-								</AsyncPage>
-							)}
+				<>
+					<AsyncPage fetchData={fetchFilters}>
+						<Container className="pt-9 pb-5">
+							<Row>
+								<Col>
+									<div className="d-flex align-items-center justify-content-between">
+										<div></div>
+										<div className="d-flex align-items-center justify-content-center">
+											<div className="d-flex align-items-center">
+												<span className="me-2">Show resources for</span>
+												<MegaFilter
+													className="me-2"
+													allowCollapse={false}
+													displayFooter={false}
+													displayCount={false}
+													applyOnChange
+													buttonTitle={
+														contentAudienceTypes.find(
+															(cat) =>
+																cat.contentAudienceTypeId ===
+																searchParams.get('contentAudienceTypeId')
+														)?.description ?? 'Anyone'
+													}
+													modalTitle="Show resources for..."
+													value={[
+														{
+															id: 'contentAudienceTypeId',
+															filterType: FILTER_TYPE.RADIO,
+															title: 'Show resources for...',
+															value: searchParams.getAll('contentAudienceTypeId'),
+															options: contentAudienceTypes.map((cat) => ({
+																value: cat.contentAudienceTypeId,
+																title: cat.description,
+															})),
+														},
+													]}
+													onChange={(filters) => {
+														filters.forEach((filter) => {
+															applyValuesToSearchParam(filter.value, filter.id);
+														});
+													}}
+												/>
+											</div>
+											<div className="d-flex align-items-center">
+												<span className="me-2">related to</span>
+												<MegaFilter
+													buttonTitle="Topics"
+													modalTitle="Topics"
+													value={tagGroups.map((tagGroup) => ({
+														id: tagGroup.tagGroupId,
+														filterType: FILTER_TYPE.CHECKBOX,
+														title: tagGroup.name,
+														value: searchParams
+															.getAll('tagId')
+															.filter((v) =>
+																(tagGroup.tags ?? []).find((t) => t.tagId === v)
+															),
+														options: (tagGroup.tags ?? []).map((tag) => ({
+															value: tag.tagId,
+															title: tag.name,
+														})),
+													}))}
+													onChange={(filters) => {
+														applyValuesToSearchParam(
+															filters.map((f) => f.value).flat(),
+															'tagId'
+														);
+													}}
+												/>
+											</div>
+										</div>
+										<div>
+											<MegaFilter
+												buttonTitle="More filters"
+												modalTitle="More filters"
+												value={[
+													{
+														id: 'resourceLibrarySortColumnId',
+														filterType: FILTER_TYPE.RADIO,
+														title: 'Sort By',
+														value: searchParams.getAll('resourceLibrarySortColumnId'),
+														options: resourceLibrarySortColumnIds.map((rlscid) => ({
+															value: rlscid.resourceLibrarySortColumnId,
+															title: rlscid.description,
+														})),
+													},
+													{
+														id: 'contentTypeId',
+														filterType: FILTER_TYPE.CHECKBOX,
+														title: 'Type',
+														value: searchParams.getAll('contentTypeId'),
+														options: contentTypes.map((ct) => ({
+															value: ct.contentTypeId,
+															title: ct.description,
+														})),
+													},
+													{
+														id: 'contentDurationId',
+														filterType: FILTER_TYPE.CHECKBOX,
+														title: 'Duration',
+														value: searchParams.getAll('contentDurationId'),
+														options: contentDurations.map((cd) => ({
+															value: cd.contentDurationId,
+															title: cd.description,
+														})),
+													},
+												]}
+												onChange={(filters) => {
+													filters.forEach((filter) => {
+														applyValuesToSearchParam(filter.value, filter.id);
+													});
+												}}
+											/>
+										</div>
+									</div>
+								</Col>
+							</Row>
+						</Container>
+					</AsyncPage>
+					{hasFilterQueryParms ? (
+						<AsyncPage fetchData={fetchData}>
+							<Container className="pb-6 pb-lg-32">
+								{contents.length <= 0 ? (
+									<Row className="pt-5 pb-24">
+										<Col>
+											<NoData
+												title="No Results"
+												description="Try adjusting your filters to see available content"
+												actions={[
+													{
+														variant: 'outline-primary',
+														title: 'Clear Filters',
+														onClick: handleClearFiltersButtonClick,
+													},
+												]}
+											/>
+										</Col>
+									</Row>
+								) : (
+									<Row className="pt-5 pb-24">
+										{contents.map((content, resourceIndex) => {
+											return (
+												<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+													<ResourceLibraryCard
+														linkTo={`/resource-library/${content.contentId}`}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={
+															tagsByTagId
+																? content.tagIds
+																		.map((tagId) => {
+																			return tagsByTagId?.[tagId] ?? null;
+																		})
+																		.filter(Boolean)
+																: []
+														}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+													/>
+												</Col>
+											);
+										})}
+									</Row>
+								)}
+							</Container>
 						</AsyncPage>
 					) : (
 						<AsyncPage fetchData={fetchData}>
-							{tagGroups.map((tagGroup) => {
-								return (
-									<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
-										<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-											<ResourceLibrarySubtopicCard
-												className="h-100"
-												colorId={tagGroup.colorId}
-												title={tagGroup.name}
-												description={tagGroup.description}
-												to={`/resource-library/tag-groups/${tagGroup.urlName}`}
-											/>
-										</Col>
-										<Col lg={9}>
-											<Carousel
-												responsive={resourceLibraryCarouselConfig}
-												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-												floatingButtonGroup
-											>
-												{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map((content) => {
-													return (
-														<ResourceLibraryCard
-															key={content.contentId}
-															linkTo={`/resource-library/${content.contentId}`}
-															className="h-100"
-															imageUrl={content.imageUrl}
-															badgeTitle={content.newFlag ? 'New' : ''}
-															title={content.title}
-															author={content.author}
-															description={content.description}
-															tags={
-																tagsByTagId
-																	? content.tagIds
-																			.map((tagId) => {
-																				return tagsByTagId?.[tagId] ?? null;
-																			})
-																			.filter(Boolean)
-																	: []
-															}
-															contentTypeId={content.contentTypeId}
-															duration={content.durationInMinutesDescription}
-														/>
-													);
-												})}
-											</Carousel>
-										</Col>
-									</Row>
-								);
-							})}
+							<Container>
+								{tagGroups.map((tagGroup) => {
+									return (
+										<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
+											<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+												<ResourceLibrarySubtopicCard
+													className="h-100"
+													colorId={tagGroup.colorId}
+													title={tagGroup.name}
+													description={tagGroup.description}
+													to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+												/>
+											</Col>
+											<Col lg={9}>
+												<Carousel
+													responsive={resourceLibraryCarouselConfig}
+													trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+													floatingButtonGroup
+												>
+													{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map(
+														(content) => {
+															return (
+																<ResourceLibraryCard
+																	key={content.contentId}
+																	linkTo={`/resource-library/${content.contentId}`}
+																	className="h-100"
+																	imageUrl={content.imageUrl}
+																	badgeTitle={content.newFlag ? 'New' : ''}
+																	title={content.title}
+																	author={content.author}
+																	description={content.description}
+																	tags={
+																		tagsByTagId
+																			? content.tagIds
+																					.map((tagId) => {
+																						return (
+																							tagsByTagId?.[tagId] ?? null
+																						);
+																					})
+																					.filter(Boolean)
+																			: []
+																	}
+																	contentTypeId={content.contentTypeId}
+																	duration={content.durationInMinutesDescription}
+																/>
+															);
+														}
+													)}
+												</Carousel>
+											</Col>
+										</Row>
+									);
+								})}
+							</Container>
 						</AsyncPage>
 					)}
-				</Container>
+				</>
 			)}
 		</>
 	);
