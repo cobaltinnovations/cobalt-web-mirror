@@ -362,8 +362,15 @@ const ResourceLibrary = () => {
 											className="me-2"
 											allowCollapse={false}
 											displayFooter={false}
+											displayCount={false}
 											applyOnChange
-											buttonTitle="Anyone"
+											buttonTitle={
+												contentAudienceTypes.find(
+													(cat) =>
+														cat.contentAudienceTypeId ===
+														searchParams.get('contentAudienceTypeId')
+												)?.description ?? 'Anyone'
+											}
 											modalTitle="Show resources for..."
 											value={[
 												{

@@ -56,7 +56,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	buttonActive: {
-		padding: '0 20px',
 		backgroundColor: theme.colors.p500,
 		'& span, & svg': {
 			color: theme.colors.n0,
@@ -89,6 +88,7 @@ export interface MegaFilterProps {
 	onChange(value: Filter[]): void;
 	allowCollapse?: boolean;
 	displayFooter?: boolean;
+	displayCount?: boolean;
 	applyOnChange?: boolean;
 	className?: string;
 }
@@ -100,6 +100,7 @@ function MegaFilter({
 	onChange,
 	allowCollapse = true,
 	displayFooter = true,
+	displayCount = true,
 	applyOnChange,
 	className,
 }: MegaFilterProps) {
@@ -200,11 +201,8 @@ function MegaFilter({
 				}}
 			>
 				<span>{buttonTitle}</span>
-				{activeLength && activeLength > 0 ? (
-					<span>&nbsp;&bull; {activeLength}</span>
-				) : (
-					<ArrowDown className="ms-1" width={24} height={24} />
-				)}
+				{displayCount && activeLength > 0 && <span>&nbsp;&bull; {activeLength}</span>}
+				<ArrowDown className="ms-1" width={24} height={24} />
 			</button>
 		</>
 	);
