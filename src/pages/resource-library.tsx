@@ -173,7 +173,7 @@ const ResourceLibrary = () => {
 			mode: 'SEARCH',
 			searchQuery: searchQuery,
 			tagIds: tagIdQuery,
-			contentAudienceTypeIds: contentAudienceTypeIdQuery,
+			contentAudienceTypeId: contentAudienceTypeIdQuery,
 			contentDurationIds: contentDurationIdQuery,
 			contentTypeIds: contentTypeIdQuery,
 			totalCount: searchResponse.findResult.totalCount,
