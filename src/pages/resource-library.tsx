@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
@@ -382,74 +382,83 @@ const ResourceLibrary = () => {
 				</Container>
 			)}
 
-			{recommendedContent ? (
-				<AsyncPage fetchData={checkScreenFlowStatus}>
-					<Container>
-						{!hasCompletedScreening ? (
-							<Row className="pt-12 pb-24">
-								<Col>
-									<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
-								</Col>
-							</Row>
-						) : (
-							<AsyncPage fetchData={fetchRecommendedContent}>
+			<AsyncPage fetchData={fetchFilters}>
+				{recommendedContent ? (
+					<AsyncPage fetchData={checkScreenFlowStatus}>
+						<Container>
+							{!hasCompletedScreening ? (
 								<Row className="pt-12 pb-24">
-									{contents.length <= 0 && (
-										<Col>
-											<div className="bg-n75 rounded p-12">
-												<Row>
-													<Col lg={{ span: 6, offset: 3 }}>
-														<h2 className="mb-6 text-muted text-center">
-															No recommendations at this time
-														</h2>
-														<p className="mb-0 fs-large text-muted text-center">
-															We are continually adding more resources to the library. In
-															the meantime, you can browse resources related to{' '}
-															{tagGroups.map((tg) => (
-																<Link to={`/resource-library/tag-groups/${tg.urlName}`}>
-																	{tg.name}
-																</Link>
-															))}
-														</p>
-													</Col>
-												</Row>
-											</div>
-										</Col>
-									)}
-									{contents.map((content) => {
-										return (
-											<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
-												<ResourceLibraryCard
-													linkTo={`/resource-library/${content.contentId}`}
-													className="h-100"
-													imageUrl={content.imageUrl}
-													badgeTitle={content.newFlag ? 'New' : ''}
-													title={content.title}
-													author={content.author}
-													description={content.description}
-													tags={
-														tagsByTagId
-															? content.tagIds
-																	.map((tagId) => {
-																		return tagsByTagId?.[tagId] ?? null;
-																	})
-																	.filter(Boolean)
-															: []
-													}
-													contentTypeId={content.contentTypeId}
-													duration={content.durationInMinutesDescription}
-												/>
-											</Col>
-										);
-									})}
+									<Col>
+										<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
+									</Col>
 								</Row>
-							</AsyncPage>
-						)}
-					</Container>
-				</AsyncPage>
-			) : (
-				<Container>
-					<AsyncPage fetchData={fetchFilters}>
+							) : (
+								<AsyncPage fetchData={fetchRecommendedContent}>
+									<Row className="pt-12 pb-24">
+										{contents.length <= 0 && (
+											<Col>
+												<div className="bg-n75 rounded p-12">
+													<Row>
+														<Col lg={{ span: 6, offset: 3 }}>
+															<h2 className="mb-6 text-muted text-center">
+																No recommendations at this time
+															</h2>
+															<p className="mb-0 fs-large text-muted text-center">
+																We are continually adding more resources to the library.
+																In the meantime, you can browse resources related to{' '}
+																{tagGroups.map((tagGroup, tagGroupIndex) => {
+																	const isLast =
+																		tagGroupIndex === tagGroups.length - 1;
+																	return (
+																		<>
+																			<Link
+																				to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+																			>
+																				{tagGroup.name}
+																			</Link>
+																			{!isLast && ', '}
+																		</>
+																	);
+																})}
+															</p>
+														</Col>
+													</Row>
+												</div>
+											</Col>
+										)}
+										{contents.map((content) => {
+											return (
+												<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+													<ResourceLibraryCard
+														linkTo={`/resource-library/${content.contentId}`}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={
+															tagsByTagId
+																? content.tagIds
+																		.map((tagId) => {
+																			return tagsByTagId?.[tagId] ?? null;
+																		})
+																		.filter(Boolean)
+																: []
+														}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+													/>
+												</Col>
+											);
+										})}
+									</Row>
+								</AsyncPage>
+							)}
+						</Container>
+					</AsyncPage>
+				) : (
+					<Container>
 						<Row className="pt-9 pb-5">
 							<Col>
 								<div className="d-flex align-items-center justify-content-between">
@@ -564,107 +573,111 @@ const ResourceLibrary = () => {
 								</div>
 							</Col>
 						</Row>
-					</AsyncPage>
-					{hasFilterQueryParms ? (
-						<AsyncPage fetchData={fetchFilteredContent}>
-							<Row className="pt-5 pb-24">
-								{contents.length <= 0 && (
-									<Col>
-										<NoData
-											title="No Results"
-											description="Try adjusting your filters to see available content"
-											actions={[
-												{
-													variant: 'outline-primary',
-													title: 'Clear Filters',
-													onClick: handleClearFiltersButtonClick,
-												},
-											]}
-										/>
-									</Col>
-								)}
-								{contents.map((content, resourceIndex) => {
-									return (
-										<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-											<ResourceLibraryCard
-												linkTo={`/resource-library/${content.contentId}`}
-												className="h-100"
-												imageUrl={content.imageUrl}
-												badgeTitle={content.newFlag ? 'New' : ''}
-												title={content.title}
-												author={content.author}
-												description={content.description}
-												tags={
-													tagsByTagId
-														? content.tagIds
-																.map((tagId) => {
-																	return tagsByTagId?.[tagId] ?? null;
-																})
-																.filter(Boolean)
-														: []
-												}
-												contentTypeId={content.contentTypeId}
-												duration={content.durationInMinutesDescription}
+						{hasFilterQueryParms ? (
+							<AsyncPage fetchData={fetchFilteredContent}>
+								<Row className="pt-5 pb-24">
+									{contents.length <= 0 && (
+										<Col>
+											<NoData
+												title="No Results"
+												description="Try adjusting your filters to see available content"
+												actions={[
+													{
+														variant: 'outline-primary',
+														title: 'Clear Filters',
+														onClick: handleClearFiltersButtonClick,
+													},
+												]}
 											/>
 										</Col>
+									)}
+									{contents.map((content, resourceIndex) => {
+										return (
+											<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+												<ResourceLibraryCard
+													linkTo={`/resource-library/${content.contentId}`}
+													className="h-100"
+													imageUrl={content.imageUrl}
+													badgeTitle={content.newFlag ? 'New' : ''}
+													title={content.title}
+													author={content.author}
+													description={content.description}
+													tags={
+														tagsByTagId
+															? content.tagIds
+																	.map((tagId) => {
+																		return tagsByTagId?.[tagId] ?? null;
+																	})
+																	.filter(Boolean)
+															: []
+													}
+													contentTypeId={content.contentTypeId}
+													duration={content.durationInMinutesDescription}
+												/>
+											</Col>
+										);
+									})}
+								</Row>
+							</AsyncPage>
+						) : (
+							<AsyncPage fetchData={fetchDefaultContent}>
+								{tagGroups.map((tagGroup) => {
+									return (
+										<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
+											<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+												<ResourceLibrarySubtopicCard
+													className="h-100"
+													colorId={tagGroup.colorId}
+													title={tagGroup.name}
+													description={tagGroup.description}
+													to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+												/>
+											</Col>
+											<Col lg={9}>
+												<Carousel
+													responsive={resourceLibraryCarouselConfig}
+													trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+													floatingButtonGroup
+												>
+													{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map(
+														(content) => {
+															return (
+																<ResourceLibraryCard
+																	key={content.contentId}
+																	linkTo={`/resource-library/${content.contentId}`}
+																	className="h-100"
+																	imageUrl={content.imageUrl}
+																	badgeTitle={content.newFlag ? 'New' : ''}
+																	title={content.title}
+																	author={content.author}
+																	description={content.description}
+																	tags={
+																		tagsByTagId
+																			? content.tagIds
+																					.map((tagId) => {
+																						return (
+																							tagsByTagId?.[tagId] ?? null
+																						);
+																					})
+																					.filter(Boolean)
+																			: []
+																	}
+																	contentTypeId={content.contentTypeId}
+																	duration={content.durationInMinutesDescription}
+																/>
+															);
+														}
+													)}
+												</Carousel>
+											</Col>
+										</Row>
 									);
 								})}
-							</Row>
-						</AsyncPage>
-					) : (
-						<AsyncPage fetchData={fetchDefaultContent}>
-							{tagGroups.map((tagGroup) => {
-								return (
-									<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
-										<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-											<ResourceLibrarySubtopicCard
-												className="h-100"
-												colorId={tagGroup.colorId}
-												title={tagGroup.name}
-												description={tagGroup.description}
-												to={`/resource-library/tag-groups/${tagGroup.urlName}`}
-											/>
-										</Col>
-										<Col lg={9}>
-											<Carousel
-												responsive={resourceLibraryCarouselConfig}
-												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-												floatingButtonGroup
-											>
-												{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map((content) => {
-													return (
-														<ResourceLibraryCard
-															key={content.contentId}
-															linkTo={`/resource-library/${content.contentId}`}
-															className="h-100"
-															imageUrl={content.imageUrl}
-															badgeTitle={content.newFlag ? 'New' : ''}
-															title={content.title}
-															author={content.author}
-															description={content.description}
-															tags={
-																tagsByTagId
-																	? content.tagIds
-																			.map((tagId) => {
-																				return tagsByTagId?.[tagId] ?? null;
-																			})
-																			.filter(Boolean)
-																	: []
-															}
-															contentTypeId={content.contentTypeId}
-															duration={content.durationInMinutesDescription}
-														/>
-													);
-												})}
-											</Carousel>
-										</Col>
-									</Row>
-								);
-							})}
-						</AsyncPage>
-					)}
-				</Container>
-			)}
+							</AsyncPage>
+						)}
+					</Container>
+				)}
+			</AsyncPage>
 		</>
 	);
 };
