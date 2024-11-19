@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Collapse, Form, Modal } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
+import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
@@ -73,8 +73,8 @@ export interface Filter {
 	id: string;
 	filterType: FILTER_TYPE;
 	title: string;
-	value?: string | string[];
-	options?: FilterOption[];
+	value: string[];
+	options: FilterOption[];
 }
 
 export interface FilterOption {
@@ -87,9 +87,9 @@ export interface MegaFilterProps {
 	modalTitle: string;
 	value: Filter[];
 	onChange(value: Filter[]): void;
-	activeLength?: number;
 	allowCollapse?: boolean;
 	displayFooter?: boolean;
+	applyOnChange?: boolean;
 	className?: string;
 }
 
@@ -98,9 +98,9 @@ function MegaFilter({
 	modalTitle,
 	value,
 	onChange,
-	activeLength,
 	allowCollapse = true,
 	displayFooter = true,
+	applyOnChange,
 	className,
 }: MegaFilterProps) {
 	const classes = useStyles();
@@ -109,6 +109,11 @@ function MegaFilter({
 
 	const handleOnEnter = useCallback(() => {
 		setInternalValue(value);
+	}, [value]);
+
+	const activeLength = useMemo(() => {
+		const thing = value.map((v) => v.value).flat().length;
+		return thing;
 	}, [value]);
 
 	return (
@@ -132,24 +137,23 @@ function MegaFilter({
 						return (
 							<React.Fragment key={filter.id}>
 								<MegaFilterCollapse
-									filter={filter}
+									id={filter.id}
+									title={filter.title}
+									filterType={filter.filterType}
+									options={filter.options}
 									allowCollapse={allowCollapse}
-									onChange={({ currentTarget }) => {
-										setInternalValue((previousValue) =>
-											previousValue.map((v) =>
-												v.id === filter.id
-													? {
-															...v,
-															value: Array.isArray(v.value)
-																? AddOrRemoveValueFromArray(
-																		currentTarget.value,
-																		v.value
-																  )
-																: currentTarget.value,
-													  }
-													: v
-											)
+									value={filter.value}
+									onChange={(newValue) => {
+										const internalValueClone = internalValue.map((v) =>
+											v.id === filter.id ? { ...v, value: newValue } : v
 										);
+
+										if (applyOnChange) {
+											setShow(false);
+											onChange(internalValueClone);
+										} else {
+											setInternalValue(internalValueClone);
+										}
 									}}
 								/>
 								{!isLast && <hr className="mb-6" />}
@@ -165,7 +169,7 @@ function MegaFilter({
 								variant="outline-primary"
 								onClick={() => {
 									setShow(false);
-									onChange(internalValue);
+									onChange(internalValue.map((v) => ({ ...v, value: [] })));
 								}}
 							>
 								Clear
@@ -231,13 +235,21 @@ const useMegaFilterCollapseStyles = createUseThemedStyles((theme) => ({
 }));
 
 const MegaFilterCollapse = ({
-	filter,
+	id,
+	title,
+	filterType,
+	options,
 	allowCollapse,
+	value,
 	onChange,
 }: {
-	filter: Filter;
+	id: string;
+	title: string;
+	filterType: FILTER_TYPE;
+	options: FilterOption[];
 	allowCollapse: boolean;
-	onChange(event: React.ChangeEvent<HTMLInputElement>): void;
+	value: string[];
+	onChange(value: string[]): void;
 }) => {
 	const classes = useMegaFilterCollapseStyles();
 	const [show, setShow] = useState(true);
@@ -252,42 +264,38 @@ const MegaFilterCollapse = ({
 						setShow(!show);
 					}}
 				>
-					{filter.title}
+					{title}
 				</Button>
 			)}
 			<Collapse in={show}>
 				<div>
 					<div className={classes.megaFilterCollapseInner}>
-						{(filter.options ?? []).map((option) => (
+						{options.map((option) => (
 							<React.Fragment key={option.value}>
-								{filter.filterType === FILTER_TYPE.CHECKBOX && (
+								{filterType === FILTER_TYPE.CHECKBOX && (
 									<Form.Check
 										type="checkbox"
-										name={`filter--${filter.id}`}
+										name={`filter--${id}`}
 										id={`filter-option--${option.value}`}
 										label={option.title}
 										value={option.value}
-										checked={
-											Array.isArray(filter.value)
-												? filter.value.includes(option.value)
-												: filter.value === option.value
-										}
-										onChange={onChange}
+										checked={value.includes(option.value)}
+										onChange={({ currentTarget }) => {
+											onChange(AddOrRemoveValueFromArray(currentTarget.value, value));
+										}}
 									/>
 								)}
-								{filter.filterType === FILTER_TYPE.RADIO && (
+								{filterType === FILTER_TYPE.RADIO && (
 									<Form.Check
 										type="radio"
-										name={`filter--${filter.id}`}
+										name={`filter--${id}`}
 										id={`filter-option--${option.value}`}
 										label={option.title}
 										value={option.value}
-										checked={
-											Array.isArray(filter.value)
-												? filter.value.includes(option.value)
-												: filter.value === option.value
-										}
-										onChange={onChange}
+										checked={value.includes(option.value)}
+										onChange={({ currentTarget }) => {
+											onChange([currentTarget.value]);
+										}}
 									/>
 								)}
 							</React.Fragment>

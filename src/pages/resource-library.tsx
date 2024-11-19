@@ -228,7 +228,7 @@ const ResourceLibrary = () => {
 		});
 	}, [contentDurationIdQuery, contentTypeIdQuery, recommendedContent, searchQuery, tagIdQuery]);
 
-	const applyRecommendedFilterValuesToSearchParam = (values: string[], searchParam: string) => {
+	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
 
 		for (const value of values) {
@@ -356,106 +356,122 @@ const ResourceLibrary = () => {
 				/>
 			)}
 
-			<Row className="mb-6">
-				<Col>
-					<MegaFilter
-						allowCollapse={false}
-						displayFooter={false}
-						buttonTitle="Anyone"
-						modalTitle="Show resources for..."
-						value={[
-							{
-								id: 'show-resources-for',
-								filterType: FILTER_TYPE.RADIO,
-								title: 'Show resources for...',
-								value: '',
-								options: [
-									{
-										value: 'ANYONE',
-										title: 'Anyone',
-									},
-									{
-										value: 'MYSELF',
-										title: 'Myself',
-									},
-									{
-										value: 'MY_CHILD',
-										title: 'My child',
-									},
-									{
-										value: 'MY_PRETEEN_TEEN',
-										title: 'My preteen/teen',
-									},
-									{
-										value: 'MY_ADULT_CHILD',
-										title: 'My adult child',
-									},
-									{
-										value: 'MY_SPOUSE',
-										title: 'My spouse',
-									},
-									{
-										value: 'AN_AGING_PARENT',
-										title: 'An aging parent',
-									},
-								],
-							},
-						]}
-						onChange={(newValues) => {
-							console.log(newValues);
-						}}
-					/>
-					<MegaFilter
-						buttonTitle="Topics"
-						modalTitle="Topics"
-						value={[
-							{
-								id: 'show-resources-for',
-								filterType: FILTER_TYPE.RADIO,
-								title: 'Show resources for...',
-								value: '',
-								options: [
-									{
-										value: 'ANYONE',
-										title: 'Anyone',
-									},
-									{
-										value: 'MYSELF',
-										title: 'Myself',
-									},
-									{
-										value: 'MY_CHILD',
-										title: 'My child',
-									},
-								],
-							},
-							{
-								id: 'symptoms',
-								filterType: FILTER_TYPE.CHECKBOX,
-								title: 'Symptoms',
-								value: [''],
-								options: [
-									{
-										value: 'ANXIETY',
-										title: 'Anxiety',
-									},
-									{
-										value: 'MOOD',
-										title: 'Mood',
-									},
-									{
-										value: 'SUBSTANCE_USE',
-										title: 'Substance Use',
-									},
-								],
-							},
-						]}
-						onChange={(newValues) => {
-							console.log(newValues);
-						}}
-					/>
-				</Col>
-			</Row>
+			<Container className="py-9">
+				<Row>
+					<Col>
+						<div className="d-flex align-items-center justify-content-center">
+							<div className="mb-2 d-flex align-items-center">
+								<span className="me-2">Show resources for</span>
+								<MegaFilter
+									className="me-2"
+									allowCollapse={false}
+									displayFooter={false}
+									applyOnChange
+									buttonTitle="Anyone"
+									modalTitle="Show resources for..."
+									value={[
+										{
+											id: 'show-resources-for',
+											filterType: FILTER_TYPE.RADIO,
+											title: 'Show resources for...',
+											value: searchParams.getAll('show-resources-for'),
+											options: [
+												{
+													value: 'ANYONE',
+													title: 'Anyone',
+												},
+												{
+													value: 'MYSELF',
+													title: 'Myself',
+												},
+												{
+													value: 'MY_CHILD',
+													title: 'My child',
+												},
+												{
+													value: 'MY_PRETEEN_TEEN',
+													title: 'My preteen/teen',
+												},
+												{
+													value: 'MY_ADULT_CHILD',
+													title: 'My adult child',
+												},
+												{
+													value: 'MY_SPOUSE',
+													title: 'My spouse',
+												},
+												{
+													value: 'AN_AGING_PARENT',
+													title: 'An aging parent',
+												},
+											],
+										},
+									]}
+									onChange={(filters) => {
+										filters.forEach((filter) => {
+											applyValuesToSearchParam(filter.value, filter.id);
+										});
+									}}
+								/>
+							</div>
+							<div className="mb-2 d-flex align-items-center">
+								<span className="me-2">related to</span>
+								<MegaFilter
+									buttonTitle="Topics"
+									modalTitle="Topics"
+									value={[
+										{
+											id: 'show-resources-for',
+											filterType: FILTER_TYPE.RADIO,
+											title: 'Show resources for...',
+											value: searchParams.getAll('show-resources-for'),
+											options: [
+												{
+													value: 'ANYONE',
+													title: 'Anyone',
+												},
+												{
+													value: 'MYSELF',
+													title: 'Myself',
+												},
+												{
+													value: 'MY_CHILD',
+													title: 'My child',
+												},
+											],
+										},
+										{
+											id: 'symptoms',
+											filterType: FILTER_TYPE.CHECKBOX,
+											title: 'Symptoms',
+											value: searchParams.getAll('symptoms'),
+											options: [
+												{
+													value: 'ANXIETY',
+													title: 'Anxiety',
+												},
+												{
+													value: 'MOOD',
+													title: 'Mood',
+												},
+												{
+													value: 'SUBSTANCE_USE',
+													title: 'Substance Use',
+												},
+											],
+										},
+									]}
+									onChange={(filters) => {
+										filters.forEach((filter) => {
+											applyValuesToSearchParam(filter.value, filter.id);
+										});
+									}}
+								/>
+							</div>
+						</div>
+					</Col>
+				</Row>
+			</Container>
 
 			{searchQuery ? (
 				<AsyncPage fetchData={fetchData}>
@@ -556,14 +572,11 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setTagFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam([], 'tagId');
+														applyValuesToSearchParam([], 'tagId');
 													}}
 													onApply={() => {
 														setTagFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															tagFilterValue,
-															'tagId'
-														);
+														applyValuesToSearchParam(tagFilterValue, 'tagId');
 													}}
 												>
 													{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
@@ -632,11 +645,11 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setContentTypeFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam([], 'contentTypeId');
+														applyValuesToSearchParam([], 'contentTypeId');
 													}}
 													onApply={() => {
 														setContentTypeFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
+														applyValuesToSearchParam(
 															contentTypeFilterValue,
 															'contentTypeId'
 														);
@@ -678,14 +691,11 @@ const ResourceLibrary = () => {
 													}}
 													onClear={() => {
 														setContentDurationFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															[],
-															'contentDurationId'
-														);
+														applyValuesToSearchParam([], 'contentDurationId');
 													}}
 													onApply={() => {
 														setContentDurationFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
+														applyValuesToSearchParam(
 															contentDurationFilterValue,
 															'contentDurationId'
 														);
