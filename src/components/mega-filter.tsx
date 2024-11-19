@@ -106,14 +106,10 @@ function MegaFilter({
 	const classes = useStyles();
 	const [show, setShow] = useState(false);
 	const [internalValue, setInternalValue] = useState<Filter[]>([]);
+	const activeLength = useMemo(() => value.map((v) => v.value).flat().length, [value]);
 
 	const handleOnEnter = useCallback(() => {
 		setInternalValue(value);
-	}, [value]);
-
-	const activeLength = useMemo(() => {
-		const thing = value.map((v) => v.value).flat().length;
-		return thing;
 	}, [value]);
 
 	return (

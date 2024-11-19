@@ -393,7 +393,9 @@ const ResourceLibrary = () => {
 												id: tagGroup.tagGroupId,
 												filterType: FILTER_TYPE.CHECKBOX,
 												title: tagGroup.name,
-												value: searchParams.getAll('tagId'),
+												value: searchParams
+													.getAll('tagId')
+													.filter((v) => (tagGroup.tags ?? []).find((t) => t.tagId === v)),
 												options: (tagGroup.tags ?? []).map((tag) => ({
 													value: tag.tagId,
 													title: tag.name,
