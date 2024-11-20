@@ -446,10 +446,10 @@ const ResourceLibrary = () => {
 					<Container>
 						<Row className="pt-9 pb-5">
 							<Col>
-								<div className="d-flex align-items-center justify-content-between">
+								<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-between">
 									<div></div>
-									<div className="d-flex align-items-center justify-content-center">
-										<div className="d-flex align-items-center">
+									<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
+										<div className="mb-2 mb-lg-0 d-flex align-items-center">
 											<span className="me-2">Show resources for</span>
 											<MegaFilter
 												className="me-2"
@@ -484,7 +484,7 @@ const ResourceLibrary = () => {
 												}}
 											/>
 										</div>
-										<div className="d-flex align-items-center">
+										<div className="mb-2 mb-lg-0 d-flex align-items-center">
 											<span className="me-2">related to</span>
 											<MegaFilter
 												buttonTitle={
