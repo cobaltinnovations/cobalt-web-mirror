@@ -216,16 +216,9 @@ const ResourceLibrary = () => {
 	};
 
 	const handleClearFiltersButtonClick = useCallback(() => {
-		searchParams.delete('searchQuery');
-		searchParams.delete('contentAudienceTypeId');
-		searchParams.delete('tagId');
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
-		searchParams.delete('contentAudienceTypeId');
-
 		setSearchInputValue('');
-		setSearchParams(searchParams, { replace: true });
-	}, [searchParams, setSearchParams]);
+		setSearchParams(new URLSearchParams(), { replace: true });
+	}, [setSearchParams]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
