@@ -487,7 +487,9 @@ const ResourceLibrary = () => {
 										<div className="d-flex align-items-center">
 											<span className="me-2">related to</span>
 											<MegaFilter
-												buttonTitle="Topics"
+												buttonTitle={
+													searchParams.getAll('tagId').length > 0 ? 'Topics' : 'Any topic'
+												}
 												modalTitle="Topics"
 												value={tagGroups.map((tagGroup) => ({
 													id: tagGroup.tagGroupId,
@@ -514,6 +516,8 @@ const ResourceLibrary = () => {
 									</div>
 									<div>
 										<MegaFilter
+											displayFilterIcon
+											displayDownArrow={false}
 											buttonTitle="More filters"
 											modalTitle="More filters"
 											value={[

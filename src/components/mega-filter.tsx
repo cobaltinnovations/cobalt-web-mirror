@@ -5,7 +5,9 @@ import classNames from 'classnames';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
+import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
@@ -61,6 +63,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 			color: theme.colors.n0,
 		},
 	},
+	filterIconButton: {
+		paddingLeft: 16,
+	},
+	noDownArrow: {
+		paddingRight: 20,
+	},
 }));
 
 export enum FILTER_TYPE {
@@ -89,6 +97,8 @@ export interface MegaFilterProps {
 	allowCollapse?: boolean;
 	displayFooter?: boolean;
 	displayCount?: boolean;
+	displayFilterIcon?: boolean;
+	displayDownArrow?: boolean;
 	applyOnChange?: boolean;
 	className?: string;
 }
@@ -101,6 +111,8 @@ function MegaFilter({
 	allowCollapse = true,
 	displayFooter = true,
 	displayCount = true,
+	displayFilterIcon = false,
+	displayDownArrow = true,
 	applyOnChange,
 	className,
 }: MegaFilterProps) {
@@ -193,6 +205,8 @@ function MegaFilter({
 					classes.button,
 					{
 						[classes.buttonActive]: activeLength,
+						[classes.filterIconButton]: displayFilterIcon,
+						[classes.noDownArrow]: !displayDownArrow,
 					},
 					className
 				)}
@@ -200,9 +214,10 @@ function MegaFilter({
 					setShow(true);
 				}}
 			>
+				{displayFilterIcon && <FilterIcon className="me-2" width={20} height={20} />}
 				<span>{buttonTitle}</span>
 				{displayCount && activeLength > 0 && <span>&nbsp;&bull; {activeLength}</span>}
-				<ArrowDown className="ms-1" width={24} height={24} />
+				{displayDownArrow && <ArrowDown className="ms-1" width={24} height={24} />}
 			</button>
 		</>
 	);
