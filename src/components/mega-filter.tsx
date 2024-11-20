@@ -255,7 +255,7 @@ const useMegaFilterCollapseStyles = createUseThemedStyles((theme) => ({
 		paddingBottom: 24,
 		columnCount: ({ displaySingleColumn }: UseMegaFilterCollapseStylesProps) => (displaySingleColumn ? 1 : 3),
 		[mediaQueries.lg]: {
-			columnCount: 1,
+			columnCount: `1 !important`,
 		},
 	},
 }));
