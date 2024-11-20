@@ -26,7 +26,6 @@ import NoData from '@/components/no-data';
 
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
-
 	const { hasTouchScreen } = useTouchScreenCheck();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -65,6 +64,12 @@ const ResourceLibraryTopic = () => {
 	const [tagGroup, setTagGroup] = useState<TagGroup>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	const [contents, setContents] = useState<Content[]>([]);
+
+	useEffect(() => {
+		if (tagGroup && !hasTouchScreen) {
+			searchInputRef.current?.focus({ preventScroll: true });
+		}
+	}, [tagGroup, hasTouchScreen]);
 
 	const fetchPageBlockingData = useCallback(async () => {
 		if (!tagGroupId) {
