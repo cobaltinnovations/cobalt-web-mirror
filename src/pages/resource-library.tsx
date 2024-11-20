@@ -170,12 +170,12 @@ const ResourceLibrary = () => {
 		setContentsByTagGroupId(undefined);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+			contentAudienceTypeIds: [contentAudienceTypeIdQuery],
+			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
 			mode: 'FILTERED',
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
 			tagIds: tagIdQuery,
-			contentAudienceTypeId: contentAudienceTypeIdQuery,
-			contentDurationIds: contentDurationIdQuery,
-			contentTypeIds: contentTypeIdQuery,
 			totalCount: searchResponse.findResult.totalCount,
 		});
 	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagIdQuery]);

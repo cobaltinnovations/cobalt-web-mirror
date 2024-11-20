@@ -119,12 +119,12 @@ const ResourceLibraryTopic = () => {
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
-			tagGroupId: tagGroup?.tagGroupId,
-			contentAudienceTypeId: contentAudienceTypeIdQuery,
-			tagIds: tagIdQuery,
-			contentTypeIds: contentTypeIdQuery,
+			contentAudienceTypeIds: [contentAudienceTypeIdQuery],
 			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
+			tagGroupId: tagGroup?.tagGroupId,
+			tagIds: tagIdQuery,
 			totalCount: findResultTotalCount,
 		});
 

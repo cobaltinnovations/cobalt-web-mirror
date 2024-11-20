@@ -127,6 +127,7 @@ export const resourceLibraryService = {
 			contentTypeId?: string[];
 			contentDurationId?: string[];
 			searchQuery?: string;
+			contentAudienceTypeId?: string;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

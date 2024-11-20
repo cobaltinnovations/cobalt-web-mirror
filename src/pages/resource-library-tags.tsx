@@ -22,6 +22,7 @@ enum FILTER_IDS {
 const ResourceLibraryTags = () => {
 	const { urlName } = useParams<{ urlName: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const contentAudienceTypeIdQuery = useMemo(() => searchParams.get('contentAudienceTypeId') ?? '', [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
 	const hasQueryParams = useMemo(
@@ -74,13 +75,14 @@ const ResourceLibraryTags = () => {
 				pageSize: 200,
 				contentTypeId: contentTypeIdQuery,
 				contentDurationId: contentDurationIdQuery,
+				contentAudienceTypeId: contentAudienceTypeIdQuery,
 			})
 			.fetch();
 
 		setFindResultTotalCount(findResult.totalCount);
 		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContent(findResult.contents);
-	}, [contentDurationIdQuery, contentTypeIdQuery, urlName]);
+	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, urlName]);
 
 	useEffect(() => {
 		if (!filtersResponse) {
@@ -121,9 +123,10 @@ const ResourceLibraryTags = () => {
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG, {
-			tagId: tag.tagId,
-			contentTypeIds: contentTypeIdQuery,
+			contentAudienceTypeIds: [contentAudienceTypeIdQuery],
 			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
+			tagId: tag.tagId,
 			totalCount: findResultTotalCount,
 		});
 
