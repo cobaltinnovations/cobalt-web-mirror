@@ -119,7 +119,7 @@ const ResourceLibraryTopic = () => {
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
-			contentAudienceTypeIds: [contentAudienceTypeIdQuery],
+			contentAudienceTypeIds: contentAudienceTypeIdQuery ? [contentAudienceTypeIdQuery] : [],
 			contentDurationIds: contentDurationIdQuery,
 			contentTypeIds: contentTypeIdQuery,
 			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,

@@ -170,7 +170,7 @@ const ResourceLibrary = () => {
 		setContentsByTagGroupId(undefined);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
-			contentAudienceTypeIds: [contentAudienceTypeIdQuery],
+			contentAudienceTypeIds: contentAudienceTypeIdQuery ? [contentAudienceTypeIdQuery] : [],
 			contentDurationIds: contentDurationIdQuery,
 			contentTypeIds: contentTypeIdQuery,
 			mode: 'FILTERED',
