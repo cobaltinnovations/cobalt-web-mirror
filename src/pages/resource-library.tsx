@@ -452,6 +452,7 @@ const ResourceLibrary = () => {
 										<div className="mb-2 mb-lg-0 d-flex align-items-center">
 											<span className="me-2">Show resources for</span>
 											<MegaFilter
+												displaySingleColumn
 												className="me-2"
 												allowCollapse={false}
 												displayFooter={false}

@@ -8,12 +8,17 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+
+interface UseStylesProps {
+	displaySingleColumn?: boolean;
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
 		width: '90%',
 		height: '100%',
-		maxWidth: 720,
+		maxWidth: ({ displaySingleColumn }: UseStylesProps) => (displaySingleColumn ? 480 : 720),
 		margin: '0 auto',
 		'& .modal-content': {
 			maxHeight: '90vh',
@@ -95,6 +100,7 @@ export interface MegaFilterProps {
 	value: Filter[];
 	onChange(value: Filter[]): void;
 	allowCollapse?: boolean;
+	displaySingleColumn?: boolean;
 	displayFooter?: boolean;
 	displayCount?: boolean;
 	displayFilterIcon?: boolean;
@@ -109,6 +115,7 @@ function MegaFilter({
 	value,
 	onChange,
 	allowCollapse = true,
+	displaySingleColumn = false,
 	displayFooter = true,
 	displayCount = true,
 	displayFilterIcon = false,
@@ -116,7 +123,7 @@ function MegaFilter({
 	applyOnChange,
 	className,
 }: MegaFilterProps) {
-	const classes = useStyles();
+	const classes = useStyles({ displaySingleColumn });
 	const [show, setShow] = useState(false);
 	const [internalValue, setInternalValue] = useState<Filter[]>([]);
 	const activeLength = useMemo(() => value.map((v) => v.value).flat().length, [value]);
@@ -146,6 +153,7 @@ function MegaFilter({
 						return (
 							<React.Fragment key={filter.id}>
 								<MegaFilterCollapse
+									displaySingleColumn={displaySingleColumn}
 									id={filter.id}
 									title={filter.title}
 									filterType={filter.filterType}
@@ -223,20 +231,29 @@ function MegaFilter({
 	);
 }
 
+interface UseMegaFilterCollapseStylesProps {
+	displaySingleColumn?: boolean;
+}
+
 const useMegaFilterCollapseStyles = createUseThemedStyles((theme) => ({
 	megaFilterCollapseButton: {
 		border: 0,
 		padding: 0,
-		appearance: 'none',
-		color: theme.colors.n700,
-		backgroundColor: 'transparent',
-		...theme.fonts.h5.default,
-		...theme.fonts.bodyBold,
+		display: 'flex',
 		marginBottom: 24,
+		appearance: 'none',
+		alignitems: 'center',
+		color: theme.colors.n700,
+		...theme.fonts.bodyBold,
+		...theme.fonts.h5.default,
+		backgroundColor: 'transparent',
+		'&:hover': {
+			color: theme.colors.p500,
+		},
 	},
 	megaFilterCollapseInner: {
 		paddingBottom: 24,
-		columnCount: 3,
+		columnCount: ({ displaySingleColumn }: UseMegaFilterCollapseStylesProps) => (displaySingleColumn ? 1 : 3),
 		[mediaQueries.lg]: {
 			columnCount: 1,
 		},
@@ -251,6 +268,7 @@ const MegaFilterCollapse = ({
 	allowCollapse,
 	value,
 	onChange,
+	displaySingleColumn,
 }: {
 	id: string;
 	title: string;
@@ -259,8 +277,9 @@ const MegaFilterCollapse = ({
 	allowCollapse: boolean;
 	value: string[];
 	onChange(value: string[]): void;
+	displaySingleColumn: boolean;
 }) => {
-	const classes = useMegaFilterCollapseStyles();
+	const classes = useMegaFilterCollapseStyles({ displaySingleColumn });
 	const [show, setShow] = useState(true);
 
 	return (
@@ -274,6 +293,7 @@ const MegaFilterCollapse = ({
 					}}
 				>
 					{title}
+					<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
 				</Button>
 			)}
 			<Collapse in={show}>
