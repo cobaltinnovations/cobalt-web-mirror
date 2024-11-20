@@ -109,11 +109,12 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryTagByTagIdentifier(tagIdentifier: string) {
 		return httpSingleton.orchestrateRequest<{
+			contentAudienceTypes: ContentAudienceType[];
+			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
 			tag: Tag;
 			tagGroup: TagGroup;
 			tagsByTagId: Record<string, Tag>;
-			contentTypes: ContentType[];
-			contentDurations: ContentDuration[];
 		}>({
 			method: 'GET',
 			url: `/resource-library/tag-filters/${tagIdentifier}`,

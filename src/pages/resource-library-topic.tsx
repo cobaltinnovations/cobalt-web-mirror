@@ -50,14 +50,14 @@ const ResourceLibraryTopic = () => {
 		]
 	);
 
-	const searchInputRef = useRef<HTMLInputElement>(null);
-
 	const [filtersResponse, setFiltersResponse] = useState<{
 		contentAudienceTypes: ContentAudienceType[];
 		contentTypes: ContentType[];
 		contentDurations: ContentDuration[];
 		tags: Tag[];
 	}>();
+
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState('');
 
 	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
