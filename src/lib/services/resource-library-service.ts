@@ -1,5 +1,14 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
+import {
+	Content,
+	ContentAudienceType,
+	ContentAudienceTypeGroup,
+	ContentDuration,
+	ContentType,
+	ResourceLibrarySortColumnId,
+	Tag,
+	TagGroup,
+} from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
 
 export const resourceLibraryService = {
@@ -13,7 +22,16 @@ export const resourceLibraryService = {
 			url: '/resource-library',
 		});
 	},
-	searchResourceLibrary(queryParameters?: { searchQuery?: string; pageNumber?: number; pageSize?: number }) {
+	searchResourceLibrary(queryParameters?: {
+		contentAudienceTypeId?: string;
+		contentDurationId?: string[];
+		contentTypeId?: string[];
+		pageNumber?: number;
+		pageSize?: number;
+		resourceLibrarySortColumnId?: string;
+		searchQuery?: string;
+		tagId?: string[];
+	}) {
 		return httpSingleton.orchestrateRequest<{
 			findResult: {
 				contents: Content[];
@@ -26,15 +44,54 @@ export const resourceLibraryService = {
 			url: buildQueryParamUrl('/resource-library/search', queryParameters),
 		});
 	},
+	getResourceLibraryRecommendedContent(queryParameters?: {
+		contentAudienceTypeId?: string;
+		contentDurationId?: string[];
+		contentTypeId?: string[];
+		pageNumber?: number;
+		pageSize?: number;
+		resourceLibrarySortColumnId?: string;
+		searchQuery?: string;
+		tagId?: string[];
+	}) {
+		return httpSingleton.orchestrateRequest<{
+			tagsByTagId: Record<string, Tag>;
+			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
+			tagGroups: TagGroup[];
+			findResult: {
+				contents: Content[];
+				totalCount: number;
+				totalCountDescription: string;
+			};
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/resource-library/recommended', queryParameters),
+		});
+	},
+	getResourceLibraryFilters() {
+		return httpSingleton.orchestrateRequest<{
+			contentAudienceTypeGroups: ContentAudienceTypeGroup[];
+			contentAudienceTypes: ContentAudienceType[];
+			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
+			resourceLibrarySortColumnIds: ResourceLibrarySortColumnId[];
+			tagGroups: TagGroup[];
+		}>({
+			method: 'GET',
+			url: '/resource-library/filters',
+		});
+	},
 	getResourceLibraryContentByTagGroupId(
 		tagGroupId: string,
 		queryParameters?: {
+			contentAudienceTypeId?: string;
+			contentDurationId?: string[];
+			contentTypeId?: string[];
 			pageNumber?: number;
 			pageSize?: number;
-			tagId?: string[];
-			contentTypeId?: string[];
-			contentDurationId?: string[];
 			searchQuery?: string;
+			tagId?: string[];
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -52,11 +109,12 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryTagByTagIdentifier(tagIdentifier: string) {
 		return httpSingleton.orchestrateRequest<{
+			contentAudienceTypes: ContentAudienceType[];
+			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
 			tag: Tag;
 			tagGroup: TagGroup;
 			tagsByTagId: Record<string, Tag>;
-			contentTypes: ContentType[];
-			contentDurations: ContentDuration[];
 		}>({
 			method: 'GET',
 			url: `/resource-library/tag-filters/${tagIdentifier}`,
@@ -70,6 +128,7 @@ export const resourceLibraryService = {
 			contentTypeId?: string[];
 			contentDurationId?: string[];
 			searchQuery?: string;
+			contentAudienceTypeId?: string;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -88,8 +147,9 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryFiltersByTagGroupId(tagGroupId: string) {
 		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentType[];
+			contentAudienceTypes: ContentAudienceType[];
 			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
 			tags: Tag[];
 		}>({
 			method: 'GET',
@@ -102,28 +162,6 @@ export const resourceLibraryService = {
 		}>({
 			method: 'GET',
 			url: `/resource-library/content-types`,
-		});
-	},
-	getResourceLibraryRecommendedContent(queryParameters?: {
-		tagId?: string[];
-		contentTypeId?: string[];
-		contentDurationId?: string[];
-		pageNumber?: number;
-		pageSize?: number;
-	}) {
-		return httpSingleton.orchestrateRequest<{
-			tagsByTagId: Record<string, Tag>;
-			contentDurations: ContentDuration[];
-			contentTypes: ContentType[];
-			tagGroups: TagGroup[];
-			findResult: {
-				contents: Content[];
-				totalCount: number;
-				totalCountDescription: string;
-			};
-		}>({
-			method: 'GET',
-			url: buildQueryParamUrl('/resource-library/recommended', queryParameters),
 		});
 	},
 };
