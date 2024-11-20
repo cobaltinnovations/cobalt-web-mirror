@@ -85,12 +85,13 @@ export const resourceLibraryService = {
 	getResourceLibraryContentByTagGroupId(
 		tagGroupId: string,
 		queryParameters?: {
+			contentAudienceTypeId?: string;
+			contentDurationId?: string[];
+			contentTypeId?: string[];
 			pageNumber?: number;
 			pageSize?: number;
-			tagId?: string[];
-			contentTypeId?: string[];
-			contentDurationId?: string[];
 			searchQuery?: string;
+			tagId?: string[];
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

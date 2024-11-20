@@ -171,7 +171,7 @@ const ResourceLibrary = () => {
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
 			mode: 'FILTERED',
-			searchQuery: searchQuery,
+			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
 			tagIds: tagIdQuery,
 			contentAudienceTypeId: contentAudienceTypeIdQuery,
 			contentDurationIds: contentDurationIdQuery,
