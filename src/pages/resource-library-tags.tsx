@@ -257,9 +257,7 @@ const ResourceLibraryTags = () => {
 											displaySingleColumn
 											className="me-2"
 											allowCollapse={false}
-											displayFooter={false}
 											displayCount={false}
-											applyOnChange
 											buttonTitle={
 												(filtersResponse?.contentAudienceTypes ?? []).find(
 													(cat) =>

@@ -448,9 +448,7 @@ const ResourceLibrary = () => {
 												displaySingleColumn
 												className="me-2"
 												allowCollapse={false}
-												displayFooter={false}
 												displayCount={false}
-												applyOnChange
 												buttonTitle={
 													contentAudienceTypes.find(
 														(cat) =>
