@@ -3,18 +3,24 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { AnalyticsNativeEventTypeId, Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
+import {
+	AnalyticsNativeEventTypeId,
+	Content,
+	ContentAudienceType,
+	ContentDuration,
+	ContentType,
+	Tag,
+	TagGroup,
+} from '@/lib/models';
 import { analyticsService, resourceLibraryService } from '@/lib/services';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import AsyncPage from '@/components/async-page';
 import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
-
 import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-
 import { SkeletonText } from '@/components/skeleton-loaders';
-import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import MegaFilter, { FILTER_TYPE } from '@/components/mega-filter';
 import NoData from '@/components/no-data';
 
@@ -48,6 +54,7 @@ const ResourceLibraryTopic = () => {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const [filtersResponse, setFiltersResponse] = useState<{
+		contentAudienceTypes: ContentAudienceType[];
 		contentTypes: ContentType[];
 		contentDurations: ContentDuration[];
 		tags: Tag[];
@@ -256,7 +263,7 @@ const ResourceLibraryTopic = () => {
 								<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
 									<div className="mb-2 mb-lg-0 d-flex align-items-center">
 										<span className="me-2">Show resources for</span>
-										{/* <MegaFilter
+										<MegaFilter
 											displaySingleColumn
 											className="me-2"
 											allowCollapse={false}
@@ -264,7 +271,7 @@ const ResourceLibraryTopic = () => {
 											displayCount={false}
 											applyOnChange
 											buttonTitle={
-												contentAudienceTypes.find(
+												(filtersResponse?.contentAudienceTypes ?? []).find(
 													(cat) =>
 														cat.contentAudienceTypeId ===
 														searchParams.get('contentAudienceTypeId')
@@ -277,10 +284,12 @@ const ResourceLibraryTopic = () => {
 													filterType: FILTER_TYPE.RADIO,
 													title: 'Show resources for...',
 													value: searchParams.getAll('contentAudienceTypeId'),
-													options: contentAudienceTypes.map((cat) => ({
-														value: cat.contentAudienceTypeId,
-														title: cat.description,
-													})),
+													options: (filtersResponse?.contentAudienceTypes ?? []).map(
+														(cat) => ({
+															value: cat.contentAudienceTypeId,
+															title: cat.description,
+														})
+													),
 												},
 											]}
 											onChange={(filters) => {
@@ -288,7 +297,7 @@ const ResourceLibraryTopic = () => {
 													applyValuesToSearchParam(filter.value, filter.id);
 												});
 											}}
-										/> */}
+										/>
 									</div>
 									<div className="mb-2 mb-lg-0 d-flex align-items-center">
 										<span className="me-2">related to</span>

@@ -145,8 +145,9 @@ export const resourceLibraryService = {
 	},
 	getResourceLibraryFiltersByTagGroupId(tagGroupId: string) {
 		return httpSingleton.orchestrateRequest<{
-			contentTypes: ContentType[];
+			contentAudienceTypes: ContentAudienceType[];
 			contentDurations: ContentDuration[];
+			contentTypes: ContentType[];
 			tags: Tag[];
 		}>({
 			method: 'GET',
