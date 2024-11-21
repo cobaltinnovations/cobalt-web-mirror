@@ -76,7 +76,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		[mediaQueries.lg]: {
 			height: 'auto',
-			width: '100%',
+			width: 120,
 		},
 	},
 	desktopNav: {
@@ -195,7 +195,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		right: 0,
 		bottom: 0,
 		zIndex: 4,
-		padding: 16,
+		paddingTop: 20,
 		position: 'fixed',
 		overflowY: 'auto',
 		backgroundColor: theme.colors.n0,
@@ -205,9 +205,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			listStyle: 'none',
 		},
 		'& a, & button': {
-			padding: 12,
 			borderRadius: 4,
 			display: 'block',
+			padding: '12px 16px',
 			textDecoration: 'none',
 			...theme.fonts.default,
 			color: theme.colors.n900,
@@ -231,12 +231,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			textAlign: 'left',
 		},
 		'& .collapse-inner': {
-			borderRadius: 8,
-			margin: '12px 0',
-			border: `1px solid ${theme.colors.border}`,
 			'& a': {
 				margin: 8,
-				padding: '8px 12px',
+				padding: '12px 16px',
 				'&:last-of-type': {
 					marginBottom: 0,
 				},
@@ -434,7 +431,6 @@ const HeaderV2 = () => {
 			navigationItemId?: string;
 			title: string;
 			to: To;
-			iconIsImage?: boolean;
 			icon: JSX.Element;
 			description: string;
 			onClick?(): void;
@@ -532,7 +528,6 @@ const HeaderV2 = () => {
 											svgProps={{ width: 24, height: 24 }}
 										/>
 									),
-									iconIsImage: !!imageUrl,
 									title: name,
 									description: '',
 									to: url,
@@ -673,7 +668,6 @@ const HeaderV2 = () => {
 													<div
 														className={classNames('d-flex', {
 															'align-items-center': !item.description,
-															'flex-column': item.iconIsImage,
 														})}
 													>
 														{item.icon}
@@ -717,40 +711,42 @@ const HeaderV2 = () => {
 									</div>
 								}
 							>
-								{accountNavigationConfig.map((item, itemIndex) => (
-									<Link key={itemIndex} to={item.to}>
-										<div className="d-flex align-items-center">
-											<item.icon className="text-p300" />
-											<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
-										</div>
-									</Link>
-								))}
-								{adminNavigationConfig.length > 0 && (
-									<>
-										<hr />
-										{adminNavigationConfig.map((item, itemIndex) => (
-											<Link key={itemIndex} to={item.to} target="_blank">
-												<div className="d-flex justify-content-between align-items-center">
-													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-													<item.icon className="text-gray" />
-												</div>
-											</Link>
-										))}
-									</>
-								)}
-								<hr className="my" />
-								<Button
-									variant="light"
-									className="mx-2 fw-semibold text-gray"
-									onClick={() => {
-										signOutAndClearContext(
-											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
-											{}
-										);
-									}}
-								>
-									Log Out
-								</Button>
+								<div className="mx-3 border rounded">
+									{accountNavigationConfig.map((item, itemIndex) => (
+										<Link key={itemIndex} to={item.to} className="m-0">
+											<div className="d-flex align-items-center">
+												<item.icon className="text-p300" />
+												<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
+											</div>
+										</Link>
+									))}
+									{adminNavigationConfig.length > 0 && (
+										<>
+											<hr className="m-0" />
+											{adminNavigationConfig.map((item, itemIndex) => (
+												<Link key={itemIndex} to={item.to} className="m-0" target="_blank">
+													<div className="d-flex justify-content-between align-items-center">
+														<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+														<item.icon className="text-gray" />
+													</div>
+												</Link>
+											))}
+										</>
+									)}
+									<hr className="m-0" />
+									<Button
+										variant="light"
+										className="fw-semibold text-gray"
+										onClick={() => {
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+												{}
+											);
+										}}
+									>
+										Log Out
+									</Button>
+								</div>
 							</MobileAccordianItem>
 						</li>
 					</ul>
