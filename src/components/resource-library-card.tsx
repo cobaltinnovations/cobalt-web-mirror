@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavigateOptions, To } from 'react-router-dom';
-import { Badge } from 'react-bootstrap';
+import { Badge, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { ContentTypeId, Tag } from '@/lib/models';
-// import { getTextClassForColorId } from '@/lib/utils/color-utils';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonBadge, SkeletonImage, SkeletonText } from './skeleton-loaders';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibraryCard: {
 		display: 'flex',
 		borderRadius: 8,
 		overflow: 'hidden',
+		position: 'relative',
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
@@ -44,13 +45,39 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	informationOuter: {
 		flex: 1,
+		padding: 24,
 		display: 'flex',
-		padding: '16px 20px 0',
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
 	tagsOuter: {
-		padding: '0 20px 16px',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		padding: 24,
+		display: 'flex',
+		position: 'absolute',
+		backgroundColor: theme.colors.n0,
+		transition: '0.2s max-height',
+	},
+	tagsOverflow: {
+		display: 'flex',
+		overflow: 'hidden',
+		flexFlow: 'column-reverse',
+	},
+	tagButton: {
+		width: 28,
+		height: 28,
+		padding: 0,
+		marginTop: 4,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		transform: 'rotate(-45deg)',
+		transition: `0.2s transform`,
+	},
+	tagButtonExpanded: {
+		transform: 'rotate(0deg)',
 	},
 	link: {
 		textDecoration: 'none',
@@ -80,9 +107,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 export interface ResourceLibraryCardProps {
-	// colorId: COLOR_IDS;
-	// subtopic: string;
-	// subtopicTo: string;
 	linkTo: To;
 	linkToOptions?: NavigateOptions;
 	title: string;
@@ -100,9 +124,6 @@ export interface ResourceLibraryCardProps {
 }
 
 const ResourceLibraryCard = ({
-	// colorId,
-	// subtopic,
-	// subtopicTo,
 	linkTo,
 	linkToOptions,
 	title,
@@ -120,8 +141,92 @@ const ResourceLibraryCard = ({
 }: ResourceLibraryCardProps) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
+	const informationRef = useRef<HTMLDivElement>(null);
+	const tagsOuterRef = useRef<HTMLDivElement>(null);
+	const tagsInnerRef = useRef<HTMLDivElement>(null);
+	const tagRefs = useMemo(
+		() =>
+			tags.reduce(
+				(accumulator, current) => ({ ...accumulator, [current.tagId]: React.createRef<HTMLDivElement>() }),
+				{} as Record<string, React.RefObject<HTMLDivElement>>
+			),
+		[tags]
+	);
+	const [showTags, setShowTags] = useState(false);
+	const [showTagButton, setShowTagButton] = useState(false);
 
-	const showTagsOuter = tags.length > 0 || contentTypeId || duration;
+	const getSingleTagHeight = useCallback(() => {
+		const tagHeights = Object.values(tagRefs).map((tagRef) => {
+			if (!tagRef.current) {
+				return 0;
+			}
+
+			const currentTagHeight = parseInt(window.getComputedStyle(tagRef.current).height, 10);
+			const currentTagMarginTop = parseInt(window.getComputedStyle(tagRef.current).marginTop, 10);
+
+			return currentTagHeight + currentTagMarginTop;
+		});
+
+		return Math.max(...tagHeights);
+	}, [tagRefs]);
+
+	const getTotalTagsHeight = useCallback(() => {
+		if (!tagsInnerRef.current) {
+			return 0;
+		}
+
+		return parseInt(window.getComputedStyle(tagsInnerRef.current).height, 10);
+	}, []);
+
+	const getTagsOuterPaddingY = useCallback(() => {
+		if (!tagsOuterRef.current) {
+			return 0;
+		}
+
+		const outerPaddingTop = parseInt(window.getComputedStyle(tagsOuterRef.current).paddingTop, 10);
+		const outerPaddingBottom = parseInt(window.getComputedStyle(tagsOuterRef.current).paddingBottom, 10);
+		return outerPaddingTop + outerPaddingBottom;
+	}, []);
+
+	const handleWindowResize = useCallback(() => {
+		const singleTagHeight = getSingleTagHeight();
+		const totalTagsHeight = getTotalTagsHeight();
+		const tagsOuterPaddingY = getTagsOuterPaddingY();
+		const collapsedHeight = tagsOuterPaddingY + singleTagHeight;
+
+		if (informationRef.current) {
+			informationRef.current.style.paddingBottom = `${collapsedHeight}px`;
+		}
+
+		setShowTagButton(totalTagsHeight > singleTagHeight);
+	}, [getSingleTagHeight, getTagsOuterPaddingY, getTotalTagsHeight]);
+
+	useEffect(() => {
+		const singleTagHeight = getSingleTagHeight();
+		const totalTagsHeight = getTotalTagsHeight();
+		const tagsOuterPaddingY = getTagsOuterPaddingY();
+		const expandedHeight = tagsOuterPaddingY + totalTagsHeight;
+		const collapsedHeight = tagsOuterPaddingY + singleTagHeight;
+
+		if (!tagsOuterRef.current) {
+			return;
+		}
+
+		if (showTags) {
+			tagsOuterRef.current.style.maxHeight = `${expandedHeight}px`;
+		} else {
+			tagsOuterRef.current.style.maxHeight = `${collapsedHeight}px`;
+		}
+	}, [getSingleTagHeight, getTagsOuterPaddingY, getTotalTagsHeight, showTags]);
+
+	useEffect(() => {
+		handleWindowResize();
+		window.addEventListener('resize', handleWindowResize);
+
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, [handleWindowResize]);
 
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
@@ -133,33 +238,41 @@ const ResourceLibraryCard = ({
 						</Badge>
 					)}
 				</div>
-				<div className={classes.informationOuter}>
-					<div className="mb-2">
-						{/* <p className="mb-2 fw-bold">
-							<Link to={subtopicTo} className={classNames(classes.link, getTextClassForColorId(colorId))}>
-								{subtopic}
-							</Link>
-						</p> */}
-						<h4 className={classNames(classes.title, 'text-dark')}>{title}</h4>
-						{subtitle && <p className="text-gray mt-1">{subtitle}</p>}
-						<p className={'mt-1 text-gray'}>
+				<div ref={informationRef} className={classes.informationOuter}>
+					<div className="mb-4 d-flex align-items-center">
+						<Badge bg="outline-dark" pill className="me-2 d-flex align-items-center flex-shrink-0">
+							{contentTypeId && (
+								<ContentTypeIcon
+									contentTypeId={contentTypeId}
+									width={16}
+									height={16}
+									className="text-gray"
+								/>
+							)}
+							{duration && <span className="ms-1 fs-small fw-bold text-gray">{duration}</span>}
+						</Badge>
+						<p className="mb-0 text-truncate text-gray">
 							{authorPrefix} {author}
 						</p>
-						{description && (
-							<div
-								className={classNames(classes.description, 'mt-2 fs-default fw-normal text-dark mb-0')}
-								dangerouslySetInnerHTML={{
-									__html: description,
-								}}
-							/>
-						)}
 					</div>
+					<div className="mb-4">
+						<h4 className={classNames(classes.title, 'text-dark')}>{title}</h4>
+						{subtitle && <p className="text-gray mt-1">{subtitle}</p>}
+					</div>
+					{description && (
+						<div
+							className={classNames(classes.description, 'fs-default fw-normal text-dark mb-0')}
+							dangerouslySetInnerHTML={{
+								__html: description,
+							}}
+						/>
+					)}
 				</div>
 			</Link>
-			{showTagsOuter && (
-				<div className={classes.tagsOuter}>
-					<div className="d-flex justify-content-between align-items-end">
-						<div className="d-none d-lg-flex flex-wrap">
+			{tags.length > 0 && (
+				<div ref={tagsOuterRef} className={classes.tagsOuter}>
+					<div className={classes.tagsOverflow}>
+						<div ref={tagsInnerRef} className="d-flex flex-wrap">
 							{tags.map((tag) => {
 								return (
 									<Link
@@ -171,6 +284,7 @@ const ResourceLibraryCard = ({
 										}}
 									>
 										<Badge
+											ref={tagRefs[tag.tagId]}
 											bg="outline-dark"
 											pill
 											as="div"
@@ -181,17 +295,19 @@ const ResourceLibraryCard = ({
 									</Link>
 								);
 							})}
-						</div>
-						<div className="d-flex align-items-center flex-shrink-0">
-							{contentTypeId && (
-								<ContentTypeIcon
-									contentTypeId={contentTypeId}
-									width={16}
-									height={16}
-									className="text-gray"
-								/>
+							{showTagButton && (
+								<Button
+									className={classNames(classes.tagButton, {
+										[classes.tagButtonExpanded]: showTags,
+									})}
+									variant="outline-primary"
+									onClick={() => {
+										setShowTags(!showTags);
+									}}
+								>
+									<CloseIcon className="d-flex" width={20} height={20} />
+								</Button>
 							)}
-							{duration && <span className="ms-1 fs-small fw-bold text-gray">{duration}</span>}
 						</div>
 					</div>
 				</div>
