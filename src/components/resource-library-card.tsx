@@ -251,9 +251,7 @@ const ResourceLibraryCard = ({
 							)}
 							{duration && <span className="ms-1 fs-small fw-bold text-gray">{duration}</span>}
 						</Badge>
-						<p className="mb-0 text-truncate text-gray">
-							{authorPrefix} {author}
-						</p>
+						<p className="mb-0 text-truncate text-gray">{author}</p>
 					</div>
 					<div className="mb-4">
 						<h4 className={classNames(classes.title, 'text-dark')}>{title}</h4>
@@ -272,7 +270,23 @@ const ResourceLibraryCard = ({
 			{tags.length > 0 && (
 				<div ref={tagsOuterRef} className={classes.tagsOuter}>
 					<div className={classes.tagsOverflow}>
-						<div ref={tagsInnerRef} className="d-flex flex-wrap">
+						<div
+							ref={tagsInnerRef}
+							className="d-flex flex-wrap-reverse flex-row-reverse justify-content-end"
+						>
+							{showTagButton && (
+								<Button
+									className={classNames(classes.tagButton, {
+										[classes.tagButtonExpanded]: showTags,
+									})}
+									variant="outline-primary"
+									onClick={() => {
+										setShowTags(!showTags);
+									}}
+								>
+									<CloseIcon className="d-flex" width={20} height={20} />
+								</Button>
+							)}
 							{tags.map((tag) => {
 								return (
 									<Link
@@ -295,19 +309,6 @@ const ResourceLibraryCard = ({
 									</Link>
 								);
 							})}
-							{showTagButton && (
-								<Button
-									className={classNames(classes.tagButton, {
-										[classes.tagButtonExpanded]: showTags,
-									})}
-									variant="outline-primary"
-									onClick={() => {
-										setShowTags(!showTags);
-									}}
-								>
-									<CloseIcon className="d-flex" width={20} height={20} />
-								</Button>
-							)}
 						</div>
 					</div>
 				</div>
