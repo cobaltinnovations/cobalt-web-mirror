@@ -434,6 +434,7 @@ const HeaderV2 = () => {
 			navigationItemId?: string;
 			title: string;
 			to: To;
+			iconIsImage?: boolean;
 			icon: JSX.Element;
 			description: string;
 			onClick?(): void;
@@ -531,6 +532,7 @@ const HeaderV2 = () => {
 											svgProps={{ width: 24, height: 24 }}
 										/>
 									),
+									iconIsImage: !!imageUrl,
 									title: name,
 									description: '',
 									to: url,
@@ -669,12 +671,13 @@ const HeaderV2 = () => {
 													}}
 												>
 													<div
-														className={classNames('d-flex flex-column flex-lg-row', {
+														className={classNames('d-flex', {
 															'align-items-center': !item.description,
+															'flex-column': item.iconIsImage,
 														})}
 													>
 														{item.icon}
-														<div className="mt-4 mt-lg-0 ps-lg-4 w-100">
+														<div className="ps-4 w-100">
 															<p className="mb-0 fw-semibold">{item.title}</p>
 															{item.description && (
 																<p className="mb-0 text-gray">{item.description}</p>
