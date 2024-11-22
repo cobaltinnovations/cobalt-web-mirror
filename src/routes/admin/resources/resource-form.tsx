@@ -8,7 +8,7 @@ import {
 	useParams,
 	useRouteLoaderData,
 } from 'react-router-dom';
-import { Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, Modal, Offcanvas, Row } from 'react-bootstrap';
 
 import {
 	AdminContent,
@@ -55,6 +55,7 @@ import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -226,6 +227,8 @@ export const Component = () => {
 	const [showConfirmPublishDialog, setShowConfirmPublishDialog] = useState(false);
 	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+	const [showImageSitesModal, setShowImageSitesModal] = useState(false);
+	const [showImageSelectionTipsModal, setShowImageSelectionTipsModal] = useState(false);
 
 	const [isDirty, setIsDirty] = useState(false);
 	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
@@ -718,28 +721,99 @@ export const Component = () => {
 						title="Image"
 						description={
 							<>
+								<ConfirmDialog
+									size="lg"
+									show={showImageSitesModal}
+									onHide={() => {
+										setShowImageSitesModal(false);
+									}}
+									titleText="Image Sites"
+									bodyText="Websites with images that are free to use:"
+									detailText={
+										<ul className="mt-4 list-unstyled">
+											<li>
+												<a href="https://unsplash.com/" target="_blank" rel="noreferrer">
+													unsplash.com
+												</a>
+											</li>
+											<li>
+												<a href="https://www.pexels.com/" target="_blank" rel="noreferrer">
+													pexels.com
+												</a>
+											</li>
+										</ul>
+									}
+									dismissText="Cancel"
+									showDissmissButton={false}
+									confirmText="Done"
+									onConfirm={() => {
+										setShowImageSitesModal(false);
+									}}
+								/>
+								<ConfirmDialog
+									size="lg"
+									show={showImageSelectionTipsModal}
+									onHide={() => {
+										setShowImageSelectionTipsModal(false);
+									}}
+									titleText="Image Selection Tips"
+									bodyText="Please follow these guidelines when choose an image:"
+									detailText={
+										<div className="mt-4">
+											<h6 className="text-gray text-uppercase fw-normal">Good Images</h6>
+											<ul className="mb-4">
+												<li>Have a warm, bold color palette</li>
+												<li>
+													Feature either a person's face, a calming piece of art, or an
+													abstract image of nature
+												</li>
+												<li>Are at lesat 850x450 pixels in size</li>
+												<li>
+													Can be cropped to different sizes without losing important details
+												</li>
+											</ul>
+											<h6 className="text-gray text-uppercase fw-normal">Inappropriate Images</h6>
+											<ul>
+												<li>Depict scenes of low mood, anxiety, or other distress</li>
+												<li>Include clichés</li>
+												<li>Are smaller than 850x450 pixels</li>
+											</ul>
+										</div>
+									}
+									dismissText="Cancel"
+									showDissmissButton={false}
+									confirmText="Done"
+									onConfirm={() => {
+										setShowImageSelectionTipsModal(false);
+									}}
+								/>
 								<p className="mb-4">
-									Add an image that represents the subject matter of your post. Choose one that looks
-									good at different sizes — this image will appear across the Cobalt website and
-									mobile apps.
+									Add an image that represents the subject matter of your post.
+									<br />
+									Your image shold be at least 850x450px. It will be cropped to a 16:9 ratio.
 								</p>
-								<p className="mb-4">
-									Your image should be at least 800×450px. It will be cropped to a 16:9 ratio.
-								</p>
-
-								<p className="mb-0">Tips for selecting a good image:</p>
-
-								<ul>
-									<li>Features a warm, bold color palette</li>
-									<li>
-										Has a subject that is one of the following: 1) a headshot, 2) a calming piece of
-										art, 3) an abstract image of nature
-									</li>
-									<li>
-										Avoid scenes that depict low mood, anxiety, or other distress as well as
-										clichés.
-									</li>
-								</ul>
+								<Button
+									type="button"
+									variant="link"
+									className="mb-2 p-0 d-flex text-decoration-none"
+									onClick={() => {
+										setShowImageSitesModal(true);
+									}}
+								>
+									<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+									<p className="mb-0 fw-semibold">Where can I find images?</p>
+								</Button>
+								<Button
+									type="button"
+									variant="link"
+									className="p-0 d-flex text-decoration-none"
+									onClick={() => {
+										setShowImageSelectionTipsModal(true);
+									}}
+								>
+									<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+									<p className="mb-0 fw-semibold">How do I choose an appropriate image?</p>
+								</Button>
 							</>
 						}
 					>
@@ -757,16 +831,9 @@ export const Component = () => {
 								}).fetch;
 							}}
 						/>
-
-						<div className="d-flex  mt-2">
+						<div className="d-flex mt-2">
 							<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
-							<p className="mb-0">
-								If you choose not to upload an image, a generic placeholder image will be added to your
-								post. Free images can be found at{' '}
-								<a href="https://unsplash.com/" target="_blank" rel="noopener noreferrer">
-									unsplash.com
-								</a>
-							</p>
+							<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
 						</div>
 					</AdminFormSection>
 

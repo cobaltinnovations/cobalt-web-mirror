@@ -18,12 +18,13 @@ export interface ConfirmDialogProps extends ModalProps {
 	bodyText: string;
 	dismissText: string;
 	confirmText: string;
-	detailText?: string;
+	detailText?: string | JSX.Element;
 	isConfirming?: boolean;
 	onConfirm(): void;
 	destructive?: boolean;
 	size?: 'sm' | 'lg';
 	displayButtonsBlock?: boolean;
+	showDissmissButton?: boolean;
 }
 
 const ConfirmDialog = ({
@@ -37,6 +38,7 @@ const ConfirmDialog = ({
 	destructive = false,
 	size = 'sm',
 	displayButtonsBlock,
+	showDissmissButton = true,
 	...props
 }: ConfirmDialogProps) => {
 	const classes = useStyles();
@@ -55,21 +57,25 @@ const ConfirmDialog = ({
 			</Modal.Header>
 			<Modal.Body>
 				<p className="mb-0 fw-bold">{bodyText}</p>
-				{detailText && <p className="mt-2">{detailText}</p>}
+				{detailText && (
+					<>{typeof detailText === 'string' ? <p className="mt-2">{detailText}</p> : detailText}</>
+				)}
 			</Modal.Body>
 			<Modal.Footer>
 				<div className="text-right">
-					<Button
-						className={classNames({
-							'mb-2': displayButtonsBlock,
-							'd-block': displayButtonsBlock,
-							'w-100': displayButtonsBlock,
-						})}
-						variant="outline-primary"
-						onClick={props.onHide}
-					>
-						{dismissText}
-					</Button>
+					{showDissmissButton && (
+						<Button
+							className={classNames({
+								'mb-2': displayButtonsBlock,
+								'd-block': displayButtonsBlock,
+								'w-100': displayButtonsBlock,
+							})}
+							variant="outline-primary"
+							onClick={props.onHide}
+						>
+							{dismissText}
+						</Button>
+					)}
 					<LoadingButton
 						isLoading={isConfirming}
 						className={classNames({
