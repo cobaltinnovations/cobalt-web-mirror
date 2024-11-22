@@ -1883,10 +1883,7 @@ function prepareGroupSessionSubmission(
 			: GroupSessionSchedulingSystemId.COBALT,
 		...(registrationEndDateFlag &&
 			registrationEndDate && {
-				registrationEndDateTime: moment(
-					`${registrationEndDate.toISOString().split('T')[0]} 23:59:00`,
-					`${DateFormats.API.Date} ${DateFormats.UI.TimeSlotInput}`
-				).format(DateFormats.API.DateTime),
+				registrationEndDateTime: `${moment(registrationEndDate).format(DateFormats.API.Date)}T23:59`,
 			}),
 		tagIds:
 			(tags ?? []).filter((tag) => (tagGroupIds ?? []).includes(tag.tagGroupId)).map((tag) => tag.tagId) ?? [],
