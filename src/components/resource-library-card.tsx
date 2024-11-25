@@ -8,7 +8,7 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonBadge, SkeletonImage, SkeletonText } from './skeleton-loaders';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibraryCard: {
@@ -73,11 +73,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		transform: 'rotate(-45deg)',
+		transform: 'rotate(0deg)',
 		transition: `0.2s transform`,
 	},
 	tagButtonExpanded: {
-		transform: 'rotate(0deg)',
+		transform: 'rotate(-45deg)',
 	},
 	link: {
 		textDecoration: 'none',
@@ -284,7 +284,7 @@ const ResourceLibraryCard = ({
 										setShowTags(!showTags);
 									}}
 								>
-									<CloseIcon className="d-flex" width={20} height={20} />
+									<PlusIcon className="d-flex" width={20} height={20} />
 								</Button>
 							)}
 							{tags.map((tag) => {
