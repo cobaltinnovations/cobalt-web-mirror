@@ -301,7 +301,11 @@ const ResourceLibraryTopic = () => {
 										)}
 									</div>
 									<div className="mb-2 mb-lg-0 d-flex align-items-center">
-										<span className="me-2">related to</span>
+										<span className="me-2">
+											{institution.contentAudiencesEnabled
+												? 'related to'
+												: 'Show resources related to '}
+										</span>
 										<MegaFilter
 											allowCollapse={false}
 											buttonTitle={
