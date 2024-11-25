@@ -79,6 +79,7 @@ export interface Institution {
 	secureFilesharingPlatformName?: string;
 	secureFilesharingPlatformUrl?: string;
 	tableauEnabled?: boolean;
+	contentAudiencesEnabled?: boolean;
 }
 
 export interface InstitutionFeature {
