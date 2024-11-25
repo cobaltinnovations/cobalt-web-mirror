@@ -58,6 +58,12 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 	const classes = useStudioEventStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
+	const showSeatAlert =
+		groupSessionsService.isGroupSession(studioEvent) &&
+		typeof studioEvent.seatsAvailable !== 'undefined' &&
+		typeof studioEvent.seats !== 'undefined' &&
+		(studioEvent.seatsAvailable <= 5 || studioEvent.seatsAvailable / studioEvent.seats <= 0.1);
+
 	if (groupSessionsService.isGroupSession(studioEvent)) {
 		return (
 			<div className={classNames(classes.studioEvent, className)}>
@@ -65,13 +71,13 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 					className={classes.imageContainer}
 					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
 				>
-					<div className={classes.imageContent}>
-						{studioEvent.seatsAvailable && studioEvent.seatsAvailable <= 20 ? (
+					{showSeatAlert && (
+						<div className={classes.imageContent}>
 							<Badge as="div" bg="outline-secondary" pill>
 								{studioEvent.seatsAvailableDescription}
 							</Badge>
-						) : null}
-					</div>
+						</div>
+					)}
 				</BackgroundImageContainer>
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
