@@ -228,7 +228,7 @@ const GroupSession = ({
 													{showSeatAlert && (
 														<InlineAlert
 															variant="warning"
-															title={`${groupSession.seatsAvailable} Left`}
+															title={groupSession.seatsAvailableDescription ?? ''}
 														/>
 													)}
 												</div>
