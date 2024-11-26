@@ -1,20 +1,21 @@
 import { lazy } from 'react';
 import { Tag, TagGroup } from '../models';
-
-const chunkloadRefreshKey = 'ChunkLoadError-refresh';
+import { config } from '@/config';
 
 export function clearChunkLoadErrorStorage() {
-	window.localStorage.removeItem(chunkloadRefreshKey);
+	window.localStorage.removeItem(config.storageKeys.chunkloadRefreshKey);
 }
 
 export function checkShouldRefreshChunkLoadError(error: unknown) {
-	const pageHasAlreadyBeenForceRefreshed = JSON.parse(window.localStorage.getItem(chunkloadRefreshKey) || 'false');
+	const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+		window.localStorage.getItem(config.storageKeys.chunkloadRefreshKey) || 'false'
+	);
 
 	return error instanceof Error && error.name === 'ChunkLoadError' && !pageHasAlreadyBeenForceRefreshed;
 }
 
 export function handleChunkLoadError() {
-	window.localStorage.setItem(chunkloadRefreshKey, 'true');
+	window.localStorage.setItem(config.storageKeys.chunkloadRefreshKey, 'true');
 	window.location.reload();
 }
 

@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, useLocation, useRevalidator } from 'react-router-dom';
+import { Link, matchPath, PathMatch, To, useLocation, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
-import { AlertTypeId, FeatureId } from '@/lib/models';
-import { institutionService } from '@/lib/services';
+import {
+	AlertTypeId,
+	AnalyticsNativeEventClickthroughFeatureSource,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
+	AnalyticsNativeEventTypeId,
+	FeatureId,
+} from '@/lib/models';
+import { analyticsService, institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useAnalytics from '@/hooks/use-analytics';
 import useAccount from '@/hooks/use-account';
@@ -29,6 +35,8 @@ import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
 import { useAppRootLoaderData } from '@/routes/root';
+
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 export const HEADER_HEIGHT = 60;
 
@@ -68,7 +76,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		[mediaQueries.lg]: {
 			height: 'auto',
-			width: '100%',
+			width: 120,
 		},
 	},
 	desktopNav: {
@@ -187,7 +195,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 		right: 0,
 		bottom: 0,
 		zIndex: 4,
-		padding: 16,
+		paddingTop: 20,
 		position: 'fixed',
 		overflowY: 'auto',
 		backgroundColor: theme.colors.n0,
@@ -197,9 +205,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			listStyle: 'none',
 		},
 		'& a, & button': {
-			padding: 12,
 			borderRadius: 4,
 			display: 'block',
+			padding: '12px 16px',
 			textDecoration: 'none',
 			...theme.fonts.default,
 			color: theme.colors.n900,
@@ -223,12 +231,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			textAlign: 'left',
 		},
 		'& .collapse-inner': {
-			borderRadius: 8,
-			margin: '12px 0',
-			border: `1px solid ${theme.colors.border}`,
 			'& a': {
 				margin: 8,
-				padding: '8px 12px',
+				padding: '12px 16px',
 				'&:last-of-type': {
 					marginBottom: 0,
 				},
@@ -414,8 +419,23 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Desktop navigation Config */
 	/* ----------------------------------------------------------- */
-
-	const navigationConfig = useMemo(() => {
+	const navigationConfig: {
+		testId?: string;
+		navigationItemId?: string;
+		title: string;
+		subtitle?: string;
+		to?: To;
+		active: PathMatch<string> | boolean | null;
+		items?: {
+			testId?: string;
+			navigationItemId?: string;
+			title: string;
+			to: To;
+			icon: JSX.Element;
+			description: string;
+			onClick?(): void;
+		}[];
+	}[] = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
 		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
 
@@ -450,6 +470,12 @@ const HeaderV2 = () => {
 										account?.institutionLocationId
 											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
 											: urlName,
+									onClick: () => {
+										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
+											featureId: featureId,
+											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
+										});
+									},
 								})),
 						},
 				  ]
@@ -492,7 +518,7 @@ const HeaderV2 = () => {
 								matchPath(url + '/*', pathname)
 							),
 							items: (institution?.additionalNavigationItems ?? []).map(
-								({ iconName, imageUrl, name, url }, index) => ({
+								({ iconName, imageUrl, name, url, topicCenterId }, index) => ({
 									testId: `menuLink-additionalItem${index}`,
 									icon: (
 										<AdditionalNavigationItemIconOrImage
@@ -505,6 +531,15 @@ const HeaderV2 = () => {
 									title: name,
 									description: '',
 									to: url,
+									onClick: () => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+											{
+												topicCenterId: topicCenterId,
+												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+											}
+										);
+									},
 								})
 							),
 						},
@@ -596,6 +631,7 @@ const HeaderV2 = () => {
 		imageUrl: featuredTopicCenter.imageUrl!,
 		descriptionHtml: featuredTopicCenter.navDescription!,
 		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
+		topicCenterId: featuredTopicCenter.topicCenterId,
 	};
 
 	return (
@@ -622,14 +658,20 @@ const HeaderV2 = () => {
 												<p className="text-n500 px-5 mb-3 mt-6">{navigationItem.subtitle}</p>
 											)}
 											{(navigationItem.items ?? []).map((item, itemIndex) => (
-												<Link key={itemIndex} to={item.to ?? '/#'}>
+												<Link
+													key={itemIndex}
+													to={item.to ?? '/#'}
+													onClick={() => {
+														item.onClick?.();
+													}}
+												>
 													<div
-														className={classNames('d-flex flex-column flex-lg-row', {
+														className={classNames('d-flex', {
 															'align-items-center': !item.description,
 														})}
 													>
 														{item.icon}
-														<div className="mt-4 mt-lg-0 ps-lg-4 w-100">
+														<div className="ps-4 w-100">
 															<p className="mb-0 fw-semibold">{item.title}</p>
 															{item.description && (
 																<p className="mb-0 text-gray">{item.description}</p>
@@ -643,6 +685,15 @@ const HeaderV2 = () => {
 													mobileNav
 													className="bg-n50 mt-6 px-4 py-6"
 													featuredItem={featuredTopicCenterItem}
+													onImageClick={() => {
+														analyticsService.persistEvent(
+															AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+															{
+																topicCenterId: featuredTopicCenterItem.topicCenterId,
+																source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+															}
+														);
+													}}
 												/>
 											)}
 										</MobileAccordianItem>
@@ -660,35 +711,42 @@ const HeaderV2 = () => {
 									</div>
 								}
 							>
-								{accountNavigationConfig.map((item, itemIndex) => (
-									<Link key={itemIndex} to={item.to}>
-										<div className="d-flex align-items-center">
-											<item.icon className="text-p300" />
-											<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
-										</div>
-									</Link>
-								))}
-								{adminNavigationConfig.length > 0 && (
-									<>
-										<hr />
-										{adminNavigationConfig.map((item, itemIndex) => (
-											<Link key={itemIndex} to={item.to} target="_blank">
-												<div className="d-flex justify-content-between align-items-center">
-													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-													<item.icon className="text-gray" />
-												</div>
-											</Link>
-										))}
-									</>
-								)}
-								<hr className="my" />
-								<Button
-									variant="light"
-									className="mx-2 fw-semibold text-gray"
-									onClick={signOutAndClearContext}
-								>
-									Log Out
-								</Button>
+								<div className="mx-3 border rounded">
+									{accountNavigationConfig.map((item, itemIndex) => (
+										<Link key={itemIndex} to={item.to} className="m-0">
+											<div className="d-flex align-items-center">
+												<item.icon className="text-p300" />
+												<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
+											</div>
+										</Link>
+									))}
+									{adminNavigationConfig.length > 0 && (
+										<>
+											<hr className="m-0" />
+											{adminNavigationConfig.map((item, itemIndex) => (
+												<Link key={itemIndex} to={item.to} className="m-0" target="_blank">
+													<div className="d-flex justify-content-between align-items-center">
+														<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
+														<item.icon className="text-gray" />
+													</div>
+												</Link>
+											))}
+										</>
+									)}
+									<hr className="m-0" />
+									<Button
+										variant="light"
+										className="fw-semibold text-gray"
+										onClick={() => {
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+												{}
+											);
+										}}
+									>
+										Log Out
+									</Button>
+								</div>
 							</MobileAccordianItem>
 						</li>
 					</ul>
@@ -779,6 +837,7 @@ const HeaderV2 = () => {
 																	link_text: navigationItem.title,
 																	link_detail: item.title,
 																});
+																item.onClick?.();
 															}}
 														>
 															<div
@@ -847,7 +906,14 @@ const HeaderV2 = () => {
 									</>
 								)}
 								<Dropdown.Divider />
-								<Dropdown.Item onClick={signOutAndClearContext}>
+								<Dropdown.Item
+									onClick={() => {
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.PATIENT_HEADER,
+											{}
+										);
+									}}
+								>
 									<p className="mb-0 text-gray">Log Out</p>
 								</Dropdown.Item>
 							</Dropdown.Menu>

@@ -720,7 +720,7 @@ export const routes: RouteObject[] = [
 						element: <ResourceLibraryTopic />,
 					},
 					{
-						path: 'resource-library/tags/:tagId',
+						path: 'resource-library/tags/:urlName',
 						element: <ResourceLibraryTags />,
 					},
 					{

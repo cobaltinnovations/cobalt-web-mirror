@@ -129,3 +129,8 @@ export interface ContentAudienceType {
 	patientRepresentation: string;
 	urlName: string;
 }
+
+export interface ResourceLibrarySortColumnId {
+	description: string;
+	resourceLibrarySortColumnId: string;
+}

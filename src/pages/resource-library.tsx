@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import classNames from 'classnames';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
 	CallToActionModel,
 	CALL_TO_ACTION_DISPLAY_AREA_ID,
-	ContentDuration,
-	ContentType,
 	TagGroup,
 	Content,
 	Tag,
+	AnalyticsNativeEventTypeId,
+	ContentAudienceType,
+	ContentDuration,
+	ContentType,
 } from '@/lib/models';
-import { callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
+import { analyticsService, callToActionService, resourceLibraryService, screeningService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useAnalytics from '@/hooks/use-analytics';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
@@ -26,9 +27,9 @@ import InputHelperSearch from '@/components/input-helper-search';
 import FloatingActionButton from '@/components/floating-action-button';
 import CallToAction from '@/components/call-to-action';
 import TabBar from '@/components/tab-bar';
-import SimpleFilter from '@/components/simple-filter';
-import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
+import MegaFilter, { FILTER_TYPE } from '@/components/mega-filter';
+import NoData from '@/components/no-data';
 
 export const resourceLibraryCarouselConfig = {
 	externalMonitor: {
@@ -66,6 +67,7 @@ const ResourceLibrary = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 	const recommendedContent = useMemo(() => searchParams.get('recommended') === 'true', [searchParams]);
+	const contentAudienceTypeIdQuery = useMemo(() => searchParams.get('contentAudienceTypeId') ?? '', [searchParams]);
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
@@ -76,28 +78,30 @@ const ResourceLibrary = () => {
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
+
+	const [contentAudienceTypes, setContentAudienceTypes] = useState<ContentAudienceType[]>([]);
+	const [contentDurations, setContentDurations] = useState<ContentDuration[]>([]);
+	const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
 	const [tagGroups, setTagGroups] = useState<TagGroup[]>([]);
-	const [contents, setContents] = useState<Content[]>([]);
-	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
-	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
-	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
-	// Topic Filter
-	const [tagGroupFilters, setTagGroupFilters] = useState<TagGroup[]>([]);
-	const [tagFilters, setTagFilters] = useState<Record<string, Tag[]>>();
-	const [tagFilterIsShowing, setTagFilterIsShowing] = useState(false);
-	const [tagFilterValue, setTagFilterValue] = useState<string[]>([]);
-	// Content Type Filter
-	const [contentTypeFilters, setContentTypeFilters] = useState<ContentType[]>([]);
-	const [contentTypeFilterIsShowing, setContentTypeFilterIsShowing] = useState(false);
-	const [contentTypeFilterValue, setContentTypeFilterValue] = useState<string[]>([]);
-	// Content Duration Filter
-	const [contentDurationFilters, setContentDurationFilters] = useState<ContentDuration[]>([]);
-	const [contentDurationFilterIsShowing, setContentDurationFilterIsShowing] = useState(false);
-	const [contentDurationFilterValue, setContentDurationFilterValue] = useState<string[]>([]);
+
+	const [contents, setContents] = useState<Content[]>([]);
+	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
+
 	const hasFilterQueryParms = useMemo(
-		() => tagIdQuery.length > 0 || contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
-		[contentDurationIdQuery.length, contentTypeIdQuery.length, tagIdQuery.length]
+		() =>
+			!!searchQuery ||
+			!!contentAudienceTypeIdQuery ||
+			tagIdQuery.length > 0 ||
+			contentTypeIdQuery.length > 0 ||
+			contentDurationIdQuery.length > 0,
+		[
+			contentAudienceTypeIdQuery,
+			contentDurationIdQuery.length,
+			contentTypeIdQuery.length,
+			searchQuery,
+			tagIdQuery.length,
+		]
 	);
 
 	useEffect(() => {
@@ -114,37 +118,26 @@ const ResourceLibrary = () => {
 		setCallsToAction(response.callsToAction);
 	}, []);
 
-	const fetchRecommendedFilters = useCallback(async () => {
-		const response = await resourceLibraryService
-			.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 0 })
-			.fetch();
+	const fetchFilters = useCallback(async () => {
+		const response = await resourceLibraryService.getResourceLibraryFilters().fetch();
 
-		const tagsByTagGroupId: Record<string, Tag[]> = {};
-		Object.values(response.tagsByTagId).forEach((tag) => {
-			if (tagsByTagGroupId[tag.tagGroupId]) {
-				tagsByTagGroupId[tag.tagGroupId].push(tag);
-			} else {
-				tagsByTagGroupId[tag.tagGroupId] = [tag];
-			}
-		});
-
-		setTagGroupFilters(response.tagGroups);
-		setTagFilters(tagsByTagGroupId);
-		setContentTypeFilters(response.contentTypes);
-		setContentDurationFilters(response.contentDurations);
+		setContentAudienceTypes(response.contentAudienceTypes);
+		setContentDurations(response.contentDurations);
+		setContentTypes(response.contentTypes);
+		setTagGroups(response.tagGroups);
+		setTagsByTagId(
+			response.tagGroups
+				.map((tg) => tg.tags ?? [])
+				.flat()
+				.reduce(
+					(accumulator, value) => ({
+						...accumulator,
+						[value.tagId]: value,
+					}),
+					{}
+				)
+		);
 	}, []);
-
-	useEffect(() => {
-		setTagFilterValue(tagIdQuery);
-	}, [tagIdQuery]);
-
-	useEffect(() => {
-		setContentTypeFilterValue(contentTypeIdQuery);
-	}, [contentTypeIdQuery]);
-
-	useEffect(() => {
-		setContentDurationFilterValue(contentDurationIdQuery);
-	}, [contentDurationIdQuery]);
 
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.contentScreeningFlowId) {
@@ -155,61 +148,64 @@ const ResourceLibrary = () => {
 			.getScreeningFlowCompletionStatusByScreeningFlowId(institution.contentScreeningFlowId)
 			.fetch();
 
-		if (sessionFullyCompleted) {
-			setHasCompletedScreening(true);
-		} else {
-			setHasCompletedScreening(false);
-		}
+		setHasCompletedScreening(sessionFullyCompleted);
 	}, [institution?.contentScreeningFlowId]);
 
-	const fetchData = useCallback(async () => {
-		if (searchQuery) {
-			setSearchInputValue(searchQuery);
+	const fetchFilteredContent = useCallback(async () => {
+		setSearchInputValue(searchQuery);
 
-			const searchResponse = await resourceLibraryService
-				.searchResourceLibrary({ searchQuery, pageNumber: 0, pageSize: 100 })
-				.fetch();
+		const searchResponse = await resourceLibraryService
+			.searchResourceLibrary({
+				contentAudienceTypeId: contentAudienceTypeIdQuery,
+				contentDurationId: contentDurationIdQuery,
+				contentTypeId: contentTypeIdQuery,
+				pageNumber: 0,
+				pageSize: 100,
+				searchQuery,
+				tagId: tagIdQuery,
+			})
+			.fetch();
 
-			setContents(searchResponse.findResult.contents);
-			setFindResultTotalCount(searchResponse.findResult.totalCount);
-			setFindResultTotalCountDescription(searchResponse.findResult.totalCountDescription);
-			setTagGroups([]);
-			setContentsByTagGroupId(undefined);
-			setTagsByTagId(searchResponse.tagsByTagId);
-			return;
-		}
+		setContents(searchResponse.findResult.contents);
+		setContentsByTagGroupId(undefined);
 
-		if (recommendedContent) {
-			const recommendedResponse = await resourceLibraryService
-				.getResourceLibraryRecommendedContent({
-					pageNumber: 0,
-					pageSize: 100,
-					tagId: tagIdQuery,
-					contentTypeId: contentTypeIdQuery,
-					contentDurationId: contentDurationIdQuery,
-				})
-				.fetch();
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+			contentAudienceTypeIds: contentAudienceTypeIdQuery ? [contentAudienceTypeIdQuery] : [],
+			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
+			mode: 'FILTERED',
+			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
+			tagIds: tagIdQuery,
+			totalCount: searchResponse.findResult.totalCount,
+		});
+	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagIdQuery]);
 
-			setContents(recommendedResponse.findResult.contents);
-			setFindResultTotalCount(0);
-			setFindResultTotalCountDescription('');
-			setTagGroups([]);
-			setContentsByTagGroupId(undefined);
-			setTagsByTagId(recommendedResponse.tagsByTagId);
-			return;
-		}
+	const fetchRecommendedContent = useCallback(async () => {
+		const recommendedResponse = await resourceLibraryService
+			.getResourceLibraryRecommendedContent({ pageNumber: 0, pageSize: 100 })
+			.fetch();
 
+		setContents(recommendedResponse.findResult.contents);
+		setContentsByTagGroupId(undefined);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+			mode: 'RECOMMENDED',
+			totalCount: recommendedResponse.findResult.totalCount,
+		});
+	}, []);
+
+	const fetchDefaultContent = useCallback(async () => {
 		const response = await resourceLibraryService.getResourceLibrary().fetch();
 
 		setContents([]);
-		setFindResultTotalCount(0);
-		setFindResultTotalCountDescription('');
-		setTagGroups(response.tagGroups);
 		setContentsByTagGroupId(response.contentsByTagGroupId);
-		setTagsByTagId(response.tagsByTagId);
-	}, [contentDurationIdQuery, contentTypeIdQuery, recommendedContent, searchQuery, tagIdQuery]);
 
-	const applyRecommendedFilterValuesToSearchParam = (values: string[], searchParam: string) => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY, {
+			mode: 'DEFAULT',
+		});
+	}, []);
+
+	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
 
 		for (const value of values) {
@@ -219,22 +215,15 @@ const ResourceLibrary = () => {
 		setSearchParams(searchParams, { replace: true });
 	};
 
-	const handleClearRecommendedFiltersButtonClick = useCallback(() => {
-		searchParams.delete('searchQuery');
-		searchParams.delete('tagId');
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
-
-		setSearchParams(searchParams, { replace: true });
-	}, [searchParams, setSearchParams]);
+	const handleClearFiltersButtonClick = useCallback(() => {
+		setSearchInputValue('');
+		setSearchParams(new URLSearchParams(), { replace: true });
+	}, [setSearchParams]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		searchParams.delete('recommended');
-		searchParams.delete('tagId');
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
 
 		if (searchInputValue) {
 			searchParams.set('searchQuery', searchInputValue);
@@ -252,10 +241,9 @@ const ResourceLibrary = () => {
 	const clearSearch = useCallback(() => {
 		setSearchInputValue('');
 
+		searchParams.delete('recommended');
 		searchParams.delete('searchQuery');
-		searchParams.delete('tagId');
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
+
 		setSearchParams(searchParams, { replace: true });
 
 		if (!hasTouchScreen) {
@@ -337,424 +325,338 @@ const ResourceLibrary = () => {
 				/>
 			)}
 
-			{searchQuery ? (
-				<AsyncPage fetchData={fetchData}>
-					<Container className="pt-5 pt-lg-6 pb-6 pb-lg-32">
-						<Row className="pt-4 mb-10">
-							<h3 className="mb-0">
-								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
-							</h3>
-						</Row>
-						<Row>
-							{contents.map((content, resourceIndex) => {
-								return (
-									<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-										<ResourceLibraryCard
-											linkTo={`/resource-library/${content.contentId}`}
-											className="h-100"
-											imageUrl={content.imageUrl}
-											badgeTitle={content.newFlag ? 'New' : ''}
-											title={content.title}
-											author={content.author}
-											description={content.description}
-											tags={
-												tagsByTagId
-													? content.tagIds.map((tagId) => {
-															return tagsByTagId[tagId];
-													  })
-													: []
-											}
-											contentTypeId={content.contentTypeId}
-											duration={content.durationInMinutesDescription}
-										/>
-									</Col>
-								);
-							})}
-						</Row>
-					</Container>
-				</AsyncPage>
-			) : (
-				<Container
-					className={classNames({
-						'pt-6': institution?.recommendedContentEnabled,
-						'pt-12': !institution?.recommendedContentEnabled,
-					})}
-				>
-					{institution?.recommendedContentEnabled && (
-						<Row className="mb-6">
-							<Col>
-								<TabBar
-									key="resource-library-tabbar"
-									value={recommendedContent ? 'FOR_YOU' : 'ALL'}
-									tabs={[
-										{ value: 'ALL', title: 'All' },
-										{ value: 'FOR_YOU', title: 'For You' },
-									]}
-									onTabClick={(value) => {
-										searchParams.delete('searchQuery');
-										searchParams.delete('tagId');
-										searchParams.delete('contentTypeId');
-										searchParams.delete('contentDurationId');
+			{institution?.recommendedContentEnabled && (
+				<Container>
+					<Row>
+						<Col>
+							<TabBar
+								key="resource-library-tabbar"
+								value={recommendedContent ? 'FOR_YOU' : 'ALL'}
+								tabs={[
+									{ value: 'ALL', title: 'All' },
+									{ value: 'FOR_YOU', title: 'For You' },
+								]}
+								onTabClick={(value) => {
+									searchParams.delete('searchQuery');
+									searchParams.delete('contentAudienceTypeId');
+									searchParams.delete('tagId');
+									searchParams.delete('contentTypeId');
+									searchParams.delete('contentDurationId');
+									searchParams.delete('contentAudienceTypeId');
 
-										if (value === 'ALL') {
-											searchParams.delete('recommended');
-										} else {
-											searchParams.set('recommended', 'true');
-										}
+									if (value === 'ALL') {
+										searchParams.delete('recommended');
+									} else {
+										searchParams.set('recommended', 'true');
+									}
 
-										setSearchParams(searchParams, { replace: true });
-									}}
-								/>
-							</Col>
-						</Row>
-					)}
-					{recommendedContent ? (
-						<AsyncPage fetchData={checkScreenFlowStatus}>
+									setSearchInputValue('');
+									setHasCompletedScreening(false);
+									setSearchParams(searchParams, { replace: true });
+								}}
+							/>
+						</Col>
+					</Row>
+				</Container>
+			)}
+
+			<AsyncPage fetchData={fetchFilters}>
+				{recommendedContent ? (
+					<AsyncPage fetchData={checkScreenFlowStatus}>
+						<Container>
 							{!hasCompletedScreening ? (
-								<Row>
+								<Row className="pt-12 pb-24">
 									<Col>
 										<ScreeningFlowCta className="bg-n75 border-0" buttonVariant="outline-primary" />
 									</Col>
 								</Row>
 							) : (
-								<>
-									<AsyncPage fetchData={fetchRecommendedFilters}>
-										<Row className="pb-6">
+								<AsyncPage fetchData={fetchRecommendedContent}>
+									<Row className="pt-12 pb-24">
+										{contents.length <= 0 && (
 											<Col>
-												<SimpleFilter
-													title="Topic"
-													className="me-2"
-													dialogWidth={628}
-													show={tagFilterIsShowing}
-													activeLength={searchParams.getAll('tagId').length}
-													onHide={() => {
-														setTagFilterIsShowing(false);
-													}}
-													onClick={() => {
-														setTagFilterIsShowing(true);
-													}}
-													onClear={() => {
-														setTagFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam([], 'tagId');
-													}}
-													onApply={() => {
-														setTagFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															tagFilterValue,
-															'tagId'
-														);
-													}}
-												>
-													{tagGroupFilters.map((tagGroup, tagGroupIndex) => {
-														const isLastTagGroup =
-															tagGroupFilters.length - 1 === tagGroupIndex;
-
-														return (
-															<div
-																key={tagGroup.tagGroupId}
-																className={classNames({
-																	'mb-5 border-bottom': !isLastTagGroup,
+												<div className="bg-n75 rounded p-12">
+													<Row>
+														<Col lg={{ span: 6, offset: 3 }}>
+															<h2 className="mb-6 text-muted text-center">
+																No recommendations at this time
+															</h2>
+															<p className="mb-0 fs-large text-muted text-center">
+																We are continually adding more resources to the library.
+																In the meantime, you can browse resources related to{' '}
+																{tagGroups.map((tagGroup, tagGroupIndex) => {
+																	const isLast =
+																		tagGroupIndex === tagGroups.length - 1;
+																	return (
+																		<>
+																			<Link
+																				to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+																			>
+																				{tagGroup.name}
+																			</Link>
+																			{!isLast && ', '}
+																		</>
+																	);
 																})}
-															>
-																<h5 className="mb-4">{tagGroup.name}</h5>
-																{tagFilters?.[tagGroup.tagGroupId].map(
-																	(tag, tagIndex) => {
-																		const isLastTag =
-																			tagFilters[tagGroup.tagGroupId].length -
-																				1 ===
-																			tagIndex;
-
-																		return (
-																			<Form.Check
-																				key={tag.tagId}
-																				className={classNames({
-																					'mb-0': isLastTagGroup && isLastTag,
-																					'mb-5':
-																						!isLastTagGroup && isLastTag,
-																					'mb-1': !isLastTag,
-																				})}
-																				type="checkbox"
-																				name={`tag-group--${tag.tagGroupId}`}
-																				id={`tag--${tag.tagId}`}
-																				label={tag.name}
-																				value={tag.tagId}
-																				checked={tagFilterValue.includes(
-																					tag.tagId
-																				)}
-																				onChange={({ currentTarget }) => {
-																					const updatedArray =
-																						AddOrRemoveValueFromArray(
-																							currentTarget.value,
-																							tagFilterValue
-																						);
-
-																					setTagFilterValue(updatedArray);
-																				}}
-																			/>
-																		);
-																	}
-																)}
-															</div>
-														);
-													})}
-												</SimpleFilter>
-												<SimpleFilter
-													title="Type"
-													className="me-2"
-													show={contentTypeFilterIsShowing}
-													activeLength={searchParams.getAll('contentTypeId').length}
-													onHide={() => {
-														setContentTypeFilterIsShowing(false);
-													}}
-													onClick={() => {
-														setContentTypeFilterIsShowing(true);
-													}}
-													onClear={() => {
-														setContentTypeFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam([], 'contentTypeId');
-													}}
-													onApply={() => {
-														setContentTypeFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															contentTypeFilterValue,
-															'contentTypeId'
-														);
-													}}
-												>
-													{contentTypeFilters.map((contentType) => {
-														return (
-															<Form.Check
-																key={contentType.contentTypeId}
-																type="checkbox"
-																name="CONTENT_TYPES"
-																id={contentType.contentTypeId}
-																label={contentType.description}
-																value={contentType.contentTypeId}
-																checked={contentTypeFilterValue.includes(
-																	contentType.contentTypeId
-																)}
-																onChange={({ currentTarget }) => {
-																	const updatedArray = AddOrRemoveValueFromArray(
-																		currentTarget.value,
-																		contentTypeFilterValue
-																	);
-
-																	setContentTypeFilterValue(updatedArray);
-																}}
-															/>
-														);
-													})}
-												</SimpleFilter>
-												<SimpleFilter
-													title="Length"
-													show={contentDurationFilterIsShowing}
-													activeLength={searchParams.getAll('contentDurationId').length}
-													onHide={() => {
-														setContentDurationFilterIsShowing(false);
-													}}
-													onClick={() => {
-														setContentDurationFilterIsShowing(true);
-													}}
-													onClear={() => {
-														setContentDurationFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															[],
-															'contentDurationId'
-														);
-													}}
-													onApply={() => {
-														setContentDurationFilterIsShowing(false);
-														applyRecommendedFilterValuesToSearchParam(
-															contentDurationFilterValue,
-															'contentDurationId'
-														);
-													}}
-												>
-													{contentDurationFilters.map((contentDuration) => {
-														return (
-															<Form.Check
-																key={contentDuration.contentDurationId}
-																type="checkbox"
-																name="CONTENT_TYPES"
-																id={contentDuration.contentDurationId}
-																label={contentDuration.description}
-																value={contentDuration.contentDurationId}
-																checked={contentDurationFilterValue.includes(
-																	contentDuration.contentDurationId
-																)}
-																onChange={({ currentTarget }) => {
-																	const updatedArray = AddOrRemoveValueFromArray(
-																		currentTarget.value,
-																		contentDurationFilterValue
-																	);
-
-																	setContentDurationFilterValue(updatedArray);
-																}}
-															/>
-														);
-													})}
-												</SimpleFilter>
-												{hasFilterQueryParms && (
-													<Button
-														variant="link"
-														className="p-0 mx-3"
-														onClick={handleClearRecommendedFiltersButtonClick}
-													>
-														Clear
-													</Button>
-												)}
-											</Col>
-										</Row>
-									</AsyncPage>
-									<AsyncPage fetchData={fetchData}>
-										{contents.length <= 0 ? (
-											<>
-												{hasFilterQueryParms ? (
-													<Row className="pt-12 pb-24">
-														<Col>
-															<h2 className="mb-6 text-muted text-center">No Results</h2>
-															<p className="mb-6 fs-large text-muted text-center">
-																Try adjusting your filters to see available content
 															</p>
-															<div className="text-center">
-																<Button
-																	size="lg"
-																	variant="outline-primary"
-																	onClick={handleClearRecommendedFiltersButtonClick}
-																>
-																	Clear Filters
-																</Button>
-															</div>
 														</Col>
 													</Row>
-												) : (
-													<Row className="mb-24">
-														<Col>
-															<div className="bg-n75 rounded p-12">
-																<Row>
-																	<Col lg={{ span: 6, offset: 3 }}>
-																		<h2 className="mb-6 text-muted text-center">
-																			No recommendations at this time
-																		</h2>
-																		<p className="mb-0 fs-large text-muted text-center">
-																			We are continually adding more resources to
-																			the library. In the meantime, you can browse
-																			resources related to{' '}
-																			<Link to="/resource-library/tag-groups/symptoms">
-																				Symptoms
-																			</Link>
-																			,{' '}
-																			<Link to="/resource-library/tag-groups/work-life">
-																				Work Life
-																			</Link>
-																			,{' '}
-																			<Link to="/resource-library/tag-groups/personal-life">
-																				Personal Life
-																			</Link>
-																			,{' '}
-																			<Link to="/resource-library/tag-groups/identity">
-																				Identity
-																			</Link>
-																			,{' '}
-																			<Link to="/resource-library/tag-groups/caretaking">
-																				Caretaking
-																			</Link>
-																			, and{' '}
-																			<Link to="/resource-library/tag-groups/world-events">
-																				World Events
-																			</Link>
-																		</p>
-																	</Col>
-																</Row>
-															</div>
-														</Col>
-													</Row>
-												)}
-											</>
-										) : (
-											<Row>
-												{contents.map((content, resourceIndex) => {
-													return (
-														<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
-															<ResourceLibraryCard
-																linkTo={`/resource-library/${content.contentId}`}
-																className="h-100"
-																imageUrl={content.imageUrl}
-																badgeTitle={content.newFlag ? 'New' : ''}
-																title={content.title}
-																author={content.author}
-																description={content.description}
-																tags={
-																	tagsByTagId
-																		? content.tagIds.map((tagId) => {
-																				return tagsByTagId[tagId];
-																		  })
-																		: []
-																}
-																contentTypeId={content.contentTypeId}
-																duration={content.durationInMinutesDescription}
-															/>
-														</Col>
-													);
-												})}
-											</Row>
+												</div>
+											</Col>
 										)}
-									</AsyncPage>
-								</>
+										{contents.map((content) => {
+											return (
+												<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+													<ResourceLibraryCard
+														linkTo={`/resource-library/${content.contentId}`}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={
+															tagsByTagId
+																? content.tagIds
+																		.map((tagId) => {
+																			return tagsByTagId?.[tagId] ?? null;
+																		})
+																		.filter(Boolean)
+																: []
+														}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+													/>
+												</Col>
+											);
+										})}
+									</Row>
+								</AsyncPage>
 							)}
-						</AsyncPage>
-					) : (
-						<AsyncPage fetchData={fetchData}>
-							{tagGroups.map((tagGroup) => {
-								return (
-									<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
-										<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-											<ResourceLibrarySubtopicCard
-												className="h-100"
-												colorId={tagGroup.colorId}
-												title={tagGroup.name}
-												description={tagGroup.description}
-												to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+						</Container>
+					</AsyncPage>
+				) : (
+					<Container>
+						<Row className="pt-9 pb-5">
+							<Col>
+								<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-between">
+									<div></div>
+									<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
+										<div className="mb-2 mb-lg-0 d-flex align-items-center">
+											{institution.contentAudiencesEnabled && (
+												<>
+													<span className="me-2">Show resources for</span>
+													<MegaFilter
+														displaySingleColumn
+														className="me-2"
+														allowCollapse={false}
+														displayCount={false}
+														buttonTitle={
+															contentAudienceTypes.find(
+																(cat) =>
+																	cat.contentAudienceTypeId ===
+																	searchParams.get('contentAudienceTypeId')
+															)?.description ?? 'Anyone'
+														}
+														modalTitle="Show resources for..."
+														value={[
+															{
+																id: 'contentAudienceTypeId',
+																filterType: FILTER_TYPE.RADIO,
+																title: 'Show resources for...',
+																value: searchParams.getAll('contentAudienceTypeId'),
+																options: contentAudienceTypes.map((cat) => ({
+																	value: cat.contentAudienceTypeId,
+																	title: cat.description,
+																})),
+															},
+														]}
+														onChange={(filters) => {
+															filters.forEach((filter) => {
+																applyValuesToSearchParam(filter.value, filter.id);
+															});
+														}}
+													/>
+												</>
+											)}
+										</div>
+										<div className="mb-2 mb-lg-0 d-flex align-items-center">
+											<span className="me-2">
+												{institution.contentAudiencesEnabled
+													? 'related to'
+													: 'Show resources related to '}
+											</span>
+											<MegaFilter
+												buttonTitle={
+													searchParams.getAll('tagId').length > 0 ? 'Topics' : 'Any topic'
+												}
+												modalTitle="Topics"
+												value={tagGroups.map((tagGroup) => ({
+													id: tagGroup.tagGroupId,
+													filterType: FILTER_TYPE.CHECKBOX,
+													title: tagGroup.name,
+													value: searchParams
+														.getAll('tagId')
+														.filter((v) =>
+															(tagGroup.tags ?? []).find((t) => t.tagId === v)
+														),
+													options: (tagGroup.tags ?? []).map((tag) => ({
+														value: tag.tagId,
+														title: tag.name,
+													})),
+												}))}
+												onChange={(filters) => {
+													applyValuesToSearchParam(
+														filters.map((f) => f.value).flat(),
+														'tagId'
+													);
+												}}
+											/>
+										</div>
+									</div>
+									<div>
+										<MegaFilter
+											displayFilterIcon
+											displayDownArrow={false}
+											buttonTitle="More filters"
+											modalTitle="More filters"
+											value={[
+												{
+													id: 'contentTypeId',
+													filterType: FILTER_TYPE.CHECKBOX,
+													title: 'Type',
+													value: searchParams.getAll('contentTypeId'),
+													options: contentTypes.map((ct) => ({
+														value: ct.contentTypeId,
+														title: ct.description,
+													})),
+												},
+												{
+													id: 'contentDurationId',
+													filterType: FILTER_TYPE.CHECKBOX,
+													title: 'Duration',
+													value: searchParams.getAll('contentDurationId'),
+													options: contentDurations.map((cd) => ({
+														value: cd.contentDurationId,
+														title: cd.description,
+													})),
+												},
+											]}
+											onChange={(filters) => {
+												filters.forEach((filter) => {
+													applyValuesToSearchParam(filter.value, filter.id);
+												});
+											}}
+										/>
+									</div>
+								</div>
+							</Col>
+						</Row>
+						{hasFilterQueryParms ? (
+							<AsyncPage fetchData={fetchFilteredContent}>
+								<Row className="pt-5 pb-24">
+									{contents.length <= 0 && (
+										<Col>
+											<NoData
+												title="No Results"
+												description="Try adjusting your filters to see available content"
+												actions={[
+													{
+														variant: 'outline-primary',
+														title: 'Clear Filters',
+														onClick: handleClearFiltersButtonClick,
+													},
+												]}
 											/>
 										</Col>
-										<Col lg={9}>
-											<Carousel
-												responsive={resourceLibraryCarouselConfig}
-												trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-												floatingButtonGroup
-											>
-												{contentsByTagGroupId?.[tagGroup.tagGroupId]?.map((content) => {
-													return (
-														<ResourceLibraryCard
-															key={content.contentId}
-															linkTo={`/resource-library/${content.contentId}`}
-															className="h-100"
-															imageUrl={content.imageUrl}
-															badgeTitle={content.newFlag ? 'New' : ''}
-															title={content.title}
-															author={content.author}
-															description={content.description}
-															tags={
-																tagsByTagId
-																	? content.tagIds.map((tagId) => {
-																			return tagsByTagId[tagId];
-																	  })
-																	: []
-															}
-															contentTypeId={content.contentTypeId}
-															duration={content.durationInMinutesDescription}
-														/>
-													);
-												})}
-											</Carousel>
-										</Col>
-									</Row>
-								);
-							})}
-						</AsyncPage>
-					)}
-				</Container>
-			)}
+									)}
+									{contents.map((content, resourceIndex) => {
+										return (
+											<Col key={resourceIndex} xs={12} md={6} lg={4} className="mb-8">
+												<ResourceLibraryCard
+													linkTo={`/resource-library/${content.contentId}`}
+													className="h-100"
+													imageUrl={content.imageUrl}
+													badgeTitle={content.newFlag ? 'New' : ''}
+													title={content.title}
+													author={content.author}
+													description={content.description}
+													tags={
+														tagsByTagId
+															? content.tagIds
+																	.map((tagId) => {
+																		return tagsByTagId?.[tagId] ?? null;
+																	})
+																	.filter(Boolean)
+															: []
+													}
+													contentTypeId={content.contentTypeId}
+													duration={content.durationInMinutesDescription}
+												/>
+											</Col>
+										);
+									})}
+								</Row>
+							</AsyncPage>
+						) : (
+							<AsyncPage fetchData={fetchDefaultContent}>
+								{tagGroups.map((tagGroup) => {
+									return (
+										<Row key={tagGroup.tagGroupId} className="mb-11 mb-lg-18">
+											<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+												<ResourceLibrarySubtopicCard
+													className="h-100"
+													colorId={tagGroup.colorId}
+													title={tagGroup.name}
+													description={tagGroup.description}
+													to={`/resource-library/tag-groups/${tagGroup.urlName}`}
+												/>
+											</Col>
+											<Col lg={9}>
+												<Carousel
+													responsive={resourceLibraryCarouselConfig}
+													trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+													floatingButtonGroup
+												>
+													{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map(
+														(content) => {
+															return (
+																<ResourceLibraryCard
+																	key={content.contentId}
+																	linkTo={`/resource-library/${content.contentId}`}
+																	className="h-100"
+																	imageUrl={content.imageUrl}
+																	badgeTitle={content.newFlag ? 'New' : ''}
+																	title={content.title}
+																	author={content.author}
+																	description={content.description}
+																	tags={
+																		tagsByTagId
+																			? content.tagIds
+																					.map((tagId) => {
+																						return (
+																							tagsByTagId?.[tagId] ?? null
+																						);
+																					})
+																					.filter(Boolean)
+																			: []
+																	}
+																	contentTypeId={content.contentTypeId}
+																	duration={content.durationInMinutesDescription}
+																/>
+															);
+														}
+													)}
+												</Carousel>
+											</Col>
+										</Row>
+									);
+								})}
+							</AsyncPage>
+						)}
+					</Container>
+				)}
+			</AsyncPage>
 		</>
 	);
 };

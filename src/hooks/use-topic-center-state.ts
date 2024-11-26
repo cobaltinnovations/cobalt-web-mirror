@@ -1,5 +1,5 @@
-import { TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
-import { topicCenterService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, TopicCenterDisplayStyleId, TopicCenterModel } from '@/lib/models';
+import { analyticsService, topicCenterService } from '@/lib/services';
 import { useCallback, useState } from 'react';
 import { useMatch, useNavigate } from 'react-router-dom';
 import useAnalytics from './use-analytics';
@@ -35,6 +35,10 @@ export function useTopicCenterState(topicCenterId?: string) {
 		mixpanel.track('Topic Center Page View', {
 			'Topic Center ID': response.topicCenter.topicCenterId,
 			'Topic Center Title': response.topicCenter.name,
+		});
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_TOPIC_CENTER, {
+			topicCenterId: response.topicCenter.topicCenterId,
 		});
 	}, [isFeaturedMatch, mixpanel, navigate, topicCenterId]);
 

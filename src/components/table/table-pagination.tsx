@@ -41,9 +41,10 @@ interface TablePaginationProps {
 	size: number;
 	total: number;
 	onClick(pageIndex: number): void;
+	disabled?: boolean;
 }
 
-export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, size, total, onClick }) => {
+export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, size, total, disabled, onClick }) => {
 	const classes = useTablePaginationStyles();
 
 	const totalPages = Math.ceil(total / size);
@@ -125,7 +126,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 				size="sm"
 				className={classes.paginationButton}
 				onClick={handlePreviousButtonClick}
-				disabled={page === 0}
+				disabled={page === 0 || disabled}
 			>
 				<LeftChevron width={24} height={24} />
 			</Button>
@@ -142,6 +143,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 							onClick={() => {
 								handlePaginationButtonClick(button.index);
 							}}
+							disabled={disabled}
 						>
 							{button.title}
 						</Button>
@@ -152,7 +154,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 				size="sm"
 				className={classes.paginationButton}
 				onClick={handleNextButtonClick}
-				disabled={page === lastPage}
+				disabled={page === lastPage || disabled}
 			>
 				<RightChevron width={24} height={24} />
 			</Button>

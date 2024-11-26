@@ -1,168 +1,93 @@
-import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Button, Col, Collapse, Container, Form, Row } from 'react-bootstrap';
-import Color from 'color';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { Content, ContentDuration, ContentType, Tag, TagGroup } from '@/lib/models';
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
-import { resourceLibraryService } from '@/lib/services';
+import {
+	AnalyticsNativeEventTypeId,
+	Content,
+	ContentAudienceType,
+	ContentDuration,
+	ContentType,
+	Tag,
+	TagGroup,
+} from '@/lib/models';
+import { analyticsService, resourceLibraryService } from '@/lib/services';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import AsyncPage from '@/components/async-page';
-import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
-import SimpleFilter, { SimpleFilterModel } from '@/components/simple-filter';
 import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
-
-import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonText } from '@/components/skeleton-loaders';
-import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
-
-// import useAnalytics from '@/hooks/use-analytics';
-// import { ContentAnalyticsEvent } from '@/contexts/analytics-context';
-
-enum FILTER_IDS {
-	TAGS = 'TAGS',
-	CONTENT_TYPES = 'CONTENT_TYPES',
-	CONTENT_DURATIONS = 'CONTENT_DURATIONS',
-}
-
-const useResourceLibraryTopicStyles = createUseThemedStyles((theme) => ({
-	filterButtonsOuter: {
-		flex: 1,
-		display: 'flex',
-		overflowX: 'auto',
-		flexWrap: 'nowrap',
-		alignItems: 'center',
-		paddingBottom: 8,
-	},
-	searchButtonOuter: {
-		flexShrink: 0,
-		paddingBottom: 8,
-		position: 'relative',
-		'&:before': {
-			top: 0,
-			bottom: 0,
-			width: 16,
-			left: -16,
-			content: '""',
-			display: 'block',
-			position: 'absolute',
-			background: `linear-gradient(90deg, ${Color(theme.colors.background).alpha(0).string()} 0%, ${Color(
-				theme.colors.background
-			)
-				.alpha(1)
-				.string()} 100%);`,
-		},
-	},
-}));
+import MegaFilter, { FILTER_TYPE } from '@/components/mega-filter';
+import NoData from '@/components/no-data';
+import useAccount from '@/hooks/use-account';
 
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
-	const [searchParams, setSearchParams] = useSearchParams();
-
 	const { hasTouchScreen } = useTouchScreenCheck();
-	// const { trackEvent } = useAnalytics();
+	const { institution } = useAccount();
 
+	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
+	const contentAudienceTypeIdQuery = useMemo(() => searchParams.get('contentAudienceTypeId') ?? '', [searchParams]);
 	const tagIdQuery = useMemo(() => searchParams.getAll('tagId'), [searchParams]);
 	const contentTypeIdQuery = useMemo(() => searchParams.getAll('contentTypeId'), [searchParams]);
 	const contentDurationIdQuery = useMemo(() => searchParams.getAll('contentDurationId'), [searchParams]);
 	const hasFilterQueryParms = useMemo(
-		() => tagIdQuery.length > 0 || contentTypeIdQuery.length > 0 || contentDurationIdQuery.length > 0,
-		[contentDurationIdQuery.length, contentTypeIdQuery.length, tagIdQuery.length]
+		() =>
+			!!searchQuery ||
+			!!contentAudienceTypeIdQuery ||
+			tagIdQuery.length > 0 ||
+			contentTypeIdQuery.length > 0 ||
+			contentDurationIdQuery.length > 0,
+		[
+			contentAudienceTypeIdQuery,
+			contentDurationIdQuery.length,
+			contentTypeIdQuery.length,
+			searchQuery,
+			tagIdQuery.length,
+		]
 	);
-	const hasQueryParams = useMemo(
-		() => searchQuery.length > 0 || hasFilterQueryParms,
-		[hasFilterQueryParms, searchQuery.length]
-	);
-
-	const classes = useResourceLibraryTopicStyles();
-	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const [filtersResponse, setFiltersResponse] = useState<{
+		contentAudienceTypes: ContentAudienceType[];
 		contentTypes: ContentType[];
 		contentDurations: ContentDuration[];
 		tags: Tag[];
 	}>();
-	const [filters, setFilters] = useState<Record<FILTER_IDS, SimpleFilterModel<FILTER_IDS>>>();
-	const [searchIsOpen, setSearchIsOpen] = useState(false);
+
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [searchInputValue, setSearchInputValue] = useState('');
 
 	const [findResultTotalCount, setFindResultTotalCount] = useState(0);
-	const [findResultTotalCountDescription, setFindResultTotalCountDescription] = useState('');
 	const [tagGroup, setTagGroup] = useState<TagGroup>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 	const [contents, setContents] = useState<Content[]>([]);
 
-	const fetchTagGroup = useCallback(async () => {
-		if (!tagGroupId) {
-			throw new Error('tagGroupId is undefined.');
-		}
-
-		const response = await resourceLibraryService
-			.getResourceLibraryContentByTagGroupId(tagGroupId, { pageNumber: 0, pageSize: 0 })
-			.fetch();
-
-		setTagGroup(response.tagGroup);
-		setTagsByTagId(response.tagsByTagId);
-	}, [tagGroupId]);
-
-	const fetchFilters = useCallback(async () => {
-		if (!tagGroupId) {
-			throw new Error('tagGroupId is undefined.');
-		}
-
-		const response = await resourceLibraryService.getResourceLibraryFiltersByTagGroupId(tagGroupId).fetch();
-		setFiltersResponse(response);
-	}, [tagGroupId]);
-
 	useEffect(() => {
-		if (!filtersResponse) {
-			return;
+		if (tagGroup && !hasTouchScreen) {
+			searchInputRef.current?.focus({ preventScroll: true });
+		}
+	}, [tagGroup, hasTouchScreen]);
+
+	const fetchPageBlockingData = useCallback(async () => {
+		if (!tagGroupId) {
+			throw new Error('tagGroupId is undefined.');
 		}
 
-		const formattedFilters = {
-			[FILTER_IDS.TAGS]: {
-				id: FILTER_IDS.TAGS,
-				title: 'Subtopic',
-				searchParam: 'tagId',
-				value: tagIdQuery,
-				options: filtersResponse.tags.map((tag) => ({
-					title: tag.name,
-					value: tag.tagId,
-				})),
-				isShowing: false,
-			},
-			[FILTER_IDS.CONTENT_TYPES]: {
-				id: FILTER_IDS.CONTENT_TYPES,
-				title: 'Type',
-				searchParam: 'contentTypeId',
-				value: contentTypeIdQuery,
-				options: filtersResponse.contentTypes.map((ct) => ({
-					title: ct.description,
-					value: ct.contentTypeId,
-				})),
-				isShowing: false,
-			},
-			[FILTER_IDS.CONTENT_DURATIONS]: {
-				id: FILTER_IDS.CONTENT_DURATIONS,
-				title: 'Length',
-				searchParam: 'contentDurationId',
-				value: contentDurationIdQuery,
-				options: filtersResponse.contentDurations.map((cd) => ({
-					title: cd.description,
-					value: cd.contentDurationId,
-				})),
-				isShowing: false,
-			},
-		};
+		const [tagGroupResponse, filtersResponse] = await Promise.all([
+			resourceLibraryService
+				.getResourceLibraryContentByTagGroupId(tagGroupId, { pageNumber: 0, pageSize: 0 })
+				.fetch(),
+			resourceLibraryService.getResourceLibraryFiltersByTagGroupId(tagGroupId).fetch(),
+		]);
 
-		setFilters(formattedFilters);
-	}, [contentDurationIdQuery, contentTypeIdQuery, filtersResponse, tagIdQuery]);
+		setTagGroup(tagGroupResponse.tagGroup);
+		setTagsByTagId(tagGroupResponse.tagsByTagId);
+		setFiltersResponse(filtersResponse);
+	}, [tagGroupId]);
 
 	const fetchContent = useCallback(async () => {
 		if (searchQuery) {
@@ -178,6 +103,7 @@ const ResourceLibraryTopic = () => {
 				pageNumber: 0,
 				pageSize: 100,
 				searchQuery,
+				contentAudienceTypeId: contentAudienceTypeIdQuery,
 				tagId: tagIdQuery,
 				contentTypeId: contentTypeIdQuery,
 				contentDurationId: contentDurationIdQuery,
@@ -185,9 +111,27 @@ const ResourceLibraryTopic = () => {
 			.fetch();
 
 		setFindResultTotalCount(findResult.totalCount);
-		setFindResultTotalCountDescription(findResult.totalCountDescription);
 		setContents(findResult.contents);
-	}, [contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
+	}, [contentAudienceTypeIdQuery, contentDurationIdQuery, contentTypeIdQuery, searchQuery, tagGroupId, tagIdQuery]);
+
+	useEffect(() => {
+		if (!tagGroup && !findResultTotalCount) {
+			return;
+		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_RESOURCE_LIBRARY_TAG_GROUP, {
+			contentAudienceTypeIds: contentAudienceTypeIdQuery ? [contentAudienceTypeIdQuery] : [],
+			contentDurationIds: contentDurationIdQuery,
+			contentTypeIds: contentTypeIdQuery,
+			searchQuery: searchQuery && searchQuery.trim().length > 0 ? searchQuery.trim() : undefined,
+			tagGroupId: tagGroup?.tagGroupId,
+			tagIds: tagIdQuery,
+			totalCount: findResultTotalCount,
+		});
+
+		// Only fire analytics event when api calls resolve, not on queryParam change
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [findResultTotalCount, tagGroup]);
 
 	const applyValuesToSearchParam = (values: string[], searchParam: string) => {
 		searchParams.delete(searchParam);
@@ -245,13 +189,10 @@ const ResourceLibraryTopic = () => {
 		};
 	}, [handleKeydown]);
 
-	const handleClearButtonClick = useCallback(() => {
-		searchParams.delete('tagId');
-		searchParams.delete('contentTypeId');
-		searchParams.delete('contentDurationId');
-
-		setSearchParams(searchParams, { replace: true });
-	}, [searchParams, setSearchParams]);
+	const handleClearFiltersButtonClick = useCallback(() => {
+		setSearchInputValue('');
+		setSearchParams(new URLSearchParams(), { replace: true });
+	}, [setSearchParams]);
 
 	return (
 		<>
@@ -260,10 +201,10 @@ const ResourceLibraryTopic = () => {
 			</Helmet>
 
 			<AsyncPage
-				fetchData={fetchTagGroup}
+				fetchData={fetchPageBlockingData}
 				loadingComponent={
 					<>
-						<Breadcrumb
+						{/* <Breadcrumb
 							breadcrumbs={[
 								{
 									to: '/',
@@ -274,7 +215,7 @@ const ResourceLibraryTopic = () => {
 									title: 'Resource Library',
 								},
 							]}
-						/>
+						/> */}
 						<HeroContainer>
 							<SkeletonText type="h1" className="mb-4 text-center" width="50%" />
 							<SkeletonText type="p" className="mb-0 text-center fs-large" numberOfLines={3} />
@@ -282,174 +223,151 @@ const ResourceLibraryTopic = () => {
 					</>
 				}
 			>
-				{tagGroup && (
-					<>
-						<Breadcrumb
-							breadcrumbs={[
-								{
-									to: '/',
-									title: 'Home',
-								},
-								{
-									to: '/resource-library',
-									title: 'Resource Library',
-								},
-								{
-									to: `/resource-library/tag-groups/${tagGroup.urlName}`,
-									title: tagGroup.name,
-								},
-							]}
+				{/* <Breadcrumb
+					breadcrumbs={[
+						{
+							to: '/',
+							title: 'Home',
+						},
+						{
+							to: '/resource-library',
+							title: 'Resource Library',
+						},
+						{
+							to: `/resource-library/tag-groups/${tagGroup?.urlName}`,
+							title: tagGroup?.name ?? '',
+						},
+					]}
+				/> */}
+				<HeroContainer className={getBackgroundClassForColorId(tagGroup?.colorId)}>
+					<h1 className="mb-4 text-center">{tagGroup?.name}</h1>
+					<p className="mb-6 text-center fs-large">{tagGroup?.description}</p>
+					<Form onSubmit={handleSearchFormSubmit}>
+						<InputHelperSearch
+							ref={searchInputRef}
+							placeholder="Search Resources"
+							value={searchInputValue}
+							onChange={({ currentTarget }) => {
+								setSearchInputValue(currentTarget.value);
+							}}
+							onClear={clearSearch}
 						/>
-						<HeroContainer className={getBackgroundClassForColorId(tagGroup.colorId)}>
-							<h1 className="mb-4 text-center">{tagGroup.name}</h1>
-							<p className="mb-0 text-center fs-large">{tagGroup.description}</p>
-						</HeroContainer>
-					</>
-				)}
-			</AsyncPage>
-			<AsyncPage fetchData={fetchFilters}>
-				<Container className="pt-8">
-					<Row className="mb-3">
+					</Form>
+				</HeroContainer>
+				<Container>
+					<Row className="py-9">
 						<Col>
-							<div className="d-flex align-items-center justify-content-between">
-								<div className={classes.filterButtonsOuter}>
-									{filters &&
-										Object.values(filters).map((filter) => {
-											return (
-												<SimpleFilter
-													key={filter.id}
+							<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center justify-content-lg-between">
+								<div></div>
+								<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
+									<div className="mb-2 mb-lg-0 d-flex align-items-center">
+										{institution.contentAudiencesEnabled && (
+											<>
+												<span className="me-2">Show resources for</span>
+												<MegaFilter
+													displaySingleColumn
 													className="me-2"
-													title={filter.title}
-													show={filter.isShowing}
-													activeLength={searchParams.getAll(filter.searchParam).length}
-													onClick={() => {
-														const filtersClone = cloneDeep(filters);
-														filtersClone[filter.id].isShowing = true;
-														setFilters(filtersClone);
-														// trackEvent(ContentAnalyticsEvent.clickFilterPill(filter.title));
+													allowCollapse={false}
+													displayCount={false}
+													buttonTitle={
+														(filtersResponse?.contentAudienceTypes ?? []).find(
+															(cat) =>
+																cat.contentAudienceTypeId ===
+																searchParams.get('contentAudienceTypeId')
+														)?.description ?? 'Anyone'
+													}
+													modalTitle="Show resources for..."
+													value={[
+														{
+															id: 'contentAudienceTypeId',
+															filterType: FILTER_TYPE.RADIO,
+															title: 'Show resources for...',
+															value: searchParams.getAll('contentAudienceTypeId'),
+															options: (filtersResponse?.contentAudienceTypes ?? []).map(
+																(cat) => ({
+																	value: cat.contentAudienceTypeId,
+																	title: cat.description,
+																})
+															),
+														},
+													]}
+													onChange={(filters) => {
+														filters.forEach((filter) => {
+															applyValuesToSearchParam(filter.value, filter.id);
+														});
 													}}
-													onHide={() => {
-														const filtersClone = cloneDeep(filters);
-														filtersClone[filter.id].value = searchParams.getAll(
-															filtersClone[filter.id].searchParam
-														);
-														filtersClone[filter.id].isShowing = false;
-														setFilters(filtersClone);
-													}}
-													onClear={() => {
-														const filtersClone = cloneDeep(filters);
-														filtersClone[filter.id].value = [];
-														filtersClone[filter.id].isShowing = false;
-														setFilters(filtersClone);
-
-														applyValuesToSearchParam(
-															[],
-															filtersClone[filter.id].searchParam
-														);
-													}}
-													onApply={() => {
-														const filtersClone = cloneDeep(filters);
-														filtersClone[filter.id].isShowing = false;
-														setFilters(filtersClone);
-
-														applyValuesToSearchParam(
-															filtersClone[filter.id].value,
-															filtersClone[filter.id].searchParam
-														);
-													}}
-												>
-													{filter.options.map((option) => {
-														return (
-															<Form.Check
-																key={option.value}
-																type="checkbox"
-																name={filter.id}
-																id={`${filter.id}--${option.value}`}
-																label={option.title}
-																value={option.value}
-																checked={filter.value.includes(option.value)}
-																onChange={({ currentTarget }) => {
-																	const filtersClone = cloneDeep(filters);
-																	const indexToRemove = filtersClone[
-																		filter.id
-																	].value.findIndex((v) => v === currentTarget.value);
-
-																	if (indexToRemove > -1) {
-																		filtersClone[filter.id].value.splice(
-																			indexToRemove,
-																			1
-																		);
-																	} else {
-																		filtersClone[filter.id].value.push(
-																			currentTarget.value
-																		);
-																	}
-
-																	setFilters(filtersClone);
-																}}
-															/>
-														);
-													})}
-												</SimpleFilter>
-											);
-										})}
-									{hasFilterQueryParms && (
-										<Button variant="link" className="p-0 mx-3" onClick={handleClearButtonClick}>
-											Clear
-										</Button>
-									)}
-								</div>
-								<div className={classes.searchButtonOuter}>
-									<Button
-										variant={searchIsOpen ? 'primary' : 'outline-primary'}
-										className="p-2"
-										onClick={() => {
-											if (searchIsOpen) {
-												clearSearch();
-												setSearchIsOpen(false);
-											} else {
-												setSearchIsOpen(true);
-											}
-										}}
-									>
-										{searchIsOpen ? (
-											<CloseIcon width={24} height={24} />
-										) : (
-											<SearchIcon width={24} height={24} />
+												/>
+											</>
 										)}
-									</Button>
+									</div>
+									<div className="mb-2 mb-lg-0 d-flex align-items-center">
+										<span className="me-2">
+											{institution.contentAudiencesEnabled
+												? 'related to'
+												: 'Show resources related to '}
+										</span>
+										<MegaFilter
+											allowCollapse={false}
+											buttonTitle={
+												searchParams.getAll('tagId').length > 0 ? 'Topics' : 'Any topic'
+											}
+											modalTitle="Topics"
+											value={[
+												{
+													id: 'TOPICS',
+													filterType: FILTER_TYPE.CHECKBOX,
+													title: 'Topics',
+													value: searchParams.getAll('tagId'),
+													options: (filtersResponse?.tags ?? []).map((tag) => ({
+														value: tag.tagId,
+														title: tag.name,
+													})),
+												},
+											]}
+											onChange={(filters) => {
+												applyValuesToSearchParam(filters.map((f) => f.value).flat(), 'tagId');
+											}}
+										/>
+									</div>
+								</div>
+								<div>
+									<MegaFilter
+										displayFilterIcon
+										displayDownArrow={false}
+										buttonTitle="More filters"
+										modalTitle="More filters"
+										value={[
+											{
+												id: 'contentTypeId',
+												filterType: FILTER_TYPE.CHECKBOX,
+												title: 'Type',
+												value: searchParams.getAll('contentTypeId'),
+												options: (filtersResponse?.contentTypes ?? []).map((ct) => ({
+													value: ct.contentTypeId,
+													title: ct.description,
+												})),
+											},
+											{
+												id: 'contentDurationId',
+												filterType: FILTER_TYPE.CHECKBOX,
+												title: 'Duration',
+												value: searchParams.getAll('contentDurationId'),
+												options: (filtersResponse?.contentDurations ?? []).map((cd) => ({
+													value: cd.contentDurationId,
+													title: cd.description,
+												})),
+											},
+										]}
+										onChange={(filters) => {
+											filters.forEach((filter) => {
+												applyValuesToSearchParam(filter.value, filter.id);
+											});
+										}}
+									/>
 								</div>
 							</div>
 						</Col>
 					</Row>
-					<div className="pb-3">
-						<Collapse
-							in={searchIsOpen}
-							onEntered={() => {
-								searchInputRef.current?.focus({ preventScroll: true });
-							}}
-						>
-							<div className="overflow-hidden">
-								<div className="pb-5">
-									<Row>
-										<Col>
-											<Form onSubmit={handleSearchFormSubmit}>
-												<InputHelperSearch
-													ref={searchInputRef}
-													placeholder="Search Resources"
-													value={searchInputValue}
-													onChange={({ currentTarget }) => {
-														setSearchInputValue(currentTarget.value);
-													}}
-													onClear={clearSearch}
-												/>
-											</Form>
-										</Col>
-									</Row>
-								</div>
-							</div>
-						</Collapse>
-					</div>
 				</Container>
 			</AsyncPage>
 			<AsyncPage
@@ -480,41 +398,49 @@ const ResourceLibraryTopic = () => {
 				}
 			>
 				<Container className="pb-24">
-					{hasQueryParams && (
+					{hasFilterQueryParms && contents.length <= 0 && (
 						<Row className="mb-10">
-							<h3 className="mb-0">
-								{findResultTotalCountDescription} result{findResultTotalCount === 1 ? '' : 's'}
-							</h3>
+							<Col>
+								<NoData
+									title="No Results"
+									description="Try adjusting your filters to see available content"
+									actions={[
+										{
+											variant: 'outline-primary',
+											title: 'Clear Filters',
+											onClick: handleClearFiltersButtonClick,
+										},
+									]}
+								/>
+							</Col>
 						</Row>
 					)}
-					{tagGroup && (
-						<Row>
-							{contents.map((content) => {
-								return (
-									<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
-										<ResourceLibraryCard
-											className="h-100"
-											linkTo={`/resource-library/${content.contentId}`}
-											imageUrl={content.imageUrl}
-											badgeTitle={content.newFlag ? 'New' : ''}
-											title={content.title}
-											author={content.author}
-											description={content.description}
-											tags={
-												tagsByTagId
-													? content.tagIds.map((tagId) => {
-															return tagsByTagId[tagId];
-													  })
-													: []
-											}
-											contentTypeId={content.contentTypeId}
-											duration={content.durationInMinutesDescription}
-										/>
-									</Col>
-								);
-							})}
-						</Row>
-					)}
+					<Row>
+						{contents.map((content) => {
+							return (
+								<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+									<ResourceLibraryCard
+										className="h-100"
+										linkTo={`/resource-library/${content.contentId}`}
+										imageUrl={content.imageUrl}
+										badgeTitle={content.newFlag ? 'New' : ''}
+										title={content.title}
+										author={content.author}
+										description={content.description}
+										tags={
+											tagsByTagId
+												? content.tagIds.map((tagId) => {
+														return tagsByTagId[tagId];
+												  })
+												: []
+										}
+										contentTypeId={content.contentTypeId}
+										duration={content.durationInMinutesDescription}
+									/>
+								</Col>
+							);
+						})}
+					</Row>
 				</Container>
 			</AsyncPage>
 		</>

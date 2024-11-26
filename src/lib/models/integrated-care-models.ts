@@ -543,17 +543,18 @@ export interface PatientOrderClosureReasonModel {
 }
 
 export interface PatientOrderAutocompleteResult {
-	referenceNumber: number;
-	referenceNumberDescription: string;
-	patientMrn: string;
-	patientUniqueId: string;
-	patientUniqueIdType: string;
-	patientFirstName: string;
-	patientLastName: string;
 	patientDisplayName: string;
 	patientDisplayNameWithLastFirst: string;
+	patientFirstName: string;
+	patientLastName: string;
+	patientMrn: string;
+	patientOrderId: string;
 	patientPhoneNumber: string;
 	patientPhoneNumberDescription: string;
+	patientUniqueId: string;
+	patientUniqueIdType: string;
+	referenceNumber: number;
+	referenceNumberDescription: string;
 }
 
 export interface PatientOrderScheduledMessageGroup {

@@ -19,6 +19,7 @@ import {
 	callToActionService,
 	screeningService,
 	institutionService,
+	analyticsService,
 } from '@/lib/services';
 import {
 	GroupSessionRequestModel,
@@ -29,6 +30,8 @@ import {
 	InstitutionBlurb,
 	Content,
 	Tag,
+	AnalyticsNativeEventTypeId,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -131,6 +134,8 @@ const Index: FC = () => {
 				// dont throw
 			}
 		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_HOME);
 	}, [account?.accountId]);
 
 	const fetchCallsToAction = useCallback(async () => {
@@ -245,6 +250,11 @@ const Index: FC = () => {
 						imageUrl={featuredTopicCenter.imageUrl!}
 						primaryActionText={featuredTopicCenter.featuredCallToAction!}
 						onPrimaryActionClick={() => {
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
+								topicCenterId: featuredTopicCenter.topicCenterId,
+								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+							});
+
 							if (featuredTopicCenter.urlOverride) {
 								window.location.href = featuredTopicCenter.urlOverride;
 							} else {
@@ -265,6 +275,11 @@ const Index: FC = () => {
 						imageUrl={secondaryFeaturedTopicCenter.imageUrl ?? ''}
 						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
 						onPrimaryActionClick={() => {
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
+								topicCenterId: secondaryFeaturedTopicCenter.topicCenterId,
+								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
+							});
+
 							if (secondaryFeaturedTopicCenter.urlOverride) {
 								try {
 									const url = new URL(secondaryFeaturedTopicCenter.urlOverride);

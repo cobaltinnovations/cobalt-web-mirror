@@ -22,6 +22,7 @@ import { ReactComponent as ChairIcon } from '@/assets/icons/chair-fill.svg';
 import { ReactComponent as ClockIcon } from '@/assets/icons/schedule.svg';
 import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
 import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location-on.svg';
+import classNames from 'classnames';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -97,6 +98,11 @@ const GroupSession = ({
 	const isPastEndDateTime = moment(groupSession.endDateTime).isBefore(moment());
 
 	const isExternal = groupSession.groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
+
+	const showSeatAlert =
+		typeof groupSession.seatsAvailable !== 'undefined' &&
+		typeof groupSession.seats !== 'undefined' &&
+		(groupSession.seatsAvailable <= 5 || groupSession.seatsAvailable / groupSession.seats <= 0.1);
 
 	return (
 		<Container className="pb-0 pt-8 py-lg-16" fluid="lg">
@@ -210,11 +216,21 @@ const GroupSession = ({
 											{isExternal ? (
 												<p className="mb-0">{groupSession.seats} offered</p>
 											) : (
-												<div>
-													<p className="mb-1 fw-bold">
-														{groupSession.seatsAvailableDescription}
+												<div className="w-100">
+													<p
+														className={classNames('fw-bold', {
+															'mb-1': !showSeatAlert,
+															'mb-4': showSeatAlert,
+														})}
+													>
+														{groupSession.seatsDescription}
 													</p>
-													<p className="mb-0">{groupSession.seatsDescription}</p>
+													{showSeatAlert && (
+														<InlineAlert
+															variant="warning"
+															title={groupSession.seatsAvailableDescription ?? ''}
+														/>
+													)}
 												</div>
 											)}
 										</div>

@@ -13,9 +13,10 @@ import {
 	CalendarEventGroupModel,
 	CalendarEventGroupsModel,
 } from '@/lib/models/calendar-event-models';
-import { appointmentService, calendarEventsService, groupSessionsService } from '@/lib/services';
+import { analyticsService, appointmentService, calendarEventsService, groupSessionsService } from '@/lib/services';
 import Loader from '@/components/loader';
 import useAccount from '@/hooks/use-account';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 interface PendingCancellationModel {
 	calendarEventTypeId: CALENDAR_EVENT_TYPE_ID;
@@ -171,7 +172,21 @@ interface CalendarEventGroupsProps {
 }
 
 const CalendarEventGroups = ({ sourceEventId, onCancel }: CalendarEventGroupsProps) => {
+	const [searchParams] = useSearchParams();
 	const calendarEventGroups = useAsyncValue() as CalendarEventGroupsModel[];
+
+	useEffect(() => {
+		const appointmentId = searchParams.get('appointmentId') || '';
+		const groupSessionReservationId = searchParams.get('groupSessionReservationId') || '';
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MY_EVENTS, {
+			appointmentId: appointmentId && appointmentId.trim().length > 0 ? appointmentId : undefined,
+			groupSessionReservationId:
+				groupSessionReservationId && groupSessionReservationId.trim().length > 0
+					? groupSessionReservationId
+					: undefined,
+		});
+	}, [searchParams, calendarEventGroups]);
 
 	const eventRefs = useMemo(
 		() =>

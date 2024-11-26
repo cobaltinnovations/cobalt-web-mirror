@@ -27,6 +27,7 @@ export const Default: Story = {
 				pathname: '',
 				hash: '#',
 			},
+			topicCenterId: '',
 		},
 		mobileNav: false,
 		onImageClick: () => {

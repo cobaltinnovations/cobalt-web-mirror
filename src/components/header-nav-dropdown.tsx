@@ -7,6 +7,8 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import { HeaderNavFeaturedItem, NavFeaturedItem } from './header-nav-featured-item';
+import { analyticsService } from '@/lib/services';
+import { AnalyticsNativeEventClickthroughTopicCenterSource, AnalyticsNativeEventTypeId } from '@/lib/models';
 
 interface UseStylesProps {
 	hasFeaturedItem: boolean;
@@ -97,6 +99,10 @@ const HeaderNavDropdown = ({
 							featuredItem={featuredItem}
 							onImageClick={() => {
 								setShow(false);
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
+									topicCenterId: featuredItem.topicCenterId,
+									source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+								});
 							}}
 						/>
 					)}

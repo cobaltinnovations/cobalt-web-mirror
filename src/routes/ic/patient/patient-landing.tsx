@@ -101,7 +101,7 @@ export const Component = () => {
 	const { data } = usePolledLoaderData({
 		useLoaderHook: usePatientLandingLoaderData,
 		immediateUpdate: true,
-		intervalSeconds: 15,
+		intervalSeconds: 30,
 		pollingFn,
 	});
 

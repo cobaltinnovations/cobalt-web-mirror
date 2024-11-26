@@ -2,8 +2,8 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import useReactPlayerSettings from '@/hooks/use-react-player-settings';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AcivityTypeId, ActivityActionId, AdminContent, Content, Tag } from '@/lib/models';
-import { activityTrackingService, tagService } from '@/lib/services';
+import { AcivityTypeId, ActivityActionId, AdminContent, AnalyticsNativeEventTypeId, Content, Tag } from '@/lib/models';
+import { activityTrackingService, analyticsService, tagService } from '@/lib/services';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
@@ -58,6 +58,10 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 		if (!content || !trackView) {
 			return;
 		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_CONTENT, {
+			contentId: content.contentId,
+		});
 
 		activityTrackingService
 			.track({

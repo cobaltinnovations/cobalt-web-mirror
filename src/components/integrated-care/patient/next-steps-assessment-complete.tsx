@@ -1,8 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { PatientOrderModel, PatientOrderSafetyPlanningStatusId, PatientOrderTriageStatusId } from '@/lib/models';
-import { appointmentService } from '@/lib/services';
+import {
+	AnalyticsNativeEventOverlayViewInCrisisSource,
+	AnalyticsNativeEventTypeId,
+	PatientOrderModel,
+	PatientOrderSafetyPlanningStatusId,
+	PatientOrderTriageStatusId,
+} from '@/lib/models';
+import { analyticsService, appointmentService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useHandleError from '@/hooks/use-handle-error';
@@ -178,6 +184,10 @@ const SafetyPlanningAlert = () => {
 			action={{
 				title: 'View all crisis resources',
 				onClick: () => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.OVERLAY_VIEW_IN_CRISIS, {
+						source: AnalyticsNativeEventOverlayViewInCrisisSource.TRIAGE_RESULTS,
+					});
+
 					openInCrisisModal();
 				},
 			}}

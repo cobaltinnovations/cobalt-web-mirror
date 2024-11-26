@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { faqsService } from '@/lib/services';
+import { analyticsService, faqsService } from '@/lib/services';
 import TabBar from '@/components/tab-bar';
 import { HEADER_HEIGHT } from '@/components/header-v2';
 import { createUseStyles } from 'react-jss';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
@@ -27,6 +28,12 @@ export const Component = () => {
 	const { faq } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_FAQ_DETAIL, {
+			faqId: faq.faqId,
+		});
+	}, [faq]);
 
 	return (
 		<>

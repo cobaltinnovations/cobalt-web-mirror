@@ -4,10 +4,11 @@ import { Helmet } from 'react-helmet';
 
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
-import { PatientOrderDispositionId } from '@/lib/models';
-import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, PatientOrderDispositionId } from '@/lib/models';
+import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 interface MhicSearchResultsLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -86,6 +87,19 @@ export const Component = () => {
 		});
 	}, [patientOrdersListPromise]);
 
+	const handleTableHasLoaded = useCallback(
+		(response: PatientOrdersListResponse['findResult']) => {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_SEARCH_RESULTS, {
+				searchQuery,
+				...(patientMrn && { patientMrn }),
+				pageSize: 15,
+				pageNumber: safeIntegerValue(pageNumber),
+				totalCount: response.totalCount,
+			});
+		},
+		[pageNumber, patientMrn, searchQuery]
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -121,6 +135,7 @@ export const Component = () => {
 								assignedMhic: true,
 							}}
 							coloredRows
+							hasLoadedCallback={handleTableHasLoaded}
 						/>
 					</Col>
 				</Row>

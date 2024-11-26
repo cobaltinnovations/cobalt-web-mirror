@@ -79,6 +79,7 @@ export interface Institution {
 	secureFilesharingPlatformName?: string;
 	secureFilesharingPlatformUrl?: string;
 	tableauEnabled?: boolean;
+	contentAudiencesEnabled?: boolean;
 }
 
 export interface InstitutionFeature {
@@ -102,6 +103,7 @@ export interface AdditionalNavigationItem {
 	name: string;
 	iconName?: string;
 	imageUrl?: string;
+	topicCenterId?: string;
 }
 
 export enum AccountSourceDisplayStyleId {

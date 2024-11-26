@@ -28,6 +28,7 @@ export const Default: Story = {
 	args: {
 		recentOrders: [
 			{
+				patientOrderId: '0',
 				referenceNumber: 0,
 				referenceNumberDescription: '0',
 				patientMrn: 'PatientMRN',
@@ -41,6 +42,7 @@ export const Default: Story = {
 				patientPhoneNumberDescription: '(555) 555-5555',
 			},
 			{
+				patientOrderId: '1',
 				referenceNumber: 1,
 				referenceNumberDescription: '1',
 				patientMrn: 'PatientMRN',
@@ -54,6 +56,7 @@ export const Default: Story = {
 				patientPhoneNumberDescription: '(555) 555-5555',
 			},
 			{
+				patientOrderId: '2',
 				referenceNumber: 2,
 				referenceNumberDescription: '2',
 				patientMrn: 'PatientMRN',

@@ -9,7 +9,7 @@ interface LoaderDataWithResponseChecksum {
 export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	useLoaderHook,
 	pollingFn,
-	intervalSeconds = 15,
+	intervalSeconds = 45,
 	immediateUpdate = false,
 	enabled = true,
 }: {
@@ -75,7 +75,9 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 		}
 
 		const intervalId = setInterval(() => {
-			pollLoader();
+			// Only perform polling if the tab is focused.
+			// Don't want to do unnecessary work when tab is in the background
+			if (document.visibilityState === 'visible') pollLoader();
 		}, intervalSeconds * 1000);
 
 		return () => clearInterval(intervalId);

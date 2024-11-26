@@ -1,12 +1,12 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import HeroContainer from '@/components/hero-container';
 import Loader from '@/components/loader';
 import useAccount from '@/hooks/use-account';
-import { InstitutionResource, InstitutionResourceGroup } from '@/lib/models';
-import { institutionService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, InstitutionResource, InstitutionResourceGroup } from '@/lib/models';
+import { analyticsService, institutionService } from '@/lib/services';
 import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -58,6 +58,14 @@ export const Component = () => {
 	const { deferredData } = useInstitutionResourceGroupDetailLoaderData();
 	const { institution } = useAccount();
 	const classes = useStyles();
+
+	useEffect(() => {
+		deferredData.then(([institutionResourceGroup]) => {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_INSTITUTION_RESOURCE_GROUP_DETAIL, {
+				institutionResourceGroupId: institutionResourceGroup.institutionResourceGroupId,
+			});
+		});
+	}, [deferredData]);
 
 	return (
 		<>

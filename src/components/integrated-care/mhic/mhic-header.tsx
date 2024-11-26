@@ -10,6 +10,7 @@ import { Button, Dropdown } from 'react-bootstrap';
 import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 import HeaderNavDropdown from '@/components/header-nav-dropdown';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
@@ -293,7 +294,10 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 								>
 									<Dropdown.Item
 										onClick={() => {
-											signOutAndClearContext();
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.MHIC_HEADER,
+												{}
+											);
 										}}
 									>
 										<span className="text-danger">Sign Out</span>

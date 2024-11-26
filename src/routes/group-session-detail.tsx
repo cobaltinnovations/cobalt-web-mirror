@@ -6,10 +6,11 @@ import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate, useRevalid
 import GroupSession from '@/components/group-session';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-import { groupSessionsService } from '@/lib/services';
+import { analyticsService, groupSessionsService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import moment from 'moment';
 import Cookies from 'js-cookie';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 export enum GroupSessionDetailNavigationSource {
 	HOME_PAGE = 'HOME_PAGE',
@@ -29,6 +30,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { groupSession, groupSessionReservation } = await groupSessionsService
 		.getGroupSessionByIdOrUrlName(urlName)
 		.fetch();
+
+	analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_GROUP_SESSION_DETAIL, {
+		groupSessionId: groupSession.groupSessionId,
+	});
 
 	return { groupSession, groupSessionReservation };
 };

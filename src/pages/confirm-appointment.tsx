@@ -3,7 +3,7 @@ import { Navigate, useMatch, useNavigate, useSearchParams } from 'react-router-d
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { accountService, appointmentService } from '@/lib/services';
+import { accountService, analyticsService, appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import useAccount from '@/hooks/use-account';
@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import moment from 'moment';
 import { DateFormats } from '@/lib/utils';
 import ConfirmAppointmentDisclaimer from '@/components/confirm-appointment-disclaimer';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const ConfirmAppointment = () => {
 	const { institution } = useAccount();
@@ -57,7 +58,19 @@ const ConfirmAppointment = () => {
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
-	}, []);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDER_APPOINTMENT_CONFIRMATION, {
+			providerId: providerId && providerId.trim().length > 0 ? providerId : undefined,
+			appointmentTypeId: appointmentTypeId && appointmentTypeId.trim().length > 0 ? appointmentTypeId : undefined,
+			date: date && date.trim().length > 0 ? date : undefined,
+			time: time && time.trim().length > 0 ? time : undefined,
+			intakeAssessmentId:
+				intakeAssessmentId && intakeAssessmentId.trim().length > 0 ? intakeAssessmentId : undefined,
+			patientOrderId: patientOrderId && patientOrderId.trim().length > 0 ? patientOrderId : undefined,
+			epicAppointmentFhirId:
+				epicAppointmentFhirId && epicAppointmentFhirId.trim().length > 0 ? epicAppointmentFhirId : undefined,
+		});
+	}, [providerId, appointmentTypeId, date, time, intakeAssessmentId, patientOrderId, epicAppointmentFhirId]);
 
 	const fetchData = useCallback(async () => {
 		if (!account) {

@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';
 import MedicationPresriber from '@/components/medication-prescriber';
-import { FeatureId } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
 
 const ConnectWithSupportMedicationPrescriber = () => {
 	const { institution } = useAccount();
@@ -14,6 +15,10 @@ const ConnectWithSupportMedicationPrescriber = () => {
 		() => (institution?.features ?? []).find((feature) => feature.featureId === FeatureId.MEDICATION_PRESCRIBER),
 		[institution?.features]
 	);
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MEDICATION_PRESCRIBER);
+	}, []);
 
 	return (
 		<>

@@ -29,14 +29,4 @@ export const activityTrackingService = {
 			},
 		});
 	},
-	trackUnauthenticated(data: TrackData): OrchestratedRequest<ActivityTrackingResponse> {
-		return httpSingleton.orchestrateRequest<ActivityTrackingResponse>({
-			method: 'post',
-			url: '/unauthenticated-activity-tracking',
-			data: {
-				...data,
-				context: JSON.stringify(data.context),
-			},
-		});
-	},
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -6,12 +6,13 @@ import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import { createUseStyles } from 'react-jss';
 
-import { faqsService } from '@/lib/services';
+import { analyticsService, faqsService } from '@/lib/services';
 import { HEADER_HEIGHT } from '@/components/header-v2';
 import HeroContainer from '@/components/hero-container';
 import TabBar from '@/components/tab-bar';
 
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
@@ -32,6 +33,10 @@ export const Component = () => {
 	const { faqTopics, faqsByFaqTopicId } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_FAQS);
+	}, []);
 
 	return (
 		<>

@@ -16,6 +16,7 @@ export const config: iConfig = {
 	authRedirectUrls: [],
 	storageKeys: {
 		mhicRecentOrdersStorageKey: 'mhicRecentOrders',
+		chunkloadRefreshKey: 'ChunkLoadError-refresh',
 	},
 };
 

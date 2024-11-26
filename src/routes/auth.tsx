@@ -6,10 +6,10 @@ import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator }
 import { LoginDestinationIdRouteMap } from '@/contexts/account-context';
 import useAccount from '@/hooks/use-account';
 import { config } from '@/config';
-import { accountService, institutionService } from '@/lib/services';
+import { accountService, analyticsService, institutionService } from '@/lib/services';
 import Loader from '@/components/loader';
 import { getSubdomain } from '@/lib/utils';
-import { AnonymousAccountExpirationStrategyId } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, AnonymousAccountExpirationStrategyId } from '@/lib/models';
 
 type AuthLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
@@ -29,13 +29,41 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		})
 		.fetch();
 
+	const accessTokenAlreadyOnFile = !!Cookies.get('accessToken');
+
+	// Keep some transient session data around to avoid making double-calls to POST /accounts/mychart
+	// because this auth flow runs twice in rapid succession.
+	// TODO: rework the auth flow more generally here on the FE so we don't execute it twice.
+	let myChartAccessTokenFromSessionStorage = sessionStorage.getItem('cobalt.myChartAccessToken');
+	let myChartCobaltAccessTokenFromSessionStorage = sessionStorage.getItem('cobalt.myChartCobaltAccessToken');
+
 	if (myChartAccessToken) {
-		const myChartAccountRequest = accountService.getMyChartAccount(myChartAccessToken);
-		request.signal.onabort = () => {
-			myChartAccountRequest.abort();
-		};
-		const myChartAccountResponse = await myChartAccountRequest.fetch();
-		accessToken = myChartAccountResponse.accessToken;
+		if (myChartAccessTokenFromSessionStorage === myChartAccessToken && myChartCobaltAccessTokenFromSessionStorage) {
+			// We have saved-off data from previous go-round: use it instead of calling POST /accounts/mychart again.
+			accessToken = myChartCobaltAccessTokenFromSessionStorage;
+
+			try {
+				sessionStorage.removeItem('cobalt.myChartAccessToken');
+				sessionStorage.removeItem('cobalt.myChartCobaltAccessToken');
+			} catch (ignored) {
+				// Nothing to do
+			}
+		} else {
+			const myChartAccountRequest = accountService.getMyChartAccount(myChartAccessToken);
+			request.signal.onabort = () => {
+				myChartAccountRequest.abort();
+			};
+			const myChartAccountResponse = await myChartAccountRequest.fetch();
+			accessToken = myChartAccountResponse.accessToken;
+
+			// Save off for next go-round
+			try {
+				sessionStorage.setItem('cobalt.myChartAccessToken', myChartAccessToken);
+				sessionStorage.setItem('cobalt.myChartCobaltAccessToken', accessToken);
+			} catch (ignored) {
+				// Nothing to do
+			}
+		}
 	}
 
 	if (!accessToken) {
@@ -63,6 +91,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	}
 
 	Cookies.remove('authRedirectUrl');
+
+	// We can run through this auth code path multiple times (redundantly).
+	// Only send an analytics event if this is a non-redundant invocation.
+	// Suppose we did not do this: there would then be duplicate analytics events fired for sign-in
+	if (!accessTokenAlreadyOnFile) {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_IN, {
+			accountId: accountId,
+			redirectUrl: authRedirectUrl && authRedirectUrl !== '/' ? authRedirectUrl : undefined,
+		});
+	}
 
 	return {
 		authRedirectUrl,

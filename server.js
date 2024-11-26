@@ -25,6 +25,7 @@ try {
 }
 
 const port = process.env.COBALT_WEB_PORT || 3000;
+const nodeEnv = process.env.NODE_ENV;
 const launchDate = new Date();
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
@@ -123,21 +124,50 @@ const subdomainBuildMap = subdomainMappingString.split(',').reduce((map, mapping
 	return map;
 }, new Map());
 
+const indexFileContentsInMemoryCache = {};
+
+// Given a path to an index file on disk (either default or institution-specific),
+// read it from disk, apply any transformations needed, and keep the result in an in-memory cache.
+// Cache entries are never evicted
+function indexFileContentsForPath(indexFilePath) {
+	var indexFileContents = indexFileContentsInMemoryCache[indexFilePath];
+
+	// On cache miss:
+	// 1. Read the file into a string in memory.
+	// 2. Inject the API base URL into the string and then cache that off.
+	if (!indexFileContents) {
+		if (!fs.existsSync(indexFilePath)) throw new Error(`Unable to locate index file at ${indexFilePath}`);
+
+		indexFileContents = fs.readFileSync(indexFilePath, { encoding: 'utf8', flag: 'r' });
+		indexFileContents = indexFileContents.replace('%ANALYTICS_API_BASE_URL%', settings.nodeApp.webApiBaseUrl);
+		indexFileContents = indexFileContents.replace('%ANALYTICS_APP_VERSION%', launchDate.toISOString());
+		indexFileContents = indexFileContents.replace(
+			'%ANALYTICS_DEBUGGING_ENABLED%',
+			nodeEnv === 'PRODUCTION' ? 'false' : 'true'
+		);
+		indexFileContentsInMemoryCache[indexFilePath] = indexFileContents;
+	}
+
+	return indexFileContents;
+}
+
 function serveIndexFile(_req, res) {
 	const subdomainBuildFolder = subdomainBuildMap.get(_req.subdomains.join('.'));
 
 	if (subdomainBuildFolder) {
-		const indexFile = path.join(BUILD_DIR, subdomainBuildFolder, 'index.html');
+		const indexFilePath = path.join(BUILD_DIR, subdomainBuildFolder, 'index.html');
 
 		// if a subdomain has configured custom build
-		if (fs.existsSync(indexFile)) {
+		if (fs.existsSync(indexFilePath)) {
 			// send its index.html
-			return res.sendFile(indexFile);
+			return res.send(indexFileContentsForPath(indexFilePath));
 		}
 	}
 
+	const defaultIndexFilePath = path.join(BUILD_DIR, subdomainBuildMap.get('*'), 'index.html');
+
 	// send default cobalt build
-	res.sendFile(path.join(BUILD_DIR, subdomainBuildMap.get('*'), 'index.html'));
+	res.send(indexFileContentsForPath(defaultIndexFilePath));
 }
 
 app.get('/', serveIndexFile);

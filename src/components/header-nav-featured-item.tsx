@@ -10,6 +10,7 @@ export interface NavFeaturedItem {
 	name: string;
 	descriptionHtml: string;
 	linkTo: To;
+	topicCenterId: string;
 }
 
 interface HeaderNavFeaturedItemProps {
@@ -53,7 +54,7 @@ export const HeaderNavFeaturedItem = ({
 
 	return (
 		<Link
-			className={classNames(classes.featuredItemContainer, 'd-block text-decoration-none', className)}
+			className={classNames(classes.featuredItemContainer, 'm-0 d-block text-decoration-none', className)}
 			to={featuredItem.linkTo}
 			onClick={() => {
 				onImageClick?.();

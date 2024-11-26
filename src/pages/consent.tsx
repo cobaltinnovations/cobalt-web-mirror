@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const Consent = () => {
 	const navigate = useNavigate();
@@ -73,7 +74,10 @@ const Consent = () => {
 									<Button
 										variant="outline-primary"
 										onClick={() => {
-											signOutAndClearContext();
+											signOutAndClearContext(
+												AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM,
+												{}
+											);
 										}}
 									>
 										I Do Not Accept

@@ -7,6 +7,7 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { accountService } from '@/lib/services';
 import ConsentModal from '@/components/consent-modal';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const UserSettings: FC = () => {
 	const { institution, account, signOutAndClearContext } = useAccount();
@@ -92,7 +93,10 @@ const UserSettings: FC = () => {
 									.rejectConsent(account.accountId)
 									.fetch()
 									.then((response) => {
-										signOutAndClearContext();
+										signOutAndClearContext(
+											AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM,
+											{}
+										);
 									})
 									.catch((e) => {
 										handleError(e);

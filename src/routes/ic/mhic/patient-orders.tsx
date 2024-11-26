@@ -25,7 +25,7 @@ import {
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { config } from '@/config';
-import { PatientOrdersListResponse, integratedCareService } from '@/lib/services';
+import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
 
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
@@ -34,6 +34,8 @@ import { useMhicLayoutLoaderData } from './mhic-layout';
 import useAccount from '@/hooks/use-account';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 interface MhicOrdersLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -191,6 +193,48 @@ export const Component = () => {
 		});
 	}, [patientOrdersListPromise]);
 
+	const handleTableHasLoaded = useCallback(
+		({ totalCount }: PatientOrdersListResponse['findResult']) => {
+			const patientOrderSortColumnId = searchParams.get('patientOrderSortColumnId') ?? '';
+			const sortDirectionId = searchParams.get('sortDirectionId') ?? '';
+			const patientOrderOutreachStatusId = searchParams.get('patientOrderOutreachStatusId') ?? '';
+			const patientOrderScreeningStatusId = searchParams.get('patientOrderScreeningStatusId') ?? '';
+			const patientOrderScheduledScreeningScheduledDate =
+				searchParams.get('patientOrderScheduledScreeningScheduledDate') ?? '';
+			const patientOrderResourcingStatusId = searchParams.get('patientOrderResourcingStatusId') ?? '';
+			const patientOrderResourceCheckInResponseStatusId =
+				searchParams.get('patientOrderResourceCheckInResponseStatusId') ?? '';
+			const patientOrderAssignmentStatusId = searchParams.get('patientOrderAssignmentStatusId') ?? '';
+			const patientOrderDispositionId = searchParams.get('patientOrderDispositionId') ?? '';
+			const referringPracticeIds = searchParams.getAll('referringPracticeIds') ?? [];
+			const patientOrderFilterFlagTypeIds = searchParams.getAll('flag') ?? [];
+			const panelAccountIds = searchParams.getAll('panelAccountId') ?? [];
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ALL_ORDERS, {
+				...(patientOrderSortColumnId && { patientOrderSortColumnId }),
+				...(sortDirectionId && { sortDirectionId }),
+				...(patientOrderOutreachStatusId && { patientOrderOutreachStatusId }),
+				...(patientOrderScreeningStatusId && { patientOrderScreeningStatusId }),
+				...(patientOrderScheduledScreeningScheduledDate && {
+					patientOrderScheduledScreeningScheduledDate,
+				}),
+				...(patientOrderResourcingStatusId && { patientOrderResourcingStatusId }),
+				...(patientOrderResourceCheckInResponseStatusId && {
+					patientOrderResourceCheckInResponseStatusId,
+				}),
+				...(patientOrderAssignmentStatusId && { patientOrderAssignmentStatusId }),
+				...(patientOrderDispositionId && { patientOrderDispositionId }),
+				...(referringPracticeIds.length > 0 && { referringPracticeIds }),
+				...(patientOrderFilterFlagTypeIds.length > 0 && { patientOrderFilterFlagTypeIds }),
+				...(panelAccountIds.length > 0 && { panelAccountIds }),
+				pageSize: 15,
+				pageNumber: safeIntegerValue(pageNumber),
+				totalCount,
+			});
+		},
+		[pageNumber, searchParams]
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -319,6 +363,7 @@ export const Component = () => {
 								episodeClosed: true,
 								episode: true,
 							}}
+							hasLoadedCallback={handleTableHasLoaded}
 						/>
 					</Col>
 				</Row>
