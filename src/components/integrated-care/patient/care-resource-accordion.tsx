@@ -24,6 +24,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	informationOuter: {
 		width: '50%',
+		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
 	},
 	inlineTitle: {
