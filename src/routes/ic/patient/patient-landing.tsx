@@ -2,7 +2,6 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { Await, defer, useNavigate, useRevalidator, useRouteLoaderData } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-
 import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
@@ -15,15 +14,14 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
-import NoData from '@/components/no-data';
-
+import { CobaltError } from '@/lib/http-client';
 import useAccount from '@/hooks/use-account';
+import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
+import NoData from '@/components/no-data';
 import { NextStepsAssessmentComplete, NextStepsItem } from '@/components/integrated-care/patient';
 import Loader from '@/components/loader';
-import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
-import { CobaltError } from '@/lib/http-client';
 import InlineAlert from '@/components/inline-alert';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 
 enum PAGE_STATES {
 	TERMINAL = 'TERMINAL',
@@ -286,21 +284,16 @@ export const Component = () => {
 								{homescreenState !== PAGE_STATES.TERMINAL && (
 									<>
 										{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
-											<Card bsPrefix="ic-card" className="mb-10">
-												<Card.Header>
-													<Card.Title>Next Steps</Card.Title>
-												</Card.Header>
-												<Card.Body className="p-0">
-													{patientOrder && (
-														<NextStepsAssessmentComplete
-															patientOrder={patientOrder}
-															onAppointmentCanceled={() => {
-																revalidator.revalidate();
-															}}
-														/>
-													)}
-												</Card.Body>
-											</Card>
+											<>
+												{patientOrder && (
+													<NextStepsAssessmentComplete
+														patientOrder={patientOrder}
+														onAppointmentCanceled={() => {
+															revalidator.revalidate();
+														}}
+													/>
+												)}
+											</>
 										)}
 										<Card bsPrefix="ic-card">
 											<Card.Header>

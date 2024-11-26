@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import {
 	AnalyticsNativeEventOverlayViewInCrisisSource,
@@ -20,7 +22,6 @@ import {
 	NextStepsItem,
 	PatientInsuranceStatementModal,
 } from '@/components/integrated-care/patient';
-import classNames from 'classnames';
 
 interface NextStepsAssessmentCompleteProps {
 	patientOrder: PatientOrderModel;
@@ -77,66 +78,80 @@ export const NextStepsAssessmentComplete = ({
 			/>
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
-				<>
-					{patientOrder.appointmentId ? (
-						<NextStepsItem
-							complete
-							title="Step 3: Schedule appointment with Mental Health Provider"
-							description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
-							button={{
-								variant: 'danger',
-								title: 'Cancel Appointment',
-								onClick: () => {
-									setShowConfirmDialog(true);
-								},
-							}}
-						>
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
-						</NextStepsItem>
-					) : (
-						<NextStepsItem
-							title="Step 3: Schedule appointment with Mental Health Provider"
-							description={`Find an appointment by browsing the list of providers and choosing an available appointment time or call us at ${institution.integratedCarePhoneNumberDescription}.`}
-							button={{
-								variant: 'primary',
-								title: 'Find Appointment',
-								onClick: () => {
-									setShowInsuranceStatementModal(true);
-								},
-							}}
-						>
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
-						</NextStepsItem>
-					)}
-				</>
+				<Card bsPrefix="ic-card" className="mb-10">
+					<Card.Header>
+						<Card.Title>Next Steps</Card.Title>
+					</Card.Header>
+					<Card.Body className="p-0">
+						{patientOrder.appointmentId ? (
+							<NextStepsItem
+								complete
+								title="Step 3: Schedule appointment with Mental Health Provider"
+								description={`You have an appointment on ${patientOrder.appointmentStartTimeDescription} with ${patientOrder.providerName}`}
+								button={{
+									variant: 'danger',
+									title: 'Cancel Appointment',
+									onClick: () => {
+										setShowConfirmDialog(true);
+									},
+								}}
+							>
+								{patientOrder.patientOrderSafetyPlanningStatusId ===
+									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
+							</NextStepsItem>
+						) : (
+							<NextStepsItem
+								title="Step 3: Schedule appointment with Mental Health Provider"
+								description={`Find an appointment by browsing the list of providers and choosing an available appointment time or call us at ${institution.integratedCarePhoneNumberDescription}.`}
+								button={{
+									variant: 'primary',
+									title: 'Find Appointment',
+									onClick: () => {
+										setShowInsuranceStatementModal(true);
+									},
+								}}
+							>
+								{patientOrder.patientOrderSafetyPlanningStatusId ===
+									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
+							</NextStepsItem>
+						)}
+					</Card.Body>
+				</Card>
 			)}
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
 				<>
-					{patientOrder.resourcesSentAt ? (
-						<NextStepsItem
-							title="Step 3: Schedule appointment with a recommended resource"
-							description={`We will send you a ${
-								institution?.myChartName ?? 'MyChart'
-							} message in the next {[TODO]: timeframe} about recommended resources in your area.`}
-						>
-							<NoData
-								title="Resources in progress"
-								description={`We will send you a ${
-									institution?.myChartName ?? 'MyChart'
-								} message about recommended resources in your area.`}
-								actions={[]}
-								className={classNames({
-									'mb-6':
-										patientOrder.patientOrderSafetyPlanningStatusId ===
-										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
-								})}
-							/>
-							{patientOrder.patientOrderSafetyPlanningStatusId ===
-								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
-						</NextStepsItem>
+					{!patientOrder.resourcesSentAt ? (
+						<Card bsPrefix="ic-card" className="mb-10">
+							<Card.Header>
+								<Card.Title>Next Steps</Card.Title>
+							</Card.Header>
+							<Card.Body className="p-0">
+								<NextStepsItem
+									title="Step 3: Schedule appointment with a recommended resource"
+									description={`We will send you a ${
+										institution?.myChartName ?? 'MyChart'
+									} message in the next {[TODO]: timeframe} about recommended resources in your area.`}
+								>
+									<NoData
+										title="Resources in progress"
+										description={`We will send you a ${
+											institution?.myChartName ?? 'MyChart'
+										} message about recommended resources in your area.`}
+										actions={[]}
+										className={classNames({
+											'mb-6':
+												patientOrder.patientOrderSafetyPlanningStatusId ===
+												PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+										})}
+									/>
+									{patientOrder.patientOrderSafetyPlanningStatusId ===
+										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && (
+										<SafetyPlanningAlert />
+									)}
+								</NextStepsItem>
+							</Card.Body>
+						</Card>
 					) : (
 						<>
 							<h4 className="mb-1">Schedule with a recommended resource</h4>
@@ -149,27 +164,34 @@ export const NextStepsAssessmentComplete = ({
 							</p>
 							<CareResourceAccordion className="mb-4" />
 							<CareResourceAccordion className="mb-4" />
-							<CareResourceAccordion />
+							<CareResourceAccordion className="mb-10" />
 						</>
 					)}
 				</>
 			)}
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
-				<NextStepsItem
-					title="Step 3: Call us for resources"
-					description={`Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
-					button={{
-						variant: 'primary',
-						title: 'Call Us',
-						onClick: () => {
-							document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
-						},
-					}}
-				>
-					{patientOrder.patientOrderSafetyPlanningStatusId ===
-						PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
-				</NextStepsItem>
+				<Card bsPrefix="ic-card" className="mb-10">
+					<Card.Header>
+						<Card.Title>Next Steps</Card.Title>
+					</Card.Header>
+					<Card.Body className="p-0">
+						<NextStepsItem
+							title="Step 3: Call us for resources"
+							description={`Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
+							button={{
+								variant: 'primary',
+								title: 'Call Us',
+								onClick: () => {
+									document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
+								},
+							}}
+						>
+							{patientOrder.patientOrderSafetyPlanningStatusId ===
+								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
+						</NextStepsItem>
+					</Card.Body>
+				</Card>
 			)}
 		</>
 	);
