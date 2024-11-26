@@ -139,14 +139,16 @@ export const NextStepsAssessmentComplete = ({
 						</NextStepsItem>
 					) : (
 						<>
-							<h1 className="mb-6">Schedule with a recommended resource</h1>
-							<p className="mb-0">
+							<h4 className="mb-1">Schedule with a recommended resource</h4>
+							<p className="mb-10">
 								These resources are covered by your insurance and were recommended based on your
 								responses to the assessment. If you have any questions, please feel free to call us at{' '}
 								{institution.integratedCarePhoneNumberDescription}{' '}
 								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 								provider.
 							</p>
+							<CareResourceAccordion className="mb-4" />
+							<CareResourceAccordion className="mb-4" />
 							<CareResourceAccordion />
 						</>
 					)}
