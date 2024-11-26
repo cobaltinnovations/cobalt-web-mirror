@@ -10,6 +10,8 @@ import { PatientInsuranceStatementModal } from './patient-insurance-statement-mo
 import ConfirmDialog from '@/components/confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
 import InlineAlert from '@/components/inline-alert';
+import NoData from '@/components/no-data';
+import classNames from 'classnames';
 
 interface NextStepsAssessmentCompleteProps {
 	patientOrder: PatientOrderModel;
@@ -106,16 +108,23 @@ export const NextStepsAssessmentComplete = ({
 				<>
 					{!patientOrder.resourcesSentAt ? (
 						<NextStepsItem
-							title="Step 3: Receive resources"
-							description={`Call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} to speak to a Mental Health Intake Coordinator about resources available in your area.`}
-							button={{
-								variant: 'primary',
-								title: 'Call Us',
-								onClick: () => {
-									document.location.href = `tel:${institution.integratedCarePhoneNumber}`;
-								},
-							}}
+							title="Step 3: Schedule appointment with a recommended resource"
+							description={`We will send you a ${
+								institution?.myChartName ?? 'MyChart'
+							} message in the next {[TODO]: timeframe} about recommended resources in your area.`}
 						>
+							<NoData
+								title="Resources in progress"
+								description={`We will send you a ${
+									institution?.myChartName ?? 'MyChart'
+								} message about recommended resources in your area.`}
+								actions={[]}
+								className={classNames({
+									'mb-6':
+										patientOrder.patientOrderSafetyPlanningStatusId ===
+										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+								})}
+							/>
 							{patientOrder.patientOrderSafetyPlanningStatusId ===
 								PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
 						</NextStepsItem>

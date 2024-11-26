@@ -284,102 +284,13 @@ export const Component = () => {
 								)}
 
 								{homescreenState !== PAGE_STATES.TERMINAL && (
-									<Card bsPrefix="ic-card">
-										<Card.Header>
-											<Card.Title>Next Steps</Card.Title>
-										</Card.Header>
-										<Card.Body className="p-0">
-											<NextStepsItem
-												complete={patientOrder?.patientDemographicsConfirmed}
-												title="Step 1: Verify your information"
-												description={
-													patientOrder?.patientDemographicsConfirmed
-														? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
-														: 'Review the information provided by your primary care provider and make sure it is correct.'
-												}
-												button={{
-													variant: patientOrder?.patientDemographicsConfirmed
-														? 'outline-primary'
-														: 'primary',
-													title: patientOrder?.patientDemographicsConfirmed
-														? 'Edit Information'
-														: 'Verify Information',
-													onClick: () => {
-														navigate('/ic/patient/demographics');
-													},
-												}}
-											/>
-											{patientOrder?.patientDemographicsCompleted &&
-												!patientOrder?.patientAddressRegionAccepted && (
-													<>
-														<hr />
-													</>
-												)}
-											{patientOrder?.patientDemographicsConfirmed && (
-												<>
-													<hr />
-													<NextStepsItem
-														complete={homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE}
-														title="Step 2: Complete the assessment"
-														description={
-															homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-																? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
-																: homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																? ''
-																: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
-														}
-														button={
-															homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-																? {
-																		variant: 'outline-primary',
-																		title: 'Review Results',
-																		onClick: () => {
-																			navigate('/ic/patient/assessment-results');
-																		},
-																  }
-																: undefined
-														}
-													>
-														{(homescreenState === PAGE_STATES.ASSESSMENT_READY ||
-															homescreenState === PAGE_STATES.ASSESSMENT_IN_PROGRESS) && (
-															<AssessmentNextStepItems
-																isReady={
-																	homescreenState === PAGE_STATES.ASSESSMENT_READY
-																}
-																inProgress={
-																	homescreenState ===
-																	PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																}
-																disabled={
-																	intakeScreeningFlow.isCreatingScreeningSession ||
-																	clinicalScreeningFlow.isCreatingScreeningSession
-																}
-																onStartAssessment={() => {
-																	intakeScreeningFlow.createScreeningSession();
-																}}
-																onResumeAssessment={() => {
-																	if (!hasCompletedIntakeScreening) {
-																		intakeScreeningFlow.resumeScreeningSession(
-																			patientOrder.mostRecentIntakeScreeningSessionId
-																		);
-																	} else {
-																		clinicalScreeningFlow.resumeScreeningSession(
-																			patientOrder.mostRecentScreeningSessionId
-																		);
-																	}
-																}}
-																onRestartAssessment={() => {
-																	intakeScreeningFlow.createScreeningSession();
-																}}
-																patientOrder={patientOrder}
-															/>
-														)}
-													</NextStepsItem>
-												</>
-											)}
-											{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
-												<>
-													<hr />
+									<>
+										{homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE && (
+											<Card bsPrefix="ic-card" className="mb-10">
+												<Card.Header>
+													<Card.Title>Next Steps</Card.Title>
+												</Card.Header>
+												<Card.Body className="p-0">
 													{patientOrder && (
 														<NextStepsAssessmentComplete
 															patientOrder={patientOrder}
@@ -388,10 +299,111 @@ export const Component = () => {
 															}}
 														/>
 													)}
-												</>
-											)}
-										</Card.Body>
-									</Card>
+												</Card.Body>
+											</Card>
+										)}
+										<Card bsPrefix="ic-card">
+											<Card.Header>
+												<Card.Title>Completed</Card.Title>
+											</Card.Header>
+											<Card.Body className="p-0 bg-n50">
+												<NextStepsItem
+													complete={patientOrder?.patientDemographicsConfirmed}
+													title="Step 1: Verify your information"
+													description={
+														patientOrder?.patientDemographicsConfirmed
+															? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
+															: 'Review the information provided by your primary care provider and make sure it is correct.'
+													}
+													button={{
+														variant: patientOrder?.patientDemographicsConfirmed
+															? 'outline-primary'
+															: 'primary',
+														title: patientOrder?.patientDemographicsConfirmed
+															? 'Edit Information'
+															: 'Verify Information',
+														onClick: () => {
+															navigate('/ic/patient/demographics');
+														},
+													}}
+												/>
+												{patientOrder?.patientDemographicsCompleted &&
+													!patientOrder?.patientAddressRegionAccepted && (
+														<>
+															<hr />
+														</>
+													)}
+												{patientOrder?.patientDemographicsConfirmed && (
+													<>
+														<hr />
+														<NextStepsItem
+															complete={
+																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
+															}
+															title="Step 2: Complete the assessment"
+															description={
+																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
+																	? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
+																	: homescreenState ===
+																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																	? ''
+																	: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
+															}
+															button={
+																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
+																	? {
+																			variant: 'outline-primary',
+																			title: 'Review Results',
+																			onClick: () => {
+																				navigate(
+																					'/ic/patient/assessment-results'
+																				);
+																			},
+																	  }
+																	: undefined
+															}
+														>
+															{(homescreenState === PAGE_STATES.ASSESSMENT_READY ||
+																homescreenState ===
+																	PAGE_STATES.ASSESSMENT_IN_PROGRESS) && (
+																<AssessmentNextStepItems
+																	isReady={
+																		homescreenState === PAGE_STATES.ASSESSMENT_READY
+																	}
+																	inProgress={
+																		homescreenState ===
+																		PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																	}
+																	disabled={
+																		intakeScreeningFlow.isCreatingScreeningSession ||
+																		clinicalScreeningFlow.isCreatingScreeningSession
+																	}
+																	onStartAssessment={() => {
+																		intakeScreeningFlow.createScreeningSession();
+																	}}
+																	onResumeAssessment={() => {
+																		if (!hasCompletedIntakeScreening) {
+																			intakeScreeningFlow.resumeScreeningSession(
+																				patientOrder.mostRecentIntakeScreeningSessionId
+																			);
+																		} else {
+																			clinicalScreeningFlow.resumeScreeningSession(
+																				patientOrder.mostRecentScreeningSessionId
+																			);
+																		}
+																	}}
+																	onRestartAssessment={() => {
+																		intakeScreeningFlow.createScreeningSession();
+																	}}
+																	patientOrder={patientOrder}
+																/>
+															)}
+														</NextStepsItem>
+													</>
+												)}
+											</Card.Body>
+										</Card>
+									</>
 								)}
 							</Col>
 						</Row>
@@ -402,13 +414,14 @@ export const Component = () => {
 										{patientOrder?.patientOrderSafetyPlanningStatusId ===
 										PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING ? (
 											<InlineAlert
-												className="mt-8"
+												className="mt-6"
 												variant="warning"
 												title="A clinician will reach out"
 												description="As a reminder, a clinician will be reaching out to you by phone on the next business day to see how we can help. "
 											/>
 										) : (
 											<InlineAlert
+												className="mt-6"
 												variant="info"
 												title="Your responses are not reviewed in real time"
 												description="If you are in crisis, you can contact the Crisis Line 24 hours a day by calling 988. If you have an urgent or life-threatening issue, call 911 or go to the nearest emergency room."
