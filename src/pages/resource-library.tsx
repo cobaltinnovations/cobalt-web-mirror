@@ -443,41 +443,49 @@ const ResourceLibrary = () => {
 									<div></div>
 									<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
 										<div className="mb-2 mb-lg-0 d-flex align-items-center">
-											<span className="me-2">Show resources for</span>
-											<MegaFilter
-												displaySingleColumn
-												className="me-2"
-												allowCollapse={false}
-												displayCount={false}
-												buttonTitle={
-													contentAudienceTypes.find(
-														(cat) =>
-															cat.contentAudienceTypeId ===
-															searchParams.get('contentAudienceTypeId')
-													)?.description ?? 'Anyone'
-												}
-												modalTitle="Show resources for..."
-												value={[
-													{
-														id: 'contentAudienceTypeId',
-														filterType: FILTER_TYPE.RADIO,
-														title: 'Show resources for...',
-														value: searchParams.getAll('contentAudienceTypeId'),
-														options: contentAudienceTypes.map((cat) => ({
-															value: cat.contentAudienceTypeId,
-															title: cat.description,
-														})),
-													},
-												]}
-												onChange={(filters) => {
-													filters.forEach((filter) => {
-														applyValuesToSearchParam(filter.value, filter.id);
-													});
-												}}
-											/>
+											{institution.contentAudiencesEnabled && (
+												<>
+													<span className="me-2">Show resources for</span>
+													<MegaFilter
+														displaySingleColumn
+														className="me-2"
+														allowCollapse={false}
+														displayCount={false}
+														buttonTitle={
+															contentAudienceTypes.find(
+																(cat) =>
+																	cat.contentAudienceTypeId ===
+																	searchParams.get('contentAudienceTypeId')
+															)?.description ?? 'Anyone'
+														}
+														modalTitle="Show resources for..."
+														value={[
+															{
+																id: 'contentAudienceTypeId',
+																filterType: FILTER_TYPE.RADIO,
+																title: 'Show resources for...',
+																value: searchParams.getAll('contentAudienceTypeId'),
+																options: contentAudienceTypes.map((cat) => ({
+																	value: cat.contentAudienceTypeId,
+																	title: cat.description,
+																})),
+															},
+														]}
+														onChange={(filters) => {
+															filters.forEach((filter) => {
+																applyValuesToSearchParam(filter.value, filter.id);
+															});
+														}}
+													/>
+												</>
+											)}
 										</div>
 										<div className="mb-2 mb-lg-0 d-flex align-items-center">
-											<span className="me-2">related to</span>
+											<span className="me-2">
+												{institution.contentAudiencesEnabled
+													? 'related to'
+													: 'Show resources related to '}
+											</span>
 											<MegaFilter
 												buttonTitle={
 													searchParams.getAll('tagId').length > 0 ? 'Topics' : 'Any topic'

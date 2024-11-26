@@ -16,17 +16,18 @@ import {
 import { analyticsService, resourceLibraryService } from '@/lib/services';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import AsyncPage from '@/components/async-page';
-import Breadcrumb from '@/components/breadcrumb';
 import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import { SkeletonText } from '@/components/skeleton-loaders';
 import MegaFilter, { FILTER_TYPE } from '@/components/mega-filter';
 import NoData from '@/components/no-data';
+import useAccount from '@/hooks/use-account';
 
 const ResourceLibraryTopic = () => {
 	const { tagGroupId } = useParams<{ tagGroupId: string }>();
 	const { hasTouchScreen } = useTouchScreenCheck();
+	const { institution } = useAccount();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
@@ -203,7 +204,7 @@ const ResourceLibraryTopic = () => {
 				fetchData={fetchPageBlockingData}
 				loadingComponent={
 					<>
-						<Breadcrumb
+						{/* <Breadcrumb
 							breadcrumbs={[
 								{
 									to: '/',
@@ -214,7 +215,7 @@ const ResourceLibraryTopic = () => {
 									title: 'Resource Library',
 								},
 							]}
-						/>
+						/> */}
 						<HeroContainer>
 							<SkeletonText type="h1" className="mb-4 text-center" width="50%" />
 							<SkeletonText type="p" className="mb-0 text-center fs-large" numberOfLines={3} />
@@ -222,7 +223,7 @@ const ResourceLibraryTopic = () => {
 					</>
 				}
 			>
-				<Breadcrumb
+				{/* <Breadcrumb
 					breadcrumbs={[
 						{
 							to: '/',
@@ -237,7 +238,7 @@ const ResourceLibraryTopic = () => {
 							title: tagGroup?.name ?? '',
 						},
 					]}
-				/>
+				/> */}
 				<HeroContainer className={getBackgroundClassForColorId(tagGroup?.colorId)}>
 					<h1 className="mb-4 text-center">{tagGroup?.name}</h1>
 					<p className="mb-6 text-center fs-large">{tagGroup?.description}</p>
@@ -260,43 +261,51 @@ const ResourceLibraryTopic = () => {
 								<div></div>
 								<div className="d-flex flex-column flex-lg-row align-items-center justify-content-center">
 									<div className="mb-2 mb-lg-0 d-flex align-items-center">
-										<span className="me-2">Show resources for</span>
-										<MegaFilter
-											displaySingleColumn
-											className="me-2"
-											allowCollapse={false}
-											displayCount={false}
-											buttonTitle={
-												(filtersResponse?.contentAudienceTypes ?? []).find(
-													(cat) =>
-														cat.contentAudienceTypeId ===
-														searchParams.get('contentAudienceTypeId')
-												)?.description ?? 'Anyone'
-											}
-											modalTitle="Show resources for..."
-											value={[
-												{
-													id: 'contentAudienceTypeId',
-													filterType: FILTER_TYPE.RADIO,
-													title: 'Show resources for...',
-													value: searchParams.getAll('contentAudienceTypeId'),
-													options: (filtersResponse?.contentAudienceTypes ?? []).map(
-														(cat) => ({
-															value: cat.contentAudienceTypeId,
-															title: cat.description,
-														})
-													),
-												},
-											]}
-											onChange={(filters) => {
-												filters.forEach((filter) => {
-													applyValuesToSearchParam(filter.value, filter.id);
-												});
-											}}
-										/>
+										{institution.contentAudiencesEnabled && (
+											<>
+												<span className="me-2">Show resources for</span>
+												<MegaFilter
+													displaySingleColumn
+													className="me-2"
+													allowCollapse={false}
+													displayCount={false}
+													buttonTitle={
+														(filtersResponse?.contentAudienceTypes ?? []).find(
+															(cat) =>
+																cat.contentAudienceTypeId ===
+																searchParams.get('contentAudienceTypeId')
+														)?.description ?? 'Anyone'
+													}
+													modalTitle="Show resources for..."
+													value={[
+														{
+															id: 'contentAudienceTypeId',
+															filterType: FILTER_TYPE.RADIO,
+															title: 'Show resources for...',
+															value: searchParams.getAll('contentAudienceTypeId'),
+															options: (filtersResponse?.contentAudienceTypes ?? []).map(
+																(cat) => ({
+																	value: cat.contentAudienceTypeId,
+																	title: cat.description,
+																})
+															),
+														},
+													]}
+													onChange={(filters) => {
+														filters.forEach((filter) => {
+															applyValuesToSearchParam(filter.value, filter.id);
+														});
+													}}
+												/>
+											</>
+										)}
 									</div>
 									<div className="mb-2 mb-lg-0 d-flex align-items-center">
-										<span className="me-2">related to</span>
+										<span className="me-2">
+											{institution.contentAudiencesEnabled
+												? 'related to'
+												: 'Show resources related to '}
+										</span>
 										<MegaFilter
 											allowCollapse={false}
 											buttonTitle={
