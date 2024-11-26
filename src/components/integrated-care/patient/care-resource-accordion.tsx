@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Collapse } from 'react-bootstrap';
+import { Marker, Map, useMap } from '@vis.gl/react-google-maps';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { CareResourceLocationModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	careResourceAccordion: {
@@ -40,13 +42,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface CareResourceAccordionProps {
-	googleMaps?: typeof google.maps.Map;
+	careResourceLocation: CareResourceLocationModel;
 	className?: string;
 }
 
-export const CareResourceAccordion = ({ className }: CareResourceAccordionProps) => {
+export const CareResourceAccordion = ({ careResourceLocation, className }: CareResourceAccordionProps) => {
 	const classes = useStyles();
+	const map = useMap(careResourceLocation.careResourceLocationId);
 	const [show, setShow] = useState(true);
+
+	useEffect(() => {
+		if (!map) {
+			return;
+		}
+
+		console.log(map);
+	}, [map]);
 
 	return (
 		<div className={classNames(classes.careResourceAccordion, className)}>
@@ -59,7 +70,7 @@ export const CareResourceAccordion = ({ className }: CareResourceAccordionProps)
 				Resource Name
 				<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
 			</button>
-			<Collapse in={show}>
+			<Collapse in={show} mountOnEnter unmountOnExit>
 				<div>
 					<div className="px-4 pb-4 bg-n75 border-bottom">
 						<p className="m-0">
@@ -117,7 +128,18 @@ export const CareResourceAccordion = ({ className }: CareResourceAccordionProps)
 								</span>
 							</div>
 						</div>
-						<div className={classes.mapOuter}>[TODO]: Google Map</div>
+						<div className={classes.mapOuter}>
+							<Map
+								mapId={careResourceLocation.careResourceLocationId}
+								style={{ width: '100%', height: '100%' }}
+								defaultCenter={{ lat: 39.9526, lng: -75.1652 }}
+								defaultZoom={12}
+								gestureHandling="greedy"
+								disableDefaultUI={true}
+							>
+								<Marker position={{ lat: 39.9526, lng: -75.1652 }} />
+							</Map>
+						</div>
 					</div>
 				</div>
 			</Collapse>

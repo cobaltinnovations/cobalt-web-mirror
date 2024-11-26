@@ -1,61 +1,40 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Row, Col, OffcanvasProps } from 'react-bootstrap';
+import { APIProvider } from '@vis.gl/react-google-maps';
+
 import { CareResourceLocationModel, PatientOrderModel } from '@/lib/models';
-import { PreviewCanvas } from '@/components/preview-canvas';
+import { institutionService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
+import { PreviewCanvas } from '@/components/preview-canvas';
 import Loader from '@/components/loader';
 import { CareResourceAccordion } from '@/components/integrated-care/patient';
-import useAccount from '@/hooks/use-account';
-
-import { Loader as GoogleMapsLoader } from '@googlemaps/js-api-loader';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
 }
-
-const loader = new GoogleMapsLoader({
-	apiKey: 'xxx',
-	version: 'weekly',
-});
 
 export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props }) => {
 	const { institution } = useAccount();
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [careResourceLocations, setCareResourceLocations] = useState<CareResourceLocationModel[]>([]);
-	const MapRef = useRef<typeof google.maps.Map>();
+	const [mapsKey, setMapsKey] = useState('');
 
 	const fetchData = useCallback(async () => {
 		try {
 			setIsLoading(true);
 
-			const { Map } = await loader.importLibrary('maps');
-			MapRef.current = Map;
+			const response = await institutionService.getGoogleMapsApiKey(institution.institutionId).fetch();
 
+			setMapsKey(response.googleMapsPlatformApiKey);
 			setCareResourceLocations([]);
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError]);
-
-	useEffect(() => {
-		if (isLoading) {
-			return;
-		}
-
-		const mapDiv = document.getElementById('map');
-
-		if (!mapDiv || !MapRef.current) {
-			return;
-		}
-
-		new MapRef.current(mapDiv, {
-			center: { lat: -34.397, lng: 150.644 },
-			zoom: 8,
-		});
-	}, [isLoading]);
+	}, [handleError, institution.institutionId]);
 
 	const handleOnEnter = useCallback(() => {
 		fetchData();
@@ -76,7 +55,6 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 			) : (
 				<Row className="mb-10">
 					<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-						<div id="map" className="mb-10" style={{ height: 400 }} />
 						<h4 className="mb-1">Schedule with a recommended resource</h4>
 						<p className="mb-10">
 							These resources are covered by your insurance and were recommended based on your responses
@@ -85,12 +63,13 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 							{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 							provider.
 						</p>
-						<CareResourceAccordion className="mb-4" />
-						<CareResourceAccordion className="mb-4" />
-						<CareResourceAccordion />
-						{careResourceLocations.map(() => (
-							<CareResourceAccordion className="mb-4" />
-						))}
+						{mapsKey && (
+							<APIProvider apiKey={mapsKey}>
+								{careResourceLocations.map((crl) => (
+									<CareResourceAccordion careResourceLocation={crl} className="mb-4" />
+								))}
+							</APIProvider>
+						)}
 					</Col>
 				</Row>
 			)}
