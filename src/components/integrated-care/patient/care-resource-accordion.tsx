@@ -40,6 +40,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface CareResourceAccordionProps {
+	googleMaps?: typeof google.maps.Map;
 	className?: string;
 }
 
