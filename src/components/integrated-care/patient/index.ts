@@ -1,3 +1,4 @@
+export * from './care-resource-accordion';
 export * from './next-steps-assessment-complete';
 export * from './next-steps-item';
 export * from './patient-header';

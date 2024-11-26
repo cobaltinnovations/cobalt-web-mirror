@@ -5,12 +5,15 @@ import { PatientOrderModel, PatientOrderSafetyPlanningStatusId, PatientOrderTria
 import { appointmentService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import { NextStepsItem } from './next-steps-item';
-import { PatientInsuranceStatementModal } from './patient-insurance-statement-modal';
-import ConfirmDialog from '@/components/confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
+import ConfirmDialog from '@/components/confirm-dialog';
 import InlineAlert from '@/components/inline-alert';
 import NoData from '@/components/no-data';
+import {
+	CareResourceAccordion,
+	NextStepsItem,
+	PatientInsuranceStatementModal,
+} from '@/components/integrated-care/patient';
 import classNames from 'classnames';
 
 interface NextStepsAssessmentCompleteProps {
@@ -106,7 +109,7 @@ export const NextStepsAssessmentComplete = ({
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
 				<>
-					{!patientOrder.resourcesSentAt ? (
+					{patientOrder.resourcesSentAt ? (
 						<NextStepsItem
 							title="Step 3: Schedule appointment with a recommended resource"
 							description={`We will send you a ${
@@ -130,30 +133,15 @@ export const NextStepsAssessmentComplete = ({
 						</NextStepsItem>
 					) : (
 						<>
-							<NextStepsItem
-								complete
-								title="Step 3: Receive Resources"
-								description={`Resources were sent to ${institution?.myChartName ?? 'MyChart'} on ${
-									patientOrder.resourcesSentAtDescription
-								}`}
-								button={{
-									variant: 'outline-primary',
-									title: `Check ${institution?.myChartName ?? 'MyChart'}`,
-									onClick: () => {
-										window.open(institution.myChartDefaultUrl, '_blank');
-									},
-								}}
-							/>
-							<hr />
-							<NextStepsItem
-								title="Step 4: Schedule & attend appointment"
-								description={`Schedule an appointment by contacting one of the resources provided through ${
-									institution?.myChartName ?? 'MyChart'
-								}`}
-							>
-								{patientOrder.patientOrderSafetyPlanningStatusId ===
-									PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING && <SafetyPlanningAlert />}
-							</NextStepsItem>
+							<h1 className="mb-6">Schedule with a recommended resource</h1>
+							<p className="mb-0">
+								These resources are covered by your insurance and were recommended based on your
+								responses to the assessment. If you have any questions, please feel free to call us at{' '}
+								{institution.integratedCarePhoneNumberDescription}{' '}
+								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
+								provider.
+							</p>
+							<CareResourceAccordion />
 						</>
 					)}
 				</>
