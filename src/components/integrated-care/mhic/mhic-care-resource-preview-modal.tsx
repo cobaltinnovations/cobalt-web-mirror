@@ -31,10 +31,13 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 			setCareResourceLocations([]);
 		} catch (error) {
 			handleError(error);
+			setCareResourceLocations([]);
+			setMapsKey('');
+			props.onHide?.();
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, institution.institutionId]);
+	}, [handleError, institution.institutionId, props]);
 
 	const handleOnEnter = useCallback(() => {
 		fetchData();
