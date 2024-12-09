@@ -162,9 +162,9 @@ export const NextStepsAssessmentComplete = ({
 								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 								provider.
 							</p>
+							{/* <CareResourceAccordion className="mb-4" />
 							<CareResourceAccordion className="mb-4" />
-							<CareResourceAccordion className="mb-4" />
-							<CareResourceAccordion className="mb-10" />
+							<CareResourceAccordion className="mb-10" /> */}
 						</>
 					)}
 				</>
