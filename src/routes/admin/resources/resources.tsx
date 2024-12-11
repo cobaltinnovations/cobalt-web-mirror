@@ -677,6 +677,7 @@ export const Component = () => {
 										page={parseInt(page, 10)}
 										size={15}
 										onClick={handlePaginationClick}
+										disabled={isLoading}
 									/>
 								</div>
 							</Col>

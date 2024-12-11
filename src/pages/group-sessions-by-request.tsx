@@ -222,6 +222,7 @@ const GroupSessionsByRequest: FC = () => {
 									page={currentPageIndex}
 									size={sizeOfPage}
 									onClick={handlePaginationClick}
+									disabled={tableIsUpdating}
 								/>
 							</div>
 						)}
