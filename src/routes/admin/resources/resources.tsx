@@ -1,94 +1,21 @@
 import { cloneDeep } from 'lodash';
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-	Await,
-	Link,
-	LoaderFunctionArgs,
-	defer,
-	useNavigate,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
-
 import classNames from 'classnames';
-
 import { AdminContent, AdminContentAction, ContentStatus, ContentStatusId, ContentTypeId, Tag } from '@/lib/models';
-import {
-	AdminContentListResponse,
-	AdminContentSortOrder,
-	ContentFiltersResponse,
-	ContentStatusesResponse,
-	ContentTagsResponse,
-	adminService,
-} from '@/lib/services';
-
+import { AdminContentListResponse, AdminContentSortOrder, ContentFiltersResponse, adminService } from '@/lib/services';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
-
 import FilterDropdown from '@/components/filter-dropdown';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import InputHelperSearch from '@/components/input-helper-search';
 import { AdminResourcesTableDropdown } from '@/components/admin';
 import ContentTypeIcon from '@/components/content-type-icon';
 import LoadingButton from '@/components/loading-button';
-
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
-
-interface AdminResourcesLoaderData {
-	resourcesPromise: Promise<
-		[ContentTagsResponse, ContentStatusesResponse, ContentFiltersResponse, AdminContentListResponse]
-	>;
-}
-
-export function useAdminResourcesLoaderData() {
-	return useRouteLoaderData('admin-resources') as AdminResourcesLoaderData;
-}
-
-export async function loader({ request }: LoaderFunctionArgs) {
-	const url = new URL(request.url);
-	const page = parseInt(url.searchParams.get('page') ?? '0', 10);
-	const institutionId = url.searchParams.get('institutionId') ?? undefined;
-	const contentStatusId = (url.searchParams.get('contentStatusId') ?? undefined) as ContentStatusId | undefined;
-	const contentTypeId = (url.searchParams.get('contentTypeId') ?? undefined) as ContentTypeId | undefined;
-	const tagId = url.searchParams.get('tagId') ?? undefined;
-	const sharingOn = url.searchParams.get('sharingOn') ?? undefined;
-	const search = url.searchParams.get('search') ?? undefined;
-	const orderBy = url.searchParams.get('orderBy') ?? undefined;
-
-	const contentTagsResponse = adminService.fetchContentTags();
-	const contentStatusesRequest = adminService.fetchContentStatuses();
-	const contentFiltersRequest = adminService.fetchMyContentFilters();
-	const contentRequest = adminService.fetchContent({
-		page,
-		...(institutionId ? { institutionId } : {}),
-		...(contentStatusId ? { contentStatusId } : {}),
-		...(contentTypeId ? { contentTypeId } : {}),
-		...(tagId ? { tagId } : {}),
-		...(sharingOn ? { sharingOn } : {}),
-		...(search ? { search } : {}),
-		...(orderBy && { orderBy }),
-	});
-
-	request.signal.addEventListener('abort', () => {
-		contentTagsResponse.abort();
-		contentStatusesRequest.abort();
-		contentFiltersRequest.abort();
-		contentRequest.abort();
-	});
-
-	const resourcesPromise = Promise.all([
-		contentTagsResponse.fetch(),
-		contentStatusesRequest.fetch(),
-		contentFiltersRequest.fetch(),
-		contentRequest.fetch(),
-	]);
-
-	return defer({
-		resourcesPromise,
-	});
-}
+import AsyncWrapper from '@/components/async-page';
 
 const contentStatusBadgeProps = {
 	[ContentStatusId.DRAFT]: {
@@ -113,13 +40,23 @@ const contentStatusBadgeProps = {
 	},
 };
 
+export function loader() {
+	return null;
+}
+
 export const Component = () => {
-	const { resourcesPromise } = useAdminResourcesLoaderData();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const page = searchParams.get('page') ?? '0';
+	const page = useMemo(() => parseInt(searchParams.get('page') ?? '0', 10), [searchParams]);
+	const institutionId = useMemo(() => searchParams.get('institutionId') ?? '', [searchParams]);
+	const contentStatusId = useMemo(() => searchParams.get('contentStatusId') ?? '', [searchParams]);
+	const contentTypeId = useMemo(() => searchParams.get('contentTypeId') ?? '', [searchParams]);
+	const tagId = useMemo(() => searchParams.get('tagId') ?? '', [searchParams]);
+	const sharingOn = useMemo(() => searchParams.get('sharingOn') ?? '', [searchParams]);
+	const search = useMemo(() => searchParams.get('search') ?? '', [searchParams]);
+	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAdding, setIsAdding] = useState<Record<string, boolean>>({});
@@ -142,6 +79,47 @@ export const Component = () => {
 	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchQuery);
 	const [showClearButton, setShowClearButton] = useState(false);
 
+	const fetchFilters = useCallback(async () => {
+		const [tagsResponse, statusResponse, filtersResposne] = await Promise.all([
+			adminService.fetchContentTags().fetch(),
+			adminService.fetchContentStatuses().fetch(),
+			adminService.fetchMyContentFilters().fetch(),
+		]);
+
+		setTags(tagsResponse.tags);
+		setContentStatuses(statusResponse.contentStatuses);
+		setContentFilters(filtersResposne);
+	}, []);
+
+	const fetchContent = useCallback(async () => {
+		try {
+			setIsLoading(true);
+
+			const response = await adminService
+				.fetchContent({
+					page,
+					...(institutionId && { institutionId }),
+					...(contentStatusId && { contentStatusId: contentStatusId as ContentStatusId }),
+					...(contentTypeId && { contentTypeId: contentTypeId as ContentTypeId }),
+					...(tagId && { tagId }),
+					...(sharingOn && { sharingOn }),
+					...(search && { search }),
+					...(orderBy && { orderBy }),
+				})
+				.fetch();
+
+			setContent(response);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [contentStatusId, contentTypeId, handleError, institutionId, orderBy, page, search, sharingOn, tagId]);
+
+	useEffect(() => {
+		fetchContent();
+	}, [fetchContent]);
+
 	useEffect(() => {
 		if (initialSearchValue === debouncedSearchQuery) {
 			return;
@@ -156,34 +134,13 @@ export const Component = () => {
 		setSearchParams(searchParams);
 	}, [debouncedSearchQuery, initialSearchValue, searchParams, setSearchParams]);
 
-	useEffect(() => {
-		if (!resourcesPromise) {
-			return;
-		}
-
-		const loadResources = async () => {
-			try {
-				setIsLoading(true);
-				const [tagsResponse, contentStatusesResposne, contentFiltersResponse, contentResponse] =
-					await resourcesPromise;
-
-				setTags(tagsResponse.tags);
-				setContentStatuses(contentStatusesResposne.contentStatuses);
-				setContentFilters(contentFiltersResponse);
-				setContent(contentResponse);
-			} catch (error) {
-				handleError(error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		loadResources();
-	}, [resourcesPromise, handleError]);
-
 	const handlePaginationClick = (pageIndex: number) => {
+		// bandaid to set loading while other react-router-dom calls are resolving.
+		// it seems that these page level calls wont even begin until outer wrappers resolve.
+		// setIsLoading(true);
+
 		searchParams.set('page', String(pageIndex));
-		setSearchParams(searchParams);
+		setSearchParams(searchParams, { replace: true });
 	};
 
 	const filters = useMemo(
@@ -278,7 +235,6 @@ export const Component = () => {
 		},
 	];
 
-	const orderBy = searchParams.get('orderBy');
 	const selectedSort = sortOptions.find((o) => o.value === orderBy) ?? sortOptions[0];
 
 	const sortConfig = {
@@ -347,7 +303,7 @@ export const Component = () => {
 	}, [activeFilters]);
 
 	return (
-		<>
+		<AsyncWrapper fetchData={fetchFilters}>
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col lg={6}>
@@ -506,185 +462,170 @@ export const Component = () => {
 						</div>
 					</Col>
 				</Row>
-				<Suspense>
-					<Await resolve={resourcesPromise}>
-						<Row className="mb-8">
-							<Col>
-								<Table isLoading={isLoading}>
-									<TableHead>
-										<TableRow>
-											<TableCell header>Date Added</TableCell>
-											<TableCell header>Resource Details</TableCell>
-											<TableCell header>Owner</TableCell>
-											<TableCell header>Status</TableCell>
-											<TableCell header>Publish Date</TableCell>
-											<TableCell header>Expiry Date</TableCell>
-											<TableCell header className="align-items-end">
-												Views
+
+				<Row className="mb-8">
+					<Col>
+						<Table isLoading={isLoading}>
+							<TableHead>
+								<TableRow>
+									<TableCell header>Date Added</TableCell>
+									<TableCell header>Resource Details</TableCell>
+									<TableCell header>Owner</TableCell>
+									<TableCell header>Status</TableCell>
+									<TableCell header>Publish Date</TableCell>
+									<TableCell header>Expiry Date</TableCell>
+									<TableCell header className="align-items-end">
+										Views
+									</TableCell>
+									<TableCell header className="align-items-end">
+										In Use
+									</TableCell>
+									<TableCell header />
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{content?.adminContent.map((content) => {
+									const isAvailable = content.actions.includes(AdminContentAction.ADD);
+
+									return (
+										<TableRow key={content.contentId}>
+											<TableCell>
+												<div className="d-flex align-items-center">
+													{content.dateAddedToInstitutionDescription}{' '}
+													{content.newFlag && (
+														<div className="ms-4">
+															<Badge pill>New</Badge>
+														</div>
+													)}
+												</div>
 											</TableCell>
-											<TableCell header className="align-items-end">
-												In Use
+
+											<TableCell width={480}>
+												<div className="d-flex align-items-center">
+													<OverlayTrigger
+														placement="bottom"
+														overlay={<Tooltip>{content.contentTypeDescription}</Tooltip>}
+													>
+														<div className="text-muted me-4">
+															<ContentTypeIcon contentTypeId={content.contentTypeId} />
+														</div>
+													</OverlayTrigger>
+
+													<div className={classNames('text-truncate', true && 'me-5')}>
+														<Link
+															className="text-decoration-none"
+															to={{
+																pathname: `/admin/resources/${
+																	content.isEditable ? 'edit' : 'preview'
+																}/${content.contentId}`,
+															}}
+														>
+															{content.title}
+														</Link>
+														<small className="text-truncate">{content.author}</small>
+													</div>
+												</div>
 											</TableCell>
-											<TableCell header />
-										</TableRow>
-									</TableHead>
-									<TableBody>
-										{content?.adminContent.map((content) => {
-											const isAvailable = content.actions.includes(AdminContentAction.ADD);
 
-											return (
-												<TableRow key={content.contentId}>
-													<TableCell>
-														<div className="d-flex align-items-center">
-															{content.dateAddedToInstitutionDescription}{' '}
-															{content.newFlag && (
-																<div className="ms-4">
-																	<Badge pill>New</Badge>
-																</div>
-															)}
-														</div>
-													</TableCell>
+											<TableCell>{content.ownerInstitution}</TableCell>
 
-													<TableCell width={480}>
-														<div className="d-flex align-items-center">
-															<OverlayTrigger
-																placement="bottom"
-																overlay={
-																	<Tooltip>{content.contentTypeDescription}</Tooltip>
-																}
-															>
-																<div className="text-muted me-4">
-																	<ContentTypeIcon
-																		contentTypeId={content.contentTypeId}
-																	/>
-																</div>
-															</OverlayTrigger>
+											<TableCell width={120}>
+												<div>
+													<Badge
+														pill
+														{...contentStatusBadgeProps[content.contentStatusId]}
+														className="me-2"
+													/>
+												</div>
+											</TableCell>
 
-															<div
-																className={classNames('text-truncate', true && 'me-5')}
-															>
-																<Link
-																	className="text-decoration-none"
-																	to={{
-																		pathname: `/admin/resources/${
-																			content.isEditable ? 'edit' : 'preview'
-																		}/${content.contentId}`,
-																	}}
-																>
-																	{content.title}
-																</Link>
-																<small className="text-truncate">
-																	{content.author}
-																</small>
-															</div>
-														</div>
-													</TableCell>
+											<TableCell>{content.publishStartDateDescription}</TableCell>
 
-													<TableCell>{content.ownerInstitution}</TableCell>
+											<TableCell>{content.publishEndDateDescription ?? 'No Expiry'}</TableCell>
 
-													<TableCell width={120}>
-														<div>
-															<Badge
-																pill
-																{...contentStatusBadgeProps[content.contentStatusId]}
-																className="me-2"
-															/>
-														</div>
-													</TableCell>
+											<TableCell className="align-items-end">{content.views}</TableCell>
 
-													<TableCell>{content.publishStartDateDescription}</TableCell>
+											<TableCell className="align-items-end">
+												{content.inUseCount > 0 ? (
+													<OverlayTrigger
+														placement="bottom"
+														overlay={
+															<Tooltip>{content.inUseInstitutionDescription}</Tooltip>
+														}
+													>
+														<div>{content.inUseCount}</div>
+													</OverlayTrigger>
+												) : (
+													<>{content.inUseCount}</>
+												)}
+											</TableCell>
 
-													<TableCell>
-														{content.publishEndDateDescription ?? 'No Expiry'}
-													</TableCell>
+											<TableCell>
+												<div className="d-flex justify-content-end">
+													{isAvailable ? (
+														<LoadingButton
+															className="me-2"
+															variant="outline-primary"
+															isLoading={!!isAdding[content.contentId]}
+															onClick={async () => {
+																setIsAdding((curr) => ({
+																	...curr,
+																	[content.contentId]: true,
+																}));
 
-													<TableCell className="align-items-end">{content.views}</TableCell>
+																try {
+																	const response = await adminService
+																		.addContent(content.contentId)
+																		.fetch();
 
-													<TableCell className="align-items-end">
-														{content.inUseCount > 0 ? (
-															<OverlayTrigger
-																placement="bottom"
-																overlay={
-																	<Tooltip>
-																		{content.inUseInstitutionDescription}
-																	</Tooltip>
-																}
-															>
-																<div>{content.inUseCount}</div>
-															</OverlayTrigger>
-														) : (
-															<>{content.inUseCount}</>
-														)}
-													</TableCell>
+																	replaceContent(
+																		AdminContentAction.ADD,
+																		response.content
+																	);
+																} catch (e) {
+																	handleError(e);
+																} finally {
+																	setIsAdding((curr) => {
+																		delete curr[content.contentId];
 
-													<TableCell>
-														<div className="d-flex justify-content-end">
-															{isAvailable ? (
-																<LoadingButton
-																	className="me-2"
-																	variant="outline-primary"
-																	isLoading={!!isAdding[content.contentId]}
-																	onClick={async () => {
-																		setIsAdding((curr) => ({
+																		return {
 																			...curr,
-																			[content.contentId]: true,
-																		}));
-
-																		try {
-																			const response = await adminService
-																				.addContent(content.contentId)
-																				.fetch();
-
-																			replaceContent(
-																				AdminContentAction.ADD,
-																				response.content
-																			);
-																		} catch (e) {
-																			handleError(e);
-																		} finally {
-																			setIsAdding((curr) => {
-																				delete curr[content.contentId];
-
-																				return {
-																					...curr,
-																				};
-																			});
-																		}
-																	}}
-																>
-																	Add
-																</LoadingButton>
-															) : (
-																<AdminResourcesTableDropdown
-																	content={content}
-																	onRefresh={replaceContent}
-																/>
-															)}
-														</div>
-													</TableCell>
-												</TableRow>
-											);
-										})}
-									</TableBody>
-								</Table>
-							</Col>
-						</Row>
-						<Row>
-							<Col xs={{ span: 4, offset: 4 }}>
-								<div className="d-flex justify-content-center align-items-center">
-									<TablePagination
-										total={contentTotalCount}
-										page={parseInt(page, 10)}
-										size={15}
-										onClick={handlePaginationClick}
-										disabled={isLoading}
-									/>
-								</div>
-							</Col>
-						</Row>
-					</Await>
-				</Suspense>
+																		};
+																	});
+																}
+															}}
+														>
+															Add
+														</LoadingButton>
+													) : (
+														<AdminResourcesTableDropdown
+															content={content}
+															onRefresh={replaceContent}
+														/>
+													)}
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+				<Row>
+					<Col xs={{ span: 4, offset: 4 }}>
+						<div className="d-flex justify-content-center align-items-center">
+							<TablePagination
+								total={contentTotalCount}
+								page={page}
+								size={15}
+								onClick={handlePaginationClick}
+								disabled={isLoading}
+							/>
+						</div>
+					</Col>
+				</Row>
 			</Container>
-		</>
+		</AsyncWrapper>
 	);
 };
