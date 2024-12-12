@@ -137,7 +137,7 @@ export const Component = () => {
 	const handlePaginationClick = (pageIndex: number) => {
 		// bandaid to set loading while other react-router-dom calls are resolving.
 		// it seems that these page level calls wont even begin until outer wrappers resolve.
-		// setIsLoading(true);
+		setIsLoading(true);
 
 		searchParams.set('page', String(pageIndex));
 		setSearchParams(searchParams, { replace: true });
