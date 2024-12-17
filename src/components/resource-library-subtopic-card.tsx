@@ -37,10 +37,11 @@ interface Props {
 	description: string;
 	to?: string;
 	toLabel?: string;
+	onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 	className?: string;
 }
 
-const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel, className }: Props) => {
+const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel, onClick, className }: Props) => {
 	const classes = useStyles({ clickable: !!to });
 	const navigate = useNavigate();
 
@@ -65,7 +66,7 @@ const ResourceLibrarySubtopicCard = ({ colorId, title, description, to, toLabel,
 			</div>
 
 			{to && (
-				<Link to={to} className="mb-0 text-decoration-none">
+				<Link to={to} className="mb-0 text-decoration-none" onClick={onClick}>
 					{toLabel || `Explore all ${title} resources`}
 				</Link>
 			)}

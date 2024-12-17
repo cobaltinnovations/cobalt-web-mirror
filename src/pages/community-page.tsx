@@ -19,6 +19,8 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from './resource-library';
 import classNames from 'classnames';
+import { analyticsService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const CommunityPage = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -325,6 +327,14 @@ const CommunityPage = () => {
 															}
 															buttonTitle="Reserve a Place"
 															onClick={() => {
+																analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_GROUP_SESSION,
+																	{
+																		topicCenterId: topicCenterId,
+																		groupSessionId: groupSession.groupSessionId,
+																	}
+																);
+
 																trackEvent(
 																	TopicCenterAnalyticsEvent.clickGroupSession(
 																		topicCenter.name,
@@ -442,6 +452,15 @@ const CommunityPage = () => {
 														description={topicCenterRowTag.description}
 														toLabel={topicCenterRowTag.cta}
 														to={topicCenterRowTag.ctaUrl}
+														onClick={() => {
+															analyticsService.persistEvent(
+																AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
+																{
+																	topicCenterId: topicCenterId,
+																	tagGroupId: topicCenterRowTag.tagId,
+																}
+															);
+														}}
 													/>
 												</Col>
 
@@ -474,6 +493,14 @@ const CommunityPage = () => {
 																	contentTypeId={content.contentTypeId}
 																	duration={content.durationInMinutesDescription}
 																	trackEvent={() => {
+																		analyticsService.persistEvent(
+																			AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
+																			{
+																				topicCenterId: topicCenterId,
+																				contentId: content.contentId,
+																			}
+																		);
+
 																		trackContentEvent(topicCenterRow, content);
 																	}}
 																/>
@@ -503,6 +530,17 @@ const CommunityPage = () => {
 																topicCenterRow={topicCenterRow}
 																pinboardNote={pinboardNote}
 																className="mb-8"
+																onClick={() => {
+																	analyticsService.persistEvent(
+																		AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_PINBOARD_NOTE_LINK,
+																		{
+																			topicCenterId: topicCenterId,
+																			pinboardNoteId: pinboardNote.pinboardNoteId,
+																			linkUrl: pinboardNote.url,
+																			linkText: pinboardNote.title,
+																		}
+																	);
+																}}
 															/>
 														);
 													})}
@@ -548,6 +586,14 @@ const CommunityPage = () => {
 															contentTypeId={content.contentTypeId}
 															duration={content.durationInMinutesDescription}
 															trackEvent={() => {
+																analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
+																	{
+																		topicCenterId: topicCenterId,
+																		contentId: content.contentId,
+																	}
+																);
+
 																trackContentEvent(topicCenterRow, content);
 															}}
 														/>
