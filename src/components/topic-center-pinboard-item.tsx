@@ -44,10 +44,11 @@ interface Props {
 	topicCenter: TopicCenterModel;
 	topicCenterRow: TopicCenterRowModel;
 	pinboardNote: PinboardNoteModel;
+	onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 	className?: string;
 }
 
-export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardNote, className }: Props) => {
+export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardNote, onClick, className }: Props) => {
 	const classes = useStyles();
 	const { mixpanel, trackEvent } = useAnalytics();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -117,7 +118,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 								href={pinboardNote.url}
 								target="_blank"
 								rel="noreferrer"
-								onClick={() => {
+								onClick={(event) => {
 									const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${pinboardNote.url}`;
 
 									trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));
@@ -129,6 +130,8 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 										'Pinboard Item ID': pinboardNote.pinboardNoteId,
 										'Pinboard Item Title': pinboardNote.title,
 									});
+
+									onClick?.(event);
 								}}
 							>
 								{pinboardNote.title}
