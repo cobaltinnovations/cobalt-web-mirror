@@ -20,6 +20,8 @@ import { Masonry } from '@/components/masonry';
 import { TopicCenterPinboardItem } from '@/components/topic-center-pinboard-item';
 import { SkeletonTopicCenterGroupSession, TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import { analyticsService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const FeaturedTopic = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
@@ -190,6 +192,14 @@ const FeaturedTopic = () => {
 															}
 															buttonTitle="Reserve a Place"
 															onClick={() => {
+																analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_GROUP_SESSION,
+																	{
+																		topicCenterId: topicCenterId,
+																		groupSessionId: groupSession.groupSessionId,
+																	}
+																);
+
 																trackEvent(
 																	TopicCenterAnalyticsEvent.clickGroupSession(
 																		topicCenter.name,
@@ -307,6 +317,15 @@ const FeaturedTopic = () => {
 														description={topicCenterRowTag.description}
 														toLabel={topicCenterRowTag.cta}
 														to={topicCenterRowTag.ctaUrl}
+														onClick={() => {
+															analyticsService.persistEvent(
+																AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
+																{
+																	topicCenterId: topicCenterId,
+																	tagId: topicCenterRowTag.tagId,
+																}
+															);
+														}}
 													/>
 												</Col>
 
@@ -339,6 +358,14 @@ const FeaturedTopic = () => {
 																	contentTypeId={content.contentTypeId}
 																	duration={content.durationInMinutesDescription}
 																	trackEvent={() => {
+																		analyticsService.persistEvent(
+																			AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
+																			{
+																				topicCenterId: topicCenterId,
+																				contentId: content.contentId,
+																			}
+																		);
+
 																		trackContentEvent(topicCenterRow, content);
 																	}}
 																/>
@@ -368,6 +395,17 @@ const FeaturedTopic = () => {
 																topicCenterRow={topicCenterRow}
 																pinboardNote={pinboardNote}
 																className="mb-8"
+																onClick={() => {
+																	analyticsService.persistEvent(
+																		AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_PINBOARD_NOTE_LINK,
+																		{
+																			topicCenterId: topicCenterId,
+																			pinboardNoteId: pinboardNote.pinboardNoteId,
+																			linkUrl: pinboardNote.url,
+																			linkText: pinboardNote.title,
+																		}
+																	);
+																}}
 															/>
 														);
 													})}
@@ -413,6 +451,14 @@ const FeaturedTopic = () => {
 															contentTypeId={content.contentTypeId}
 															duration={content.durationInMinutesDescription}
 															trackEvent={() => {
+																analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
+																	{
+																		topicCenterId: topicCenterId,
+																		contentId: content.contentId,
+																	}
+																);
+
 																trackContentEvent(topicCenterRow, content);
 															}}
 														/>
