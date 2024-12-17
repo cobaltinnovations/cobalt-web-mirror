@@ -457,7 +457,7 @@ const CommunityPage = () => {
 																AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
 																{
 																	topicCenterId: topicCenterId,
-																	tagGroupId: topicCenterRowTag.tagId,
+																	tagId: topicCenterRowTag.tagId,
 																}
 															);
 														}}
