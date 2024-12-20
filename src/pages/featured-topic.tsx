@@ -195,7 +195,7 @@ const FeaturedTopic = () => {
 																analyticsService.persistEvent(
 																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_GROUP_SESSION,
 																	{
-																		topicCenterId: topicCenterId,
+																		topicCenterId: topicCenter.topicCenterId,
 																		groupSessionId: groupSession.groupSessionId,
 																	}
 																);
@@ -321,7 +321,7 @@ const FeaturedTopic = () => {
 															analyticsService.persistEvent(
 																AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
 																{
-																	topicCenterId: topicCenterId,
+																	topicCenterId: topicCenter.topicCenterId,
 																	tagId: topicCenterRowTag.tagId,
 																}
 															);
@@ -361,12 +361,23 @@ const FeaturedTopic = () => {
 																		analyticsService.persistEvent(
 																			AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
 																			{
-																				topicCenterId: topicCenterId,
+																				topicCenterId:
+																					topicCenter.topicCenterId,
 																				contentId: content.contentId,
 																			}
 																		);
 
 																		trackContentEvent(topicCenterRow, content);
+																	}}
+																	trackTagEvent={(tag) => {
+																		analyticsService.persistEvent(
+																			AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
+																			{
+																				topicCenterId:
+																					topicCenter.topicCenterId,
+																				tagId: tag.tagId,
+																			}
+																		);
 																	}}
 																/>
 															);
@@ -395,14 +406,14 @@ const FeaturedTopic = () => {
 																topicCenterRow={topicCenterRow}
 																pinboardNote={pinboardNote}
 																className="mb-8"
-																onClick={() => {
+																onClick={({ linkUrl, linkText }) => {
 																	analyticsService.persistEvent(
 																		AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_PINBOARD_NOTE_LINK,
 																		{
-																			topicCenterId: topicCenterId,
+																			topicCenterId: topicCenter.topicCenterId,
 																			pinboardNoteId: pinboardNote.pinboardNoteId,
-																			linkUrl: pinboardNote.url,
-																			linkText: pinboardNote.title,
+																			linkUrl,
+																			linkText,
 																		}
 																	);
 																}}
@@ -454,12 +465,21 @@ const FeaturedTopic = () => {
 																analyticsService.persistEvent(
 																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_CONTENT,
 																	{
-																		topicCenterId: topicCenterId,
+																		topicCenterId: topicCenter.topicCenterId,
 																		contentId: content.contentId,
 																	}
 																);
 
 																trackContentEvent(topicCenterRow, content);
+															}}
+															trackTagEvent={(tag) => {
+																analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_TAG,
+																	{
+																		topicCenterId: topicCenter.topicCenterId,
+																		tagId: tag.tagId,
+																	}
+																);
 															}}
 														/>
 													</Col>
