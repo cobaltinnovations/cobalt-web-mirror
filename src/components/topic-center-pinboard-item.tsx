@@ -44,7 +44,7 @@ interface Props {
 	topicCenter: TopicCenterModel;
 	topicCenterRow: TopicCenterRowModel;
 	pinboardNote: PinboardNoteModel;
-	onClick?: (url: string) => void;
+	onClick?: ({ linkUrl, linkText }: { linkUrl: string; linkText: string }) => void;
 	className?: string;
 }
 
@@ -112,7 +112,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 			const link = clickedElement.closest('a');
 
 			if (link) {
-				onClick?.(link.href);
+				onClick?.({ linkUrl: link.href, linkText: link.textContent ?? '' });
 			}
 		}
 	};
@@ -144,7 +144,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 										'Pinboard Item Title': pinboardNote.title,
 									});
 
-									onClick?.(pinboardNote.url);
+									onClick?.({ linkUrl: pinboardNote.url, linkText: pinboardNote.title });
 								}}
 							>
 								{pinboardNote.title}

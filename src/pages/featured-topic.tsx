@@ -406,14 +406,14 @@ const FeaturedTopic = () => {
 																topicCenterRow={topicCenterRow}
 																pinboardNote={pinboardNote}
 																className="mb-8"
-																onClick={(clickedUrl) => {
+																onClick={({ linkUrl, linkText }) => {
 																	analyticsService.persistEvent(
 																		AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER_PINBOARD_NOTE_LINK,
 																		{
 																			topicCenterId: topicCenter.topicCenterId,
 																			pinboardNoteId: pinboardNote.pinboardNoteId,
-																			linkUrl: clickedUrl,
-																			linkText: pinboardNote.title,
+																			linkUrl,
+																			linkText,
 																		}
 																	);
 																}}
