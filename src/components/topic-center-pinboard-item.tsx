@@ -44,7 +44,7 @@ interface Props {
 	topicCenter: TopicCenterModel;
 	topicCenterRow: TopicCenterRowModel;
 	pinboardNote: PinboardNoteModel;
-	onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
+	onClick?: (url: string) => void;
 	className?: string;
 }
 
@@ -104,6 +104,19 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 		trackEvent,
 	]);
 
+	const handleDangerousHtmlClick = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
+		const { nativeEvent } = event;
+		const clickedElement = nativeEvent.target;
+
+		if (clickedElement instanceof HTMLElement) {
+			const link = clickedElement.closest('a');
+
+			if (link) {
+				onClick?.(link.href);
+			}
+		}
+	};
+
 	return (
 		<div className={classNames(classes.topicCenterPinboard, 'px-5 pt-5 pb-6', className)}>
 			<div
@@ -131,7 +144,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 										'Pinboard Item Title': pinboardNote.title,
 									});
 
-									onClick?.(event);
+									onClick?.(pinboardNote.url);
 								}}
 							>
 								{pinboardNote.title}
@@ -142,7 +155,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 					</h5>
 				</div>
 
-				<p dangerouslySetInnerHTML={{ __html: pinboardNote.description }} />
+				<p onClick={handleDangerousHtmlClick} dangerouslySetInnerHTML={{ __html: pinboardNote.description }} />
 			</div>
 		</div>
 	);
