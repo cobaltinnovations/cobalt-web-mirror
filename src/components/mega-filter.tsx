@@ -346,4 +346,14 @@ export const megaFilterValueAsSearchParams = (value: Filter[]) => {
 	);
 };
 
+export const getMegaFilterWithValueCleared = (value: Filter[]) => {
+	return value.map(
+		(currentvalue) => ({
+			...currentvalue,
+			value: [],
+		}),
+		[]
+	);
+};
+
 export default MegaFilter;

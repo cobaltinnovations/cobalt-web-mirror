@@ -12,7 +12,14 @@ import useHandleError from '@/hooks/use-handle-error';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
 import { MhicCareResourceLocationDetails } from './mhic-care-resource-location-details';
-import MegaFilter, { Filter, FILTER_TYPE, FilterOption, megaFilterValueAsSearchParams } from '@/components/mega-filter';
+import MegaFilter, {
+	Filter,
+	FILTER_TYPE,
+	FilterOption,
+	getMegaFilterWithValueCleared,
+	megaFilterValueAsSearchParams,
+} from '@/components/mega-filter';
+import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -380,8 +387,8 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 								}}
 							/>
 							<MegaFilter
-								className="me-2"
 								allowCollapse={false}
+								displayCount={false}
 								displaySingleColumn={true}
 								buttonTitle="Distance"
 								modalTitle="Select Distance"
@@ -393,8 +400,10 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 									}));
 								}}
 							/>
+							<div className="vr mx-4" />
 							<MegaFilter
 								className="me-2"
+								displayCount={false}
 								allowCollapse={false}
 								buttonTitle="Insurance"
 								modalTitle="Select Insurance"
@@ -419,6 +428,25 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 									}));
 								}}
 							/>
+							{Object.values({
+								...megaFilterValueAsSearchParams(formValues.insurance),
+								...megaFilterValueAsSearchParams(formValues.megaFilter),
+							}).length > 0 && (
+								<Button
+									variant="link"
+									className="d-flex align-items-center text-decoration-none"
+									onClick={() => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											insurance: getMegaFilterWithValueCleared(previousValue.insurance),
+											megaFilter: getMegaFilterWithValueCleared(previousValue.megaFilter),
+										}));
+									}}
+								>
+									<CancelIcon className="me-1" />
+									Clear Filters
+								</Button>
+							)}
 						</div>
 					</Col>
 				</Row>
