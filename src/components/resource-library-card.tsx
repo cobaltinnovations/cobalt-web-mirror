@@ -121,6 +121,7 @@ export interface ResourceLibraryCardProps {
 	duration?: string;
 	className?: string;
 	trackEvent?(): void;
+	trackTagEvent?(tag: Tag): void;
 }
 
 const ResourceLibraryCard = ({
@@ -138,6 +139,7 @@ const ResourceLibraryCard = ({
 	duration,
 	className,
 	trackEvent,
+	trackTagEvent,
 }: ResourceLibraryCardProps) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -295,6 +297,7 @@ const ResourceLibraryCard = ({
 										className={classes.link}
 										onClick={(event) => {
 											event.stopPropagation();
+											trackTagEvent?.(tag);
 										}}
 									>
 										<Badge
