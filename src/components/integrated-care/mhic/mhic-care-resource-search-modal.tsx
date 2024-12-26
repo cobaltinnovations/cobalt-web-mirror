@@ -19,6 +19,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
 import { MhicCareResourceLocationDetails } from './mhic-care-resource-location-details';
+import MegaFilter, { Filter, FILTER_TYPE } from '@/components/mega-filter';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -27,9 +28,10 @@ interface Props extends OffcanvasProps {
 interface FormValues {
 	searchName: string;
 	address?: PlaceModel;
-	orderBy: string;
 	distance?: DistanceOption;
 	insurance: CareResourceTag[];
+	megaFilter: Filter[];
+	orderBy: string;
 }
 
 interface DistanceOption {
@@ -76,42 +78,99 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		address: undefined,
-		orderBy: '',
 		distance: undefined,
 		insurance: [],
+		megaFilter: [],
+		orderBy: '',
 	});
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [insuranceOptions, setInsuranceOptions] = useState<CareResourceTag[]>([]);
-
 	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
 
 	const fetchFilterData = useCallback(async () => {
 		try {
-			const response = await careResourceService
-				.getCareResourceTags({
-					careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
-				})
-				.fetch();
+			const [
+				payorsResponse,
+				specialtiesResponse,
+				therapyTypesResponse,
+				populationServedResponse,
+				ethnicitiesResponse,
+				languagesResponse,
+				facilityTypesResponse,
+			] = await Promise.all([
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.PAYORS,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.SPECIALTIES,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.THERAPY_TYPES,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.POPULATION_SERVED,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.ETHNICITIES,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.LANGUAGES,
+					})
+					.fetch(),
+				careResourceService
+					.getCareResourceTags({
+						careResourceTagGroupId: CARE_RESOURCE_TAG_GROUP_ID.FACILITY_TYPES,
+					})
+					.fetch(),
+			]);
 
-			setInsuranceOptions(response.careResourceTags);
+			return {
+				payorsResponse,
+				specialtiesResponse,
+				therapyTypesResponse,
+				populationServedResponse,
+				ethnicitiesResponse,
+				languagesResponse,
+				facilityTypesResponse,
+			};
 		} catch (error) {
-			handleError(error);
+			throw error;
 		}
-	}, [handleError]);
+	}, []);
 
 	const fetchData = useCallback(async () => {
 		try {
 			setIsLoading(true);
 
+			const megaFilterValuesAsSearchParams = formValues.megaFilter.reduce(
+				(accumulator, currentvalue) => ({
+					...accumulator,
+					...(currentvalue.value.length > 0 ? { [currentvalue.id]: currentvalue.value } : {}),
+				}),
+				{}
+			);
+
 			const distanceValue = formValues.distance?.value ?? 0;
 			const response = await careResourceService
 				.getCareResourceLocations({
-					...(formValues.orderBy && { orderBy: formValues.orderBy as 'NAME_ASC' }),
 					...(formValues.searchName && { searchQuery: formValues.searchName }),
 					...(distanceValue > 0 && { searchRadiusMiles: distanceValue }),
 					...(formValues.insurance.length > 0 && {
 						payorIds: formValues.insurance.map((i) => i.careResourceTagId),
 					}),
+					...(Object.values(megaFilterValuesAsSearchParams).length > 0 && megaFilterValuesAsSearchParams),
+					...(formValues.orderBy && { orderBy: formValues.orderBy as 'NAME_ASC' }),
 				})
 				.fetch();
 
@@ -128,24 +187,104 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 		fetchData();
 	}, [fetchData]);
 
-	const handleOnEnter = useCallback(() => {
+	const handleOnEnter = useCallback(async () => {
 		const targetDistanceOption = distanceOptions.find((d) => d.value === patientOrder.inPersonCareRadius);
 
-		setFormValues({
-			searchName: '',
-			address: patientOrder.patientAddress
-				? {
-						placeId: patientOrder.patientAddress.addressId,
-						text: `${patientOrder.patientAddress.streetAddress1}, ${patientOrder.patientAddress.locality}, ${patientOrder.patientAddress.region}`,
-				  }
-				: undefined,
-			orderBy: '',
-			distance: targetDistanceOption ? targetDistanceOption : undefined,
-			insurance: [],
-		});
-
-		fetchFilterData();
-	}, [fetchFilterData, patientOrder.inPersonCareRadius, patientOrder.patientAddress]);
+		try {
+			const filterData = await fetchFilterData();
+			setInsuranceOptions(filterData?.payorsResponse.careResourceTags);
+			setFormValues({
+				searchName: '',
+				address: patientOrder.patientAddress
+					? {
+							placeId: patientOrder.patientAddress.addressId,
+							text: `${patientOrder.patientAddress.streetAddress1}, ${patientOrder.patientAddress.locality}, ${patientOrder.patientAddress.region}`,
+					  }
+					: undefined,
+				orderBy: '',
+				distance: targetDistanceOption ? targetDistanceOption : undefined,
+				insurance: [],
+				megaFilter: [
+					{
+						id: 'specialtyIds',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Specialties',
+						value: [],
+						options: filterData.specialtiesResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'therapyTypeIds',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Therapy Types',
+						value: [],
+						options: filterData.therapyTypesResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'facilityType',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Facility Type',
+						value: [],
+						options: filterData.facilityTypesResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'wheelchairAccess',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Accessibility',
+						value: [],
+						options: [],
+					},
+					{
+						id: 'populationServedIds',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Population Served',
+						value: [],
+						options: filterData.populationServedResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'languageIds',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Languages Spoken',
+						value: [],
+						options: filterData.languagesResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'ethnicityIds',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Provider Ethnicity',
+						value: [],
+						options: filterData.ethnicitiesResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+					{
+						id: 'mega-filter--provider-faith',
+						filterType: FILTER_TYPE.CHECKBOX,
+						title: 'Provider Faith',
+						value: [],
+						options: [],
+					},
+				],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [fetchFilterData, handleError, patientOrder.inPersonCareRadius, patientOrder.patientAddress]);
 
 	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -267,6 +406,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 								}}
 							/>
 							<FilterDropdownV2
+								className="me-2"
 								id="insurance-filter"
 								title="Insurance"
 								optionIdKey="careResourceTagId"
@@ -277,6 +417,19 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 									setFormValues((previousValue) => ({
 										...previousValue,
 										insurance: newValue ? [newValue] : [],
+									}));
+								}}
+							/>
+							<MegaFilter
+								displayFilterIcon
+								displayDownArrow={false}
+								buttonTitle="More Filters"
+								modalTitle="Select Filters"
+								value={formValues.megaFilter}
+								onChange={(value) => {
+									setFormValues((previousValue) => ({
+										...previousValue,
+										megaFilter: value,
 									}));
 								}}
 							/>

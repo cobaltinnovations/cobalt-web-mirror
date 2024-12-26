@@ -174,8 +174,7 @@ export const careResourceService = {
 			careResourceLocations: CareResourceLocationModel[];
 		}>({
 			method: 'GET',
-			url: '/care-resources/locations',
-			params,
+			url: buildQueryParamUrl('/care-resources/locations', params),
 		});
 	},
 	addInternalNotes(data: { careResourceLocationId: string; internalNotes: string }) {
