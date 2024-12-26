@@ -4,22 +4,15 @@ import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 import { MhicPageHeader } from './mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import {
-	CARE_RESOURCE_TAG_GROUP_ID,
-	CareResourceLocationModel,
-	CareResourceTag,
-	PatientOrderModel,
-	PlaceModel,
-} from '@/lib/models';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, PatientOrderModel, PlaceModel } from '@/lib/models';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
-import FilterDropdownV2 from '@/components/filter-dropdown-v2';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { careResourceService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
 import { MhicCareResourceLocationDetails } from './mhic-care-resource-location-details';
-import MegaFilter, { Filter, FILTER_TYPE } from '@/components/mega-filter';
+import MegaFilter, { Filter, FILTER_TYPE, FilterOption, megaFilterValueAsSearchParams } from '@/components/mega-filter';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -28,43 +21,32 @@ interface Props extends OffcanvasProps {
 interface FormValues {
 	searchName: string;
 	address?: PlaceModel;
-	distance?: DistanceOption;
-	insurance: CareResourceTag[];
+	distance: Filter[];
+	insurance: Filter[];
 	megaFilter: Filter[];
 	orderBy: string;
 }
 
-interface DistanceOption {
-	distanceId: string;
-	title: string;
-	value: number;
-}
-
-const distanceOptions: DistanceOption[] = [
+const distanceOptions: FilterOption[] = [
 	{
-		distanceId: '5',
 		title: '5 miles',
-		value: 5,
+		value: '5',
 	},
 	{
-		distanceId: '10',
 		title: '10 miles',
-		value: 10,
+		value: '10',
 	},
 	{
-		distanceId: '15',
 		title: '15 miles',
-		value: 15,
+		value: '15',
 	},
 	{
-		distanceId: '20',
 		title: '20 miles',
-		value: 20,
+		value: '20',
 	},
 	{
-		distanceId: '25',
 		title: '25 miles',
-		value: 25,
+		value: '25',
 	},
 ];
 
@@ -78,13 +60,12 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	const [formValues, setFormValues] = useState<FormValues>({
 		searchName: '',
 		address: undefined,
-		distance: undefined,
+		distance: [],
 		insurance: [],
 		megaFilter: [],
 		orderBy: '',
 	});
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
-	const [insuranceOptions, setInsuranceOptions] = useState<CareResourceTag[]>([]);
 	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
 
 	const fetchFilterData = useCallback(async () => {
@@ -153,23 +134,12 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 		try {
 			setIsLoading(true);
 
-			const megaFilterValuesAsSearchParams = formValues.megaFilter.reduce(
-				(accumulator, currentvalue) => ({
-					...accumulator,
-					...(currentvalue.value.length > 0 ? { [currentvalue.id]: currentvalue.value } : {}),
-				}),
-				{}
-			);
-
-			const distanceValue = formValues.distance?.value ?? 0;
 			const response = await careResourceService
 				.getCareResourceLocations({
 					...(formValues.searchName && { searchQuery: formValues.searchName }),
-					...(distanceValue > 0 && { searchRadiusMiles: distanceValue }),
-					...(formValues.insurance.length > 0 && {
-						payorIds: formValues.insurance.map((i) => i.careResourceTagId),
-					}),
-					...(Object.values(megaFilterValuesAsSearchParams).length > 0 && megaFilterValuesAsSearchParams),
+					...megaFilterValueAsSearchParams(formValues.distance),
+					...megaFilterValueAsSearchParams(formValues.insurance),
+					...megaFilterValueAsSearchParams(formValues.megaFilter),
 					...(formValues.orderBy && { orderBy: formValues.orderBy as 'NAME_ASC' }),
 				})
 				.fetch();
@@ -188,11 +158,11 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	}, [fetchData]);
 
 	const handleOnEnter = useCallback(async () => {
-		const targetDistanceOption = distanceOptions.find((d) => d.value === patientOrder.inPersonCareRadius);
+		const targetDistanceOption = distanceOptions.find((d) => d.value === `${patientOrder.inPersonCareRadius}`);
 
 		try {
 			const filterData = await fetchFilterData();
-			setInsuranceOptions(filterData?.payorsResponse.careResourceTags);
+
 			setFormValues({
 				searchName: '',
 				address: patientOrder.patientAddress
@@ -202,8 +172,27 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 					  }
 					: undefined,
 				orderBy: '',
-				distance: targetDistanceOption ? targetDistanceOption : undefined,
-				insurance: [],
+				distance: [
+					{
+						id: 'searchRadiusMiles',
+						filterType: FILTER_TYPE.RADIO,
+						title: 'Distance',
+						value: targetDistanceOption ? [targetDistanceOption.value] : [],
+						options: distanceOptions,
+					},
+				],
+				insurance: [
+					{
+						id: 'payorIds',
+						filterType: FILTER_TYPE.RADIO,
+						title: 'Specialties',
+						value: [],
+						options: filterData.payorsResponse.careResourceTags.map((tag) => ({
+							value: tag.careResourceTagId,
+							title: tag.name,
+						})),
+					},
+				],
 				megaFilter: [
 					{
 						id: 'specialtyIds',
@@ -390,33 +379,30 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 									}));
 								}}
 							/>
-							<FilterDropdownV2
+							<MegaFilter
 								className="me-2"
-								id="distance-filter"
-								title="Distance"
-								optionIdKey="distanceId"
-								optionLabelKey="title"
-								options={distanceOptions}
+								allowCollapse={false}
+								displaySingleColumn={true}
+								buttonTitle="Distance"
+								modalTitle="Select Distance"
 								value={formValues.distance}
-								onChange={(newValue) => {
+								onChange={(value) => {
 									setFormValues((previousValue) => ({
 										...previousValue,
-										distance: newValue,
+										distance: value,
 									}));
 								}}
 							/>
-							<FilterDropdownV2
+							<MegaFilter
 								className="me-2"
-								id="insurance-filter"
-								title="Insurance"
-								optionIdKey="careResourceTagId"
-								optionLabelKey="name"
-								options={insuranceOptions}
-								value={formValues.insurance[0]}
-								onChange={(newValue) => {
+								allowCollapse={false}
+								buttonTitle="Insurance"
+								modalTitle="Select Insurance"
+								value={formValues.insurance}
+								onChange={(value) => {
 									setFormValues((previousValue) => ({
 										...previousValue,
-										insurance: newValue ? [newValue] : [],
+										insurance: value,
 									}));
 								}}
 							/>

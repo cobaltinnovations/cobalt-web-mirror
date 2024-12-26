@@ -336,4 +336,14 @@ const MegaFilterCollapse = ({
 	);
 };
 
+export const megaFilterValueAsSearchParams = (value: Filter[]) => {
+	return value.reduce(
+		(accumulator, currentvalue) => ({
+			...accumulator,
+			...(currentvalue.value.length > 0 ? { [currentvalue.id]: currentvalue.value } : {}),
+		}),
+		{}
+	);
+};
+
 export default MegaFilter;
