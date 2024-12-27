@@ -66,7 +66,11 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 						{mapsKey && (
 							<APIProvider apiKey={mapsKey}>
 								{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl) => (
-									<CareResourceAccordion careResourceLocation={crl} className="mb-4" />
+									<CareResourceAccordion
+										key={crl.resourcePacketCareResourceLocationId}
+										careResourceLocation={crl}
+										className="mb-4"
+									/>
 								))}
 							</APIProvider>
 						)}
