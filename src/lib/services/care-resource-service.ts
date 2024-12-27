@@ -4,6 +4,7 @@ import {
 	CareResourceModel,
 	CareResourceTag,
 	PlaceModel,
+	ResourcePacketModel,
 } from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons';
 import { buildQueryParamUrl } from '../utils';
@@ -198,6 +199,13 @@ export const careResourceService = {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
 			url: `/resource-packets/location/${resourcePacketCareResourceLocationId}`,
+		});
+	},
+	reorderCareResourceLocationPacket(resourcePacketCareResourceLocationId: string, data: { displayOrder: number }) {
+		return httpSingleton.orchestrateRequest<ResourcePacketModel>({
+			method: 'PUT',
+			url: `/resource-packets/location/${resourcePacketCareResourceLocationId}`,
+			data,
 		});
 	},
 };

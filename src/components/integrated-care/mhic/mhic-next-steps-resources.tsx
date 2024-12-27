@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
@@ -34,6 +34,9 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const [showCareResourceSearchModal, setShowCareResourceSearchModal] = useState(false);
 	const [showCareResourcePreviewModal, setShowCareResourcePreviewModal] = useState(false);
+
+	const [careResourceLocations, setCareResourceLocations] = useState<ResourcePacketLocation[]>([]);
+
 	const revalidator = useRevalidator();
 
 	const handleResourcesModalSave = useCallback(
@@ -44,17 +47,34 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		[revalidator]
 	);
 
-	const handleDragEnd = ({ source, destination, type }: DropResult) => {
+	// In order to not have the drag-n-drop jump around during API calls
+	// clone the packet into its own state
+	useEffect(() => {
+		setCareResourceLocations(patientOrder.resourcePacket?.careResourceLocations ?? []);
+	}, [patientOrder]);
+
+	const handleDragEnd = async ({ source, destination, type }: DropResult) => {
 		if (!destination) {
 			return;
 		}
 
-		const itemsClone = window.structuredClone(patientOrder.resourcePacket?.careResourceLocations ?? []);
+		const itemsClone = window.structuredClone(careResourceLocations);
 		const [removed] = (itemsClone ?? []).splice(source.index, 1);
 		(itemsClone ?? []).splice(destination.index, 0, removed);
 
-		// TODO: Api call to reorder
-		// setItems(itemsClone);
+		setCareResourceLocations(itemsClone);
+
+		try {
+			await careResourceService
+				.reorderCareResourceLocationPacket(removed.resourcePacketCareResourceLocationId, {
+					displayOrder: destination.index,
+				})
+				.fetch();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			revalidator.revalidate();
+		}
 	};
 
 	const handleMinusButtonClick = async (resourcePacketLocation: ResourcePacketLocation) => {
@@ -151,11 +171,9 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					<Card.Body className="p-0">
 						<div className="p-4">
 							<p className="m-0">
-								{(patientOrder.resourcePacket?.careResourceLocations ?? []).length} resource
-								{(patientOrder.resourcePacket?.careResourceLocations ?? []).length === 1
-									? ' is'
-									: 's are'}{' '}
-								currently available for the patient (drag to reorder)
+								{careResourceLocations.length} resource
+								{careResourceLocations.length === 1 ? ' is' : 's are'} currently available for the
+								patient (drag to reorder)
 							</p>
 						</div>
 						<DragDropContext onDragEnd={handleDragEnd}>
@@ -166,59 +184,54 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 										className="list-unstyled m-0"
 										{...droppableProvided.droppableProps}
 									>
-										{(patientOrder.resourcePacket?.careResourceLocations ?? []).map(
-											(crl, itemIndex) => (
-												<Draggable
-													key={crl.resourcePacketCareResourceLocationId}
-													draggableId={`care-resources-draggable-${crl.resourcePacketCareResourceLocationId}`}
-													index={itemIndex}
-												>
-													{(draggableProvided, itemDraggableSnapshot) => (
-														<li
-															ref={draggableProvided.innerRef}
-															className={classNames(
-																'bg-white d-flex align-items-center',
-																{
-																	'border-top': !itemDraggableSnapshot.isDragging,
-																	border: itemDraggableSnapshot.isDragging,
-																	'shadow-lg': itemDraggableSnapshot.isDragging,
-																	rounded: itemDraggableSnapshot.isDragging,
-																}
-															)}
-															{...draggableProvided.draggableProps}
+										{careResourceLocations.map((crl, itemIndex) => (
+											<Draggable
+												key={crl.resourcePacketCareResourceLocationId}
+												draggableId={`care-resources-draggable-${crl.resourcePacketCareResourceLocationId}`}
+												index={itemIndex}
+											>
+												{(draggableProvided, itemDraggableSnapshot) => (
+													<li
+														ref={draggableProvided.innerRef}
+														className={classNames('bg-white d-flex align-items-center', {
+															'border-top': !itemDraggableSnapshot.isDragging,
+															border: itemDraggableSnapshot.isDragging,
+															'shadow-lg': itemDraggableSnapshot.isDragging,
+															rounded: itemDraggableSnapshot.isDragging,
+														})}
+														{...draggableProvided.draggableProps}
+													>
+														<div
+															className="p-4 flex-shrink-0"
+															{...draggableProvided.dragHandleProps}
 														>
-															<div
-																className="p-4 flex-shrink-0"
-																{...draggableProvided.dragHandleProps}
+															<DragIndicator className="text-gray" />
+														</div>
+														<div className="py-4 flex-fill">
+															<span className="d-block">
+																{crl.careResourceLocationName} (
+																{crl.careResourceLocationName})
+															</span>
+															<span className="d-block text-gray">
+																Added {crl.addedDateDescription} by{' '}
+																{crl.addedByDisplayName}
+															</span>
+														</div>
+														<div className="p-4 flex-shrink-0">
+															<Button
+																variant="danger"
+																className="p-2"
+																onClick={() => {
+																	handleMinusButtonClick(crl);
+																}}
 															>
-																<DragIndicator className="text-gray" />
-															</div>
-															<div className="py-4 flex-fill">
-																<span className="d-block">
-																	{crl.careResourceLocationName} (
-																	{crl.careResourceLocationName})
-																</span>
-																<span className="d-block text-gray">
-																	Added {crl.addedDateDescription} by{' '}
-																	{crl.addedByDisplayName}
-																</span>
-															</div>
-															<div className="p-4 flex-shrink-0">
-																<Button
-																	variant="danger"
-																	className="p-2"
-																	onClick={() => {
-																		handleMinusButtonClick(crl);
-																	}}
-																>
-																	<MinusIcon className="d-flex" />
-																</Button>
-															</div>
-														</li>
-													)}
-												</Draggable>
-											)
-										)}
+																<MinusIcon className="d-flex" />
+															</Button>
+														</div>
+													</li>
+												)}
+											</Draggable>
+										))}
 										{droppableProvided.placeholder}
 									</ul>
 								)}
