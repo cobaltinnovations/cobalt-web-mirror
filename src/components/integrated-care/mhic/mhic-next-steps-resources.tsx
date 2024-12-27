@@ -4,7 +4,14 @@ import { Button, Card } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 
-import { PatientOrderModel, PatientOrderResourcingStatusId, ReferenceDataResponse } from '@/lib/models';
+import {
+	PatientOrderModel,
+	PatientOrderResourcingStatusId,
+	ReferenceDataResponse,
+	ResourcePacketLocation,
+} from '@/lib/models';
+import { careResourceService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import {
 	MhicCareResourcePreviewModal,
 	MhicCareResourceSearchModal,
@@ -23,6 +30,7 @@ interface Props {
 }
 
 export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, className }: Props) => {
+	const handleError = useHandleError();
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const [showCareResourceSearchModal, setShowCareResourceSearchModal] = useState(false);
 	const [showCareResourcePreviewModal, setShowCareResourcePreviewModal] = useState(false);
@@ -36,40 +44,31 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		[revalidator]
 	);
 
-	const [items, setItems] = useState([
-		{
-			itemId: '0',
-			resourceName: 'Merakay',
-			locationName: 'Malvern',
-			date: '1-1-24',
-			createdBy: 'MHIC',
-		},
-		{
-			itemId: '1',
-			resourceName: 'Merakay',
-			locationName: 'Brookhaven',
-			date: '1-1-24',
-			createdBy: 'MHIC',
-		},
-		{
-			itemId: '2',
-			resourceName: 'Merakay',
-			locationName: 'Havertown',
-			date: '1-1-24',
-			createdBy: 'MHIC',
-		},
-	]);
-
 	const handleDragEnd = ({ source, destination, type }: DropResult) => {
 		if (!destination) {
 			return;
 		}
 
-		const itemsClone = window.structuredClone(items);
+		const itemsClone = window.structuredClone(patientOrder.resourcePacket?.careResourceLocations ?? []);
 		const [removed] = (itemsClone ?? []).splice(source.index, 1);
 		(itemsClone ?? []).splice(destination.index, 0, removed);
 
-		setItems(itemsClone);
+		// TODO: Api call to reorder
+		// setItems(itemsClone);
+	};
+
+	const handleMinusButtonClick = async (resourcePacketLocation: ResourcePacketLocation) => {
+		try {
+			await careResourceService
+				.removeCareResourceLocationToPatientOrderResourcePacket(
+					resourcePacketLocation.resourcePacketCareResourceLocationId
+				)
+				.fetch();
+
+			revalidator.revalidate();
+		} catch (error) {
+			handleError(error);
+		}
 	};
 
 	return (
@@ -205,7 +204,13 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																</span>
 															</div>
 															<div className="p-4 flex-shrink-0">
-																<Button variant="danger" className="p-2">
+																<Button
+																	variant="danger"
+																	className="p-2"
+																	onClick={() => {
+																		handleMinusButtonClick(crl);
+																	}}
+																>
 																	<MinusIcon className="d-flex" />
 																</Button>
 															</div>
