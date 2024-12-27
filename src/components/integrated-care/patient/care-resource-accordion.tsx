@@ -83,16 +83,22 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 						<div className={classes.informationOuter}>
 							<div className="p-4">
 								<span className="mb-2 small text-gray">Address</span>
-								<span className="small">100 S. Broad Street, Suite 1304</span>
-								<span className="small">Philadelphia, PA 19110</span>
+								<span className="small">{careResourceLocation.address.streetAddress1}</span>
+								<span className="small">
+									{careResourceLocation.address.locality}, {careResourceLocation.address.region}{' '}
+									{careResourceLocation.address.postalCode}
+								</span>
 							</div>
 							<hr />
 							<div className="p-4">
 								<div className="mb-2">
 									<span className={classes.inlineTitle}>Phone:</span>
 									<span className="d-inline small">
-										<a className="text-decoration-none fw-normal" href="tel:+1 000-000-0000">
-											+1 000-000-0000
+										<a
+											className="text-decoration-none fw-normal"
+											href={`tel:${careResourceLocation.phoneNumber}`}
+										>
+											{careResourceLocation.formattedPhoneNumber}
 										</a>
 									</span>
 								</div>
@@ -109,11 +115,11 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 									<span className="d-inline small">
 										<a
 											className="text-decoration-none fw-normal"
-											href="http://www.website.com"
+											href={careResourceLocation.websiteUrl}
 											target="_blank"
 											rel="noreferrer"
 										>
-											www.website.com
+											{careResourceLocation.websiteUrl}
 										</a>
 									</span>
 								</div>
@@ -132,12 +138,20 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 							<Map
 								mapId={careResourceLocation.careResourceLocationId}
 								style={{ width: '100%', height: '100%' }}
-								defaultCenter={{ lat: 39.9526, lng: -75.1652 }}
+								defaultCenter={{
+									lat: careResourceLocation.address.latitude,
+									lng: careResourceLocation.address.longitude,
+								}}
 								defaultZoom={12}
 								gestureHandling="greedy"
 								disableDefaultUI={true}
 							>
-								<Marker position={{ lat: 39.9526, lng: -75.1652 }} />
+								<Marker
+									position={{
+										lat: careResourceLocation.address.latitude,
+										lng: careResourceLocation.address.longitude,
+									}}
+								/>
 							</Map>
 						</div>
 					</div>

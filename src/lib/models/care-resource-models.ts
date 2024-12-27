@@ -100,20 +100,41 @@ export interface PlaceModel {
 	text: string;
 }
 
+export interface ResourcePacketModel {
+	resourcePacketId: string;
+	careResourceLocations: ResourcePacketLocation[];
+}
+
 export interface ResourcePacketLocation {
 	addedByDisplayName: string;
 	addedDateDescription: string;
+	address: ResourcePacketAddress;
 	careResourceLocationId: string;
 	careResourceLocationName: string;
 	createdByAccountFirstName: string;
 	createdByAccountId: string;
 	createdByAccountLastName: string;
 	displayOrder: number;
+	formattedPhoneNumber: string;
+	phoneNumber: string;
 	resourcePacketCareResourceLocationId: string;
 	resourcePacketId: string;
+	websiteUrl: string;
 }
 
-export interface ResourcePacketModel {
-	resourcePacketId: string;
-	careResourceLocations: ResourcePacketLocation[];
+export interface ResourcePacketAddress {
+	addressId: string;
+	countryCode: string;
+	formattedAddress: string;
+	googleMapsUrl: string;
+	googlePlaceId: string;
+	latitude: number;
+	locality: string;
+	longitude: number;
+	postalCode: string;
+	postalCodeSuffix: string;
+	postalName: string;
+	region: string;
+	regionSubdivision: string;
+	streetAddress1: string;
 }
