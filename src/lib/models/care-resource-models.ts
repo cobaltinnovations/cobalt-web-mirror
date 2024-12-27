@@ -115,7 +115,9 @@ export interface ResourcePacketLocation {
 	createdByAccountId: string;
 	createdByAccountLastName: string;
 	displayOrder: number;
+	emailAddress: string;
 	formattedPhoneNumber: string;
+	notes: string;
 	phoneNumber: string;
 	resourcePacketCareResourceLocationId: string;
 	resourcePacketId: string;

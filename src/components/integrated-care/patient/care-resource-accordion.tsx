@@ -105,8 +105,11 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 								<div className="mb-2">
 									<span className={classes.inlineTitle}>Email:</span>
 									<span className="d-inline small">
-										<a className="text-decoration-none fw-normal" href="mailto:email@email.com">
-											email@email.com
+										<a
+											className="text-decoration-none fw-normal"
+											href={`mailto:${careResourceLocation.emailAddress}`}
+										>
+											{careResourceLocation.emailAddress}
 										</a>
 									</span>
 								</div>
@@ -127,11 +130,12 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 							<hr />
 							<div className="p-4">
 								<span className="mb-2 d-block small text-gray">Location Notes</span>
-								<span className="d-block small">
-									Lorem ipsum dolor sit amet consectetur. Porttitor sit bibendum sem nunc pulvinar
-									eget aliquam. Scelerisque pulvinar pretium tempus gravida sagittis sapien dui ipsum
-									nulla. Purus viverra cras fermentum elit augue sit feugiat integer.
-								</span>
+								<div
+									className="small"
+									dangerouslySetInnerHTML={{
+										__html: careResourceLocation.notes ?? '<p class="mb-0">No location notes.</p<',
+									}}
+								/>
 							</div>
 						</div>
 						<div className={classes.mapOuter}>
