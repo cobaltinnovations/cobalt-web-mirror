@@ -152,8 +152,11 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					<Card.Body className="p-0">
 						<div className="p-4">
 							<p className="m-0">
-								{items.length} resource{items.length === 1 ? ' is' : 's are'} currently available for
-								the patient (drag to reorder)
+								{(patientOrder.resourcePacket?.careResourceLocations ?? []).length} resource
+								{(patientOrder.resourcePacket?.careResourceLocations ?? []).length === 1
+									? ' is'
+									: 's are'}{' '}
+								currently available for the patient (drag to reorder)
 							</p>
 						</div>
 						<DragDropContext onDragEnd={handleDragEnd}>
@@ -164,46 +167,53 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 										className="list-unstyled m-0"
 										{...droppableProvided.droppableProps}
 									>
-										{items.map((item, itemIndex) => (
-											<Draggable
-												key={item.itemId}
-												draggableId={`care-resources-draggable-${item.itemId}`}
-												index={itemIndex}
-											>
-												{(draggableProvided, itemDraggableSnapshot) => (
-													<li
-														ref={draggableProvided.innerRef}
-														className={classNames('bg-white d-flex align-items-center', {
-															'border-top': !itemDraggableSnapshot.isDragging,
-															border: itemDraggableSnapshot.isDragging,
-															'shadow-lg': itemDraggableSnapshot.isDragging,
-															rounded: itemDraggableSnapshot.isDragging,
-														})}
-														{...draggableProvided.draggableProps}
-													>
-														<div
-															className="p-4 flex-shrink-0"
-															{...draggableProvided.dragHandleProps}
+										{(patientOrder.resourcePacket?.careResourceLocations ?? []).map(
+											(crl, itemIndex) => (
+												<Draggable
+													key={crl.resourcePacketCareResourceLocationId}
+													draggableId={`care-resources-draggable-${crl.resourcePacketCareResourceLocationId}`}
+													index={itemIndex}
+												>
+													{(draggableProvided, itemDraggableSnapshot) => (
+														<li
+															ref={draggableProvided.innerRef}
+															className={classNames(
+																'bg-white d-flex align-items-center',
+																{
+																	'border-top': !itemDraggableSnapshot.isDragging,
+																	border: itemDraggableSnapshot.isDragging,
+																	'shadow-lg': itemDraggableSnapshot.isDragging,
+																	rounded: itemDraggableSnapshot.isDragging,
+																}
+															)}
+															{...draggableProvided.draggableProps}
 														>
-															<DragIndicator className="text-gray" />
-														</div>
-														<div className="py-4 flex-fill">
-															<span className="d-block">
-																{item.resourceName} ({item.locationName})
-															</span>
-															<span className="d-block text-gray">
-																Add {item.date} by {item.createdBy}
-															</span>
-														</div>
-														<div className="p-4 flex-shrink-0">
-															<Button variant="danger" className="p-2">
-																<MinusIcon className="d-flex" />
-															</Button>
-														</div>
-													</li>
-												)}
-											</Draggable>
-										))}
+															<div
+																className="p-4 flex-shrink-0"
+																{...draggableProvided.dragHandleProps}
+															>
+																<DragIndicator className="text-gray" />
+															</div>
+															<div className="py-4 flex-fill">
+																<span className="d-block">
+																	{crl.careResourceLocationName} (
+																	{crl.careResourceLocationName})
+																</span>
+																<span className="d-block text-gray">
+																	Added {crl.addedDateDescription} by{' '}
+																	{crl.addedByDisplayName}
+																</span>
+															</div>
+															<div className="p-4 flex-shrink-0">
+																<Button variant="danger" className="p-2">
+																	<MinusIcon className="d-flex" />
+																</Button>
+															</div>
+														</li>
+													)}
+												</Draggable>
+											)
+										)}
 										{droppableProvided.placeholder}
 									</ul>
 								)}

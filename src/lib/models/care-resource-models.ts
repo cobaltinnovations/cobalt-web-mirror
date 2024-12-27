@@ -99,3 +99,21 @@ export interface PlaceModel {
 	placeId: string;
 	text: string;
 }
+
+export interface ResourcePacketLocation {
+	addedByDisplayName: string;
+	addedDateDescription: string;
+	careResourceLocationId: string;
+	careResourceLocationName: string;
+	createdByAccountFirstName: string;
+	createdByAccountId: string;
+	createdByAccountLastName: string;
+	displayOrder: number;
+	resourcePacketCareResourceLocationId: string;
+	resourcePacketId: string;
+}
+
+export interface ResourcePacketModel {
+	resourcePacketId: string;
+	careResourceLocations: ResourcePacketLocation[];
+}

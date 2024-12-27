@@ -184,4 +184,20 @@ export const careResourceService = {
 			data,
 		});
 	},
+	addCareResourceLocationToPatientOrderResourcePacket(data: {
+		resourcePacketId: string;
+		careResourceLocationId: string;
+	}) {
+		return httpSingleton.orchestrateRequest<{ resourcePacketCareResourceLocationId: string }>({
+			method: 'POST',
+			url: '/resource-packets/location',
+			data,
+		});
+	},
+	removeCareResourceLocationToPatientOrderResourcePacket(resourcePacketCareResourceLocationId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'DELETE',
+			url: `/resource-packets/location/${resourcePacketCareResourceLocationId}`,
+		});
+	},
 };

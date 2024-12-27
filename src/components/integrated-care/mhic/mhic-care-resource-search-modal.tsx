@@ -20,6 +20,7 @@ import MegaFilter, {
 	megaFilterValueAsSearchParams,
 } from '@/components/mega-filter';
 import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
+import { useRevalidator } from 'react-router-dom';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -74,6 +75,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	});
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
+	const revalidator = useRevalidator();
 
 	const fetchFilterData = useCallback(async () => {
 		try {
@@ -334,6 +336,51 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 		};
 	}, [handleKeydown]);
 
+	const handleAddButtonClick = async (careResourceLocation: CareResourceLocationModel) => {
+		try {
+			if (!patientOrder.resourcePacket) {
+				throw new Error('patientOrder does not require resources.');
+			}
+
+			await careResourceService
+				.addCareResourceLocationToPatientOrderResourcePacket({
+					resourcePacketId: patientOrder.resourcePacket.resourcePacketId,
+					careResourceLocationId: careResourceLocation.careResourceLocationId,
+				})
+				.fetch();
+
+			revalidator.revalidate();
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleRemoveButtonClick = async (careResourceLocation: CareResourceLocationModel) => {
+		try {
+			if (!patientOrder.resourcePacket) {
+				throw new Error('patientOrder does not require resources.');
+			}
+
+			const targetPacket = patientOrder.resourcePacket.careResourceLocations.find(
+				(crl) => crl.careResourceLocationId === careResourceLocation.careResourceLocationId
+			);
+
+			if (!targetPacket) {
+				throw new Error('targetPacket is undefined.');
+			}
+
+			await careResourceService
+				.removeCareResourceLocationToPatientOrderResourcePacket(
+					targetPacket.resourcePacketCareResourceLocationId
+				)
+				.fetch();
+
+			revalidator.revalidate();
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
 	return (
 		<>
 			<PreviewCanvas title="Available Resources" onEnter={handleOnEnter} {...props}>
@@ -505,7 +552,29 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 											[TODO]
 										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
-											<Button variant="outline-primary">Add</Button>
+											{patientOrder.resourcePacket?.careResourceLocations.some(
+												(crl) =>
+													crl.careResourceLocationId ===
+													careResourceLocation.careResourceLocationId
+											) ? (
+												<Button
+													variant="outline-danger"
+													onClick={() => {
+														handleRemoveButtonClick(careResourceLocation);
+													}}
+												>
+													Remove
+												</Button>
+											) : (
+												<Button
+													variant="outline-primary"
+													onClick={() => {
+														handleAddButtonClick(careResourceLocation);
+													}}
+												>
+													Add
+												</Button>
+											)}
 										</TableCell>
 									</TableRow>
 								))}
