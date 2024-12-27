@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Row, Col, OffcanvasProps } from 'react-bootstrap';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
-import { CareResourceLocationModel, PatientOrderModel } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
@@ -18,7 +18,6 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 	const { institution } = useAccount();
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
-	const [careResourceLocations, setCareResourceLocations] = useState<CareResourceLocationModel[]>([]);
 	const [mapsKey, setMapsKey] = useState('');
 
 	const fetchData = useCallback(async () => {
@@ -28,10 +27,8 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 			const response = await institutionService.getGoogleMapsApiKey(institution.institutionId).fetch();
 
 			setMapsKey(response.googleMapsPlatformApiKey);
-			setCareResourceLocations([]);
 		} catch (error) {
 			handleError(error);
-			setCareResourceLocations([]);
 			setMapsKey('');
 			props.onHide?.();
 		} finally {
@@ -68,7 +65,7 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 						</p>
 						{mapsKey && (
 							<APIProvider apiKey={mapsKey}>
-								{careResourceLocations.map((crl) => (
+								{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl) => (
 									<CareResourceAccordion careResourceLocation={crl} className="mb-4" />
 								))}
 							</APIProvider>

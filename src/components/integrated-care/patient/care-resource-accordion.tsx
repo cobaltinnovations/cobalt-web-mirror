@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
-import { CareResourceLocationModel } from '@/lib/models';
+import { ResourcePacketLocation } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	careResourceAccordion: {
@@ -42,7 +42,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface CareResourceAccordionProps {
-	careResourceLocation: CareResourceLocationModel;
+	careResourceLocation: ResourcePacketLocation;
 	className?: string;
 }
 
@@ -67,7 +67,7 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 					setShow(!show);
 				}}
 			>
-				Resource Name
+				{careResourceLocation.careResourceLocationName}
 				<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
 			</button>
 			<Collapse in={show} mountOnEnter unmountOnExit>
