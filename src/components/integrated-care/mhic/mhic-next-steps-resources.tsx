@@ -68,7 +68,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		try {
 			await careResourceService
 				.reorderCareResourceLocationPacket(removed.resourcePacketCareResourceLocationId, {
-					displayOrder: destination.index,
+					displayOrder: destination.index === 0 ? destination.index : destination.index + 1,
 				})
 				.fetch();
 		} catch (error) {
