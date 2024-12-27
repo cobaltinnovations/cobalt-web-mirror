@@ -53,7 +53,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		setCareResourceLocations(patientOrder.resourcePacket?.careResourceLocations ?? []);
 	}, [patientOrder]);
 
-	const handleDragEnd = async ({ source, destination, type }: DropResult) => {
+	const handleDragEnd = async ({ source, destination }: DropResult) => {
 		if (!destination) {
 			return;
 		}
@@ -62,6 +62,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		const [removed] = (itemsClone ?? []).splice(source.index, 1);
 		(itemsClone ?? []).splice(destination.index, 0, removed);
 
+		// Optimistically update UI so drag-n-drop feels fast/tight/responsive
 		setCareResourceLocations(itemsClone);
 
 		try {
@@ -73,6 +74,8 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 		} catch (error) {
 			handleError(error);
 		} finally {
+			// Revalidate after reorder call to get the "true" order from the backend
+			// This will automatically fire the useEffect above to update the internal drag-n-drop state
 			revalidator.revalidate();
 		}
 	};
