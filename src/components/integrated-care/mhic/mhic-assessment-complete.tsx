@@ -146,229 +146,221 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 				<title>Cobalt | Integrated Care - Assessment Results</title>
 			</Helmet>
 
-			<AsyncWrapper fetchData={fetchData}>
-				<Container className="py-10">
-					{patientOrder && (
-						<>
-							<Row className="mb-11">
-								<Col md={{ span: 10, offset: 1 }}>
-									<div className="d-flex align-items-center justify-content-between">
-										<h2 className="mb-0">Assessment Review</h2>
-										<div className="d-flex align-items-center">
-											<Button
-												className="me-2"
-												variant="outline-primary"
-												onClick={() => {
-													analyticsService.persistEvent(
-														AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT,
-														{
-															patientOrderId: patientOrder.patientOrderId,
-														}
-													);
+			<Container className="py-10">
+				{patientOrder && (
+					<>
+						<Row className="mb-11">
+							<Col md={{ span: 10, offset: 1 }}>
+								<div className="d-flex align-items-center justify-content-between">
+									<h2 className="mb-0">Assessment Review</h2>
+									<div className="d-flex align-items-center">
+										<Button
+											className="me-2"
+											variant="outline-primary"
+											onClick={() => {
+												analyticsService.persistEvent(
+													AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT,
+													{
+														patientOrderId: patientOrder.patientOrderId,
+													}
+												);
 
-													onStartNewAssessment();
-												}}
-												disabled={
-													patientOrder.patientOrderDispositionId !==
-													PatientOrderDispositionId.OPEN
-												}
-											>
-												Retake Assessment
-											</Button>
-											<Button
-												className="d-flex align-items-center"
-												onClick={handleExportResultsClick}
-												disabled={isExportingResults}
-											>
-												Export Results
-												<ExternalIcon className="ms-2" width={20} height={20} />
-											</Button>
-										</div>
+												onStartNewAssessment();
+											}}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
+											}
+										>
+											Retake Assessment
+										</Button>
+										<Button
+											className="d-flex align-items-center"
+											onClick={handleExportResultsClick}
+											disabled={isExportingResults}
+										>
+											Export Results
+											<ExternalIcon className="ms-2" width={20} height={20} />
+										</Button>
 									</div>
-									<p className="mb-0">
-										Completed{' '}
-										{patientOrder.screeningSession?.completedAtDescription ??
-											patientOrder.intakeScreeningSession?.completedAtDescription}{' '}
-										by{' '}
-										{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
-											patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
-									</p>
-								</Col>
-							</Row>
-							<Row className="mb-8">
-								<Col md={{ span: 10, offset: 1 }}>
-									<hr />
-								</Col>
-							</Row>
-							<Row>
-								<Col md={{ span: 7, offset: 1 }}>
-									<div className={classes.scrollAnchor} id="results" />
-									<div className="mb-8 d-flex align-items-center justify-content-between">
-										<h3 className="mb-0">Results</h3>
+								</div>
+								<p className="mb-0">
+									Completed{' '}
+									{patientOrder.screeningSession?.completedAtDescription ??
+										patientOrder.intakeScreeningSession?.completedAtDescription}{' '}
+									by{' '}
+									{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+										patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
+								</p>
+							</Col>
+						</Row>
+						<Row className="mb-8">
+							<Col md={{ span: 10, offset: 1 }}>
+								<hr />
+							</Col>
+						</Row>
+						<Row>
+							<Col md={{ span: 7, offset: 1 }}>
+								<div className={classes.scrollAnchor} id="results" />
+								<div className="mb-8 d-flex align-items-center justify-content-between">
+									<h3 className="mb-0">Results</h3>
 
-										{canFlagForSafetyPlanning && (
-											<MhicFlagOrderForSafetyPlanning
-												patientOrderId={patientOrder.patientOrderId}
+									{canFlagForSafetyPlanning && (
+										<MhicFlagOrderForSafetyPlanning patientOrderId={patientOrder.patientOrderId} />
+									)}
+								</div>
+								<MhicNextStepsAlerts
+									patientOrder={patientOrder}
+									referenceData={referenceDataResponse}
+									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								/>
+								<MhicTriageCard
+									className="mb-6"
+									patientOrder={patientOrder}
+									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								/>
+								<MhicNextStepsAppointment
+									className="mb-6"
+									patientOrder={patientOrder}
+									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								/>
+								<hr className="mb-8" />
+
+								<div className="mb-8">
+									<h3 className="mb-0">Resources</h3>
+								</div>
+								<MhicNextStepsResources
+									patientOrder={patientOrder}
+									referenceData={referenceDataResponse}
+									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								/>
+								<hr className="mb-8" />
+
+								{eligilityResults.length > 0 && (
+									<>
+										<div className={classes.scrollAnchor} id="eligibility" />
+										<h3 className="mb-8">Eligibility</h3>
+										{eligilityResults.map((screening) => (
+											<ScreeningResultCard
+												key={screening.screeningId}
+												screening={screening}
+												id={screening.screeningId}
 											/>
+										))}
+										<hr className="mb-8" />
+									</>
+								)}
+
+								{completedAssessmentsResults.length > 0 && (
+									<>
+										<div className={classes.scrollAnchor} id="completed-assessments" />
+										<h3 className="mb-8">Completed Assessments</h3>
+										{completedAssessmentsResults.map((screening) => (
+											<ScreeningResultCard
+												key={screening.screeningId}
+												screening={screening}
+												id={screening.screeningId}
+											/>
+										))}
+									</>
+								)}
+
+								<AsyncWrapper fetchData={fetchData}>
+									<>
+										{notTakenScreeningTypes.length > 0 && (
+											<>
+												<hr className="mb-8" />
+												<div className={classes.scrollAnchor} id="other-assessments" />
+												<h3 className="mb-2">Other Assessments</h3>
+												<p className="mb-8">
+													These assessments were not applicable to the patient.
+												</p>
+												{notTakenScreeningTypes.map((screeningType) => (
+													<ScreeningResultCard
+														key={screeningType.screeningTypeId}
+														screening={{
+															screeningVersionId: '',
+															screeningId: '',
+															screeningVersionNumber: 0,
+															screeningTypeId: screeningType.screeningTypeId,
+															screeningName: screeningType.description,
+															screeningScore: {
+																overallScore: undefined,
+																personalAccomplishmentScore: 0,
+																depersonalizationScore: 0,
+																emotionalExhaustionScore: 0,
+															},
+															belowScoringThreshold: undefined,
+														}}
+														id={screeningType.screeningTypeId}
+													/>
+												))}
+											</>
 										)}
-									</div>
-									<MhicNextStepsAlerts
-										patientOrder={patientOrder}
-										referenceData={referenceDataResponse}
-										disabled={
-											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
-										}
-									/>
-									<MhicTriageCard
-										className="mb-6"
-										patientOrder={patientOrder}
-										disabled={
-											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
-										}
-									/>
-									<MhicNextStepsAppointment
-										className="mb-6"
-										patientOrder={patientOrder}
-										disabled={
-											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
-										}
-									/>
-									<hr className="mb-8" />
-
-									<div className="mb-8">
-										<h3 className="mb-0">Resources</h3>
-									</div>
-									<MhicNextStepsResources
-										patientOrder={patientOrder}
-										referenceData={referenceDataResponse}
-										disabled={
-											patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
-										}
-									/>
-									<hr className="mb-8" />
-
-									{eligilityResults.length > 0 && (
-										<>
-											<div className={classes.scrollAnchor} id="eligibility" />
-											<h3 className="mb-8">Eligibility</h3>
-											{eligilityResults.map((screening) => (
-												<ScreeningResultCard
-													key={screening.screeningId}
-													screening={screening}
-													id={screening.screeningId}
-												/>
-											))}
-											<hr className="mb-8" />
-										</>
-									)}
-
-									{completedAssessmentsResults.length > 0 && (
-										<>
-											<div className={classes.scrollAnchor} id="completed-assessments" />
-											<h3 className="mb-8">Completed Assessments</h3>
-											{completedAssessmentsResults.map((screening) => (
-												<ScreeningResultCard
-													key={screening.screeningId}
-													screening={screening}
-													id={screening.screeningId}
-												/>
-											))}
-										</>
-									)}
-
-									{notTakenScreeningTypes.length > 0 && (
-										<>
-											<hr className="mb-8" />
-											<div className={classes.scrollAnchor} id="other-assessments" />
-											<h3 className="mb-2">Other Assessments</h3>
-											<p className="mb-8">
-												These assessments were not applicable to the patient.
-											</p>
-											{notTakenScreeningTypes.map((screeningType) => (
-												<ScreeningResultCard
-													key={screeningType.screeningTypeId}
-													screening={{
-														screeningVersionId: '',
-														screeningId: '',
-														screeningVersionNumber: 0,
-														screeningTypeId: screeningType.screeningTypeId,
-														screeningName: screeningType.description,
-														screeningScore: {
-															overallScore: undefined,
-															personalAccomplishmentScore: 0,
-															depersonalizationScore: 0,
-															emotionalExhaustionScore: 0,
-														},
-														belowScoringThreshold: undefined,
-													}}
-													id={screeningType.screeningTypeId}
-												/>
-											))}
-										</>
-									)}
-								</Col>
-								<Col md={{ span: 2, offset: 1 }}>
-									<TabBar
-										key="mhic-assessment-tabbar"
-										className="position-sticky"
-										style={{ top: MHIC_HEADER_HEIGHT + 32 }}
-										orientation="vertical"
-										value="RESULTS"
-										tabs={[
-											{
-												title: 'Results',
-												value: '#results',
-											},
-											...(eligilityResults.length > 0
-												? [
-														{
-															title: 'Eligibility',
-															value: '#eligibility',
-														},
-												  ]
-												: []),
-											...eligilityResults.map((result) => ({
-												title: result.screeningName ?? '',
-												value: result.screeningId ? `#${result.screeningId}` : '#',
-												level: 1,
-											})),
-											...(completedAssessmentsResults.length > 0
-												? [
-														{
-															title: 'Completed Assessments',
-															value: '#completed-assessments',
-														},
-												  ]
-												: []),
-											...completedAssessmentsResults.map((result) => ({
-												title: result.screeningName ?? '',
-												value: result.screeningId ? `#${result.screeningId}` : '#',
-												level: 1,
-											})),
-											...(notTakenScreeningTypes.length > 0
-												? [
-														{
-															title: 'Other Assessments',
-															value: '#other-assessments',
-														},
-												  ]
-												: []),
-											...notTakenScreeningTypes.map((result) => ({
-												title: result.description ?? '',
-												value: result.screeningTypeId ? `#${result.screeningTypeId}` : '#',
-												level: 1,
-											})),
-										]}
-										onTabClick={(value) => {
-											navigate(`${pathname}${value}`);
-										}}
-									/>
-								</Col>
-							</Row>
-						</>
-					)}
-				</Container>
-			</AsyncWrapper>
+									</>
+								</AsyncWrapper>
+							</Col>
+							<Col md={{ span: 2, offset: 1 }}>
+								<TabBar
+									key="mhic-assessment-tabbar"
+									className="position-sticky"
+									style={{ top: MHIC_HEADER_HEIGHT + 32 }}
+									orientation="vertical"
+									value="RESULTS"
+									tabs={[
+										{
+											title: 'Results',
+											value: '#results',
+										},
+										...(eligilityResults.length > 0
+											? [
+													{
+														title: 'Eligibility',
+														value: '#eligibility',
+													},
+											  ]
+											: []),
+										...eligilityResults.map((result) => ({
+											title: result.screeningName ?? '',
+											value: result.screeningId ? `#${result.screeningId}` : '#',
+											level: 1,
+										})),
+										...(completedAssessmentsResults.length > 0
+											? [
+													{
+														title: 'Completed Assessments',
+														value: '#completed-assessments',
+													},
+											  ]
+											: []),
+										...completedAssessmentsResults.map((result) => ({
+											title: result.screeningName ?? '',
+											value: result.screeningId ? `#${result.screeningId}` : '#',
+											level: 1,
+										})),
+										...(notTakenScreeningTypes.length > 0
+											? [
+													{
+														title: 'Other Assessments',
+														value: '#other-assessments',
+													},
+											  ]
+											: []),
+										...notTakenScreeningTypes.map((result) => ({
+											title: result.description ?? '',
+											value: result.screeningTypeId ? `#${result.screeningTypeId}` : '#',
+											level: 1,
+										})),
+									]}
+									onTabClick={(value) => {
+										navigate(`${pathname}${value}`);
+									}}
+								/>
+							</Col>
+						</Row>
+					</>
+				)}
+			</Container>
 		</>
 	);
 };

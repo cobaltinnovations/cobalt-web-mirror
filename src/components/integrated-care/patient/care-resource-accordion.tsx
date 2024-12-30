@@ -133,7 +133,7 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 								<div
 									className="small"
 									dangerouslySetInnerHTML={{
-										__html: careResourceLocation.notes ?? '<p class="mb-0">No location notes.</p<',
+										__html: careResourceLocation.notes ?? '<p class="mb-0">No location notes.</p>',
 									}}
 								/>
 							</div>
