@@ -245,14 +245,15 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 		'.cobalt-screening-button-group': {
 			'& input.btn-check': {
 				'& + label': {
-					paddingLeft: 15,
+					paddingLeft: 16,
 					cursor: 'pointer',
 
 					'& .checkmark-wrapper': {
-						height: 25,
 						width: 25,
-						border: `2px solid ${theme.colors.n300}`,
+						height: 25,
+						marginLeft: -8,
 						borderRadius: 500,
+						border: `2px solid ${theme.colors.n300}`,
 						'& svg': {
 							width: 20,
 							height: 20,
@@ -279,11 +280,23 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 			},
 
 			'& .cobalt-button': {
-				border: `1px solid ${theme.colors.border}`,
+				border: 0,
+				'&:after': {
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					content: '""',
+					position: 'absolute',
+					pointerEvents: 'none',
+					borderRadius: 'inherit',
+					border: `1px solid ${theme.colors.border}`,
+				},
 
 				'&:hover': {
-					padding: '9px 19px',
-					border: `2px solid ${theme.colors.p500}`,
+					'&:after': {
+						border: `2px solid ${theme.colors.p500}`,
+					},
 				},
 
 				'&.cobalt-button-light': {
@@ -294,8 +307,9 @@ export const screeningButtonGroup = (theme: CobaltTheme) => {
 				},
 
 				'&.cobalt-button-primary': {
-					borderColor: theme.colors.p500,
-
+					'&:after': {
+						border: `2px solid ${theme.colors.p500}`,
+					},
 					'&:hover': {
 						backgroundColor: theme.colors.p500,
 					},
