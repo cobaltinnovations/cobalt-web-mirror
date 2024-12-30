@@ -178,84 +178,25 @@ export const button = (theme: CobaltTheme) => {
 			/* Outline variants */
 			/* ----------------------------------------------------------- */
 			'&-outline-primary': {
-				color: theme.colors.p500,
-				backgroundColor: 'transparent',
-				'&:after': {
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					content: '""',
-					position: 'absolute',
-					pointerEvents: 'none',
-					borderRadius: 'inherit',
-					border: `2px solid ${theme.colors.p500}`,
-				},
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.p500,
-				},
-				'&:active': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.p700,
-				},
-				'&:disabled:after': {
-					border: `2px solid ${theme.colors.n500}`,
-				},
+				...outlineButton(theme.colors.p500, theme.colors.n0, theme.colors.p700),
 			},
 			'&-outline-secondary': {
-				color: theme.colors.a500,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.a500}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.a500,
-				},
+				...outlineButton(theme.colors.a500, theme.colors.n0, theme.colors.a700),
 			},
 			'&-outline-success': {
-				color: theme.colors.s500,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.s500}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.s500,
-				},
+				...outlineButton(theme.colors.s500, theme.colors.n0, theme.colors.s700),
 			},
 			'&-outline-danger': {
-				color: theme.colors.d500,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.d500}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.d500,
-				},
+				...outlineButton(theme.colors.d500, theme.colors.n0, theme.colors.d700),
 			},
 			'&-outline-warning': {
-				color: theme.colors.w500,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.w500}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.w500,
-				},
+				...outlineButton(theme.colors.w500, theme.colors.n0, theme.colors.w700),
 			},
 			'&-outline-info': {
-				color: theme.colors.i500,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.i500}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.i500,
-				},
+				...outlineButton(theme.colors.i500, theme.colors.n0, theme.colors.i700),
 			},
 			'&-outline-dark': {
-				color: theme.colors.n900,
-				backgroundColor: 'transparent',
-				border: `2px solid ${theme.colors.n900}`,
-				'&:hover': {
-					color: theme.colors.n0,
-					backgroundColor: theme.colors.n900,
-				},
+				...outlineButton(theme.colors.n900, theme.colors.n0, theme.colors.n900),
 			},
 			'&-outline-light': {
 				color: theme.colors.p500,
@@ -266,6 +207,35 @@ export const button = (theme: CobaltTheme) => {
 					backgroundColor: theme.colors.a500,
 				},
 			},
+		},
+	};
+};
+
+const outlineButton = (color: string, hoverTextColor: string, activeColor: string) => {
+	return {
+		color: color,
+		backgroundColor: 'transparent',
+		'&:after': {
+			top: 0,
+			left: 0,
+			right: 0,
+			bottom: 0,
+			content: '""',
+			position: 'absolute',
+			pointerEvents: 'none',
+			borderRadius: 'inherit',
+			border: `2px solid ${color}`,
+		},
+		'&:hover': {
+			color: hoverTextColor,
+			backgroundColor: color,
+		},
+		'&:active': {
+			color: hoverTextColor,
+			backgroundColor: activeColor,
+		},
+		'&:disabled:after': {
+			border: `2px solid ${color}`,
 		},
 	};
 };

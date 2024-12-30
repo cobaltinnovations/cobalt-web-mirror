@@ -351,6 +351,8 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 
 			revalidator.revalidate();
 		} catch (error) {
+			console.log(error);
+
 			handleError(error);
 		}
 	};
