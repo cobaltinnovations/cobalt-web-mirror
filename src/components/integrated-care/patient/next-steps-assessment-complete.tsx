@@ -162,9 +162,16 @@ export const NextStepsAssessmentComplete = ({
 								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 								provider.
 							</p>
-							{/* <CareResourceAccordion className="mb-4" />
-							<CareResourceAccordion className="mb-4" />
-							<CareResourceAccordion className="mb-10" /> */}
+							{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl, crlIndex) => {
+								const isLast =
+									crlIndex === (patientOrder.resourcePacket?.careResourceLocations ?? []).length - 1;
+								return (
+									<CareResourceAccordion
+										className={classNames({ 'mb-4': !isLast, 'mb-10': isLast })}
+										careResourceLocation={crl}
+									/>
+								);
+							})}
 						</>
 					)}
 				</>
