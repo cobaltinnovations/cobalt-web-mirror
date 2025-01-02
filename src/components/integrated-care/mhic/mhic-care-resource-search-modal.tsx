@@ -146,7 +146,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 			const response = await careResourceService
 				.getCareResourceLocations({
 					...(formValues.searchName && { searchQuery: formValues.searchName }),
-					...(formValues.address && { googlePlaceId: formValues.address.placeId }),
+					...(formValues.address && { addressId: formValues.address.placeId }),
 					...megaFilterValueAsSearchParams(formValues.distance),
 					...megaFilterValueAsSearchParams(formValues.insurance),
 					...megaFilterValueAsSearchParams(formValues.megaFilter),

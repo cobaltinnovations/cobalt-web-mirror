@@ -168,7 +168,7 @@ export const careResourceService = {
 		ethnicityIds?: string[];
 		languageIds?: string[];
 		facilityTypes?: string[];
-		googlePlaceId?: string;
+		addressId?: string;
 	}) {
 		return httpSingleton.orchestrateRequest<{
 			totalCountDescription: string;
