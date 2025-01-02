@@ -146,6 +146,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 			const response = await careResourceService
 				.getCareResourceLocations({
 					...(formValues.searchName && { searchQuery: formValues.searchName }),
+					...(formValues.address && { googlePlaceId: formValues.address.placeId }),
 					...megaFilterValueAsSearchParams(formValues.distance),
 					...megaFilterValueAsSearchParams(formValues.insurance),
 					...megaFilterValueAsSearchParams(formValues.megaFilter),
@@ -238,7 +239,12 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 						filterType: FILTER_TYPE.CHECKBOX,
 						title: 'Accessibility',
 						value: [],
-						options: [],
+						options: [
+							{
+								value: 'true',
+								title: 'Wheelchair Accessible',
+							},
+						],
 					},
 					{
 						id: 'populationServedIds',
@@ -270,13 +276,14 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 							title: tag.name,
 						})),
 					},
-					{
-						id: 'mega-filter--provider-faith',
-						filterType: FILTER_TYPE.CHECKBOX,
-						title: 'Provider Faith',
-						value: [],
-						options: [],
-					},
+					// Data does not support this yet.
+					// {
+					// 	id: 'mega-filter--provider-faith',
+					// 	filterType: FILTER_TYPE.CHECKBOX,
+					// 	title: 'Provider Faith',
+					// 	value: [],
+					// 	options: [],
+					// },
 				],
 			});
 		} catch (error) {

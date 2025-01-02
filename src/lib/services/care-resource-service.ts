@@ -154,8 +154,8 @@ export const careResourceService = {
 		});
 	},
 	getCareResourceLocations(params?: {
-		pageNumber?: string;
-		pageSize?: string;
+		pageNumber?: number;
+		pageSize?: number;
 		searchQuery?: string;
 		orderBy?: 'NAME_ASC' | 'NAME_DESC';
 		wheelchairAccess?: boolean;
@@ -167,7 +167,8 @@ export const careResourceService = {
 		genderIds?: string[];
 		ethnicityIds?: string[];
 		languageIds?: string[];
-		facilityType?: string[];
+		facilityTypes?: string[];
+		googlePlaceId?: string;
 	}) {
 		return httpSingleton.orchestrateRequest<{
 			totalCountDescription: string;
