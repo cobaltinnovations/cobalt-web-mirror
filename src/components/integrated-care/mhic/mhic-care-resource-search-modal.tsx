@@ -544,8 +544,14 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 													);
 												}}
 											>
-												{careResourceLocation.name}
+												{careResourceLocation.resourceName} ({careResourceLocation.name})
 											</Button>
+											<span>{careResourceLocation.address.streetAddress1}</span>
+											<span>
+												{careResourceLocation.address.locality},{' '}
+												{careResourceLocation.address.region}{' '}
+												{careResourceLocation.address.postalCode}
+											</span>
 										</TableCell>
 										<TableCell>
 											{careResourceLocation.payors.length > 0
