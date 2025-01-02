@@ -257,6 +257,7 @@ const ResourceLibraryTags = () => {
 											<>
 												<span className="me-2">Show resources for</span>
 												<MegaFilter
+													maxWidth={480}
 													displaySingleColumn
 													className="me-2"
 													allowCollapse={false}

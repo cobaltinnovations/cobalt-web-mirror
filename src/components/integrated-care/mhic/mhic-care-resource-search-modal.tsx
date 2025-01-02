@@ -443,6 +443,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 								}}
 							/>
 							<MegaFilter
+								maxWidth={480}
 								allowCollapse={false}
 								displayCount={false}
 								displaySingleColumn={true}
@@ -458,6 +459,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 							/>
 							<div className="vr mx-4" />
 							<MegaFilter
+								maxWidth={720}
 								className="me-2"
 								displayCount={false}
 								allowCollapse={false}
@@ -472,6 +474,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 								}}
 							/>
 							<MegaFilter
+								maxWidth={960}
 								displayFilterIcon
 								displayDownArrow={false}
 								buttonTitle="More Filters"
