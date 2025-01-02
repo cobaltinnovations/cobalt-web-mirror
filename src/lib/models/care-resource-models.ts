@@ -54,6 +54,7 @@ export interface CareResourceLocationModel {
 	facilityTypes: CareResourceTag[];
 	overridePayors: boolean;
 	overrideSpecialties: boolean;
+	distanceInMiles?: number;
 }
 
 export interface PayorModel {

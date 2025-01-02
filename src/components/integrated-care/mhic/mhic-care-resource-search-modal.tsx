@@ -567,7 +567,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 												: 'Not provided'}
 										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-start">
-											[TODO]
+											{careResourceLocation.distanceInMiles} miles
 										</TableCell>
 										<TableCell className="flex-row align-items-center justify-content-end">
 											{patientOrder.resourcePacket?.careResourceLocations.some(
