@@ -22,6 +22,7 @@ import MegaFilter, {
 } from '@/components/mega-filter';
 import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
 import useAccount from '@/hooks/use-account';
+import NoData from '@/components/no-data';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -557,6 +558,23 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 								</TableRow>
 							</TableHead>
 							<TableBody>
+								{careResourceLocations.length <= 0 && (
+									<TableRow>
+										<TableCell colSpan={5}>
+											<NoData
+												title="No Locations"
+												description="There are 0 locations matching your selections"
+												actions={[
+													{
+														variant: 'primary',
+														title: 'Reset Filters to Defaults',
+														onClick: handleOnEnter,
+													},
+												]}
+											/>
+										</TableCell>
+									</TableRow>
+								)}
 								{careResourceLocations.map((careResourceLocation) => (
 									<TableRow key={careResourceLocation.careResourceLocationId}>
 										<TableCell>
